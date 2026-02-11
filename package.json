@@ -1,6 +1,6 @@
 {
   "name": "simplix-react",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "private": true,
   "description": "Package-first React framework that auto-generates reusable domain packages from OpenAPI specs",
   "type": "module",
@@ -14,6 +14,8 @@
     "docs:api": "typedoc",
     "changeset": "changeset",
     "version-packages": "changeset version",
+    "sync-version": "node --input-type=module -e \"import{readFileSync,writeFileSync}from'fs';const v=JSON.parse(readFileSync('package.json','utf8')).version;const p='packages/simplix-react/package.json';const d=JSON.parse(readFileSync(p,'utf8'));d.version=v;writeFileSync(p,JSON.stringify(d,null,2)+'\\n');console.log('simplix-react version synced to '+v)\"",
+    "prerelease": "pnpm sync-version",
     "release": "turbo run build && changeset publish"
   },
   "devDependencies": {
