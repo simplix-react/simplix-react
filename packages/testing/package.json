@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react/testing",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Testing utilities for simplix-react applications",
   "type": "module",
   "exports": {
