@@ -1,0 +1,42 @@
+# simplix-react · Package-first React Framework
+
+> Define once. Derive everything.
+
+simplix-react is a package-first React framework that auto-generates reusable domain packages from OpenAPI specs. Define your API surface once with Zod schemas, and the framework derives type-safe HTTP clients, React Query hooks, MSW mock handlers, and i18n bundles automatically.
+
+## Docs
+
+### Getting Started
+- [Overview](https://raw.githubusercontent.com/simplix-react/simplix-react/main/docs/getting-started/overview.md): Framework architecture, core philosophy, and the define-once-derive-everything pipeline
+- [Installation](https://raw.githubusercontent.com/simplix-react/simplix-react/main/docs/getting-started/installation.md): Package installation, peer dependencies, and project setup instructions
+- [Quick Start](https://raw.githubusercontent.com/simplix-react/simplix-react/main/docs/getting-started/quick-start.md): Build a complete contract-driven feature with client, hooks, and mock backend in 5 minutes
+- [TypeScript](https://raw.githubusercontent.com/simplix-react/simplix-react/main/docs/getting-started/typescript.md): Recommended tsconfig settings, strict mode requirements, and Zod type inference patterns
+
+### Core Concepts
+- [API Contracts](https://raw.githubusercontent.com/simplix-react/simplix-react/main/docs/core-concepts/api-contracts.md): EntityDefinition, OperationDefinition, defineApi, and the contract-as-single-source-of-truth design
+- [Schema Derivation](https://raw.githubusercontent.com/simplix-react/simplix-react/main/docs/core-concepts/schema-derivation.md): The five-stage pipeline from defineApi through deriveClient, deriveQueryKeys, deriveHooks, and deriveMockHandlers
+- [Cache Invalidation](https://raw.githubusercontent.com/simplix-react/simplix-react/main/docs/core-concepts/cache-invalidation.md): Automatic query invalidation strategy, optimistic updates, and operation-level cache control
+- [Mock Data Layer](https://raw.githubusercontent.com/simplix-react/simplix-react/main/docs/core-concepts/mock-data-layer.md): MSW + PGlite architecture for in-browser PostgreSQL-backed mock APIs
+
+### Guides
+- [CLI Usage](https://raw.githubusercontent.com/simplix-react/simplix-react/main/docs/guides/cli-usage.md): Project scaffolding, domain/module generation, validation, i18n codegen, migrations, and OpenAPI import
+- [Custom Fetch](https://raw.githubusercontent.com/simplix-react/simplix-react/main/docs/guides/custom-fetch.md): Customize the HTTP layer for authentication, headers, interceptors, retry logic, and token refresh
+- [Custom Operations](https://raw.githubusercontent.com/simplix-react/simplix-react/main/docs/guides/custom-operations.md): Define non-CRUD endpoints (batch actions, RPC calls, file uploads) with OperationDefinition
+- [Defining Entities](https://raw.githubusercontent.com/simplix-react/simplix-react/main/docs/guides/defining-entities.md): Define type-safe CRUD entities with Zod schemas, register in contracts, and use derived clients
+- [Internationalization](https://raw.githubusercontent.com/simplix-react/simplix-react/main/docs/guides/internationalization.md): Multi-language setup with createI18nConfig, React hooks, module translations, and formatting
+- [Mock Handlers](https://raw.githubusercontent.com/simplix-react/simplix-react/main/docs/guides/mock-handlers.md): Derive MSW handlers from contracts, configure per-entity behavior, and add custom handlers
+- [Parent-Child Relationships](https://raw.githubusercontent.com/simplix-react/simplix-react/main/docs/guides/parent-child.md): Configure nested entity hierarchies with parent-scoped URLs, query keys, and hooks
+- [PGlite Repositories](https://raw.githubusercontent.com/simplix-react/simplix-react/main/docs/guides/pglite-repositories.md): Set up PGlite with migrations, seed data, migration helpers, and test cleanup
+- [Testing with Mocks](https://raw.githubusercontent.com/simplix-react/simplix-react/main/docs/guides/testing-with-mocks.md): Configure Vitest with test QueryClient, wrapper components, mock clients, and MSW integration
+
+### Tutorials
+- [Full-Stack Mock](https://raw.githubusercontent.com/simplix-react/simplix-react/main/docs/tutorials/full-stack-mock.md): Build a complete frontend app backed by in-browser PGlite and MSW with no backend server
+- [Project App](https://raw.githubusercontent.com/simplix-react/simplix-react/main/docs/tutorials/project-app.md): Build a project management app from scratch with CRUD for projects and parent-child tasks
+
+### Package References
+- [@simplix-react/contract](https://raw.githubusercontent.com/simplix-react/simplix-react/main/packages/contract/README.md): Zod-based type-safe API contract definitions with defineApi, deriveClient, and deriveQueryKeys
+- [@simplix-react/react](https://raw.githubusercontent.com/simplix-react/simplix-react/main/packages/react/README.md): Derives TanStack Query hooks (useList, useGet, useCreate, useUpdate, useDelete, useInfiniteList) from contracts
+- [@simplix-react/mock](https://raw.githubusercontent.com/simplix-react/simplix-react/main/packages/mock/README.md): Auto-generated MSW handlers and PGlite repositories with SQL utilities and migration helpers
+- [@simplix-react/i18n](https://raw.githubusercontent.com/simplix-react/simplix-react/main/packages/i18n/README.md): Internationalization framework with adapter pattern, i18next integration, and React bindings
+- [@simplix-react/testing](https://raw.githubusercontent.com/simplix-react/simplix-react/main/packages/testing/README.md): Testing utilities with pre-configured QueryClient, wrapper components, and in-memory mock clients
+- [@simplix-react/cli](https://raw.githubusercontent.com/simplix-react/simplix-react/main/packages/cli/README.md): CLI for project scaffolding, domain/module generation, validation, i18n codegen, and OpenAPI import

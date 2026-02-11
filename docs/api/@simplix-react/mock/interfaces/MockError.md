@@ -1,0 +1,47 @@
+[**Documentation**](../../../README.md)
+
+***
+
+[Documentation](../../../README.md) / [@simplix-react/mock](../README.md) / MockError
+
+# Interface: MockError
+
+Defined in: sql/error-mapping.ts:8
+
+Represents a mapped database error with an HTTP-friendly status code.
+
+Produced by [mapPgError](../functions/mapPgError.md) from raw PostgreSQL/PGlite exceptions.
+
+## See
+
+[mapPgError](../functions/mapPgError.md) - Creates instances from raw errors.
+
+## Properties
+
+### code
+
+> **code**: `string`
+
+Defined in: sql/error-mapping.ts:12
+
+A machine-readable error code (e.g. `"unique_violation"`, `"not_found"`).
+
+***
+
+### message
+
+> **message**: `string`
+
+Defined in: sql/error-mapping.ts:14
+
+A human-readable error description.
+
+***
+
+### status
+
+> **status**: `number`
+
+Defined in: sql/error-mapping.ts:10
+
+The HTTP status code corresponding to the error type.

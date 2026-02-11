@@ -1,0 +1,9 @@
+name: simplix-react
+description: Package-first React framework that auto-generates reusable domain packages from OpenAPI specs
+version: 1.0.0
+entry: simplix-react/SKILL.md
+references:
+  - simplix-react/references/api-patterns.md
+  - simplix-react/references/recipes.md
+  - simplix-react/references/configuration.md
+install: claude skill add https://raw.githubusercontent.com/simplix-react/simplix-react/main/skills/simplix-react.skill

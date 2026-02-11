@@ -1,0 +1,39 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPointStrategy": "packages",
+  "entryPoints": [
+    "packages/contract",
+    "packages/react",
+    "packages/mock",
+    "packages/i18n",
+    "packages/testing"
+  ],
+  "out": "docs/api",
+  "plugin": ["typedoc-plugin-markdown"],
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "excludeExternals": true,
+  "readme": "none",
+  "githubPages": false,
+  "hideGenerator": true,
+  "categoryOrder": ["Functions", "Types", "Classes", "Interfaces", "*"],
+  "kindSortOrder": [
+    "Function",
+    "Class",
+    "Interface",
+    "TypeAlias",
+    "Variable",
+    "Enum"
+  ],
+  "externalSymbolLinkMappings": {
+    "@tanstack/query-core": {
+      "QueryClient": "https://tanstack.com/query/latest/docs/reference/QueryClient"
+    },
+    "@tanstack/react-query": {
+      "QueryClientProvider": "https://tanstack.com/query/latest/docs/framework/react/reference/QueryClientProvider"
+    },
+    "@simplix-react/contract": {
+      "ApiContractConfig": "../@simplix-react/contract/interfaces/ApiContractConfig.md"
+    }
+  }
+}

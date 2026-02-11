@@ -1,0 +1,61 @@
+[**Documentation**](../../../README.md)
+
+***
+
+[Documentation](../../../README.md) / [@simplix-react/i18n](../README.md) / NumberFormatOptions
+
+# Interface: NumberFormatOptions
+
+Defined in: types.ts:106
+
+Configures number formatting options passed to `Intl.NumberFormat`.
+
+## Properties
+
+### currency?
+
+> `optional` **currency**: `string`
+
+Defined in: types.ts:110
+
+ISO 4217 currency code (required when `style` is `"currency"`).
+
+***
+
+### maximumFractionDigits?
+
+> `optional` **maximumFractionDigits**: `number`
+
+Defined in: types.ts:116
+
+Maximum number of fraction digits to display.
+
+***
+
+### minimumFractionDigits?
+
+> `optional` **minimumFractionDigits**: `number`
+
+Defined in: types.ts:114
+
+Minimum number of fraction digits to display.
+
+***
+
+### style?
+
+> `optional` **style**: [`NumberFormatStyle`](../type-aliases/NumberFormatStyle.md)
+
+Defined in: types.ts:108
+
+The number formatting style.
+
+***
+
+### unit?
+
+> `optional` **unit**: `string`
+
+Defined in: types.ts:112
+
+Unit identifier (required when `style` is `"unit"`).
