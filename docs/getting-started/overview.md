@@ -97,6 +97,7 @@ simplix-react is designed for React developers who:
 | --- | --- | --- |
 | `@simplix-react/contract` | `@simplix-react/contract` | Zod-based type-safe API contract definitions. Entry point for `defineApi`. |
 | `@simplix-react/react` | `@simplix-react/react` | Derives TanStack Query hooks from a contract via `deriveHooks`. |
+| `@simplix-react/form` | `@simplix-react/form` | TanStack Form hooks derived from contracts via `deriveFormHooks`. |
 | `@simplix-react/mock` | `@simplix-react/mock` | Generates MSW handlers and PGlite repositories from a contract. |
 | `@simplix-react/auth` | `@simplix-react/auth` | Authentication middleware with Bearer, API Key, OAuth2, and custom schemes. |
 | `@simplix-react/i18n` | `@simplix-react/i18n` | Internationalization framework built on i18next. |

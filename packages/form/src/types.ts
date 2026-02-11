@@ -1,12 +1,6 @@
 import type { z } from "zod";
 import type { AnyFormApi } from "@tanstack/react-form";
-import type { EntityDefinition } from "@simplix-react/contract";
 import type { EntityHooks } from "@simplix-react/react";
-
-// Shared internal type aliases — single source of truth (CLAUDE.md Critical Rule #2)
-
-/** Shorthand for an entity definition with any Zod schema types. */
-export type AnyEntityDef = EntityDefinition<z.ZodTypeAny, z.ZodTypeAny, z.ZodTypeAny>;
 
 /** Shorthand for entity hooks with any Zod schema types. */
 export type AnyEntityHooks = EntityHooks<z.ZodTypeAny, z.ZodTypeAny, z.ZodTypeAny>;

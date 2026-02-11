@@ -3,6 +3,7 @@
   "version": "0.0.2",
   "description": "Internationalization framework with i18next adapter",
   "type": "module",
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

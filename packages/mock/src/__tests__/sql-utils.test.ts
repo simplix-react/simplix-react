@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { toCamelCase, toSnakeCase, mapRow, mapRows } from "../sql/row-mapping.js";
+import { camelToSnake } from "@simplix-react/contract";
+import { toCamelCase, mapRow, mapRows } from "../sql/row-mapping.js";
 import { buildSetClause } from "../sql/query-building.js";
 import { mapPgError } from "../sql/error-mapping.js";
 
@@ -18,14 +19,14 @@ describe("toCamelCase", () => {
   });
 });
 
-describe("toSnakeCase", () => {
+describe("camelToSnake", () => {
   it("converts camelCase to snake_case", () => {
-    expect(toSnakeCase("createdAt")).toBe("created_at");
-    expect(toSnakeCase("topologyId")).toBe("topology_id");
+    expect(camelToSnake("createdAt")).toBe("created_at");
+    expect(camelToSnake("topologyId")).toBe("topology_id");
   });
 
   it("handles single word", () => {
-    expect(toSnakeCase("name")).toBe("name");
+    expect(camelToSnake("name")).toBe("name");
   });
 });
 

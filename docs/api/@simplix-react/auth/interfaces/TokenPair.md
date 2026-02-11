@@ -6,7 +6,7 @@
 
 # Interface: TokenPair
 
-Defined in: packages/auth/src/types.ts:60
+Defined in: [packages/auth/src/types.ts:60](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L60)
 
 Represents an access/refresh token pair returned from an auth endpoint.
 
@@ -16,7 +16,7 @@ Represents an access/refresh token pair returned from an auth endpoint.
 
 > **accessToken**: `string`
 
-Defined in: packages/auth/src/types.ts:61
+Defined in: [packages/auth/src/types.ts:61](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L61)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: packages/auth/src/types.ts:61
 
 > `optional` **expiresIn**: `number`
 
-Defined in: packages/auth/src/types.ts:64
+Defined in: [packages/auth/src/types.ts:64](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L64)
 
 Token validity duration in seconds.
 
@@ -34,4 +34,4 @@ Token validity duration in seconds.
 
 > `optional` **refreshToken**: `string`
 
-Defined in: packages/auth/src/types.ts:62
+Defined in: [packages/auth/src/types.ts:62](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L62)

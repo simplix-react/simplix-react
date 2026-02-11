@@ -26,7 +26,7 @@ export function buildPath(
 ): string {
   let result = template;
   for (const [key, value] of Object.entries(params)) {
-    result = result.replace(`:${key}`, encodeURIComponent(value));
+    result = result.replaceAll(`:${key}`, encodeURIComponent(value));
   }
   return result;
 }

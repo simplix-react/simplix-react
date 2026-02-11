@@ -6,7 +6,7 @@
 
 # Interface: BearerSchemeOptions
 
-Defined in: packages/auth/src/types.ts:122
+Defined in: [packages/auth/src/types.ts:122](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L122)
 
 Options for [bearerScheme](../functions/bearerScheme.md).
 
@@ -16,7 +16,7 @@ Options for [bearerScheme](../functions/bearerScheme.md).
 
 > `optional` **refresh**: `object`
 
-Defined in: packages/auth/src/types.ts:133
+Defined in: [packages/auth/src/types.ts:133](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L133)
 
 Optional refresh configuration.
 
@@ -42,7 +42,7 @@ Async function that returns a fresh token pair.
 
 > **store**: [`TokenStore`](TokenStore.md)
 
-Defined in: packages/auth/src/types.ts:124
+Defined in: [packages/auth/src/types.ts:124](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L124)
 
 Token store for persisting access and refresh tokens.
 
@@ -52,7 +52,7 @@ Token store for persisting access and refresh tokens.
 
 > **token**: `string` \| () => `string` \| `null`
 
-Defined in: packages/auth/src/types.ts:130
+Defined in: [packages/auth/src/types.ts:130](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L130)
 
 Static token string or function returning the current access token.
 If a function, called on each request.

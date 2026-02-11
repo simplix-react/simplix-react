@@ -1,9 +1,6 @@
-import type { AuthScheme, BearerSchemeOptions, TokenPair } from "../types.js";
+import type { AuthScheme, BearerSchemeOptions } from "../types.js";
 import { AuthError } from "../errors.js";
-
-const ACCESS_TOKEN_KEY = "access_token";
-const REFRESH_TOKEN_KEY = "refresh_token";
-const EXPIRES_AT_KEY = "expires_at";
+import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, EXPIRES_AT_KEY, storeTokenPair } from "../helpers/token-storage.js";
 
 /**
  * Creates a Bearer token {@link AuthScheme}.
@@ -48,19 +45,6 @@ export function bearerScheme(options: BearerSchemeOptions): AuthScheme {
     return Date.now() >= expiresAtMs - bufferMs;
   }
 
-  function storeTokenPair(pair: TokenPair): void {
-    store.set(ACCESS_TOKEN_KEY, pair.accessToken);
-
-    if (pair.refreshToken) {
-      store.set(REFRESH_TOKEN_KEY, pair.refreshToken);
-    }
-
-    if (pair.expiresIn) {
-      const expiresAt = Date.now() + pair.expiresIn * 1000;
-      store.set(EXPIRES_AT_KEY, String(expiresAt));
-    }
-  }
-
   return {
     name: "bearer",
 
@@ -68,7 +52,7 @@ export function bearerScheme(options: BearerSchemeOptions): AuthScheme {
       if (refresh && isExpiringSoon()) {
         try {
           const pair = await refresh.refreshFn();
-          storeTokenPair(pair);
+          storeTokenPair(store, pair);
         } catch {
           // Proactive refresh failed; proceed with current token
         }
@@ -89,7 +73,7 @@ export function bearerScheme(options: BearerSchemeOptions): AuthScheme {
       }
 
       const pair = await refresh.refreshFn();
-      storeTokenPair(pair);
+      storeTokenPair(store, pair);
     },
 
     isAuthenticated() {

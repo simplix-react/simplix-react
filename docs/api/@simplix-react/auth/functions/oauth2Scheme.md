@@ -8,7 +8,7 @@
 
 > **oauth2Scheme**(`options`): [`AuthScheme`](../interfaces/AuthScheme.md)
 
-Defined in: packages/auth/src/schemes/oauth2-scheme.ts:25
+Defined in: [packages/auth/src/schemes/oauth2-scheme.ts:22](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/schemes/oauth2-scheme.ts#L22)
 
 Creates an OAuth2 refresh_token grant [AuthScheme](../interfaces/AuthScheme.md).
 

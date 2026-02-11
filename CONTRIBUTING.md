@@ -4,8 +4,8 @@ Thank you for your interest in contributing to simplix-react. This guide covers 
 
 ## Prerequisites
 
-- **Node.js** >= 20
-- **pnpm** 10.x
+- **Node.js** 18 or later
+- **pnpm** 9 or later
 - **TypeScript** 5.9+
 
 ## Getting Started

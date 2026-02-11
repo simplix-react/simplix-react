@@ -68,12 +68,16 @@ export async function defaultFetch<T>(
   path: string,
   options?: RequestInit,
 ): Promise<T> {
+  const method = options?.method?.toUpperCase();
+  const hasBody = method === "POST" || method === "PUT" || method === "PATCH";
+  const headers: Record<string, string> = {
+    ...(hasBody ? { "Content-Type": "application/json" } : {}),
+    ...(options?.headers as Record<string, string>),
+  };
+
   const res = await fetch(path, {
     ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options?.headers,
-    },
+    headers,
   });
 
   if (!res.ok) {

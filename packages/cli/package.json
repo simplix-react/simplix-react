@@ -3,6 +3,7 @@
   "version": "0.0.4",
   "description": "CLI for scaffolding and validating simplix-react projects",
   "type": "module",
+  "sideEffects": false,
   "bin": {
     "simplix": "./dist/bin.js"
   },
@@ -27,6 +28,7 @@
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
+    "@simplix-react/contract": "workspace:*",
     "commander": "^13.1.0",
     "handlebars": "^4.7.8",
     "jiti": "^2.4.2",

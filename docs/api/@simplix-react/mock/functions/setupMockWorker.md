@@ -8,7 +8,7 @@
 
 > **setupMockWorker**(`config`): `Promise`\<`void`\>
 
-Defined in: [msw.ts:90](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/mock/src/msw.ts#L90)
+Defined in: [msw.ts:90](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/mock/src/msw.ts#L90)
 
 Bootstraps a complete mock environment with PGlite and MSW.
 

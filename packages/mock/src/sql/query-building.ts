@@ -1,4 +1,4 @@
-import { toSnakeCase } from "./row-mapping.js";
+import { camelToSnake } from "@simplix-react/contract";
 
 /**
  * Represents the result of {@link buildSetClause}.
@@ -57,7 +57,7 @@ export function buildSetClause<T extends object>(
   for (const [key, value] of Object.entries(input)) {
     if (value === undefined) continue;
 
-    const column = toSnakeCase(key);
+    const column = camelToSnake(key);
 
     if (typeof value === "object" && value !== null && !(value instanceof Date)) {
       // JSON fields

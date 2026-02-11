@@ -3,6 +3,7 @@
   "version": "0.0.2",
   "description": "Auto-generated MSW handlers and PGlite repositories from @simplix-react/contract",
   "type": "module",
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

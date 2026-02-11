@@ -6,7 +6,7 @@
 
 # Interface: TokenStore
 
-Defined in: packages/auth/src/types.ts:48
+Defined in: [packages/auth/src/types.ts:48](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L48)
 
 Abstraction over key-value storage for tokens.
 
@@ -22,7 +22,7 @@ Abstraction over key-value storage for tokens.
 
 > **clear**(): `void`
 
-Defined in: packages/auth/src/types.ts:52
+Defined in: [packages/auth/src/types.ts:52](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L52)
 
 #### Returns
 
@@ -34,7 +34,7 @@ Defined in: packages/auth/src/types.ts:52
 
 > **get**(`key`): `string` \| `null`
 
-Defined in: packages/auth/src/types.ts:49
+Defined in: [packages/auth/src/types.ts:49](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L49)
 
 #### Parameters
 
@@ -52,7 +52,7 @@ Defined in: packages/auth/src/types.ts:49
 
 > **remove**(`key`): `void`
 
-Defined in: packages/auth/src/types.ts:51
+Defined in: [packages/auth/src/types.ts:51](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L51)
 
 #### Parameters
 
@@ -70,7 +70,7 @@ Defined in: packages/auth/src/types.ts:51
 
 > **set**(`key`, `value`): `void`
 
-Defined in: packages/auth/src/types.ts:50
+Defined in: [packages/auth/src/types.ts:50](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L50)
 
 #### Parameters
 

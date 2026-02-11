@@ -28,7 +28,7 @@ Peer dependencies:
 ## Quick Example
 
 ```ts
-import { defineContract } from "@simplix-react/contract";
+import { defineApi, simpleQueryBuilder } from "@simplix-react/contract";
 import {
   setupMockWorker,
   deriveMockHandlers,
@@ -37,7 +37,7 @@ import {
 import { z } from "zod";
 
 // 1. Define your contract
-const projectContract = defineContract({
+const projectContract = defineApi({
   domain: "project",
   basePath: "/api",
   entities: {
@@ -47,12 +47,13 @@ const projectContract = defineContract({
         id: z.string(),
         title: z.string(),
         status: z.enum(["todo", "done"]),
-        createdAt: z.date(),
+        createdAt: z.string(),
       }),
       createSchema: z.object({ title: z.string() }),
       updateSchema: z.object({ status: z.enum(["todo", "done"]).optional() }),
     },
   },
+  queryBuilder: simpleQueryBuilder,
 });
 
 // 2. Derive handlers and bootstrap
@@ -339,4 +340,3 @@ describe("task repository", () => {
 - [setupMockWorker](functions/setupMockWorker.md)
 - [tableExists](functions/tableExists.md)
 - [toCamelCase](functions/toCamelCase.md)
-- [toSnakeCase](functions/toSnakeCase.md)

@@ -6,8 +6,8 @@
 
 ## Prerequisites
 
-- Node.js >= 20
-- pnpm >= 9
+- Node.js 18 or later
+- pnpm 9 or later
 - `@simplix-react/cli` installed globally or via npx
 
 ```bash
@@ -348,4 +348,4 @@ simplix openapi ──> Zod Schemas (schemas.ts)
 
 - [Build a Full-Stack Mock Application](./full-stack-mock.md) — use the
   generated hooks and mock handlers in a React application
-- [CLI Reference](../api/cli.md) — explore all available CLI commands and flags
+- [CLI Reference](../guides/cli-usage.md) — explore all available CLI commands and flags

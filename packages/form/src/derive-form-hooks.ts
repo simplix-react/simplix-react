@@ -1,7 +1,7 @@
 import type { z } from "zod";
-import type { ApiContractConfig } from "@simplix-react/contract";
+import type { AnyEntityDef, ApiContractConfig } from "@simplix-react/contract";
 import type { EntityHooks } from "@simplix-react/react";
-import type { AnyEntityDef, EntityFormHooks } from "./types.js";
+import type { EntityFormHooks } from "./types.js";
 import { createEntityFormHooks } from "./create-entity-form-hooks.js";
 
 /**

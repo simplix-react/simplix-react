@@ -6,7 +6,7 @@
 
 # Interface: ListParams\<TFilters\>
 
-Defined in: [packages/contract/src/helpers/query-types.ts:59](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/contract/src/helpers/query-types.ts#L59)
+Defined in: [packages/contract/src/helpers/query-types.ts:59](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/contract/src/helpers/query-types.ts#L59)
 
 Encapsulates all list query parameters: filters, sorting, and pagination.
 
@@ -41,7 +41,7 @@ Shape of the filter object, defaults to `Record<string, unknown>`.
 
 > `optional` **filters**: `TFilters`
 
-Defined in: [packages/contract/src/helpers/query-types.ts:61](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/contract/src/helpers/query-types.ts#L61)
+Defined in: [packages/contract/src/helpers/query-types.ts:61](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/contract/src/helpers/query-types.ts#L61)
 
 Optional filter criteria applied to the list query.
 
@@ -51,7 +51,7 @@ Optional filter criteria applied to the list query.
 
 > `optional` **pagination**: [`PaginationParam`](../type-aliases/PaginationParam.md)
 
-Defined in: [packages/contract/src/helpers/query-types.ts:65](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/contract/src/helpers/query-types.ts#L65)
+Defined in: [packages/contract/src/helpers/query-types.ts:65](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/contract/src/helpers/query-types.ts#L65)
 
 Pagination strategy and parameters.
 
@@ -61,6 +61,6 @@ Pagination strategy and parameters.
 
 > `optional` **sort**: [`SortParam`](SortParam.md) \| [`SortParam`](SortParam.md)[]
 
-Defined in: [packages/contract/src/helpers/query-types.ts:63](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/contract/src/helpers/query-types.ts#L63)
+Defined in: [packages/contract/src/helpers/query-types.ts:63](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/contract/src/helpers/query-types.ts#L63)
 
 Single sort directive or array of sort directives.

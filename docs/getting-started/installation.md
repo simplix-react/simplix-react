@@ -6,8 +6,8 @@ Before installing simplix-react, ensure you have the following:
 
 | Requirement | Version | Check Command |
 | --- | --- | --- |
-| Node.js | >= 20.0.0 | `node --version` |
-| pnpm | >= 10.x | `pnpm --version` |
+| Node.js | >= 18.0.0 | `node --version` |
+| pnpm | >= 9.0.0 | `pnpm --version` |
 
 If you do not have pnpm installed:
 

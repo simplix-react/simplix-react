@@ -20,7 +20,7 @@ Or install globally:
 pnpm add -g @simplix-react/cli
 ```
 
-Requires **Node.js >= 20.0.0**.
+Requires **Node.js 18 or later**.
 
 ## Quick Start
 

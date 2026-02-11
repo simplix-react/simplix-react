@@ -8,7 +8,7 @@
 
 > **createI18nConfig**(`options`): [`I18nConfigResult`](../interfaces/I18nConfigResult.md)
 
-Defined in: [create-i18n-config.ts:68](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/i18n/src/create-i18n-config.ts#L68)
+Defined in: [create-i18n-config.ts:68](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/create-i18n-config.ts#L68)
 
 Creates and initializes an i18n configuration with an [I18nextAdapter](../classes/I18nextAdapter.md).
 

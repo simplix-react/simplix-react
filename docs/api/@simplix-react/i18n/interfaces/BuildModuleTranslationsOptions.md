@@ -6,7 +6,7 @@
 
 # Interface: BuildModuleTranslationsOptions
 
-Defined in: [module-translations.ts:23](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/i18n/src/module-translations.ts#L23)
+Defined in: [module-translations.ts:23](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/module-translations.ts#L23)
 
 Configures the [buildModuleTranslations](../functions/buildModuleTranslations.md) function.
 
@@ -16,7 +16,7 @@ Configures the [buildModuleTranslations](../functions/buildModuleTranslations.md
 
 > **components**: `Record`\<`string`, [`ComponentTranslations`](ComponentTranslations.md)\>
 
-Defined in: [module-translations.ts:29](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/i18n/src/module-translations.ts#L29)
+Defined in: [module-translations.ts:29](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/module-translations.ts#L29)
 
 Map of component paths to their locale-specific translation loaders.
 
@@ -26,7 +26,7 @@ Map of component paths to their locale-specific translation loaders.
 
 > **locales**: `string`[]
 
-Defined in: [module-translations.ts:27](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/i18n/src/module-translations.ts#L27)
+Defined in: [module-translations.ts:27](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/module-translations.ts#L27)
 
 List of supported locale codes.
 
@@ -36,6 +36,6 @@ List of supported locale codes.
 
 > **namespace**: `string`
 
-Defined in: [module-translations.ts:25](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/i18n/src/module-translations.ts#L25)
+Defined in: [module-translations.ts:25](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/module-translations.ts#L25)
 
 Namespace prefix for all component translations in this module.

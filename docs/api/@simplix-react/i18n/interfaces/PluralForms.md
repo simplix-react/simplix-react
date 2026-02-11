@@ -6,7 +6,7 @@
 
 # Interface: PluralForms
 
-Defined in: [types.ts:82](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/i18n/src/types.ts#L82)
+Defined in: [types.ts:82](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/types.ts#L82)
 
 Defines plural form strings following the CLDR plural rules.
 
@@ -20,7 +20,7 @@ Defines plural form strings following the CLDR plural rules.
 
 > `optional` **few**: `string`
 
-Defined in: [types.ts:86](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/i18n/src/types.ts#L86)
+Defined in: [types.ts:86](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/types.ts#L86)
 
 ***
 
@@ -28,7 +28,7 @@ Defined in: [types.ts:86](https://github.com/simplix-react/simplix-react/blob/65
 
 > `optional` **many**: `string`
 
-Defined in: [types.ts:87](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/i18n/src/types.ts#L87)
+Defined in: [types.ts:87](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/types.ts#L87)
 
 ***
 
@@ -36,7 +36,7 @@ Defined in: [types.ts:87](https://github.com/simplix-react/simplix-react/blob/65
 
 > **one**: `string`
 
-Defined in: [types.ts:84](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/i18n/src/types.ts#L84)
+Defined in: [types.ts:84](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/types.ts#L84)
 
 ***
 
@@ -44,7 +44,7 @@ Defined in: [types.ts:84](https://github.com/simplix-react/simplix-react/blob/65
 
 > **other**: `string`
 
-Defined in: [types.ts:88](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/i18n/src/types.ts#L88)
+Defined in: [types.ts:88](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/types.ts#L88)
 
 ***
 
@@ -52,7 +52,7 @@ Defined in: [types.ts:88](https://github.com/simplix-react/simplix-react/blob/65
 
 > `optional` **two**: `string`
 
-Defined in: [types.ts:85](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/i18n/src/types.ts#L85)
+Defined in: [types.ts:85](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/types.ts#L85)
 
 ***
 
@@ -60,4 +60,4 @@ Defined in: [types.ts:85](https://github.com/simplix-react/simplix-react/blob/65
 
 > `optional` **zero**: `string`
 
-Defined in: [types.ts:83](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/i18n/src/types.ts#L83)
+Defined in: [types.ts:83](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/types.ts#L83)

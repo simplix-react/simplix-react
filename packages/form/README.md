@@ -24,7 +24,7 @@ pnpm add @simplix-react/form @tanstack/react-form
 ## Quick Example
 
 ```ts
-import { defineApi } from "@simplix-react/contract";
+import { defineApi, simpleQueryBuilder } from "@simplix-react/contract";
 import { deriveHooks } from "@simplix-react/react";
 import { deriveFormHooks } from "@simplix-react/form";
 import { z } from "zod";
@@ -41,6 +41,7 @@ const projectContract = defineApi({
       updateSchema: z.object({ title: z.string().optional(), status: z.string().optional() }),
     },
   },
+  queryBuilder: simpleQueryBuilder,
 });
 
 // 2. Derive React Query hooks
@@ -69,22 +70,22 @@ function CreateTaskForm({ projectId }: { projectId: string }) {
 
 | Export | Kind | Description |
 | --- | --- | --- |
-| `deriveFormHooks` | Function | contract + hooks → entity form hooks 파생 |
-| `extractDirtyFields` | Function | 변경된 필드만 추출 (PATCH 요청용) |
-| `mapServerErrorsToForm` | Function | 422 서버 에러를 폼 필드 에러로 매핑 |
-| `CreateFormOptions` | Type | `useCreateForm` 옵션 인터페이스 |
-| `UpdateFormOptions` | Type | `useUpdateForm` 옵션 인터페이스 |
-| `CreateFormReturn` | Type | `useCreateForm` 반환값 인터페이스 |
-| `UpdateFormReturn` | Type | `useUpdateForm` 반환값 인터페이스 |
-| `DerivedCreateFormHook` | Type | Create form hook 시그니처 |
-| `DerivedUpdateFormHook` | Type | Update form hook 시그니처 |
-| `EntityFormHooks` | Type | 단일 엔티티의 폼 hook 인터페이스 |
+| `deriveFormHooks` | Function | Derives entity form hooks from contract + hooks |
+| `extractDirtyFields` | Function | Extracts only changed fields (for PATCH requests) |
+| `mapServerErrorsToForm` | Function | Maps 422 server errors to form field errors |
+| `CreateFormOptions` | Type | Options interface for `useCreateForm` |
+| `UpdateFormOptions` | Type | Options interface for `useUpdateForm` |
+| `CreateFormReturn` | Type | Return type interface for `useCreateForm` |
+| `UpdateFormReturn` | Type | Return type interface for `useUpdateForm` |
+| `DerivedCreateFormHook` | Type | Create form hook signature |
+| `DerivedUpdateFormHook` | Type | Update form hook signature |
+| `EntityFormHooks` | Type | Form hook interface for a single entity |
 
 ## Key Concepts
 
 ### Hook Derivation
 
-`deriveFormHooks()`는 API contract의 엔티티 정의를 읽어 각 엔티티별로 `useCreateForm`과 `useUpdateForm` hook을 생성한다. 내부적으로 `@simplix-react/react`의 mutation hooks를 TanStack Form에 연결한다.
+`deriveFormHooks()` reads the entity definitions from the API contract and generates `useCreateForm` and `useUpdateForm` hooks for each entity. Internally, it connects the mutation hooks from `@simplix-react/react` to TanStack Form.
 
 ```ts
 const formHooks = deriveFormHooks(projectContract, projectHooks);
@@ -94,17 +95,17 @@ const formHooks = deriveFormHooks(projectContract, projectHooks);
 
 ### Auto Dirty-Field Extraction
 
-`useUpdateForm`은 기본적으로 변경된 필드만 서버에 전송한다 (`dirtyOnly: true`). 원본 엔티티 데이터와 현재 폼 값을 비교하여 변경 사항만 추출하므로 PATCH-friendly한 요청을 자동으로 생성한다.
+`useUpdateForm` sends only changed fields to the server by default (`dirtyOnly: true`). It compares the original entity data with the current form values and extracts only the differences, automatically producing PATCH-friendly requests.
 
 ### Server Error Mapping
 
-서버에서 422 Validation Error가 반환되면, `mapServerErrorsToForm`이 자동으로 필드별 에러 메시지를 폼에 설정한다. Rails 형식과 JSON:API 형식을 모두 지원한다.
+When the server returns a 422 Validation Error, `mapServerErrorsToForm` automatically sets per-field error messages on the form. Both Rails format and JSON:API format are supported.
 
 ## Hook Reference
 
 ### `useCreateForm`
 
-새 엔티티를 생성하는 폼 hook. TanStack Form 인스턴스와 create mutation을 연결한다.
+A form hook for creating new entities. Connects a TanStack Form instance with the create mutation.
 
 ```ts
 const { form, isSubmitting, submitError, reset } = formHooks.task.useCreateForm(parentId?, options?);
@@ -114,24 +115,24 @@ const { form, isSubmitting, submitError, reset } = formHooks.task.useCreateForm(
 
 | Parameter | Type | Description |
 | --- | --- | --- |
-| `parentId` | `string?` | 상위 엔티티 ID (하위 엔티티인 경우) |
-| `options.defaultValues` | `Partial<CreateSchema>?` | 폼 초기값 |
-| `options.resetOnSuccess` | `boolean?` | 성공 시 폼 초기화 (default: `true`) |
-| `options.onSuccess` | `(data) => void` | 성공 콜백 |
-| `options.onError` | `(error) => void` | 에러 콜백 |
+| `parentId` | `string?` | Parent entity ID (for child entities) |
+| `options.defaultValues` | `Partial<CreateSchema>?` | Initial form values |
+| `options.resetOnSuccess` | `boolean?` | Reset form on success (default: `true`) |
+| `options.onSuccess` | `(data) => void` | Success callback |
+| `options.onError` | `(error) => void` | Error callback |
 
 **Returns:**
 
 | Property | Type | Description |
 | --- | --- | --- |
-| `form` | `AnyFormApi` | TanStack Form 인스턴스 |
-| `isSubmitting` | `boolean` | 제출 진행 중 여부 |
-| `submitError` | `Error \| null` | 마지막 제출 에러 |
-| `reset` | `() => void` | 폼 및 에러 상태 초기화 |
+| `form` | `AnyFormApi` | TanStack Form instance |
+| `isSubmitting` | `boolean` | Whether submission is in progress |
+| `submitError` | `Error \| null` | Last submission error |
+| `reset` | `() => void` | Reset form and error state |
 
 ### `useUpdateForm`
 
-기존 엔티티를 수정하는 폼 hook. 엔티티 데이터를 자동 로드하고, 리페치 시 폼을 자동 리셋한다.
+A form hook for updating existing entities. Automatically loads entity data and resets the form on refetch.
 
 ```ts
 const { form, isLoading, isSubmitting, submitError, entity } = formHooks.task.useUpdateForm(entityId, options?);
@@ -141,26 +142,26 @@ const { form, isLoading, isSubmitting, submitError, entity } = formHooks.task.us
 
 | Parameter | Type | Description |
 | --- | --- | --- |
-| `entityId` | `string` | 수정할 엔티티 ID (필수) |
-| `options.dirtyOnly` | `boolean?` | 변경된 필드만 전송 (default: `true`) |
-| `options.onSuccess` | `(data) => void` | 성공 콜백 |
-| `options.onError` | `(error) => void` | 에러 콜백 |
+| `entityId` | `string` | ID of the entity to update (required) |
+| `options.dirtyOnly` | `boolean?` | Send only changed fields (default: `true`) |
+| `options.onSuccess` | `(data) => void` | Success callback |
+| `options.onError` | `(error) => void` | Error callback |
 
 **Returns:**
 
 | Property | Type | Description |
 | --- | --- | --- |
-| `form` | `AnyFormApi` | TanStack Form 인스턴스 |
-| `isLoading` | `boolean` | 엔티티 데이터 로딩 중 여부 |
-| `isSubmitting` | `boolean` | 제출 진행 중 여부 |
-| `submitError` | `Error \| null` | 마지막 제출 에러 |
-| `entity` | `Entity \| undefined` | 로드된 엔티티 데이터 |
+| `form` | `AnyFormApi` | TanStack Form instance |
+| `isLoading` | `boolean` | Whether entity data is loading |
+| `isSubmitting` | `boolean` | Whether submission is in progress |
+| `submitError` | `Error \| null` | Last submission error |
+| `entity` | `Entity \| undefined` | Loaded entity data |
 
 ## Utilities
 
 ### `extractDirtyFields(current, original)`
 
-두 객체를 deep equality로 비교하여 변경된 필드만 추출한다. Date, 배열, 중첩 객체를 모두 지원한다.
+Compares two objects using deep equality and extracts only the changed fields. Supports Date, arrays, and nested objects.
 
 ```ts
 import { extractDirtyFields } from "@simplix-react/form";
@@ -174,9 +175,9 @@ const dirty = extractDirtyFields(
 
 ### `mapServerErrorsToForm(error, form)`
 
-422 `ApiError`의 응답 본문을 파싱하여 TanStack Form 필드 에러로 매핑한다.
+Parses the response body of a 422 `ApiError` and maps it to TanStack Form field errors.
 
-지원하는 에러 형식:
+Supported error formats:
 
 - **Rails:** `{ errors: { [field]: string[] } }`
 - **JSON:API:** `{ errors: [{ field, message }] }`
@@ -184,7 +185,7 @@ const dirty = extractDirtyFields(
 ```ts
 import { mapServerErrorsToForm } from "@simplix-react/form";
 
-// 수동 사용 (hook 내부에서 자동 호출됨)
+// Manual usage (automatically called inside hooks)
 try {
   await mutation.mutateAsync(data);
 } catch (error) {
@@ -194,20 +195,20 @@ try {
 
 ## CLI Integration
 
-`@simplix-react/cli`의 OpenAPI 코드 생성 시 form hooks 파일이 자동 생성된다.
+When generating code from OpenAPI specs with `@simplix-react/cli`, form hook files are automatically generated.
 
 ```bash
-simplix openapi <spec-path>     # form-hooks.ts 포함 생성
-simplix openapi <spec-path> --no-forms  # form hooks 생성 생략
+simplix openapi <spec-path>              # Generates including form-hooks.ts
+simplix openapi <spec-path> --no-forms   # Skips form hook generation
 ```
 
 ## Related Packages
 
 | Package | Description |
 | --- | --- |
-| `@simplix-react/contract` | Zod 기반 type-safe API contract 정의 |
-| `@simplix-react/react` | contract에서 파생된 React Query hooks |
-| `@simplix-react/mock` | MSW handlers + PGlite repositories 자동 생성 |
+| `@simplix-react/contract` | Zod-based type-safe API contract definitions |
+| `@simplix-react/react` | React Query hooks derived from contracts |
+| `@simplix-react/mock` | Auto-generated MSW handlers and PGlite repositories |
 
 ---
 

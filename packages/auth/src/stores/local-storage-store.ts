@@ -1,4 +1,5 @@
 import type { TokenStore } from "../types.js";
+import { createWebStorageStore } from "./create-web-storage-store.js";
 
 /**
  * Creates a {@link TokenStore} backed by `localStorage`.
@@ -16,21 +17,5 @@ import type { TokenStore } from "../types.js";
  * ```
  */
 export function localStorageStore(prefix = "auth:"): TokenStore {
-  return {
-    get: (key) => localStorage.getItem(`${prefix}${key}`),
-    set: (key, value) => localStorage.setItem(`${prefix}${key}`, value),
-    remove: (key) => localStorage.removeItem(`${prefix}${key}`),
-    clear: () => {
-      const keysToRemove: string[] = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key?.startsWith(prefix)) {
-          keysToRemove.push(key);
-        }
-      }
-      for (const key of keysToRemove) {
-        localStorage.removeItem(key);
-      }
-    },
-  };
+  return createWebStorageStore(localStorage, prefix);
 }

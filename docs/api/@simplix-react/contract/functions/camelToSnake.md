@@ -8,11 +8,12 @@
 
 > **camelToSnake**(`str`): `string`
 
-Defined in: [packages/contract/src/helpers/case-transform.ts:37](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/contract/src/helpers/case-transform.ts#L37)
+Defined in: [packages/contract/src/helpers/case-transform.ts:39](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/contract/src/helpers/case-transform.ts#L39)
 
 Converts a camelCase string to snake_case.
 
-Used internally for transforming entity names into database-friendly column names.
+Also handles hyphenated and space-separated inputs by replacing them with
+underscores before lowercasing.
 
 ## Parameters
 
@@ -35,4 +36,5 @@ import { camelToSnake } from "@simplix-react/contract";
 
 camelToSnake("doorReader");  // "door_reader"
 camelToSnake("myEntity");    // "my_entity"
+camelToSnake("some-field");  // "some_field"
 ```

@@ -1,3 +1,4 @@
+import { useCallback, useMemo } from "react";
 import type { TokenPair } from "../types.js";
 import { useAuthContext, useAuthState } from "./auth-provider.js";
 
@@ -44,10 +45,15 @@ export function useAuth(): UseAuthReturn {
   const auth = useAuthContext();
   const isAuthenticated = useAuthState(auth);
 
-  return {
-    isAuthenticated,
-    login: (tokens: TokenPair) => auth.setTokens(tokens),
-    logout: () => auth.clear(),
-    getAccessToken: () => auth.getAccessToken(),
-  };
+  const login = useCallback(
+    (tokens: TokenPair) => auth.setTokens(tokens),
+    [auth],
+  );
+  const logout = useCallback(() => auth.clear(), [auth]);
+  const getAccessToken = useCallback(() => auth.getAccessToken(), [auth]);
+
+  return useMemo(
+    () => ({ isAuthenticated, login, logout, getAccessToken }),
+    [isAuthenticated, login, logout, getAccessToken],
+  );
 }

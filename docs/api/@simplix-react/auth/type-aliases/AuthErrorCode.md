@@ -8,6 +8,6 @@
 
 > **AuthErrorCode** = `"TOKEN_EXPIRED"` \| `"REFRESH_FAILED"` \| `"UNAUTHENTICATED"` \| `"SCHEME_ERROR"`
 
-Defined in: packages/auth/src/errors.ts:4
+Defined in: [packages/auth/src/errors.ts:4](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/errors.ts#L4)
 
 Discriminated error codes for auth-related failures.

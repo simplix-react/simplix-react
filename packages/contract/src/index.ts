@@ -23,6 +23,8 @@ export type {
   EntityClient,
   ApiContract,
   FetchFn,
+  AnyEntityDef,
+  AnyOperationDef,
 } from "./types.js";
 
 export type {

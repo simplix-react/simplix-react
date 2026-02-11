@@ -33,14 +33,14 @@ simplix-react is a package-first React framework that auto-generates reusable do
 
 ```bash
 pnpm add @simplix-react/contract @simplix-react/react
-pnpm add -D zod @tanstack/react-query
+pnpm add zod @tanstack/react-query
 ```
 
 ### 2. Define a contract
 
 ```ts
 import { z } from "zod";
-import { defineApi } from "@simplix-react/contract";
+import { defineApi, simpleQueryBuilder } from "@simplix-react/contract";
 
 const projectSchema = z.object({
   id: z.string(),
@@ -59,6 +59,7 @@ const api = defineApi({
       updateSchema: projectSchema.partial().omit({ id: true }),
     },
   },
+  queryBuilder: simpleQueryBuilder,
 });
 ```
 
@@ -126,6 +127,7 @@ Detailed guides are available in the [docs/](./docs/) directory:
 - [Project App](./docs/tutorials/project-app.md) -- Build a project management app from scratch
 - [Auth Protected App](./docs/tutorials/auth-protected-app.md) -- Login, logout, token refresh, and route guards
 - [Full-Stack Mock](./docs/tutorials/full-stack-mock.md) -- Complete frontend with in-browser PGlite
+- [Petstore OpenAPI](./docs/tutorials/petstore-openapi.md) -- Generate domain packages from the Swagger Petstore spec
 
 ### API Reference
 

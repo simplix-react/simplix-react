@@ -1,5 +1,6 @@
 import type { AuthConfig, AuthInstance, TokenPair } from "./types.js";
 import { createAuthFetch } from "./create-auth-fetch.js";
+import { storeTokenPair } from "./helpers/token-storage.js";
 
 /**
  * Creates a reactive {@link AuthInstance} with state management and subscriptions.
@@ -55,16 +56,7 @@ export function createAuth(config: AuthConfig): AuthInstance {
 
     setTokens(tokens: TokenPair) {
       if (store) {
-        store.set("access_token", tokens.accessToken);
-
-        if (tokens.refreshToken) {
-          store.set("refresh_token", tokens.refreshToken);
-        }
-
-        if (tokens.expiresIn) {
-          const expiresAt = Date.now() + tokens.expiresIn * 1000;
-          store.set("expires_at", String(expiresAt));
-        }
+        storeTokenPair(store, tokens);
       }
 
       notify();

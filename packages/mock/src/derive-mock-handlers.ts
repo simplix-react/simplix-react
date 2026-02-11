@@ -1,14 +1,10 @@
 import { HttpResponse, http } from "msw";
-import type { ApiContractConfig, EntityDefinition, OperationDefinition } from "@simplix-react/contract";
-import type { z } from "zod";
+import { camelToSnake, type AnyEntityDef, type AnyOperationDef, type ApiContractConfig } from "@simplix-react/contract";
 import { getPGliteInstance } from "./pglite.js";
-import { mapRows, mapRow, toSnakeCase } from "./sql/row-mapping.js";
+import { mapRows, mapRow } from "./sql/row-mapping.js";
 import { buildSetClause } from "./sql/query-building.js";
 import { mapPgError } from "./sql/error-mapping.js";
 import { mockSuccess, mockFailure, type MockResult } from "./mock-result.js";
-
-type AnyEntityDef = EntityDefinition<z.ZodTypeAny, z.ZodTypeAny, z.ZodTypeAny>;
-type AnyOperationDef = OperationDefinition<z.ZodTypeAny, z.ZodTypeAny>;
 
 /**
  * Provides per-entity configuration for mock handler generation.
@@ -123,7 +119,7 @@ export function deriveMockHandlers<
 
   for (const [name, entity] of Object.entries(entities) as [string, AnyEntityDef][]) {
     const entityConfig = mockConfig?.[name];
-    const tableName = entityConfig?.tableName ?? toSnakeCase(name) + "s";
+    const tableName = entityConfig?.tableName ?? camelToSnake(name) + "s";
     const defaultLimit = entityConfig?.defaultLimit ?? 50;
     const maxLimit = entityConfig?.maxLimit ?? 100;
     const defaultSort = entityConfig?.defaultSort ?? "created_at DESC";
@@ -135,7 +131,7 @@ export function deriveMockHandlers<
       handlers.push(
         http.get(listPath, async ({ request, params: routeParams }) => {
           const parentId = routeParams[entity.parent!.param] as string;
-          const parentColumn = toSnakeCase(entity.parent!.param);
+          const parentColumn = camelToSnake(entity.parent!.param);
           const searchParams = parseSearchParams(request.url);
           return toResponse(
             await queryListWithParams(
@@ -272,7 +268,7 @@ async function queryListWithParams<T>(
 
     // Dynamic filters from query params
     for (const [key, value] of Object.entries(searchParams.filters)) {
-      const column = toSnakeCase(key);
+      const column = camelToSnake(key);
       conditions.push(`${column} = $${paramIndex}`);
       values.push(value);
       paramIndex++;
@@ -285,7 +281,7 @@ async function queryListWithParams<T>(
     if (searchParams.sort) {
       const sortParts = searchParams.sort.split(",").map((s) => {
         const [field, dir] = s.trim().split(":");
-        const column = toSnakeCase(field);
+        const column = camelToSnake(field);
         const direction = dir === "desc" ? "DESC" : "ASC";
         return `${column} ${direction}`;
       });
@@ -362,7 +358,7 @@ async function queryByIdWithRelations<T>(
 
     // Load belongsTo relations
     for (const [relationName, relation] of Object.entries(relations)) {
-      const localColumn = toSnakeCase(relation.localKey);
+      const localColumn = camelToSnake(relation.localKey);
       const fkValue = row[localColumn];
       if (fkValue) {
         const foreignKey = relation.foreignKey ?? "id";
@@ -404,7 +400,7 @@ async function insertRow<T>(
 
     for (const [key, value] of Object.entries(dto)) {
       if (value === undefined) continue;
-      const column = toSnakeCase(key);
+      const column = camelToSnake(key);
       columns.push(column);
 
       if (typeof value === "object" && value !== null && !(value instanceof Date)) {

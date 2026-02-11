@@ -335,6 +335,8 @@ try {
 
 ## Type Aliases
 
+- [AnyEntityDef](type-aliases/AnyEntityDef.md)
+- [AnyOperationDef](type-aliases/AnyOperationDef.md)
 - [FetchFn](type-aliases/FetchFn.md)
 - [HttpMethod](type-aliases/HttpMethod.md)
 - [PaginationParam](type-aliases/PaginationParam.md)

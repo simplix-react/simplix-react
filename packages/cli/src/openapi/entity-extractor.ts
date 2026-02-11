@@ -1,3 +1,4 @@
+import { camelToSnake } from "@simplix-react/contract";
 import type {
   OpenAPISpec,
   SchemaObject,
@@ -327,7 +328,7 @@ function schemaToFields(schema: SchemaObject): EntityField[] {
 
     fields.push({
       name,
-      snakeName: toSnakeCase(name),
+      snakeName: camelToSnake(name),
       type: prop.type ?? "string",
       format: prop.format,
       zodType: toZodType(prop),
@@ -363,9 +364,3 @@ function toPascalCase(str: string): string {
     .join("");
 }
 
-function toSnakeCase(str: string): string {
-  return str
-    .replace(/([a-z])([A-Z])/g, "$1_$2")
-    .replace(/[-\s]+/g, "_")
-    .toLowerCase();
-}

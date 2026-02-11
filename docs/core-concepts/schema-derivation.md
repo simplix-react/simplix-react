@@ -10,7 +10,7 @@ This approach eliminates an entire class of bugs: mismatched types between clien
 
 ## How It Works
 
-The derivation pipeline has four stages, each consuming the contract and producing a different artifact:
+The derivation pipeline has five stages, each consuming the contract and producing a different artifact:
 
 <!--
 ```mermaid

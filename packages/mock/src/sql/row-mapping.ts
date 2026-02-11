@@ -28,24 +28,6 @@ export function toCamelCase(str: string): string {
 }
 
 /**
- * Converts a camelCase string to snake_case.
- *
- * @param str - The camelCase input string.
- * @returns The snake_case equivalent.
- *
- * @example
- * ```ts
- * import { toSnakeCase } from "@simplix-react/mock";
- *
- * toSnakeCase("createdAt"); // "created_at"
- * toSnakeCase("projectId"); // "project_id"
- * ```
- */
-export function toSnakeCase(str: string): string {
-  return str.replace(/([a-z0-9])([A-Z])/g, "$1_$2").toLowerCase();
-}
-
-/**
  * Maps a single database row from snake_case columns to a camelCase object.
  *
  * Columns ending in `_at` are automatically converted to `Date` objects.

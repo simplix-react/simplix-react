@@ -22,7 +22,7 @@ pnpm add @simplix-react/react
 ## Quick Example
 
 ```ts
-import { defineApi } from "@simplix-react/contract";
+import { defineApi, simpleQueryBuilder } from "@simplix-react/contract";
 import { deriveHooks } from "@simplix-react/react";
 import { z } from "zod";
 
@@ -38,6 +38,7 @@ const projectContract = defineApi({
       updateSchema: z.object({ title: z.string().optional(), status: z.string().optional() }),
     },
   },
+  queryBuilder: simpleQueryBuilder,
 });
 
 // 2. Derive hooks — one call generates everything

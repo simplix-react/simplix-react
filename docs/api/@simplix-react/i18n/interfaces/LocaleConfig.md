@@ -6,7 +6,7 @@
 
 # Interface: LocaleConfig
 
-Defined in: [i18next-adapter.ts:30](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/i18n/src/i18next-adapter.ts#L30)
+Defined in: [i18next-adapter.ts:30](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/i18next-adapter.ts#L30)
 
 Describes the configuration for a single supported locale.
 
@@ -30,7 +30,7 @@ const korean: LocaleConfig = {
 
 > **code**: `string`
 
-Defined in: [i18next-adapter.ts:32](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/i18n/src/i18next-adapter.ts#L32)
+Defined in: [i18next-adapter.ts:32](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/i18next-adapter.ts#L32)
 
 BCP 47 locale code.
 
@@ -40,7 +40,7 @@ BCP 47 locale code.
 
 > `optional` **currency**: `string`
 
-Defined in: [i18next-adapter.ts:44](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/i18n/src/i18next-adapter.ts#L44)
+Defined in: [i18next-adapter.ts:44](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/i18next-adapter.ts#L44)
 
 Default ISO 4217 currency code.
 
@@ -50,7 +50,7 @@ Default ISO 4217 currency code.
 
 > `optional` **dateFormat**: `string`
 
-Defined in: [i18next-adapter.ts:40](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/i18n/src/i18next-adapter.ts#L40)
+Defined in: [i18next-adapter.ts:40](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/i18next-adapter.ts#L40)
 
 Default date format pattern.
 
@@ -60,7 +60,7 @@ Default date format pattern.
 
 > `optional` **direction**: `"ltr"` \| `"rtl"`
 
-Defined in: [i18next-adapter.ts:38](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/i18n/src/i18next-adapter.ts#L38)
+Defined in: [i18next-adapter.ts:38](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/i18next-adapter.ts#L38)
 
 Text direction (defaults to `"ltr"`).
 
@@ -70,7 +70,7 @@ Text direction (defaults to `"ltr"`).
 
 > **englishName**: `string`
 
-Defined in: [i18next-adapter.ts:36](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/i18n/src/i18next-adapter.ts#L36)
+Defined in: [i18next-adapter.ts:36](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/i18next-adapter.ts#L36)
 
 English display name.
 
@@ -80,7 +80,7 @@ English display name.
 
 > **name**: `string`
 
-Defined in: [i18next-adapter.ts:34](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/i18n/src/i18next-adapter.ts#L34)
+Defined in: [i18next-adapter.ts:34](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/i18next-adapter.ts#L34)
 
 Native display name.
 
@@ -90,6 +90,6 @@ Native display name.
 
 > `optional` **timeFormat**: `string`
 
-Defined in: [i18next-adapter.ts:42](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/i18n/src/i18next-adapter.ts#L42)
+Defined in: [i18next-adapter.ts:42](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/i18next-adapter.ts#L42)
 
 Default time format pattern.

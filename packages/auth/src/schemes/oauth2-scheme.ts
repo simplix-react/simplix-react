@@ -1,9 +1,6 @@
-import type { AuthScheme, OAuth2SchemeOptions, TokenPair } from "../types.js";
+import type { AuthScheme, OAuth2SchemeOptions } from "../types.js";
 import { AuthError } from "../errors.js";
-
-const ACCESS_TOKEN_KEY = "access_token";
-const REFRESH_TOKEN_KEY = "refresh_token";
-const EXPIRES_AT_KEY = "expires_at";
+import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, EXPIRES_AT_KEY, storeTokenPair } from "../helpers/token-storage.js";
 
 /**
  * Creates an OAuth2 refresh_token grant {@link AuthScheme}.
@@ -24,19 +21,6 @@ const EXPIRES_AT_KEY = "expires_at";
  */
 export function oauth2Scheme(options: OAuth2SchemeOptions): AuthScheme {
   const { store, tokenEndpoint, clientId, clientSecret, scopes } = options;
-
-  function storeTokenPair(pair: TokenPair): void {
-    store.set(ACCESS_TOKEN_KEY, pair.accessToken);
-
-    if (pair.refreshToken) {
-      store.set(REFRESH_TOKEN_KEY, pair.refreshToken);
-    }
-
-    if (pair.expiresIn) {
-      const expiresAt = Date.now() + pair.expiresIn * 1000;
-      store.set(EXPIRES_AT_KEY, String(expiresAt));
-    }
-  }
 
   return {
     name: "oauth2",
@@ -91,7 +75,7 @@ export function oauth2Scheme(options: OAuth2SchemeOptions): AuthScheme {
 
       const data = await response.json();
 
-      storeTokenPair({
+      storeTokenPair(store, {
         accessToken: data.access_token,
         refreshToken: data.refresh_token ?? refreshToken,
         expiresIn: data.expires_in,

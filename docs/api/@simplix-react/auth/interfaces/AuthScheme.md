@@ -6,7 +6,7 @@
 
 # Interface: AuthScheme
 
-Defined in: packages/auth/src/types.ts:16
+Defined in: [packages/auth/src/types.ts:16](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L16)
 
 Defines the contract for an authentication strategy.
 
@@ -26,7 +26,7 @@ how tokens are refreshed, and how auth state is managed.
 
 > `readonly` **name**: `string`
 
-Defined in: packages/auth/src/types.ts:18
+Defined in: [packages/auth/src/types.ts:18](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L18)
 
 Unique identifier for this scheme.
 
@@ -36,7 +36,7 @@ Unique identifier for this scheme.
 
 > **clear**(): `void`
 
-Defined in: packages/auth/src/types.ts:36
+Defined in: [packages/auth/src/types.ts:36](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L36)
 
 Clears all stored credentials for this scheme.
 
@@ -50,7 +50,7 @@ Clears all stored credentials for this scheme.
 
 > **getHeaders**(): `Promise`\<`Record`\<`string`, `string`\>\>
 
-Defined in: packages/auth/src/types.ts:24
+Defined in: [packages/auth/src/types.ts:24](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L24)
 
 Returns headers to attach to each outgoing request.
 May perform async work (e.g., decrypt a stored token).
@@ -65,7 +65,7 @@ May perform async work (e.g., decrypt a stored token).
 
 > **isAuthenticated**(): `boolean`
 
-Defined in: packages/auth/src/types.ts:33
+Defined in: [packages/auth/src/types.ts:33](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L33)
 
 Returns whether the scheme currently holds valid credentials.
 
@@ -79,7 +79,7 @@ Returns whether the scheme currently holds valid credentials.
 
 > `optional` **refresh**(): `Promise`\<`void`\>
 
-Defined in: packages/auth/src/types.ts:30
+Defined in: [packages/auth/src/types.ts:30](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L30)
 
 Attempts to refresh the authentication credentials.
 Called when a 401 response is received.

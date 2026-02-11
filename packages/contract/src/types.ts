@@ -347,3 +347,11 @@ export interface ApiContract<
     [K in keyof TEntities]: QueryKeyFactory;
   };
 }
+
+// ── Shared Type Aliases ──
+
+/** Shorthand for an entity definition with any Zod schema types. */
+export type AnyEntityDef = EntityDefinition<z.ZodTypeAny, z.ZodTypeAny, z.ZodTypeAny>;
+
+/** Shorthand for an operation definition with any Zod schema types. */
+export type AnyOperationDef = OperationDefinition<z.ZodTypeAny, z.ZodTypeAny>;

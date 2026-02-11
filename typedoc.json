@@ -6,7 +6,10 @@
   ],
   "exclude": [
     "packages/config-eslint",
-    "packages/config-typescript"
+    "packages/config-typescript",
+    "**/__tests__/**",
+    "**/*.test.*",
+    "**/*.spec.*"
   ],
   "out": "docs/api",
   "plugin": ["typedoc-plugin-markdown"],

@@ -8,7 +8,7 @@
 
 > **mapRows**\<`T`\>(`rows`): `T`[]
 
-Defined in: [sql/row-mapping.ts:110](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/mock/src/sql/row-mapping.ts#L110)
+Defined in: [sql/row-mapping.ts:92](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/mock/src/sql/row-mapping.ts#L92)
 
 Maps an array of database rows from snake_case to camelCase objects.
 

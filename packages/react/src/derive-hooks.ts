@@ -7,17 +7,14 @@ import {
   type UseMutationOptions,
 } from "@tanstack/react-query";
 import type {
+  AnyEntityDef,
+  AnyOperationDef,
   ApiContractConfig,
-  EntityDefinition,
   ListParams,
   OperationDefinition,
   QueryKeyFactory,
 } from "@simplix-react/contract";
-import type { z } from "zod";
 import type { EntityHooks, OperationHooks } from "./types.js";
-
-type AnyEntityDef = EntityDefinition<z.ZodTypeAny, z.ZodTypeAny, z.ZodTypeAny>;
-type AnyOperationDef = OperationDefinition<z.ZodTypeAny, z.ZodTypeAny>;
 
 /**
  * Derives type-safe React Query hooks from an API contract.
@@ -286,11 +283,12 @@ function createEntityHooks(
           return entityClient.list(listParams);
         },
         initialPageParam: 1 as unknown,
-        getNextPageParam: (lastPage: unknown) => {
+        getNextPageParam: (lastPage: unknown, _allPages: unknown[], lastPageParam: unknown) => {
           const page = lastPage as { meta?: { hasNextPage?: boolean; nextCursor?: string } };
           if (!page.meta?.hasNextPage) return undefined;
           if (page.meta.nextCursor) return page.meta.nextCursor;
-          return undefined;
+          // Offset-based pagination: increment page number
+          return typeof lastPageParam === "number" ? lastPageParam + 1 : undefined;
         },
         enabled: entity.parent ? !!parentId : true,
         ...options,

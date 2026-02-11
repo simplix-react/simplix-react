@@ -8,7 +8,7 @@
 
 > **mockFailure**(`error`): [`MockResult`](../interfaces/MockResult.md)\<`never`\>
 
-Defined in: [mock-result.ts:65](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/mock/src/mock-result.ts#L65)
+Defined in: [mock-result.ts:65](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/mock/src/mock-result.ts#L65)
 
 Creates a failure [MockResult](../interfaces/MockResult.md) with the given error code and message.
 

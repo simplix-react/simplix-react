@@ -14,7 +14,7 @@ export { mockSuccess, mockFailure } from "./mock-result.js";
 export type { MockResult } from "./mock-result.js";
 
 // SQL utilities
-export { mapRow, mapRows, toCamelCase, toSnakeCase } from "./sql/row-mapping.js";
+export { mapRow, mapRows, toCamelCase } from "./sql/row-mapping.js";
 export type { DbRow } from "./sql/row-mapping.js";
 export { buildSetClause } from "./sql/query-building.js";
 export type { SetClauseResult } from "./sql/query-building.js";

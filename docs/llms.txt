@@ -39,6 +39,7 @@ simplix-react is a package-first React framework that auto-generates reusable do
 ### Package References
 - [@simplix-react/contract](https://raw.githubusercontent.com/simplix-react/simplix-react/main/packages/contract/README.md): Zod-based type-safe API contract definitions with defineApi, deriveClient, and deriveQueryKeys
 - [@simplix-react/react](https://raw.githubusercontent.com/simplix-react/simplix-react/main/packages/react/README.md): Derives TanStack Query hooks (useList, useGet, useCreate, useUpdate, useDelete, useInfiniteList) from contracts
+- [@simplix-react/form](https://raw.githubusercontent.com/simplix-react/simplix-react/main/packages/form/README.md): TanStack Form hooks derived from contracts via deriveFormHooks, with auto dirty-field extraction and server error mapping
 - [@simplix-react/mock](https://raw.githubusercontent.com/simplix-react/simplix-react/main/packages/mock/README.md): Auto-generated MSW handlers and PGlite repositories with SQL utilities and migration helpers
 - [@simplix-react/auth](https://raw.githubusercontent.com/simplix-react/simplix-react/main/packages/auth/README.md): Authentication middleware with Bearer, API Key, OAuth2, and custom schemes, plus React bindings
 - [@simplix-react/i18n](https://raw.githubusercontent.com/simplix-react/simplix-react/main/packages/i18n/README.md): Internationalization framework with adapter pattern, i18next integration, and React bindings

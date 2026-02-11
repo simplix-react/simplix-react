@@ -3,6 +3,7 @@
   "version": "0.0.2",
   "description": "Authentication middleware for @simplix-react/contract with strategy pattern",
   "type": "module",
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
