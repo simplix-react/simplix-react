@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react/auth",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Authentication middleware for @simplix-react/contract with strategy pattern",
   "type": "module",
   "sideEffects": false,

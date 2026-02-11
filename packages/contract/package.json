@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react/contract",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Define type-safe API contracts with Zod schemas",
   "type": "module",
   "sideEffects": false,

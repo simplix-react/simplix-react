@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react/mock",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Auto-generated MSW handlers and PGlite repositories from @simplix-react/contract",
   "type": "module",
   "sideEffects": false,
