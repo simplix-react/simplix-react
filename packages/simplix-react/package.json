@@ -1,6 +1,6 @@
 {
   "name": "simplix-react",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Package-first React framework that auto-generates reusable domain packages from OpenAPI specs",
   "type": "module",
   "sideEffects": false,
