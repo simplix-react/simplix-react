@@ -1,0 +1,35 @@
+{
+  "name": "simplix-react",
+  "version": "0.0.3",
+  "description": "Package-first React framework that auto-generates reusable domain packages from OpenAPI specs",
+  "type": "module",
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@simplix-react/contract": "workspace:*",
+    "@simplix-react/react": "workspace:*",
+    "@simplix-react/form": "workspace:*",
+    "@simplix-react/auth": "workspace:*",
+    "@simplix-react/mock": "workspace:*",
+    "@simplix-react/i18n": "workspace:*",
+    "@simplix-react/cli": "workspace:*",
+    "@simplix-react/testing": "workspace:*"
+  },
+  "keywords": [
+    "react",
+    "openapi",
+    "codegen",
+    "tanstack-query",
+    "zod",
+    "msw",
+    "i18n",
+    "form"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/simplix-react/simplix-react.git"
+  }
+}
