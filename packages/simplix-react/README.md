@@ -11,6 +11,16 @@ Meta package that installs all `@simplix-react/*` packages in one dependency.
 pnpm add simplix-react
 ```
 
+### pnpm Configuration
+
+pnpm uses strict dependency resolution. To import from `@simplix-react/*` sub-packages, add this to your `.npmrc`:
+
+```ini
+public-hoist-pattern[]=@simplix-react/*
+```
+
+> Projects created with `simplix init` include this configuration automatically.
+
 This single install provides:
 
 | Package | Description |

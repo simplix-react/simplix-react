@@ -33,6 +33,19 @@ import { defineApi } from "@simplix-react/contract";
 import { deriveHooks } from "@simplix-react/react";
 ```
 
+#### pnpm Hoist Configuration
+
+pnpm uses strict dependency resolution — transitive dependencies are not automatically accessible. When using the `simplix-react` meta package, you must configure `.npmrc` to hoist `@simplix-react/*` packages:
+
+```ini
+# .npmrc
+public-hoist-pattern[]=@simplix-react/*
+```
+
+This allows your code to import from `@simplix-react/contract`, `@simplix-react/react`, etc. even though only `simplix-react` is declared in `package.json`.
+
+> **Note:** Projects created with `simplix init` include this `.npmrc` automatically.
+
 ### Selective Installation
 
 Alternatively, install only the packages you need:

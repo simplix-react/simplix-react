@@ -10,6 +10,12 @@ Install via the meta package (recommended):
 pnpm add simplix-react
 ```
 
+When using pnpm, add this to `.npmrc` so `@simplix-react/*` packages are resolvable:
+
+```ini
+public-hoist-pattern[]=@simplix-react/*
+```
+
 Or install the CLI only:
 
 ```bash
@@ -17,6 +23,8 @@ pnpm add -D @simplix-react/cli
 ```
 
 Requires **Node.js 18 or later**.
+
+> **Note:** Projects scaffolded with `simplix init` include the `.npmrc` configuration automatically.
 
 ## Quick Start
 

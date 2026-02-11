@@ -41,6 +41,12 @@ pnpm add simplix-react
 pnpm add zod @tanstack/react-query
 ```
 
+When using pnpm, add this to your `.npmrc` so transitive `@simplix-react/*` packages are resolvable:
+
+```ini
+public-hoist-pattern[]=@simplix-react/*
+```
+
 Or install only the packages you need:
 
 ```bash
