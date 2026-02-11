@@ -8,7 +8,7 @@
 
 > **DerivedInfiniteListHook**\<`TData`\> = (`parentId?`, `params?`, `options?`) => `UseInfiniteQueryResult`\<\{ `data`: `TData`[]; `meta`: `PageInfo`; \}, `Error`\>
 
-Defined in: [types.ts:166](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/react/src/types.ts#L166)
+Defined in: [types.ts:166](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/react/src/types.ts#L166)
 
 Represents a derived infinite list query hook for cursor-based or offset-based pagination.
 

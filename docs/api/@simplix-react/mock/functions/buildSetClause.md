@@ -8,7 +8,7 @@
 
 > **buildSetClause**\<`T`\>(`input`, `startIndex?`): [`SetClauseResult`](../interfaces/SetClauseResult.md)
 
-Defined in: [sql/query-building.ts:49](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/mock/src/sql/query-building.ts#L49)
+Defined in: [sql/query-building.ts:49](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/mock/src/sql/query-building.ts#L49)
 
 Builds a parameterized SQL SET clause from a partial update object.
 

@@ -1,0 +1,52 @@
+{
+  "name": "@simplix-react/auth",
+  "version": "0.0.2",
+  "description": "Authentication middleware for @simplix-react/contract with strategy pattern",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rm -rf dist .turbo"
+  },
+  "peerDependencies": {
+    "@simplix-react/contract": "workspace:*",
+    "react": ">=18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@simplix-react/config-eslint": "workspace:*",
+    "@simplix-react/config-typescript": "workspace:*",
+    "@simplix-react/contract": "workspace:*",
+    "@testing-library/react": "^16.3.2",
+    "@types/react": "^19.0.0",
+    "eslint": "^9.39.2",
+    "jsdom": "^28.0.0",
+    "react": "^19.0.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^3.0.0"
+  }
+}

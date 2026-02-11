@@ -1,6 +1,8 @@
 # Custom Fetch Functions
 
-> How to customize the HTTP layer for authentication, headers, interceptors, and error handling.
+> How to customize the HTTP layer for headers, interceptors, and error handling.
+>
+> **Looking for authentication?** For token-based auth (Bearer, API Key, OAuth2) with automatic refresh and 401 retry, use [`@simplix-react/auth`](./authentication.md) instead. This guide covers lower-level fetch customization for cases not covered by the auth package.
 
 ## Before You Begin
 
@@ -253,5 +255,6 @@ const projectApi = defineApi(projectConfig, { fetchFn: prefixedFetch });
 
 ## Related
 
-- [Mock Handlers](./mock-handlers.md) -- set up MSW handlers for development without a backend
+- [Authentication Guide](./authentication.md) --- set up token-based auth with `@simplix-react/auth`
+- [Mock Handlers](./mock-handlers.md) --- set up MSW handlers for development without a backend
 - `@simplix-react/contract` types: `FetchFn`, `ApiError`, `defaultFetch`

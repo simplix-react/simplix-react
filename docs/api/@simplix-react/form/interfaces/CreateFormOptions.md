@@ -6,7 +6,7 @@
 
 # Interface: CreateFormOptions\<TCreate\>
 
-Defined in: types.ts:29
+Defined in: [types.ts:29](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/form/src/types.ts#L29)
 
 Options for the `useCreateForm` hook.
 
@@ -35,7 +35,7 @@ Zod schema type for the create DTO
 
 > `optional` **defaultValues**: `Partial`\<`output`\<`TCreate`\>\>
 
-Defined in: types.ts:31
+Defined in: [types.ts:31](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/form/src/types.ts#L31)
 
 Initial form field values.
 
@@ -45,7 +45,7 @@ Initial form field values.
 
 > `optional` **onError**: (`error`) => `void`
 
-Defined in: types.ts:37
+Defined in: [types.ts:37](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/form/src/types.ts#L37)
 
 Callback invoked when the mutation fails.
 
@@ -65,7 +65,7 @@ Callback invoked when the mutation fails.
 
 > `optional` **onSuccess**: (`data`) => `void`
 
-Defined in: types.ts:35
+Defined in: [types.ts:35](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/form/src/types.ts#L35)
 
 Callback invoked after a successful mutation.
 
@@ -85,6 +85,6 @@ Callback invoked after a successful mutation.
 
 > `optional` **resetOnSuccess**: `boolean`
 
-Defined in: types.ts:33
+Defined in: [types.ts:33](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/form/src/types.ts#L33)
 
 Reset the form after successful submission. Defaults to `true`.

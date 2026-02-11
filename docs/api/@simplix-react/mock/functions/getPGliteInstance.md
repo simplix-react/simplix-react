@@ -8,7 +8,7 @@
 
 > **getPGliteInstance**(): `PGlite`
 
-Defined in: [pglite.ts:50](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/mock/src/pglite.ts#L50)
+Defined in: [pglite.ts:50](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/mock/src/pglite.ts#L50)
 
 Returns the current PGlite singleton instance.
 

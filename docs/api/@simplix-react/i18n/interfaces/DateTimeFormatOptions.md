@@ -6,7 +6,7 @@
 
 # Interface: DateTimeFormatOptions
 
-Defined in: [types.ts:94](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/i18n/src/types.ts#L94)
+Defined in: [types.ts:94](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/i18n/src/types.ts#L94)
 
 Configures date/time formatting options passed to `Intl.DateTimeFormat`.
 
@@ -16,7 +16,7 @@ Configures date/time formatting options passed to `Intl.DateTimeFormat`.
 
 > `optional` **dateStyle**: [`DateTimeStyle`](../type-aliases/DateTimeStyle.md)
 
-Defined in: [types.ts:96](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/i18n/src/types.ts#L96)
+Defined in: [types.ts:96](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/i18n/src/types.ts#L96)
 
 The date formatting style.
 
@@ -26,7 +26,7 @@ The date formatting style.
 
 > `optional` **hour12**: `boolean`
 
-Defined in: [types.ts:100](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/i18n/src/types.ts#L100)
+Defined in: [types.ts:100](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/i18n/src/types.ts#L100)
 
 Whether to use 12-hour time format.
 
@@ -36,6 +36,6 @@ Whether to use 12-hour time format.
 
 > `optional` **timeStyle**: [`DateTimeStyle`](../type-aliases/DateTimeStyle.md)
 
-Defined in: [types.ts:98](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/i18n/src/types.ts#L98)
+Defined in: [types.ts:98](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/i18n/src/types.ts#L98)
 
 The time formatting style.

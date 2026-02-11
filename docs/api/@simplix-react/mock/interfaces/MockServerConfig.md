@@ -6,7 +6,7 @@
 
 # Interface: MockServerConfig
 
-Defined in: [msw.ts:30](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/mock/src/msw.ts#L30)
+Defined in: [msw.ts:30](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/mock/src/msw.ts#L30)
 
 Describes the configuration required by [setupMockWorker](../functions/setupMockWorker.md).
 
@@ -40,7 +40,7 @@ const config: MockServerConfig = {
 
 > `optional` **dataDir**: `string`
 
-Defined in: [msw.ts:36](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/mock/src/msw.ts#L36)
+Defined in: [msw.ts:36](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/mock/src/msw.ts#L36)
 
 IndexedDB data directory for PGlite persistence.
 
@@ -54,7 +54,7 @@ IndexedDB data directory for PGlite persistence.
 
 > **handlers**: `unknown`[]
 
-Defined in: [msw.ts:57](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/mock/src/msw.ts#L57)
+Defined in: [msw.ts:57](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/mock/src/msw.ts#L57)
 
 MSW request handlers to register with the service worker.
 
@@ -66,7 +66,7 @@ Typically produced by [deriveMockHandlers](../functions/deriveMockHandlers.md).
 
 > **migrations**: (`db`) => `Promise`\<`void`\>[]
 
-Defined in: [msw.ts:43](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/mock/src/msw.ts#L43)
+Defined in: [msw.ts:43](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/mock/src/msw.ts#L43)
 
 Migration functions to run in order.
 
@@ -88,7 +88,7 @@ Each function receives the PGlite instance and should create or alter tables.
 
 > **seed**: (`db`) => `Promise`\<`void`\>[]
 
-Defined in: [msw.ts:50](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/mock/src/msw.ts#L50)
+Defined in: [msw.ts:50](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/mock/src/msw.ts#L50)
 
 Seed functions to run in order (after migrations).
 

@@ -8,7 +8,7 @@
 
 > **toCamelCase**(`str`): `string`
 
-Defined in: [sql/row-mapping.ts:26](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/mock/src/sql/row-mapping.ts#L26)
+Defined in: [sql/row-mapping.ts:26](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/mock/src/sql/row-mapping.ts#L26)
 
 Converts a snake_case string to camelCase.
 

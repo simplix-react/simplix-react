@@ -6,7 +6,7 @@
 
 # Interface: EntityHooks\<TSchema, TCreate, TUpdate\>
 
-Defined in: [types.ts:202](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/react/src/types.ts#L202)
+Defined in: [types.ts:202](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/react/src/types.ts#L202)
 
 Represents the complete set of React Query hooks derived from an entity definition.
 
@@ -59,7 +59,7 @@ The Zod schema defining the update DTO shape
 
 > **useCreate**: [`DerivedCreateHook`](../type-aliases/DerivedCreateHook.md)\<`output`\<`TCreate`\>, `output`\<`TSchema`\>\>
 
-Defined in: [types.ts:209](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/react/src/types.ts#L209)
+Defined in: [types.ts:209](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/react/src/types.ts#L209)
 
 ***
 
@@ -67,7 +67,7 @@ Defined in: [types.ts:209](https://github.com/simplix-react/simplix-react/blob/5
 
 > **useDelete**: [`DerivedDeleteHook`](../type-aliases/DerivedDeleteHook.md)
 
-Defined in: [types.ts:211](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/react/src/types.ts#L211)
+Defined in: [types.ts:211](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/react/src/types.ts#L211)
 
 ***
 
@@ -75,7 +75,7 @@ Defined in: [types.ts:211](https://github.com/simplix-react/simplix-react/blob/5
 
 > **useGet**: [`DerivedGetHook`](../type-aliases/DerivedGetHook.md)\<`output`\<`TSchema`\>\>
 
-Defined in: [types.ts:208](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/react/src/types.ts#L208)
+Defined in: [types.ts:208](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/react/src/types.ts#L208)
 
 ***
 
@@ -83,7 +83,7 @@ Defined in: [types.ts:208](https://github.com/simplix-react/simplix-react/blob/5
 
 > **useInfiniteList**: [`DerivedInfiniteListHook`](../type-aliases/DerivedInfiniteListHook.md)\<`output`\<`TSchema`\>\>
 
-Defined in: [types.ts:212](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/react/src/types.ts#L212)
+Defined in: [types.ts:212](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/react/src/types.ts#L212)
 
 ***
 
@@ -91,7 +91,7 @@ Defined in: [types.ts:212](https://github.com/simplix-react/simplix-react/blob/5
 
 > **useList**: [`DerivedListHook`](../type-aliases/DerivedListHook.md)\<`output`\<`TSchema`\>\>
 
-Defined in: [types.ts:207](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/react/src/types.ts#L207)
+Defined in: [types.ts:207](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/react/src/types.ts#L207)
 
 ***
 
@@ -99,4 +99,4 @@ Defined in: [types.ts:207](https://github.com/simplix-react/simplix-react/blob/5
 
 > **useUpdate**: [`DerivedUpdateHook`](../type-aliases/DerivedUpdateHook.md)\<`output`\<`TUpdate`\>, `output`\<`TSchema`\>\>
 
-Defined in: [types.ts:210](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/react/src/types.ts#L210)
+Defined in: [types.ts:210](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/react/src/types.ts#L210)

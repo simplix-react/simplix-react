@@ -6,7 +6,7 @@
 
 # Interface: EntityQuery
 
-Defined in: [packages/contract/src/types.ts:37](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/contract/src/types.ts#L37)
+Defined in: [packages/contract/src/types.ts:37](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/contract/src/types.ts#L37)
 
 Represents a named query scope that filters entities by a parent relationship.
 
@@ -23,7 +23,7 @@ referenced throughout the application.
 
 > **param**: `string`
 
-Defined in: [packages/contract/src/types.ts:41](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/contract/src/types.ts#L41)
+Defined in: [packages/contract/src/types.ts:41](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/contract/src/types.ts#L41)
 
 Route parameter name used to scope the query (e.g. `"projectId"`).
 
@@ -33,6 +33,6 @@ Route parameter name used to scope the query (e.g. `"projectId"`).
 
 > **parent**: `string`
 
-Defined in: [packages/contract/src/types.ts:39](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/contract/src/types.ts#L39)
+Defined in: [packages/contract/src/types.ts:39](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/contract/src/types.ts#L39)
 
 Name of the parent entity this query filters by (e.g. `"project"`).

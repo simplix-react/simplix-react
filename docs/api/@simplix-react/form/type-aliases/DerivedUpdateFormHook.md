@@ -8,7 +8,7 @@
 
 > **DerivedUpdateFormHook**\<`TSchema`\> = (`entityId`, `options?`) => [`UpdateFormReturn`](../interfaces/UpdateFormReturn.md)\<`TSchema`\>
 
-Defined in: types.ts:144
+Defined in: [types.ts:144](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/form/src/types.ts#L144)
 
 Hook signature for updating an existing entity via a TanStack Form instance.
 

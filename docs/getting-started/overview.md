@@ -12,6 +12,8 @@ The central idea behind simplix-react is that your API contract is the **single 
 Contract (Zod schemas)
     |
     +---> Client (type-safe HTTP client)
+    |       |
+    |       +---> Auth (Bearer, API Key, OAuth2)
     |
     +---> Hooks (TanStack Query hooks)
     |
@@ -96,6 +98,7 @@ simplix-react is designed for React developers who:
 | `@simplix-react/contract` | `@simplix-react/contract` | Zod-based type-safe API contract definitions. Entry point for `defineApi`. |
 | `@simplix-react/react` | `@simplix-react/react` | Derives TanStack Query hooks from a contract via `deriveHooks`. |
 | `@simplix-react/mock` | `@simplix-react/mock` | Generates MSW handlers and PGlite repositories from a contract. |
+| `@simplix-react/auth` | `@simplix-react/auth` | Authentication middleware with Bearer, API Key, OAuth2, and custom schemes. |
 | `@simplix-react/i18n` | `@simplix-react/i18n` | Internationalization framework built on i18next. |
 | `@simplix-react/testing` | `@simplix-react/testing` | Testing utilities for simplix-react applications. |
 | `@simplix-react/cli` | `@simplix-react/cli` | CLI for project scaffolding and validation. |

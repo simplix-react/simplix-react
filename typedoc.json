@@ -2,12 +2,11 @@
   "$schema": "https://typedoc.org/schema.json",
   "entryPointStrategy": "packages",
   "entryPoints": [
-    "packages/contract",
-    "packages/react",
-    "packages/mock",
-    "packages/form",
-    "packages/i18n",
-    "packages/testing"
+    "packages/*"
+  ],
+  "exclude": [
+    "packages/config-eslint",
+    "packages/config-typescript"
   ],
   "out": "docs/api",
   "plugin": ["typedoc-plugin-markdown"],
@@ -35,7 +34,10 @@
     },
     "@simplix-react/contract": {
       "ApiContractConfig": "../@simplix-react/contract/interfaces/ApiContractConfig.md",
-      "ApiError": "../@simplix-react/contract/classes/ApiError.md"
+      "ApiError": "../@simplix-react/contract/classes/ApiError.md",
+      "FetchFn": "../@simplix-react/contract/type-aliases/FetchFn.md",
+      "defaultFetch": "../@simplix-react/contract/functions/defaultFetch.md",
+      "defineApi": "../@simplix-react/contract/functions/defineApi.md"
     }
   }
 }

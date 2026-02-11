@@ -6,6 +6,8 @@
 
 ## Packages
 
+- [@simplix-react/auth](@simplix-react/auth/README.md)
+- [@simplix-react/cli](@simplix-react/cli/README.md)
 - [@simplix-react/contract](@simplix-react/contract/README.md)
 - [@simplix-react/form](@simplix-react/form/README.md)
 - [@simplix-react/i18n](@simplix-react/i18n/README.md)

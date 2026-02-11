@@ -8,7 +8,7 @@
 
 > **initPGlite**(`dataDir`): `Promise`\<`PGlite`\>
 
-Defined in: [pglite.ts:25](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/mock/src/pglite.ts#L25)
+Defined in: [pglite.ts:25](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/mock/src/pglite.ts#L25)
 
 Initializes a singleton PGlite instance with the given data directory.
 

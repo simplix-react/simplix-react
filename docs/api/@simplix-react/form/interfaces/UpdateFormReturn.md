@@ -6,7 +6,7 @@
 
 # Interface: UpdateFormReturn\<TSchema\>
 
-Defined in: types.ts:110
+Defined in: [types.ts:110](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/form/src/types.ts#L110)
 
 Return value of the `useUpdateForm` hook.
 
@@ -41,7 +41,7 @@ Zod schema type for the entity
 
 > **entity**: `output`\<`TSchema`\> \| `undefined`
 
-Defined in: types.ts:120
+Defined in: [types.ts:120](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/form/src/types.ts#L120)
 
 The loaded entity data, or `undefined` while loading.
 
@@ -51,7 +51,7 @@ The loaded entity data, or `undefined` while loading.
 
 > **form**: `AnyFormApi`
 
-Defined in: types.ts:112
+Defined in: [types.ts:112](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/form/src/types.ts#L112)
 
 TanStack Form API instance for field binding and submission.
 
@@ -61,7 +61,7 @@ TanStack Form API instance for field binding and submission.
 
 > **isLoading**: `boolean`
 
-Defined in: types.ts:114
+Defined in: [types.ts:114](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/form/src/types.ts#L114)
 
 Whether the entity data is still loading from the server.
 
@@ -71,7 +71,7 @@ Whether the entity data is still loading from the server.
 
 > **isSubmitting**: `boolean`
 
-Defined in: types.ts:116
+Defined in: [types.ts:116](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/form/src/types.ts#L116)
 
 Whether the update mutation is currently in flight.
 
@@ -81,6 +81,6 @@ Whether the update mutation is currently in flight.
 
 > **submitError**: `Error` \| `null`
 
-Defined in: types.ts:118
+Defined in: [types.ts:118](https://github.com/simplix-react/simplix-react/blob/656b6ff5067b57340319f1199e4ef833afd3d08f/packages/form/src/types.ts#L118)
 
 The most recent submission error, or `null` if the last attempt succeeded.
