@@ -33,6 +33,7 @@ const fwVersions: Record<string, string> = {};
 for (const pkg of FRAMEWORK_PKGS) {
   fwVersions[pkg] = readPkg(pkg).version;
 }
+fwVersions["meta"] = readPkg("simplix-react").version;
 
 // ---------------------------------------------------------------------------
 // 2. Build unified dependency version map

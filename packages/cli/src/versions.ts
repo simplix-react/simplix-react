@@ -64,7 +64,7 @@ function pkgNameToKey(name: string): string {
  * Adds framework version and dependency version Handlebars variables to a template context.
  *
  * Framework versions (caret ranges):
- *   {{fw.cli}}, {{fw.contract}}, {{fw.react}}, {{fw.mock}}, {{fw.i18n}}
+ *   {{fw.meta}}, {{fw.cli}}, {{fw.contract}}, {{fw.react}}, {{fw.mock}}, {{fw.i18n}}
  *
  * Dependency versions (as-is from package.json):
  *   {{deps.zod}}, {{deps.typescript}}, {{deps.tanstackReactQuery}}, etc.

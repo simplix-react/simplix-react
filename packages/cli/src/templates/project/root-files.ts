@@ -19,7 +19,7 @@ export const rootPackageJson = `{
     "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
-    "@simplix-react/cli": "{{fw.cli}}",
+    "simplix-react": "{{fw.meta}}",
     "turbo": "{{deps.turbo}}",
     "typescript": "{{deps.typescript}}"
   }

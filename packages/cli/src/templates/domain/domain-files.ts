@@ -28,13 +28,11 @@ export const domainPackageJson = `{
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
-    "@simplix-react/contract": "{{fw.contract}}",
-    "@simplix-react/react": "{{fw.react}}",
+    "simplix-react": "{{fw.meta}}",
     "@tanstack/react-query": "{{deps.tanstackReactQuery}}",
     "zod": "{{deps.zod}}"
   },
   "devDependencies": {
-    "@simplix-react/mock": "{{fw.mock}}",
     "@electric-sql/pglite": "{{deps.electricSqlPglite}}",
     "msw": "{{deps.msw}}",
     "tsup": "{{deps.tsup}}",

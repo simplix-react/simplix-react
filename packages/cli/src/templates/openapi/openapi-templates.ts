@@ -29,11 +29,7 @@ export const openapiPackageJsonWithEslintConfig = `{
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
-    "@simplix-react/contract": "{{fw.contract}}",
-{{#if generateForms}}
-    "@simplix-react/form": "{{fw.form}}",
-{{/if}}
-    "@simplix-react/react": "{{fw.react}}",
+    "simplix-react": "{{fw.meta}}",
 {{#if generateForms}}
     "@tanstack/react-form": "{{deps.tanstackReactForm}}",
 {{/if}}
@@ -42,7 +38,6 @@ export const openapiPackageJsonWithEslintConfig = `{
   },
   "devDependencies": {
     "{{configEslintPkgName}}": "workspace:*",
-    "@simplix-react/mock": "{{fw.mock}}",
     "@electric-sql/pglite": "{{deps.electricSqlPglite}}",
     "eslint": "{{deps.eslint}}",
     "msw": "{{deps.msw}}",
@@ -80,11 +75,7 @@ export const openapiPackageJsonStandalone = `{
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
-    "@simplix-react/contract": "{{fw.contract}}",
-{{#if generateForms}}
-    "@simplix-react/form": "{{fw.form}}",
-{{/if}}
-    "@simplix-react/react": "{{fw.react}}",
+    "simplix-react": "{{fw.meta}}",
 {{#if generateForms}}
     "@tanstack/react-form": "{{deps.tanstackReactForm}}",
 {{/if}}
@@ -92,7 +83,6 @@ export const openapiPackageJsonStandalone = `{
     "zod": "{{deps.zod}}"
   },
   "devDependencies": {
-    "@simplix-react/mock": "{{fw.mock}}",
     "@electric-sql/pglite": "{{deps.electricSqlPglite}}",
     "@typescript-eslint/eslint-plugin": "{{deps.typescriptEslintEslintPlugin}}",
     "@typescript-eslint/parser": "{{deps.typescriptEslintParser}}",

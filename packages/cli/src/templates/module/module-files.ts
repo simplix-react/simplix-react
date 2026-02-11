@@ -35,8 +35,8 @@ export const modulePackageJson = `{
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
-    {{#if enableI18n}}"@simplix-react/i18n": "{{fw.i18n}}",
-    {{/if}}"lucide-react": "{{deps.lucideReact}}"
+    "simplix-react": "{{fw.meta}}",
+    "lucide-react": "{{deps.lucideReact}}"
   },
   "peerDependencies": {
     "react": ">=18.0.0",

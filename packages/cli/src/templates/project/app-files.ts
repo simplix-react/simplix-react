@@ -15,8 +15,7 @@ export const appPackageJson = `{
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
-    "@simplix-react/mock": "{{fw.mock}}",{{#if enableI18n}}
-    "@simplix-react/i18n": "{{fw.i18n}}",{{/if}}
+    "simplix-react": "{{fw.meta}}",
     "@tanstack/react-query": "{{deps.tanstackReactQuery}}",
     "@tanstack/react-router": "{{deps.tanstackReactRouter}}",
     "lucide-react": "{{deps.lucideReact}}",

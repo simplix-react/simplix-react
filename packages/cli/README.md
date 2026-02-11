@@ -4,14 +4,16 @@ CLI for scaffolding and validating simplix-react projects.
 
 ## Installation
 
+Install via the meta package (recommended):
+
 ```bash
-pnpm add -D @simplix-react/cli
+pnpm add simplix-react
 ```
 
-Or install globally:
+Or install the CLI only:
 
 ```bash
-pnpm add -g @simplix-react/cli
+pnpm add -D @simplix-react/cli
 ```
 
 Requires **Node.js 18 or later**.
@@ -544,9 +546,19 @@ The config file is loaded using [jiti](https://github.com/unjs/jiti), so TypeScr
 
 ## Related Packages
 
+Install all packages at once with the meta package:
+
+```bash
+pnpm add simplix-react
+```
+
 | Package | Description |
 | --- | --- |
+| [`simplix-react`](https://www.npmjs.com/package/simplix-react) | Meta package (installs all packages below) |
 | `@simplix-react/contract` | Zod-based type-safe API contract definitions |
 | `@simplix-react/react` | React Query hooks derived from contracts |
+| `@simplix-react/form` | TanStack Form hooks derived from contracts |
+| `@simplix-react/auth` | Authentication middleware (Bearer, API Key, OAuth2) |
 | `@simplix-react/mock` | MSW handlers + PGlite repositories auto-generation |
 | `@simplix-react/i18n` | i18next-based internationalization framework |
+| `@simplix-react/testing` | Test utilities (mock clients, query wrappers) |
