@@ -82,6 +82,11 @@ export const rootTsconfigJson = `{
 }
 `;
 
+export const npmrc = `# Hoist @simplix-react/* packages so transitive deps from
+# the simplix-react meta package are directly importable.
+public-hoist-pattern[]=@simplix-react/*
+`;
+
 export const gitignore = `node_modules/
 dist/
 .turbo/

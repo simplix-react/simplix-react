@@ -10,6 +10,7 @@ import {
   pnpmWorkspaceYaml,
   turboJson,
   rootTsconfigJson,
+  npmrc,
   gitignore,
 } from "../templates/project/root-files.js";
 import { withVersions } from "../versions.js";
@@ -185,6 +186,7 @@ export const initCommand = new Command("init")
         "pnpm-workspace.yaml": renderTemplate(pnpmWorkspaceYaml, ctx),
         "turbo.json": renderTemplate(turboJson, ctx),
         "tsconfig.json": renderTemplate(rootTsconfigJson, ctx),
+        ".npmrc": npmrc,
         ".gitignore": gitignore,
         "simplix.config.ts": renderTemplate(simplixConfigTs, ctx),
       });
