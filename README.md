@@ -1,5 +1,8 @@
 # simplix-react
 
+[![npm version](https://img.shields.io/npm/v/simplix-react.svg)](https://www.npmjs.com/package/simplix-react)
+[![license](https://img.shields.io/npm/l/simplix-react.svg)](https://github.com/simplix-react/simplix-react/blob/main/LICENSE)
+
 Package-first React framework that auto-generates reusable domain packages from OpenAPI specs.
 
 ## What is simplix-react?
@@ -18,18 +21,27 @@ simplix-react is a package-first React framework that auto-generates reusable do
 
 | Package | npm | Description |
 | --- | --- | --- |
-| [contract](./packages/contract) | `@simplix-react/contract` | Define type-safe API contracts with Zod schemas |
-| [react](./packages/react) | `@simplix-react/react` | React Query hooks derived from contracts |
-| [form](./packages/form) | `@simplix-react/form` | TanStack Form hooks derived from contracts |
-| [auth](./packages/auth) | `@simplix-react/auth` | Authentication middleware with Bearer, API Key, OAuth2 |
-| [mock](./packages/mock) | `@simplix-react/mock` | Auto-generated MSW handlers and PGlite repositories |
-| [i18n](./packages/i18n) | `@simplix-react/i18n` | Internationalization framework with i18next adapter |
-| [testing](./packages/testing) | `@simplix-react/testing` | Testing utilities for simplix-react applications |
-| [cli](./packages/cli) | `@simplix-react/cli` | CLI for scaffolding and validating projects |
+| [contract](./packages/contract) | [![npm](https://img.shields.io/npm/v/@simplix-react/contract.svg)](https://www.npmjs.com/package/@simplix-react/contract) | Type-safe API contracts with Zod schemas |
+| [react](./packages/react) | [![npm](https://img.shields.io/npm/v/@simplix-react/react.svg)](https://www.npmjs.com/package/@simplix-react/react) | React Query hooks derived from contracts |
+| [form](./packages/form) | [![npm](https://img.shields.io/npm/v/@simplix-react/form.svg)](https://www.npmjs.com/package/@simplix-react/form) | TanStack Form hooks derived from contracts |
+| [auth](./packages/auth) | [![npm](https://img.shields.io/npm/v/@simplix-react/auth.svg)](https://www.npmjs.com/package/@simplix-react/auth) | Authentication middleware (Bearer, API Key, OAuth2) |
+| [mock](./packages/mock) | [![npm](https://img.shields.io/npm/v/@simplix-react/mock.svg)](https://www.npmjs.com/package/@simplix-react/mock) | MSW handlers + PGlite repositories |
+| [i18n](./packages/i18n) | [![npm](https://img.shields.io/npm/v/@simplix-react/i18n.svg)](https://www.npmjs.com/package/@simplix-react/i18n) | i18next-based internationalization |
+| [testing](./packages/testing) | [![npm](https://img.shields.io/npm/v/@simplix-react/testing.svg)](https://www.npmjs.com/package/@simplix-react/testing) | Testing utilities |
+| [cli](./packages/cli) | [![npm](https://img.shields.io/npm/v/@simplix-react/cli.svg)](https://www.npmjs.com/package/@simplix-react/cli) | Project scaffolding and validation CLI |
 
 ## Quick Start
 
 ### 1. Install
+
+Install all packages at once:
+
+```bash
+pnpm add simplix-react
+pnpm add zod @tanstack/react-query
+```
+
+Or install only the packages you need:
 
 ```bash
 pnpm add @simplix-react/contract @simplix-react/react

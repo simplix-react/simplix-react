@@ -1,5 +1,8 @@
 # simplix-react
 
+[![npm version](https://img.shields.io/npm/v/simplix-react.svg)](https://www.npmjs.com/package/simplix-react)
+[![license](https://img.shields.io/npm/l/simplix-react.svg)](https://github.com/simplix-react/simplix-react/blob/main/LICENSE)
+
 Meta package that installs all `@simplix-react/*` packages in one dependency.
 
 ## Installation

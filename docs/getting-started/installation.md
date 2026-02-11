@@ -18,9 +18,28 @@ corepack prepare pnpm@latest --activate
 
 ## Installing Packages
 
-### Core Packages
+### All-in-One (Recommended)
 
-Install the contract and React hooks packages — these are the foundation of every simplix-react project:
+Install the meta package to get all `@simplix-react/*` packages in a single dependency:
+
+```bash
+pnpm add simplix-react
+```
+
+This includes contract, react, form, auth, mock, i18n, cli, and testing packages. Import directly from individual packages:
+
+```ts
+import { defineApi } from "@simplix-react/contract";
+import { deriveHooks } from "@simplix-react/react";
+```
+
+### Selective Installation
+
+Alternatively, install only the packages you need:
+
+#### Core Packages
+
+The contract and React hooks packages are the foundation of every simplix-react project:
 
 ```bash
 pnpm add @simplix-react/contract @simplix-react/react
