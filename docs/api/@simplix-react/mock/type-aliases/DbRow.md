@@ -8,7 +8,7 @@
 
 > **DbRow** = `Record`\<`string`, `unknown`\>
 
-Defined in: sql/row-mapping.ts:10
+Defined in: [sql/row-mapping.ts:10](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/mock/src/sql/row-mapping.ts#L10)
 
 Represents a raw database row with unknown column values.
 

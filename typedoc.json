@@ -5,6 +5,7 @@
     "packages/contract",
     "packages/react",
     "packages/mock",
+    "packages/form",
     "packages/i18n",
     "packages/testing"
   ],
@@ -33,7 +34,8 @@
       "QueryClientProvider": "https://tanstack.com/query/latest/docs/framework/react/reference/QueryClientProvider"
     },
     "@simplix-react/contract": {
-      "ApiContractConfig": "../@simplix-react/contract/interfaces/ApiContractConfig.md"
+      "ApiContractConfig": "../@simplix-react/contract/interfaces/ApiContractConfig.md",
+      "ApiError": "../@simplix-react/contract/classes/ApiError.md"
     }
   }
 }

@@ -30,7 +30,13 @@ export const openapiPackageJsonWithEslintConfig = `{
   },
   "dependencies": {
     "@simplix-react/contract": "{{fw.contract}}",
+{{#if generateForms}}
+    "@simplix-react/form": "{{fw.form}}",
+{{/if}}
     "@simplix-react/react": "{{fw.react}}",
+{{#if generateForms}}
+    "@tanstack/react-form": "{{deps.tanstackReactForm}}",
+{{/if}}
     "@tanstack/react-query": "{{deps.tanstackReactQuery}}",
     "zod": "{{deps.zod}}"
   },
@@ -75,7 +81,13 @@ export const openapiPackageJsonStandalone = `{
   },
   "dependencies": {
     "@simplix-react/contract": "{{fw.contract}}",
+{{#if generateForms}}
+    "@simplix-react/form": "{{fw.form}}",
+{{/if}}
     "@simplix-react/react": "{{fw.react}}",
+{{#if generateForms}}
+    "@tanstack/react-form": "{{deps.tanstackReactForm}}",
+{{/if}}
     "@tanstack/react-query": "{{deps.tanstackReactQuery}}",
     "zod": "{{deps.zod}}"
   },
@@ -167,6 +179,12 @@ export * from "./contract.js";
 export * from "./hooks.js";
 `;
 
+export const openapiGeneratedIndexWithFormsTs = `export * from "./schemas.js";
+export * from "./contract.js";
+export * from "./hooks.js";
+export * from "./form-hooks.js";
+`;
+
 export const openapiGeneratedContractTs = `import { defineApi, simpleQueryBuilder } from "@simplix-react/contract";
 {{#each entities}}
 import { {{name}}Schema, create{{pascalName}}Schema, update{{pascalName}}Schema } from "./schemas.js";
@@ -193,6 +211,13 @@ export const openapiGeneratedHooksTs = `import { deriveHooks } from "@simplix-re
 import { {{domainName}}Api } from "./contract.js";
 
 export const {{domainName}}Hooks = deriveHooks({{domainName}}Api);
+`;
+
+export const openapiGeneratedFormHooksTs = `import { deriveFormHooks } from "@simplix-react/form";
+import { {{domainName}}Api } from "./contract.js";
+import { {{domainName}}Hooks } from "./hooks.js";
+
+export const {{domainName}}FormHooks = deriveFormHooks({{domainName}}Api, {{domainName}}Hooks);
 `;
 
 export const openapiGeneratedMockHandlersTs = `import type { HttpHandler } from "msw";

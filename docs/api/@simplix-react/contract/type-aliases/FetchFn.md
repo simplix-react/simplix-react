@@ -8,7 +8,7 @@
 
 > **FetchFn** = \<`T`\>(`path`, `options?`) => `Promise`\<`T`\>
 
-Defined in: packages/contract/src/types.ts:306
+Defined in: [packages/contract/src/types.ts:306](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/contract/src/types.ts#L306)
 
 Represents a customizable fetch function signature.
 

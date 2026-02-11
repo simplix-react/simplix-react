@@ -8,7 +8,7 @@
 
 > **mapPgError**(`err`): [`MockError`](../interfaces/MockError.md)
 
-Defined in: sql/error-mapping.ts:45
+Defined in: [sql/error-mapping.ts:45](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/mock/src/sql/error-mapping.ts#L45)
 
 Maps a raw PostgreSQL/PGlite error to an HTTP-friendly [MockError](../interfaces/MockError.md).
 

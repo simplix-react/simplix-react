@@ -6,7 +6,7 @@
 
 # Interface: EntityClient\<TSchema, TCreate, TUpdate\>
 
-Defined in: packages/contract/src/types.ts:272
+Defined in: [packages/contract/src/types.ts:272](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/contract/src/types.ts#L272)
 
 Provides a type-safe CRUD client for a single entity, derived from its
 [EntityDefinition](EntityDefinition.md) schemas.
@@ -59,7 +59,7 @@ Zod schema for the update payload.
 
 > **create**: (`parentIdOrDto`, `dto?`) => `Promise`\<`output`\<`TSchema`\>\>
 
-Defined in: packages/contract/src/types.ts:285
+Defined in: [packages/contract/src/types.ts:285](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/contract/src/types.ts#L285)
 
 Creates a new entity, optionally under a parent resource.
 
@@ -83,7 +83,7 @@ Creates a new entity, optionally under a parent resource.
 
 > **delete**: (`id`) => `Promise`\<`void`\>
 
-Defined in: packages/contract/src/types.ts:292
+Defined in: [packages/contract/src/types.ts:292](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/contract/src/types.ts#L292)
 
 Deletes an entity by its ID.
 
@@ -103,7 +103,7 @@ Deletes an entity by its ID.
 
 > **get**: (`id`) => `Promise`\<`output`\<`TSchema`\>\>
 
-Defined in: packages/contract/src/types.ts:283
+Defined in: [packages/contract/src/types.ts:283](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/contract/src/types.ts#L283)
 
 Fetches a single entity by its ID.
 
@@ -123,7 +123,7 @@ Fetches a single entity by its ID.
 
 > **list**: (`parentIdOrParams?`, `params?`) => `Promise`\<`output`\<`TSchema`\>[]\>
 
-Defined in: packages/contract/src/types.ts:278
+Defined in: [packages/contract/src/types.ts:278](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/contract/src/types.ts#L278)
 
 Fetches a list of entities, optionally scoped by parent ID and/or list parameters.
 
@@ -147,7 +147,7 @@ Fetches a list of entities, optionally scoped by parent ID and/or list parameter
 
 > **update**: (`id`, `dto`) => `Promise`\<`output`\<`TSchema`\>\>
 
-Defined in: packages/contract/src/types.ts:290
+Defined in: [packages/contract/src/types.ts:290](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/contract/src/types.ts#L290)
 
 Partially updates an existing entity by ID.
 

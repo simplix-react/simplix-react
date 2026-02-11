@@ -1,9 +1,40 @@
-// SimplixConfig — loaded from simplix.config.ts at project root
-
+/**
+ * Environment entry for `.http` file generation.
+ *
+ * @see {@link SimplixConfig.http} for environment configuration
+ */
 export interface SimplixHttpEnvironment {
+  /** Absolute base URL for HTTP requests in this environment. */
   baseUrl: string;
 }
 
+/**
+ * Project-level configuration loaded from `simplix.config.ts` at the project root.
+ *
+ * @remarks
+ * Controls code generation behavior, mock layer defaults, package naming,
+ * and OpenAPI domain splitting. All fields are optional — sensible defaults
+ * are applied when omitted.
+ *
+ * @example
+ * ```ts
+ * import { defineConfig } from "@simplix-react/cli";
+ *
+ * export default defineConfig({
+ *   api: { baseUrl: "/api/v1" },
+ *   packages: { prefix: "acme" },
+ *   codegen: { header: true },
+ *   openapi: {
+ *     domains: {
+ *       project: ["Projects", "Tasks"],
+ *       auth: ["Auth", "Users"],
+ *     },
+ *   },
+ * });
+ * ```
+ *
+ * @see {@link defineConfig} — identity wrapper for type-safe autocompletion
+ */
 export interface SimplixConfig {
   /** API settings — used for basePath in code generation */
   api?: {

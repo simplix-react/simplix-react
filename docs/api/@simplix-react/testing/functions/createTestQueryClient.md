@@ -8,7 +8,7 @@
 
 > **createTestQueryClient**(): [`QueryClient`](https://tanstack.com/query/latest/docs/reference/QueryClient)
 
-Defined in: test-query-client.ts:30
+Defined in: [test-query-client.ts:30](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/testing/src/test-query-client.ts#L30)
 
 Creates a [QueryClient](https://tanstack.com/query/latest/docs/reference/QueryClient) pre-configured for deterministic test execution.
 

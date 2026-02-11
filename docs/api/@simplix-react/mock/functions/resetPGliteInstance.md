@@ -8,7 +8,7 @@
 
 > **resetPGliteInstance**(): `void`
 
-Defined in: pglite.ts:73
+Defined in: [pglite.ts:73](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/mock/src/pglite.ts#L73)
 
 Resets the PGlite singleton instance to `null`.
 

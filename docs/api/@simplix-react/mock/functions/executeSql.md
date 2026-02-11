@@ -8,7 +8,7 @@
 
 > **executeSql**(`db`, `sql`): `Promise`\<`void`\>
 
-Defined in: sql/migration-helpers.ts:82
+Defined in: [sql/migration-helpers.ts:82](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/mock/src/sql/migration-helpers.ts#L82)
 
 Executes multiple SQL statements separated by semicolons.
 

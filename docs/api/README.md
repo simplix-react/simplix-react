@@ -7,6 +7,7 @@
 ## Packages
 
 - [@simplix-react/contract](@simplix-react/contract/README.md)
+- [@simplix-react/form](@simplix-react/form/README.md)
 - [@simplix-react/i18n](@simplix-react/i18n/README.md)
 - [@simplix-react/mock](@simplix-react/mock/README.md)
 - [@simplix-react/react](@simplix-react/react/README.md)

@@ -12,6 +12,7 @@ type FrameworkPkg =
   | "@simplix-react/cli"
   | "@simplix-react/contract"
   | "@simplix-react/react"
+  | "@simplix-react/form"
   | "@simplix-react/mock"
   | "@simplix-react/i18n"
   | "@simplix-react/testing";
@@ -20,6 +21,7 @@ const FW_KEY_MAP: Record<FrameworkPkg, string> = {
   "@simplix-react/cli": "cli",
   "@simplix-react/contract": "contract",
   "@simplix-react/react": "react",
+  "@simplix-react/form": "form",
   "@simplix-react/mock": "mock",
   "@simplix-react/i18n": "i18n",
   "@simplix-react/testing": "testing",

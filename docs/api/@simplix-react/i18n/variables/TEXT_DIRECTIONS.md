@@ -8,7 +8,7 @@
 
 > `const` **TEXT\_DIRECTIONS**: `object`
 
-Defined in: types.ts:66
+Defined in: [types.ts:66](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/i18n/src/types.ts#L66)
 
 Provides constant values for text direction (`"ltr"` or `"rtl"`).
 

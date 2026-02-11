@@ -8,7 +8,7 @@
 
 > **TranslationResources** = `Record`\<[`LocaleCode`](LocaleCode.md), `Record`\<[`TranslationNamespace`](TranslationNamespace.md), `Record`\<`string`, `unknown`\>\>\>
 
-Defined in: i18next-adapter.ts:60
+Defined in: [i18next-adapter.ts:60](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/i18n/src/i18next-adapter.ts#L60)
 
 Represents a nested structure of translation resources keyed by locale, then namespace.
 

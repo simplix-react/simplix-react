@@ -27,8 +27,10 @@ import {
   openapiUserIndexTs,
   openapiUserMockIndexTs,
   openapiGeneratedIndexTs,
+  openapiGeneratedIndexWithFormsTs,
   openapiGeneratedContractTs,
   openapiGeneratedHooksTs,
+  openapiGeneratedFormHooksTs,
   openapiGeneratedMockHandlersTs,
   openapiGeneratedMockMigrationsTs,
   openapiMockSeedTs,
@@ -42,6 +44,7 @@ interface OpenAPIFlags {
   force?: boolean;
   http?: boolean;
   mock?: boolean;
+  forms?: boolean;
   header?: boolean;
   yes?: boolean;
 }
@@ -61,6 +64,7 @@ export const openapiCommand = new Command("openapi")
   .option("-f, --force", "Force regeneration even if no changes detected")
   .option("--no-http", "Skip .http file generation")
   .option("--no-mock", "Skip mock layer generation")
+  .option("--no-forms", "Skip form hooks generation")
   .option("--header", "Add auto-generated header comment to files (default)")
   .option("--no-header", "Skip auto-generated header comment in files")
   .option("-y, --yes", "Auto-confirm without prompts")
@@ -278,6 +282,7 @@ async function generateDomainPackage(opts: {
     // Build template context
     const apiBaseUrl = config.api?.baseUrl ?? "/api";
     const apiBasePath = `${apiBaseUrl}/${domainName}`;
+    const generateForms = flags.forms !== false;
     const ctx = buildTemplateContext({
       domainName,
       domainPkgName,
@@ -286,6 +291,7 @@ async function generateDomainPackage(opts: {
       scope,
       apiBasePath,
       entities,
+      generateForms,
     });
 
     // Clean generated directories before regeneration
@@ -299,10 +305,17 @@ async function generateDomainPackage(opts: {
     // --- Generated files (always regenerated) ---
     const generatedFiles: Record<string, string> = {};
 
-    generatedFiles["src/generated/index.ts"] = openapiGeneratedIndexTs;
+    generatedFiles["src/generated/index.ts"] = generateForms
+      ? openapiGeneratedIndexWithFormsTs
+      : openapiGeneratedIndexTs;
     generatedFiles["src/generated/schemas.ts"] = generateZodSchemas(entities);
     generatedFiles["src/generated/contract.ts"] = renderTemplate(openapiGeneratedContractTs, ctx);
     generatedFiles["src/generated/hooks.ts"] = renderTemplate(openapiGeneratedHooksTs, ctx);
+
+    // Form hooks
+    if (generateForms) {
+      generatedFiles["src/generated/form-hooks.ts"] = renderTemplate(openapiGeneratedFormHooksTs, ctx);
+    }
 
     // Mock generated layer
     if (flags.mock !== false) {
@@ -452,6 +465,7 @@ function buildTemplateContext(opts: {
   scope: string;
   apiBasePath: string;
   entities: ExtractedEntity[];
+  generateForms: boolean;
 }): Record<string, unknown> {
   return withVersions({
     domainName: opts.domainName,
@@ -461,6 +475,7 @@ function buildTemplateContext(opts: {
     projectName: opts.projectName,
     scope: opts.scope,
     apiBasePath: opts.apiBasePath,
+    generateForms: opts.generateForms,
     PascalName:
       opts.domainName.charAt(0).toUpperCase() + opts.domainName.slice(1),
     entities: opts.entities.map((e) => ({
@@ -500,6 +515,10 @@ function buildFileList(
   files["src/generated/schemas.ts"] = true;
   files["src/generated/contract.ts"] = true;
   files["src/generated/hooks.ts"] = true;
+
+  if (flags.forms !== false) {
+    files["src/generated/form-hooks.ts"] = true;
+  }
 
   if (flags.mock !== false) {
     files["src/mock/generated/handlers.ts"] = true;

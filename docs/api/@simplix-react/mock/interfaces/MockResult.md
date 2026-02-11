@@ -6,7 +6,7 @@
 
 # Interface: MockResult\<T\>
 
-Defined in: mock-result.ts:26
+Defined in: [mock-result.ts:26](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/mock/src/mock-result.ts#L26)
 
 Represents the outcome of a mock repository operation.
 
@@ -47,7 +47,7 @@ The type of the data payload on success.
 
 > `optional` **data**: `T`
 
-Defined in: mock-result.ts:28
+Defined in: [mock-result.ts:28](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/mock/src/mock-result.ts#L28)
 
 ***
 
@@ -55,7 +55,7 @@ Defined in: mock-result.ts:28
 
 > `optional` **error**: `object`
 
-Defined in: mock-result.ts:29
+Defined in: [mock-result.ts:29](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/mock/src/mock-result.ts#L29)
 
 #### code
 
@@ -71,4 +71,4 @@ Defined in: mock-result.ts:29
 
 > **success**: `boolean`
 
-Defined in: mock-result.ts:27
+Defined in: [mock-result.ts:27](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/mock/src/mock-result.ts#L27)

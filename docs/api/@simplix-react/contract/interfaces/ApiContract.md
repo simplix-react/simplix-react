@@ -6,7 +6,7 @@
 
 # Interface: ApiContract\<TEntities, TOperations\>
 
-Defined in: packages/contract/src/types.ts:324
+Defined in: [packages/contract/src/types.ts:324](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/contract/src/types.ts#L324)
 
 Represents the fully constructed API contract returned by [defineApi](../functions/defineApi.md).
 
@@ -40,7 +40,7 @@ Map of operation names to their definitions.
 
 > **client**: \{ \[K in string \| number \| symbol\]: EntityClient\<TEntities\[K\]\["schema"\], TEntities\[K\]\["createSchema"\], TEntities\[K\]\["updateSchema"\]\> \} & \{ \[K in string \| number \| symbol\]: TOperations\[K\] extends OperationDefinition\<\_TInput, TOutput\> ? (args: unknown\[\]) =\> Promise\<output\<TOutput\>\> : never \}
 
-Defined in: packages/contract/src/types.ts:331
+Defined in: [packages/contract/src/types.ts:331](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/contract/src/types.ts#L331)
 
 Type-safe HTTP client with methods for each entity and operation.
 
@@ -50,7 +50,7 @@ Type-safe HTTP client with methods for each entity and operation.
 
 > **config**: [`ApiContractConfig`](ApiContractConfig.md)\<`TEntities`, `TOperations`\>
 
-Defined in: packages/contract/src/types.ts:329
+Defined in: [packages/contract/src/types.ts:329](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/contract/src/types.ts#L329)
 
 The original contract configuration.
 
@@ -60,6 +60,6 @@ The original contract configuration.
 
 > **queryKeys**: \{ \[K in string \| number \| symbol\]: QueryKeyFactory \}
 
-Defined in: packages/contract/src/types.ts:346
+Defined in: [packages/contract/src/types.ts:346](https://github.com/simplix-react/simplix-react/blob/5a1c363918967dad0c47839d93eeb985e4d431ce/packages/contract/src/types.ts#L346)
 
 Query key factories for cache management, one per entity.
