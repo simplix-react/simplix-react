@@ -8,7 +8,7 @@
 
 > **addColumnIfNotExists**(`db`, `tableName`, `columnName`, `columnDef`): `Promise`\<`void`\>
 
-Defined in: [sql/migration-helpers.ts:114](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/mock/src/sql/migration-helpers.ts#L114)
+Defined in: [sql/migration-helpers.ts:114](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/mock/src/sql/migration-helpers.ts#L114)
 
 Adds a column to a table only if it does not already exist.
 

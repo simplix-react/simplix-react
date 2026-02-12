@@ -4,6 +4,10 @@
 
 [Documentation](../../README.md) / @simplix-react/mock
 
+<p align="center">
+  <img src="../../_media/simplix-logo.png" alt="simplix-react" width="200" />
+</p>
+
 # @simplix-react/mock
 
 Auto-generated MSW handlers and PGlite repositories from `@simplix-react/contract`.

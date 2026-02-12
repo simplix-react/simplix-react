@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="../../docs/assets/simplix-logo.png" alt="simplix-react" width="200" />
+</p>
+
 # @simplix-react/cli
 
 CLI for scaffolding and validating simplix-react projects.

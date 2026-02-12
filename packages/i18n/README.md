@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="../../docs/assets/simplix-logo.png" alt="simplix-react" width="200" />
+</p>
+
 # @simplix-react/i18n
 
 Internationalization framework with an adapter pattern and built-in i18next integration.

@@ -6,7 +6,7 @@
 
 # Interface: SimplixConfig
 
-Defined in: [types.ts:38](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/cli/src/config/types.ts#L38)
+Defined in: [types.ts:38](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/cli/src/config/types.ts#L38)
 
 Project-level configuration loaded from `simplix.config.ts` at the project root.
 
@@ -44,7 +44,7 @@ export default defineConfig({
 
 > `optional` **api**: `object`
 
-Defined in: [types.ts:40](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/cli/src/config/types.ts#L40)
+Defined in: [types.ts:40](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/cli/src/config/types.ts#L40)
 
 API settings — used for basePath in code generation
 
@@ -60,7 +60,7 @@ API base path (default: "/api")
 
 > `optional` **codegen**: `object`
 
-Defined in: [types.ts:68](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/cli/src/config/types.ts#L68)
+Defined in: [types.ts:68](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/cli/src/config/types.ts#L68)
 
 Code generation options
 
@@ -76,7 +76,7 @@ Prepend auto-generated header comment to generated files (default: true)
 
 > `optional` **http**: `object`
 
-Defined in: [types.ts:55](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/cli/src/config/types.ts#L55)
+Defined in: [types.ts:55](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/cli/src/config/types.ts#L55)
 
 .http file environment settings
 
@@ -90,7 +90,7 @@ Defined in: [types.ts:55](https://github.com/simplix-react/simplix-react/blob/2c
 
 > `optional` **mock**: `object`
 
-Defined in: [types.ts:60](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/cli/src/config/types.ts#L60)
+Defined in: [types.ts:60](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/cli/src/config/types.ts#L60)
 
 Mock layer defaults
 
@@ -114,7 +114,7 @@ PGlite IndexedDB storage path (default: "idb://simplix-mock")
 
 > `optional` **openapi**: `object`
 
-Defined in: [types.ts:74](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/cli/src/config/types.ts#L74)
+Defined in: [types.ts:74](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/cli/src/config/types.ts#L74)
 
 OpenAPI code generation options
 
@@ -130,7 +130,7 @@ Tag-based domain splitting: domainName → tagPatterns (exact string or /regex/)
 
 > `optional` **packages**: `object`
 
-Defined in: [types.ts:49](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/cli/src/config/types.ts#L49)
+Defined in: [types.ts:49](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/cli/src/config/types.ts#L49)
 
 Package naming options
 
@@ -146,6 +146,6 @@ Short prefix for generated package names (default: derived from root package.jso
 
 > `optional` **queryBuilder**: `unknown`
 
-Defined in: [types.ts:46](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/cli/src/config/types.ts#L46)
+Defined in: [types.ts:46](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/cli/src/config/types.ts#L46)
 
 Global QueryBuilder — applied to all domains

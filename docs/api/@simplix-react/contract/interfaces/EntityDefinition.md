@@ -6,7 +6,7 @@
 
 # Interface: EntityDefinition\<TSchema, TCreate, TUpdate\>
 
-Defined in: [packages/contract/src/types.ts:73](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/contract/src/types.ts#L73)
+Defined in: [packages/contract/src/types.ts:73](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/contract/src/types.ts#L73)
 
 Defines a CRUD-capable API entity with Zod schemas for type-safe validation.
 
@@ -61,7 +61,7 @@ Zod schema for the update (partial) payload.
 
 > **createSchema**: `TCreate`
 
-Defined in: [packages/contract/src/types.ts:83](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/contract/src/types.ts#L83)
+Defined in: [packages/contract/src/types.ts:83](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/contract/src/types.ts#L83)
 
 Zod schema describing the payload required to create a new entity.
 
@@ -71,7 +71,7 @@ Zod schema describing the payload required to create a new entity.
 
 > `optional` **filterSchema**: `ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>
 
-Defined in: [packages/contract/src/types.ts:91](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/contract/src/types.ts#L91)
+Defined in: [packages/contract/src/types.ts:91](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/contract/src/types.ts#L91)
 
 Optional Zod schema for validating list filter parameters.
 
@@ -81,7 +81,7 @@ Optional Zod schema for validating list filter parameters.
 
 > `optional` **parent**: [`EntityParent`](EntityParent.md)
 
-Defined in: [packages/contract/src/types.ts:87](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/contract/src/types.ts#L87)
+Defined in: [packages/contract/src/types.ts:87](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/contract/src/types.ts#L87)
 
 Optional parent resource for nested URL construction.
 
@@ -91,7 +91,7 @@ Optional parent resource for nested URL construction.
 
 > **path**: `string`
 
-Defined in: [packages/contract/src/types.ts:79](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/contract/src/types.ts#L79)
+Defined in: [packages/contract/src/types.ts:79](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/contract/src/types.ts#L79)
 
 URL path segment for this entity (e.g. `"/tasks"`).
 
@@ -101,7 +101,7 @@ URL path segment for this entity (e.g. `"/tasks"`).
 
 > `optional` **queries**: `Record`\<`string`, [`EntityQuery`](EntityQuery.md)\>
 
-Defined in: [packages/contract/src/types.ts:89](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/contract/src/types.ts#L89)
+Defined in: [packages/contract/src/types.ts:89](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/contract/src/types.ts#L89)
 
 Named query scopes for filtering entities by parent relationships.
 
@@ -111,7 +111,7 @@ Named query scopes for filtering entities by parent relationships.
 
 > **schema**: `TSchema`
 
-Defined in: [packages/contract/src/types.ts:81](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/contract/src/types.ts#L81)
+Defined in: [packages/contract/src/types.ts:81](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/contract/src/types.ts#L81)
 
 Zod schema describing the full entity shape returned by the API.
 
@@ -121,6 +121,6 @@ Zod schema describing the full entity shape returned by the API.
 
 > **updateSchema**: `TUpdate`
 
-Defined in: [packages/contract/src/types.ts:85](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/contract/src/types.ts#L85)
+Defined in: [packages/contract/src/types.ts:85](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/contract/src/types.ts#L85)
 
 Zod schema describing the payload for updating an existing entity.

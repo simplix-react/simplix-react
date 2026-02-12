@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="../../docs/assets/simplix-logo.png" alt="simplix-react" width="200" />
+</p>
+
 # @simplix-react/form
 
 TanStack Form hooks derived automatically from `@simplix-react/contract` schemas and `@simplix-react/react` hooks.

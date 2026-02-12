@@ -1,5 +1,11 @@
+[**Documentation**](../README.md)
+
+***
+
+[Documentation](../README.md) / simplix-react
+
 <p align="center">
-  <img src="../../docs/assets/simplix-logo.png" alt="simplix-react" width="200" />
+  <img src="../_media/simplix-logo.png" alt="simplix-react" width="200" />
 </p>
 
 # SimpliX React

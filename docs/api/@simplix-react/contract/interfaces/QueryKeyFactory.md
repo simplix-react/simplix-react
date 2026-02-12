@@ -6,7 +6,7 @@
 
 # Interface: QueryKeyFactory
 
-Defined in: [packages/contract/src/types.ts:232](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/contract/src/types.ts#L232)
+Defined in: [packages/contract/src/types.ts:232](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/contract/src/types.ts#L232)
 
 Provides structured query key generators for a single entity, following the
 query key factory pattern recommended by TanStack Query.
@@ -38,7 +38,7 @@ api.queryKeys.task.detail("abc");    // ["project", "task", "detail", "abc"]
 
 > **all**: readonly `unknown`[]
 
-Defined in: [packages/contract/src/types.ts:234](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/contract/src/types.ts#L234)
+Defined in: [packages/contract/src/types.ts:234](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/contract/src/types.ts#L234)
 
 Root key matching all queries for this entity: `[domain, entity]`.
 
@@ -48,7 +48,7 @@ Root key matching all queries for this entity: `[domain, entity]`.
 
 > **detail**: (`id`) => readonly `unknown`[]
 
-Defined in: [packages/contract/src/types.ts:242](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/contract/src/types.ts#L242)
+Defined in: [packages/contract/src/types.ts:242](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/contract/src/types.ts#L242)
 
 Returns key matching a specific detail query by ID.
 
@@ -68,7 +68,7 @@ readonly `unknown`[]
 
 > **details**: () => readonly `unknown`[]
 
-Defined in: [packages/contract/src/types.ts:240](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/contract/src/types.ts#L240)
+Defined in: [packages/contract/src/types.ts:240](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/contract/src/types.ts#L240)
 
 Returns key matching all detail queries: `[domain, entity, "detail"]`.
 
@@ -82,7 +82,7 @@ readonly `unknown`[]
 
 > **list**: (`params`) => readonly `unknown`[]
 
-Defined in: [packages/contract/src/types.ts:238](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/contract/src/types.ts#L238)
+Defined in: [packages/contract/src/types.ts:238](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/contract/src/types.ts#L238)
 
 Returns key matching a specific list query with parameters.
 
@@ -102,7 +102,7 @@ readonly `unknown`[]
 
 > **lists**: () => readonly `unknown`[]
 
-Defined in: [packages/contract/src/types.ts:236](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/contract/src/types.ts#L236)
+Defined in: [packages/contract/src/types.ts:236](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/contract/src/types.ts#L236)
 
 Returns key matching all list queries: `[domain, entity, "list"]`.
 

@@ -1,11 +1,15 @@
-# simplix-react
+<p align="center">
+  <img src="docs/assets/simplix-logo.png" alt="simplix-react" width="200" />
+</p>
+
+# SimpliX React
 
 [![npm version](https://img.shields.io/npm/v/simplix-react.svg)](https://www.npmjs.com/package/simplix-react)
 [![license](https://img.shields.io/npm/l/simplix-react.svg)](https://github.com/simplix-react/simplix-react/blob/main/LICENSE)
 
 Package-first React framework that auto-generates reusable domain packages from OpenAPI specs.
 
-## What is simplix-react?
+## What is SimpliX React?
 
 simplix-react is a package-first React framework that auto-generates reusable domain packages from OpenAPI specs. Define your API surface once and derive type-safe clients, React Query hooks, mock servers, and i18n bundles automatically — from contract to component.
 

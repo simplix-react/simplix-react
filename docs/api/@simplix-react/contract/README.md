@@ -4,6 +4,10 @@
 
 [Documentation](../../README.md) / @simplix-react/contract
 
+<p align="center">
+  <img src="../../_media/simplix-logo.png" alt="simplix-react" width="200" />
+</p>
+
 # @simplix-react/contract
 
 Define type-safe API contracts with Zod schemas. A single contract drives your HTTP client, React Query hooks, and MSW mock handlers.

@@ -6,7 +6,7 @@
 
 # Interface: LocaleInfo
 
-Defined in: [types.ts:122](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/types.ts#L122)
+Defined in: [types.ts:122](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/i18n/src/types.ts#L122)
 
 Describes metadata for a single locale including display names, text direction, and default formats.
 
@@ -16,7 +16,7 @@ Describes metadata for a single locale including display names, text direction, 
 
 > **code**: `string`
 
-Defined in: [types.ts:124](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/types.ts#L124)
+Defined in: [types.ts:124](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/i18n/src/types.ts#L124)
 
 BCP 47 locale code.
 
@@ -26,7 +26,7 @@ BCP 47 locale code.
 
 > **currency**: `string`
 
-Defined in: [types.ts:136](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/types.ts#L136)
+Defined in: [types.ts:136](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/i18n/src/types.ts#L136)
 
 Default ISO 4217 currency code.
 
@@ -36,7 +36,7 @@ Default ISO 4217 currency code.
 
 > **dateFormat**: `string`
 
-Defined in: [types.ts:132](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/types.ts#L132)
+Defined in: [types.ts:132](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/i18n/src/types.ts#L132)
 
 Default date format pattern.
 
@@ -46,7 +46,7 @@ Default date format pattern.
 
 > **direction**: [`TextDirection`](../type-aliases/TextDirection.md)
 
-Defined in: [types.ts:130](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/types.ts#L130)
+Defined in: [types.ts:130](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/i18n/src/types.ts#L130)
 
 Text direction for the locale.
 
@@ -56,7 +56,7 @@ Text direction for the locale.
 
 > **englishName**: `string`
 
-Defined in: [types.ts:128](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/types.ts#L128)
+Defined in: [types.ts:128](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/i18n/src/types.ts#L128)
 
 English name of the locale (e.g., "Korean").
 
@@ -66,7 +66,7 @@ English name of the locale (e.g., "Korean").
 
 > **name**: `string`
 
-Defined in: [types.ts:126](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/types.ts#L126)
+Defined in: [types.ts:126](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/i18n/src/types.ts#L126)
 
 Native name of the locale (e.g., "한국어").
 
@@ -76,6 +76,6 @@ Native name of the locale (e.g., "한국어").
 
 > **timeFormat**: `string`
 
-Defined in: [types.ts:134](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/i18n/src/types.ts#L134)
+Defined in: [types.ts:134](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/i18n/src/types.ts#L134)
 
 Default time format pattern.

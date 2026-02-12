@@ -4,6 +4,10 @@
 
 [Documentation](../../README.md) / @simplix-react/testing
 
+<p align="center">
+  <img src="../../_media/simplix-logo.png" alt="simplix-react" width="200" />
+</p>
+
 # @simplix-react/testing
 
 Testing utilities for simplix-react applications — pre-configured QueryClient, wrapper components, query helpers, and in-memory mock clients.

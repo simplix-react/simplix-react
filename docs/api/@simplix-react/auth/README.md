@@ -4,6 +4,10 @@
 
 [Documentation](../../README.md) / @simplix-react/auth
 
+<p align="center">
+  <img src="../../_media/simplix-logo.png" alt="simplix-react" width="200" />
+</p>
+
 # @simplix-react/auth
 
 Authentication middleware for `@simplix-react/contract` with a strategy pattern. Plug in one or more auth schemes, pick a token store, and get an authenticated `fetchFn` you can pass straight to `defineApi`.

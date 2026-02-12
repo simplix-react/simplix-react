@@ -4,6 +4,10 @@
 
 [Documentation](../../README.md) / @simplix-react/form
 
+<p align="center">
+  <img src="../../_media/simplix-logo.png" alt="simplix-react" width="200" />
+</p>
+
 # @simplix-react/form
 
 TanStack Form hooks derived automatically from `@simplix-react/contract` schemas and `@simplix-react/react` hooks.

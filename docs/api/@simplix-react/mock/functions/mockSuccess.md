@@ -8,7 +8,7 @@
 
 > **mockSuccess**\<`T`\>(`data`): [`MockResult`](../interfaces/MockResult.md)\<`T`\>
 
-Defined in: [mock-result.ts:47](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/mock/src/mock-result.ts#L47)
+Defined in: [mock-result.ts:47](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/mock/src/mock-result.ts#L47)
 
 Creates a successful [MockResult](../interfaces/MockResult.md) wrapping the given data.
 

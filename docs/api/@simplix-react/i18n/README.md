@@ -4,6 +4,10 @@
 
 [Documentation](../../README.md) / @simplix-react/i18n
 
+<p align="center">
+  <img src="../../_media/simplix-logo.png" alt="simplix-react" width="200" />
+</p>
+
 # @simplix-react/i18n
 
 Internationalization framework with an adapter pattern and built-in i18next integration.

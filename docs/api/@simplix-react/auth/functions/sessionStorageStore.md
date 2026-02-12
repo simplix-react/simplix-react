@@ -8,7 +8,7 @@
 
 > **sessionStorageStore**(`prefix?`): [`TokenStore`](../interfaces/TokenStore.md)
 
-Defined in: [packages/auth/src/stores/session-storage-store.ts:18](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/stores/session-storage-store.ts#L18)
+Defined in: [packages/auth/src/stores/session-storage-store.ts:18](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/auth/src/stores/session-storage-store.ts#L18)
 
 Creates a [TokenStore](../interfaces/TokenStore.md) backed by `sessionStorage`.
 

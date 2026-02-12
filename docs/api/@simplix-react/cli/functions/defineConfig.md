@@ -8,7 +8,7 @@
 
 > **defineConfig**(`config`): [`SimplixConfig`](../interfaces/SimplixConfig.md)
 
-Defined in: [define-config.ts:28](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/cli/src/config/define-config.ts#L28)
+Defined in: [define-config.ts:28](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/cli/src/config/define-config.ts#L28)
 
 Identity function that provides type-safe autocompletion for `simplix.config.ts`.
 

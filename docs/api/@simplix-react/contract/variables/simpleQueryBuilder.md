@@ -8,7 +8,7 @@
 
 > `const` **simpleQueryBuilder**: [`QueryBuilder`](../interfaces/QueryBuilder.md)
 
-Defined in: [packages/contract/src/helpers/query-builders.ts:30](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/contract/src/helpers/query-builders.ts#L30)
+Defined in: [packages/contract/src/helpers/query-builders.ts:30](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/contract/src/helpers/query-builders.ts#L30)
 
 Provides a straightforward [QueryBuilder](../interfaces/QueryBuilder.md) implementation for common REST APIs.
 

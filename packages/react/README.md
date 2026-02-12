@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="../../docs/assets/simplix-logo.png" alt="simplix-react" width="200" />
+</p>
+
 # @simplix-react/react
 
 Type-safe React Query hooks derived automatically from an `@simplix-react/contract` API contract.

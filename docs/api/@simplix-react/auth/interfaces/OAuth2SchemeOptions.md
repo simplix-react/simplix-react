@@ -6,7 +6,7 @@
 
 # Interface: OAuth2SchemeOptions
 
-Defined in: [packages/auth/src/types.ts:159](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L159)
+Defined in: [packages/auth/src/types.ts:159](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/auth/src/types.ts#L159)
 
 Options for [oauth2Scheme](../functions/oauth2Scheme.md).
 
@@ -16,7 +16,7 @@ Options for [oauth2Scheme](../functions/oauth2Scheme.md).
 
 > **clientId**: `string`
 
-Defined in: [packages/auth/src/types.ts:167](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L167)
+Defined in: [packages/auth/src/types.ts:167](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/auth/src/types.ts#L167)
 
 OAuth2 client ID.
 
@@ -26,7 +26,7 @@ OAuth2 client ID.
 
 > `optional` **clientSecret**: `string`
 
-Defined in: [packages/auth/src/types.ts:170](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L170)
+Defined in: [packages/auth/src/types.ts:170](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/auth/src/types.ts#L170)
 
 OAuth2 client secret (optional for public clients).
 
@@ -36,7 +36,7 @@ OAuth2 client secret (optional for public clients).
 
 > `optional` **scopes**: `string`[]
 
-Defined in: [packages/auth/src/types.ts:173](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L173)
+Defined in: [packages/auth/src/types.ts:173](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/auth/src/types.ts#L173)
 
 Requested scopes.
 
@@ -46,7 +46,7 @@ Requested scopes.
 
 > **store**: [`TokenStore`](TokenStore.md)
 
-Defined in: [packages/auth/src/types.ts:161](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L161)
+Defined in: [packages/auth/src/types.ts:161](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/auth/src/types.ts#L161)
 
 Token store for persisting OAuth2 tokens.
 
@@ -56,7 +56,7 @@ Token store for persisting OAuth2 tokens.
 
 > **tokenEndpoint**: `string`
 
-Defined in: [packages/auth/src/types.ts:164](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L164)
+Defined in: [packages/auth/src/types.ts:164](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/auth/src/types.ts#L164)
 
 URL of the token endpoint.
 
@@ -66,7 +66,7 @@ URL of the token endpoint.
 
 > `optional` **tokenEndpointBody**: `Record`\<`string`, `string`\>
 
-Defined in: [packages/auth/src/types.ts:179](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L179)
+Defined in: [packages/auth/src/types.ts:179](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/auth/src/types.ts#L179)
 
 Additional body parameters for the token endpoint request.
 
@@ -76,6 +76,6 @@ Additional body parameters for the token endpoint request.
 
 > `optional` **tokenEndpointHeaders**: `Record`\<`string`, `string`\>
 
-Defined in: [packages/auth/src/types.ts:176](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L176)
+Defined in: [packages/auth/src/types.ts:176](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/auth/src/types.ts#L176)
 
 Additional headers for the token endpoint request.

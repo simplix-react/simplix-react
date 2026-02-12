@@ -4,23 +4,37 @@
 
 [Documentation](../../README.md) / @simplix-react/cli
 
+<p align="center">
+  <img src="../../_media/simplix-logo.png" alt="simplix-react" width="200" />
+</p>
+
 # @simplix-react/cli
 
 CLI for scaffolding and validating simplix-react projects.
 
 ## Installation
 
+Install via the meta package (recommended):
+
+```bash
+pnpm add simplix-react
+```
+
+When using pnpm, add this to `.npmrc` so `@simplix-react/*` packages are resolvable:
+
+```ini
+public-hoist-pattern[]=@simplix-react/*
+```
+
+Or install the CLI only:
+
 ```bash
 pnpm add -D @simplix-react/cli
 ```
 
-Or install globally:
-
-```bash
-pnpm add -g @simplix-react/cli
-```
-
 Requires **Node.js 18 or later**.
+
+> **Note:** Projects scaffolded with `simplix init` include the `.npmrc` configuration automatically.
 
 ## Quick Start
 
@@ -550,12 +564,22 @@ The config file is loaded using [jiti](https://github.com/unjs/jiti), so TypeScr
 
 ## Related Packages
 
+Install all packages at once with the meta package:
+
+```bash
+pnpm add simplix-react
+```
+
 | Package | Description |
 | --- | --- |
+| [`simplix-react`](https://www.npmjs.com/package/simplix-react) | Meta package (installs all packages below) |
 | `@simplix-react/contract` | Zod-based type-safe API contract definitions |
 | `@simplix-react/react` | React Query hooks derived from contracts |
+| `@simplix-react/form` | TanStack Form hooks derived from contracts |
+| `@simplix-react/auth` | Authentication middleware (Bearer, API Key, OAuth2) |
 | `@simplix-react/mock` | MSW handlers + PGlite repositories auto-generation |
 | `@simplix-react/i18n` | i18next-based internationalization framework |
+| `@simplix-react/testing` | Test utilities (mock clients, query wrappers) |
 
 ## Interfaces
 

@@ -6,7 +6,7 @@
 
 # Class: AuthError
 
-Defined in: [packages/auth/src/errors.ts:27](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/errors.ts#L27)
+Defined in: [packages/auth/src/errors.ts:27](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/auth/src/errors.ts#L27)
 
 Error thrown by auth operations.
 
@@ -35,7 +35,7 @@ try {
 
 > **new AuthError**(`code`, `message`, `options?`): `AuthError`
 
-Defined in: [packages/auth/src/errors.ts:30](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/errors.ts#L30)
+Defined in: [packages/auth/src/errors.ts:30](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/auth/src/errors.ts#L30)
 
 #### Parameters
 
@@ -83,7 +83,7 @@ Defined in: node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/li
 
 > `readonly` **code**: [`AuthErrorCode`](../type-aliases/AuthErrorCode.md)
 
-Defined in: [packages/auth/src/errors.ts:32](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/errors.ts#L32)
+Defined in: [packages/auth/src/errors.ts:32](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/auth/src/errors.ts#L32)
 
 Typed error code for programmatic handling.
 
@@ -105,7 +105,7 @@ Defined in: node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/li
 
 > `readonly` **name**: `"AuthError"` = `"AuthError"`
 
-Defined in: [packages/auth/src/errors.ts:28](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/errors.ts#L28)
+Defined in: [packages/auth/src/errors.ts:28](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/auth/src/errors.ts#L28)
 
 #### Overrides
 

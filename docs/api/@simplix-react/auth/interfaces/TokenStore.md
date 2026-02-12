@@ -6,7 +6,7 @@
 
 # Interface: TokenStore
 
-Defined in: [packages/auth/src/types.ts:48](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L48)
+Defined in: [packages/auth/src/types.ts:48](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/auth/src/types.ts#L48)
 
 Abstraction over key-value storage for tokens.
 
@@ -22,7 +22,7 @@ Abstraction over key-value storage for tokens.
 
 > **clear**(): `void`
 
-Defined in: [packages/auth/src/types.ts:52](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L52)
+Defined in: [packages/auth/src/types.ts:52](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/auth/src/types.ts#L52)
 
 #### Returns
 
@@ -34,7 +34,7 @@ Defined in: [packages/auth/src/types.ts:52](https://github.com/simplix-react/sim
 
 > **get**(`key`): `string` \| `null`
 
-Defined in: [packages/auth/src/types.ts:49](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L49)
+Defined in: [packages/auth/src/types.ts:49](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/auth/src/types.ts#L49)
 
 #### Parameters
 
@@ -52,7 +52,7 @@ Defined in: [packages/auth/src/types.ts:49](https://github.com/simplix-react/sim
 
 > **remove**(`key`): `void`
 
-Defined in: [packages/auth/src/types.ts:51](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L51)
+Defined in: [packages/auth/src/types.ts:51](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/auth/src/types.ts#L51)
 
 #### Parameters
 
@@ -70,7 +70,7 @@ Defined in: [packages/auth/src/types.ts:51](https://github.com/simplix-react/sim
 
 > **set**(`key`, `value`): `void`
 
-Defined in: [packages/auth/src/types.ts:50](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/auth/src/types.ts#L50)
+Defined in: [packages/auth/src/types.ts:50](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/auth/src/types.ts#L50)
 
 #### Parameters
 

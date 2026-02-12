@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="../../docs/assets/simplix-logo.png" alt="simplix-react" width="200" />
+</p>
+
 # @simplix-react/mock
 
 Auto-generated MSW handlers and PGlite repositories from `@simplix-react/contract`.

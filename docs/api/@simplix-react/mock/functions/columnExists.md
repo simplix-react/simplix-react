@@ -8,7 +8,7 @@
 
 > **columnExists**(`db`, `tableName`, `columnName`): `Promise`\<`boolean`\>
 
-Defined in: [sql/migration-helpers.ts:47](https://github.com/simplix-react/simplix-react/blob/2c8833b1d8a5d1d824b2a35744e68395ed208513/packages/mock/src/sql/migration-helpers.ts#L47)
+Defined in: [sql/migration-helpers.ts:47](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/mock/src/sql/migration-helpers.ts#L47)
 
 Checks whether a column exists in a table by querying `information_schema.columns`.
 
