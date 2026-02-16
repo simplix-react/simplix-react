@@ -62,7 +62,7 @@ export function deriveFormHooks<
 }
 
 /** Mapped type that produces per-entity {@link EntityFormHooks} from the contract's entity map. */
-type DerivedFormHooksResult<TEntities extends Record<string, AnyEntityDef>> = {
+export type DerivedFormHooksResult<TEntities extends Record<string, AnyEntityDef>> = {
   [K in keyof TEntities]: EntityFormHooks<
     TEntities[K]["schema"],
     TEntities[K]["createSchema"]

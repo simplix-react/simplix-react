@@ -1,3 +1,16 @@
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value) && !(value instanceof Date);
+}
+
+function arraysEqual(a: unknown[], b: unknown[]): boolean {
+  return a.length === b.length && a.every((item, index) => deepEqual(item, b[index]));
+}
+
+function objectsEqual(a: Record<string, unknown>, b: Record<string, unknown>): boolean {
+  const keysA = Object.keys(a);
+  return keysA.length === Object.keys(b).length && keysA.every((key) => deepEqual(a[key], b[key]));
+}
+
 /**
  * Performs a deep equality check between two values.
  *
@@ -11,30 +24,10 @@
  */
 export function deepEqual(a: unknown, b: unknown): boolean {
   if (Object.is(a, b)) return true;
-  if (a === null || b === null) return false;
-  if (a === undefined || b === undefined) return false;
-
-  if (a instanceof Date && b instanceof Date) {
-    return a.getTime() === b.getTime();
-  }
-
-  if (Array.isArray(a) && Array.isArray(b)) {
-    if (a.length !== b.length) return false;
-    return a.every((item, index) => deepEqual(item, b[index]));
-  }
-
-  if (typeof a === "object" && typeof b === "object") {
-    const keysA = Object.keys(a as Record<string, unknown>);
-    const keysB = Object.keys(b as Record<string, unknown>);
-    if (keysA.length !== keysB.length) return false;
-    return keysA.every((key) =>
-      deepEqual(
-        (a as Record<string, unknown>)[key],
-        (b as Record<string, unknown>)[key],
-      ),
-    );
-  }
-
+  if (a == null || b == null) return false;
+  if (a instanceof Date && b instanceof Date) return a.getTime() === b.getTime();
+  if (Array.isArray(a) && Array.isArray(b)) return arraysEqual(a, b);
+  if (isPlainObject(a) && isPlainObject(b)) return objectsEqual(a, b);
   return false;
 }
 
