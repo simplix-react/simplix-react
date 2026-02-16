@@ -125,175 +125,214 @@ function createEntityHooks(
   _config: ApiContractConfig<any, any>,
 ) {
   return {
-    useList(
-      parentIdOrParams?: string | ListParams,
-      paramsOrOptions?: ListParams | Omit<UseQueryOptions<unknown[], Error>, "queryKey" | "queryFn">,
-      options?: Omit<UseQueryOptions<unknown[], Error>, "queryKey" | "queryFn">,
-    ) {
-      const { parentId, listParams, queryOptions } = resolveListArgs(
-        parentIdOrParams,
-        paramsOrOptions,
-        options,
-      );
+    useList: createUseListHook(entity, entityClient, keys),
+    useGet: createUseGetHook(entityClient, keys),
+    useCreate: createUseCreateHook(entity, entityClient, keys),
+    useUpdate: createUseUpdateHook(entityClient, keys),
+    useDelete: createUseDeleteHook(entityClient, keys),
+    useInfiniteList: createUseInfiniteListHook(entity, entityClient, keys),
+  };
+}
 
-      const keyParams: Record<string, unknown> = {};
-      if (entity.parent && parentId) keyParams[entity.parent.param] = parentId;
-      if (listParams) Object.assign(keyParams, listParams);
+function createUseListHook(
+  entity: AnyEntityDef,
+  entityClient: EntityClientShape,
+  keys: QueryKeyFactory,
+) {
+  return function useList(
+    parentIdOrParams?: string | ListParams,
+    paramsOrOptions?: ListParams | Omit<UseQueryOptions<unknown[], Error>, "queryKey" | "queryFn">,
+    options?: Omit<UseQueryOptions<unknown[], Error>, "queryKey" | "queryFn">,
+  ) {
+    const { parentId, listParams, queryOptions } = resolveListArgs(
+      parentIdOrParams,
+      paramsOrOptions,
+      options,
+    );
 
-      return useQuery({
-        queryKey: keys.list(keyParams),
-        queryFn: () => {
-          if (entity.parent) {
-            return entityClient.list(parentId, listParams) as Promise<unknown[]>;
+    const keyParams: Record<string, unknown> = {};
+    if (entity.parent && parentId) keyParams[entity.parent.param] = parentId;
+    if (listParams) Object.assign(keyParams, listParams);
+
+    return useQuery({
+      queryKey: keys.list(keyParams),
+      queryFn: () => {
+        if (entity.parent) {
+          return entityClient.list(parentId, listParams) as Promise<unknown[]>;
+        }
+        return entityClient.list(listParams) as Promise<unknown[]>;
+      },
+      enabled: entity.parent ? !!parentId : true,
+      ...queryOptions,
+    });
+  };
+}
+
+function createUseGetHook(
+  entityClient: EntityClientShape,
+  keys: QueryKeyFactory,
+) {
+  return function useGet(
+    id: string,
+    options?: Omit<UseQueryOptions<unknown, Error>, "queryKey" | "queryFn">,
+  ) {
+    return useQuery<unknown, Error>({
+      queryKey: keys.detail(id),
+      queryFn: () => entityClient.get(id),
+      enabled: !!id,
+      ...options,
+    });
+  };
+}
+
+function createUseCreateHook(
+  entity: AnyEntityDef,
+  entityClient: EntityClientShape,
+  keys: QueryKeyFactory,
+) {
+  return function useCreate(
+    parentId?: string,
+    options?: Omit<UseMutationOptions<unknown, Error, unknown>, "mutationFn">,
+  ) {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+      mutationFn: (dto: unknown) => {
+        if (entity.parent && parentId) {
+          return entityClient.create(parentId, dto);
+        }
+        return entityClient.create(dto);
+      },
+      onSuccess: (...args) => {
+        queryClient.invalidateQueries({ queryKey: keys.all });
+        options?.onSuccess?.(...args);
+      },
+      ...omit(options, ["onSuccess"]),
+    });
+  };
+}
+
+function createUseUpdateHook(
+  entityClient: EntityClientShape,
+  keys: QueryKeyFactory,
+) {
+  return function useUpdate(
+    options?: Omit<
+      UseMutationOptions<unknown, Error, { id: string; dto: unknown }>,
+      "mutationFn"
+    > & { optimistic?: boolean },
+  ) {
+    const queryClient = useQueryClient();
+    const isOptimistic = options?.optimistic ?? false;
+
+    return useMutation({
+      mutationFn: ({ id, dto }: { id: string; dto: unknown }) =>
+        entityClient.update(id, dto),
+
+      onMutate: isOptimistic
+        ? async ({ id, dto }: { id: string; dto: unknown }) => {
+            await queryClient.cancelQueries({ queryKey: keys.all });
+            const previousData = queryClient.getQueriesData<unknown[]>({ queryKey: keys.lists() });
+            queryClient.setQueriesData<unknown[]>(
+              { queryKey: keys.lists() },
+              (old) =>
+                old?.map((item) =>
+                  isRecord(item) && item.id === id ? { ...item, ...(dto as object) } : item,
+                ),
+            );
+            return { previousData } as const;
           }
-          return entityClient.list(listParams) as Promise<unknown[]>;
-        },
-        enabled: entity.parent ? !!parentId : true,
-        ...queryOptions,
-      });
-    },
+        : undefined,
 
-    useGet(
-      id: string,
-      options?: Omit<UseQueryOptions<unknown, Error>, "queryKey" | "queryFn">,
-    ) {
-      return useQuery<unknown, Error>({
-        queryKey: keys.detail(id),
-        queryFn: () => entityClient.get(id),
-        enabled: !!id,
-        ...options,
-      });
-    },
-
-    useCreate(
-      parentId?: string,
-      options?: Omit<UseMutationOptions<unknown, Error, unknown>, "mutationFn">,
-    ) {
-      const queryClient = useQueryClient();
-
-      return useMutation({
-        mutationFn: (dto: unknown) => {
-          if (entity.parent && parentId) {
-            return entityClient.create(parentId, dto);
-          }
-          return entityClient.create(dto);
-        },
-        onSuccess: (...args) => {
-          queryClient.invalidateQueries({ queryKey: keys.all });
-          options?.onSuccess?.(...args);
-        },
-        ...omit(options, ["onSuccess"]),
-      });
-    },
-
-    useUpdate(
-      options?: Omit<
-        UseMutationOptions<unknown, Error, { id: string; dto: unknown }>,
-        "mutationFn"
-      > & { optimistic?: boolean },
-    ) {
-      const queryClient = useQueryClient();
-      const isOptimistic = options?.optimistic ?? false;
-
-      return useMutation({
-        mutationFn: ({ id, dto }: { id: string; dto: unknown }) =>
-          entityClient.update(id, dto),
-
-        onMutate: isOptimistic
-          ? async ({ id, dto }: { id: string; dto: unknown }) => {
-              await queryClient.cancelQueries({ queryKey: keys.all });
-              const previousData = queryClient.getQueriesData<unknown[]>({ queryKey: keys.lists() });
-              queryClient.setQueriesData<unknown[]>(
-                { queryKey: keys.lists() },
-                (old) =>
-                  old?.map((item) =>
-                    isRecord(item) && item.id === id ? { ...item, ...(dto as object) } : item,
-                  ),
-              );
-              return { previousData } as const;
-            }
-          : undefined,
-
-        onError: isOptimistic
-          ? (_err, _vars, context) => {
-              const ctx = context as { previousData?: [readonly unknown[], unknown][] } | undefined;
-              if (ctx?.previousData) {
-                for (const [queryKey, data] of ctx.previousData) {
-                  queryClient.setQueryData(queryKey, data);
-                }
+      onError: isOptimistic
+        ? (_err, _vars, context) => {
+            const ctx = context as { previousData?: [readonly unknown[], unknown][] } | undefined;
+            if (ctx?.previousData) {
+              for (const [queryKey, data] of ctx.previousData) {
+                queryClient.setQueryData(queryKey, data);
               }
             }
-          : undefined,
-
-        onSuccess: (...args) => {
-          options?.onSuccess?.(...args);
-        },
-
-        onSettled: () => {
-          queryClient.invalidateQueries({ queryKey: keys.all });
-        },
-
-        ...omit(options, ["onSuccess", "onMutate", "onError", "onSettled", "optimistic"]),
-      });
-    },
-
-    useDelete(
-      options?: Omit<UseMutationOptions<void, Error, string>, "mutationFn">,
-    ) {
-      const queryClient = useQueryClient();
-
-      return useMutation({
-        mutationFn: (id: string) => entityClient.delete(id),
-        onSuccess: (...args) => {
-          queryClient.invalidateQueries({ queryKey: keys.all });
-          options?.onSuccess?.(...args);
-        },
-        ...omit(options, ["onSuccess"]),
-      });
-    },
-
-    useInfiniteList(
-      parentId?: string,
-      params?: Omit<ListParams, "pagination"> & { limit?: number },
-      options?: Record<string, unknown>,
-    ) {
-      const limit = params?.limit ?? 20;
-
-      const keyParams: Record<string, unknown> = { infinite: true };
-      if (entity.parent && parentId) keyParams[entity.parent.param] = parentId;
-      if (params?.filters) keyParams.filters = params.filters;
-      if (params?.sort) keyParams.sort = params.sort;
-
-      return useInfiniteQuery({
-        queryKey: keys.list(keyParams),
-        queryFn: ({ pageParam }) => {
-          const pagination = typeof pageParam === "string"
-            ? { type: "cursor" as const, cursor: pageParam, limit }
-            : { type: "offset" as const, page: (pageParam as number) ?? 1, limit };
-
-          const listParams: ListParams = {
-            filters: params?.filters,
-            sort: params?.sort,
-            pagination,
-          };
-
-          if (entity.parent) {
-            return entityClient.list(parentId, listParams);
           }
-          return entityClient.list(listParams);
-        },
-        initialPageParam: 1 as unknown,
-        getNextPageParam: (lastPage: unknown, _allPages: unknown[], lastPageParam: unknown) => {
-          const page = lastPage as { meta?: { hasNextPage?: boolean; nextCursor?: string } };
-          if (!page.meta?.hasNextPage) return undefined;
-          if (page.meta.nextCursor) return page.meta.nextCursor;
-          // Offset-based pagination: increment page number
-          return typeof lastPageParam === "number" ? lastPageParam + 1 : undefined;
-        },
-        enabled: entity.parent ? !!parentId : true,
-        ...options,
-      });
-    },
+        : undefined,
+
+      onSuccess: (...args) => {
+        options?.onSuccess?.(...args);
+      },
+
+      onSettled: () => {
+        queryClient.invalidateQueries({ queryKey: keys.all });
+      },
+
+      ...omit(options, ["onSuccess", "onMutate", "onError", "onSettled", "optimistic"]),
+    });
+  };
+}
+
+function createUseDeleteHook(
+  entityClient: EntityClientShape,
+  keys: QueryKeyFactory,
+) {
+  return function useDelete(
+    options?: Omit<UseMutationOptions<void, Error, string>, "mutationFn">,
+  ) {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+      mutationFn: (id: string) => entityClient.delete(id),
+      onSuccess: (...args) => {
+        queryClient.invalidateQueries({ queryKey: keys.all });
+        options?.onSuccess?.(...args);
+      },
+      ...omit(options, ["onSuccess"]),
+    });
+  };
+}
+
+function createUseInfiniteListHook(
+  entity: AnyEntityDef,
+  entityClient: EntityClientShape,
+  keys: QueryKeyFactory,
+) {
+  return function useInfiniteList(
+    parentId?: string,
+    params?: Omit<ListParams, "pagination"> & { limit?: number },
+    options?: Record<string, unknown>,
+  ) {
+    const limit = params?.limit ?? 20;
+
+    const keyParams: Record<string, unknown> = { infinite: true };
+    if (entity.parent && parentId) keyParams[entity.parent.param] = parentId;
+    if (params?.filters) keyParams.filters = params.filters;
+    if (params?.sort) keyParams.sort = params.sort;
+
+    return useInfiniteQuery({
+      queryKey: keys.list(keyParams),
+      queryFn: ({ pageParam }) => {
+        const pagination = typeof pageParam === "string"
+          ? { type: "cursor" as const, cursor: pageParam, limit }
+          : { type: "offset" as const, page: (pageParam as number) ?? 1, limit };
+
+        const listParams: ListParams = {
+          filters: params?.filters,
+          sort: params?.sort,
+          pagination,
+        };
+
+        if (entity.parent) {
+          return entityClient.list(parentId, listParams);
+        }
+        return entityClient.list(listParams);
+      },
+      initialPageParam: 1 as unknown,
+      getNextPageParam: (lastPage: unknown, _allPages: unknown[], lastPageParam: unknown) => {
+        const page = lastPage as { meta?: { hasNextPage?: boolean; nextCursor?: string } };
+        if (!page.meta?.hasNextPage) return undefined;
+        if (page.meta.nextCursor) return page.meta.nextCursor;
+        return typeof lastPageParam === "number" ? lastPageParam + 1 : undefined;
+      },
+      enabled: entity.parent ? !!parentId : true,
+      ...options,
+    });
   };
 }
 
@@ -387,7 +426,7 @@ function resolveListArgs(
 
 // ── Result Type ──
 
-type DerivedHooksResult<
+export type DerivedHooksResult<
   TEntities extends Record<string, AnyEntityDef>,
   TOperations extends Record<string, AnyOperationDef>,
 > = {
