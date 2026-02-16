@@ -5,6 +5,7 @@
     "packages/*"
   ],
   "exclude": [
+    "packages/simplix-react",
     "packages/config-eslint",
     "packages/config-typescript",
     "**/__tests__/**",

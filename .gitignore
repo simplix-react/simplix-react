@@ -9,3 +9,4 @@ dist/
 .changeset/
 .ckb/
 *.scip
+.mcp.json
