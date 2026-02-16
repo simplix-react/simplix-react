@@ -56,10 +56,10 @@ import { deriveQueryKeys } from "./derive/query-keys.js";
  * @see {@link @simplix-react/mock!deriveMockHandlers | deriveMockHandlers} for deriving MSW handlers.
  */
 export function defineApi<
-  TEntities extends Record<string, EntityDefinition<any, any, any>>,
+  TEntities extends Record<string, EntityDefinition>,
   TOperations extends Record<
     string,
-    OperationDefinition<any, any>
+    OperationDefinition
   > = Record<string, never>,
 >(
   config: ApiContractConfig<TEntities, TOperations>,

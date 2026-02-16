@@ -35,8 +35,8 @@ import { ApiError, defaultFetch } from "../helpers/fetch.js";
  * @see {@link defineApi} for the recommended high-level API.
  */
 export function deriveClient<
-  TEntities extends Record<string, EntityDefinition<any, any, any>>,
-  TOperations extends Record<string, OperationDefinition<any, any>>,
+  TEntities extends Record<string, EntityDefinition>,
+  TOperations extends Record<string, OperationDefinition>,
 >(
   config: ApiContractConfig<TEntities, TOperations>,
   fetchFn: FetchFn = defaultFetch,
@@ -59,7 +59,7 @@ export function deriveClient<
 
 function createEntityClient(
   basePath: string,
-  entity: EntityDefinition<any, any, any>,
+  entity: EntityDefinition,
   fetchFn: FetchFn,
   queryBuilder?: QueryBuilder,
 ) {
@@ -125,7 +125,7 @@ function createEntityClient(
 
 function createOperationClient(
   basePath: string,
-  operation: OperationDefinition<any, any>,
+  operation: OperationDefinition,
   fetchFn: FetchFn,
 ) {
   return (...args: unknown[]) => {

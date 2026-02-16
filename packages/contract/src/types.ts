@@ -184,11 +184,11 @@ export interface OperationDefinition<
  * @see {@link defineApi} for constructing a contract from this config.
  */
 export interface ApiContractConfig<
-  TEntities extends Record<string, EntityDefinition<any, any, any>> = Record<
+  TEntities extends Record<string, EntityDefinition> = Record<
     string,
     EntityDefinition
   >,
-  TOperations extends Record<string, OperationDefinition<any, any>> = Record<
+  TOperations extends Record<string, OperationDefinition> = Record<
     string,
     OperationDefinition
   >,
@@ -322,8 +322,8 @@ export type FetchFn = <T>(path: string, options?: RequestInit) => Promise<T>;
  * @see {@link @simplix-react/mock!deriveMockHandlers | deriveMockHandlers} for deriving mock handlers.
  */
 export interface ApiContract<
-  TEntities extends Record<string, EntityDefinition<any, any, any>>,
-  TOperations extends Record<string, OperationDefinition<any, any>>,
+  TEntities extends Record<string, EntityDefinition>,
+  TOperations extends Record<string, OperationDefinition>,
 > {
   /** The original contract configuration. */
   config: ApiContractConfig<TEntities, TOperations>;

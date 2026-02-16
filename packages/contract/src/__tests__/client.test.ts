@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { z } from "zod";
 import { deriveClient } from "../derive/client.js";
-import { defineApi } from "../define-api.js";
+
 import { simpleQueryBuilder } from "../helpers/query-builders.js";
 import type { ListParams } from "../helpers/query-types.js";
 

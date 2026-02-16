@@ -33,7 +33,7 @@ import type {
  * @see {@link QueryKeyFactory} for the generated key structure.
  */
 export function deriveQueryKeys<
-  TEntities extends Record<string, EntityDefinition<any, any, any>>,
+  TEntities extends Record<string, EntityDefinition>,
 >(
   config: Pick<ApiContractConfig<TEntities>, "domain" | "entities">,
 ): { [K in keyof TEntities]: QueryKeyFactory } {
