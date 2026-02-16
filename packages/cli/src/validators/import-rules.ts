@@ -13,8 +13,8 @@ import type { ValidationResult } from "../commands/validate.js";
 export async function validateImportRules(
   moduleDir: string,
   result: ValidationResult,
-  rootDir: string,
-  options?: { fix?: boolean },
+  _rootDir: string,
+  _options?: { fix?: boolean },
 ): Promise<void> {
   const srcDir = join(moduleDir, "src");
   if (!(await pathExists(srcDir))) return;

@@ -13,7 +13,7 @@ import type { ValidationResult } from "../commands/validate.js";
 export async function validateFsdRules(
   moduleDir: string,
   result: ValidationResult,
-  options?: { fix?: boolean },
+  _options?: { fix?: boolean },
 ): Promise<void> {
   const srcDir = join(moduleDir, "src");
   if (!(await pathExists(srcDir))) return;

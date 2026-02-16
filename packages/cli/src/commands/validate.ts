@@ -2,7 +2,7 @@ import { Command } from "commander";
 import { resolve, join, relative } from "node:path";
 import { readdir } from "node:fs/promises";
 import { log } from "../utils/logger.js";
-import { pathExists, readJsonFile } from "../utils/fs.js";
+import { pathExists } from "../utils/fs.js";
 import {
   validateFsdRules,
   validateImportRules,

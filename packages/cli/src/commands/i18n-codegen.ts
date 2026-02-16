@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { resolve, join, dirname, basename } from "node:path";
+import { resolve, join, basename } from "node:path";
 import { readdir, readFile, writeFile, watch } from "node:fs/promises";
 import { log } from "../utils/logger.js";
 import { pathExists } from "../utils/fs.js";

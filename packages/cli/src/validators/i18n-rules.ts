@@ -1,15 +1,8 @@
 import { join, relative } from "node:path";
-import { readdir, readFile, writeFile } from "node:fs/promises";
+import { readdir, writeFile } from "node:fs/promises";
 import { pathExists, readJsonFile } from "../utils/fs.js";
 import type { ValidationResult } from "../commands/validate.js";
 
-/**
- * i18n Rules:
- * - Missing keys: en.json keys must exist in ko.json and ja.json
- * - Extra keys: keys in ko.json/ja.json not in en.json
- * - Empty values: translation values that are empty strings
- * - Interpolation consistency: {{variable}} patterns must match across locales
- */
 export async function validateI18nRules(
   moduleDir: string,
   result: ValidationResult,
@@ -18,27 +11,14 @@ export async function validateI18nRules(
   const localesDir = join(moduleDir, "src", "locales");
   if (!(await pathExists(localesDir))) return;
 
-  // Find all JSON locale files grouped by directory
   const localeGroups = await discoverLocaleFiles(localesDir);
-
   if (localeGroups.size === 0) return;
 
   for (const [groupPath, localeFiles] of localeGroups) {
     const relGroup = relative(moduleDir, groupPath);
-
-    // Load all locale files
-    const translations = new Map<string, Record<string, unknown>>();
-    for (const file of localeFiles) {
-      const locale = file.replace(".json", "");
-      const content = await readJsonFile<Record<string, unknown>>(
-        join(groupPath, file),
-      );
-      translations.set(locale, content);
-    }
-
+    const translations = await loadLocaleFiles(groupPath, localeFiles);
     if (translations.size < 2) continue;
 
-    // Use "en" as reference, or first locale
     const refLocale = translations.has("en")
       ? "en"
       : translations.keys().next().value!;
@@ -51,44 +31,19 @@ export async function validateI18nRules(
       const localeKeys = flattenKeys(content);
       const refKeySet = new Set(refKeys.map((k) => k.key));
       const localeKeySet = new Set(localeKeys.map((k) => k.key));
-      let localeModified = false;
 
-      // Missing keys
-      for (const key of refKeySet) {
-        if (!localeKeySet.has(key)) {
-          if (options?.fix) {
-            const refValue = getNestedValue(refData, key);
-            setNestedValue(content, key, refValue);
-            localeModified = true;
-            result.passes.push(
-              `i18n: Auto-fixed: copied "${key}" from ${refLocale}.json to ${locale}.json (${relGroup})`,
-            );
-          } else {
-            result.errors.push(
-              `i18n: Missing key "${key}" in ${locale}.json (${relGroup})`,
-            );
-          }
-        }
-      }
+      const localeModified = applyKeyChecks(
+        refKeySet,
+        localeKeySet,
+        refData,
+        content,
+        locale,
+        refLocale,
+        relGroup,
+        result,
+        options,
+      );
 
-      // Extra keys
-      for (const key of localeKeySet) {
-        if (!refKeySet.has(key)) {
-          if (options?.fix) {
-            deleteNestedValue(content, key);
-            localeModified = true;
-            result.passes.push(
-              `i18n: Auto-fixed: removed extra key "${key}" from ${locale}.json (${relGroup})`,
-            );
-          } else {
-            result.warnings.push(
-              `i18n: Extra key "${key}" in ${locale}.json (${relGroup})`,
-            );
-          }
-        }
-      }
-
-      // Write back if modified
       if (localeModified) {
         const filePath = join(groupPath, `${locale}.json`);
         await writeFile(
@@ -98,39 +53,172 @@ export async function validateI18nRules(
         );
       }
 
-      // Empty values
       const updatedLocaleKeys = localeModified
         ? flattenKeys(content)
         : localeKeys;
-      for (const { key, value } of updatedLocaleKeys) {
-        if (typeof value === "string" && value.trim() === "") {
-          result.warnings.push(
-            `i18n: Empty value for "${key}" in ${locale}.json (${relGroup})`,
-          );
-        }
-      }
 
-      // Interpolation consistency
-      for (const { key, value } of refKeys) {
-        if (typeof value !== "string") continue;
-        const refVars = extractInterpolationVars(value);
-        if (refVars.length === 0) continue;
-
-        const localeEntry = updatedLocaleKeys.find((k) => k.key === key);
-        if (!localeEntry || typeof localeEntry.value !== "string") continue;
-
-        const localeVars = extractInterpolationVars(localeEntry.value);
-        const missingVars = refVars.filter((v) => !localeVars.includes(v));
-
-        for (const v of missingVars) {
-          result.errors.push(
-            `i18n: Missing interpolation "{{${v}}}" for key "${key}" in ${locale}.json (${relGroup})`,
-          );
-        }
-      }
+      checkEmptyValues(updatedLocaleKeys, locale, relGroup, result);
+      checkInterpolationMismatch(refKeys, updatedLocaleKeys, locale, relGroup, result);
     }
 
     result.passes.push(`i18n: ${relGroup} locale consistency checked`);
+  }
+}
+
+async function loadLocaleFiles(
+  groupPath: string,
+  localeFiles: string[],
+): Promise<Map<string, Record<string, unknown>>> {
+  const translations = new Map<string, Record<string, unknown>>();
+  for (const file of localeFiles) {
+    const locale = file.replace(".json", "");
+    const content = await readJsonFile<Record<string, unknown>>(
+      join(groupPath, file),
+    );
+    translations.set(locale, content);
+  }
+  return translations;
+}
+
+function applyKeyChecks(
+  refKeySet: Set<string>,
+  localeKeySet: Set<string>,
+  refData: Record<string, unknown>,
+  content: Record<string, unknown>,
+  locale: string,
+  refLocale: string,
+  relGroup: string,
+  result: ValidationResult,
+  options?: { fix?: boolean },
+): boolean {
+  let modified = false;
+
+  modified = checkMissingKeys(
+    refKeySet,
+    localeKeySet,
+    refData,
+    content,
+    locale,
+    refLocale,
+    relGroup,
+    result,
+    options,
+  ) || modified;
+
+  modified = checkExtraKeys(
+    refKeySet,
+    localeKeySet,
+    content,
+    locale,
+    relGroup,
+    result,
+    options,
+  ) || modified;
+
+  return modified;
+}
+
+function checkMissingKeys(
+  refKeySet: Set<string>,
+  localeKeySet: Set<string>,
+  refData: Record<string, unknown>,
+  content: Record<string, unknown>,
+  locale: string,
+  refLocale: string,
+  relGroup: string,
+  result: ValidationResult,
+  options?: { fix?: boolean },
+): boolean {
+  let modified = false;
+
+  for (const key of refKeySet) {
+    if (localeKeySet.has(key)) continue;
+
+    if (options?.fix) {
+      const refValue = getNestedValue(refData, key);
+      setNestedValue(content, key, refValue);
+      modified = true;
+      result.passes.push(
+        `i18n: Auto-fixed: copied "${key}" from ${refLocale}.json to ${locale}.json (${relGroup})`,
+      );
+    } else {
+      result.errors.push(
+        `i18n: Missing key "${key}" in ${locale}.json (${relGroup})`,
+      );
+    }
+  }
+
+  return modified;
+}
+
+function checkExtraKeys(
+  refKeySet: Set<string>,
+  localeKeySet: Set<string>,
+  content: Record<string, unknown>,
+  locale: string,
+  relGroup: string,
+  result: ValidationResult,
+  options?: { fix?: boolean },
+): boolean {
+  let modified = false;
+
+  for (const key of localeKeySet) {
+    if (refKeySet.has(key)) continue;
+
+    if (options?.fix) {
+      deleteNestedValue(content, key);
+      modified = true;
+      result.passes.push(
+        `i18n: Auto-fixed: removed extra key "${key}" from ${locale}.json (${relGroup})`,
+      );
+    } else {
+      result.warnings.push(
+        `i18n: Extra key "${key}" in ${locale}.json (${relGroup})`,
+      );
+    }
+  }
+
+  return modified;
+}
+
+function checkEmptyValues(
+  localeKeys: FlatKey[],
+  locale: string,
+  relGroup: string,
+  result: ValidationResult,
+): void {
+  for (const { key, value } of localeKeys) {
+    if (typeof value === "string" && value.trim() === "") {
+      result.warnings.push(
+        `i18n: Empty value for "${key}" in ${locale}.json (${relGroup})`,
+      );
+    }
+  }
+}
+
+function checkInterpolationMismatch(
+  refKeys: FlatKey[],
+  localeKeys: FlatKey[],
+  locale: string,
+  relGroup: string,
+  result: ValidationResult,
+): void {
+  for (const { key, value } of refKeys) {
+    if (typeof value !== "string") continue;
+    const refVars = extractInterpolationVars(value);
+    if (refVars.length === 0) continue;
+
+    const localeEntry = localeKeys.find((k) => k.key === key);
+    if (!localeEntry || typeof localeEntry.value !== "string") continue;
+
+    const localeVars = extractInterpolationVars(localeEntry.value);
+    const missingVars = refVars.filter((v) => !localeVars.includes(v));
+
+    for (const v of missingVars) {
+      result.errors.push(
+        `i18n: Missing interpolation "{{${v}}}" for key "${key}" in ${locale}.json (${relGroup})`,
+      );
+    }
   }
 }
 
@@ -186,7 +274,6 @@ function deleteNestedValue(
 
   delete current[keys[keys.length - 1]];
 
-  // Clean up empty parent objects
   for (let i = parents.length - 1; i >= 0; i--) {
     const parent = parents[i];
     const child = parent.obj[parent.key] as Record<string, unknown>;
