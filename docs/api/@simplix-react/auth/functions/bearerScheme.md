@@ -8,7 +8,7 @@
 
 > **bearerScheme**(`options`): [`AuthScheme`](../interfaces/AuthScheme.md)
 
-Defined in: [packages/auth/src/schemes/bearer-scheme.ts:26](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/auth/src/schemes/bearer-scheme.ts#L26)
+Defined in: [packages/auth/src/schemes/bearer-scheme.ts:26](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/auth/src/schemes/bearer-scheme.ts#L26)
 
 Creates a Bearer token [AuthScheme](../interfaces/AuthScheme.md).
 

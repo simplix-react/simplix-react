@@ -4,36 +4,47 @@ import { initPGlite } from "./pglite.js";
 type RequestHandler = unknown;
 
 /**
- * Describes the configuration required by {@link setupMockWorker}.
+ * Describes a single domain's mock configuration.
  *
- * Combines PGlite database setup (migrations and seed data) with MSW request
- * handlers into a single bootstrap configuration.
+ * Each domain groups its own handlers, migrations, and seed data together,
+ * enabling selective activation via the {@link enabled} flag.
  *
  * @example
  * ```ts
- * import type { MockServerConfig } from "@simplix-react/mock";
+ * import type { MockDomainConfig } from "@simplix-react/mock";
  * import { deriveMockHandlers } from "@simplix-react/mock";
  * import { projectContract } from "./contract";
  * import { runMigrations } from "./migrations";
  * import { seedData } from "./seed";
  *
- * const config: MockServerConfig = {
- *   dataDir: "idb://project-mock",
+ * const projectDomain: MockDomainConfig = {
+ *   name: "project",
+ *   handlers: deriveMockHandlers(projectContract.config),
  *   migrations: [runMigrations],
  *   seed: [seedData],
- *   handlers: deriveMockHandlers(projectContract.config),
  * };
  * ```
  *
- * @see {@link setupMockWorker} - Consumes this config to bootstrap the mock environment.
+ * @see {@link MockServerConfig} - Aggregates multiple domains.
+ * @see {@link setupMockWorker} - Consumes domains to bootstrap the mock environment.
  */
-export interface MockServerConfig {
+export interface MockDomainConfig {
+  /** Unique name identifying this domain (used for logging/debugging). */
+  name: string;
+
   /**
-   * IndexedDB data directory for PGlite persistence.
+   * Whether this domain is active.
    *
-   * @defaultValue `"idb://simplix-mock"`
+   * @defaultValue `true`
    */
-  dataDir?: string;
+  enabled?: boolean;
+
+  /**
+   * MSW request handlers for this domain.
+   *
+   * Typically produced by {@link deriveMockHandlers}.
+   */
+  handlers: RequestHandler[];
 
   /**
    * Migration functions to run in order.
@@ -43,70 +54,95 @@ export interface MockServerConfig {
   migrations: Array<(db: PGlite) => Promise<void>>;
 
   /**
-   * Seed functions to run in order (after migrations).
+   * Seed functions to run in order (after all migrations across all domains complete).
    *
    * Each function receives the PGlite instance and should insert initial data.
    */
-  seed: Array<(db: PGlite) => Promise<void>>;
+  seed?: Array<(db: PGlite) => Promise<void>>;
+}
 
+/**
+ * Describes the configuration required by {@link setupMockWorker}.
+ *
+ * Combines multiple {@link MockDomainConfig} entries into a single bootstrap
+ * configuration with an optional shared data directory.
+ *
+ * @example
+ * ```ts
+ * import type { MockServerConfig } from "@simplix-react/mock";
+ *
+ * const config: MockServerConfig = {
+ *   dataDir: "idb://my-app-mock",
+ *   domains: [projectDomain, userDomain],
+ * };
+ * ```
+ *
+ * @see {@link setupMockWorker} - Consumes this config to bootstrap the mock environment.
+ * @see {@link MockDomainConfig} - Individual domain configuration.
+ */
+export interface MockServerConfig {
   /**
-   * MSW request handlers to register with the service worker.
+   * IndexedDB data directory for PGlite persistence.
    *
-   * Typically produced by {@link deriveMockHandlers}.
+   * @defaultValue `"idb://simplix-mock"`
    */
-  handlers: RequestHandler[];
+  dataDir?: string;
+
+  /** Domain configurations to activate. */
+  domains: MockDomainConfig[];
 }
 
 /**
  * Bootstraps a complete mock environment with PGlite and MSW.
  *
  * Performs the following steps in order:
- * 1. Initializes a PGlite instance at the configured `dataDir`
- * 2. Runs all migration functions sequentially
- * 3. Runs all seed functions sequentially
- * 4. Starts the MSW service worker with the provided handlers
+ * 1. Filters domains to only those with `enabled !== false`
+ * 2. Initializes a PGlite instance at the configured `dataDir`
+ * 3. Runs all migration functions across enabled domains sequentially
+ * 4. Runs all seed functions across enabled domains sequentially
+ * 5. Starts the MSW service worker with the combined handlers
  *
- * @param config - The {@link MockServerConfig} describing database setup and handlers.
+ * @param config - The {@link MockServerConfig} describing domains and their setup.
  *
  * @example
  * ```ts
- * import { setupMockWorker, deriveMockHandlers } from "@simplix-react/mock";
- * import { projectContract } from "./contract";
- * import { runMigrations } from "./migrations";
- * import { seedData } from "./seed";
+ * import { setupMockWorker } from "@simplix-react/mock";
  *
  * await setupMockWorker({
- *   dataDir: "idb://project-mock",
- *   migrations: [runMigrations],
- *   seed: [seedData],
- *   handlers: deriveMockHandlers(projectContract.config),
+ *   dataDir: "idb://my-app-mock",
+ *   domains: [projectDomain, userDomain],
  * });
  * ```
  *
  * @see {@link MockServerConfig} - Configuration shape.
+ * @see {@link MockDomainConfig} - Individual domain configuration.
  * @see {@link deriveMockHandlers} - Generates MSW handlers from a contract.
  * @see {@link initPGlite} - Underlying PGlite initialization.
  */
 export async function setupMockWorker(config: MockServerConfig): Promise<void> {
-  const {
-    dataDir = "idb://simplix-mock",
-    migrations,
-    seed,
-    handlers,
-  } = config;
+  const { dataDir = "idb://simplix-mock", domains } = config;
+
+  const enabledDomains = domains.filter((d) => d.enabled !== false);
 
   // Initialize PGlite
   const db = await initPGlite(dataDir);
 
-  // Run migrations
-  for (const migration of migrations) {
-    await migration(db);
+  // Run all migrations across enabled domains
+  for (const domain of enabledDomains) {
+    for (const migration of domain.migrations) {
+      await migration(db);
+    }
   }
 
-  // Run seed
-  for (const seedFn of seed) {
-    await seedFn(db);
+  // Run all seeds across enabled domains
+  for (const domain of enabledDomains) {
+    for (const seedFn of domain.seed ?? []) {
+      await seedFn(db);
+    }
   }
+
+  // Combine handlers from all enabled domains
+  const handlers = enabledDomains.flatMap((d) => d.handlers);
 
   // Start MSW worker (dynamic import to avoid bundling msw in non-mock builds)
   const { setupWorker } = await import("msw/browser");

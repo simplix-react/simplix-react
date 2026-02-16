@@ -200,9 +200,14 @@ const handlers = deriveMockHandlers(projectApi.config);
 export async function startMockWorker(): Promise<void> {
   await setupMockWorker({
     dataDir: "idb://project-mock",
-    migrations: [runMigrations],
-    seed: [seedData],
-    handlers,
+    domains: [
+      {
+        name: "project",
+        handlers,
+        migrations: [runMigrations],
+        seed: [seedData],
+      },
+    ],
   });
 }
 ```

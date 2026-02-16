@@ -6,33 +6,28 @@
 
 # Interface: MockServerConfig
 
-Defined in: [msw.ts:30](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/mock/src/msw.ts#L30)
+Defined in: [msw.ts:83](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/mock/src/msw.ts#L83)
 
 Describes the configuration required by [setupMockWorker](../functions/setupMockWorker.md).
 
-Combines PGlite database setup (migrations and seed data) with MSW request
-handlers into a single bootstrap configuration.
+Combines multiple [MockDomainConfig](MockDomainConfig.md) entries into a single bootstrap
+configuration with an optional shared data directory.
 
 ## Example
 
 ```ts
 import type { MockServerConfig } from "@simplix-react/mock";
-import { deriveMockHandlers } from "@simplix-react/mock";
-import { projectContract } from "./contract";
-import { runMigrations } from "./migrations";
-import { seedData } from "./seed";
 
 const config: MockServerConfig = {
-  dataDir: "idb://project-mock",
-  migrations: [runMigrations],
-  seed: [seedData],
-  handlers: deriveMockHandlers(projectContract.config),
+  dataDir: "idb://my-app-mock",
+  domains: [projectDomain, userDomain],
 };
 ```
 
 ## See
 
-[setupMockWorker](../functions/setupMockWorker.md) - Consumes this config to bootstrap the mock environment.
+ - [setupMockWorker](../functions/setupMockWorker.md) - Consumes this config to bootstrap the mock environment.
+ - [MockDomainConfig](MockDomainConfig.md) - Individual domain configuration.
 
 ## Properties
 
@@ -40,7 +35,7 @@ const config: MockServerConfig = {
 
 > `optional` **dataDir**: `string`
 
-Defined in: [msw.ts:36](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/mock/src/msw.ts#L36)
+Defined in: [msw.ts:89](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/mock/src/msw.ts#L89)
 
 IndexedDB data directory for PGlite persistence.
 
@@ -50,56 +45,10 @@ IndexedDB data directory for PGlite persistence.
 
 ***
 
-### handlers
+### domains
 
-> **handlers**: `unknown`[]
+> **domains**: [`MockDomainConfig`](MockDomainConfig.md)[]
 
-Defined in: [msw.ts:57](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/mock/src/msw.ts#L57)
+Defined in: [msw.ts:92](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/mock/src/msw.ts#L92)
 
-MSW request handlers to register with the service worker.
-
-Typically produced by [deriveMockHandlers](../functions/deriveMockHandlers.md).
-
-***
-
-### migrations
-
-> **migrations**: (`db`) => `Promise`\<`void`\>[]
-
-Defined in: [msw.ts:43](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/mock/src/msw.ts#L43)
-
-Migration functions to run in order.
-
-Each function receives the PGlite instance and should create or alter tables.
-
-#### Parameters
-
-##### db
-
-`PGlite`
-
-#### Returns
-
-`Promise`\<`void`\>
-
-***
-
-### seed
-
-> **seed**: (`db`) => `Promise`\<`void`\>[]
-
-Defined in: [msw.ts:50](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/mock/src/msw.ts#L50)
-
-Seed functions to run in order (after migrations).
-
-Each function receives the PGlite instance and should insert initial data.
-
-#### Parameters
-
-##### db
-
-`PGlite`
-
-#### Returns
-
-`Promise`\<`void`\>
+Domain configurations to activate.

@@ -123,9 +123,22 @@ import { {{domainName}}Api } from "./contract.js";
 export const {{domainName}}Hooks = deriveHooks({{domainName}}Api);
 `;
 
-export const domainMockIndexTs = `export { handlers } from "./handlers.js";
-export { migrations } from "./migrations.js";
-export { seed } from "./seed.js";
+export const domainMockIndexTs = `import type { MockDomainConfig } from "@simplix-react/mock";
+import { executeSql } from "@simplix-react/mock";
+import { handlers } from "./handlers.js";
+import { migrations as migrationSql } from "./migrations.js";
+import { seed } from "./seed.js";
+
+export const {{domainName}}Mock: MockDomainConfig = {
+  name: "{{domainName}}",
+  handlers,
+  migrations: [
+    async (db) => {
+      for (const sql of migrationSql) { await executeSql(db, sql); }
+    },
+  ],
+  seed: [seed],
+};
 `;
 
 export const domainMockHandlersTs = `import type { HttpHandler } from "msw";

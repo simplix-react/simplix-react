@@ -6,7 +6,7 @@
 
 # Interface: CreateFormReturn
 
-Defined in: [types.ts:72](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/form/src/types.ts#L72)
+Defined in: [types.ts:72](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/form/src/types.ts#L72)
 
 Return value of the `useCreateForm` hook.
 
@@ -32,7 +32,7 @@ return (
 
 > **form**: `AnyFormApi`
 
-Defined in: [types.ts:74](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/form/src/types.ts#L74)
+Defined in: [types.ts:74](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/form/src/types.ts#L74)
 
 TanStack Form API instance for field binding and submission.
 
@@ -42,7 +42,7 @@ TanStack Form API instance for field binding and submission.
 
 > **isSubmitting**: `boolean`
 
-Defined in: [types.ts:76](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/form/src/types.ts#L76)
+Defined in: [types.ts:76](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/form/src/types.ts#L76)
 
 Whether the create mutation is currently in flight.
 
@@ -52,7 +52,7 @@ Whether the create mutation is currently in flight.
 
 > **reset**: () => `void`
 
-Defined in: [types.ts:80](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/form/src/types.ts#L80)
+Defined in: [types.ts:80](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/form/src/types.ts#L80)
 
 Resets the form fields and clears the submission error.
 
@@ -66,6 +66,6 @@ Resets the form fields and clears the submission error.
 
 > **submitError**: `Error` \| `null`
 
-Defined in: [types.ts:78](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/form/src/types.ts#L78)
+Defined in: [types.ts:78](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/form/src/types.ts#L78)
 
 The most recent submission error, or `null` if the last attempt succeeded.

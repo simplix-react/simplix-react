@@ -8,7 +8,7 @@
 
 > **createTestWrapper**(`options?`): `FC`\<\{ `children`: `ReactNode`; \}\>
 
-Defined in: [test-wrapper.ts:39](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/testing/src/test-wrapper.ts#L39)
+Defined in: [test-wrapper.ts:39](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/testing/src/test-wrapper.ts#L39)
 
 Creates a React wrapper component that provides all necessary context providers
 for rendering hooks and components under test.

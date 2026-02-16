@@ -61,7 +61,7 @@ With `relations` configured, a `GET /tasks/:id` request automatically joins and 
 
 ### Bootstrap with `setupMockWorker`
 
-`setupMockWorker` handles the full lifecycle: PGlite init, migrations, seed data, and MSW worker start:
+`setupMockWorker` handles the full lifecycle: PGlite init, migrations, seed data, and MSW worker start. Configuration is organized by domain using `MockDomainConfig`:
 
 ```ts
 import { setupMockWorker, deriveMockHandlers } from "@simplix-react/mock";
@@ -71,9 +71,14 @@ import { seedData } from "./seed";
 
 await setupMockWorker({
   dataDir: "idb://project-mock",
-  migrations: [runMigrations],
-  seed: [seedData],
-  handlers: deriveMockHandlers(projectApi.config),
+  domains: [
+    {
+      name: "project",
+      handlers: deriveMockHandlers(projectApi.config),
+      migrations: [runMigrations],
+      seed: [seedData],
+    },
+  ],
 });
 ```
 
@@ -82,9 +87,17 @@ The `MockServerConfig` shape:
 | Field | Type | Description |
 | --- | --- | --- |
 | `dataDir` | `string` | IndexedDB path for PGlite (default: `"idb://simplix-mock"`) |
-| `migrations` | `Array<(db: PGlite) => Promise<void>>` | Migration functions, run in order |
-| `seed` | `Array<(db: PGlite) => Promise<void>>` | Seed functions, run after migrations |
+| `domains` | `MockDomainConfig[]` | Domain configurations to activate |
+
+Each `MockDomainConfig` has:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `name` | `string` | Domain identifier |
+| `enabled` | `boolean` | Toggle this domain on/off (default: `true`) |
 | `handlers` | `RequestHandler[]` | MSW handlers (from `deriveMockHandlers`) |
+| `migrations` | `Array<(db: PGlite) => Promise<void>>` | Migration functions, run in order |
+| `seed` | `Array<(db: PGlite) => Promise<void>>` | Seed functions, run after migrations (optional) |
 
 ### Integrate in Your App Entry Point
 
@@ -103,9 +116,14 @@ async function bootstrap() {
 
     await setupMockWorker({
       dataDir: "idb://project-mock",
-      migrations: [runMigrations],
-      seed: [seedData],
-      handlers: deriveMockHandlers(projectApi.config),
+      domains: [
+        {
+          name: "project",
+          handlers: deriveMockHandlers(projectApi.config),
+          migrations: [runMigrations],
+          seed: [seedData],
+        },
+      ],
     });
   }
 
@@ -147,9 +165,14 @@ const customHandlers = [
 ];
 
 await setupMockWorker({
-  migrations: [runMigrations],
-  seed: [seedData],
-  handlers: [...customHandlers, ...derivedHandlers],
+  domains: [
+    {
+      name: "project",
+      handlers: [...customHandlers, ...derivedHandlers],
+      migrations: [runMigrations],
+      seed: [seedData],
+    },
+  ],
 });
 ```
 
@@ -185,20 +208,35 @@ const handlers = [...overrides, ...derivedHandlers];
 
 ### Multiple Contracts
 
-When the app has multiple API domains, derive and merge handlers from each contract:
+When the app has multiple API domains, define each contract as a separate domain:
 
 ```ts
-import { deriveMockHandlers } from "@simplix-react/mock";
+import { setupMockWorker, deriveMockHandlers } from "@simplix-react/mock";
 import { projectApi } from "./contracts/project";
 import { authApi } from "./contracts/auth";
+import { runProjectMigrations } from "./mock/project-migrations";
+import { runAuthMigrations } from "./mock/auth-migrations";
 
-const handlers = [
-  ...deriveMockHandlers(projectApi.config),
-  ...deriveMockHandlers(authApi.config, {
-    user: { tableName: "users", defaultSort: "email ASC" },
-  }),
-];
+await setupMockWorker({
+  dataDir: "idb://app-mock",
+  domains: [
+    {
+      name: "project",
+      handlers: deriveMockHandlers(projectApi.config),
+      migrations: [runProjectMigrations],
+    },
+    {
+      name: "auth",
+      handlers: deriveMockHandlers(authApi.config, {
+        user: { tableName: "users", defaultSort: "email ASC" },
+      }),
+      migrations: [runAuthMigrations],
+    },
+  ],
+});
 ```
+
+Each domain can be independently toggled via `enabled: false`, and all migrations across enabled domains run before any seeds (to support cross-domain foreign key references).
 
 ## Related
 

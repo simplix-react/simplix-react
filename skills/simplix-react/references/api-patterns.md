@@ -374,15 +374,21 @@ interface MockEntityConfig {
 ```ts
 async function setupMockWorker(config: MockServerConfig): Promise<void>;
 
+interface MockDomainConfig {
+  name: string;
+  enabled?: boolean;                            // default: true
+  handlers: RequestHandler[];
+  migrations: Array<(db: PGlite) => Promise<void>>;
+  seed?: Array<(db: PGlite) => Promise<void>>;
+}
+
 interface MockServerConfig {
   dataDir?: string;                             // default: "idb://simplix-mock"
-  migrations: Array<(db: PGlite) => Promise<void>>;
-  seed: Array<(db: PGlite) => Promise<void>>;
-  handlers: RequestHandler[];
+  domains: MockDomainConfig[];
 }
 ```
 
-Steps: init PGlite -> run migrations -> run seed -> start MSW worker.
+Steps: filter enabled domains -> init PGlite -> run all migrations -> run all seeds -> start MSW worker.
 
 ### PGlite Utilities
 

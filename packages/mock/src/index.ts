@@ -3,7 +3,7 @@ export { initPGlite, getPGliteInstance, resetPGliteInstance } from "./pglite.js"
 
 // MSW
 export { setupMockWorker } from "./msw.js";
-export type { MockServerConfig } from "./msw.js";
+export type { MockServerConfig, MockDomainConfig } from "./msw.js";
 
 // Mock derivation
 export { deriveMockHandlers } from "./derive-mock-handlers.js";

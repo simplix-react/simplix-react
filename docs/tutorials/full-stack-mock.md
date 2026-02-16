@@ -211,9 +211,14 @@ import { handlers } from "./handlers";
 export async function startMockEnvironment(): Promise<void> {
   await setupMockWorker({
     dataDir: "idb://project-mock-demo",
-    migrations: [runMigrations],
-    seed: [],
-    handlers,
+    domains: [
+      {
+        name: "project",
+        handlers,
+        migrations: [runMigrations],
+        seed: [],
+      },
+    ],
   });
 }
 ```
@@ -244,10 +249,11 @@ bootstrap();
 
 `setupMockWorker` performs these steps in order:
 
-1. Initializes PGlite at `idb://project-mock-demo` (persisted in IndexedDB)
-2. Runs all migration functions
-3. Runs all seed functions
-4. Starts the MSW service worker
+1. Filters domains where `enabled !== false`
+2. Initializes PGlite at `idb://project-mock-demo` (persisted in IndexedDB)
+3. Runs all migration functions across enabled domains
+4. Runs all seed functions across enabled domains
+5. Combines handlers from enabled domains and starts the MSW service worker
 
 **Expected result:** Opening the browser console shows `[MSW] Mocking enabled`. All API requests to `/api/v1/*` are intercepted by the service worker and handled by PGlite.
 
@@ -459,9 +465,14 @@ import { handlers } from "./handlers";
 export async function startMockEnvironment(): Promise<void> {
   await setupMockWorker({
     dataDir: "idb://project-mock-demo",
-    migrations: [runMigrations],
-    seed: [seedData],
-    handlers,
+    domains: [
+      {
+        name: "project",
+        handlers,
+        migrations: [runMigrations],
+        seed: [seedData],
+      },
+    ],
   });
 }
 ```

@@ -6,7 +6,7 @@
 
 # Interface: NumberFormatOptions
 
-Defined in: [types.ts:106](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/i18n/src/types.ts#L106)
+Defined in: [types.ts:106](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/i18n/src/types.ts#L106)
 
 Configures number formatting options passed to `Intl.NumberFormat`.
 
@@ -16,7 +16,7 @@ Configures number formatting options passed to `Intl.NumberFormat`.
 
 > `optional` **currency**: `string`
 
-Defined in: [types.ts:110](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/i18n/src/types.ts#L110)
+Defined in: [types.ts:110](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/i18n/src/types.ts#L110)
 
 ISO 4217 currency code (required when `style` is `"currency"`).
 
@@ -26,7 +26,7 @@ ISO 4217 currency code (required when `style` is `"currency"`).
 
 > `optional` **maximumFractionDigits**: `number`
 
-Defined in: [types.ts:116](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/i18n/src/types.ts#L116)
+Defined in: [types.ts:116](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/i18n/src/types.ts#L116)
 
 Maximum number of fraction digits to display.
 
@@ -36,7 +36,7 @@ Maximum number of fraction digits to display.
 
 > `optional` **minimumFractionDigits**: `number`
 
-Defined in: [types.ts:114](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/i18n/src/types.ts#L114)
+Defined in: [types.ts:114](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/i18n/src/types.ts#L114)
 
 Minimum number of fraction digits to display.
 
@@ -46,7 +46,7 @@ Minimum number of fraction digits to display.
 
 > `optional` **style**: [`NumberFormatStyle`](../type-aliases/NumberFormatStyle.md)
 
-Defined in: [types.ts:108](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/i18n/src/types.ts#L108)
+Defined in: [types.ts:108](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/i18n/src/types.ts#L108)
 
 The number formatting style.
 
@@ -56,6 +56,6 @@ The number formatting style.
 
 > `optional` **unit**: `string`
 
-Defined in: [types.ts:112](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/i18n/src/types.ts#L112)
+Defined in: [types.ts:112](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/i18n/src/types.ts#L112)
 
 Unit identifier (required when `style` is `"unit"`).

@@ -6,7 +6,7 @@
 
 # Interface: MockEntityConfig
 
-Defined in: [derive-mock-handlers.ts:36](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/mock/src/derive-mock-handlers.ts#L36)
+Defined in: [derive-mock-handlers.ts:36](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/mock/src/derive-mock-handlers.ts#L36)
 
 Provides per-entity configuration for mock handler generation.
 
@@ -43,7 +43,7 @@ const taskConfig: MockEntityConfig = {
 
 > `optional` **defaultLimit**: `number`
 
-Defined in: [derive-mock-handlers.ts:44](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/mock/src/derive-mock-handlers.ts#L44)
+Defined in: [derive-mock-handlers.ts:44](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/mock/src/derive-mock-handlers.ts#L44)
 
 Default number of rows per page.
 
@@ -59,7 +59,7 @@ Default number of rows per page.
 
 > `optional` **defaultSort**: `string`
 
-Defined in: [derive-mock-handlers.ts:56](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/mock/src/derive-mock-handlers.ts#L56)
+Defined in: [derive-mock-handlers.ts:56](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/mock/src/derive-mock-handlers.ts#L56)
 
 Default SQL ORDER BY clause.
 
@@ -73,7 +73,7 @@ Default SQL ORDER BY clause.
 
 > `optional` **maxLimit**: `number`
 
-Defined in: [derive-mock-handlers.ts:50](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/mock/src/derive-mock-handlers.ts#L50)
+Defined in: [derive-mock-handlers.ts:50](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/mock/src/derive-mock-handlers.ts#L50)
 
 Maximum allowed rows per page.
 
@@ -89,7 +89,7 @@ Maximum allowed rows per page.
 
 > `optional` **relations**: `Record`\<`string`, \{ `foreignKey?`: `string`; `localKey`: `string`; `table`: `string`; `type`: `"belongsTo"`; \}\>
 
-Defined in: [derive-mock-handlers.ts:58](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/mock/src/derive-mock-handlers.ts#L58)
+Defined in: [derive-mock-handlers.ts:58](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/mock/src/derive-mock-handlers.ts#L58)
 
 Map of relation names to their `belongsTo` join configuration.
 
@@ -99,6 +99,6 @@ Map of relation names to their `belongsTo` join configuration.
 
 > `optional` **tableName**: `string`
 
-Defined in: [derive-mock-handlers.ts:38](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/mock/src/derive-mock-handlers.ts#L38)
+Defined in: [derive-mock-handlers.ts:38](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/mock/src/derive-mock-handlers.ts#L38)
 
 Overrides the auto-derived PostgreSQL table name.

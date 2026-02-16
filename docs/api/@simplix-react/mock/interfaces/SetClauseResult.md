@@ -6,7 +6,7 @@
 
 # Interface: SetClauseResult
 
-Defined in: [sql/query-building.ts:11](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/mock/src/sql/query-building.ts#L11)
+Defined in: [sql/query-building.ts:11](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/mock/src/sql/query-building.ts#L11)
 
 Represents the result of [buildSetClause](../functions/buildSetClause.md).
 
@@ -23,7 +23,7 @@ available parameter index for appending additional conditions (e.g. a WHERE clau
 
 > **clause**: `string`
 
-Defined in: [sql/query-building.ts:13](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/mock/src/sql/query-building.ts#L13)
+Defined in: [sql/query-building.ts:13](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/mock/src/sql/query-building.ts#L13)
 
 The SQL SET clause string (e.g. `"name = $1, updated_at = NOW()"`).
 
@@ -33,7 +33,7 @@ The SQL SET clause string (e.g. `"name = $1, updated_at = NOW()"`).
 
 > **nextIndex**: `number`
 
-Defined in: [sql/query-building.ts:17](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/mock/src/sql/query-building.ts#L17)
+Defined in: [sql/query-building.ts:17](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/mock/src/sql/query-building.ts#L17)
 
 The next available `$N` parameter index.
 
@@ -43,6 +43,6 @@ The next available `$N` parameter index.
 
 > **values**: `unknown`[]
 
-Defined in: [sql/query-building.ts:15](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/mock/src/sql/query-building.ts#L15)
+Defined in: [sql/query-building.ts:15](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/mock/src/sql/query-building.ts#L15)
 
 The ordered parameter values corresponding to the placeholders.

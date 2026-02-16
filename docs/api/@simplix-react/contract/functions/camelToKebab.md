@@ -8,7 +8,7 @@
 
 > **camelToKebab**(`str`): `string`
 
-Defined in: [packages/contract/src/helpers/case-transform.ts:17](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/contract/src/helpers/case-transform.ts#L17)
+Defined in: [packages/contract/src/helpers/case-transform.ts:17](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/contract/src/helpers/case-transform.ts#L17)
 
 Converts a camelCase string to kebab-case.
 

@@ -6,7 +6,7 @@
 
 # Interface: AuthConfig
 
-Defined in: [packages/auth/src/types.ts:72](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/auth/src/types.ts#L72)
+Defined in: [packages/auth/src/types.ts:72](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/auth/src/types.ts#L72)
 
 Configuration for creating an auth instance via [createAuth](../functions/createAuth.md).
 
@@ -16,7 +16,7 @@ Configuration for creating an auth instance via [createAuth](../functions/create
 
 > `optional` **maxRetries**: `number`
 
-Defined in: [packages/auth/src/types.ts:83](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/auth/src/types.ts#L83)
+Defined in: [packages/auth/src/types.ts:83](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/auth/src/types.ts#L83)
 
 Maximum retry attempts after 401. Defaults to `1`.
 
@@ -26,7 +26,7 @@ Maximum retry attempts after 401. Defaults to `1`.
 
 > `optional` **onRefreshFailure**: (`error`) => `void`
 
-Defined in: [packages/auth/src/types.ts:80](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/auth/src/types.ts#L80)
+Defined in: [packages/auth/src/types.ts:80](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/auth/src/types.ts#L80)
 
 Called when all refresh attempts fail.
 
@@ -46,7 +46,7 @@ Called when all refresh attempts fail.
 
 > **schemes**: [`AuthScheme`](AuthScheme.md)[]
 
-Defined in: [packages/auth/src/types.ts:74](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/auth/src/types.ts#L74)
+Defined in: [packages/auth/src/types.ts:74](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/auth/src/types.ts#L74)
 
 One or more authentication schemes to compose.
 
@@ -56,6 +56,6 @@ One or more authentication schemes to compose.
 
 > `optional` **store**: [`TokenStore`](TokenStore.md)
 
-Defined in: [packages/auth/src/types.ts:77](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/auth/src/types.ts#L77)
+Defined in: [packages/auth/src/types.ts:77](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/auth/src/types.ts#L77)
 
 Token store shared across schemes.

@@ -57,21 +57,25 @@ const projectContract = defineApi({
 // 2. Derive handlers and bootstrap
 await setupMockWorker({
   dataDir: "idb://project-mock",
-  migrations: [
-    async (db) => {
-      await executeSql(db, `
-        CREATE TABLE IF NOT EXISTS tasks (
-          id TEXT PRIMARY KEY,
-          title TEXT NOT NULL,
-          status TEXT NOT NULL DEFAULT 'todo',
-          created_at TIMESTAMP DEFAULT NOW(),
-          updated_at TIMESTAMP DEFAULT NOW()
-        )
-      `);
+  domains: [
+    {
+      name: "project",
+      handlers: deriveMockHandlers(projectContract.config),
+      migrations: [
+        async (db) => {
+          await executeSql(db, `
+            CREATE TABLE IF NOT EXISTS tasks (
+              id TEXT PRIMARY KEY,
+              title TEXT NOT NULL,
+              status TEXT NOT NULL DEFAULT 'todo',
+              created_at TIMESTAMP DEFAULT NOW(),
+              updated_at TIMESTAMP DEFAULT NOW()
+            )
+          `);
+        },
+      ],
     },
   ],
-  seed: [],
-  handlers: deriveMockHandlers(projectContract.config),
 });
 ```
 
@@ -85,7 +89,8 @@ After `setupMockWorker` resolves, every `fetch("/api/tasks")` call in your appli
 | --- | --- |
 | `setupMockWorker(config)` | Bootstraps PGlite + MSW in one call |
 | `deriveMockHandlers(config, mockConfig?)` | Generates CRUD MSW handlers from a contract |
-| `MockServerConfig` | Configuration for `setupMockWorker` |
+| `MockServerConfig` | Domain-based configuration for `setupMockWorker` |
+| `MockDomainConfig` | Per-domain mock configuration (handlers, migrations, seed, toggle) |
 | `MockEntityConfig` | Per-entity mock configuration (table name, limits, relations) |
 
 ### PGlite Lifecycle

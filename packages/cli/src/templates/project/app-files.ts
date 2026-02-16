@@ -92,8 +92,9 @@ async function enableMocking() {
   if (import.meta.env.PROD) return;
   const { setupMockWorker } = await import("@simplix-react/mock");
   await setupMockWorker({
-    handlers: [],
-    migrations: [],
+    domains: [
+      // (await import("{{domainPkgName}}/mock")).{{domainName}}Mock,
+    ],
   });
 }
 

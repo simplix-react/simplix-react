@@ -86,25 +86,41 @@ The `"idb://..."` prefix tells PGlite to persist data in IndexedDB, meaning data
 
 ### Bootstrap Flow
 
-The `setupMockWorker()` function orchestrates the full bootstrap sequence:
+The `setupMockWorker()` function orchestrates the full bootstrap sequence using a domain-based configuration. Each domain groups its own handlers, migrations, and seed data:
 
 ```ts
 import { setupMockWorker, deriveMockHandlers } from "@simplix-react/mock";
 
 await setupMockWorker({
   dataDir: "idb://project-mock",
-  migrations: [runMigrations],
-  seed: [seedData],
-  handlers: deriveMockHandlers(projectApi.config),
+  domains: [
+    {
+      name: "project",
+      handlers: deriveMockHandlers(projectApi.config),
+      migrations: [runProjectMigrations],
+      seed: [seedProjectData],
+    },
+    {
+      name: "auth",
+      enabled: false, // temporarily disable this domain
+      handlers: deriveMockHandlers(authApi.config),
+      migrations: [runAuthMigrations],
+    },
+  ],
 });
 ```
 
 The sequence is:
 
-1. Initialize PGlite at the configured data directory
-2. Run migration functions sequentially (create tables, alter schemas)
-3. Run seed functions sequentially (insert initial data)
-4. Start the MSW service worker with the derived handlers
+1. Filter domains where `enabled !== false`
+2. Initialize PGlite at the configured data directory
+3. Run ALL migration functions across enabled domains sequentially (create tables, alter schemas)
+4. Run ALL seed functions across enabled domains sequentially (insert initial data)
+5. Combine handlers from enabled domains and start the MSW service worker
+
+All migrations run before any seeds to ensure cross-domain foreign key references are satisfied. For example, if the "auth" domain creates a `users` table and the "project" domain seeds tasks with a `user_id` reference, the `users` table is guaranteed to exist before seeding begins.
+
+Each domain can be independently toggled via the `enabled` flag (defaults to `true`), making it easy to disable specific domains during development without removing their configuration.
 
 Unhandled requests (those not matching any handler) are bypassed to the network, allowing the mock layer to coexist with real API calls.
 

@@ -157,9 +157,22 @@ export const openapiTsconfigJson = `{
 export const openapiUserIndexTs = `export * from "./generated/index.js";
 `;
 
-export const openapiUserMockIndexTs = `export { handlers } from "./generated/handlers.js";
-export { migrations } from "./generated/migrations.js";
-export { seed } from "./seed.js";
+export const openapiUserMockIndexTs = `import type { MockDomainConfig } from "@simplix-react/mock";
+import { executeSql } from "@simplix-react/mock";
+import { handlers } from "./generated/handlers.js";
+import { migrations as migrationSql } from "./generated/migrations.js";
+import { seed } from "./seed.js";
+
+export const {{domainName}}Mock: MockDomainConfig = {
+  name: "{{domainName}}",
+  handlers,
+  migrations: [
+    async (db) => {
+      for (const sql of migrationSql) { await executeSql(db, sql); }
+    },
+  ],
+  seed: [seed],
+};
 `;
 
 // --- Machine-generated files (always regenerated) ---
