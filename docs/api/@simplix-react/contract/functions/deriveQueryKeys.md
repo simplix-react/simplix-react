@@ -8,7 +8,7 @@
 
 > **deriveQueryKeys**\<`TEntities`\>(`config`): \{ \[K in string \| number \| symbol\]: QueryKeyFactory \}
 
-Defined in: [packages/contract/src/derive/query-keys.ts:35](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/contract/src/derive/query-keys.ts#L35)
+Defined in: [packages/contract/src/derive/query-keys.ts:35](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/contract/src/derive/query-keys.ts#L35)
 
 Derives a set of [QueryKeyFactory](../interfaces/QueryKeyFactory.md) instances for all entities in a contract.
 
@@ -23,7 +23,7 @@ Typically called internally by [defineApi](defineApi.md) rather than used direct
 
 ### TEntities
 
-`TEntities` *extends* `Record`\<`string`, [`EntityDefinition`](../interfaces/EntityDefinition.md)\<`any`, `any`, `any`\>\>
+`TEntities` *extends* `Record`\<`string`, [`EntityDefinition`](../interfaces/EntityDefinition.md)\<`ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>\>\>
 
 Map of entity names to their definitions.
 

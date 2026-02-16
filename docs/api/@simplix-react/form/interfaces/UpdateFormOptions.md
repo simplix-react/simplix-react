@@ -6,7 +6,7 @@
 
 # Interface: UpdateFormOptions
 
-Defined in: [types.ts:45](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/form/src/types.ts#L45)
+Defined in: [types.ts:45](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/form/src/types.ts#L45)
 
 Options for the `useUpdateForm` hook.
 
@@ -25,7 +25,7 @@ const { form } = formHooks.task.useUpdateForm(taskId, {
 
 > `optional` **dirtyOnly**: `boolean`
 
-Defined in: [types.ts:47](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/form/src/types.ts#L47)
+Defined in: [types.ts:47](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/form/src/types.ts#L47)
 
 Send only changed fields to the server (PATCH-friendly). Defaults to `true`.
 
@@ -35,7 +35,7 @@ Send only changed fields to the server (PATCH-friendly). Defaults to `true`.
 
 > `optional` **onError**: (`error`) => `void`
 
-Defined in: [types.ts:51](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/form/src/types.ts#L51)
+Defined in: [types.ts:51](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/form/src/types.ts#L51)
 
 Callback invoked when the mutation fails.
 
@@ -55,7 +55,7 @@ Callback invoked when the mutation fails.
 
 > `optional` **onSuccess**: (`data`) => `void`
 
-Defined in: [types.ts:49](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/form/src/types.ts#L49)
+Defined in: [types.ts:49](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/form/src/types.ts#L49)
 
 Callback invoked after a successful mutation.
 

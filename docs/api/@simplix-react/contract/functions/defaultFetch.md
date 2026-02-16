@@ -8,7 +8,7 @@
 
 > **defaultFetch**\<`T`\>(`path`, `options?`): `Promise`\<`T`\>
 
-Defined in: [packages/contract/src/helpers/fetch.ts:67](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/contract/src/helpers/fetch.ts#L67)
+Defined in: [packages/contract/src/helpers/fetch.ts:67](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/contract/src/helpers/fetch.ts#L67)
 
 Performs an HTTP request with automatic JSON content-type headers and
 `{ data: T }` envelope unwrapping.

@@ -6,9 +6,9 @@
 
 # Function: deriveHooks()
 
-> **deriveHooks**\<`TEntities`, `TOperations`\>(`contract`): `DerivedHooksResult`\<`TEntities`, `TOperations`\>
+> **deriveHooks**\<`TEntities`, `TOperations`\>(`contract`): [`DerivedHooksResult`](../type-aliases/DerivedHooksResult.md)\<`TEntities`, `TOperations`\>
 
-Defined in: [derive-hooks.ts:72](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/react/src/derive-hooks.ts#L72)
+Defined in: [derive-hooks.ts:72](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/react/src/derive-hooks.ts#L72)
 
 Derives type-safe React Query hooks from an API contract.
 
@@ -56,7 +56,7 @@ The API contract produced by `defineApi()` from `@simplix-react/contract`,
 
 ## Returns
 
-`DerivedHooksResult`\<`TEntities`, `TOperations`\>
+[`DerivedHooksResult`](../type-aliases/DerivedHooksResult.md)\<`TEntities`, `TOperations`\>
 
 An object keyed by entity/operation name, each containing its derived hooks.
 

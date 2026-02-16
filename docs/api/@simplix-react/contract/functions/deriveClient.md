@@ -8,7 +8,7 @@
 
 > **deriveClient**\<`TEntities`, `TOperations`\>(`config`, `fetchFn?`): `Record`\<`string`, `unknown`\>
 
-Defined in: [packages/contract/src/derive/client.ts:37](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/contract/src/derive/client.ts#L37)
+Defined in: [packages/contract/src/derive/client.ts:37](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/contract/src/derive/client.ts#L37)
 
 Derives a type-safe HTTP client from an [ApiContractConfig](../interfaces/ApiContractConfig.md).
 
@@ -23,13 +23,13 @@ Typically called internally by [defineApi](defineApi.md) rather than used direct
 
 ### TEntities
 
-`TEntities` *extends* `Record`\<`string`, [`EntityDefinition`](../interfaces/EntityDefinition.md)\<`any`, `any`, `any`\>\>
+`TEntities` *extends* `Record`\<`string`, [`EntityDefinition`](../interfaces/EntityDefinition.md)\<`ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>\>\>
 
 Map of entity names to their definitions.
 
 ### TOperations
 
-`TOperations` *extends* `Record`\<`string`, [`OperationDefinition`](../interfaces/OperationDefinition.md)\<`any`, `any`\>\>
+`TOperations` *extends* `Record`\<`string`, [`OperationDefinition`](../interfaces/OperationDefinition.md)\<`ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>\>\>
 
 Map of operation names to their definitions.
 

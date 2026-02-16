@@ -253,6 +253,7 @@ Next Step → `@simplix-react/mock`
 - [DerivedCreateHook](type-aliases/DerivedCreateHook.md)
 - [DerivedDeleteHook](type-aliases/DerivedDeleteHook.md)
 - [DerivedGetHook](type-aliases/DerivedGetHook.md)
+- [DerivedHooksResult](type-aliases/DerivedHooksResult.md)
 - [DerivedInfiniteListHook](type-aliases/DerivedInfiniteListHook.md)
 - [DerivedListHook](type-aliases/DerivedListHook.md)
 - [DerivedUpdateHook](type-aliases/DerivedUpdateHook.md)

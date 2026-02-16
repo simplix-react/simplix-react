@@ -235,6 +235,7 @@ Next Step → `@simplix-react/mock`
 ## Type Aliases
 
 - [DerivedCreateFormHook](type-aliases/DerivedCreateFormHook.md)
+- [DerivedFormHooksResult](type-aliases/DerivedFormHooksResult.md)
 - [DerivedUpdateFormHook](type-aliases/DerivedUpdateFormHook.md)
 
 ## Functions

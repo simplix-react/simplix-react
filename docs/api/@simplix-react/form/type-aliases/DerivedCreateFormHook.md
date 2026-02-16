@@ -8,7 +8,7 @@
 
 > **DerivedCreateFormHook**\<`TCreate`\> = (`parentId?`, `options?`) => [`CreateFormReturn`](../interfaces/CreateFormReturn.md)
 
-Defined in: [types.ts:125](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/form/src/types.ts#L125)
+Defined in: [types.ts:125](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/form/src/types.ts#L125)
 
 Hook signature for creating a new entity via a TanStack Form instance.
 

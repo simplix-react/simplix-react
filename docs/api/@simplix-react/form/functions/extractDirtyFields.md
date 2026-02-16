@@ -8,7 +8,7 @@
 
 > **extractDirtyFields**\<`T`\>(`current`, `original`): `Partial`\<`T`\>
 
-Defined in: [utils/dirty-fields.ts:66](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/form/src/utils/dirty-fields.ts#L66)
+Defined in: [utils/dirty-fields.ts:59](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/form/src/utils/dirty-fields.ts#L59)
 
 Extracts only the fields that differ between current and original objects.
 

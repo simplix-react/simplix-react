@@ -6,7 +6,7 @@
 
 # Interface: OperationDefinition\<TInput, TOutput\>
 
-Defined in: [packages/contract/src/types.ts:126](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/contract/src/types.ts#L126)
+Defined in: [packages/contract/src/types.ts:126](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/contract/src/types.ts#L126)
 
 Defines a custom (non-CRUD) API operation with typed input and output.
 
@@ -52,7 +52,7 @@ Zod schema for the response payload.
 
 > `optional` **contentType**: `"json"` \| `"multipart"`
 
-Defined in: [packages/contract/src/types.ts:139](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/contract/src/types.ts#L139)
+Defined in: [packages/contract/src/types.ts:139](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/contract/src/types.ts#L139)
 
 Content type for the request body. Defaults to `"json"`.
 
@@ -62,7 +62,7 @@ Content type for the request body. Defaults to `"json"`.
 
 > **input**: `TInput`
 
-Defined in: [packages/contract/src/types.ts:135](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/contract/src/types.ts#L135)
+Defined in: [packages/contract/src/types.ts:135](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/contract/src/types.ts#L135)
 
 Zod schema validating the request payload.
 
@@ -72,7 +72,7 @@ Zod schema validating the request payload.
 
 > `optional` **invalidates**: (`queryKeys`, `params`) => readonly `unknown`[][]
 
-Defined in: [packages/contract/src/types.ts:146](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/contract/src/types.ts#L146)
+Defined in: [packages/contract/src/types.ts:146](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/contract/src/types.ts#L146)
 
 Returns query key arrays that should be invalidated after this operation succeeds.
 Enables automatic cache invalidation in `@simplix-react/react`.
@@ -97,7 +97,7 @@ readonly `unknown`[][]
 
 > **method**: [`HttpMethod`](../type-aliases/HttpMethod.md)
 
-Defined in: [packages/contract/src/types.ts:131](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/contract/src/types.ts#L131)
+Defined in: [packages/contract/src/types.ts:131](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/contract/src/types.ts#L131)
 
 HTTP method for this operation.
 
@@ -107,7 +107,7 @@ HTTP method for this operation.
 
 > **output**: `TOutput`
 
-Defined in: [packages/contract/src/types.ts:137](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/contract/src/types.ts#L137)
+Defined in: [packages/contract/src/types.ts:137](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/contract/src/types.ts#L137)
 
 Zod schema validating the response payload.
 
@@ -117,7 +117,7 @@ Zod schema validating the response payload.
 
 > **path**: `string`
 
-Defined in: [packages/contract/src/types.ts:133](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/contract/src/types.ts#L133)
+Defined in: [packages/contract/src/types.ts:133](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/contract/src/types.ts#L133)
 
 URL path with optional `:paramName` placeholders (e.g. `"/tasks/:taskId/assign"`).
 
@@ -127,6 +127,6 @@ URL path with optional `:paramName` placeholders (e.g. `"/tasks/:taskId/assign"`
 
 > `optional` **responseType**: `"json"` \| `"blob"`
 
-Defined in: [packages/contract/src/types.ts:141](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/contract/src/types.ts#L141)
+Defined in: [packages/contract/src/types.ts:141](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/contract/src/types.ts#L141)
 
 Expected response format. Defaults to `"json"`.

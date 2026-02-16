@@ -8,7 +8,7 @@
 
 > **tableExists**(`db`, `tableName`): `Promise`\<`boolean`\>
 
-Defined in: [sql/migration-helpers.ts:20](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/mock/src/sql/migration-helpers.ts#L20)
+Defined in: [sql/migration-helpers.ts:20](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/mock/src/sql/migration-helpers.ts#L20)
 
 Checks whether a table exists in the database by querying `information_schema.tables`.
 

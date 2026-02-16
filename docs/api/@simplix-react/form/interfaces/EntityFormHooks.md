@@ -6,7 +6,7 @@
 
 # Interface: EntityFormHooks\<TSchema, TCreate\>
 
-Defined in: [types.ts:166](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/form/src/types.ts#L166)
+Defined in: [types.ts:166](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/form/src/types.ts#L166)
 
 Form hook set for a single entity, containing `useCreateForm` and `useUpdateForm`.
 
@@ -51,7 +51,7 @@ Creation input Zod schema type
 
 > **useCreateForm**: [`DerivedCreateFormHook`](../type-aliases/DerivedCreateFormHook.md)\<`TCreate`\>
 
-Defined in: [types.ts:171](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/form/src/types.ts#L171)
+Defined in: [types.ts:171](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/form/src/types.ts#L171)
 
 Hook for creating a new entity with a managed form.
 
@@ -61,6 +61,6 @@ Hook for creating a new entity with a managed form.
 
 > **useUpdateForm**: [`DerivedUpdateFormHook`](../type-aliases/DerivedUpdateFormHook.md)\<`TSchema`\>
 
-Defined in: [types.ts:173](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/form/src/types.ts#L173)
+Defined in: [types.ts:173](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/form/src/types.ts#L173)
 
 Hook for updating an existing entity with a managed form.

@@ -6,7 +6,7 @@
 
 # Interface: CreateFormOptions\<TCreate\>
 
-Defined in: [types.ts:23](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/form/src/types.ts#L23)
+Defined in: [types.ts:23](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/form/src/types.ts#L23)
 
 Options for the `useCreateForm` hook.
 
@@ -35,7 +35,7 @@ Zod schema type for the create DTO
 
 > `optional` **defaultValues**: `Partial`\<`output`\<`TCreate`\>\>
 
-Defined in: [types.ts:25](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/form/src/types.ts#L25)
+Defined in: [types.ts:25](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/form/src/types.ts#L25)
 
 Initial form field values.
 
@@ -45,7 +45,7 @@ Initial form field values.
 
 > `optional` **onError**: (`error`) => `void`
 
-Defined in: [types.ts:31](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/form/src/types.ts#L31)
+Defined in: [types.ts:31](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/form/src/types.ts#L31)
 
 Callback invoked when the mutation fails.
 
@@ -65,7 +65,7 @@ Callback invoked when the mutation fails.
 
 > `optional` **onSuccess**: (`data`) => `void`
 
-Defined in: [types.ts:29](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/form/src/types.ts#L29)
+Defined in: [types.ts:29](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/form/src/types.ts#L29)
 
 Callback invoked after a successful mutation.
 
@@ -85,6 +85,6 @@ Callback invoked after a successful mutation.
 
 > `optional` **resetOnSuccess**: `boolean`
 
-Defined in: [types.ts:27](https://github.com/simplix-react/simplix-react/blob/7b385f612737a3aa7cc5a3b289dfdffa21c92677/packages/form/src/types.ts#L27)
+Defined in: [types.ts:27](https://github.com/simplix-react/simplix-react/blob/2426719b5527895551fb3ee252c71ac8c52498fa/packages/form/src/types.ts#L27)
 
 Reset the form after successful submission. Defaults to `true`.
