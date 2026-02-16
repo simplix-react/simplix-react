@@ -197,7 +197,7 @@ export const openapiCommand = new Command("openapi")
 
 // --- Core generation ---
 
-async function generateDomainPackage(opts: {
+interface DomainPackageOpts {
   domainName: string;
   entities: ExtractedEntity[];
   specSource: string;
@@ -208,27 +208,82 @@ async function generateDomainPackage(opts: {
   prefix: string;
   scope: string;
   baseName: string;
-}): Promise<void> {
+}
+
+async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
   const { domainName, entities, specSource, flags, config, outputBase, prefix, scope, baseName } = opts;
 
   const dirName = `${prefix}-domain-${domainName}`;
   const targetDir = join(outputBase, dirName);
   const domainPkgName = `${scope}/${dirName}`;
-
-  // Check for existing package and handle diff
   const snapshotPath = join(targetDir, ".openapi-snapshot.json");
   const isUpdate = await pathExists(snapshotPath);
   const isFirstRun = !(await pathExists(targetDir));
 
-  if (isUpdate) {
-    const previousSnapshot = await readJsonFile<OpenAPISnapshot>(
-      snapshotPath,
+  const shouldProceed = await confirmRegeneration({
+    isUpdate, isFirstRun, snapshotPath, domainPkgName, dirName, entities, flags,
+  });
+  if (!shouldProceed) return;
+
+  const writeSpinner = ora(
+    isUpdate
+      ? `Updating domain package: ${domainPkgName}`
+      : `Creating domain package: ${domainPkgName}`,
+  ).start();
+
+  try {
+    const configEslintPkgName = await detectConfigEslintPackage(outputBase, scope);
+    const generateForms = flags.forms !== false;
+    const apiBasePath = `${config.api?.baseUrl ?? "/api"}/${domainName}`;
+    const ctx = buildTemplateContext({
+      domainName, domainPkgName, configEslintPkgName,
+      projectName: baseName, scope, apiBasePath, entities, generateForms,
+    });
+
+    if (!isFirstRun) {
+      await cleanGeneratedDirs(targetDir, flags);
+    }
+
+    const generatedFiles = buildGeneratedFiles({ entities, flags, ctx, apiBasePath, generateForms, config });
+    const scaffoldFiles = isFirstRun
+      ? buildScaffoldFiles(configEslintPkgName, flags, ctx)
+      : {};
+
+    const addHeader = flags.header !== undefined ? flags.header : (config.codegen?.header ?? true);
+    await writeFilesToDisk(targetDir, generatedFiles, scaffoldFiles, addHeader);
+    await saveSnapshot(snapshotPath, specSource, entities);
+
+    const totalFiles = Object.keys(generatedFiles).length + Object.keys(scaffoldFiles).length;
+    writeSpinner.succeed(
+      isUpdate ? `Updated domain package: ${domainPkgName}` : `Created domain package: ${domainPkgName}`,
     );
+
+    printSummary({ dirName, domainPkgName, entities, totalFiles, isFirstRun });
+  } catch (err) {
+    writeSpinner.fail("Failed to generate domain package");
+    log.error(String(err));
+    process.exit(1);
+  }
+}
+
+async function confirmRegeneration(opts: {
+  isUpdate: boolean;
+  isFirstRun: boolean;
+  snapshotPath: string;
+  domainPkgName: string;
+  dirName: string;
+  entities: ExtractedEntity[];
+  flags: OpenAPIFlags;
+}): Promise<boolean> {
+  const { isUpdate, isFirstRun, snapshotPath, domainPkgName, dirName, entities, flags } = opts;
+
+  if (isUpdate) {
+    const previousSnapshot = await readJsonFile<OpenAPISnapshot>(snapshotPath);
     const diff = computeDiff(previousSnapshot, entities);
 
     if (!diff.hasChanges && !flags.force) {
       log.success(`${domainPkgName}: No changes detected. Package is up-to-date.`);
-      return;
+      return false;
     }
 
     if (diff.hasChanges) {
@@ -246,183 +301,156 @@ async function generateDomainPackage(opts: {
         message: `${domainPkgName}: Regenerate src/generated/ with updated code?`,
         initial: false,
       });
-
       if (!proceed) {
         log.info("Update cancelled.");
-        return;
+        return false;
       }
     }
-  } else if (!isFirstRun) {
-    // Existing package without snapshot
-    if (!flags.yes) {
-      const { proceed } = await prompts({
-        type: "confirm",
-        name: "proceed",
-        message: `Package "${dirName}" already exists. Regenerate generated files?`,
-        initial: false,
-      });
 
-      if (!proceed) {
-        log.info("Generation cancelled.");
-        return;
-      }
+    return true;
+  }
+
+  if (!isFirstRun && !flags.yes) {
+    const { proceed } = await prompts({
+      type: "confirm",
+      name: "proceed",
+      message: `Package "${dirName}" already exists. Regenerate generated files?`,
+      initial: false,
+    });
+    if (!proceed) {
+      log.info("Generation cancelled.");
+      return false;
     }
   }
 
-  const writeSpinner = ora(
-    isUpdate
-      ? `Updating domain package: ${domainPkgName}`
-      : `Creating domain package: ${domainPkgName}`,
-  ).start();
+  return true;
+}
 
-  try {
-    // Detect config-eslint package in workspace
-    const configEslintPkgName = await detectConfigEslintPackage(outputBase, scope);
+async function cleanGeneratedDirs(targetDir: string, flags: OpenAPIFlags): Promise<void> {
+  await rm(join(targetDir, "src/generated"), { recursive: true, force: true });
+  if (flags.mock !== false) {
+    await rm(join(targetDir, "src/mock/generated"), { recursive: true, force: true });
+  }
+}
 
-    // Build template context
-    const apiBaseUrl = config.api?.baseUrl ?? "/api";
-    const apiBasePath = `${apiBaseUrl}/${domainName}`;
-    const generateForms = flags.forms !== false;
-    const ctx = buildTemplateContext({
-      domainName,
-      domainPkgName,
-      configEslintPkgName,
-      projectName: baseName,
-      scope,
-      apiBasePath,
-      entities,
-      generateForms,
-    });
+function buildGeneratedFiles(opts: {
+  entities: ExtractedEntity[];
+  flags: OpenAPIFlags;
+  ctx: Record<string, unknown>;
+  apiBasePath: string;
+  generateForms: boolean;
+  config: SimplixConfig;
+}): Record<string, string> {
+  const { entities, flags, ctx, apiBasePath, generateForms, config } = opts;
+  const files: Record<string, string> = {};
 
-    // Clean generated directories before regeneration
-    if (!isFirstRun) {
-      await rm(join(targetDir, "src/generated"), { recursive: true, force: true });
-      if (flags.mock !== false) {
-        await rm(join(targetDir, "src/mock/generated"), { recursive: true, force: true });
-      }
+  files["src/generated/index.ts"] = generateForms
+    ? openapiGeneratedIndexWithFormsTs
+    : openapiGeneratedIndexTs;
+  files["src/generated/schemas.ts"] = generateZodSchemas(entities);
+  files["src/generated/contract.ts"] = renderTemplate(openapiGeneratedContractTs, ctx);
+  files["src/generated/hooks.ts"] = renderTemplate(openapiGeneratedHooksTs, ctx);
+
+  if (generateForms) {
+    files["src/generated/form-hooks.ts"] = renderTemplate(openapiGeneratedFormHooksTs, ctx);
+  }
+
+  if (flags.mock !== false) {
+    files["src/mock/generated/handlers.ts"] = renderTemplate(openapiGeneratedMockHandlersTs, ctx);
+    files["src/mock/generated/migrations.ts"] = renderTemplate(openapiGeneratedMockMigrationsTs, ctx);
+  }
+
+  if (flags.http !== false) {
+    files["http/http-client.env.json"] = generateHttpEnvJson(config);
+    for (const entity of entities) {
+      files[`http/${entity.name}.http`] = generateHttpFile(entity, apiBasePath);
     }
+  }
 
-    // --- Generated files (always regenerated) ---
-    const generatedFiles: Record<string, string> = {};
+  return files;
+}
 
-    generatedFiles["src/generated/index.ts"] = generateForms
-      ? openapiGeneratedIndexWithFormsTs
-      : openapiGeneratedIndexTs;
-    generatedFiles["src/generated/schemas.ts"] = generateZodSchemas(entities);
-    generatedFiles["src/generated/contract.ts"] = renderTemplate(openapiGeneratedContractTs, ctx);
-    generatedFiles["src/generated/hooks.ts"] = renderTemplate(openapiGeneratedHooksTs, ctx);
+function buildScaffoldFiles(
+  configEslintPkgName: string | null,
+  flags: OpenAPIFlags,
+  ctx: Record<string, unknown>,
+): Record<string, string> {
+  const files: Record<string, string> = {};
 
-    // Form hooks
-    if (generateForms) {
-      generatedFiles["src/generated/form-hooks.ts"] = renderTemplate(openapiGeneratedFormHooksTs, ctx);
-    }
+  const pkgJsonTemplate = configEslintPkgName
+    ? openapiPackageJsonWithEslintConfig
+    : openapiPackageJsonStandalone;
+  const eslintTemplate = configEslintPkgName
+    ? openapiEslintConfigShared
+    : openapiEslintConfigStandalone;
 
-    // Mock generated layer
-    if (flags.mock !== false) {
-      generatedFiles["src/mock/generated/handlers.ts"] = renderTemplate(
-        openapiGeneratedMockHandlersTs,
-        ctx,
-      );
-      generatedFiles["src/mock/generated/migrations.ts"] = renderTemplate(
-        openapiGeneratedMockMigrationsTs,
-        ctx,
-      );
-    }
+  files["package.json"] = renderTemplate(pkgJsonTemplate, ctx);
+  files["tsup.config.ts"] = openapiTsupConfig;
+  files["tsconfig.json"] = openapiTsconfigJson;
+  files["eslint.config.js"] = renderTemplate(eslintTemplate, ctx);
+  files["src/index.ts"] = openapiUserIndexTs;
 
-    // .http files (outside src/ — not compiled)
-    if (flags.http !== false) {
-      const httpEnv = generateHttpEnvJson(config);
-      generatedFiles["http/http-client.env.json"] = httpEnv;
+  if (flags.mock !== false) {
+    files["src/mock/index.ts"] = openapiUserMockIndexTs;
+    files["src/mock/seed.ts"] = renderTemplate(openapiMockSeedTs, ctx);
+  }
 
-      for (const entity of entities) {
-        generatedFiles[`http/${entity.name}.http`] = generateHttpFile(
-          entity,
-          apiBasePath,
-        );
-      }
-    }
+  return files;
+}
 
-    // --- Scaffold files (first-run only) ---
-    const scaffoldFiles: Record<string, string> = {};
+async function writeFilesToDisk(
+  targetDir: string,
+  generatedFiles: Record<string, string>,
+  scaffoldFiles: Record<string, string>,
+  addHeader: boolean,
+): Promise<void> {
+  for (const [relativePath, content] of Object.entries(generatedFiles)) {
+    const output = addHeader ? prependGeneratedHeader(relativePath, content) : content;
+    await writeFileWithDir(join(targetDir, relativePath), output);
+  }
 
-    if (isFirstRun) {
-      const pkgJsonTemplate = configEslintPkgName
-        ? openapiPackageJsonWithEslintConfig
-        : openapiPackageJsonStandalone;
-      const eslintTemplate = configEslintPkgName
-        ? openapiEslintConfigShared
-        : openapiEslintConfigStandalone;
+  for (const [relativePath, content] of Object.entries(scaffoldFiles)) {
+    await writeFileWithDir(join(targetDir, relativePath), content);
+  }
+}
 
-      scaffoldFiles["package.json"] = renderTemplate(pkgJsonTemplate, ctx);
-      scaffoldFiles["tsup.config.ts"] = openapiTsupConfig;
-      scaffoldFiles["tsconfig.json"] = openapiTsconfigJson;
-      scaffoldFiles["eslint.config.js"] = renderTemplate(eslintTemplate, ctx);
-      scaffoldFiles["src/index.ts"] = openapiUserIndexTs;
+async function saveSnapshot(
+  snapshotPath: string,
+  specSource: string,
+  entities: ExtractedEntity[],
+): Promise<void> {
+  const snapshot: OpenAPISnapshot = {
+    generatedAt: new Date().toISOString(),
+    specSource,
+    entities,
+  };
+  await writeFile(snapshotPath, JSON.stringify(snapshot, null, 2), "utf-8");
+}
 
-      if (flags.mock !== false) {
-        scaffoldFiles["src/mock/index.ts"] = openapiUserMockIndexTs;
-        scaffoldFiles["src/mock/seed.ts"] = renderTemplate(openapiMockSeedTs, ctx);
-      }
-    }
+function printSummary(opts: {
+  dirName: string;
+  domainPkgName: string;
+  entities: ExtractedEntity[];
+  totalFiles: number;
+  isFirstRun: boolean;
+}): void {
+  const { dirName, domainPkgName, entities, totalFiles, isFirstRun } = opts;
 
-    // Determine whether to prepend auto-generated header
-    const addHeader =
-      flags.header !== undefined ? flags.header : (config.codegen?.header ?? true);
-
-    // Write generated files (with header)
-    for (const [relativePath, content] of Object.entries(generatedFiles)) {
-      const output = addHeader
-        ? prependGeneratedHeader(relativePath, content)
-        : content;
-      await writeFileWithDir(join(targetDir, relativePath), output);
-    }
-
-    // Write scaffold files (no header — user-owned)
-    for (const [relativePath, content] of Object.entries(scaffoldFiles)) {
-      await writeFileWithDir(join(targetDir, relativePath), content);
-    }
-
-    // Save snapshot for future diffs
-    const snapshot: OpenAPISnapshot = {
-      generatedAt: new Date().toISOString(),
-      specSource,
-      entities,
-    };
-    await writeFile(
-      snapshotPath,
-      JSON.stringify(snapshot, null, 2),
-      "utf-8",
+  log.info("");
+  log.step(`Location: packages/${dirName}/`);
+  log.step(`Entities: ${entities.map((e) => e.name).join(", ")}`);
+  log.step(`Files: ${totalFiles} generated`);
+  if (!isFirstRun) {
+    log.step("User files preserved (src/index.ts, src/mock/index.ts, package.json, etc.)");
+  }
+  log.info("");
+  log.info("Next steps:");
+  log.step("pnpm install");
+  log.step("pnpm build");
+  if (isFirstRun) {
+    log.step(
+      `Add "${domainPkgName}": "workspace:*" to your app's dependencies`,
     );
-
-    const totalFiles = Object.keys(generatedFiles).length + Object.keys(scaffoldFiles).length;
-
-    writeSpinner.succeed(
-      isUpdate
-        ? `Updated domain package: ${domainPkgName}`
-        : `Created domain package: ${domainPkgName}`,
-    );
-
-    // Summary
-    log.info("");
-    log.step(`Location: packages/${dirName}/`);
-    log.step(`Entities: ${entities.map((e) => e.name).join(", ")}`);
-    log.step(`Files: ${totalFiles} generated`);
-    if (!isFirstRun) {
-      log.step("User files preserved (src/index.ts, src/mock/index.ts, package.json, etc.)");
-    }
-    log.info("");
-    log.info("Next steps:");
-    log.step("pnpm install");
-    log.step("pnpm build");
-    if (isFirstRun) {
-      log.step(
-        `Add "${domainPkgName}": "workspace:*" to your app's dependencies`,
-      );
-    }
-  } catch (err) {
-    writeSpinner.fail("Failed to generate domain package");
-    log.error(String(err));
-    process.exit(1);
   }
 }
 

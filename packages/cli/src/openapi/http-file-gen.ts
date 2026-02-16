@@ -87,6 +87,24 @@ function generateSampleBody(
   return JSON.stringify(obj, null, 2);
 }
 
+const STRING_FORMAT_SAMPLES: Record<string, () => unknown> = {
+  email: () => "user@example.com",
+  uuid: () => "00000000-0000-0000-0000-000000000001",
+  "date-time": () => new Date().toISOString(),
+  date: () => new Date().toISOString().split("T")[0],
+  uri: () => "https://example.com",
+  url: () => "https://example.com",
+  ipv4: () => "192.168.1.1",
+};
+
+const TYPE_SAMPLES: Record<string, unknown> = {
+  integer: 1,
+  number: 1.0,
+  boolean: true,
+  array: [],
+  object: {},
+};
+
 function getSampleValue(field: {
   name: string;
   type: string;
@@ -98,30 +116,9 @@ function getSampleValue(field: {
   }
 
   if (field.type === "string") {
-    switch (field.format) {
-      case "email":
-        return "user@example.com";
-      case "uuid":
-        return "00000000-0000-0000-0000-000000000001";
-      case "date-time":
-        return new Date().toISOString();
-      case "date":
-        return new Date().toISOString().split("T")[0];
-      case "uri":
-      case "url":
-        return "https://example.com";
-      case "ipv4":
-        return "192.168.1.1";
-      default:
-        return `sample-${field.name}`;
-    }
+    const formatSample = field.format && STRING_FORMAT_SAMPLES[field.format];
+    return formatSample ? formatSample() : `sample-${field.name}`;
   }
 
-  if (field.type === "integer") return 1;
-  if (field.type === "number") return 1.0;
-  if (field.type === "boolean") return true;
-  if (field.type === "array") return [];
-  if (field.type === "object") return {};
-
-  return `sample-${field.name}`;
+  return TYPE_SAMPLES[field.type] ?? `sample-${field.name}`;
 }

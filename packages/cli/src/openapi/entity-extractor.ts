@@ -207,72 +207,94 @@ function detectOperations(
   return ops;
 }
 
+function extractSchemaFromGetItem(
+  spec: OpenAPISpec,
+  group: PathGroup,
+): SchemaObject | undefined {
+  if (!group.itemPath) return undefined;
+  const schema = extractResponseSchema(spec, group.itemPath, "get");
+  if (schema?.properties) return schema;
+  return undefined;
+}
+
+function extractSchemaFromGetList(
+  spec: OpenAPISpec,
+  group: PathGroup,
+): SchemaObject | undefined {
+  if (!group.collectionPath) return undefined;
+  const schema = extractResponseSchema(spec, group.collectionPath, "get");
+  if (!schema) return undefined;
+
+  if (schema.type === "array" && schema.items?.properties) {
+    return schema.items;
+  }
+  if (schema.properties?.data?.type === "array" && schema.properties.data.items?.properties) {
+    return schema.properties.data.items;
+  }
+  if (schema.properties?.items?.type === "array" && schema.properties.items.items?.properties) {
+    return schema.properties.items.items;
+  }
+  return undefined;
+}
+
+function extractSchemaFromPostBody(
+  spec: OpenAPISpec,
+  group: PathGroup,
+): SchemaObject | undefined {
+  if (!group.collectionPath) return undefined;
+  const pathItem = spec.paths[group.collectionPath];
+  const schema =
+    pathItem?.post?.requestBody?.content?.["application/json"]?.schema;
+  if (!schema?.properties) return undefined;
+
+  return {
+    type: "object",
+    properties: {
+      id: { type: "string", format: "uuid" },
+      ...schema.properties,
+      createdAt: { type: "string", format: "date-time" },
+      updatedAt: { type: "string", format: "date-time" },
+    },
+    required: [
+      "id",
+      ...(schema.required ?? []),
+      "createdAt",
+      "updatedAt",
+    ],
+  };
+}
+
+const FALLBACK_SCHEMA: SchemaObject = {
+  type: "object",
+  properties: {
+    id: { type: "string", format: "uuid" },
+    createdAt: { type: "string", format: "date-time" },
+    updatedAt: { type: "string", format: "date-time" },
+  },
+  required: ["id", "createdAt", "updatedAt"],
+};
+
 function extractEntitySchema(
   spec: OpenAPISpec,
   group: PathGroup,
   operations: CRUDOperations,
 ): SchemaObject {
-  // Priority: GET item response > GET list response item > POST request body
-
-  // Try GET item response
-  if (operations.get && group.itemPath) {
-    const schema = extractResponseSchema(spec, group.itemPath, "get");
-    if (schema?.properties) return schema;
+  if (operations.get) {
+    const schema = extractSchemaFromGetItem(spec, group);
+    if (schema) return schema;
   }
 
-  // Try GET list response (look for array items)
-  if (operations.list && group.collectionPath) {
-    const schema = extractResponseSchema(spec, group.collectionPath, "get");
-    if (schema) {
-      // Might be wrapped in { data: [...] } or directly an array
-      if (schema.type === "array" && schema.items?.properties) {
-        return schema.items;
-      }
-      if (schema.properties?.data?.type === "array" && schema.properties.data.items?.properties) {
-        return schema.properties.data.items;
-      }
-      // Direct object with items in properties
-      if (schema.properties?.items?.type === "array" && schema.properties.items.items?.properties) {
-        return schema.properties.items.items;
-      }
-    }
+  if (operations.list) {
+    const schema = extractSchemaFromGetList(spec, group);
+    if (schema) return schema;
   }
 
-  // Try POST request body
-  if (operations.create && group.collectionPath) {
-    const pathItem = spec.paths[group.collectionPath];
-    const schema =
-      pathItem?.post?.requestBody?.content?.["application/json"]?.schema;
-    if (schema?.properties) {
-      // Add id + timestamps that would be in the full entity
-      return {
-        type: "object",
-        properties: {
-          id: { type: "string", format: "uuid" },
-          ...schema.properties,
-          createdAt: { type: "string", format: "date-time" },
-          updatedAt: { type: "string", format: "date-time" },
-        },
-        required: [
-          "id",
-          ...(schema.required ?? []),
-          "createdAt",
-          "updatedAt",
-        ],
-      };
-    }
+  if (operations.create) {
+    const schema = extractSchemaFromPostBody(spec, group);
+    if (schema) return schema;
   }
 
-  // Fallback: minimal entity with just id
-  return {
-    type: "object",
-    properties: {
-      id: { type: "string", format: "uuid" },
-      createdAt: { type: "string", format: "date-time" },
-      updatedAt: { type: "string", format: "date-time" },
-    },
-    required: ["id", "createdAt", "updatedAt"],
-  };
+  return FALLBACK_SCHEMA;
 }
 
 function extractResponseSchema(
