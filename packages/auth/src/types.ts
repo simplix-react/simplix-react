@@ -88,7 +88,7 @@ export interface AuthConfig {
 /**
  * Reactive auth instance returned by {@link createAuth}.
  *
- * Provides a `fetchFn` compatible with {@link defineApi} that automatically
+ * Provides a `fetchFn` compatible with `defineApi` that automatically
  * injects auth headers, handles 401 retries, and manages token refresh.
  */
 export interface AuthInstance {

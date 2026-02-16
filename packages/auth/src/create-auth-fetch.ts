@@ -52,59 +52,41 @@ export function createAuthFetch(
     return `${path}${separator}${queryParamValue}`;
   }
 
+  async function buildAndFetch<T>(path: string, options?: RequestInit): Promise<T> {
+    const headers = await mergeHeaders();
+    const resolvedPath = injectQueryParams(path, headers);
+    return baseFetchFn<T>(resolvedPath, {
+      ...options,
+      headers: { ...headers, ...options?.headers },
+    });
+  }
+
+  async function handleRefresh(): Promise<void> {
+    try {
+      await refreshManager.refresh();
+    } catch (refreshError) {
+      onRefreshFailure?.(
+        refreshError instanceof Error
+          ? refreshError
+          : new Error(String(refreshError)),
+      );
+      throw refreshError;
+    }
+  }
+
   return async function authFetch<T>(
     path: string,
     options?: RequestInit,
   ): Promise<T> {
-    const authHeaders = await mergeHeaders();
-    const finalPath = injectQueryParams(path, authHeaders);
-
-    const mergedOptions: RequestInit = {
-      ...options,
-      headers: {
-        ...authHeaders,
-        ...options?.headers,
-      },
-    };
-
     let lastError: unknown;
 
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
-        if (attempt > 0) {
-          const freshHeaders = await mergeHeaders();
-          const freshPath = injectQueryParams(path, freshHeaders);
-
-          return await baseFetchFn<T>(freshPath, {
-            ...options,
-            headers: {
-              ...freshHeaders,
-              ...options?.headers,
-            },
-          });
-        }
-
-        return await baseFetchFn<T>(finalPath, mergedOptions);
+        return await buildAndFetch<T>(path, options);
       } catch (error) {
         lastError = error;
-
-        const is401 =
-          error instanceof ApiError && error.status === 401;
-
-        if (!is401 || attempt >= maxRetries) {
-          break;
-        }
-
-        try {
-          await refreshManager.refresh();
-        } catch (refreshError) {
-          onRefreshFailure?.(
-            refreshError instanceof Error
-              ? refreshError
-              : new Error(String(refreshError)),
-          );
-          throw refreshError;
-        }
+        if (!(error instanceof ApiError && error.status === 401) || attempt >= maxRetries) break;
+        await handleRefresh();
       }
     }
 
