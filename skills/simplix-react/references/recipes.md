@@ -655,7 +655,7 @@ const { adapter, i18nReady } = createI18nConfig({
 
 ## Mock Layer Setup
 
-Setting up MSW + PGlite for development and testing.
+Setting up MSW + in-memory stores for development and testing.
 
 ### Basic Mock Setup
 
@@ -666,10 +666,9 @@ import { shopApi } from "../contract";
 
 export const handlers = deriveMockHandlers(shopApi.config, {
   product: {
-    tableName: "products",
     defaultLimit: 20,
     maxLimit: 100,
-    defaultSort: "created_at DESC",
+    defaultSort: "createdAt:desc",
   },
 });
 ```
@@ -679,10 +678,9 @@ export const handlers = deriveMockHandlers(shopApi.config, {
 ```ts
 const handlers = deriveMockHandlers(projectApi.config, {
   task: {
-    tableName: "tasks",
     relations: {
       project: {
-        table: "projects",
+        entity: "project",
         localKey: "projectId",
         type: "belongsTo",
       },
@@ -696,42 +694,24 @@ const handlers = deriveMockHandlers(projectApi.config, {
 ```ts
 // src/mocks/setup.ts
 import { setupMockWorker, deriveMockHandlers } from "@simplix-react/mock";
-import type { PGlite } from "@electric-sql/pglite";
 import { projectApi } from "../contract";
-
-async function runMigrations(db: PGlite) {
-  await db.query(`
-    CREATE TABLE IF NOT EXISTS projects (
-      id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
-      name TEXT NOT NULL,
-      status TEXT NOT NULL DEFAULT 'active',
-      created_at TIMESTAMPTZ DEFAULT NOW(),
-      updated_at TIMESTAMPTZ DEFAULT NOW()
-    );
-    CREATE TABLE IF NOT EXISTS tasks (
-      id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
-      project_id TEXT NOT NULL REFERENCES projects(id),
-      title TEXT NOT NULL,
-      completed BOOLEAN NOT NULL DEFAULT FALSE,
-      created_at TIMESTAMPTZ DEFAULT NOW(),
-      updated_at TIMESTAMPTZ DEFAULT NOW()
-    );
-  `);
-}
-
-async function seedData(db: PGlite) {
-  await db.query(`
-    INSERT INTO projects (id, name) VALUES ('proj-1', 'Demo Project');
-    INSERT INTO tasks (id, project_id, title) VALUES ('task-1', 'proj-1', 'First Task');
-  `);
-}
 
 export async function startMocks() {
   await setupMockWorker({
-    dataDir: "idb://project-mock",
-    migrations: [runMigrations],
-    seed: [seedData],
-    handlers: deriveMockHandlers(projectApi.config),
+    domains: [
+      {
+        name: "project",
+        handlers: deriveMockHandlers(projectApi.config),
+        seed: {
+          project_projects: [
+            { id: 1, name: "Demo Project", status: "active" },
+          ],
+          project_tasks: [
+            { id: 1, projectId: "1", title: "First Task", completed: false },
+          ],
+        },
+      },
+    ],
   });
 }
 ```
@@ -795,33 +775,29 @@ describe("product hooks", () => {
 
 ```ts
 import { setupServer } from "msw/node";
-import { deriveMockHandlers } from "@simplix-react/mock";
-import { initPGlite, resetPGliteInstance } from "@simplix-react/mock";
+import { deriveMockHandlers, seedEntityStore, resetStore } from "@simplix-react/mock";
 import { shopApi } from "./contract";
 
 const handlers = deriveMockHandlers(shopApi.config);
 const server = setupServer(...handlers);
 
-beforeAll(async () => {
-  const db = await initPGlite("memory://test");
-  await db.query(`
-    CREATE TABLE products (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      price NUMERIC NOT NULL,
-      status TEXT DEFAULT 'active',
-      created_at TIMESTAMPTZ DEFAULT NOW(),
-      updated_at TIMESTAMPTZ DEFAULT NOW()
-    );
-  `);
+beforeAll(() => {
   server.listen();
+});
+
+beforeEach(() => {
+  resetStore();
+  seedEntityStore("shop_products", [
+    { id: 1, name: "Widget", price: 100, status: "active" },
+    { id: 2, name: "Gadget", price: 200, status: "active" },
+  ]);
 });
 
 afterEach(() => server.resetHandlers());
 
 afterAll(() => {
   server.close();
-  resetPGliteInstance();
+  resetStore();
 });
 ```
 

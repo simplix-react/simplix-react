@@ -1,4 +1,4 @@
-import type { AccessPolicy, AccessRule, AccessUser } from "@simplix-react/access";
+import type { AccessPolicy, AccessRule, AccessUser, DefaultActions } from "@simplix-react/access";
 import { createAccessPolicy, createStaticAdapter } from "@simplix-react/access";
 
 /**
@@ -53,7 +53,7 @@ export function createMockPolicy(options: MockPolicyOptions = {}): AccessPolicy 
     roles: [],
   };
 
-  const policy = createAccessPolicy({
+  const policy = createAccessPolicy<DefaultActions>({
     adapter: createStaticAdapter(effectiveRules, effectiveUser),
   });
 
