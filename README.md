@@ -18,7 +18,7 @@ simplix-react is a package-first React framework that auto-generates reusable do
 - **Contract-Driven** -- Define entities and operations once with Zod schemas; everything else is derived.
 - **Type-Safe End-to-End** -- Full TypeScript inference from API contract through React hooks to UI components.
 - **Auto-Generated Hooks** -- `deriveHooks` produces `useList`, `useGet`, `useCreate`, `useUpdate`, `useDelete`, and `useInfiniteList` per entity.
-- **Mock-First Development** -- Auto-generate MSW handlers and PGlite repositories from the same contract.
+- **Mock-First Development** -- Auto-generate MSW handlers and in-memory mock stores from the same contract.
 - **Monorepo Architecture** -- Modular packages that can be adopted incrementally.
 
 ## Packages
@@ -29,7 +29,7 @@ simplix-react is a package-first React framework that auto-generates reusable do
 | [react](./packages/react) | [![npm](https://img.shields.io/npm/v/@simplix-react/react.svg)](https://www.npmjs.com/package/@simplix-react/react) | React Query hooks derived from contracts |
 | [form](./packages/form) | [![npm](https://img.shields.io/npm/v/@simplix-react/form.svg)](https://www.npmjs.com/package/@simplix-react/form) | TanStack Form hooks derived from contracts |
 | [auth](./packages/auth) | [![npm](https://img.shields.io/npm/v/@simplix-react/auth.svg)](https://www.npmjs.com/package/@simplix-react/auth) | Authentication middleware (Bearer, API Key, OAuth2) |
-| [mock](./packages/mock) | [![npm](https://img.shields.io/npm/v/@simplix-react/mock.svg)](https://www.npmjs.com/package/@simplix-react/mock) | MSW handlers + PGlite repositories |
+| [mock](./packages/mock) | [![npm](https://img.shields.io/npm/v/@simplix-react/mock.svg)](https://www.npmjs.com/package/@simplix-react/mock) | MSW handlers + in-memory stores |
 | [i18n](./packages/i18n) | [![npm](https://img.shields.io/npm/v/@simplix-react/i18n.svg)](https://www.npmjs.com/package/@simplix-react/i18n) | i18next-based internationalization |
 | [testing](./packages/testing) | [![npm](https://img.shields.io/npm/v/@simplix-react/testing.svg)](https://www.npmjs.com/package/@simplix-react/testing) | Testing utilities |
 | [cli](./packages/cli) | [![npm](https://img.shields.io/npm/v/@simplix-react/cli.svg)](https://www.npmjs.com/package/@simplix-react/cli) | Project scaffolding and validation CLI |
@@ -129,7 +129,7 @@ Detailed guides are available in the [docs/](./docs/) directory:
 - [Schema Derivation](./docs/core-concepts/schema-derivation.md) -- The five-stage derivation pipeline
 - [Authentication](./docs/core-concepts/authentication.md) -- Auth architecture and strategy pattern
 - [Cache Invalidation](./docs/core-concepts/cache-invalidation.md) -- Automatic query invalidation
-- [Mock Data Layer](./docs/core-concepts/mock-data-layer.md) -- MSW + PGlite architecture
+- [Mock Data Layer](./docs/core-concepts/mock-data-layer.md) -- MSW + in-memory store architecture
 
 ### Guides
 
@@ -148,7 +148,7 @@ Detailed guides are available in the [docs/](./docs/) directory:
 
 - [Project App](./docs/tutorials/project-app.md) -- Build a project management app from scratch
 - [Auth Protected App](./docs/tutorials/auth-protected-app.md) -- Login, logout, token refresh, and route guards
-- [Full-Stack Mock](./docs/tutorials/full-stack-mock.md) -- Complete frontend with in-browser PGlite
+- [Full-Stack Mock](./docs/tutorials/full-stack-mock.md) -- Complete frontend with in-browser mock layer
 - [Petstore OpenAPI](./docs/tutorials/petstore-openapi.md) -- Generate domain packages from the Swagger Petstore spec
 
 ### API Reference

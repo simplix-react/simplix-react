@@ -24,11 +24,18 @@
     "clean": "rm -rf dist .turbo"
   },
   "peerDependencies": {
+    "@simplix-react/access": "workspace:*",
     "@simplix-react/contract": "workspace:*",
     "@tanstack/react-query": ">=5.0.0",
     "react": ">=18.0.0"
   },
+  "peerDependenciesMeta": {
+    "@simplix-react/access": {
+      "optional": true
+    }
+  },
   "devDependencies": {
+    "@simplix-react/access": "workspace:*",
     "@simplix-react/config-eslint": "workspace:*",
     "@simplix-react/config-typescript": "workspace:*",
     "@simplix-react/contract": "workspace:*",

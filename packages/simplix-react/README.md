@@ -33,7 +33,7 @@ This single install provides:
 | `@simplix-react/react` | React Query hooks derived from contracts |
 | `@simplix-react/form` | TanStack Form hooks derived from contracts |
 | `@simplix-react/auth` | Authentication middleware (Bearer, API Key, OAuth2) |
-| `@simplix-react/mock` | MSW handlers + PGlite repositories |
+| `@simplix-react/mock` | MSW handlers + in-memory stores |
 | `@simplix-react/i18n` | i18next-based internationalization |
 | `@simplix-react/cli` | Project scaffolding and validation CLI |
 | `@simplix-react/testing` | Test utilities (mock clients, query wrappers) |
