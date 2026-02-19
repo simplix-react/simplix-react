@@ -8,7 +8,7 @@
 
 > **DefaultActions** = `"list"` \| `"view"` \| `"create"` \| `"edit"` \| `"delete"` \| `"export"` \| `"import"` \| `"approve"` \| `"manage"`
 
-Defined in: packages/access/src/types.ts:24
+Defined in: [packages/access/src/types.ts:24](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L24)
 
 Default action verbs for access control.
 

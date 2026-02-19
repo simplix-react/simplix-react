@@ -6,7 +6,7 @@
 
 # Class: AccessDeniedError
 
-Defined in: packages/access/src/errors.ts:23
+Defined in: [packages/access/src/errors.ts:23](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/errors.ts#L23)
 
 Thrown when an access check fails.
 
@@ -41,7 +41,7 @@ try {
 
 > **new AccessDeniedError**(`action`, `subject`): `AccessDeniedError`
 
-Defined in: packages/access/src/errors.ts:33
+Defined in: [packages/access/src/errors.ts:33](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/errors.ts#L33)
 
 #### Parameters
 
@@ -71,7 +71,7 @@ The subject the action was attempted on.
 
 > `readonly` **action**: `string`
 
-Defined in: packages/access/src/errors.ts:25
+Defined in: [packages/access/src/errors.ts:25](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/errors.ts#L25)
 
 The action that was denied.
 
@@ -129,7 +129,7 @@ Defined in: node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/li
 
 > `readonly` **subject**: `string`
 
-Defined in: packages/access/src/errors.ts:27
+Defined in: [packages/access/src/errors.ts:27](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/errors.ts#L27)
 
 The subject the action was attempted on.
 

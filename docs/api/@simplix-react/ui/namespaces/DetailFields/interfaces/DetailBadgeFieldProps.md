@@ -6,7 +6,7 @@
 
 # Interface: DetailBadgeFieldProps\<T\>
 
-Defined in: [packages/ui/src/fields/detail/badge-field.tsx:12](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/detail/badge-field.tsx#L12)
+Defined in: [packages/ui/src/fields/detail/badge-field.tsx:12](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/fields/detail/badge-field.tsx#L12)
 
 Props for the [DetailBadgeField](../functions/DetailBadgeField.md) component.
 
@@ -26,7 +26,7 @@ Props for the [DetailBadgeField](../functions/DetailBadgeField.md) component.
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:36](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L36)
+Defined in: [packages/ui/src/crud/shared/types.ts:36](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/shared/types.ts#L36)
 
 #### Inherited from
 
@@ -38,7 +38,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:36](https://github.com/simplix
 
 > `optional` **displayValue**: `string`
 
-Defined in: [packages/ui/src/fields/detail/badge-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/detail/badge-field.tsx#L17)
+Defined in: [packages/ui/src/fields/detail/badge-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/fields/detail/badge-field.tsx#L17)
 
 Translated or formatted text to display inside the badge. Falls back to [value](#value) when omitted.
 
@@ -48,7 +48,7 @@ Translated or formatted text to display inside the badge. Falls back to [value](
 
 > `optional` **label**: `string`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:34](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L34)
+Defined in: [packages/ui/src/crud/shared/types.ts:34](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/shared/types.ts#L34)
 
 #### Inherited from
 
@@ -60,7 +60,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:34](https://github.com/simplix
 
 > `optional` **labelKey**: `string`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:35](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L35)
+Defined in: [packages/ui/src/crud/shared/types.ts:35](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/shared/types.ts#L35)
 
 #### Inherited from
 
@@ -72,7 +72,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:35](https://github.com/simplix
 
 > `optional` **labelPosition**: `"hidden"` \| `"top"` \| `"left"`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L5)
+Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/shared/types.ts#L5)
 
 #### Inherited from
 
@@ -82,9 +82,9 @@ Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-
 
 ### size?
 
-> `optional` **size**: `"sm"` \| `"md"` \| `"lg"`
+> `optional` **size**: `"lg"` \| `"md"` \| `"sm"`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L6)
+Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/shared/types.ts#L6)
 
 #### Inherited from
 
@@ -96,7 +96,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-
 
 > **value**: `T`
 
-Defined in: [packages/ui/src/fields/detail/badge-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/detail/badge-field.tsx#L15)
+Defined in: [packages/ui/src/fields/detail/badge-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/fields/detail/badge-field.tsx#L15)
 
 The current status/category value (used for variant lookup).
 
@@ -106,6 +106,6 @@ The current status/category value (used for variant lookup).
 
 > **variants**: `Record`\<`T`, [`BadgeVariant`](../type-aliases/BadgeVariant.md)\>
 
-Defined in: [packages/ui/src/fields/detail/badge-field.tsx:19](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/detail/badge-field.tsx#L19)
+Defined in: [packages/ui/src/fields/detail/badge-field.tsx:19](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/fields/detail/badge-field.tsx#L19)
 
 Mapping from value to badge variant for visual differentiation.

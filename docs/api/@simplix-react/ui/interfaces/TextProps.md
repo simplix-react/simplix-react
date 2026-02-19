@@ -6,7 +6,7 @@
 
 # Interface: TextProps
 
-Defined in: [packages/ui/src/primitives/text.tsx:42](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/text.tsx#L42)
+Defined in: [packages/ui/src/primitives/text.tsx:42](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/primitives/text.tsx#L42)
 
 Props for the [Text](../variables/Text.md) component.
 
@@ -331,7 +331,7 @@ Indicates that the element is perceivable but disabled, so it is not editable or
 
 ### ~~aria-dropeffect?~~
 
-> `optional` **aria-dropeffect**: `"link"` \| `"none"` \| `"copy"` \| `"execute"` \| `"move"` \| `"popup"`
+> `optional` **aria-dropeffect**: `"none"` \| `"link"` \| `"copy"` \| `"execute"` \| `"move"` \| `"popup"`
 
 Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2559
 
@@ -921,7 +921,7 @@ Defines the human readable text alternative of aria-valuenow for a range widget.
 
 > `optional` **as**: [`TextTag`](../type-aliases/TextTag.md)
 
-Defined in: [packages/ui/src/primitives/text.tsx:46](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/text.tsx#L46)
+Defined in: [packages/ui/src/primitives/text.tsx:46](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/primitives/text.tsx#L46)
 
 Override the rendered HTML tag (default: "p", "code" when font="mono").
 
@@ -929,7 +929,7 @@ Override the rendered HTML tag (default: "p", "code" when font="mono").
 
 ### autoCapitalize?
 
-> `optional` **autoCapitalize**: `"off"` \| `"none"` \| `"on"` \| `"sentences"` \| `"words"` \| `"characters"` \| `string` & `object`
+> `optional` **autoCapitalize**: `"none"` \| `"off"` \| `"on"` \| `"sentences"` \| `"words"` \| `"characters"` \| `string` & `object`
 
 Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2786
 
@@ -1155,7 +1155,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **font**: `"sans"` \| `"display"` \| `"mono"` \| `null`
 
-Defined in: [packages/ui/src/primitives/text.tsx:27](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/text.tsx#L27)
+Defined in: [packages/ui/src/primitives/text.tsx:27](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/primitives/text.tsx#L27)
 
 #### Inherited from
 
@@ -1217,7 +1217,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 ### inputMode?
 
-> `optional` **inputMode**: `"search"` \| `"text"` \| `"none"` \| `"tel"` \| `"url"` \| `"email"` \| `"numeric"` \| `"decimal"`
+> `optional` **inputMode**: `"none"` \| `"search"` \| `"text"` \| `"tel"` \| `"url"` \| `"email"` \| `"numeric"` \| `"decimal"`
 
 Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2851
 
@@ -3553,9 +3553,9 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 ### size?
 
-> `optional` **size**: `"base"` \| `"caption"` \| `"sm"` \| `"lg"` \| `null`
+> `optional` **size**: `"lg"` \| `"sm"` \| `"base"` \| `"caption"` \| `null`
 
-Defined in: [packages/ui/src/primitives/text.tsx:15](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/text.tsx#L15)
+Defined in: [packages/ui/src/primitives/text.tsx:15](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/primitives/text.tsx#L15)
 
 #### Inherited from
 
@@ -3651,7 +3651,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **tone**: `"default"` \| `"destructive"` \| `"muted"` \| `"primary"` \| `null`
 
-Defined in: [packages/ui/src/primitives/text.tsx:21](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/text.tsx#L21)
+Defined in: [packages/ui/src/primitives/text.tsx:21](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/primitives/text.tsx#L21)
 
 #### Inherited from
 

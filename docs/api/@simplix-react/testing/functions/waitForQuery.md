@@ -8,7 +8,7 @@
 
 > **waitForQuery**(`queryClient`, `queryKey`, `options?`): `Promise`\<`void`\>
 
-Defined in: [wait-for-query.ts:35](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/testing/src/wait-for-query.ts#L35)
+Defined in: [wait-for-query.ts:35](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/testing/src/wait-for-query.ts#L35)
 
 Polls the [QueryClient](https://tanstack.com/query/latest/docs/reference/QueryClient) until the given query key resolves to a
 non-pending status.

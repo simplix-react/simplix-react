@@ -174,6 +174,9 @@ Semantic layout components built with CVA variants.
 | `Grid` | CSS Grid layout | `columns` (1-6), `gap` |
 | `Container` | Centered max-width wrapper | `size` (sm/md/lg/xl/full) |
 | `Section` | Content section with title/description | `title`, `description` |
+| `Card` | Card container with border and shadow | `padding` (none/sm/md/lg), `interactive` |
+| `Heading` | Semantic heading (h1-h6) | `level` (1-6), `tone`, `font` (sans/display/mono) |
+| `Text` | Body text with typography scale | `size` (lg/base/sm/caption), `tone`, `font` (sans/display/mono) |
 
 ```tsx
 <Stack gap="lg">
@@ -190,11 +193,21 @@ Semantic layout components built with CVA variants.
 
 Unstyled Radix UI primitives with Tailwind CSS styling. Used internally by field components and available for direct use.
 
+- `Button` (with CVA variants: `variant`, `size`)
 - `Input`, `Textarea`, `Label`, `Badge`, `Switch`, `Checkbox`
 - `Select` (Root, Trigger, Value, Content, Item, Group, Label, Separator)
 - `RadioGroup` (Root, Item)
 - `Calendar` (date picker grid)
 - `Popover` (Root, Trigger, Content, Anchor)
+- `Dialog` (Root, Trigger, Content, Header, Footer, Title, Description, Close)
+- `DropdownMenu` (Root, Trigger, Content, Item, CheckboxItem, RadioItem, RadioGroup, Label, Separator, Sub, SubTrigger, SubContent, Group)
+- `Sheet` (Root, Trigger, Content, Header, Footer, Title, Description, Close)
+- `Table` (Root, Header, Body, Footer, Head, Row, Cell, Caption)
+- `Tabs` (Root, List, Trigger, Content)
+- `Tooltip` (Provider, Root, Trigger, Content)
+- `NavigationMenu` (Root, List, Item, Trigger, Content, Link, Viewport, Indicator)
+- `Separator`
+- `Skeleton`
 
 ### Form Field Components
 
@@ -215,6 +228,10 @@ import { FormFields } from "@simplix-react/ui";
 | `FormFields.RadioGroupField` | `string` | `options` (label/value/description), `direction` |
 | `FormFields.DateField` | `Date \| null` | `minDate`, `maxDate`, `format`, `placeholder` |
 | `FormFields.ComboboxField` | `string \| null` | `options`, `onSearch`, `loading`, `emptyMessage` |
+| `FormFields.PasswordField` | `string` | `placeholder`, `maxLength` (with visibility toggle) |
+| `FormFields.ColorField` | `string` (hex) | Native color picker + hex text input |
+| `FormFields.SliderField` | `number` | `min`, `max`, `step`, `showValue` |
+| `FormFields.MultiSelectField` | `string[]` | `options`, `placeholder`, `maxCount` |
 | `FormFields.Field` | `ReactNode` (children) | Generic wrapper for custom content |
 
 ```tsx
@@ -246,6 +263,9 @@ import { DetailFields } from "@simplix-react/ui";
 | `DetailFields.DetailDateField` | `Date \| string \| null` | `format` (date/datetime/relative), `fallback` |
 | `DetailFields.DetailBadgeField` | `string` | `variants` (value-to-variant mapping) |
 | `DetailFields.DetailLinkField` | `string` | `href`, `external` |
+| `DetailFields.DetailBooleanField` | `boolean \| null` | `mode` (text/icon), `labels` |
+| `DetailFields.DetailImageField` | `string \| null` (URL) | `alt`, `width`, `height`, `imageClassName` |
+| `DetailFields.DetailListField` | `string[] \| null` | `mode` (badges/comma/bullet) |
 | `DetailFields.DetailField` | `ReactNode` (children) | Generic wrapper for custom content |
 
 ```tsx
@@ -260,6 +280,23 @@ import { DetailFields } from "@simplix-react/ui";
   value={user.status}
   variants={{ active: "success", inactive: "secondary", banned: "destructive" }}
 />
+```
+
+### Field Wrappers
+
+Low-level wrappers used internally by `FormFields` and `DetailFields`. Export them to build custom field components.
+
+| Component | Purpose | Key Props |
+| --- | --- | --- |
+| `FieldWrapper` | Wraps editable inputs with label, error, description | `label`, `error`, `description`, `required`, `disabled`, `labelPosition`, `size` |
+| `DetailFieldWrapper` | Wraps read-only display values with label | `label`, `labelPosition`, `size` |
+
+```tsx
+import { FieldWrapper } from "@simplix-react/ui";
+
+<FieldWrapper label="Custom Field" error={errors.custom} required>
+  <MyCustomInput value={value} onChange={onChange} />
+</FieldWrapper>
 ```
 
 ### Field Variant System
@@ -468,7 +505,100 @@ import { Wizard } from "@simplix-react/ui";
 
 Sub-components: `Wizard.Step` (with `title`, `description`, and optional async `validate` function)
 
+### QueryFallback
+
+Loading and not-found fallback guard for single-entity views.
+
+```tsx
+import { QueryFallback } from "@simplix-react/ui";
+
+const { data, isLoading } = useGet(id);
+if (isLoading || !data) return <QueryFallback isLoading={isLoading} notFoundMessage="Pet not found." />;
+```
+
+Props: `isLoading`, `notFoundMessage`, `loadingMessage`
+
 ### CRUD Hooks
+
+#### useCrudFormSubmit
+
+Handles create/update mutation dispatch for CRUD forms. Determines whether to create or update based on `entityId` presence.
+
+```tsx
+const { isEdit, handleSubmit, isPending } = useCrudFormSubmit<FormValues>({
+  entityId,
+  create: entityHooks.useCreate(),
+  update: entityHooks.useUpdate(),
+  onSuccess: () => navigate(-1),
+});
+```
+
+Returns: `{ isEdit, handleSubmit, isPending }`
+
+#### useCrudDeleteList
+
+Manages delete-confirmation state for **list** views.
+
+```tsx
+const del = useCrudDeleteList();
+
+// Trigger: del.requestDelete({ id: row.id, name: row.name })
+<CrudDelete
+  open={del.open}
+  onOpenChange={(o) => { if (!o) del.cancel(); }}
+  onConfirm={() => deleteMutation.mutate(del.target!.id)}
+  entityName={del.target?.name}
+/>
+```
+
+Returns: `{ open, target, requestDelete, cancel }`
+
+#### useCrudDeleteDetail
+
+Manages delete-confirmation state for **detail** views (single item).
+
+```tsx
+const del = useCrudDeleteDetail();
+
+<button onClick={del.requestDelete}>Delete</button>
+<CrudDelete open={del.open} onOpenChange={del.onOpenChange} onConfirm={handleDelete} />
+```
+
+Returns: `{ open, requestDelete, cancel, onOpenChange }`
+
+#### usePreviousData
+
+Retains previous query data during refetch to prevent layout flicker.
+
+```tsx
+const { data, isLoading } = useGet(id);
+const stableData = usePreviousData(data);
+```
+
+#### useFadeTransition
+
+CSS fade transition hook for view transitions (e.g., list-to-detail).
+
+```tsx
+const { isVisible, shouldRender } = useFadeTransition({
+  show: !!selectedId,
+  duration: 200,
+});
+```
+
+Returns: `{ isVisible, shouldRender }`
+
+#### useListDetailState
+
+State management for the ListDetail pattern — tracks selected item and panel toggle.
+
+```tsx
+const { selectedId, select, deselect, isDetailOpen } = useListDetailState({
+  onSelect: (id) => navigate(`/users/${id}`),
+});
+```
+
+Returns: `{ selectedId, select, deselect, isDetailOpen }`
 
 #### useCrudList
 
@@ -555,10 +685,12 @@ Status values: `"idle"` | `"saving"` | `"saved"` | `"error"`
 
 #### ListDetail
 
-Side-by-side list + detail layout with draggable divider.
+Two rendering variants for list + detail layouts.
+
+**Panel variant** (default): Side-by-side layout with draggable divider.
 
 ```tsx
-<ListDetail listWidth="1/3">
+<ListDetail variant="panel" listWidth="1/3">
   <ListDetail.List>
     {/* List content */}
   </ListDetail.List>
@@ -568,9 +700,31 @@ Side-by-side list + detail layout with draggable divider.
 </ListDetail>
 ```
 
-- `listWidth`: `"1/3"` | `"2/5"` | `"1/2"` (default)
+**Dialog variant**: Full-width list with detail in a modal dialog.
+
+```tsx
+<ListDetail variant="dialog" onClose={() => setSelected(null)}>
+  <ListDetail.List>
+    {/* List takes full width */}
+  </ListDetail.List>
+  <ListDetail.Detail>
+    {/* Opens in a modal dialog */}
+  </ListDetail.Detail>
+</ListDetail>
+```
+
+Props:
+
+- `variant`: `"panel"` (default) | `"dialog"`
+- `listWidth`: `"1/4"` | `"1/3"` | `"2/5"` | `"1/2"` | `"3/5"` | `"2/3"` | `"3/4"` | `"4/5"` (panel variant only)
+- `activePanel`: `"list"` | `"detail"` (controlled mode)
+- `onClose`: Callback when dialog is dismissed (dialog variant only)
+
+Panel variant features:
 - Responsive: collapses to single-panel on mobile
 - Draggable divider with keyboard support (ArrowLeft/Right)
+
+`ListDetailRoot` is the same component as `ListDetail` — exported as an alias for compound pattern composition.
 
 ### Router Adapters
 
@@ -620,6 +774,7 @@ Overridable components: `Input`, `Textarea`, `Label`, `Switch`, `Checkbox`, `Bad
 | Function | Description |
 | --- | --- |
 | `cn(...inputs)` | Merges class names with `clsx` + `tailwind-merge` |
+| `toTestId(label)` | Converts a label string to a kebab-case `data-testid` value |
 | `sanitizeHtml(dirty)` | Sanitizes HTML via DOMPurify |
 
 ## Accessibility
@@ -640,9 +795,12 @@ Overridable components: `Input`, `Textarea`, `Label`, `Switch`, `Checkbox`, `Bad
   "@simplix-react/form": "workspace:*",
   "@simplix-react/i18n": "workspace:*",
   "@simplix-react/react": "workspace:*",
-  "react": ">=18.0.0"
+  "react": ">=18.0.0",
+  "react-router-dom": ">=6.0.0 (optional)"
 }
 ```
+
+`react-router-dom` is required only when using `createReactRouterAdapter`. Other router adapters can be provided via `CrudProvider`.
 
 ## License
 
@@ -748,6 +906,20 @@ See root LICENSE file.
 - [CheckboxProps](type-aliases/CheckboxProps.md)
 - [ContainerVariants](type-aliases/ContainerVariants.md)
 - [DetailView](type-aliases/DetailView.md)
+- [DialogContentProps](type-aliases/DialogContentProps.md)
+- [DialogDescriptionProps](type-aliases/DialogDescriptionProps.md)
+- [DialogFooterProps](type-aliases/DialogFooterProps.md)
+- [DialogHeaderProps](type-aliases/DialogHeaderProps.md)
+- [DialogOverlayProps](type-aliases/DialogOverlayProps.md)
+- [DialogTitleProps](type-aliases/DialogTitleProps.md)
+- [DropdownMenuCheckboxItemProps](type-aliases/DropdownMenuCheckboxItemProps.md)
+- [DropdownMenuContentProps](type-aliases/DropdownMenuContentProps.md)
+- [DropdownMenuItemProps](type-aliases/DropdownMenuItemProps.md)
+- [DropdownMenuLabelProps](type-aliases/DropdownMenuLabelProps.md)
+- [DropdownMenuRadioItemProps](type-aliases/DropdownMenuRadioItemProps.md)
+- [DropdownMenuSeparatorProps](type-aliases/DropdownMenuSeparatorProps.md)
+- [DropdownMenuSubContentProps](type-aliases/DropdownMenuSubContentProps.md)
+- [DropdownMenuSubTriggerProps](type-aliases/DropdownMenuSubTriggerProps.md)
 - [EmptyReason](type-aliases/EmptyReason.md)
 - [FlexProps](type-aliases/FlexProps.md)
 - [GridVariants](type-aliases/GridVariants.md)
@@ -757,6 +929,14 @@ See root LICENSE file.
 - [LabelProps](type-aliases/LabelProps.md)
 - [ListDetailVariant](type-aliases/ListDetailVariant.md)
 - [ListWidth](type-aliases/ListWidth.md)
+- [NavigationMenuContentProps](type-aliases/NavigationMenuContentProps.md)
+- [NavigationMenuIndicatorProps](type-aliases/NavigationMenuIndicatorProps.md)
+- [NavigationMenuItemProps](type-aliases/NavigationMenuItemProps.md)
+- [NavigationMenuLinkProps](type-aliases/NavigationMenuLinkProps.md)
+- [NavigationMenuListProps](type-aliases/NavigationMenuListProps.md)
+- [NavigationMenuProps](type-aliases/NavigationMenuProps.md)
+- [NavigationMenuTriggerProps](type-aliases/NavigationMenuTriggerProps.md)
+- [NavigationMenuViewportProps](type-aliases/NavigationMenuViewportProps.md)
 - [PopoverContentProps](type-aliases/PopoverContentProps.md)
 - [RadioGroupItemProps](type-aliases/RadioGroupItemProps.md)
 - [RadioGroupProps](type-aliases/RadioGroupProps.md)
@@ -765,11 +945,31 @@ See root LICENSE file.
 - [SelectLabelProps](type-aliases/SelectLabelProps.md)
 - [SelectSeparatorProps](type-aliases/SelectSeparatorProps.md)
 - [SelectTriggerProps](type-aliases/SelectTriggerProps.md)
+- [SeparatorProps](type-aliases/SeparatorProps.md)
+- [SheetContentProps](type-aliases/SheetContentProps.md)
+- [SheetDescriptionProps](type-aliases/SheetDescriptionProps.md)
+- [SheetFooterProps](type-aliases/SheetFooterProps.md)
+- [SheetHeaderProps](type-aliases/SheetHeaderProps.md)
+- [SheetTitleProps](type-aliases/SheetTitleProps.md)
+- [SkeletonProps](type-aliases/SkeletonProps.md)
 - [StackVariants](type-aliases/StackVariants.md)
 - [SwitchProps](type-aliases/SwitchProps.md)
+- [TableBodyProps](type-aliases/TableBodyProps.md)
+- [TableCaptionProps](type-aliases/TableCaptionProps.md)
+- [TableCellProps](type-aliases/TableCellProps.md)
+- [TableFooterProps](type-aliases/TableFooterProps.md)
+- [TableHeaderProps](type-aliases/TableHeaderProps.md)
+- [TableHeadProps](type-aliases/TableHeadProps.md)
+- [TableProps](type-aliases/TableProps.md)
+- [TableRowProps](type-aliases/TableRowProps.md)
+- [TabsContentProps](type-aliases/TabsContentProps.md)
+- [TabsListProps](type-aliases/TabsListProps.md)
+- [TabsTriggerProps](type-aliases/TabsTriggerProps.md)
 - [TextareaProps](type-aliases/TextareaProps.md)
 - [TextTag](type-aliases/TextTag.md)
 - [TextVariants](type-aliases/TextVariants.md)
+- [TooltipContentProps](type-aliases/TooltipContentProps.md)
+- [TooltipProviderProps](type-aliases/TooltipProviderProps.md)
 
 ## Variables
 
@@ -786,6 +986,28 @@ See root LICENSE file.
 - [CrudDetail](variables/CrudDetail.md)
 - [CrudForm](variables/CrudForm.md)
 - [CrudList](variables/CrudList.md)
+- [Dialog](variables/Dialog.md)
+- [DialogClose](variables/DialogClose.md)
+- [DialogContent](variables/DialogContent.md)
+- [DialogDescription](variables/DialogDescription.md)
+- [DialogOverlay](variables/DialogOverlay.md)
+- [DialogPortal](variables/DialogPortal.md)
+- [DialogTitle](variables/DialogTitle.md)
+- [DialogTrigger](variables/DialogTrigger.md)
+- [DropdownMenu](variables/DropdownMenu.md)
+- [DropdownMenuCheckboxItem](variables/DropdownMenuCheckboxItem.md)
+- [DropdownMenuContent](variables/DropdownMenuContent.md)
+- [DropdownMenuGroup](variables/DropdownMenuGroup.md)
+- [DropdownMenuItem](variables/DropdownMenuItem.md)
+- [DropdownMenuLabel](variables/DropdownMenuLabel.md)
+- [DropdownMenuPortal](variables/DropdownMenuPortal.md)
+- [DropdownMenuRadioGroup](variables/DropdownMenuRadioGroup.md)
+- [DropdownMenuRadioItem](variables/DropdownMenuRadioItem.md)
+- [DropdownMenuSeparator](variables/DropdownMenuSeparator.md)
+- [DropdownMenuSub](variables/DropdownMenuSub.md)
+- [DropdownMenuSubContent](variables/DropdownMenuSubContent.md)
+- [DropdownMenuSubTrigger](variables/DropdownMenuSubTrigger.md)
+- [DropdownMenuTrigger](variables/DropdownMenuTrigger.md)
 - [FieldVariantContext](variables/FieldVariantContext.md)
 - [Flex](variables/Flex.md)
 - [Grid](variables/Grid.md)
@@ -795,6 +1017,14 @@ See root LICENSE file.
 - [Input](variables/Input.md)
 - [Label](variables/Label.md)
 - [ListDetail](variables/ListDetail.md)
+- [NavigationMenuContent](variables/NavigationMenuContent.md)
+- [NavigationMenuIndicator](variables/NavigationMenuIndicator.md)
+- [NavigationMenuItem](variables/NavigationMenuItem.md)
+- [NavigationMenuLink](variables/NavigationMenuLink.md)
+- [NavigationMenuList](variables/NavigationMenuList.md)
+- [NavigationMenuTrigger](variables/NavigationMenuTrigger.md)
+- [navigationMenuTriggerStyle](variables/navigationMenuTriggerStyle.md)
+- [NavigationMenuViewport](variables/NavigationMenuViewport.md)
 - [Popover](variables/Popover.md)
 - [PopoverAnchor](variables/PopoverAnchor.md)
 - [PopoverContent](variables/PopoverContent.md)
@@ -811,12 +1041,34 @@ See root LICENSE file.
 - [SelectSeparator](variables/SelectSeparator.md)
 - [SelectTrigger](variables/SelectTrigger.md)
 - [SelectValue](variables/SelectValue.md)
+- [Separator](variables/Separator.md)
+- [Sheet](variables/Sheet.md)
+- [SheetClose](variables/SheetClose.md)
+- [SheetContent](variables/SheetContent.md)
+- [SheetDescription](variables/SheetDescription.md)
+- [SheetTitle](variables/SheetTitle.md)
+- [SheetTrigger](variables/SheetTrigger.md)
 - [Stack](variables/Stack.md)
 - [stackVariants](variables/stackVariants.md)
 - [Switch](variables/Switch.md)
+- [Table](variables/Table.md)
+- [TableBody](variables/TableBody.md)
+- [TableCaption](variables/TableCaption.md)
+- [TableCell](variables/TableCell.md)
+- [TableFooter](variables/TableFooter.md)
+- [TableHead](variables/TableHead.md)
+- [TableHeader](variables/TableHeader.md)
+- [TableRow](variables/TableRow.md)
+- [Tabs](variables/Tabs.md)
+- [TabsContent](variables/TabsContent.md)
+- [TabsList](variables/TabsList.md)
+- [TabsTrigger](variables/TabsTrigger.md)
 - [Text](variables/Text.md)
 - [Textarea](variables/Textarea.md)
 - [textVariants](variables/textVariants.md)
+- [Tooltip](variables/Tooltip.md)
+- [TooltipContent](variables/TooltipContent.md)
+- [TooltipTrigger](variables/TooltipTrigger.md)
 - [UIComponentContext](variables/UIComponentContext.md)
 - [Wizard](variables/Wizard.md)
 
@@ -828,10 +1080,17 @@ See root LICENSE file.
 - [CrudDelete](functions/CrudDelete.md)
 - [CrudProvider](functions/CrudProvider.md)
 - [DetailFieldWrapper](functions/DetailFieldWrapper.md)
+- [DialogFooter](functions/DialogFooter.md)
+- [DialogHeader](functions/DialogHeader.md)
 - [FieldWrapper](functions/FieldWrapper.md)
 - [ListDetailRoot](functions/ListDetailRoot.md)
+- [NavigationMenu](functions/NavigationMenu.md)
 - [QueryFallback](functions/QueryFallback.md)
 - [sanitizeHtml](functions/sanitizeHtml.md)
+- [SheetFooter](functions/SheetFooter.md)
+- [SheetHeader](functions/SheetHeader.md)
+- [Skeleton](functions/Skeleton.md)
+- [TooltipProvider](functions/TooltipProvider.md)
 - [toTestId](functions/toTestId.md)
 - [UIProvider](functions/UIProvider.md)
 - [useAutosave](functions/useAutosave.md)

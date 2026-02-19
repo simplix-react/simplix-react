@@ -8,7 +8,7 @@
 
 > **DetailListField**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/detail/list-field.tsx:26](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/detail/list-field.tsx#L26)
+Defined in: [packages/ui/src/fields/detail/list-field.tsx:26](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/fields/detail/list-field.tsx#L26)
 
 Read-only list display field. Renders string arrays as badges, comma-separated text, or a bullet list.
 

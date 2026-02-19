@@ -544,6 +544,7 @@ Next Step → [`@simplix-react/react`](../react/README.md)
 ## Classes
 
 - [AuthError](classes/AuthError.md)
+- [AutoRefreshScheduler](classes/AutoRefreshScheduler.md)
 
 ## Interfaces
 
@@ -551,8 +552,11 @@ Next Step → [`@simplix-react/react`](../react/README.md)
 - [AuthConfig](interfaces/AuthConfig.md)
 - [AuthInstance](interfaces/AuthInstance.md)
 - [AuthScheme](interfaces/AuthScheme.md)
+- [AutoRefreshSchedulerOptions](interfaces/AutoRefreshSchedulerOptions.md)
 - [BearerSchemeOptions](interfaces/BearerSchemeOptions.md)
+- [CrossTabSyncOptions](interfaces/CrossTabSyncOptions.md)
 - [CustomSchemeOptions](interfaces/CustomSchemeOptions.md)
+- [OAuth2PopupOptions](interfaces/OAuth2PopupOptions.md)
 - [OAuth2SchemeOptions](interfaces/OAuth2SchemeOptions.md)
 - [TokenPair](interfaces/TokenPair.md)
 - [TokenStore](interfaces/TokenStore.md)
@@ -560,6 +564,7 @@ Next Step → [`@simplix-react/react`](../react/README.md)
 ## Type Aliases
 
 - [AuthErrorCode](type-aliases/AuthErrorCode.md)
+- [OAuth2PopupResult](type-aliases/OAuth2PopupResult.md)
 
 ## Functions
 
@@ -568,8 +573,10 @@ Next Step → [`@simplix-react/react`](../react/README.md)
 - [composeSchemes](functions/composeSchemes.md)
 - [createAuth](functions/createAuth.md)
 - [createAuthFetch](functions/createAuthFetch.md)
+- [createCrossTabSync](functions/createCrossTabSync.md)
 - [customScheme](functions/customScheme.md)
 - [localStorageStore](functions/localStorageStore.md)
 - [memoryStore](functions/memoryStore.md)
 - [oauth2Scheme](functions/oauth2Scheme.md)
+- [openOAuth2Popup](functions/openOAuth2Popup.md)
 - [sessionStorageStore](functions/sessionStorageStore.md)

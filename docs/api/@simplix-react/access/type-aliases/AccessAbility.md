@@ -8,7 +8,7 @@
 
 > **AccessAbility**\<`TActions`, `TSubjects`\> = [`MongoAbility`](https://casl.js.org/v6/en/api/casl-ability#mongoability)\<\[`TActions`, `TSubjects` \| `"all"`\]\>
 
-Defined in: packages/access/src/types.ts:50
+Defined in: [packages/access/src/types.ts:50](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L50)
 
 A CASL [MongoAbility](https://casl.js.org/v6/en/api/casl-ability#mongoability) parameterized with action and subject types.
 

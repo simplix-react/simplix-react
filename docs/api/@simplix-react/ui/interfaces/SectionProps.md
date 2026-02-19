@@ -6,7 +6,7 @@
 
 # Interface: SectionProps
 
-Defined in: [packages/ui/src/primitives/section.tsx:8](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/section.tsx#L8)
+Defined in: [packages/ui/src/primitives/section.tsx:8](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/primitives/section.tsx#L8)
 
 Props for the [Section](../variables/Section.md) layout component.
 
@@ -331,7 +331,7 @@ Indicates that the element is perceivable but disabled, so it is not editable or
 
 ### ~~aria-dropeffect?~~
 
-> `optional` **aria-dropeffect**: `"link"` \| `"none"` \| `"copy"` \| `"execute"` \| `"move"` \| `"popup"`
+> `optional` **aria-dropeffect**: `"none"` \| `"link"` \| `"copy"` \| `"execute"` \| `"move"` \| `"popup"`
 
 Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2559
 
@@ -919,7 +919,7 @@ Defines the human readable text alternative of aria-valuenow for a range widget.
 
 ### autoCapitalize?
 
-> `optional` **autoCapitalize**: `"off"` \| `"none"` \| `"on"` \| `"sentences"` \| `"words"` \| `"characters"` \| `string` & `object`
+> `optional` **autoCapitalize**: `"none"` \| `"off"` \| `"on"` \| `"sentences"` \| `"words"` \| `"characters"` \| `string` & `object`
 
 Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2786
 
@@ -969,7 +969,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/primitives/section.tsx:14](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/section.tsx#L14)
+Defined in: [packages/ui/src/primitives/section.tsx:14](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/primitives/section.tsx#L14)
 
 #### Overrides
 
@@ -1093,7 +1093,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **description**: `string`
 
-Defined in: [packages/ui/src/primitives/section.tsx:13](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/section.tsx#L13)
+Defined in: [packages/ui/src/primitives/section.tsx:13](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/primitives/section.tsx#L13)
 
 Descriptive text rendered below the title.
 
@@ -1205,7 +1205,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 ### inputMode?
 
-> `optional` **inputMode**: `"search"` \| `"text"` \| `"none"` \| `"tel"` \| `"url"` \| `"email"` \| `"numeric"` \| `"decimal"`
+> `optional` **inputMode**: `"none"` \| `"search"` \| `"text"` \| `"tel"` \| `"url"` \| `"email"` \| `"numeric"` \| `"decimal"`
 
 Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2851
 
@@ -3615,7 +3615,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **title**: `ReactNode`
 
-Defined in: [packages/ui/src/primitives/section.tsx:11](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/section.tsx#L11)
+Defined in: [packages/ui/src/primitives/section.tsx:11](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/primitives/section.tsx#L11)
 
 Section heading rendered as an h3 element.
 

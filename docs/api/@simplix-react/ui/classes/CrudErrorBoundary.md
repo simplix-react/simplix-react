@@ -6,7 +6,7 @@
 
 # Class: CrudErrorBoundary
 
-Defined in: [packages/ui/src/crud/shared/error-boundary.tsx:22](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/error-boundary.tsx#L22)
+Defined in: [packages/ui/src/crud/shared/error-boundary.tsx:22](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/shared/error-boundary.tsx#L22)
 
 Error boundary for CRUD components.
 Catches render errors and displays a default fallback with retry,
@@ -22,7 +22,7 @@ or a custom fallback ReactNode/render function.
 
 > **new CrudErrorBoundary**(`props`): `CrudErrorBoundary`
 
-Defined in: [packages/ui/src/crud/shared/error-boundary.tsx:26](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/error-boundary.tsx#L26)
+Defined in: [packages/ui/src/crud/shared/error-boundary.tsx:26](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/shared/error-boundary.tsx#L26)
 
 #### Parameters
 
@@ -149,7 +149,7 @@ Only kept in types for backwards compatibility. Will be removed in a future majo
 
 > **componentDidCatch**(`error`, `errorInfo`): `void`
 
-Defined in: [packages/ui/src/crud/shared/error-boundary.tsx:35](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/error-boundary.tsx#L35)
+Defined in: [packages/ui/src/crud/shared/error-boundary.tsx:35](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/shared/error-boundary.tsx#L35)
 
 Catches exceptions generated in descendant components. Unhandled exceptions will cause
 the entire component tree to unmount.
@@ -428,7 +428,7 @@ lifecycle events from running.
 
 > **render**(): `ReactNode`
 
-Defined in: [packages/ui/src/crud/shared/error-boundary.tsx:43](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/error-boundary.tsx#L43)
+Defined in: [packages/ui/src/crud/shared/error-boundary.tsx:43](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/shared/error-boundary.tsx#L43)
 
 #### Returns
 
@@ -645,7 +645,7 @@ this from being invoked.
 
 > `static` **getDerivedStateFromError**(`error`): [`ErrorBoundaryState`](../interfaces/ErrorBoundaryState.md)
 
-Defined in: [packages/ui/src/crud/shared/error-boundary.tsx:31](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/error-boundary.tsx#L31)
+Defined in: [packages/ui/src/crud/shared/error-boundary.tsx:31](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/shared/error-boundary.tsx#L31)
 
 #### Parameters
 

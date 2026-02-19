@@ -6,7 +6,7 @@
 
 # Interface: ContainerProps
 
-Defined in: [packages/ui/src/primitives/container.tsx:26](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/container.tsx#L26)
+Defined in: [packages/ui/src/primitives/container.tsx:26](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/primitives/container.tsx#L26)
 
 Props for the [Container](../variables/Container.md) layout component.
 
@@ -331,7 +331,7 @@ Indicates that the element is perceivable but disabled, so it is not editable or
 
 ### ~~aria-dropeffect?~~
 
-> `optional` **aria-dropeffect**: `"link"` \| `"none"` \| `"copy"` \| `"execute"` \| `"move"` \| `"popup"`
+> `optional` **aria-dropeffect**: `"none"` \| `"link"` \| `"copy"` \| `"execute"` \| `"move"` \| `"popup"`
 
 Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2559
 
@@ -919,7 +919,7 @@ Defines the human readable text alternative of aria-valuenow for a range widget.
 
 ### autoCapitalize?
 
-> `optional` **autoCapitalize**: `"off"` \| `"none"` \| `"on"` \| `"sentences"` \| `"words"` \| `"characters"` \| `string` & `object`
+> `optional` **autoCapitalize**: `"none"` \| `"off"` \| `"on"` \| `"sentences"` \| `"words"` \| `"characters"` \| `string` & `object`
 
 Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2786
 
@@ -969,7 +969,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/primitives/container.tsx:29](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/container.tsx#L29)
+Defined in: [packages/ui/src/primitives/container.tsx:29](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/primitives/container.tsx#L29)
 
 #### Overrides
 
@@ -1195,7 +1195,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 ### inputMode?
 
-> `optional` **inputMode**: `"search"` \| `"text"` \| `"none"` \| `"tel"` \| `"url"` \| `"email"` \| `"numeric"` \| `"decimal"`
+> `optional` **inputMode**: `"none"` \| `"search"` \| `"text"` \| `"tel"` \| `"url"` \| `"email"` \| `"numeric"` \| `"decimal"`
 
 Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2851
 
@@ -3531,9 +3531,9 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 ### size?
 
-> `optional` **size**: `"2xl"` \| `"sm"` \| `"md"` \| `"lg"` \| `"xl"` \| `"full"` \| `null`
+> `optional` **size**: `"full"` \| `"lg"` \| `"md"` \| `"sm"` \| `"2xl"` \| `"xl"` \| `null`
 
-Defined in: [packages/ui/src/primitives/container.tsx:10](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/container.tsx#L10)
+Defined in: [packages/ui/src/primitives/container.tsx:10](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/primitives/container.tsx#L10)
 
 #### Inherited from
 

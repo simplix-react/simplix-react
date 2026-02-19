@@ -8,7 +8,7 @@
 
 > **seedEntityStore**(`storeName`, `records`): `void`
 
-Defined in: [mock-store.ts:48](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/mock/src/mock-store.ts#L48)
+Defined in: [mock-store.ts:48](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/mock/src/mock-store.ts#L48)
 
 Loads an array of records into the store and sets the auto-increment counter
 to one past the maximum numeric id found.

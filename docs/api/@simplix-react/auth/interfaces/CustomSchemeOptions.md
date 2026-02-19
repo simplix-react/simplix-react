@@ -6,7 +6,7 @@
 
 # Interface: CustomSchemeOptions
 
-Defined in: [packages/auth/src/types.ts:185](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/auth/src/types.ts#L185)
+Defined in: [packages/auth/src/types.ts:213](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/auth/src/types.ts#L213)
 
 Options for [customScheme](../functions/customScheme.md).
 
@@ -16,7 +16,7 @@ Options for [customScheme](../functions/customScheme.md).
 
 > **clear**: () => `void`
 
-Defined in: [packages/auth/src/types.ts:199](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/auth/src/types.ts#L199)
+Defined in: [packages/auth/src/types.ts:227](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/auth/src/types.ts#L227)
 
 Clears all stored credentials.
 
@@ -30,7 +30,7 @@ Clears all stored credentials.
 
 > **getHeaders**: () => `Promise`\<`Record`\<`string`, `string`\>\>
 
-Defined in: [packages/auth/src/types.ts:190](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/auth/src/types.ts#L190)
+Defined in: [packages/auth/src/types.ts:218](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/auth/src/types.ts#L218)
 
 Returns headers to attach to each request.
 
@@ -44,7 +44,7 @@ Returns headers to attach to each request.
 
 > **isAuthenticated**: () => `boolean`
 
-Defined in: [packages/auth/src/types.ts:196](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/auth/src/types.ts#L196)
+Defined in: [packages/auth/src/types.ts:224](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/auth/src/types.ts#L224)
 
 Returns whether credentials are currently valid.
 
@@ -58,7 +58,7 @@ Returns whether credentials are currently valid.
 
 > **name**: `string`
 
-Defined in: [packages/auth/src/types.ts:187](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/auth/src/types.ts#L187)
+Defined in: [packages/auth/src/types.ts:215](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/auth/src/types.ts#L215)
 
 Unique name for this custom scheme.
 
@@ -68,7 +68,7 @@ Unique name for this custom scheme.
 
 > `optional` **refresh**: () => `Promise`\<`void`\>
 
-Defined in: [packages/auth/src/types.ts:193](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/auth/src/types.ts#L193)
+Defined in: [packages/auth/src/types.ts:221](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/auth/src/types.ts#L221)
 
 Optional refresh logic.
 

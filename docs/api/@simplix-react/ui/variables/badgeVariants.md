@@ -8,13 +8,13 @@
 
 > `const` **badgeVariants**: (`props?`) => `string`
 
-Defined in: [packages/ui/src/base/badge.tsx:6](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/base/badge.tsx#L6)
+Defined in: [packages/ui/src/base/badge.tsx:6](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/base/badge.tsx#L6)
 
 ## Parameters
 
 ### props?
 
-ConfigVariants\<\{ variant: \{ default: string; secondary: string; destructive: string; outline: string; success: string; warning: string; slate: string; red: string; orange: string; amber: string; yellow: string; ... 12 more ...; rose: string; \}; \}\> & ClassProp
+ConfigVariants\<\{ rounded: \{ full: string; lg: string; md: string; sm: string; none: string; \}; variant: \{ default: string; secondary: string; destructive: string; outline: string; success: string; warning: string; ... 17 more ...; rose: string; \}; \}\> & ClassProp
 
 ## Returns
 

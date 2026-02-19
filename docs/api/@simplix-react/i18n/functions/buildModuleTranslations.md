@@ -8,7 +8,7 @@
 
 > **buildModuleTranslations**(`options`): [`ModuleTranslations`](../interfaces/ModuleTranslations.md)
 
-Defined in: [module-translations.ts:70](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/module-translations.ts#L70)
+Defined in: [module-translations.ts:70](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/module-translations.ts#L70)
 
 Builds a lazy-loadable module translation descriptor from per-component translation loaders.
 

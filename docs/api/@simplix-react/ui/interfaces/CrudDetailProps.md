@@ -6,7 +6,7 @@
 
 # Interface: CrudDetailProps
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:13](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/detail/crud-detail.tsx#L13)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:13](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/detail/crud-detail.tsx#L13)
 
 Props for the [CrudDetail](../variables/CrudDetail.md) compound component root.
 
@@ -16,7 +16,7 @@ Props for the [CrudDetail](../variables/CrudDetail.md) compound component root.
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:22](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/detail/crud-detail.tsx#L22)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:22](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/detail/crud-detail.tsx#L22)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:22](https://github.com/
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:21](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/detail/crud-detail.tsx#L21)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:21](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/detail/crud-detail.tsx#L21)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:21](https://github.com/
 
 > `optional` **fieldVariant**: [`FieldVariant`](FieldVariant.md)
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:20](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/detail/crud-detail.tsx#L20)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:20](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/detail/crud-detail.tsx#L20)
 
 ***
 
@@ -40,7 +40,7 @@ Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:20](https://github.com/
 
 > `optional` **header**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:19](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/detail/crud-detail.tsx#L19)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:19](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/detail/crud-detail.tsx#L19)
 
 Content rendered at the left side of the header toolbar (e.g. breadcrumb, back button, label).
 
@@ -50,7 +50,7 @@ Content rendered at the left side of the header toolbar (e.g. breadcrumb, back b
 
 > `optional` **isLoading**: `boolean`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:15](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/detail/crud-detail.tsx#L15)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:15](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/detail/crud-detail.tsx#L15)
 
 Shows a semi-transparent overlay with a spinner on top of the detail content.
 
@@ -60,7 +60,7 @@ Shows a semi-transparent overlay with a spinner on top of the detail content.
 
 > `optional` **onClose**: () => `void`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:17](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/detail/crud-detail.tsx#L17)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:17](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/detail/crud-detail.tsx#L17)
 
 Renders a close button (panel-right-close icon) at the right side of the header toolbar.
 

@@ -6,7 +6,7 @@
 
 # Interface: UseListDetailStateResult
 
-Defined in: [packages/ui/src/crud/patterns/use-list-detail-state.ts:7](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/patterns/use-list-detail-state.ts#L7)
+Defined in: [packages/ui/src/crud/patterns/use-list-detail-state.ts:7](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/patterns/use-list-detail-state.ts#L7)
 
 Return type of [useListDetailState](../functions/useListDetailState.md).
 
@@ -16,7 +16,7 @@ Return type of [useListDetailState](../functions/useListDetailState.md).
 
 > **selectedId**: `string` \| `null`
 
-Defined in: [packages/ui/src/crud/patterns/use-list-detail-state.ts:8](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/patterns/use-list-detail-state.ts#L8)
+Defined in: [packages/ui/src/crud/patterns/use-list-detail-state.ts:8](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/patterns/use-list-detail-state.ts#L8)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [packages/ui/src/crud/patterns/use-list-detail-state.ts:8](https://g
 
 > **showDetail**: (`id`) => `void`
 
-Defined in: [packages/ui/src/crud/patterns/use-list-detail-state.ts:10](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/patterns/use-list-detail-state.ts#L10)
+Defined in: [packages/ui/src/crud/patterns/use-list-detail-state.ts:10](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/patterns/use-list-detail-state.ts#L10)
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: [packages/ui/src/crud/patterns/use-list-detail-state.ts:10](https://
 
 > **showEdit**: (`id`) => `void`
 
-Defined in: [packages/ui/src/crud/patterns/use-list-detail-state.ts:13](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/patterns/use-list-detail-state.ts#L13)
+Defined in: [packages/ui/src/crud/patterns/use-list-detail-state.ts:13](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/patterns/use-list-detail-state.ts#L13)
 
 #### Parameters
 
@@ -60,7 +60,7 @@ Defined in: [packages/ui/src/crud/patterns/use-list-detail-state.ts:13](https://
 
 > **showList**: () => `void`
 
-Defined in: [packages/ui/src/crud/patterns/use-list-detail-state.ts:11](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/patterns/use-list-detail-state.ts#L11)
+Defined in: [packages/ui/src/crud/patterns/use-list-detail-state.ts:11](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/patterns/use-list-detail-state.ts#L11)
 
 #### Returns
 
@@ -72,7 +72,7 @@ Defined in: [packages/ui/src/crud/patterns/use-list-detail-state.ts:11](https://
 
 > **showNew**: () => `void`
 
-Defined in: [packages/ui/src/crud/patterns/use-list-detail-state.ts:12](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/patterns/use-list-detail-state.ts#L12)
+Defined in: [packages/ui/src/crud/patterns/use-list-detail-state.ts:12](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/patterns/use-list-detail-state.ts#L12)
 
 #### Returns
 
@@ -84,4 +84,4 @@ Defined in: [packages/ui/src/crud/patterns/use-list-detail-state.ts:12](https://
 
 > **view**: [`DetailView`](../type-aliases/DetailView.md)
 
-Defined in: [packages/ui/src/crud/patterns/use-list-detail-state.ts:9](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/patterns/use-list-detail-state.ts#L9)
+Defined in: [packages/ui/src/crud/patterns/use-list-detail-state.ts:9](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/patterns/use-list-detail-state.ts#L9)

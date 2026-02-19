@@ -6,7 +6,7 @@
 
 # Interface: BearerSchemeOptions
 
-Defined in: [packages/auth/src/types.ts:122](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/auth/src/types.ts#L122)
+Defined in: [packages/auth/src/types.ts:141](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/auth/src/types.ts#L141)
 
 Options for [bearerScheme](../functions/bearerScheme.md).
 
@@ -16,9 +16,31 @@ Options for [bearerScheme](../functions/bearerScheme.md).
 
 > `optional` **refresh**: `object`
 
-Defined in: [packages/auth/src/types.ts:133](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/auth/src/types.ts#L133)
+Defined in: [packages/auth/src/types.ts:152](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/auth/src/types.ts#L152)
 
 Optional refresh configuration.
+
+#### autoSchedule?
+
+> `optional` **autoSchedule**: `boolean`
+
+Enable background timer-based auto refresh. Defaults to `false`.
+
+#### minIntervalSeconds?
+
+> `optional` **minIntervalSeconds**: `number`
+
+Minimum interval between scheduled refreshes in seconds. Defaults to `30`.
+
+#### onScheduledRefreshFailed()?
+
+> `optional` **onScheduledRefreshFailed**: () => `void`
+
+Called when a scheduled background refresh fails.
+
+##### Returns
+
+`void`
 
 #### refreshBeforeExpiry?
 
@@ -42,7 +64,7 @@ Async function that returns a fresh token pair.
 
 > **store**: [`TokenStore`](TokenStore.md)
 
-Defined in: [packages/auth/src/types.ts:124](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/auth/src/types.ts#L124)
+Defined in: [packages/auth/src/types.ts:143](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/auth/src/types.ts#L143)
 
 Token store for persisting access and refresh tokens.
 
@@ -52,7 +74,7 @@ Token store for persisting access and refresh tokens.
 
 > **token**: `string` \| () => `string` \| `null`
 
-Defined in: [packages/auth/src/types.ts:130](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/auth/src/types.ts#L130)
+Defined in: [packages/auth/src/types.ts:149](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/auth/src/types.ts#L149)
 
 Static token string or function returning the current access token.
 If a function, called on each request.

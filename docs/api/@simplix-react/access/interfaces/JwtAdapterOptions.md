@@ -6,7 +6,7 @@
 
 # Interface: JwtAdapterOptions
 
-Defined in: packages/access/src/adapters/jwt-adapter.ts:25
+Defined in: [packages/access/src/adapters/jwt-adapter.ts:25](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/adapters/jwt-adapter.ts#L25)
 
 Configuration for [createJwtAdapter](../functions/createJwtAdapter.md).
 
@@ -27,7 +27,7 @@ const options: JwtAdapterOptions = {
 
 > `optional` **decode**: (`token`) => `Record`\<`string`, `unknown`\>
 
-Defined in: packages/access/src/adapters/jwt-adapter.ts:49
+Defined in: [packages/access/src/adapters/jwt-adapter.ts:49](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/adapters/jwt-adapter.ts#L49)
 
 Custom JWT decode function. Defaults to base64url payload parsing.
 
@@ -47,7 +47,7 @@ Custom JWT decode function. Defaults to base64url payload parsing.
 
 > `optional` **flatSeparator**: `string`
 
-Defined in: packages/access/src/adapters/jwt-adapter.ts:47
+Defined in: [packages/access/src/adapters/jwt-adapter.ts:47](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/adapters/jwt-adapter.ts#L47)
 
 Separator for flat/scopes formats. Defaults to `":"`.
 
@@ -57,7 +57,7 @@ Separator for flat/scopes formats. Defaults to `":"`.
 
 > `optional` **permissionFormat**: `"map"` \| `"flat"` \| `"scopes"`
 
-Defined in: packages/access/src/adapters/jwt-adapter.ts:45
+Defined in: [packages/access/src/adapters/jwt-adapter.ts:45](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/adapters/jwt-adapter.ts#L45)
 
 Format of the permissions claim.
 
@@ -73,7 +73,7 @@ Defaults to `"map"`.
 
 > `optional` **permissionsKey**: `string`
 
-Defined in: packages/access/src/adapters/jwt-adapter.ts:29
+Defined in: [packages/access/src/adapters/jwt-adapter.ts:29](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/adapters/jwt-adapter.ts#L29)
 
 JWT claim key for permissions. Defaults to `"permissions"`.
 
@@ -83,7 +83,7 @@ JWT claim key for permissions. Defaults to `"permissions"`.
 
 > `optional` **rolesKey**: `string`
 
-Defined in: packages/access/src/adapters/jwt-adapter.ts:27
+Defined in: [packages/access/src/adapters/jwt-adapter.ts:27](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/adapters/jwt-adapter.ts#L27)
 
 JWT claim key for roles. Defaults to `"roles"`.
 
@@ -93,7 +93,7 @@ JWT claim key for roles. Defaults to `"roles"`.
 
 > `optional` **superAdminKey**: `string`
 
-Defined in: packages/access/src/adapters/jwt-adapter.ts:31
+Defined in: [packages/access/src/adapters/jwt-adapter.ts:31](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/adapters/jwt-adapter.ts#L31)
 
 JWT claim key for super-admin flag. Defaults to `"isSuperAdmin"`.
 
@@ -103,7 +103,7 @@ JWT claim key for super-admin flag. Defaults to `"isSuperAdmin"`.
 
 > `optional` **transform**: (`claims`) => [`AccessExtractResult`](AccessExtractResult.md)
 
-Defined in: packages/access/src/adapters/jwt-adapter.ts:51
+Defined in: [packages/access/src/adapters/jwt-adapter.ts:51](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/adapters/jwt-adapter.ts#L51)
 
 Custom transform that replaces default extraction logic entirely.
 
@@ -123,7 +123,7 @@ Custom transform that replaces default extraction logic entirely.
 
 > `optional` **userIdKey**: `string`
 
-Defined in: packages/access/src/adapters/jwt-adapter.ts:33
+Defined in: [packages/access/src/adapters/jwt-adapter.ts:33](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/adapters/jwt-adapter.ts#L33)
 
 JWT claim key for user ID. Defaults to `"sub"`.
 
@@ -133,6 +133,6 @@ JWT claim key for user ID. Defaults to `"sub"`.
 
 > `optional` **usernameKey**: `string`
 
-Defined in: packages/access/src/adapters/jwt-adapter.ts:35
+Defined in: [packages/access/src/adapters/jwt-adapter.ts:35](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/adapters/jwt-adapter.ts#L35)
 
 JWT claim key for username. Defaults to `"username"`.

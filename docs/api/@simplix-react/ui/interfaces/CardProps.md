@@ -6,7 +6,7 @@
 
 # Interface: CardProps
 
-Defined in: [packages/ui/src/primitives/card.tsx:39](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/card.tsx#L39)
+Defined in: [packages/ui/src/primitives/card.tsx:39](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/primitives/card.tsx#L39)
 
 Props for the [Card](../variables/Card.md) component.
 
@@ -331,7 +331,7 @@ Indicates that the element is perceivable but disabled, so it is not editable or
 
 ### ~~aria-dropeffect?~~
 
-> `optional` **aria-dropeffect**: `"link"` \| `"none"` \| `"copy"` \| `"execute"` \| `"move"` \| `"popup"`
+> `optional` **aria-dropeffect**: `"none"` \| `"link"` \| `"copy"` \| `"execute"` \| `"move"` \| `"popup"`
 
 Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2559
 
@@ -921,7 +921,7 @@ Defines the human readable text alternative of aria-valuenow for a range widget.
 
 > `optional` **as**: [`CardTag`](../type-aliases/CardTag.md)
 
-Defined in: [packages/ui/src/primitives/card.tsx:43](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/card.tsx#L43)
+Defined in: [packages/ui/src/primitives/card.tsx:43](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/primitives/card.tsx#L43)
 
 Override the rendered HTML tag (default: "div", "button" when interactive).
 
@@ -929,7 +929,7 @@ Override the rendered HTML tag (default: "div", "button" when interactive).
 
 ### autoCapitalize?
 
-> `optional` **autoCapitalize**: `"off"` \| `"none"` \| `"on"` \| `"sentences"` \| `"words"` \| `"characters"` \| `string` & `object`
+> `optional` **autoCapitalize**: `"none"` \| `"off"` \| `"on"` \| `"sentences"` \| `"words"` \| `"characters"` \| `string` & `object`
 
 Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2786
 
@@ -979,7 +979,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/primitives/card.tsx:44](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/card.tsx#L44)
+Defined in: [packages/ui/src/primitives/card.tsx:44](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/primitives/card.tsx#L44)
 
 #### Overrides
 
@@ -1205,7 +1205,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 ### inputMode?
 
-> `optional` **inputMode**: `"search"` \| `"text"` \| `"none"` \| `"tel"` \| `"url"` \| `"email"` \| `"numeric"` \| `"decimal"`
+> `optional` **inputMode**: `"none"` \| `"search"` \| `"text"` \| `"tel"` \| `"url"` \| `"email"` \| `"numeric"` \| `"decimal"`
 
 Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2851
 
@@ -1225,7 +1225,7 @@ Hints at the type of data that might be entered by the user while editing the el
 
 > `optional` **interactive**: `boolean` \| `null`
 
-Defined in: [packages/ui/src/primitives/card.tsx:24](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/card.tsx#L24)
+Defined in: [packages/ui/src/primitives/card.tsx:24](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/primitives/card.tsx#L24)
 
 #### Inherited from
 
@@ -3373,9 +3373,9 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 ### padding?
 
-> `optional` **padding**: `"none"` \| `"sm"` \| `"md"` \| `"lg"` \| `null`
+> `optional` **padding**: `"lg"` \| `"md"` \| `"sm"` \| `"none"` \| `null`
 
-Defined in: [packages/ui/src/primitives/card.tsx:18](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/card.tsx#L18)
+Defined in: [packages/ui/src/primitives/card.tsx:18](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/primitives/card.tsx#L18)
 
 #### Inherited from
 

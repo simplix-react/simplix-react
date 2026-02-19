@@ -6,7 +6,7 @@
 
 # Interface: ListSearchProps
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:77](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L77)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:86](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/crud-list.tsx#L86)
 
 Props for the List.Search sub-component.
 
@@ -16,7 +16,7 @@ Props for the List.Search sub-component.
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:81](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L81)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:90](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/crud-list.tsx#L90)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:81](https://github.com/simp
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:79](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L79)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:88](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/crud-list.tsx#L88)
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:79](https://github.com/simp
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:80](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L80)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:89](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/crud-list.tsx#L89)
 
 ***
 
@@ -50,4 +50,4 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:80](https://github.com/simp
 
 > **value**: `string`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:78](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L78)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:87](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/crud-list.tsx#L87)

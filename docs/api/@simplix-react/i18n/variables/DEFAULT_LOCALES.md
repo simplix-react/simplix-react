@@ -8,8 +8,8 @@
 
 > `const` **DEFAULT\_LOCALES**: [`LocaleConfig`](../interfaces/LocaleConfig.md)[]
 
-Defined in: [utils/locale-config.ts:8](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/utils/locale-config.ts#L8)
+Defined in: [utils/locale-config.ts:8](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/utils/locale-config.ts#L8)
 
-Provides built-in locale configurations for Korean, English, and Japanese.
+Provides built-in locale configurations for commonly used languages worldwide.
 
 Used as the default value for `supportedLocales` in [createI18nConfig](../functions/createI18nConfig.md).

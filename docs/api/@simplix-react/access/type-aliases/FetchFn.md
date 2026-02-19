@@ -8,7 +8,7 @@
 
 > **FetchFn** = (`path`, `options?`) => `Promise`\<`unknown`\>
 
-Defined in: packages/access/src/adapters/api-adapter.ts:10
+Defined in: [packages/access/src/adapters/api-adapter.ts:10](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/adapters/api-adapter.ts#L10)
 
 Custom fetch function signature for API adapter.
 

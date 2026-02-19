@@ -6,7 +6,7 @@
 
 # Interface: CardListProps\<T\>
 
-Defined in: [packages/ui/src/crud/list/card-list.tsx:10](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/card-list.tsx#L10)
+Defined in: [packages/ui/src/crud/list/card-list.tsx:10](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/card-list.tsx#L10)
 
 Props for the [CardList](../functions/CardList.md) component.
 
@@ -22,7 +22,7 @@ Props for the [CardList](../functions/CardList.md) component.
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/list/card-list.tsx:14](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/card-list.tsx#L14)
+Defined in: [packages/ui/src/crud/list/card-list.tsx:14](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/card-list.tsx#L14)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [packages/ui/src/crud/list/card-list.tsx:14](https://github.com/simp
 
 > `optional` **columns**: `1` \| `2` \| `3`
 
-Defined in: [packages/ui/src/crud/list/card-list.tsx:13](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/card-list.tsx#L13)
+Defined in: [packages/ui/src/crud/list/card-list.tsx:13](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/card-list.tsx#L13)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [packages/ui/src/crud/list/card-list.tsx:13](https://github.com/simp
 
 > **data**: `T`[]
 
-Defined in: [packages/ui/src/crud/list/card-list.tsx:11](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/card-list.tsx#L11)
+Defined in: [packages/ui/src/crud/list/card-list.tsx:11](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/card-list.tsx#L11)
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: [packages/ui/src/crud/list/card-list.tsx:11](https://github.com/simp
 
 > **renderCard**: (`item`, `index`) => `ReactNode`
 
-Defined in: [packages/ui/src/crud/list/card-list.tsx:12](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/card-list.tsx#L12)
+Defined in: [packages/ui/src/crud/list/card-list.tsx:12](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/card-list.tsx#L12)
 
 #### Parameters
 

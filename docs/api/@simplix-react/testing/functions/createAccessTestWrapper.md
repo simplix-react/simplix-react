@@ -8,7 +8,7 @@
 
 > **createAccessTestWrapper**(`options?`): `FC`\<\{ `children`: `ReactNode`; \}\>
 
-Defined in: [access-test-wrapper.ts:46](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/testing/src/access-test-wrapper.ts#L46)
+Defined in: [access-test-wrapper.ts:46](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/testing/src/access-test-wrapper.ts#L46)
 
 Creates a React wrapper component that provides both [QueryClientProvider](https://tanstack.com/query/latest/docs/framework/react/reference/QueryClientProvider)
 and [AccessProvider](../@simplix-react/access/functions/AccessProvider.md) for testing hooks and components that depend on

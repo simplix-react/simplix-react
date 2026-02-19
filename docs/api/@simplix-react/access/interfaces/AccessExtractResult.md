@@ -6,7 +6,7 @@
 
 # Interface: AccessExtractResult\<TActions, TSubjects\>
 
-Defined in: packages/access/src/types.ts:144
+Defined in: [packages/access/src/types.ts:144](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L144)
 
 The result of extracting access information from an auth source.
 
@@ -45,7 +45,7 @@ Subject name union.
 
 > `optional` **roles**: `string`[]
 
-Defined in: packages/access/src/types.ts:153
+Defined in: [packages/access/src/types.ts:153](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L153)
 
 Role names extracted from the auth source.
 
@@ -55,7 +55,7 @@ Role names extracted from the auth source.
 
 > **rules**: `DefineRule`\<`ToAbilityTypes`\<\[`TActions`, `"all"` \| `TSubjects`\]\>, `MongoQuery`, `ClaimRawRule`\<`Extract`\<`ToAbilityTypes`\<\[`TActions`, `"all"` \| `TSubjects`\]\>, `string`\>\>\>[]
 
-Defined in: packages/access/src/types.ts:149
+Defined in: [packages/access/src/types.ts:149](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L149)
 
 CASL rules derived from the auth source.
 
@@ -65,6 +65,6 @@ CASL rules derived from the auth source.
 
 > `optional` **user**: [`AccessUser`](AccessUser.md)\<`Record`\<`string`, `unknown`\>\>
 
-Defined in: packages/access/src/types.ts:151
+Defined in: [packages/access/src/types.ts:151](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L151)
 
 User information, if available.

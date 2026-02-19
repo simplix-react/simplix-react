@@ -6,7 +6,7 @@
 
 # Interface: I18nextAdapterOptions
 
-Defined in: [i18next-adapter.ts:68](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/i18next-adapter.ts#L68)
+Defined in: [i18next-adapter.ts:37](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/i18next-adapter.ts#L37)
 
 Configures the [I18nextAdapter](../classes/I18nextAdapter.md) constructor.
 
@@ -16,7 +16,7 @@ Configures the [I18nextAdapter](../classes/I18nextAdapter.md) constructor.
 
 > `optional` **debug**: `boolean`
 
-Defined in: [i18next-adapter.ts:80](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/i18next-adapter.ts#L80)
+Defined in: [i18next-adapter.ts:49](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/i18next-adapter.ts#L49)
 
 Enables i18next debug logging.
 
@@ -26,7 +26,7 @@ Enables i18next debug logging.
 
 > `optional` **defaultLocale**: `string`
 
-Defined in: [i18next-adapter.ts:70](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/i18next-adapter.ts#L70)
+Defined in: [i18next-adapter.ts:39](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/i18next-adapter.ts#L39)
 
 Initial locale to use (defaults to `"en"`).
 
@@ -36,7 +36,7 @@ Initial locale to use (defaults to `"en"`).
 
 > `optional` **fallbackLocale**: `string`
 
-Defined in: [i18next-adapter.ts:72](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/i18next-adapter.ts#L72)
+Defined in: [i18next-adapter.ts:41](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/i18next-adapter.ts#L41)
 
 Fallback locale when a key is missing (defaults to `"en"`).
 
@@ -46,7 +46,7 @@ Fallback locale when a key is missing (defaults to `"en"`).
 
 > `optional` **i18nextInstance**: `i18n`
 
-Defined in: [i18next-adapter.ts:78](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/i18next-adapter.ts#L78)
+Defined in: [i18next-adapter.ts:47](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/i18next-adapter.ts#L47)
 
 An existing i18next instance to reuse instead of creating a new one.
 
@@ -56,7 +56,7 @@ An existing i18next instance to reuse instead of creating a new one.
 
 > `optional` **locales**: [`LocaleConfig`](LocaleConfig.md)[]
 
-Defined in: [i18next-adapter.ts:74](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/i18next-adapter.ts#L74)
+Defined in: [i18next-adapter.ts:43](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/i18next-adapter.ts#L43)
 
 Supported locale configurations.
 
@@ -66,6 +66,6 @@ Supported locale configurations.
 
 > `optional` **resources**: [`TranslationResources`](../type-aliases/TranslationResources.md)
 
-Defined in: [i18next-adapter.ts:76](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/i18next-adapter.ts#L76)
+Defined in: [i18next-adapter.ts:45](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/i18next-adapter.ts#L45)
 
 Pre-loaded translation resources.

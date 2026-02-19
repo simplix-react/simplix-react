@@ -6,7 +6,7 @@
 
 # Interface: DetailFieldWrapperProps
 
-Defined in: [packages/ui/src/fields/shared/detail-field-wrapper.tsx:30](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/shared/detail-field-wrapper.tsx#L30)
+Defined in: [packages/ui/src/fields/shared/detail-field-wrapper.tsx:30](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/fields/shared/detail-field-wrapper.tsx#L30)
 
 Props for the [DetailFieldWrapper](../functions/DetailFieldWrapper.md) component.
 
@@ -20,7 +20,7 @@ Props for the [DetailFieldWrapper](../functions/DetailFieldWrapper.md) component
 
 > **children**: `ReactNode`
 
-Defined in: [packages/ui/src/fields/shared/detail-field-wrapper.tsx:36](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/shared/detail-field-wrapper.tsx#L36)
+Defined in: [packages/ui/src/fields/shared/detail-field-wrapper.tsx:36](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/fields/shared/detail-field-wrapper.tsx#L36)
 
 ***
 
@@ -28,7 +28,7 @@ Defined in: [packages/ui/src/fields/shared/detail-field-wrapper.tsx:36](https://
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/fields/shared/detail-field-wrapper.tsx:35](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/shared/detail-field-wrapper.tsx#L35)
+Defined in: [packages/ui/src/fields/shared/detail-field-wrapper.tsx:35](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/fields/shared/detail-field-wrapper.tsx#L35)
 
 ***
 
@@ -36,7 +36,7 @@ Defined in: [packages/ui/src/fields/shared/detail-field-wrapper.tsx:35](https://
 
 > `optional` **label**: `string`
 
-Defined in: [packages/ui/src/fields/shared/detail-field-wrapper.tsx:32](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/shared/detail-field-wrapper.tsx#L32)
+Defined in: [packages/ui/src/fields/shared/detail-field-wrapper.tsx:32](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/fields/shared/detail-field-wrapper.tsx#L32)
 
 Visible label text for the field.
 
@@ -46,7 +46,7 @@ Visible label text for the field.
 
 > `optional` **labelKey**: `string`
 
-Defined in: [packages/ui/src/fields/shared/detail-field-wrapper.tsx:34](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/shared/detail-field-wrapper.tsx#L34)
+Defined in: [packages/ui/src/fields/shared/detail-field-wrapper.tsx:34](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/fields/shared/detail-field-wrapper.tsx#L34)
 
 i18n key for label resolution.
 
@@ -56,7 +56,7 @@ i18n key for label resolution.
 
 > `optional` **labelPosition**: `"hidden"` \| `"top"` \| `"left"`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L5)
+Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/shared/types.ts#L5)
 
 #### Inherited from
 
@@ -66,9 +66,9 @@ Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-
 
 ### size?
 
-> `optional` **size**: `"sm"` \| `"md"` \| `"lg"`
+> `optional` **size**: `"lg"` \| `"md"` \| `"sm"`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L6)
+Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/shared/types.ts#L6)
 
 #### Inherited from
 

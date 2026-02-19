@@ -6,7 +6,7 @@
 
 # Interface: AccessPolicy\<TActions, TSubjects\>
 
-Defined in: packages/access/src/types.ts:313
+Defined in: [packages/access/src/types.ts:313](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L313)
 
 The main access policy interface.
 
@@ -54,7 +54,7 @@ Subject name union (defaults to any `string`).
 
 > `readonly` **ability**: [`AccessAbility`](../type-aliases/AccessAbility.md)\<`TActions`, `TSubjects`\>
 
-Defined in: packages/access/src/types.ts:318
+Defined in: [packages/access/src/types.ts:318](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L318)
 
 The underlying CASL ability instance.
 
@@ -64,7 +64,7 @@ The underlying CASL ability instance.
 
 > `readonly` **roles**: `string`[]
 
-Defined in: packages/access/src/types.ts:322
+Defined in: [packages/access/src/types.ts:322](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L322)
 
 The current role names.
 
@@ -74,7 +74,7 @@ The current role names.
 
 > `readonly` **user**: [`AccessUser`](AccessUser.md)\<`Record`\<`string`, `unknown`\>\> \| `null`
 
-Defined in: packages/access/src/types.ts:320
+Defined in: [packages/access/src/types.ts:320](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L320)
 
 The current authenticated user, or `null`.
 
@@ -84,7 +84,7 @@ The current authenticated user, or `null`.
 
 > **can**(`action`, `subject`): `boolean`
 
-Defined in: packages/access/src/types.ts:331
+Defined in: [packages/access/src/types.ts:331](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L331)
 
 Returns `true` if the given action is allowed on the subject.
 
@@ -114,7 +114,7 @@ The subject to check against (e.g., `"Pet"`, `"all"`).
 
 > **cannot**(`action`, `subject`): `boolean`
 
-Defined in: packages/access/src/types.ts:340
+Defined in: [packages/access/src/types.ts:340](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L340)
 
 Returns `true` if the given action is NOT allowed on the subject.
 
@@ -144,7 +144,7 @@ The subject to check against.
 
 > **clear**(): `void`
 
-Defined in: packages/access/src/types.ts:385
+Defined in: [packages/access/src/types.ts:385](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L385)
 
 Clears all access state and persisted data.
 
@@ -158,7 +158,7 @@ Clears all access state and persisted data.
 
 > **getSnapshot**(): [`AccessSnapshot`](AccessSnapshot.md)\<`TActions`, `TSubjects`\>
 
-Defined in: packages/access/src/types.ts:420
+Defined in: [packages/access/src/types.ts:420](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L420)
 
 Returns a serializable snapshot of the current state.
 
@@ -179,7 +179,7 @@ safe for use with `useSyncExternalStore`.
 
 > **hasAnyRole**(`roles`): `boolean`
 
-Defined in: packages/access/src/types.ts:359
+Defined in: [packages/access/src/types.ts:359](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L359)
 
 Checks if the current user has any of the given roles.
 
@@ -203,7 +203,7 @@ Role names to check (with or without `ROLE_` prefix).
 
 > **hasRole**(`role`): `boolean`
 
-Defined in: packages/access/src/types.ts:351
+Defined in: [packages/access/src/types.ts:351](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L351)
 
 Checks if the current user has the given role.
 
@@ -231,7 +231,7 @@ Role matching is prefix-insensitive: `"ADMIN"` matches `"ROLE_ADMIN"`.
 
 > **loadPublicAccess**(): `Promise`\<`void`\>
 
-Defined in: packages/access/src/types.ts:394
+Defined in: [packages/access/src/types.ts:394](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L394)
 
 Loads public (unauthenticated) access rules from the config.
 
@@ -250,7 +250,7 @@ Does nothing if `publicAccess` is not configured.
 
 > **rehydrate**(): `boolean`
 
-Defined in: packages/access/src/types.ts:401
+Defined in: [packages/access/src/types.ts:401](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L401)
 
 Attempts to rehydrate access state from persisted storage.
 
@@ -266,7 +266,7 @@ Attempts to rehydrate access state from persisted storage.
 
 > **setRules**(`rules`, `user?`, `roles?`): `void`
 
-Defined in: packages/access/src/types.ts:378
+Defined in: [packages/access/src/types.ts:378](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L378)
 
 Directly sets rules, user, and roles without going through the adapter.
 
@@ -304,7 +304,7 @@ Omitted `user` and `roles` parameters preserve their current values.
 
 > **subscribe**(`listener`): () => `void`
 
-Defined in: packages/access/src/types.ts:409
+Defined in: [packages/access/src/types.ts:409](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L409)
 
 Subscribes to access state changes.
 
@@ -332,7 +332,7 @@ An unsubscribe function.
 
 > **update**(`authData`): `Promise`\<`void`\>
 
-Defined in: packages/access/src/types.ts:366
+Defined in: [packages/access/src/types.ts:366](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L366)
 
 Updates access state by extracting rules from the given auth data.
 

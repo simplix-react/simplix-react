@@ -6,7 +6,7 @@
 
 # Interface: ListHookResult\<T\>
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:6](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/use-crud-list.ts#L6)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:6](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/use-crud-list.ts#L6)
 
 ## Type Parameters
 
@@ -20,7 +20,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:6](https://github.com/si
 
 > **data**: `T`[] \| `undefined`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:7](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/use-crud-list.ts#L7)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:7](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/use-crud-list.ts#L7)
 
 ***
 
@@ -28,7 +28,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:7](https://github.com/si
 
 > **error**: `Error` \| `null`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:9](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/use-crud-list.ts#L9)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:9](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/use-crud-list.ts#L9)
 
 ***
 
@@ -36,4 +36,4 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:9](https://github.com/si
 
 > **isLoading**: `boolean`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:8](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/use-crud-list.ts#L8)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:8](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/use-crud-list.ts#L8)

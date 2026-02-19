@@ -8,7 +8,7 @@
 
 > **deriveHooks**\<`TEntities`, `TOperations`\>(`contract`): [`DerivedHooksResult`](../type-aliases/DerivedHooksResult.md)\<`TEntities`, `TOperations`\>
 
-Defined in: [derive-hooks.ts:75](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/react/src/derive-hooks.ts#L75)
+Defined in: [derive-hooks.ts:75](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/react/src/derive-hooks.ts#L75)
 
 Derives type-safe React Query hooks from an API contract.
 

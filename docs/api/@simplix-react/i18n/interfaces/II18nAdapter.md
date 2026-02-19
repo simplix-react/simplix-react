@@ -6,7 +6,7 @@
 
 # Interface: II18nAdapter
 
-Defined in: [adapter.ts:29](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/adapter.ts#L29)
+Defined in: [adapter.ts:29](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/adapter.ts#L29)
 
 Defines the contract for an internationalization adapter.
 
@@ -33,7 +33,7 @@ class CustomAdapter implements II18nAdapter {
 
 > `readonly` **availableLocales**: `string`[]
 
-Defined in: [adapter.ts:39](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/adapter.ts#L39)
+Defined in: [adapter.ts:39](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/adapter.ts#L39)
 
 List of all locale codes supported by this adapter.
 
@@ -43,7 +43,7 @@ List of all locale codes supported by this adapter.
 
 > `readonly` **fallbackLocale**: `string`
 
-Defined in: [adapter.ts:37](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/adapter.ts#L37)
+Defined in: [adapter.ts:37](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/adapter.ts#L37)
 
 Locale code used when a translation key is missing in the active locale.
 
@@ -53,7 +53,7 @@ Locale code used when a translation key is missing in the active locale.
 
 > `readonly` **id**: `string`
 
-Defined in: [adapter.ts:31](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/adapter.ts#L31)
+Defined in: [adapter.ts:31](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/adapter.ts#L31)
 
 Unique identifier for this adapter implementation.
 
@@ -63,7 +63,7 @@ Unique identifier for this adapter implementation.
 
 > `readonly` **locale**: `string`
 
-Defined in: [adapter.ts:35](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/adapter.ts#L35)
+Defined in: [adapter.ts:35](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/adapter.ts#L35)
 
 Currently active locale code.
 
@@ -73,7 +73,7 @@ Currently active locale code.
 
 > `readonly` **name**: `string`
 
-Defined in: [adapter.ts:33](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/adapter.ts#L33)
+Defined in: [adapter.ts:33](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/adapter.ts#L33)
 
 Human-readable name for this adapter.
 
@@ -83,7 +83,7 @@ Human-readable name for this adapter.
 
 > **dispose**(): `Promise`\<`void`\>
 
-Defined in: [adapter.ts:48](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/adapter.ts#L48)
+Defined in: [adapter.ts:48](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/adapter.ts#L48)
 
 Disposes of the adapter and releases all resources.
 
@@ -97,7 +97,7 @@ Disposes of the adapter and releases all resources.
 
 > **exists**(`key`, `namespace?`): `boolean`
 
-Defined in: [adapter.ts:94](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/adapter.ts#L94)
+Defined in: [adapter.ts:94](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/adapter.ts#L94)
 
 Checks whether a translation key exists.
 
@@ -125,7 +125,7 @@ Optional namespace to scope the lookup.
 
 > **formatCurrency**(`value`, `currency?`): `string`
 
-Defined in: [adapter.ts:135](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/adapter.ts#L135)
+Defined in: [adapter.ts:135](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/adapter.ts#L135)
 
 Formats a number as a currency string according to the active locale.
 
@@ -153,7 +153,7 @@ ISO 4217 currency code override (defaults to the locale's currency).
 
 > **formatDate**(`date`, `options?`): `string`
 
-Defined in: [adapter.ts:101](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/adapter.ts#L101)
+Defined in: [adapter.ts:101](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/adapter.ts#L101)
 
 Formats a date according to the active locale.
 
@@ -181,7 +181,7 @@ Formatting options.
 
 > **formatDateTime**(`date`, `options?`): `string`
 
-Defined in: [adapter.ts:115](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/adapter.ts#L115)
+Defined in: [adapter.ts:115](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/adapter.ts#L115)
 
 Formats a date and time together according to the active locale.
 
@@ -209,7 +209,7 @@ Formatting options.
 
 > **formatNumber**(`value`, `options?`): `string`
 
-Defined in: [adapter.ts:128](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/adapter.ts#L128)
+Defined in: [adapter.ts:128](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/adapter.ts#L128)
 
 Formats a number according to the active locale.
 
@@ -237,7 +237,7 @@ Formatting options.
 
 > **formatRelativeTime**(`date`): `string`
 
-Defined in: [adapter.ts:121](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/adapter.ts#L121)
+Defined in: [adapter.ts:121](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/adapter.ts#L121)
 
 Formats a date as a human-readable relative time string (e.g., "3 hours ago").
 
@@ -259,7 +259,7 @@ The date to compare against the current time.
 
 > **formatTime**(`date`, `options?`): `string`
 
-Defined in: [adapter.ts:108](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/adapter.ts#L108)
+Defined in: [adapter.ts:108](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/adapter.ts#L108)
 
 Formats a time according to the active locale.
 
@@ -287,7 +287,7 @@ Formatting options.
 
 > **getLoadState**(`locale`, `namespace?`): [`TranslationLoadState`](../type-aliases/TranslationLoadState.md)
 
-Defined in: [adapter.ts:154](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/adapter.ts#L154)
+Defined in: [adapter.ts:154](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/adapter.ts#L154)
 
 Returns the loading state of translation resources.
 
@@ -315,7 +315,7 @@ Optional namespace to check (defaults to `"translation"`).
 
 > **getLocaleInfo**(`locale`): [`LocaleInfo`](LocaleInfo.md) \| `null`
 
-Defined in: [adapter.ts:60](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/adapter.ts#L60)
+Defined in: [adapter.ts:60](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/adapter.ts#L60)
 
 Returns metadata for the given locale, or `null` if unsupported.
 
@@ -337,7 +337,7 @@ The locale code to look up.
 
 > **initialize**(`defaultLocale?`): `Promise`\<`void`\>
 
-Defined in: [adapter.ts:45](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/adapter.ts#L45)
+Defined in: [adapter.ts:45](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/adapter.ts#L45)
 
 Initializes the adapter with an optional default locale.
 
@@ -359,7 +359,7 @@ The locale to activate on initialization.
 
 > **loadTranslations**(`locale`, `namespace`, `translations`): `void`
 
-Defined in: [adapter.ts:143](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/adapter.ts#L143)
+Defined in: [adapter.ts:143](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/adapter.ts#L143)
 
 Loads translation resources for a given locale and namespace.
 
@@ -393,7 +393,7 @@ The translation key-value pairs to load.
 
 > **onLocaleChange**(`handler`): () => `void`
 
-Defined in: [adapter.ts:164](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/adapter.ts#L164)
+Defined in: [adapter.ts:164](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/adapter.ts#L164)
 
 Registers a callback invoked whenever the active locale changes.
 
@@ -421,7 +421,7 @@ A function that unregisters the handler when called.
 
 > **setLocale**(`locale`): `Promise`\<`void`\>
 
-Defined in: [adapter.ts:54](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/adapter.ts#L54)
+Defined in: [adapter.ts:54](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/adapter.ts#L54)
 
 Changes the active locale.
 
@@ -443,7 +443,7 @@ The target locale code.
 
 > **t**(`key`, `values?`): `string`
 
-Defined in: [adapter.ts:67](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/adapter.ts#L67)
+Defined in: [adapter.ts:67](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/adapter.ts#L67)
 
 Translates a key with optional interpolation values.
 
@@ -471,7 +471,7 @@ Interpolation values.
 
 > **tn**(`namespace`, `key`, `values?`): `string`
 
-Defined in: [adapter.ts:75](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/adapter.ts#L75)
+Defined in: [adapter.ts:75](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/adapter.ts#L75)
 
 Translates a namespaced key with optional interpolation values.
 
@@ -505,7 +505,7 @@ Interpolation values.
 
 > **tp**(`key`, `count`, `values?`): `string`
 
-Defined in: [adapter.ts:87](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/adapter.ts#L87)
+Defined in: [adapter.ts:87](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/adapter.ts#L87)
 
 Translates a key with plural form selection based on count.
 

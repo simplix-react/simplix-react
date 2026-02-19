@@ -8,7 +8,7 @@
 
 > **hasRole**(`roles`, `role`): `boolean`
 
-Defined in: packages/access/src/helpers/role-utils.ts:31
+Defined in: [packages/access/src/helpers/role-utils.ts:64](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/helpers/role-utils.ts#L64)
 
 Checks if a role exists in the given role list.
 

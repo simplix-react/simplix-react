@@ -6,7 +6,7 @@
 
 # Interface: ListFilterProps
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:105](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L105)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:114](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/crud-list.tsx#L114)
 
 Props for the List.Filter sub-component.
 
@@ -16,7 +16,7 @@ Props for the List.Filter sub-component.
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:111](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L111)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:120](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/crud-list.tsx#L120)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:111](https://github.com/sim
 
 > **label**: `string`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:106](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L106)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:115](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/crud-list.tsx#L115)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:106](https://github.com/sim
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:108](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L108)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:117](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/crud-list.tsx#L117)
 
 #### Parameters
 
@@ -50,7 +50,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:108](https://github.com/sim
 
 > **options**: [`ListFilterOption`](ListFilterOption.md)[]
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:109](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L109)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:118](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/crud-list.tsx#L118)
 
 ***
 
@@ -58,7 +58,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:109](https://github.com/sim
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:110](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L110)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:119](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/crud-list.tsx#L119)
 
 ***
 
@@ -66,4 +66,4 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:110](https://github.com/sim
 
 > **value**: `string`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:107](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L107)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:116](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/crud-list.tsx#L116)

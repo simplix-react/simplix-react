@@ -6,7 +6,7 @@
 
 # Interface: DetailImageFieldProps
 
-Defined in: [packages/ui/src/fields/detail/image-field.tsx:8](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/detail/image-field.tsx#L8)
+Defined in: [packages/ui/src/fields/detail/image-field.tsx:8](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/fields/detail/image-field.tsx#L8)
 
 Props for the [DetailImageField](../functions/DetailImageField.md) component.
 
@@ -20,7 +20,7 @@ Props for the [DetailImageField](../functions/DetailImageField.md) component.
 
 > `optional` **alt**: `string`
 
-Defined in: [packages/ui/src/fields/detail/image-field.tsx:12](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/detail/image-field.tsx#L12)
+Defined in: [packages/ui/src/fields/detail/image-field.tsx:12](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/fields/detail/image-field.tsx#L12)
 
 Alt text for the image.
 
@@ -30,7 +30,7 @@ Alt text for the image.
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:36](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L36)
+Defined in: [packages/ui/src/crud/shared/types.ts:36](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/shared/types.ts#L36)
 
 #### Inherited from
 
@@ -42,7 +42,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:36](https://github.com/simplix
 
 > `optional` **height**: `string` \| `number`
 
-Defined in: [packages/ui/src/fields/detail/image-field.tsx:16](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/detail/image-field.tsx#L16)
+Defined in: [packages/ui/src/fields/detail/image-field.tsx:16](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/fields/detail/image-field.tsx#L16)
 
 Image height in pixels or CSS value. Defaults to `96`.
 
@@ -52,7 +52,7 @@ Image height in pixels or CSS value. Defaults to `96`.
 
 > `optional` **imageClassName**: `string`
 
-Defined in: [packages/ui/src/fields/detail/image-field.tsx:18](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/detail/image-field.tsx#L18)
+Defined in: [packages/ui/src/fields/detail/image-field.tsx:18](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/fields/detail/image-field.tsx#L18)
 
 Additional CSS class for the image element.
 
@@ -62,7 +62,7 @@ Additional CSS class for the image element.
 
 > `optional` **label**: `string`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:34](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L34)
+Defined in: [packages/ui/src/crud/shared/types.ts:34](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/shared/types.ts#L34)
 
 #### Inherited from
 
@@ -74,7 +74,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:34](https://github.com/simplix
 
 > `optional` **labelKey**: `string`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:35](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L35)
+Defined in: [packages/ui/src/crud/shared/types.ts:35](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/shared/types.ts#L35)
 
 #### Inherited from
 
@@ -86,7 +86,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:35](https://github.com/simplix
 
 > `optional` **labelPosition**: `"hidden"` \| `"top"` \| `"left"`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L5)
+Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/shared/types.ts#L5)
 
 #### Inherited from
 
@@ -96,9 +96,9 @@ Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-
 
 ### size?
 
-> `optional` **size**: `"sm"` \| `"md"` \| `"lg"`
+> `optional` **size**: `"lg"` \| `"md"` \| `"sm"`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L6)
+Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/shared/types.ts#L6)
 
 #### Inherited from
 
@@ -110,7 +110,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-
 
 > **value**: `string` \| `null` \| `undefined`
 
-Defined in: [packages/ui/src/fields/detail/image-field.tsx:10](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/detail/image-field.tsx#L10)
+Defined in: [packages/ui/src/fields/detail/image-field.tsx:10](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/fields/detail/image-field.tsx#L10)
 
 Image source URL.
 
@@ -120,6 +120,6 @@ Image source URL.
 
 > `optional` **width**: `string` \| `number`
 
-Defined in: [packages/ui/src/fields/detail/image-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/detail/image-field.tsx#L14)
+Defined in: [packages/ui/src/fields/detail/image-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/fields/detail/image-field.tsx#L14)
 
 Image width in pixels or CSS value. Defaults to `96`.

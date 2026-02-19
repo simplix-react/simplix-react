@@ -708,6 +708,7 @@ render(<MyComponent />, { wrapper });
 - [DefaultActions](type-aliases/DefaultActions.md)
 - [DefaultSubjects](type-aliases/DefaultSubjects.md)
 - [FetchFn](type-aliases/FetchFn.md)
+- [RoleInput](type-aliases/RoleInput.md)
 
 ## Functions
 
@@ -720,4 +721,5 @@ render(<MyComponent />, { wrapper });
 - [normalizeFlatPermissions](functions/normalizeFlatPermissions.md)
 - [normalizePermissionMap](functions/normalizePermissionMap.md)
 - [normalizeRole](functions/normalizeRole.md)
+- [normalizeRoles](functions/normalizeRoles.md)
 - [normalizeScopePermissions](functions/normalizeScopePermissions.md)

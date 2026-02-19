@@ -6,7 +6,7 @@
 
 # Interface: DomainTranslationConfig
 
-Defined in: [domain-translations.ts:7](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/domain-translations.ts#L7)
+Defined in: [domain-translations.ts:7](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/domain-translations.ts#L7)
 
 Configuration for registering domain-specific translations.
 
@@ -19,7 +19,7 @@ its own translation files via this interface.
 
 > **domain**: `string`
 
-Defined in: [domain-translations.ts:9](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/domain-translations.ts#L9)
+Defined in: [domain-translations.ts:9](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/domain-translations.ts#L9)
 
 Unique domain identifier (e.g., `"pet"`, `"store"`).
 
@@ -29,6 +29,6 @@ Unique domain identifier (e.g., `"pet"`, `"store"`).
 
 > **locales**: `Record`\<`string`, () => `Promise`\<\{ `default`: `Record`\<`string`, `unknown`\>; \}\>\>
 
-Defined in: [domain-translations.ts:11](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/domain-translations.ts#L11)
+Defined in: [domain-translations.ts:11](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/i18n/src/domain-translations.ts#L11)
 
 Map of locale codes to lazy-loading functions for translation JSON files.

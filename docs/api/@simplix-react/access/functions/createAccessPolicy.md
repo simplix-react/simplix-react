@@ -8,7 +8,7 @@
 
 > **createAccessPolicy**\<`TActions`, `TSubjects`\>(`config`): [`AccessPolicy`](../interfaces/AccessPolicy.md)\<`TActions`, `TSubjects`\>
 
-Defined in: packages/access/src/create-access-policy.ts:56
+Defined in: [packages/access/src/create-access-policy.ts:56](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/create-access-policy.ts#L56)
 
 Creates an [AccessPolicy](../interfaces/AccessPolicy.md) instance backed by CASL.
 

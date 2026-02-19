@@ -6,7 +6,7 @@
 
 # Interface: StackProps
 
-Defined in: [packages/ui/src/primitives/stack.tsx:42](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/stack.tsx#L42)
+Defined in: [packages/ui/src/primitives/stack.tsx:42](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/primitives/stack.tsx#L42)
 
 Props for the [Stack](../variables/Stack.md) layout component.
 
@@ -44,7 +44,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **align**: `"center"` \| `"start"` \| `"end"` \| `"stretch"` \| `"baseline"` \| `null`
 
-Defined in: [packages/ui/src/primitives/stack.tsx:19](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/stack.tsx#L19)
+Defined in: [packages/ui/src/primitives/stack.tsx:19](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/primitives/stack.tsx#L19)
 
 #### Inherited from
 
@@ -343,7 +343,7 @@ Indicates that the element is perceivable but disabled, so it is not editable or
 
 ### ~~aria-dropeffect?~~
 
-> `optional` **aria-dropeffect**: `"link"` \| `"none"` \| `"copy"` \| `"execute"` \| `"move"` \| `"popup"`
+> `optional` **aria-dropeffect**: `"none"` \| `"link"` \| `"copy"` \| `"execute"` \| `"move"` \| `"popup"`
 
 Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2559
 
@@ -931,7 +931,7 @@ Defines the human readable text alternative of aria-valuenow for a range widget.
 
 ### autoCapitalize?
 
-> `optional` **autoCapitalize**: `"off"` \| `"none"` \| `"on"` \| `"sentences"` \| `"words"` \| `"characters"` \| `string` & `object`
+> `optional` **autoCapitalize**: `"none"` \| `"off"` \| `"on"` \| `"sentences"` \| `"words"` \| `"characters"` \| `string` & `object`
 
 Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2786
 
@@ -981,7 +981,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/primitives/stack.tsx:45](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/stack.tsx#L45)
+Defined in: [packages/ui/src/primitives/stack.tsx:45](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/primitives/stack.tsx#L45)
 
 #### Overrides
 
@@ -1105,7 +1105,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **direction**: `"row"` \| `"column"` \| `null`
 
-Defined in: [packages/ui/src/primitives/stack.tsx:10](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/stack.tsx#L10)
+Defined in: [packages/ui/src/primitives/stack.tsx:10](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/primitives/stack.tsx#L10)
 
 #### Inherited from
 
@@ -1155,9 +1155,9 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 ### gap?
 
-> `optional` **gap**: `"none"` \| `"sm"` \| `"md"` \| `"lg"` \| `"xl"` \| `"xs"` \| `null`
+> `optional` **gap**: `"lg"` \| `"md"` \| `"sm"` \| `"none"` \| `"xl"` \| `"xs"` \| `null`
 
-Defined in: [packages/ui/src/primitives/stack.tsx:11](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/stack.tsx#L11)
+Defined in: [packages/ui/src/primitives/stack.tsx:11](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/primitives/stack.tsx#L11)
 
 #### Inherited from
 
@@ -1219,7 +1219,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 ### inputMode?
 
-> `optional` **inputMode**: `"search"` \| `"text"` \| `"none"` \| `"tel"` \| `"url"` \| `"email"` \| `"numeric"` \| `"decimal"`
+> `optional` **inputMode**: `"none"` \| `"search"` \| `"text"` \| `"tel"` \| `"url"` \| `"email"` \| `"numeric"` \| `"decimal"`
 
 Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2851
 
@@ -1317,7 +1317,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **justify**: `"center"` \| `"start"` \| `"end"` \| `"between"` \| `"around"` \| `null`
 
-Defined in: [packages/ui/src/primitives/stack.tsx:26](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/stack.tsx#L26)
+Defined in: [packages/ui/src/primitives/stack.tsx:26](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/primitives/stack.tsx#L26)
 
 #### Inherited from
 
@@ -3701,7 +3701,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **wrap**: `boolean` \| `null`
 
-Defined in: [packages/ui/src/primitives/stack.tsx:33](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/stack.tsx#L33)
+Defined in: [packages/ui/src/primitives/stack.tsx:33](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/primitives/stack.tsx#L33)
 
 #### Inherited from
 

@@ -8,7 +8,7 @@
 
 > **EntityClient**\<`_TSchema`, `TOperations`\> = `{ [K in keyof TOperations]: (args: unknown[]) => Promise<unknown> }`
 
-Defined in: [packages/contract/src/types.ts:388](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/contract/src/types.ts#L388)
+Defined in: [packages/contract/src/types.ts:388](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/contract/src/types.ts#L388)
 
 Provides a type-safe client for a single entity, derived from its
 [EntityDefinition](../interfaces/EntityDefinition.md) operations.

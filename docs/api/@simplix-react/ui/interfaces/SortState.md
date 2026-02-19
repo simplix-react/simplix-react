@@ -6,7 +6,7 @@
 
 # Interface: SortState
 
-Defined in: [packages/ui/src/crud/shared/types.ts:42](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L42)
+Defined in: [packages/ui/src/crud/shared/types.ts:42](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/shared/types.ts#L42)
 
 Represents a sort configuration with field name and direction.
 
@@ -16,7 +16,7 @@ Represents a sort configuration with field name and direction.
 
 > **direction**: `"desc"` \| `"asc"`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:44](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L44)
+Defined in: [packages/ui/src/crud/shared/types.ts:44](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/shared/types.ts#L44)
 
 ***
 
@@ -24,4 +24,4 @@ Defined in: [packages/ui/src/crud/shared/types.ts:44](https://github.com/simplix
 
 > **field**: `string`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:43](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L43)
+Defined in: [packages/ui/src/crud/shared/types.ts:43](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/shared/types.ts#L43)

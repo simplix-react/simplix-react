@@ -6,7 +6,7 @@
 
 # Interface: ApiContract\<TEntities, TOperations\>
 
-Defined in: [packages/contract/src/types.ts:424](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/contract/src/types.ts#L424)
+Defined in: [packages/contract/src/types.ts:424](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/contract/src/types.ts#L424)
 
 Represents the fully constructed API contract returned by [defineApi](../functions/defineApi.md).
 
@@ -40,7 +40,7 @@ Map of operation names to their definitions.
 
 > **client**: \{ \[K in string \| number \| symbol\]: EntityClient\<TEntities\[K\]\["schema"\], TEntities\[K\]\["operations"\]\> \} & \{ \[K in string \| number \| symbol\]: TOperations\[K\] extends OperationDefinition\<\_TInput, TOutput\> ? (args: unknown\[\]) =\> Promise\<output\<TOutput\>\> : never \}
 
-Defined in: [packages/contract/src/types.ts:431](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/contract/src/types.ts#L431)
+Defined in: [packages/contract/src/types.ts:431](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/contract/src/types.ts#L431)
 
 Type-safe HTTP client with methods for each entity and operation.
 
@@ -50,7 +50,7 @@ Type-safe HTTP client with methods for each entity and operation.
 
 > **config**: [`ApiContractConfig`](ApiContractConfig.md)\<`TEntities`, `TOperations`\>
 
-Defined in: [packages/contract/src/types.ts:429](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/contract/src/types.ts#L429)
+Defined in: [packages/contract/src/types.ts:429](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/contract/src/types.ts#L429)
 
 The original contract configuration.
 
@@ -60,6 +60,6 @@ The original contract configuration.
 
 > **queryKeys**: \{ \[K in string \| number \| symbol\]: QueryKeyFactory \}
 
-Defined in: [packages/contract/src/types.ts:445](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/contract/src/types.ts#L445)
+Defined in: [packages/contract/src/types.ts:445](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/contract/src/types.ts#L445)
 
 Query key factories for cache management, one per entity.
