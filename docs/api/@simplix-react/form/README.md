@@ -218,7 +218,7 @@ simplix openapi <spec-path> --no-forms   # Skips form hook generation
 | --- | --- |
 | `@simplix-react/contract` | Zod-based type-safe API contract definitions |
 | `@simplix-react/react` | React Query hooks derived from contracts |
-| `@simplix-react/mock` | Auto-generated MSW handlers and PGlite repositories |
+| `@simplix-react/mock` | Auto-generated MSW handlers with in-memory stores |
 
 ---
 

@@ -6,7 +6,7 @@
 
 # Interface: QueryKeyFactory
 
-Defined in: [packages/contract/src/types.ts:232](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/contract/src/types.ts#L232)
+Defined in: [packages/contract/src/types.ts:342](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/types.ts#L342)
 
 Provides structured query key generators for a single entity, following the
 query key factory pattern recommended by TanStack Query.
@@ -21,11 +21,13 @@ import { defineApi } from "@simplix-react/contract";
 
 const api = defineApi(config);
 
-api.queryKeys.task.all;              // ["project", "task"]
-api.queryKeys.task.lists();          // ["project", "task", "list"]
-api.queryKeys.task.list({ status: "open" }); // ["project", "task", "list", { status: "open" }]
-api.queryKeys.task.details();        // ["project", "task", "detail"]
-api.queryKeys.task.detail("abc");    // ["project", "task", "detail", "abc"]
+api.queryKeys.product.all;                     // ["inventory", "product"]
+api.queryKeys.product.lists();                 // ["inventory", "product", "list"]
+api.queryKeys.product.list({ status: "active" }); // ["inventory", "product", "list", { status: "active" }]
+api.queryKeys.product.details();               // ["inventory", "product", "detail"]
+api.queryKeys.product.detail("abc");           // ["inventory", "product", "detail", "abc"]
+api.queryKeys.product.trees();                 // ["inventory", "product", "tree"]
+api.queryKeys.product.tree({ rootId: "x" });   // ["inventory", "product", "tree", { rootId: "x" }]
 ```
 
 ## See
@@ -38,7 +40,7 @@ api.queryKeys.task.detail("abc");    // ["project", "task", "detail", "abc"]
 
 > **all**: readonly `unknown`[]
 
-Defined in: [packages/contract/src/types.ts:234](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/contract/src/types.ts#L234)
+Defined in: [packages/contract/src/types.ts:344](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/types.ts#L344)
 
 Root key matching all queries for this entity: `[domain, entity]`.
 
@@ -48,7 +50,7 @@ Root key matching all queries for this entity: `[domain, entity]`.
 
 > **detail**: (`id`) => readonly `unknown`[]
 
-Defined in: [packages/contract/src/types.ts:242](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/contract/src/types.ts#L242)
+Defined in: [packages/contract/src/types.ts:352](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/types.ts#L352)
 
 Returns key matching a specific detail query by ID.
 
@@ -56,7 +58,7 @@ Returns key matching a specific detail query by ID.
 
 ##### id
 
-`string`
+[`EntityId`](../type-aliases/EntityId.md)
 
 #### Returns
 
@@ -68,7 +70,7 @@ readonly `unknown`[]
 
 > **details**: () => readonly `unknown`[]
 
-Defined in: [packages/contract/src/types.ts:240](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/contract/src/types.ts#L240)
+Defined in: [packages/contract/src/types.ts:350](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/types.ts#L350)
 
 Returns key matching all detail queries: `[domain, entity, "detail"]`.
 
@@ -82,7 +84,7 @@ readonly `unknown`[]
 
 > **list**: (`params`) => readonly `unknown`[]
 
-Defined in: [packages/contract/src/types.ts:238](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/contract/src/types.ts#L238)
+Defined in: [packages/contract/src/types.ts:348](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/types.ts#L348)
 
 Returns key matching a specific list query with parameters.
 
@@ -102,9 +104,43 @@ readonly `unknown`[]
 
 > **lists**: () => readonly `unknown`[]
 
-Defined in: [packages/contract/src/types.ts:236](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/contract/src/types.ts#L236)
+Defined in: [packages/contract/src/types.ts:346](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/types.ts#L346)
 
 Returns key matching all list queries: `[domain, entity, "list"]`.
+
+#### Returns
+
+readonly `unknown`[]
+
+***
+
+### tree()
+
+> **tree**: (`params?`) => readonly `unknown`[]
+
+Defined in: [packages/contract/src/types.ts:356](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/types.ts#L356)
+
+Returns key matching a specific tree query with parameters.
+
+#### Parameters
+
+##### params?
+
+`Record`\<`string`, `unknown`\>
+
+#### Returns
+
+readonly `unknown`[]
+
+***
+
+### trees()
+
+> **trees**: () => readonly `unknown`[]
+
+Defined in: [packages/contract/src/types.ts:354](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/types.ts#L354)
+
+Returns key matching all tree queries: `[domain, entity, "tree"]`.
 
 #### Returns
 

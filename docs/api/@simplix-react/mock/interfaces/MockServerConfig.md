@@ -6,12 +6,12 @@
 
 # Interface: MockServerConfig
 
-Defined in: [msw.ts:83](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/mock/src/msw.ts#L83)
+Defined in: [msw.ts:76](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/mock/src/msw.ts#L76)
 
 Describes the configuration required by [setupMockWorker](../functions/setupMockWorker.md).
 
 Combines multiple [MockDomainConfig](MockDomainConfig.md) entries into a single bootstrap
-configuration with an optional shared data directory.
+configuration.
 
 ## Example
 
@@ -19,7 +19,6 @@ configuration with an optional shared data directory.
 import type { MockServerConfig } from "@simplix-react/mock";
 
 const config: MockServerConfig = {
-  dataDir: "idb://my-app-mock",
   domains: [projectDomain, userDomain],
 };
 ```
@@ -31,24 +30,10 @@ const config: MockServerConfig = {
 
 ## Properties
 
-### dataDir?
-
-> `optional` **dataDir**: `string`
-
-Defined in: [msw.ts:89](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/mock/src/msw.ts#L89)
-
-IndexedDB data directory for PGlite persistence.
-
-#### Default Value
-
-`"idb://simplix-mock"`
-
-***
-
 ### domains
 
 > **domains**: [`MockDomainConfig`](MockDomainConfig.md)[]
 
-Defined in: [msw.ts:92](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/mock/src/msw.ts#L92)
+Defined in: [msw.ts:78](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/mock/src/msw.ts#L78)
 
 Domain configurations to activate.

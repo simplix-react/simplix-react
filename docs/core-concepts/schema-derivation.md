@@ -100,7 +100,7 @@ All hooks support full TanStack Query options passthrough --- callers can provid
 
 ### Stage 5: deriveMockHandlers (MSW Handler Generation)
 
-`deriveMockHandlers()` from `@simplix-react/mock` reads the contract config and generates MSW `http.*` handlers for each entity's CRUD operations. Each handler reads from and writes to a PGlite database instance.
+`deriveMockHandlers()` from `@simplix-react/mock` reads the contract config and generates MSW `http.*` handlers for each entity's CRUD operations. Each handler reads from and writes to an in-memory Map store.
 
 For each entity, five handlers are generated:
 

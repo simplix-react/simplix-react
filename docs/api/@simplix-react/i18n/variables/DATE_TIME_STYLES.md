@@ -8,7 +8,7 @@
 
 > `const` **DATE\_TIME\_STYLES**: `object`
 
-Defined in: [types.ts:27](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/i18n/src/types.ts#L27)
+Defined in: [types.ts:27](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/i18n/src/types.ts#L27)
 
 Provides constant values for date/time formatting styles compatible with the `Intl.DateTimeFormat` API.
 

@@ -8,7 +8,7 @@
 
 > **DerivedGetHook**\<`TData`\> = (`id`, `options?`) => `UseQueryResult`\<`TData`\>
 
-Defined in: [types.ts:59](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/react/src/types.ts#L59)
+Defined in: [types.ts:59](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/react/src/types.ts#L59)
 
 Represents a derived detail query hook that fetches a single entity by ID.
 
@@ -26,7 +26,7 @@ The entity type returned by the query
 
 ### id
 
-`string`
+`EntityId`
 
 ### options?
 
@@ -47,4 +47,4 @@ const { data: task } = hooks.task.useGet(taskId);
 
 ## See
 
-[EntityHooks](../interfaces/EntityHooks.md) for the complete set of entity hooks.
+[EntityHooks](EntityHooks.md) for the complete set of entity hooks.

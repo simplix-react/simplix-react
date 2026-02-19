@@ -8,7 +8,7 @@
 
 > **OperationMutationHook**\<`TInput`, `TOutput`\> = (`options?`) => `UseMutationResult`\<`TOutput`, `Error`, `TInput`\>
 
-Defined in: [types.ts:235](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/react/src/types.ts#L235)
+Defined in: [types.ts:208](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/react/src/types.ts#L208)
 
 Represents a derived mutation hook for a custom operation.
 
@@ -38,16 +38,6 @@ The output type for the operation
 ## Returns
 
 `UseMutationResult`\<`TOutput`, `Error`, `TInput`\>
-
-## Example
-
-```ts
-import { deriveHooks } from "@simplix-react/react";
-
-const hooks = deriveHooks(projectContract);
-const archiveProject = hooks.archiveProject.useMutation();
-archiveProject.mutate({ projectId: "abc" });
-```
 
 ## See
 

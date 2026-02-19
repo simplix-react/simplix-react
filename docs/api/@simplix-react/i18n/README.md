@@ -213,7 +213,7 @@ function LocaleBadge() {
 
 - `@simplix-react/contract` -- Type-safe API contract definitions
 - `@simplix-react/react` -- React Query hooks derived from contracts
-- `@simplix-react/mock` -- MSW handlers and PGlite repositories
+- `@simplix-react/mock` -- MSW handlers with in-memory stores
 
 ## Classes
 
@@ -225,6 +225,7 @@ function LocaleBadge() {
 - [ComponentTranslations](interfaces/ComponentTranslations.md)
 - [CreateI18nConfigOptions](interfaces/CreateI18nConfigOptions.md)
 - [DateTimeFormatOptions](interfaces/DateTimeFormatOptions.md)
+- [DomainTranslationConfig](interfaces/DomainTranslationConfig.md)
 - [I18nConfigResult](interfaces/I18nConfigResult.md)
 - [I18nextAdapterOptions](interfaces/I18nextAdapterOptions.md)
 - [II18nAdapter](interfaces/II18nAdapter.md)
@@ -258,3 +259,4 @@ function LocaleBadge() {
 
 - [buildModuleTranslations](functions/buildModuleTranslations.md)
 - [createI18nConfig](functions/createI18nConfig.md)
+- [registerDomainTranslations](functions/registerDomainTranslations.md)

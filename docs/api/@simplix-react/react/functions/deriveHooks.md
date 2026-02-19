@@ -8,18 +8,14 @@
 
 > **deriveHooks**\<`TEntities`, `TOperations`\>(`contract`): [`DerivedHooksResult`](../type-aliases/DerivedHooksResult.md)\<`TEntities`, `TOperations`\>
 
-Defined in: [derive-hooks.ts:72](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/react/src/derive-hooks.ts#L72)
+Defined in: [derive-hooks.ts:75](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/react/src/derive-hooks.ts#L75)
 
 Derives type-safe React Query hooks from an API contract.
 
 Generates a complete set of hooks for every entity and operation defined in
-the contract. Entity hooks include `useList`, `useGet`, `useCreate`,
-`useUpdate`, `useDelete`, and `useInfiniteList`. Operation hooks provide
-a single `useMutation` with automatic cache invalidation.
-
-All hooks support full TanStack Query options passthrough — callers can
-provide any option except `queryKey`/`queryFn` (for queries) or
-`mutationFn` (for mutations), which are managed internally.
+the contract. Entity operations with CRUD roles produce specialized hooks
+(`useList`, `useGet`, `useCreate`, `useUpdate`, `useDelete`, `useInfiniteList`).
+Custom operations produce generic query or mutation hooks based on their HTTP method.
 
 ## Type Parameters
 
@@ -65,33 +61,37 @@ An object keyed by entity/operation name, each containing its derived hooks.
 ```ts
 import { defineApi } from "@simplix-react/contract";
 import { deriveHooks } from "@simplix-react/react";
-import { z } from "zod";
 
-const projectContract = defineApi({
-  domain: "project",
+const inventoryContract = defineApi({
+  domain: "inventory",
   basePath: "/api",
   entities: {
-    task: {
-      path: "/tasks",
-      schema: z.object({ id: z.string(), title: z.string(), status: z.string() }),
-      createSchema: z.object({ title: z.string(), status: z.string() }),
-      updateSchema: z.object({ title: z.string().optional(), status: z.string().optional() }),
+    product: {
+      schema: productSchema,
+      operations: {
+        list:   { method: "GET",    path: "/products" },
+        get:    { method: "GET",    path: "/products/:id" },
+        create: { method: "POST",   path: "/products", input: createProductSchema },
+        update: { method: "PATCH",  path: "/products/:id", input: updateProductSchema },
+        delete: { method: "DELETE", path: "/products/:id" },
+        archive: { method: "POST",  path: "/products/:id/archive" },
+      },
     },
   },
 });
 
-// Derive all hooks at once
-const hooks = deriveHooks(projectContract);
+const hooks = deriveHooks(inventoryContract);
 
-// Use in components
-function TaskList() {
-  const { data: tasks } = hooks.task.useList();
-  const createTask = hooks.task.useCreate();
-  // ...
-}
+// CRUD hooks
+hooks.product.useList();
+hooks.product.useGet("id-1");
+hooks.product.useCreate();
+
+// Custom operation hooks
+hooks.product.useArchive();
 ```
 
 ## See
 
- - [EntityHooks](../interfaces/EntityHooks.md) for the per-entity hook interface.
+ - [EntityHooks](../type-aliases/EntityHooks.md) for the per-entity hook interface.
  - [OperationHooks](../interfaces/OperationHooks.md) for the per-operation hook interface.

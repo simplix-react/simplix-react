@@ -6,9 +6,9 @@
 
 # Type Alias: DerivedDeleteHook()
 
-> **DerivedDeleteHook** = (`options?`) => `UseMutationResult`\<`void`, `Error`, `string`\>
+> **DerivedDeleteHook** = (`options?`) => `UseMutationResult`\<`void`, `Error`, `EntityId`\>
 
-Defined in: [types.ts:137](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/react/src/types.ts#L137)
+Defined in: [types.ts:137](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/react/src/types.ts#L137)
 
 Represents a derived delete mutation hook.
 
@@ -19,11 +19,11 @@ all entity queries on success.
 
 ### options?
 
-`Omit`\<`UseMutationOptions`\<`void`, `Error`, `string`\>, `"mutationFn"`\>
+`Omit`\<`UseMutationOptions`\<`void`, `Error`, `EntityId`\>, `"mutationFn"`\>
 
 ## Returns
 
-`UseMutationResult`\<`void`, `Error`, `string`\>
+`UseMutationResult`\<`void`, `Error`, `EntityId`\>
 
 ## Example
 
@@ -37,4 +37,4 @@ deleteTask.mutate(taskId);
 
 ## See
 
-[EntityHooks](../interfaces/EntityHooks.md) for the complete set of entity hooks.
+[EntityHooks](EntityHooks.md) for the complete set of entity hooks.

@@ -8,7 +8,7 @@
 
 > **createMockClient**\<`TEntities`\>(`config`, `data`): `Record`\<`string`, `unknown`\>
 
-Defined in: [mock-client.ts:39](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/testing/src/mock-client.ts#L39)
+Defined in: [mock-client.ts:36](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/testing/src/mock-client.ts#L36)
 
 Creates an in-memory mock API client that mirrors the shape of a real
 [ApiContract](../../contract/interfaces/ApiContract.md) client without requiring MSW or any network layer.
@@ -17,7 +17,7 @@ Creates an in-memory mock API client that mirrors the shape of a real
 
 ### TEntities
 
-`TEntities` *extends* `Record`\<`string`, `EntityDefinition`\<`any`, `any`, `any`\>\>
+`TEntities` *extends* `Record`\<`string`, `EntityDefinition`\<`any`, `any`\>\>
 
 The entity map derived from an [ApiContractConfig](../@simplix-react/contract/interfaces/ApiContractConfig.md).
 
@@ -40,18 +40,14 @@ A record whose keys match entity names and whose values are
 
 `Record`\<`string`, `unknown`\>
 
-A record keyed by entity name, where each value exposes the standard
-  CRUD methods (`list`, `get`, `create`, `update`, `delete`).
+A record keyed by entity name, where each value exposes operation methods.
 
 ## Remarks
 
-Each entity receives a record with `list`, `get`, `create`, `update`, and
-`delete` methods backed by a plain array. Data mutations (create, update,
-delete) modify the provided arrays in place, which makes it straightforward
-to seed and inspect state within a single test.
-
-This utility is ideal for unit testing React Query hooks in isolation, where
-full HTTP mocking would add unnecessary overhead.
+Each entity operation receives a mock function based on its CRUD role.
+CRUD role operations (list, get, create, update, delete, tree) are backed
+by a plain array. Non-CRUD operations return `null` by default.
+Data mutations (create, update, delete) modify the provided arrays in place.
 
 ## Example
 
@@ -60,12 +56,12 @@ import { createMockClient } from "@simplix-react/testing";
 import { contract } from "./my-contract";
 
 const mockClient = createMockClient(contract.config, {
-  users: [{ id: "1", name: "Alice" }],
+  product: [{ id: "1", name: "Widget" }],
 });
 
-const users = await mockClient.users.list();
-// [{ id: "1", name: "Alice" }]
+const products = await mockClient.product.list();
+// [{ id: "1", name: "Widget" }]
 
-await mockClient.users.create({ name: "Bob" });
-// users array now contains two items
+await mockClient.product.create({ name: "Gadget" });
+// product array now contains two items
 ```

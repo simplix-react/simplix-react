@@ -8,20 +8,22 @@
 
 > **deriveMockHandlers**\<`TEntities`, `TOperations`\>(`config`, `mockConfig?`): `HttpHandler`[]
 
-Defined in: [derive-mock-handlers.ts:110](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/mock/src/derive-mock-handlers.ts#L110)
+Defined in: [derive-mock-handlers.ts:117](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/mock/src/derive-mock-handlers.ts#L117)
 
 Derives MSW request handlers from an [@simplix-react/contract!ApiContractConfig](../../contract/interfaces/ApiContractConfig.md).
 
-Generates a complete set of CRUD handlers for every entity defined in the contract:
+Generates handlers for every operation in each entity based on its CRUD role:
 
-- **GET list** — supports query-param filtering, sorting, and offset-based pagination
-- **GET by id** — supports `belongsTo` relation loading via joins
-- **POST create** — auto-generates a UUID `id` when not provided
-- **PATCH update** — partial updates with automatic `updated_at` timestamp
-- **DELETE** — removes the row by `id`
+- **list** (GET) — supports query-param filtering, sorting, and offset-based pagination
+- **get** (GET) — supports `belongsTo` relation loading
+- **create** (POST) — auto-generates a numeric `id` when not provided
+- **update** (PATCH/PUT) — partial updates with automatic `updatedAt` timestamp
+- **delete** (DELETE) — removes the record by `id`
+- **tree** (GET) — returns recursive hierarchical data
+- **custom** — returns default 200 response, or uses custom resolver if provided
 
-All handlers read from and write to the PGlite singleton managed by
-[initPGlite](initPGlite.md)/[getPGliteInstance](getPGliteInstance.md).
+All handlers read from and write to the in-memory store managed by
+[getEntityStore](getEntityStore.md).
 
 ## Type Parameters
 
@@ -61,20 +63,10 @@ An array of MSW `HttpHandler` instances ready for use with `setupWorker`.
 
 ```ts
 import { deriveMockHandlers } from "@simplix-react/mock";
-import { projectContract } from "./contract";
+import { inventoryContract } from "./contract";
 
-const handlers = deriveMockHandlers(projectContract.config, {
-  task: {
-    tableName: "tasks",
-    defaultLimit: 20,
-    relations: {
-      project: {
-        table: "projects",
-        localKey: "projectId",
-        type: "belongsTo",
-      },
-    },
-  },
+const handlers = deriveMockHandlers(inventoryContract.config, {
+  product: { defaultLimit: 20 },
 });
 ```
 
@@ -82,4 +74,3 @@ const handlers = deriveMockHandlers(projectContract.config, {
 
  - [MockEntityConfig](../interfaces/MockEntityConfig.md) - Per-entity configuration options.
  - [setupMockWorker](setupMockWorker.md) - High-level bootstrap that accepts these handlers.
- - [@simplix-react/contract!ApiContractConfig](../../contract/interfaces/ApiContractConfig.md) - The contract config shape.

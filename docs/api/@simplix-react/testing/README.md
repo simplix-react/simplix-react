@@ -196,7 +196,7 @@ describe("my hook", () => {
 | --- | --- |
 | `@simplix-react/contract` | Zod-based type-safe API contract definitions |
 | `@simplix-react/react` | React Query hooks derived from contracts |
-| `@simplix-react/mock` | MSW handlers + PGlite repositories for integration testing |
+| `@simplix-react/mock` | MSW handlers + in-memory mock stores for integration testing |
 
 ## Functions
 

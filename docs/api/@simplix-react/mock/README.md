@@ -10,7 +10,7 @@
 
 # @simplix-react/mock
 
-Auto-generated MSW handlers and PGlite repositories from `@simplix-react/contract`.
+Auto-generated MSW handlers and in-memory stores from `@simplix-react/contract`.
 
 > **Prerequisites:** Requires a contract defined with `@simplix-react/contract`.
 
@@ -27,17 +27,13 @@ Peer dependencies:
 | `@simplix-react/contract` | Yes | Provides the API contract definition |
 | `zod` | Yes | `>=4.0.0` |
 | `msw` | Optional | `>=2.0.0` — needed for MSW handler generation |
-| `@electric-sql/pglite` | Optional | `>=0.2.0` — needed for in-browser PostgreSQL |
+| `vite` | Optional | `>=5.0.0` — needed for the Vite plugin |
 
 ## Quick Example
 
 ```ts
 import { defineApi, simpleQueryBuilder } from "@simplix-react/contract";
-import {
-  setupMockWorker,
-  deriveMockHandlers,
-  executeSql,
-} from "@simplix-react/mock";
+import { setupMockWorker, deriveMockHandlers } from "@simplix-react/mock";
 import { z } from "zod";
 
 // 1. Define your contract
@@ -48,7 +44,7 @@ const projectContract = defineApi({
     task: {
       path: "/tasks",
       schema: z.object({
-        id: z.string(),
+        id: z.number(),
         title: z.string(),
         status: z.enum(["todo", "done"]),
         createdAt: z.string(),
@@ -62,30 +58,21 @@ const projectContract = defineApi({
 
 // 2. Derive handlers and bootstrap
 await setupMockWorker({
-  dataDir: "idb://project-mock",
   domains: [
     {
       name: "project",
       handlers: deriveMockHandlers(projectContract.config),
-      migrations: [
-        async (db) => {
-          await executeSql(db, `
-            CREATE TABLE IF NOT EXISTS tasks (
-              id TEXT PRIMARY KEY,
-              title TEXT NOT NULL,
-              status TEXT NOT NULL DEFAULT 'todo',
-              created_at TIMESTAMP DEFAULT NOW(),
-              updated_at TIMESTAMP DEFAULT NOW()
-            )
-          `);
-        },
-      ],
+      seed: {
+        project_tasks: [
+          { id: 1, title: "Sample Task", status: "todo", createdAt: "2025-01-01T00:00:00Z" },
+        ],
+      },
     },
   ],
 });
 ```
 
-After `setupMockWorker` resolves, every `fetch("/api/tasks")` call in your application is intercepted by MSW and served from the in-browser PGlite database.
+After `setupMockWorker` resolves, every `fetch("/api/tasks")` call in your application is intercepted by MSW and served from the in-memory store.
 
 ## API Overview
 
@@ -93,19 +80,20 @@ After `setupMockWorker` resolves, every `fetch("/api/tasks")` call in your appli
 
 | Export | Description |
 | --- | --- |
-| `setupMockWorker(config)` | Bootstraps PGlite + MSW in one call |
+| `setupMockWorker(config)` | Bootstraps in-memory stores + MSW in one call |
 | `deriveMockHandlers(config, mockConfig?)` | Generates CRUD MSW handlers from a contract |
 | `MockServerConfig` | Domain-based configuration for `setupMockWorker` |
-| `MockDomainConfig` | Per-domain mock configuration (handlers, migrations, seed, toggle) |
-| `MockEntityConfig` | Per-entity mock configuration (table name, limits, relations) |
+| `MockDomainConfig` | Per-domain mock configuration (handlers, seed, toggle) |
+| `MockEntityConfig` | Per-entity mock configuration (limits, relations, resolvers) |
 
-### PGlite Lifecycle
+### In-Memory Store
 
 | Export | Description |
 | --- | --- |
-| `initPGlite(dataDir)` | Initializes the PGlite singleton |
-| `getPGliteInstance()` | Returns the active instance (throws if uninitialized) |
-| `resetPGliteInstance()` | Clears the singleton (for test teardown) |
+| `getEntityStore(storeName)` | Returns the `Map` for the given store (creates lazily) |
+| `getNextId(storeName)` | Returns the next auto-increment numeric ID |
+| `seedEntityStore(storeName, records)` | Loads records into a store and sets the ID counter |
+| `resetStore()` | Clears all stores and counters |
 
 ### Result Types
 
@@ -115,41 +103,45 @@ After `setupMockWorker` resolves, every `fetch("/api/tasks")` call in your appli
 | `mockSuccess(data)` | Creates a success result |
 | `mockFailure(error)` | Creates a failure result |
 
-### SQL Utilities
+### Tree Builder
 
 | Export | Description |
 | --- | --- |
-| `mapRow(row)` | Converts a snake_case DB row to camelCase (with Date parsing) |
-| `mapRows(rows)` | Maps an array of rows |
-| `toCamelCase(str)` | `snake_case` → `camelCase` |
-| `toSnakeCase(str)` | `camelCase` → `snake_case` |
-| `DbRow` | Type alias for `Record<string, unknown>` |
-| `buildSetClause(input)` | Builds a parameterized SQL SET clause |
-| `SetClauseResult` | Return type of `buildSetClause` |
-| `mapPgError(err)` | Maps PGlite errors to HTTP-friendly `MockError` |
-| `MockError` | Structured error with status, code, message |
+| `buildTreeFromFlatRows(rows, identityField?)` | Converts flat parent-child rows to a recursive tree |
 
-### Migration Helpers
+### Vite Plugin
 
 | Export | Description |
 | --- | --- |
-| `tableExists(db, tableName)` | Checks if a table exists |
-| `columnExists(db, tableName, columnName)` | Checks if a column exists |
-| `executeSql(db, sql)` | Executes semicolon-separated SQL statements |
-| `addColumnIfNotExists(db, table, column, def)` | Idempotent column addition |
+| `mswPlugin()` | Serves `mockServiceWorker.js` without copying it to `public/` |
 
 ## Key Concepts
 
+### In-Memory Store
+
+Each entity gets its own `Map<string | number, Record<string, unknown>>`, keyed by a store name following the `{domain}_{snake_case_entity}` convention (e.g. `"project_tasks"`).
+
+The store is fully synchronous:
+
+- **Read** — iterate or look up by ID from the Map
+- **Write** — set/delete entries directly
+- **ID generation** — `getNextId` provides auto-increment numeric IDs
+- **Seeding** — `seedEntityStore` populates records and adjusts the counter to the max existing numeric ID
+- **Reset** — `resetStore` clears all stores and counters (called automatically by `setupMockWorker`)
+
+Data lives in memory only and is lost on page reload, making it ideal for development and testing.
+
 ### MSW Handler Derivation
 
-`deriveMockHandlers` reads your contract's entity definitions and generates five handlers per entity:
+`deriveMockHandlers` reads your contract's entity definitions and generates handlers for each CRUD operation based on its role:
 
 ```
 GET    {basePath}{entityPath}        → List (with filter, sort, pagination)
 GET    {basePath}{entityPath}/:id    → Get by ID (with relation loading)
-POST   {basePath}{entityPath}        → Create (auto-generates UUID)
+POST   {basePath}{entityPath}        → Create (auto-generates numeric ID)
 PATCH  {basePath}{entityPath}/:id    → Partial update
 DELETE {basePath}{entityPath}/:id    → Delete
+GET    {basePath}{entityPath}/tree   → Tree query (hierarchical data)
 ```
 
 For child entities with a `parent` definition, list and create routes are nested under the parent path:
@@ -158,6 +150,8 @@ For child entities with a `parent` definition, list and create routes are nested
 GET    {basePath}{parentPath}/:parentId{entityPath}     → List by parent
 POST   {basePath}{parentPath}/:parentId{entityPath}     → Create under parent
 ```
+
+Non-standard operations are handled by inferring behavior from the HTTP method and path structure. Custom resolvers can override any operation.
 
 #### Query Parameters
 
@@ -168,20 +162,31 @@ List endpoints support the following query parameters:
 | `sort` | `sort=title:asc,createdAt:desc` | Comma-separated `field:direction` pairs |
 | `page` | `page=2` | Offset-based page number (1-indexed) |
 | `limit` | `limit=20` | Rows per page (capped by `maxLimit`) |
-| `{field}` | `status=done` | Equality filter on any column |
+| `{field}` | `status=done` | Equality filter on any field |
+
+When `page` or `cursor` is present, the response includes pagination metadata:
+
+```json
+{
+  "data": {
+    "data": [...],
+    "meta": { "total": 100, "page": 2, "limit": 20, "hasNextPage": true }
+  }
+}
+```
 
 #### Relation Loading
 
-Configure `belongsTo` relations in `MockEntityConfig` to automatically JOIN related data on GET-by-ID requests:
+Configure `belongsTo` relations in `MockEntityConfig` to automatically join related data on GET-by-ID requests:
 
 ```ts
 const handlers = deriveMockHandlers(contract.config, {
   task: {
     relations: {
       project: {
-        table: "projects",
+        entity: "project",
         localKey: "projectId",
-        foreignKey: "id",      // defaults to "id"
+        foreignKey: "id", // defaults to "id"
         type: "belongsTo",
       },
     },
@@ -189,124 +194,181 @@ const handlers = deriveMockHandlers(contract.config, {
 });
 ```
 
-### PGlite Integration
+When fetching a task, the related `project` record is looked up from the `{domain}_project` store and embedded in the response.
 
-PGlite provides a full PostgreSQL database running in the browser via WebAssembly. This package manages a singleton instance:
+#### Tree Queries
+
+Entities with a `tree` role operation support hierarchical queries. The handler converts flat rows with `parentId` fields into a nested tree structure using `buildTreeFromFlatRows`.
+
+Pass `rootId` as a query parameter to retrieve a subtree starting from a specific node:
 
 ```
-initPGlite(dataDir) → getPGliteInstance() → resetPGliteInstance()
+GET /api/categories/tree?rootId=cat-1
 ```
 
-Data persists across page reloads via IndexedDB when using an `idb://` data directory.
+#### Custom Resolvers
 
-### SQL Utilities
-
-The SQL utility modules handle the mapping between JavaScript (camelCase) and PostgreSQL (snake_case) conventions:
-
-- **Row mapping** — `mapRow`/`mapRows` convert query results to JS objects, automatically parsing `_at` columns as `Date` instances.
-- **Query building** — `buildSetClause` constructs parameterized UPDATE queries from partial objects, always appending `updated_at = NOW()`.
-- **Error mapping** — `mapPgError` classifies PGlite exceptions into structured errors with appropriate HTTP status codes.
-- **Migration helpers** — Idempotent utilities (`tableExists`, `addColumnIfNotExists`, `executeSql`) for writing safe migration functions.
-
-## Guides
-
-### Writing Migrations
-
-Migrations are async functions that receive a PGlite instance. Use the migration helpers for idempotent operations:
+Override any operation with a custom resolver for logic that goes beyond standard CRUD:
 
 ```ts
-import type { PGlite } from "@electric-sql/pglite";
-import { tableExists, executeSql, addColumnIfNotExists } from "@simplix-react/mock";
-
-export async function migrate(db: PGlite) {
-  if (!(await tableExists(db, "tasks"))) {
-    await executeSql(db, `
-      CREATE TABLE tasks (
-        id TEXT PRIMARY KEY,
-        title TEXT NOT NULL,
-        status TEXT NOT NULL DEFAULT 'todo',
-        project_id TEXT,
-        created_at TIMESTAMP DEFAULT NOW(),
-        updated_at TIMESTAMP DEFAULT NOW()
-      )
-    `);
-  }
-
-  // Safe to call multiple times
-  await addColumnIfNotExists(db, "tasks", "priority", "INTEGER DEFAULT 0");
-}
-```
-
-### Writing Seed Functions
-
-Seed functions populate the database with initial data after migrations:
-
-```ts
-import type { PGlite } from "@electric-sql/pglite";
-
-export async function seed(db: PGlite) {
-  await db.query(
-    `INSERT INTO tasks (id, title, status) VALUES ($1, $2, $3)
-     ON CONFLICT (id) DO NOTHING`,
-    ["task-1", "Sample Task", "todo"],
-  );
-}
-```
-
-### Custom Repository Handlers
-
-For advanced use cases beyond auto-generated CRUD, use the SQL utilities directly:
-
-```ts
-import { http, HttpResponse } from "msw";
-import {
-  getPGliteInstance,
-  mapRows,
-  mapPgError,
-  mockSuccess,
-  mockFailure,
-} from "@simplix-react/mock";
-
-const customHandler = http.get("/api/tasks/overdue", async () => {
-  try {
-    const db = getPGliteInstance();
-    const result = await db.query(
-      "SELECT * FROM tasks WHERE status != 'done' AND created_at < NOW() - INTERVAL '7 days'",
-    );
-    const tasks = mapRows(result.rows as Record<string, unknown>[]);
-    return HttpResponse.json({ data: mockSuccess(tasks) });
-  } catch (err) {
-    const mapped = mapPgError(err);
-    return HttpResponse.json(
-      { code: mapped.code, message: mapped.message },
-      { status: mapped.status },
-    );
-  }
+const handlers = deriveMockHandlers(contract.config, {
+  task: {
+    resolvers: {
+      batchCreate: async ({ request }) => {
+        const tasks = await request.json();
+        // Custom batch logic...
+        return HttpResponse.json({ data: created }, { status: 201 });
+      },
+    },
+  },
 });
 ```
 
-### Testing with PGlite
+### Domain-Based Configuration
 
-Reset the singleton between tests to ensure isolation:
+`setupMockWorker` organizes handlers by domain with per-domain toggling:
 
 ```ts
-import { initPGlite, resetPGliteInstance, executeSql } from "@simplix-react/mock";
-import { afterEach, beforeEach, describe, it } from "vitest";
+await setupMockWorker({
+  domains: [
+    {
+      name: "project",
+      enabled: true, // default
+      handlers: deriveMockHandlers(projectContract.config),
+      seed: {
+        project_tasks: [
+          { id: 1, title: "Task 1", status: "todo", createdAt: "2025-01-01T00:00:00Z" },
+        ],
+      },
+    },
+    {
+      name: "user",
+      enabled: false, // disabled — handlers won't be registered
+      handlers: deriveMockHandlers(userContract.config),
+    },
+  ],
+});
+```
 
-describe("task repository", () => {
-  beforeEach(async () => {
-    const db = await initPGlite("memory://");
-    await executeSql(db, `
-      CREATE TABLE tasks (id TEXT PRIMARY KEY, title TEXT NOT NULL)
-    `);
+The bootstrap sequence:
+
+1. Filters domains to only those with `enabled !== false`
+2. Resets all in-memory stores
+3. Seeds each entity store from domain `seed` data
+4. Starts the MSW service worker with combined handlers
+
+### Error Handling
+
+Failed operations return structured errors with appropriate HTTP status codes:
+
+| Error Code | HTTP Status | Description |
+| --- | --- | --- |
+| `not_found` | 404 | Record does not exist |
+| `unique_violation` | 409 | Duplicate key conflict |
+| `foreign_key_violation` | 422 | Referenced record missing |
+| Other | 500 | Unexpected error |
+
+### Vite Plugin
+
+The `mswPlugin` eliminates the need to manually copy `mockServiceWorker.js` into your `public/` directory:
+
+```ts
+// vite.config.ts
+import { mswPlugin } from "@simplix-react/mock/vite";
+
+export default defineConfig({
+  plugins: [mswPlugin()],
+});
+```
+
+- **Dev mode** — serves the worker script via middleware at `/mockServiceWorker.js`
+- **Build mode** — emits it as a static asset in the output directory
+
+## Guides
+
+### Seeding Data
+
+Seed data is provided per entity store in the domain config. Store names follow the `{domain}_{snake_case_entity}` convention:
+
+```ts
+const projectDomain: MockDomainConfig = {
+  name: "project",
+  handlers: deriveMockHandlers(projectContract.config),
+  seed: {
+    project_tasks: [
+      { id: 1, title: "Design mockups", status: "done", createdAt: "2025-01-01T00:00:00Z" },
+      { id: 2, title: "Implement API", status: "todo", createdAt: "2025-01-02T00:00:00Z" },
+    ],
+    project_projects: [
+      { id: 1, name: "Acme Project", createdAt: "2025-01-01T00:00:00Z" },
+    ],
+  },
+};
+```
+
+You can also seed stores programmatically:
+
+```ts
+import { seedEntityStore } from "@simplix-react/mock";
+
+seedEntityStore("project_tasks", [
+  { id: 1, title: "Task 1", status: "todo" },
+  { id: 2, title: "Task 2", status: "done" },
+]);
+```
+
+### Custom Handlers
+
+For endpoints beyond auto-generated CRUD, create MSW handlers that use the in-memory store directly:
+
+```ts
+import { http, HttpResponse } from "msw";
+import { getEntityStore, mockSuccess } from "@simplix-react/mock";
+
+const overdueHandler = http.get("/api/tasks/overdue", () => {
+  const store = getEntityStore("project_tasks");
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
+  const overdue = Array.from(store.values()).filter(
+    (task) => task.status !== "done" && (task.createdAt as string) < weekAgo,
+  );
+
+  return HttpResponse.json({ data: mockSuccess(overdue) });
+});
+```
+
+Include custom handlers alongside derived ones in your domain config:
+
+```ts
+const projectDomain: MockDomainConfig = {
+  name: "project",
+  handlers: [...deriveMockHandlers(projectContract.config), overdueHandler],
+};
+```
+
+### Testing
+
+Reset stores between tests to ensure isolation:
+
+```ts
+import { resetStore, seedEntityStore, getEntityStore } from "@simplix-react/mock";
+import { afterEach, beforeEach, describe, it, expect } from "vitest";
+
+describe("task store", () => {
+  beforeEach(() => {
+    resetStore();
+    seedEntityStore("project_tasks", [
+      { id: 1, title: "Test Task", status: "todo" },
+    ]);
   });
 
   afterEach(() => {
-    resetPGliteInstance();
+    resetStore();
   });
 
-  it("inserts a task", async () => {
-    // ...
+  it("retrieves seeded data", () => {
+    const store = getEntityStore("project_tasks");
+    expect(store.get(1)).toEqual({ id: 1, title: "Test Task", status: "todo" });
   });
 });
 ```
@@ -323,30 +385,17 @@ describe("task repository", () => {
 
 - [MockDomainConfig](interfaces/MockDomainConfig.md)
 - [MockEntityConfig](interfaces/MockEntityConfig.md)
-- [MockError](interfaces/MockError.md)
 - [MockResult](interfaces/MockResult.md)
 - [MockServerConfig](interfaces/MockServerConfig.md)
-- [SetClauseResult](interfaces/SetClauseResult.md)
-
-## Type Aliases
-
-- [DbRow](type-aliases/DbRow.md)
 
 ## Functions
 
-- [addColumnIfNotExists](functions/addColumnIfNotExists.md)
-- [buildSetClause](functions/buildSetClause.md)
-- [columnExists](functions/columnExists.md)
+- [buildTreeFromFlatRows](functions/buildTreeFromFlatRows.md)
 - [deriveMockHandlers](functions/deriveMockHandlers.md)
-- [executeSql](functions/executeSql.md)
-- [getPGliteInstance](functions/getPGliteInstance.md)
-- [initPGlite](functions/initPGlite.md)
-- [mapPgError](functions/mapPgError.md)
-- [mapRow](functions/mapRow.md)
-- [mapRows](functions/mapRows.md)
+- [getEntityStore](functions/getEntityStore.md)
+- [getNextId](functions/getNextId.md)
 - [mockFailure](functions/mockFailure.md)
 - [mockSuccess](functions/mockSuccess.md)
-- [resetPGliteInstance](functions/resetPGliteInstance.md)
+- [resetStore](functions/resetStore.md)
+- [seedEntityStore](functions/seedEntityStore.md)
 - [setupMockWorker](functions/setupMockWorker.md)
-- [tableExists](functions/tableExists.md)
-- [toCamelCase](functions/toCamelCase.md)

@@ -65,7 +65,7 @@ This project uses simplix-react, a contract-driven React framework.
 Core pipeline:
 1. defineApi() — Zod schemas → { config, client, queryKeys }
 2. deriveHooks() — contract → React Query hooks
-3. deriveMockHandlers() — contract → MSW handlers (backed by PGlite)
+3. deriveMockHandlers() — contract → MSW handlers (backed by in-memory stores)
 
 Key rules:
 - Entity ≠ model; derive ≠ generate; contract ≠ schema
@@ -87,7 +87,7 @@ This project uses simplix-react, a contract-driven React framework.
 Core pipeline:
 1. defineApi() — Zod schemas → { config, client, queryKeys }
 2. deriveHooks() — contract → React Query hooks
-3. deriveMockHandlers() — contract → MSW handlers (backed by PGlite)
+3. deriveMockHandlers() — contract → MSW handlers (backed by in-memory stores)
 
 Key rules:
 - Entity ≠ model; derive ≠ generate; contract ≠ schema
@@ -109,7 +109,7 @@ This project uses simplix-react, a contract-driven React framework.
 Core pipeline:
 1. defineApi() — Zod schemas → { config, client, queryKeys }
 2. deriveHooks() — contract → React Query hooks
-3. deriveMockHandlers() — contract → MSW handlers (backed by PGlite)
+3. deriveMockHandlers() — contract → MSW handlers (backed by in-memory stores)
 
 Key rules:
 - Entity ≠ model; derive ≠ generate; contract ≠ schema
@@ -146,7 +146,7 @@ This project uses simplix-react, a contract-driven React framework.
 Core pipeline:
 1. defineApi() — Zod schemas → { config, client, queryKeys }
 2. deriveHooks() — contract → React Query hooks
-3. deriveMockHandlers() — contract → MSW handlers (backed by PGlite)
+3. deriveMockHandlers() — contract → MSW handlers (backed by in-memory stores)
 
 Key rules:
 - Entity ≠ model; derive ≠ generate; contract ≠ schema
@@ -195,7 +195,7 @@ This project uses simplix-react, a contract-driven React framework.
 ### Core Pipeline
 1. defineApi() — Zod schemas → { config, client, queryKeys }
 2. deriveHooks() — contract → React Query hooks (useList, useGet, useCreate, useUpdate, useDelete, useInfiniteList)
-3. deriveMockHandlers() — contract → MSW handlers (backed by PGlite)
+3. deriveMockHandlers() — contract → MSW handlers (backed by in-memory stores)
 
 ### Key Rules
 - Entity ≠ model; derive ≠ generate; contract ≠ schema
@@ -245,7 +245,7 @@ Test prompts to verify that the agent correctly understands simplix-react contex
 **Expected result:**
 
 - Should use `deriveMockHandlers` + `setupMockWorker`
-- Should include PGlite migration setup
+- Should include seed data setup with `setupMockWorker`
 
 ### 4. Infinite Scrolling Component
 

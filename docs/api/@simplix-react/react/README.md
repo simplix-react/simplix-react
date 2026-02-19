@@ -245,7 +245,6 @@ Next Step → `@simplix-react/mock`
 
 ## Interfaces
 
-- [EntityHooks](interfaces/EntityHooks.md)
 - [OperationHooks](interfaces/OperationHooks.md)
 
 ## Type Aliases
@@ -257,6 +256,7 @@ Next Step → `@simplix-react/mock`
 - [DerivedInfiniteListHook](type-aliases/DerivedInfiniteListHook.md)
 - [DerivedListHook](type-aliases/DerivedListHook.md)
 - [DerivedUpdateHook](type-aliases/DerivedUpdateHook.md)
+- [EntityHooks](type-aliases/EntityHooks.md)
 - [OperationMutationHook](type-aliases/OperationMutationHook.md)
 
 ## Functions

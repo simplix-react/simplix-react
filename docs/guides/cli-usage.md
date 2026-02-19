@@ -1,6 +1,6 @@
 # How to Use the simplix CLI
 
-> Scaffold projects, add domains and modules, validate structure, generate i18n types, manage migrations, and import OpenAPI specs using the `simplix` command-line tool.
+> Scaffold projects, add domains and modules, validate structure, generate i18n types, and import OpenAPI specs using the `simplix` command-line tool.
 
 ## Before You Begin
 
@@ -131,7 +131,6 @@ packages/my-project-domain-inventory/
     mock/
       index.ts
       handlers.ts
-      migrations.ts
       seed.ts
       repositories/
         product.ts
@@ -278,36 +277,6 @@ Watch mode regenerates on file changes:
 ```bash
 simplix i18n-codegen --watch
 ```
-
-### simplix migration create -- Create a Migration File
-
-Generates a timestamped migration file for a domain package's PGlite mock database:
-
-```bash
-simplix migration create add-status-column --domain inventory
-```
-
-Creates a file like `20260211143022-add-status-column.ts`:
-
-```ts
-import type { PGlite } from "@electric-sql/pglite";
-
-export async function up(db: PGlite): Promise<void> {
-  await db.query(`
-    -- ALTER TABLE ...
-  `);
-}
-
-export async function down(db: PGlite): Promise<void> {
-  await db.query(`
-    -- ALTER TABLE ...
-  `);
-}
-```
-
-| Option | Description |
-| --- | --- |
-| `--domain <name>` | Required. Target domain package name |
 
 ### simplix openapi -- Generate Domain from OpenAPI Spec
 

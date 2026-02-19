@@ -8,13 +8,11 @@
 
 > **DerivedInfiniteListHook**\<`TData`\> = (`parentId?`, `params?`, `options?`) => `UseInfiniteQueryResult`\<\{ `data`: `TData`[]; `meta`: `PageInfo`; \}, `Error`\>
 
-Defined in: [types.ts:166](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/react/src/types.ts#L166)
+Defined in: [types.ts:153](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/react/src/types.ts#L153)
 
 Represents a derived infinite list query hook for cursor-based or offset-based pagination.
 
 Automatically determines the next page parameter from the response `meta` field.
-Pagination parameters are managed internally; callers provide only filters, sort,
-and an optional page size limit.
 
 ## Type Parameters
 
@@ -42,18 +40,6 @@ The entity type returned in each page
 
 `UseInfiniteQueryResult`\<\{ `data`: `TData`[]; `meta`: `PageInfo`; \}, `Error`\>
 
-## Example
-
-```ts
-import { deriveHooks } from "@simplix-react/react";
-
-const hooks = deriveHooks(projectContract);
-const { data, fetchNextPage, hasNextPage } = hooks.task.useInfiniteList(
-  projectId,
-  { limit: 10, filters: { status: "open" } },
-);
-```
-
 ## See
 
-[EntityHooks](../interfaces/EntityHooks.md) for the complete set of entity hooks.
+[EntityHooks](EntityHooks.md) for the complete set of entity hooks.

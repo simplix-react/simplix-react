@@ -8,14 +8,14 @@
 
 > **deriveClient**\<`TEntities`, `TOperations`\>(`config`, `fetchFn?`): `Record`\<`string`, `unknown`\>
 
-Defined in: [packages/contract/src/derive/client.ts:37](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/contract/src/derive/client.ts#L37)
+Defined in: [packages/contract/src/derive/client.ts:40](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/derive/client.ts#L40)
 
 Derives a type-safe HTTP client from an [ApiContractConfig](../interfaces/ApiContractConfig.md).
 
 Iterates over all entities and operations in the config and generates
-corresponding CRUD methods and operation functions. Each entity produces
-`list`, `get`, `create`, `update`, and `delete` methods. Each operation
-produces a callable function with positional path parameter arguments.
+corresponding client methods. Entity operations are generated dynamically
+from the `operations` map. Each top-level operation produces a callable
+function with positional path parameter arguments.
 
 Typically called internally by [defineApi](defineApi.md) rather than used directly.
 
@@ -23,7 +23,7 @@ Typically called internally by [defineApi](defineApi.md) rather than used direct
 
 ### TEntities
 
-`TEntities` *extends* `Record`\<`string`, [`EntityDefinition`](../interfaces/EntityDefinition.md)\<`ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>\>\>
+`TEntities` *extends* `Record`\<`string`, [`EntityDefinition`](../interfaces/EntityDefinition.md)\<`ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `Record`\<`string`, [`EntityOperationDef`](../interfaces/EntityOperationDef.md)\<`ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>\>\>\>\>
 
 Map of entity names to their definitions.
 
@@ -59,7 +59,7 @@ A client object with typed methods for each entity and operation.
 import { deriveClient } from "@simplix-react/contract";
 
 const client = deriveClient(config);
-const tasks = await client.task.list();
+const products = await client.product.list();
 ```
 
 ## See

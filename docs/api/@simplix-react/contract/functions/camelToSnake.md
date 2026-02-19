@@ -8,7 +8,7 @@
 
 > **camelToSnake**(`str`): `string`
 
-Defined in: [packages/contract/src/helpers/case-transform.ts:39](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/contract/src/helpers/case-transform.ts#L39)
+Defined in: [packages/contract/src/helpers/case-transform.ts:19](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/helpers/case-transform.ts#L19)
 
 Converts a camelCase string to snake_case.
 

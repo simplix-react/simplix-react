@@ -8,13 +8,14 @@
 
 > **deriveFormHooks**\<`TEntities`\>(`contract`, `hooks`): [`DerivedFormHooksResult`](../type-aliases/DerivedFormHooksResult.md)\<`TEntities`\>
 
-Defined in: [derive-form-hooks.ts:33](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/form/src/derive-form-hooks.ts#L33)
+Defined in: [derive-form-hooks.ts:34](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/form/src/derive-form-hooks.ts#L34)
 
 Derives TanStack Form hooks from an API contract and its derived React Query hooks.
 
-For each entity in the contract, produces `useCreateForm` and `useUpdateForm` hooks
-that wire TanStack Form to the entity's create/update mutations with automatic
-dirty-field extraction and server error mapping.
+For each entity in the contract, produces `useCreateForm` and/or `useUpdateForm` hooks
+based on the presence of `create` and `update` role operations. These hooks wire
+TanStack Form to the entity's mutations with automatic dirty-field extraction
+and server error mapping.
 
 ## Type Parameters
 
@@ -34,7 +35,7 @@ The API contract produced by `defineApi()` from `@simplix-react/contract`
 
 ### hooks
 
-\{ \[K in string \| number \| symbol\]: EntityHooks\<TEntities\[K\]\["schema"\], TEntities\[K\]\["createSchema"\], TEntities\[K\]\["updateSchema"\]\> \}
+\{ \[K in string \| number \| symbol\]: EntityHooks\<TEntities\[K\]\["schema"\]\> \}
 
 The React Query hooks produced by `deriveHooks()` from `@simplix-react/react`
 
@@ -48,14 +49,14 @@ An object keyed by entity name, each containing form hooks
 
 ```ts
 import { deriveFormHooks } from "@simplix-react/form";
-import { projectApi } from "./contract";
-import { projectHooks } from "./hooks";
+import { inventoryApi } from "./contract";
+import { inventoryHooks } from "./hooks";
 
-export const projectFormHooks = deriveFormHooks(projectApi, projectHooks);
+export const inventoryFormHooks = deriveFormHooks(inventoryApi, inventoryHooks);
 
 // Use in components
-function CreateTaskForm() {
-  const { form, isSubmitting } = projectFormHooks.task.useCreateForm(projectId);
+function CreateProductForm() {
+  const { form, isSubmitting } = inventoryFormHooks.product.useCreateForm();
   return <form onSubmit={e => { e.preventDefault(); form.handleSubmit(); }}>...</form>;
 }
 ```

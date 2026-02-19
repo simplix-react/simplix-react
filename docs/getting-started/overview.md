@@ -17,7 +17,7 @@ Contract (Zod schemas)
     |
     +---> Hooks (TanStack Query hooks)
     |
-    +---> Mock Handlers (MSW + PGlite)
+    +---> Mock Handlers (MSW + In-Memory Store)
 ```
 
 This eliminates the common problem of manually keeping API types, client functions, query hooks, and mock data in sync. When the contract changes, every derived layer updates automatically with full type safety.
@@ -67,17 +67,17 @@ const hooks = deriveHooks(projectApi);
 
 **Step 3 — Mock the Backend**
 
-Derive MSW request handlers from the same contract. Combined with PGlite (an in-browser PostgreSQL), you get a fully functional mock backend with zero server setup.
+Derive MSW request handlers from the same contract. Combined with in-memory stores, you get a fully functional mock backend with zero server setup.
 
 ```ts
 import { deriveMockHandlers, setupMockWorker } from "@simplix-react/mock";
 
-const handlers = deriveMockHandlers(projectApi.config);
-
 await setupMockWorker({
-  migrations: [runMigrations],
-  seed: [seedData],
-  handlers,
+  domains: [{
+    name: "project",
+    handlers: deriveMockHandlers(projectApi.config),
+    seed: { task: [{ id: "1", title: "Sample", status: "todo" }] },
+  }],
 });
 ```
 
@@ -98,7 +98,7 @@ simplix-react is designed for React developers who:
 | `@simplix-react/contract` | `@simplix-react/contract` | Zod-based type-safe API contract definitions. Entry point for `defineApi`. |
 | `@simplix-react/react` | `@simplix-react/react` | Derives TanStack Query hooks from a contract via `deriveHooks`. |
 | `@simplix-react/form` | `@simplix-react/form` | TanStack Form hooks derived from contracts via `deriveFormHooks`. |
-| `@simplix-react/mock` | `@simplix-react/mock` | Generates MSW handlers and PGlite repositories from a contract. |
+| `@simplix-react/mock` | `@simplix-react/mock` | Auto-generated MSW handlers with in-memory stores from contracts. |
 | `@simplix-react/auth` | `@simplix-react/auth` | Authentication middleware with Bearer, API Key, OAuth2, and custom schemes. |
 | `@simplix-react/i18n` | `@simplix-react/i18n` | Internationalization framework built on i18next. |
 | `@simplix-react/testing` | `@simplix-react/testing` | Testing utilities for simplix-react applications. |

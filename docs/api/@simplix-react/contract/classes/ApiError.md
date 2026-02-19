@@ -6,7 +6,7 @@
 
 # Class: ApiError
 
-Defined in: [packages/contract/src/helpers/fetch.ts:22](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/contract/src/helpers/fetch.ts#L22)
+Defined in: [packages/contract/src/helpers/fetch.ts:22](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/helpers/fetch.ts#L22)
 
 Represents an HTTP error response from the API.
 
@@ -39,7 +39,7 @@ try {
 
 > **new ApiError**(`status`, `body`): `ApiError`
 
-Defined in: [packages/contract/src/helpers/fetch.ts:23](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/contract/src/helpers/fetch.ts#L23)
+Defined in: [packages/contract/src/helpers/fetch.ts:23](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/helpers/fetch.ts#L23)
 
 #### Parameters
 
@@ -69,7 +69,7 @@ Raw response body text.
 
 > `readonly` **body**: `string`
 
-Defined in: [packages/contract/src/helpers/fetch.ts:27](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/contract/src/helpers/fetch.ts#L27)
+Defined in: [packages/contract/src/helpers/fetch.ts:27](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/helpers/fetch.ts#L27)
 
 Raw response body text.
 
@@ -127,7 +127,7 @@ Defined in: node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/li
 
 > `readonly` **status**: `number`
 
-Defined in: [packages/contract/src/helpers/fetch.ts:25](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/contract/src/helpers/fetch.ts#L25)
+Defined in: [packages/contract/src/helpers/fetch.ts:25](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/helpers/fetch.ts#L25)
 
 HTTP status code of the failed response.
 

@@ -10,7 +10,7 @@ pnpm add @simplix-react/contract @simplix-react/react \
   zod @tanstack/react-query react react-dom
 
 # Dev (mock layer)
-pnpm add -D @simplix-react/mock msw @electric-sql/pglite
+pnpm add -D @simplix-react/mock msw
 ```
 
 ## Step 2: Define a Contract
@@ -148,71 +148,35 @@ export function App() {
 
 ## Step 5: Add a Mock Data Layer
 
-Use `@simplix-react/mock` to create a fully functional in-browser backend powered by MSW and PGlite. No real server required.
+Use `@simplix-react/mock` to create a fully functional in-browser backend powered by MSW and in-memory stores. No real server required.
 
-### 5a. Define Migrations
-
-```ts
-// src/mocks/migrations.ts
-import type { PGlite } from "@electric-sql/pglite";
-
-export async function runMigrations(db: PGlite): Promise<void> {
-  await db.query(`
-    CREATE TABLE IF NOT EXISTS tasks (
-      id TEXT PRIMARY KEY,
-      title TEXT NOT NULL,
-      status TEXT NOT NULL DEFAULT 'pending',
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `);
-}
-```
-
-### 5b. Define Seed Data
-
-```ts
-// src/mocks/seed.ts
-import type { PGlite } from "@electric-sql/pglite";
-
-export async function seedData(db: PGlite): Promise<void> {
-  await db.query(`
-    INSERT INTO tasks (id, title, status) VALUES
-      ('task-1', 'Design the API contract', 'done'),
-      ('task-2', 'Implement the frontend', 'in-progress'),
-      ('task-3', 'Write tests', 'pending')
-    ON CONFLICT (id) DO NOTHING
-  `);
-}
-```
-
-### 5c. Derive Handlers and Start the Worker
+### 5a. Derive Handlers and Start the Worker
 
 ```ts
 // src/mocks/setup.ts
 import { deriveMockHandlers, setupMockWorker } from "@simplix-react/mock";
 import { projectApi } from "../contracts/project";
-import { runMigrations } from "./migrations";
-import { seedData } from "./seed";
-
-const handlers = deriveMockHandlers(projectApi.config);
 
 export async function startMockWorker(): Promise<void> {
   await setupMockWorker({
-    dataDir: "idb://project-mock",
     domains: [
       {
         name: "project",
-        handlers,
-        migrations: [runMigrations],
-        seed: [seedData],
+        handlers: deriveMockHandlers(projectApi.config),
+        seed: {
+          task: [
+            { id: "task-1", title: "Design the API contract", status: "done" },
+            { id: "task-2", title: "Implement the frontend", status: "in-progress" },
+            { id: "task-3", title: "Write tests", status: "pending" },
+          ],
+        },
       },
     ],
   });
 }
 ```
 
-### 5d. Initialize Before Rendering
+### 5b. Initialize Before Rendering
 
 ```tsx
 // src/main.tsx
@@ -238,7 +202,7 @@ With just a few files, you now have:
 - ✔ A **type-safe API contract** with Zod schema validation
 - ✔ An **HTTP client** with `list`, `get`, `create`, `update`, `delete` methods
 - ✔ **React Query hooks** with automatic cache invalidation
-- ✔ An **in-browser mock backend** with PostgreSQL (PGlite) and MSW
+- ✔ An **in-browser mock backend** with MSW and in-memory stores
 - ✔ **Zero manual type definitions** — everything is inferred from the contract
 
 ## Next Steps

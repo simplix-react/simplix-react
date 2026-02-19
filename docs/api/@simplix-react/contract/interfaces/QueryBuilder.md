@@ -6,7 +6,7 @@
 
 # Interface: QueryBuilder
 
-Defined in: [packages/contract/src/helpers/query-types.ts:124](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/contract/src/helpers/query-types.ts#L124)
+Defined in: [packages/contract/src/helpers/query-types.ts:124](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/helpers/query-types.ts#L124)
 
 Defines how list parameters are serialized to URL search params and how
 pagination metadata is extracted from API responses.
@@ -46,7 +46,7 @@ const customQueryBuilder: QueryBuilder = {
 
 > **buildSearchParams**(`params`): `URLSearchParams`
 
-Defined in: [packages/contract/src/helpers/query-types.ts:126](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/contract/src/helpers/query-types.ts#L126)
+Defined in: [packages/contract/src/helpers/query-types.ts:126](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/helpers/query-types.ts#L126)
 
 Converts structured list parameters into URL search params.
 
@@ -66,7 +66,7 @@ Converts structured list parameters into URL search params.
 
 > `optional` **parsePageInfo**(`response`): [`PageInfo`](PageInfo.md)
 
-Defined in: [packages/contract/src/helpers/query-types.ts:128](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/contract/src/helpers/query-types.ts#L128)
+Defined in: [packages/contract/src/helpers/query-types.ts:128](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/helpers/query-types.ts#L128)
 
 Extracts pagination metadata from an API response (optional).
 

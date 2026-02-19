@@ -6,9 +6,9 @@
 
 # Type Alias: DerivedUpdateHook()\<TInput, TOutput\>
 
-> **DerivedUpdateHook**\<`TInput`, `TOutput`\> = (`options?`) => `UseMutationResult`\<`TOutput`, `Error`, \{ `dto`: `TInput`; `id`: `string`; \}\>
+> **DerivedUpdateHook**\<`TInput`, `TOutput`\> = (`options?`) => `UseMutationResult`\<`TOutput`, `Error`, \{ `dto`: `TInput`; `id`: `EntityId`; \}\>
 
-Defined in: [types.ts:113](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/react/src/types.ts#L113)
+Defined in: [types.ts:113](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/react/src/types.ts#L113)
 
 Represents a derived update mutation hook.
 
@@ -22,7 +22,7 @@ on settlement.
 
 `TInput`
 
-The update DTO type (inferred from the entity's updateSchema)
+The update DTO type (inferred from the entity's update operation input)
 
 ### TOutput
 
@@ -34,11 +34,11 @@ The entity type returned after update
 
 ### options?
 
-`Omit`\<`UseMutationOptions`\<`TOutput`, `Error`, \{ `dto`: `TInput`; `id`: `string`; \}\>, `"mutationFn"`\>
+`Omit`\<`UseMutationOptions`\<`TOutput`, `Error`, \{ `dto`: `TInput`; `id`: `EntityId`; \}\>, `"mutationFn"`\>
 
 ## Returns
 
-`UseMutationResult`\<`TOutput`, `Error`, \{ `dto`: `TInput`; `id`: `string`; \}\>
+`UseMutationResult`\<`TOutput`, `Error`, \{ `dto`: `TInput`; `id`: `EntityId`; \}\>
 
 ## Example
 
@@ -52,4 +52,4 @@ updateTask.mutate({ id: taskId, dto: { status: "done" } });
 
 ## See
 
-[EntityHooks](../interfaces/EntityHooks.md) for the complete set of entity hooks.
+[EntityHooks](EntityHooks.md) for the complete set of entity hooks.

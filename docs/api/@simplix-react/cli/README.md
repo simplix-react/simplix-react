@@ -156,8 +156,7 @@ packages/<project>-domain-<name>/
       index.ts
     mock/
       handlers.ts         # MSW request handlers
-      migrations.ts       # PGlite migrations
-      seed.ts             # Seed data
+      seed.ts             # Mock seed data
       repositories/
         <entity>.ts       # Per-entity repository
       index.ts
@@ -323,54 +322,6 @@ export type LocalesKeys =
   | "actions.cancel";
 ```
 
-### simplix migration
-
-Database migration management for PGlite mock databases.
-
-#### simplix migration create
-
-Create a new timestamped migration file in a domain package.
-
-```bash
-simplix migration create <name> --domain <domain>
-```
-
-**Arguments:**
-
-| Argument | Description |
-| --- | --- |
-| `name` | Migration name (auto-converted to kebab-case) |
-
-**Options:**
-
-| Option | Description | Required |
-| --- | --- | --- |
-| `--domain <domain>` | Domain package name | Yes |
-
-**Example:**
-
-```bash
-simplix migration create addStatusColumn --domain inventory
-```
-
-Creates a file like `20260211143022-add-status-column.ts` in the domain's `src/mock/migrations/` directory:
-
-```ts
-import type { PGlite } from "@electric-sql/pglite";
-
-export async function up(db: PGlite): Promise<void> {
-  await db.query(`
-    -- ALTER TABLE ...
-  `);
-}
-
-export async function down(db: PGlite): Promise<void> {
-  await db.query(`
-    -- ALTER TABLE ...
-  `);
-}
-```
-
 ### simplix openapi
 
 Generate a complete domain package from an OpenAPI specification. Supports both file paths and URLs as input. On subsequent runs, it performs incremental updates by comparing against a snapshot, regenerating only the `src/generated/` directory while preserving user-modified files.
@@ -434,9 +385,6 @@ packages/<prefix>-domain-<name>/
     mock/
       generated/            # Auto-generated mock layer
         handlers.ts         # MSW request handlers
-        migrations.ts       # PGlite migrations
-        repositories/
-          <entity>.ts       # Per-entity repository
       seed.ts               # User-editable seed data
       index.ts              # User-editable mock entry
     index.ts                # User-editable package entry
@@ -577,7 +525,7 @@ pnpm add simplix-react
 | `@simplix-react/react` | React Query hooks derived from contracts |
 | `@simplix-react/form` | TanStack Form hooks derived from contracts |
 | `@simplix-react/auth` | Authentication middleware (Bearer, API Key, OAuth2) |
-| `@simplix-react/mock` | MSW handlers + PGlite repositories auto-generation |
+| `@simplix-react/mock` | MSW handlers + in-memory mock stores |
 | `@simplix-react/i18n` | i18next-based internationalization framework |
 | `@simplix-react/testing` | Test utilities (mock clients, query wrappers) |
 

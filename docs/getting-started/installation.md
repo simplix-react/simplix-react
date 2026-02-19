@@ -123,11 +123,10 @@ pnpm add @tanstack/react-query react zod
 | --- | --- | --- |
 | `@simplix-react/contract` | (installed above) | Yes |
 | `msw` | >= 2.0.0 | Optional |
-| `@electric-sql/pglite` | >= 0.2.0 | Optional |
 | `zod` | >= 4.0.0 | Yes |
 
 ```bash
-pnpm add -D msw @electric-sql/pglite
+pnpm add -D msw
 ```
 
 ### @simplix-react/i18n
@@ -163,7 +162,7 @@ pnpm add @simplix-react/contract @simplix-react/react @simplix-react/i18n \
 
 # Dev dependencies
 pnpm add -D @simplix-react/mock @simplix-react/testing @simplix-react/cli \
-  msw @electric-sql/pglite
+  msw
 ```
 
 ## Using the CLI for Scaffolding

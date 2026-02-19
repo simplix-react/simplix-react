@@ -6,7 +6,7 @@
 
 # Interface: ApiContractConfig\<TEntities, TOperations\>
 
-Defined in: [packages/contract/src/types.ts:186](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/contract/src/types.ts#L186)
+Defined in: [packages/contract/src/types.ts:294](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/types.ts#L294)
 
 Configures a complete API contract with entities, operations, and shared settings.
 
@@ -21,14 +21,18 @@ import { simpleQueryBuilder } from "@simplix-react/contract";
 import type { ApiContractConfig } from "@simplix-react/contract";
 
 const config: ApiContractConfig = {
-  domain: "project",
+  domain: "inventory",
   basePath: "/api/v1",
   entities: {
-    task: {
-      path: "/tasks",
-      schema: z.object({ id: z.string(), title: z.string() }),
-      createSchema: z.object({ title: z.string() }),
-      updateSchema: z.object({ title: z.string().optional() }),
+    product: {
+      schema: productSchema,
+      operations: {
+        list:   { method: "GET",    path: "/products" },
+        get:    { method: "GET",    path: "/products/:id" },
+        create: { method: "POST",   path: "/products", input: createProductSchema },
+        update: { method: "PATCH",  path: "/products/:id", input: updateProductSchema },
+        delete: { method: "DELETE", path: "/products/:id" },
+      },
     },
   },
   queryBuilder: simpleQueryBuilder,
@@ -59,7 +63,7 @@ Map of operation names to their definitions.
 
 > **basePath**: `string`
 
-Defined in: [packages/contract/src/types.ts:199](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/contract/src/types.ts#L199)
+Defined in: [packages/contract/src/types.ts:307](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/types.ts#L307)
 
 Base URL path prepended to all entity and operation paths (e.g. `"/api/v1"`).
 
@@ -69,9 +73,9 @@ Base URL path prepended to all entity and operation paths (e.g. `"/api/v1"`).
 
 > **domain**: `string`
 
-Defined in: [packages/contract/src/types.ts:197](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/contract/src/types.ts#L197)
+Defined in: [packages/contract/src/types.ts:305](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/types.ts#L305)
 
-Logical domain name used as the root segment in query keys (e.g. `"project"`).
+Logical domain name used as the root segment in query keys (e.g. `"inventory"`).
 
 ***
 
@@ -79,9 +83,9 @@ Logical domain name used as the root segment in query keys (e.g. `"project"`).
 
 > **entities**: `TEntities`
 
-Defined in: [packages/contract/src/types.ts:201](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/contract/src/types.ts#L201)
+Defined in: [packages/contract/src/types.ts:309](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/types.ts#L309)
 
-Map of entity names to their CRUD definitions.
+Map of entity names to their operation-based definitions.
 
 ***
 
@@ -89,9 +93,9 @@ Map of entity names to their CRUD definitions.
 
 > `optional` **operations**: `TOperations`
 
-Defined in: [packages/contract/src/types.ts:203](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/contract/src/types.ts#L203)
+Defined in: [packages/contract/src/types.ts:311](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/types.ts#L311)
 
-Optional map of custom operation names to their definitions.
+Optional map of standalone operation names to their definitions.
 
 ***
 
@@ -99,6 +103,6 @@ Optional map of custom operation names to their definitions.
 
 > `optional` **queryBuilder**: [`QueryBuilder`](QueryBuilder.md)
 
-Defined in: [packages/contract/src/types.ts:205](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/contract/src/types.ts#L205)
+Defined in: [packages/contract/src/types.ts:313](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/types.ts#L313)
 
 Strategy for serializing list parameters (filters, sort, pagination) into URL search params.

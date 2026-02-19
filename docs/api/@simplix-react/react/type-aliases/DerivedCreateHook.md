@@ -8,7 +8,7 @@
 
 > **DerivedCreateHook**\<`TInput`, `TOutput`\> = (`parentId?`, `options?`) => `UseMutationResult`\<`TOutput`, `Error`, `TInput`\>
 
-Defined in: [types.ts:84](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/react/src/types.ts#L84)
+Defined in: [types.ts:84](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/react/src/types.ts#L84)
 
 Represents a derived create mutation hook.
 
@@ -21,7 +21,7 @@ For child entities, accepts a `parentId` as the first argument.
 
 `TInput`
 
-The create DTO type (inferred from the entity's createSchema)
+The create DTO type (inferred from the entity's create operation input)
 
 ### TOutput
 
@@ -55,4 +55,4 @@ createTask.mutate({ title: "New task", status: "open" });
 
 ## See
 
-[EntityHooks](../interfaces/EntityHooks.md) for the complete set of entity hooks.
+[EntityHooks](EntityHooks.md) for the complete set of entity hooks.

@@ -79,7 +79,6 @@ projectApi.queryKeys.task.detail("task-1");          // ["project", "task", "det
 | `defaultFetch` | Function | Built-in fetch with JSON content-type and `{ data }` envelope unwrapping |
 | `ApiError` | Class | Error type for non-2xx HTTP responses |
 | `simpleQueryBuilder` | Object | Ready-made `QueryBuilder` for common REST query string patterns |
-| `camelToKebab` | Function | Converts camelCase to kebab-case |
 | `camelToSnake` | Function | Converts camelCase to snake_case |
 
 ### Type Exports
@@ -311,7 +310,7 @@ try {
 | Package | Description |
 | --- | --- |
 | `@simplix-react/react` | Derives React Query hooks from the contract |
-| `@simplix-react/mock` | Generates MSW handlers and PGlite repositories from the contract |
+| `@simplix-react/mock` | Generates MSW handlers with in-memory stores from the contract |
 | `@simplix-react/testing` | Test utilities built on top of the contract and mock packages |
 
 ---
@@ -326,9 +325,11 @@ try {
 
 - [ApiContract](interfaces/ApiContract.md)
 - [ApiContractConfig](interfaces/ApiContractConfig.md)
-- [EntityClient](interfaces/EntityClient.md)
+- [ApiPatch](interfaces/ApiPatch.md)
 - [EntityDefinition](interfaces/EntityDefinition.md)
+- [EntityOperationDef](interfaces/EntityOperationDef.md)
 - [EntityParent](interfaces/EntityParent.md)
+- [EntityPatch](interfaces/EntityPatch.md)
 - [EntityQuery](interfaces/EntityQuery.md)
 - [ListParams](interfaces/ListParams.md)
 - [OperationDefinition](interfaces/OperationDefinition.md)
@@ -336,25 +337,33 @@ try {
 - [QueryBuilder](interfaces/QueryBuilder.md)
 - [QueryKeyFactory](interfaces/QueryKeyFactory.md)
 - [SortParam](interfaces/SortParam.md)
+- [TreeNode](interfaces/TreeNode.md)
 
 ## Type Aliases
 
 - [AnyEntityDef](type-aliases/AnyEntityDef.md)
 - [AnyOperationDef](type-aliases/AnyOperationDef.md)
+- [CrudRole](type-aliases/CrudRole.md)
+- [EntityClient](type-aliases/EntityClient.md)
+- [EntityId](type-aliases/EntityId.md)
 - [FetchFn](type-aliases/FetchFn.md)
 - [HttpMethod](type-aliases/HttpMethod.md)
 - [PaginationParam](type-aliases/PaginationParam.md)
 
 ## Variables
 
+- [CRUD\_OPERATIONS](variables/CRUD_OPERATIONS.md)
 - [simpleQueryBuilder](variables/simpleQueryBuilder.md)
 
 ## Functions
 
 - [buildPath](functions/buildPath.md)
-- [camelToKebab](functions/camelToKebab.md)
 - [camelToSnake](functions/camelToSnake.md)
+- [customizeApi](functions/customizeApi.md)
 - [defaultFetch](functions/defaultFetch.md)
 - [defineApi](functions/defineApi.md)
 - [deriveClient](functions/deriveClient.md)
 - [deriveQueryKeys](functions/deriveQueryKeys.md)
+- [extractPathParams](functions/extractPathParams.md)
+- [interpolatePath](functions/interpolatePath.md)
+- [resolveRole](functions/resolveRole.md)

@@ -1,0 +1,199 @@
+[**Documentation**](../../../../../README.md)
+
+***
+
+[Documentation](../../../../../README.md) / [@simplix-react/ui](../../../README.md) / [FormFields](../README.md) / TextareaFieldProps
+
+# Interface: TextareaFieldProps
+
+Defined in: packages/ui/src/fields/form/textarea-field.tsx:7
+
+Props for the [TextareaField](../functions/TextareaField.md) form component.
+
+## Extends
+
+- [`CommonFieldProps`](../../../interfaces/CommonFieldProps.md)
+
+## Properties
+
+### className?
+
+> `optional` **className**: `string`
+
+Defined in: packages/ui/src/crud/shared/types.ts:29
+
+#### Inherited from
+
+[`CommonFieldProps`](../../../interfaces/CommonFieldProps.md).[`className`](../../../interfaces/CommonFieldProps.md#classname)
+
+***
+
+### description?
+
+> `optional` **description**: `string`
+
+Defined in: packages/ui/src/crud/shared/types.ts:26
+
+#### Inherited from
+
+[`CommonFieldProps`](../../../interfaces/CommonFieldProps.md).[`description`](../../../interfaces/CommonFieldProps.md#description)
+
+***
+
+### disabled?
+
+> `optional` **disabled**: `boolean`
+
+Defined in: packages/ui/src/crud/shared/types.ts:28
+
+#### Inherited from
+
+[`CommonFieldProps`](../../../interfaces/CommonFieldProps.md).[`disabled`](../../../interfaces/CommonFieldProps.md#disabled)
+
+***
+
+### error?
+
+> `optional` **error**: `string`
+
+Defined in: packages/ui/src/crud/shared/types.ts:25
+
+#### Inherited from
+
+[`CommonFieldProps`](../../../interfaces/CommonFieldProps.md).[`error`](../../../interfaces/CommonFieldProps.md#error)
+
+***
+
+### label?
+
+> `optional` **label**: `string`
+
+Defined in: packages/ui/src/crud/shared/types.ts:23
+
+#### Inherited from
+
+[`CommonFieldProps`](../../../interfaces/CommonFieldProps.md).[`label`](../../../interfaces/CommonFieldProps.md#label)
+
+***
+
+### labelKey?
+
+> `optional` **labelKey**: `string`
+
+Defined in: packages/ui/src/crud/shared/types.ts:24
+
+#### Inherited from
+
+[`CommonFieldProps`](../../../interfaces/CommonFieldProps.md).[`labelKey`](../../../interfaces/CommonFieldProps.md#labelkey)
+
+***
+
+### labelPosition?
+
+> `optional` **labelPosition**: `"hidden"` \| `"top"` \| `"left"`
+
+Defined in: packages/ui/src/crud/shared/types.ts:5
+
+#### Inherited from
+
+[`FieldVariant`](../../../interfaces/FieldVariant.md).[`labelPosition`](../../../interfaces/FieldVariant.md#labelposition)
+
+***
+
+### maxLength?
+
+> `optional` **maxLength**: `number`
+
+Defined in: packages/ui/src/fields/form/textarea-field.tsx:15
+
+***
+
+### onChange()
+
+> **onChange**: (`value`) => `void`
+
+Defined in: packages/ui/src/fields/form/textarea-field.tsx:11
+
+Called when the value changes.
+
+#### Parameters
+
+##### value
+
+`string`
+
+#### Returns
+
+`void`
+
+***
+
+### placeholder?
+
+> `optional` **placeholder**: `string`
+
+Defined in: packages/ui/src/fields/form/textarea-field.tsx:12
+
+***
+
+### required?
+
+> `optional` **required**: `boolean`
+
+Defined in: packages/ui/src/crud/shared/types.ts:27
+
+#### Inherited from
+
+[`CommonFieldProps`](../../../interfaces/CommonFieldProps.md).[`required`](../../../interfaces/CommonFieldProps.md#required)
+
+***
+
+### resize?
+
+> `optional` **resize**: `"none"` \| `"both"` \| `"vertical"`
+
+Defined in: packages/ui/src/fields/form/textarea-field.tsx:17
+
+Resize behavior. Defaults to `"vertical"`.
+
+***
+
+### rows?
+
+> `optional` **rows**: `number`
+
+Defined in: packages/ui/src/fields/form/textarea-field.tsx:14
+
+Number of visible text rows.
+
+***
+
+### size?
+
+> `optional` **size**: `"sm"` \| `"md"` \| `"lg"`
+
+Defined in: packages/ui/src/crud/shared/types.ts:6
+
+#### Inherited from
+
+[`FieldVariant`](../../../interfaces/FieldVariant.md).[`size`](../../../interfaces/FieldVariant.md#size)
+
+***
+
+### textareaProps?
+
+> `optional` **textareaProps**: `DetailedHTMLProps`\<`TextareaHTMLAttributes`\<`HTMLTextAreaElement`\>, `HTMLTextAreaElement`\>
+
+Defined in: packages/ui/src/fields/form/textarea-field.tsx:19
+
+Additional props forwarded to the underlying textarea element.
+
+***
+
+### value
+
+> **value**: `string`
+
+Defined in: packages/ui/src/fields/form/textarea-field.tsx:9
+
+Current textarea value.

@@ -6,8 +6,8 @@
 
 # Type Alias: AnyEntityDef
 
-> **AnyEntityDef** = [`EntityDefinition`](../interfaces/EntityDefinition.md)\<`z.ZodTypeAny`, `z.ZodTypeAny`, `z.ZodTypeAny`\>
+> **AnyEntityDef** = [`EntityDefinition`](../interfaces/EntityDefinition.md)\<`z.ZodTypeAny`, `Record`\<`string`, [`EntityOperationDef`](../interfaces/EntityOperationDef.md)\>\>
 
-Defined in: [packages/contract/src/types.ts:354](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/contract/src/types.ts#L354)
+Defined in: [packages/contract/src/types.ts:468](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/types.ts#L468)
 
 Shorthand for an entity definition with any Zod schema types.

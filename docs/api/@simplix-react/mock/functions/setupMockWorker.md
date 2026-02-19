@@ -8,16 +8,15 @@
 
 > **setupMockWorker**(`config`): `Promise`\<`void`\>
 
-Defined in: [msw.ts:122](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/mock/src/msw.ts#L122)
+Defined in: [msw.ts:105](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/mock/src/msw.ts#L105)
 
-Bootstraps a complete mock environment with PGlite and MSW.
+Bootstraps a complete mock environment with MSW and in-memory stores.
 
 Performs the following steps in order:
 1. Filters domains to only those with `enabled !== false`
-2. Initializes a PGlite instance at the configured `dataDir`
-3. Runs all migration functions across enabled domains sequentially
-4. Runs all seed functions across enabled domains sequentially
-5. Starts the MSW service worker with the combined handlers
+2. Resets the in-memory store
+3. Seeds each entity store from domain seed data
+4. Starts the MSW service worker with the combined handlers
 
 ## Parameters
 
@@ -37,7 +36,6 @@ The [MockServerConfig](../interfaces/MockServerConfig.md) describing domains and
 import { setupMockWorker } from "@simplix-react/mock";
 
 await setupMockWorker({
-  dataDir: "idb://my-app-mock",
   domains: [projectDomain, userDomain],
 });
 ```
@@ -47,4 +45,3 @@ await setupMockWorker({
  - [MockServerConfig](../interfaces/MockServerConfig.md) - Configuration shape.
  - [MockDomainConfig](../interfaces/MockDomainConfig.md) - Individual domain configuration.
  - [deriveMockHandlers](deriveMockHandlers.md) - Generates MSW handlers from a contract.
- - [initPGlite](initPGlite.md) - Underlying PGlite initialization.

@@ -8,7 +8,7 @@
 
 > **defineConfig**(`config`): [`SimplixConfig`](../interfaces/SimplixConfig.md)
 
-Defined in: [define-config.ts:28](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/cli/src/config/define-config.ts#L28)
+Defined in: [define-config.ts:28](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/cli/src/config/define-config.ts#L28)
 
 Identity function that provides type-safe autocompletion for `simplix.config.ts`.
 
@@ -41,7 +41,7 @@ import { defineConfig } from "@simplix-react/cli";
 export default defineConfig({
   api: { baseUrl: "/api/v1" },
   packages: { prefix: "my-app" },
-  mock: { defaultLimit: 20 },
+  codegen: { header: true },
 });
 ```
 

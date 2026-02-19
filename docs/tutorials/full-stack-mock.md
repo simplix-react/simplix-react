@@ -1,6 +1,6 @@
 # Build a Full-Stack Mock Development Environment
 
-> After completing this tutorial, you will have a fully working frontend application backed by an in-browser PostgreSQL database (PGlite) and MSW service worker — no backend server required.
+> After completing this tutorial, you will have a fully working frontend application backed by an in-memory mock store and MSW service worker — no backend server required.
 
 ## Prerequisites
 
@@ -111,54 +111,7 @@ export const projectApi = defineApi({
 
 **Expected result:** The file compiles without errors. `projectApi.config` contains both entity definitions.
 
-## Step 3: Set Up PGlite with Migrations
-
-Create a migration function that builds the database schema using PGlite and the `executeSql` helper.
-
-Create `src/mock/migrations.ts`:
-
-```ts
-import type { PGlite } from "@electric-sql/pglite";
-import { tableExists, executeSql } from "@simplix-react/mock";
-
-export async function runMigrations(db: PGlite): Promise<void> {
-  const projectsExist = await tableExists(db, "projects");
-  if (projectsExist) return;
-
-  await executeSql(
-    db,
-    `
-    CREATE TABLE projects (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      description TEXT NOT NULL DEFAULT '',
-      status TEXT NOT NULL DEFAULT 'active',
-      created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-      updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-    );
-
-    CREATE TABLE tasks (
-      id TEXT PRIMARY KEY,
-      project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
-      title TEXT NOT NULL,
-      completed BOOLEAN NOT NULL DEFAULT false,
-      created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-      updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-    )
-  `,
-  );
-}
-```
-
-Key points:
-
-- `tableExists` checks whether a table already exists (idempotent migrations)
-- `executeSql` splits and executes multiple SQL statements separated by semicolons
-- Column names use `snake_case` — the mock layer automatically maps them to `camelCase` in JSON responses
-
-**Expected result:** The migration creates `projects` and `tasks` tables with proper types and a foreign key relationship.
-
-## Step 4: Derive Mock Handlers
+## Step 3: Derive Mock Handlers
 
 Generate MSW handlers from the contract using `deriveMockHandlers`.
 
@@ -170,12 +123,10 @@ import { projectApi } from "../contract";
 
 export const handlers = deriveMockHandlers(projectApi.config, {
   project: {
-    tableName: "projects",
-    defaultSort: "created_at DESC",
+    defaultSort: "createdAt:desc",
   },
   task: {
-    tableName: "tasks",
-    defaultSort: "created_at DESC",
+    defaultSort: "createdAt:desc",
   },
 });
 ```
@@ -195,28 +146,29 @@ This single call generates 10 handlers:
 | task    | PATCH  | `/api/v1/tasks/:id`                        |
 | task    | DELETE | `/api/v1/tasks/:id`                        |
 
-**Expected result:** `handlers` is an array of MSW `HttpHandler` instances. Each handler reads from and writes to the PGlite database.
+Key points:
 
-## Step 5: Start the MSW Worker
+- No `tableName` is needed — the store name is derived automatically as `{domain}_{snake_case_entity}` (e.g. `project_project`, `project_task`)
+- `defaultSort` uses `"field:direction"` format with camelCase field names
 
-Use `setupMockWorker` to bootstrap PGlite and MSW together.
+**Expected result:** `handlers` is an array of MSW `HttpHandler` instances. Each handler reads from and writes to the in-memory store.
+
+## Step 4: Start the MSW Worker
+
+Use `setupMockWorker` to bootstrap the in-memory store and MSW together.
 
 Create `src/mock/setup.ts`:
 
 ```ts
 import { setupMockWorker } from "@simplix-react/mock";
-import { runMigrations } from "./migrations";
 import { handlers } from "./handlers";
 
 export async function startMockEnvironment(): Promise<void> {
   await setupMockWorker({
-    dataDir: "idb://project-mock-demo",
     domains: [
       {
         name: "project",
         handlers,
-        migrations: [runMigrations],
-        seed: [],
       },
     ],
   });
@@ -250,14 +202,13 @@ bootstrap();
 `setupMockWorker` performs these steps in order:
 
 1. Filters domains where `enabled !== false`
-2. Initializes PGlite at `idb://project-mock-demo` (persisted in IndexedDB)
-3. Runs all migration functions across enabled domains
-4. Runs all seed functions across enabled domains
-5. Combines handlers from enabled domains and starts the MSW service worker
+2. Resets the in-memory store
+3. Seeds each entity store from domain seed data (if provided)
+4. Combines handlers from enabled domains and starts the MSW service worker
 
-**Expected result:** Opening the browser console shows `[MSW] Mocking enabled`. All API requests to `/api/v1/*` are intercepted by the service worker and handled by PGlite.
+**Expected result:** Opening the browser console shows `[MSW] Mocking enabled`. All API requests to `/api/v1/*` are intercepted by the service worker and handled by the in-memory store.
 
-## Step 6: Derive Hooks and Build the UI
+## Step 5: Derive Hooks and Build the UI
 
 Create the hooks and a simple UI to test the full stack.
 
@@ -383,9 +334,9 @@ export default function App() {
 }
 ```
 
-**Expected result:** The app runs with full CRUD for projects and tasks. All data is persisted in the browser's IndexedDB via PGlite.
+**Expected result:** The app runs with full CRUD for projects and tasks. All data is stored in-memory and handled via MSW.
 
-## Step 7: Verify CRUD Operations Work
+## Step 6: Verify CRUD Operations Work
 
 Start the development server and test every operation.
 
@@ -403,89 +354,115 @@ Open the browser and perform these operations in order:
 | 4 | Toggle the task checkbox | The task shows as completed                          |
 | 5 | Click "Remove" on the task | The task disappears from the list                  |
 | 6 | Click "Delete" on the project | The project disappears from the list             |
-| 7 | Refresh the page     | Previously created data persists (IndexedDB)            |
 
 Open the Network tab in DevTools. All requests to `/api/v1/*` should show `(ServiceWorker)` as the initiator.
 
-**Expected result:** All seven operations succeed. Data persists across page refreshes.
+> **Note:** Data is stored in-memory and resets on every page refresh. This is by design — the mock layer is intended for development and testing, not data persistence. See Step 7 for pre-populating data with seed records.
 
-## Step 8: Add Seed Data
+**Expected result:** All six operations succeed. Each page refresh starts with a clean slate (or with seed data if configured).
 
-Create a seed function to pre-populate the database with sample data.
+## Step 7: Add Seed Data
 
-Create `src/mock/seed.ts`:
+Pre-populate the mock store with sample data using the `seed` option in `MockDomainConfig`.
 
-```ts
-import type { PGlite } from "@electric-sql/pglite";
-
-export async function seedData(db: PGlite): Promise<void> {
-  // Check if data already exists
-  const result = await db.query<{ count: string }>(
-    "SELECT COUNT(*) as count FROM projects",
-  );
-  const count = parseInt(result.rows[0]?.count ?? "0", 10);
-  if (count > 0) return;
-
-  // Seed projects
-  await db.query(
-    `INSERT INTO projects (id, name, description, status)
-     VALUES
-       ('proj-1', 'Website Redesign', 'Redesign the company website', 'active'),
-       ('proj-2', 'Mobile App', 'Build a mobile application', 'active'),
-       ('proj-3', 'Legacy Migration', 'Migrate legacy systems', 'archived')`,
-  );
-
-  // Seed tasks for "Website Redesign"
-  await db.query(
-    `INSERT INTO tasks (id, project_id, title, completed)
-     VALUES
-       ('task-1', 'proj-1', 'Create wireframes', true),
-       ('task-2', 'proj-1', 'Design mockups', false),
-       ('task-3', 'proj-1', 'Implement homepage', false)`,
-  );
-
-  // Seed tasks for "Mobile App"
-  await db.query(
-    `INSERT INTO tasks (id, project_id, title, completed)
-     VALUES
-       ('task-4', 'proj-2', 'Set up React Native', true),
-       ('task-5', 'proj-2', 'Build navigation', false)`,
-  );
-}
-```
-
-Update `src/mock/setup.ts` to include the seed function:
+Update `src/mock/setup.ts` to include seed data:
 
 ```ts
 import { setupMockWorker } from "@simplix-react/mock";
-import { runMigrations } from "./migrations";
-import { seedData } from "./seed";
 import { handlers } from "./handlers";
 
 export async function startMockEnvironment(): Promise<void> {
   await setupMockWorker({
-    dataDir: "idb://project-mock-demo",
     domains: [
       {
         name: "project",
         handlers,
-        migrations: [runMigrations],
-        seed: [seedData],
+        seed: {
+          project_project: [
+            {
+              id: "proj-1",
+              name: "Website Redesign",
+              description: "Redesign the company website",
+              status: "active",
+              createdAt: "2025-01-15T09:00:00Z",
+              updatedAt: "2025-01-15T09:00:00Z",
+            },
+            {
+              id: "proj-2",
+              name: "Mobile App",
+              description: "Build a mobile application",
+              status: "active",
+              createdAt: "2025-01-10T09:00:00Z",
+              updatedAt: "2025-01-10T09:00:00Z",
+            },
+            {
+              id: "proj-3",
+              name: "Legacy Migration",
+              description: "Migrate legacy systems",
+              status: "archived",
+              createdAt: "2025-01-05T09:00:00Z",
+              updatedAt: "2025-01-05T09:00:00Z",
+            },
+          ],
+          project_task: [
+            {
+              id: "task-1",
+              projectId: "proj-1",
+              title: "Create wireframes",
+              completed: true,
+              createdAt: "2025-01-16T09:00:00Z",
+              updatedAt: "2025-01-16T09:00:00Z",
+            },
+            {
+              id: "task-2",
+              projectId: "proj-1",
+              title: "Design mockups",
+              completed: false,
+              createdAt: "2025-01-17T09:00:00Z",
+              updatedAt: "2025-01-17T09:00:00Z",
+            },
+            {
+              id: "task-3",
+              projectId: "proj-1",
+              title: "Implement homepage",
+              completed: false,
+              createdAt: "2025-01-18T09:00:00Z",
+              updatedAt: "2025-01-18T09:00:00Z",
+            },
+            {
+              id: "task-4",
+              projectId: "proj-2",
+              title: "Set up React Native",
+              completed: true,
+              createdAt: "2025-01-11T09:00:00Z",
+              updatedAt: "2025-01-11T09:00:00Z",
+            },
+            {
+              id: "task-5",
+              projectId: "proj-2",
+              title: "Build navigation",
+              completed: false,
+              createdAt: "2025-01-12T09:00:00Z",
+              updatedAt: "2025-01-12T09:00:00Z",
+            },
+          ],
+        },
       },
     ],
   });
 }
 ```
 
-To see the seed data on a fresh start, clear the existing IndexedDB:
+Key points:
 
-1. Open DevTools → Application → IndexedDB
-2. Delete the `project-mock-demo` database
-3. Refresh the page
+- Seed data is plain JavaScript objects — no SQL, no migrations
+- Store names follow the convention `{domain}_{snake_case_entity}` (e.g. domain `"project"` + entity `"project"` = `"project_project"`, entity `"task"` = `"project_task"`)
+- Each record should include all fields that the schema expects, including `id`, `createdAt`, and `updatedAt`
+- Seed data is loaded fresh on every page refresh, ensuring a consistent starting state
 
-**Expected result:** The app loads with 3 projects and their associated tasks pre-populated.
+**Expected result:** The app loads with 3 projects and their associated tasks pre-populated on every page load.
 
-## Step 9: Transition to a Real API
+## Step 8: Transition to a Real API
 
 When your backend is ready, switching from mock to real API requires zero changes to your contract, hooks, or components. The only changes are in your bootstrap code.
 
@@ -530,7 +507,7 @@ The transition path:
 ```
 Contract (shared)
     |
-    +-- Mock: PGlite + MSW (development)
+    +-- Mock: In-Memory Store + MSW (development)
     |
     +-- Real: Backend API server (production)
 ```
@@ -545,16 +522,16 @@ In this tutorial you:
 
 1. Installed `@simplix-react/contract`, `@simplix-react/react`, and `@simplix-react/mock`
 2. Defined a contract with project and task entities
-3. Created database migrations using `executeSql` and `tableExists`
-4. Derived MSW handlers with `deriveMockHandlers`
-5. Bootstrapped the mock environment with `setupMockWorker`
-6. Built a working CRUD UI powered entirely by in-browser PGlite
-7. Added seed data for realistic development
-8. Set up an environment-variable-based switch for transitioning to a real API
+3. Derived MSW handlers with `deriveMockHandlers`
+4. Bootstrapped the mock environment with `setupMockWorker`
+5. Built a working CRUD UI powered entirely by an in-memory store
+6. Added seed data using plain JavaScript objects
+7. Set up an environment-variable-based switch for transitioning to a real API
 
 The mock environment provides:
 
-- Full PostgreSQL semantics (joins, constraints, transactions) via PGlite
-- Persistent data across page refreshes via IndexedDB
+- Lightweight in-memory storage with automatic CRUD operations
+- Sorting, filtering, and offset-based pagination out of the box
 - Network-level interception via MSW (visible in DevTools Network tab)
+- Consistent seed data on every page load for reliable development
 - Zero code changes needed when switching to a real backend

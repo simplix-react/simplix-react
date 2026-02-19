@@ -4,27 +4,23 @@
 
 [Documentation](../../../README.md) / [@simplix-react/form](../README.md) / EntityFormHooks
 
-# Interface: EntityFormHooks\<TSchema, TCreate\>
+# Interface: EntityFormHooks\<TSchema\>
 
-Defined in: [types.ts:166](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/form/src/types.ts#L166)
+Defined in: [types.ts:146](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/form/src/types.ts#L146)
 
 Form hook set for a single entity, containing `useCreateForm` and `useUpdateForm`.
 
-## Remarks
-
-Produced by `deriveFormHooks()` for each entity in the contract.
-Each hook wires a TanStack Form instance to the entity's React Query
-mutations with automatic dirty-field extraction and server error mapping.
+Only populated for operations with `create` and `update` roles respectively.
+If an entity lacks a create or update operation, the corresponding hook will be absent.
 
 ## Example
 
 ```ts
 import { deriveFormHooks } from "@simplix-react/form";
 
-const formHooks = deriveFormHooks(projectApi, projectHooks);
-// formHooks.task: EntityFormHooks<TaskSchema, CreateTaskSchema>
-// formHooks.task.useCreateForm(parentId?, options?)
-// formHooks.task.useUpdateForm(entityId, options?)
+const formHooks = deriveFormHooks(inventoryApi, inventoryHooks);
+// formHooks.product.useCreateForm(parentId?, options?)
+// formHooks.product.useUpdateForm(entityId, options?)
 ```
 
 ## See
@@ -35,32 +31,26 @@ const formHooks = deriveFormHooks(projectApi, projectHooks);
 
 ### TSchema
 
-`TSchema` *extends* `z.ZodTypeAny`
+`TSchema` *extends* `z.ZodTypeAny` = `z.ZodTypeAny`
 
 Entity's Zod schema type
 
-### TCreate
-
-`TCreate` *extends* `z.ZodTypeAny`
-
-Creation input Zod schema type
-
 ## Properties
 
-### useCreateForm
+### useCreateForm?
 
-> **useCreateForm**: [`DerivedCreateFormHook`](../type-aliases/DerivedCreateFormHook.md)\<`TCreate`\>
+> `optional` **useCreateForm**: [`DerivedCreateFormHook`](../type-aliases/DerivedCreateFormHook.md)\<`ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>\>
 
-Defined in: [types.ts:171](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/form/src/types.ts#L171)
+Defined in: [types.ts:150](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/form/src/types.ts#L150)
 
-Hook for creating a new entity with a managed form.
+Hook for creating a new entity with a managed form. Present only if a `create` operation exists.
 
 ***
 
-### useUpdateForm
+### useUpdateForm?
 
-> **useUpdateForm**: [`DerivedUpdateFormHook`](../type-aliases/DerivedUpdateFormHook.md)\<`TSchema`\>
+> `optional` **useUpdateForm**: [`DerivedUpdateFormHook`](../type-aliases/DerivedUpdateFormHook.md)\<`TSchema`\>
 
-Defined in: [types.ts:173](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/form/src/types.ts#L173)
+Defined in: [types.ts:152](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/form/src/types.ts#L152)
 
-Hook for updating an existing entity with a managed form.
+Hook for updating an existing entity with a managed form. Present only if an `update` operation exists.

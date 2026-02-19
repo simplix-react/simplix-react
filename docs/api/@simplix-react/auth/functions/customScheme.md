@@ -8,7 +8,7 @@
 
 > **customScheme**(`options`): [`AuthScheme`](../interfaces/AuthScheme.md)
 
-Defined in: [packages/auth/src/schemes/custom-scheme.ts:25](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/auth/src/schemes/custom-scheme.ts#L25)
+Defined in: [packages/auth/src/schemes/custom-scheme.ts:25](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/auth/src/schemes/custom-scheme.ts#L25)
 
 Creates a user-defined [AuthScheme](../interfaces/AuthScheme.md) from callback functions.
 

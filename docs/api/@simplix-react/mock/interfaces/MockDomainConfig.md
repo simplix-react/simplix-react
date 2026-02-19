@@ -6,11 +6,11 @@
 
 # Interface: MockDomainConfig
 
-Defined in: [msw.ts:31](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/mock/src/msw.ts#L31)
+Defined in: [msw.ts:31](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/mock/src/msw.ts#L31)
 
 Describes a single domain's mock configuration.
 
-Each domain groups its own handlers, migrations, and seed data together,
+Each domain groups its own handlers and seed data together,
 enabling selective activation via the [enabled](#enabled) flag.
 
 ## Example
@@ -19,14 +19,15 @@ enabling selective activation via the [enabled](#enabled) flag.
 import type { MockDomainConfig } from "@simplix-react/mock";
 import { deriveMockHandlers } from "@simplix-react/mock";
 import { projectContract } from "./contract";
-import { runMigrations } from "./migrations";
-import { seedData } from "./seed";
 
 const projectDomain: MockDomainConfig = {
   name: "project",
   handlers: deriveMockHandlers(projectContract.config),
-  migrations: [runMigrations],
-  seed: [seedData],
+  seed: {
+    project_tasks: [
+      { id: 1, title: "Task 1", createdAt: "2025-01-01" },
+    ],
+  },
 };
 ```
 
@@ -41,7 +42,7 @@ const projectDomain: MockDomainConfig = {
 
 > `optional` **enabled**: `boolean`
 
-Defined in: [msw.ts:40](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/mock/src/msw.ts#L40)
+Defined in: [msw.ts:40](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/mock/src/msw.ts#L40)
 
 Whether this domain is active.
 
@@ -55,7 +56,7 @@ Whether this domain is active.
 
 > **handlers**: `unknown`[]
 
-Defined in: [msw.ts:47](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/mock/src/msw.ts#L47)
+Defined in: [msw.ts:47](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/mock/src/msw.ts#L47)
 
 MSW request handlers for this domain.
 
@@ -63,33 +64,11 @@ Typically produced by [deriveMockHandlers](../functions/deriveMockHandlers.md).
 
 ***
 
-### migrations
-
-> **migrations**: (`db`) => `Promise`\<`void`\>[]
-
-Defined in: [msw.ts:54](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/mock/src/msw.ts#L54)
-
-Migration functions to run in order.
-
-Each function receives the PGlite instance and should create or alter tables.
-
-#### Parameters
-
-##### db
-
-`PGlite`
-
-#### Returns
-
-`Promise`\<`void`\>
-
-***
-
 ### name
 
 > **name**: `string`
 
-Defined in: [msw.ts:33](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/mock/src/msw.ts#L33)
+Defined in: [msw.ts:33](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/mock/src/msw.ts#L33)
 
 Unique name identifying this domain (used for logging/debugging).
 
@@ -97,20 +76,11 @@ Unique name identifying this domain (used for logging/debugging).
 
 ### seed?
 
-> `optional` **seed**: (`db`) => `Promise`\<`void`\>[]
+> `optional` **seed**: `Record`\<`string`, `Record`\<`string`, `unknown`\>[]\>
 
-Defined in: [msw.ts:61](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/mock/src/msw.ts#L61)
+Defined in: [msw.ts:55](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/mock/src/msw.ts#L55)
 
-Seed functions to run in order (after all migrations across all domains complete).
+Seed data keyed by entity store name.
 
-Each function receives the PGlite instance and should insert initial data.
-
-#### Parameters
-
-##### db
-
-`PGlite`
-
-#### Returns
-
-`Promise`\<`void`\>
+Each key corresponds to a store name (e.g. `"project_tasks"`)
+and the value is an array of records to pre-populate.

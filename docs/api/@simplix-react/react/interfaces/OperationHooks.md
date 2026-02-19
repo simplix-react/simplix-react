@@ -6,24 +6,11 @@
 
 # Interface: OperationHooks\<TInput, TOutput\>
 
-Defined in: [types.ts:264](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/react/src/types.ts#L264)
+Defined in: [types.ts:225](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/react/src/types.ts#L225)
 
 Represents the hook container for a custom operation defined in the contract.
 
-Each operation in the contract produces an object with a single `useMutation` hook.
-Cache invalidation is handled automatically based on the operation's `invalidates`
-configuration in the contract.
-
-## Example
-
-```ts
-import { deriveHooks } from "@simplix-react/react";
-
-const hooks = deriveHooks(projectContract);
-const { mutate, isPending } = hooks.archiveProject.useMutation({
-  onSuccess: () => console.log("Project archived"),
-});
-```
+Each top-level operation in the contract produces an object with a single `useMutation` hook.
 
 ## See
 
@@ -49,4 +36,4 @@ The Zod schema defining the operation output
 
 > **useMutation**: [`OperationMutationHook`](../type-aliases/OperationMutationHook.md)\<`output`\<`TInput`\>, `output`\<`TOutput`\>\>
 
-Defined in: [types.ts:268](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/react/src/types.ts#L268)
+Defined in: [types.ts:229](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/react/src/types.ts#L229)

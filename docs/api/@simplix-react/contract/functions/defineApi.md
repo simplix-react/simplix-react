@@ -8,7 +8,7 @@
 
 > **defineApi**\<`TEntities`, `TOperations`\>(`config`, `options?`): `object`
 
-Defined in: [packages/contract/src/define-api.ts:58](https://github.com/simplix-react/simplix-react/blob/4ea24257717de0d53c64dd58c65ddec728b945e5/packages/contract/src/define-api.ts#L58)
+Defined in: [packages/contract/src/define-api.ts:62](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/define-api.ts#L62)
 
 Creates a fully-typed API contract from an [ApiContractConfig](../interfaces/ApiContractConfig.md).
 
@@ -21,7 +21,7 @@ by `@simplix-react/react` for hooks and `@simplix-react/mock` for MSW handlers.
 
 ### TEntities
 
-`TEntities` *extends* `Record`\<`string`, [`EntityDefinition`](../interfaces/EntityDefinition.md)\<`ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>\>\>
+`TEntities` *extends* `Record`\<`string`, [`EntityDefinition`](../interfaces/EntityDefinition.md)\<`ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `Record`\<`string`, [`EntityOperationDef`](../interfaces/EntityOperationDef.md)\<`ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>\>\>\>\>
 
 Map of entity names to their [EntityDefinition](../interfaces/EntityDefinition.md)s.
 
@@ -73,27 +73,31 @@ An [ApiContract](../interfaces/ApiContract.md) containing `config`, `client`, an
 import { z } from "zod";
 import { defineApi, simpleQueryBuilder } from "@simplix-react/contract";
 
-const projectApi = defineApi({
-  domain: "project",
+const inventoryApi = defineApi({
+  domain: "inventory",
   basePath: "/api/v1",
   entities: {
-    task: {
-      path: "/tasks",
-      schema: z.object({ id: z.string(), title: z.string() }),
-      createSchema: z.object({ title: z.string() }),
-      updateSchema: z.object({ title: z.string().optional() }),
+    product: {
+      schema: productSchema,
+      operations: {
+        list:   { method: "GET",    path: "/products" },
+        get:    { method: "GET",    path: "/products/:id" },
+        create: { method: "POST",   path: "/products", input: createProductSchema },
+        update: { method: "PATCH",  path: "/products/:id", input: updateProductSchema },
+        delete: { method: "DELETE", path: "/products/:id" },
+      },
     },
   },
   queryBuilder: simpleQueryBuilder,
 });
 
 // Type-safe client usage
-const tasks = await projectApi.client.task.list();
-const task = await projectApi.client.task.get("task-1");
+const products = await inventoryApi.client.product.list();
+const product = await inventoryApi.client.product.get("product-1");
 
 // Query keys for TanStack Query
-projectApi.queryKeys.task.all;       // ["project", "task"]
-projectApi.queryKeys.task.detail("task-1"); // ["project", "task", "detail", "task-1"]
+inventoryApi.queryKeys.product.all;       // ["inventory", "product"]
+inventoryApi.queryKeys.product.detail("product-1"); // ["inventory", "product", "detail", "product-1"]
 ```
 
 ## See
