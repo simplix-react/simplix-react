@@ -1,6 +1,7 @@
 // Types
 export type {
   LocaleCode,
+  LocaleConfig,
   TranslationValues,
   DateTimeStyle,
   NumberFormatStyle,
@@ -26,7 +27,6 @@ export type { II18nAdapter } from "./adapter.js";
 // I18next implementation
 export { I18nextAdapter } from "./i18next-adapter.js";
 export type {
-  LocaleConfig,
   TranslationResources,
   I18nextAdapterOptions,
 } from "./i18next-adapter.js";

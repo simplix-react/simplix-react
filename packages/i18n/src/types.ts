@@ -137,6 +137,39 @@ export interface LocaleInfo {
 }
 
 /**
+ * Describes the configuration for a single supported locale.
+ *
+ * @example
+ * ```ts
+ * import type { LocaleConfig } from "@simplix-react/i18n";
+ *
+ * const korean: LocaleConfig = {
+ *   code: "ko",
+ *   name: "한국어",
+ *   englishName: "Korean",
+ *   direction: "ltr",
+ *   currency: "KRW",
+ * };
+ * ```
+ */
+export interface LocaleConfig {
+  /** BCP 47 locale code. */
+  code: LocaleCode;
+  /** Native display name. */
+  name: string;
+  /** English display name. */
+  englishName: string;
+  /** Text direction (defaults to `"ltr"`). */
+  direction?: "ltr" | "rtl";
+  /** Default date format pattern. */
+  dateFormat?: string;
+  /** Default time format pattern. */
+  timeFormat?: string;
+  /** Default ISO 4217 currency code. */
+  currency?: string;
+}
+
+/**
  * Represents a translation namespace identifier used to scope translation keys.
  */
 export type TranslationNamespace = string;

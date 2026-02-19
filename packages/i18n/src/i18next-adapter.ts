@@ -3,6 +3,7 @@ import type { II18nAdapter } from "./adapter.js";
 import type {
   DateTimeFormatOptions,
   LocaleCode,
+  LocaleConfig,
   LocaleInfo,
   NumberFormatOptions,
   PluralForms,
@@ -10,39 +11,7 @@ import type {
   TranslationNamespace,
   TranslationValues,
 } from "./types.js";
-
-/**
- * Describes the configuration for a single supported locale.
- *
- * @example
- * ```ts
- * import type { LocaleConfig } from "@simplix-react/i18n";
- *
- * const korean: LocaleConfig = {
- *   code: "ko",
- *   name: "한국어",
- *   englishName: "Korean",
- *   direction: "ltr",
- *   currency: "KRW",
- * };
- * ```
- */
-export interface LocaleConfig {
-  /** BCP 47 locale code. */
-  code: LocaleCode;
-  /** Native display name. */
-  name: string;
-  /** English display name. */
-  englishName: string;
-  /** Text direction (defaults to `"ltr"`). */
-  direction?: "ltr" | "rtl";
-  /** Default date format pattern. */
-  dateFormat?: string;
-  /** Default time format pattern. */
-  timeFormat?: string;
-  /** Default ISO 4217 currency code. */
-  currency?: string;
-}
+import { DEFAULT_LOCALES } from "./utils/locale-config.js";
 
 /**
  * Represents a nested structure of translation resources keyed by locale, then namespace.
@@ -80,35 +49,11 @@ export interface I18nextAdapterOptions {
   debug?: boolean;
 }
 
-const BUILTIN_LOCALES: LocaleConfig[] = [
-  {
-    code: "ko",
-    name: "한국어",
-    englishName: "Korean",
-    direction: "ltr",
-    dateFormat: "yyyy-MM-dd",
-    timeFormat: "HH:mm:ss",
-    currency: "KRW",
-  },
-  {
-    code: "en",
-    name: "English",
-    englishName: "English",
-    direction: "ltr",
-    dateFormat: "MM/dd/yyyy",
-    timeFormat: "h:mm:ss a",
-    currency: "USD",
-  },
-  {
-    code: "ja",
-    name: "日本語",
-    englishName: "Japanese",
-    direction: "ltr",
-    dateFormat: "yyyy/MM/dd",
-    timeFormat: "HH:mm:ss",
-    currency: "JPY",
-  },
-];
+
+const BUILTIN_LOCALE_CODES = ["ko", "en", "ja"] as const;
+const BUILTIN_LOCALES = DEFAULT_LOCALES.filter((l) =>
+  (BUILTIN_LOCALE_CODES as readonly string[]).includes(l.code),
+);
 
 /**
  * Implements {@link II18nAdapter} using i18next as the underlying translation engine.

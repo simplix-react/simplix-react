@@ -182,9 +182,9 @@ describe("buildModuleTranslations", () => {
 });
 
 describe("DEFAULT_LOCALES", () => {
-  it("contains ko, en, and ja", () => {
+  it("contains ko, en, and ja as the first three entries", () => {
     const codes = DEFAULT_LOCALES.map((l) => l.code);
-    expect(codes).toEqual(["ko", "en", "ja"]);
+    expect(codes.slice(0, 3)).toEqual(["ko", "en", "ja"]);
   });
 
   it("has correct structure for each locale", () => {
@@ -192,7 +192,7 @@ describe("DEFAULT_LOCALES", () => {
       expect(locale.code).toBeTruthy();
       expect(locale.name).toBeTruthy();
       expect(locale.englishName).toBeTruthy();
-      expect(locale.direction).toBe("ltr");
+      expect(["ltr", "rtl"]).toContain(locale.direction);
       expect(locale.currency).toBeTruthy();
     }
   });
@@ -200,7 +200,7 @@ describe("DEFAULT_LOCALES", () => {
 
 describe("SUPPORTED_LOCALES", () => {
   it("lists locale codes from DEFAULT_LOCALES", () => {
-    expect(SUPPORTED_LOCALES).toEqual(["ko", "en", "ja"]);
+    expect(SUPPORTED_LOCALES).toEqual(DEFAULT_LOCALES.map((l) => l.code));
   });
 });
 
@@ -241,7 +241,7 @@ describe("detection", () => {
   });
 
   it("ignores unsupported locale in localStorage and falls back to defaultLocale", async () => {
-    storageMap.set("i18n:locale", "fr");
+    storageMap.set("i18n:locale", "xx-FAKE");
 
     const { adapter, i18nReady } = createI18nConfig({
       defaultLocale: "en",

@@ -1,11 +1,8 @@
 import { getDomainTranslationRegistry } from "./domain-translations.js";
 import { I18nextAdapter } from "./i18next-adapter.js";
-import type {
-  TranslationResources,
-  LocaleConfig,
-} from "./i18next-adapter.js";
+import type { TranslationResources } from "./i18next-adapter.js";
 import type { ModuleTranslations } from "./module-translations.js";
-import type { LocaleCode } from "./types.js";
+import type { LocaleCode, LocaleConfig } from "./types.js";
 import { DEFAULT_LOCALES } from "./utils/locale-config.js";
 
 /**
