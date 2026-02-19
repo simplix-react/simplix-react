@@ -4,9 +4,16 @@ import { type ComponentPropsWithRef, forwardRef } from "react";
 import { cn } from "../utils/cn";
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex items-center border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
   {
     variants: {
+      rounded: {
+        full: "rounded-full",
+        lg: "rounded-lg",
+        md: "rounded-md",
+        sm: "rounded-sm",
+        none: "rounded-none",
+      },
       variant: {
         default: "border-transparent bg-primary text-primary-foreground",
         secondary: "border-transparent bg-secondary text-secondary-foreground",
@@ -56,7 +63,7 @@ const badgeVariants = cva(
           "border-transparent bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-100",
       },
     },
-    defaultVariants: { variant: "default" },
+    defaultVariants: { variant: "default", rounded: "full" },
   },
 );
 
@@ -67,10 +74,10 @@ export interface BadgeProps
     BadgeVariants {}
 
 export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
-  ({ className, variant, ...rest }, ref) => (
+  ({ className, variant, rounded, ...rest }, ref) => (
     <span
       ref={ref}
-      className={cn(badgeVariants({ variant }), className)}
+      className={cn(badgeVariants({ variant, rounded }), className)}
       {...rest}
     />
   ),

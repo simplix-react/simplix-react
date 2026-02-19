@@ -23,6 +23,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../base/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  type TableProps,
+} from "../../base/table";
 import { Flex } from "../../primitives/flex";
 import { Stack } from "../../primitives/stack";
 import { cn } from "../../utils/cn";
@@ -240,6 +249,12 @@ export interface ListTableProps<T> {
   cardBreakpoint?: number;
   /** Render prop for card content. Card interactions (click, selection) are handled by the framework. */
   cardRender?: (props: { row: T; index: number }) => ReactNode;
+  /** Table visual variant. */
+  variant?: TableProps["variant"];
+  /** Cell padding size. */
+  size?: TableProps["size"];
+  /** Container border radius. */
+  rounded?: TableProps["rounded"];
   className?: string;
   children?: ReactNode;
 }
@@ -274,6 +289,9 @@ function ListTable<T>({
   rowId,
   cardBreakpoint,
   cardRender,
+  variant,
+  size,
+  rounded,
   className,
   children,
 }: ListTableProps<T>) {
@@ -467,43 +485,42 @@ function ListTable<T>({
         </div>
       ) : (
         <div key="table" className="animate-in fade-in-0 duration-200">
-          <table className={cn("w-full table-auto caption-bottom text-sm", className)}>
-            <thead className="border-b">
+          <Table variant={variant} size={size} rounded={rounded} className={cn("table-auto", className)}>
+            <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id}>
+                <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    <th
+                    <TableHead
                       key={header.id}
-                      className="h-10 truncate px-3 text-left align-middle font-medium text-muted-foreground"
+                      className="truncate"
                       style={header.column.getSize() !== 150 ? { width: header.column.getSize() } : undefined}
                     >
                       {header.isPlaceholder
                         ? null
                         : flexRender(header.column.columnDef.header, header.getContext())}
-                    </th>
+                    </TableHead>
                   ))}
-                </tr>
+                </TableRow>
               ))}
-            </thead>
-            <tbody>
+            </TableHeader>
+            <TableBody>
               {isLoading && data.length === 0
                 ? Array.from({ length: 5 }, (_, i) => (
-                    <tr key={`skeleton-${i}`} className="border-b">
+                    <TableRow key={`skeleton-${i}`}>
                       {table.getAllColumns().map((col) => (
-                        <td key={col.id} className="px-3 py-2.5 align-middle">
+                        <TableCell key={col.id}>
                           <Skeleton className="h-4 w-full" />
-                        </td>
+                        </TableCell>
                       ))}
-                    </tr>
+                    </TableRow>
                   ))
                 : table.getRowModel().rows.map((row) => {
                     const rid = rowId?.(row.original) ?? row.id;
                     const isActive = activeRowId != null && rid === activeRowId;
                     return (
-                      <tr
+                      <TableRow
                         key={row.id}
                         className={cn(
-                          "border-b transition-colors hover:bg-muted/50",
                           selectedIndices?.has(row.index) && "bg-muted/30",
                           isActive && "bg-muted/50",
                           onRowClick && "cursor-pointer",
@@ -512,15 +529,15 @@ function ListTable<T>({
                         data-testid={`list-row-${rid}`}
                       >
                         {row.getVisibleCells().map((cell) => (
-                          <td key={cell.id} className="truncate px-3 py-2.5 align-middle">
+                          <TableCell key={cell.id} className="truncate">
                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                          </td>
+                          </TableCell>
                         ))}
-                      </tr>
+                      </TableRow>
                     );
                   })}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       )}
     </div>
