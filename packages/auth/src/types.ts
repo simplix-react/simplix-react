@@ -62,6 +62,10 @@ export interface TokenPair {
   refreshToken?: string;
   /** Token validity duration in seconds. */
   expiresIn?: number;
+  /** Absolute expiry time as ISO 8601 string or epoch milliseconds. */
+  expiresAt?: string | number;
+  /** Absolute refresh token expiry as ISO 8601 string or epoch milliseconds. */
+  refreshTokenExpiresAt?: string | number;
 }
 
 // ── Auth Config ──
@@ -81,6 +85,12 @@ export interface AuthConfig {
 
   /** Maximum retry attempts after 401. Defaults to `1`. */
   maxRetries?: number;
+
+  /** Validates a stored access token on rehydration. Return `true` if valid. */
+  onRehydrate?: (accessToken: string) => Promise<boolean>;
+
+  /** Returns additional headers to merge into every authenticated request. */
+  globalHeaders?: () => Promise<Record<string, string>> | Record<string, string>;
 }
 
 // ── Auth Instance ──
@@ -112,6 +122,15 @@ export interface AuthInstance {
    * @returns An unsubscribe function.
    */
   subscribe(listener: () => void): () => void;
+
+  /** Rehydrates auth state from storage, optionally validating with the server. */
+  rehydrate(): Promise<void>;
+
+  /** Returns the current user object, or `null` if not set. */
+  getUser<TUser = unknown>(): TUser | null;
+
+  /** Sets the current user object and notifies subscribers. */
+  setUser<TUser = unknown>(user: TUser | null): void;
 }
 
 // ── Scheme Options ──
@@ -136,6 +155,15 @@ export interface BearerSchemeOptions {
 
     /** Seconds before expiry to trigger proactive refresh. */
     refreshBeforeExpiry?: number;
+
+    /** Enable background timer-based auto refresh. Defaults to `false`. */
+    autoSchedule?: boolean;
+
+    /** Minimum interval between scheduled refreshes in seconds. Defaults to `30`. */
+    minIntervalSeconds?: number;
+
+    /** Called when a scheduled background refresh fails. */
+    onScheduledRefreshFailed?: () => void;
   };
 }
 

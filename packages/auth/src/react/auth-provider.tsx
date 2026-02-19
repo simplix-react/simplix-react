@@ -1,8 +1,9 @@
-import { createContext, useContext, useSyncExternalStore } from "react";
+import { createContext, useContext, useEffect, useState, useSyncExternalStore } from "react";
 import type { ReactNode } from "react";
 import type { AuthInstance } from "../types.js";
 
 const AuthContext = createContext<AuthInstance | null>(null);
+const AuthLoadingContext = createContext<boolean>(false);
 
 /**
  * Props for {@link AuthProvider}.
@@ -11,6 +12,8 @@ export interface AuthProviderProps {
   /** Auth instance created by {@link createAuth}. */
   auth: AuthInstance;
   children: ReactNode;
+  /** Async function that loads the current user after rehydration. */
+  userLoader?: (accessToken: string) => Promise<unknown>;
 }
 
 /**
@@ -24,15 +27,51 @@ export interface AuthProviderProps {
  *
  * function App() {
  *   return (
- *     <AuthProvider auth={auth}>
+ *     <AuthProvider auth={auth} userLoader={fetchCurrentUser}>
  *       <MyApp />
  *     </AuthProvider>
  *   );
  * }
  * ```
  */
-export function AuthProvider({ auth, children }: AuthProviderProps) {
-  return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
+export function AuthProvider({ auth, children, userLoader }: AuthProviderProps) {
+  const [isLoading, setIsLoading] = useState(!!userLoader);
+
+  useEffect(() => {
+    if (!userLoader) return;
+
+    let cancelled = false;
+
+    async function init() {
+      await auth.rehydrate();
+
+      const token = auth.getAccessToken();
+      if (token) {
+        try {
+          const user = await userLoader!(token);
+          if (!cancelled) auth.setUser(user);
+        } catch {
+          if (!cancelled) auth.clear();
+        }
+      }
+
+      if (!cancelled) setIsLoading(false);
+    }
+
+    void init();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [auth, userLoader]);
+
+  return (
+    <AuthContext.Provider value={auth}>
+      <AuthLoadingContext.Provider value={isLoading}>
+        {children}
+      </AuthLoadingContext.Provider>
+    </AuthContext.Provider>
+  );
 }
 
 /**
@@ -49,6 +88,14 @@ export function useAuthContext(): AuthInstance {
   }
 
   return auth;
+}
+
+/**
+ * Returns the loading state from AuthProvider.
+ * @internal
+ */
+export function useAuthLoading(): boolean {
+  return useContext(AuthLoadingContext);
 }
 
 /**

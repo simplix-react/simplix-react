@@ -30,3 +30,11 @@ export { composeSchemes } from "./schemes/compose-schemes.js";
 export { memoryStore } from "./stores/memory-store.js";
 export { localStorageStore } from "./stores/local-storage-store.js";
 export { sessionStorageStore } from "./stores/session-storage-store.js";
+
+// Helpers
+export { AutoRefreshScheduler } from "./helpers/auto-refresh-scheduler.js";
+export type { AutoRefreshSchedulerOptions } from "./helpers/auto-refresh-scheduler.js";
+export { createCrossTabSync } from "./helpers/cross-tab-sync.js";
+export type { CrossTabSyncOptions } from "./helpers/cross-tab-sync.js";
+export { openOAuth2Popup } from "./helpers/oauth2-popup.js";
+export type { OAuth2PopupOptions, OAuth2PopupResult } from "./helpers/oauth2-popup.js";

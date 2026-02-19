@@ -1,6 +1,7 @@
 import type { AuthScheme, BearerSchemeOptions } from "../types.js";
 import { AuthError } from "../errors.js";
-import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, EXPIRES_AT_KEY, storeTokenPair } from "../helpers/token-storage.js";
+import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, EXPIRES_AT_KEY, REFRESH_EXPIRES_AT_KEY, storeTokenPair } from "../helpers/token-storage.js";
+import { AutoRefreshScheduler } from "../helpers/auto-refresh-scheduler.js";
 
 /**
  * Creates a Bearer token {@link AuthScheme}.
@@ -25,6 +26,28 @@ import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, EXPIRES_AT_KEY, storeTokenPair } f
  */
 export function bearerScheme(options: BearerSchemeOptions): AuthScheme {
   const { store, token, refresh } = options;
+
+  let scheduler: AutoRefreshScheduler | null = null;
+
+  if (refresh?.autoSchedule) {
+    scheduler = new AutoRefreshScheduler({
+      refreshBeforeExpirySeconds: refresh.refreshBeforeExpiry,
+      minIntervalSeconds: refresh.minIntervalSeconds,
+      onRefreshFailed: refresh.onScheduledRefreshFailed,
+    });
+
+    scheduler.start(
+      async () => {
+        const pair = await refresh.refreshFn();
+        storeTokenPair(store, pair);
+        return pair;
+      },
+      () => {
+        const raw = store.get(EXPIRES_AT_KEY);
+        return raw ? Number(raw) : null;
+      },
+    );
+  }
 
   function resolveToken(): string | null {
     if (typeof token === "function") {
@@ -74,6 +97,19 @@ export function bearerScheme(options: BearerSchemeOptions): AuthScheme {
 
       const pair = await refresh.refreshFn();
       storeTokenPair(store, pair);
+
+      // Reschedule after manual refresh
+      scheduler?.start(
+        async () => {
+          const p = await refresh.refreshFn();
+          storeTokenPair(store, p);
+          return p;
+        },
+        () => {
+          const raw = store.get(EXPIRES_AT_KEY);
+          return raw ? Number(raw) : null;
+        },
+      );
     },
 
     isAuthenticated() {
@@ -81,9 +117,11 @@ export function bearerScheme(options: BearerSchemeOptions): AuthScheme {
     },
 
     clear() {
+      scheduler?.stop();
       store.remove(ACCESS_TOKEN_KEY);
       store.remove(REFRESH_TOKEN_KEY);
       store.remove(EXPIRES_AT_KEY);
+      store.remove(REFRESH_EXPIRES_AT_KEY);
     },
   };
 }

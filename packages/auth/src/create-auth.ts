@@ -1,6 +1,6 @@
 import type { AuthConfig, AuthInstance, TokenPair } from "./types.js";
 import { createAuthFetch } from "./create-auth-fetch.js";
-import { storeTokenPair } from "./helpers/token-storage.js";
+import { storeTokenPair, ACCESS_TOKEN_KEY } from "./helpers/token-storage.js";
 
 /**
  * Creates a reactive {@link AuthInstance} with state management and subscriptions.
@@ -34,6 +34,7 @@ import { storeTokenPair } from "./helpers/token-storage.js";
 export function createAuth(config: AuthConfig): AuthInstance {
   const { schemes, store } = config;
   const listeners = new Set<() => void>();
+  let user: unknown = null;
 
   function notify(): void {
     for (const listener of listeners) {
@@ -51,7 +52,7 @@ export function createAuth(config: AuthConfig): AuthInstance {
     },
 
     getAccessToken() {
-      return store?.get("access_token") ?? null;
+      return store?.get(ACCESS_TOKEN_KEY) ?? null;
     },
 
     setTokens(tokens: TokenPair) {
@@ -68,12 +69,43 @@ export function createAuth(config: AuthConfig): AuthInstance {
       }
 
       store?.clear();
+      user = null;
       notify();
     },
 
     subscribe(listener: () => void) {
       listeners.add(listener);
       return () => listeners.delete(listener);
+    },
+
+    async rehydrate() {
+      const accessToken = store?.get(ACCESS_TOKEN_KEY) ?? null;
+      if (!accessToken) {
+        notify();
+        return;
+      }
+
+      if (config.onRehydrate) {
+        const valid = await config.onRehydrate(accessToken);
+        if (!valid) {
+          for (const scheme of schemes) {
+            scheme.clear();
+          }
+          store?.clear();
+          user = null;
+        }
+      }
+
+      notify();
+    },
+
+    getUser<TUser = unknown>(): TUser | null {
+      return user as TUser | null;
+    },
+
+    setUser<TUser = unknown>(newUser: TUser | null): void {
+      user = newUser;
+      notify();
     },
   };
 }

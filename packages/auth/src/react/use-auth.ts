@@ -1,6 +1,6 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useSyncExternalStore } from "react";
 import type { TokenPair } from "../types.js";
-import { useAuthContext, useAuthState } from "./auth-provider.js";
+import { useAuthContext, useAuthLoading, useAuthState } from "./auth-provider.js";
 
 /**
  * Return type of {@link useAuth}.
@@ -8,6 +8,12 @@ import { useAuthContext, useAuthState } from "./auth-provider.js";
 export interface UseAuthReturn {
   /** Whether the user is currently authenticated. */
   isAuthenticated: boolean;
+
+  /** Whether auth initialization (rehydration + user loading) is in progress. */
+  isLoading: boolean;
+
+  /** The current user object, or `null`. */
+  user: unknown;
 
   /** Stores tokens and notifies subscribers. */
   login(tokens: TokenPair): void;
@@ -27,7 +33,9 @@ export interface UseAuthReturn {
  * @example
  * ```tsx
  * function LoginButton() {
- *   const { isAuthenticated, login, logout } = useAuth();
+ *   const { isAuthenticated, user, isLoading, login, logout } = useAuth();
+ *
+ *   if (isLoading) return <span>Loading...</span>;
  *
  *   if (isAuthenticated) {
  *     return <button onClick={logout}>Logout</button>;
@@ -44,6 +52,13 @@ export interface UseAuthReturn {
 export function useAuth(): UseAuthReturn {
   const auth = useAuthContext();
   const isAuthenticated = useAuthState(auth);
+  const isLoading = useAuthLoading();
+
+  const user = useSyncExternalStore(
+    auth.subscribe,
+    () => auth.getUser(),
+    () => null,
+  );
 
   const login = useCallback(
     (tokens: TokenPair) => auth.setTokens(tokens),
@@ -53,7 +68,7 @@ export function useAuth(): UseAuthReturn {
   const getAccessToken = useCallback(() => auth.getAccessToken(), [auth]);
 
   return useMemo(
-    () => ({ isAuthenticated, login, logout, getAccessToken }),
-    [isAuthenticated, login, logout, getAccessToken],
+    () => ({ isAuthenticated, isLoading, user, login, logout, getAccessToken }),
+    [isAuthenticated, isLoading, user, login, logout, getAccessToken],
   );
 }

@@ -35,6 +35,11 @@ export function createAuthFetch(
   async function mergeHeaders(): Promise<Record<string, string>> {
     const merged: Record<string, string> = {};
 
+    if (config.globalHeaders) {
+      const global = await config.globalHeaders();
+      Object.assign(merged, global);
+    }
+
     for (const scheme of schemes) {
       const headers = await scheme.getHeaders();
       Object.assign(merged, headers);
