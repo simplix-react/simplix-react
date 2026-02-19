@@ -1,6 +1,7 @@
 import type {
   ApiContractConfig,
   EntityDefinition,
+  EntityId,
   QueryKeyFactory,
 } from "../types.js";
 
@@ -9,8 +10,8 @@ import type {
  *
  * Generates structured query keys following the factory pattern recommended
  * by TanStack Query. Each entity receives keys scoped by `[domain, entityName]`,
- * enabling granular cache invalidation (e.g. invalidate all task lists without
- * affecting task details).
+ * enabling granular cache invalidation (e.g. invalidate all product lists without
+ * affecting product details).
  *
  * Typically called internally by {@link defineApi} rather than used directly.
  *
@@ -22,11 +23,13 @@ import type {
  * ```ts
  * import { deriveQueryKeys } from "@simplix-react/contract";
  *
- * const queryKeys = deriveQueryKeys({ domain: "project", entities: { task: taskEntity } });
+ * const queryKeys = deriveQueryKeys({ domain: "inventory", entities: { product: productEntity } });
  *
- * queryKeys.task.all;              // ["project", "task"]
- * queryKeys.task.lists();          // ["project", "task", "list"]
- * queryKeys.task.detail("abc");    // ["project", "task", "detail", "abc"]
+ * queryKeys.product.all;              // ["inventory", "product"]
+ * queryKeys.product.lists();          // ["inventory", "product", "list"]
+ * queryKeys.product.detail("abc");    // ["inventory", "product", "detail", "abc"]
+ * queryKeys.product.trees();          // ["inventory", "product", "tree"]
+ * queryKeys.product.tree({ rootId: "x" }); // ["inventory", "product", "tree", { rootId: "x" }]
  * ```
  *
  * @see {@link defineApi} for the recommended high-level API.
@@ -57,6 +60,12 @@ function createQueryKeyFactory(
     list: (params: Record<string, unknown>) =>
       [domain, entity, "list", params] as const,
     details: () => [domain, entity, "detail"] as const,
-    detail: (id: string) => [domain, entity, "detail", id] as const,
+    detail: (id: EntityId) =>
+      [domain, entity, "detail", id] as const,
+    trees: () => [domain, entity, "tree"] as const,
+    tree: (params?: Record<string, unknown>) =>
+      params
+        ? ([domain, entity, "tree", params] as const)
+        : ([domain, entity, "tree"] as const),
   };
 }

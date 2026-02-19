@@ -27,10 +27,14 @@ describe("deriveQueryKeys", () => {
     basePath: "/api",
     entities: {
       task: {
-        path: "/tasks",
         schema: taskSchema,
-        createSchema: createTaskDto,
-        updateSchema: updateTaskDto,
+        operations: {
+          list:   { method: "GET" as const,    path: "/tasks" },
+          get:    { method: "GET" as const,    path: "/tasks/:id" },
+          create: { method: "POST" as const,   path: "/tasks", input: createTaskDto },
+          update: { method: "PATCH" as const,  path: "/tasks/:id", input: updateTaskDto },
+          delete: { method: "DELETE" as const, path: "/tasks/:id" },
+        },
       },
     },
   };
@@ -54,6 +58,28 @@ describe("deriveQueryKeys", () => {
     const keys = deriveQueryKeys(config);
     expect(keys.task.detail("123")).toEqual(["tasks", "task", "detail", "123"]);
   });
+
+  it("generates trees key", () => {
+    const keys = deriveQueryKeys(config);
+    expect(keys.task.trees()).toEqual(["tasks", "task", "tree"]);
+  });
+
+  it("generates tree key with params", () => {
+    const keys = deriveQueryKeys(config);
+    expect(keys.task.tree({ rootId: "abc" })).toEqual(["tasks", "task", "tree", { rootId: "abc" }]);
+  });
+
+  it("generates tree key without params", () => {
+    const keys = deriveQueryKeys(config);
+    expect(keys.task.tree()).toEqual(["tasks", "task", "tree"]);
+  });
+
+  it("generates detail key with composite key (Record)", () => {
+    const keys = deriveQueryKeys(config);
+    expect(keys.task.detail({ tenantId: "tenant-1", productId: "product-1" })).toEqual(
+      ["tasks", "task", "detail", { tenantId: "tenant-1", productId: "product-1" }],
+    );
+  });
 });
 
 describe("defineApi", () => {
@@ -63,10 +89,14 @@ describe("defineApi", () => {
       basePath: "/api",
       entities: {
         task: {
-          path: "/tasks",
           schema: taskSchema,
-          createSchema: createTaskDto,
-          updateSchema: updateTaskDto,
+          operations: {
+            list:   { method: "GET" as const,    path: "/tasks" },
+            get:    { method: "GET" as const,    path: "/tasks/:id" },
+            create: { method: "POST" as const,   path: "/tasks", input: createTaskDto },
+            update: { method: "PATCH" as const,  path: "/tasks/:id", input: updateTaskDto },
+            delete: { method: "DELETE" as const, path: "/tasks/:id" },
+          },
         },
       },
     });
@@ -85,10 +115,14 @@ describe("defineApi", () => {
       queryBuilder: simpleQueryBuilder,
       entities: {
         task: {
-          path: "/tasks",
           schema: taskSchema,
-          createSchema: createTaskDto,
-          updateSchema: updateTaskDto,
+          operations: {
+            list:   { method: "GET" as const,    path: "/tasks" },
+            get:    { method: "GET" as const,    path: "/tasks/:id" },
+            create: { method: "POST" as const,   path: "/tasks", input: createTaskDto },
+            update: { method: "PATCH" as const,  path: "/tasks/:id", input: updateTaskDto },
+            delete: { method: "DELETE" as const, path: "/tasks/:id" },
+          },
         },
       },
     });
@@ -108,10 +142,14 @@ describe("deriveClient.list with queryBuilder", () => {
         queryBuilder: simpleQueryBuilder,
         entities: {
           task: {
-            path: "/tasks",
             schema: taskSchema,
-            createSchema: createTaskDto,
-            updateSchema: updateTaskDto,
+            operations: {
+              list:   { method: "GET" as const,    path: "/tasks" },
+              get:    { method: "GET" as const,    path: "/tasks/:id" },
+              create: { method: "POST" as const,   path: "/tasks", input: createTaskDto },
+              update: { method: "PATCH" as const,  path: "/tasks/:id", input: updateTaskDto },
+              delete: { method: "DELETE" as const, path: "/tasks/:id" },
+            },
           },
         },
       },
@@ -138,10 +176,14 @@ describe("deriveClient.list with queryBuilder", () => {
         basePath: "/api",
         entities: {
           task: {
-            path: "/tasks",
             schema: taskSchema,
-            createSchema: createTaskDto,
-            updateSchema: updateTaskDto,
+            operations: {
+              list:   { method: "GET" as const,    path: "/tasks" },
+              get:    { method: "GET" as const,    path: "/tasks/:id" },
+              create: { method: "POST" as const,   path: "/tasks", input: createTaskDto },
+              update: { method: "PATCH" as const,  path: "/tasks/:id", input: updateTaskDto },
+              delete: { method: "DELETE" as const, path: "/tasks/:id" },
+            },
           },
         },
       },
@@ -166,10 +208,14 @@ describe("deriveClient.list with queryBuilder", () => {
         queryBuilder: simpleQueryBuilder,
         entities: {
           controller: {
-            path: "/controllers",
             schema: taskSchema,
-            createSchema: createTaskDto,
-            updateSchema: updateTaskDto,
+            operations: {
+              list:   { method: "GET" as const,    path: "/controllers" },
+              get:    { method: "GET" as const,    path: "/controllers/:id" },
+              create: { method: "POST" as const,   path: "/controllers", input: createTaskDto },
+              update: { method: "PATCH" as const,  path: "/controllers/:id", input: updateTaskDto },
+              delete: { method: "DELETE" as const, path: "/controllers/:id" },
+            },
             parent: { param: "topologyId", path: "/topologies" },
           },
         },

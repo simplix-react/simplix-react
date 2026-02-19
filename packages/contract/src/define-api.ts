@@ -28,27 +28,31 @@ import { deriveQueryKeys } from "./derive/query-keys.js";
  * import { z } from "zod";
  * import { defineApi, simpleQueryBuilder } from "@simplix-react/contract";
  *
- * const projectApi = defineApi({
- *   domain: "project",
+ * const inventoryApi = defineApi({
+ *   domain: "inventory",
  *   basePath: "/api/v1",
  *   entities: {
- *     task: {
- *       path: "/tasks",
- *       schema: z.object({ id: z.string(), title: z.string() }),
- *       createSchema: z.object({ title: z.string() }),
- *       updateSchema: z.object({ title: z.string().optional() }),
+ *     product: {
+ *       schema: productSchema,
+ *       operations: {
+ *         list:   { method: "GET",    path: "/products" },
+ *         get:    { method: "GET",    path: "/products/:id" },
+ *         create: { method: "POST",   path: "/products", input: createProductSchema },
+ *         update: { method: "PATCH",  path: "/products/:id", input: updateProductSchema },
+ *         delete: { method: "DELETE", path: "/products/:id" },
+ *       },
  *     },
  *   },
  *   queryBuilder: simpleQueryBuilder,
  * });
  *
  * // Type-safe client usage
- * const tasks = await projectApi.client.task.list();
- * const task = await projectApi.client.task.get("task-1");
+ * const products = await inventoryApi.client.product.list();
+ * const product = await inventoryApi.client.product.get("product-1");
  *
  * // Query keys for TanStack Query
- * projectApi.queryKeys.task.all;       // ["project", "task"]
- * projectApi.queryKeys.task.detail("task-1"); // ["project", "task", "detail", "task-1"]
+ * inventoryApi.queryKeys.product.all;       // ["inventory", "product"]
+ * inventoryApi.queryKeys.product.detail("product-1"); // ["inventory", "product", "detail", "product-1"]
  * ```
  *
  * @see {@link ApiContractConfig} for the full config shape.

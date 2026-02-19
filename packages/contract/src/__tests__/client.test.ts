@@ -26,10 +26,14 @@ const baseConfig = {
   basePath: "/api/v1",
   entities: {
     task: {
-      path: "/tasks",
       schema: taskSchema,
-      createSchema: createTaskDto,
-      updateSchema: updateTaskDto,
+      operations: {
+        list:   { method: "GET" as const,    path: "/tasks" },
+        get:    { method: "GET" as const,    path: "/tasks/:id" },
+        create: { method: "POST" as const,   path: "/tasks", input: createTaskDto },
+        update: { method: "PATCH" as const,  path: "/tasks/:id", input: updateTaskDto },
+        delete: { method: "DELETE" as const, path: "/tasks/:id" },
+      },
     },
   },
 };
@@ -95,10 +99,14 @@ describe("deriveClient with parent entity", () => {
     basePath: "/api/v1",
     entities: {
       task: {
-        path: "/tasks",
         schema: taskSchema,
-        createSchema: createTaskDto,
-        updateSchema: updateTaskDto,
+        operations: {
+          list:   { method: "GET" as const,    path: "/tasks" },
+          get:    { method: "GET" as const,    path: "/tasks/:id" },
+          create: { method: "POST" as const,   path: "/tasks", input: createTaskDto },
+          update: { method: "PATCH" as const,  path: "/tasks/:id", input: updateTaskDto },
+          delete: { method: "DELETE" as const, path: "/tasks/:id" },
+        },
         parent: { param: "projectId", path: "/projects" },
       },
     },
@@ -154,16 +162,20 @@ describe("deriveClient with parent entity", () => {
   });
 });
 
-describe("deriveClient with operations", () => {
+describe("deriveClient with top-level operations", () => {
   const configWithOps = {
     domain: "project",
     basePath: "/api/v1",
     entities: {
       task: {
-        path: "/tasks",
         schema: taskSchema,
-        createSchema: createTaskDto,
-        updateSchema: updateTaskDto,
+        operations: {
+          list:   { method: "GET" as const,    path: "/tasks" },
+          get:    { method: "GET" as const,    path: "/tasks/:id" },
+          create: { method: "POST" as const,   path: "/tasks", input: createTaskDto },
+          update: { method: "PATCH" as const,  path: "/tasks/:id", input: updateTaskDto },
+          delete: { method: "DELETE" as const, path: "/tasks/:id" },
+        },
       },
     },
     operations: {
@@ -266,6 +278,177 @@ describe("deriveClient with operations", () => {
   });
 });
 
+describe("deriveClient with custom entity operations", () => {
+  it("handles PUT method entity", async () => {
+    const config = {
+      domain: "project",
+      basePath: "/api/v1",
+      entities: {
+        task: {
+          schema: taskSchema,
+          operations: {
+            update: { method: "PUT" as const, path: "/tasks/:id", input: updateTaskDto },
+          },
+        },
+      },
+    };
+
+    const mockFetch = vi.fn().mockResolvedValue({ id: "1" });
+    const client = deriveClient(config, mockFetch);
+    const taskClient = client.task as { update: (id: string, dto: unknown) => Promise<unknown> };
+
+    await taskClient.update("task-1", { title: "Updated" });
+    expect(mockFetch).toHaveBeenCalledWith("/api/v1/tasks/task-1", {
+      method: "PUT",
+      body: JSON.stringify({ title: "Updated" }),
+    });
+  });
+
+  it("entity without delete operation has no delete method", () => {
+    const config = {
+      domain: "project",
+      basePath: "/api/v1",
+      entities: {
+        task: {
+          schema: taskSchema,
+          operations: {
+            list: { method: "GET" as const, path: "/tasks" },
+            get:  { method: "GET" as const, path: "/tasks/:id" },
+          },
+        },
+      },
+    };
+
+    const mockFetch = vi.fn();
+    const client = deriveClient(config, mockFetch);
+    const taskClient = client.task as Record<string, unknown>;
+
+    expect(taskClient.list).toBeDefined();
+    expect(taskClient.get).toBeDefined();
+    expect(taskClient.delete).toBeUndefined();
+  });
+
+  it("handles custom archive operation", async () => {
+    const config = {
+      domain: "project",
+      basePath: "/api/v1",
+      entities: {
+        task: {
+          schema: taskSchema,
+          operations: {
+            archive: { method: "POST" as const, path: "/tasks/:id/archive", input: z.object({ reason: z.string() }) },
+          },
+        },
+      },
+    };
+
+    const mockFetch = vi.fn().mockResolvedValue({ success: true });
+    const client = deriveClient(config, mockFetch);
+    const taskClient = client.task as { archive: (...args: unknown[]) => Promise<unknown> };
+
+    await taskClient.archive("task-1", { reason: "completed" });
+    expect(mockFetch).toHaveBeenCalledWith("/api/v1/tasks/task-1/archive", {
+      method: "POST",
+      body: JSON.stringify({ reason: "completed" }),
+    });
+  });
+
+  it("handles bulkDelete operation", async () => {
+    const config = {
+      domain: "project",
+      basePath: "/api/v1",
+      entities: {
+        task: {
+          schema: taskSchema,
+          operations: {
+            bulkDelete: {
+              method: "POST" as const,
+              path: "/tasks/bulk-delete",
+              input: z.object({ ids: z.array(z.string()) }),
+            },
+          },
+        },
+      },
+    };
+
+    const mockFetch = vi.fn().mockResolvedValue({ success: true });
+    const client = deriveClient(config, mockFetch);
+    const taskClient = client.task as { bulkDelete: (...args: unknown[]) => Promise<unknown> };
+
+    await taskClient.bulkDelete({ ids: ["1", "2", "3"] });
+    expect(mockFetch).toHaveBeenCalledWith("/api/v1/tasks/bulk-delete", {
+      method: "POST",
+      body: JSON.stringify({ ids: ["1", "2", "3"] }),
+    });
+  });
+
+  it("handles tree operation", async () => {
+    const config = {
+      domain: "project",
+      basePath: "/api/v1",
+      entities: {
+        category: {
+          schema: z.object({ id: z.string(), name: z.string(), parentId: z.string().nullable() }),
+          operations: {
+            tree: { method: "GET" as const, path: "/categories/tree" },
+          },
+        },
+      },
+    };
+
+    const mockFetch = vi.fn().mockResolvedValue([]);
+    const client = deriveClient(config, mockFetch);
+    const categoryClient = client.category as { tree: (params?: Record<string, unknown>) => Promise<unknown> };
+
+    await categoryClient.tree();
+    expect(mockFetch).toHaveBeenCalledWith("/api/v1/categories/tree");
+  });
+
+  it("handles tree operation with rootId param", async () => {
+    const config = {
+      domain: "project",
+      basePath: "/api/v1",
+      entities: {
+        category: {
+          schema: z.object({ id: z.string(), name: z.string(), parentId: z.string().nullable() }),
+          operations: {
+            tree: { method: "GET" as const, path: "/categories/tree" },
+          },
+        },
+      },
+    };
+
+    const mockFetch = vi.fn().mockResolvedValue([]);
+    const client = deriveClient(config, mockFetch);
+    const categoryClient = client.category as { tree: (params?: Record<string, unknown>) => Promise<unknown> };
+
+    await categoryClient.tree({ rootId: "abc" });
+    expect(mockFetch).toHaveBeenCalledWith("/api/v1/categories/tree?rootId=abc");
+  });
+
+  it("handles explicit role mapping", async () => {
+    const config = {
+      domain: "project",
+      basePath: "/api/v1",
+      entities: {
+        task: {
+          schema: taskSchema,
+          operations: {
+            fetchAll: { method: "GET" as const, path: "/tasks", role: "list" as const },
+          },
+        },
+      },
+    };
+
+    const mockFetch = vi.fn().mockResolvedValue([]);
+    const client = deriveClient(config, mockFetch);
+    const taskClient = client.task as { fetchAll: (params?: ListParams) => Promise<unknown> };
+
+    await taskClient.fetchAll();
+    expect(mockFetch).toHaveBeenCalledWith("/api/v1/tasks");
+  });
+});
+
 describe("deriveClient with multiple entities", () => {
   const projectSchema = z.object({ id: z.string(), name: z.string() });
   const createProjectDto = z.object({ name: z.string() });
@@ -276,16 +459,24 @@ describe("deriveClient with multiple entities", () => {
     basePath: "/api",
     entities: {
       task: {
-        path: "/tasks",
         schema: taskSchema,
-        createSchema: createTaskDto,
-        updateSchema: updateTaskDto,
+        operations: {
+          list:   { method: "GET" as const,    path: "/tasks" },
+          get:    { method: "GET" as const,    path: "/tasks/:id" },
+          create: { method: "POST" as const,   path: "/tasks", input: createTaskDto },
+          update: { method: "PATCH" as const,  path: "/tasks/:id", input: updateTaskDto },
+          delete: { method: "DELETE" as const, path: "/tasks/:id" },
+        },
       },
       project: {
-        path: "/projects",
         schema: projectSchema,
-        createSchema: createProjectDto,
-        updateSchema: updateProjectDto,
+        operations: {
+          list:   { method: "GET" as const,    path: "/projects" },
+          get:    { method: "GET" as const,    path: "/projects/:id" },
+          create: { method: "POST" as const,   path: "/projects", input: createProjectDto },
+          update: { method: "PATCH" as const,  path: "/projects/:id", input: updateProjectDto },
+          delete: { method: "DELETE" as const, path: "/projects/:id" },
+        },
       },
     },
   };

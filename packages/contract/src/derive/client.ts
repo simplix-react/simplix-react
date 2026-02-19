@@ -1,20 +1,23 @@
 import type {
   ApiContractConfig,
   EntityDefinition,
+  EntityOperationDef,
   FetchFn,
   OperationDefinition,
 } from "../types.js";
 import type { ListParams, QueryBuilder } from "../helpers/query-types.js";
 import { buildPath } from "../helpers/path-builder.js";
+import { interpolatePath, extractPathParams } from "../helpers/path-params.js";
+import { resolveRole } from "../helpers/resolve-role.js";
 import { ApiError, defaultFetch } from "../helpers/fetch.js";
 
 /**
  * Derives a type-safe HTTP client from an {@link ApiContractConfig}.
  *
  * Iterates over all entities and operations in the config and generates
- * corresponding CRUD methods and operation functions. Each entity produces
- * `list`, `get`, `create`, `update`, and `delete` methods. Each operation
- * produces a callable function with positional path parameter arguments.
+ * corresponding client methods. Entity operations are generated dynamically
+ * from the `operations` map. Each top-level operation produces a callable
+ * function with positional path parameter arguments.
  *
  * Typically called internally by {@link defineApi} rather than used directly.
  *
@@ -29,7 +32,7 @@ import { ApiError, defaultFetch } from "../helpers/fetch.js";
  * import { deriveClient } from "@simplix-react/contract";
  *
  * const client = deriveClient(config);
- * const tasks = await client.task.list();
+ * const products = await client.product.list();
  * ```
  *
  * @see {@link defineApi} for the recommended high-level API.
@@ -50,7 +53,7 @@ export function deriveClient<
 
   if (operations) {
     for (const [name, operation] of Object.entries(operations)) {
-      result[name] = createOperationClient(basePath, operation, fetchFn);
+      result[name] = createTopLevelOperationClient(basePath, operation, fetchFn);
     }
   }
 
@@ -63,67 +66,229 @@ function createEntityClient(
   fetchFn: FetchFn,
   queryBuilder?: QueryBuilder,
 ) {
-  const { path, parent } = entity;
+  const client: Record<string, unknown> = {};
 
-  return {
-    list(parentIdOrParams?: string | ListParams, params?: ListParams) {
-      let parentId: string | undefined;
-      let listParams: ListParams | undefined;
+  for (const [name, op] of Object.entries(entity.operations)) {
+    const role = resolveRole(name, op);
+    client[name] = createOperationFn(basePath, op, role, entity, fetchFn, queryBuilder);
+  }
 
-      if (typeof parentIdOrParams === "string") {
-        parentId = parentIdOrParams;
-        listParams = params;
-      } else {
-        listParams = parentIdOrParams;
-      }
+  return client;
+}
 
-      let url =
-        parent && parentId
-          ? `${basePath}${parent.path}/${parentId}${path}`
-          : `${basePath}${path}`;
+function createOperationFn(
+  basePath: string,
+  op: EntityOperationDef,
+  role: string | undefined,
+  entity: EntityDefinition,
+  fetchFn: FetchFn,
+  queryBuilder?: QueryBuilder,
+) {
+  switch (role) {
+    case "list":
+      return createListFn(basePath, op, entity, fetchFn, queryBuilder);
+    case "get":
+      return createGetFn(basePath, op, fetchFn);
+    case "create":
+      return createCreateFn(basePath, op, entity, fetchFn);
+    case "update":
+      return createUpdateFn(basePath, op, fetchFn);
+    case "delete":
+      return createDeleteFn(basePath, op, fetchFn);
+    case "tree":
+      return createTreeFn(basePath, op, fetchFn, queryBuilder);
+    default:
+      return createGenericOperationFn(basePath, op, fetchFn);
+  }
+}
 
-      if (listParams && queryBuilder) {
-        const sp = queryBuilder.buildSearchParams(listParams);
-        const qs = sp.toString();
-        if (qs) url += `?${qs}`;
-      }
+// ── Role-specific client functions ──
 
-      return fetchFn(url);
-    },
+function createListFn(
+  basePath: string,
+  op: EntityOperationDef,
+  entity: EntityDefinition,
+  fetchFn: FetchFn,
+  queryBuilder?: QueryBuilder,
+) {
+  const { parent } = entity;
 
-    get(id: string) {
-      return fetchFn(`${basePath}${path}/${id}`);
-    },
+  return function list(parentIdOrParams?: string | ListParams, params?: ListParams) {
+    let parentId: string | undefined;
+    let listParams: ListParams | undefined;
 
-    create(parentIdOrDto: unknown, dto?: unknown) {
-      if (parent && typeof parentIdOrDto === "string") {
-        const url = `${basePath}${parent.path}/${parentIdOrDto}${path}`;
-        return fetchFn(url, {
-          method: "POST",
-          body: JSON.stringify(dto),
-        });
-      }
-      const url = `${basePath}${path}`;
-      return fetchFn(url, {
-        method: "POST",
-        body: JSON.stringify(parentIdOrDto),
-      });
-    },
+    if (typeof parentIdOrParams === "string") {
+      parentId = parentIdOrParams;
+      listParams = params;
+    } else {
+      listParams = parentIdOrParams;
+    }
 
-    update(id: string, dto: unknown) {
-      return fetchFn(`${basePath}${path}/${id}`, {
-        method: "PATCH",
-        body: JSON.stringify(dto),
-      });
-    },
+    let url: string;
+    if (parent && parentId) {
+      url = `${basePath}${parent.path}/${parentId}${op.path}`;
+    } else {
+      url = `${basePath}${op.path}`;
+    }
 
-    delete(id: string) {
-      return fetchFn(`${basePath}${path}/${id}`, { method: "DELETE" });
-    },
+    if (listParams && queryBuilder) {
+      const sp = queryBuilder.buildSearchParams(listParams);
+      const qs = sp.toString();
+      if (qs) url += `?${qs}`;
+    }
+
+    return fetchFn(url);
   };
 }
 
-function createOperationClient(
+function createGetFn(
+  basePath: string,
+  op: EntityOperationDef,
+  fetchFn: FetchFn,
+) {
+  const pathParams = extractPathParams(op.path);
+
+  return function get(idOrParams: string | Record<string, string>) {
+    const params = typeof idOrParams === "string"
+      ? { [pathParams[pathParams.length - 1] ?? "id"]: idOrParams }
+      : idOrParams;
+    const url = `${basePath}${interpolatePath(op.path, params)}`;
+    return fetchFn(url);
+  };
+}
+
+function createCreateFn(
+  basePath: string,
+  op: EntityOperationDef,
+  entity: EntityDefinition,
+  fetchFn: FetchFn,
+) {
+  const { parent } = entity;
+
+  return function create(parentIdOrDto: unknown, dto?: unknown) {
+    if (parent && typeof parentIdOrDto === "string") {
+      const url = `${basePath}${parent.path}/${parentIdOrDto}${op.path}`;
+      return fetchFn(url, {
+        method: op.method,
+        body: JSON.stringify(dto),
+      });
+    }
+    const url = `${basePath}${op.path}`;
+    return fetchFn(url, {
+      method: op.method,
+      body: JSON.stringify(parentIdOrDto),
+    });
+  };
+}
+
+function createUpdateFn(
+  basePath: string,
+  op: EntityOperationDef,
+  fetchFn: FetchFn,
+) {
+  const pathParams = extractPathParams(op.path);
+
+  return function update(idOrParams: string | Record<string, string>, dto: unknown) {
+    const params = typeof idOrParams === "string"
+      ? { [pathParams[pathParams.length - 1] ?? "id"]: idOrParams }
+      : idOrParams;
+    const url = `${basePath}${interpolatePath(op.path, params)}`;
+    return fetchFn(url, {
+      method: op.method,
+      body: JSON.stringify(dto),
+    });
+  };
+}
+
+function createDeleteFn(
+  basePath: string,
+  op: EntityOperationDef,
+  fetchFn: FetchFn,
+) {
+  const pathParams = extractPathParams(op.path);
+
+  return function deleteFn(idOrParams: string | Record<string, string>) {
+    const params = typeof idOrParams === "string"
+      ? { [pathParams[pathParams.length - 1] ?? "id"]: idOrParams }
+      : idOrParams;
+    const url = `${basePath}${interpolatePath(op.path, params)}`;
+    return fetchFn(url, { method: op.method });
+  };
+}
+
+function createTreeFn(
+  basePath: string,
+  op: EntityOperationDef,
+  fetchFn: FetchFn,
+  queryBuilder?: QueryBuilder,
+) {
+  return function tree(params?: Record<string, unknown>) {
+    let url = `${basePath}${op.path}`;
+
+    if (params && queryBuilder) {
+      const sp = queryBuilder.buildSearchParams({ filters: params });
+      const qs = sp.toString();
+      if (qs) url += `?${qs}`;
+    } else if (params) {
+      const sp = new URLSearchParams();
+      for (const [key, value] of Object.entries(params)) {
+        if (value !== undefined && value !== null) {
+          sp.set(key, String(value));
+        }
+      }
+      const qs = sp.toString();
+      if (qs) url += `?${qs}`;
+    }
+
+    return fetchFn(url);
+  };
+}
+
+function createGenericOperationFn(
+  basePath: string,
+  op: EntityOperationDef,
+  fetchFn: FetchFn,
+) {
+  const paramNames = extractPathParams(op.path);
+
+  return (...args: unknown[]) => {
+    const pathParams: Record<string, string> = {};
+    let argIndex = 0;
+
+    for (const paramName of paramNames) {
+      if (argIndex < args.length) {
+        pathParams[paramName] = String(args[argIndex]);
+        argIndex++;
+      }
+    }
+
+    let inputData: unknown = undefined;
+    if (argIndex < args.length) {
+      inputData = args[argIndex];
+    }
+
+    const url = `${basePath}${buildPath(op.path, pathParams)}`;
+
+    if (op.contentType === "multipart" && inputData !== undefined) {
+      return multipartFetch(url, op.method, toFormData(inputData), op.responseType);
+    }
+
+    if (op.responseType === "blob") {
+      return blobFetch(url, op.method, inputData);
+    }
+
+    const options: RequestInit = { method: op.method };
+    if (inputData !== undefined && op.method !== "GET") {
+      options.body = JSON.stringify(inputData);
+    }
+
+    return fetchFn(url, options);
+  };
+}
+
+// ── Top-level operation client (unchanged from original) ──
+
+function createTopLevelOperationClient(
   basePath: string,
   operation: OperationDefinition,
   fetchFn: FetchFn,
@@ -166,6 +331,8 @@ function createOperationClient(
     return fetchFn(url, options);
   };
 }
+
+// ── Utility functions ──
 
 function toFormData(data: unknown): FormData {
   const formData = new FormData();

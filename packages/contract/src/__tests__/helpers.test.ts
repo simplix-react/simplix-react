@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { buildPath } from "../helpers/path-builder.js";
-import { camelToKebab, camelToSnake } from "../helpers/case-transform.js";
+import { camelToSnake } from "../helpers/case-transform.js";
 import { simpleQueryBuilder } from "../helpers/query-builders.js";
 import type { ListParams } from "../helpers/query-types.js";
 
@@ -22,20 +22,6 @@ describe("buildPath", () => {
 
   it("returns template unchanged when no params", () => {
     expect(buildPath("/items")).toBe("/items");
-  });
-});
-
-describe("camelToKebab", () => {
-  it("converts camelCase to kebab-case", () => {
-    expect(camelToKebab("doorReader")).toBe("door-reader");
-  });
-
-  it("handles single word", () => {
-    expect(camelToKebab("door")).toBe("door");
-  });
-
-  it("handles multiple uppercase transitions", () => {
-    expect(camelToKebab("accessPointController")).toBe("access-point-controller");
   });
 });
 
