@@ -5,7 +5,7 @@ import type {
   UseMutationOptions,
   UseMutationResult,
 } from "@tanstack/react-query";
-import type { ListParams, PageInfo } from "@simplix-react/contract";
+import type { EntityId, ListParams, PageInfo } from "@simplix-react/contract";
 import type { z } from "zod";
 
 /**
@@ -57,7 +57,7 @@ export type DerivedListHook<TData> = (
  * @see {@link EntityHooks} for the complete set of entity hooks.
  */
 export type DerivedGetHook<TData> = (
-  id: string,
+  id: EntityId,
   options?: Omit<UseQueryOptions<TData, Error>, "queryKey" | "queryFn">,
 ) => UseQueryResult<TData>;
 
@@ -67,7 +67,7 @@ export type DerivedGetHook<TData> = (
  * Automatically invalidates all entity queries on success.
  * For child entities, accepts a `parentId` as the first argument.
  *
- * @typeParam TInput - The create DTO type (inferred from the entity's createSchema)
+ * @typeParam TInput - The create DTO type (inferred from the entity's create operation input)
  * @typeParam TOutput - The entity type returned after creation
  *
  * @example
@@ -96,7 +96,7 @@ export type DerivedCreateHook<TInput, TOutput> = (
  * via the `optimistic` option. Automatically invalidates all entity queries
  * on settlement.
  *
- * @typeParam TInput - The update DTO type (inferred from the entity's updateSchema)
+ * @typeParam TInput - The update DTO type (inferred from the entity's update operation input)
  * @typeParam TOutput - The entity type returned after update
  *
  * @example
@@ -112,10 +112,10 @@ export type DerivedCreateHook<TInput, TOutput> = (
  */
 export type DerivedUpdateHook<TInput, TOutput> = (
   options?: Omit<
-    UseMutationOptions<TOutput, Error, { id: string; dto: TInput }>,
+    UseMutationOptions<TOutput, Error, { id: EntityId; dto: TInput }>,
     "mutationFn"
   >,
-) => UseMutationResult<TOutput, Error, { id: string; dto: TInput }>;
+) => UseMutationResult<TOutput, Error, { id: EntityId; dto: TInput }>;
 
 /**
  * Represents a derived delete mutation hook.
@@ -136,30 +136,17 @@ export type DerivedUpdateHook<TInput, TOutput> = (
  */
 export type DerivedDeleteHook = (
   options?: Omit<
-    UseMutationOptions<void, Error, string>,
+    UseMutationOptions<void, Error, EntityId>,
     "mutationFn"
   >,
-) => UseMutationResult<void, Error, string>;
+) => UseMutationResult<void, Error, EntityId>;
 
 /**
  * Represents a derived infinite list query hook for cursor-based or offset-based pagination.
  *
  * Automatically determines the next page parameter from the response `meta` field.
- * Pagination parameters are managed internally; callers provide only filters, sort,
- * and an optional page size limit.
  *
  * @typeParam TData - The entity type returned in each page
- *
- * @example
- * ```ts
- * import { deriveHooks } from "@simplix-react/react";
- *
- * const hooks = deriveHooks(projectContract);
- * const { data, fetchNextPage, hasNextPage } = hooks.task.useInfiniteList(
- *   projectId,
- *   { limit: 10, filters: { status: "open" } },
- * );
- * ```
  *
  * @see {@link EntityHooks} for the complete set of entity hooks.
  */
@@ -175,42 +162,37 @@ export type DerivedInfiniteListHook<TData> = (
 /**
  * Represents the complete set of React Query hooks derived from an entity definition.
  *
- * Each entity in the contract produces an object conforming to this interface,
- * with hooks for CRUD operations and infinite scrolling.
+ * Each entity in the contract produces an object conforming to this interface.
+ * Hook names are derived from operation names with a `use` prefix and PascalCase.
+ * CRUD role operations produce specialized hooks; custom operations produce
+ * generic query/mutation hooks based on their HTTP method.
  *
  * @typeParam TSchema - The Zod schema defining the entity shape
- * @typeParam TCreate - The Zod schema defining the create DTO shape
- * @typeParam TUpdate - The Zod schema defining the update DTO shape
  *
  * @example
  * ```ts
  * import { deriveHooks } from "@simplix-react/react";
  *
- * const hooks = deriveHooks(projectContract);
+ * const hooks = deriveHooks(inventoryContract);
  *
- * // hooks.task satisfies EntityHooks<TaskSchema, CreateTaskSchema, UpdateTaskSchema>
- * const { data } = hooks.task.useList();
- * const { data: single } = hooks.task.useGet(id);
- * const create = hooks.task.useCreate();
- * const update = hooks.task.useUpdate();
- * const remove = hooks.task.useDelete();
- * const infinite = hooks.task.useInfiniteList();
+ * // CRUD hooks (from operations with CRUD roles)
+ * const { data } = hooks.product.useList();
+ * const { data: single } = hooks.product.useGet(id);
+ * const create = hooks.product.useCreate();
+ * const update = hooks.product.useUpdate();
+ * const remove = hooks.product.useDelete();
+ * const infinite = hooks.product.useInfiniteList();
+ *
+ * // Custom operation hooks
+ * const archive = hooks.product.useArchive();
+ * const { data: results } = hooks.product.useSearch({ q: "keyword" });
  * ```
  *
  * @see {@link deriveHooks} for generating these hooks from a contract.
  */
-export interface EntityHooks<
-  TSchema extends z.ZodTypeAny,
-  TCreate extends z.ZodTypeAny,
-  TUpdate extends z.ZodTypeAny,
-> {
-  useList: DerivedListHook<z.infer<TSchema>>;
-  useGet: DerivedGetHook<z.infer<TSchema>>;
-  useCreate: DerivedCreateHook<z.infer<TCreate>, z.infer<TSchema>>;
-  useUpdate: DerivedUpdateHook<z.infer<TUpdate>, z.infer<TSchema>>;
-  useDelete: DerivedDeleteHook;
-  useInfiniteList: DerivedInfiniteListHook<z.infer<TSchema>>;
-}
+export type EntityHooks<
+  _TSchema extends z.ZodTypeAny = z.ZodTypeAny,
+> = Record<string, (...args: unknown[]) => unknown>;
 
 /**
  * Represents a derived mutation hook for a custom operation.
@@ -220,15 +202,6 @@ export interface EntityHooks<
  *
  * @typeParam TInput - The input type for the operation
  * @typeParam TOutput - The output type for the operation
- *
- * @example
- * ```ts
- * import { deriveHooks } from "@simplix-react/react";
- *
- * const hooks = deriveHooks(projectContract);
- * const archiveProject = hooks.archiveProject.useMutation();
- * archiveProject.mutate({ projectId: "abc" });
- * ```
  *
  * @see {@link OperationHooks} for the operation hooks container.
  */
@@ -242,22 +215,10 @@ export type OperationMutationHook<TInput, TOutput> = (
 /**
  * Represents the hook container for a custom operation defined in the contract.
  *
- * Each operation in the contract produces an object with a single `useMutation` hook.
- * Cache invalidation is handled automatically based on the operation's `invalidates`
- * configuration in the contract.
+ * Each top-level operation in the contract produces an object with a single `useMutation` hook.
  *
  * @typeParam TInput - The Zod schema defining the operation input
  * @typeParam TOutput - The Zod schema defining the operation output
- *
- * @example
- * ```ts
- * import { deriveHooks } from "@simplix-react/react";
- *
- * const hooks = deriveHooks(projectContract);
- * const { mutate, isPending } = hooks.archiveProject.useMutation({
- *   onSuccess: () => console.log("Project archived"),
- * });
- * ```
  *
  * @see {@link deriveHooks} for generating hooks from a contract.
  */

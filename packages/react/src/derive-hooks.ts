@@ -10,23 +10,22 @@ import type {
   AnyEntityDef,
   AnyOperationDef,
   ApiContractConfig,
+  EntityId,
+  EntityOperationDef,
   ListParams,
   OperationDefinition,
   QueryKeyFactory,
 } from "@simplix-react/contract";
+import { resolveRole } from "@simplix-react/contract";
 import type { EntityHooks, OperationHooks } from "./types.js";
 
 /**
  * Derives type-safe React Query hooks from an API contract.
  *
  * Generates a complete set of hooks for every entity and operation defined in
- * the contract. Entity hooks include `useList`, `useGet`, `useCreate`,
- * `useUpdate`, `useDelete`, and `useInfiniteList`. Operation hooks provide
- * a single `useMutation` with automatic cache invalidation.
- *
- * All hooks support full TanStack Query options passthrough — callers can
- * provide any option except `queryKey`/`queryFn` (for queries) or
- * `mutationFn` (for mutations), which are managed internally.
+ * the contract. Entity operations with CRUD roles produce specialized hooks
+ * (`useList`, `useGet`, `useCreate`, `useUpdate`, `useDelete`, `useInfiniteList`).
+ * Custom operations produce generic query or mutation hooks based on their HTTP method.
  *
  * @typeParam TEntities - Record of entity definitions from the contract
  * @typeParam TOperations - Record of operation definitions from the contract
@@ -40,30 +39,34 @@ import type { EntityHooks, OperationHooks } from "./types.js";
  * ```ts
  * import { defineApi } from "@simplix-react/contract";
  * import { deriveHooks } from "@simplix-react/react";
- * import { z } from "zod";
  *
- * const projectContract = defineApi({
- *   domain: "project",
+ * const inventoryContract = defineApi({
+ *   domain: "inventory",
  *   basePath: "/api",
  *   entities: {
- *     task: {
- *       path: "/tasks",
- *       schema: z.object({ id: z.string(), title: z.string(), status: z.string() }),
- *       createSchema: z.object({ title: z.string(), status: z.string() }),
- *       updateSchema: z.object({ title: z.string().optional(), status: z.string().optional() }),
+ *     product: {
+ *       schema: productSchema,
+ *       operations: {
+ *         list:   { method: "GET",    path: "/products" },
+ *         get:    { method: "GET",    path: "/products/:id" },
+ *         create: { method: "POST",   path: "/products", input: createProductSchema },
+ *         update: { method: "PATCH",  path: "/products/:id", input: updateProductSchema },
+ *         delete: { method: "DELETE", path: "/products/:id" },
+ *         archive: { method: "POST",  path: "/products/:id/archive" },
+ *       },
  *     },
  *   },
  * });
  *
- * // Derive all hooks at once
- * const hooks = deriveHooks(projectContract);
+ * const hooks = deriveHooks(inventoryContract);
  *
- * // Use in components
- * function TaskList() {
- *   const { data: tasks } = hooks.task.useList();
- *   const createTask = hooks.task.useCreate();
- *   // ...
- * }
+ * // CRUD hooks
+ * hooks.product.useList();
+ * hooks.product.useGet("id-1");
+ * hooks.product.useCreate();
+ *
+ * // Custom operation hooks
+ * hooks.product.useArchive();
  * ```
  *
  * @see {@link EntityHooks} for the per-entity hook interface.
@@ -85,58 +88,85 @@ export function deriveHooks<
   // Entity hooks
   for (const entityName of Object.keys(config.entities)) {
     const entity = config.entities[entityName];
-    const entityClient = client[entityName] as EntityClientShape;
+    const entityClient = client[entityName] as Record<string, (...args: unknown[]) => Promise<unknown>>;
     const keys = queryKeys[entityName];
 
     result[entityName] = createEntityHooks(entity, entityClient, keys, queryKeys, config);
   }
 
-  // Operation hooks
+  // Top-level operation hooks
   if (config.operations) {
     for (const opName of Object.keys(config.operations)) {
       const operation = config.operations[opName];
       const opClient = client[opName] as (...args: unknown[]) => Promise<unknown>;
 
-      result[opName] = createOperationHooks(opClient, operation, queryKeys);
+      result[opName] = createTopLevelOperationHooks(opClient, operation, queryKeys);
     }
   }
 
   return result as DerivedHooksResult<TEntities, TOperations>;
 }
 
-// ── Internal Types ──
-
-interface EntityClientShape {
-  list: (parentIdOrParams?: string | ListParams, params?: ListParams) => Promise<unknown>;
-  get: (id: string) => Promise<unknown>;
-  create: (parentIdOrDto: unknown, dto?: unknown) => Promise<unknown>;
-  update: (id: string, dto: unknown) => Promise<unknown>;
-  delete: (id: string) => Promise<void>;
-}
-
 // ── Entity Hook Creators ──
 
 function createEntityHooks(
   entity: AnyEntityDef,
-  entityClient: EntityClientShape,
+  entityClient: Record<string, (...args: unknown[]) => Promise<unknown>>,
   keys: QueryKeyFactory,
   _allQueryKeys: Record<string, QueryKeyFactory>,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   _config: ApiContractConfig<any, any>,
 ) {
-  return {
-    useList: createUseListHook(entity, entityClient, keys),
-    useGet: createUseGetHook(entityClient, keys),
-    useCreate: createUseCreateHook(entity, entityClient, keys),
-    useUpdate: createUseUpdateHook(entityClient, keys),
-    useDelete: createUseDeleteHook(entityClient, keys),
-    useInfiniteList: createUseInfiniteListHook(entity, entityClient, keys),
-  };
+  const hooks: Record<string, unknown> = {};
+
+  for (const [opName, op] of Object.entries(entity.operations) as [string, EntityOperationDef][]) {
+    const role = resolveRole(opName, op);
+    const hookName = `use${capitalize(opName)}`;
+
+    switch (role) {
+      case "list": {
+        hooks[hookName] = createUseListHook(entity, entityClient[opName], keys);
+        hooks.useInfiniteList = createUseInfiniteListHook(entity, entityClient[opName], keys);
+        break;
+      }
+      case "get": {
+        hooks[hookName] = createUseGetHook(entityClient[opName], keys);
+        break;
+      }
+      case "create": {
+        hooks[hookName] = createUseCreateHook(entity, entityClient[opName], keys);
+        break;
+      }
+      case "update": {
+        hooks[hookName] = createUseUpdateHook(entityClient[opName], keys);
+        break;
+      }
+      case "delete": {
+        hooks[hookName] = createUseDeleteHook(entityClient[opName], keys);
+        break;
+      }
+      case "tree": {
+        hooks[hookName] = createUseTreeHook(entityClient[opName], keys);
+        break;
+      }
+      default: {
+        // Custom operation — query for GET, mutation for others
+        if (op.method === "GET") {
+          hooks[hookName] = createGenericQueryHook(opName, entityClient[opName], keys);
+        } else {
+          hooks[hookName] = createGenericMutationHook(opName, op, entityClient[opName], keys);
+        }
+        break;
+      }
+    }
+  }
+
+  return hooks;
 }
 
 function createUseListHook(
   entity: AnyEntityDef,
-  entityClient: EntityClientShape,
+  listFn: (...args: unknown[]) => Promise<unknown>,
   keys: QueryKeyFactory,
 ) {
   return function useList(
@@ -156,11 +186,15 @@ function createUseListHook(
 
     return useQuery({
       queryKey: keys.list(keyParams),
-      queryFn: () => {
-        if (entity.parent) {
-          return entityClient.list(parentId, listParams) as Promise<unknown[]>;
+      queryFn: async () => {
+        const result = entity.parent
+          ? await listFn(parentId, listParams)
+          : await listFn(listParams);
+        // Unwrap { data: T[], meta?: ... } envelope from paginated responses
+        if (result && typeof result === "object" && !Array.isArray(result) && "data" in (result as Record<string, unknown>)) {
+          return (result as { data: unknown[] }).data;
         }
-        return entityClient.list(listParams) as Promise<unknown[]>;
+        return result as unknown[];
       },
       enabled: entity.parent ? !!parentId : true,
       ...queryOptions,
@@ -169,17 +203,17 @@ function createUseListHook(
 }
 
 function createUseGetHook(
-  entityClient: EntityClientShape,
+  getFn: (...args: unknown[]) => Promise<unknown>,
   keys: QueryKeyFactory,
 ) {
   return function useGet(
-    id: string,
+    id: EntityId,
     options?: Omit<UseQueryOptions<unknown, Error>, "queryKey" | "queryFn">,
   ) {
     return useQuery<unknown, Error>({
       queryKey: keys.detail(id),
-      queryFn: () => entityClient.get(id),
-      enabled: !!id,
+      queryFn: () => getFn(id),
+      enabled: typeof id === "string" ? !!id : Object.keys(id).length > 0,
       ...options,
     });
   };
@@ -187,7 +221,7 @@ function createUseGetHook(
 
 function createUseCreateHook(
   entity: AnyEntityDef,
-  entityClient: EntityClientShape,
+  createFn: (...args: unknown[]) => Promise<unknown>,
   keys: QueryKeyFactory,
 ) {
   return function useCreate(
@@ -199,9 +233,9 @@ function createUseCreateHook(
     return useMutation({
       mutationFn: (dto: unknown) => {
         if (entity.parent && parentId) {
-          return entityClient.create(parentId, dto);
+          return createFn(parentId, dto);
         }
-        return entityClient.create(dto);
+        return createFn(dto);
       },
       onSuccess: (...args) => {
         queryClient.invalidateQueries({ queryKey: keys.all });
@@ -213,12 +247,12 @@ function createUseCreateHook(
 }
 
 function createUseUpdateHook(
-  entityClient: EntityClientShape,
+  updateFn: (...args: unknown[]) => Promise<unknown>,
   keys: QueryKeyFactory,
 ) {
   return function useUpdate(
     options?: Omit<
-      UseMutationOptions<unknown, Error, { id: string; dto: unknown }>,
+      UseMutationOptions<unknown, Error, { id: EntityId; dto: unknown }>,
       "mutationFn"
     > & { optimistic?: boolean },
   ) {
@@ -226,18 +260,18 @@ function createUseUpdateHook(
     const isOptimistic = options?.optimistic ?? false;
 
     return useMutation({
-      mutationFn: ({ id, dto }: { id: string; dto: unknown }) =>
-        entityClient.update(id, dto),
+      mutationFn: ({ id, dto }: { id: EntityId; dto: unknown }) =>
+        updateFn(id, dto),
 
       onMutate: isOptimistic
-        ? async ({ id, dto }: { id: string; dto: unknown }) => {
+        ? async ({ id, dto }: { id: EntityId; dto: unknown }) => {
             await queryClient.cancelQueries({ queryKey: keys.all });
             const previousData = queryClient.getQueriesData<unknown[]>({ queryKey: keys.lists() });
             queryClient.setQueriesData<unknown[]>(
               { queryKey: keys.lists() },
               (old) =>
                 old?.map((item) =>
-                  isRecord(item) && item.id === id ? { ...item, ...(dto as object) } : item,
+                  isRecord(item) && matchesEntityId(item, id) ? { ...item, ...(dto as object) } : item,
                 ),
             );
             return { previousData } as const;
@@ -269,16 +303,16 @@ function createUseUpdateHook(
 }
 
 function createUseDeleteHook(
-  entityClient: EntityClientShape,
+  deleteFn: (...args: unknown[]) => Promise<unknown>,
   keys: QueryKeyFactory,
 ) {
   return function useDelete(
-    options?: Omit<UseMutationOptions<void, Error, string>, "mutationFn">,
+    options?: Omit<UseMutationOptions<void, Error, EntityId>, "mutationFn">,
   ) {
     const queryClient = useQueryClient();
 
     return useMutation({
-      mutationFn: (id: string) => entityClient.delete(id),
+      mutationFn: (id: EntityId) => deleteFn(id) as Promise<void>,
       onSuccess: (...args) => {
         queryClient.invalidateQueries({ queryKey: keys.all });
         options?.onSuccess?.(...args);
@@ -290,7 +324,7 @@ function createUseDeleteHook(
 
 function createUseInfiniteListHook(
   entity: AnyEntityDef,
-  entityClient: EntityClientShape,
+  listFn: (...args: unknown[]) => Promise<unknown>,
   keys: QueryKeyFactory,
 ) {
   return function useInfiniteList(
@@ -319,9 +353,9 @@ function createUseInfiniteListHook(
         };
 
         if (entity.parent) {
-          return entityClient.list(parentId, listParams);
+          return listFn(parentId, listParams);
         }
-        return entityClient.list(listParams);
+        return listFn(listParams);
       },
       initialPageParam: 1 as unknown,
       getNextPageParam: (lastPage: unknown, _allPages: unknown[], lastPageParam: unknown) => {
@@ -336,9 +370,72 @@ function createUseInfiniteListHook(
   };
 }
 
-// ── Operation Hook Creators ──
+function createUseTreeHook(
+  treeFn: (...args: unknown[]) => Promise<unknown>,
+  keys: QueryKeyFactory,
+) {
+  return function useTree(
+    params?: Record<string, unknown>,
+    options?: Omit<UseQueryOptions<unknown, Error>, "queryKey" | "queryFn">,
+  ) {
+    return useQuery({
+      queryKey: keys.tree(params),
+      queryFn: () => treeFn(params),
+      ...options,
+    });
+  };
+}
 
-function createOperationHooks(
+function createGenericQueryHook(
+  opName: string,
+  opFn: (...args: unknown[]) => Promise<unknown>,
+  keys: QueryKeyFactory,
+) {
+  return function useGenericQuery(
+    params?: Record<string, unknown>,
+    options?: Omit<UseQueryOptions<unknown, Error>, "queryKey" | "queryFn">,
+  ) {
+    return useQuery({
+      queryKey: keys.list({ operation: opName, ...params }),
+      queryFn: () => opFn(params),
+      ...options,
+    });
+  };
+}
+
+function createGenericMutationHook(
+  _opName: string,
+  op: EntityOperationDef,
+  opFn: (...args: unknown[]) => Promise<unknown>,
+  keys: QueryKeyFactory,
+) {
+  return function useGenericMutation(
+    options?: Omit<UseMutationOptions<unknown, Error, unknown>, "mutationFn">,
+  ) {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+      mutationFn: (...args: unknown[]) => opFn(...args),
+      onSuccess: (...args) => {
+        // Invalidate entity queries for write operations
+        if (op.invalidates) {
+          const keysToInvalidate = op.invalidates({ [_opName]: keys }, {});
+          for (const key of keysToInvalidate) {
+            queryClient.invalidateQueries({ queryKey: key as unknown[] });
+          }
+        } else {
+          queryClient.invalidateQueries({ queryKey: keys.all });
+        }
+        options?.onSuccess?.(...args);
+      },
+      ...omit(options, ["onSuccess"]),
+    });
+  };
+}
+
+// ── Top-level Operation Hook Creators ──
+
+function createTopLevelOperationHooks(
   opClient: (...args: unknown[]) => Promise<unknown>,
   operation: AnyOperationDef,
   allQueryKeys: Record<string, QueryKeyFactory>,
@@ -352,7 +449,6 @@ function createOperationHooks(
       return useMutation({
         mutationFn: (input: unknown) => opClient(input),
         onSuccess: (...args) => {
-          // C7: invalidate based on operation config
           if (operation.invalidates) {
             const keysToInvalidate = operation.invalidates(allQueryKeys, {});
             for (const key of keysToInvalidate) {
@@ -369,6 +465,10 @@ function createOperationHooks(
 
 // ── Utility ──
 
+function capitalize(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 function omit<T extends Record<string, unknown>>(
   obj: T | undefined,
   keys: string[],
@@ -379,6 +479,11 @@ function omit<T extends Record<string, unknown>>(
     delete result[key];
   }
   return result;
+}
+
+function matchesEntityId(item: Record<string, unknown>, id: EntityId): boolean {
+  if (typeof id === "string") return String(item.id) === id;
+  return Object.entries(id).every(([key, value]) => String(item[key]) === value);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -430,11 +535,7 @@ export type DerivedHooksResult<
   TEntities extends Record<string, AnyEntityDef>,
   TOperations extends Record<string, AnyOperationDef>,
 > = {
-  [K in keyof TEntities]: EntityHooks<
-    TEntities[K]["schema"],
-    TEntities[K]["createSchema"],
-    TEntities[K]["updateSchema"]
-  >;
+  [K in keyof TEntities]: EntityHooks<TEntities[K]["schema"]>;
 } & {
   [K in keyof TOperations]: TOperations[K] extends OperationDefinition<
     infer TInput,

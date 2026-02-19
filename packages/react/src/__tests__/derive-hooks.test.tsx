@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 import { createElement } from "react";
 import { z } from "zod";
 import { deriveHooks } from "../derive-hooks.js";
-import type { QueryKeyFactory } from "@simplix-react/contract";
+import type { EntityId, QueryKeyFactory } from "@simplix-react/contract";
 
 // ── Schemas ──
 
@@ -43,7 +43,9 @@ function createMockQueryKeys(): Record<string, QueryKeyFactory> {
       lists: () => ["test", "task", "list"] as const,
       list: (params: Record<string, unknown>) => ["test", "task", "list", params] as const,
       details: () => ["test", "task", "detail"] as const,
-      detail: (id: string) => ["test", "task", "detail", id] as const,
+      detail: (id: EntityId) => ["test", "task", "detail", id] as const,
+      trees: () => ["test", "task", "tree"] as const,
+      tree: (params?: Record<string, unknown>) => params ? ["test", "task", "tree", params] as const : ["test", "task", "tree"] as const,
     },
   };
 }
@@ -56,10 +58,14 @@ function createMockContract(clientOverride?: ReturnType<typeof createMockClient>
       basePath: "/api",
       entities: {
         task: {
-          path: "/tasks",
           schema: taskSchema,
-          createSchema: createTaskDto,
-          updateSchema: updateTaskDto,
+          operations: {
+            list:   { method: "GET" as const,    path: "/tasks" },
+            get:    { method: "GET" as const,    path: "/tasks/:id" },
+            create: { method: "POST" as const,   path: "/tasks", input: createTaskDto },
+            update: { method: "PATCH" as const,  path: "/tasks/:id", input: updateTaskDto },
+            delete: { method: "DELETE" as const, path: "/tasks/:id" },
+          },
         },
       },
     },
@@ -76,10 +82,14 @@ function createMockContractWithParent(clientOverride?: ReturnType<typeof createM
       basePath: "/api",
       entities: {
         task: {
-          path: "/tasks",
           schema: taskSchema,
-          createSchema: createTaskDto,
-          updateSchema: updateTaskDto,
+          operations: {
+            list:   { method: "GET" as const,    path: "/tasks" },
+            get:    { method: "GET" as const,    path: "/tasks/:id" },
+            create: { method: "POST" as const,   path: "/tasks", input: createTaskDto },
+            update: { method: "PATCH" as const,  path: "/tasks/:id", input: updateTaskDto },
+            delete: { method: "DELETE" as const, path: "/tasks/:id" },
+          },
           parent: { param: "projectId", path: "/projects" },
         },
       },
@@ -133,10 +143,14 @@ describe("deriveHooks", () => {
           basePath: "/api",
           entities: {
             task: {
-              path: "/tasks",
               schema: taskSchema,
-              createSchema: createTaskDto,
-              updateSchema: updateTaskDto,
+              operations: {
+                list:   { method: "GET" as const,    path: "/tasks" },
+                get:    { method: "GET" as const,    path: "/tasks/:id" },
+                create: { method: "POST" as const,   path: "/tasks", input: createTaskDto },
+                update: { method: "PATCH" as const,  path: "/tasks/:id", input: updateTaskDto },
+                delete: { method: "DELETE" as const, path: "/tasks/:id" },
+              },
             },
           },
           operations: {
@@ -302,6 +316,22 @@ describe("deriveHooks", () => {
 
       expect(result.current.fetchStatus).toBe("idle");
       expect(client.task.get).not.toHaveBeenCalled();
+    });
+
+    it("fetches a single entity by composite key", async () => {
+      const client = createMockClient();
+      const compositeId = { tenantId: "t1", taskId: "1" };
+      client.task.get.mockResolvedValue({ tenantId: "t1", taskId: "1", title: "Task 1", status: "open" });
+      const contract = createMockContract(client);
+      const hooks = deriveHooks(contract);
+
+      const { result } = renderHook(() => hooks.task.useGet(compositeId), {
+        wrapper: createWrapper(queryClient),
+      });
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+      expect(client.task.get).toHaveBeenCalledWith(compositeId);
     });
   });
 
@@ -472,6 +502,54 @@ describe("deriveHooks", () => {
       const cachedData = queryClient.getQueryData(["test", "task", "list", {}]);
       expect(cachedData).toEqual(originalData);
     });
+
+    it("updates an entity with composite key", async () => {
+      const client = createMockClient();
+      const compositeId = { tenantId: "t1", taskId: "1" };
+      client.task.update.mockResolvedValue({ tenantId: "t1", taskId: "1", title: "Updated", status: "done" });
+      const contract = createMockContract(client);
+      const hooks = deriveHooks(contract);
+
+      const { result } = renderHook(() => hooks.task.useUpdate(), {
+        wrapper: createWrapper(queryClient),
+      });
+
+      await act(async () => {
+        result.current.mutate({ id: compositeId, dto: { title: "Updated" } });
+      });
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+      expect(client.task.update).toHaveBeenCalledWith(compositeId, { title: "Updated" });
+    });
+
+    it("supports optimistic updates with composite key", async () => {
+      const client = createMockClient();
+      const compositeId = { tenantId: "t1", taskId: "1" };
+      client.task.update.mockImplementation(
+        () => new Promise((resolve) => setTimeout(() => resolve({ tenantId: "t1", taskId: "1", title: "Server Updated", status: "done" }), 50)),
+      );
+      const contract = createMockContract(client);
+      const hooks = deriveHooks(contract);
+
+      queryClient.setQueryData(["test", "task", "list", {}], [
+        { tenantId: "t1", taskId: "1", title: "Task 1", status: "open" },
+        { tenantId: "t1", taskId: "2", title: "Task 2", status: "done" },
+      ]);
+
+      const { result } = renderHook(
+        () => hooks.task.useUpdate({ optimistic: true } as never),
+        { wrapper: createWrapper(queryClient) },
+      );
+
+      await act(async () => {
+        result.current.mutate({ id: compositeId, dto: { title: "Optimistic Update" } });
+      });
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+      expect(client.task.update).toHaveBeenCalledWith(compositeId, { title: "Optimistic Update" });
+    });
   });
 
   // ── useDelete ──
@@ -517,6 +595,25 @@ describe("deriveHooks", () => {
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
       expect(onSuccess).toHaveBeenCalled();
+    });
+
+    it("deletes an entity with composite key", async () => {
+      const client = createMockClient();
+      const compositeId = { tenantId: "t1", taskId: "1" };
+      const contract = createMockContract(client);
+      const hooks = deriveHooks(contract);
+
+      const { result } = renderHook(() => hooks.task.useDelete(), {
+        wrapper: createWrapper(queryClient),
+      });
+
+      await act(async () => {
+        result.current.mutate(compositeId);
+      });
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+      expect(client.task.delete).toHaveBeenCalledWith(compositeId);
     });
   });
 
@@ -896,10 +993,14 @@ describe("deriveHooks", () => {
           basePath: "/api",
           entities: {
             task: {
-              path: "/tasks",
               schema: taskSchema,
-              createSchema: createTaskDto,
-              updateSchema: updateTaskDto,
+              operations: {
+                list:   { method: "GET" as const,    path: "/tasks" },
+                get:    { method: "GET" as const,    path: "/tasks/:id" },
+                create: { method: "POST" as const,   path: "/tasks", input: createTaskDto },
+                update: { method: "PATCH" as const,  path: "/tasks/:id", input: updateTaskDto },
+                delete: { method: "DELETE" as const, path: "/tasks/:id" },
+              },
             },
           },
           operations: {
@@ -945,10 +1046,14 @@ describe("deriveHooks", () => {
           basePath: "/api",
           entities: {
             task: {
-              path: "/tasks",
               schema: taskSchema,
-              createSchema: createTaskDto,
-              updateSchema: updateTaskDto,
+              operations: {
+                list:   { method: "GET" as const,    path: "/tasks" },
+                get:    { method: "GET" as const,    path: "/tasks/:id" },
+                create: { method: "POST" as const,   path: "/tasks", input: createTaskDto },
+                update: { method: "PATCH" as const,  path: "/tasks/:id", input: updateTaskDto },
+                delete: { method: "DELETE" as const, path: "/tasks/:id" },
+              },
             },
           },
           operations: {
@@ -997,10 +1102,14 @@ describe("deriveHooks", () => {
           basePath: "/api",
           entities: {
             task: {
-              path: "/tasks",
               schema: taskSchema,
-              createSchema: createTaskDto,
-              updateSchema: updateTaskDto,
+              operations: {
+                list:   { method: "GET" as const,    path: "/tasks" },
+                get:    { method: "GET" as const,    path: "/tasks/:id" },
+                create: { method: "POST" as const,   path: "/tasks", input: createTaskDto },
+                update: { method: "PATCH" as const,  path: "/tasks/:id", input: updateTaskDto },
+                delete: { method: "DELETE" as const, path: "/tasks/:id" },
+              },
             },
           },
           operations: {
@@ -1044,10 +1153,14 @@ describe("deriveHooks", () => {
           basePath: "/api",
           entities: {
             task: {
-              path: "/tasks",
               schema: taskSchema,
-              createSchema: createTaskDto,
-              updateSchema: updateTaskDto,
+              operations: {
+                list:   { method: "GET" as const,    path: "/tasks" },
+                get:    { method: "GET" as const,    path: "/tasks/:id" },
+                create: { method: "POST" as const,   path: "/tasks", input: createTaskDto },
+                update: { method: "PATCH" as const,  path: "/tasks/:id", input: updateTaskDto },
+                delete: { method: "DELETE" as const, path: "/tasks/:id" },
+              },
             },
           },
           operations: {
