@@ -2,6 +2,7 @@ import { createElement, type FC, type ReactNode } from "react";
 import type { QueryClient } from "@tanstack/react-query";
 import { QueryClientProvider } from "@tanstack/react-query";
 import type { AccessPolicy } from "@simplix-react/access";
+import { AccessProvider } from "@simplix-react/access/react";
 import { createTestQueryClient } from "./test-query-client.js";
 import { createMockPolicy } from "./mock-policy.js";
 
@@ -16,14 +17,13 @@ export interface AccessTestWrapperOptions {
 }
 
 /**
- * Creates a React wrapper component that provides {@link QueryClientProvider}
- * and an access-aware context for testing hooks and components that depend on
+ * Creates a React wrapper component that provides both {@link QueryClientProvider}
+ * and {@link AccessProvider} for testing hooks and components that depend on
  * access control.
  *
  * @remarks
- * When `@simplix-react/access/react` exports `AccessProvider`, this wrapper
- * will include it automatically. Pass the returned component as the `wrapper`
- * option to `renderHook` or `render` from `@testing-library/react`.
+ * Pass the returned component as the `wrapper` option to `renderHook` or
+ * `render` from `@testing-library/react`.
  *
  * @example
  * ```tsx
@@ -47,10 +47,13 @@ export function createAccessTestWrapper(
   options?: AccessTestWrapperOptions,
 ): FC<{ children: ReactNode }> {
   const queryClient = options?.queryClient ?? createTestQueryClient();
-  const _policy = options?.policy ?? createMockPolicy();
+  const policy = options?.policy ?? createMockPolicy();
 
-  // TODO: Wrap with AccessProvider from @simplix-react/access/react once available
   return function AccessTestWrapper({ children }: { children: ReactNode }) {
-    return createElement(QueryClientProvider, { client: queryClient }, children);
+    return createElement(
+      QueryClientProvider,
+      { client: queryClient },
+      createElement(AccessProvider, { policy: policy as AccessPolicy }, children),
+    );
   };
 }

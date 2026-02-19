@@ -8,7 +8,7 @@
 
 > **ComboboxField**\<`T`\>(`__namedParameters`): `Element`
 
-Defined in: packages/ui/src/fields/form/combobox-field.tsx:41
+Defined in: [packages/ui/src/fields/form/combobox-field.tsx:41](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/form/combobox-field.tsx#L41)
 
 Searchable dropdown field with type-ahead filtering.
 Supports async search via onSearch callback and loading state.

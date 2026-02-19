@@ -8,7 +8,7 @@
 
 > **deriveQueryKeys**\<`TEntities`\>(`config`): \{ \[K in string \| number \| symbol\]: QueryKeyFactory \}
 
-Defined in: [packages/contract/src/derive/query-keys.ts:38](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/derive/query-keys.ts#L38)
+Defined in: [packages/contract/src/derive/query-keys.ts:38](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/contract/src/derive/query-keys.ts#L38)
 
 Derives a set of [QueryKeyFactory](../interfaces/QueryKeyFactory.md) instances for all entities in a contract.
 

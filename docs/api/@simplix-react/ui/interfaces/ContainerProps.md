@@ -6,7 +6,7 @@
 
 # Interface: ContainerProps
 
-Defined in: packages/ui/src/primitives/container.tsx:26
+Defined in: [packages/ui/src/primitives/container.tsx:26](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/container.tsx#L26)
 
 Props for the [Container](../variables/Container.md) layout component.
 
@@ -969,7 +969,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **children**: `ReactNode`
 
-Defined in: packages/ui/src/primitives/container.tsx:29
+Defined in: [packages/ui/src/primitives/container.tsx:29](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/container.tsx#L29)
 
 #### Overrides
 
@@ -3533,7 +3533,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **size**: `"2xl"` \| `"sm"` \| `"md"` \| `"lg"` \| `"xl"` \| `"full"` \| `null`
 
-Defined in: packages/ui/src/primitives/container.tsx:10
+Defined in: [packages/ui/src/primitives/container.tsx:10](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/container.tsx#L10)
 
 #### Inherited from
 

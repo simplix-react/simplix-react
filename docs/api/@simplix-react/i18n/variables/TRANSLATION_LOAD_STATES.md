@@ -8,7 +8,7 @@
 
 > `const` **TRANSLATION\_LOAD\_STATES**: `object`
 
-Defined in: [types.ts:147](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/i18n/src/types.ts#L147)
+Defined in: [types.ts:147](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/types.ts#L147)
 
 Provides constant values representing translation resource loading states.
 

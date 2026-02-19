@@ -6,7 +6,7 @@
 
 # Interface: CrudListSelection\<T\>
 
-Defined in: packages/ui/src/crud/list/use-crud-list.ts:52
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:52](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/use-crud-list.ts#L52)
 
 Selection state returned by [useCrudList](../functions/useCrudList.md).
 
@@ -22,7 +22,7 @@ Selection state returned by [useCrudList](../functions/useCrudList.md).
 
 > **clear**: () => `void`
 
-Defined in: packages/ui/src/crud/list/use-crud-list.ts:56
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:56](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/use-crud-list.ts#L56)
 
 #### Returns
 
@@ -34,7 +34,7 @@ Defined in: packages/ui/src/crud/list/use-crud-list.ts:56
 
 > **isSelected**: (`index`) => `boolean`
 
-Defined in: packages/ui/src/crud/list/use-crud-list.ts:57
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:57](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/use-crud-list.ts#L57)
 
 #### Parameters
 
@@ -52,7 +52,7 @@ Defined in: packages/ui/src/crud/list/use-crud-list.ts:57
 
 > **selected**: `Set`\<`number`\>
 
-Defined in: packages/ui/src/crud/list/use-crud-list.ts:53
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:53](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/use-crud-list.ts#L53)
 
 ***
 
@@ -60,7 +60,7 @@ Defined in: packages/ui/src/crud/list/use-crud-list.ts:53
 
 > **toggle**: (`index`) => `void`
 
-Defined in: packages/ui/src/crud/list/use-crud-list.ts:54
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:54](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/use-crud-list.ts#L54)
 
 #### Parameters
 
@@ -78,7 +78,7 @@ Defined in: packages/ui/src/crud/list/use-crud-list.ts:54
 
 > **toggleAll**: (`data`) => `void`
 
-Defined in: packages/ui/src/crud/list/use-crud-list.ts:55
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:55](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/use-crud-list.ts#L55)
 
 #### Parameters
 

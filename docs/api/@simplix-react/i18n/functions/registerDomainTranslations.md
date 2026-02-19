@@ -8,7 +8,7 @@
 
 > **registerDomainTranslations**(`config`): `void`
 
-Defined in: domain-translations.ts:37
+Defined in: [domain-translations.ts:37](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/i18n/src/domain-translations.ts#L37)
 
 Registers domain-specific translations into the global registry.
 

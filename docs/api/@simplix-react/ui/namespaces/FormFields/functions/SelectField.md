@@ -8,7 +8,7 @@
 
 > **SelectField**\<`T`\>(`__namedParameters`): `Element`
 
-Defined in: packages/ui/src/fields/form/select-field.tsx:33
+Defined in: [packages/ui/src/fields/form/select-field.tsx:33](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/form/select-field.tsx#L33)
 
 Dropdown select field built on Radix Select primitives.
 

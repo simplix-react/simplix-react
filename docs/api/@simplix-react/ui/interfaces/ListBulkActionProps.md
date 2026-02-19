@@ -6,7 +6,7 @@
 
 # Interface: ListBulkActionProps
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:728
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:728](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L728)
 
 Props for individual bulk action buttons.
 
@@ -16,7 +16,7 @@ Props for individual bulk action buttons.
 
 > `optional` **className**: `string`
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:733
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:733](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L733)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: packages/ui/src/crud/list/crud-list.tsx:733
 
 > `optional` **icon**: `ReactNode`
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:730
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:730](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L730)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: packages/ui/src/crud/list/crud-list.tsx:730
 
 > **label**: `string`
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:729
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:729](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L729)
 
 ***
 
@@ -40,7 +40,7 @@ Defined in: packages/ui/src/crud/list/crud-list.tsx:729
 
 > **onClick**: () => `void`
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:731
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:731](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L731)
 
 #### Returns
 
@@ -52,4 +52,4 @@ Defined in: packages/ui/src/crud/list/crud-list.tsx:731
 
 > `optional` **variant**: `"default"` \| `"destructive"`
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:732
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:732](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L732)

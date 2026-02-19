@@ -20,6 +20,7 @@
 
 ## Type Aliases
 
+- [BadgeVariant](type-aliases/BadgeVariant.md)
 - [BooleanDisplayMode](type-aliases/BooleanDisplayMode.md)
 - [ListDisplayMode](type-aliases/ListDisplayMode.md)
 

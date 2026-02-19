@@ -24,6 +24,8 @@ export type {
   CrudListPagination,
   CrudListSelection,
   CrudListSort,
+  ListHook,
+  ListHookResult,
   UseCrudListOptions,
   UseCrudListResult,
 } from "./use-crud-list";

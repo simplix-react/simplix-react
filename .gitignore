@@ -10,6 +10,7 @@ dist/
 .ckb/
 *.scip
 .mcp.json
+modules/
 
 # Stale JS artifacts in TypeScript source directories
 **/src/**/*.js

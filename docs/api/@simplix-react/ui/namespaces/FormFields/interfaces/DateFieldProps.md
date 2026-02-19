@@ -6,7 +6,7 @@
 
 # Interface: DateFieldProps
 
-Defined in: packages/ui/src/fields/form/date-field.tsx:14
+Defined in: [packages/ui/src/fields/form/date-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/form/date-field.tsx#L14)
 
 Props for the [DateField](../functions/DateField.md) form component.
 
@@ -20,7 +20,7 @@ Props for the [DateField](../functions/DateField.md) form component.
 
 > `optional` **className**: `string`
 
-Defined in: packages/ui/src/crud/shared/types.ts:29
+Defined in: [packages/ui/src/crud/shared/types.ts:29](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L29)
 
 #### Inherited from
 
@@ -32,7 +32,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:29
 
 > `optional` **description**: `string`
 
-Defined in: packages/ui/src/crud/shared/types.ts:26
+Defined in: [packages/ui/src/crud/shared/types.ts:26](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L26)
 
 #### Inherited from
 
@@ -44,7 +44,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:26
 
 > `optional` **disabled**: `boolean`
 
-Defined in: packages/ui/src/crud/shared/types.ts:28
+Defined in: [packages/ui/src/crud/shared/types.ts:28](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L28)
 
 #### Inherited from
 
@@ -56,7 +56,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:28
 
 > `optional` **error**: `string`
 
-Defined in: packages/ui/src/crud/shared/types.ts:25
+Defined in: [packages/ui/src/crud/shared/types.ts:25](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L25)
 
 #### Inherited from
 
@@ -68,7 +68,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:25
 
 > `optional` **format**: `string`
 
-Defined in: packages/ui/src/fields/form/date-field.tsx:24
+Defined in: [packages/ui/src/fields/form/date-field.tsx:24](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/form/date-field.tsx#L24)
 
 Date format string (reserved for future use).
 
@@ -78,7 +78,7 @@ Date format string (reserved for future use).
 
 > `optional` **label**: `string`
 
-Defined in: packages/ui/src/crud/shared/types.ts:23
+Defined in: [packages/ui/src/crud/shared/types.ts:23](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L23)
 
 #### Inherited from
 
@@ -90,7 +90,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:23
 
 > `optional` **labelKey**: `string`
 
-Defined in: packages/ui/src/crud/shared/types.ts:24
+Defined in: [packages/ui/src/crud/shared/types.ts:24](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L24)
 
 #### Inherited from
 
@@ -102,7 +102,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:24
 
 > `optional` **labelPosition**: `"hidden"` \| `"top"` \| `"left"`
 
-Defined in: packages/ui/src/crud/shared/types.ts:5
+Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L5)
 
 #### Inherited from
 
@@ -114,7 +114,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:5
 
 > `optional` **maxDate**: `Date`
 
-Defined in: packages/ui/src/fields/form/date-field.tsx:22
+Defined in: [packages/ui/src/fields/form/date-field.tsx:22](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/form/date-field.tsx#L22)
 
 Latest selectable date.
 
@@ -124,7 +124,7 @@ Latest selectable date.
 
 > `optional` **minDate**: `Date`
 
-Defined in: packages/ui/src/fields/form/date-field.tsx:20
+Defined in: [packages/ui/src/fields/form/date-field.tsx:20](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/form/date-field.tsx#L20)
 
 Earliest selectable date.
 
@@ -134,7 +134,7 @@ Earliest selectable date.
 
 > **onChange**: (`value`) => `void`
 
-Defined in: packages/ui/src/fields/form/date-field.tsx:18
+Defined in: [packages/ui/src/fields/form/date-field.tsx:18](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/form/date-field.tsx#L18)
 
 Called when the date selection changes.
 
@@ -154,7 +154,7 @@ Called when the date selection changes.
 
 > `optional` **placeholder**: `string`
 
-Defined in: packages/ui/src/fields/form/date-field.tsx:26
+Defined in: [packages/ui/src/fields/form/date-field.tsx:26](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/form/date-field.tsx#L26)
 
 Placeholder text when no date is selected.
 
@@ -164,7 +164,7 @@ Placeholder text when no date is selected.
 
 > `optional` **required**: `boolean`
 
-Defined in: packages/ui/src/crud/shared/types.ts:27
+Defined in: [packages/ui/src/crud/shared/types.ts:27](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L27)
 
 #### Inherited from
 
@@ -176,7 +176,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:27
 
 > `optional` **size**: `"sm"` \| `"md"` \| `"lg"`
 
-Defined in: packages/ui/src/crud/shared/types.ts:6
+Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L6)
 
 #### Inherited from
 
@@ -188,6 +188,6 @@ Defined in: packages/ui/src/crud/shared/types.ts:6
 
 > **value**: `Date` \| `null`
 
-Defined in: packages/ui/src/fields/form/date-field.tsx:16
+Defined in: [packages/ui/src/fields/form/date-field.tsx:16](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/form/date-field.tsx#L16)
 
 Currently selected date, or `null` when no date is selected.

@@ -1,0 +1,57 @@
+{
+  "name": "@simplix-react/access",
+  "version": "0.1.0",
+  "description": "Authorization and access control for @simplix-react with CASL integration",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rm -rf dist .turbo"
+  },
+  "peerDependencies": {
+    "@casl/ability": ">=6.0.0",
+    "@simplix-react/auth": "workspace:*",
+    "react": ">=18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@simplix-react/auth": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@casl/ability": "^6.8.0",
+    "@simplix-react/auth": "workspace:*",
+    "@simplix-react/config-eslint": "workspace:*",
+    "@simplix-react/config-typescript": "workspace:*",
+    "@simplix-react/contract": "workspace:*",
+    "@types/react": "^19.0.0",
+    "eslint": "^9.39.2",
+    "react": "^19.0.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^3.0.0"
+  }
+}

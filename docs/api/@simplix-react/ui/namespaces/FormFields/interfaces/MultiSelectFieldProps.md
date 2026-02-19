@@ -6,7 +6,7 @@
 
 # Interface: MultiSelectFieldProps\<T\>
 
-Defined in: packages/ui/src/fields/form/multi-select-field.tsx:14
+Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/form/multi-select-field.tsx#L14)
 
 Props for the [MultiSelectField](../functions/MultiSelectField.md) form component.
 
@@ -26,7 +26,7 @@ Props for the [MultiSelectField](../functions/MultiSelectField.md) form componen
 
 > `optional` **className**: `string`
 
-Defined in: packages/ui/src/crud/shared/types.ts:29
+Defined in: [packages/ui/src/crud/shared/types.ts:29](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L29)
 
 #### Inherited from
 
@@ -38,7 +38,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:29
 
 > `optional` **description**: `string`
 
-Defined in: packages/ui/src/crud/shared/types.ts:26
+Defined in: [packages/ui/src/crud/shared/types.ts:26](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L26)
 
 #### Inherited from
 
@@ -50,7 +50,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:26
 
 > `optional` **disabled**: `boolean`
 
-Defined in: packages/ui/src/crud/shared/types.ts:28
+Defined in: [packages/ui/src/crud/shared/types.ts:28](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L28)
 
 #### Inherited from
 
@@ -62,7 +62,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:28
 
 > `optional` **error**: `string`
 
-Defined in: packages/ui/src/crud/shared/types.ts:25
+Defined in: [packages/ui/src/crud/shared/types.ts:25](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L25)
 
 #### Inherited from
 
@@ -74,7 +74,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:25
 
 > `optional` **label**: `string`
 
-Defined in: packages/ui/src/crud/shared/types.ts:23
+Defined in: [packages/ui/src/crud/shared/types.ts:23](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L23)
 
 #### Inherited from
 
@@ -86,7 +86,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:23
 
 > `optional` **labelKey**: `string`
 
-Defined in: packages/ui/src/crud/shared/types.ts:24
+Defined in: [packages/ui/src/crud/shared/types.ts:24](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L24)
 
 #### Inherited from
 
@@ -98,7 +98,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:24
 
 > `optional` **labelPosition**: `"hidden"` \| `"top"` \| `"left"`
 
-Defined in: packages/ui/src/crud/shared/types.ts:5
+Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L5)
 
 #### Inherited from
 
@@ -110,7 +110,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:5
 
 > `optional` **maxCount**: `number`
 
-Defined in: packages/ui/src/fields/form/multi-select-field.tsx:24
+Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:24](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/form/multi-select-field.tsx#L24)
 
 Maximum number of selections allowed.
 
@@ -120,7 +120,7 @@ Maximum number of selections allowed.
 
 > **onChange**: (`value`) => `void`
 
-Defined in: packages/ui/src/fields/form/multi-select-field.tsx:19
+Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:19](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/form/multi-select-field.tsx#L19)
 
 Called when the selection changes.
 
@@ -140,7 +140,7 @@ Called when the selection changes.
 
 > **options**: `object`[]
 
-Defined in: packages/ui/src/fields/form/multi-select-field.tsx:21
+Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:21](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/form/multi-select-field.tsx#L21)
 
 Available options with label/value pairs.
 
@@ -158,7 +158,7 @@ Available options with label/value pairs.
 
 > `optional` **placeholder**: `string`
 
-Defined in: packages/ui/src/fields/form/multi-select-field.tsx:22
+Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:22](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/form/multi-select-field.tsx#L22)
 
 ***
 
@@ -166,7 +166,7 @@ Defined in: packages/ui/src/fields/form/multi-select-field.tsx:22
 
 > `optional` **required**: `boolean`
 
-Defined in: packages/ui/src/crud/shared/types.ts:27
+Defined in: [packages/ui/src/crud/shared/types.ts:27](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L27)
 
 #### Inherited from
 
@@ -178,7 +178,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:27
 
 > `optional` **size**: `"sm"` \| `"md"` \| `"lg"`
 
-Defined in: packages/ui/src/crud/shared/types.ts:6
+Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L6)
 
 #### Inherited from
 
@@ -190,6 +190,6 @@ Defined in: packages/ui/src/crud/shared/types.ts:6
 
 > **value**: `T`[]
 
-Defined in: packages/ui/src/fields/form/multi-select-field.tsx:17
+Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/form/multi-select-field.tsx#L17)
 
 Currently selected values.

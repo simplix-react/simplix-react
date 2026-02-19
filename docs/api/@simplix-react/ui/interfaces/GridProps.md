@@ -6,7 +6,7 @@
 
 # Interface: GridProps
 
-Defined in: packages/ui/src/primitives/grid.tsx:34
+Defined in: [packages/ui/src/primitives/grid.tsx:34](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/grid.tsx#L34)
 
 Props for the [Grid](../variables/Grid.md) layout component.
 
@@ -969,7 +969,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **children**: `ReactNode`
 
-Defined in: packages/ui/src/primitives/grid.tsx:37
+Defined in: [packages/ui/src/primitives/grid.tsx:37](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/grid.tsx#L37)
 
 #### Overrides
 
@@ -1005,7 +1005,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **columns**: `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `null`
 
-Defined in: packages/ui/src/primitives/grid.tsx:10
+Defined in: [packages/ui/src/primitives/grid.tsx:10](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/grid.tsx#L10)
 
 #### Inherited from
 
@@ -1157,7 +1157,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **gap**: `"none"` \| `"sm"` \| `"md"` \| `"lg"` \| `"xl"` \| `"xs"` \| `null`
 
-Defined in: packages/ui/src/primitives/grid.tsx:18
+Defined in: [packages/ui/src/primitives/grid.tsx:18](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/grid.tsx#L18)
 
 #### Inherited from
 

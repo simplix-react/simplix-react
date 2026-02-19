@@ -6,7 +6,7 @@
 
 # Interface: UseCrudListResult\<T\>
 
-Defined in: packages/ui/src/crud/list/use-crud-list.ts:61
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:61](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/use-crud-list.ts#L61)
 
 Complete state returned by [useCrudList](../functions/useCrudList.md).
 
@@ -22,7 +22,7 @@ Complete state returned by [useCrudList](../functions/useCrudList.md).
 
 > **data**: `T`[]
 
-Defined in: packages/ui/src/crud/list/use-crud-list.ts:62
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:62](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/use-crud-list.ts#L62)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: packages/ui/src/crud/list/use-crud-list.ts:62
 
 > **emptyReason**: [`EmptyReason`](../type-aliases/EmptyReason.md) \| `null`
 
-Defined in: packages/ui/src/crud/list/use-crud-list.ts:69
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:69](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/use-crud-list.ts#L69)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: packages/ui/src/crud/list/use-crud-list.ts:69
 
 > **error**: `Error` \| `null`
 
-Defined in: packages/ui/src/crud/list/use-crud-list.ts:64
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:64](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/use-crud-list.ts#L64)
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: packages/ui/src/crud/list/use-crud-list.ts:64
 
 > **filters**: [`CrudListFilters`](CrudListFilters.md)
 
-Defined in: packages/ui/src/crud/list/use-crud-list.ts:65
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:65](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/use-crud-list.ts#L65)
 
 ***
 
@@ -54,7 +54,7 @@ Defined in: packages/ui/src/crud/list/use-crud-list.ts:65
 
 > **isLoading**: `boolean`
 
-Defined in: packages/ui/src/crud/list/use-crud-list.ts:63
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:63](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/use-crud-list.ts#L63)
 
 ***
 
@@ -62,7 +62,7 @@ Defined in: packages/ui/src/crud/list/use-crud-list.ts:63
 
 > **pagination**: [`CrudListPagination`](CrudListPagination.md)
 
-Defined in: packages/ui/src/crud/list/use-crud-list.ts:67
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:67](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/use-crud-list.ts#L67)
 
 ***
 
@@ -70,7 +70,7 @@ Defined in: packages/ui/src/crud/list/use-crud-list.ts:67
 
 > **selection**: [`CrudListSelection`](CrudListSelection.md)\<`T`\>
 
-Defined in: packages/ui/src/crud/list/use-crud-list.ts:68
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:68](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/use-crud-list.ts#L68)
 
 ***
 
@@ -78,4 +78,4 @@ Defined in: packages/ui/src/crud/list/use-crud-list.ts:68
 
 > **sort**: [`CrudListSort`](CrudListSort.md)
 
-Defined in: packages/ui/src/crud/list/use-crud-list.ts:66
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:66](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/use-crud-list.ts#L66)

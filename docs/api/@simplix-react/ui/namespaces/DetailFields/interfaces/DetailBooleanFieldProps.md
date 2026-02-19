@@ -6,7 +6,7 @@
 
 # Interface: DetailBooleanFieldProps
 
-Defined in: packages/ui/src/fields/detail/boolean-field.tsx:8
+Defined in: [packages/ui/src/fields/detail/boolean-field.tsx:8](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/detail/boolean-field.tsx#L8)
 
 Props for the [DetailBooleanField](../functions/DetailBooleanField.md) component.
 
@@ -20,7 +20,7 @@ Props for the [DetailBooleanField](../functions/DetailBooleanField.md) component
 
 > `optional` **className**: `string`
 
-Defined in: packages/ui/src/crud/shared/types.ts:36
+Defined in: [packages/ui/src/crud/shared/types.ts:36](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L36)
 
 #### Inherited from
 
@@ -32,7 +32,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:36
 
 > `optional` **label**: `string`
 
-Defined in: packages/ui/src/crud/shared/types.ts:34
+Defined in: [packages/ui/src/crud/shared/types.ts:34](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L34)
 
 #### Inherited from
 
@@ -44,7 +44,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:34
 
 > `optional` **labelKey**: `string`
 
-Defined in: packages/ui/src/crud/shared/types.ts:35
+Defined in: [packages/ui/src/crud/shared/types.ts:35](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L35)
 
 #### Inherited from
 
@@ -56,7 +56,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:35
 
 > `optional` **labelPosition**: `"hidden"` \| `"top"` \| `"left"`
 
-Defined in: packages/ui/src/crud/shared/types.ts:5
+Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L5)
 
 #### Inherited from
 
@@ -68,7 +68,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:5
 
 > `optional` **labels**: `object`
 
-Defined in: packages/ui/src/fields/detail/boolean-field.tsx:14
+Defined in: [packages/ui/src/fields/detail/boolean-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/detail/boolean-field.tsx#L14)
 
 Custom labels for true/false values when using `"text"` mode.
 
@@ -86,7 +86,7 @@ Custom labels for true/false values when using `"text"` mode.
 
 > `optional` **mode**: [`BooleanDisplayMode`](../type-aliases/BooleanDisplayMode.md)
 
-Defined in: packages/ui/src/fields/detail/boolean-field.tsx:12
+Defined in: [packages/ui/src/fields/detail/boolean-field.tsx:12](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/detail/boolean-field.tsx#L12)
 
 Display mode: `"text"` shows Yes/No, `"icon"` shows check/x icons. Defaults to `"text"`.
 
@@ -96,7 +96,7 @@ Display mode: `"text"` shows Yes/No, `"icon"` shows check/x icons. Defaults to `
 
 > `optional` **size**: `"sm"` \| `"md"` \| `"lg"`
 
-Defined in: packages/ui/src/crud/shared/types.ts:6
+Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L6)
 
 #### Inherited from
 
@@ -108,6 +108,6 @@ Defined in: packages/ui/src/crud/shared/types.ts:6
 
 > **value**: `boolean` \| `null` \| `undefined`
 
-Defined in: packages/ui/src/fields/detail/boolean-field.tsx:10
+Defined in: [packages/ui/src/fields/detail/boolean-field.tsx:10](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/detail/boolean-field.tsx#L10)
 
 Boolean value to display.

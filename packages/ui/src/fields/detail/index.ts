@@ -1,5 +1,5 @@
 export { DetailBadgeField } from "./badge-field";
-export type { DetailBadgeFieldProps } from "./badge-field";
+export type { BadgeVariant, DetailBadgeFieldProps } from "./badge-field";
 
 export { DetailBooleanField } from "./boolean-field";
 export type { DetailBooleanFieldProps, BooleanDisplayMode } from "./boolean-field";

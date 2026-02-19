@@ -36,6 +36,18 @@
     "@tanstack/react-query": {
       "QueryClientProvider": "https://tanstack.com/query/latest/docs/framework/react/reference/QueryClientProvider"
     },
+    "@casl/ability": {
+      "MongoAbility": "https://casl.js.org/v6/en/api/casl-ability#mongoability"
+    },
+    "@simplix-react/access": {
+      "AccessPolicy": "../@simplix-react/access/interfaces/AccessPolicy.md",
+      "AccessProvider": "../@simplix-react/access/functions/AccessProvider.md",
+      "AccessDeniedError": "../@simplix-react/access/classes/AccessDeniedError.md"
+    },
+    "@types/react": {
+      "React.Component.render": "https://react.dev/reference/react/Component#render",
+      "React.StaticLifecycle.getDerivedStateFromProps": "https://react.dev/reference/react/Component#static-getderivedstatefromprops"
+    },
     "@simplix-react/contract": {
       "ApiContractConfig": "../@simplix-react/contract/interfaces/ApiContractConfig.md",
       "ApiError": "../@simplix-react/contract/classes/ApiError.md",

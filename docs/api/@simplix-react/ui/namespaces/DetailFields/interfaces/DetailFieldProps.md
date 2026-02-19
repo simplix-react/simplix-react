@@ -6,7 +6,7 @@
 
 # Interface: DetailFieldProps
 
-Defined in: packages/ui/src/fields/detail/field.tsx:7
+Defined in: [packages/ui/src/fields/detail/field.tsx:7](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/detail/field.tsx#L7)
 
 Props for the generic [DetailField](../functions/DetailField.md) wrapper.
 
@@ -20,7 +20,7 @@ Props for the generic [DetailField](../functions/DetailField.md) wrapper.
 
 > **children**: `ReactNode`
 
-Defined in: packages/ui/src/fields/detail/field.tsx:8
+Defined in: [packages/ui/src/fields/detail/field.tsx:8](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/detail/field.tsx#L8)
 
 ***
 
@@ -28,7 +28,7 @@ Defined in: packages/ui/src/fields/detail/field.tsx:8
 
 > `optional` **className**: `string`
 
-Defined in: packages/ui/src/crud/shared/types.ts:36
+Defined in: [packages/ui/src/crud/shared/types.ts:36](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L36)
 
 #### Inherited from
 
@@ -40,7 +40,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:36
 
 > `optional` **label**: `string`
 
-Defined in: packages/ui/src/crud/shared/types.ts:34
+Defined in: [packages/ui/src/crud/shared/types.ts:34](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L34)
 
 #### Inherited from
 
@@ -52,7 +52,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:34
 
 > `optional` **labelKey**: `string`
 
-Defined in: packages/ui/src/crud/shared/types.ts:35
+Defined in: [packages/ui/src/crud/shared/types.ts:35](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L35)
 
 #### Inherited from
 
@@ -64,7 +64,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:35
 
 > `optional` **labelPosition**: `"hidden"` \| `"top"` \| `"left"`
 
-Defined in: packages/ui/src/crud/shared/types.ts:5
+Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L5)
 
 #### Inherited from
 
@@ -76,7 +76,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:5
 
 > `optional` **size**: `"sm"` \| `"md"` \| `"lg"`
 
-Defined in: packages/ui/src/crud/shared/types.ts:6
+Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L6)
 
 #### Inherited from
 

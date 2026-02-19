@@ -531,7 +531,9 @@ pnpm add simplix-react
 
 ## Interfaces
 
+- [CrudEndpointPattern](interfaces/CrudEndpointPattern.md)
 - [SimplixConfig](interfaces/SimplixConfig.md)
+- [SimplixHttpEnvironment](interfaces/SimplixHttpEnvironment.md)
 
 ## Functions
 

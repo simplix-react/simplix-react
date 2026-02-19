@@ -6,7 +6,7 @@
 
 # Class: CrudErrorBoundary
 
-Defined in: packages/ui/src/crud/shared/error-boundary.tsx:22
+Defined in: [packages/ui/src/crud/shared/error-boundary.tsx:22](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/error-boundary.tsx#L22)
 
 Error boundary for CRUD components.
 Catches render errors and displays a default fallback with retry,
@@ -14,7 +14,7 @@ or a custom fallback ReactNode/render function.
 
 ## Extends
 
-- `Component`\<[`CrudErrorBoundaryProps`](../interfaces/CrudErrorBoundaryProps.md), `ErrorBoundaryState`\>
+- `Component`\<[`CrudErrorBoundaryProps`](../interfaces/CrudErrorBoundaryProps.md), [`ErrorBoundaryState`](../interfaces/ErrorBoundaryState.md)\>
 
 ## Constructors
 
@@ -22,7 +22,7 @@ or a custom fallback ReactNode/render function.
 
 > **new CrudErrorBoundary**(`props`): `CrudErrorBoundary`
 
-Defined in: packages/ui/src/crud/shared/error-boundary.tsx:26
+Defined in: [packages/ui/src/crud/shared/error-boundary.tsx:26](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/error-boundary.tsx#L26)
 
 #### Parameters
 
@@ -149,7 +149,7 @@ Only kept in types for backwards compatibility. Will be removed in a future majo
 
 > **componentDidCatch**(`error`, `errorInfo`): `void`
 
-Defined in: packages/ui/src/crud/shared/error-boundary.tsx:35
+Defined in: [packages/ui/src/crud/shared/error-boundary.tsx:35](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/error-boundary.tsx#L35)
 
 Catches exceptions generated in descendant components. Unhandled exceptions will cause
 the entire component tree to unmount.
@@ -232,11 +232,11 @@ The snapshot is only present if [getSnapshotBeforeUpdate](#getsnapshotbeforeupda
 
 Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:1269
 
-Called immediately before mounting occurs, and before Component.render.
+Called immediately before mounting occurs, and before [Component.render](https://react.dev/reference/react/Component#render).
 Avoid introducing any side-effects or subscriptions in this method.
 
 Note: the presence of [getSnapshotBeforeUpdate](#getsnapshotbeforeupdate)
-or StaticLifecycle.getDerivedStateFromProps getDerivedStateFromProps prevents
+or [getDerivedStateFromProps](https://react.dev/reference/react/Component#static-getderivedstatefromprops) prevents
 this from being invoked.
 
 #### Returns
@@ -271,7 +271,7 @@ props if you only want to handle changes.
 Calling [Component.setState](#setstate) generally does not trigger this method.
 
 Note: the presence of [getSnapshotBeforeUpdate](#getsnapshotbeforeupdate)
-or StaticLifecycle.getDerivedStateFromProps getDerivedStateFromProps prevents
+or [getDerivedStateFromProps](https://react.dev/reference/react/Component#static-getderivedstatefromprops) prevents
 this from being invoked.
 
 #### Parameters
@@ -290,7 +290,7 @@ this from being invoked.
 
 #### Deprecated
 
-16.3, use static StaticLifecycle.getDerivedStateFromProps getDerivedStateFromProps instead; will stop working in React 17
+16.3, use static [getDerivedStateFromProps](https://react.dev/reference/react/Component#static-getderivedstatefromprops) instead; will stop working in React 17
 
 #### See
 
@@ -333,7 +333,7 @@ Called immediately before rendering when new props or state is received. Not cal
 Note: You cannot call [Component.setState](#setstate) here.
 
 Note: the presence of [getSnapshotBeforeUpdate](#getsnapshotbeforeupdate)
-or StaticLifecycle.getDerivedStateFromProps getDerivedStateFromProps prevents
+or [getDerivedStateFromProps](https://react.dev/reference/react/Component#static-getderivedstatefromprops) prevents
 this from being invoked.
 
 #### Parameters
@@ -397,9 +397,9 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:1247
 
-Runs before React applies the result of Component.render render to the document, and
+Runs before React applies the result of [render](https://react.dev/reference/react/Component#render) to the document, and
 returns an object to be given to [componentDidUpdate](#componentdidupdate). Useful for saving
-things such as scroll position before Component.render render causes changes to it.
+things such as scroll position before [render](https://react.dev/reference/react/Component#render) causes changes to it.
 
 Note: the presence of this method prevents any of the deprecated
 lifecycle events from running.
@@ -428,7 +428,7 @@ lifecycle events from running.
 
 > **render**(): `ReactNode`
 
-Defined in: packages/ui/src/crud/shared/error-boundary.tsx:43
+Defined in: [packages/ui/src/crud/shared/error-boundary.tsx:43](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/error-boundary.tsx#L43)
 
 #### Returns
 
@@ -456,7 +456,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 ##### state
 
-`ErrorBoundaryState` | (`prevState`, `props`) => `ErrorBoundaryState` \| `Pick`\<`ErrorBoundaryState`, `K`\> \| `null` | `Pick`\<`ErrorBoundaryState`, `K`\> | `null`
+[`ErrorBoundaryState`](../interfaces/ErrorBoundaryState.md) | (`prevState`, `props`) => [`ErrorBoundaryState`](../interfaces/ErrorBoundaryState.md) \| `Pick`\<[`ErrorBoundaryState`](../interfaces/ErrorBoundaryState.md), `K`\> \| `null` | `Pick`\<[`ErrorBoundaryState`](../interfaces/ErrorBoundaryState.md), `K`\> | `null`
 
 ##### callback?
 
@@ -484,7 +484,7 @@ Called to determine whether the change in props and state should trigger a re-re
 `PureComponent` implements a shallow comparison on props and state and returns true if any
 props or states have changed.
 
-If false is returned, Component.render, `componentWillUpdate`
+If false is returned, [Component.render](https://react.dev/reference/react/Component#render), `componentWillUpdate`
 and `componentDidUpdate` will not be called.
 
 #### Parameters
@@ -517,13 +517,13 @@ and `componentDidUpdate` will not be called.
 
 Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:1284
 
-Called immediately before mounting occurs, and before Component.render.
+Called immediately before mounting occurs, and before [Component.render](https://react.dev/reference/react/Component#render).
 Avoid introducing any side-effects or subscriptions in this method.
 
 This method will not stop working in React 17.
 
 Note: the presence of [getSnapshotBeforeUpdate](#getsnapshotbeforeupdate)
-or StaticLifecycle.getDerivedStateFromProps getDerivedStateFromProps prevents
+or [getDerivedStateFromProps](https://react.dev/reference/react/Component#static-getderivedstatefromprops) prevents
 this from being invoked.
 
 #### Returns
@@ -560,7 +560,7 @@ Calling [Component.setState](#setstate) generally does not trigger this method.
 This method will not stop working in React 17.
 
 Note: the presence of [getSnapshotBeforeUpdate](#getsnapshotbeforeupdate)
-or StaticLifecycle.getDerivedStateFromProps getDerivedStateFromProps prevents
+or [getDerivedStateFromProps](https://react.dev/reference/react/Component#static-getderivedstatefromprops) prevents
 this from being invoked.
 
 #### Parameters
@@ -579,7 +579,7 @@ this from being invoked.
 
 #### Deprecated
 
-16.3, use static StaticLifecycle.getDerivedStateFromProps getDerivedStateFromProps instead
+16.3, use static [getDerivedStateFromProps](https://react.dev/reference/react/Component#static-getderivedstatefromprops) instead
 
 #### See
 
@@ -605,7 +605,7 @@ Note: You cannot call [Component.setState](#setstate) here.
 This method will not stop working in React 17.
 
 Note: the presence of [getSnapshotBeforeUpdate](#getsnapshotbeforeupdate)
-or StaticLifecycle.getDerivedStateFromProps getDerivedStateFromProps prevents
+or [getDerivedStateFromProps](https://react.dev/reference/react/Component#static-getderivedstatefromprops) prevents
 this from being invoked.
 
 #### Parameters
@@ -643,9 +643,9 @@ this from being invoked.
 
 ### getDerivedStateFromError()
 
-> `static` **getDerivedStateFromError**(`error`): `ErrorBoundaryState`
+> `static` **getDerivedStateFromError**(`error`): [`ErrorBoundaryState`](../interfaces/ErrorBoundaryState.md)
 
-Defined in: packages/ui/src/crud/shared/error-boundary.tsx:31
+Defined in: [packages/ui/src/crud/shared/error-boundary.tsx:31](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/error-boundary.tsx#L31)
 
 #### Parameters
 
@@ -655,4 +655,4 @@ Defined in: packages/ui/src/crud/shared/error-boundary.tsx:31
 
 #### Returns
 
-`ErrorBoundaryState`
+[`ErrorBoundaryState`](../interfaces/ErrorBoundaryState.md)

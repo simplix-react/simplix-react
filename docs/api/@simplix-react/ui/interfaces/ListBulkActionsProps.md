@@ -6,7 +6,7 @@
 
 # Interface: ListBulkActionsProps
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:685
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:685](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L685)
 
 Props for the List.BulkActions bar shown when rows are selected.
 
@@ -16,7 +16,7 @@ Props for the List.BulkActions bar shown when rows are selected.
 
 > `optional` **children**: `ReactNode`
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:693
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:693](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L693)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: packages/ui/src/crud/list/crud-list.tsx:693
 
 > `optional` **className**: `string`
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:692
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:692](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L692)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: packages/ui/src/crud/list/crud-list.tsx:692
 
 > `optional` **clearLabel**: `string`
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:691
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:691](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L691)
 
 Label for the clear button. Defaults to `"Clear"`.
 
@@ -42,7 +42,7 @@ Label for the clear button. Defaults to `"Clear"`.
 
 > `optional` **onClear**: () => `void`
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:687
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:687](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L687)
 
 #### Returns
 
@@ -54,7 +54,7 @@ Defined in: packages/ui/src/crud/list/crud-list.tsx:687
 
 > **selectedCount**: `number`
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:686
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:686](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L686)
 
 ***
 
@@ -62,7 +62,7 @@ Defined in: packages/ui/src/crud/list/crud-list.tsx:686
 
 > `optional` **selectedLabel**: (`count`) => `string`
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:689
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:689](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L689)
 
 Format the selected count label. Defaults to `` `${count} selected` ``.
 

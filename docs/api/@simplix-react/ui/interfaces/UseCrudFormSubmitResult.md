@@ -6,7 +6,7 @@
 
 # Interface: UseCrudFormSubmitResult\<T\>
 
-Defined in: packages/ui/src/crud/form/use-crud-form-submit.ts:18
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:18](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/form/use-crud-form-submit.ts#L18)
 
 Return type of [useCrudFormSubmit](../functions/useCrudFormSubmit.md).
 
@@ -22,7 +22,7 @@ Return type of [useCrudFormSubmit](../functions/useCrudFormSubmit.md).
 
 > **handleSubmit**: (`values`) => `void`
 
-Defined in: packages/ui/src/crud/form/use-crud-form-submit.ts:20
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:20](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/form/use-crud-form-submit.ts#L20)
 
 #### Parameters
 
@@ -40,7 +40,7 @@ Defined in: packages/ui/src/crud/form/use-crud-form-submit.ts:20
 
 > **isEdit**: `boolean`
 
-Defined in: packages/ui/src/crud/form/use-crud-form-submit.ts:19
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:19](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/form/use-crud-form-submit.ts#L19)
 
 ***
 
@@ -48,4 +48,4 @@ Defined in: packages/ui/src/crud/form/use-crud-form-submit.ts:19
 
 > **isPending**: `boolean`
 
-Defined in: packages/ui/src/crud/form/use-crud-form-submit.ts:21
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:21](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/form/use-crud-form-submit.ts#L21)

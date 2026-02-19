@@ -6,7 +6,7 @@
 
 # Interface: TextFieldProps
 
-Defined in: packages/ui/src/fields/form/text-field.tsx:7
+Defined in: [packages/ui/src/fields/form/text-field.tsx:7](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/form/text-field.tsx#L7)
 
 Props for the [TextField](../functions/TextField.md) form component.
 
@@ -20,7 +20,7 @@ Props for the [TextField](../functions/TextField.md) form component.
 
 > `optional` **className**: `string`
 
-Defined in: packages/ui/src/crud/shared/types.ts:29
+Defined in: [packages/ui/src/crud/shared/types.ts:29](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L29)
 
 #### Inherited from
 
@@ -32,7 +32,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:29
 
 > `optional` **description**: `string`
 
-Defined in: packages/ui/src/crud/shared/types.ts:26
+Defined in: [packages/ui/src/crud/shared/types.ts:26](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L26)
 
 #### Inherited from
 
@@ -44,7 +44,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:26
 
 > `optional` **disabled**: `boolean`
 
-Defined in: packages/ui/src/crud/shared/types.ts:28
+Defined in: [packages/ui/src/crud/shared/types.ts:28](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L28)
 
 #### Inherited from
 
@@ -56,7 +56,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:28
 
 > `optional` **error**: `string`
 
-Defined in: packages/ui/src/crud/shared/types.ts:25
+Defined in: [packages/ui/src/crud/shared/types.ts:25](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L25)
 
 #### Inherited from
 
@@ -68,7 +68,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:25
 
 > `optional` **inputProps**: `DetailedHTMLProps`\<`InputHTMLAttributes`\<`HTMLInputElement`\>, `HTMLInputElement`\>
 
-Defined in: packages/ui/src/fields/form/text-field.tsx:17
+Defined in: [packages/ui/src/fields/form/text-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/form/text-field.tsx#L17)
 
 Additional props forwarded to the underlying input element.
 
@@ -78,7 +78,7 @@ Additional props forwarded to the underlying input element.
 
 > `optional` **label**: `string`
 
-Defined in: packages/ui/src/crud/shared/types.ts:23
+Defined in: [packages/ui/src/crud/shared/types.ts:23](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L23)
 
 #### Inherited from
 
@@ -90,7 +90,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:23
 
 > `optional` **labelKey**: `string`
 
-Defined in: packages/ui/src/crud/shared/types.ts:24
+Defined in: [packages/ui/src/crud/shared/types.ts:24](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L24)
 
 #### Inherited from
 
@@ -102,7 +102,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:24
 
 > `optional` **labelPosition**: `"hidden"` \| `"top"` \| `"left"`
 
-Defined in: packages/ui/src/crud/shared/types.ts:5
+Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L5)
 
 #### Inherited from
 
@@ -114,7 +114,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:5
 
 > `optional` **maxLength**: `number`
 
-Defined in: packages/ui/src/fields/form/text-field.tsx:13
+Defined in: [packages/ui/src/fields/form/text-field.tsx:13](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/form/text-field.tsx#L13)
 
 ***
 
@@ -122,7 +122,7 @@ Defined in: packages/ui/src/fields/form/text-field.tsx:13
 
 > **onChange**: (`value`) => `void`
 
-Defined in: packages/ui/src/fields/form/text-field.tsx:11
+Defined in: [packages/ui/src/fields/form/text-field.tsx:11](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/form/text-field.tsx#L11)
 
 Called when the value changes.
 
@@ -142,7 +142,7 @@ Called when the value changes.
 
 > `optional` **placeholder**: `string`
 
-Defined in: packages/ui/src/fields/form/text-field.tsx:12
+Defined in: [packages/ui/src/fields/form/text-field.tsx:12](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/form/text-field.tsx#L12)
 
 ***
 
@@ -150,7 +150,7 @@ Defined in: packages/ui/src/fields/form/text-field.tsx:12
 
 > `optional` **required**: `boolean`
 
-Defined in: packages/ui/src/crud/shared/types.ts:27
+Defined in: [packages/ui/src/crud/shared/types.ts:27](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L27)
 
 #### Inherited from
 
@@ -162,7 +162,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:27
 
 > `optional` **size**: `"sm"` \| `"md"` \| `"lg"`
 
-Defined in: packages/ui/src/crud/shared/types.ts:6
+Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L6)
 
 #### Inherited from
 
@@ -174,7 +174,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:6
 
 > `optional` **type**: `"text"` \| `"tel"` \| `"url"` \| `"email"` \| `"password"`
 
-Defined in: packages/ui/src/fields/form/text-field.tsx:15
+Defined in: [packages/ui/src/fields/form/text-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/form/text-field.tsx#L15)
 
 HTML input type. Defaults to `"text"`.
 
@@ -184,6 +184,6 @@ HTML input type. Defaults to `"text"`.
 
 > **value**: `string`
 
-Defined in: packages/ui/src/fields/form/text-field.tsx:9
+Defined in: [packages/ui/src/fields/form/text-field.tsx:9](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/form/text-field.tsx#L9)
 
 Current input value.

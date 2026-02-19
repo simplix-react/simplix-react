@@ -6,7 +6,7 @@
 
 # Interface: DetailNumberFieldProps
 
-Defined in: packages/ui/src/fields/detail/number-field.tsx:7
+Defined in: [packages/ui/src/fields/detail/number-field.tsx:7](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/detail/number-field.tsx#L7)
 
 Props for the [DetailNumberField](../functions/DetailNumberField.md) component.
 
@@ -20,7 +20,7 @@ Props for the [DetailNumberField](../functions/DetailNumberField.md) component.
 
 > `optional` **className**: `string`
 
-Defined in: packages/ui/src/crud/shared/types.ts:36
+Defined in: [packages/ui/src/crud/shared/types.ts:36](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L36)
 
 #### Inherited from
 
@@ -32,7 +32,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:36
 
 > `optional` **currency**: `string`
 
-Defined in: packages/ui/src/fields/detail/number-field.tsx:15
+Defined in: [packages/ui/src/fields/detail/number-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/detail/number-field.tsx#L15)
 
 Currency code when `format="currency"` (e.g., `"USD"`).
 
@@ -42,7 +42,7 @@ Currency code when `format="currency"` (e.g., `"USD"`).
 
 > `optional` **fallback**: `string`
 
-Defined in: packages/ui/src/fields/detail/number-field.tsx:17
+Defined in: [packages/ui/src/fields/detail/number-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/detail/number-field.tsx#L17)
 
 Fallback text when value is null. Defaults to em-dash.
 
@@ -52,7 +52,7 @@ Fallback text when value is null. Defaults to em-dash.
 
 > `optional` **format**: `"decimal"` \| `"currency"` \| `"percent"`
 
-Defined in: packages/ui/src/fields/detail/number-field.tsx:11
+Defined in: [packages/ui/src/fields/detail/number-field.tsx:11](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/detail/number-field.tsx#L11)
 
 Number formatting style. Defaults to `"decimal"`.
 
@@ -62,7 +62,7 @@ Number formatting style. Defaults to `"decimal"`.
 
 > `optional` **label**: `string`
 
-Defined in: packages/ui/src/crud/shared/types.ts:34
+Defined in: [packages/ui/src/crud/shared/types.ts:34](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L34)
 
 #### Inherited from
 
@@ -74,7 +74,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:34
 
 > `optional` **labelKey**: `string`
 
-Defined in: packages/ui/src/crud/shared/types.ts:35
+Defined in: [packages/ui/src/crud/shared/types.ts:35](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L35)
 
 #### Inherited from
 
@@ -86,7 +86,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:35
 
 > `optional` **labelPosition**: `"hidden"` \| `"top"` \| `"left"`
 
-Defined in: packages/ui/src/crud/shared/types.ts:5
+Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L5)
 
 #### Inherited from
 
@@ -98,7 +98,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:5
 
 > `optional` **locale**: `string`
 
-Defined in: packages/ui/src/fields/detail/number-field.tsx:13
+Defined in: [packages/ui/src/fields/detail/number-field.tsx:13](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/detail/number-field.tsx#L13)
 
 Locale for number formatting (e.g., `"en-US"`).
 
@@ -108,7 +108,7 @@ Locale for number formatting (e.g., `"en-US"`).
 
 > `optional` **size**: `"sm"` \| `"md"` \| `"lg"`
 
-Defined in: packages/ui/src/crud/shared/types.ts:6
+Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L6)
 
 #### Inherited from
 
@@ -120,6 +120,6 @@ Defined in: packages/ui/src/crud/shared/types.ts:6
 
 > **value**: `number` \| `null`
 
-Defined in: packages/ui/src/fields/detail/number-field.tsx:9
+Defined in: [packages/ui/src/fields/detail/number-field.tsx:9](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/detail/number-field.tsx#L9)
 
 Numeric value to display.

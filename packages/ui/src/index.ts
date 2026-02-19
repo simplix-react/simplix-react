@@ -17,6 +17,7 @@ export {
 } from "./primitives";
 export type {
   CardProps,
+  CardTag,
   CardVariants,
   ContainerProps,
   ContainerVariants,
@@ -24,11 +25,13 @@ export type {
   GridProps,
   GridVariants,
   HeadingProps,
+  HeadingTag,
   HeadingVariants,
   SectionProps,
   StackProps,
   StackVariants,
   TextProps,
+  TextTag,
   TextVariants,
 } from "./primitives";
 
@@ -114,6 +117,8 @@ export type {
   ListEmptyProps,
   ListFilterOption,
   ListFilterProps,
+  ListHook,
+  ListHookResult,
   ListPaginationProps,
   ListProps,
   ListRowActionsProps,
@@ -163,7 +168,7 @@ export type {
 
 // CRUD error boundary
 export { CrudErrorBoundary } from "./crud/shared";
-export type { CrudErrorBoundaryProps } from "./crud/shared";
+export type { CrudErrorBoundaryProps, ErrorBoundaryState } from "./crud/shared";
 
 // Query fallback
 export { QueryFallback } from "./crud/shared";
@@ -182,10 +187,14 @@ export { CrudProvider, createReactRouterAdapter, RouterContext, useRouter } from
 export type { CrudProviderProps, ReactRouterHooks, RouterAdapter } from "./adapters";
 
 // CRUD patterns
-export { ListDetail, useFadeTransition, useListDetailState } from "./crud/patterns";
+export { ListDetail, ListDetailRoot, useFadeTransition, useListDetailState } from "./crud/patterns";
 export type {
   DetailView,
+  ListDetailContextValue,
+  ListDetailPanelProps,
   ListDetailProps,
+  ListDetailVariant,
+  ListWidth,
   UseFadeTransitionOptions,
   UseFadeTransitionResult,
   UseListDetailStateOptions,

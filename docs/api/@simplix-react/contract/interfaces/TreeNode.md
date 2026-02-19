@@ -6,7 +6,7 @@
 
 # Interface: TreeNode\<T\>
 
-Defined in: [packages/contract/src/types.ts:119](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/types.ts#L119)
+Defined in: [packages/contract/src/types.ts:119](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/contract/src/types.ts#L119)
 
 Tree response node wrapping entity data with recursive children.
 
@@ -27,7 +27,7 @@ The entity data type.
 
 > **children**: `TreeNode`\<`T`\>[]
 
-Defined in: [packages/contract/src/types.ts:123](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/types.ts#L123)
+Defined in: [packages/contract/src/types.ts:123](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/contract/src/types.ts#L123)
 
 Child nodes in the hierarchy.
 
@@ -37,6 +37,6 @@ Child nodes in the hierarchy.
 
 > **data**: `T`
 
-Defined in: [packages/contract/src/types.ts:121](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/types.ts#L121)
+Defined in: [packages/contract/src/types.ts:121](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/contract/src/types.ts#L121)
 
 The entity data for this node.

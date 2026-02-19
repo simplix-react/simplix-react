@@ -6,7 +6,7 @@
 
 # Interface: UseCrudDeleteDetailResult
 
-Defined in: packages/ui/src/crud/delete/use-crud-delete.ts:42
+Defined in: [packages/ui/src/crud/delete/use-crud-delete.ts:42](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/delete/use-crud-delete.ts#L42)
 
 Return type of [useCrudDeleteDetail](../functions/useCrudDeleteDetail.md).
 
@@ -16,7 +16,7 @@ Return type of [useCrudDeleteDetail](../functions/useCrudDeleteDetail.md).
 
 > **cancel**: () => `void`
 
-Defined in: packages/ui/src/crud/delete/use-crud-delete.ts:45
+Defined in: [packages/ui/src/crud/delete/use-crud-delete.ts:45](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/delete/use-crud-delete.ts#L45)
 
 #### Returns
 
@@ -28,7 +28,7 @@ Defined in: packages/ui/src/crud/delete/use-crud-delete.ts:45
 
 > **onOpenChange**: (`open`) => `void`
 
-Defined in: packages/ui/src/crud/delete/use-crud-delete.ts:46
+Defined in: [packages/ui/src/crud/delete/use-crud-delete.ts:46](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/delete/use-crud-delete.ts#L46)
 
 #### Parameters
 
@@ -46,7 +46,7 @@ Defined in: packages/ui/src/crud/delete/use-crud-delete.ts:46
 
 > **open**: `boolean`
 
-Defined in: packages/ui/src/crud/delete/use-crud-delete.ts:43
+Defined in: [packages/ui/src/crud/delete/use-crud-delete.ts:43](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/delete/use-crud-delete.ts#L43)
 
 ***
 
@@ -54,7 +54,7 @@ Defined in: packages/ui/src/crud/delete/use-crud-delete.ts:43
 
 > **requestDelete**: () => `void`
 
-Defined in: packages/ui/src/crud/delete/use-crud-delete.ts:44
+Defined in: [packages/ui/src/crud/delete/use-crud-delete.ts:44](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/delete/use-crud-delete.ts#L44)
 
 #### Returns
 

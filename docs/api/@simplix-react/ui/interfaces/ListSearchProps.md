@@ -6,7 +6,7 @@
 
 # Interface: ListSearchProps
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:77
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:77](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L77)
 
 Props for the List.Search sub-component.
 
@@ -16,7 +16,7 @@ Props for the List.Search sub-component.
 
 > `optional` **className**: `string`
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:81
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:81](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L81)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: packages/ui/src/crud/list/crud-list.tsx:81
 
 > **onChange**: (`value`) => `void`
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:79
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:79](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L79)
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: packages/ui/src/crud/list/crud-list.tsx:79
 
 > `optional` **placeholder**: `string`
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:80
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:80](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L80)
 
 ***
 
@@ -50,4 +50,4 @@ Defined in: packages/ui/src/crud/list/crud-list.tsx:80
 
 > **value**: `string`
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:78
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:78](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L78)

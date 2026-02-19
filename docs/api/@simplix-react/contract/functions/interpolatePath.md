@@ -8,7 +8,7 @@
 
 > **interpolatePath**(`path`, `params`): `string`
 
-Defined in: packages/contract/src/helpers/path-params.ts:35
+Defined in: [packages/contract/src/helpers/path-params.ts:35](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/contract/src/helpers/path-params.ts#L35)
 
 Substitutes `:paramName` placeholders in a URL path with actual values.
 

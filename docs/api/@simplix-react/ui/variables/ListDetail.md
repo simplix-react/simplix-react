@@ -6,9 +6,9 @@
 
 # Variable: ListDetail
 
-> `const` **ListDetail**: *typeof* `ListDetailRoot` & `object`
+> `const` **ListDetail**: *typeof* [`ListDetailRoot`](../functions/ListDetailRoot.md) & `object`
 
-Defined in: packages/ui/src/crud/patterns/list-detail.tsx:301
+Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:301](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/patterns/list-detail.tsx#L301)
 
 List-detail layout with two variants:
 - `"panel"` (default): Side-by-side layout with draggable divider.
@@ -20,16 +20,16 @@ Sub-components: List, Detail, useListDetail.
 
 ### Detail
 
-> **Detail**: `ForwardRefExoticComponent`\<`PanelProps` & `RefAttributes`\<`HTMLElement`\>\> = `DetailPanel`
+> **Detail**: `ForwardRefExoticComponent`\<[`ListDetailPanelProps`](../interfaces/ListDetailPanelProps.md) & `RefAttributes`\<`HTMLElement`\>\> = `DetailPanel`
 
 ### List
 
-> **List**: `ForwardRefExoticComponent`\<`PanelProps` & `RefAttributes`\<`HTMLElement`\>\> = `ListPanel`
+> **List**: `ForwardRefExoticComponent`\<[`ListDetailPanelProps`](../interfaces/ListDetailPanelProps.md) & `RefAttributes`\<`HTMLElement`\>\> = `ListPanel`
 
 ### useListDetail()
 
-> **useListDetail**: () => `ListDetailContextValue`
+> **useListDetail**: () => [`ListDetailContextValue`](../interfaces/ListDetailContextValue.md)
 
 #### Returns
 
-`ListDetailContextValue`
+[`ListDetailContextValue`](../interfaces/ListDetailContextValue.md)

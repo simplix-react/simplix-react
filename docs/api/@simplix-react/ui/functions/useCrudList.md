@@ -8,7 +8,7 @@
 
 > **useCrudList**\<`T`\>(`useList`, `options?`): [`UseCrudListResult`](../interfaces/UseCrudListResult.md)\<`T`\>
 
-Defined in: packages/ui/src/crud/list/use-crud-list.ts:77
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:77](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/use-crud-list.ts#L77)
 
 State management hook for CRUD list views.
 Handles filtering, sorting, pagination, and selection with
@@ -24,7 +24,7 @@ support for both server-side and client-side data processing.
 
 ### useList
 
-`ListHook`\<`T`\>
+[`ListHook`](../interfaces/ListHook.md)\<`T`\>
 
 ### options?
 

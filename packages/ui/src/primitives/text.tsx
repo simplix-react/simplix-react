@@ -36,7 +36,7 @@ const textVariants = cva("font-normal", {
 /** Variant props extracted from {@link textVariants}. */
 export type TextVariants = VariantProps<typeof textVariants>;
 
-type TextTag = "p" | "span" | "div" | "label" | "code";
+export type TextTag = "p" | "span" | "div" | "label" | "code";
 
 /** Props for the {@link Text} component. */
 export interface TextProps

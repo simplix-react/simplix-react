@@ -6,7 +6,7 @@
 
 # Interface: TextProps
 
-Defined in: packages/ui/src/primitives/text.tsx:42
+Defined in: [packages/ui/src/primitives/text.tsx:42](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/text.tsx#L42)
 
 Props for the [Text](../variables/Text.md) component.
 
@@ -919,9 +919,9 @@ Defines the human readable text alternative of aria-valuenow for a range widget.
 
 ### as?
 
-> `optional` **as**: `TextTag`
+> `optional` **as**: [`TextTag`](../type-aliases/TextTag.md)
 
-Defined in: packages/ui/src/primitives/text.tsx:46
+Defined in: [packages/ui/src/primitives/text.tsx:46](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/text.tsx#L46)
 
 Override the rendered HTML tag (default: "p", "code" when font="mono").
 
@@ -1155,7 +1155,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **font**: `"sans"` \| `"display"` \| `"mono"` \| `null`
 
-Defined in: packages/ui/src/primitives/text.tsx:27
+Defined in: [packages/ui/src/primitives/text.tsx:27](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/text.tsx#L27)
 
 #### Inherited from
 
@@ -3555,7 +3555,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **size**: `"base"` \| `"caption"` \| `"sm"` \| `"lg"` \| `null`
 
-Defined in: packages/ui/src/primitives/text.tsx:15
+Defined in: [packages/ui/src/primitives/text.tsx:15](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/text.tsx#L15)
 
 #### Inherited from
 
@@ -3651,7 +3651,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **tone**: `"default"` \| `"destructive"` \| `"muted"` \| `"primary"` \| `null`
 
-Defined in: packages/ui/src/primitives/text.tsx:21
+Defined in: [packages/ui/src/primitives/text.tsx:21](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/text.tsx#L21)
 
 #### Inherited from
 

@@ -6,7 +6,7 @@
 
 # Interface: AuthInstance
 
-Defined in: [packages/auth/src/types.ts:94](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/auth/src/types.ts#L94)
+Defined in: [packages/auth/src/types.ts:94](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/auth/src/types.ts#L94)
 
 Reactive auth instance returned by [createAuth](../functions/createAuth.md).
 
@@ -19,7 +19,7 @@ injects auth headers, handles 401 retries, and manages token refresh.
 
 > **fetchFn**: [`FetchFn`](../@simplix-react/contract/type-aliases/FetchFn.md)
 
-Defined in: [packages/auth/src/types.ts:96](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/auth/src/types.ts#L96)
+Defined in: [packages/auth/src/types.ts:96](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/auth/src/types.ts#L96)
 
 Authenticated fetch function for use with `defineApi`.
 
@@ -29,7 +29,7 @@ Authenticated fetch function for use with `defineApi`.
 
 > **clear**(): `void`
 
-Defined in: [packages/auth/src/types.ts:108](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/auth/src/types.ts#L108)
+Defined in: [packages/auth/src/types.ts:108](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/auth/src/types.ts#L108)
 
 Clears all auth state and notifies subscribers.
 
@@ -43,7 +43,7 @@ Clears all auth state and notifies subscribers.
 
 > **getAccessToken**(): `string` \| `null`
 
-Defined in: [packages/auth/src/types.ts:102](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/auth/src/types.ts#L102)
+Defined in: [packages/auth/src/types.ts:102](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/auth/src/types.ts#L102)
 
 Returns the current access token from the store, or `null`.
 
@@ -57,7 +57,7 @@ Returns the current access token from the store, or `null`.
 
 > **isAuthenticated**(): `boolean`
 
-Defined in: [packages/auth/src/types.ts:99](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/auth/src/types.ts#L99)
+Defined in: [packages/auth/src/types.ts:99](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/auth/src/types.ts#L99)
 
 Returns true if any scheme reports valid credentials.
 
@@ -71,7 +71,7 @@ Returns true if any scheme reports valid credentials.
 
 > **setTokens**(`tokens`): `void`
 
-Defined in: [packages/auth/src/types.ts:105](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/auth/src/types.ts#L105)
+Defined in: [packages/auth/src/types.ts:105](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/auth/src/types.ts#L105)
 
 Stores a token pair and notifies subscribers.
 
@@ -91,7 +91,7 @@ Stores a token pair and notifies subscribers.
 
 > **subscribe**(`listener`): () => `void`
 
-Defined in: [packages/auth/src/types.ts:114](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/auth/src/types.ts#L114)
+Defined in: [packages/auth/src/types.ts:114](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/auth/src/types.ts#L114)
 
 Subscribes to auth state changes.
 

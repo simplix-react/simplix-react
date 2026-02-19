@@ -1,5 +1,11 @@
-export { ListDetail } from "./list-detail";
-export type { ListDetailProps } from "./list-detail";
+export { ListDetail, ListDetailRoot } from "./list-detail";
+export type {
+  ListDetailProps,
+  ListDetailVariant,
+  ListDetailContextValue,
+  ListWidth,
+  PanelProps as ListDetailPanelProps,
+} from "./list-detail";
 export { useListDetailState } from "./use-list-detail-state";
 export type {
   DetailView,

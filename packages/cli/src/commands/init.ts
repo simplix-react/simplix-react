@@ -34,12 +34,15 @@ import {
   i18nConstantsTs,
   getCommonTranslationJson,
 } from "../templates/project/i18n-files.js";
+import { accessConfigTs } from "../templates/project/access-files.js";
 
 export interface InitOptions {
   name: string;
   scope: string;
   includeDemo: boolean;
   enableI18n: boolean;
+  enableAuth: boolean;
+  enableAccess: boolean;
   locales: string[];
 }
 
@@ -100,6 +103,8 @@ export const initCommand = new Command("init")
   .option("-s, --scope <scope>", "npm scope for packages", "")
   .option("--no-demo", "Skip demo app creation")
   .option("--no-i18n", "Skip i18n setup")
+  .option("--no-auth", "Skip auth setup")
+  .option("--no-access", "Skip access control setup")
   .option("-y, --yes", "Accept all defaults (non-interactive)")
   .action(async (projectName: string, flags: Record<string, unknown>) => {
     const targetDir = resolve(process.cwd(), projectName);
@@ -118,6 +123,8 @@ export const initCommand = new Command("init")
         scope: (flags.scope as string) || `@${projectName}`,
         includeDemo: flags.demo !== false,
         enableI18n: flags.i18n !== false,
+        enableAuth: flags.auth !== false,
+        enableAccess: flags.access !== false,
         locales: ["en", "ko", "ja"],
       };
     } else {
@@ -142,7 +149,20 @@ export const initCommand = new Command("init")
           initial: flags.i18n !== false,
         },
         {
-          type: (prev: boolean) => (prev ? "multiselect" : null),
+          type: "confirm",
+          name: "enableAuth",
+          message: "Enable auth (authentication)?",
+          initial: flags.auth !== false,
+        },
+        {
+          type: "confirm",
+          name: "enableAccess",
+          message: "Enable access control (authorization)?",
+          initial: flags.access !== false,
+        },
+        {
+          type: (_prev: unknown, values: Record<string, unknown>) =>
+            values.enableI18n ? "multiselect" : null,
           name: "locales",
           message: "Select locales:",
           choices: [
@@ -159,6 +179,8 @@ export const initCommand = new Command("init")
         scope: (flags.scope as string) || response.scope || `@${projectName}`,
         includeDemo: response.includeDemo ?? true,
         enableI18n: response.enableI18n ?? true,
+        enableAuth: response.enableAuth ?? true,
+        enableAccess: response.enableAccess ?? true,
         locales: response.locales ?? ["en", "ko", "ja"],
       };
     }
@@ -176,6 +198,8 @@ export const initCommand = new Command("init")
         scope: options.scope,
         includeDemo: options.includeDemo,
         enableI18n: options.enableI18n,
+        enableAuth: options.enableAuth,
+        enableAccess: options.enableAccess,
         locales: options.locales,
         defaultLocale: options.locales[0] || "en",
       });
@@ -326,6 +350,15 @@ function HomePage() {
             ] = getCommonTranslationJson(locale);
           }
           await writeFiles(targetDir, i18nFiles);
+        }
+
+        // access files for app
+        if (options.enableAccess) {
+          spinner.text = "Creating access control files...";
+          await writeFiles(targetDir, {
+            [`apps/${ctx.projectName}-demo/src/app/access/index.ts`]:
+              renderTemplate(accessConfigTs, appCtx),
+          });
         }
       }
 

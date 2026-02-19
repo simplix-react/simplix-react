@@ -8,4 +8,4 @@
 
 > `const` **Switch**: `ForwardRefExoticComponent`\<`Omit`\<`SwitchProps` & `RefAttributes`\<`HTMLButtonElement`\>, `"ref"`\> & `RefAttributes`\<`HTMLButtonElement`\>\>
 
-Defined in: packages/ui/src/base/switch.tsx:8
+Defined in: [packages/ui/src/base/switch.tsx:8](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/base/switch.tsx#L8)

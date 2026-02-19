@@ -6,7 +6,7 @@
 
 # Interface: DetailDateFieldProps
 
-Defined in: packages/ui/src/fields/detail/date-field.tsx:7
+Defined in: [packages/ui/src/fields/detail/date-field.tsx:7](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/detail/date-field.tsx#L7)
 
 Props for the [DetailDateField](../functions/DetailDateField.md) component.
 
@@ -20,7 +20,7 @@ Props for the [DetailDateField](../functions/DetailDateField.md) component.
 
 > `optional` **className**: `string`
 
-Defined in: packages/ui/src/crud/shared/types.ts:36
+Defined in: [packages/ui/src/crud/shared/types.ts:36](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L36)
 
 #### Inherited from
 
@@ -32,7 +32,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:36
 
 > `optional` **fallback**: `string`
 
-Defined in: packages/ui/src/fields/detail/date-field.tsx:13
+Defined in: [packages/ui/src/fields/detail/date-field.tsx:13](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/detail/date-field.tsx#L13)
 
 Fallback text when value is null. Defaults to em-dash.
 
@@ -42,7 +42,7 @@ Fallback text when value is null. Defaults to em-dash.
 
 > `optional` **format**: `string`
 
-Defined in: packages/ui/src/fields/detail/date-field.tsx:11
+Defined in: [packages/ui/src/fields/detail/date-field.tsx:11](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/detail/date-field.tsx#L11)
 
 Display format. Defaults to `"date"`.
 
@@ -52,7 +52,7 @@ Display format. Defaults to `"date"`.
 
 > `optional` **label**: `string`
 
-Defined in: packages/ui/src/crud/shared/types.ts:34
+Defined in: [packages/ui/src/crud/shared/types.ts:34](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L34)
 
 #### Inherited from
 
@@ -64,7 +64,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:34
 
 > `optional` **labelKey**: `string`
 
-Defined in: packages/ui/src/crud/shared/types.ts:35
+Defined in: [packages/ui/src/crud/shared/types.ts:35](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L35)
 
 #### Inherited from
 
@@ -76,7 +76,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:35
 
 > `optional` **labelPosition**: `"hidden"` \| `"top"` \| `"left"`
 
-Defined in: packages/ui/src/crud/shared/types.ts:5
+Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L5)
 
 #### Inherited from
 
@@ -88,7 +88,7 @@ Defined in: packages/ui/src/crud/shared/types.ts:5
 
 > `optional` **size**: `"sm"` \| `"md"` \| `"lg"`
 
-Defined in: packages/ui/src/crud/shared/types.ts:6
+Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/types.ts#L6)
 
 #### Inherited from
 
@@ -100,6 +100,6 @@ Defined in: packages/ui/src/crud/shared/types.ts:6
 
 > **value**: `string` \| `Date` \| `null`
 
-Defined in: packages/ui/src/fields/detail/date-field.tsx:9
+Defined in: [packages/ui/src/fields/detail/date-field.tsx:9](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/fields/detail/date-field.tsx#L9)
 
 Date value as Date object or ISO string.

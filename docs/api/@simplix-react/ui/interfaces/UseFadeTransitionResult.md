@@ -6,7 +6,7 @@
 
 # Interface: UseFadeTransitionResult
 
-Defined in: packages/ui/src/crud/patterns/use-fade-transition.ts:15
+Defined in: [packages/ui/src/crud/patterns/use-fade-transition.ts:15](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/patterns/use-fade-transition.ts#L15)
 
 Return type of [useFadeTransition](../functions/useFadeTransition.md).
 
@@ -16,7 +16,7 @@ Return type of [useFadeTransition](../functions/useFadeTransition.md).
 
 > **displayedId**: `string` \| `null`
 
-Defined in: packages/ui/src/crud/patterns/use-fade-transition.ts:16
+Defined in: [packages/ui/src/crud/patterns/use-fade-transition.ts:16](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/patterns/use-fade-transition.ts#L16)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: packages/ui/src/crud/patterns/use-fade-transition.ts:16
 
 > **fading**: `boolean`
 
-Defined in: packages/ui/src/crud/patterns/use-fade-transition.ts:17
+Defined in: [packages/ui/src/crud/patterns/use-fade-transition.ts:17](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/patterns/use-fade-transition.ts#L17)
 
 ***
 
@@ -32,4 +32,4 @@ Defined in: packages/ui/src/crud/patterns/use-fade-transition.ts:17
 
 > **style**: `CSSProperties`
 
-Defined in: packages/ui/src/crud/patterns/use-fade-transition.ts:18
+Defined in: [packages/ui/src/crud/patterns/use-fade-transition.ts:18](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/patterns/use-fade-transition.ts#L18)

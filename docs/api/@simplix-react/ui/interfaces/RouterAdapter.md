@@ -6,7 +6,7 @@
 
 # Interface: RouterAdapter
 
-Defined in: packages/ui/src/adapters/router-provider.ts:4
+Defined in: [packages/ui/src/adapters/router-provider.ts:4](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/adapters/router-provider.ts#L4)
 
 Router abstraction interface. Adapters (e.g., React Router) implement this contract.
 
@@ -16,7 +16,7 @@ Router abstraction interface. Adapters (e.g., React Router) implement this contr
 
 > **getSearchParams**: () => `URLSearchParams`
 
-Defined in: packages/ui/src/adapters/router-provider.ts:6
+Defined in: [packages/ui/src/adapters/router-provider.ts:6](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/adapters/router-provider.ts#L6)
 
 #### Returns
 
@@ -28,7 +28,7 @@ Defined in: packages/ui/src/adapters/router-provider.ts:6
 
 > **navigate**: (`to`, `options?`) => `void`
 
-Defined in: packages/ui/src/adapters/router-provider.ts:5
+Defined in: [packages/ui/src/adapters/router-provider.ts:5](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/adapters/router-provider.ts#L5)
 
 #### Parameters
 
@@ -52,7 +52,7 @@ Defined in: packages/ui/src/adapters/router-provider.ts:5
 
 > **setSearchParams**: (`params`, `options?`) => `void`
 
-Defined in: packages/ui/src/adapters/router-provider.ts:7
+Defined in: [packages/ui/src/adapters/router-provider.ts:7](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/adapters/router-provider.ts#L7)
 
 #### Parameters
 
@@ -76,7 +76,7 @@ Defined in: packages/ui/src/adapters/router-provider.ts:7
 
 > **useCurrentPath**: () => `string`
 
-Defined in: packages/ui/src/adapters/router-provider.ts:11
+Defined in: [packages/ui/src/adapters/router-provider.ts:11](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/adapters/router-provider.ts#L11)
 
 #### Returns
 

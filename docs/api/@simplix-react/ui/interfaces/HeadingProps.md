@@ -6,7 +6,7 @@
 
 # Interface: HeadingProps
 
-Defined in: packages/ui/src/primitives/heading.tsx:49
+Defined in: [packages/ui/src/primitives/heading.tsx:49](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/heading.tsx#L49)
 
 Props for the [Heading](../variables/Heading.md) component.
 
@@ -919,9 +919,9 @@ Defines the human readable text alternative of aria-valuenow for a range widget.
 
 ### as?
 
-> `optional` **as**: `HeadingTag`
+> `optional` **as**: [`HeadingTag`](../type-aliases/HeadingTag.md)
 
-Defined in: packages/ui/src/primitives/heading.tsx:53
+Defined in: [packages/ui/src/primitives/heading.tsx:53](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/heading.tsx#L53)
 
 Override the rendered HTML tag (default: matches level).
 
@@ -1155,7 +1155,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **font**: `"sans"` \| `"display"` \| `"mono"` \| `null`
 
-Defined in: packages/ui/src/primitives/heading.tsx:24
+Defined in: [packages/ui/src/primitives/heading.tsx:24](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/heading.tsx#L24)
 
 #### Inherited from
 
@@ -1339,7 +1339,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **level**: `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `null`
 
-Defined in: packages/ui/src/primitives/heading.tsx:10
+Defined in: [packages/ui/src/primitives/heading.tsx:10](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/heading.tsx#L10)
 
 #### Inherited from
 
@@ -3651,7 +3651,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **tone**: `"default"` \| `"destructive"` \| `"muted"` \| `"primary"` \| `null`
 
-Defined in: packages/ui/src/primitives/heading.tsx:18
+Defined in: [packages/ui/src/primitives/heading.tsx:18](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/primitives/heading.tsx#L18)
 
 #### Inherited from
 

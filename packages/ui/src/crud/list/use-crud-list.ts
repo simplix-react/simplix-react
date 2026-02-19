@@ -3,13 +3,13 @@ import { useCallback, useMemo, useState } from "react";
 import type { EmptyReason, SortState } from "../shared/types";
 
 // Minimal hook shape to avoid tight coupling with @simplix-react/react generics
-interface ListHookResult<T> {
+export interface ListHookResult<T> {
   data: T[] | undefined;
   isLoading: boolean;
   error: Error | null;
 }
 
-interface ListHook<T> {
+export interface ListHook<T> {
   (params?: Record<string, unknown>, options?: Record<string, unknown>): ListHookResult<T>;
 }
 

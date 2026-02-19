@@ -6,7 +6,7 @@
 
 # Interface: ListPaginationProps
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:591
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:591](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L591)
 
 Props for the List.Pagination sub-component.
 
@@ -16,7 +16,7 @@ Props for the List.Pagination sub-component.
 
 > `optional` **className**: `string`
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:605
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:605](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L605)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: packages/ui/src/crud/list/crud-list.tsx:605
 
 > `optional` **noResultsLabel**: `string`
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:600
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:600](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L600)
 
 Label shown when total is 0. Defaults to `"No results"`.
 
@@ -34,7 +34,7 @@ Label shown when total is 0. Defaults to `"No results"`.
 
 > **onPageChange**: (`page`) => `void`
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:596
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:596](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L596)
 
 #### Parameters
 
@@ -52,7 +52,7 @@ Defined in: packages/ui/src/crud/list/crud-list.tsx:596
 
 > `optional` **onPageSizeChange**: (`size`) => `void`
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:597
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:597](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L597)
 
 #### Parameters
 
@@ -70,7 +70,7 @@ Defined in: packages/ui/src/crud/list/crud-list.tsx:597
 
 > **page**: `number`
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:592
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:592](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L592)
 
 ***
 
@@ -78,7 +78,7 @@ Defined in: packages/ui/src/crud/list/crud-list.tsx:592
 
 > **pageSize**: `number`
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:593
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:593](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L593)
 
 ***
 
@@ -86,7 +86,7 @@ Defined in: packages/ui/src/crud/list/crud-list.tsx:593
 
 > `optional` **pageSizeOptions**: `number`[]
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:598
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:598](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L598)
 
 ***
 
@@ -94,7 +94,7 @@ Defined in: packages/ui/src/crud/list/crud-list.tsx:598
 
 > `optional` **rangeLabel**: (`start`, `end`, `total`) => `string`
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:604
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:604](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L604)
 
 Format the range text. Defaults to `` `${start}-${end} of ${total}` ``.
 
@@ -122,7 +122,7 @@ Format the range text. Defaults to `` `${start}-${end} of ${total}` ``.
 
 > `optional` **rowsLabel**: `string`
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:602
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:602](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L602)
 
 Label for page-size selector. Defaults to `"Rows:"`.
 
@@ -132,7 +132,7 @@ Label for page-size selector. Defaults to `"Rows:"`.
 
 > **total**: `number`
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:594
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:594](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L594)
 
 ***
 
@@ -140,4 +140,4 @@ Defined in: packages/ui/src/crud/list/crud-list.tsx:594
 
 > **totalPages**: `number`
 
-Defined in: packages/ui/src/crud/list/crud-list.tsx:595
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:595](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/crud-list.tsx#L595)

@@ -6,7 +6,7 @@
 
 # Interface: ReactRouterHooks
 
-Defined in: packages/ui/src/adapters/react-router.ts:7
+Defined in: [packages/ui/src/adapters/react-router.ts:7](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/adapters/react-router.ts#L7)
 
 React Router v6+ hook references required to create a router adapter.
 
@@ -16,7 +16,7 @@ React Router v6+ hook references required to create a router adapter.
 
 > **useLocation**: () => `object`
 
-Defined in: packages/ui/src/adapters/react-router.ts:16
+Defined in: [packages/ui/src/adapters/react-router.ts:16](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/adapters/react-router.ts#L16)
 
 #### Returns
 
@@ -32,7 +32,7 @@ Defined in: packages/ui/src/adapters/react-router.ts:16
 
 > **useNavigate**: () => (`to`, `options?`) => `void`
 
-Defined in: packages/ui/src/adapters/react-router.ts:8
+Defined in: [packages/ui/src/adapters/react-router.ts:8](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/adapters/react-router.ts#L8)
 
 #### Returns
 
@@ -60,7 +60,7 @@ Defined in: packages/ui/src/adapters/react-router.ts:8
 
 > **useSearchParams**: () => \[`URLSearchParams`, (`params`, `options?`) => `void`\]
 
-Defined in: packages/ui/src/adapters/react-router.ts:9
+Defined in: [packages/ui/src/adapters/react-router.ts:9](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/adapters/react-router.ts#L9)
 
 #### Returns
 

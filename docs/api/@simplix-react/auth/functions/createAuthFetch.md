@@ -8,7 +8,7 @@
 
 > **createAuthFetch**(`config`, `baseFetchFn?`): [`FetchFn`](../@simplix-react/contract/type-aliases/FetchFn.md)
 
-Defined in: [packages/auth/src/create-auth-fetch.ts:28](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/auth/src/create-auth-fetch.ts#L28)
+Defined in: [packages/auth/src/create-auth-fetch.ts:28](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/auth/src/create-auth-fetch.ts#L28)
 
 Creates an authenticated [FetchFn](../@simplix-react/contract/type-aliases/FetchFn.md) that wraps a base fetch function.
 

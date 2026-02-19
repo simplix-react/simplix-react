@@ -10,7 +10,7 @@ export interface CrudErrorBoundaryProps {
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
 }
 
-interface ErrorBoundaryState {
+export interface ErrorBoundaryState {
   error: Error | null;
 }
 

@@ -14,9 +14,9 @@ import { cn } from "../../utils/cn";
 
 // ── Context ──
 
-type ListDetailVariant = "panel" | "dialog";
+export type ListDetailVariant = "panel" | "dialog";
 
-interface ListDetailContextValue {
+export interface ListDetailContextValue {
   variant: ListDetailVariant;
   activePanel: "list" | "detail";
   setActivePanel: (panel: "list" | "detail") => void;
@@ -34,7 +34,7 @@ function useListDetail() {
 
 // ── Width mapping (3-column: list | divider | detail) ──
 
-type ListWidth = "1/4" | "1/3" | "2/5" | "1/2" | "3/5" | "2/3" | "3/4" | "4/5";
+export type ListWidth = "1/4" | "1/3" | "2/5" | "1/2" | "3/5" | "2/3" | "3/4" | "4/5";
 
 /** Divider track width in px: 1px visible line + 18px padding on each side. */
 const DIVIDER_TRACK = 37;
@@ -66,7 +66,7 @@ export interface ListDetailProps {
   children: ReactNode;
 }
 
-function ListDetailRoot({ variant = "panel", activePanel: activePanelProp, listWidth = "1/2", onClose, className, children }: ListDetailProps) {
+export function ListDetailRoot({ variant = "panel", activePanel: activePanelProp, listWidth = "1/2", onClose, className, children }: ListDetailProps) {
   const [activePanelState, setActivePanel] = useState<"list" | "detail">("list");
   const activePanel = activePanelProp ?? activePanelState;
   const [dragCols, setDragCols] = useState<string | null>(null);
@@ -202,7 +202,7 @@ function Divider({ onDrag, onDragStart, onDragEnd }: DividerProps) {
 
 // ── List panel ──
 
-interface PanelProps {
+export interface PanelProps {
   children: ReactNode;
   className?: string;
 }

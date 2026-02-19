@@ -6,7 +6,7 @@
 
 # Interface: CalendarProps
 
-Defined in: packages/ui/src/base/calendar.tsx:5
+Defined in: [packages/ui/src/base/calendar.tsx:5](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/base/calendar.tsx#L5)
 
 ## Extends
 
@@ -1315,7 +1315,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **maxDate**: `Date`
 
-Defined in: packages/ui/src/base/calendar.tsx:10
+Defined in: [packages/ui/src/base/calendar.tsx:10](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/base/calendar.tsx#L10)
 
 ***
 
@@ -1323,7 +1323,7 @@ Defined in: packages/ui/src/base/calendar.tsx:10
 
 > `optional` **minDate**: `Date`
 
-Defined in: packages/ui/src/base/calendar.tsx:9
+Defined in: [packages/ui/src/base/calendar.tsx:9](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/base/calendar.tsx#L9)
 
 ***
 
@@ -2971,7 +2971,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **onSelect**: (`date`) => `void`
 
-Defined in: packages/ui/src/base/calendar.tsx:8
+Defined in: [packages/ui/src/base/calendar.tsx:8](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/base/calendar.tsx#L8)
 
 #### Parameters
 
@@ -3553,7 +3553,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **selected**: `Date`
 
-Defined in: packages/ui/src/base/calendar.tsx:7
+Defined in: [packages/ui/src/base/calendar.tsx:7](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/base/calendar.tsx#L7)
 
 ***
 

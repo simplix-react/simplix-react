@@ -6,7 +6,7 @@
 
 # Interface: QueryFallbackProps
 
-Defined in: packages/ui/src/crud/shared/query-fallback.tsx:4
+Defined in: [packages/ui/src/crud/shared/query-fallback.tsx:4](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/query-fallback.tsx#L4)
 
 Props for the [QueryFallback](../functions/QueryFallback.md) component.
 
@@ -16,7 +16,7 @@ Props for the [QueryFallback](../functions/QueryFallback.md) component.
 
 > **isLoading**: `boolean`
 
-Defined in: packages/ui/src/crud/shared/query-fallback.tsx:6
+Defined in: [packages/ui/src/crud/shared/query-fallback.tsx:6](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/query-fallback.tsx#L6)
 
 Whether the query is currently loading.
 
@@ -26,7 +26,7 @@ Whether the query is currently loading.
 
 > `optional` **loadingMessage**: `string`
 
-Defined in: packages/ui/src/crud/shared/query-fallback.tsx:10
+Defined in: [packages/ui/src/crud/shared/query-fallback.tsx:10](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/query-fallback.tsx#L10)
 
 Message to display while loading. Defaults to `"Loading..."`.
 
@@ -36,6 +36,6 @@ Message to display while loading. Defaults to `"Loading..."`.
 
 > `optional` **notFoundMessage**: `string`
 
-Defined in: packages/ui/src/crud/shared/query-fallback.tsx:8
+Defined in: [packages/ui/src/crud/shared/query-fallback.tsx:8](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/query-fallback.tsx#L8)
 
 Message to display when data is not found. Defaults to `"Not found."`.

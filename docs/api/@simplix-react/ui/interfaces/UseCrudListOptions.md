@@ -6,7 +6,7 @@
 
 # Interface: UseCrudListOptions
 
-Defined in: packages/ui/src/crud/list/use-crud-list.ts:17
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:17](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/use-crud-list.ts#L17)
 
 Configuration options for the [useCrudList](../functions/useCrudList.md) hook.
 
@@ -16,7 +16,7 @@ Configuration options for the [useCrudList](../functions/useCrudList.md) hook.
 
 > `optional` **defaultPageSize**: `number`
 
-Defined in: packages/ui/src/crud/list/use-crud-list.ts:21
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:21](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/use-crud-list.ts#L21)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: packages/ui/src/crud/list/use-crud-list.ts:21
 
 > `optional` **defaultSort**: [`SortState`](SortState.md)
 
-Defined in: packages/ui/src/crud/list/use-crud-list.ts:20
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:20](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/use-crud-list.ts#L20)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: packages/ui/src/crud/list/use-crud-list.ts:20
 
 > `optional` **maxRows**: `number`
 
-Defined in: packages/ui/src/crud/list/use-crud-list.ts:19
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:19](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/use-crud-list.ts#L19)
 
 ***
 
@@ -40,4 +40,4 @@ Defined in: packages/ui/src/crud/list/use-crud-list.ts:19
 
 > `optional` **stateMode**: `"server"` \| `"client"`
 
-Defined in: packages/ui/src/crud/list/use-crud-list.ts:18
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:18](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/list/use-crud-list.ts#L18)

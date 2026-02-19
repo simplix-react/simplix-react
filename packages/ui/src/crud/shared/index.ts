@@ -13,6 +13,6 @@ export type {
 } from "./types";
 export { PanelRightCloseIcon } from "./icons";
 export { CrudErrorBoundary } from "./error-boundary";
-export type { CrudErrorBoundaryProps } from "./error-boundary";
+export type { CrudErrorBoundaryProps, ErrorBoundaryState } from "./error-boundary";
 export { QueryFallback } from "./query-fallback";
 export type { QueryFallbackProps } from "./query-fallback";

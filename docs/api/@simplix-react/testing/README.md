@@ -198,9 +198,16 @@ describe("my hook", () => {
 | `@simplix-react/react` | React Query hooks derived from contracts |
 | `@simplix-react/mock` | MSW handlers + in-memory mock stores for integration testing |
 
+## Interfaces
+
+- [AccessTestWrapperOptions](interfaces/AccessTestWrapperOptions.md)
+- [MockPolicyOptions](interfaces/MockPolicyOptions.md)
+
 ## Functions
 
+- [createAccessTestWrapper](functions/createAccessTestWrapper.md)
 - [createMockClient](functions/createMockClient.md)
+- [createMockPolicy](functions/createMockPolicy.md)
 - [createTestQueryClient](functions/createTestQueryClient.md)
 - [createTestWrapper](functions/createTestWrapper.md)
 - [waitForQuery](functions/waitForQuery.md)

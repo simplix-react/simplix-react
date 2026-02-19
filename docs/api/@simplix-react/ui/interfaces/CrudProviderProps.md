@@ -6,7 +6,7 @@
 
 # Interface: CrudProviderProps
 
-Defined in: packages/ui/src/adapters/crud-provider.tsx:6
+Defined in: [packages/ui/src/adapters/crud-provider.tsx:6](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/adapters/crud-provider.tsx#L6)
 
 Props for the [CrudProvider](../functions/CrudProvider.md) component.
 
@@ -16,7 +16,7 @@ Props for the [CrudProvider](../functions/CrudProvider.md) component.
 
 > **children**: `ReactNode`
 
-Defined in: packages/ui/src/adapters/crud-provider.tsx:8
+Defined in: [packages/ui/src/adapters/crud-provider.tsx:8](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/adapters/crud-provider.tsx#L8)
 
 ***
 
@@ -24,4 +24,4 @@ Defined in: packages/ui/src/adapters/crud-provider.tsx:8
 
 > **router**: [`RouterAdapter`](RouterAdapter.md)
 
-Defined in: packages/ui/src/adapters/crud-provider.tsx:7
+Defined in: [packages/ui/src/adapters/crud-provider.tsx:7](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/adapters/crud-provider.tsx#L7)

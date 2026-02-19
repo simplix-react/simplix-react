@@ -31,7 +31,7 @@ const headingVariants = cva("tracking-tight", {
 });
 
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
-type HeadingTag = "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+export type HeadingTag = "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 
 const levelToTag: Record<HeadingLevel, HeadingTag> = {
   1: "h1",

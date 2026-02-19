@@ -8,7 +8,7 @@
 
 > **deriveClient**\<`TEntities`, `TOperations`\>(`config`, `fetchFn?`): `Record`\<`string`, `unknown`\>
 
-Defined in: [packages/contract/src/derive/client.ts:40](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/contract/src/derive/client.ts#L40)
+Defined in: [packages/contract/src/derive/client.ts:40](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/contract/src/derive/client.ts#L40)
 
 Derives a type-safe HTTP client from an [ApiContractConfig](../interfaces/ApiContractConfig.md).
 

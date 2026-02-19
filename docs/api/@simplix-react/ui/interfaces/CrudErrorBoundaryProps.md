@@ -6,7 +6,7 @@
 
 # Interface: CrudErrorBoundaryProps
 
-Defined in: packages/ui/src/crud/shared/error-boundary.tsx:7
+Defined in: [packages/ui/src/crud/shared/error-boundary.tsx:7](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/error-boundary.tsx#L7)
 
 Props for the [CrudErrorBoundary](../classes/CrudErrorBoundary.md) component.
 
@@ -16,7 +16,7 @@ Props for the [CrudErrorBoundary](../classes/CrudErrorBoundary.md) component.
 
 > **children**: `ReactNode`
 
-Defined in: packages/ui/src/crud/shared/error-boundary.tsx:8
+Defined in: [packages/ui/src/crud/shared/error-boundary.tsx:8](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/error-boundary.tsx#L8)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: packages/ui/src/crud/shared/error-boundary.tsx:8
 
 > `optional` **fallback**: `ReactNode` \| (`error`, `reset`) => `ReactNode`
 
-Defined in: packages/ui/src/crud/shared/error-boundary.tsx:9
+Defined in: [packages/ui/src/crud/shared/error-boundary.tsx:9](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/error-boundary.tsx#L9)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: packages/ui/src/crud/shared/error-boundary.tsx:9
 
 > `optional` **onError**: (`error`, `errorInfo`) => `void`
 
-Defined in: packages/ui/src/crud/shared/error-boundary.tsx:10
+Defined in: [packages/ui/src/crud/shared/error-boundary.tsx:10](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/shared/error-boundary.tsx#L10)
 
 #### Parameters
 

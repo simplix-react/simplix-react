@@ -6,7 +6,7 @@
 
 # Interface: CrudFormSectionProps
 
-Defined in: packages/ui/src/crud/form/crud-form.tsx:98
+Defined in: [packages/ui/src/crud/form/crud-form.tsx:98](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/form/crud-form.tsx#L98)
 
 Props for the CrudForm.Section sub-component.
 
@@ -16,7 +16,7 @@ Props for the CrudForm.Section sub-component.
 
 > `optional` **children**: `ReactNode`
 
-Defined in: packages/ui/src/crud/form/crud-form.tsx:103
+Defined in: [packages/ui/src/crud/form/crud-form.tsx:103](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/form/crud-form.tsx#L103)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: packages/ui/src/crud/form/crud-form.tsx:103
 
 > `optional` **className**: `string`
 
-Defined in: packages/ui/src/crud/form/crud-form.tsx:102
+Defined in: [packages/ui/src/crud/form/crud-form.tsx:102](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/form/crud-form.tsx#L102)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: packages/ui/src/crud/form/crud-form.tsx:102
 
 > `optional` **description**: `string`
 
-Defined in: packages/ui/src/crud/form/crud-form.tsx:100
+Defined in: [packages/ui/src/crud/form/crud-form.tsx:100](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/form/crud-form.tsx#L100)
 
 ***
 
@@ -40,7 +40,7 @@ Defined in: packages/ui/src/crud/form/crud-form.tsx:100
 
 > `optional` **layout**: `"single-column"` \| `"two-column"` \| `"three-column"`
 
-Defined in: packages/ui/src/crud/form/crud-form.tsx:101
+Defined in: [packages/ui/src/crud/form/crud-form.tsx:101](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/form/crud-form.tsx#L101)
 
 ***
 
@@ -48,4 +48,4 @@ Defined in: packages/ui/src/crud/form/crud-form.tsx:101
 
 > **title**: `string`
 
-Defined in: packages/ui/src/crud/form/crud-form.tsx:99
+Defined in: [packages/ui/src/crud/form/crud-form.tsx:99](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/crud/form/crud-form.tsx#L99)

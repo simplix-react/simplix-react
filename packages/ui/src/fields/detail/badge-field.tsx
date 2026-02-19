@@ -2,7 +2,7 @@ import type { CommonDetailFieldProps } from "../../crud/shared/types";
 import { useUIComponents } from "../../provider";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
 
-type BadgeVariant = NonNullable<
+export type BadgeVariant = NonNullable<
   import("class-variance-authority").VariantProps<
     typeof import("../../base/badge").badgeVariants
   >["variant"]

@@ -8,7 +8,7 @@
 
 > **EntityHooks**\<`_TSchema`\> = `Record`\<`string`, (...`args`) => `unknown`\>
 
-Defined in: [types.ts:193](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/react/src/types.ts#L193)
+Defined in: [types.ts:193](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/react/src/types.ts#L193)
 
 Represents the complete set of React Query hooks derived from an entity definition.
 

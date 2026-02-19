@@ -4,6 +4,14 @@ import type { ReactNode } from "react";
 import { I18nProvider } from "@simplix-react/i18n/react";
 import { i18nAdapter } from "../i18n/index.js";
 {{/if}}
+{{#if enableAuth}}
+import { AuthProvider } from "@simplix-react/auth/react";
+import { auth } from "../auth/index.js";
+{{/if}}
+{{#if enableAccess}}
+import { AccessProvider } from "@simplix-react/access/react";
+import { accessPolicy } from "../access/index.js";
+{{/if}}
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,14 +26,28 @@ export function AppProviders({ children }: { children: ReactNode }) {
   return (
 {{#if enableI18n}}
     <I18nProvider adapter={i18nAdapter}>
-      <QueryClientProvider client={queryClient}>
-        {children}
-      </QueryClientProvider>
-    </I18nProvider>
+{{/if}}
+{{#if enableAuth}}
+      <AuthProvider auth={auth}>
+{{/if}}
+{{#if enableAccess}}
+{{#if enableAuth}}
+        <AccessProvider policy={accessPolicy} auth={auth}>
 {{else}}
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
+        <AccessProvider policy={accessPolicy}>
+{{/if}}
+{{/if}}
+          <QueryClientProvider client={queryClient}>
+            {children}
+          </QueryClientProvider>
+{{#if enableAccess}}
+        </AccessProvider>
+{{/if}}
+{{#if enableAuth}}
+      </AuthProvider>
+{{/if}}
+{{#if enableI18n}}
+    </I18nProvider>
 {{/if}}
   );
 }

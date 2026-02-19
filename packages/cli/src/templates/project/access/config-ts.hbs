@@ -1,0 +1,21 @@
+import { createAccessPolicy, createApiAdapter } from "@simplix-react/access";
+{{#if enableAuth}}
+import { auth } from "../auth/index.js";
+{{/if}}
+
+export const accessPolicy = createAccessPolicy({
+  adapter: createApiAdapter({
+    endpoint: "/api/v1/user/me/permissions",
+{{#if enableAuth}}
+    fetchFn: auth.fetchFn,
+{{/if}}
+  }),
+  publicAccess: createApiAdapter({
+    endpoint: "/api/v1/public/user/permissions",
+  }),
+  isSuperAdmin: (user) => user.isSuperAdmin === true,
+  persist: {
+    key: "{{kebabCase projectName}}-access",
+    revalidateOnMount: true,
+  },
+});

@@ -31,7 +31,7 @@ import { useContainerWidth } from "./use-container-width";
 
 // ── List Root ──
 
-/** Props for the {@link List} compound component root. */
+/** Props for the {@link CrudList} compound component root. */
 export interface ListProps {
   compact?: boolean;
   className?: string;

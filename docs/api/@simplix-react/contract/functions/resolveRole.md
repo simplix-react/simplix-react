@@ -8,7 +8,7 @@
 
 > **resolveRole**(`name`, `operation`): [`CrudRole`](../type-aliases/CrudRole.md) \| `undefined`
 
-Defined in: packages/contract/src/helpers/resolve-role.ts:27
+Defined in: [packages/contract/src/helpers/resolve-role.ts:27](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/contract/src/helpers/resolve-role.ts#L27)
 
 Resolves the CRUD role for an entity operation.
 

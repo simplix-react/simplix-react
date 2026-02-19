@@ -6,7 +6,7 @@
 
 # Interface: BadgeProps
 
-Defined in: packages/ui/src/base/badge.tsx:65
+Defined in: [packages/ui/src/base/badge.tsx:65](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/base/badge.tsx#L65)
 
 ## Extends
 
@@ -3651,7 +3651,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **variant**: `"default"` \| `"secondary"` \| `"destructive"` \| `"outline"` \| `"success"` \| `"warning"` \| `"slate"` \| `"red"` \| `"orange"` \| `"amber"` \| `"yellow"` \| `"lime"` \| `"green"` \| `"emerald"` \| `"teal"` \| `"cyan"` \| `"sky"` \| `"blue"` \| `"indigo"` \| `"violet"` \| `"purple"` \| `"fuchsia"` \| `"pink"` \| `"rose"` \| `null`
 
-Defined in: packages/ui/src/base/badge.tsx:10
+Defined in: [packages/ui/src/base/badge.tsx:10](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/base/badge.tsx#L10)
 
 #### Inherited from
 

@@ -33,7 +33,7 @@ const cardVariants = cva(
 /** Variant props extracted from {@link cardVariants}. */
 export type CardVariants = VariantProps<typeof cardVariants>;
 
-type CardTag = "div" | "button" | "article";
+export type CardTag = "div" | "button" | "article";
 
 /** Props for the {@link Card} component. */
 export interface CardProps

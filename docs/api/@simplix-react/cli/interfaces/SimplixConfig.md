@@ -6,7 +6,7 @@
 
 # Interface: SimplixConfig
 
-Defined in: [types.ts:56](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/cli/src/config/types.ts#L56)
+Defined in: [types.ts:56](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/cli/src/config/types.ts#L56)
 
 Project-level configuration loaded from `simplix.config.ts` at the project root.
 
@@ -44,7 +44,7 @@ export default defineConfig({
 
 > `optional` **api**: `object`
 
-Defined in: [types.ts:58](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/cli/src/config/types.ts#L58)
+Defined in: [types.ts:58](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/cli/src/config/types.ts#L58)
 
 API settings — used for basePath in code generation
 
@@ -60,7 +60,7 @@ API base path (default: "/api")
 
 > `optional` **codegen**: `object`
 
-Defined in: [types.ts:78](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/cli/src/config/types.ts#L78)
+Defined in: [types.ts:78](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/cli/src/config/types.ts#L78)
 
 Code generation options
 
@@ -76,13 +76,13 @@ Prepend auto-generated header comment to generated files (default: true)
 
 > `optional` **http**: `object`
 
-Defined in: [types.ts:73](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/cli/src/config/types.ts#L73)
+Defined in: [types.ts:73](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/cli/src/config/types.ts#L73)
 
 .http file environment settings
 
 #### environments?
 
-> `optional` **environments**: `Record`\<`string`, `SimplixHttpEnvironment`\>
+> `optional` **environments**: `Record`\<`string`, [`SimplixHttpEnvironment`](SimplixHttpEnvironment.md)\>
 
 ***
 
@@ -90,7 +90,7 @@ Defined in: [types.ts:73](https://github.com/simplix-react/simplix-react/blob/21
 
 > `optional` **i18n**: `object`
 
-Defined in: [types.ts:84](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/cli/src/config/types.ts#L84)
+Defined in: [types.ts:84](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/cli/src/config/types.ts#L84)
 
 Internationalization settings
 
@@ -112,13 +112,13 @@ Supported locale codes (default: ["en", "ko", "ja"])
 
 > `optional` **openapi**: `object`
 
-Defined in: [types.ts:92](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/cli/src/config/types.ts#L92)
+Defined in: [types.ts:92](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/cli/src/config/types.ts#L92)
 
 OpenAPI code generation options
 
 #### crud?
 
-> `optional` **crud**: `Partial`\<`Record`\<`CrudRole`, `CrudEndpointPattern`\>\>
+> `optional` **crud**: `Partial`\<`Record`\<`CrudRole`, [`CrudEndpointPattern`](CrudEndpointPattern.md)\>\>
 
 CRUD role detection patterns. When omitted, no CRUD roles are assigned.
 
@@ -134,7 +134,7 @@ Tag-based domain splitting: domainName → tagPatterns (exact string or /regex/)
 
 > `optional` **packages**: `object`
 
-Defined in: [types.ts:67](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/cli/src/config/types.ts#L67)
+Defined in: [types.ts:67](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/cli/src/config/types.ts#L67)
 
 Package naming options
 
@@ -150,6 +150,6 @@ Short prefix for generated package names (default: derived from root package.jso
 
 > `optional` **queryBuilder**: `unknown`
 
-Defined in: [types.ts:64](https://github.com/simplix-react/simplix-react/blob/2136b85a6090bed608ab01dc049555ebf281de32/packages/cli/src/config/types.ts#L64)
+Defined in: [types.ts:64](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/cli/src/config/types.ts#L64)
 
 Global QueryBuilder — applied to all domains

@@ -6,7 +6,7 @@
 
 # Interface: ButtonProps
 
-Defined in: packages/ui/src/base/button.tsx:40
+Defined in: [packages/ui/src/base/button.tsx:40](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/base/button.tsx#L40)
 
 ## Extends
 
@@ -3627,7 +3627,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **size**: `"default"` \| `"sm"` \| `"lg"` \| `"icon"` \| `"icon-sm"` \| `null`
 
-Defined in: packages/ui/src/base/button.tsx:23
+Defined in: [packages/ui/src/base/button.tsx:23](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/base/button.tsx#L23)
 
 #### Inherited from
 
@@ -3783,7 +3783,7 @@ Defined in: node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/
 
 > `optional` **variant**: `"default"` \| `"secondary"` \| `"destructive"` \| `"outline"` \| `"link"` \| `"primary"` \| `"ghost"` \| `null`
 
-Defined in: packages/ui/src/base/button.tsx:10
+Defined in: [packages/ui/src/base/button.tsx:10](https://github.com/simplix-react/simplix-react/blob/003caac4b599d994962dbe01fbd34d6c7e7deda6/packages/ui/src/base/button.tsx#L10)
 
 #### Inherited from
 
