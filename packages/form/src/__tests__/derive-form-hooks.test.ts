@@ -20,16 +20,24 @@ describe("deriveFormHooks", () => {
       config: {
         entities: {
           task: {
-            path: "/tasks",
             schema: z.any(),
-            createSchema: z.any(),
-            updateSchema: z.any(),
+            operations: {
+              list:   { method: "GET" as const,    path: "/tasks" },
+              get:    { method: "GET" as const,    path: "/tasks/:id" },
+              create: { method: "POST" as const,   path: "/tasks", input: z.any() },
+              update: { method: "PATCH" as const,  path: "/tasks/:id", input: z.any() },
+              delete: { method: "DELETE" as const, path: "/tasks/:id" },
+            },
           },
           project: {
-            path: "/projects",
             schema: z.any(),
-            createSchema: z.any(),
-            updateSchema: z.any(),
+            operations: {
+              list:   { method: "GET" as const,    path: "/projects" },
+              get:    { method: "GET" as const,    path: "/projects/:id" },
+              create: { method: "POST" as const,   path: "/projects", input: z.any() },
+              update: { method: "PATCH" as const,  path: "/projects/:id", input: z.any() },
+              delete: { method: "DELETE" as const, path: "/projects/:id" },
+            },
           },
         },
         domain: "test",

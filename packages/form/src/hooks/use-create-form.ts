@@ -54,7 +54,7 @@ export function createUseCreateForm(
         setSubmitError(null);
         options?.onSuccess?.(data);
       },
-    });
+    }) as { mutateAsync: (value: unknown) => Promise<unknown>; isPending: boolean };
 
     const form = useForm({
       defaultValues: (options?.defaultValues ?? {}) as Record<string, unknown>,

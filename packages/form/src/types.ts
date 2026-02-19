@@ -2,8 +2,8 @@ import type { z } from "zod";
 import type { AnyFormApi } from "@tanstack/react-form";
 import type { EntityHooks } from "@simplix-react/react";
 
-/** Shorthand for entity hooks with any Zod schema types. */
-export type AnyEntityHooks = EntityHooks<z.ZodTypeAny, z.ZodTypeAny, z.ZodTypeAny>;
+/** Shorthand for entity hooks with any Zod schema type. */
+export type AnyEntityHooks = EntityHooks<z.ZodTypeAny>;
 
 /**
  * Options for the `useCreateForm` hook.
@@ -84,22 +84,6 @@ export interface CreateFormReturn {
  * Return value of the `useUpdateForm` hook.
  *
  * @typeParam TSchema - Zod schema type for the entity
- *
- * @example
- * ```ts
- * const { form, isLoading, isSubmitting, entity } = formHooks.task.useUpdateForm(taskId);
- *
- * if (isLoading) return <p>Loading...</p>;
- *
- * return (
- *   <form onSubmit={(e) => { e.preventDefault(); form.handleSubmit(); }}>
- *     <form.Field name="title">
- *       {(field) => <input value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />}
- *     </form.Field>
- *     <button type="submit" disabled={isSubmitting}>Save</button>
- *   </form>
- * );
- * ```
  */
 export interface UpdateFormReturn<TSchema extends z.ZodTypeAny> {
   /** TanStack Form API instance for field binding and submission. */
@@ -143,32 +127,27 @@ export type DerivedUpdateFormHook<TSchema extends z.ZodTypeAny> = (
 /**
  * Form hook set for a single entity, containing `useCreateForm` and `useUpdateForm`.
  *
- * @remarks
- * Produced by `deriveFormHooks()` for each entity in the contract.
- * Each hook wires a TanStack Form instance to the entity's React Query
- * mutations with automatic dirty-field extraction and server error mapping.
+ * Only populated for operations with `create` and `update` roles respectively.
+ * If an entity lacks a create or update operation, the corresponding hook will be absent.
  *
  * @typeParam TSchema - Entity's Zod schema type
- * @typeParam TCreate - Creation input Zod schema type
  *
  * @example
  * ```ts
  * import { deriveFormHooks } from "@simplix-react/form";
  *
- * const formHooks = deriveFormHooks(projectApi, projectHooks);
- * // formHooks.task: EntityFormHooks<TaskSchema, CreateTaskSchema>
- * // formHooks.task.useCreateForm(parentId?, options?)
- * // formHooks.task.useUpdateForm(entityId, options?)
+ * const formHooks = deriveFormHooks(inventoryApi, inventoryHooks);
+ * // formHooks.product.useCreateForm(parentId?, options?)
+ * // formHooks.product.useUpdateForm(entityId, options?)
  * ```
  *
  * @see {@link deriveFormHooks} — derives form hooks from a contract
  */
 export interface EntityFormHooks<
-  TSchema extends z.ZodTypeAny,
-  TCreate extends z.ZodTypeAny,
+  TSchema extends z.ZodTypeAny = z.ZodTypeAny,
 > {
-  /** Hook for creating a new entity with a managed form. */
-  useCreateForm: DerivedCreateFormHook<TCreate>;
-  /** Hook for updating an existing entity with a managed form. */
-  useUpdateForm: DerivedUpdateFormHook<TSchema>;
+  /** Hook for creating a new entity with a managed form. Present only if a `create` operation exists. */
+  useCreateForm?: DerivedCreateFormHook<z.ZodTypeAny>;
+  /** Hook for updating an existing entity with a managed form. Present only if an `update` operation exists. */
+  useUpdateForm?: DerivedUpdateFormHook<TSchema>;
 }

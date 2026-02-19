@@ -68,7 +68,11 @@ export function createUseUpdateForm(
     const [submitError, setSubmitError] = useState<Error | null>(null);
     const dirtyOnly = options?.dirtyOnly ?? true;
 
-    const queryResult = entityHooks.useGet(entityId);
+    const queryResult = entityHooks.useGet(entityId) as {
+      data: unknown;
+      isLoading: boolean;
+      dataUpdatedAt: number;
+    };
     const { data: entity, isLoading, dataUpdatedAt } = queryResult;
 
     const updateMutation = entityHooks.useUpdate({
@@ -76,7 +80,7 @@ export function createUseUpdateForm(
         setSubmitError(null);
         options?.onSuccess?.(data);
       },
-    });
+    }) as { mutateAsync: (value: unknown) => Promise<unknown>; isPending: boolean };
 
     const form = useForm({
       defaultValues: (entity ?? {}) as Record<string, unknown>,

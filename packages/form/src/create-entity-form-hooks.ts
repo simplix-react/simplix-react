@@ -1,37 +1,45 @@
 import type { z } from "zod";
-import type { AnyEntityHooks, EntityFormHooks } from "./types.js";
+import type { EntityFormHooks } from "./types.js";
 import { createUseCreateForm } from "./hooks/use-create-form.js";
 import { createUseUpdateForm } from "./hooks/use-update-form.js";
 
 /**
- * Assembles the `useCreateForm` and `useUpdateForm` hooks for a single entity.
+ * Assembles form hooks for a single entity based on available CRUD roles.
  *
  * @remarks
  * This is the per-entity factory used internally by {@link deriveFormHooks}.
- * It delegates to {@link createUseCreateForm} and {@link createUseUpdateForm}
- * to produce the hook pair, then bundles them into an {@link EntityFormHooks}
- * object.
+ * It only creates `useCreateForm` and `useUpdateForm` when the entity has
+ * corresponding create/update role operations.
  *
  * @param entityHooks - Pre-derived React Query hooks for the entity
- *   (must include `useCreate`, `useUpdate`, and `useGet`)
- * @returns An object containing `useCreateForm` and `useUpdateForm` hooks
- *
- * @example
- * ```ts
- * // Internal usage within deriveFormHooks:
- * const taskFormHooks = createEntityFormHooks(hooks.task);
- * // taskFormHooks.useCreateForm(parentId?, options?)
- * // taskFormHooks.useUpdateForm(entityId, options?)
- * ```
+ * @param hasCreate - Whether the entity has a create role operation
+ * @param hasUpdate - Whether the entity has an update role operation
+ * @returns An object containing available form hooks
  *
  * @see {@link deriveFormHooks} — the public entry point that calls this factory
  * @see {@link EntityFormHooks} for the returned hook set shape
  */
 export function createEntityFormHooks(
-  entityHooks: AnyEntityHooks,
-): EntityFormHooks<z.ZodTypeAny, z.ZodTypeAny> {
-  return {
-    useCreateForm: createUseCreateForm(entityHooks),
-    useUpdateForm: createUseUpdateForm(entityHooks),
+  entityHooks: Record<string, (...args: unknown[]) => unknown>,
+  hasCreate: boolean,
+  hasUpdate: boolean,
+): EntityFormHooks<z.ZodTypeAny> {
+  const formHooks: EntityFormHooks<z.ZodTypeAny> = {};
+
+  // Build a compatible entity hooks shape for the form hook creators
+  const compatHooks = {
+    useCreate: entityHooks.useCreate as ((...args: unknown[]) => unknown) | undefined,
+    useUpdate: entityHooks.useUpdate as ((...args: unknown[]) => unknown) | undefined,
+    useGet: entityHooks.useGet as ((...args: unknown[]) => unknown) | undefined,
   };
+
+  if (hasCreate && compatHooks.useCreate) {
+    formHooks.useCreateForm = createUseCreateForm(compatHooks as never);
+  }
+
+  if (hasUpdate && compatHooks.useUpdate && compatHooks.useGet) {
+    formHooks.useUpdateForm = createUseUpdateForm(compatHooks as never);
+  }
+
+  return formHooks;
 }

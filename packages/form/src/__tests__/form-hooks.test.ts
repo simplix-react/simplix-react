@@ -74,9 +74,9 @@ describe("createUseUpdateForm", () => {
 });
 
 describe("createEntityFormHooks", () => {
-  it("returns an object with useCreateForm and useUpdateForm", () => {
+  it("returns an object with useCreateForm and useUpdateForm when both roles exist", () => {
     const hooks = createMockEntityHooks();
-    const result = createEntityFormHooks(hooks);
+    const result = createEntityFormHooks(hooks as unknown as Record<string, (...args: unknown[]) => unknown>, true, true);
 
     expect(result).toHaveProperty("useCreateForm");
     expect(result).toHaveProperty("useUpdateForm");
@@ -84,23 +84,23 @@ describe("createEntityFormHooks", () => {
 
   it("useCreateForm is a function named useCreateForm", () => {
     const hooks = createMockEntityHooks();
-    const result = createEntityFormHooks(hooks);
+    const result = createEntityFormHooks(hooks as unknown as Record<string, (...args: unknown[]) => unknown>, true, true);
 
     expect(typeof result.useCreateForm).toBe("function");
-    expect(result.useCreateForm.name).toBe("useCreateForm");
+    expect(result.useCreateForm!.name).toBe("useCreateForm");
   });
 
   it("useUpdateForm is a function named useUpdateForm", () => {
     const hooks = createMockEntityHooks();
-    const result = createEntityFormHooks(hooks);
+    const result = createEntityFormHooks(hooks as unknown as Record<string, (...args: unknown[]) => unknown>, true, true);
 
     expect(typeof result.useUpdateForm).toBe("function");
-    expect(result.useUpdateForm.name).toBe("useUpdateForm");
+    expect(result.useUpdateForm!.name).toBe("useUpdateForm");
   });
 
-  it("returns only useCreateForm and useUpdateForm keys", () => {
+  it("returns only useCreateForm and useUpdateForm keys when both roles exist", () => {
     const hooks = createMockEntityHooks();
-    const result = createEntityFormHooks(hooks);
+    const result = createEntityFormHooks(hooks as unknown as Record<string, (...args: unknown[]) => unknown>, true, true);
 
     expect(Object.keys(result).sort()).toEqual(
       ["useCreateForm", "useUpdateForm"].sort(),
@@ -110,10 +110,25 @@ describe("createEntityFormHooks", () => {
   it("produces distinct hooks for different entity hooks", () => {
     const hooks1 = createMockEntityHooks();
     const hooks2 = createMockEntityHooks();
-    const result1 = createEntityFormHooks(hooks1);
-    const result2 = createEntityFormHooks(hooks2);
+    const result1 = createEntityFormHooks(hooks1 as unknown as Record<string, (...args: unknown[]) => unknown>, true, true);
+    const result2 = createEntityFormHooks(hooks2 as unknown as Record<string, (...args: unknown[]) => unknown>, true, true);
 
     expect(result1.useCreateForm).not.toBe(result2.useCreateForm);
     expect(result1.useUpdateForm).not.toBe(result2.useUpdateForm);
+  });
+
+  it("returns empty object when no create/update roles", () => {
+    const hooks = createMockEntityHooks();
+    const result = createEntityFormHooks(hooks as unknown as Record<string, (...args: unknown[]) => unknown>, false, false);
+
+    expect(Object.keys(result)).toHaveLength(0);
+  });
+
+  it("returns only useCreateForm when only create role exists", () => {
+    const hooks = createMockEntityHooks();
+    const result = createEntityFormHooks(hooks as unknown as Record<string, (...args: unknown[]) => unknown>, true, false);
+
+    expect(result).toHaveProperty("useCreateForm");
+    expect(result).not.toHaveProperty("useUpdateForm");
   });
 });
