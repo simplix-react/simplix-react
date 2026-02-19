@@ -70,7 +70,6 @@ export function useLocalePicker(): UseLocalePickerReturn {
         displayName: getDisplayName(loc),
       })),
     // Re-derive when locale changes (display names use the locale's own language)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [adapter, locale],
   );
 
