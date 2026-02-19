@@ -45,5 +45,9 @@ export type {
   I18nConfigResult,
 } from "./create-i18n-config.js";
 
+// Domain translations
+export { registerDomainTranslations } from "./domain-translations.js";
+export type { DomainTranslationConfig } from "./domain-translations.js";
+
 // Locale config
 export { DEFAULT_LOCALES, SUPPORTED_LOCALES } from "./utils/locale-config.js";

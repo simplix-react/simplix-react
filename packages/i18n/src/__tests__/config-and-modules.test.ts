@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { createI18nConfig } from "../create-i18n-config.js";
 import { buildModuleTranslations } from "../module-translations.js";
 import { DEFAULT_LOCALES, SUPPORTED_LOCALES } from "../utils/locale-config.js";
@@ -201,5 +201,106 @@ describe("DEFAULT_LOCALES", () => {
 describe("SUPPORTED_LOCALES", () => {
   it("lists locale codes from DEFAULT_LOCALES", () => {
     expect(SUPPORTED_LOCALES).toEqual(["ko", "en", "ja"]);
+  });
+});
+
+describe("detection", () => {
+  const storageMap = new Map<string, string>();
+
+  beforeEach(() => {
+    storageMap.clear();
+    vi.stubGlobal("localStorage", {
+      getItem: (key: string) => storageMap.get(key) ?? null,
+      setItem: (key: string, value: string) => storageMap.set(key, value),
+      removeItem: (key: string) => storageMap.delete(key),
+    });
+    vi.stubGlobal("navigator", { languages: ["en-US", "en"] });
+  });
+
+  it("initializes with locale from localStorage", async () => {
+    storageMap.set("i18n:locale", "ko");
+
+    const { adapter, i18nReady } = createI18nConfig({
+      defaultLocale: "en",
+      detection: { order: ["localStorage", "navigator"] },
+    });
+
+    await i18nReady;
+    expect(adapter.locale).toBe("ko");
+  });
+
+  it("persists locale to localStorage on setLocale", async () => {
+    const { adapter, i18nReady } = createI18nConfig({
+      defaultLocale: "en",
+      detection: { order: ["localStorage", "navigator"] },
+    });
+
+    await i18nReady;
+    await adapter.setLocale("ja");
+    expect(storageMap.get("i18n:locale")).toBe("ja");
+  });
+
+  it("ignores unsupported locale in localStorage and falls back to defaultLocale", async () => {
+    storageMap.set("i18n:locale", "fr");
+
+    const { adapter, i18nReady } = createI18nConfig({
+      defaultLocale: "en",
+      detection: { order: ["localStorage", "navigator"] },
+    });
+
+    await i18nReady;
+    expect(adapter.locale).toBe("en");
+  });
+
+  it("detects locale from navigator.languages", async () => {
+    vi.stubGlobal("navigator", { languages: ["ja", "en"] });
+
+    const { adapter, i18nReady } = createI18nConfig({
+      defaultLocale: "en",
+      detection: { order: ["navigator"] },
+    });
+
+    await i18nReady;
+    expect(adapter.locale).toBe("ja");
+  });
+
+  it("matches navigator language by prefix (e.g. ko-KR → ko)", async () => {
+    vi.stubGlobal("navigator", { languages: ["ko-KR", "en-US"] });
+
+    const { adapter, i18nReady } = createI18nConfig({
+      defaultLocale: "en",
+      detection: { order: ["navigator"] },
+    });
+
+    await i18nReady;
+    expect(adapter.locale).toBe("ko");
+  });
+
+  it("uses custom storageKey", async () => {
+    storageMap.set("app:lang", "ja");
+
+    const { adapter, i18nReady } = createI18nConfig({
+      defaultLocale: "en",
+      detection: { order: ["localStorage"], storageKey: "app:lang" },
+    });
+
+    await i18nReady;
+    expect(adapter.locale).toBe("ja");
+
+    await adapter.setLocale("ko");
+    expect(storageMap.get("app:lang")).toBe("ko");
+  });
+
+  it("localStorage takes priority over navigator when listed first", async () => {
+    storageMap.set("i18n:locale", "ja");
+    vi.stubGlobal("navigator", { languages: ["ko"] });
+
+    const { adapter, i18nReady } = createI18nConfig({
+      defaultLocale: "en",
+      detection: { order: ["localStorage", "navigator"] },
+    });
+
+    await i18nReady;
+    expect(adapter.locale).toBe("ja");
   });
 });

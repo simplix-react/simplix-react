@@ -207,4 +207,4 @@ function LocaleBadge() {
 
 - `@simplix-react/contract` -- Type-safe API contract definitions
 - `@simplix-react/react` -- React Query hooks derived from contracts
-- `@simplix-react/mock` -- MSW handlers and PGlite repositories
+- `@simplix-react/mock` -- MSW handlers with in-memory stores
