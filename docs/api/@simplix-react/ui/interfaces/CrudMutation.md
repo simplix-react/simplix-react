@@ -6,7 +6,7 @@
 
 # Interface: CrudMutation\<TInput\>
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:4](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/form/use-crud-form-submit.ts#L4)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:4](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L4)
 
 Minimal mutation shape used by [useCrudFormSubmit](../functions/useCrudFormSubmit.md).
 
@@ -22,7 +22,7 @@ Minimal mutation shape used by [useCrudFormSubmit](../functions/useCrudFormSubmi
 
 > **isPending**: `boolean`
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:6](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/form/use-crud-form-submit.ts#L6)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L6)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:6](https://github
 
 > **mutate**: (`input`, `options?`) => `void`
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:5](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/form/use-crud-form-submit.ts#L5)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L5)
 
 #### Parameters
 

@@ -8,7 +8,7 @@
 
 > **deriveFormHooks**\<`TEntities`\>(`contract`, `hooks`): [`DerivedFormHooksResult`](../type-aliases/DerivedFormHooksResult.md)\<`TEntities`\>
 
-Defined in: [derive-form-hooks.ts:34](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/form/src/derive-form-hooks.ts#L34)
+Defined in: [derive-form-hooks.ts:34](https://github.com/simplix-react/simplix-react/blob/main/derive-form-hooks.ts#L34)
 
 Derives TanStack Form hooks from an API contract and its derived React Query hooks.
 

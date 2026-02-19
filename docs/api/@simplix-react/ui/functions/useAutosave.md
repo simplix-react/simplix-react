@@ -8,7 +8,7 @@
 
 > **useAutosave**(`__namedParameters`): [`UseAutosaveReturn`](../interfaces/UseAutosaveReturn.md)
 
-Defined in: [packages/ui/src/crud/form/use-autosave.ts:35](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/form/use-autosave.ts#L35)
+Defined in: [packages/ui/src/crud/form/use-autosave.ts:35](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-autosave.ts#L35)
 
 Debounced autosave hook that watches form values for changes.
 Automatically saves after a configurable debounce interval.

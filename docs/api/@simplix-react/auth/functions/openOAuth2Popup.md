@@ -8,7 +8,7 @@
 
 > **openOAuth2Popup**(`options`): `Promise`\<[`OAuth2PopupResult`](../type-aliases/OAuth2PopupResult.md)\>
 
-Defined in: [packages/auth/src/helpers/oauth2-popup.ts:26](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/auth/src/helpers/oauth2-popup.ts#L26)
+Defined in: [packages/auth/src/helpers/oauth2-popup.ts:26](https://github.com/simplix-react/simplix-react/blob/main/packages/auth/src/helpers/oauth2-popup.ts#L26)
 
 Opens an OAuth2 authorization flow in a popup window and waits for
 the result via `postMessage`.

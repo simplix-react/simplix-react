@@ -8,7 +8,7 @@
 
 > **DateField**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/form/date-field.tsx:47](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/fields/form/date-field.tsx#L47)
+Defined in: [packages/ui/src/fields/form/date-field.tsx:47](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/date-field.tsx#L47)
 
 Date picker field with calendar popover.
 

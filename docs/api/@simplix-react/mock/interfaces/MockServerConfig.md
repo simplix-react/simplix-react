@@ -6,7 +6,7 @@
 
 # Interface: MockServerConfig
 
-Defined in: [msw.ts:76](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/mock/src/msw.ts#L76)
+Defined in: [msw.ts:76](https://github.com/simplix-react/simplix-react/blob/main/msw.ts#L76)
 
 Describes the configuration required by [setupMockWorker](../functions/setupMockWorker.md).
 
@@ -34,6 +34,6 @@ const config: MockServerConfig = {
 
 > **domains**: [`MockDomainConfig`](MockDomainConfig.md)[]
 
-Defined in: [msw.ts:78](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/mock/src/msw.ts#L78)
+Defined in: [msw.ts:78](https://github.com/simplix-react/simplix-react/blob/main/msw.ts#L78)
 
 Domain configurations to activate.

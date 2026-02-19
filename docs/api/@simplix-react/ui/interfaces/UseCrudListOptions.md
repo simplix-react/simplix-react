@@ -6,7 +6,7 @@
 
 # Interface: UseCrudListOptions
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:17](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/use-crud-list.ts#L17)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L17)
 
 Configuration options for the [useCrudList](../functions/useCrudList.md) hook.
 
@@ -16,7 +16,7 @@ Configuration options for the [useCrudList](../functions/useCrudList.md) hook.
 
 > `optional` **defaultPageSize**: `number`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:21](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/use-crud-list.ts#L21)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L21)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:21](https://github.com/s
 
 > `optional` **defaultSort**: [`SortState`](SortState.md)
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:20](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/use-crud-list.ts#L20)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L20)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:20](https://github.com/s
 
 > `optional` **maxRows**: `number`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:19](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/use-crud-list.ts#L19)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L19)
 
 ***
 
@@ -40,4 +40,4 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:19](https://github.com/s
 
 > `optional` **stateMode**: `"server"` \| `"client"`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:18](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/use-crud-list.ts#L18)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L18)

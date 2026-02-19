@@ -6,7 +6,7 @@
 
 # Interface: AccessPolicyConfig\<TActions, TSubjects\>
 
-Defined in: [packages/access/src/types.ts:240](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L240)
+Defined in: [packages/access/src/types.ts:240](https://github.com/simplix-react/simplix-react/blob/main/packages/access/src/types.ts#L240)
 
 Configuration for creating an [AccessPolicy](AccessPolicy.md).
 
@@ -47,7 +47,7 @@ Subject name union (defaults to any `string`).
 
 > **adapter**: [`AccessAdapter`](AccessAdapter.md)\<`TActions`, `TSubjects`\>
 
-Defined in: [packages/access/src/types.ts:245](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L245)
+Defined in: [packages/access/src/types.ts:245](https://github.com/simplix-react/simplix-react/blob/main/packages/access/src/types.ts#L245)
 
 Adapter that extracts rules from auth data.
 
@@ -57,7 +57,7 @@ Adapter that extracts rules from auth data.
 
 > `optional` **isSuperAdmin**: (`user`) => `boolean`
 
-Defined in: [packages/access/src/types.ts:254](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L254)
+Defined in: [packages/access/src/types.ts:254](https://github.com/simplix-react/simplix-react/blob/main/packages/access/src/types.ts#L254)
 
 Custom super-admin check. Defaults to checking `user.isSuperAdmin`.
 
@@ -77,7 +77,7 @@ Custom super-admin check. Defaults to checking `user.isSuperAdmin`.
 
 > `optional` **onAccessDenied**: (`action`, `subject`) => `void`
 
-Defined in: [packages/access/src/types.ts:256](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L256)
+Defined in: [packages/access/src/types.ts:256](https://github.com/simplix-react/simplix-react/blob/main/packages/access/src/types.ts#L256)
 
 Callback invoked when an access check fails.
 
@@ -101,7 +101,7 @@ Callback invoked when an access check fails.
 
 > `optional` **persist**: [`AccessPersistConfig`](AccessPersistConfig.md)
 
-Defined in: [packages/access/src/types.ts:258](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L258)
+Defined in: [packages/access/src/types.ts:258](https://github.com/simplix-react/simplix-react/blob/main/packages/access/src/types.ts#L258)
 
 Persistence configuration.
 
@@ -111,7 +111,7 @@ Persistence configuration.
 
 > `optional` **publicAccess**: [`AccessAdapter`](AccessAdapter.md)\<`TActions`, `TSubjects`\> \| `DefineRule`\<`ToAbilityTypes`\<\[`TActions`, `"all"` \| `TSubjects`\]\>, `MongoQuery`, `ClaimRawRule`\<`Extract`\<`ToAbilityTypes`\<\[`TActions`, `"all"` \| `TSubjects`\]\>, `string`\>\>\>[]
 
-Defined in: [packages/access/src/types.ts:250](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L250)
+Defined in: [packages/access/src/types.ts:250](https://github.com/simplix-react/simplix-react/blob/main/packages/access/src/types.ts#L250)
 
 Rules or adapter for unauthenticated (public) access.
 If an array, used as static rules. If an adapter, called with `null`.

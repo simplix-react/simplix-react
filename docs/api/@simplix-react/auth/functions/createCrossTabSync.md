@@ -8,7 +8,7 @@
 
 > **createCrossTabSync**(`options`): `object`
 
-Defined in: [packages/auth/src/helpers/cross-tab-sync.ts:16](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/auth/src/helpers/cross-tab-sync.ts#L16)
+Defined in: [packages/auth/src/helpers/cross-tab-sync.ts:16](https://github.com/simplix-react/simplix-react/blob/main/packages/auth/src/helpers/cross-tab-sync.ts#L16)
 
 Synchronizes auth state across browser tabs via the `storage` event.
 

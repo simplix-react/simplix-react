@@ -8,7 +8,7 @@
 
 > **DetailTextField**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/detail/text-field.tsx:25](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/fields/detail/text-field.tsx#L25)
+Defined in: [packages/ui/src/fields/detail/text-field.tsx:25](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/text-field.tsx#L25)
 
 Read-only text display field with optional copy-to-clipboard functionality.
 

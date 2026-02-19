@@ -6,7 +6,7 @@
 
 # Interface: OAuth2PopupOptions
 
-Defined in: [packages/auth/src/helpers/oauth2-popup.ts:1](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/auth/src/helpers/oauth2-popup.ts#L1)
+Defined in: [packages/auth/src/helpers/oauth2-popup.ts:1](https://github.com/simplix-react/simplix-react/blob/main/packages/auth/src/helpers/oauth2-popup.ts#L1)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/auth/src/helpers/oauth2-popup.ts:1](https://github.com/sim
 
 > **expectedOrigin**: `string`
 
-Defined in: [packages/auth/src/helpers/oauth2-popup.ts:11](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/auth/src/helpers/oauth2-popup.ts#L11)
+Defined in: [packages/auth/src/helpers/oauth2-popup.ts:11](https://github.com/simplix-react/simplix-react/blob/main/packages/auth/src/helpers/oauth2-popup.ts#L11)
 
 Expected origin of the postMessage from the popup callback page.
 
@@ -24,7 +24,7 @@ Expected origin of the postMessage from the popup callback page.
 
 > `optional` **height**: `number`
 
-Defined in: [packages/auth/src/helpers/oauth2-popup.ts:7](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/auth/src/helpers/oauth2-popup.ts#L7)
+Defined in: [packages/auth/src/helpers/oauth2-popup.ts:7](https://github.com/simplix-react/simplix-react/blob/main/packages/auth/src/helpers/oauth2-popup.ts#L7)
 
 Popup window height. Defaults to `600`.
 
@@ -34,7 +34,7 @@ Popup window height. Defaults to `600`.
 
 > `optional` **timeoutMs**: `number`
 
-Defined in: [packages/auth/src/helpers/oauth2-popup.ts:9](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/auth/src/helpers/oauth2-popup.ts#L9)
+Defined in: [packages/auth/src/helpers/oauth2-popup.ts:9](https://github.com/simplix-react/simplix-react/blob/main/packages/auth/src/helpers/oauth2-popup.ts#L9)
 
 Timeout in milliseconds. Defaults to `120000` (2 minutes).
 
@@ -44,7 +44,7 @@ Timeout in milliseconds. Defaults to `120000` (2 minutes).
 
 > **url**: `string`
 
-Defined in: [packages/auth/src/helpers/oauth2-popup.ts:3](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/auth/src/helpers/oauth2-popup.ts#L3)
+Defined in: [packages/auth/src/helpers/oauth2-popup.ts:3](https://github.com/simplix-react/simplix-react/blob/main/packages/auth/src/helpers/oauth2-popup.ts#L3)
 
 Full URL to open in the popup (e.g., authorization endpoint).
 
@@ -54,6 +54,6 @@ Full URL to open in the popup (e.g., authorization endpoint).
 
 > `optional` **width**: `number`
 
-Defined in: [packages/auth/src/helpers/oauth2-popup.ts:5](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/auth/src/helpers/oauth2-popup.ts#L5)
+Defined in: [packages/auth/src/helpers/oauth2-popup.ts:5](https://github.com/simplix-react/simplix-react/blob/main/packages/auth/src/helpers/oauth2-popup.ts#L5)
 
 Popup window width. Defaults to `500`.

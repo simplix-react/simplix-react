@@ -8,7 +8,7 @@
 
 > **buildTreeFromFlatRows**\<`T`\>(`rows`, `identityField?`): `TreeNode`\<`T`\>[]
 
-Defined in: [tree-builder.ts:23](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/mock/src/tree-builder.ts#L23)
+Defined in: [tree-builder.ts:23](https://github.com/simplix-react/simplix-react/blob/main/tree-builder.ts#L23)
 
 Converts flat database rows into a recursive tree structure.
 

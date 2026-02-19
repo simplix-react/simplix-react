@@ -6,7 +6,7 @@
 
 # Interface: WizardStepProps
 
-Defined in: [packages/ui/src/crud/form/wizard.tsx:16](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/form/wizard.tsx#L16)
+Defined in: [packages/ui/src/crud/form/wizard.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/wizard.tsx#L16)
 
 Props for the Wizard.Step sub-component.
 
@@ -16,7 +16,7 @@ Props for the Wizard.Step sub-component.
 
 > **children**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/form/wizard.tsx:20](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/form/wizard.tsx#L20)
+Defined in: [packages/ui/src/crud/form/wizard.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/wizard.tsx#L20)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [packages/ui/src/crud/form/wizard.tsx:20](https://github.com/simplix
 
 > `optional` **description**: `string`
 
-Defined in: [packages/ui/src/crud/form/wizard.tsx:18](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/form/wizard.tsx#L18)
+Defined in: [packages/ui/src/crud/form/wizard.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/wizard.tsx#L18)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [packages/ui/src/crud/form/wizard.tsx:18](https://github.com/simplix
 
 > **title**: `string`
 
-Defined in: [packages/ui/src/crud/form/wizard.tsx:17](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/form/wizard.tsx#L17)
+Defined in: [packages/ui/src/crud/form/wizard.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/wizard.tsx#L17)
 
 ***
 
@@ -40,7 +40,7 @@ Defined in: [packages/ui/src/crud/form/wizard.tsx:17](https://github.com/simplix
 
 > `optional` **validate**: () => `boolean` \| `Promise`\<`boolean`\>
 
-Defined in: [packages/ui/src/crud/form/wizard.tsx:19](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/form/wizard.tsx#L19)
+Defined in: [packages/ui/src/crud/form/wizard.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/wizard.tsx#L19)
 
 #### Returns
 

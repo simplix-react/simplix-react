@@ -6,7 +6,7 @@
 
 # Interface: UIComponents
 
-Defined in: [packages/ui/src/provider/types.ts:38](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/provider/types.ts#L38)
+Defined in: [packages/ui/src/provider/types.ts:38](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L38)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/provider/types.ts:38](https://github.com/simplix-re
 
 > **Badge**: `ComponentType`\<[`BadgeProps`](BadgeProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:45](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/provider/types.ts#L45)
+Defined in: [packages/ui/src/provider/types.ts:45](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L45)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [packages/ui/src/provider/types.ts:45](https://github.com/simplix-re
 
 > **Calendar**: `ComponentType`\<[`CalendarProps`](CalendarProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:46](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/provider/types.ts#L46)
+Defined in: [packages/ui/src/provider/types.ts:46](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L46)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [packages/ui/src/provider/types.ts:46](https://github.com/simplix-re
 
 > **Card**: `ComponentType`\<[`CardProps`](CardProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:56](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/provider/types.ts#L56)
+Defined in: [packages/ui/src/provider/types.ts:56](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L56)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [packages/ui/src/provider/types.ts:56](https://github.com/simplix-re
 
 > **Checkbox**: `ComponentType`\<`CheckboxProps` & `RefAttributes`\<`HTMLButtonElement`\>\>
 
-Defined in: [packages/ui/src/provider/types.ts:44](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/provider/types.ts#L44)
+Defined in: [packages/ui/src/provider/types.ts:44](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L44)
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: [packages/ui/src/provider/types.ts:44](https://github.com/simplix-re
 
 > **Container**: `ComponentType`\<[`ContainerProps`](ContainerProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:50](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/provider/types.ts#L50)
+Defined in: [packages/ui/src/provider/types.ts:50](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L50)
 
 ***
 
@@ -54,7 +54,7 @@ Defined in: [packages/ui/src/provider/types.ts:50](https://github.com/simplix-re
 
 > **Flex**: `ComponentType`\<[`StackProps`](StackProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:52](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/provider/types.ts#L52)
+Defined in: [packages/ui/src/provider/types.ts:52](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L52)
 
 ***
 
@@ -62,7 +62,7 @@ Defined in: [packages/ui/src/provider/types.ts:52](https://github.com/simplix-re
 
 > **Grid**: `ComponentType`\<[`GridProps`](GridProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:53](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/provider/types.ts#L53)
+Defined in: [packages/ui/src/provider/types.ts:53](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L53)
 
 ***
 
@@ -70,7 +70,7 @@ Defined in: [packages/ui/src/provider/types.ts:53](https://github.com/simplix-re
 
 > **Heading**: `ComponentType`\<[`HeadingProps`](HeadingProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:54](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/provider/types.ts#L54)
+Defined in: [packages/ui/src/provider/types.ts:54](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L54)
 
 ***
 
@@ -78,7 +78,7 @@ Defined in: [packages/ui/src/provider/types.ts:54](https://github.com/simplix-re
 
 > **Input**: `ComponentType`\<`DetailedHTMLProps`\<`InputHTMLAttributes`\<`HTMLInputElement`\>, `HTMLInputElement`\>\>
 
-Defined in: [packages/ui/src/provider/types.ts:40](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/provider/types.ts#L40)
+Defined in: [packages/ui/src/provider/types.ts:40](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L40)
 
 ***
 
@@ -86,7 +86,7 @@ Defined in: [packages/ui/src/provider/types.ts:40](https://github.com/simplix-re
 
 > **Label**: `ComponentType`\<`LabelProps` & `RefAttributes`\<`HTMLLabelElement`\>\>
 
-Defined in: [packages/ui/src/provider/types.ts:42](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/provider/types.ts#L42)
+Defined in: [packages/ui/src/provider/types.ts:42](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L42)
 
 ***
 
@@ -94,7 +94,7 @@ Defined in: [packages/ui/src/provider/types.ts:42](https://github.com/simplix-re
 
 > **RadioGroup**: [`RadioGroupComponents`](RadioGroupComponents.md)
 
-Defined in: [packages/ui/src/provider/types.ts:48](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/provider/types.ts#L48)
+Defined in: [packages/ui/src/provider/types.ts:48](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L48)
 
 ***
 
@@ -102,7 +102,7 @@ Defined in: [packages/ui/src/provider/types.ts:48](https://github.com/simplix-re
 
 > **Section**: `ComponentType`\<[`SectionProps`](SectionProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:57](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/provider/types.ts#L57)
+Defined in: [packages/ui/src/provider/types.ts:57](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L57)
 
 ***
 
@@ -110,7 +110,7 @@ Defined in: [packages/ui/src/provider/types.ts:57](https://github.com/simplix-re
 
 > **Select**: [`SelectComponents`](SelectComponents.md)
 
-Defined in: [packages/ui/src/provider/types.ts:47](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/provider/types.ts#L47)
+Defined in: [packages/ui/src/provider/types.ts:47](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L47)
 
 ***
 
@@ -118,7 +118,7 @@ Defined in: [packages/ui/src/provider/types.ts:47](https://github.com/simplix-re
 
 > **Stack**: `ComponentType`\<[`StackProps`](StackProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:51](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/provider/types.ts#L51)
+Defined in: [packages/ui/src/provider/types.ts:51](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L51)
 
 ***
 
@@ -126,7 +126,7 @@ Defined in: [packages/ui/src/provider/types.ts:51](https://github.com/simplix-re
 
 > **Switch**: `ComponentType`\<`SwitchProps` & `RefAttributes`\<`HTMLButtonElement`\>\>
 
-Defined in: [packages/ui/src/provider/types.ts:43](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/provider/types.ts#L43)
+Defined in: [packages/ui/src/provider/types.ts:43](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L43)
 
 ***
 
@@ -134,7 +134,7 @@ Defined in: [packages/ui/src/provider/types.ts:43](https://github.com/simplix-re
 
 > **Text**: `ComponentType`\<[`TextProps`](TextProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:55](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/provider/types.ts#L55)
+Defined in: [packages/ui/src/provider/types.ts:55](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L55)
 
 ***
 
@@ -142,4 +142,4 @@ Defined in: [packages/ui/src/provider/types.ts:55](https://github.com/simplix-re
 
 > **Textarea**: `ComponentType`\<`DetailedHTMLProps`\<`TextareaHTMLAttributes`\<`HTMLTextAreaElement`\>, `HTMLTextAreaElement`\>\>
 
-Defined in: [packages/ui/src/provider/types.ts:41](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/provider/types.ts#L41)
+Defined in: [packages/ui/src/provider/types.ts:41](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L41)

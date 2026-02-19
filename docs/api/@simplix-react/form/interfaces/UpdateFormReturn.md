@@ -6,7 +6,7 @@
 
 # Interface: UpdateFormReturn\<TSchema\>
 
-Defined in: [types.ts:88](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/form/src/types.ts#L88)
+Defined in: [types.ts:88](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L88)
 
 Return value of the `useUpdateForm` hook.
 
@@ -24,7 +24,7 @@ Zod schema type for the entity
 
 > **entity**: `output`\<`TSchema`\> \| `undefined`
 
-Defined in: [types.ts:98](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/form/src/types.ts#L98)
+Defined in: [types.ts:98](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L98)
 
 The loaded entity data, or `undefined` while loading.
 
@@ -34,7 +34,7 @@ The loaded entity data, or `undefined` while loading.
 
 > **form**: `AnyFormApi`
 
-Defined in: [types.ts:90](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/form/src/types.ts#L90)
+Defined in: [types.ts:90](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L90)
 
 TanStack Form API instance for field binding and submission.
 
@@ -44,7 +44,7 @@ TanStack Form API instance for field binding and submission.
 
 > **isLoading**: `boolean`
 
-Defined in: [types.ts:92](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/form/src/types.ts#L92)
+Defined in: [types.ts:92](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L92)
 
 Whether the entity data is still loading from the server.
 
@@ -54,7 +54,7 @@ Whether the entity data is still loading from the server.
 
 > **isSubmitting**: `boolean`
 
-Defined in: [types.ts:94](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/form/src/types.ts#L94)
+Defined in: [types.ts:94](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L94)
 
 Whether the update mutation is currently in flight.
 
@@ -64,6 +64,6 @@ Whether the update mutation is currently in flight.
 
 > **submitError**: `Error` \| `null`
 
-Defined in: [types.ts:96](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/form/src/types.ts#L96)
+Defined in: [types.ts:96](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L96)
 
 The most recent submission error, or `null` if the last attempt succeeded.

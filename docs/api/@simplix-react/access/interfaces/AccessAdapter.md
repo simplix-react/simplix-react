@@ -6,7 +6,7 @@
 
 # Interface: AccessAdapter\<TActions, TSubjects\>
 
-Defined in: [packages/access/src/types.ts:182](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L182)
+Defined in: [packages/access/src/types.ts:182](https://github.com/simplix-react/simplix-react/blob/main/packages/access/src/types.ts#L182)
 
 Defines how to extract access rules from an authentication data source.
 
@@ -54,7 +54,7 @@ Subject name union.
 
 > **extract**(`authData`): `Promise`\<[`AccessExtractResult`](AccessExtractResult.md)\<`TActions`, `TSubjects`\>\>
 
-Defined in: [packages/access/src/types.ts:191](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L191)
+Defined in: [packages/access/src/types.ts:191](https://github.com/simplix-react/simplix-react/blob/main/packages/access/src/types.ts#L191)
 
 Extracts access rules, user info, and roles from the given auth data.
 

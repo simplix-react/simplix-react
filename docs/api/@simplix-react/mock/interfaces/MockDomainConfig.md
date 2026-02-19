@@ -6,7 +6,7 @@
 
 # Interface: MockDomainConfig
 
-Defined in: [msw.ts:31](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/mock/src/msw.ts#L31)
+Defined in: [msw.ts:31](https://github.com/simplix-react/simplix-react/blob/main/msw.ts#L31)
 
 Describes a single domain's mock configuration.
 
@@ -42,7 +42,7 @@ const projectDomain: MockDomainConfig = {
 
 > `optional` **enabled**: `boolean`
 
-Defined in: [msw.ts:40](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/mock/src/msw.ts#L40)
+Defined in: [msw.ts:40](https://github.com/simplix-react/simplix-react/blob/main/msw.ts#L40)
 
 Whether this domain is active.
 
@@ -56,7 +56,7 @@ Whether this domain is active.
 
 > **handlers**: `unknown`[]
 
-Defined in: [msw.ts:47](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/mock/src/msw.ts#L47)
+Defined in: [msw.ts:47](https://github.com/simplix-react/simplix-react/blob/main/msw.ts#L47)
 
 MSW request handlers for this domain.
 
@@ -68,7 +68,7 @@ Typically produced by [deriveMockHandlers](../functions/deriveMockHandlers.md).
 
 > **name**: `string`
 
-Defined in: [msw.ts:33](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/mock/src/msw.ts#L33)
+Defined in: [msw.ts:33](https://github.com/simplix-react/simplix-react/blob/main/msw.ts#L33)
 
 Unique name identifying this domain (used for logging/debugging).
 
@@ -78,7 +78,7 @@ Unique name identifying this domain (used for logging/debugging).
 
 > `optional` **seed**: `Record`\<`string`, `Record`\<`string`, `unknown`\>[]\>
 
-Defined in: [msw.ts:55](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/mock/src/msw.ts#L55)
+Defined in: [msw.ts:55](https://github.com/simplix-react/simplix-react/blob/main/msw.ts#L55)
 
 Seed data keyed by entity store name.
 

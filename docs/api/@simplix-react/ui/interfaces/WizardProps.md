@@ -6,7 +6,7 @@
 
 # Interface: WizardProps
 
-Defined in: [packages/ui/src/crud/form/wizard.tsx:110](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/form/wizard.tsx#L110)
+Defined in: [packages/ui/src/crud/form/wizard.tsx:110](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/wizard.tsx#L110)
 
 Props for the [Wizard](../variables/Wizard.md) compound component root.
 
@@ -16,7 +16,7 @@ Props for the [Wizard](../variables/Wizard.md) compound component root.
 
 > **children**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/form/wizard.tsx:113](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/form/wizard.tsx#L113)
+Defined in: [packages/ui/src/crud/form/wizard.tsx:113](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/wizard.tsx#L113)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [packages/ui/src/crud/form/wizard.tsx:113](https://github.com/simpli
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/form/wizard.tsx:112](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/form/wizard.tsx#L112)
+Defined in: [packages/ui/src/crud/form/wizard.tsx:112](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/wizard.tsx#L112)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [packages/ui/src/crud/form/wizard.tsx:112](https://github.com/simpli
 
 > **onComplete**: () => `void`
 
-Defined in: [packages/ui/src/crud/form/wizard.tsx:111](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/form/wizard.tsx#L111)
+Defined in: [packages/ui/src/crud/form/wizard.tsx:111](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/wizard.tsx#L111)
 
 #### Returns
 

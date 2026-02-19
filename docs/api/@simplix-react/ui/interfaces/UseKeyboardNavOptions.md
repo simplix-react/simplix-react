@@ -6,7 +6,7 @@
 
 # Interface: UseKeyboardNavOptions
 
-Defined in: [packages/ui/src/crud/list/use-keyboard-nav.ts:4](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/use-keyboard-nav.ts#L4)
+Defined in: [packages/ui/src/crud/list/use-keyboard-nav.ts:4](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-keyboard-nav.ts#L4)
 
 Options for the [useKeyboardNav](../functions/useKeyboardNav.md) hook.
 
@@ -16,7 +16,7 @@ Options for the [useKeyboardNav](../functions/useKeyboardNav.md) hook.
 
 > `optional` **enabled**: `boolean`
 
-Defined in: [packages/ui/src/crud/list/use-keyboard-nav.ts:10](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/use-keyboard-nav.ts#L10)
+Defined in: [packages/ui/src/crud/list/use-keyboard-nav.ts:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-keyboard-nav.ts#L10)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [packages/ui/src/crud/list/use-keyboard-nav.ts:10](https://github.co
 
 > `optional` **onEscape**: () => `void`
 
-Defined in: [packages/ui/src/crud/list/use-keyboard-nav.ts:9](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/use-keyboard-nav.ts#L9)
+Defined in: [packages/ui/src/crud/list/use-keyboard-nav.ts:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-keyboard-nav.ts#L9)
 
 #### Returns
 
@@ -36,7 +36,7 @@ Defined in: [packages/ui/src/crud/list/use-keyboard-nav.ts:9](https://github.com
 
 > **onNavigate**: (`direction`) => `void`
 
-Defined in: [packages/ui/src/crud/list/use-keyboard-nav.ts:5](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/use-keyboard-nav.ts#L5)
+Defined in: [packages/ui/src/crud/list/use-keyboard-nav.ts:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-keyboard-nav.ts#L5)
 
 #### Parameters
 
@@ -54,7 +54,7 @@ Defined in: [packages/ui/src/crud/list/use-keyboard-nav.ts:5](https://github.com
 
 > **onSearch**: () => `void`
 
-Defined in: [packages/ui/src/crud/list/use-keyboard-nav.ts:8](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/use-keyboard-nav.ts#L8)
+Defined in: [packages/ui/src/crud/list/use-keyboard-nav.ts:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-keyboard-nav.ts#L8)
 
 #### Returns
 
@@ -66,7 +66,7 @@ Defined in: [packages/ui/src/crud/list/use-keyboard-nav.ts:8](https://github.com
 
 > **onSelect**: () => `void`
 
-Defined in: [packages/ui/src/crud/list/use-keyboard-nav.ts:6](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/use-keyboard-nav.ts#L6)
+Defined in: [packages/ui/src/crud/list/use-keyboard-nav.ts:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-keyboard-nav.ts#L6)
 
 #### Returns
 
@@ -78,7 +78,7 @@ Defined in: [packages/ui/src/crud/list/use-keyboard-nav.ts:6](https://github.com
 
 > **onToggle**: () => `void`
 
-Defined in: [packages/ui/src/crud/list/use-keyboard-nav.ts:7](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/list/use-keyboard-nav.ts#L7)
+Defined in: [packages/ui/src/crud/list/use-keyboard-nav.ts:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-keyboard-nav.ts#L7)
 
 #### Returns
 

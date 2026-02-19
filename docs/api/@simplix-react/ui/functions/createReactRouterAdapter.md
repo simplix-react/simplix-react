@@ -8,7 +8,7 @@
 
 > **createReactRouterAdapter**(`hooks`): [`RouterAdapter`](../interfaces/RouterAdapter.md)
 
-Defined in: [packages/ui/src/adapters/react-router.ts:25](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/adapters/react-router.ts#L25)
+Defined in: [packages/ui/src/adapters/react-router.ts:25](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/adapters/react-router.ts#L25)
 
 Creates a [RouterAdapter](../interfaces/RouterAdapter.md) from React Router v6+ hooks.
 Must be called inside a React Router context (e.g., \<BrowserRouter\>).

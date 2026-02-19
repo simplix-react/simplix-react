@@ -8,7 +8,7 @@
 
 > **customizeApi**\<`TEntities`, `TOperations`\>(`base`, `patch`, `options?`): `object`
 
-Defined in: [packages/contract/src/customize-api.ts:66](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/contract/src/customize-api.ts#L66)
+Defined in: [packages/contract/src/customize-api.ts:66](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/customize-api.ts#L66)
 
 Creates a patched copy of an API contract by adding, replacing, or removing
 entity operations.

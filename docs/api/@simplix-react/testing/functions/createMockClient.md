@@ -8,7 +8,7 @@
 
 > **createMockClient**\<`TEntities`\>(`config`, `data`): `Record`\<`string`, `unknown`\>
 
-Defined in: [mock-client.ts:36](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/testing/src/mock-client.ts#L36)
+Defined in: [mock-client.ts:36](https://github.com/simplix-react/simplix-react/blob/main/mock-client.ts#L36)
 
 Creates an in-memory mock API client that mirrors the shape of a real
 [ApiContract](../../contract/interfaces/ApiContract.md) client without requiring MSW or any network layer.

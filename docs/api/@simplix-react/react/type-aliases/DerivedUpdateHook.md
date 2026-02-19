@@ -8,7 +8,7 @@
 
 > **DerivedUpdateHook**\<`TInput`, `TOutput`\> = (`options?`) => `UseMutationResult`\<`TOutput`, `Error`, \{ `dto`: `TInput`; `id`: `EntityId`; \}\>
 
-Defined in: [types.ts:113](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/react/src/types.ts#L113)
+Defined in: [types.ts:113](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L113)
 
 Represents a derived update mutation hook.
 

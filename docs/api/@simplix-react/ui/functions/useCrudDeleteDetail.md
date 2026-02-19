@@ -8,7 +8,7 @@
 
 > **useCrudDeleteDetail**(): [`UseCrudDeleteDetailResult`](../interfaces/UseCrudDeleteDetailResult.md)
 
-Defined in: [packages/ui/src/crud/delete/use-crud-delete.ts:59](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/delete/use-crud-delete.ts#L59)
+Defined in: [packages/ui/src/crud/delete/use-crud-delete.ts:59](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/use-crud-delete.ts#L59)
 
 Manages delete-confirmation state for a **detail** view (single item).
 

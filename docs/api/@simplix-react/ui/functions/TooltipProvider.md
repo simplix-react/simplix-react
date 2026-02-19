@@ -8,7 +8,7 @@
 
 > **TooltipProvider**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/base/tooltip.tsx:11](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/base/tooltip.tsx#L11)
+Defined in: [packages/ui/src/base/tooltip.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/tooltip.tsx#L11)
 
 ## Parameters
 

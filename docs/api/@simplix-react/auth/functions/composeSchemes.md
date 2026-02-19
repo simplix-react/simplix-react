@@ -8,7 +8,7 @@
 
 > **composeSchemes**(...`schemes`): [`AuthScheme`](../interfaces/AuthScheme.md)
 
-Defined in: [packages/auth/src/schemes/compose-schemes.ts:17](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/auth/src/schemes/compose-schemes.ts#L17)
+Defined in: [packages/auth/src/schemes/compose-schemes.ts:17](https://github.com/simplix-react/simplix-react/blob/main/packages/auth/src/schemes/compose-schemes.ts#L17)
 
 Composes multiple [AuthScheme](../interfaces/AuthScheme.md)s into a single scheme.
 

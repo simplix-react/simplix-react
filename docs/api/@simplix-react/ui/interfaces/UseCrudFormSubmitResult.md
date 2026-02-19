@@ -6,7 +6,7 @@
 
 # Interface: UseCrudFormSubmitResult\<T\>
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:18](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/form/use-crud-form-submit.ts#L18)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L18)
 
 Return type of [useCrudFormSubmit](../functions/useCrudFormSubmit.md).
 
@@ -22,7 +22,7 @@ Return type of [useCrudFormSubmit](../functions/useCrudFormSubmit.md).
 
 > **handleSubmit**: (`values`) => `void`
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:20](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/form/use-crud-form-submit.ts#L20)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L20)
 
 #### Parameters
 
@@ -40,7 +40,7 @@ Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:20](https://githu
 
 > **isEdit**: `boolean`
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:19](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/form/use-crud-form-submit.ts#L19)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L19)
 
 ***
 
@@ -48,4 +48,4 @@ Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:19](https://githu
 
 > **isPending**: `boolean`
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:21](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/form/use-crud-form-submit.ts#L21)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L21)

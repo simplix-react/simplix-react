@@ -6,7 +6,7 @@
 
 # Interface: AccessSnapshot\<TActions, TSubjects\>
 
-Defined in: [packages/access/src/types.ts:273](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L273)
+Defined in: [packages/access/src/types.ts:273](https://github.com/simplix-react/simplix-react/blob/main/packages/access/src/types.ts#L273)
 
 A serializable snapshot of the current access state.
 
@@ -35,7 +35,7 @@ Subject name union (defaults to any `string`).
 
 > **roles**: `string`[]
 
-Defined in: [packages/access/src/types.ts:280](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L280)
+Defined in: [packages/access/src/types.ts:280](https://github.com/simplix-react/simplix-react/blob/main/packages/access/src/types.ts#L280)
 
 Current role names.
 
@@ -45,7 +45,7 @@ Current role names.
 
 > **rules**: `DefineRule`\<`ToAbilityTypes`\<\[`TActions`, `"all"` \| `TSubjects`\]\>, `MongoQuery`, `ClaimRawRule`\<`Extract`\<`ToAbilityTypes`\<\[`TActions`, `"all"` \| `TSubjects`\]\>, `string`\>\>\>[]
 
-Defined in: [packages/access/src/types.ts:282](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L282)
+Defined in: [packages/access/src/types.ts:282](https://github.com/simplix-react/simplix-react/blob/main/packages/access/src/types.ts#L282)
 
 Current CASL rules.
 
@@ -55,6 +55,6 @@ Current CASL rules.
 
 > **user**: [`AccessUser`](AccessUser.md)\<`Record`\<`string`, `unknown`\>\> \| `null`
 
-Defined in: [packages/access/src/types.ts:278](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L278)
+Defined in: [packages/access/src/types.ts:278](https://github.com/simplix-react/simplix-react/blob/main/packages/access/src/types.ts#L278)
 
 Current user, or `null` if unauthenticated.

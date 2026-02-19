@@ -8,7 +8,7 @@
 
 > **createStaticAdapter**(`rules`, `user?`): [`AccessAdapter`](../interfaces/AccessAdapter.md)
 
-Defined in: [packages/access/src/adapters/static-adapter.ts:29](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/adapters/static-adapter.ts#L29)
+Defined in: [packages/access/src/adapters/static-adapter.ts:29](https://github.com/simplix-react/simplix-react/blob/main/packages/access/src/adapters/static-adapter.ts#L29)
 
 Creates an adapter that always returns the same static rules.
 

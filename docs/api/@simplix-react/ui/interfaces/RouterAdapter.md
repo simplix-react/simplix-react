@@ -6,7 +6,7 @@
 
 # Interface: RouterAdapter
 
-Defined in: [packages/ui/src/adapters/router-provider.ts:4](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/adapters/router-provider.ts#L4)
+Defined in: [packages/ui/src/adapters/router-provider.ts:4](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/adapters/router-provider.ts#L4)
 
 Router abstraction interface. Adapters (e.g., React Router) implement this contract.
 
@@ -16,7 +16,7 @@ Router abstraction interface. Adapters (e.g., React Router) implement this contr
 
 > **getSearchParams**: () => `URLSearchParams`
 
-Defined in: [packages/ui/src/adapters/router-provider.ts:6](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/adapters/router-provider.ts#L6)
+Defined in: [packages/ui/src/adapters/router-provider.ts:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/adapters/router-provider.ts#L6)
 
 #### Returns
 
@@ -28,7 +28,7 @@ Defined in: [packages/ui/src/adapters/router-provider.ts:6](https://github.com/s
 
 > **navigate**: (`to`, `options?`) => `void`
 
-Defined in: [packages/ui/src/adapters/router-provider.ts:5](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/adapters/router-provider.ts#L5)
+Defined in: [packages/ui/src/adapters/router-provider.ts:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/adapters/router-provider.ts#L5)
 
 #### Parameters
 
@@ -52,7 +52,7 @@ Defined in: [packages/ui/src/adapters/router-provider.ts:5](https://github.com/s
 
 > **setSearchParams**: (`params`, `options?`) => `void`
 
-Defined in: [packages/ui/src/adapters/router-provider.ts:7](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/adapters/router-provider.ts#L7)
+Defined in: [packages/ui/src/adapters/router-provider.ts:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/adapters/router-provider.ts#L7)
 
 #### Parameters
 
@@ -76,7 +76,7 @@ Defined in: [packages/ui/src/adapters/router-provider.ts:7](https://github.com/s
 
 > **useCurrentPath**: () => `string`
 
-Defined in: [packages/ui/src/adapters/router-provider.ts:11](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/adapters/router-provider.ts#L11)
+Defined in: [packages/ui/src/adapters/router-provider.ts:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/adapters/router-provider.ts#L11)
 
 #### Returns
 

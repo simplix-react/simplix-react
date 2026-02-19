@@ -6,7 +6,7 @@
 
 # Interface: AccessUser\<TMeta\>
 
-Defined in: [packages/access/src/types.ts:108](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L108)
+Defined in: [packages/access/src/types.ts:108](https://github.com/simplix-react/simplix-react/blob/main/packages/access/src/types.ts#L108)
 
 Represents an authenticated user for access control purposes.
 
@@ -35,7 +35,7 @@ Shape of the optional [metadata](#metadata) field.
 
 > `optional` **displayName**: `string`
 
-Defined in: [packages/access/src/types.ts:114](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L114)
+Defined in: [packages/access/src/types.ts:114](https://github.com/simplix-react/simplix-react/blob/main/packages/access/src/types.ts#L114)
 
 Human-readable display name.
 
@@ -45,7 +45,7 @@ Human-readable display name.
 
 > `optional` **isSuperAdmin**: `boolean`
 
-Defined in: [packages/access/src/types.ts:118](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L118)
+Defined in: [packages/access/src/types.ts:118](https://github.com/simplix-react/simplix-react/blob/main/packages/access/src/types.ts#L118)
 
 Whether this user bypasses all access checks.
 
@@ -55,7 +55,7 @@ Whether this user bypasses all access checks.
 
 > `optional` **metadata**: `TMeta`
 
-Defined in: [packages/access/src/types.ts:120](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L120)
+Defined in: [packages/access/src/types.ts:120](https://github.com/simplix-react/simplix-react/blob/main/packages/access/src/types.ts#L120)
 
 Arbitrary user metadata.
 
@@ -65,7 +65,7 @@ Arbitrary user metadata.
 
 > **roles**: `string`[]
 
-Defined in: [packages/access/src/types.ts:116](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L116)
+Defined in: [packages/access/src/types.ts:116](https://github.com/simplix-react/simplix-react/blob/main/packages/access/src/types.ts#L116)
 
 Assigned roles.
 
@@ -75,7 +75,7 @@ Assigned roles.
 
 > **userId**: `string`
 
-Defined in: [packages/access/src/types.ts:110](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L110)
+Defined in: [packages/access/src/types.ts:110](https://github.com/simplix-react/simplix-react/blob/main/packages/access/src/types.ts#L110)
 
 Unique user identifier (e.g., from JWT `sub` claim).
 
@@ -85,6 +85,6 @@ Unique user identifier (e.g., from JWT `sub` claim).
 
 > **username**: `string`
 
-Defined in: [packages/access/src/types.ts:112](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/types.ts#L112)
+Defined in: [packages/access/src/types.ts:112](https://github.com/simplix-react/simplix-react/blob/main/packages/access/src/types.ts#L112)
 
 Login username.

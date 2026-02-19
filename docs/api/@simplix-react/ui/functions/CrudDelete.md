@@ -8,7 +8,7 @@
 
 > **CrudDelete**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:37](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/delete/crud-delete.tsx#L37)
+Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:37](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/crud-delete.tsx#L37)
 
 Delete confirmation dialog using Radix AlertDialog.
 Requires explicit user confirmation before deletion proceeds.

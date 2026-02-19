@@ -6,7 +6,7 @@
 
 # Interface: UseAutosaveOptions
 
-Defined in: [packages/ui/src/crud/form/use-autosave.ts:7](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/form/use-autosave.ts#L7)
+Defined in: [packages/ui/src/crud/form/use-autosave.ts:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-autosave.ts#L7)
 
 Configuration options for the [useAutosave](../functions/useAutosave.md) hook.
 
@@ -16,7 +16,7 @@ Configuration options for the [useAutosave](../functions/useAutosave.md) hook.
 
 > `optional` **debounceMs**: `number`
 
-Defined in: [packages/ui/src/crud/form/use-autosave.ts:13](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/form/use-autosave.ts#L13)
+Defined in: [packages/ui/src/crud/form/use-autosave.ts:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-autosave.ts#L13)
 
 Debounce interval in milliseconds. Defaults to 2000.
 
@@ -26,7 +26,7 @@ Debounce interval in milliseconds. Defaults to 2000.
 
 > `optional` **enabled**: `boolean`
 
-Defined in: [packages/ui/src/crud/form/use-autosave.ts:15](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/form/use-autosave.ts#L15)
+Defined in: [packages/ui/src/crud/form/use-autosave.ts:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-autosave.ts#L15)
 
 Enable or disable autosave. Defaults to true.
 
@@ -36,7 +36,7 @@ Enable or disable autosave. Defaults to true.
 
 > `optional` **hasErrors**: `boolean`
 
-Defined in: [packages/ui/src/crud/form/use-autosave.ts:17](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/form/use-autosave.ts#L17)
+Defined in: [packages/ui/src/crud/form/use-autosave.ts:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-autosave.ts#L17)
 
 Whether the form currently has validation errors. Skips save if true.
 
@@ -46,7 +46,7 @@ Whether the form currently has validation errors. Skips save if true.
 
 > **onSave**: (`values`) => `void` \| `Promise`\<`void`\>
 
-Defined in: [packages/ui/src/crud/form/use-autosave.ts:11](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/form/use-autosave.ts#L11)
+Defined in: [packages/ui/src/crud/form/use-autosave.ts:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-autosave.ts#L11)
 
 Callback invoked with the current values when autosave triggers.
 
@@ -66,6 +66,6 @@ Callback invoked with the current values when autosave triggers.
 
 > **values**: `Record`\<`string`, `unknown`\>
 
-Defined in: [packages/ui/src/crud/form/use-autosave.ts:9](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/form/use-autosave.ts#L9)
+Defined in: [packages/ui/src/crud/form/use-autosave.ts:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-autosave.ts#L9)
 
 Current form values to watch for changes.

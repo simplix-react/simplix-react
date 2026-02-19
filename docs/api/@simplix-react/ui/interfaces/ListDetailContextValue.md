@@ -6,7 +6,7 @@
 
 # Interface: ListDetailContextValue
 
-Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:19](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/patterns/list-detail.tsx#L19)
+Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L19)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:19](https://github.co
 
 > **activePanel**: `"list"` \| `"detail"`
 
-Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:21](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/patterns/list-detail.tsx#L21)
+Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L21)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:21](https://github.co
 
 > **setActivePanel**: (`panel`) => `void`
 
-Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:22](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/patterns/list-detail.tsx#L22)
+Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L22)
 
 #### Parameters
 
@@ -40,4 +40,4 @@ Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:22](https://github.co
 
 > **variant**: [`ListDetailVariant`](../type-aliases/ListDetailVariant.md)
 
-Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:20](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/patterns/list-detail.tsx#L20)
+Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L20)

@@ -8,7 +8,7 @@
 
 > **normalizeRoles**(`roles`): `string`[]
 
-Defined in: [packages/access/src/helpers/role-utils.ts:25](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/helpers/role-utils.ts#L25)
+Defined in: [packages/access/src/helpers/role-utils.ts:25](https://github.com/simplix-react/simplix-react/blob/main/packages/access/src/helpers/role-utils.ts#L25)
 
 Normalizes an array of mixed role inputs into plain role strings.
 

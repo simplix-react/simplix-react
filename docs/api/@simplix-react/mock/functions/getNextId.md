@@ -8,7 +8,7 @@
 
 > **getNextId**(`storeName`): `number`
 
-Defined in: [mock-store.ts:34](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/mock/src/mock-store.ts#L34)
+Defined in: [mock-store.ts:34](https://github.com/simplix-react/simplix-react/blob/main/mock-store.ts#L34)
 
 Returns the next auto-increment id for the given store and advances the counter.
 

@@ -8,7 +8,7 @@
 
 > **createMockPolicy**(`options?`): [`AccessPolicy`](../@simplix-react/access/interfaces/AccessPolicy.md)\<`string`, `string`\>
 
-Defined in: [mock-policy.ts:44](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/testing/src/mock-policy.ts#L44)
+Defined in: [mock-policy.ts:44](https://github.com/simplix-react/simplix-react/blob/main/mock-policy.ts#L44)
 
 Creates a mock [AccessPolicy](../@simplix-react/access/interfaces/AccessPolicy.md) for testing purposes.
 

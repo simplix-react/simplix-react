@@ -8,7 +8,7 @@
 
 > `const` **CrudDetail**: (`__namedParameters`) => `Element` & `object`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:156](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/detail/crud-detail.tsx#L156)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:156](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L156)
 
 Compound component for building read-only CRUD detail views.
 

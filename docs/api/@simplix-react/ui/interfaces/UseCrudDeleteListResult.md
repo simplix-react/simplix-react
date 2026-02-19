@@ -6,7 +6,7 @@
 
 # Interface: UseCrudDeleteListResult
 
-Defined in: [packages/ui/src/crud/delete/use-crud-delete.ts:12](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/delete/use-crud-delete.ts#L12)
+Defined in: [packages/ui/src/crud/delete/use-crud-delete.ts:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/use-crud-delete.ts#L12)
 
 Return type of [useCrudDeleteList](../functions/useCrudDeleteList.md).
 
@@ -16,7 +16,7 @@ Return type of [useCrudDeleteList](../functions/useCrudDeleteList.md).
 
 > **cancel**: () => `void`
 
-Defined in: [packages/ui/src/crud/delete/use-crud-delete.ts:16](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/delete/use-crud-delete.ts#L16)
+Defined in: [packages/ui/src/crud/delete/use-crud-delete.ts:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/use-crud-delete.ts#L16)
 
 #### Returns
 
@@ -28,7 +28,7 @@ Defined in: [packages/ui/src/crud/delete/use-crud-delete.ts:16](https://github.c
 
 > **open**: `boolean`
 
-Defined in: [packages/ui/src/crud/delete/use-crud-delete.ts:13](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/delete/use-crud-delete.ts#L13)
+Defined in: [packages/ui/src/crud/delete/use-crud-delete.ts:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/use-crud-delete.ts#L13)
 
 ***
 
@@ -36,7 +36,7 @@ Defined in: [packages/ui/src/crud/delete/use-crud-delete.ts:13](https://github.c
 
 > **requestDelete**: (`target`) => `void`
 
-Defined in: [packages/ui/src/crud/delete/use-crud-delete.ts:15](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/delete/use-crud-delete.ts#L15)
+Defined in: [packages/ui/src/crud/delete/use-crud-delete.ts:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/use-crud-delete.ts#L15)
 
 #### Parameters
 
@@ -54,4 +54,4 @@ Defined in: [packages/ui/src/crud/delete/use-crud-delete.ts:15](https://github.c
 
 > **target**: [`DeleteTarget`](DeleteTarget.md) \| `null`
 
-Defined in: [packages/ui/src/crud/delete/use-crud-delete.ts:14](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/ui/src/crud/delete/use-crud-delete.ts#L14)
+Defined in: [packages/ui/src/crud/delete/use-crud-delete.ts:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/use-crud-delete.ts#L14)

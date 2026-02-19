@@ -6,7 +6,7 @@
 
 # Class: AutoRefreshScheduler
 
-Defined in: [packages/auth/src/helpers/auto-refresh-scheduler.ts:18](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/auth/src/helpers/auto-refresh-scheduler.ts#L18)
+Defined in: [packages/auth/src/helpers/auto-refresh-scheduler.ts:18](https://github.com/simplix-react/simplix-react/blob/main/packages/auth/src/helpers/auto-refresh-scheduler.ts#L18)
 
 Timer-based background token refresh scheduler.
 
@@ -19,7 +19,7 @@ via a minimum interval guard.
 
 > **new AutoRefreshScheduler**(`options?`): `AutoRefreshScheduler`
 
-Defined in: [packages/auth/src/helpers/auto-refresh-scheduler.ts:22](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/auth/src/helpers/auto-refresh-scheduler.ts#L22)
+Defined in: [packages/auth/src/helpers/auto-refresh-scheduler.ts:22](https://github.com/simplix-react/simplix-react/blob/main/packages/auth/src/helpers/auto-refresh-scheduler.ts#L22)
 
 #### Parameters
 
@@ -37,7 +37,7 @@ Defined in: [packages/auth/src/helpers/auto-refresh-scheduler.ts:22](https://git
 
 > **isRunning**(): `boolean`
 
-Defined in: [packages/auth/src/helpers/auto-refresh-scheduler.ts:39](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/auth/src/helpers/auto-refresh-scheduler.ts#L39)
+Defined in: [packages/auth/src/helpers/auto-refresh-scheduler.ts:39](https://github.com/simplix-react/simplix-react/blob/main/packages/auth/src/helpers/auto-refresh-scheduler.ts#L39)
 
 #### Returns
 
@@ -49,7 +49,7 @@ Defined in: [packages/auth/src/helpers/auto-refresh-scheduler.ts:39](https://git
 
 > **start**(`refreshFn`, `getExpiresAt`): `void`
 
-Defined in: [packages/auth/src/helpers/auto-refresh-scheduler.ts:24](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/auth/src/helpers/auto-refresh-scheduler.ts#L24)
+Defined in: [packages/auth/src/helpers/auto-refresh-scheduler.ts:24](https://github.com/simplix-react/simplix-react/blob/main/packages/auth/src/helpers/auto-refresh-scheduler.ts#L24)
 
 #### Parameters
 
@@ -71,7 +71,7 @@ Defined in: [packages/auth/src/helpers/auto-refresh-scheduler.ts:24](https://git
 
 > **stop**(): `void`
 
-Defined in: [packages/auth/src/helpers/auto-refresh-scheduler.ts:32](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/auth/src/helpers/auto-refresh-scheduler.ts#L32)
+Defined in: [packages/auth/src/helpers/auto-refresh-scheduler.ts:32](https://github.com/simplix-react/simplix-react/blob/main/packages/auth/src/helpers/auto-refresh-scheduler.ts#L32)
 
 #### Returns
 

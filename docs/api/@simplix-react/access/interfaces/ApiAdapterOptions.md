@@ -6,7 +6,7 @@
 
 # Interface: ApiAdapterOptions
 
-Defined in: [packages/access/src/adapters/api-adapter.ts:27](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/adapters/api-adapter.ts#L27)
+Defined in: [packages/access/src/adapters/api-adapter.ts:27](https://github.com/simplix-react/simplix-react/blob/main/packages/access/src/adapters/api-adapter.ts#L27)
 
 Configuration for [createApiAdapter](../functions/createApiAdapter.md).
 
@@ -29,7 +29,7 @@ const options: ApiAdapterOptions = {
 
 > `optional` **endpoint**: `string`
 
-Defined in: [packages/access/src/adapters/api-adapter.ts:29](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/adapters/api-adapter.ts#L29)
+Defined in: [packages/access/src/adapters/api-adapter.ts:29](https://github.com/simplix-react/simplix-react/blob/main/packages/access/src/adapters/api-adapter.ts#L29)
 
 API endpoint to fetch permissions from. Defaults to `"/api/me/permissions"`.
 
@@ -39,7 +39,7 @@ API endpoint to fetch permissions from. Defaults to `"/api/me/permissions"`.
 
 > `optional` **fetchFn**: [`FetchFn`](../type-aliases/FetchFn.md)
 
-Defined in: [packages/access/src/adapters/api-adapter.ts:31](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/adapters/api-adapter.ts#L31)
+Defined in: [packages/access/src/adapters/api-adapter.ts:31](https://github.com/simplix-react/simplix-react/blob/main/packages/access/src/adapters/api-adapter.ts#L31)
 
 Custom fetch function. Defaults to the global `fetch`.
 
@@ -49,7 +49,7 @@ Custom fetch function. Defaults to the global `fetch`.
 
 > `optional` **transformResponse**: (`response`) => `object`
 
-Defined in: [packages/access/src/adapters/api-adapter.ts:33](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/access/src/adapters/api-adapter.ts#L33)
+Defined in: [packages/access/src/adapters/api-adapter.ts:33](https://github.com/simplix-react/simplix-react/blob/main/packages/access/src/adapters/api-adapter.ts#L33)
 
 Custom response transformer.
 

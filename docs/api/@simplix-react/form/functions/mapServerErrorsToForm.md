@@ -8,7 +8,7 @@
 
 > **mapServerErrorsToForm**(`error`, `form`): `void`
 
-Defined in: [utils/server-error-mapping.ts:47](https://github.com/simplix-react/simplix-react/blob/27627ea75dc186c7030069980bcf62e25a2ccd38/packages/form/src/utils/server-error-mapping.ts#L47)
+Defined in: [utils/server-error-mapping.ts:47](https://github.com/simplix-react/simplix-react/blob/main/utils/server-error-mapping.ts#L47)
 
 Maps 422 validation errors from the server to TanStack Form field errors.
 
