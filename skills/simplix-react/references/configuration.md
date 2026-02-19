@@ -46,8 +46,7 @@ export default defineConfig({
     defaultLimit: 50,
     /** Maximum allowed page size */
     maxLimit: 100,
-    /** PGlite IndexedDB storage path */
-    dataDir: "idb://my-project-mock",
+    /** Default page size for mock list queries */
   },
 
   // ── Code Generation ────────────────────────────────────────
@@ -109,22 +108,6 @@ Each environment defines a `baseUrl` used in generated `.http` test files.
 | --- | --- | --- | --- |
 | `defaultLimit` | `number` | `50` | Default page size for mock list endpoints |
 | `maxLimit` | `number` | `100` | Maximum allowed page size (clamped) |
-| `dataDir` | `string` | `"idb://simplix-mock"` | PGlite IndexedDB storage path |
-
-The `dataDir` determines where PGlite stores its data in the browser's IndexedDB. Use a project-specific name to avoid collisions between projects:
-
-```ts
-mock: {
-  dataDir: "idb://my-project-mock",
-}
-```
-
-For testing, use `memory://test` to avoid persistence:
-
-```ts
-const db = await initPGlite("memory://test");
-```
-
 ### codegen
 
 | Option | Type | Default | Description |
@@ -230,7 +213,6 @@ export default defineConfig({
   mock: {
     defaultLimit: 10,
     maxLimit: 50,
-    dataDir: "idb://my-project-dev",
   },
 });
 ```

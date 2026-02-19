@@ -213,7 +213,6 @@ Replaces `:paramName` placeholders with URI-encoded values.
 
 ```ts
 function camelToSnake(str: string): string;
-function camelToKebab(str: string): string;
 ```
 
 ---
@@ -356,16 +355,16 @@ Generates MSW handlers for each entity:
 
 ```ts
 interface MockEntityConfig {
-  tableName?: string;          // default: snake_case(entityName) + "s"
   defaultLimit?: number;       // default: 50
   maxLimit?: number;           // default: 100
-  defaultSort?: string;        // default: "created_at DESC"
+  defaultSort?: string;        // default: "createdAt:desc"
   relations?: Record<string, {
-    table: string;
+    entity: string;
     localKey: string;
     foreignKey?: string;       // default: "id"
     type: "belongsTo";
   }>;
+  resolvers?: Record<string, (params) => unknown>;
 }
 ```
 
@@ -378,39 +377,26 @@ interface MockDomainConfig {
   name: string;
   enabled?: boolean;                            // default: true
   handlers: RequestHandler[];
-  migrations: Array<(db: PGlite) => Promise<void>>;
-  seed?: Array<(db: PGlite) => Promise<void>>;
+  seed?: Record<string, Record<string, unknown>[]>;
 }
 
 interface MockServerConfig {
-  dataDir?: string;                             // default: "idb://simplix-mock"
   domains: MockDomainConfig[];
 }
 ```
 
-Steps: filter enabled domains -> init PGlite -> run all migrations -> run all seeds -> start MSW worker.
+Steps: filter enabled domains -> reset in-memory stores -> seed stores -> start MSW worker.
 
-### PGlite Utilities
-
-```ts
-async function initPGlite(dataDir: string): Promise<PGlite>;
-function getPGliteInstance(): PGlite;          // throws if not initialized
-function resetPGliteInstance(): void;          // for test teardown
-```
-
-### SQL Utilities
+### In-Memory Store
 
 ```ts
-async function executeSql<T>(sql: string, values?: unknown[]): Promise<T[]>;
-function buildSetClause(dto: Record<string, unknown>): SetClauseResult;
-function mapRow<T>(row: Record<string, unknown>): T;    // snake_case -> camelCase
-function mapRows<T>(rows: Record<string, unknown>[]): T[];
-function toSnakeCase(str: string): string;
-function toCamelCase(str: string): string;
-async function tableExists(tableName: string): Promise<boolean>;
-async function columnExists(tableName: string, columnName: string): Promise<boolean>;
-async function addColumnIfNotExists(tableName: string, columnName: string, columnType: string): Promise<void>;
+function getEntityStore(storeName: string): Map<string | number, Record<string, unknown>>;
+function getNextId(storeName: string): number;
+function seedEntityStore(storeName: string, records: Record<string, unknown>[]): void;
+function resetStore(): void;
 ```
+
+Store naming convention: `{domain}_{snake_case_entity}` (e.g., `"project_tasks"`).
 
 ### MockResult
 

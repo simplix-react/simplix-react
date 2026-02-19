@@ -17,7 +17,7 @@ Contract (Zod schemas)
     +---> Client (type-safe HTTP)     -- deriveClient()
     +---> QueryKeys (cache keys)      -- deriveQueryKeys()
     +---> Hooks (React Query)         -- deriveHooks()
-    +---> Mock Handlers (MSW+PGlite)  -- deriveMockHandlers()
+    +---> Mock Handlers (MSW)         -- deriveMockHandlers()
 ```
 
 ## Core API Quick Reference
@@ -101,27 +101,34 @@ hooks.assignTask.useMutation(options?);
 
 ### deriveMockHandlers(config, entityConfigs?)
 
-Generates MSW `http.*` handlers backed by PGlite SQL.
+Generates MSW `http.*` handlers backed by in-memory stores.
 
 ```ts
 import { deriveMockHandlers } from "@simplix-react/mock";
 const handlers = deriveMockHandlers(api.config, {
-  task: { tableName: "tasks", defaultLimit: 20 },
+  task: { defaultLimit: 20 },
 });
 ```
 
 ### setupMockWorker(config)
 
-Bootstrap PGlite + MSW service worker.
+Bootstrap in-memory stores + MSW service worker.
 
 ```ts
 import { setupMockWorker, deriveMockHandlers } from "@simplix-react/mock";
 
 await setupMockWorker({
-  dataDir: "idb://project-mock",
-  migrations: [runMigrations],
-  seed: [seedData],
-  handlers: deriveMockHandlers(api.config),
+  domains: [
+    {
+      name: "project",
+      handlers: deriveMockHandlers(api.config),
+      seed: {
+        project_tasks: [
+          { id: 1, title: "First Task", completed: false },
+        ],
+      },
+    },
+  ],
 });
 ```
 
@@ -178,7 +185,7 @@ export default defineConfig({
   mock: {                              // Mock layer defaults
     defaultLimit: 50,
     maxLimit: 100,
-    dataDir: "idb://my-app-mock",
+    defaultLimit: 50,
   },
   codegen: { header: true },           // Auto-generated file header
   // openapi: { domains: { ... } },    // OpenAPI tag-based domain splitting
@@ -194,7 +201,7 @@ Activate when:
 - Defining new API contracts with `defineApi`
 - Adding entities or operations to existing contracts
 - Setting up React Query hooks via `deriveHooks`
-- Configuring mock data layer with MSW + PGlite
+- Configuring mock data layer with MSW + in-memory stores
 - Configuring `simplix.config.ts` project settings
 - Debugging type errors in the derivation pipeline
 - Setting up i18n with `createI18nConfig`
