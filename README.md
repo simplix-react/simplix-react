@@ -29,6 +29,7 @@ simplix-react is a package-first React framework that auto-generates reusable do
 | [react](./packages/react) | [![npm](https://img.shields.io/npm/v/@simplix-react/react.svg)](https://www.npmjs.com/package/@simplix-react/react) | React Query hooks derived from contracts |
 | [form](./packages/form) | [![npm](https://img.shields.io/npm/v/@simplix-react/form.svg)](https://www.npmjs.com/package/@simplix-react/form) | TanStack Form hooks derived from contracts |
 | [auth](./packages/auth) | [![npm](https://img.shields.io/npm/v/@simplix-react/auth.svg)](https://www.npmjs.com/package/@simplix-react/auth) | Authentication middleware (Bearer, API Key, OAuth2) |
+| [access](./packages/access) | [![npm](https://img.shields.io/npm/v/@simplix-react/access.svg)](https://www.npmjs.com/package/@simplix-react/access) | CASL-based authorization (RBAC/ABAC) with React bindings |
 | [mock](./packages/mock) | [![npm](https://img.shields.io/npm/v/@simplix-react/mock.svg)](https://www.npmjs.com/package/@simplix-react/mock) | MSW handlers + in-memory stores |
 | [i18n](./packages/i18n) | [![npm](https://img.shields.io/npm/v/@simplix-react/i18n.svg)](https://www.npmjs.com/package/@simplix-react/i18n) | i18next-based internationalization |
 | [testing](./packages/testing) | [![npm](https://img.shields.io/npm/v/@simplix-react/testing.svg)](https://www.npmjs.com/package/@simplix-react/testing) | Testing utilities |
