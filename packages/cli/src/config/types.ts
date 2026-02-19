@@ -1,3 +1,21 @@
+import type { HttpMethod, CrudRole } from "@simplix-react/contract";
+
+/**
+ * Defines how a CRUD role maps to HTTP method(s) and path pattern(s).
+ *
+ * Path patterns use basePath-relative segments:
+ * - `/` — basePath itself (collection)
+ * - `/:id` — basePath + any path param
+ * - `/*` — basePath + any single segment
+ * - `/literal` — basePath + exact literal segment
+ */
+export interface CrudEndpointPattern {
+  /** HTTP method(s). Array for multiple methods (e.g., `["PUT", "PATCH"]`). */
+  method: HttpMethod | HttpMethod[];
+  /** BasePath-relative path pattern(s). Array for multiple patterns. */
+  path: string | string[];
+}
+
 /**
  * Environment entry for `.http` file generation.
  *
@@ -56,23 +74,25 @@ export interface SimplixConfig {
     environments?: Record<string, SimplixHttpEnvironment>;
   };
 
-  /** Mock layer defaults */
-  mock?: {
-    defaultLimit?: number;
-    maxLimit?: number;
-    /** PGlite IndexedDB storage path (default: "idb://simplix-mock") */
-    dataDir?: string;
-  };
-
   /** Code generation options */
   codegen?: {
     /** Prepend auto-generated header comment to generated files (default: true) */
     header?: boolean;
   };
 
+  /** Internationalization settings */
+  i18n?: {
+    /** Supported locale codes (default: ["en", "ko", "ja"]) */
+    locales?: string[];
+    /** Default locale code (default: "en") */
+    defaultLocale?: string;
+  };
+
   /** OpenAPI code generation options */
   openapi?: {
     /** Tag-based domain splitting: domainName → tagPatterns (exact string or /regex/) */
     domains?: Record<string, string[]>;
+    /** CRUD role detection patterns. When omitted, no CRUD roles are assigned. */
+    crud?: Partial<Record<CrudRole, CrudEndpointPattern>>;
   };
 }

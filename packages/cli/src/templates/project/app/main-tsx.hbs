@@ -1,0 +1,31 @@
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import App from "./app";
+{{#if enableI18n}}
+import { i18nReady } from "./app/i18n";
+{{/if}}
+
+async function enableMocking() {
+  if (import.meta.env.PROD) return;
+  const { setupMockWorker } = await import("@simplix-react/mock");
+  await setupMockWorker({
+    domains: [
+      // (await import("{{domainPkgName}}/mock")).{{domainName}}Mock,
+    ],
+  });
+}
+
+{{#if enableI18n}}
+Promise.all([enableMocking(), i18nReady]).then(() => {
+{{else}}
+enableMocking().then(() => {
+{{/if}}
+  const rootElement = document.getElementById("root");
+  if (!rootElement) throw new Error("Root element not found");
+  createRoot(rootElement).render(
+    <StrictMode>
+      <App />
+    </StrictMode>,
+  );
+});

@@ -1,11 +1,12 @@
 import { Command } from "commander";
 import { initCommand } from "./commands/init.js";
+import { initUiCommand } from "./commands/init-ui.js";
 import { addDomainCommand } from "./commands/add-domain.js";
 import { addModuleCommand } from "./commands/add-module.js";
 import { validateCommand } from "./commands/validate.js";
 import { i18nCodegenCommand } from "./commands/i18n-codegen.js";
-import { migrationCommand } from "./commands/migration.js";
 import { openapiCommand } from "./commands/openapi.js";
+import { scaffoldCrudCommand } from "./commands/scaffold-crud.js";
 import { frameworkVersion } from "./versions.js";
 
 const program = new Command();
@@ -20,7 +21,8 @@ program.addCommand(addDomainCommand);
 program.addCommand(addModuleCommand);
 program.addCommand(validateCommand);
 program.addCommand(i18nCodegenCommand);
-program.addCommand(migrationCommand);
 program.addCommand(openapiCommand);
+program.addCommand(initUiCommand);
+program.addCommand(scaffoldCrudCommand);
 
 program.parse();

@@ -1,0 +1,16 @@
+import { deriveHooks } from "@simplix-react/react";
+import { {{domainName}}Api } from "./contract";
+
+/**
+ * Auto-derived React Query hooks for the {{domainName}} domain.
+ *
+ * Usage:
+{{#each entities}}
+ *   {{../domainName}}Hooks.{{entityName}}.useList()    - paginated list query
+ *   {{../domainName}}Hooks.{{entityName}}.useGet(id)   - single item query
+ *   {{../domainName}}Hooks.{{entityName}}.useCreate()   - create mutation
+ *   {{../domainName}}Hooks.{{entityName}}.useUpdate()   - update mutation
+ *   {{../domainName}}Hooks.{{entityName}}.useDelete()   - delete mutation
+{{/each}}
+ */
+export const {{domainName}}Hooks = deriveHooks({{domainName}}Api);

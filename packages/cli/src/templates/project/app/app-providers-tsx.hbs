@@ -1,0 +1,31 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { ReactNode } from "react";
+{{#if enableI18n}}
+import { I18nProvider } from "@simplix-react/i18n/react";
+import { i18nAdapter } from "../i18n/index.js";
+{{/if}}
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60,
+      retry: 1,
+    },
+  },
+});
+
+export function AppProviders({ children }: { children: ReactNode }) {
+  return (
+{{#if enableI18n}}
+    <I18nProvider adapter={i18nAdapter}>
+      <QueryClientProvider client={queryClient}>
+        {children}
+      </QueryClientProvider>
+    </I18nProvider>
+{{else}}
+    <QueryClientProvider client={queryClient}>
+      {children}
+    </QueryClientProvider>
+{{/if}}
+  );
+}

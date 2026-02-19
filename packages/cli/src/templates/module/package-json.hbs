@@ -1,0 +1,54 @@
+{
+  "name": "{{modulePkgName}}",
+  "version": "0.0.1",
+  "description": "{{PascalName}} module for {{projectName}}",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./features": {
+      "types": "./dist/features/index.d.ts",
+      "import": "./dist/features/index.js"
+    },
+    "./widgets": {
+      "types": "./dist/widgets/index.d.ts",
+      "import": "./dist/widgets/index.js"
+    }{{#if enableI18n}},
+    "./locales": {
+      "types": "./dist/locales/index.d.ts",
+      "import": "./dist/locales/index.js"
+    }{{/if}}
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "simplix-react": "{{fw.meta}}",
+    "lucide-react": "{{deps.lucideReact}}"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "@tanstack/react-query": ">=5.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "{{deps.eslintJs}}",
+    "@typescript-eslint/eslint-plugin": "{{deps.typescriptEslintEslintPlugin}}",
+    "@typescript-eslint/parser": "{{deps.typescriptEslintParser}}",
+    "eslint": "{{deps.eslint}}",
+    "react": "{{deps.react}}",
+    "@tanstack/react-query": "{{deps.tanstackReactQuery}}",
+    "tsup": "{{deps.tsup}}",
+    "typescript": "{{deps.typescript}}",
+    "vitest": "{{deps.vitest}}"
+  }
+}

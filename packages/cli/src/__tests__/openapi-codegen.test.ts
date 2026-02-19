@@ -1,11 +1,21 @@
 import { describe, it, expect } from "vitest";
 import { resolveRefs } from "../openapi/schema-resolver.js";
 import { extractEntities } from "../openapi/entity-extractor.js";
-import { toZodType, toSqlType, generateZodSchemas } from "../openapi/zod-codegen.js";
+import { toZodType, generateZodSchemas } from "../openapi/zod-codegen.js";
 import { generateHttpFile, generateHttpEnvJson } from "../openapi/http-file-gen.js";
 import { computeDiff, formatDiff } from "../openapi/diff-engine.js";
 import { createTagMatcher, entityMatchesDomain, groupEntitiesByDomain } from "../openapi/domain-splitter.js";
 import type { OpenAPISpec, ExtractedEntity, OpenAPISnapshot } from "../openapi/types.js";
+import type { CrudEndpointPattern } from "../config/types.js";
+import type { CrudRole } from "@simplix-react/contract";
+
+const standardCrud: Partial<Record<CrudRole, CrudEndpointPattern>> = {
+  create: { method: "POST", path: "/" },
+  list: { method: "GET", path: "/" },
+  get: { method: "GET", path: "/:id" },
+  update: { method: "PATCH", path: "/:id" },
+  delete: { method: "DELETE", path: "/:id" },
+};
 
 // --- Test fixtures ---
 
@@ -205,15 +215,24 @@ describe("entity-extractor", () => {
     expect(entities[0].path).toBe("/users");
   });
 
-  it("detects all CRUD operations", () => {
+  it("detects CRUD operations with config patterns", () => {
+    const entities = extractEntities(minimalSpec, standardCrud);
+    const ops = entities[0].operations;
+    const roles = ops.map((op) => op.role).filter(Boolean);
+
+    expect(roles).toContain("list");
+    expect(roles).toContain("get");
+    expect(roles).toContain("create");
+    expect(roles).toContain("update");
+    expect(roles).toContain("delete");
+  });
+
+  it("assigns no CRUD roles without config", () => {
     const entities = extractEntities(minimalSpec);
     const ops = entities[0].operations;
+    const roles = ops.map((op) => op.role).filter(Boolean);
 
-    expect(ops.list).toBe(true);
-    expect(ops.get).toBe(true);
-    expect(ops.create).toBe(true);
-    expect(ops.update).toBe(true);
-    expect(ops.delete).toBe(true);
+    expect(roles).toHaveLength(0);
   });
 
   it("extracts fields from response schema", () => {
@@ -227,14 +246,84 @@ describe("entity-extractor", () => {
     expect(idField?.required).toBe(true);
   });
 
-  it("separates createFields (excludes id/timestamps)", () => {
-    const entities = extractEntities(minimalSpec);
-    const createFields = entities[0].createFields;
+  it("stores bodySchema on create operation from POST requestBody", () => {
+    const entities = extractEntities(minimalSpec, standardCrud);
+    const createOp = entities[0].operations.find((op) => op.role === "create");
 
-    const fieldNames = createFields.map((f) => f.name);
-    expect(fieldNames).not.toContain("id");
-    expect(fieldNames).not.toContain("createdAt");
-    expect(fieldNames).not.toContain("updatedAt");
+    expect(createOp?.bodySchema).toBeDefined();
+    expect(createOp?.bodySchema?.properties).toHaveProperty("email");
+    expect(createOp?.bodySchema?.properties).toHaveProperty("name");
+    expect(createOp?.bodySchema?.properties).toHaveProperty("role");
+    expect(createOp?.bodySchema?.required).toEqual(["email", "name"]);
+  });
+
+  it("stores bodySchema on update operation from PATCH requestBody", () => {
+    const entities = extractEntities(minimalSpec, standardCrud);
+    const updateOp = entities[0].operations.find((op) => op.role === "update");
+
+    expect(updateOp?.bodySchema).toBeDefined();
+    expect(updateOp?.bodySchema?.properties).toHaveProperty("name");
+    expect(updateOp?.bodySchema?.properties).toHaveProperty("role");
+    // PATCH body has no required → undefined
+    expect(updateOp?.bodySchema?.required).toBeUndefined();
+  });
+
+  it("has no create operation bodySchema when no POST exists", () => {
+    const noPostSpec: OpenAPISpec = {
+      openapi: "3.0.3",
+      info: { title: "No POST", version: "1.0.0" },
+      paths: {
+        "/items": {
+          get: {
+            responses: {
+              "200": {
+                description: "OK",
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          id: { type: "string" },
+                          name: { type: "string" },
+                        },
+                        required: ["id", "name"],
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        "/items/{id}": {
+          get: {
+            responses: {
+              "200": {
+                description: "OK",
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "object",
+                      properties: {
+                        id: { type: "string" },
+                        name: { type: "string" },
+                      },
+                      required: ["id", "name"],
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    };
+
+    const entities = extractEntities(noPostSpec, standardCrud);
+    const createOp = entities[0].operations.find((op) => op.role === "create");
+    expect(createOp).toBeUndefined();
   });
 
   it("extracts entities with resolved $refs", () => {
@@ -244,6 +333,44 @@ describe("entity-extractor", () => {
     expect(entities).toHaveLength(1);
     expect(entities[0].name).toBe("product");
     expect(entities[0].fields.length).toBeGreaterThan(0);
+  });
+
+  it("does not assign list role when GET collection returns a map (non-array)", () => {
+    const mapSpec: OpenAPISpec = {
+      openapi: "3.0.3",
+      info: { title: "Map API", version: "1.0.0" },
+      paths: {
+        "/store/inventory": {
+          get: {
+            tags: ["store"],
+            operationId: "getInventory",
+            responses: {
+              "200": {
+                description: "OK",
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "object",
+                      additionalProperties: { type: "integer", format: "int32" },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    };
+
+    const entities = extractEntities(mapSpec);
+    expect(entities).toHaveLength(1);
+    const ops = entities[0].operations;
+    const listOp = ops.find((op) => op.role === "list");
+    expect(listOp).toBeUndefined();
+    // Should be a custom operation with no CRUD role
+    // cleanOperationId("getInventory", "inventory") strips entity name → "get"
+    expect(ops).toHaveLength(1);
+    expect(ops[0].role).toBeUndefined();
   });
 
   it("detects nested parent-child relationships", () => {
@@ -360,44 +487,61 @@ describe("zod-codegen", () => {
   });
 
   it("generates complete Zod schema file", () => {
-    const entities = extractEntities(minimalSpec);
+    const entities = extractEntities(minimalSpec, standardCrud);
     const code = generateZodSchemas(entities);
 
     expect(code).toContain('import { z } from "zod"');
     expect(code).toContain("export const userSchema = z.object({");
-    expect(code).toContain("export const createUserSchema");
-    expect(code).toContain("export const updateUserSchema");
+    expect(code).toContain("export const createUserSchema = z.object({");
+    expect(code).toContain("export const updateUserSchema = z.object({");
     expect(code).toContain("export type User =");
     expect(code).toContain("export type CreateUser =");
     expect(code).toContain("export type UpdateUser =");
-  });
-});
-
-describe("sql-type-mapping", () => {
-  it("maps string+uuid to UUID", () => {
-    expect(toSqlType({ type: "string", format: "uuid" })).toBe("UUID");
+    // Should NOT contain mechanical derivation patterns
+    expect(code).not.toContain(".omit(");
+    expect(code).not.toContain(".partial()");
   });
 
-  it("maps string+datetime to TIMESTAMPTZ", () => {
-    expect(toSqlType({ type: "string", format: "date-time" })).toBe(
-      "TIMESTAMPTZ",
-    );
-  });
+  it("does not generate create/update schemas when no requestBody", () => {
+    const noBodySpec: OpenAPISpec = {
+      openapi: "3.0.3",
+      info: { title: "No Body", version: "1.0.0" },
+      paths: {
+        "/items": {
+          get: {
+            responses: {
+              "200": {
+                description: "OK",
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          id: { type: "string" },
+                          name: { type: "string" },
+                        },
+                        required: ["id", "name"],
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    };
 
-  it("maps string to TEXT", () => {
-    expect(toSqlType({ type: "string" })).toBe("TEXT");
-  });
+    const entities = extractEntities(noBodySpec);
+    const code = generateZodSchemas(entities);
 
-  it("maps integer to INTEGER", () => {
-    expect(toSqlType({ type: "integer" })).toBe("INTEGER");
-  });
-
-  it("maps boolean to BOOLEAN", () => {
-    expect(toSqlType({ type: "boolean" })).toBe("BOOLEAN");
-  });
-
-  it("maps array to JSONB", () => {
-    expect(toSqlType({ type: "array" })).toBe("JSONB");
+    expect(code).toContain("export const itemSchema = z.object({");
+    expect(code).not.toContain("createItemSchema");
+    expect(code).not.toContain("updateItemSchema");
+    expect(code).not.toContain("CreateItem");
+    expect(code).not.toContain("UpdateItem");
   });
 });
 
@@ -409,24 +553,36 @@ describe("http-file-gen", () => {
       pluralName: "users",
       path: "/users",
       fields: [],
-      createFields: [
-        { name: "email", snakeName: "email", type: "string", format: "email", zodType: "z.string().email()", sqlType: "TEXT", required: true, nullable: false },
-        { name: "name", snakeName: "name", type: "string", zodType: "z.string()", sqlType: "TEXT", required: true, nullable: false },
-      ],
-      updateFields: [
-        { name: "email", snakeName: "email", type: "string", format: "email", zodType: "z.string().email()", sqlType: "TEXT", required: false, nullable: false },
-        { name: "name", snakeName: "name", type: "string", zodType: "z.string()", sqlType: "TEXT", required: false, nullable: false },
-      ],
       queryParams: [],
-      operations: { list: true, get: true, create: true, update: true, delete: true },
+      operations: [
+        { name: "list", method: "GET", path: "/users", role: "list", hasInput: false, queryParams: [] },
+        { name: "get", method: "GET", path: "/users/:userId", role: "get", hasInput: false, queryParams: [] },
+        {
+          name: "create", method: "POST", path: "/users", role: "create", hasInput: true, queryParams: [],
+          bodySchema: {
+            type: "object",
+            properties: { email: { type: "string", format: "email" }, name: { type: "string" } },
+            required: ["email", "name"],
+          },
+        },
+        {
+          name: "update", method: "PATCH", path: "/users/:userId", role: "update", hasInput: true, queryParams: [],
+          bodySchema: {
+            type: "object",
+            properties: { email: { type: "string", format: "email" }, name: { type: "string" } },
+          },
+        },
+        { name: "delete", method: "DELETE", path: "/users/:userId", role: "delete", hasInput: false, queryParams: [] },
+      ],
       tags: [],
     };
 
     const result = generateHttpFile(entity, "/api/test");
 
-    expect(result).toContain("### List Users");
+    expect(result).toContain("### List User");
     expect(result).toContain("GET {{baseUrl}}/api/test/users");
-    expect(result).toContain("### Get User by ID");
+    expect(result).toContain("### Get User");
+    expect(result).toContain("GET {{baseUrl}}/api/test/users/{{userId}}");
     expect(result).toContain("### Create User");
     expect(result).toContain("POST {{baseUrl}}/api/test/users");
     expect(result).toContain("### Update User");
@@ -458,13 +614,17 @@ describe("diff-engine", () => {
     pluralName: "users",
     path: "/users",
     fields: [
-      { name: "id", snakeName: "id", type: "string", format: "uuid", zodType: "z.string().uuid()", sqlType: "UUID", required: true, nullable: false },
-      { name: "name", snakeName: "name", type: "string", zodType: "z.string()", sqlType: "TEXT", required: true, nullable: false },
+      { name: "id", snakeName: "id", type: "string", format: "uuid", zodType: "z.string().uuid()", required: true, nullable: false },
+      { name: "name", snakeName: "name", type: "string", zodType: "z.string()", required: true, nullable: false },
     ],
-    createFields: [],
-    updateFields: [],
     queryParams: [],
-    operations: { list: true, get: true, create: true, update: true, delete: true },
+    operations: [
+      { name: "list", method: "GET", path: "/users", role: "list", hasInput: false, queryParams: [] },
+      { name: "get", method: "GET", path: "/users/:id", role: "get", hasInput: false, queryParams: [] },
+      { name: "create", method: "POST", path: "/users", role: "create", hasInput: true, queryParams: [] },
+      { name: "update", method: "PATCH", path: "/users/:id", role: "update", hasInput: true, queryParams: [] },
+      { name: "delete", method: "DELETE", path: "/users/:id", role: "delete", hasInput: false, queryParams: [] },
+    ],
     tags: [],
   };
 
@@ -516,7 +676,7 @@ describe("diff-engine", () => {
       ...baseEntity,
       fields: [
         ...baseEntity.fields,
-        { name: "email", snakeName: "email", type: "string", format: "email", zodType: "z.string().email()", sqlType: "TEXT", required: true, nullable: false },
+        { name: "email", snakeName: "email", type: "string", format: "email", zodType: "z.string().email()", required: true, nullable: false },
       ],
     };
 
@@ -632,10 +792,10 @@ describe("domain-splitter", () => {
     pluralName: name + "s",
     path: `/${name}s`,
     fields: [],
-    createFields: [],
-    updateFields: [],
     queryParams: [],
-    operations: { list: true, get: false, create: false, update: false, delete: false },
+    operations: [
+      { name: "list", method: "GET", path: `/${name}s`, role: "list", hasInput: false, queryParams: [] },
+    ],
     tags,
   });
 
@@ -778,5 +938,115 @@ describe("domain-splitter", () => {
       const groups = groupEntitiesByDomain([], { iam: ["IAM"] }, "misc");
       expect(groups).toEqual([]);
     });
+  });
+});
+
+describe("CRUD pattern matching", () => {
+  it("matches multiple methods in a single pattern", () => {
+    const crud: Partial<Record<CrudRole, CrudEndpointPattern>> = {
+      update: { method: ["PUT", "PATCH"], path: "/:id" },
+    };
+    const spec: OpenAPISpec = {
+      openapi: "3.0.3",
+      info: { title: "Multi Method", version: "1.0.0" },
+      paths: {
+        "/items/{id}": {
+          put: {
+            requestBody: { content: { "application/json": { schema: { type: "object", properties: { name: { type: "string" } } } } } },
+            responses: { "200": { description: "OK" } },
+          },
+          patch: {
+            requestBody: { content: { "application/json": { schema: { type: "object", properties: { name: { type: "string" } } } } } },
+            responses: { "200": { description: "OK" } },
+          },
+        },
+      },
+    };
+
+    const entities = extractEntities(spec, crud);
+    expect(entities).toHaveLength(1);
+    const roles = entities[0].operations.map((op) => op.role);
+    // Both PUT and PATCH should be update
+    expect(roles.filter((r) => r === "update")).toHaveLength(2);
+  });
+
+  it("matches multiple paths in a single pattern", () => {
+    const crud: Partial<Record<CrudRole, CrudEndpointPattern>> = {
+      update: { method: ["PUT", "PATCH"], path: ["/", "/:id"] },
+    };
+    const spec: OpenAPISpec = {
+      openapi: "3.0.3",
+      info: { title: "Multi Path", version: "1.0.0" },
+      paths: {
+        "/items": {
+          put: {
+            requestBody: { content: { "application/json": { schema: { type: "object", properties: { name: { type: "string" } } } } } },
+            responses: { "200": { description: "OK" } },
+          },
+        },
+        "/items/{id}": {
+          patch: {
+            requestBody: { content: { "application/json": { schema: { type: "object", properties: { name: { type: "string" } } } } } },
+            responses: { "200": { description: "OK" } },
+          },
+        },
+      },
+    };
+
+    const entities = extractEntities(spec, crud);
+    expect(entities).toHaveLength(1);
+    const roles = entities[0].operations.map((op) => op.role);
+    expect(roles.filter((r) => r === "update")).toHaveLength(2);
+  });
+
+  it("handles entities with no discoverable schema", () => {
+    const noSchemaSpec: OpenAPISpec = {
+      openapi: "3.0.3",
+      info: { title: "No Schema", version: "1.0.0" },
+      paths: {
+        "/things": {
+          post: {
+            responses: { "202": { description: "Accepted" } },
+          },
+        },
+      },
+    };
+
+    const entities = extractEntities(noSchemaSpec);
+    expect(entities).toHaveLength(1);
+    expect(entities[0].fields).toHaveLength(0);
+    const code = generateZodSchemas(entities);
+    expect(code).toContain("thingSchema = z.object({");
+  });
+});
+
+describe("zod-codegen allOf/oneOf/anyOf", () => {
+  it("converts allOf to merged z.object", () => {
+    const result = toZodType({
+      allOf: [
+        { type: "object", properties: { a: { type: "string" } }, required: ["a"] },
+        { type: "object", properties: { b: { type: "number" } } },
+      ],
+    });
+    expect(result).toContain("a: z.string()");
+    expect(result).toContain("b: z.number()");
+  });
+
+  it("converts oneOf to z.union", () => {
+    expect(toZodType({
+      oneOf: [{ type: "string" }, { type: "number" }],
+    })).toBe("z.union([z.string(), z.number()])");
+  });
+
+  it("converts anyOf to z.union", () => {
+    expect(toZodType({
+      anyOf: [{ type: "boolean" }, { type: "integer" }],
+    })).toBe("z.union([z.boolean(), z.number().int()])");
+  });
+
+  it("converts single-variant oneOf without union", () => {
+    expect(toZodType({
+      oneOf: [{ type: "string" }],
+    })).toBe("z.string()");
   });
 });

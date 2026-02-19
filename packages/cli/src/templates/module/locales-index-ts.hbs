@@ -1,0 +1,17 @@
+import { buildModuleTranslations } from "@simplix-react/i18n";
+
+export const PACKAGE_NAMESPACE = "{{namespace}}";
+
+export const {{camelCase moduleName}}Translations = buildModuleTranslations({
+  namespace: PACKAGE_NAMESPACE,
+  locales: {{{json locales}}},
+  components: {
+    // CLI will auto-populate as features/widgets are added
+    // Example:
+    // "widgets/editor": {
+    //   ko: () => import("./widgets/editor/ko.json"),
+    //   en: () => import("./widgets/editor/en.json"),
+    //   ja: () => import("./widgets/editor/ja.json"),
+    // },
+  },
+});

@@ -5,6 +5,7 @@ import type {
   DiffResult,
   EntityModification,
   FieldChange,
+  OperationChange,
 } from "./types.js";
 
 /**
@@ -91,10 +92,47 @@ function diffEntity(
     }
   }
 
+  // Operation-level diffing
+  const prevOpMap = new Map(prev.operations.map((o) => [o.name, o]));
+  const currOpMap = new Map(curr.operations.map((o) => [o.name, o]));
+
+  const addedOperations = curr.operations
+    .filter((o) => !prevOpMap.has(o.name))
+    .map((o) => o.name);
+  const removedOperations = prev.operations
+    .filter((o) => !currOpMap.has(o.name))
+    .map((o) => o.name);
+  const changedOperations: OperationChange[] = [];
+
+  for (const [name, currOp] of currOpMap) {
+    const prevOp = prevOpMap.get(name);
+    if (!prevOp) continue;
+
+    if (prevOp.method !== currOp.method) {
+      changedOperations.push({
+        name,
+        field: "method",
+        from: prevOp.method,
+        to: currOp.method,
+      });
+    }
+    if (prevOp.path !== currOp.path) {
+      changedOperations.push({
+        name,
+        field: "path",
+        from: prevOp.path,
+        to: currOp.path,
+      });
+    }
+  }
+
   if (
     addedFields.length === 0 &&
     removedFields.length === 0 &&
-    changedFields.length === 0
+    changedFields.length === 0 &&
+    addedOperations.length === 0 &&
+    removedOperations.length === 0 &&
+    changedOperations.length === 0
   ) {
     return null;
   }
@@ -104,6 +142,9 @@ function diffEntity(
     addedFields,
     removedFields,
     changedFields,
+    addedOperations,
+    removedOperations,
+    changedOperations,
   };
 }
 
@@ -147,6 +188,19 @@ export function formatDiff(diff: DiffResult): string {
       for (const change of mod.changedFields) {
         lines.push(
           pc.cyan(`    ✎ ${change.name}: ${change.from} → ${change.to}`),
+        );
+      }
+      for (const name of mod.addedOperations) {
+        lines.push(pc.green(`    ✚ operation: ${name}`));
+      }
+      for (const name of mod.removedOperations) {
+        lines.push(pc.red(`    ✖ operation: ${name}`));
+      }
+      for (const change of mod.changedOperations) {
+        lines.push(
+          pc.cyan(
+            `    ✎ operation ${change.name}.${change.field}: ${change.from} → ${change.to}`,
+          ),
         );
       }
     }

@@ -1,0 +1,27 @@
+// {{PascalName}} Module Manifest
+
+export interface ModuleManifest {
+  id: string;
+  name: string;
+  version: string;
+  navigation: {
+    label: string;
+    icon: string;
+    path: string;
+    order: number;
+  };
+  capabilities: string[];
+}
+
+export const {{camelCase moduleName}}Manifest: ModuleManifest = {
+  id: "{{moduleName}}",
+  name: "{{PascalName}}",
+  version: "0.0.1",
+  navigation: {
+    label: "{{PascalName}}",
+    icon: "Layout",
+    path: "/{{moduleName}}",
+    order: 10,
+  },
+  capabilities: [],
+};

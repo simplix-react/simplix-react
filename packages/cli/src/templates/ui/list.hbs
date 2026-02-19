@@ -1,0 +1,123 @@
+{{#unless packageName}}
+import { useMemo } from "react";
+
+{{/unless}}
+import { Button, CrudList, Flex, Stack, Text, useCrudList } from "@simplix-react/ui";
+import { useEntityTranslation } from "@simplix-react/i18n/react";
+{{#if packageName}}
+import { {{domainCamel}}Hooks } from "{{packageName}}";
+{{/if}}
+
+interface {{EntityPascal}} {
+{{#each fields}}
+  {{this.name}}: {{this.tsType}};
+{{/each}}
+}
+
+{{#unless packageName}}
+function useMockList(): { data: {{EntityPascal}}[] | undefined; isLoading: boolean; error: Error | null } {
+  const data = useMemo<{{EntityPascal}}[]>(() => [], []);
+  return { data, isLoading: false, error: null };
+}
+{{/unless}}
+
+interface {{EntityPascal}}ListProps {
+  onView?: (row: {{EntityPascal}}) => void;
+{{#if hasCreate}}
+  onCreate?: () => void;
+{{/if}}
+{{#if hasUpdate}}
+  onEdit?: (row: {{EntityPascal}}) => void;
+{{/if}}
+{{#if hasDelete}}
+  onDelete?: (row: {{EntityPascal}}) => void;
+{{/if}}
+}
+
+export function {{EntityPascal}}List({ onView{{#if hasCreate}}, onCreate{{/if}}{{#if hasUpdate}}, onEdit{{/if}}{{#if hasDelete}}, onDelete{{/if}} }: {{EntityPascal}}ListProps) {
+  const { fieldLabel } = useEntityTranslation("{{entity}}");
+{{#if packageName}}
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const list = useCrudList<{{EntityPascal}}>({{domainCamel}}Hooks.{{entity}}.useList as any);
+{{else}}
+  // TODO: Connect to domain package hooks
+  const list = useCrudList<{{EntityPascal}}>(useMockList);
+{{/if}}
+
+  return (
+    <CrudList>
+      <CrudList.Toolbar>
+        <CrudList.Search
+          value={list.filters.search}
+          onChange={list.filters.setSearch}
+          placeholder="Search {{entity}}..."
+        />
+{{#if hasCreate}}
+        <Button onClick={onCreate}>New {{EntityPascal}}</Button>
+{{/if}}
+      </CrudList.Toolbar>
+
+      <CrudList.Table
+        data={list.data}
+        isLoading={list.isLoading}
+        onRowClick={(row) => onView?.(row)}
+        sort={list.sort.field ? { field: list.sort.field, direction: list.sort.direction } : null}
+        onSortChange={(s) => list.sort.setSort(s.field, s.direction)}
+        selectedIndices={list.selection.selected}
+        onSelectionChange={list.selection.toggle}
+        onSelectAll={() => list.selection.toggleAll(list.data)}
+        cardBreakpoint={480}
+        cardRender={({ row }) => (
+          <Stack gap="xs">
+{{#each fields}}
+{{#if @first}}
+            <Text className="font-semibold">{row.{{this.name~}} }</Text>
+{{else}}
+            <Text size="sm" className="text-muted-foreground">{fieldLabel("{{this.name}}")}: {row.{{this.name~}} }</Text>
+{{/if}}
+{{/each}}
+          </Stack>
+        )}
+      >
+{{#each fields}}
+        <CrudList.Column<{{../EntityPascal}}>
+          field="{{this.name}}"
+          header={fieldLabel("{{this.name}}")}
+        />
+{{/each}}
+{{#if (or hasUpdate hasDelete)}}
+        <CrudList.Column<{{EntityPascal}}>
+          header=""
+          width={120}
+        >
+          {({ row }) => (
+            <Flex gap="xs" justify="end">
+{{#if hasUpdate}}
+              <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); onEdit?.(row); }}>
+                Edit
+              </Button>
+{{/if}}
+{{#if hasDelete}}
+              <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); onDelete?.(row); }}>
+                Delete
+              </Button>
+{{/if}}
+            </Flex>
+          )}
+        </CrudList.Column>
+{{/if}}
+      </CrudList.Table>
+
+      <CrudList.Pagination
+        page={list.pagination.page}
+        pageSize={list.pagination.pageSize}
+        total={list.pagination.total}
+        totalPages={list.pagination.totalPages}
+        onPageChange={list.pagination.setPage}
+        onPageSizeChange={list.pagination.setPageSize}
+      />
+
+      {list.emptyReason && <CrudList.Empty reason={list.emptyReason} />}
+    </CrudList>
+  );
+}

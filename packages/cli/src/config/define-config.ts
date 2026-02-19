@@ -19,7 +19,7 @@ import type { SimplixConfig } from "./types.js";
  * export default defineConfig({
  *   api: { baseUrl: "/api/v1" },
  *   packages: { prefix: "my-app" },
- *   mock: { defaultLimit: 20 },
+ *   codegen: { header: true },
  * });
  * ```
  *

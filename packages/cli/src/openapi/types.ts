@@ -1,4 +1,8 @@
+import type { HttpMethod, CrudRole } from "@simplix-react/contract";
+
 // OpenAPI parsing result types
+
+export type { HttpMethod, CrudRole };
 
 export interface OpenAPISpec {
   openapi: string;
@@ -77,7 +81,6 @@ export interface EntityField {
   type: string;
   format?: string;
   zodType: string;
-  sqlType: string;
   required: boolean;
   nullable: boolean;
   default?: unknown;
@@ -91,12 +94,16 @@ export interface QueryParam {
   description?: string;
 }
 
-export interface CRUDOperations {
-  list: boolean;
-  get: boolean;
-  create: boolean;
-  update: boolean;
-  delete: boolean;
+export interface ExtractedOperation {
+  name: string;
+  method: HttpMethod;
+  path: string;
+  role?: CrudRole;
+  hasInput: boolean;
+  bodySchema?: SchemaObject;
+  contentType?: "json" | "multipart";
+  operationId?: string;
+  queryParams: QueryParam[];
 }
 
 export interface ExtractedEntity {
@@ -106,11 +113,10 @@ export interface ExtractedEntity {
   path: string;
   parent?: { param: string; path: string };
   fields: EntityField[];
-  createFields: EntityField[];
-  updateFields: EntityField[];
   queryParams: QueryParam[];
-  operations: CRUDOperations;
+  operations: ExtractedOperation[];
   tags: string[];
+  schemaOverride?: string;
 }
 
 export interface DomainGroup {
@@ -120,6 +126,7 @@ export interface DomainGroup {
 
 /** Snapshot stored as .openapi-snapshot.json for diff comparison */
 export interface OpenAPISnapshot {
+  version?: number;
   generatedAt: string;
   specSource: string;
   entities: ExtractedEntity[];
@@ -133,11 +140,21 @@ export interface DiffResult {
   hasChanges: boolean;
 }
 
+export interface OperationChange {
+  name: string;
+  field: string;
+  from: string;
+  to: string;
+}
+
 export interface EntityModification {
   entityName: string;
   addedFields: EntityField[];
   removedFields: string[];
   changedFields: FieldChange[];
+  addedOperations: string[];
+  removedOperations: string[];
+  changedOperations: OperationChange[];
 }
 
 export interface FieldChange {

@@ -15,8 +15,9 @@ import { extractEntities } from "../openapi/entity-extractor.js";
 import { generateZodSchemas } from "../openapi/zod-codegen.js";
 import { generateHttpFile, generateHttpEnvJson } from "../openapi/http-file-gen.js";
 import { computeDiff, formatDiff } from "../openapi/diff-engine.js";
-import type { ExtractedEntity, DomainGroup, OpenAPISnapshot } from "../openapi/types.js";
+import type { ExtractedEntity, ExtractedOperation, DomainGroup, OpenAPISnapshot } from "../openapi/types.js";
 import { groupEntitiesByDomain } from "../openapi/domain-splitter.js";
+import { generateSeedCode } from "../openapi/seed-generator.js";
 import {
   openapiPackageJsonWithEslintConfig,
   openapiPackageJsonStandalone,
@@ -25,16 +26,15 @@ import {
   openapiEslintConfigStandalone,
   openapiTsconfigJson,
   openapiUserIndexTs,
+  openapiUserContractTs,
+  openapiUserHooksTs,
   openapiUserMockIndexTs,
   openapiGeneratedIndexTs,
   openapiGeneratedIndexWithFormsTs,
   openapiGeneratedContractTs,
   openapiGeneratedHooksTs,
   openapiGeneratedFormHooksTs,
-  openapiGeneratedMockHandlersTs,
-  openapiGeneratedMockMigrationsTs,
-  openapiMockSeedTs,
-} from "../templates/openapi/openapi-templates.js";
+} from "../templates/openapi/index.js";
 
 interface OpenAPIFlags {
   domain?: string;
@@ -112,7 +112,7 @@ export const openapiCommand = new Command("openapi")
     const resolvedSpec = resolveRefs(spec);
 
     // 5. Extract entities
-    let entities = extractEntities(resolvedSpec);
+    let entities = extractEntities(resolvedSpec, config.openapi?.crud);
 
     if (entities.length === 0) {
       log.error("No CRUD entities found in the OpenAPI spec.");
@@ -234,7 +234,7 @@ async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
   try {
     const configEslintPkgName = await detectConfigEslintPackage(outputBase, scope);
     const generateForms = flags.forms !== false;
-    const apiBasePath = `${config.api?.baseUrl ?? "/api"}/${domainName}`;
+    const apiBasePath = config.api?.baseUrl ?? "";
     const ctx = buildTemplateContext({
       domainName, domainPkgName, configEslintPkgName,
       projectName: baseName, scope, apiBasePath, entities, generateForms,
@@ -278,7 +278,8 @@ async function confirmRegeneration(opts: {
   const { isUpdate, isFirstRun, snapshotPath, domainPkgName, dirName, entities, flags } = opts;
 
   if (isUpdate) {
-    const previousSnapshot = await readJsonFile<OpenAPISnapshot>(snapshotPath);
+    const rawSnapshot = await readJsonFile<OpenAPISnapshot>(snapshotPath);
+    const previousSnapshot = migrateSnapshot(rawSnapshot);
     const diff = computeDiff(previousSnapshot, entities);
 
     if (!diff.hasChanges && !flags.force) {
@@ -326,11 +327,8 @@ async function confirmRegeneration(opts: {
   return true;
 }
 
-async function cleanGeneratedDirs(targetDir: string, flags: OpenAPIFlags): Promise<void> {
+async function cleanGeneratedDirs(targetDir: string, _flags: OpenAPIFlags): Promise<void> {
   await rm(join(targetDir, "src/generated"), { recursive: true, force: true });
-  if (flags.mock !== false) {
-    await rm(join(targetDir, "src/mock/generated"), { recursive: true, force: true });
-  }
 }
 
 function buildGeneratedFiles(opts: {
@@ -353,11 +351,6 @@ function buildGeneratedFiles(opts: {
 
   if (generateForms) {
     files["src/generated/form-hooks.ts"] = renderTemplate(openapiGeneratedFormHooksTs, ctx);
-  }
-
-  if (flags.mock !== false) {
-    files["src/mock/generated/handlers.ts"] = renderTemplate(openapiGeneratedMockHandlersTs, ctx);
-    files["src/mock/generated/migrations.ts"] = renderTemplate(openapiGeneratedMockMigrationsTs, ctx);
   }
 
   if (flags.http !== false) {
@@ -389,10 +382,11 @@ function buildScaffoldFiles(
   files["tsconfig.json"] = openapiTsconfigJson;
   files["eslint.config.js"] = renderTemplate(eslintTemplate, ctx);
   files["src/index.ts"] = openapiUserIndexTs;
+  files["src/contract.ts"] = renderTemplate(openapiUserContractTs, ctx);
+  files["src/hooks.ts"] = renderTemplate(openapiUserHooksTs, ctx);
 
   if (flags.mock !== false) {
-    files["src/mock/index.ts"] = openapiUserMockIndexTs;
-    files["src/mock/seed.ts"] = renderTemplate(openapiMockSeedTs, ctx);
+    files["src/mock/index.ts"] = renderTemplate(openapiUserMockIndexTs, ctx);
   }
 
   return files;
@@ -420,11 +414,85 @@ async function saveSnapshot(
   entities: ExtractedEntity[],
 ): Promise<void> {
   const snapshot: OpenAPISnapshot = {
+    version: 2,
     generatedAt: new Date().toISOString(),
     specSource,
     entities,
   };
   await writeFile(snapshotPath, JSON.stringify(snapshot, null, 2), "utf-8");
+}
+
+/**
+ * Migrate v1 snapshot (boolean CRUDOperations) to v2 (ExtractedOperation[]).
+ */
+function migrateSnapshot(snapshot: OpenAPISnapshot): OpenAPISnapshot {
+  if (snapshot.version === 2) return snapshot;
+
+  // v1 snapshots have operations as boolean flags
+  return {
+    ...snapshot,
+    version: 2,
+    entities: snapshot.entities.map((entity) => {
+      if (Array.isArray(entity.operations)) return entity;
+
+      // v1 format: { list: boolean, get: boolean, ... }
+      const boolOps = entity.operations as unknown as Record<string, boolean>;
+      const operations: ExtractedOperation[] = [];
+
+      if (boolOps.list) {
+        operations.push({
+          name: "list",
+          method: "GET",
+          path: entity.path,
+          role: "list",
+          hasInput: false,
+          queryParams: entity.queryParams ?? [],
+        });
+      }
+      if (boolOps.get) {
+        operations.push({
+          name: "get",
+          method: "GET",
+          path: `${entity.path}/:id`,
+          role: "get",
+          hasInput: false,
+          queryParams: [],
+        });
+      }
+      if (boolOps.create) {
+        operations.push({
+          name: "create",
+          method: "POST",
+          path: entity.path,
+          role: "create",
+          hasInput: true,
+          queryParams: [],
+        });
+      }
+      if (boolOps.update) {
+        operations.push({
+          name: "update",
+          method: "PATCH",
+          path: `${entity.path}/:id`,
+          role: "update",
+          hasInput: true,
+          queryParams: [],
+        });
+      }
+      if (boolOps.delete) {
+        operations.push({
+          name: "delete",
+          method: "DELETE",
+          path: `${entity.path}/:id`,
+          role: "delete",
+          hasInput: false,
+          queryParams: [],
+        });
+      }
+
+      return { ...entity, operations };
+    }),
+  };
 }
 
 function printSummary(opts: {
@@ -506,10 +574,48 @@ function buildTemplateContext(opts: {
     generateForms: opts.generateForms,
     PascalName:
       opts.domainName.charAt(0).toUpperCase() + opts.domainName.slice(1),
+    allSchemaImports: buildAllSchemaImports(opts.entities),
+    seedData: generateSeedCode(opts.entities, opts.domainName),
     entities: opts.entities.map((e) => ({
       ...e,
+      operationEntries: buildOperationEntries(e),
     })),
   });
+}
+
+function buildAllSchemaImports(entities: ExtractedEntity[]): string {
+  const imports: string[] = [];
+
+  for (const entity of entities) {
+    imports.push(`${entity.name}Schema`);
+    for (const op of entity.operations) {
+      if (op.bodySchema) {
+        imports.push(`${op.name}${entity.pascalName}Schema`);
+      }
+    }
+  }
+
+  return imports.join(", ");
+}
+
+function buildOperationEntries(entity: ExtractedEntity): string {
+  const lines: string[] = [];
+
+  for (const op of entity.operations) {
+    const parts = [`method: "${op.method}"`, `path: "${op.path}"`];
+
+    if (op.bodySchema) {
+      parts.push(`input: ${op.name}${entity.pascalName}Schema`);
+    }
+
+    if (op.contentType === "multipart") {
+      parts.push(`contentType: "multipart"`);
+    }
+
+    lines.push(`        ${op.name}: { ${parts.join(", ")} },`);
+  }
+
+  return lines.join("\n");
 }
 
 const GENERATED_HEADER_TS =
@@ -548,11 +654,6 @@ function buildFileList(
     files["src/generated/form-hooks.ts"] = true;
   }
 
-  if (flags.mock !== false) {
-    files["src/mock/generated/handlers.ts"] = true;
-    files["src/mock/generated/migrations.ts"] = true;
-  }
-
   if (flags.http !== false) {
     files["http/http-client.env.json"] = true;
     for (const e of entities) {
@@ -567,10 +668,11 @@ function buildFileList(
     files["tsconfig.json"] = true;
     files["eslint.config.js"] = true;
     files["src/index.ts"] = true;
+    files["src/contract.ts"] = true;
+    files["src/hooks.ts"] = true;
 
     if (flags.mock !== false) {
       files["src/mock/index.ts"] = true;
-      files["src/mock/seed.ts"] = true;
     }
   }
 

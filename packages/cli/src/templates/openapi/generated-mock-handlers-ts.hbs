@@ -1,0 +1,5 @@
+import type { HttpHandler } from "msw";
+import { deriveMockHandlers } from "@simplix-react/mock";
+import { {{domainName}}Api } from "../contract";
+
+export const handlers: HttpHandler[] = deriveMockHandlers({{domainName}}Api.config);

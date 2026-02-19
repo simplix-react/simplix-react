@@ -15,6 +15,7 @@ import {
 } from "../templates/project/root-files.js";
 import { withVersions } from "../versions.js";
 import {
+  appEslintConfig,
   appPackageJson,
   appTsconfigJson,
   viteConfig,
@@ -25,13 +26,13 @@ import {
   appProvidersTsx,
   errorFallbacksTsx,
   pageLoadingFallbackTsx,
+  appFeaturesIndexTs,
+  appWidgetsIndexTs,
 } from "../templates/project/app-files.js";
 import {
   i18nConfigTs,
   i18nConstantsTs,
-  commonEnJson,
-  commonKoJson,
-  commonJaJson,
+  getCommonTranslationJson,
 } from "../templates/project/i18n-files.js";
 
 export interface InitOptions {
@@ -67,16 +68,16 @@ export default defineConfig({
     },
   },
 
-  // ── Mock ───────────────────────────────────────────────────
-  mock: {
-    /** Default page size for mock list queries */
-    defaultLimit: 50,
-    /** Maximum allowed page size */
-    maxLimit: 100,
-    /** PGlite IndexedDB storage path */
-    dataDir: "idb://{{projectName}}-mock",
+{{#if enableI18n}}
+  // ── i18n ─────────────────────────────────────────────────────
+  i18n: {
+    /** Supported locale codes */
+    locales: {{{json locales}}},
+    /** Default locale */
+    defaultLocale: "{{defaultLocale}}",
   },
 
+{{/if}}
   // ── Code Generation ────────────────────────────────────────
   codegen: {
     /** Prepend auto-generated header comment to generated files */
@@ -211,6 +212,7 @@ export const initCommand = new Command("init")
               verbatimModuleSyntax: true,
               resolveJsonModule: true,
               forceConsistentCasingInFileNames: true,
+              noEmit: true,
               lib: ["ES2022"],
             },
             exclude: ["node_modules", "dist"],
@@ -244,6 +246,7 @@ export const initCommand = new Command("init")
             appPackageJson,
             appCtx,
           ),
+          [`apps/${ctx.projectName}-demo/eslint.config.js`]: appEslintConfig,
           [`apps/${ctx.projectName}-demo/tsconfig.json`]: renderTemplate(
             appTsconfigJson,
             appCtx,
@@ -266,10 +269,18 @@ export const initCommand = new Command("init")
             renderTemplate(appProvidersTsx, appCtx),
           [`apps/${ctx.projectName}-demo/src/app/providers/index.ts`]:
             'export { AppProviders } from "./app-providers.js";\n',
-          [`apps/${ctx.projectName}-demo/src/shared/error-fallbacks.tsx`]:
+          // FSD layers
+          [`apps/${ctx.projectName}-demo/src/features/index.ts`]:
+            appFeaturesIndexTs,
+          [`apps/${ctx.projectName}-demo/src/widgets/index.ts`]:
+            appWidgetsIndexTs,
+          [`apps/${ctx.projectName}-demo/src/shared/ui/error-fallbacks.tsx`]:
             errorFallbacksTsx,
-          [`apps/${ctx.projectName}-demo/src/shared/page-loading-fallback.tsx`]:
+          [`apps/${ctx.projectName}-demo/src/shared/ui/page-loading-fallback.tsx`]:
             pageLoadingFallbackTsx,
+          [`apps/${ctx.projectName}-demo/public/.gitkeep`]: "",
+          [`apps/${ctx.projectName}-demo/src/shared/lib/.gitkeep`]: "",
+          [`apps/${ctx.projectName}-demo/src/shared/config/.gitkeep`]: "",
           [`apps/${ctx.projectName}-demo/src/routes/__root.tsx`]: renderTemplate(
             `import { createRootRoute, Outlet } from "@tanstack/react-router";
 
@@ -303,18 +314,18 @@ function HomePage() {
         if (options.enableI18n) {
           spinner.text = "Creating i18n files...";
           const i18nCtx = { ...appCtx };
-          await writeFiles(targetDir, {
+          const i18nFiles: Record<string, string> = {
             [`apps/${ctx.projectName}-demo/src/app/i18n/index.ts`]:
               renderTemplate(i18nConfigTs, i18nCtx),
             [`apps/${ctx.projectName}-demo/src/app/i18n/constants.ts`]:
               renderTemplate(i18nConstantsTs, i18nCtx),
-            [`apps/${ctx.projectName}-demo/src/locales/common/en.json`]:
-              commonEnJson,
-            [`apps/${ctx.projectName}-demo/src/locales/common/ko.json`]:
-              commonKoJson,
-            [`apps/${ctx.projectName}-demo/src/locales/common/ja.json`]:
-              commonJaJson,
-          });
+          };
+          for (const locale of options.locales) {
+            i18nFiles[
+              `apps/${ctx.projectName}-demo/src/locales/common/${locale}.json`
+            ] = getCommonTranslationJson(locale);
+          }
+          await writeFiles(targetDir, i18nFiles);
         }
       }
 

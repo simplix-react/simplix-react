@@ -1,0 +1,21 @@
+import { deriveHooks } from "@simplix-react/react";
+{{#if generateForms}}
+import { deriveFormHooks } from "@simplix-react/form";
+{{/if}}
+import { {{domainName}}Api } from "./contract";
+
+export const {{domainName}}Hooks = deriveHooks({{domainName}}Api);
+{{#if generateForms}}
+export const {{domainName}}FormHooks = deriveFormHooks({{domainName}}Api, {{domainName}}Hooks);
+{{/if}}
+
+// Add custom hooks below.
+// This file is preserved across `simplix openapi` regeneration.
+// Hooks are derived from your contract.ts, so customizeApi() changes
+// are automatically reflected here.
+//
+// Examples:
+//   import { useQuery } from "@tanstack/react-query";
+//   export function useCustomAggregation() {
+//     return useQuery({ queryKey: ["custom"], queryFn: () => fetch("/api/...") });
+//   }

@@ -1,0 +1,39 @@
+{
+  "name": "{{appPkgName}}",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:app": "vite",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "simplix-react": "{{fw.meta}}",
+    "@tanstack/react-query": "{{deps.tanstackReactQuery}}",
+    "@tanstack/react-router": "{{deps.tanstackReactRouter}}",
+    "lucide-react": "{{deps.lucideReact}}",
+    "react": "{{deps.react}}",
+    "react-dom": "{{deps.reactDom}}"
+  },
+  "devDependencies": {
+    "@tanstack/router-plugin": "{{deps.tanstackRouterPlugin}}",
+    "@eslint/js": "{{deps.eslintJs}}",
+    "@typescript-eslint/eslint-plugin": "{{deps.typescriptEslintEslintPlugin}}",
+    "@typescript-eslint/parser": "{{deps.typescriptEslintParser}}",
+    "@types/react": "{{deps.typesReact}}",
+    "@types/react-dom": "{{deps.typesReactDom}}",
+    "@vitejs/plugin-react": "{{deps.vitejsPluginReact}}",
+    "@tailwindcss/vite": "{{deps.tailwindcssVite}}",
+    "eslint": "{{deps.eslint}}",
+    "tailwindcss": "{{deps.tailwindcss}}",
+    "typescript": "{{deps.typescript}}",
+    "vite": "{{deps.vite}}",
+    "vitest": "{{deps.vitest}}"
+  },
+  "msw": {}
+}

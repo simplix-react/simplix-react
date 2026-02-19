@@ -1,0 +1,11 @@
+import type { MockDomainConfig } from "@simplix-react/mock";
+import { deriveMockHandlers } from "@simplix-react/mock";
+import { {{domainName}}Api } from "../contract";
+
+const seed: Record<string, Record<string, unknown>[]> = {{{seedData}}};
+
+export const {{domainName}}Mock: MockDomainConfig = {
+  name: "{{domainName}}",
+  handlers: deriveMockHandlers({{domainName}}Api.config),
+  seed,
+};

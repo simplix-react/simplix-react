@@ -1,0 +1,50 @@
+import { z } from "zod";
+import { defineApi, simpleQueryBuilder } from "@simplix-react/contract";
+
+{{#each entities}}
+export const {{entityName}}Schema = z.object({
+  id: z.string().uuid(),
+  name: z.string().min(1),
+  // TODO: Add your domain fields here
+  // Examples:
+  //   description: z.string().max(500).optional(),
+  //   price: z.number().min(0),
+  //   status: z.enum(["active", "inactive"]),
+  //   categoryId: z.string().uuid(),
+  //   tags: z.array(z.string()),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+
+export const create{{EntityPascal}}Schema = {{entityName}}Schema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const update{{EntityPascal}}Schema = create{{EntityPascal}}Schema.partial();
+
+export type {{EntityPascal}} = z.infer<typeof {{entityName}}Schema>;
+export type Create{{EntityPascal}} = z.infer<typeof create{{EntityPascal}}Schema>;
+export type Update{{EntityPascal}} = z.infer<typeof update{{EntityPascal}}Schema>;
+
+{{/each}}
+export const {{domainName}}Api = defineApi({
+  domain: "{{domainName}}",
+  basePath: "{{apiBasePath}}",
+  entities: {
+{{#each entities}}
+    {{entityName}}: {
+      schema: {{entityName}}Schema,
+      operations: {
+        list:   { method: "GET",    path: "/{{entityName}}s" },
+        get:    { method: "GET",    path: "/{{entityName}}s/:id" },
+        create: { method: "POST",   path: "/{{entityName}}s", input: create{{EntityPascal}}Schema },
+        update: { method: "PATCH",  path: "/{{entityName}}s/:id", input: update{{EntityPascal}}Schema },
+        delete: { method: "DELETE", path: "/{{entityName}}s/:id" },
+      },
+    },
+{{/each}}
+  },
+  queryBuilder: simpleQueryBuilder,
+});

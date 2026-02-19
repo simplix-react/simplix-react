@@ -8,22 +8,24 @@ import type { ValidationResult } from "../commands/validate.js";
  * FSD Layer Rules:
  * - features/ cannot import from widgets/
  * - shared/ cannot import from features/ or widgets/
- * - All modules must have manifest.ts
+ * - Modules must have manifest.ts (apps are exempt)
  */
 export async function validateFsdRules(
   moduleDir: string,
   result: ValidationResult,
-  _options?: { fix?: boolean },
+  options?: { fix?: boolean; type?: "module" | "app" },
 ): Promise<void> {
   const srcDir = join(moduleDir, "src");
   if (!(await pathExists(srcDir))) return;
 
-  // Check manifest.ts exists
-  const manifestPath = join(srcDir, "manifest.ts");
-  if (await pathExists(manifestPath)) {
-    result.passes.push("Manifest exists");
-  } else {
-    result.errors.push("Missing manifest.ts");
+  // Check manifest.ts exists (modules only — apps don't need a manifest)
+  if (options?.type !== "app") {
+    const manifestPath = join(srcDir, "manifest.ts");
+    if (await pathExists(manifestPath)) {
+      result.passes.push("Manifest exists");
+    } else {
+      result.errors.push("Missing manifest.ts");
+    }
   }
 
   // Check FSD layer violations

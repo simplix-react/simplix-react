@@ -27,7 +27,7 @@ function readPkg(pkgName: string): PkgData {
   };
 }
 
-const FRAMEWORK_PKGS = ["cli", "contract", "react", "form", "mock", "i18n", "testing"];
+const FRAMEWORK_PKGS = ["cli", "contract", "react", "form", "mock", "i18n", "testing", "ui"];
 const fwVersions: Record<string, string> = {};
 
 for (const pkg of FRAMEWORK_PKGS) {
@@ -53,9 +53,8 @@ const CONSUMER_DEPS: Record<string, string> = {
   "@typescript-eslint/eslint-plugin": "^8.33.0",
   "@typescript-eslint/parser": "^8.33.0",
   "@vitejs/plugin-react": "^4.5.2",
-  "autoprefixer": "^10.4.21",
+  "@tailwindcss/vite": "^4.1.10",
   "lucide-react": "^0.562.0",
-  "postcss": "^8.5.4",
   "react": "^19.0.0",
   "react-dom": "^19.0.0",
   "tailwindcss": "^4.1.10",
@@ -97,6 +96,7 @@ const sharedConfig: import("tsup").Options = {
   splitting: false,
   treeshake: true,
   define: versionDefines,
+  loader: { ".hbs": "text" },
   external: [
     /^commander/,
     /^handlebars/,

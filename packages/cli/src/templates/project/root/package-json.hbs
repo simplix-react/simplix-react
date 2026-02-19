@@ -1,0 +1,24 @@
+{
+  "name": "{{scope}}/{{projectName}}-monorepo",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "packageManager": "pnpm@10.12.4",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --concurrency=15",
+    "dev:watch": "turbo watch dev --concurrency=25",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck"
+  },
+  "devDependencies": {
+    "simplix-react": "{{fw.meta}}",
+    "turbo": "{{deps.turbo}}",
+    "typescript": "{{deps.typescript}}"
+  }
+}

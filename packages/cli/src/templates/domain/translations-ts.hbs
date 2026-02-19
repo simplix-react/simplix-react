@@ -1,0 +1,10 @@
+import { registerDomainTranslations } from "@simplix-react/i18n";
+
+registerDomainTranslations({
+  domain: "{{domainName}}",
+  locales: {
+{{#each locales}}
+    "{{this}}": () => import("./locales/{{this}}.json"),
+{{/each}}
+  },
+});

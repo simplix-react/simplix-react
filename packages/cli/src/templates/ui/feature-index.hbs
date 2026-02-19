@@ -1,0 +1,13 @@
+// {{EntityPascal}} CRUD Widgets
+// FSD widgets/ layer — composable CRUD screen components
+
+{{#if hasList}}
+export { {{EntityPascal}}List } from "./{{entityKebab}}-list";
+{{/if}}
+{{#if hasForm}}
+export { {{EntityPascal}}Form } from "./{{entityKebab}}-form";
+export type { {{EntityPascal}}FormValues } from "./{{entityKebab}}-form";
+{{/if}}
+{{#if hasDetail}}
+export { {{EntityPascal}}Detail } from "./{{entityKebab}}-detail";
+{{/if}}

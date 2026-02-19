@@ -1,0 +1,42 @@
+{
+  "name": "{{domainPkgName}}",
+  "version": "0.0.1",
+  "description": "{{PascalName}} domain API and mock for {{projectName}}",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./mock": {
+      "types": "./dist/mock.d.ts",
+      "import": "./dist/mock.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "simplix-react": "{{fw.meta}}",
+    "@tanstack/react-query": "{{deps.tanstackReactQuery}}",
+    "zod": "{{deps.zod}}"
+  },
+  "devDependencies": {
+    "@eslint/js": "{{deps.eslintJs}}",
+    "@typescript-eslint/eslint-plugin": "{{deps.typescriptEslintEslintPlugin}}",
+    "@typescript-eslint/parser": "{{deps.typescriptEslintParser}}",
+    "eslint": "{{deps.eslint}}",
+    "msw": "{{deps.msw}}",
+    "tsup": "{{deps.tsup}}",
+    "typescript": "{{deps.typescript}}",
+    "vitest": "{{deps.vitest}}"
+  }
+}

@@ -46,15 +46,14 @@ function getDefaultConfig(): SimplixConfig {
     api: {
       baseUrl: "/api",
     },
+    i18n: {
+      locales: ["en", "ko", "ja"],
+      defaultLocale: "en",
+    },
     http: {
       environments: {
         development: { baseUrl: "http://localhost:3000" },
       },
-    },
-    mock: {
-      defaultLimit: 50,
-      maxLimit: 100,
-      dataDir: "idb://simplix-mock",
     },
   };
 }

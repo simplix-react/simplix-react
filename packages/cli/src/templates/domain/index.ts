@@ -1,0 +1,11 @@
+export { default as domainEslintConfig } from "./eslint-config.hbs";
+export { default as domainPackageJson } from "./package-json.hbs";
+export { default as domainTsupConfig } from "./tsup-config.hbs";
+export { default as domainTsconfigJson } from "./tsconfig-json.hbs";
+export { default as domainIndexTs } from "./index-ts.hbs";
+export { default as domainContractTs } from "./contract-ts.hbs";
+export { default as domainHooksTs } from "./hooks-ts.hbs";
+export { default as domainMockIndexTs } from "./mock-index-ts.hbs";
+export { default as domainMockHandlersTs } from "./mock-handlers-ts.hbs";
+export { default as domainMockSeedTs } from "./mock-seed-ts.hbs";
+export { default as domainTranslationsTs } from "./translations-ts.hbs";

@@ -1,0 +1,18 @@
+import { defineApi, simpleQueryBuilder } from "@simplix-react/contract";
+import { {{{allSchemaImports}}} } from "./schemas";
+
+export const {{domainName}}Api = defineApi({
+  domain: "{{domainName}}",
+  basePath: "{{apiBasePath}}",
+  entities: {
+{{#each entities}}
+    {{name}}: {
+      schema: {{name}}Schema,
+      operations: {
+{{{operationEntries}}}
+      },
+    },
+{{/each}}
+  },
+  queryBuilder: simpleQueryBuilder,
+});

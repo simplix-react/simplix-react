@@ -4,10 +4,12 @@ import ora from "ora";
 import { join, resolve } from "node:path";
 import { writeFileWithDir, pathExists, readJsonFile } from "../utils/fs.js";
 import { log } from "../utils/logger.js";
+import { toPascalCase } from "../utils/case.js";
 import { renderTemplate } from "../utils/template.js";
 import { loadConfig } from "../config/config-loader.js";
 import { withVersions } from "../versions.js";
 import {
+  domainEslintConfig,
   domainPackageJson,
   domainTsupConfig,
   domainTsconfigJson,
@@ -16,16 +18,17 @@ import {
   domainHooksTs,
   domainMockIndexTs,
   domainMockHandlersTs,
-  domainMockMigrationsTs,
   domainMockSeedTs,
-} from "../templates/domain/domain-files.js";
+  domainTranslationsTs,
+} from "../templates/domain/index.js";
 
 export const addDomainCommand = new Command("add-domain")
   .description("Add a new domain package")
   .argument("<name>", "Domain name (e.g., inventory, topology)")
   .option("-e, --entities <entities>", "Comma-separated entity names", "")
+  .option("--no-i18n", "Skip i18n translations setup")
   .option("-y, --yes", "Accept all defaults (non-interactive)")
-  .action(async (name: string, flags: Record<string, string>) => {
+  .action(async (name: string, flags: Record<string, unknown>) => {
     const rootDir = resolve(process.cwd());
     const rootPkg = await readJsonFile<{ name: string }>(
       join(rootDir, "package.json"),
@@ -50,7 +53,7 @@ export const addDomainCommand = new Command("add-domain")
 
     let entitiesInput: string;
     if (flags.entities || flags.yes) {
-      entitiesInput = flags.entities || name;
+      entitiesInput = (flags.entities as string) || name;
     } else {
       const response = await prompts([
         {
@@ -68,9 +71,25 @@ export const addDomainCommand = new Command("add-domain")
       .map((e: string) => e.trim())
       .filter(Boolean);
 
-    // Load config for apiBasePath
+    let enableI18n: boolean;
+    if (flags.yes || flags.i18n === false) {
+      enableI18n = flags.i18n !== false;
+    } else {
+      const response = await prompts([
+        {
+          type: "confirm",
+          name: "enableI18n",
+          message: "Enable i18n for this domain?",
+          initial: true,
+        },
+      ]);
+      enableI18n = response.enableI18n ?? true;
+    }
+
+    // Load config
     const config = await loadConfig(rootDir);
     const apiBaseUrl = config.api?.baseUrl ?? "/api";
+    const locales = config.i18n?.locales ?? ["en", "ko", "ja"];
 
     const domainPkgName = `${scope}/${baseName}-domain-${name}`;
     const dirName = `${baseName}-domain-${name}`;
@@ -89,26 +108,39 @@ export const addDomainCommand = new Command("add-domain")
         domainPkgName,
         projectName: baseName,
         scope,
+        enableI18n,
+        locales,
         apiBasePath: `${apiBaseUrl}/${name}`,
         entities: entities.map((e: string) => ({
           entityName: e,
-          EntityPascal: e.charAt(0).toUpperCase() + e.slice(1),
+          EntityPascal: toPascalCase(e),
         })),
-        PascalName: name.charAt(0).toUpperCase() + name.slice(1),
+        PascalName: toPascalCase(name),
       });
 
       const files: Record<string, string> = {
         "package.json": renderTemplate(domainPackageJson, ctx),
+        "eslint.config.js": domainEslintConfig,
         "tsup.config.ts": domainTsupConfig,
         "tsconfig.json": renderTemplate(domainTsconfigJson, ctx),
-        "src/index.ts": domainIndexTs,
+        "src/index.ts": renderTemplate(domainIndexTs, ctx),
         "src/contract.ts": renderTemplate(domainContractTs, ctx),
         "src/hooks.ts": renderTemplate(domainHooksTs, ctx),
         "src/mock/index.ts": renderTemplate(domainMockIndexTs, ctx),
         "src/mock/handlers.ts": renderTemplate(domainMockHandlersTs, ctx),
-        "src/mock/migrations.ts": renderTemplate(domainMockMigrationsTs, ctx),
         "src/mock/seed.ts": renderTemplate(domainMockSeedTs, ctx),
       };
+
+      if (enableI18n) {
+        files["src/translations.ts"] = renderTemplate(
+          domainTranslationsTs,
+          ctx,
+        );
+        const emptyJson = "{}\n";
+        for (const locale of locales) {
+          files[`src/locales/${locale}.json`] = emptyJson;
+        }
+      }
 
       for (const [relativePath, content] of Object.entries(files)) {
         await writeFileWithDir(join(targetDir, relativePath), content);
@@ -118,6 +150,9 @@ export const addDomainCommand = new Command("add-domain")
       log.info("");
       log.step(`Location: packages/${dirName}/`);
       log.step(`Entities: ${entities.join(", ")}`);
+      if (enableI18n) {
+        log.step(`i18n: locales/ with ${locales.join(", ")}`);
+      }
       log.info("");
       log.info("Next steps:");
       log.step("pnpm install");

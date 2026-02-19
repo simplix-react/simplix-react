@@ -83,10 +83,14 @@ export const api = defineApi({
   basePath: "/api/v1",
   entities: {
     task: {
-      path: "/tasks",
       schema: z.object({ id: z.string(), title: z.string() }),
-      createSchema: z.object({ title: z.string() }),
-      updateSchema: z.object({ title: z.string().optional() }),
+      operations: {
+        list:   { method: "GET",    path: "/tasks" },
+        get:    { method: "GET",    path: "/tasks/:id" },
+        create: { method: "POST",   path: "/tasks", input: z.object({ title: z.string() }) },
+        update: { method: "PATCH",  path: "/tasks/:id", input: z.object({ title: z.string().optional() }) },
+        delete: { method: "DELETE", path: "/tasks/:id" },
+      },
     },
   },
 });
@@ -100,7 +104,7 @@ export const api = defineApi({
     expect(result.passes.some((p) => p.includes("All entities have complete schemas"))).toBe(true);
   });
 
-  it("errors when entity is missing required schema fields", async () => {
+  it("errors when entity is missing required fields", async () => {
     const contractDir = join(tempDir, "src", "api");
     await mkdir(contractDir, { recursive: true });
     await writeFile(
@@ -114,7 +118,6 @@ export const api = defineApi({
   basePath: "/api/v1",
   entities: {
     task: {
-      path: "/tasks",
       schema: z.object({ id: z.string() }),
     },
   },
@@ -125,8 +128,7 @@ export const api = defineApi({
     const result = createResult(tempDir);
     await validateContractRules(tempDir, result);
 
-    expect(result.errors.some((e) => e.includes("task") && e.includes("createSchema"))).toBe(true);
-    expect(result.errors.some((e) => e.includes("task") && e.includes("updateSchema"))).toBe(true);
+    expect(result.errors.some((e) => e.includes("task") && e.includes("operations"))).toBe(true);
   });
 
   it("validates operations have input and output", async () => {
@@ -143,10 +145,14 @@ export const api = defineApi({
   basePath: "/api/v1",
   entities: {
     task: {
-      path: "/tasks",
       schema: z.object({ id: z.string() }),
-      createSchema: z.object({ title: z.string() }),
-      updateSchema: z.object({ title: z.string().optional() }),
+      operations: {
+        list:   { method: "GET",    path: "/tasks" },
+        get:    { method: "GET",    path: "/tasks/:id" },
+        create: { method: "POST",   path: "/tasks", input: z.object({ title: z.string() }) },
+        update: { method: "PATCH",  path: "/tasks/:id", input: z.object({ title: z.string().optional() }) },
+        delete: { method: "DELETE", path: "/tasks/:id" },
+      },
     },
   },
   operations: {
@@ -182,10 +188,14 @@ export const api = defineApi({
   basePath: "/api/v1",
   entities: {
     task: {
-      path: "/tasks",
       schema: z.object({ id: z.string() }),
-      createSchema: z.object({ title: z.string() }),
-      updateSchema: z.object({ title: z.string().optional() }),
+      operations: {
+        list:   { method: "GET",    path: "/tasks" },
+        get:    { method: "GET",    path: "/tasks/:id" },
+        create: { method: "POST",   path: "/tasks", input: z.object({ title: z.string() }) },
+        update: { method: "PATCH",  path: "/tasks/:id", input: z.object({ title: z.string().optional() }) },
+        delete: { method: "DELETE", path: "/tasks/:id" },
+      },
     },
   },
   operations: {
@@ -219,10 +229,11 @@ export const api = defineApi({
   basePath: "/api/v1",
   entities: {
     task: {
-      path: "/tasks",
       schema: z.object({ id: z.string() }),
-      createSchema: z.object({ title: z.string() }),
-      updateSchema: z.object({ title: z.string().optional() }),
+      operations: {
+        list: { method: "GET", path: "/tasks" },
+        get: { method: "GET", path: "/tasks/:id" },
+      },
     },
   },
 });
@@ -252,10 +263,11 @@ export const api = defineApi({
   basePath: "/api/v1",
   entities: {
     task: {
-      path: "/tasks",
       schema: z.object({ id: z.string() }),
-      createSchema: z.object({ title: z.string() }),
-      updateSchema: z.object({ title: z.string().optional() }),
+      operations: {
+        list: { method: "GET", path: "/tasks" },
+        get: { method: "GET", path: "/tasks/:id" },
+      },
     },
   },
 });
@@ -297,10 +309,11 @@ export const api = defineApi({
   basePath: "/api/v1",
   entities: {
     task: {
-      path: "/tasks",
       schema: z.object({ id: z.string() }),
-      createSchema: z.object({ title: z.string() }),
-      updateSchema: z.object({ title: z.string().optional() }),
+      operations: {
+        list: { method: "GET", path: "/tasks" },
+        get: { method: "GET", path: "/tasks/:id" },
+      },
     },
   },
 });
@@ -335,16 +348,18 @@ export const api = defineApi({
   basePath: "/api/v1",
   entities: {
     task: {
-      path: "/tasks",
       schema: z.object({ id: z.string() }),
-      createSchema: z.object({ title: z.string() }),
-      updateSchema: z.object({ title: z.string().optional() }),
+      operations: {
+        list: { method: "GET", path: "/tasks" },
+        get: { method: "GET", path: "/tasks/:id" },
+      },
     },
     member: {
-      path: "/members",
       schema: z.object({ id: z.string() }),
-      createSchema: z.object({ name: z.string() }),
-      updateSchema: z.object({ name: z.string().optional() }),
+      operations: {
+        list: { method: "GET", path: "/members" },
+        get: { method: "GET", path: "/members/:id" },
+      },
     },
   },
 });
@@ -384,10 +399,11 @@ export const api = defineApi({
   basePath: "/api",
   entities: {
     item: {
-      path: "/items",
       schema: z.object({ id: z.string() }),
-      createSchema: z.object({ name: z.string() }),
-      updateSchema: z.object({ name: z.string().optional() }),
+      operations: {
+        list: { method: "GET", path: "/items" },
+        get: { method: "GET", path: "/items/:id" },
+      },
     },
   },
 });
@@ -415,13 +431,13 @@ export const api = defineApi({
   basePath: "/api/v1",
   entities: {
     task: {
-      path: "/tasks",
       schema: z.object({ id: z.string() }),
-      createSchema: z.object({ title: z.string() }),
-      updateSchema: z.object({ title: z.string().optional() }),
+      operations: {
+        list: { method: "GET", path: "/tasks" },
+        get: { method: "GET", path: "/tasks/:id" },
+      },
     },
     member: {
-      path: "/members",
       schema: z.object({ id: z.string() }),
     },
   },
@@ -432,9 +448,8 @@ export const api = defineApi({
     const result = createResult(tempDir);
     await validateContractRules(tempDir, result);
 
-    // task is complete, member is missing createSchema and updateSchema
-    expect(result.errors.some((e) => e.includes("member") && e.includes("createSchema"))).toBe(true);
-    expect(result.errors.some((e) => e.includes("member") && e.includes("updateSchema"))).toBe(true);
+    // task is complete, member is missing operations
+    expect(result.errors.some((e) => e.includes("member") && e.includes("operations"))).toBe(true);
     // task should NOT be in errors
     expect(result.errors.some((e) => e.includes("task"))).toBe(false);
   });

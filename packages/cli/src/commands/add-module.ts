@@ -4,9 +4,12 @@ import ora from "ora";
 import { join, resolve } from "node:path";
 import { writeFileWithDir, pathExists, readJsonFile } from "../utils/fs.js";
 import { log } from "../utils/logger.js";
+import { toPascalCase } from "../utils/case.js";
 import { renderTemplate } from "../utils/template.js";
+import { loadConfig } from "../config/config-loader.js";
 import { withVersions } from "../versions.js";
 import {
+  moduleEslintConfig,
   modulePackageJson,
   moduleTsupConfig,
   moduleTsconfigJson,
@@ -18,10 +21,7 @@ import {
   moduleSharedUiGitkeep,
   moduleSharedConfigGitkeep,
   moduleLocalesIndexTs,
-  moduleLocaleEnJson,
-  moduleLocaleKoJson,
-  moduleLocaleJaJson,
-} from "../templates/module/module-files.js";
+} from "../templates/module/index.js";
 
 export const addModuleCommand = new Command("add-module")
   .description("Add a new FSD module")
@@ -49,19 +49,23 @@ export const addModuleCommand = new Command("add-module")
       .replace(/-monorepo$/, "");
 
     let enableI18n: boolean;
-    if (flags.yes) {
+    if (flags.yes || flags.i18n === false) {
       enableI18n = flags.i18n !== false;
     } else {
       const response = await prompts([
         {
-          type: flags.i18n !== false ? null : "confirm",
+          type: "confirm",
           name: "enableI18n",
           message: "Enable i18n for this module?",
           initial: true,
         },
       ]);
-      enableI18n = response.enableI18n ?? flags.i18n !== false;
+      enableI18n = response.enableI18n ?? true;
     }
+
+    // Load config for i18n locales
+    const config = await loadConfig(rootDir);
+    const locales = config.i18n?.locales ?? ["en", "ko", "ja"];
 
     const modulePkgName = `${scope}/${baseName}-${name}`;
     const dirName = `${baseName}-${name}`;
@@ -81,12 +85,14 @@ export const addModuleCommand = new Command("add-module")
         projectName: baseName,
         scope,
         enableI18n,
-        PascalName: name.charAt(0).toUpperCase() + name.slice(1),
+        locales,
+        PascalName: toPascalCase(name),
         namespace: `${baseName}-${name}`,
       });
 
       const files: Record<string, string> = {
         "package.json": renderTemplate(modulePackageJson, ctx),
+        "eslint.config.js": moduleEslintConfig,
         "tsup.config.ts": renderTemplate(moduleTsupConfig, ctx),
         "tsconfig.json": renderTemplate(moduleTsconfigJson, ctx),
         "src/index.ts": renderTemplate(moduleIndexTs, ctx),
@@ -103,12 +109,11 @@ export const addModuleCommand = new Command("add-module")
           moduleLocalesIndexTs,
           ctx,
         );
-        files["src/locales/widgets/.gitkeep"] = "";
-        files["src/locales/features/.gitkeep"] = "";
-        // Default locale files
-        files["src/locales/en.json"] = moduleLocaleEnJson;
-        files["src/locales/ko.json"] = moduleLocaleKoJson;
-        files["src/locales/ja.json"] = moduleLocaleJaJson;
+        const emptyJson = "{}\n";
+        for (const locale of locales) {
+          files[`src/locales/features/${locale}.json`] = emptyJson;
+          files[`src/locales/widgets/${locale}.json`] = emptyJson;
+        }
       }
 
       for (const [relativePath, content] of Object.entries(files)) {
@@ -120,7 +125,7 @@ export const addModuleCommand = new Command("add-module")
       log.step(`Location: modules/${dirName}/`);
       log.step(`FSD layers: features/ widgets/ shared/`);
       if (enableI18n) {
-        log.step("i18n: locales/ with en, ko, ja");
+        log.step(`i18n: locales/ with ${locales.join(", ")}`);
       }
       log.info("");
       log.info("Next steps:");

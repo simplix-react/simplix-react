@@ -1,0 +1,153 @@
+import type { ReactNode } from "react";
+import { useCallback, useState } from "react";
+
+{{#if hasUpdate}}
+import { QueryFallback, Button, CrudForm, FormFields, useCrudFormSubmit } from "@simplix-react/ui";
+{{else}}
+import { Button, CrudForm, FormFields, useCrudFormSubmit } from "@simplix-react/ui";
+{{/if}}
+import type { EntityId } from "@simplix-react/contract";
+import { useEntityTranslation } from "@simplix-react/i18n/react";
+{{#if packageName}}
+import { {{domainCamel}}Hooks } from "{{packageName}}";
+{{/if}}
+
+export interface {{EntityPascal}}FormValues {
+{{#each fields}}
+  {{this.name}}: {{this.tsType}};
+{{/each}}
+}
+
+interface {{EntityPascal}}FormProps {
+{{#if hasUpdate}}
+  {{entity}}Id?: EntityId;
+{{/if}}
+  header?: ReactNode;
+  onClose?: () => void;
+  onSuccess?: () => void;
+  onCancel?: () => void;
+}
+
+export function {{EntityPascal}}Form({ {{#if hasUpdate}}{{entity}}Id, {{/if}}header, onClose, onSuccess, onCancel }: {{EntityPascal}}FormProps) {
+{{#if hasUpdate}}
+  const isEdit = !!{{entity}}Id;
+{{/if}}
+{{#if packageName}}
+{{#if hasUpdate}}
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, isLoading } = isEdit ? ({{domainCamel}}Hooks.{{entity}}.useGet({{entity}}Id) as any) : { data: null, isLoading: false };
+{{/if}}
+{{/if}}
+
+  const { handleSubmit } = useCrudFormSubmit<{{EntityPascal}}FormValues>({
+{{#if hasUpdate}}
+    entityId: {{entity}}Id,
+{{/if}}
+{{#if packageName}}
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    create: {{domainCamel}}Hooks.{{entity}}.useCreate() as any,
+{{#if hasUpdate}}
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    update: {{domainCamel}}Hooks.{{entity}}.useUpdate() as any,
+{{/if}}
+{{/if}}
+    onSuccess,
+  });
+
+{{#if hasUpdate}}
+  if (isEdit && (isLoading || !data)) return <QueryFallback isLoading={isLoading} notFoundMessage="{{EntityPascal}} not found." />;
+
+  return <{{EntityPascal}}FormInner defaultValues={isEdit ? data : undefined} onSubmit={handleSubmit} header={header} onClose={onClose} onCancel={onCancel} />;
+{{else}}
+  return <{{EntityPascal}}FormInner onSubmit={handleSubmit} header={header} onClose={onClose} onCancel={onCancel} />;
+{{/if}}
+}
+
+interface {{EntityPascal}}FormInnerProps {
+  defaultValues?: Partial<{{EntityPascal}}FormValues>;
+  onSubmit: (values: {{EntityPascal}}FormValues) => void;
+  header?: ReactNode;
+  onClose?: () => void;
+  onCancel?: () => void;
+}
+
+function {{EntityPascal}}FormInner({ defaultValues, onSubmit, header, onClose, onCancel }: {{EntityPascal}}FormInnerProps) {
+  const { fieldLabel, enumLabel } = useEntityTranslation("{{entity}}");
+{{#each fields}}
+  const [{{this.name}}, set{{this.capitalizedName}}] = useState<{{this.tsType}}>(defaultValues?.{{this.name}} ?? {{this.defaultValue}});
+{{/each}}
+
+  const handleSubmit = useCallback(
+    () => {
+      onSubmit({ {{fieldNameList}} });
+    },
+    [onSubmit, {{fieldNameList}}],
+  );
+
+  return (
+    <CrudForm onSubmit={handleSubmit} header={header} onClose={onClose}>
+      <CrudForm.Section title="{{EntityPascal}} Information">
+{{#each fields}}
+{{#if (eq this.formComponent "TextField")}}
+        <FormFields.TextField
+          label={fieldLabel("{{this.name}}")}
+          value={ {{~this.name~}} }
+          onChange={set{{this.capitalizedName~}} }
+{{#if (eq this.inputType "email")}}
+          type="email"
+{{/if}}
+{{#if (eq this.inputType "url")}}
+          type="url"
+{{/if}}
+        />
+{{/if}}
+{{#if (eq this.formComponent "TextareaField")}}
+        <FormFields.TextareaField
+          label={fieldLabel("{{this.name}}")}
+          value={ {{~this.name~}} }
+          onChange={set{{this.capitalizedName~}} }
+        />
+{{/if}}
+{{#if (eq this.formComponent "NumberField")}}
+        <FormFields.NumberField
+          label={fieldLabel("{{this.name}}")}
+          value={ {{~this.name~}} }
+          onChange={(v) => set{{this.capitalizedName}}(v ?? {{this.defaultValue}})}
+        />
+{{/if}}
+{{#if (eq this.formComponent "SwitchField")}}
+        <FormFields.SwitchField
+          label={fieldLabel("{{this.name}}")}
+          value={ {{~this.name~}} }
+          onChange={set{{this.capitalizedName~}} }
+        />
+{{/if}}
+{{#if (eq this.formComponent "DateField")}}
+        <FormFields.DateField
+          label={fieldLabel("{{this.name}}")}
+          value={ {{~this.name~}} }
+          onChange={set{{this.capitalizedName~}} }
+        />
+{{/if}}
+{{#if (eq this.formComponent "SelectField")}}
+        <FormFields.SelectField
+          label={fieldLabel("{{this.name}}")}
+          value={ {{~this.name~}} }
+          onChange={set{{this.capitalizedName~}} }
+          options={[
+{{#each this.options}}
+            { label: enumLabel("{{../../entity}}{{../capitalizedName}}", "{{this}}"), value: "{{this}}" },
+{{/each}}
+          ]}
+        />
+{{/if}}
+{{/each}}
+      </CrudForm.Section>
+
+      <CrudForm.Actions className={onCancel ? "justify-between" : "justify-end"}>
+        {onCancel && <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>}
+        <Button type="submit" variant="primary">Save {{EntityPascal}}</Button>
+      </CrudForm.Actions>
+    </CrudForm>
+  );
+}

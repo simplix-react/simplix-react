@@ -1,27 +1,8 @@
-// i18n configuration template files
+export { default as i18nConfigTs } from "./i18n/config-ts.hbs";
+export { default as i18nConstantsTs } from "./i18n/constants-ts.hbs";
 
-export const i18nConfigTs = `import { createI18nConfig } from "@simplix-react/i18n";
-
-// Import app-local translations via Vite's glob import
-const appTranslations = import.meta.glob("/src/locales/**/*.json", { eager: true });
-
-export const { adapter: i18nAdapter, i18nReady } = createI18nConfig({
-  defaultLocale: "{{defaultLocale}}",
-  fallbackLocale: "en",
-  supportedLocales: {{{json locales}}},
-  detection: { order: ["localStorage", "navigator"] },
-  appTranslations,
-  moduleTranslations: [],
-});
-`;
-
-export const i18nConstantsTs = `export const SUPPORTED_LOCALES = {{{json locales}}} as const;
-export const DEFAULT_LOCALE = "{{defaultLocale}}";
-export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
-`;
-
-export const commonEnJson = JSON.stringify(
-  {
+const commonTranslations: Record<string, object> = {
+  en: {
     app: {
       title: "My App",
       subtitle: "Built with simplix-react",
@@ -42,12 +23,7 @@ export const commonEnJson = JSON.stringify(
       error: "An error occurred",
     },
   },
-  null,
-  2,
-);
-
-export const commonKoJson = JSON.stringify(
-  {
+  ko: {
     app: {
       title: "My App",
       subtitle: "simplix-react로 구축됨",
@@ -68,12 +44,7 @@ export const commonKoJson = JSON.stringify(
       error: "오류가 발생했습니다",
     },
   },
-  null,
-  2,
-);
-
-export const commonJaJson = JSON.stringify(
-  {
+  ja: {
     app: {
       title: "My App",
       subtitle: "simplix-reactで構築",
@@ -94,6 +65,13 @@ export const commonJaJson = JSON.stringify(
       error: "エラーが発生しました",
     },
   },
-  null,
-  2,
-);
+};
+
+/**
+ * Returns common translation JSON for a given locale.
+ * Known locales (en, ko, ja) get starter content; others get an empty object.
+ */
+export function getCommonTranslationJson(locale: string): string {
+  const content = commonTranslations[locale] ?? {};
+  return JSON.stringify(content, null, 2);
+}

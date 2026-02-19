@@ -1,0 +1,96 @@
+import type { ReactNode } from "react";
+
+import { QueryFallback, {{#if hasDelete}}CrudDelete, useCrudDeleteDetail, {{/if}}CrudDetail, DetailFields, usePreviousData } from "@simplix-react/ui";
+import type { EntityId } from "@simplix-react/contract";
+import { useEntityTranslation } from "@simplix-react/i18n/react";
+{{#if packageName}}
+import { {{domainCamel}}Hooks } from "{{packageName}}";
+{{/if}}
+
+interface {{EntityPascal}}DetailProps {
+  {{entity}}Id: EntityId;
+  header?: ReactNode;
+  onClose?: () => void;
+{{#if hasUpdate}}
+  onEdit?: () => void;
+{{/if}}
+{{#if hasDelete}}
+  onDeleted?: () => void;
+{{/if}}
+}
+
+export function {{EntityPascal}}Detail({ {{entity}}Id, header, onClose{{#if hasUpdate}}, onEdit{{/if}}{{#if hasDelete}}, onDeleted{{/if}} }: {{EntityPascal}}DetailProps) {
+{{#if packageName}}
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, isLoading } = {{domainCamel}}Hooks.{{entity}}.useGet({{entity}}Id) as any;
+{{#if hasDelete}}
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const delete{{EntityPascal}} = {{domainCamel}}Hooks.{{entity}}.useDelete() as any;
+  const del = useCrudDeleteDetail();
+{{/if}}
+{{/if}}
+
+  const { fieldLabel, enumLabel } = useEntityTranslation("{{entity}}");
+  const displayData = usePreviousData(data);
+
+  if (!displayData) return <QueryFallback isLoading={isLoading} notFoundMessage="{{EntityPascal}} not found." />;
+
+  return (
+    <>
+      <CrudDetail isLoading={isLoading} header={header} onClose={onClose}>
+        <CrudDetail.Section title="{{EntityPascal}} Information">
+{{#each fields}}
+{{#if (eq this.component "Date")}}
+          <DetailFields.DetailDateField
+            label={fieldLabel("{{this.name}}")}
+            value={displayData.{{this.name~}} }
+          />
+{{else if (eq this.component "Number")}}
+          <DetailFields.DetailNumberField
+            label={fieldLabel("{{this.name}}")}
+            value={displayData.{{this.name~}} }
+          />
+{{else if (eq this.component "Boolean")}}
+          <DetailFields.DetailTextField
+            label={fieldLabel("{{this.name}}")}
+            value={displayData.{{this.name}} ? "Yes" : "No"}
+          />
+{{else if (eq this.component "Select")}}
+          <DetailFields.DetailBadgeField
+            label={fieldLabel("{{this.name}}")}
+            value={displayData.{{this.name~}} }
+            displayValue={enumLabel("{{../entity}}{{this.capitalizedName}}", displayData.{{this.name}})}
+            variants={{ldb}} {{#each this.options}}"{{this}}": "default"{{#unless @last}}, {{/unless}}{{/each}} {{rdb}}
+          />
+{{else}}
+          <DetailFields.DetailTextField
+            label={fieldLabel("{{this.name}}")}
+            value={String(displayData.{{this.name}} ?? "")}
+          />
+{{/if}}
+{{/each}}
+        </CrudDetail.Section>
+
+        <CrudDetail.DefaultActions
+          onClose={onClose}
+{{#if hasDelete}}
+          onDelete={del.requestDelete}
+{{/if}}
+{{#if hasUpdate}}
+          onEdit={onEdit}
+{{/if}}
+        />
+      </CrudDetail>
+{{#if hasDelete}}
+      <CrudDelete
+        open={del.open}
+        onOpenChange={del.onOpenChange}
+        onConfirm={() => delete{{EntityPascal}}.mutate({{entity}}Id, { onSuccess: onDeleted })}
+        title="Delete {{EntityPascal}}"
+        description="Are you sure you want to delete this {{entity}}? This action cannot be undone."
+        loading={delete{{EntityPascal}}.isPending}
+      />
+{{/if}}
+    </>
+  );
+}

@@ -1,0 +1,8 @@
+export function RouteErrorFallback({ error }: { error: Error }) {
+  return (
+    <div style={{ padding: "2rem", color: "#EF4444" }}>
+      <h2>Something went wrong</h2>
+      <pre style={{ whiteSpace: "pre-wrap" }}>{error.message}</pre>
+    </div>
+  );
+}

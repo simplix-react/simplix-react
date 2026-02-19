@@ -5,8 +5,8 @@ import type { ValidationResult } from "../commands/validate.js";
 
 /**
  * Contract Rules:
- * - All entities must have schema + createSchema + updateSchema
- * - All operations must have input + output
+ * - All entities must have schema + operations
+ * - All top-level operations must have input + output
  * - All entities must have mock handler config
  *
  * Only applies to packages with defineApi() usage.
@@ -30,8 +30,8 @@ export async function validateContractRules(
   // Check entity schema completeness
   validateEntitySchemas(contractContent, entityNames, result);
 
-  // Check operation completeness
-  validateOperations(contractContent, result);
+  // Check top-level operation completeness
+  validateTopLevelOperations(contractContent, result);
 
   // Check mock handler config
   await validateMockHandlers(pkgDir, entityNames, result);
@@ -53,21 +53,56 @@ async function findContractFile(pkgDir: string): Promise<string | null> {
   return null;
 }
 
-function extractEntityNames(content: string): string[] {
-  // Match entities block: entities: { name: { ... }, name2: { ... } }
-  const entitiesMatch = content.match(
-    /entities\s*:\s*\{([\s\S]*?)\}\s*,?\s*(?:operations|$|\})/,
-  );
-  if (!entitiesMatch) return [];
+/**
+ * Extract a balanced brace block starting after the opening brace.
+ * Returns the content between (exclusive) the braces,
+ * or null if the block is not found.
+ */
+function extractBalancedBlock(content: string, startIdx: number): string | null {
+  let depth = 1;
+  let i = startIdx;
 
-  const entitiesBlock = entitiesMatch[1];
+  while (i < content.length && depth > 0) {
+    if (content[i] === "{") depth++;
+    else if (content[i] === "}") depth--;
+    i++;
+  }
+
+  if (depth !== 0) return null;
+  return content.slice(startIdx, i - 1);
+}
+
+/**
+ * Count brace depth at a position within a string.
+ */
+function depthAt(content: string, endIdx: number): number {
+  let depth = 0;
+  for (let i = 0; i < endIdx; i++) {
+    if (content[i] === "{") depth++;
+    else if (content[i] === "}") depth--;
+  }
+  return depth;
+}
+
+function extractEntityNames(content: string): string[] {
+  // Find the entities: { block using depth counting
+  const entitiesStart = content.match(/entities\s*:\s*\{/);
+  if (!entitiesStart) return [];
+
+  const blockStart = entitiesStart.index! + entitiesStart[0].length;
+  const entitiesBlock = extractBalancedBlock(content, blockStart);
+  if (!entitiesBlock) return [];
+
   const names: string[] = [];
 
-  // Match top-level keys: `name: {` or `name:{`
+  // Only match top-level keys inside the entities block (depth 0)
   const keyPattern = /(\w+)\s*:\s*\{/g;
   let match: RegExpExecArray | null;
+
   while ((match = keyPattern.exec(entitiesBlock)) !== null) {
-    names.push(match[1]);
+    if (depthAt(entitiesBlock, match.index) === 0) {
+      names.push(match[1]);
+    }
   }
 
   return names;
@@ -78,11 +113,11 @@ function validateEntitySchemas(
   entityNames: string[],
   result: ValidationResult,
 ): void {
-  const requiredFields = ["schema", "createSchema", "updateSchema"];
+  const requiredFields = ["schema", "operations"];
   let allComplete = true;
 
   for (const entityName of entityNames) {
-    const entityBlock = extractEntityBlock(content, entityName);
+    const entityBlock = extractEntityBlockInEntities(content, entityName);
     if (!entityBlock) continue;
 
     for (const field of requiredFields) {
@@ -101,43 +136,69 @@ function validateEntitySchemas(
   }
 }
 
-function extractEntityBlock(
+/**
+ * Extract an entity block from within the entities section.
+ * Uses depth-counting to handle nested braces correctly.
+ */
+function extractEntityBlockInEntities(
   content: string,
   entityName: string,
 ): string | null {
+  // Find within the entities block to avoid matching wrong keys
+  const entitiesStart = content.match(/entities\s*:\s*\{/);
+  if (!entitiesStart) return null;
+
+  const blockStart = entitiesStart.index! + entitiesStart[0].length;
+  const entitiesBlock = extractBalancedBlock(content, blockStart);
+  if (!entitiesBlock) return null;
+
   const startPattern = new RegExp(`${entityName}\\s*:\\s*\\{`);
-  const startMatch = startPattern.exec(content);
+  const startMatch = startPattern.exec(entitiesBlock);
   if (!startMatch) return null;
 
-  const startIdx = startMatch.index + startMatch[0].length;
-  let depth = 1;
-  let i = startIdx;
-
-  while (i < content.length && depth > 0) {
-    if (content[i] === "{") depth++;
-    else if (content[i] === "}") depth--;
-    i++;
-  }
-
-  return content.slice(startIdx, i - 1);
+  const entityBlockStart = startMatch.index + startMatch[0].length;
+  return extractBalancedBlock(entitiesBlock, entityBlockStart);
 }
 
-function validateOperations(
+/**
+ * Validate top-level operations (standalone, not inside entities).
+ * These are the operations property at the same level as entities in defineApi.
+ */
+function validateTopLevelOperations(
   content: string,
   result: ValidationResult,
 ): void {
-  const operationsMatch = content.match(
-    /operations\s*:\s*\{([\s\S]*?)\}\s*,?\s*\}/,
-  );
-  if (!operationsMatch) return;
+  // Find defineApi({ to locate the config object
+  const defineApiMatch = content.match(/defineApi\s*\(\s*\{/);
+  if (!defineApiMatch) return;
 
-  const operationsBlock = operationsMatch[1];
+  const configStart = defineApiMatch.index! + defineApiMatch[0].length;
+  const configBlock = extractBalancedBlock(content, configStart);
+  if (!configBlock) return;
+
+  // Find top-level operations key in the config block (depth 0)
+  let operationsBlock: string | null = null;
+  const opsPattern = /operations\s*:\s*\{/g;
+  let match: RegExpExecArray | null;
+
+  while ((match = opsPattern.exec(configBlock)) !== null) {
+    if (depthAt(configBlock, match.index) === 0) {
+      // This is a top-level operations block
+      const opBlockStart = match.index + match[0].length;
+      operationsBlock = extractBalancedBlock(configBlock, opBlockStart);
+      break;
+    }
+  }
+
+  if (!operationsBlock) return;
 
   const opNames: string[] = [];
   const keyPattern = /(\w+)\s*:\s*\{/g;
-  let match: RegExpExecArray | null;
-  while ((match = keyPattern.exec(operationsBlock)) !== null) {
-    opNames.push(match[1]);
+  let opMatch: RegExpExecArray | null;
+  while ((opMatch = keyPattern.exec(operationsBlock)) !== null) {
+    if (depthAt(operationsBlock, opMatch.index) === 0) {
+      opNames.push(opMatch[1]);
+    }
   }
 
   if (opNames.length === 0) return;
@@ -146,7 +207,12 @@ function validateOperations(
   let allComplete = true;
 
   for (const opName of opNames) {
-    const opBlock = extractEntityBlock(content, opName);
+    const opStartPattern = new RegExp(`${opName}\\s*:\\s*\\{`);
+    const opStartMatch = opStartPattern.exec(operationsBlock);
+    if (!opStartMatch) continue;
+
+    const opBlockStart = opStartMatch.index + opStartMatch[0].length;
+    const opBlock = extractBalancedBlock(operationsBlock, opBlockStart);
     if (!opBlock) continue;
 
     for (const field of requiredFields) {

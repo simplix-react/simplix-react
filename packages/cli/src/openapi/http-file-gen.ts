@@ -1,5 +1,12 @@
-import type { ExtractedEntity } from "./types.js";
+import type { ExtractedEntity, SchemaObject } from "./types.js";
 import type { SimplixConfig } from "../config/types.js";
+
+/**
+ * Convert `:paramName` path segments to `{{paramName}}` for .http file format.
+ */
+function toHttpPathParams(path: string): string {
+  return path.replace(/:(\w+)/g, "{{$1}}");
+}
 
 /**
  * Generate .http file content for an entity's CRUD operations.
@@ -9,59 +16,45 @@ export function generateHttpFile(
   basePath: string,
 ): string {
   const lines: string[] = [];
-  const entityPath = `{{baseUrl}}${basePath}${entity.path}`;
-  const idVar = `{{${entity.name}Id}}`;
 
-  if (entity.operations.list) {
-    lines.push(`### List ${entity.pascalName}s`);
-    lines.push(`GET ${entityPath}`);
-    if (entity.queryParams.length > 0) {
-      const params = entity.queryParams
+  for (const op of entity.operations) {
+    const fullPath = `{{baseUrl}}${basePath}${toHttpPathParams(op.path)}`;
+
+    // Section header
+    lines.push(`### ${pascalCase(op.name)} ${entity.pascalName}`);
+
+    // Method + URL (with query params if any)
+    let url = `${op.method} ${fullPath}`;
+    if (op.queryParams.length > 0) {
+      const params = op.queryParams
         .map((p) => `${p.name}={{${p.name}}}`)
         .join("&");
-      // Replace last line to add query params
-      lines[lines.length - 1] = `GET ${entityPath}?${params}`;
+      url += `?${params}`;
     }
-    lines.push("Accept: application/json");
-    lines.push("");
-  }
+    lines.push(url);
 
-  if (entity.operations.get) {
-    lines.push(`### Get ${entity.pascalName} by ID`);
-    lines.push(`GET ${entityPath}/${idVar}`);
-    lines.push("Accept: application/json");
-    lines.push("");
-  }
+    // Headers
+    if (op.method === "GET" || op.method === "DELETE") {
+      lines.push("Accept: application/json");
+    } else {
+      lines.push("Content-Type: application/json");
+    }
 
-  if (entity.operations.create) {
-    const body = generateSampleBody(entity.createFields);
-    lines.push(`### Create ${entity.pascalName}`);
-    lines.push(`POST ${entityPath}`);
-    lines.push("Content-Type: application/json");
-    lines.push("");
-    lines.push(body);
-    lines.push("");
-  }
+    // Request body for operations with input
+    if (op.hasInput && op.bodySchema) {
+      const body = generateSampleBodyFromSchema(op.bodySchema);
+      lines.push("");
+      lines.push(body);
+    }
 
-  if (entity.operations.update) {
-    // Use a subset of fields for update sample
-    const updateFields = entity.updateFields.slice(0, 3);
-    const body = generateSampleBody(updateFields);
-    lines.push(`### Update ${entity.pascalName}`);
-    lines.push(`PATCH ${entityPath}/${idVar}`);
-    lines.push("Content-Type: application/json");
-    lines.push("");
-    lines.push(body);
-    lines.push("");
-  }
-
-  if (entity.operations.delete) {
-    lines.push(`### Delete ${entity.pascalName}`);
-    lines.push(`DELETE ${entityPath}/${idVar}`);
     lines.push("");
   }
 
   return lines.join("\n");
+}
+
+function pascalCase(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 /**
@@ -75,13 +68,16 @@ export function generateHttpEnvJson(config: SimplixConfig): string {
   return JSON.stringify(environments, null, 2);
 }
 
-function generateSampleBody(
-  fields: { name: string; type: string; format?: string; enum?: string[] }[],
-): string {
+function generateSampleBodyFromSchema(schema: SchemaObject): string {
   const obj: Record<string, unknown> = {};
 
-  for (const field of fields) {
-    obj[field.name] = getSampleValue(field);
+  for (const [name, prop] of Object.entries(schema.properties ?? {})) {
+    obj[name] = getSampleValue({
+      name,
+      type: prop.type ?? "string",
+      format: prop.format,
+      enum: prop.enum,
+    });
   }
 
   return JSON.stringify(obj, null, 2);

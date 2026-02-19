@@ -36,12 +36,14 @@ export const validateCommand = new Command("validate")
 
     const results: ValidationResult[] = [];
 
-    // Discover packages and modules
+    // Discover packages, modules, and apps
     const packagesDir = join(rootDir, "packages");
     const modulesDir = join(rootDir, "modules");
+    const appsDir = join(rootDir, "apps");
 
     const packages = await discoverDirs(packagesDir);
     const modules = await discoverDirs(modulesDir);
+    const apps = await discoverDirs(appsDir);
 
     // Validate each package
     for (const pkg of packages) {
@@ -70,6 +72,20 @@ export const validateCommand = new Command("validate")
       await validateImportRules(mod, result, rootDir, { fix: flags.fix });
       await validateI18nRules(mod, result, { fix: flags.fix });
       await validatePackageRules(mod, result, { fix: flags.fix });
+      results.push(result);
+    }
+
+    // Validate each app (FSD layer rules apply to apps too)
+    for (const app of apps) {
+      const result: ValidationResult = {
+        path: relative(rootDir, app),
+        errors: [],
+        warnings: [],
+        passes: [],
+      };
+
+      await validateFsdRules(app, result, { fix: flags.fix, type: "app" });
+      await validateImportRules(app, result, rootDir, { fix: flags.fix });
       results.push(result);
     }
 

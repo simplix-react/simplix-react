@@ -1,0 +1,23 @@
+export * from "./generated/schemas";
+export * from "./generated/contract";
+
+// Add custom schemas or extend the generated contract below.
+// This file is preserved across `simplix openapi` regeneration.
+//
+// To customize the generated contract (add/replace/remove operations),
+// use customizeApi() instead of re-exporting the generated contract:
+//
+//   import { customizeApi } from "@simplix-react/contract";
+//   import { {{domainName}}Api as _{{domainName}}Api } from "./generated/contract";
+//
+//   export const {{domainName}}Api = customizeApi(_{{domainName}}Api, {
+//     entities: {
+//       // Replace or add operations:
+//       //   someEntity: {
+//       //     operations: {
+//       //       list: { method: "GET", path: "/custom-path", role: "list" },
+//       //       obsoleteOp: null,  // Remove an operation
+//       //     },
+//       //   },
+//     },
+//   });

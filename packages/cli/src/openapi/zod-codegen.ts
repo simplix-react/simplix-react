@@ -1,4 +1,5 @@
 import type { SchemaObject, ExtractedEntity } from "./types.js";
+import { toPascalCase } from "./entity-extractor.js";
 
 /**
  * Convert an OpenAPI SchemaObject to a Zod type string.
@@ -24,6 +25,20 @@ function buildBaseZodType(schema: SchemaObject): string {
     return `z.enum([${values}])`;
   }
 
+  // allOf — merge all sub-schemas
+  if (schema.allOf?.length) {
+    const merged = mergeAllOfSchemas(schema.allOf);
+    return toZodType(merged);
+  }
+
+  // oneOf / anyOf — z.union
+  if (schema.oneOf?.length || schema.anyOf?.length) {
+    const variants = (schema.oneOf ?? schema.anyOf)!;
+    if (variants.length === 1) return toZodType(variants[0]);
+    const types = variants.map((s) => toZodType(s));
+    return `z.union([${types.join(", ")}])`;
+  }
+
   // Array
   if (schema.type === "array" && schema.items) {
     const itemType = toZodType(schema.items);
@@ -34,7 +49,7 @@ function buildBaseZodType(schema: SchemaObject): string {
   if (schema.type === "object" && schema.properties) {
     const entries = Object.entries(schema.properties);
     if (entries.length === 0) {
-      return "z.record(z.unknown())";
+      return "z.record(z.string(), z.unknown())";
     }
     const requiredSet = new Set(schema.required ?? []);
     const fields = entries
@@ -71,7 +86,7 @@ function buildBaseZodType(schema: SchemaObject): string {
 
   // Object without properties
   if (schema.type === "object") {
-    return "z.record(z.unknown())";
+    return "z.record(z.string(), z.unknown())";
   }
 
   // Fallback
@@ -123,27 +138,6 @@ function addConstraints(base: string, schema: SchemaObject): string {
 }
 
 /**
- * Convert an OpenAPI SchemaObject to a SQL type string.
- */
-export function toSqlType(schema: SchemaObject): string {
-  if (schema.type === "string") {
-    switch (schema.format) {
-      case "uuid":
-        return "UUID";
-      case "date-time":
-        return "TIMESTAMPTZ";
-      default:
-        return "TEXT";
-    }
-  }
-  if (schema.type === "integer") return "INTEGER";
-  if (schema.type === "number") return "NUMERIC";
-  if (schema.type === "boolean") return "BOOLEAN";
-  if (schema.type === "array" || schema.type === "object") return "JSONB";
-  return "TEXT";
-}
-
-/**
  * Generate complete Zod schema file content for an entity.
  */
 export function generateZodSchemas(entities: ExtractedEntity[]): string {
@@ -151,58 +145,89 @@ export function generateZodSchemas(entities: ExtractedEntity[]): string {
 
   for (const entity of entities) {
     // Main schema
-    const fieldEntries = entity.fields
-      .map((f) => {
-        let field = `  ${f.name}: ${f.zodType}`;
-        if (!f.required && !f.zodType.includes(".optional()")) {
-          field += ".optional()";
-        }
-        return field + ",";
-      })
-      .join("\n");
-
-    lines.push(`export const ${entity.name}Schema = z.object({`);
-    lines.push(fieldEntries);
-    lines.push("});");
-    lines.push("");
-
-    // Create schema — omit id, timestamps
-    const omitFields = entity.fields
-      .filter((f) => ["id", "createdAt", "updatedAt", "created_at", "updated_at"].includes(f.name))
-      .map((f) => `  ${f.name}: true,`)
-      .join("\n");
-
-    if (omitFields) {
-      lines.push(
-        `export const create${entity.pascalName}Schema = ${entity.name}Schema.omit({`,
-      );
-      lines.push(omitFields);
-      lines.push("});");
+    if (entity.schemaOverride) {
+      lines.push(`export const ${entity.name}Schema = ${entity.schemaOverride};`);
     } else {
-      lines.push(
-        `export const create${entity.pascalName}Schema = ${entity.name}Schema;`,
-      );
+      const fieldEntries = entity.fields
+        .map((f) => {
+          let field = `  ${f.name}: ${f.zodType}`;
+          if (!f.required && !f.zodType.includes(".optional()")) {
+            field += ".optional()";
+          }
+          return field + ",";
+        })
+        .join("\n");
+
+      lines.push(`export const ${entity.name}Schema = z.object({`);
+      lines.push(fieldEntries);
+      lines.push("});");
     }
     lines.push("");
 
-    // Update schema — partial of create
-    lines.push(
-      `export const update${entity.pascalName}Schema = create${entity.pascalName}Schema.partial();`,
-    );
-    lines.push("");
+    // Operation input schemas — unified naming: ${opName}${PascalName}Schema
+    for (const op of entity.operations) {
+      if (!op.bodySchema) continue;
+      const schemaName = `${op.name}${entity.pascalName}Schema`;
+      const schemaCode = generateInlineSchema(op.bodySchema);
+      lines.push(`export const ${schemaName} = ${schemaCode};`);
+      lines.push("");
+    }
 
     // Type exports
     lines.push(
       `export type ${entity.pascalName} = z.infer<typeof ${entity.name}Schema>;`,
     );
-    lines.push(
-      `export type Create${entity.pascalName} = z.infer<typeof create${entity.pascalName}Schema>;`,
-    );
-    lines.push(
-      `export type Update${entity.pascalName} = z.infer<typeof update${entity.pascalName}Schema>;`,
-    );
+    for (const op of entity.operations) {
+      if (!op.bodySchema) continue;
+      const typeName = `${toPascalCase(op.name)}${entity.pascalName}`;
+      const schemaName = `${op.name}${entity.pascalName}Schema`;
+      lines.push(
+        `export type ${typeName} = z.infer<typeof ${schemaName}>;`,
+      );
+    }
     lines.push("");
   }
 
   return lines.join("\n");
+}
+
+function generateInlineSchema(schema: SchemaObject): string {
+  if (!schema.properties) {
+    return toZodType(schema);
+  }
+
+  const requiredSet = new Set(schema.required ?? []);
+  const fields = Object.entries(schema.properties)
+    .map(([key, prop]) => {
+      let fieldType = toZodType(prop);
+      if (!requiredSet.has(key)) {
+        fieldType += ".optional()";
+      }
+      return `  ${key}: ${fieldType},`;
+    })
+    .join("\n");
+
+  return `z.object({\n${fields}\n})`;
+}
+
+/**
+ * Merge allOf sub-schemas by combining properties and required arrays.
+ */
+function mergeAllOfSchemas(schemas: SchemaObject[]): SchemaObject {
+  const merged: SchemaObject = { type: "object", properties: {}, required: [] };
+
+  for (const s of schemas) {
+    if (s.properties) {
+      Object.assign(merged.properties!, s.properties);
+    }
+    if (s.required) {
+      merged.required!.push(...s.required);
+    }
+  }
+
+  if (merged.required!.length === 0) {
+    delete merged.required;
+  }
+
+  return merged;
 }

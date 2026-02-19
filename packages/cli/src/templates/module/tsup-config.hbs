@@ -1,0 +1,17 @@
+import { defineConfig } from "tsup";
+
+export default defineConfig((options) => ({
+  entry: {
+    index: "src/index.ts",
+    "features/index": "src/features/index.ts",
+    "widgets/index": "src/widgets/index.ts",{{#if enableI18n}}
+    "locales/index": "src/locales/index.ts",{{/if}}
+  },
+  format: ["esm"],
+  dts: true,
+  splitting: true,
+  sourcemap: true,
+  clean: !options.watch,
+  treeshake: true,
+  external: [/^@/, /^react/, /^zod/],
+}));
