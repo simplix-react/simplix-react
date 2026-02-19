@@ -1,12 +1,11 @@
-import type { PGlite } from "@electric-sql/pglite";
-import { initPGlite } from "./pglite.js";
+import { resetStore, seedEntityStore } from "./mock-store.js";
 
 type RequestHandler = unknown;
 
 /**
  * Describes a single domain's mock configuration.
  *
- * Each domain groups its own handlers, migrations, and seed data together,
+ * Each domain groups its own handlers and seed data together,
  * enabling selective activation via the {@link enabled} flag.
  *
  * @example
@@ -14,14 +13,15 @@ type RequestHandler = unknown;
  * import type { MockDomainConfig } from "@simplix-react/mock";
  * import { deriveMockHandlers } from "@simplix-react/mock";
  * import { projectContract } from "./contract";
- * import { runMigrations } from "./migrations";
- * import { seedData } from "./seed";
  *
  * const projectDomain: MockDomainConfig = {
  *   name: "project",
  *   handlers: deriveMockHandlers(projectContract.config),
- *   migrations: [runMigrations],
- *   seed: [seedData],
+ *   seed: {
+ *     project_tasks: [
+ *       { id: 1, title: "Task 1", createdAt: "2025-01-01" },
+ *     ],
+ *   },
  * };
  * ```
  *
@@ -47,32 +47,25 @@ export interface MockDomainConfig {
   handlers: RequestHandler[];
 
   /**
-   * Migration functions to run in order.
+   * Seed data keyed by entity store name.
    *
-   * Each function receives the PGlite instance and should create or alter tables.
+   * Each key corresponds to a store name (e.g. `"project_tasks"`)
+   * and the value is an array of records to pre-populate.
    */
-  migrations: Array<(db: PGlite) => Promise<void>>;
-
-  /**
-   * Seed functions to run in order (after all migrations across all domains complete).
-   *
-   * Each function receives the PGlite instance and should insert initial data.
-   */
-  seed?: Array<(db: PGlite) => Promise<void>>;
+  seed?: Record<string, Record<string, unknown>[]>;
 }
 
 /**
  * Describes the configuration required by {@link setupMockWorker}.
  *
  * Combines multiple {@link MockDomainConfig} entries into a single bootstrap
- * configuration with an optional shared data directory.
+ * configuration.
  *
  * @example
  * ```ts
  * import type { MockServerConfig } from "@simplix-react/mock";
  *
  * const config: MockServerConfig = {
- *   dataDir: "idb://my-app-mock",
  *   domains: [projectDomain, userDomain],
  * };
  * ```
@@ -81,26 +74,18 @@ export interface MockDomainConfig {
  * @see {@link MockDomainConfig} - Individual domain configuration.
  */
 export interface MockServerConfig {
-  /**
-   * IndexedDB data directory for PGlite persistence.
-   *
-   * @defaultValue `"idb://simplix-mock"`
-   */
-  dataDir?: string;
-
   /** Domain configurations to activate. */
   domains: MockDomainConfig[];
 }
 
 /**
- * Bootstraps a complete mock environment with PGlite and MSW.
+ * Bootstraps a complete mock environment with MSW and in-memory stores.
  *
  * Performs the following steps in order:
  * 1. Filters domains to only those with `enabled !== false`
- * 2. Initializes a PGlite instance at the configured `dataDir`
- * 3. Runs all migration functions across enabled domains sequentially
- * 4. Runs all seed functions across enabled domains sequentially
- * 5. Starts the MSW service worker with the combined handlers
+ * 2. Resets the in-memory store
+ * 3. Seeds each entity store from domain seed data
+ * 4. Starts the MSW service worker with the combined handlers
  *
  * @param config - The {@link MockServerConfig} describing domains and their setup.
  *
@@ -109,7 +94,6 @@ export interface MockServerConfig {
  * import { setupMockWorker } from "@simplix-react/mock";
  *
  * await setupMockWorker({
- *   dataDir: "idb://my-app-mock",
  *   domains: [projectDomain, userDomain],
  * });
  * ```
@@ -117,27 +101,24 @@ export interface MockServerConfig {
  * @see {@link MockServerConfig} - Configuration shape.
  * @see {@link MockDomainConfig} - Individual domain configuration.
  * @see {@link deriveMockHandlers} - Generates MSW handlers from a contract.
- * @see {@link initPGlite} - Underlying PGlite initialization.
  */
 export async function setupMockWorker(config: MockServerConfig): Promise<void> {
-  const { dataDir = "idb://simplix-mock", domains } = config;
+  const { domains } = config;
 
   const enabledDomains = domains.filter((d) => d.enabled !== false);
 
-  // Initialize PGlite
-  const db = await initPGlite(dataDir);
+  // Skip setup entirely when no domains are configured
+  if (enabledDomains.length === 0) return;
 
-  // Run all migrations across enabled domains
-  for (const domain of enabledDomains) {
-    for (const migration of domain.migrations) {
-      await migration(db);
-    }
-  }
+  // Reset in-memory stores
+  resetStore();
 
-  // Run all seeds across enabled domains
+  // Seed entity stores from each domain
   for (const domain of enabledDomains) {
-    for (const seedFn of domain.seed ?? []) {
-      await seedFn(db);
+    if (domain.seed) {
+      for (const [storeName, records] of Object.entries(domain.seed)) {
+        seedEntityStore(storeName, records);
+      }
     }
   }
 

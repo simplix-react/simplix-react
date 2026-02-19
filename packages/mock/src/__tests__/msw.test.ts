@@ -1,10 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { MockDomainConfig } from "../msw.js";
 
-// Mock PGlite
-const mockDb = {};
-vi.mock("../pglite.js", () => ({
-  initPGlite: vi.fn().mockResolvedValue(mockDb),
+// Mock mock-store
+const mockResetStore = vi.fn();
+const mockSeedEntityStore = vi.fn();
+vi.mock("../mock-store.js", () => ({
+  resetStore: (...args: unknown[]) => mockResetStore(...args),
+  seedEntityStore: (...args: unknown[]) => mockSeedEntityStore(...args),
 }));
 
 // Mock MSW browser (dynamic import)
@@ -16,7 +18,6 @@ vi.mock("msw/browser", () => ({
 
 // Import after mocks are set up
 const { setupMockWorker } = await import("../msw.js");
-const { initPGlite } = await import("../pglite.js");
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -24,93 +25,59 @@ beforeEach(() => {
 
 describe("setupMockWorker", () => {
   it("runs only enabled domains (skips enabled:false)", async () => {
-    const enabledMigration = vi.fn();
-    const disabledMigration = vi.fn();
-    const enabledSeed = vi.fn();
-    const disabledSeed = vi.fn();
-
     const domains: MockDomainConfig[] = [
       {
         name: "active",
         enabled: true,
         handlers: ["handler-a"],
-        migrations: [enabledMigration],
-        seed: [enabledSeed],
+        seed: { store_a: [{ id: 1, name: "A" }] },
       },
       {
         name: "inactive",
         enabled: false,
         handlers: ["handler-b"],
-        migrations: [disabledMigration],
-        seed: [disabledSeed],
+        seed: { store_b: [{ id: 2, name: "B" }] },
       },
     ];
 
     await setupMockWorker({ domains });
 
-    expect(enabledMigration).toHaveBeenCalledWith(mockDb);
-    expect(enabledSeed).toHaveBeenCalledWith(mockDb);
-    expect(disabledMigration).not.toHaveBeenCalled();
-    expect(disabledSeed).not.toHaveBeenCalled();
+    expect(mockSeedEntityStore).toHaveBeenCalledWith("store_a", [{ id: 1, name: "A" }]);
+    expect(mockSeedEntityStore).not.toHaveBeenCalledWith("store_b", expect.anything());
     expect(mockSetupWorker).toHaveBeenCalledWith("handler-a");
   });
 
   it("treats domains without explicit enabled field as enabled", async () => {
-    const migration = vi.fn();
-
     const domains: MockDomainConfig[] = [
       {
         name: "default-enabled",
         handlers: ["handler-default"],
-        migrations: [migration],
+        seed: { store_x: [{ id: 1 }] },
       },
     ];
 
     await setupMockWorker({ domains });
 
-    expect(migration).toHaveBeenCalledWith(mockDb);
+    expect(mockSeedEntityStore).toHaveBeenCalledWith("store_x", [{ id: 1 }]);
     expect(mockSetupWorker).toHaveBeenCalledWith("handler-default");
   });
 
-  it("runs all migrations before any seeds", async () => {
-    const order: string[] = [];
-
-    const migrationA = vi.fn().mockImplementation(async () => {
-      order.push("migration-a");
-    });
-    const migrationB = vi.fn().mockImplementation(async () => {
-      order.push("migration-b");
-    });
-    const seedA = vi.fn().mockImplementation(async () => {
-      order.push("seed-a");
-    });
-    const seedB = vi.fn().mockImplementation(async () => {
-      order.push("seed-b");
-    });
-
+  it("calls resetStore before seeding", async () => {
     const domains: MockDomainConfig[] = [
       {
         name: "domain-a",
         handlers: [],
-        migrations: [migrationA],
-        seed: [seedA],
-      },
-      {
-        name: "domain-b",
-        handlers: [],
-        migrations: [migrationB],
-        seed: [seedB],
+        seed: { store_a: [{ id: 1 }] },
       },
     ];
 
     await setupMockWorker({ domains });
 
-    expect(order).toEqual([
-      "migration-a",
-      "migration-b",
-      "seed-a",
-      "seed-b",
-    ]);
+    expect(mockResetStore).toHaveBeenCalledTimes(1);
+    // resetStore should be called before seedEntityStore
+    const resetOrder = mockResetStore.mock.invocationCallOrder[0];
+    const seedOrder = mockSeedEntityStore.mock.invocationCallOrder[0];
+    expect(resetOrder).toBeLessThan(seedOrder);
   });
 
   it("merges handlers from all enabled domains via flatMap", async () => {
@@ -118,18 +85,15 @@ describe("setupMockWorker", () => {
       {
         name: "domain-a",
         handlers: ["h1", "h2"],
-        migrations: [],
       },
       {
         name: "domain-b",
         handlers: ["h3"],
-        migrations: [],
       },
       {
         name: "domain-c",
         enabled: false,
         handlers: ["h4"],
-        migrations: [],
       },
     ];
 
@@ -141,46 +105,32 @@ describe("setupMockWorker", () => {
   it("handles empty domains array without error", async () => {
     await setupMockWorker({ domains: [] });
 
-    expect(initPGlite).toHaveBeenCalled();
-    expect(mockSetupWorker).toHaveBeenCalledWith();
-    expect(mockStart).toHaveBeenCalled();
+    expect(mockResetStore).not.toHaveBeenCalled();
+    expect(mockSetupWorker).not.toHaveBeenCalled();
+    expect(mockStart).not.toHaveBeenCalled();
   });
 
   it("works correctly when seed is omitted", async () => {
-    const migration = vi.fn();
-
     const domains: MockDomainConfig[] = [
       {
         name: "no-seed",
         handlers: ["handler-ns"],
-        migrations: [migration],
       },
     ];
 
     await setupMockWorker({ domains });
 
-    expect(migration).toHaveBeenCalledWith(mockDb);
+    expect(mockSeedEntityStore).not.toHaveBeenCalled();
     expect(mockSetupWorker).toHaveBeenCalledWith("handler-ns");
     expect(mockStart).toHaveBeenCalled();
   });
 
-  it("passes dataDir to initPGlite", async () => {
-    await setupMockWorker({
-      dataDir: "idb://custom-dir",
-      domains: [],
-    });
-
-    expect(initPGlite).toHaveBeenCalledWith("idb://custom-dir");
-  });
-
-  it("uses default dataDir when not specified", async () => {
-    await setupMockWorker({ domains: [] });
-
-    expect(initPGlite).toHaveBeenCalledWith("idb://simplix-mock");
-  });
-
   it("starts worker with correct options", async () => {
-    await setupMockWorker({ domains: [] });
+    const domains: MockDomainConfig[] = [
+      { name: "test", handlers: [] },
+    ];
+
+    await setupMockWorker({ domains });
 
     expect(mockStart).toHaveBeenCalledWith({
       onUnhandledRequest: "bypass",

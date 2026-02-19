@@ -5,12 +5,12 @@ import { deriveMockHandlers } from "../derive-mock-handlers.js";
 
 // Minimal entity schemas for testing
 const taskSchema = z.object({ id: z.string(), title: z.string() });
-const taskCreateSchema = z.object({ title: z.string() });
-const taskUpdateSchema = z.object({ title: z.string().optional() });
+const taskCreateInput = z.object({ title: z.string() });
+const taskUpdateInput = z.object({ title: z.string().optional() });
 
 const memberSchema = z.object({ id: z.string(), name: z.string() });
-const memberCreateSchema = z.object({ name: z.string() });
-const memberUpdateSchema = z.object({ name: z.string().optional() });
+const memberCreateInput = z.object({ name: z.string() });
+const memberUpdateInput = z.object({ name: z.string().optional() });
 
 function createBasicConfig(): ApiContractConfig {
   return {
@@ -18,10 +18,14 @@ function createBasicConfig(): ApiContractConfig {
     basePath: "/api/v1",
     entities: {
       task: {
-        path: "/tasks",
         schema: taskSchema,
-        createSchema: taskCreateSchema,
-        updateSchema: taskUpdateSchema,
+        operations: {
+          list:   { method: "GET",    path: "/tasks" },
+          get:    { method: "GET",    path: "/tasks/:id" },
+          create: { method: "POST",   path: "/tasks", input: taskCreateInput },
+          update: { method: "PATCH",  path: "/tasks/:id", input: taskUpdateInput },
+          delete: { method: "DELETE", path: "/tasks/:id" },
+        },
       },
     },
   };
@@ -34,24 +38,28 @@ describe("deriveMockHandlers", () => {
     expect(handlers.length).toBeGreaterThan(0);
   });
 
-  it("generates 4 handlers per entity without parent (GET list, GET by id, POST, PATCH, DELETE)", () => {
+  it("generates 5 handlers for entity with 5 CRUD operations", () => {
     const config = createBasicConfig();
     const handlers = deriveMockHandlers(config);
 
-    // Each entity without parent: GET list + GET by id + POST + PATCH + DELETE = 5
+    // Each CRUD operation: GET list + GET by id + POST + PATCH + DELETE = 5
     expect(handlers).toHaveLength(5);
   });
 
-  it("generates 5 handlers per entity with parent (parent GET list, GET by id, parent POST, PATCH, DELETE)", () => {
+  it("generates handlers for entity with parent (parent-scoped list and create)", () => {
     const config: ApiContractConfig = {
       domain: "project",
       basePath: "/api/v1",
       entities: {
         task: {
-          path: "/tasks",
           schema: taskSchema,
-          createSchema: taskCreateSchema,
-          updateSchema: taskUpdateSchema,
+          operations: {
+            list:   { method: "GET",    path: "/tasks" },
+            get:    { method: "GET",    path: "/tasks/:id" },
+            create: { method: "POST",   path: "/tasks", input: taskCreateInput },
+            update: { method: "PATCH",  path: "/tasks/:id", input: taskUpdateInput },
+            delete: { method: "DELETE", path: "/tasks/:id" },
+          },
           parent: {
             param: "projectId",
             path: "/projects",
@@ -72,16 +80,24 @@ describe("deriveMockHandlers", () => {
       basePath: "/api/v1",
       entities: {
         task: {
-          path: "/tasks",
           schema: taskSchema,
-          createSchema: taskCreateSchema,
-          updateSchema: taskUpdateSchema,
+          operations: {
+            list:   { method: "GET",    path: "/tasks" },
+            get:    { method: "GET",    path: "/tasks/:id" },
+            create: { method: "POST",   path: "/tasks", input: taskCreateInput },
+            update: { method: "PATCH",  path: "/tasks/:id", input: taskUpdateInput },
+            delete: { method: "DELETE", path: "/tasks/:id" },
+          },
         },
         member: {
-          path: "/members",
           schema: memberSchema,
-          createSchema: memberCreateSchema,
-          updateSchema: memberUpdateSchema,
+          operations: {
+            list:   { method: "GET",    path: "/members" },
+            get:    { method: "GET",    path: "/members/:id" },
+            create: { method: "POST",   path: "/members", input: memberCreateInput },
+            update: { method: "PATCH",  path: "/members/:id", input: memberUpdateInput },
+            delete: { method: "DELETE", path: "/members/:id" },
+          },
         },
       },
     };
@@ -98,16 +114,24 @@ describe("deriveMockHandlers", () => {
       basePath: "/api/v1",
       entities: {
         project: {
-          path: "/projects",
           schema: z.object({ id: z.string(), name: z.string() }),
-          createSchema: z.object({ name: z.string() }),
-          updateSchema: z.object({ name: z.string().optional() }),
+          operations: {
+            list:   { method: "GET",    path: "/projects" },
+            get:    { method: "GET",    path: "/projects/:id" },
+            create: { method: "POST",   path: "/projects", input: z.object({ name: z.string() }) },
+            update: { method: "PATCH",  path: "/projects/:id", input: z.object({ name: z.string().optional() }) },
+            delete: { method: "DELETE", path: "/projects/:id" },
+          },
         },
         task: {
-          path: "/tasks",
           schema: taskSchema,
-          createSchema: taskCreateSchema,
-          updateSchema: taskUpdateSchema,
+          operations: {
+            list:   { method: "GET",    path: "/tasks" },
+            get:    { method: "GET",    path: "/tasks/:id" },
+            create: { method: "POST",   path: "/tasks", input: taskCreateInput },
+            update: { method: "PATCH",  path: "/tasks/:id", input: taskUpdateInput },
+            delete: { method: "DELETE", path: "/tasks/:id" },
+          },
           parent: {
             param: "projectId",
             path: "/projects",
@@ -126,10 +150,9 @@ describe("deriveMockHandlers", () => {
     const config = createBasicConfig();
     const handlers = deriveMockHandlers(config, {
       task: {
-        tableName: "custom_tasks",
         defaultLimit: 20,
         maxLimit: 200,
-        defaultSort: "title ASC",
+        defaultSort: "title:asc",
       },
     });
 
@@ -142,7 +165,7 @@ describe("deriveMockHandlers", () => {
       task: {
         relations: {
           project: {
-            table: "projects",
+            entity: "projects",
             localKey: "projectId",
             type: "belongsTo",
           },
@@ -169,9 +192,72 @@ describe("deriveMockHandlers", () => {
     const handlers = deriveMockHandlers(createBasicConfig());
 
     for (const handler of handlers) {
-      // MSW handlers have an info property with header/path and a method
       expect(handler).toBeDefined();
       expect(typeof handler).toBe("object");
     }
+  });
+
+  it("generates handlers for custom operations without CRUD role", () => {
+    const config: ApiContractConfig = {
+      domain: "project",
+      basePath: "/api/v1",
+      entities: {
+        task: {
+          schema: taskSchema,
+          operations: {
+            list:       { method: "GET",    path: "/tasks" },
+            get:        { method: "GET",    path: "/tasks/:id" },
+            archive:    { method: "POST",   path: "/tasks/:id/archive" },
+            bulkDelete: { method: "POST",   path: "/tasks/bulk-delete" },
+          },
+        },
+      },
+    };
+
+    const handlers = deriveMockHandlers(config);
+
+    // list + get + archive (custom) + bulkDelete (custom) = 4
+    expect(handlers).toHaveLength(4);
+  });
+
+  it("generates handler for tree role operation", () => {
+    const config: ApiContractConfig = {
+      domain: "project",
+      basePath: "/api/v1",
+      entities: {
+        category: {
+          schema: z.object({ id: z.string(), name: z.string(), parentId: z.string().nullable() }),
+          operations: {
+            list: { method: "GET", path: "/categories" },
+            tree: { method: "GET", path: "/categories/tree" },
+          },
+        },
+      },
+    };
+
+    const handlers = deriveMockHandlers(config);
+
+    // list + tree = 2
+    expect(handlers).toHaveLength(2);
+  });
+
+  it("entity with only list and get generates 2 handlers", () => {
+    const config: ApiContractConfig = {
+      domain: "project",
+      basePath: "/api/v1",
+      entities: {
+        task: {
+          schema: taskSchema,
+          operations: {
+            list: { method: "GET", path: "/tasks" },
+            get:  { method: "GET", path: "/tasks/:id" },
+          },
+        },
+      },
+    };
+
+    const handlers = deriveMockHandlers(config);
+
+    expect(handlers).toHaveLength(2);
   });
 });

@@ -1,11 +1,11 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: { index: "src/index.ts" },
+  entry: { index: "src/index.ts", vite: "src/vite-plugin.ts" },
   format: ["esm"],
   dts: true,
   splitting: true,
   treeshake: true,
   clean: true,
-  external: [/^zod/, /^msw/, /^@electric-sql/, /^@simplix-react/],
+  external: [/^zod/, /^msw/, /^@simplix-react/, /^vite$/],
 });
