@@ -1,0 +1,11 @@
+{
+  "name": "simplix-boot",
+  "private": true,
+  "scripts": {
+    "build": "turbo build",
+    "typecheck": "turbo typecheck",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "clean": "turbo clean"
+  }
+}

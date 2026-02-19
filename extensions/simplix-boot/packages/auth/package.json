@@ -1,0 +1,36 @@
+{
+  "name": "@simplix-boot/auth",
+  "version": "0.1.0",
+  "description": "Spring Security authentication adapter for @simplix-react/auth",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rm -rf dist .turbo"
+  },
+  "peerDependencies": {
+    "@simplix-react/auth": "workspace:*",
+    "@simplix-react/contract": "workspace:*"
+  },
+  "devDependencies": {
+    "@simplix-react/auth": "workspace:*",
+    "@simplix-react/contract": "workspace:*",
+    "@simplix-react/config-eslint": "workspace:*",
+    "@simplix-react/config-typescript": "workspace:*",
+    "eslint": "^9.39.2",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^3.0.0"
+  }
+}

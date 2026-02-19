@@ -1,2 +1,3 @@
 packages:
   - "packages/*"
+  - "extensions/simplix-boot/packages/*"
