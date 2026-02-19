@@ -33,4 +33,10 @@ export {
   normalizeFlatPermissions,
   normalizeScopePermissions,
 } from "./helpers/normalize-rules.js";
-export { normalizeRole, hasRole, hasAnyRole } from "./helpers/role-utils.js";
+export {
+  normalizeRole,
+  normalizeRoles,
+  hasRole,
+  hasAnyRole,
+} from "./helpers/role-utils.js";
+export type { RoleInput } from "./helpers/role-utils.js";

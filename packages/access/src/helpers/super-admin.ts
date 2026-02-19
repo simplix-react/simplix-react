@@ -25,5 +25,5 @@ export function checkSuperAdmin(
   checker?: (user: AccessUser) => boolean,
 ): boolean {
   if (checker) return checker(user);
-  return user.isSuperAdmin === true;
+  return user.isSuperAdmin === true || (user.isSuperAdmin as unknown) === "true";
 }
