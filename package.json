@@ -9,7 +9,7 @@
     "dev": "turbo run dev",
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",
-    "test": "turbo run test",
+    "test": "vitest run --reporter=verbose",
     "clean": "turbo run clean",
     "docs:api": "typedoc",
     "changeset": "changeset",
@@ -24,7 +24,8 @@
     "turbo": "^2.7.5",
     "typedoc": "^0.28.16",
     "typedoc-plugin-markdown": "^4.10.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
   },
   "packageManager": "pnpm@10.12.4",
   "engines": {
