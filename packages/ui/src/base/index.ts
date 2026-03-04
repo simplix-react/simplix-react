@@ -5,7 +5,17 @@ export { Button, buttonVariants } from "./button";
 export type { ButtonProps, ButtonVariants } from "./button";
 
 export { Calendar } from "./calendar";
-export type { CalendarProps } from "./calendar";
+export type { CalendarProps, DateRange } from "./calendar";
+
+export {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+} from "./command";
 
 export { Checkbox } from "./checkbox";
 export type { CheckboxProps } from "./checkbox";
@@ -63,6 +73,9 @@ export type { InputProps } from "./input";
 
 export { Label } from "./label";
 export type { LabelProps } from "./label";
+
+export { Map, MapMarker, MapPinContainer, useMap } from "./map";
+export type { MapProps, MapMarkerProps, MapPinContainerProps, MapRef, MapContextValue } from "./map";
 
 export {
   NavigationMenu,

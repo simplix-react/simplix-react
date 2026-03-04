@@ -2,14 +2,14 @@ import { createContext, useContext } from "react";
 
 /** Field display configuration for label position and size. */
 export interface FieldVariant {
-  labelPosition?: "top" | "left" | "hidden";
+  layout?: "top" | "left" | "inline" | "hidden";
   size?: "sm" | "md" | "lg";
 }
 
 /** Context for propagating field display configuration to descendant fields. */
 export const FieldVariantContext = createContext<FieldVariant>({
-  labelPosition: "top",
-  size: "md",
+  layout: "top",
+  size: "sm",
 });
 
 /** Retrieves the current field variant from context, merged with optional overrides. */
@@ -59,3 +59,15 @@ export interface FilterState {
 
 /** Reason for an empty list state (no data, no filter match, no search match). */
 export type EmptyReason = "no-data" | "no-filter" | "no-search";
+
+/** Configuration for drag-and-drop row reordering. */
+export interface ReorderConfig<T> {
+  /** Field name used for ordering (e.g. "displayOrder", "sortOrder"). */
+  orderField: keyof T & string;
+  /** Field name for row ID (default: "id"). */
+  idField?: keyof T & string;
+  /** Callback invoked with reordered data after drag ends. */
+  onReorder: (items: T[]) => void | Promise<void>;
+  /** Per-row drag gate — return false to disable drag for specific rows. */
+  canDrag?: (row: T) => boolean;
+}

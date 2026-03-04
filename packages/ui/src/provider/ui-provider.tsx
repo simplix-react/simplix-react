@@ -1,32 +1,87 @@
 import { type ReactNode, useContext, useMemo } from "react";
 
-import { Badge } from "../base/badge";
-import { Calendar } from "../base/calendar";
-import { Checkbox } from "../base/checkbox";
-import { Input } from "../base/input";
-import { Label } from "../base/label";
-import { RadioGroup, RadioGroupItem } from "../base/radio-group";
 import {
+  Badge,
+  Button,
+  Calendar,
+  Checkbox,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogTitle,
+  DialogTrigger,
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+  Input,
+  Label,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  RadioGroup,
+  RadioGroupItem,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../base/select";
-import { Switch } from "../base/switch";
-import { Textarea } from "../base/textarea";
-import { Card } from "../primitives/card";
-import { Container } from "../primitives/container";
-import { Flex } from "../primitives/flex";
-import { Grid } from "../primitives/grid";
-import { Heading } from "../primitives/heading";
-import { Section } from "../primitives/section";
-import { Stack } from "../primitives/stack";
-import { Text } from "../primitives/text";
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  Skeleton,
+  Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  Textarea,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../base";
+import { CrudDelete } from "../crud/delete";
+import { QueryFallback } from "../crud/shared";
+import { SectionShell } from "../crud/shared/section-shell";
+import { DetailFieldWrapper, FieldWrapper } from "../fields";
+import { Card, Container, Flex, Grid, Heading, Section, Stack, Text } from "../primitives";
 import type { UIComponents } from "./types";
 import { UIComponentContext } from "./ui-component-context";
 
 const defaultComponents: UIComponents = {
+  // Base
   Input,
   Textarea,
   Label,
@@ -34,17 +89,20 @@ const defaultComponents: UIComponents = {
   Checkbox,
   Badge,
   Calendar,
-  Select: {
-    Root: Select,
-    Trigger: SelectTrigger,
-    Value: SelectValue,
-    Content: SelectContent,
-    Item: SelectItem,
-  },
-  RadioGroup: {
-    Root: RadioGroup,
-    Item: RadioGroupItem,
-  },
+  Button,
+  Skeleton,
+  // Compound base
+  Select: { Root: Select, Trigger: SelectTrigger, Value: SelectValue, Content: SelectContent, Item: SelectItem },
+  RadioGroup: { Root: RadioGroup, Item: RadioGroupItem },
+  Dialog: { Root: Dialog, Trigger: DialogTrigger, Content: DialogContent, Header: DialogHeader, Footer: DialogFooter, Title: DialogTitle, Description: DialogDescription, Overlay: DialogOverlay, Close: DialogClose },
+  Sheet: { Root: Sheet, Trigger: SheetTrigger, Content: SheetContent, Header: SheetHeader, Footer: SheetFooter, Title: SheetTitle, Description: SheetDescription, Close: SheetClose },
+  Popover: { Root: Popover, Trigger: PopoverTrigger, Content: PopoverContent },
+  Tooltip: { Provider: TooltipProvider, Root: Tooltip, Trigger: TooltipTrigger, Content: TooltipContent },
+  DropdownMenu: { Root: DropdownMenu, Trigger: DropdownMenuTrigger, Content: DropdownMenuContent, Item: DropdownMenuItem, CheckboxItem: DropdownMenuCheckboxItem, RadioItem: DropdownMenuRadioItem, Label: DropdownMenuLabel, Separator: DropdownMenuSeparator, Group: DropdownMenuGroup, RadioGroup: DropdownMenuRadioGroup, Sub: DropdownMenuSub, SubTrigger: DropdownMenuSubTrigger, SubContent: DropdownMenuSubContent },
+  Tabs: { Root: Tabs, List: TabsList, Trigger: TabsTrigger, Content: TabsContent },
+  Command: { Root: Command, Input: CommandInput, List: CommandList, Empty: CommandEmpty, Group: CommandGroup, Item: CommandItem, Separator: CommandSeparator },
+  Table: { Root: Table, Header: TableHeader, Body: TableBody, Row: TableRow, Head: TableHead, Cell: TableCell },
+  // Primitives
   Container,
   Stack,
   Flex,
@@ -53,7 +111,20 @@ const defaultComponents: UIComponents = {
   Text,
   Card,
   Section,
+  // CRUD
+  SectionShell,
+  QueryFallback,
+  CrudDelete,
+  // Field wrappers
+  FieldWrapper,
+  DetailFieldWrapper,
 };
+
+/** Compound component keys that need deep merge. */
+const COMPOUND_KEYS = [
+  "Select", "RadioGroup", "Dialog", "Sheet", "Popover",
+  "Tooltip", "DropdownMenu", "Tabs", "Command", "Table",
+] as const;
 
 /** Props for the {@link UIProvider} component. */
 export interface UIProviderProps {
@@ -68,8 +139,8 @@ export interface UIProviderProps {
  *
  * @example
  * ```tsx
- * <UIProvider overrides={{ Input: MyCustomInput }}>
- *   <FormFields.TextField label="Name" value={v} onChange={setV} />
+ * <UIProvider overrides={{ Button: MyButton, SectionShell: MySectionShell }}>
+ *   <App />
  * </UIProvider>
  * ```
  */
@@ -95,19 +166,21 @@ export function UIProvider({ overrides, children }: UIProviderProps) {
 export function useUIComponents(): UIComponents {
   const overrides = useContext(UIComponentContext);
 
-  return useMemo(
-    () => ({
-      ...defaultComponents,
-      ...overrides,
-      Select: {
-        ...defaultComponents.Select,
-        ...overrides.Select,
-      },
-      RadioGroup: {
-        ...defaultComponents.RadioGroup,
-        ...overrides.RadioGroup,
-      },
-    }),
-    [overrides],
-  );
+  return useMemo(() => {
+    const result = { ...defaultComponents, ...overrides };
+
+    // Deep merge compound component groups
+    for (const key of COMPOUND_KEYS) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const defaults = (defaultComponents as any)[key];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const override = (overrides as any)[key];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (result as any)[key] = override
+        ? { ...defaults, ...override }
+        : defaults;
+    }
+
+    return result;
+  }, [overrides]);
 }

@@ -21,3 +21,12 @@ export type {
   UseCrudFormSubmitOptions,
   UseCrudFormSubmitResult,
 } from "./use-crud-form-submit";
+
+export {
+  adaptOrvalCreate,
+  adaptOrvalDelete,
+  adaptOrvalOrder,
+  adaptOrvalUpdate,
+} from "./adapt-orval-mutation";
+
+export { useInvalidateEntity } from "./use-invalidate-entity";

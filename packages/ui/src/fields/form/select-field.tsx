@@ -65,7 +65,7 @@ export function SelectField<T extends string = string>({
         <Select.Trigger
           aria-invalid={!!error}
           aria-label={
-            variantProps.labelPosition === "hidden" ? label : undefined
+            variantProps.layout === "hidden" ? label : undefined
           }
         >
           <Select.Value placeholder={placeholder} />

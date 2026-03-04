@@ -10,6 +10,7 @@ import { cn } from "../utils/cn";
 interface TableContextValue {
   variant: "default" | "striped" | "bordered";
   size: "sm" | "md" | "lg";
+  density?: "compact" | "default" | "comfortable";
 }
 
 const TableContext = createContext<TableContextValue>({
@@ -36,20 +37,17 @@ const tableContainerVariants = cva("relative w-full overflow-x-auto", {
 });
 
 // ---------------------------------------------------------------------------
-// Size maps
+// Size / density maps
 // ---------------------------------------------------------------------------
 
-const headSizeMap = {
-  sm: "h-8 px-2",
-  md: "h-10 px-3",
-  lg: "h-12 px-4",
-} as const;
+const headPxMap = { sm: "px-2", md: "px-3", lg: "px-4" } as const;
+const headHMap = { sm: "h-8", md: "h-10", lg: "h-12" } as const;
 
-const cellSizeMap = {
-  sm: "px-2 py-1.5",
-  md: "px-3 py-2.5",
-  lg: "px-4 py-4",
-} as const;
+const cellPxMap = { sm: "px-2", md: "px-3", lg: "px-4" } as const;
+const cellPyMap = { sm: "py-1.5", md: "py-2.5", lg: "py-4" } as const;
+
+const densityCellPyMap = { compact: "py-1", default: "py-2", comfortable: "py-3" } as const;
+const densityHeadHMap = { compact: "h-8", default: "h-9", comfortable: "h-11" } as const;
 
 // ---------------------------------------------------------------------------
 // Table
@@ -58,15 +56,16 @@ const cellSizeMap = {
 export type TableProps = ComponentPropsWithRef<"table"> & {
   variant?: "default" | "striped" | "bordered";
   size?: "sm" | "md" | "lg";
+  density?: "compact" | "default" | "comfortable";
   rounded?: "none" | "sm" | "md" | "lg";
 };
 
 export const Table = forwardRef<HTMLTableElement, TableProps>(
   (
-    { className, variant = "default", size = "md", rounded = "none", children, ...rest },
+    { className, variant = "default", size = "md", density, rounded = "none", children, ...rest },
     ref,
   ) => (
-    <TableContext.Provider value={{ variant, size }}>
+    <TableContext.Provider value={{ variant, size, density }}>
       <div
         data-slot="table-container"
         className={cn(
@@ -104,7 +103,7 @@ export const TableHeader = forwardRef<HTMLTableSectionElement, TableHeaderProps>
     <thead
       ref={ref}
       data-slot="table-header"
-      className={cn("[&_tr]:border-b", className)}
+      className={cn("border-t border-border bg-muted/50 [&_tr]:border-b", className)}
       {...rest}
     />
   ),
@@ -123,7 +122,7 @@ export const TableBody = forwardRef<HTMLTableSectionElement, TableBodyProps>(
     <tbody
       ref={ref}
       data-slot="table-body"
-      className={cn("[&_tr:last-child]:border-0", className)}
+      className={cn("", className)}
       {...rest}
     />
   ),
@@ -189,14 +188,15 @@ export type TableHeadProps = ComponentPropsWithRef<"th">;
 
 export const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
   ({ className, ...rest }, ref) => {
-    const { size, variant } = useTableContext();
+    const { size, variant, density } = useTableContext();
     return (
       <th
         ref={ref}
         data-slot="table-head"
         className={cn(
           "text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
-          headSizeMap[size],
+          headPxMap[size],
+          density ? densityHeadHMap[density] : headHMap[size],
           variant === "bordered" && "border border-border",
           className,
         )}
@@ -216,14 +216,15 @@ export type TableCellProps = ComponentPropsWithRef<"td">;
 
 export const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(
   ({ className, ...rest }, ref) => {
-    const { size, variant } = useTableContext();
+    const { size, variant, density } = useTableContext();
     return (
       <td
         ref={ref}
         data-slot="table-cell"
         className={cn(
           "align-middle [&:has([role=checkbox])]:pr-0",
-          cellSizeMap[size],
+          cellPxMap[size],
+          density ? densityCellPyMap[density] : cellPyMap[size],
           variant === "bordered" && "border border-border",
           className,
         )}

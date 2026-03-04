@@ -16,7 +16,7 @@ export interface SwitchFieldProps extends CommonFieldProps {
 }
 
 /**
- * Toggle switch field. Defaults to `labelPosition="left"` for natural layout.
+ * Toggle switch field. Defaults to `layout="left"` for natural layout.
  *
  * @example
  * ```tsx
@@ -34,7 +34,7 @@ export function SwitchField({
   required,
   disabled,
   className,
-  labelPosition = "left",
+  layout = "left",
   ...variantProps
 }: SwitchFieldProps) {
   const { Switch } = useUIComponents();
@@ -48,7 +48,7 @@ export function SwitchField({
       required={required}
       disabled={disabled}
       className={className}
-      labelPosition={labelPosition}
+      layout={layout}
       {...variantProps}
     >
       <Switch
@@ -56,7 +56,7 @@ export function SwitchField({
         onCheckedChange={onChange}
         disabled={disabled}
         aria-invalid={!!error}
-        aria-label={labelPosition === "hidden" ? label : undefined}
+        aria-label={layout === "hidden" ? label : undefined}
         {...switchProps}
       />
     </FieldWrapper>

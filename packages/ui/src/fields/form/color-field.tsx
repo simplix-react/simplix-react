@@ -55,7 +55,7 @@ export function ColorField({
           disabled={disabled}
           className="h-10 w-10 shrink-0 cursor-pointer rounded-md border border-input bg-transparent p-0.5 disabled:cursor-not-allowed disabled:opacity-50"
           aria-label={
-            variantProps.labelPosition === "hidden" ? label : undefined
+            variantProps.layout === "hidden" ? label : undefined
           }
         />
         <Input

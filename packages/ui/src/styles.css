@@ -1,0 +1,29 @@
+/*
+ * Chrome 121+ ignores ::-webkit-scrollbar when scrollbar-width is not 'auto'.
+ * Reset to 'auto' so the pseudo-element styles take effect (persistent scrollbar on macOS).
+ */
+[data-slot="table-container"] {
+  scrollbar-width: auto;
+  scrollbar-color: auto;
+}
+
+[data-slot="table-container"]::-webkit-scrollbar {
+  height: 6px;
+}
+
+[data-slot="table-container"]::-webkit-scrollbar-track {
+  background: var(--muted);
+}
+
+[data-slot="table-container"]::-webkit-scrollbar-thumb {
+  background-color: var(--border);
+  border-radius: 3px;
+}
+
+/* Firefox: standard properties (Firefox always shows scrollbars, thin is fine) */
+@supports not selector(::-webkit-scrollbar) {
+  [data-slot="table-container"] {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+}

@@ -1,3 +1,4 @@
+import { useTranslation } from "@simplix-react/i18n/react";
 import type { ReactNode } from "react";
 
 /** Props for the {@link QueryFallback} component. */
@@ -22,12 +23,13 @@ export interface QueryFallbackProps {
  */
 export function QueryFallback({
   isLoading,
-  notFoundMessage = "Not found.",
-  loadingMessage = "Loading...",
+  notFoundMessage,
+  loadingMessage,
 }: QueryFallbackProps): ReactNode {
+  const { t } = useTranslation("simplix/ui");
   return (
     <div className="text-muted-foreground">
-      {isLoading ? loadingMessage : notFoundMessage}
+      {isLoading ? (loadingMessage ?? t("common.loading")) : (notFoundMessage ?? t("common.notFound"))}
     </div>
   );
 }

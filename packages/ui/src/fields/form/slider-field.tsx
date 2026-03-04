@@ -64,7 +64,7 @@ export function SliderField({
           disabled={disabled}
           aria-invalid={!!error}
           aria-label={
-            variantProps.labelPosition === "hidden" ? label : undefined
+            variantProps.layout === "hidden" ? label : undefined
           }
           aria-valuemin={min}
           aria-valuemax={max}

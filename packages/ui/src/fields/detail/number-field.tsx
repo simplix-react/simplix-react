@@ -34,7 +34,7 @@ export function DetailNumberField({
   fallback = "\u2014",
   label,
   labelKey,
-  labelPosition,
+  layout,
   size,
   className,
 }: DetailNumberFieldProps) {
@@ -64,7 +64,7 @@ export function DetailNumberField({
     <DetailFieldWrapper
       label={label}
       labelKey={labelKey}
-      labelPosition={labelPosition}
+      layout={layout}
       size={size}
       className={className}
     >

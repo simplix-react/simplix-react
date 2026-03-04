@@ -1,0 +1,42 @@
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+
+export interface PageHeaderState {
+  title?: ReactNode;
+  description?: ReactNode;
+  actions?: ReactNode;
+}
+
+const PageHeaderContext = createContext<{
+  header: PageHeaderState;
+  setHeader: (h: PageHeaderState) => void;
+}>({ header: {}, setHeader: () => {} });
+
+export function PageHeaderProvider({ children }: { children: ReactNode }) {
+  const [header, setHeader] = useState<PageHeaderState>({});
+  return (
+    <PageHeaderContext.Provider value={{ header, setHeader }}>
+      {children}
+    </PageHeaderContext.Provider>
+  );
+}
+
+export function usePageHeader(header: PageHeaderState) {
+  const { setHeader } = useContext(PageHeaderContext);
+  const ref = useRef(header);
+  ref.current = header;
+
+  // Update when title or description changes (string deps are stable)
+  // actions is read from ref.current so it's always up-to-date
+  useEffect(() => {
+    setHeader(ref.current);
+  }, [header.title, header.description, setHeader]);
+
+  // Clear header on unmount
+  useEffect(() => {
+    return () => setHeader({});
+  }, [setHeader]);
+}
+
+export function usePageHeaderState(): PageHeaderState {
+  return useContext(PageHeaderContext).header;
+}

@@ -28,7 +28,7 @@ export function DetailListField({
   mode = "badges",
   label,
   labelKey,
-  labelPosition,
+  layout,
   size,
   className,
 }: DetailListFieldProps) {
@@ -39,7 +39,7 @@ export function DetailListField({
       <DetailFieldWrapper
         label={label}
         labelKey={labelKey}
-        labelPosition={labelPosition}
+        layout={layout}
         size={size}
         className={className}
       >
@@ -52,7 +52,7 @@ export function DetailListField({
     <DetailFieldWrapper
       label={label}
       labelKey={labelKey}
-      labelPosition={labelPosition}
+      layout={layout}
       size={size}
       className={className}
     >

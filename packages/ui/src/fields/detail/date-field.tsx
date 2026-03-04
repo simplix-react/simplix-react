@@ -1,12 +1,14 @@
 import { useMemo } from "react";
 
 import type { CommonDetailFieldProps } from "../../crud/shared/types";
+import type { DateLike } from "../../utils/parse-date";
+import { parseDate } from "../../utils/parse-date";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
 
 /** Props for the {@link DetailDateField} component. */
 export interface DetailDateFieldProps extends CommonDetailFieldProps {
-  /** Date value as Date object or ISO string. */
-  value: Date | string | null;
+  /** Date value as Date object, ISO string, or unix timestamp. */
+  value: DateLike | null;
   /** Display format. Defaults to `"date"`. */
   format?: "date" | "datetime" | "relative" | string;
   /** Fallback text when value is null. Defaults to em-dash. */
@@ -40,10 +42,6 @@ function formatRelativeTime(date: Date): string {
   }
 
   return "just now";
-}
-
-function toDate(value: Date | string): Date {
-  return typeof value === "string" ? new Date(value) : value;
 }
 
 function formatDate(
@@ -85,14 +83,14 @@ export function DetailDateField({
   fallback = "\u2014",
   label,
   labelKey,
-  labelPosition,
+  layout,
   size,
   className,
 }: DetailDateFieldProps) {
   const displayValue = useMemo(() => {
     if (value == null) return fallback;
-    const date = toDate(value);
-    if (Number.isNaN(date.getTime())) return fallback;
+    const date = parseDate(value);
+    if (!date) return fallback;
     return formatDate(date, format);
   }, [value, format, fallback]);
 
@@ -100,7 +98,7 @@ export function DetailDateField({
     <DetailFieldWrapper
       label={label}
       labelKey={labelKey}
-      labelPosition={labelPosition}
+      layout={layout}
       size={size}
       className={className}
     >

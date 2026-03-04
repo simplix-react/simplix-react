@@ -10,7 +10,9 @@ import { Flex } from "../../primitives/flex";
 import { Grid } from "../../primitives/grid";
 import { Stack } from "../../primitives/stack";
 import { cn } from "../../utils/cn";
-import { PanelRightCloseIcon } from "../shared/icons";
+import { useUIComponents } from "../../provider/ui-provider";
+import { XIcon } from "../shared/icons";
+import type { SectionShellProps } from "../shared/section-shell";
 import { type FieldVariant, FieldVariantContext } from "../shared/types";
 
 // ── Form Root ──
@@ -22,6 +24,8 @@ export interface CrudFormProps {
   onClose?: () => void;
   /** Content rendered at the left side of the header toolbar (e.g. breadcrumb, back button, label). */
   header?: ReactNode;
+  /** Fixed footer rendered below the scrollable content (e.g. action buttons). */
+  footer?: ReactNode;
   fieldVariant?: FieldVariant;
   warnOnUnsavedChanges?: boolean;
   className?: string;
@@ -32,6 +36,7 @@ function FormRoot({
   onSubmit,
   onClose,
   header,
+  footer,
   fieldVariant,
   warnOnUnsavedChanges,
   className,
@@ -58,20 +63,25 @@ function FormRoot({
   );
 
   const content = (
-    <form onSubmit={handleSubmit} className={cn("w-full px-1", className)} data-testid="crud-form">
-      <Stack gap="lg">
-        {(onClose || header) && (
-          <Flex justify={header ? "between" : "end"} align="center" className="border-b pb-4">
-            {header}
-            {onClose && (
-              <Button type="button" variant="ghost" size="icon" onClick={onClose}>
-                <PanelRightCloseIcon className="h-4 w-4" />
-              </Button>
-            )}
-          </Flex>
-        )}
-        {children}
-      </Stack>
+    <form onSubmit={handleSubmit} className={cn("flex flex-col w-full flex-1 min-h-0", className)} data-testid="crud-form">
+      {(onClose || header) && (
+        <Flex justify={header ? "between" : "end"} align="center" className="shrink-0 border-b pb-2 px-2">
+          {header}
+          {onClose && (
+            <Button type="button" variant="ghost" size="icon-xs" onClick={onClose}>
+              <XIcon className="h-3 w-3" />
+            </Button>
+          )}
+        </Flex>
+      )}
+      <div className="min-h-0 overflow-auto [scrollbar-gutter:stable]">
+        <Stack gap="sm" className={cn("relative py-2", !(onClose || header) && "pt-2")}>
+          {children}
+        </Stack>
+      </div>
+      {footer && (
+        <div className="shrink-0 mt-2">{footer}</div>
+      )}
     </form>
   );
 
@@ -94,43 +104,40 @@ const layoutClasses = {
   "three-column": 3,
 } as const;
 
-/** Props for the CrudForm.Section sub-component. */
-export interface CrudFormSectionProps {
-  title: string;
-  description?: string;
+/**
+ * Section sub-component for CrudForm.
+ *
+ * @example Icon in title
+ * ```tsx
+ * <CrudForm.Section title={<><UserIcon className="size-4" /> Account</>} variant="flat">
+ *   ...
+ * </CrudForm.Section>
+ * ```
+ *
+ * @example Trailing content
+ * ```tsx
+ * <CrudForm.Section title="Settings" trailing={<Badge variant="outline">Optional</Badge>}>
+ *   ...
+ * </CrudForm.Section>
+ * ```
+ */
+export interface CrudFormSectionProps extends SectionShellProps {
   layout?: keyof typeof layoutClasses;
-  className?: string;
-  children?: ReactNode;
 }
 
 function FormSection({
-  title,
-  description,
   layout = "single-column",
-  className,
-  children,
+  ...props
 }: CrudFormSectionProps) {
+  const { SectionShell } = useUIComponents();
   const columns = layoutClasses[layout];
 
   return (
-    <section
-      className={cn(
-        "rounded-lg border bg-card p-6 text-card-foreground shadow-sm",
-        className,
-      )}
-    >
-      <Stack gap="md">
-        <Stack gap="xs">
-          <h3 className="text-lg font-semibold tracking-tight">{title}</h3>
-          {description && (
-            <p className="text-sm text-muted-foreground">{description}</p>
-          )}
-        </Stack>
-        <Grid columns={columns} gap="md">
-          {children}
-        </Grid>
-      </Stack>
-    </section>
+    <SectionShell {...props}>
+      <Grid columns={columns} gap="md">
+        {props.children}
+      </Grid>
+    </SectionShell>
   );
 }
 
@@ -144,7 +151,7 @@ export interface CrudFormActionsProps {
 
 function FormActions({ className, children }: CrudFormActionsProps) {
   return (
-    <Flex gap="sm" justify="end" className={cn("border-t pt-4", className)}>
+    <Flex gap="sm" justify="end" className={cn("border-t pt-2 px-2", className)}>
       {children}
     </Flex>
   );

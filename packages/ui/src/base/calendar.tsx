@@ -2,12 +2,21 @@ import { type ComponentPropsWithRef, forwardRef, useMemo, useState } from "react
 
 import { cn } from "../utils/cn";
 
+export interface DateRange {
+  from: Date | undefined;
+  to: Date | undefined;
+}
+
 export interface CalendarProps
   extends Omit<ComponentPropsWithRef<"div">, "onSelect"> {
   selected?: Date;
   onSelect?: (date: Date) => void;
   minDate?: Date;
   maxDate?: Date;
+  mode?: "single" | "range";
+  selectedRange?: DateRange;
+  onSelectRange?: (range: DateRange) => void;
+  numberOfMonths?: number;
 }
 
 const DAYS_OF_WEEK = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"] as const;
@@ -38,41 +47,103 @@ function isDateDisabled(
   return false;
 }
 
+function isInRange(date: Date, from: Date | undefined, to: Date | undefined): boolean {
+  if (!from || !to) return false;
+  return date > from && date < to;
+}
+
+function isRangeStart(date: Date, from: Date | undefined): boolean {
+  if (!from) return false;
+  return isSameDay(date, from);
+}
+
+function isRangeEnd(date: Date, to: Date | undefined): boolean {
+  if (!to) return false;
+  return isSameDay(date, to);
+}
+
+function buildMonthDays(year: number, month: number): Array<Date | null> {
+  const daysInMonth = getDaysInMonth(year, month);
+  const firstDay = getFirstDayOfMonth(year, month);
+  const cells: Array<Date | null> = [];
+
+  for (let i = 0; i < firstDay; i++) {
+    cells.push(null);
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    cells.push(new Date(year, month, d));
+  }
+
+  return cells;
+}
+
 export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
-  ({ className, selected, onSelect, minDate, maxDate, ...rest }, ref) => {
-    const [viewDate, setViewDate] = useState(
-      () => selected ?? new Date(),
-    );
+  (
+    {
+      className,
+      selected,
+      onSelect,
+      minDate,
+      maxDate,
+      mode = "single",
+      selectedRange,
+      onSelectRange,
+      numberOfMonths = 1,
+      ...rest
+    },
+    ref,
+  ) => {
+    const [viewDate, setViewDate] = useState(() => {
+      if (mode === "range" && selectedRange?.from) return selectedRange.from;
+      return selected ?? new Date();
+    });
 
-    const year = viewDate.getFullYear();
-    const month = viewDate.getMonth();
+    const [rangeStart, setRangeStart] = useState<Date | undefined>(undefined);
 
-    const days = useMemo(() => {
-      const daysInMonth = getDaysInMonth(year, month);
-      const firstDay = getFirstDayOfMonth(year, month);
-      const cells: Array<Date | null> = [];
+    const baseYear = viewDate.getFullYear();
+    const baseMonth = viewDate.getMonth();
 
-      // Leading empty cells
-      for (let i = 0; i < firstDay; i++) {
-        cells.push(null);
+    const months = useMemo(() => {
+      const result: Array<{ year: number; month: number; days: Array<Date | null> }> = [];
+      for (let i = 0; i < numberOfMonths; i++) {
+        const d = new Date(baseYear, baseMonth + i, 1);
+        const y = d.getFullYear();
+        const m = d.getMonth();
+        result.push({ year: y, month: m, days: buildMonthDays(y, m) });
       }
-
-      // Day cells
-      for (let d = 1; d <= daysInMonth; d++) {
-        cells.push(new Date(year, month, d));
-      }
-
-      return cells;
-    }, [year, month]);
-
-    const monthLabel = new Intl.DateTimeFormat("en-US", {
-      month: "long",
-      year: "numeric",
-    }).format(viewDate);
+      return result;
+    }, [baseYear, baseMonth, numberOfMonths]);
 
     function navigateMonth(delta: number) {
       setViewDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + delta, 1));
     }
+
+    function handleDayClick(date: Date) {
+      if (mode === "single") {
+        onSelect?.(date);
+        return;
+      }
+
+      // Range mode
+      if (!rangeStart) {
+        setRangeStart(date);
+        onSelectRange?.({ from: date, to: undefined });
+      } else {
+        if (date < rangeStart) {
+          // Clicked before the start — reset with new start
+          setRangeStart(date);
+          onSelectRange?.({ from: date, to: undefined });
+        } else {
+          // Complete the range
+          onSelectRange?.({ from: rangeStart, to: date });
+          setRangeStart(undefined);
+        }
+      }
+    }
+
+    const rangeFrom = mode === "range" ? (selectedRange?.from ?? rangeStart) : undefined;
+    const rangeTo = mode === "range" ? selectedRange?.to : undefined;
 
     return (
       <div ref={ref} className={cn("w-fit p-3", className)} {...rest}>
@@ -100,7 +171,19 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
               />
             </svg>
           </button>
-          <span className="text-sm font-medium">{monthLabel}</span>
+          <div className="flex gap-4">
+            {months.map(({ year, month }) => {
+              const label = new Intl.DateTimeFormat("en-US", {
+                month: "long",
+                year: "numeric",
+              }).format(new Date(year, month, 1));
+              return (
+                <span key={`${year}-${month}`} className="text-sm font-medium">
+                  {label}
+                </span>
+              );
+            })}
+          </div>
           <button
             type="button"
             className="inline-flex h-7 w-7 items-center justify-center rounded-md text-sm hover:bg-accent hover:text-accent-foreground"
@@ -125,49 +208,65 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
           </button>
         </nav>
 
-        {/* Day-of-week headers */}
-        <header className="grid grid-cols-7 gap-0">
-          {DAYS_OF_WEEK.map((day) => (
-            <span
-              key={day}
-              className="flex h-8 w-8 items-center justify-center text-xs font-medium text-muted-foreground"
-            >
-              {day}
-            </span>
+        {/* Month grids */}
+        <div className="flex gap-4">
+          {months.map(({ year, month, days }) => (
+            <div key={`${year}-${month}`}>
+              {/* Day-of-week headers */}
+              <header className="grid grid-cols-7 gap-0">
+                {DAYS_OF_WEEK.map((day) => (
+                  <span
+                    key={day}
+                    className="flex h-8 w-8 items-center justify-center text-xs font-medium text-muted-foreground"
+                  >
+                    {day}
+                  </span>
+                ))}
+              </header>
+
+              {/* Day grid */}
+              <div className="grid grid-cols-7 gap-0">
+                {days.map((date, i) => {
+                  if (!date) {
+                    return <span key={`empty-${i}`} className="h-8 w-8" />;
+                  }
+
+                  const isSelected = mode === "single" && selected ? isSameDay(date, selected) : false;
+                  const isToday = isSameDay(date, new Date());
+                  const disabled = isDateDisabled(date, minDate, maxDate);
+
+                  const inRange = mode === "range" && isInRange(date, rangeFrom, rangeTo);
+                  const isStart = mode === "range" && isRangeStart(date, rangeFrom);
+                  const isEnd = mode === "range" && isRangeEnd(date, rangeTo);
+
+                  return (
+                    <button
+                      key={date.toISOString()}
+                      type="button"
+                      disabled={disabled}
+                      onClick={() => handleDayClick(date)}
+                      className={cn(
+                        "inline-flex h-8 w-8 items-center justify-center rounded-md text-sm",
+                        "hover:bg-accent hover:text-accent-foreground",
+                        "focus-visible:outline-none",
+                        "disabled:pointer-events-none disabled:opacity-50",
+                        isToday && "border border-accent",
+                        isSelected &&
+                          "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
+                        inRange && "bg-accent rounded-none",
+                        isStart &&
+                          "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground rounded-l-md rounded-r-none",
+                        isEnd &&
+                          "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground rounded-r-md rounded-l-none",
+                      )}
+                    >
+                      {date.getDate()}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           ))}
-        </header>
-
-        {/* Day grid */}
-        <div className="grid grid-cols-7 gap-0">
-          {days.map((date, i) => {
-            if (!date) {
-              return <span key={`empty-${i}`} className="h-8 w-8" />;
-            }
-
-            const isSelected = selected ? isSameDay(date, selected) : false;
-            const isToday = isSameDay(date, new Date());
-            const disabled = isDateDisabled(date, minDate, maxDate);
-
-            return (
-              <button
-                key={date.toISOString()}
-                type="button"
-                disabled={disabled}
-                onClick={() => onSelect?.(date)}
-                className={cn(
-                  "inline-flex h-8 w-8 items-center justify-center rounded-md text-sm",
-                  "hover:bg-accent hover:text-accent-foreground",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                  "disabled:pointer-events-none disabled:opacity-50",
-                  isToday && "border border-accent",
-                  isSelected &&
-                    "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
-                )}
-              >
-                {date.getDate()}
-              </button>
-            );
-          })}
         </div>
       </div>
     );

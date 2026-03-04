@@ -7,5 +7,6 @@ export default defineConfig({
   splitting: true,
   treeshake: true,
   clean: true,
-  external: [/^react/, /^@simplix-react/, /^@tanstack/],
+  external: [/^react/, /^@simplix-react/, /^@tanstack/, /^@dnd-kit/, /^maplibre/, /^pmtiles/, /^protomaps/],
+  onSuccess: "cp src/styles.css dist/styles.css",
 });

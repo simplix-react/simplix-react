@@ -7,6 +7,9 @@ export type { ColorFieldProps } from "./color-field";
 export { ComboboxField } from "./combobox-field";
 export type { ComboboxFieldProps } from "./combobox-field";
 
+export { CountryField } from "./country-field";
+export type { CountryFieldProps } from "./country-field";
+
 export { DateField } from "./date-field";
 export type { DateFieldProps } from "./date-field";
 
@@ -39,3 +42,9 @@ export type { TextFieldProps } from "./text-field";
 
 export { TextareaField } from "./textarea-field";
 export type { TextareaFieldProps } from "./textarea-field";
+
+export { LocationPickerField } from "./location-picker-field";
+export type { LocationPickerFieldProps } from "./location-picker-field";
+
+export { TimezoneField } from "./timezone-field";
+export type { TimezoneFieldProps } from "./timezone-field";

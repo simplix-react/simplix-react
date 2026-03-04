@@ -37,7 +37,7 @@ export function DetailBadgeField<T extends string = string>({
   variants,
   label,
   labelKey,
-  labelPosition,
+  layout,
   size,
   className,
 }: DetailBadgeFieldProps<T>) {
@@ -48,7 +48,7 @@ export function DetailBadgeField<T extends string = string>({
     <DetailFieldWrapper
       label={label}
       labelKey={labelKey}
-      labelPosition={labelPosition}
+      layout={layout}
       size={size}
       className={className}
     >

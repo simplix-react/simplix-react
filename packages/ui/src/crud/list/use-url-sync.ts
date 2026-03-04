@@ -26,7 +26,13 @@ function stateToParams(
   }
 
   for (const [key, value] of Object.entries(filters.values)) {
-    if (value !== undefined && value !== null && value !== "") {
+    if (value === undefined || value === null || value === "") continue;
+    if (Array.isArray(value)) {
+      if (value.length === 0) continue;
+      for (const v of value) {
+        params.append(`filters[${key}]`, String(v));
+      }
+    } else {
       params.set(`filters[${key}]`, String(value));
     }
   }
@@ -51,11 +57,19 @@ function paramsToState(params: URLSearchParams) {
   const searchVal = params.get("q");
   if (searchVal) filters.search = searchVal;
 
+  const filterEntries: Record<string, string[]> = {};
   for (const [key, value] of params.entries()) {
     const match = key.match(/^filters\[(.+)]$/);
     if (match?.[1]) {
-      filters.values[match[1]] = value;
+      const filterKey = match[1];
+      if (!filterEntries[filterKey]) {
+        filterEntries[filterKey] = [];
+      }
+      filterEntries[filterKey].push(value);
     }
+  }
+  for (const [k, vals] of Object.entries(filterEntries)) {
+    filters.values[k] = vals.length === 1 ? vals[0] : vals;
   }
 
   const sortVal = params.get("sort");

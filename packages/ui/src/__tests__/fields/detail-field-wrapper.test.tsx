@@ -29,7 +29,7 @@ describe("DetailFieldWrapper", () => {
 
   it("applies grid classes for left layout", () => {
     render(
-      <DetailFieldWrapper label="Name" labelPosition="left">
+      <DetailFieldWrapper label="Name" layout="left">
         value
       </DetailFieldWrapper>,
     );
@@ -41,7 +41,7 @@ describe("DetailFieldWrapper", () => {
 
   it("hides label when position is hidden", () => {
     render(
-      <DetailFieldWrapper label="Secret" labelPosition="hidden">
+      <DetailFieldWrapper label="Secret" layout="hidden">
         value
       </DetailFieldWrapper>,
     );
@@ -53,7 +53,7 @@ describe("DetailFieldWrapper", () => {
 
   it("sets aria-label when label is hidden", () => {
     render(
-      <DetailFieldWrapper label="Secret" labelPosition="hidden">
+      <DetailFieldWrapper label="Secret" layout="hidden">
         value
       </DetailFieldWrapper>,
     );

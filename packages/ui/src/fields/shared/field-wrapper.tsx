@@ -7,9 +7,10 @@ import { cn, toTestId } from "../../utils/cn";
 
 const fieldWrapperVariants = cva("", {
   variants: {
-    labelPosition: {
+    layout: {
       top: "flex flex-col gap-1.5",
       left: "grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-1",
+      inline: "flex items-center justify-between gap-3",
       hidden: "flex flex-col gap-1.5",
     },
     size: {
@@ -18,7 +19,7 @@ const fieldWrapperVariants = cva("", {
       lg: "[&_label]:text-base [&_input]:h-12 [&_input]:text-lg",
     },
   },
-  defaultVariants: { labelPosition: "top", size: "md" },
+  defaultVariants: { layout: "top", size: "sm" },
 });
 
 /** Variant props extracted from {@link fieldWrapperVariants}. */
@@ -55,17 +56,17 @@ export function FieldWrapper({
   children,
   ...variantOverride
 }: FieldWrapperProps) {
-  const { labelPosition, size } = useFieldVariant(variantOverride);
+  const { layout, size } = useFieldVariant(variantOverride);
   const { Label } = useUIComponents();
   const id = useId();
 
-  const isHidden = labelPosition === "hidden";
+  const isHidden = layout === "hidden";
   const testId = label ? `form-field-${toTestId(label)}` : undefined;
 
   return (
     <fieldset
       className={cn(
-        fieldWrapperVariants({ labelPosition, size }),
+        fieldWrapperVariants({ layout, size }),
         className,
       )}
       disabled={variantOverride.disabled ?? undefined}
@@ -90,7 +91,7 @@ export function FieldWrapper({
       ) : null}
 
       {/* Content area - spans full width in left layout for description/error */}
-      {labelPosition === "left" ? (
+      {layout === "left" ? (
         <>
           {children}
           {/* Description and error occupy the second column */}

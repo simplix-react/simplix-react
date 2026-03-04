@@ -23,7 +23,7 @@ export function DetailField({
   children,
   label,
   labelKey,
-  labelPosition,
+  layout,
   size,
   className,
 }: DetailFieldProps) {
@@ -31,7 +31,7 @@ export function DetailField({
     <DetailFieldWrapper
       label={label}
       labelKey={labelKey}
-      labelPosition={labelPosition}
+      layout={layout}
       size={size}
       className={className}
     >

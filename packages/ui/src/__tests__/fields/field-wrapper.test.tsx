@@ -25,7 +25,7 @@ describe("FieldWrapper", () => {
 
   it("applies left layout classes", () => {
     render(
-      <FieldWrapper label="Name" labelPosition="left">
+      <FieldWrapper label="Name" layout="left">
         input
       </FieldWrapper>,
     );
@@ -37,7 +37,7 @@ describe("FieldWrapper", () => {
 
   it("hides label visually with sr-only when position is hidden", () => {
     render(
-      <FieldWrapper label="Search" labelPosition="hidden">
+      <FieldWrapper label="Search" layout="hidden">
         input
       </FieldWrapper>,
     );
@@ -49,7 +49,7 @@ describe("FieldWrapper", () => {
 
   it("sets aria-label on fieldset when label is hidden", () => {
     render(
-      <FieldWrapper label="Search" labelPosition="hidden">
+      <FieldWrapper label="Search" layout="hidden">
         input
       </FieldWrapper>,
     );
@@ -164,7 +164,7 @@ describe("FieldWrapper", () => {
     render(
       <FieldWrapper
         label="Name"
-        labelPosition="left"
+        layout="left"
         description="Help text"
         error="Error text"
       >

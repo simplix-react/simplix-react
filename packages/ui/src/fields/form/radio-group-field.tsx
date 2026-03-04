@@ -69,7 +69,7 @@ export function RadioGroupField<T extends string = string>({
         onValueChange={(v) => onChange(v as T)}
         disabled={disabled}
         className={cn(directionClasses[direction])}
-        aria-label={variantProps.labelPosition === "hidden" ? label : undefined}
+        aria-label={variantProps.layout === "hidden" ? label : undefined}
       >
         {options.map((opt) => (
           <label

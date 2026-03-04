@@ -65,7 +65,7 @@ export function PasswordField({
           required={required}
           aria-invalid={!!error}
           aria-label={
-            variantProps.labelPosition === "hidden" ? label : undefined
+            variantProps.layout === "hidden" ? label : undefined
           }
           {...inputProps}
           className={cn(

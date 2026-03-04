@@ -7,9 +7,10 @@ import { cn, toTestId } from "../../utils/cn";
 
 const detailFieldWrapperVariants = cva("", {
   variants: {
-    labelPosition: {
+    layout: {
       top: "flex flex-col gap-1",
       left: "grid grid-cols-[auto_1fr] items-baseline gap-x-3",
+      inline: "flex items-baseline justify-between gap-3",
       hidden: "flex flex-col",
     },
     size: {
@@ -18,7 +19,7 @@ const detailFieldWrapperVariants = cva("", {
       lg: "[&_.field-label]:text-base [&_.field-value]:text-base",
     },
   },
-  defaultVariants: { labelPosition: "top", size: "md" },
+  defaultVariants: { layout: "top", size: "md" },
 });
 
 /** Variant props extracted from {@link detailFieldWrapperVariants}. */
@@ -43,13 +44,13 @@ export interface DetailFieldWrapperProps extends Partial<FieldVariant> {
 export function DetailFieldWrapper({
   label,
   labelKey,
-  labelPosition: labelPositionOverride,
+  layout: layoutOverride,
   size: sizeOverride,
   className,
   children,
 }: DetailFieldWrapperProps) {
-  const { labelPosition, size } = useFieldVariant({
-    labelPosition: labelPositionOverride,
+  const { layout, size } = useFieldVariant({
+    layout: layoutOverride,
     size: sizeOverride,
   });
 
@@ -59,13 +60,13 @@ export function DetailFieldWrapper({
   return (
     <span
       className={cn(
-        detailFieldWrapperVariants({ labelPosition, size }),
+        detailFieldWrapperVariants({ layout, size }),
         className,
       )}
       data-testid={testId}
-      aria-label={labelPosition === "hidden" && displayLabel ? displayLabel : undefined}
+      aria-label={layout === "hidden" && displayLabel ? displayLabel : undefined}
     >
-      {labelPosition !== "hidden" && displayLabel && (
+      {layout !== "hidden" && displayLabel && (
         <span className="field-label text-muted-foreground">
           {displayLabel}
         </span>

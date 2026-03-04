@@ -2,9 +2,12 @@ import { useCallback, useMemo, useState } from "react";
 
 import type { EmptyReason, SortState } from "../shared/types";
 
+const EMPTY_FILTERS: Record<string, unknown> = {};
+
 // Minimal hook shape to avoid tight coupling with @simplix-react/react generics
 export interface ListHookResult<T> {
   data: T[] | undefined;
+  total?: number;
   isLoading: boolean;
   error: Error | null;
 }
@@ -16,6 +19,7 @@ export interface ListHook<T> {
 /** Configuration options for the {@link useCrudList} hook. */
 export interface UseCrudListOptions {
   stateMode?: "server" | "client";
+  filterMode?: "immediate" | "deferred";
   maxRows?: number;
   defaultSort?: SortState;
   defaultPageSize?: number;
@@ -27,7 +31,11 @@ export interface CrudListFilters {
   setSearch: (value: string) => void;
   values: Record<string, unknown>;
   setValue: (key: string, value: unknown) => void;
+  setValues: (updates: Record<string, unknown>) => void;
+  setAll: (filters: { search: string; values: Record<string, unknown> }) => void;
   clear: () => void;
+  apply: () => void;
+  isPending: boolean;
 }
 
 /** Sort state returned by {@link useCrudList}. */
@@ -80,21 +88,58 @@ export function useCrudList<T>(
 ): UseCrudListResult<T> {
   const {
     stateMode = "server",
+    filterMode = "deferred",
     defaultSort,
     defaultPageSize = 10,
   } = options ?? {};
 
+  const isImmediate = filterMode === "immediate";
+
   // ── Filter state ──
   const [search, setSearch] = useState("");
-  const [filterValues, setFilterValues] = useState<Record<string, unknown>>({});
+  const [pendingFilterValues, setPendingFilterValues] = useState(EMPTY_FILTERS);
+  const [committedFilterValues, setCommittedFilterValues] = useState(EMPTY_FILTERS);
 
   const setFilterValue = useCallback((key: string, value: unknown) => {
-    setFilterValues((prev) => ({ ...prev, [key]: value }));
-  }, []);
+    const updater = (prev: Record<string, unknown>) => ({ ...prev, [key]: value });
+    setPendingFilterValues(updater);
+    if (isImmediate) {
+      setCommittedFilterValues(updater);
+      setPage(1);
+    }
+  }, [isImmediate]);
+
+  const setFilterValuesBatch = useCallback((updates: Record<string, unknown>) => {
+    const updater = (prev: Record<string, unknown>) => ({ ...prev, ...updates });
+    setPendingFilterValues(updater);
+    if (isImmediate) {
+      setCommittedFilterValues(updater);
+      setPage(1);
+    }
+  }, [isImmediate]);
 
   const clearFilters = useCallback(() => {
     setSearch("");
-    setFilterValues({});
+    setPendingFilterValues({});
+    setCommittedFilterValues({});
+  }, []);
+
+  const setAllFilters = useCallback((state: { search: string; values: Record<string, unknown> }) => {
+    setSearch(state.search);
+    setPendingFilterValues(state.values);
+    setCommittedFilterValues(state.values);
+  }, []);
+
+  const applyFilters = useCallback(() => {
+    setCommittedFilterValues(pendingFilterValues);
+    setPage(1);
+  }, [pendingFilterValues]);
+
+  const filtersPending = !isImmediate && pendingFilterValues !== committedFilterValues;
+
+  const setSearchWithReset = useCallback((value: string) => {
+    setSearch(value);
+    setPage(1);
   }, []);
 
   // ── Sort state ──
@@ -163,7 +208,7 @@ export function useCrudList<T>(
 
     const params: Record<string, unknown> = {};
 
-    const filters: Record<string, unknown> = { ...filterValues };
+    const filters: Record<string, unknown> = { ...committedFilterValues };
     if (search) filters._search = search;
     if (Object.keys(filters).length > 0) params.filters = filters;
 
@@ -178,7 +223,7 @@ export function useCrudList<T>(
     };
 
     return params;
-  }, [stateMode, filterValues, search, sortField, sortDirection, page, pageSize]);
+  }, [stateMode, committedFilterValues, search, sortField, sortDirection, page, pageSize]);
 
   // ── Data fetching ──
   const queryResult = useList(
@@ -206,7 +251,7 @@ export function useCrudList<T>(
     }
 
     // Apply filter values
-    for (const [key, val] of Object.entries(filterValues)) {
+    for (const [key, val] of Object.entries(committedFilterValues)) {
       if (val !== undefined && val !== null && val !== "") {
         filtered = filtered.filter((item) => {
           const record = item as Record<string, unknown>;
@@ -231,10 +276,12 @@ export function useCrudList<T>(
     }
 
     return filtered;
-  }, [queryResult.data, stateMode, search, filterValues, sortField, sortDirection]);
+  }, [queryResult.data, stateMode, search, committedFilterValues, sortField, sortDirection]);
 
   // ── Compute total and paginate (client mode) ──
-  const total = stateMode === "client" ? processedData.length : (queryResult.data?.length ?? 0);
+  const total = stateMode === "client"
+    ? processedData.length
+    : (queryResult.total ?? queryResult.data?.length ?? 0);
 
   const paginatedData = useMemo(() => {
     if (stateMode === "server") return processedData;
@@ -251,11 +298,11 @@ export function useCrudList<T>(
     if (queryResult.isLoading) return null;
 
     if (search) return "no-search";
-    if (Object.values(filterValues).some((v) => v !== undefined && v !== null && v !== "")) {
+    if (Object.values(committedFilterValues).some((v) => v !== undefined && v !== null && v !== "")) {
       return "no-filter";
     }
     return "no-data";
-  }, [paginatedData.length, queryResult.isLoading, search, filterValues]);
+  }, [paginatedData.length, queryResult.isLoading, search, committedFilterValues]);
 
   return {
     data: paginatedData,
@@ -263,10 +310,14 @@ export function useCrudList<T>(
     error: queryResult.error,
     filters: {
       search,
-      setSearch,
-      values: filterValues,
+      setSearch: setSearchWithReset,
+      values: pendingFilterValues,
       setValue: setFilterValue,
+      setValues: setFilterValuesBatch,
+      setAll: setAllFilters,
       clear: clearFilters,
+      apply: applyFilters,
+      isPending: filtersPending,
     },
     sort: {
       field: sortField,

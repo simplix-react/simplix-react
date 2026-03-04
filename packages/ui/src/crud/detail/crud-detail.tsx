@@ -1,13 +1,47 @@
+import { useTranslation } from "@simplix-react/i18n/react";
 import type { ReactNode } from "react";
 
 import { Button } from "../../base/button";
 import { Flex } from "../../primitives/flex";
 import { Stack } from "../../primitives/stack";
 import { cn } from "../../utils/cn";
-import { PanelRightCloseIcon, TrashIcon } from "../shared/icons";
+import { useUIComponents } from "../../provider/ui-provider";
+import { ArrowLeftIcon, XIcon, TrashIcon } from "../shared/icons";
+import type { SectionShellProps } from "../shared/section-shell";
 import { type FieldVariant, FieldVariantContext } from "../shared/types";
 
 // ── Detail Root ──
+//
+// ┌─────────────────────────────────────┐
+// │ DetailRoot  (flex col, min-h-0)     │
+// │                                     │
+// │ ┌─────────────────────────────────┐ │
+// │ │ Header toolbar  (shrink-0)      │ │
+// │ │ ┌──────────┐        ┌────────┐  │ │
+// │ │ │  header  │        │ [X]    │  │ │
+// │ │ └──────────┘        └────────┘  │ │
+// │ └─────────────────────────────────┘ │
+// │ ┌─────────────────────────────────┐ │
+// │ │ Scrollable area  (overflow-auto)│ │
+// │ │ ┌─────────────────────────────┐ │ │
+// │ │ │ Stack (gap-sm, relative)    │ │ │
+// │ │ │                             │ │ │
+// │ │ │  ┌───────────────────────┐  │ │ │
+// │ │ │  │ Loading overlay (z-10)│  │ │ │
+// │ │ │  │      [spinner]        │  │ │ │
+// │ │ │  └───────────────────────┘  │ │ │
+// │ │ │                             │ │ │
+// │ │ │  {children}                 │ │ │
+// │ │ │   ├─ Section                │ │ │
+// │ │ │   ├─ Section                │ │ │
+// │ │ │   └─ ...                    │ │ │
+// │ │ └─────────────────────────────┘ │ │
+// │ └─────────────────────────────────┘ │
+// │ ┌─────────────────────────────────┐ │
+// │ │ Footer  (shrink-0)              │ │
+// │ │  e.g. DefaultActions            │ │
+// │ └─────────────────────────────────┘ │
+// └─────────────────────────────────────┘
 
 /** Props for the {@link CrudDetail} compound component root. */
 export interface CrudDetailProps {
@@ -17,35 +51,44 @@ export interface CrudDetailProps {
   onClose?: () => void;
   /** Content rendered at the left side of the header toolbar (e.g. breadcrumb, back button, label). */
   header?: ReactNode;
+  /** Fixed footer rendered below the scrollable content (e.g. action buttons). */
+  footer?: ReactNode;
   fieldVariant?: FieldVariant;
   className?: string;
   children?: ReactNode;
 }
 
-function DetailRoot({ isLoading, onClose, header, fieldVariant, className, children }: CrudDetailProps) {
+function DetailRoot({ isLoading, onClose, header, footer, fieldVariant, className, children }: CrudDetailProps) {
   const content = (
-    <Stack gap="lg" className={cn("relative w-full px-1", className)} data-testid="crud-detail">
-      {isLoading && (
-        <output
-          aria-busy="true"
-          aria-label="Loading"
-          className="absolute inset-0 z-10 flex items-center justify-center rounded-md bg-background/60 animate-in fade-in-0 duration-150"
-        >
-          <span className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-        </output>
-      )}
+    <div className={cn("flex flex-col flex-1 min-h-0 w-full", className)} data-testid="crud-detail">
       {(onClose || header) && (
-        <Flex justify={header ? "between" : "end"} align="center" className="border-b pb-4">
+        <Flex justify={header ? "between" : "end"} align="center" className="shrink-0 border-b pb-2 px-2">
           {header}
           {onClose && (
-            <Button type="button" variant="ghost" size="icon" onClick={onClose}>
-              <PanelRightCloseIcon className="h-4 w-4" />
+            <Button type="button" variant="ghost" size="icon-xs" onClick={onClose}>
+              <XIcon className="h-3 w-3" />
             </Button>
           )}
         </Flex>
       )}
-      {children}
-    </Stack>
+      <div className="min-h-0 overflow-auto [scrollbar-gutter:stable]">
+        <Stack gap="sm" className={cn("relative py-2", !(onClose || header) && "pt-2")}>
+          {isLoading && (
+            <output
+              aria-busy="true"
+              aria-label="Loading"
+              className="absolute inset-0 z-10 flex items-center justify-center rounded-md bg-background/60 animate-in fade-in-0 duration-150"
+            >
+              <span className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+            </output>
+          )}
+          {children}
+        </Stack>
+      </div>
+      {footer && (
+        <div className="shrink-0 mt-2">{footer}</div>
+      )}
+    </div>
   );
 
   if (fieldVariant) {
@@ -60,39 +103,63 @@ function DetailRoot({ isLoading, onClose, header, fieldVariant, className, child
 }
 
 // ── Detail.Section ──
+//
+// ┌─────────────────────────────────┐
+// │ SectionShell (card/flat/inset)  │
+// │ ┌───────────────────────────┐   │
+// │ │ title          [trailing] │   │
+// │ ├───────────────────────────┤   │
+// │ │ Stack (gap-sm)            │   │
+// │ │  {children}               │   │
+// │ │   ├─ field row            │   │
+// │ │   ├─ field row            │   │
+// │ │   └─ ...                  │   │
+// │ └───────────────────────────┘   │
+// └─────────────────────────────────┘
 
-/** Props for the CrudDetail.Section sub-component. */
-export interface CrudDetailSectionProps {
-  title: string;
-  description?: string;
-  className?: string;
-  children?: ReactNode;
-}
+/**
+ * Section sub-component for CrudDetail.
+ *
+ * @example Basic
+ * ```tsx
+ * <CrudDetail.Section title="Basic Info" variant="flat">
+ *   ...
+ * </CrudDetail.Section>
+ * ```
+ *
+ * @example Icon in title
+ * ```tsx
+ * <CrudDetail.Section title={<><MapPinIcon className="size-4" /> Location</>} variant="flat">
+ *   ...
+ * </CrudDetail.Section>
+ * ```
+ *
+ * @example Trailing action
+ * ```tsx
+ * <CrudDetail.Section title="Details" trailing={<Button size="sm" variant="outline">Edit</Button>}>
+ *   ...
+ * </CrudDetail.Section>
+ * ```
+ */
+export type CrudDetailSectionProps = SectionShellProps;
 
-function DetailSection({ title, description, className, children }: CrudDetailSectionProps) {
+function DetailSection(props: CrudDetailSectionProps) {
+  const { SectionShell } = useUIComponents();
   return (
-    <section
-      className={cn(
-        "rounded-lg border bg-card p-6 text-card-foreground shadow-sm",
-        className,
-      )}
-    >
-      <Stack gap="md">
-        <Stack gap="xs">
-          <h3 className="text-lg font-semibold tracking-tight">{title}</h3>
-          {description && (
-            <p className="text-sm text-muted-foreground">{description}</p>
-          )}
-        </Stack>
-        <Stack gap="sm">
-          {children}
-        </Stack>
+    <SectionShell {...props}>
+      <Stack gap="sm">
+        {props.children}
       </Stack>
-    </section>
+    </SectionShell>
   );
 }
 
 // ── Detail.Actions ──
+//
+// ┌─────────────────────────────────┐
+// │ Actions  (border-t, flex row)   │
+// │  {children}                     │
+// └─────────────────────────────────┘
 
 /** Props for the CrudDetail.Actions sub-component. */
 export interface CrudDetailActionsProps {
@@ -102,34 +169,55 @@ export interface CrudDetailActionsProps {
 
 function DetailActions({ className, children }: CrudDetailActionsProps) {
   return (
-    <Flex gap="sm" className={cn("border-t pt-4", className)}>
+    <Flex gap="sm" className={cn("border-t pt-2", className)}>
       {children}
     </Flex>
   );
 }
 
 // ── Detail.DefaultActions ──
+//
+// ┌─────────────────────────────────────┐
+// │ DefaultActions  (border-t)          │
+// │                                     │
+// │ ┌──────────┐     ┌──────┐ ┌──────┐  │
+// │ │ ← Back   │     │  [X] │ │ Edit │  │
+// │ │ or Close │     │      │ │      │  │
+// │ └──────────┘     └──────┘ └──────┘  │
+// │  (onBack/Close)  (onDelete)(onEdit) │
+// └─────────────────────────────────────┘
 
 /** Props for the CrudDetail.DefaultActions sub-component. */
 export interface CrudDetailDefaultActionsProps {
   onClose?: () => void;
+  /** Renders a "← Back" button instead of "Close". Mutually exclusive with `onClose`. */
+  onBack?: () => void;
   onDelete?: () => void;
   onEdit?: () => void;
   /** Label for the close button (defaults to `"Close"`). */
   closeLabel?: string;
+  /** Label for the back button (defaults to `"Back"`). */
+  backLabel?: string;
   /** Label for the edit button (defaults to `"Edit"`). */
   editLabel?: string;
   className?: string;
 }
 
-function DetailDefaultActions({ onClose, onDelete, onEdit, closeLabel = "Close", editLabel = "Edit", className }: CrudDetailDefaultActionsProps) {
+function DetailDefaultActions({ onClose, onBack, onDelete, onEdit, closeLabel, backLabel, editLabel, className }: CrudDetailDefaultActionsProps) {
+  const { t } = useTranslation("simplix/ui");
+  const hasLeft = onBack || onClose;
   return (
-    <DetailActions className={cn(onClose ? "justify-between" : "justify-end", className)}>
-      {onClose && (
-        <Button type="button" size="sm" variant="outline" onClick={onClose}>
-          {closeLabel}
+    <DetailActions className={cn(hasLeft ? "justify-between" : "justify-end", className)}>
+      {onBack ? (
+        <Button type="button" size="sm" variant="outline" onClick={onBack}>
+          <ArrowLeftIcon className="h-4 w-4" />
+          {backLabel ?? t("common.back")}
         </Button>
-      )}
+      ) : onClose ? (
+        <Button type="button" size="sm" variant="outline" onClick={onClose}>
+          {closeLabel ?? t("common.close")}
+        </Button>
+      ) : null}
       <Flex gap="sm">
         {onDelete && (
           <Button type="button" size="icon-sm" variant="outline" onClick={onDelete}>
@@ -138,7 +226,7 @@ function DetailDefaultActions({ onClose, onDelete, onEdit, closeLabel = "Close",
         )}
         {onEdit && (
           <Button type="button" size="sm" variant="primary" onClick={onEdit}>
-            {editLabel}
+            {editLabel ?? t("common.edit")}
           </Button>
         )}
       </Flex>

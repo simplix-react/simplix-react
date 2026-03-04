@@ -107,8 +107,8 @@ export function ComboboxField<T extends string = string>({
         <PopoverTrigger asChild>
           <span
             className={cn(
-              "relative flex h-10 w-full items-center rounded-md border border-input bg-background text-sm ring-offset-background",
-              "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
+              "relative flex h-8 w-full items-center rounded-md border border-input bg-background text-sm",
+              "focus-within:border-foreground",
               disabled && "cursor-not-allowed opacity-50",
               error && "border-destructive",
             )}
@@ -122,9 +122,9 @@ export function ComboboxField<T extends string = string>({
               disabled={disabled}
               aria-invalid={!!error}
               aria-label={
-                variantProps.labelPosition === "hidden" ? label : undefined
+                variantProps.layout === "hidden" ? label : undefined
               }
-              className="border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+              className="border-0 shadow-none"
             />
             {value && !disabled && (
               <button

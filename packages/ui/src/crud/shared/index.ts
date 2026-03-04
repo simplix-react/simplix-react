@@ -2,6 +2,8 @@ export {
   FieldVariantContext,
   useFieldVariant,
 } from "./types";
+export { CrudListColumnContext, useCrudListColumns } from "./column-context";
+export type { ColumnInfo, CrudListColumnContextValue } from "./column-context";
 export type {
   CommonDetailFieldProps,
   CommonFieldProps,
@@ -9,6 +11,7 @@ export type {
   FieldVariant,
   FilterState,
   PaginationState,
+  ReorderConfig,
   SortState,
 } from "./types";
 export { PanelRightCloseIcon } from "./icons";

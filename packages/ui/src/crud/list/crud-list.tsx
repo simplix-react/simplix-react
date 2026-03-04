@@ -1,61 +1,93 @@
+import {useTranslation} from "@simplix-react/i18n/react";
 import {
   type ColumnDef,
-  type SortingState,
   flexRender,
   getCoreRowModel,
+  type SortingState,
   useReactTable,
+  type VisibilityState,
 } from "@tanstack/react-table";
-import {
-  type ReactNode,
-  createElement,
-  useCallback,
-  useMemo,
-  useRef,
-} from "react";
+import {createElement, type ReactNode, useCallback, useEffect, useMemo, useRef, useState,} from "react";
 
-import { Badge, type BadgeVariants } from "../../base/badge";
-import { Input } from "../../base/input";
-import { Skeleton } from "../../base/skeleton";
 import {
+  Badge,
+  type BadgeVariants,
+  Button,
+  Input,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../base/select";
-import {
+  Skeleton,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
   type TableProps,
-} from "../../base/table";
-import { Flex } from "../../primitives/flex";
-import { Stack } from "../../primitives/stack";
-import { cn } from "../../utils/cn";
-import type { EmptyReason, SortState } from "../shared/types";
-import { useContainerWidth } from "./use-container-width";
+  TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from "../../base";
+import {Flex, Stack} from "../../primitives";
+import {cn} from "../../utils/cn";
+import type {ColumnInfo, EmptyReason, SortState} from "../shared";
+import {CrudListColumnContext, useCrudListColumns} from "../shared";
+import {ArrowUpDownIcon, EyeIcon, FolderTreeIcon, PencilIcon, PlusIcon, TrashIcon} from "../shared/icons";
+import {
+  AdvancedSelectFilter,
+  AdvancedTextFilter,
+  DateFilter,
+  DateRangeFilter,
+  FacetedFilter,
+  FilterActions,
+  FilterBar,
+  MultiTextFilter,
+  NumberFilter,
+  TextFilter,
+  ToggleFilter,
+  UnifiedTextFilter,
+} from "../filters";
+import { closestCenter, DndContext } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import type { ReorderConfig } from "../shared";
+import { useReorder } from "../reorder/use-reorder";
+import { DragHandleHeader } from "../reorder/drag-handle";
+import { DraggableRow } from "../reorder/draggable-row";
+import { DraggableCard } from "../reorder/draggable-card";
+import {useContainerWidth} from "./use-container-width";
 
 // ── List Root ──
 
 /** Props for the {@link CrudList} compound component root. */
 export interface ListProps {
-  compact?: boolean;
   className?: string;
   children?: ReactNode;
 }
 
-function ListRoot({ compact, className, children }: ListProps) {
+function ListRoot({ className, children }: ListProps) {
+  const [columns, setColumns] = useState<ColumnInfo[]>([]);
+  const [hiddenColumns, setHiddenColumns] = useState<Set<string>>(new Set());
+  const [isCardMode, setIsCardMode] = useState(false);
+
+  const columnCtx = useMemo(
+    () => ({ columns, setColumns, hiddenColumns, setHiddenColumns, isCardMode, setIsCardMode }),
+    [columns, hiddenColumns, isCardMode],
+  );
+
   return (
-    <Stack
-      gap={compact ? "sm" : "md"}
-      className={cn("w-full", className)}
-      data-testid="crud-list"
-    >
-      {children}
-    </Stack>
+    <CrudListColumnContext.Provider value={columnCtx}>
+      <Stack
+        gap="sm"
+        className={cn("w-full", className)}
+        data-testid="crud-list"
+      >
+        {children}
+      </Stack>
+    </CrudListColumnContext.Provider>
   );
 }
 
@@ -73,7 +105,7 @@ function ListToolbar({ className, children }: ListToolbarProps) {
       gap="sm"
       align="center"
       wrap
-      className={cn("w-full", className)}
+      className={cn("w-full rounded-lg border bg-card p-3 [&>*]:grow", className)}
     >
       {children}
     </Flex>
@@ -90,59 +122,20 @@ export interface ListSearchProps {
   className?: string;
 }
 
-function ListSearch({ value, onChange, placeholder = "Search...", className }: ListSearchProps) {
+function ListSearch({ value, onChange, placeholder, className }: ListSearchProps) {
+  const { t } = useTranslation("simplix/ui");
   return (
     <Input
       type="search"
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
+      placeholder={placeholder ?? t("list.searchPlaceholder")}
       className={cn("max-w-xs", className)}
     />
   );
 }
 
 // ── List.Filter ──
-
-/** Option item for the List.Filter select dropdown. */
-export interface ListFilterOption {
-  label: string;
-  value: string;
-}
-
-/** Props for the List.Filter sub-component. */
-export interface ListFilterProps {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  options: ListFilterOption[];
-  placeholder?: string;
-  className?: string;
-}
-
-function ListFilter({
-  label,
-  value,
-  onChange,
-  options,
-  placeholder,
-  className,
-}: ListFilterProps) {
-  return (
-    <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className={cn("w-[180px]", className)} aria-label={label}>
-        <SelectValue placeholder={placeholder ?? label} />
-      </SelectTrigger>
-      <SelectContent>
-        {options.map((opt) => (
-          <SelectItem key={opt.value} value={opt.value}>
-            {opt.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  );
-}
 
 // ── Sort Icon SVG ──
 
@@ -229,6 +222,19 @@ function formatCellValue(value: unknown, format?: "date" | "datetime" | "relativ
   return `${days}d ago`;
 }
 
+// ── Action types ──
+
+export type ActionType = "view" | "edit" | "delete" | "add-child" | "reorder" | "move";
+export type ActionVariant = "outline" | "ghost" | "icon";
+
+export interface RowActionDef<T> {
+  type: ActionType;
+  onClick: (row: T) => void;
+  label?: string;
+  icon?: ReactNode;
+  when?: (row: T) => boolean;
+}
+
 // ── List.Table ──
 
 /** Props for the List.Table sub-component built on TanStack Table. */
@@ -247,16 +253,128 @@ export interface ListTableProps<T> {
   rowId?: (row: T) => string;
   /** Container width threshold (px) below which card mode activates. Disabled when omitted. */
   cardBreakpoint?: number;
-  /** Render prop for card content. Card interactions (click, selection) are handled by the framework. */
-  cardRender?: (props: { row: T; index: number }) => ReactNode;
+  /** Render prop for the card title area. Displayed with a bottom border, inline with action buttons. */
+  cardTitle?: (props: { row: T; index: number }) => ReactNode;
+  /** Render prop for the card content area below the title. */
+  cardContent?: (props: { row: T; index: number }) => ReactNode;
   /** Table visual variant. */
   variant?: TableProps["variant"];
   /** Cell padding size. */
   size?: TableProps["size"];
+  /** Vertical density (padding). Overrides size-based vertical spacing when set. */
+  density?: TableProps["density"];
   /** Container border radius. */
   rounded?: TableProps["rounded"];
+  /** Declarative row action buttons. Automatically appends an action column to the table. */
+  actions?: RowActionDef<T>[];
+  /** Visual variant for action buttons. Defaults to `"outline"`. */
+  actionVariant?: ActionVariant;
+  /** Override the auto-calculated action column width (px). */
+  actionColumnWidth?: number;
+  /** Drag-and-drop row reorder configuration. */
+  reorder?: ReorderConfig<T>;
+  /** When set, displays an empty-state message inside the table body. */
+  emptyReason?: EmptyReason | null;
+  /** Rich empty state config for "no-data" reason. Replaces the entire table with a centered illustration. */
+  emptyState?: {
+    icon?: ReactNode;
+    title: string;
+    description?: string;
+    action?: ReactNode;
+  };
   className?: string;
   children?: ReactNode;
+}
+
+// ── Default action config ──
+
+const ACTION_LABEL_KEYS: Record<ActionType, string> = {
+  view: "common.view",
+  edit: "common.edit",
+  delete: "common.delete",
+  "add-child": "tree.addChild",
+  reorder: "tree.reorder",
+  move: "tree.move",
+};
+
+const ACTION_ICONS: Record<ActionType, ReactNode> = {
+  view: <EyeIcon className="size-4" />,
+  edit: <PencilIcon className="size-4" />,
+  delete: <TrashIcon className="size-4" />,
+  "add-child": <PlusIcon className="size-4" />,
+  reorder: <ArrowUpDownIcon className="size-4" />,
+  move: <FolderTreeIcon className="size-4" />,
+};
+
+function getActionColumnWidth(actions: RowActionDef<unknown>[], variant: ActionVariant): number {
+  if (variant === "icon") return actions.length * 30 + 4;
+  return 120;
+}
+
+function RowActionCell<T>({ row, actions, variant, compact }: { row: T; actions: RowActionDef<T>[]; variant: ActionVariant; compact?: boolean }) {
+  const { t } = useTranslation("simplix/ui");
+  const visible = actions.filter((a) => !a.when || a.when(row));
+  if (visible.length === 0) return null;
+
+  const handleClick = (e: React.MouseEvent, action: RowActionDef<T>) => {
+    e.stopPropagation();
+    action.onClick(row);
+  };
+
+  if (variant === "icon") {
+    return (
+      <TooltipProvider>
+        <Flex justify="end" align="center">
+          <div className={cn("inline-flex items-center rounded-md border overflow-hidden", compact && "border-none gap-0.5")}>
+            {visible.map((action, i) => {
+              const label = action.label ?? t(ACTION_LABEL_KEYS[action.type]);
+              const icon = action.icon ?? ACTION_ICONS[action.type];
+              const isDelete = action.type === "delete";
+              return (
+                <Tooltip key={action.type}>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="icon-xs"
+                      variant="ghost"
+                      className={cn(
+                        compact ? "size-5 [&_svg]:size-3" : "rounded-none",
+                        !compact && i > 0 && "border-l",
+                        isDelete && "text-destructive",
+                      )}
+                      onClick={(e) => handleClick(e, action)}
+                    >
+                      {icon}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>{label}</TooltipContent>
+                </Tooltip>
+              );
+            })}
+          </div>
+        </Flex>
+      </TooltipProvider>
+    );
+  }
+
+  // outline / ghost variant
+  return (
+    <Flex gap="xs" justify="end">
+      {visible.map((action) => {
+        const label = action.label ?? t(ACTION_LABEL_KEYS[action.type]);
+        const isDelete = action.type === "delete";
+        return (
+          <Button
+            key={action.type}
+            size="sm"
+            variant={isDelete ? "destructive" : variant}
+            onClick={(e) => handleClick(e, action)}
+          >
+            {label}
+          </Button>
+        );
+      })}
+    </Flex>
+  );
 }
 
 function extractColumnDefs<T>(children: ReactNode): ListColumnProps<T>[] {
@@ -275,6 +393,343 @@ function extractColumnDefs<T>(children: ReactNode): ListColumnProps<T>[] {
   return columns;
 }
 
+// ── Reorderable Table (DndContext wraps Table to avoid <div> inside <table>) ──
+
+interface ReorderableTableProps<T> {
+  reorderConfig: ReorderConfig<T>;
+  data: T[];
+  sort: SortState | null;
+  onSortChange?: (sort: SortState) => void;
+  table: ReturnType<typeof useReactTable<T>>;
+  rowId?: (row: T) => string;
+  activeRowId?: string | null;
+  selectedIndices?: Set<number>;
+  onRowClick?: (row: T) => void;
+  isLoading?: boolean;
+  emptyReason?: EmptyReason | null;
+  emptyState?: ListTableProps<T>["emptyState"];
+  variant?: TableProps["variant"];
+  size?: TableProps["size"];
+  density?: TableProps["density"];
+  rounded?: TableProps["rounded"];
+  className?: string;
+}
+
+function ReorderableTable<T>({
+  reorderConfig,
+  data,
+  sort,
+  onSortChange,
+  table,
+  rowId: rowIdFn,
+  activeRowId,
+  selectedIndices,
+  onRowClick,
+  isLoading,
+  emptyReason,
+  emptyState,
+  variant,
+  size,
+  density,
+  rounded,
+  className,
+}: ReorderableTableProps<T>) {
+  const { t } = useTranslation("simplix/ui");
+  const emptyMessages: Record<EmptyReason, string> = {
+    "no-data": t("list.noData"),
+    "no-filter": t("list.noFilter"),
+    "no-search": t("list.noSearch"),
+  };
+  const {
+    sensors,
+    handleDragStart,
+    handleDragEnd,
+    isDragEnabled,
+    getRowId: dndGetRowId,
+    optimisticData,
+  } = useReorder({ config: reorderConfig, data, sort, onSortChange });
+
+  const sortableIds = useMemo(
+    () => optimisticData.map((row) => dndGetRowId(row)),
+    [optimisticData, dndGetRowId],
+  );
+
+  // Reorder tanstack rows to match optimistic order
+  const orderedRows = useMemo(() => {
+    const rows = table.getRowModel().rows;
+    if (optimisticData === data) return rows;
+    const idOrder = new Map(sortableIds.map((id, i) => [id, i]));
+    return [...rows].sort((a, b) => {
+      const ai = idOrder.get(dndGetRowId(a.original)) ?? 0;
+      const bi = idOrder.get(dndGetRowId(b.original)) ?? 0;
+      return ai - bi;
+    });
+  }, [table, optimisticData, data, sortableIds, dndGetRowId]);
+
+  const tableHeader = (
+    <TableHeader>
+      {table.getHeaderGroups().map((headerGroup) => (
+        <TableRow key={headerGroup.id}>
+          <TableHead className="w-10 px-2" style={{ width: 40 }}>
+            <DragHandleHeader
+              isDragEnabled={isDragEnabled}
+              onActivate={() => onSortChange?.({ field: reorderConfig.orderField, direction: "asc" })}
+            />
+          </TableHead>
+          {headerGroup.headers.map((header) => (
+            <TableHead
+              key={header.id}
+              className="truncate"
+              style={header.column.getSize() !== 150 ? { width: header.column.getSize() } : undefined}
+            >
+              {header.isPlaceholder
+                ? null
+                : flexRender(header.column.columnDef.header, header.getContext())}
+            </TableHead>
+          ))}
+        </TableRow>
+      ))}
+    </TableHeader>
+  );
+
+  if (isLoading && data.length === 0) {
+    return (
+      <Table variant={variant} size={size} density={density} rounded={rounded} className={cn("table-auto", className)}>
+        {tableHeader}
+        <TableBody>
+          {Array.from({ length: 5 }, (_, i) => (
+            <TableRow key={`skeleton-${i}`}>
+              <TableCell><Skeleton className="h-4 w-4" /></TableCell>
+              {table.getAllColumns().map((col) => (
+                <TableCell key={col.id}>
+                  <Skeleton className="h-4 w-full" />
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    );
+  }
+
+  if (emptyReason && data.length === 0) {
+    if (emptyReason === "no-data" && emptyState) {
+      return (
+        <div className="flex flex-col items-center justify-center rounded-lg border py-16 text-center">
+          {emptyState.icon && (
+            <div className="mb-3 rounded-full bg-muted p-4 text-muted-foreground [&_svg]:size-8">
+              {emptyState.icon}
+            </div>
+          )}
+          <p className="text-base font-semibold">{emptyState.title}</p>
+          {emptyState.description && (
+            <p className="mt-1 max-w-sm text-sm text-muted-foreground">{emptyState.description}</p>
+          )}
+          {emptyState.action && <div className="mt-4">{emptyState.action}</div>}
+        </div>
+      );
+    }
+    return (
+      <Table variant={variant} size={size} density={density} rounded={rounded} className={cn("table-auto", className)}>
+        {tableHeader}
+        <TableBody>
+          <TableRow>
+            <TableCell colSpan={table.getAllColumns().length + 1} className="h-24 text-center text-muted-foreground">
+              {emptyMessages[emptyReason]}
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    );
+  }
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
+      <Table variant={variant} size={size} density={density} rounded={rounded} className={cn("table-auto", className)}>
+        {tableHeader}
+        <SortableContext items={sortableIds} strategy={verticalListSortingStrategy}>
+          <TableBody>
+            {orderedRows.map((row) => {
+              const rid = rowIdFn?.(row.original) ?? row.id;
+              const dndId = dndGetRowId(row.original);
+              const isActive = activeRowId != null && rid === activeRowId;
+              return (
+                <DraggableRow
+                  key={row.id}
+                  row={row}
+                  rowId={dndId}
+                  isActive={isActive}
+                  isSelected={selectedIndices?.has(row.index)}
+                  isDragEnabled={isDragEnabled}
+                  reorderConfig={reorderConfig}
+                  onRowClick={onRowClick}
+                />
+              );
+            })}
+          </TableBody>
+        </SortableContext>
+      </Table>
+    </DndContext>
+  );
+}
+
+// ── Reorderable Card List ──
+
+type CardDensity = "compact" | "default" | "comfortable";
+
+const cardDensityPadding: Record<CardDensity, string> = {
+  compact: "px-3 py-2",
+  default: "px-4 py-3",
+  comfortable: "px-5 py-4",
+};
+
+interface ReorderableCardListProps<T> {
+  reorderConfig: ReorderConfig<T>;
+  data: T[];
+  sort: SortState | null;
+  onSortChange?: (sort: SortState) => void;
+  rowId?: (row: T) => string;
+  activeRowId?: string | null;
+  selectable?: boolean;
+  selectedIndices?: Set<number>;
+  onSelectionChange?: (index: number) => void;
+  onRowClick?: (row: T) => void;
+  isLoading?: boolean;
+  emptyReason?: EmptyReason | null;
+  emptyState?: ListTableProps<T>["emptyState"];
+  density?: CardDensity;
+  actions?: RowActionDef<T>[];
+  actionVariant?: ActionVariant;
+  cardTitle: (props: { row: T; index: number }) => ReactNode;
+  cardContent: (props: { row: T; index: number }) => ReactNode;
+}
+
+function ReorderableCardList<T>({
+  reorderConfig,
+  data,
+  sort,
+  onSortChange,
+  rowId: rowIdFn,
+  activeRowId,
+  selectable,
+  selectedIndices,
+  onSelectionChange,
+  onRowClick,
+  isLoading,
+  emptyReason,
+  emptyState,
+  density = "default",
+  actions,
+  actionVariant = "icon",
+  cardTitle,
+  cardContent,
+}: ReorderableCardListProps<T>) {
+  const { t } = useTranslation("simplix/ui");
+  const emptyMessages: Record<EmptyReason, string> = {
+    "no-data": t("list.noData"),
+    "no-filter": t("list.noFilter"),
+    "no-search": t("list.noSearch"),
+  };
+  const {
+    sensors,
+    handleDragStart,
+    handleDragEnd,
+    isDragEnabled,
+    getRowId: dndGetRowId,
+    optimisticData,
+  } = useReorder({ config: reorderConfig, data, sort, onSortChange });
+
+  const sortableIds = useMemo(
+    () => optimisticData.map((row) => dndGetRowId(row)),
+    [optimisticData, dndGetRowId],
+  );
+
+  const skeletonPadding = cardDensityPadding[density];
+
+  if (isLoading && data.length === 0) {
+    return (
+      <Stack gap="sm">
+        {Array.from({ length: 3 }, (_, i) => (
+          <div key={`card-skeleton-${i}`} className={cn("rounded-lg border", skeletonPadding)}>
+            <Stack gap="xs">
+              <Skeleton className="h-5 w-2/3" />
+              <Skeleton className="h-4 w-1/2" />
+              <Skeleton className="h-4 w-1/3" />
+            </Stack>
+          </div>
+        ))}
+      </Stack>
+    );
+  }
+
+  if (emptyReason && data.length === 0) {
+    if (emptyReason === "no-data" && emptyState) {
+      return (
+        <div className="flex flex-col items-center justify-center rounded-lg border py-16 text-center">
+          {emptyState.icon && (
+            <div className="mb-3 rounded-full bg-muted p-4 text-muted-foreground [&_svg]:size-8">
+              {emptyState.icon}
+            </div>
+          )}
+          <p className="text-base font-semibold">{emptyState.title}</p>
+          {emptyState.description && (
+            <p className="mt-1 max-w-sm text-sm text-muted-foreground">{emptyState.description}</p>
+          )}
+          {emptyState.action && <div className="mt-4">{emptyState.action}</div>}
+        </div>
+      );
+    }
+    return (
+      <div className="flex h-24 items-center justify-center text-sm text-muted-foreground">
+        {emptyMessages[emptyReason]}
+      </div>
+    );
+  }
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext items={sortableIds} strategy={verticalListSortingStrategy}>
+        <Stack gap="sm">
+          {optimisticData.map((row, index) => {
+            const rid = rowIdFn?.(row) ?? String(index);
+            const dndId = dndGetRowId(row);
+            const isActive = activeRowId != null && rid === activeRowId;
+            return (
+              <DraggableCard
+                key={dndId}
+                row={row}
+                rowId={dndId}
+                index={index}
+                isActive={isActive}
+                isSelected={selectedIndices?.has(index)}
+                isDragEnabled={isDragEnabled}
+                reorderConfig={reorderConfig}
+                selectable={selectable}
+                density={density}
+                onRowClick={onRowClick}
+                onSelectionChange={onSelectionChange}
+                cardActions={actions && actions.length > 0 ? <RowActionCell row={row} actions={actions} variant={actionVariant} compact /> : undefined}
+                cardTitle={createElement(cardTitle, { row, index })}
+                cardContent={createElement(cardContent, { row, index })}
+              />
+            );
+          })}
+        </Stack>
+      </SortableContext>
+    </DndContext>
+  );
+}
+
 function ListTable<T>({
   data,
   isLoading,
@@ -288,23 +743,56 @@ function ListTable<T>({
   onSelectAll,
   rowId,
   cardBreakpoint,
-  cardRender,
+  cardTitle,
+  cardContent,
   variant,
   size,
+  density,
   rounded,
+  actions,
+  actionVariant = "icon",
+  actionColumnWidth: actionColumnWidthOverride,
+  reorder,
+  emptyReason,
+  emptyState,
   className,
   children,
 }: ListTableProps<T>) {
+  const { t } = useTranslation("simplix/ui");
+  const emptyMessages: Record<EmptyReason, string> = {
+    "no-data": t("list.noData"),
+    "no-filter": t("list.noFilter"),
+    "no-search": t("list.noSearch"),
+  };
   const containerRef = useRef<HTMLDivElement>(null);
   const containerWidth = useContainerWidth(containerRef);
+  const hasCard = !!(cardTitle || cardContent);
   const isCardMode = !!(
     cardBreakpoint &&
-    cardRender &&
+    hasCard &&
     containerWidth > 0 &&
     containerWidth < cardBreakpoint
   );
 
+  const columnCtx = useCrudListColumns();
+
+  // Sync card mode to context so FilterBar can hide column toggle
+  useEffect(() => {
+    columnCtx?.setIsCardMode(isCardMode);
+  }, [isCardMode, columnCtx?.setIsCardMode]);
   const columnDefs = useMemo(() => extractColumnDefs<T>(children), [children]);
+
+  // Register columns to context for FilterBar's Columns dropdown
+  const derivedColumns = useMemo(
+    () => columnDefs
+      .filter((d): d is ListColumnProps<T> & { field: string } => !!d.field)
+      .map((d) => ({ field: d.field, label: d.header ?? d.field })),
+    [columnDefs],
+  );
+
+  useEffect(() => {
+    columnCtx?.setColumns(derivedColumns);
+  }, [derivedColumns, columnCtx?.setColumns]);
 
   const sorting: SortingState = sort?.field
     ? [{ id: sort.field, desc: sort.direction === "desc" }]
@@ -400,6 +888,18 @@ function ListTable<T>({
       });
     }
 
+    if (actions && actions.length > 0) {
+      const colWidth = actionColumnWidthOverride ?? getActionColumnWidth(actions as RowActionDef<unknown>[], actionVariant);
+      cols.push({
+        id: "_actions",
+        header: () => "",
+        cell: ({ row }) => (
+          <RowActionCell row={row.original} actions={actions} variant={actionVariant} />
+        ),
+        size: colWidth,
+      });
+    }
+
     return cols;
   }, [
     columnDefs,
@@ -410,15 +910,46 @@ function ListTable<T>({
     handleSortChange,
     onSelectAll,
     onSelectionChange,
+    actions,
+    actionVariant,
+    actionColumnWidthOverride,
   ]);
+
+  const columnVisibility: VisibilityState = useMemo(() => {
+    const hidden = columnCtx?.hiddenColumns;
+    if (!hidden?.size) return {};
+    const vis: VisibilityState = {};
+    for (const field of hidden) vis[field] = false;
+    return vis;
+  }, [columnCtx?.hiddenColumns]);
 
   const table = useReactTable({
     data,
     columns: tanstackColumns,
-    state: { sorting },
+    state: { sorting, columnVisibility },
     getCoreRowModel: getCoreRowModel(),
     manualSorting: true,
   });
+
+  // Rich empty state for "no-data" — replaces the entire table/card area
+  if (emptyReason === "no-data" && emptyState && data.length === 0 && !isLoading) {
+    return (
+      <div ref={containerRef} className="w-full">
+        <div className="flex flex-col items-center justify-center rounded-lg border py-16 text-center">
+          {emptyState.icon && (
+            <div className="mb-3 rounded-full bg-muted p-4 text-muted-foreground [&_svg]:size-8">
+              {emptyState.icon}
+            </div>
+          )}
+          <p className="text-base font-semibold">{emptyState.title}</p>
+          {emptyState.description && (
+            <p className="mt-1 max-w-sm text-sm text-muted-foreground">{emptyState.description}</p>
+          )}
+          {emptyState.action && <div className="mt-4">{emptyState.action}</div>}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div ref={containerRef} className={cn("w-full", !isCardMode && "overflow-x-auto")}>
@@ -435,13 +966,34 @@ function ListTable<T>({
                     className="h-4 w-4 rounded border-gray-300"
                     aria-label="Select all"
                   />
-                  Select all
+                  {t("list.selectAll")}
                 </label>
               </Flex>
             )}
-            {isLoading && data.length === 0
+            {reorder && hasCard ? (
+              <ReorderableCardList
+                reorderConfig={reorder}
+                data={data}
+                sort={sort ?? null}
+                onSortChange={onSortChange}
+                rowId={rowId}
+                activeRowId={activeRowId}
+                selectable={selectable}
+                selectedIndices={selectedIndices}
+                onSelectionChange={onSelectionChange}
+                onRowClick={onRowClick}
+                isLoading={isLoading}
+                emptyReason={emptyReason}
+                emptyState={emptyState}
+                density={density}
+                actions={actions}
+                actionVariant={actionVariant}
+                cardTitle={cardTitle ?? (() => null)}
+                cardContent={cardContent ?? (() => null)}
+              />
+            ) : isLoading && data.length === 0
               ? Array.from({ length: 3 }, (_, i) => (
-                  <div key={`card-skeleton-${i}`} className="rounded-lg border p-4">
+                  <div key={`card-skeleton-${i}`} className={cn("rounded-lg border", cardDensityPadding[density ?? "default"])}>
                     <Stack gap="xs">
                       <Skeleton className="h-5 w-2/3" />
                       <Skeleton className="h-4 w-1/2" />
@@ -449,6 +1001,8 @@ function ListTable<T>({
                     </Stack>
                   </div>
                 ))
+              : emptyReason && data.length === 0
+                ? <div className="flex h-24 items-center justify-center text-sm text-muted-foreground">{emptyMessages[emptyReason]}</div>
               : data.map((row, index) => {
                   const rid = rowId?.(row) ?? String(index);
                   const isSelected = selectedIndices?.has(index);
@@ -457,7 +1011,7 @@ function ListTable<T>({
                     <div
                       key={rid}
                       className={cn(
-                        "relative rounded-lg border p-4 transition-colors hover:bg-muted/50",
+                        "relative rounded-lg border transition-colors hover:bg-muted/50",
                         isSelected && "ring-2 ring-primary",
                         isActive && "bg-muted/50",
                         onRowClick && "cursor-pointer",
@@ -465,19 +1019,33 @@ function ListTable<T>({
                       onClick={onRowClick ? () => onRowClick(row) : undefined}
                       data-testid={`list-row-${rid}`}
                     >
-                      {selectable && (
-                        <input
-                          type="checkbox"
-                          checked={isSelected ?? false}
-                          onChange={(e) => {
-                            e.stopPropagation();
-                            onSelectionChange?.(index);
-                          }}
-                          className="absolute right-3 top-3 h-4 w-4 rounded border-gray-300"
-                          aria-label={`Select row ${index + 1}`}
-                        />
+                      {cardTitle && (
+                        <Flex align="center" justify="between" className={cn("border-b px-2 py-1.5")}>
+                          <div className="min-w-0 flex-1">{createElement(cardTitle, { row, index })}</div>
+                          <Flex gap="xs" align="center" className="shrink-0 ml-2">
+                            {actions && actions.length > 0 && (
+                              <RowActionCell row={row} actions={actions} variant={actionVariant} compact />
+                            )}
+                            {selectable && (
+                              <input
+                                type="checkbox"
+                                checked={isSelected ?? false}
+                                onChange={(e) => {
+                                  e.stopPropagation();
+                                  onSelectionChange?.(index);
+                                }}
+                                className="h-4 w-4 rounded border-gray-300"
+                                aria-label={`Select row ${index + 1}`}
+                              />
+                            )}
+                          </Flex>
+                        </Flex>
                       )}
-                      {createElement(cardRender, { row, index })}
+                      {cardContent && (
+                        <div className={cn(cardDensityPadding[density ?? "default"], cardTitle && "pt-2")}>
+                          {createElement(cardContent, { row, index })}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -485,120 +1053,86 @@ function ListTable<T>({
         </div>
       ) : (
         <div key="table" className="animate-in fade-in-0 duration-200">
-          <Table variant={variant} size={size} rounded={rounded} className={cn("table-auto", className)}>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead
-                      key={header.id}
-                      className="truncate"
-                      style={header.column.getSize() !== 150 ? { width: header.column.getSize() } : undefined}
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {isLoading && data.length === 0
-                ? Array.from({ length: 5 }, (_, i) => (
-                    <TableRow key={`skeleton-${i}`}>
-                      {table.getAllColumns().map((col) => (
-                        <TableCell key={col.id}>
-                          <Skeleton className="h-4 w-full" />
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                : table.getRowModel().rows.map((row) => {
-                    const rid = rowId?.(row.original) ?? row.id;
-                    const isActive = activeRowId != null && rid === activeRowId;
-                    return (
-                      <TableRow
-                        key={row.id}
-                        className={cn(
-                          selectedIndices?.has(row.index) && "bg-muted/30",
-                          isActive && "bg-muted/50",
-                          onRowClick && "cursor-pointer",
-                        )}
-                        onClick={onRowClick ? () => onRowClick(row.original) : undefined}
-                        data-testid={`list-row-${rid}`}
+          {reorder ? (
+            <ReorderableTable
+              reorderConfig={reorder}
+              data={data}
+              sort={sort ?? null}
+              onSortChange={onSortChange}
+              table={table}
+              rowId={rowId}
+              activeRowId={activeRowId}
+              selectedIndices={selectedIndices}
+              onRowClick={onRowClick}
+              isLoading={isLoading}
+              emptyReason={emptyReason}
+              emptyState={emptyState}
+              variant={variant}
+              size={size}
+              density={density}
+              rounded={rounded}
+              className={className}
+            />
+          ) : (
+            <Table variant={variant} size={size} density={density} rounded={rounded} className={cn("table-auto", className)}>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead
+                        key={header.id}
+                        className="truncate"
+                        style={header.column.getSize() !== 150 ? { width: header.column.getSize() } : undefined}
                       >
-                        {row.getVisibleCells().map((cell) => (
-                          <TableCell key={cell.id} className="truncate">
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(header.column.columnDef.header, header.getContext())}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {isLoading && data.length === 0
+                  ? Array.from({ length: 5 }, (_, i) => (
+                      <TableRow key={`skeleton-${i}`}>
+                        {table.getAllColumns().map((col) => (
+                          <TableCell key={col.id}>
+                            <Skeleton className="h-4 w-full" />
                           </TableCell>
                         ))}
                       </TableRow>
-                    );
-                  })}
-            </TableBody>
-          </Table>
+                    ))
+                  : emptyReason && data.length === 0
+                    ? <TableRow><TableCell colSpan={table.getAllColumns().length} className="h-24 text-center text-muted-foreground">{emptyMessages[emptyReason]}</TableCell></TableRow>
+                    : table.getRowModel().rows.map((row) => {
+                      const rid = rowId?.(row.original) ?? row.id;
+                      const isActive = activeRowId != null && rid === activeRowId;
+                      return (
+                        <TableRow
+                          key={row.id}
+                          className={cn(
+                            selectedIndices?.has(row.index) && "bg-muted/30",
+                            isActive && "bg-muted/50",
+                            onRowClick && "cursor-pointer",
+                          )}
+                          onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+                          data-testid={`list-row-${rid}`}
+                        >
+                          {row.getVisibleCells().map((cell) => (
+                            <TableCell key={cell.id} className="truncate">
+                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      );
+                    })}
+              </TableBody>
+            </Table>
+          )}
         </div>
       )}
     </div>
-  );
-}
-
-// ── List.RowActions ──
-
-/** Props for the List.RowActions container. */
-export interface ListRowActionsProps {
-  className?: string;
-  children?: ReactNode;
-}
-
-function ListRowActions({ className, children }: ListRowActionsProps) {
-  return (
-    <Flex gap="xs" align="center" className={cn("justify-end", className)}>
-      {children}
-    </Flex>
-  );
-}
-
-// ── List.Action ──
-
-/** Props for individual row action buttons. */
-export interface ListActionProps<T = unknown> {
-  action?: "edit" | "delete";
-  label?: string;
-  icon?: ReactNode;
-  onClick?: (row: T) => void;
-  when?: (row: T) => boolean;
-  variant?: "default" | "destructive";
-  className?: string;
-}
-
-function ListAction<T>({
-  action,
-  label,
-  onClick,
-  variant = action === "delete" ? "destructive" : "default",
-  className,
-}: ListActionProps<T>) {
-  const displayLabel = label ?? (action === "edit" ? "Edit" : action === "delete" ? "Delete" : "Action");
-
-  return (
-    <button
-      type="button"
-      onClick={(e) => {
-        e.stopPropagation();
-        onClick?.(undefined as unknown as T);
-      }}
-      className={cn(
-        "inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
-        variant === "destructive"
-          ? "text-destructive hover:bg-destructive/10"
-          : "text-foreground hover:bg-muted",
-        className,
-      )}
-    >
-      {displayLabel}
-    </button>
   );
 }
 
@@ -613,13 +1147,34 @@ export interface ListPaginationProps {
   onPageChange: (page: number) => void;
   onPageSizeChange?: (size: number) => void;
   pageSizeOptions?: number[];
-  /** Label shown when total is 0. Defaults to `"No results"`. */
-  noResultsLabel?: string;
   /** Label for page-size selector. Defaults to `"Rows:"`. */
   rowsLabel?: string;
-  /** Format the range text. Defaults to `` `${start}-${end} of ${total}` ``. */
-  rangeLabel?: (start: number, end: number, total: number) => string;
+  /** Breakpoint (px) below which the compact variant is used. Defaults to `640`. */
+  compactBreakpoint?: number;
   className?: string;
+}
+
+/**
+ * Build the page numbers to display, with ellipsis for gaps.
+ * Always shows first, last, and a window around the current page.
+ */
+function getPageNumbers(page: number, totalPages: number): (number | "ellipsis")[] {
+  if (totalPages <= 7) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
+  }
+
+  const pages: (number | "ellipsis")[] = [1];
+
+  if (page > 3) pages.push("ellipsis");
+
+  const start = Math.max(2, page - 1);
+  const end = Math.min(totalPages - 1, page + 1);
+  for (let i = start; i <= end; i++) pages.push(i);
+
+  if (page < totalPages - 2) pages.push("ellipsis");
+
+  pages.push(totalPages);
+  return pages;
 }
 
 function ListPagination({
@@ -630,69 +1185,102 @@ function ListPagination({
   onPageChange,
   onPageSizeChange,
   pageSizeOptions = [10, 20, 50, 100],
-  noResultsLabel = "No results",
-  rowsLabel = "Rows:",
-  rangeLabel,
+  rowsLabel,
+  compactBreakpoint = 640,
   className,
 }: ListPaginationProps) {
-  const start = (page - 1) * pageSize + 1;
-  const end = Math.min(page * pageSize, total);
+  const { t } = useTranslation("simplix/ui");
+  const containerRef = useRef<HTMLDivElement>(null);
+  const containerWidth = useContainerWidth(containerRef);
+  const isCompact = containerWidth > 0 && containerWidth < compactBreakpoint;
+  const pageSizeSelector = onPageSizeChange && (
+    <Flex gap="xs" align="center">
+      <span className="text-xs text-muted-foreground">{rowsLabel ?? t("list.rows")}</span>
+      <Select
+        value={String(pageSize)}
+        onValueChange={(v) => onPageSizeChange(Number(v))}
+      >
+        <SelectTrigger className="h-6 w-[54px] text-xs" aria-label="Page size">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {pageSizeOptions.map((size) => (
+            <SelectItem key={size} value={String(size)}>
+              {size}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </Flex>
+  );
+
+  const prevButton = (
+    <button
+      type="button"
+      disabled={page <= 1}
+      onClick={() => onPageChange(page - 1)}
+      className="inline-flex h-6 w-6 items-center justify-center rounded border text-xs disabled:opacity-50"
+      aria-label="Previous page"
+    >
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M10 4L6 8L10 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </button>
+  );
+
+  const nextButton = (
+    <button
+      type="button"
+      disabled={page >= totalPages}
+      onClick={() => onPageChange(page + 1)}
+      className="inline-flex h-6 w-6 items-center justify-center rounded border text-xs disabled:opacity-50"
+      aria-label="Next page"
+    >
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M6 4L10 8L6 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </button>
+  );
+
+  const pageNumbers = isCompact ? null : getPageNumbers(page, totalPages);
 
   return (
-    <Flex align="center" justify="between" className={cn("w-full", className)}>
-      <span className="text-sm text-muted-foreground">
-        {total > 0 ? (rangeLabel ? rangeLabel(start, end, total) : `${start}-${end} of ${total}`) : noResultsLabel}
-      </span>
+    <div ref={containerRef} className={cn("flex w-full items-center justify-end", className)}>
       <Flex gap="sm" align="center">
-        {onPageSizeChange && (
-          <Flex gap="xs" align="center">
-            <span className="text-sm text-muted-foreground">{rowsLabel}</span>
-            <Select
-              value={String(pageSize)}
-              onValueChange={(v) => onPageSizeChange(Number(v))}
-            >
-              <SelectTrigger className="h-8 w-[70px]" aria-label="Page size">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {pageSizeOptions.map((size) => (
-                  <SelectItem key={size} value={String(size)}>
-                    {size}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Flex>
-        )}
+        {pageSizeSelector}
         <Flex gap="xs" align="center">
-          <button
-            type="button"
-            disabled={page <= 1}
-            onClick={() => onPageChange(page - 1)}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-md border text-sm disabled:opacity-50"
-            aria-label="Previous page"
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M10 4L6 8L10 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-          <span className="text-sm">
-            {page} / {totalPages}
-          </span>
-          <button
-            type="button"
-            disabled={page >= totalPages}
-            onClick={() => onPageChange(page + 1)}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-md border text-sm disabled:opacity-50"
-            aria-label="Next page"
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M6 4L10 8L6 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
+        {prevButton}
+        {isCompact ? (
+          <span className="text-xs">{page} / {totalPages}</span>
+        ) : (
+          pageNumbers!.map((p, i) =>
+            p === "ellipsis" ? (
+              <span key={`ellipsis-${i}`} className="inline-flex h-6 w-6 items-center justify-center text-xs text-muted-foreground">
+                &hellip;
+              </span>
+            ) : (
+              <button
+                key={p}
+                type="button"
+                onClick={() => onPageChange(p)}
+                className={cn(
+                  "inline-flex h-6 w-6 items-center justify-center rounded text-xs font-medium",
+                  p === page
+                    ? "bg-primary text-primary-foreground"
+                    : "hover:bg-accent hover:text-accent-foreground",
+                )}
+                aria-label={`Page ${p}`}
+                aria-current={p === page ? "page" : undefined}
+              >
+                {p}
+              </button>
+            ),
+          )
+        )}
+        {nextButton}
         </Flex>
       </Flex>
-    </Flex>
+    </div>
   );
 }
 
@@ -710,7 +1298,8 @@ export interface ListBulkActionsProps {
   children?: ReactNode;
 }
 
-function ListBulkActions({ selectedCount, onClear, selectedLabel, clearLabel = "Clear", className, children }: ListBulkActionsProps) {
+function ListBulkActions({ selectedCount, onClear, selectedLabel, clearLabel, className, children }: ListBulkActionsProps) {
+  const { t } = useTranslation("simplix/ui");
   if (selectedCount === 0) return null;
 
   return (
@@ -723,7 +1312,7 @@ function ListBulkActions({ selectedCount, onClear, selectedLabel, clearLabel = "
       )}
     >
       <span className="text-sm font-medium">
-        {selectedLabel ? selectedLabel(selectedCount) : `${selectedCount} selected`}
+        {selectedLabel ? selectedLabel(selectedCount) : t("list.selected", { count: selectedCount })}
       </span>
       {children}
       {onClear && (
@@ -732,7 +1321,7 @@ function ListBulkActions({ selectedCount, onClear, selectedLabel, clearLabel = "
           onClick={onClear}
           className="ml-auto text-sm text-muted-foreground hover:text-foreground"
         >
-          {clearLabel}
+          {clearLabel ?? t("common.clear")}
         </button>
       )}
     </Flex>
@@ -784,14 +1373,14 @@ export interface ListEmptyProps {
   children?: ReactNode | ((props: { reason: EmptyReason }) => ReactNode);
 }
 
-const defaultEmptyMessages: Record<EmptyReason, string> = {
-  "no-data": "No data available.",
-  "no-filter": "No items match the selected filters.",
-  "no-search": "No items match the search query.",
-};
-
 function ListEmpty({ reason = "no-data", messages, className, children }: ListEmptyProps) {
-  const mergedMessages = messages ? { ...defaultEmptyMessages, ...messages } : defaultEmptyMessages;
+  const { t } = useTranslation("simplix/ui");
+  const defaultMessages: Record<EmptyReason, string> = {
+    "no-data": t("list.noData"),
+    "no-filter": t("list.noFilter"),
+    "no-search": t("list.noSearch"),
+  };
+  const mergedMessages = messages ? { ...defaultMessages, ...messages } : defaultMessages;
   const content = typeof children === "function"
     ? children({ reason })
     : children ?? mergedMessages[reason];
@@ -809,17 +1398,28 @@ function ListEmpty({ reason = "no-data", messages, className, children }: ListEm
  * Compound component for building CRUD list views with toolbar, table,
  * pagination, selection, and bulk actions.
  *
- * Sub-components: Toolbar, Search, Filter, Table, Column, RowActions,
- * Action, Pagination, BulkActions, BulkAction, Empty.
+ * Sub-components: Toolbar, Search, Filter, Table, Column,
+ * Pagination, BulkActions, BulkAction, Empty.
  */
 export const CrudList = Object.assign(ListRoot, {
   Toolbar: ListToolbar,
   Search: ListSearch,
-  Filter: ListFilter,
+  // Filter components (10 types + actions)
+  TextFilter,
+  MultiTextFilter,
+  AdvancedTextFilter,
+  UnifiedTextFilter,
+  NumberFilter,
+  DateFilter,
+  DateRangeFilter,
+  FacetedFilter,
+  AdvancedSelectFilter,
+  ToggleFilter,
+  FilterActions,
+  FilterBar,
+  // Core components
   Table: ListTable,
   Column: ListColumn,
-  RowActions: ListRowActions,
-  Action: ListAction,
   Pagination: ListPagination,
   BulkActions: ListBulkActions,
   BulkAction: ListBulkAction,

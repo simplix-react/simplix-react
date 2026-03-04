@@ -25,7 +25,7 @@ export function DetailLinkField({
   external,
   label,
   labelKey,
-  labelPosition,
+  layout,
   size,
   className,
 }: DetailLinkFieldProps) {
@@ -33,7 +33,7 @@ export function DetailLinkField({
     <DetailFieldWrapper
       label={label}
       labelKey={labelKey}
-      labelPosition={labelPosition}
+      layout={layout}
       size={size}
       className={className}
     >

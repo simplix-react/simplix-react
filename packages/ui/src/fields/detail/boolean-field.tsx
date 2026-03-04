@@ -29,7 +29,7 @@ export function DetailBooleanField({
   labels = { true: "Yes", false: "No" },
   label,
   labelKey,
-  labelPosition,
+  layout,
   size,
   className,
 }: DetailBooleanFieldProps) {
@@ -38,7 +38,7 @@ export function DetailBooleanField({
       <DetailFieldWrapper
         label={label}
         labelKey={labelKey}
-        labelPosition={labelPosition}
+        layout={layout}
         size={size}
         className={className}
       >
@@ -51,7 +51,7 @@ export function DetailBooleanField({
     <DetailFieldWrapper
       label={label}
       labelKey={labelKey}
-      labelPosition={labelPosition}
+      layout={layout}
       size={size}
       className={className}
     >

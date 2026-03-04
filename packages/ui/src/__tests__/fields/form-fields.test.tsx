@@ -93,13 +93,13 @@ describe("TextField", () => {
     expect(input?.getAttribute("type")).toBe("email");
   });
 
-  it("sets aria-label when labelPosition is hidden", () => {
+  it("sets aria-label when layout is hidden", () => {
     render(
       <TextField
         label="Search"
         value=""
         onChange={vi.fn()}
-        labelPosition="hidden"
+        layout="hidden"
       />,
     );
     const input = screen.getByRole("textbox");

@@ -34,7 +34,7 @@ export function DetailImageField({
   imageClassName,
   label,
   labelKey,
-  labelPosition,
+  layout,
   size,
   className,
 }: DetailImageFieldProps) {
@@ -47,7 +47,7 @@ export function DetailImageField({
     <DetailFieldWrapper
       label={label}
       labelKey={labelKey}
-      labelPosition={labelPosition}
+      layout={layout}
       size={size}
       className={className}
     >

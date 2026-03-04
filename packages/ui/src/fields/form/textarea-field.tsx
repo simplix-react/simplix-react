@@ -72,7 +72,7 @@ export function TextareaField({
         disabled={disabled}
         required={required}
         aria-invalid={!!error}
-        aria-label={variantProps.labelPosition === "hidden" ? label : undefined}
+        aria-label={variantProps.layout === "hidden" ? label : undefined}
         {...textareaProps}
         className={cn(
           resizeClasses[resize],

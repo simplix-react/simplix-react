@@ -9,3 +9,10 @@ export type {
   UseCrudDeleteDetailResult,
   UseCrudDeleteListResult,
 } from "./use-crud-delete";
+
+export { useCrudDeleteWired } from "./use-crud-delete-wired";
+export type {
+  CrudDeleteWiredLabels,
+  UseCrudDeleteWiredOptions,
+  UseCrudDeleteWiredResult,
+} from "./use-crud-delete-wired";

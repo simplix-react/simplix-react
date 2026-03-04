@@ -63,7 +63,7 @@ export function TextField({
         disabled={disabled}
         required={required}
         aria-invalid={!!error}
-        aria-label={variantProps.labelPosition === "hidden" ? label : undefined}
+        aria-label={variantProps.layout === "hidden" ? label : undefined}
         {...inputProps}
         className={cn(error && "border-destructive", inputProps?.className)}
       />

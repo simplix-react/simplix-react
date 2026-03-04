@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import type { CommonFieldProps } from "../../crud/shared/types";
 import {
@@ -8,12 +8,14 @@ import {
 } from "../../base/popover";
 import { useUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
+import type { DateLike } from "../../utils/parse-date";
+import { parseDate } from "../../utils/parse-date";
 import { FieldWrapper } from "../shared/field-wrapper";
 
 /** Props for the {@link DateField} form component. */
 export interface DateFieldProps extends CommonFieldProps {
-  /** Currently selected date, or `null` when no date is selected. */
-  value: Date | null;
+  /** Currently selected date. Accepts Date, ISO string, or unix timestamp. */
+  value: DateLike | null;
   /** Called when the date selection changes. */
   onChange: (value: Date | null) => void;
   /** Earliest selectable date. */
@@ -24,11 +26,6 @@ export interface DateFieldProps extends CommonFieldProps {
   format?: string;
   /** Placeholder text when no date is selected. */
   placeholder?: string;
-}
-
-function formatDate(date: Date, _format?: string): string {
-  // Use locale date string by default
-  return date.toLocaleDateString();
 }
 
 /**
@@ -62,6 +59,7 @@ export function DateField({
 }: DateFieldProps) {
   const { Calendar } = useUIComponents();
   const [open, setOpen] = useState(false);
+  const parsed = useMemo(() => parseDate(value), [value]);
 
   function handleSelect(date: Date) {
     onChange(date);
@@ -86,13 +84,13 @@ export function DateField({
             disabled={disabled}
             aria-invalid={!!error}
             aria-label={
-              variantProps.labelPosition === "hidden" ? label : undefined
+              variantProps.layout === "hidden" ? label : undefined
             }
             className={cn(
-              "flex h-10 w-full items-center rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+              "flex h-8 w-full items-center rounded-md border border-input bg-background px-3 py-1.5 text-sm",
+              "focus-visible:outline-none focus-visible:border-foreground",
               "disabled:cursor-not-allowed disabled:opacity-50",
-              !value && "text-muted-foreground",
+              !parsed && "text-muted-foreground",
               error && "border-destructive",
             )}
           >
@@ -112,12 +110,12 @@ export function DateField({
                 clipRule="evenodd"
               />
             </svg>
-            {value ? formatDate(value, format) : placeholder}
+            {parsed ? parsed.toLocaleDateString() : placeholder}
           </button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar
-            selected={value ?? undefined}
+            selected={parsed}
             onSelect={handleSelect}
             minDate={minDate}
             maxDate={maxDate}

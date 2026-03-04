@@ -75,9 +75,9 @@ export class CrudErrorBoundary extends Component<
           onClick={this.handleReset}
           className={cn(
             "inline-flex h-9 items-center justify-center rounded-md px-4 text-sm font-medium",
-            "border border-input bg-background ring-offset-background transition-colors",
+            "border border-input bg-background transition-colors",
             "hover:bg-accent hover:text-accent-foreground",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+            "focus-visible:outline-none",
           )}
         >
           Try again

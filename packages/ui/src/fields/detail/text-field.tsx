@@ -28,7 +28,7 @@ export function DetailTextField({
   copyable,
   label,
   labelKey,
-  labelPosition,
+  layout,
   size,
   className,
 }: DetailTextFieldProps) {
@@ -47,7 +47,7 @@ export function DetailTextField({
     <DetailFieldWrapper
       label={label}
       labelKey={labelKey}
-      labelPosition={labelPosition}
+      layout={layout}
       size={size}
       className={className}
     >

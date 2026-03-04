@@ -100,15 +100,15 @@ export function MultiSelectField<T extends string = string>({
         <PopoverTrigger asChild>
           <span
             className={cn(
-              "relative flex min-h-10 w-full flex-wrap items-center gap-1 rounded-md border border-input bg-background px-3 py-1.5 text-sm ring-offset-background",
-              "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
+              "relative flex min-h-8 w-full flex-wrap items-center gap-1 rounded-md border border-input bg-background px-3 py-1 text-sm",
+              "focus-within:border-foreground",
               disabled && "cursor-not-allowed opacity-50",
               error && "border-destructive",
             )}
             role="combobox"
             aria-expanded={open}
             aria-label={
-              variantProps.labelPosition === "hidden" ? label : undefined
+              variantProps.layout === "hidden" ? label : undefined
             }
           >
             {selectedLabels.map((opt) => (
@@ -154,7 +154,7 @@ export function MultiSelectField<T extends string = string>({
               onFocus={() => setOpen(true)}
               placeholder={value.length === 0 ? placeholder : ""}
               disabled={disabled}
-              className="h-auto min-w-[60px] flex-1 border-0 p-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+              className="h-auto min-w-[60px] flex-1 border-0 p-0 shadow-none"
             />
           </span>
         </PopoverTrigger>

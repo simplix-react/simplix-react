@@ -16,7 +16,7 @@ export interface CheckboxFieldProps extends CommonFieldProps {
 }
 
 /**
- * Checkbox field. Defaults to `labelPosition="left"` for natural layout.
+ * Checkbox field. Defaults to `layout="left"` for natural layout.
  *
  * @example
  * ```tsx
@@ -34,7 +34,7 @@ export function CheckboxField({
   required,
   disabled,
   className,
-  labelPosition = "left",
+  layout = "left",
   ...variantProps
 }: CheckboxFieldProps) {
   const { Checkbox } = useUIComponents();
@@ -48,7 +48,7 @@ export function CheckboxField({
       required={required}
       disabled={disabled}
       className={className}
-      labelPosition={labelPosition}
+      layout={layout}
       {...variantProps}
     >
       <Checkbox
@@ -56,7 +56,7 @@ export function CheckboxField({
         onCheckedChange={(checked) => onChange(checked === true)}
         disabled={disabled}
         aria-invalid={!!error}
-        aria-label={labelPosition === "hidden" ? label : undefined}
+        aria-label={layout === "hidden" ? label : undefined}
         {...checkboxProps}
       />
     </FieldWrapper>

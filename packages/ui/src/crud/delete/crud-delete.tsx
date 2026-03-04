@@ -1,3 +1,4 @@
+import { useTranslation } from "@simplix-react/i18n/react";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
 
 import { cn } from "../../utils/cn";
@@ -42,14 +43,14 @@ export function CrudDelete({
   description,
   loading = false,
   entityName,
-  cancelLabel = "Cancel",
-  deleteLabel = "Delete",
-  deletingLabel = "Deleting...",
+  cancelLabel,
+  deleteLabel,
+  deletingLabel,
 }: CrudDeleteProps) {
-  const displayTitle = title ?? `Delete ${entityName ?? "item"}`;
+  const { t } = useTranslation("simplix/ui");
+  const displayTitle = title ?? t("list.deleteTitle", { entity: entityName ?? "item" });
   const displayDescription =
-    description ??
-    `Are you sure you want to delete this ${entityName ?? "item"}? This action cannot be undone.`;
+    description ?? t("list.deleteDescription", { entity: entityName ?? "item" });
 
   return (
     <AlertDialog.Root open={open} onOpenChange={onOpenChange}>
@@ -76,14 +77,14 @@ export function CrudDelete({
             <AlertDialog.Cancel
               className={cn(
                 "inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-medium",
-                "border border-input bg-background ring-offset-background transition-colors",
+                "border border-input bg-background transition-colors",
                 "hover:bg-accent hover:text-accent-foreground",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                "focus-visible:outline-none",
                 "disabled:pointer-events-none disabled:opacity-50",
               )}
               disabled={loading}
             >
-              {cancelLabel}
+              {cancelLabel ?? t("common.cancel")}
             </AlertDialog.Cancel>
             <AlertDialog.Action
               onClick={(e) => {
@@ -92,14 +93,14 @@ export function CrudDelete({
               }}
               className={cn(
                 "inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-medium",
-                "bg-destructive text-destructive-foreground ring-offset-background transition-colors",
+                "bg-destructive text-destructive-foreground transition-colors",
                 "hover:bg-destructive/90",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                "focus-visible:outline-none",
                 "disabled:pointer-events-none disabled:opacity-50",
               )}
               disabled={loading}
             >
-              {loading ? deletingLabel : deleteLabel}
+              {loading ? (deletingLabel ?? t("common.deleting")) : (deleteLabel ?? t("common.delete"))}
             </AlertDialog.Action>
           </footer>
         </AlertDialog.Content>
