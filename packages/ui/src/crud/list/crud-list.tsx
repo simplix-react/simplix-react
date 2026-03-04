@@ -36,7 +36,7 @@ import {Flex, Stack} from "../../primitives";
 import {cn} from "../../utils/cn";
 import type {ColumnInfo, EmptyReason, SortState} from "../shared";
 import {CrudListColumnContext, useCrudListColumns} from "../shared";
-import {AlertTriangleIcon, ArrowUpDownIcon, EyeIcon, FolderTreeIcon, MapPinIcon, PencilIcon, PlusIcon, TrashIcon} from "../shared/icons";
+import {AlertTriangleIcon, ArrowUpDownIcon, EyeIcon, FolderTreeIcon, FunnelIcon, MagnifyingGlassIcon, MapPinIcon, PencilIcon, PlusIcon, TrashIcon} from "../shared/icons";
 import {
   AdvancedSelectFilter,
   AdvancedTextFilter,
@@ -60,16 +60,24 @@ import { DraggableRow } from "../reorder/draggable-row";
 import { DraggableCard } from "../reorder/draggable-card";
 import {useContainerWidth} from "./use-container-width";
 
-// ── Error Card ──
+// ── Empty Reason Card ──
 
-function ErrorCard({ title, description }: { title: string; description: string }) {
+const emptyReasonConfig = {
+  error: { icon: <AlertTriangleIcon />, iconClassName: "bg-destructive/10 text-destructive", titleKey: "list.errorTitle", descKey: "list.errorDescription" },
+  "no-filter": { icon: <FunnelIcon />, iconClassName: "bg-muted text-muted-foreground", titleKey: "list.noFilterTitle", descKey: "list.noFilter" },
+  "no-search": { icon: <MagnifyingGlassIcon />, iconClassName: "bg-muted text-muted-foreground", titleKey: "list.noSearchTitle", descKey: "list.noSearch" },
+} as const;
+
+function EmptyReasonCard({ reason }: { reason: Exclude<EmptyReason, "no-data"> }) {
+  const { t } = useTranslation("simplix/ui");
+  const config = emptyReasonConfig[reason];
   return (
     <div className="flex flex-col items-center justify-center rounded-lg border py-16 text-center">
-      <div className="mb-3 rounded-full bg-destructive/10 p-4 text-destructive [&_svg]:size-8">
-        <AlertTriangleIcon />
+      <div className={`mb-3 rounded-full p-4 [&_svg]:size-8 ${config.iconClassName}`}>
+        {config.icon}
       </div>
-      <p className="text-base font-semibold">{title}</p>
-      <p className="mt-1 max-w-sm text-sm text-muted-foreground">{description}</p>
+      <p className="text-base font-semibold">{t(config.titleKey)}</p>
+      <p className="mt-1 max-w-sm text-sm text-muted-foreground">{t(config.descKey)}</p>
     </div>
   );
 }
@@ -530,9 +538,6 @@ function ReorderableTable<T>({
   }
 
   if (emptyReason && data.length === 0) {
-    if (emptyReason === "error") {
-      return <ErrorCard title={t("list.errorTitle")} description={t("list.errorDescription")} />;
-    }
     if (emptyReason === "no-data" && emptyState) {
       return (
         <div className="flex flex-col items-center justify-center rounded-lg border py-16 text-center">
@@ -549,17 +554,13 @@ function ReorderableTable<T>({
         </div>
       );
     }
+    if (emptyReason !== "no-data") {
+      return <EmptyReasonCard reason={emptyReason} />;
+    }
     return (
-      <Table variant={variant} size={size} density={density} rounded={rounded} className={cn("table-auto", className)}>
-        {tableHeader}
-        <TableBody>
-          <TableRow>
-            <TableCell colSpan={table.getAllColumns().length + 1} className="h-24 text-center text-muted-foreground">
-              {emptyMessages[emptyReason]}
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
+      <div className="flex h-24 items-center justify-center rounded-lg border text-sm text-muted-foreground">
+        {emptyMessages[emptyReason]}
+      </div>
     );
   }
 
@@ -689,9 +690,6 @@ function ReorderableCardList<T>({
   }
 
   if (emptyReason && data.length === 0) {
-    if (emptyReason === "error") {
-      return <ErrorCard title={t("list.errorTitle")} description={t("list.errorDescription")} />;
-    }
     if (emptyReason === "no-data" && emptyState) {
       return (
         <div className="flex flex-col items-center justify-center rounded-lg border py-16 text-center">
@@ -708,8 +706,11 @@ function ReorderableCardList<T>({
         </div>
       );
     }
+    if (emptyReason !== "no-data") {
+      return <EmptyReasonCard reason={emptyReason} />;
+    }
     return (
-      <div className="flex h-24 items-center justify-center text-sm text-muted-foreground">
+      <div className="flex h-24 items-center justify-center rounded-lg border text-sm text-muted-foreground">
         {emptyMessages[emptyReason]}
       </div>
     );
@@ -956,33 +957,33 @@ function ListTable<T>({
     manualSorting: true,
   });
 
-  // Error state — replaces the entire table/card area
-  if (emptyReason === "error" && data.length === 0 && !isLoading) {
-    return (
-      <div ref={containerRef} className="w-full">
-        <ErrorCard title={t("list.errorTitle")} description={t("list.errorDescription")} />
-      </div>
-    );
-  }
-
-  // Rich empty state for "no-data" — replaces the entire table/card area
-  if (emptyReason === "no-data" && emptyState && data.length === 0 && !isLoading) {
-    return (
-      <div ref={containerRef} className="w-full">
-        <div className="flex flex-col items-center justify-center rounded-lg border py-16 text-center">
-          {emptyState.icon && (
-            <div className="mb-3 rounded-full bg-muted p-4 text-muted-foreground [&_svg]:size-8">
-              {emptyState.icon}
-            </div>
-          )}
-          <p className="text-base font-semibold">{emptyState.title}</p>
-          {emptyState.description && (
-            <p className="mt-1 max-w-sm text-sm text-muted-foreground">{emptyState.description}</p>
-          )}
-          {emptyState.action && <div className="mt-4">{emptyState.action}</div>}
+  // Empty states — replace the entire table/card area
+  if (emptyReason && data.length === 0 && !isLoading) {
+    if (emptyReason === "no-data" && emptyState) {
+      return (
+        <div ref={containerRef} className="w-full">
+          <div className="flex flex-col items-center justify-center rounded-lg border py-16 text-center">
+            {emptyState.icon && (
+              <div className="mb-3 rounded-full bg-muted p-4 text-muted-foreground [&_svg]:size-8">
+                {emptyState.icon}
+              </div>
+            )}
+            <p className="text-base font-semibold">{emptyState.title}</p>
+            {emptyState.description && (
+              <p className="mt-1 max-w-sm text-sm text-muted-foreground">{emptyState.description}</p>
+            )}
+            {emptyState.action && <div className="mt-4">{emptyState.action}</div>}
+          </div>
         </div>
-      </div>
-    );
+      );
+    }
+    if (emptyReason !== "no-data") {
+      return (
+        <div ref={containerRef} className="w-full">
+          <EmptyReasonCard reason={emptyReason} />
+        </div>
+      );
+    }
   }
 
   return (
