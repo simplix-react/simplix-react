@@ -66,9 +66,10 @@ export const addModuleCommand = new Command("add-module")
     // Load config for i18n locales
     const config = await loadConfig(rootDir);
     const locales = config.i18n?.locales ?? ["en", "ko", "ja"];
+    const prefix = config.packages?.prefix ?? baseName;
 
-    const modulePkgName = `${scope}/${baseName}-${name}`;
-    const dirName = `${baseName}-${name}`;
+    const dirName = prefix ? `${prefix}-${name}` : name;
+    const modulePkgName = scope ? `${scope}/${dirName}` : dirName;
     const targetDir = join(rootDir, "modules", dirName);
 
     if (await pathExists(targetDir)) {
@@ -87,7 +88,7 @@ export const addModuleCommand = new Command("add-module")
         enableI18n,
         locales,
         PascalName: toPascalCase(name),
-        namespace: `${baseName}-${name}`,
+        namespace: prefix ? `${prefix}-${name}` : name,
       });
 
       const files: Record<string, string> = {

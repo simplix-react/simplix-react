@@ -1,5 +1,6 @@
 export function toPascalCase(str: string): string {
   return str
+    .replace(/([a-z])([A-Z])/g, "$1-$2")
     .split(/[-_\s]+/)
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
     .join("");

@@ -1,0 +1,5 @@
+{{#if hasListDetail}}
+export { {{EntityPascal}}CrudPage } from "./crud-page";
+{{else if (and (not hasList) hasCreate)}}
+export { {{EntityPascal}}ListPage } from "./list-page";
+{{/if}}

@@ -1,0 +1,72 @@
+import { CrudTree } from "@simplix-react/ui";
+import type { ActionVariant, RowActionDef } from "@simplix-react/ui";
+import { useEntityTranslation, useTranslation } from "@simplix-react/i18n/react";
+{{#if hookTree}}
+import { {{hookTree}} } from "{{packageName}}";
+{{/if}}
+
+interface {{EntityPascal}} {
+{{#each fields}}
+{{#if (eq this.name ../treeParentIdField)}}
+  {{this.name}}: string | null;
+{{else}}
+  {{this.name}}: {{this.tsType}};
+{{/if}}
+{{/each}}
+  children: {{EntityPascal}}[];
+}
+
+export function use{{EntityPascal}}Tree() {
+{{#if hookTree}}
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, isLoading } = {{hookTree}}() as any;
+  return { data: (data ?? []) as {{EntityPascal}}[], isLoading };
+{{else}}
+  // TODO: Connect to domain package tree hook
+  return { data: [] as {{EntityPascal}}[], isLoading: false };
+{{/if}}
+}
+
+interface {{EntityPascal}}TreeProps {
+  tree?: ReturnType<typeof use{{EntityPascal}}Tree>;
+  activeRowId?: string | null;
+  actions?: RowActionDef<{{EntityPascal}}>[];
+  actionVariant?: ActionVariant;
+  onRowClick?: (row: {{EntityPascal}}) => void;
+}
+
+export function {{EntityPascal}}Tree({ tree: externalTree, activeRowId, actions, actionVariant = "icon", onRowClick }: {{EntityPascal}}TreeProps) {
+  const { fieldLabel } = useEntityTranslation("{{entity}}");
+  const { t } = useTranslation("{{moduleNamespace}}/widgets");
+  const internalTree = use{{EntityPascal}}Tree();
+  const tree = externalTree ?? internalTree;
+
+  return (
+    <CrudTree>
+      <CrudTree.Table<{{EntityPascal}}>
+        data={tree.data}
+        isLoading={tree.isLoading}
+        density="compact"
+        tree={{ldb}} idField: "{{rowIdField}}", childrenField: "children", initialExpandedDepth: 2 {{rdb}}
+        searchFields={[{{#each treeSearchFields}}"{{this}}"{{#unless @last}}, {{/unless}}{{/each}}]}
+        onRowClick={onRowClick}
+        activeRowId={activeRowId}
+        actions={actions}
+        actionVariant={actionVariant}
+        headerActions={<CrudTree.HeaderActions searchPlaceholder={t("{{entity}}.searchPlaceholder")} />}
+      >
+{{#each treeDisplayFields}}
+        <CrudTree.Column<{{../EntityPascal}}>
+          field="{{this.name}}"
+          header={fieldLabel("{{this.name}}")}
+{{#if @first}}
+          sortable
+{{/if}}
+        />
+{{/each}}
+      </CrudTree.Table>
+
+      {tree.data.length === 0 && !tree.isLoading && <CrudTree.Empty />}
+    </CrudTree>
+  );
+}

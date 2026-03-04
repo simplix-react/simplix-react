@@ -1,6 +1,11 @@
 import { readFile } from "node:fs/promises";
 import type { OpenAPISpec } from "./types.js";
 
+/** Check whether a spec source is a URL (http:// or https://) */
+export function isSpecUrl(source: string): boolean {
+  return source.startsWith("http://") || source.startsWith("https://");
+}
+
 /**
  * Load and parse OpenAPI spec from URL or file path.
  * Supports both JSON and YAML formats.
@@ -13,7 +18,7 @@ export async function loadOpenAPISpec(source: string): Promise<OpenAPISpec> {
 }
 
 async function loadRawContent(source: string): Promise<string> {
-  if (source.startsWith("http://") || source.startsWith("https://")) {
+  if (isSpecUrl(source)) {
     const res = await fetch(source);
     if (!res.ok) {
       throw new Error(

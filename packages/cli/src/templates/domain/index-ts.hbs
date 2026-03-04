@@ -1,5 +1,11 @@
 {{#if enableI18n}}
 import "./translations";
 {{/if}}
+{{#if enableOrval}}
+export * from "./hooks";
+export * from "./generated/model";
+{{else}}
+export * from "./schemas";
 export * from "./contract";
 export * from "./hooks";
+{{/if}}

@@ -2,19 +2,38 @@ import type { ReactNode } from "react";
 import { useCallback, useState } from "react";
 
 {{#if hasUpdate}}
-import { QueryFallback, Button, CrudForm, FormFields, useCrudFormSubmit } from "@simplix-react/ui";
+import { QueryFallback, ArrowLeftIcon, Button, CrudForm, FormFields, Heading, {{#if hasTree}}TreeSelectField, {{/if}}useCrudFormSubmit, adaptOrvalCreate{{#if hookUpdate}}, adaptOrvalUpdate{{/if}}{{#if hasDateFields}}, parseDate{{/if}}{{#if hookCreate}}, useInvalidateEntity{{/if}} } from "@simplix-react/ui";
 {{else}}
-import { Button, CrudForm, FormFields, useCrudFormSubmit } from "@simplix-react/ui";
+import { ArrowLeftIcon, Button, CrudForm, FormFields, Heading, {{#if hasTree}}TreeSelectField, {{/if}}useCrudFormSubmit, adaptOrvalCreate{{#if hasDateFields}}, parseDate{{/if}}{{#if hookCreate}}, useInvalidateEntity{{/if}} } from "@simplix-react/ui";
 {{/if}}
+{{#if hasUpdate}}
 import type { EntityId } from "@simplix-react/contract";
-import { useEntityTranslation } from "@simplix-react/i18n/react";
+{{/if}}
+import { useEntityTranslation, useTranslation } from "@simplix-react/i18n/react";
 {{#if packageName}}
-import { {{domainCamel}}Hooks } from "{{packageName}}";
+import { {{#if hasUpdate}}{{#if hookGetForEdit}}{{hookGetForEdit}}, {{else}}{{#if hookGet}}{{hookGet}}, {{/if}}{{/if}}{{/if}}{{#if hookCreate}}{{hookCreate}}{{/if}}{{#if hookUpdate}}{{#if hookCreate}}, {{/if}}{{hookUpdate}}{{/if}}{{#if hasTree}}{{#if hookTree}}, {{hookTree}}{{/if}}{{/if}} } from "{{packageName}}";
 {{/if}}
 
+{{#if hasTree}}
+interface {{EntityPascal}} {
+{{#each fields}}
+{{#if (eq this.name ../treeParentIdField)}}
+  {{this.name}}: string | null;
+{{else}}
+  {{this.name}}: {{this.tsType}};
+{{/if}}
+{{/each}}
+  children: {{EntityPascal}}[];
+}
+
+{{/if}}
 export interface {{EntityPascal}}FormValues {
 {{#each fields}}
+{{#if (eq this.name ../treeParentIdField)}}
+  {{this.name}}: string | null;
+{{else}}
   {{this.name}}: {{this.tsType}};
+{{/if}}
 {{/each}}
 }
 
@@ -22,60 +41,129 @@ interface {{EntityPascal}}FormProps {
 {{#if hasUpdate}}
   {{entity}}Id?: EntityId;
 {{/if}}
-  header?: ReactNode;
+{{#if hasTree}}
+  defaultParentId?: string | null;
+{{/if}}
   onClose?: () => void;
   onSuccess?: () => void;
   onCancel?: () => void;
+  onBack?: () => void;
 }
 
-export function {{EntityPascal}}Form({ {{#if hasUpdate}}{{entity}}Id, {{/if}}header, onClose, onSuccess, onCancel }: {{EntityPascal}}FormProps) {
+export function {{EntityPascal}}Form({ {{#if hasUpdate}}{{entity}}Id, {{/if}}{{#if hasTree}}defaultParentId, {{/if}}onClose, onSuccess, onCancel, onBack }: {{EntityPascal}}FormProps) {
 {{#if hasUpdate}}
   const isEdit = !!{{entity}}Id;
 {{/if}}
-{{#if packageName}}
 {{#if hasUpdate}}
+{{#if hookGetForEdit}}
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, isLoading } = isEdit ? ({{domainCamel}}Hooks.{{entity}}.useGet({{entity}}Id) as any) : { data: null, isLoading: false };
+  const { data, isLoading } = isEdit ? ({{hookGetForEdit}}({{entity}}Id as any, { query: { gcTime: 0 } }) as any) : { data: null, isLoading: false };
+{{else if hookGet}}
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, isLoading } = isEdit ? ({{hookGet}}({{entity}}Id as any, { query: { gcTime: 0 } }) as any) : { data: null, isLoading: false };
+{{else}}
+  // TODO: Wire up useGet hook from your domain package
+  const data = null;
+  const isLoading = false;
 {{/if}}
+{{/if}}
+
+{{#if hookCreate}}
+  const _create = {{hookCreate}}();
+{{/if}}
+{{#if hasUpdate}}
+{{#if hookUpdate}}
+  const _update = {{hookUpdate}}();
+{{/if}}
+{{/if}}
+{{#if hookCreate}}
+  const invalidate = useInvalidateEntity("{{entityPath}}");
 {{/if}}
 
   const { handleSubmit } = useCrudFormSubmit<{{EntityPascal}}FormValues>({
 {{#if hasUpdate}}
     entityId: {{entity}}Id,
 {{/if}}
-{{#if packageName}}
+{{#if hookCreate}}
+    create: adaptOrvalCreate(_create, { onSettled: invalidate }),
+{{else}}
+    // TODO: Wire up create mutation from your domain package
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    create: {{domainCamel}}Hooks.{{entity}}.useCreate() as any,
+    create: { mutate: (() => {}) as any, isPending: false },
+{{/if}}
 {{#if hasUpdate}}
+{{#if hookUpdate}}
+{{#if updatePathParam}}
+    update: adaptOrvalUpdate(_update, "{{updatePathParam}}", { onSettled: invalidate }),
+{{else}}
+    update: adaptOrvalUpdate(_update),
+{{/if}}
+{{else}}
+    // TODO: Wire up update mutation from your domain package
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    update: {{domainCamel}}Hooks.{{entity}}.useUpdate() as any,
+    update: { mutate: (() => {}) as any, isPending: false },
 {{/if}}
 {{/if}}
     onSuccess,
   });
 
+  const { t } = useTranslation("{{moduleNamespace}}/widgets");
+{{#if hasUpdate}}
+  const header = onClose ? <Heading level={4} tone="muted">{isEdit ? t("{{entity}}.editHeader", { id: String({{entity}}Id) }) : t("{{entity}}.newHeader")}</Heading> : undefined;
+{{else}}
+  const header = onClose ? <Heading level={4} tone="muted">{t("{{entity}}.newHeader")}</Heading> : undefined;
+{{/if}}
+
 {{#if hasUpdate}}
   if (isEdit && (isLoading || !data)) return <QueryFallback isLoading={isLoading} notFoundMessage="{{EntityPascal}} not found." />;
 
-  return <{{EntityPascal}}FormInner defaultValues={isEdit ? data : undefined} onSubmit={handleSubmit} header={header} onClose={onClose} onCancel={onCancel} />;
+  return <{{EntityPascal}}FormInner {{#if hasTree}}{{entity}}Id={ {{entity}}Id} defaultParentId={defaultParentId} {{/if}}defaultValues={isEdit ? data ?? undefined : undefined} onSubmit={handleSubmit} header={header} onClose={onClose} onCancel={onCancel} onBack={onBack} />;
 {{else}}
-  return <{{EntityPascal}}FormInner onSubmit={handleSubmit} header={header} onClose={onClose} onCancel={onCancel} />;
+  return <{{EntityPascal}}FormInner {{#if hasTree}}defaultParentId={defaultParentId} {{/if}}onSubmit={handleSubmit} header={header} onClose={onClose} onCancel={onCancel} onBack={onBack} />;
 {{/if}}
 }
 
 interface {{EntityPascal}}FormInnerProps {
+{{#if hasTree}}
+{{#if hasUpdate}}
+  {{entity}}Id?: EntityId;
+{{/if}}
+  defaultParentId?: string | null;
+{{/if}}
   defaultValues?: Partial<{{EntityPascal}}FormValues>;
   onSubmit: (values: {{EntityPascal}}FormValues) => void;
   header?: ReactNode;
   onClose?: () => void;
   onCancel?: () => void;
+  onBack?: () => void;
 }
 
-function {{EntityPascal}}FormInner({ defaultValues, onSubmit, header, onClose, onCancel }: {{EntityPascal}}FormInnerProps) {
+function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}Id, {{/if}}defaultParentId, {{/if}}defaultValues, onSubmit, header, onClose, onCancel, onBack }: {{EntityPascal}}FormInnerProps) {
+{{#unless hasEnumFields}}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+{{/unless}}
   const { fieldLabel, enumLabel } = useEntityTranslation("{{entity}}");
+  const { t } = useTranslation("{{moduleNamespace}}/widgets");
 {{#each fields}}
+{{#if (eq this.name ../treeParentIdField)}}
+  const [{{this.name}}, set{{this.capitalizedName}}] = useState<string | null>(defaultParentId ?? defaultValues?.{{this.name}} ?? null);
+{{else if (eq this.formComponent "DateField")}}
+  const [{{this.name}}, set{{this.capitalizedName}}] = useState<{{this.tsType}}>(parseDate(defaultValues?.{{this.name}}) ?? {{this.defaultValue}});
+{{else}}
   const [{{this.name}}, set{{this.capitalizedName}}] = useState<{{this.tsType}}>(defaultValues?.{{this.name}} ?? {{this.defaultValue}});
+{{/if}}
 {{/each}}
+
+{{#if hasTree}}
+{{#if hookTree}}
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: treeResponse, isLoading: treeLoading } = {{hookTree}}() as any;
+  const treeData = (treeResponse?.data ?? []) as {{EntityPascal}}[];
+{{else}}
+  const treeData = [] as {{EntityPascal}}[];
+  const treeLoading = false;
+{{/if}}
+{{/if}}
 
   const handleSubmit = useCallback(
     () => {
@@ -85,10 +173,47 @@ function {{EntityPascal}}FormInner({ defaultValues, onSubmit, header, onClose, o
   );
 
   return (
-    <CrudForm onSubmit={handleSubmit} header={header} onClose={onClose}>
-      <CrudForm.Section title="{{EntityPascal}} Information">
+    <CrudForm onSubmit={handleSubmit} header={header} onClose={onClose} footer={
+      <CrudForm.Actions className={onBack || onCancel ? "justify-between" : "justify-end"}>
+        {onBack ? (
+          <Button type="button" size="sm" variant="outline" onClick={onBack}>
+            <ArrowLeftIcon className="h-4 w-4" />
+{{#if hasTree}}
+            {t("common.back")}
+{{else}}
+            Back
+{{/if}}
+          </Button>
+        ) : onCancel ? (
+{{#if hasTree}}
+          <Button type="button" size="sm" variant="outline" onClick={onCancel}>{t("common.cancel")}</Button>
+{{else}}
+          <Button type="button" size="sm" variant="outline" onClick={onCancel}>Cancel</Button>
+{{/if}}
+        ) : null}
+{{#if hasTree}}
+        <Button type="submit" size="sm" variant="primary">{t("{{entity}}.save{{EntityPascal}}")}</Button>
+{{else}}
+        <Button type="submit" size="sm" variant="primary">Save {{EntityPascal}}</Button>
+{{/if}}
+      </CrudForm.Actions>
+    }>
+      <CrudForm.Section title={t("{{entity}}.sectionTitle")} variant="flat">
 {{#each fields}}
-{{#if (eq this.formComponent "TextField")}}
+{{#if (eq this.name ../treeParentIdField)}}
+        <TreeSelectField<{{../EntityPascal}}>
+          label={fieldLabel("{{this.name}}")}
+          value={ {{~this.name~}} }
+          onChange={set{{this.capitalizedName~}} }
+          treeData={treeData}
+          isLoading={treeLoading}
+          config={{ldb}} idField: "{{../rowIdField}}", childrenField: "children" {{rdb}}
+          getDisplayName={(item) => item.{{../treeDisplayNameField}} ?? ""}
+{{#if ../hasUpdate}}
+          disabledItemId={ {{~../entity~}}Id ? String({{~../entity~}}Id) : undefined}
+{{/if}}
+        />
+{{else if (eq this.formComponent "TextField")}}
         <FormFields.TextField
           label={fieldLabel("{{this.name}}")}
           value={ {{~this.name~}} }
@@ -100,36 +225,31 @@ function {{EntityPascal}}FormInner({ defaultValues, onSubmit, header, onClose, o
           type="url"
 {{/if}}
         />
-{{/if}}
-{{#if (eq this.formComponent "TextareaField")}}
+{{else if (eq this.formComponent "TextareaField")}}
         <FormFields.TextareaField
           label={fieldLabel("{{this.name}}")}
           value={ {{~this.name~}} }
           onChange={set{{this.capitalizedName~}} }
         />
-{{/if}}
-{{#if (eq this.formComponent "NumberField")}}
+{{else if (eq this.formComponent "NumberField")}}
         <FormFields.NumberField
           label={fieldLabel("{{this.name}}")}
           value={ {{~this.name~}} }
           onChange={(v) => set{{this.capitalizedName}}(v ?? {{this.defaultValue}})}
         />
-{{/if}}
-{{#if (eq this.formComponent "SwitchField")}}
+{{else if (eq this.formComponent "SwitchField")}}
         <FormFields.SwitchField
           label={fieldLabel("{{this.name}}")}
           value={ {{~this.name~}} }
           onChange={set{{this.capitalizedName~}} }
         />
-{{/if}}
-{{#if (eq this.formComponent "DateField")}}
+{{else if (eq this.formComponent "DateField")}}
         <FormFields.DateField
           label={fieldLabel("{{this.name}}")}
           value={ {{~this.name~}} }
-          onChange={set{{this.capitalizedName~}} }
+          onChange={(v) => set{{this.capitalizedName}}(v ?? {{this.defaultValue}})}
         />
-{{/if}}
-{{#if (eq this.formComponent "SelectField")}}
+{{else if (eq this.formComponent "SelectField")}}
         <FormFields.SelectField
           label={fieldLabel("{{this.name}}")}
           value={ {{~this.name~}} }
@@ -143,11 +263,6 @@ function {{EntityPascal}}FormInner({ defaultValues, onSubmit, header, onClose, o
 {{/if}}
 {{/each}}
       </CrudForm.Section>
-
-      <CrudForm.Actions className={onCancel ? "justify-between" : "justify-end"}>
-        {onCancel && <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>}
-        <Button type="submit" variant="primary">Save {{EntityPascal}}</Button>
-      </CrudForm.Actions>
     </CrudForm>
   );
 }

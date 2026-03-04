@@ -1,7 +1,7 @@
 import type { ExtractedEntity, EntityField } from "./types.js";
 import { camelToSnake } from "@simplix-react/contract";
 
-const SEED_COUNT = 5;
+const SEED_COUNT = 20;
 
 /**
  * Generates TypeScript seed data code from extracted entities.
@@ -49,8 +49,14 @@ function generateFieldValue(
 ): string | undefined {
   const name = field.name.toLowerCase();
 
-  // ID field
+  // ID field — respect actual type (string for UUID, number for integer)
   if (name === "id") {
+    if (field.type === "string") {
+      if (field.format === "uuid") {
+        return `"00000000-0000-0000-0000-00000000000${index}"`;
+      }
+      return `"${index}"`;
+    }
     return String(index);
   }
 
@@ -124,6 +130,11 @@ function generateStringValue(
     return `"password${index}"`;
   }
 
+  // Foreign key fields (e.g. siteId, buildingId)
+  if (fieldName.endsWith("id") && fieldName !== "id") {
+    return `"${index}"`;
+  }
+
   // Name heuristics
   if (fieldName === "name" || fieldName === "title") {
     return `"${capitalize(entityName)} ${index}"`;
@@ -176,7 +187,8 @@ function generateObjectValue(field: EntityField, index: number): string {
     return `{ id: ${index}, name: "Category ${index}" }`;
   }
 
-  return `{ id: ${index} }`;
+  // Nested entity reference — use string id to match UUID patterns
+  return `{ id: "${index}" }`;
 }
 
 function capitalize(str: string): string {
@@ -185,3 +197,55 @@ function capitalize(str: string): string {
 
 const FIRST_NAMES = ["Alice", "Bob", "Charlie", "Diana", "Eve"];
 const LAST_NAMES = ["Smith", "Johnson", "Williams", "Brown", "Jones"];
+
+/**
+ * Generates a typed seed file for Orval domain packages.
+ *
+ * Output: TypeScript file with `export const {name}Seeds: {PascalName}[] = [...]`
+ * per entity, importing model types from `../generated/model`.
+ *
+ * @param entities - Extracted entities from OpenAPI spec
+ * @returns Full TypeScript file content for `mock/seeds.ts`
+ */
+export function generateOrvalSeedFile(entities: ExtractedEntity[]): string {
+  const validEntities = entities.filter((e) => e.fields.length > 0);
+  if (validEntities.length === 0) return "";
+
+  const typeImports = validEntities.map((e) => e.modelType ?? e.pascalName).join(", ");
+  const lines: string[] = [
+    `/**`,
+    ` * Mock seed data — auto-generated from OpenAPI schema.`,
+    ` *`,
+    ` * Values are generated based on field types and naming conventions.`,
+    ` * Customize this file to use realistic data for your project.`,
+    ` * This file is only generated once and will NOT be overwritten by the CLI.`,
+    ` */`,
+    `import type { ${typeImports} } from "../generated/model";`,
+    "",
+  ];
+
+  for (const entity of validEntities) {
+    const typeName = entity.modelType ?? entity.pascalName;
+    const rows: string[] = [];
+
+    for (let i = 1; i <= SEED_COUNT; i++) {
+      const fields: string[] = [];
+      for (const field of entity.fields) {
+        const value = generateFieldValue(field, i, entity.name);
+        if (value !== undefined) {
+          fields.push(`    ${field.name}: ${value}`);
+        }
+      }
+      rows.push(`  {\n${fields.join(",\n")},\n  }`);
+    }
+
+    lines.push(
+      `export const ${entity.name}Seeds: ${typeName}[] = [`,
+      rows.join(",\n") + ",",
+      `];`,
+      "",
+    );
+  }
+
+  return lines.join("\n");
+}

@@ -1,0 +1,25 @@
+import { Button, Container, Heading, Stack, Text } from "@simplix-react/ui";
+import { useTranslation } from "@simplix-react/i18n/react";
+
+interface {{EntityPascal}}ListPageProps {
+{{#if hasCreate}}
+  onCreate{{EntityPascal}}: () => void;
+{{/if}}
+}
+
+export function {{EntityPascal}}ListPage({ {{#if hasCreate}}onCreate{{EntityPascal}}{{/if}} }: {{EntityPascal}}ListPageProps) {
+  const { t } = useTranslation("{{moduleNamespace}}/widgets");
+  return (
+    <Container size="full">
+      <Stack gap="md" align="center">
+        <Heading level={3}>{t("{{entity}}.title")}</Heading>
+        <Text className="text-muted-foreground">
+          {t("{{entity}}.description")}
+        </Text>
+{{#if hasCreate}}
+        <Button onClick={onCreate{{EntityPascal}} }>{t("{{entity}}.new{{EntityPascal}}")}</Button>
+{{/if}}
+      </Stack>
+    </Container>
+  );
+}

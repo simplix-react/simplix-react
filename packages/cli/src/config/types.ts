@@ -1,4 +1,7 @@
+import { resolve } from "node:path";
 import type { HttpMethod, CrudRole } from "@simplix-react/contract";
+import type { OpenApiNamingStrategy } from "../openapi/naming-strategy.js";
+import type { ResponseAdapterConfig } from "../openapi/response-adapter.js";
 
 /**
  * Defines how a CRUD role maps to HTTP method(s) and path pattern(s).
@@ -88,11 +91,69 @@ export interface SimplixConfig {
     defaultLocale?: string;
   };
 
-  /** OpenAPI code generation options */
-  openapi?: {
-    /** Tag-based domain splitting: domainName → tagPatterns (exact string or /regex/) */
-    domains?: Record<string, string[]>;
-    /** CRUD role detection patterns. When omitted, no CRUD roles are assigned. */
-    crud?: Partial<Record<CrudRole, CrudEndpointPattern>>;
-  };
+  /** OpenAPI code generation — array of per-spec configurations */
+  openapi?: OpenAPISpecConfig[];
 }
+
+/** Per-spec OpenAPI configuration */
+export interface OpenAPISpecConfig {
+  /** OpenAPI spec file path (relative to project root) or URL */
+  spec: string;
+  /** Spec Profile preset name (bundles naming + responseAdapter) */
+  profile?: string;
+  /** NamingStrategy — overrides profile's naming if both are set */
+  naming?: OpenApiNamingStrategy;
+  /** ResponseAdapter — overrides profile's responseAdapter if both are set */
+  responseAdapter?: ResponseAdapterConfig;
+  /** Tag-based domain splitting: domainName → tagPatterns (exact string or /regex/) */
+  domains: Record<string, string[]>;
+  /** CRUD role detection patterns. When omitted, no CRUD roles are assigned. */
+  crud?: Partial<Record<CrudRole, CrudEndpointPattern>>;
+}
+
+/** Find the spec config that contains the given domain name */
+export function findSpecForDomain(
+  specs: OpenAPISpecConfig[] | undefined,
+  domainName: string,
+): OpenAPISpecConfig | undefined {
+  return specs?.find((s) => domainName in s.domains);
+}
+
+/** Find the spec config matching a given source path/URL */
+export function findSpecBySource(
+  specs: OpenAPISpecConfig[] | undefined,
+  source: string,
+  rootDir: string,
+): OpenAPISpecConfig | undefined {
+  return specs?.find((s) => {
+    if (isUrlSpec(s.spec) || isUrlSpec(source)) {
+      return s.spec === source;
+    }
+    return resolve(rootDir, s.spec) === resolve(rootDir, source);
+  });
+}
+
+function isUrlSpec(source: string): boolean {
+  return source.startsWith("http://") || source.startsWith("https://");
+}
+
+/** Per-entity CRUD role → operationId mapping */
+export interface CrudEntityConfig {
+  list?: string;
+  get?: string;
+  getForEdit?: string;
+  create?: string;
+  update?: string;
+  delete?: string;
+  multiUpdate?: string;
+  batchUpdate?: string;
+  batchDelete?: string;
+  search?: string;
+  tree?: string;
+  subtree?: string;
+  /** Extended roles (e.g. order, activate, archive) */
+  [role: string]: string | undefined;
+}
+
+/** Entity name → CRUD config mapping for a domain package */
+export type CrudMap = Record<string, CrudEntityConfig>;

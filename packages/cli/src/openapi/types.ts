@@ -9,6 +9,7 @@ export interface OpenAPISpec {
   info: { title: string; version: string; description?: string };
   paths: Record<string, PathItem>;
   components?: { schemas?: Record<string, SchemaObject> };
+  tags?: Array<{ name: string; description?: string; [key: string]: unknown }>;
 }
 
 export interface PathItem {
@@ -90,6 +91,7 @@ export interface EntityField {
 export interface QueryParam {
   name: string;
   type: string;
+  format?: string;
   required: boolean;
   description?: string;
 }
@@ -98,12 +100,20 @@ export interface ExtractedOperation {
   name: string;
   method: HttpMethod;
   path: string;
-  role?: CrudRole;
+  role?: string;
   hasInput: boolean;
   bodySchema?: SchemaObject;
   contentType?: "json" | "multipart";
   operationId?: string;
   queryParams: QueryParam[];
+  responseEntityType?: string;
+  isArrayResponse?: boolean;
+  /**
+   * Hook name resolved by NamingStrategy (e.g., "useGetAdminUserAccount").
+   * Set when a naming strategy is applied. Used by hook-generator to match
+   * actual Orval-generated hook names instead of deriving from operationId.
+   */
+  resolvedHookName?: string;
 }
 
 export interface ExtractedEntity {
@@ -117,6 +127,13 @@ export interface ExtractedEntity {
   operations: ExtractedOperation[];
   tags: string[];
   schemaOverride?: string;
+  /**
+   * Actual Orval-generated model type name (e.g., "UserAccount").
+   * Differs from pascalName when a naming strategy renames the entity
+   * (e.g., pascalName="AdminUserAccount" but model type="UserAccount").
+   * Used for type imports in generated mock/seed/hook files.
+   */
+  modelType?: string;
 }
 
 export interface DomainGroup {

@@ -1,5 +1,4 @@
 export { default as i18nConfigTs } from "./i18n/config-ts.hbs";
-export { default as i18nConstantsTs } from "./i18n/constants-ts.hbs";
 
 const commonTranslations: Record<string, object> = {
   en: {

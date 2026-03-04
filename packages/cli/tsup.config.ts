@@ -27,7 +27,7 @@ function readPkg(pkgName: string): PkgData {
   };
 }
 
-const FRAMEWORK_PKGS = ["cli", "contract", "react", "form", "mock", "i18n", "testing", "ui"];
+const FRAMEWORK_PKGS = ["cli", "contract", "react", "form", "mock", "i18n", "testing", "ui", "api"];
 const fwVersions: Record<string, string> = {};
 
 for (const pkg of FRAMEWORK_PKGS) {
@@ -44,6 +44,8 @@ const depVersions: Record<string, string> = {};
 
 // Consumer-only deps (not in any framework package.json)
 const CONSUMER_DEPS: Record<string, string> = {
+  "@eslint/js": "^9.28.0",
+  "@tanstack/query-core": "^5.90.0",
   "@tanstack/react-form": "^1.0.0",
   "@tanstack/react-query": "^5.64.0",
   "@tanstack/react-router": "^1.151.0",

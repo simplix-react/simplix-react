@@ -1,13 +1,13 @@
 import { createI18nConfig } from "@simplix-react/i18n";
+import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "../../shared/config/app";
 
 // Import app-local translations via Vite's glob import
 const appTranslations = import.meta.glob("/src/locales/**/*.json", { eager: true });
 
 export const { adapter: i18nAdapter, i18nReady } = createI18nConfig({
-  defaultLocale: "{{defaultLocale}}",
-  fallbackLocale: "en",
-  supportedLocales: {{{json locales}}},
+  defaultLocale: DEFAULT_LOCALE,
+  fallbackLocale: DEFAULT_LOCALE,
+  supportedLocales: [...SUPPORTED_LOCALES],
   detection: { order: ["localStorage", "navigator"] },
   appTranslations,
-  moduleTranslations: [],
 });

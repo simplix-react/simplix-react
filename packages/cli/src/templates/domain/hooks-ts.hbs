@@ -1,4 +1,4 @@
-import { deriveHooks } from "@simplix-react/react";
+import { deriveEntityHooks } from "@simplix-react/react";
 import { {{domainName}}Api } from "./contract";
 
 /**
@@ -13,4 +13,4 @@ import { {{domainName}}Api } from "./contract";
  *   {{../domainName}}Hooks.{{entityName}}.useDelete()   - delete mutation
 {{/each}}
  */
-export const {{domainName}}Hooks = deriveHooks({{domainName}}Api);
+export const {{domainName}}Hooks = deriveEntityHooks({{domainName}}Api);

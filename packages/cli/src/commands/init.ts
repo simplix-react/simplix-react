@@ -28,10 +28,10 @@ import {
   pageLoadingFallbackTsx,
   appFeaturesIndexTs,
   appWidgetsIndexTs,
+  appConfigTs,
 } from "../templates/project/app-files.js";
 import {
   i18nConfigTs,
-  i18nConstantsTs,
   getCommonTranslationJson,
 } from "../templates/project/i18n-files.js";
 import { accessConfigTs } from "../templates/project/access-files.js";
@@ -341,8 +341,8 @@ function HomePage() {
           const i18nFiles: Record<string, string> = {
             [`apps/${ctx.projectName}-demo/src/app/i18n/index.ts`]:
               renderTemplate(i18nConfigTs, i18nCtx),
-            [`apps/${ctx.projectName}-demo/src/app/i18n/constants.ts`]:
-              renderTemplate(i18nConstantsTs, i18nCtx),
+            [`apps/${ctx.projectName}-demo/src/shared/config/app.ts`]:
+              renderTemplate(appConfigTs, i18nCtx),
           };
           for (const locale of options.locales) {
             i18nFiles[

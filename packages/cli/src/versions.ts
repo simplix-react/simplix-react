@@ -16,7 +16,8 @@ type FrameworkPkg =
   | "@simplix-react/mock"
   | "@simplix-react/i18n"
   | "@simplix-react/testing"
-  | "@simplix-react/ui";
+  | "@simplix-react/ui"
+  | "@simplix-react/api";
 
 const FW_KEY_MAP: Record<FrameworkPkg, string> = {
   "@simplix-react/cli": "cli",
@@ -27,6 +28,7 @@ const FW_KEY_MAP: Record<FrameworkPkg, string> = {
   "@simplix-react/i18n": "i18n",
   "@simplix-react/testing": "testing",
   "@simplix-react/ui": "ui",
+  "@simplix-react/api": "api",
 };
 
 export function frameworkVersion(pkg: FrameworkPkg): string {

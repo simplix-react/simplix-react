@@ -32,6 +32,19 @@ Handlebars.registerHelper("or", (...args: unknown[]) => {
 Handlebars.registerHelper("ldb", () => "{{");
 Handlebars.registerHelper("rdb", () => "}}");
 
+Handlebars.registerHelper("and", (...args: unknown[]) => {
+  const values = args.slice(0, -1);
+  return values.every(Boolean);
+});
+
+Handlebars.registerHelper("not", (value: unknown) => {
+  return !value;
+});
+
+Handlebars.registerHelper("neq", (a: unknown, b: unknown) => {
+  return a !== b;
+});
+
 Handlebars.registerHelper("ifIncludes", function (
   this: unknown,
   arr: string[],

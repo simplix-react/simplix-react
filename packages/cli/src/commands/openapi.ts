@@ -1,72 +1,73 @@
 import { Command } from "commander";
 import prompts from "prompts";
 import ora from "ora";
-import { join, resolve } from "node:path";
-import { rm, writeFile } from "node:fs/promises";
+import { join, relative, resolve } from "node:path";
+import { rm } from "node:fs/promises";
 import { writeFileWithDir, pathExists, readJsonFile } from "../utils/fs.js";
 import { log } from "../utils/logger.js";
+import { toPascalCase } from "../utils/case.js";
 import { renderTemplate } from "../utils/template.js";
 import { loadConfig } from "../config/config-loader.js";
+import { findSpecBySource } from "../config/types.js";
 import type { SimplixConfig } from "../config/types.js";
-import { withVersions } from "../versions.js";
-import { loadOpenAPISpec } from "../openapi/parser.js";
+import { loadOpenAPISpec, isSpecUrl } from "../openapi/parser.js";
 import { resolveRefs } from "../openapi/schema-resolver.js";
-import { extractEntities } from "../openapi/entity-extractor.js";
-import { generateZodSchemas } from "../openapi/zod-codegen.js";
-import { generateHttpFile, generateHttpEnvJson } from "../openapi/http-file-gen.js";
+import { extractEntities, enrichWithResponseInfo } from "../openapi/entity-extractor.js";
 import { computeDiff, formatDiff } from "../openapi/diff-engine.js";
-import type { ExtractedEntity, ExtractedOperation, DomainGroup, OpenAPISnapshot } from "../openapi/types.js";
-import { groupEntitiesByDomain } from "../openapi/domain-splitter.js";
-import { generateSeedCode } from "../openapi/seed-generator.js";
+import { groupEntitiesByDomain, entityMatchesDomain } from "../openapi/domain-splitter.js";
+import { generateMockFiles } from "../openapi/mock-generator.js";
+import { generateHookFiles } from "../openapi/hook-generator.js";
+import { generateHttpFile, generateHttpEnvJson } from "../openapi/http-file-gen.js";
 import {
-  openapiPackageJsonWithEslintConfig,
-  openapiPackageJsonStandalone,
-  openapiTsupConfig,
-  openapiEslintConfigShared,
-  openapiEslintConfigStandalone,
-  openapiTsconfigJson,
-  openapiUserIndexTs,
-  openapiUserContractTs,
-  openapiUserHooksTs,
-  openapiUserMockIndexTs,
-  openapiGeneratedIndexTs,
-  openapiGeneratedIndexWithFormsTs,
-  openapiGeneratedContractTs,
-  openapiGeneratedHooksTs,
-  openapiGeneratedFormHooksTs,
-} from "../templates/openapi/index.js";
+  runOrval,
+  narrowResponseTypes,
+  addTsNocheckToEndpoints,
+  generateEndpointsBarrel,
+  extractSharedEndpointTypes,
+  generateSchemasProxy,
+  generateDomainMutatorContent,
+  buildHookImportMap,
+  pruneUnusedModels,
+} from "../openapi/orval-runner.js";
+import { resolveSpecConfig } from "../openapi/resolve-spec-config.js";
+import {
+  downloadI18nMessages,
+  buildEntityKeyMap,
+  transformToLocaleData,
+  overlayLocaleJson,
+} from "../openapi/presets/simplix-boot-i18n.js";
+import type { OperationContext } from "../openapi/naming-strategy.js";
+import type { OpenApiNamingStrategy } from "../openapi/naming-strategy.js";
+import type { ExtractedEntity, ExtractedOperation, DomainGroup, OpenAPISnapshot, OpenAPISpec } from "../openapi/types.js";
+import { domainIndexTs } from "../templates/domain/index.js";
+
+const SNAPSHOT_FILE = ".openapi-snapshot.json";
 
 interface OpenAPIFlags {
   domain?: string;
   entities?: string;
   output?: string;
-  dryRun?: boolean;
   force?: boolean;
   http?: boolean;
-  mock?: boolean;
-  forms?: boolean;
-  header?: boolean;
   yes?: boolean;
 }
 
 export const openapiCommand = new Command("openapi")
   .description(
-    "Generate domain package from OpenAPI spec (URL or file path)",
+    "Generate domain code from OpenAPI spec using Orval (URL or file path)",
   )
   .argument("<spec>", "OpenAPI spec file path or URL")
-  .option("-d, --domain <name>", "Domain name (defaults to OpenAPI info.title)")
+  .option(
+    "-d, --domain <name>",
+    "Domain name to generate (defaults to all domains)",
+  )
   .option(
     "-e, --entities <names>",
     "Entity names to generate (comma-separated, defaults to all)",
   )
   .option("-o, --output <dir>", "Output directory (defaults to packages/)")
-  .option("--dry-run", "Preview files without writing", false)
   .option("-f, --force", "Force regeneration even if no changes detected")
   .option("--no-http", "Skip .http file generation")
-  .option("--no-mock", "Skip mock layer generation")
-  .option("--no-forms", "Skip form hooks generation")
-  .option("--header", "Add auto-generated header comment to files (default)")
-  .option("--no-header", "Skip auto-generated header comment in files")
   .option("-y, --yes", "Auto-confirm without prompts")
   .action(async (specSource: string, flags: OpenAPIFlags) => {
     const rootDir = resolve(process.cwd());
@@ -83,7 +84,6 @@ export const openapiCommand = new Command("openapi")
       process.exit(1);
     }
 
-    // Extract scope and base name
     const pkgName = rootPkg.name;
     const scopeMatch = pkgName.match(/^(@[^/]+)\//);
     const scope = scopeMatch ? scopeMatch[1] : "";
@@ -112,7 +112,12 @@ export const openapiCommand = new Command("openapi")
     const resolvedSpec = resolveRefs(spec);
 
     // 5. Extract entities
-    let entities = extractEntities(resolvedSpec, config.openapi?.crud);
+    const specConfig = findSpecBySource(config.openapi, specSource, rootDir);
+    const resolvedSpecConfig = specConfig ? resolveSpecConfig(specConfig) : undefined;
+    let entities = extractEntities(resolvedSpec, specConfig?.crud, resolvedSpecConfig?.naming);
+
+    // Enrich with response type info from raw spec
+    enrichWithResponseInfo(spec, entities);
 
     if (entities.length === 0) {
       log.error("No CRUD entities found in the OpenAPI spec.");
@@ -132,7 +137,7 @@ export const openapiCommand = new Command("openapi")
       }
     }
 
-    // 6. Determine domain groups (tag-based splitting or single domain)
+    // 6. Determine domain groups
     const outputBase = flags.output
       ? resolve(flags.output)
       : join(rootDir, "packages");
@@ -140,20 +145,16 @@ export const openapiCommand = new Command("openapi")
 
     let domainGroups: DomainGroup[];
 
-    if (config.openapi?.domains && Object.keys(config.openapi.domains).length > 0) {
-      // Multi-domain: tag-based grouping
-      const fallback = flags.domain ?? normalizeDomainName(spec.info.title);
-      domainGroups = groupEntitiesByDomain(entities, config.openapi.domains, fallback);
-
-      // Skip domains with 0 entities
+    if (specConfig?.domains && Object.keys(specConfig.domains).length > 0) {
+      const fallback = normalizeDomainName(spec.info.title);
+      domainGroups = groupEntitiesByDomain(entities, specConfig.domains, fallback);
       domainGroups = domainGroups.filter((g) => g.entities.length > 0);
 
       log.info(
         `Multi-domain mode: ${domainGroups.map((g) => `${g.domainName}(${g.entities.length})`).join(", ")}`,
       );
     } else {
-      // Single-domain: legacy behavior
-      const domainName = flags.domain ?? normalizeDomainName(spec.info.title);
+      const domainName = normalizeDomainName(spec.info.title);
       domainGroups = [{ domainName, entities }];
 
       log.info(
@@ -161,21 +162,14 @@ export const openapiCommand = new Command("openapi")
       );
     }
 
-    // Dry-run: show file list per domain, then exit
-    if (flags.dryRun) {
-      for (const group of domainGroups) {
-        const dirName = `${prefix}-domain-${group.domainName}`;
-        const targetDir = join(outputBase, dirName);
-        const isFirstRun = !(await pathExists(targetDir));
+    // Filter by domain name if specified
+    if (flags.domain) {
+      domainGroups = domainGroups.filter((g) => g.domainName === flags.domain);
 
-        log.info(`Dry run — ${dirName}/`);
-        const fileList = buildFileList(group.entities, flags, isFirstRun);
-        for (const path of Object.keys(fileList)) {
-          log.step(path);
-        }
-        console.log("");
+      if (domainGroups.length === 0) {
+        log.error(`Domain "${flags.domain}" not found in spec config.`);
+        process.exit(1);
       }
-      return;
     }
 
     // Generate each domain package
@@ -184,232 +178,221 @@ export const openapiCommand = new Command("openapi")
         domainName: group.domainName,
         entities: group.entities,
         specSource,
+        spec,
         flags,
         config,
         rootDir,
         outputBase,
         prefix,
         scope,
-        baseName,
+        specConfig: specConfig
+          ? specConfig
+          : { spec: specSource, domains: { [group.domainName]: group.entities[0]?.tags ?? [] } },
+        resolvedSpecConfig,
       });
     }
   });
 
-// --- Core generation ---
+// ── Core generation ──────────────────────────────────────────
 
 interface DomainPackageOpts {
   domainName: string;
   entities: ExtractedEntity[];
   specSource: string;
+  spec: OpenAPISpec;
   flags: OpenAPIFlags;
   config: SimplixConfig;
   rootDir: string;
   outputBase: string;
   prefix: string;
   scope: string;
-  baseName: string;
+  specConfig: { spec: string; domains: Record<string, string[]> };
+  resolvedSpecConfig?: ReturnType<typeof resolveSpecConfig>;
 }
 
 async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
-  const { domainName, entities, specSource, flags, config, outputBase, prefix, scope, baseName } = opts;
+  const {
+    domainName, entities, specSource, spec, flags, config,
+    rootDir, outputBase, prefix, specConfig, resolvedSpecConfig,
+  } = opts;
+  const { naming, responseAdapter } = resolvedSpecConfig ?? {};
 
-  const dirName = `${prefix}-domain-${domainName}`;
+  const dirName = prefix ? `${prefix}-domain-${domainName}` : `domain-${domainName}`;
   const targetDir = join(outputBase, dirName);
-  const domainPkgName = `${scope}/${dirName}`;
-  const snapshotPath = join(targetDir, ".openapi-snapshot.json");
-  const isUpdate = await pathExists(snapshotPath);
-  const isFirstRun = !(await pathExists(targetDir));
+  const domainPkgName = opts.scope ? `${opts.scope}/${dirName}` : dirName;
 
-  const shouldProceed = await confirmRegeneration({
-    isUpdate, isFirstRun, snapshotPath, domainPkgName, dirName, entities, flags,
-  });
-  if (!shouldProceed) return;
+  // 1. Domain package must exist (created by `simplix add-domain`)
+  if (!(await pathExists(targetDir))) {
+    log.error(`Domain package "${dirName}" not found.`);
+    log.step(`Run first: simplix add-domain ${domainName}`);
+    process.exit(1);
+  }
 
-  const writeSpinner = ora(
-    isUpdate
-      ? `Updating domain package: ${domainPkgName}`
-      : `Creating domain package: ${domainPkgName}`,
-  ).start();
+  // 2. Diff check (snapshot comparison)
+  const snapshotPath = join(targetDir, SNAPSHOT_FILE);
+  const hasSnapshot = await pathExists(snapshotPath);
+
+  if (hasSnapshot && !flags.force) {
+    const previous = await readJsonFile<OpenAPISnapshot>(snapshotPath).catch(() => null);
+
+    if (previous) {
+      const diff = computeDiff(previous, entities);
+
+      if (!diff.hasChanges) {
+        log.success(`${domainPkgName}: No changes detected. Package is up-to-date.`);
+        return;
+      }
+
+      console.log("");
+      console.log(formatDiff(diff));
+      console.log("");
+
+      if (!flags.yes) {
+        const { proceed } = await prompts({
+          type: "confirm",
+          name: "proceed",
+          message: `${domainPkgName}: Regenerate with updated code?`,
+          initial: true,
+        });
+        if (!proceed) {
+          log.info("Update cancelled.");
+          return;
+        }
+      }
+    }
+  }
+
+  const spinner = ora(`Generating code for: ${domainPkgName}`).start();
 
   try {
-    const configEslintPkgName = await detectConfigEslintPackage(outputBase, scope);
-    const generateForms = flags.forms !== false;
-    const apiBasePath = config.api?.baseUrl ?? "";
-    const ctx = buildTemplateContext({
-      domainName, domainPkgName, configEslintPkgName,
-      projectName: baseName, scope, apiBasePath, entities, generateForms,
-    });
+    // 3. Clean generated dirs
+    await cleanGeneratedDirs(targetDir);
 
-    if (!isFirstRun) {
-      await cleanGeneratedDirs(targetDir, flags);
+    // 4. Ensure mutator.ts exists
+    const mutatorPath = join(targetDir, "src/mutator.ts");
+    if (!(await pathExists(mutatorPath))) {
+      const strategy = resolvedSpecConfig?.mutatorStrategy;
+      await writeFileWithDir(mutatorPath, generateDomainMutatorContent(domainName, strategy));
     }
 
-    const generatedFiles = buildGeneratedFiles({ entities, flags, ctx, apiBasePath, generateForms, config });
-    const scaffoldFiles = isFirstRun
-      ? buildScaffoldFiles(configEslintPkgName, flags, ctx)
-      : {};
+    // 5. Resolve hook names via NamingStrategy (stored on entities for hook-generator)
+    if (naming) {
+      resolveEntityHookNames(entities, naming);
+    }
 
-    const addHeader = flags.header !== undefined ? flags.header : (config.codegen?.header ?? true);
-    await writeFilesToDisk(targetDir, generatedFiles, scaffoldFiles, addHeader);
-    await saveSnapshot(snapshotPath, specSource, entities);
+    // 6. Ensure crud.config.ts exists (after hook name resolution for correct names)
+    const crudConfigPath = join(targetDir, "crud.config.ts");
+    if (flags.force || !(await pathExists(crudConfigPath))) {
+      await writeFileWithDir(crudConfigPath, generateCrudConfigContent(entities));
+    }
 
-    const totalFiles = Object.keys(generatedFiles).length + Object.keys(scaffoldFiles).length;
-    writeSpinner.succeed(
-      isUpdate ? `Updated domain package: ${domainPkgName}` : `Created domain package: ${domainPkgName}`,
-    );
+    // 7. Run Orval (with optional NamingStrategy override)
+    const domainTags = specConfig.domains[domainName] ?? [];
+    // Build tag → entityName map for multi-entity domains
+    const entityMap = new Map<string, string>();
+    for (const entity of entities) {
+      for (const tag of entity.tags) {
+        entityMap.set(tag, entity.name);
+      }
+    }
 
-    printSummary({ dirName, domainPkgName, entities, totalFiles, isFirstRun });
+    // Compute spec relative path for programmatic Orval config
+    const specRelativePath = isSpecUrl(specConfig.spec)
+      ? specConfig.spec
+      : relative(targetDir, resolve(rootDir, specConfig.spec));
+
+    await runOrval(spinner, targetDir, dirName, {
+      naming,
+      entityMap,
+      entityName: entities[0]?.name,
+      specRelativePath,
+      tags: domainTags,
+    });
+
+    // 8. Post-process endpoints & prune unused models
+    await narrowResponseTypes(targetDir);
+    await addTsNocheckToEndpoints(targetDir);
+    await extractSharedEndpointTypes(targetDir);
+    await generateEndpointsBarrel(targetDir);
+    const pruned = await pruneUnusedModels(targetDir);
+    if (pruned > 0) {
+      log.info(`Pruned ${pruned} unused model files.`);
+    }
+
+    // 9. Build hook import map and generate hooks (with optional responseAdapter)
+    const importMap = await buildHookImportMap(targetDir);
+    await generateHookFiles(targetDir, entities, importMap, responseAdapter);
+
+    // 10. Generate mock files (with optional responseAdapter for envelope wrapping)
+    await generateMockFiles(targetDir, domainName, entities, responseAdapter);
+
+    // 11. Generate schemas proxy if missing
+    const schemasPath = join(targetDir, "src/schemas.ts");
+    if (!(await pathExists(schemasPath))) {
+      await generateSchemasProxy(targetDir);
+    }
+
+    // 12. Regenerate index.ts
+    const hasTranslations = await pathExists(join(targetDir, "src/translations.ts"));
+    const indexContent = renderTemplate(domainIndexTs, {
+      enableI18n: hasTranslations,
+      enableOrval: true,
+      PascalName: toPascalCase(domainName),
+    });
+    await writeFileWithDir(join(targetDir, "src/index.ts"), indexContent);
+
+    // 13. Update locale files
+    const locales = config.i18n?.locales ?? ["en", "ko", "ja"];
+    if (hasTranslations) {
+      await generateLocaleFiles(targetDir, entities, locales);
+    }
+
+    // 13b. Overlay server i18n translations (simplix-boot profile only)
+    if (hasTranslations && resolvedSpecConfig?.i18nEndpoint) {
+      const serverOrigin = resolveServerOrigin(specSource, spec);
+      if (serverOrigin) {
+        await overlayServerTranslations(
+          targetDir, entities, locales, serverOrigin, resolvedSpecConfig.i18nEndpoint,
+        );
+      }
+    }
+
+    // 14. Generate .http files
+    if (flags.http !== false) {
+      const apiBasePath = config.api?.baseUrl ?? "";
+      await writeFileWithDir(
+        join(targetDir, "http/http-client.env.json"),
+        generateHttpEnvJson(config),
+      );
+      for (const entity of entities) {
+        await writeFileWithDir(
+          join(targetDir, `http/${entity.name}.http`),
+          generateHttpFile(entity, apiBasePath),
+        );
+      }
+    }
+
+    // 15. Save snapshot
+    await saveSnapshot(targetDir, specSource, entities);
+
+    spinner.succeed(`Generated code for: ${domainPkgName}`);
+    printSummary(dirName, domainPkgName, entities);
   } catch (err) {
-    writeSpinner.fail("Failed to generate domain package");
+    spinner.fail("Failed to generate domain code");
     log.error(String(err));
     process.exit(1);
   }
 }
 
-async function confirmRegeneration(opts: {
-  isUpdate: boolean;
-  isFirstRun: boolean;
-  snapshotPath: string;
-  domainPkgName: string;
-  dirName: string;
-  entities: ExtractedEntity[];
-  flags: OpenAPIFlags;
-}): Promise<boolean> {
-  const { isUpdate, isFirstRun, snapshotPath, domainPkgName, dirName, entities, flags } = opts;
+// ── Helpers ──────────────────────────────────────────────────
 
-  if (isUpdate) {
-    const rawSnapshot = await readJsonFile<OpenAPISnapshot>(snapshotPath);
-    const previousSnapshot = migrateSnapshot(rawSnapshot);
-    const diff = computeDiff(previousSnapshot, entities);
-
-    if (!diff.hasChanges && !flags.force) {
-      log.success(`${domainPkgName}: No changes detected. Package is up-to-date.`);
-      return false;
-    }
-
-    if (diff.hasChanges) {
-      console.log("");
-      console.log(formatDiff(diff));
-      console.log("");
-    } else {
-      log.info(`${domainPkgName}: No changes detected. Forcing regeneration...`);
-    }
-
-    if (!flags.yes && !flags.force) {
-      const { proceed } = await prompts({
-        type: "confirm",
-        name: "proceed",
-        message: `${domainPkgName}: Regenerate src/generated/ with updated code?`,
-        initial: false,
-      });
-      if (!proceed) {
-        log.info("Update cancelled.");
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  if (!isFirstRun && !flags.yes) {
-    const { proceed } = await prompts({
-      type: "confirm",
-      name: "proceed",
-      message: `Package "${dirName}" already exists. Regenerate generated files?`,
-      initial: false,
-    });
-    if (!proceed) {
-      log.info("Generation cancelled.");
-      return false;
-    }
-  }
-
-  return true;
-}
-
-async function cleanGeneratedDirs(targetDir: string, _flags: OpenAPIFlags): Promise<void> {
+async function cleanGeneratedDirs(targetDir: string): Promise<void> {
   await rm(join(targetDir, "src/generated"), { recursive: true, force: true });
-}
-
-function buildGeneratedFiles(opts: {
-  entities: ExtractedEntity[];
-  flags: OpenAPIFlags;
-  ctx: Record<string, unknown>;
-  apiBasePath: string;
-  generateForms: boolean;
-  config: SimplixConfig;
-}): Record<string, string> {
-  const { entities, flags, ctx, apiBasePath, generateForms, config } = opts;
-  const files: Record<string, string> = {};
-
-  files["src/generated/index.ts"] = generateForms
-    ? openapiGeneratedIndexWithFormsTs
-    : openapiGeneratedIndexTs;
-  files["src/generated/schemas.ts"] = generateZodSchemas(entities);
-  files["src/generated/contract.ts"] = renderTemplate(openapiGeneratedContractTs, ctx);
-  files["src/generated/hooks.ts"] = renderTemplate(openapiGeneratedHooksTs, ctx);
-
-  if (generateForms) {
-    files["src/generated/form-hooks.ts"] = renderTemplate(openapiGeneratedFormHooksTs, ctx);
-  }
-
-  if (flags.http !== false) {
-    files["http/http-client.env.json"] = generateHttpEnvJson(config);
-    for (const entity of entities) {
-      files[`http/${entity.name}.http`] = generateHttpFile(entity, apiBasePath);
-    }
-  }
-
-  return files;
-}
-
-function buildScaffoldFiles(
-  configEslintPkgName: string | null,
-  flags: OpenAPIFlags,
-  ctx: Record<string, unknown>,
-): Record<string, string> {
-  const files: Record<string, string> = {};
-
-  const pkgJsonTemplate = configEslintPkgName
-    ? openapiPackageJsonWithEslintConfig
-    : openapiPackageJsonStandalone;
-  const eslintTemplate = configEslintPkgName
-    ? openapiEslintConfigShared
-    : openapiEslintConfigStandalone;
-
-  files["package.json"] = renderTemplate(pkgJsonTemplate, ctx);
-  files["tsup.config.ts"] = openapiTsupConfig;
-  files["tsconfig.json"] = openapiTsconfigJson;
-  files["eslint.config.js"] = renderTemplate(eslintTemplate, ctx);
-  files["src/index.ts"] = openapiUserIndexTs;
-  files["src/contract.ts"] = renderTemplate(openapiUserContractTs, ctx);
-  files["src/hooks.ts"] = renderTemplate(openapiUserHooksTs, ctx);
-
-  if (flags.mock !== false) {
-    files["src/mock/index.ts"] = renderTemplate(openapiUserMockIndexTs, ctx);
-  }
-
-  return files;
-}
-
-async function writeFilesToDisk(
-  targetDir: string,
-  generatedFiles: Record<string, string>,
-  scaffoldFiles: Record<string, string>,
-  addHeader: boolean,
-): Promise<void> {
-  for (const [relativePath, content] of Object.entries(generatedFiles)) {
-    const output = addHeader ? prependGeneratedHeader(relativePath, content) : content;
-    await writeFileWithDir(join(targetDir, relativePath), output);
-  }
-
-  for (const [relativePath, content] of Object.entries(scaffoldFiles)) {
-    await writeFileWithDir(join(targetDir, relativePath), content);
-  }
+  await rm(join(targetDir, "src/hooks"), { recursive: true, force: true });
 }
 
 async function saveSnapshot(
-  snapshotPath: string,
+  targetDir: string,
   specSource: string,
   entities: ExtractedEntity[],
 ): Promise<void> {
@@ -419,130 +402,22 @@ async function saveSnapshot(
     specSource,
     entities,
   };
-  await writeFile(snapshotPath, JSON.stringify(snapshot, null, 2), "utf-8");
+  await writeFileWithDir(
+    join(targetDir, SNAPSHOT_FILE),
+    JSON.stringify(snapshot, null, 2) + "\n",
+  );
 }
 
-/**
- * Migrate v1 snapshot (boolean CRUDOperations) to v2 (ExtractedOperation[]).
- */
-function migrateSnapshot(snapshot: OpenAPISnapshot): OpenAPISnapshot {
-  if (snapshot.version === 2) return snapshot;
-
-  // v1 snapshots have operations as boolean flags
-  return {
-    ...snapshot,
-    version: 2,
-    entities: snapshot.entities.map((entity) => {
-      if (Array.isArray(entity.operations)) return entity;
-
-      // v1 format: { list: boolean, get: boolean, ... }
-      const boolOps = entity.operations as unknown as Record<string, boolean>;
-      const operations: ExtractedOperation[] = [];
-
-      if (boolOps.list) {
-        operations.push({
-          name: "list",
-          method: "GET",
-          path: entity.path,
-          role: "list",
-          hasInput: false,
-          queryParams: entity.queryParams ?? [],
-        });
-      }
-      if (boolOps.get) {
-        operations.push({
-          name: "get",
-          method: "GET",
-          path: `${entity.path}/:id`,
-          role: "get",
-          hasInput: false,
-          queryParams: [],
-        });
-      }
-      if (boolOps.create) {
-        operations.push({
-          name: "create",
-          method: "POST",
-          path: entity.path,
-          role: "create",
-          hasInput: true,
-          queryParams: [],
-        });
-      }
-      if (boolOps.update) {
-        operations.push({
-          name: "update",
-          method: "PATCH",
-          path: `${entity.path}/:id`,
-          role: "update",
-          hasInput: true,
-          queryParams: [],
-        });
-      }
-      if (boolOps.delete) {
-        operations.push({
-          name: "delete",
-          method: "DELETE",
-          path: `${entity.path}/:id`,
-          role: "delete",
-          hasInput: false,
-          queryParams: [],
-        });
-      }
-
-      return { ...entity, operations };
-    }),
-  };
-}
-
-function printSummary(opts: {
-  dirName: string;
-  domainPkgName: string;
-  entities: ExtractedEntity[];
-  totalFiles: number;
-  isFirstRun: boolean;
-}): void {
-  const { dirName, domainPkgName, entities, totalFiles, isFirstRun } = opts;
-
+function printSummary(
+  dirName: string,
+  domainPkgName: string,
+  entities: ExtractedEntity[],
+): void {
   log.info("");
   log.step(`Location: packages/${dirName}/`);
   log.step(`Entities: ${entities.map((e) => e.name).join(", ")}`);
-  log.step(`Files: ${totalFiles} generated`);
-  if (!isFirstRun) {
-    log.step("User files preserved (src/index.ts, src/mock/index.ts, package.json, etc.)");
-  }
+  log.step("Generated: src/generated/, src/hooks/, src/mock/");
   log.info("");
-  log.info("Next steps:");
-  log.step("pnpm install");
-  log.step("pnpm build");
-  if (isFirstRun) {
-    log.step(
-      `Add "${domainPkgName}": "workspace:*" to your app's dependencies`,
-    );
-  }
-}
-
-// --- Helper functions ---
-
-async function detectConfigEslintPackage(
-  outputBase: string,
-  scope: string,
-): Promise<string | null> {
-  // Check common config-eslint package locations relative to output directory
-  const candidates = [
-    { dir: join(outputBase, "config-eslint"), name: `${scope}/config-eslint` },
-    { dir: join(outputBase, "..", "config", "eslint"), name: `${scope}/config-eslint` },
-  ];
-
-  for (const candidate of candidates) {
-    const pkgJsonPath = join(candidate.dir, "package.json");
-    if (await pathExists(pkgJsonPath)) {
-      const pkg = await readJsonFile<{ name: string }>(pkgJsonPath);
-      return pkg.name;
-    }
-  }
-
-  return null;
 }
 
 function normalizeDomainName(title: string): string {
@@ -553,128 +428,303 @@ function normalizeDomainName(title: string): string {
     .replace(/\s+/g, "-");
 }
 
-function buildTemplateContext(opts: {
-  domainName: string;
-  domainPkgName: string;
-  configEslintPkgName: string | null;
-  projectName: string;
-  scope: string;
-  apiBasePath: string;
-  entities: ExtractedEntity[];
-  generateForms: boolean;
-}): Record<string, unknown> {
-  return withVersions({
-    domainName: opts.domainName,
-    domainPkgName: opts.domainPkgName,
-    configEslintPkgName: opts.configEslintPkgName,
-    hasConfigEslint: opts.configEslintPkgName !== null,
-    projectName: opts.projectName,
-    scope: opts.scope,
-    apiBasePath: opts.apiBasePath,
-    generateForms: opts.generateForms,
-    PascalName:
-      opts.domainName.charAt(0).toUpperCase() + opts.domainName.slice(1),
-    allSchemaImports: buildAllSchemaImports(opts.entities),
-    seedData: generateSeedCode(opts.entities, opts.domainName),
-    entities: opts.entities.map((e) => ({
-      ...e,
-      operationEntries: buildOperationEntries(e),
-    })),
-  });
+// ── Locale helpers (from add-domain.ts) ──────────────────────
+
+function camelToLabel(name: string): string {
+  if (name.toLowerCase() === "id") return "ID";
+  return name
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, (c) => c.toUpperCase())
+    .trim();
 }
 
-function buildAllSchemaImports(entities: ExtractedEntity[]): string {
-  const imports: string[] = [];
+function enumName(entityName: string, fieldName: string): string {
+  return entityName + fieldName.charAt(0).toUpperCase() + fieldName.slice(1);
+}
+
+function buildLocaleJson(
+  entities: ExtractedEntity[],
+): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
+  const enums: Record<string, Record<string, string>> = {};
 
   for (const entity of entities) {
-    imports.push(`${entity.name}Schema`);
-    for (const op of entity.operations) {
-      if (op.bodySchema) {
-        imports.push(`${op.name}${entity.pascalName}Schema`);
+    const fields: Record<string, string> = {};
+    for (const field of entity.fields) {
+      fields[field.name] = camelToLabel(field.name);
+      if (field.enum?.length) {
+        const eName = enumName(entity.name, field.name);
+        enums[eName] = {};
+        for (const v of field.enum) {
+          enums[eName][v] = camelToLabel(v);
+        }
       }
     }
+    result[entity.name] = { fields };
   }
 
-  return imports.join(", ");
+  if (Object.keys(enums).length > 0) {
+    result["enums"] = enums;
+  }
+
+  return result;
 }
 
-function buildOperationEntries(entity: ExtractedEntity): string {
-  const lines: string[] = [];
+function mergeLocaleJson(
+  existing: Record<string, unknown>,
+  generated: Record<string, unknown>,
+): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
 
-  for (const op of entity.operations) {
-    const parts = [`method: "${op.method}"`, `path: "${op.path}"`];
-
-    if (op.bodySchema) {
-      parts.push(`input: ${op.name}${entity.pascalName}Schema`);
+  for (const [key, genValue] of Object.entries(generated)) {
+    const exValue = existing[key];
+    if (
+      exValue && typeof exValue === "object" && !Array.isArray(exValue) &&
+      genValue && typeof genValue === "object" && !Array.isArray(genValue)
+    ) {
+      result[key] = mergeLocaleJson(
+        exValue as Record<string, unknown>,
+        genValue as Record<string, unknown>,
+      );
+    } else if (exValue !== undefined) {
+      result[key] = exValue;
+    } else {
+      result[key] = genValue;
     }
-
-    if (op.contentType === "multipart") {
-      parts.push(`contentType: "multipart"`);
-    }
-
-    lines.push(`        ${op.name}: { ${parts.join(", ")} },`);
   }
+
+  return result;
+}
+
+async function generateLocaleFiles(
+  targetDir: string,
+  entities: ExtractedEntity[],
+  locales: string[],
+): Promise<void> {
+  const generated = buildLocaleJson(entities);
+  const localesDir = join(targetDir, "src/locales");
+
+  for (const locale of locales) {
+    const filePath = join(localesDir, `${locale}.json`);
+    let content: Record<string, unknown>;
+
+    if (await pathExists(filePath)) {
+      const existing = await readJsonFile<Record<string, unknown>>(filePath)
+        .catch(() => ({}));
+      content = mergeLocaleJson(existing, generated);
+    } else {
+      content = generated;
+    }
+
+    await writeFileWithDir(filePath, JSON.stringify(content, null, 2) + "\n");
+  }
+}
+
+// ── NamingStrategy hook name resolution ──────────────────────
+
+/**
+ * Populate `resolvedHookName` on each entity's operations by calling
+ * `naming.resolveOperation()`. This stores the naming-strategy-resolved
+ * hook name (with "use" prefix) so the hook-generator can match
+ * the actual Orval-generated function names.
+ */
+function resolveEntityHookNames(
+  entities: ExtractedEntity[],
+  naming: OpenApiNamingStrategy,
+): void {
+  for (const entity of entities) {
+    for (const op of entity.operations) {
+      if (!op.operationId) continue;
+
+      // Convert :param back to {param} for OperationContext
+      const pathWithBraces = op.path.replace(/:(\w+)/g, "{$1}");
+      const pathParams = [...op.path.matchAll(/:(\w+)/g)].map((m) => m[1]);
+
+      const context: OperationContext = {
+        operationId: op.operationId,
+        method: op.method,
+        path: pathWithBraces,
+        tag: entity.tags[0],
+        entityName: entity.name,
+        pathParams,
+        queryParams: op.queryParams.map((qp) => qp.name),
+        extensions: {},
+      };
+
+      const resolved = naming.resolveOperation(context);
+      // hookName is without "use" prefix (Orval adds it); store the full name
+      const hn = resolved.hookName;
+      op.resolvedHookName = `use${hn.charAt(0).toUpperCase()}${hn.slice(1)}`;
+      op.role = resolved.role;
+    }
+  }
+}
+
+// ── CRUD config generation ───────────────────────────────────
+
+type InferredRole = "list" | "get" | "getForEdit" | "create" | "update" | "delete" | "multiUpdate" | "batchUpdate" | "batchDelete" | "search";
+
+function inferCrudRole(
+  method: string,
+  opPath: string,
+  basePath: string,
+): InferredRole | null {
+  const relative = opPath === basePath ? "/" : opPath.slice(basePath.length);
+  const isItemPath = /^\/[:{][^/}]+\}?$/.test(relative);
+
+  if (method === "GET" && (relative === "/" || relative === "/search")) return "list";
+  if (method === "GET" && isItemPath) return "get";
+  if (method === "GET" && /^\/[:{][^/}]+\}?\/edit$/.test(relative)) return "getForEdit";
+  if (method === "POST" && (relative === "/" || relative === "/create")) return "create";
+  if (method === "POST" && relative === "/search") return "search";
+  if ((method === "PUT" || method === "PATCH") && isItemPath) return "update";
+  if (method === "PATCH" && relative === "/") return "multiUpdate";
+  if (method === "PATCH" && relative === "/batch") return "batchUpdate";
+  if (method === "DELETE" && isItemPath) return "delete";
+  if (method === "DELETE" && (relative === "/" || relative === "/batch")) return "batchDelete";
+  return null;
+}
+
+function generateCrudConfigContent(
+  entities: ExtractedEntity[],
+): string {
+  const STANDARD_ROLES = ["list", "get", "create", "update", "delete", "getForEdit", "tree", "subtree", "multiUpdate", "batchUpdate", "batchDelete", "search"] as const;
+
+  const lines: string[] = [
+    `import { defineCrudMap } from "@simplix-react/cli";`,
+    ``,
+    `/**`,
+    ` * CRUD operation mapping: entity → hook name (without "use" prefix)`,
+    ` *`,
+    ` * Maps each entity's CRUD roles to hook names.`,
+    ` * The scaffold-crud command uses this to resolve hook names.`,
+    ` *`,
+    ` * Standard roles:`,
+    ` *   list        - List/search items`,
+    ` *   get         - Get single item by ID`,
+    ` *   create      - Create new item`,
+    ` *   update      - Update existing item`,
+    ` *   delete      - Delete item`,
+    ` *   getForEdit  - Get item for edit form`,
+    ` *   multiUpdate - Bulk update (PATCH without ID)`,
+    ` *   batchUpdate - Batch update (PATCH /batch)`,
+    ` *   batchDelete - Batch delete (DELETE /batch)`,
+    ` *   search      - Search with POST body`,
+    ` *   tree        - Get full tree (GET /entity/tree)`,
+    ` *   subtree     - Get subtree by ID (GET /entity/tree/:id)`,
+    ` *`,
+    ` * Extended roles (e.g., order, activate) are auto-detected from`,
+    ` * PATCH endpoints with custom suffixes.`,
+    ` */`,
+    `export default defineCrudMap({`,
+  ];
+
+  for (const entity of entities) {
+    const inferredRoles = new Map<string, string>();
+
+    for (const op of entity.operations) {
+      const hookId = resolveHookId(op);
+      const role = op.role ?? inferCrudRole(op.method, op.path, entity.path);
+
+      if (role && !inferredRoles.has(role)) {
+        inferredRoles.set(role, hookId);
+      }
+    }
+
+    lines.push(`  ${entity.name}: {`);
+
+    // Emit standard roles: active if inferred, commented if not
+    for (const role of STANDARD_ROLES) {
+      const hookId = inferredRoles.get(role);
+      if (hookId) {
+        lines.push(`    ${role}: "${hookId}",`);
+      } else {
+        lines.push(`    // ${role}: "",`);
+      }
+    }
+
+    // Emit extra roles (not in STANDARD_ROLES)
+    const standardSet = new Set<string>(STANDARD_ROLES);
+    for (const [role, hookId] of inferredRoles) {
+      if (!standardSet.has(role)) {
+        lines.push(`    ${role}: "${hookId}",`);
+      }
+    }
+
+    lines.push(`  },`);
+  }
+
+  lines.push(`});`);
+  lines.push(``);
 
   return lines.join("\n");
 }
 
-const GENERATED_HEADER_TS =
-  "// Auto-generated by simplix openapi — DO NOT EDIT\n// Regenerate with: simplix openapi <spec>\n\n";
-const GENERATED_HEADER_HTTP =
-  "# Auto-generated by simplix openapi — DO NOT EDIT\n# Regenerate with: simplix openapi <spec>\n\n";
+// ── Server i18n overlay ──────────────────────────────────────
 
-function prependGeneratedHeader(
-  filePath: string,
-  content: string,
-): string {
-  if (filePath.endsWith(".ts") || filePath.endsWith(".js")) {
-    return GENERATED_HEADER_TS + content;
+/**
+ * Resolve the server origin for i18n download.
+ * 1. If spec source is an HTTP URL → use its origin
+ * 2. Otherwise → use spec.servers[0].url from parsed spec
+ */
+function resolveServerOrigin(
+  specSource: string,
+  spec: OpenAPISpec,
+): string | undefined {
+  if (isSpecUrl(specSource)) {
+    return new URL(specSource).origin;
   }
-  if (filePath.endsWith(".http")) {
-    return GENERATED_HEADER_HTTP + content;
+  // OpenAPI spec may have servers[] not in our type definition
+  const servers = (spec as unknown as { servers?: Array<{ url: string }> }).servers;
+  const serverUrl = servers?.[0]?.url;
+  if (serverUrl) {
+    try {
+      return new URL(serverUrl).origin;
+    } catch {
+      return undefined;
+    }
   }
-  // JSON and other files: no header (no comment syntax)
-  return content;
+  return undefined;
 }
 
-function buildFileList(
+async function overlayServerTranslations(
+  targetDir: string,
   entities: ExtractedEntity[],
-  flags: OpenAPIFlags,
-  isFirstRun: boolean,
-): Record<string, true> {
-  const files: Record<string, true> = {};
+  locales: string[],
+  serverOrigin: string,
+  i18nEndpoint: string,
+): Promise<void> {
+  const serverData = await downloadI18nMessages(serverOrigin, i18nEndpoint);
+  if (!serverData) return;
 
-  // Generated files (always)
-  files["src/generated/index.ts"] = true;
-  files["src/generated/schemas.ts"] = true;
-  files["src/generated/contract.ts"] = true;
-  files["src/generated/hooks.ts"] = true;
+  const entityKeyMap = buildEntityKeyMap(entities);
+  const localeDataMap = transformToLocaleData(serverData, entityKeyMap, locales);
 
-  if (flags.forms !== false) {
-    files["src/generated/form-hooks.ts"] = true;
+  if (localeDataMap.size === 0) return;
+
+  const localesDir = join(targetDir, "src/locales");
+  for (const locale of locales) {
+    const overlay = localeDataMap.get(locale);
+    if (!overlay) continue;
+
+    const filePath = join(localesDir, `${locale}.json`);
+    const existing = await readJsonFile<Record<string, unknown>>(filePath).catch(() => ({}));
+    const merged = overlayLocaleJson(existing, overlay);
+    await writeFileWithDir(filePath, JSON.stringify(merged, null, 2) + "\n");
   }
 
-  if (flags.http !== false) {
-    files["http/http-client.env.json"] = true;
-    for (const e of entities) {
-      files[`http/${e.name}.http`] = true;
-    }
+  log.info("Applied server i18n translations.");
+}
+
+/**
+ * Get the hook identifier for an operation (without "use" prefix).
+ * Prefers resolvedHookName (from NamingStrategy), falls back to operationId.
+ */
+function resolveHookId(op: ExtractedOperation): string {
+  if (op.resolvedHookName) {
+    // resolvedHookName has "use" prefix (e.g., "useGetAdminUserAccount") — strip it
+    return op.resolvedHookName.replace(/^use/, "").charAt(0).toLowerCase()
+      + op.resolvedHookName.replace(/^use/, "").slice(1);
   }
-
-  // Scaffold files (first-run only)
-  if (isFirstRun) {
-    files["package.json"] = true;
-    files["tsup.config.ts"] = true;
-    files["tsconfig.json"] = true;
-    files["eslint.config.js"] = true;
-    files["src/index.ts"] = true;
-    files["src/contract.ts"] = true;
-    files["src/hooks.ts"] = true;
-
-    if (flags.mock !== false) {
-      files["src/mock/index.ts"] = true;
-    }
-  }
-
-  return files;
+  return op.operationId ?? op.name;
 }

@@ -3,6 +3,7 @@ export { default as domainPackageJson } from "./package-json.hbs";
 export { default as domainTsupConfig } from "./tsup-config.hbs";
 export { default as domainTsconfigJson } from "./tsconfig-json.hbs";
 export { default as domainIndexTs } from "./index-ts.hbs";
+export { default as domainSchemasTs } from "./schemas-ts.hbs";
 export { default as domainContractTs } from "./contract-ts.hbs";
 export { default as domainHooksTs } from "./hooks-ts.hbs";
 export { default as domainMockIndexTs } from "./mock-index-ts.hbs";

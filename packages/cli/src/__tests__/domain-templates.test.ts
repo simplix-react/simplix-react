@@ -9,8 +9,6 @@ import {
 } from "../templates/domain/index.js";
 import {
   openapiUserIndexTs,
-  openapiUserContractTs,
-  openapiUserHooksTs,
 } from "../templates/openapi/index.js";
 
 // --- Shared context ---
@@ -119,10 +117,10 @@ describe("domainHooksTs", () => {
     expect(result).toContain("inventoryHooks.category.useDelete()");
   });
 
-  it("renders the deriveHooks call", () => {
+  it("renders the deriveEntityHooks call", () => {
     const result = renderTemplate(domainHooksTs, domainCtx);
 
-    expect(result).toContain("export const inventoryHooks = deriveHooks(inventoryApi)");
+    expect(result).toContain("export const inventoryHooks = deriveEntityHooks(inventoryApi)");
   });
 });
 
@@ -165,79 +163,38 @@ describe("domainMockSeedTs", () => {
 
 // --- OpenAPI template tests ---
 
-describe("openapiUserIndexTs", () => {
-  it("exports from contract and hooks", () => {
-    expect(openapiUserIndexTs).toContain('export * from "./contract"');
-    expect(openapiUserIndexTs).toContain('export * from "./hooks"');
+describe("openapiUserIndexTs (Orval-aware)", () => {
+  it("exports from mutator, hooks, and generated/model", () => {
+    const result = renderTemplate(openapiUserIndexTs, { enableI18n: false, PascalName: "Inventory" });
+
+    expect(result).toContain('export { configureInventoryMutator } from "./mutator"');
+    expect(result).toContain('export * from "./hooks"');
+    expect(result).toContain('export * from "./generated/model"');
   });
 
-  it("does not export from generated/index", () => {
-    expect(openapiUserIndexTs).not.toContain("./generated/index");
-  });
-});
+  it("includes translations import when i18n enabled", () => {
+    const result = renderTemplate(openapiUserIndexTs, { enableI18n: true, PascalName: "Inventory" });
 
-describe("openapiUserContractTs", () => {
-  it("re-exports generated schemas and contract", () => {
-    const result = renderTemplate(openapiUserContractTs, { domainName: "inventory" });
-
-    expect(result).toContain('export * from "./generated/schemas"');
-    expect(result).toContain('export * from "./generated/contract"');
+    expect(result).toContain('import "./translations"');
   });
 
-  it("contains customizeApi example with domainName", () => {
-    const result = renderTemplate(openapiUserContractTs, { domainName: "inventory" });
+  it("excludes translations import when i18n disabled", () => {
+    const result = renderTemplate(openapiUserIndexTs, { enableI18n: false, PascalName: "Inventory" });
 
-    expect(result).toContain("customizeApi");
-    expect(result).toContain("inventoryApi as _inventoryApi");
-    expect(result).toContain("export const inventoryApi = customizeApi(_inventoryApi");
-  });
-
-  it("contains extension guide comments", () => {
-    const result = renderTemplate(openapiUserContractTs, { domainName: "inventory" });
-
-    expect(result).toContain("Add custom schemas or extend the generated contract below");
-    expect(result).toContain("preserved across");
-  });
-});
-
-describe("openapiUserHooksTs", () => {
-  it("derives hooks from user-owned contract", () => {
-    const result = renderTemplate(openapiUserHooksTs, { domainName: "inventory", generateForms: false });
-
-    expect(result).toContain('import { deriveHooks } from "@simplix-react/react"');
-    expect(result).toContain('import { inventoryApi } from "./contract"');
-    expect(result).toContain("export const inventoryHooks = deriveHooks(inventoryApi)");
-  });
-
-  it("includes deriveFormHooks when generateForms is true", () => {
-    const result = renderTemplate(openapiUserHooksTs, { domainName: "inventory", generateForms: true });
-
-    expect(result).toContain('import { deriveFormHooks } from "@simplix-react/form"');
-    expect(result).toContain("export const inventoryFormHooks = deriveFormHooks(inventoryApi, inventoryHooks)");
-  });
-
-  it("excludes deriveFormHooks when generateForms is false", () => {
-    const result = renderTemplate(openapiUserHooksTs, { domainName: "inventory", generateForms: false });
-
-    expect(result).not.toContain("deriveFormHooks");
-  });
-
-  it("contains extension guide comments", () => {
-    const result = renderTemplate(openapiUserHooksTs, { domainName: "inventory", generateForms: false });
-
-    expect(result).toContain("Add custom hooks below");
-    expect(result).toContain("preserved across");
+    expect(result).not.toContain('import "./translations"');
   });
 });
 
 // --- Structural consistency ---
 
 describe("structural consistency between domain and openapi templates", () => {
-  it("both index templates export from contract and hooks", () => {
+  it("domain index exports from contract and hooks (non-orval mode)", () => {
     expect(domainIndexTs).toContain('export * from "./contract"');
     expect(domainIndexTs).toContain('export * from "./hooks"');
+  });
 
-    expect(openapiUserIndexTs).toContain('export * from "./contract"');
-    expect(openapiUserIndexTs).toContain('export * from "./hooks"');
+  it("domain index exports from hooks and model in orval mode", () => {
+    expect(domainIndexTs).toContain('export * from "./hooks"');
+    expect(domainIndexTs).toContain('export * from "./generated/model"');
   });
 });

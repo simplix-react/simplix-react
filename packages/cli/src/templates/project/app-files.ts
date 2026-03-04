@@ -11,3 +11,4 @@ export { default as errorFallbacksTsx } from "./app/error-fallbacks-tsx.hbs";
 export { default as pageLoadingFallbackTsx } from "./app/page-loading-fallback-tsx.hbs";
 export { default as appFeaturesIndexTs } from "./app/app-features-index-ts.hbs";
 export { default as appWidgetsIndexTs } from "./app/app-widgets-index-ts.hbs";
+export { default as appConfigTs } from "./app/app-config-ts.hbs";

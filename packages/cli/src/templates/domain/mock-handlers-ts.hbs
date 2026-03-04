@@ -1,12 +1,17 @@
 import type { HttpHandler } from "msw";
+import type { MockHandlerOptions } from "@simplix-react/mock";
 import { deriveMockHandlers } from "@simplix-react/mock";
 import { {{domainName}}Api } from "../contract";
 
 // Auto-derived CRUD handlers from the API contract.
 // To add custom handlers, spread and extend:
 //   import { http, HttpResponse } from "msw";
-//   export const handlers: HttpHandler[] = [
-//     ...deriveMockHandlers({{domainName}}Api.config),
-//     http.get("/api/{{domainName}}/custom", () => HttpResponse.json({ ... })),
-//   ];
-export const handlers: HttpHandler[] = deriveMockHandlers({{domainName}}Api.config);
+//   export function createHandlers(options?: MockHandlerOptions): HttpHandler[] {
+//     return [
+//       ...deriveMockHandlers({{domainName}}Api.config, undefined, options),
+//       http.get("/api/{{domainName}}/custom", () => HttpResponse.json({ ... })),
+//     ];
+//   }
+export function createHandlers(options?: MockHandlerOptions): HttpHandler[] {
+  return deriveMockHandlers({{domainName}}Api.config, undefined, options);
+}

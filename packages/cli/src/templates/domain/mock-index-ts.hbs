@@ -1,9 +1,11 @@
-import type { MockDomainConfig } from "@simplix-react/mock";
-import { handlers } from "./handlers";
+import type { MockDomainConfig, MockHandlerOptions } from "@simplix-react/mock";
+import { createHandlers } from "./handlers";
 import { seed } from "./seed";
 
-export const {{domainName}}Mock: MockDomainConfig = {
-  name: "{{domainName}}",
-  handlers,
-  seed,
-};
+export function create{{pascalCase domainName}}Mock(options?: MockHandlerOptions): MockDomainConfig {
+  return {
+    name: "{{domainName}}",
+    handlers: createHandlers(options),
+    seed,
+  };
+}

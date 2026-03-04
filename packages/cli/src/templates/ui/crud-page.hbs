@@ -1,0 +1,217 @@
+import type { CrudSearch } from "@simplix-react/ui";
+import { {{#if hasCreate}}Button, {{/if}}Container, ListDetail, Stack{{#if hasDelete}}, adaptOrvalDelete{{/if}}{{#if hasDelete}}, useCrudDeleteWired{{/if}}, useCrudNavigation, useCrudPageState{{#if hasDelete}}, useInvalidateEntity{{/if}}, usePageHeader } from "@simplix-react/ui";
+import { useTranslation } from "@simplix-react/i18n/react";
+{{#if hookDelete}}
+import { {{hookDelete}} } from "{{packageName}}";
+{{/if}}
+
+import { {{EntityPascal}}Detail, {{#if hasForm}}{{EntityPascal}}Form, {{/if}}{{EntityPascal}}List, use{{EntityPascal}}List } from "../../widgets";
+
+interface {{EntityPascal}}CrudPageProps {
+  variant?: "panel" | "dialog" | "page";
+  search: CrudSearch;
+  onNavigate: (search: CrudSearch) => void;
+}
+
+export function {{EntityPascal}}CrudPage({ variant = "panel", search, onNavigate }: {{EntityPascal}}CrudPageProps) {
+  const list = use{{EntityPascal}}List();
+  const { t } = useTranslation("{{moduleNamespace}}/widgets");
+
+  const nav = useCrudNavigation(search, onNavigate);
+  const { view, selectedId, showList, showDetail{{#if hasCreate}}, showNew{{/if}}{{#if hasUpdate}}, showEdit{{/if}} } = nav;
+
+{{#if hasDelete}}
+{{#if hookDelete}}
+  const invalidate = useInvalidateEntity("{{entityPath}}");
+  const { requestDelete, deleteDialog } = useCrudDeleteWired({
+    deleteMutation: adaptOrvalDelete({{hookDelete}}(), "{{deletePathParam}}", { onSettled: invalidate }),
+    labels: {
+      title: () => t("{{entity}}.delete{{EntityPascal}}Title"),
+      description: (target) => t("{{entity}}.delete{{EntityPascal}}Desc", { name: target.name }),
+      cancel: t("common.cancel"),
+      delete: t("common.delete"),
+      deleting: t("common.deleting"),
+    },
+    onDeleted: showList,
+  });
+{{else}}
+  // TODO: Wire up delete mutation from your domain package
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { requestDelete, deleteDialog } = useCrudDeleteWired({
+    deleteMutation: { mutate: (() => {}) as (...args: unknown[]) => void, isPending: false } as any,
+    labels: {
+      title: () => t("{{entity}}.delete{{EntityPascal}}Title"),
+      description: (target) => t("{{entity}}.delete{{EntityPascal}}Desc", { name: target.name }),
+      cancel: t("common.cancel"),
+      delete: t("common.delete"),
+      deleting: t("common.deleting"),
+    },
+    onDeleted: showList,
+  });
+{{/if}}
+{{/if}}
+
+  const { state, fade, closePanel } = useCrudPageState(variant, nav);
+
+  usePageHeader((() => {
+    if (variant === "page") {
+{{#if hasCreate}}
+      if (view === "new") return { title: t("{{entity}}.new{{EntityPascal}}") };
+{{/if}}
+{{#if hasUpdate}}
+      if (view === "edit") return { title: t("{{entity}}.edit{{EntityPascal}}") };
+{{/if}}
+{{#if hasDetail}}
+      if (view === "detail") return { title: t("{{entity}}.{{entity}}Detail") };
+{{/if}}
+      return {
+        title: t("{{entity}}.{{entityPlural}}"),
+{{#if hasCreate}}
+        actions: <Button onClick={showNew}>{t("{{entity}}.new{{EntityPascal}}")}</Button>,
+{{/if}}
+      };
+    }
+    return {
+      title: t("{{entity}}.{{entityPlural}}"),
+      description: t("{{entity}}.{{entityPlural}}Description"),
+{{#if hasCreate}}
+      actions: <Button onClick={showNew}>{t("{{entity}}.new{{EntityPascal}}")}</Button>,
+{{/if}}
+    };
+  })());
+
+  // ── Page variant: full-page view switching ──
+
+  if (variant === "page") {
+{{#if hasCreate}}
+    if (view === "new") {
+      return (
+        <Container size="full">
+          <{{EntityPascal}}Form onSuccess={showList} onBack={showList} />
+        </Container>
+      );
+    }
+{{/if}}
+
+{{#if hasUpdate}}
+    if (view === "edit" && selectedId) {
+      return (
+        <Container size="full">
+          <{{EntityPascal}}Form
+            {{entity}}Id={selectedId}
+            onSuccess={() => showDetail(selectedId)}
+            onBack={() => showDetail(selectedId)}
+          />
+        </Container>
+      );
+    }
+{{/if}}
+
+{{#if hasDetail}}
+    if (view === "detail" && selectedId) {
+      return (
+        <Container size="full">
+          <{{EntityPascal}}Detail
+            {{entity}}Id={selectedId}
+            onBack={showList}
+{{#if hasUpdate}}
+            onEdit={() => showEdit(selectedId)}
+{{/if}}
+{{#if hasDelete}}
+            onDeleted={showList}
+{{/if}}
+          />
+        </Container>
+      );
+    }
+{{/if}}
+
+    return (
+      <Container size="full">
+        <Stack gap="md">
+          <{{EntityPascal}}List
+            list={list}
+{{#if hasDetail}}
+            onRowClick={(row) => showDetail(String(row.{{rowIdField}}))}
+{{/if}}
+            actions={[
+{{#if hasDetail}}
+              { type: "view", onClick: (row) => showDetail(String(row.{{rowIdField}})) },
+{{/if}}
+{{#if hasUpdate}}
+              { type: "edit", onClick: (row) => showEdit(String(row.{{rowIdField}})) },
+{{/if}}
+{{#if hasDelete}}
+              { type: "delete", onClick: (row) => requestDelete({ id: row.{{rowIdField}}!, name: String(row.{{rowIdField}}) }) },
+{{/if}}
+            ]}
+          />
+        </Stack>
+{{#if hasDelete}}
+        {deleteDialog}
+{{/if}}
+      </Container>
+    );
+  }
+
+  // ── Panel / Dialog variant: ListDetail layout ──
+
+  return (
+    <>
+    <Stack className="flex-1 min-h-0" gap="md">
+      <ListDetail variant={variant} activePanel={view === "list" ? "list" : "detail"} detailWidth={480}
+                  onClose={showList} className="min-h-0 flex-1">
+        <ListDetail.List>
+          <{{EntityPascal}}List
+            list={list}
+            activeRowId={selectedId}
+            onRowClick={(row) => showDetail(String(row.{{rowIdField}}))}
+            actions={[{ type: "view", onClick: (row) => showDetail(String(row.{{rowIdField}})) }]}
+          />
+        </ListDetail.List>
+
+        <ListDetail.Detail>
+          <ListDetail.ViewSwitch
+            state={state}
+            fade={fade}
+            renderDetail={(id) => (
+              <{{EntityPascal}}Detail
+                {{entity}}Id={id}
+                onClose={closePanel}
+{{#if hasUpdate}}
+                onEdit={() => showEdit(id)}
+{{/if}}
+{{#if hasDelete}}
+                onDeleted={showList}
+{{/if}}
+              />
+            )}
+{{#if hasCreate}}
+            renderNew={() => (
+              <{{EntityPascal}}Form
+                onClose={closePanel}
+                onSuccess={showList}
+                onCancel={showList}
+              />
+            )}
+{{/if}}
+{{#if hasUpdate}}
+            renderEdit={(id) => (
+              <{{EntityPascal}}Form
+                {{entity}}Id={id}
+                onClose={closePanel}
+                onSuccess={() => showDetail(id)}
+                onCancel={() => showDetail(id)}
+              />
+            )}
+{{/if}}
+          />
+        </ListDetail.Detail>
+      </ListDetail>
+    </Stack>
+{{#if hasDelete}}
+    {deleteDialog}
+{{/if}}
+    </>
+  );
+}

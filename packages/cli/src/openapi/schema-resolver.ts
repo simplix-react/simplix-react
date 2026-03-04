@@ -11,6 +11,8 @@ export function resolveRefs(spec: OpenAPISpec): OpenAPISpec {
 
 class SchemaResolver {
   private schemas: Record<string, SchemaObject>;
+  /** Tracks schema names currently being resolved to detect circular $ref. */
+  private resolving = new Set<string>();
 
   constructor(private spec: OpenAPISpec) {
     this.schemas = spec.components?.schemas ?? {};
@@ -88,8 +90,7 @@ class SchemaResolver {
   private resolveSchema(schema: SchemaObject): SchemaObject {
     // Handle $ref
     if (schema.$ref) {
-      const resolved = this.resolveRef(schema.$ref);
-      return this.resolveSchema(resolved);
+      return this.resolveRef(schema.$ref);
     }
 
     // Handle allOf — merge all schemas
@@ -132,10 +133,19 @@ class SchemaResolver {
     const schemaName = match[1];
     const schema = this.schemas[schemaName];
     if (!schema) {
-      throw new Error(`Schema not found: ${schemaName} (referenced by ${ref})`);
+      // Missing schema in spec — keep the $ref as-is so Orval can handle it
+      return { $ref: ref };
     }
 
-    return JSON.parse(JSON.stringify(schema));
+    // Circular reference detected — return a stub with the original $ref intact
+    if (this.resolving.has(schemaName)) {
+      return { $ref: ref };
+    }
+
+    this.resolving.add(schemaName);
+    const resolved = this.resolveSchema(JSON.parse(JSON.stringify(schema)));
+    this.resolving.delete(schemaName);
+    return resolved;
   }
 
   private mergeAllOf(schemas: SchemaObject[]): SchemaObject {

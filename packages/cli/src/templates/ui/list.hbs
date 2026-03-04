@@ -1,11 +1,17 @@
-{{#unless packageName}}
+{{#unless hookList}}
 import { useMemo } from "react";
-
 {{/unless}}
-import { Button, CrudList, Flex, Stack, Text, useCrudList } from "@simplix-react/ui";
-import { useEntityTranslation } from "@simplix-react/i18n/react";
+
+import { {{#if hookList}}adaptOrvalList, {{/if}}{{#if hookOrder}}adaptOrvalOrder, {{/if}}Badge, CrudList, DetailFieldWrapper, {{#if hasEnumFields}}Flex, {{/if}}{{#if hasFilters}}SearchOperator, {{/if}}Stack, useCrudList{{#if hookOrder}}, useInvalidateEntity{{/if}} } from "@simplix-react/ui";
+import type { ActionVariant, RowActionDef } from "@simplix-react/ui";
+import { useEntityTranslation, useTranslation } from "@simplix-react/i18n/react";
+import { {{#if hasFilters}}ListIcon, {{/if}}{{entityIcon}} } from "lucide-react";
 {{#if packageName}}
-import { {{domainCamel}}Hooks } from "{{packageName}}";
+{{#if hookList}}
+import { {{hookList}}{{#if hookOrder}}, {{hookOrder}}{{/if}} } from "{{packageName}}";
+{{else if hookOrder}}
+import { {{hookOrder}} } from "{{packageName}}";
+{{/if}}
 {{/if}}
 
 interface {{EntityPascal}} {
@@ -21,103 +27,198 @@ function useMockList(): { data: {{EntityPascal}}[] | undefined; isLoading: boole
 }
 {{/unless}}
 
-interface {{EntityPascal}}ListProps {
-  onView?: (row: {{EntityPascal}}) => void;
-{{#if hasCreate}}
-  onCreate?: () => void;
+export function use{{EntityPascal}}List() {
+{{#if hookList}}
+  return useCrudList<{{EntityPascal}}>(
+    adaptOrvalList({{hookList}}),
+    {
+      stateMode: "server",
+      defaultPageSize: 10,
+{{#if orderField}}
+      defaultSort: { field: "{{orderField}}", direction: "asc" },
+{{else}}
+      defaultSort: { field: "{{rowIdField}}", direction: "desc" },
 {{/if}}
-{{#if hasUpdate}}
-  onEdit?: (row: {{EntityPascal}}) => void;
+{{#if hasFilters}}
+      filterMode: "deferred",
 {{/if}}
-{{#if hasDelete}}
-  onDelete?: (row: {{EntityPascal}}) => void;
+    },
+  );
+{{else}}
+  // TODO: Connect to domain package list hook
+  return useCrudList<{{EntityPascal}}>(useMockList);
 {{/if}}
 }
 
-export function {{EntityPascal}}List({ onView{{#if hasCreate}}, onCreate{{/if}}{{#if hasUpdate}}, onEdit{{/if}}{{#if hasDelete}}, onDelete{{/if}} }: {{EntityPascal}}ListProps) {
-  const { fieldLabel } = useEntityTranslation("{{entity}}");
-{{#if packageName}}
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const list = useCrudList<{{EntityPascal}}>({{domainCamel}}Hooks.{{entity}}.useList as any);
-{{else}}
-  // TODO: Connect to domain package hooks
-  const list = useCrudList<{{EntityPascal}}>(useMockList);
-{{/if}}
+interface {{EntityPascal}}ListToolbarProps {
+  list: ReturnType<typeof use{{EntityPascal}}List>;
+}
 
+export function {{EntityPascal}}ListToolbar({ list }: {{EntityPascal}}ListToolbarProps) {
+{{#if hasFilters}}
+  const { t } = useTranslation("simplix/ui");
+  const { fieldLabel } = useEntityTranslation("{{entity}}");
+{{/if}}
   return (
-    <CrudList>
+{{#if hasFilters}}
+      <CrudList.FilterBar
+        leading={
+          <Badge variant="outline" className="gap-1.5 font-normal">
+            <ListIcon className="size-3.5 text-muted-foreground" />
+            {t("list.totalCount", { count: list.pagination.total })}
+          </Badge>
+        }
+        filters={[
+{{#each filterBarDefs}}
+{{#if isText}}
+          { type: "text", field: "{{field}}", label: fieldLabel("{{field}}"), operators: [{{#each operators}}SearchOperator.{{this}}{{#unless @last}}, {{/unless}}{{/each}}], defaultOperator: SearchOperator.{{defaultOperator}} },
+{{/if}}
+{{#if isNumber}}
+          { type: "number", field: "{{field}}", label: fieldLabel("{{field}}"), operators: [{{#each operators}}SearchOperator.{{this}}{{#unless @last}}, {{/unless}}{{/each}}], defaultOperator: SearchOperator.{{defaultOperator}} },
+{{/if}}
+{{#if isFaceted}}
+          { type: "faceted", field: "{{field}}", label: fieldLabel("{{field}}"), options: [{{#each options}}{ label: "{{this}}", value: "{{this}}" },{{/each}}] },
+{{/if}}
+{{#if isToggle}}
+          { type: "toggle", field: "{{field}}", label: fieldLabel("{{field}}") },
+{{/if}}
+{{#if isDateRange}}
+          { type: "dateRange", field: "{{field}}", label: fieldLabel("{{field}}") },
+{{/if}}
+{{#if isCountry}}
+          { type: "country", field: "{{field}}", label: fieldLabel("{{field}}") },
+{{/if}}
+{{#if isTimezone}}
+          { type: "timezone", field: "{{field}}", label: fieldLabel("{{field}}") },
+{{/if}}
+{{/each}}
+        ]}
+        state={list.filters}
+      />
+{{else}}
       <CrudList.Toolbar>
         <CrudList.Search
           value={list.filters.search}
           onChange={list.filters.setSearch}
           placeholder="Search {{entity}}..."
         />
-{{#if hasCreate}}
-        <Button onClick={onCreate}>New {{EntityPascal}}</Button>
-{{/if}}
       </CrudList.Toolbar>
+{{/if}}
+  );
+}
+
+interface {{EntityPascal}}ListProps {
+  list?: ReturnType<typeof use{{EntityPascal}}List>;
+  activeRowId?: string | null;
+  actions?: RowActionDef<{{EntityPascal}}>[];
+  actionVariant?: ActionVariant;
+  onRowClick?: (row: {{EntityPascal}}) => void;
+}
+
+export function {{EntityPascal}}List({ list: externalList, activeRowId, actions, actionVariant, onRowClick }: {{EntityPascal}}ListProps) {
+  const { t } = useTranslation("{{moduleName}}/widgets");
+{{#if hasEnumFields}}
+  const { fieldLabel, enumLabel } = useEntityTranslation("{{entity}}");
+{{else}}
+  const { fieldLabel } = useEntityTranslation("{{entity}}");
+{{/if}}
+  const internalList = use{{EntityPascal}}List();
+  const list = externalList ?? internalList;
+{{#if hookOrder}}
+  const orderMutation = {{hookOrder}}();
+  const invalidate = useInvalidateEntity("{{entityPath}}");
+{{/if}}
+
+  return (
+    <CrudList>
+      <{{EntityPascal}}ListToolbar list={list} />
 
       <CrudList.Table
         data={list.data}
         isLoading={list.isLoading}
-        onRowClick={(row) => onView?.(row)}
+        emptyReason={list.emptyReason}
+        emptyState={{ldb}}
+          icon: <{{entityIcon}} />,
+          title: t("{{entity}}.emptyTitle"),
+          description: t("{{entity}}.emptyDescription"),
+        {{rdb}}
+        density="compact"
+        onRowClick={onRowClick}
+        activeRowId={activeRowId}
+        rowId={(row) => String(row.{{rowIdField}})}
         sort={list.sort.field ? { field: list.sort.field, direction: list.sort.direction } : null}
         onSortChange={(s) => list.sort.setSort(s.field, s.direction)}
         selectedIndices={list.selection.selected}
         onSelectionChange={list.selection.toggle}
         onSelectAll={() => list.selection.toggleAll(list.data)}
+        actions={actions}
+        actionVariant={actionVariant}
+{{#if hookOrder}}
+        reorder={{ldb}}
+          orderField: "{{orderField}}",
+          idField: "{{rowIdField}}",
+          onReorder: adaptOrvalOrder(orderMutation, "{{rowIdField}}", "{{orderField}}", { onSettled: invalidate }),
+        {{rdb}}
+{{/if}}
         cardBreakpoint={480}
-        cardRender={({ row }) => (
+        cardTitle={({ row }) => (
+          <span className="text-sm font-semibold">{row.{{fields.[0].name~}} }</span>
+        )}
+        cardContent={({ row }) => (
           <Stack gap="xs">
 {{#each fields}}
-{{#if @first}}
-            <Text className="font-semibold">{row.{{this.name~}} }</Text>
+{{#unless @first}}
+{{#if (eq this.component "Select")}}
+            <DetailFieldWrapper label={fieldLabel("{{this.name}}")} layout="inline" size="sm">
+              <Badge>{enumLabel("{{../entity}}{{this.capitalizedName}}", String(row.{{this.name}}))}</Badge>
+            </DetailFieldWrapper>
+{{else if (eq this.component "Date")}}
+            <DetailFieldWrapper label={fieldLabel("{{this.name}}")} layout="inline" size="sm">
+              {row.{{this.name}} ? String(row.{{this.name}}) : ""}
+            </DetailFieldWrapper>
+{{else if (eq this.component "Boolean")}}
+            <DetailFieldWrapper label={fieldLabel("{{this.name}}")} layout="inline" size="sm">
+              {row.{{this.name}} ? "Yes" : "No"}
+            </DetailFieldWrapper>
 {{else}}
-            <Text size="sm" className="text-muted-foreground">{fieldLabel("{{this.name}}")}: {row.{{this.name~}} }</Text>
+            <DetailFieldWrapper label={fieldLabel("{{this.name}}")} layout="inline" size="sm">
+              {row.{{this.name~}} }
+            </DetailFieldWrapper>
 {{/if}}
+{{/unless}}
 {{/each}}
           </Stack>
         )}
       >
 {{#each fields}}
+{{#if (eq this.component "Select")}}
         <CrudList.Column<{{../EntityPascal}}>
           field="{{this.name}}"
           header={fieldLabel("{{this.name}}")}
+          display="badge"
+          sortable
+          variants={{ldb}} {{#each this.options}}"{{this}}": "default"{{#unless @last}}, {{/unless}}{{/each}} {{rdb}}
         />
+{{else}}
+        <CrudList.Column<{{../EntityPascal}}>
+          field="{{this.name}}"
+          header={fieldLabel("{{this.name}}")}
+          sortable
+        />
+{{/if}}
 {{/each}}
-{{#if (or hasUpdate hasDelete)}}
-        <CrudList.Column<{{EntityPascal}}>
-          header=""
-          width={120}
-        >
-          {({ row }) => (
-            <Flex gap="xs" justify="end">
-{{#if hasUpdate}}
-              <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); onEdit?.(row); }}>
-                Edit
-              </Button>
-{{/if}}
-{{#if hasDelete}}
-              <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); onDelete?.(row); }}>
-                Delete
-              </Button>
-{{/if}}
-            </Flex>
-          )}
-        </CrudList.Column>
-{{/if}}
       </CrudList.Table>
 
-      <CrudList.Pagination
-        page={list.pagination.page}
-        pageSize={list.pagination.pageSize}
-        total={list.pagination.total}
-        totalPages={list.pagination.totalPages}
-        onPageChange={list.pagination.setPage}
-        onPageSizeChange={list.pagination.setPageSize}
-      />
-
-      {list.emptyReason && <CrudList.Empty reason={list.emptyReason} />}
+      {list.emptyReason !== "no-data" && (
+        <CrudList.Pagination
+          page={list.pagination.page}
+          pageSize={list.pagination.pageSize}
+          total={list.pagination.total}
+          totalPages={list.pagination.totalPages}
+          onPageChange={list.pagination.setPage}
+          onPageSizeChange={list.pagination.setPageSize}
+        />
+      )}
     </CrudList>
   );
 }

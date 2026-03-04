@@ -8,12 +8,19 @@ import { toPascalCase } from "../utils/case.js";
 import { renderTemplate } from "../utils/template.js";
 import { loadConfig } from "../config/config-loader.js";
 import { withVersions } from "../versions.js";
+import { isSpecUrl } from "../openapi/parser.js";
+import { findSpecForDomain } from "../config/types.js";
+import {
+  generateDomainMutatorContent,
+} from "../openapi/orval-runner.js";
+import { SPEC_PROFILES } from "../openapi/presets/spec-profiles.js";
 import {
   domainEslintConfig,
   domainPackageJson,
   domainTsupConfig,
   domainTsconfigJson,
   domainIndexTs,
+  domainSchemasTs,
   domainContractTs,
   domainHooksTs,
   domainMockIndexTs,
@@ -23,9 +30,8 @@ import {
 } from "../templates/domain/index.js";
 
 export const addDomainCommand = new Command("add-domain")
-  .description("Add a new domain package")
+  .description("Add a new domain package (skeleton only)")
   .argument("<name>", "Domain name (e.g., inventory, topology)")
-  .option("-e, --entities <entities>", "Comma-separated entity names", "")
   .option("--no-i18n", "Skip i18n translations setup")
   .option("-y, --yes", "Accept all defaults (non-interactive)")
   .action(async (name: string, flags: Record<string, unknown>) => {
@@ -42,34 +48,75 @@ export const addDomainCommand = new Command("add-domain")
     }
 
     // Extract project name and scope from root package.json
-    const pkgName = rootPkg.name; // e.g., "@myapp/myapp-monorepo"
+    const pkgName = rootPkg.name;
     const scopeMatch = pkgName.match(/^(@[^/]+)\//);
     const scope = scopeMatch ? scopeMatch[1] : "";
-
-    // Extract base project name
     const baseName = pkgName
       .replace(/^@[^/]+\//, "")
       .replace(/-monorepo$/, "");
 
-    let entitiesInput: string;
-    if (flags.entities || flags.yes) {
-      entitiesInput = (flags.entities as string) || name;
-    } else {
-      const response = await prompts([
-        {
-          type: "text",
-          name: "entities",
-          message: "Entity names (comma-separated, e.g., product,category):",
-          initial: name,
-        },
-      ]);
-      entitiesInput = response.entities || name;
+    // Load config
+    const config = await loadConfig(rootDir);
+    const apiBaseUrl = config.api?.baseUrl ?? "/api";
+    const locales = config.i18n?.locales ?? ["en", "ko", "ja"];
+    const prefix = config.packages?.prefix ?? baseName;
+
+    const dirName = prefix ? `${prefix}-domain-${name}` : `domain-${name}`;
+    const domainPkgName = scope ? `${scope}/${dirName}` : dirName;
+    const targetDir = join(rootDir, "packages", dirName);
+
+    // Detect OpenAPI configuration
+    const specConfig = findSpecForDomain(config.openapi, name);
+    const openapiSpec = specConfig?.spec;
+    const domainTags = specConfig?.domains[name];
+    let useOrval = !!(openapiSpec && domainTags);
+
+    if (useOrval && !isSpecUrl(openapiSpec!)) {
+      const absSpecPath = resolve(rootDir, openapiSpec!);
+      if (!(await pathExists(absSpecPath))) {
+        log.warn(
+          `OpenAPI spec not found: ${openapiSpec} — skipping OpenAPI generation.`,
+        );
+        useOrval = false;
+      }
     }
 
-    const entities = entitiesInput
-      .split(",")
-      .map((e: string) => e.trim())
-      .filter(Boolean);
+    // If package already exists, reject — updates go through `simplix openapi`
+    if (await pathExists(targetDir)) {
+      log.error(`Domain package "${dirName}" already exists.`);
+      if (useOrval) {
+        log.step(`To regenerate code: simplix openapi ${openapiSpec}`);
+      }
+      process.exit(1);
+    }
+
+    // Prompt for entities only in non-OpenAPI mode
+    let entities: Array<{ entityName: string; EntityPascal: string }> = [];
+    if (!useOrval) {
+      let entitiesInput: string;
+      if (flags.yes) {
+        entitiesInput = name;
+      } else {
+        const response = await prompts([
+          {
+            type: "text",
+            name: "entities",
+            message: "Entity names (comma-separated, e.g., product,category):",
+            initial: name,
+          },
+        ]);
+        entitiesInput = response.entities || name;
+      }
+
+      entities = entitiesInput
+        .split(",")
+        .map((e: string) => e.trim())
+        .filter(Boolean)
+        .map((e: string) => ({
+          entityName: e,
+          EntityPascal: toPascalCase(e),
+        }));
+    }
 
     let enableI18n: boolean;
     if (flags.yes || flags.i18n === false) {
@@ -86,20 +133,6 @@ export const addDomainCommand = new Command("add-domain")
       enableI18n = response.enableI18n ?? true;
     }
 
-    // Load config
-    const config = await loadConfig(rootDir);
-    const apiBaseUrl = config.api?.baseUrl ?? "/api";
-    const locales = config.i18n?.locales ?? ["en", "ko", "ja"];
-
-    const domainPkgName = `${scope}/${baseName}-domain-${name}`;
-    const dirName = `${baseName}-domain-${name}`;
-    const targetDir = join(rootDir, "packages", dirName);
-
-    if (await pathExists(targetDir)) {
-      log.error(`Domain package "${dirName}" already exists.`);
-      process.exit(1);
-    }
-
     const spinner = ora(`Creating domain package: ${domainPkgName}`).start();
 
     try {
@@ -109,39 +142,81 @@ export const addDomainCommand = new Command("add-domain")
         projectName: baseName,
         scope,
         enableI18n,
+        enableOrval: useOrval,
         locales,
         apiBasePath: `${apiBaseUrl}/${name}`,
-        entities: entities.map((e: string) => ({
-          entityName: e,
-          EntityPascal: toPascalCase(e),
-        })),
+        entities,
         PascalName: toPascalCase(name),
       });
 
+      // Scaffolding files (common to both modes)
       const files: Record<string, string> = {
         "package.json": renderTemplate(domainPackageJson, ctx),
         "eslint.config.js": domainEslintConfig,
         "tsup.config.ts": domainTsupConfig,
         "tsconfig.json": renderTemplate(domainTsconfigJson, ctx),
         "src/index.ts": renderTemplate(domainIndexTs, ctx),
-        "src/contract.ts": renderTemplate(domainContractTs, ctx),
-        "src/hooks.ts": renderTemplate(domainHooksTs, ctx),
-        "src/mock/index.ts": renderTemplate(domainMockIndexTs, ctx),
-        "src/mock/handlers.ts": renderTemplate(domainMockHandlersTs, ctx),
-        "src/mock/seed.ts": renderTemplate(domainMockSeedTs, ctx),
       };
 
+      if (useOrval) {
+        // OpenAPI mode: skeleton with mutator + orval config
+        files["src/mutator.ts"] = generateDomainMutatorContent(name);
+
+        // Inject OpenAPI-specific dependencies + codegen script
+        const pkgJson = JSON.parse(files["package.json"]);
+        if (!pkgJson.dependencies) pkgJson.dependencies = {};
+        pkgJson.dependencies["@simplix-react/api"] = "workspace:*";
+        pkgJson.devDependencies["orval"] = "^8.4.1";
+        pkgJson.devDependencies["@faker-js/faker"] = "^9.0.0";
+        pkgJson.scripts["codegen"] = `simplix openapi ${openapiSpec}`;
+
+        // Add profile-specific dependencies (data-driven from SpecProfile)
+        if (specConfig?.profile) {
+          const profile = SPEC_PROFILES[specConfig.profile];
+          if (profile?.dependencies) {
+            Object.assign(pkgJson.dependencies, profile.dependencies);
+          }
+        }
+
+        files["package.json"] = JSON.stringify(pkgJson, null, 2) + "\n";
+      } else {
+        // Non-OpenAPI mode: template-based generation
+        files["src/schemas.ts"] = renderTemplate(domainSchemasTs, ctx);
+        files["src/contract.ts"] = renderTemplate(domainContractTs, ctx);
+        files["src/hooks.ts"] = renderTemplate(domainHooksTs, ctx);
+        files["src/mock/index.ts"] = renderTemplate(domainMockIndexTs, ctx);
+        files["src/mock/handlers.ts"] = renderTemplate(
+          domainMockHandlersTs,
+          ctx,
+        );
+        files["src/mock/seed.ts"] = renderTemplate(domainMockSeedTs, ctx);
+
+        // Inject non-OpenAPI-specific dependencies
+        const pkgJson = JSON.parse(files["package.json"]);
+        if (!pkgJson.dependencies) pkgJson.dependencies = {};
+        pkgJson.dependencies["@simplix-react/contract"] = "workspace:*";
+        pkgJson.dependencies["@simplix-react/react"] = "workspace:*";
+        files["package.json"] = JSON.stringify(pkgJson, null, 2) + "\n";
+      }
+
+      // i18n files (common to both modes)
       if (enableI18n) {
         files["src/translations.ts"] = renderTemplate(
           domainTranslationsTs,
           ctx,
         );
-        const emptyJson = "{}\n";
         for (const locale of locales) {
-          files[`src/locales/${locale}.json`] = emptyJson;
+          files[`src/locales/${locale}.json`] = "{}\n";
         }
+
+        // Add @simplix-react/i18n dependency
+        const pkgJson = JSON.parse(files["package.json"]);
+        if (!pkgJson.dependencies) pkgJson.dependencies = {};
+        pkgJson.dependencies["@simplix-react/i18n"] = "workspace:*";
+        files["package.json"] = JSON.stringify(pkgJson, null, 2) + "\n";
       }
 
+      // Write all files
       for (const [relativePath, content] of Object.entries(files)) {
         await writeFileWithDir(join(targetDir, relativePath), content);
       }
@@ -149,17 +224,25 @@ export const addDomainCommand = new Command("add-domain")
       spinner.succeed(`Domain package created: ${domainPkgName}`);
       log.info("");
       log.step(`Location: packages/${dirName}/`);
-      log.step(`Entities: ${entities.join(", ")}`);
+      if (!useOrval) {
+        log.step(
+          `Entities: ${entities.map((e) => e.entityName).join(", ")}`,
+        );
+      }
       if (enableI18n) {
         log.step(`i18n: locales/ with ${locales.join(", ")}`);
       }
       log.info("");
       log.info("Next steps:");
       log.step("pnpm install");
-      log.step("pnpm build");
-      log.step(
-        `Add "${domainPkgName}": "workspace:*" to your app's dependencies`,
-      );
+      if (useOrval) {
+        log.step(`simplix openapi ${openapiSpec}    ← Orval code generation`);
+      } else {
+        log.step("pnpm build");
+        log.step(
+          `Add "${domainPkgName}": "workspace:*" to your app's dependencies`,
+        );
+      }
     } catch (err) {
       spinner.fail("Failed to create domain package");
       log.error(String(err));

@@ -12,6 +12,8 @@ import type {
   CrudRole,
 } from "./types.js";
 import type { CrudEndpointPattern } from "../config/types.js";
+import type { OpenApiNamingStrategy, EntityNameContext } from "./naming-strategy.js";
+import { log } from "../utils/logger.js";
 import { toZodType } from "./zod-codegen.js";
 
 type CrudPatterns = Partial<Record<CrudRole, CrudEndpointPattern>>;
@@ -19,20 +21,29 @@ type CrudPatterns = Partial<Record<CrudRole, CrudEndpointPattern>>;
 /**
  * Extract entities from OpenAPI spec using tag-based grouping
  * and per-operation extraction.
+ *
+ * When `naming` is provided, uses `resolveEntityName()` to determine entity names
+ * from the tag context instead of path-based extraction.
  */
 export function extractEntities(
   spec: OpenAPISpec,
   crudPatterns?: CrudPatterns,
+  naming?: OpenApiNamingStrategy,
 ): ExtractedEntity[] {
   const rawOps = collectAllOperations(spec);
   const tagGroups = groupByTag(rawOps);
   const entities: ExtractedEntity[] = [];
 
-  for (const [_tag, ops] of tagGroups) {
+  for (const [tag, ops] of tagGroups) {
+    // When naming strategy is provided, resolve entity name from tag context
+    const resolvedName = naming
+      ? naming.resolveEntityName(buildEntityNameContext(spec, tag, ops))
+      : undefined;
+
     const subGroups = splitIntoEntities(ops);
 
     for (const group of subGroups) {
-      const entity = buildEntityFromOps(spec, group, crudPatterns);
+      const entity = buildEntityFromOps(spec, group, crudPatterns, resolvedName);
       if (entity) {
         entities.push(entity);
       }
@@ -40,6 +51,81 @@ export function extractEntities(
   }
 
   return deduplicateEntities(entities);
+}
+
+// --- Entity name context for NamingStrategy ---
+
+function buildEntityNameContext(
+  spec: OpenAPISpec,
+  tag: string,
+  ops: RawOperation[],
+): EntityNameContext {
+  const paths = [...new Set(ops.map((op) => op.path))];
+
+  const operations = ops.map((op) => {
+    const params: ParameterObject[] = [
+      ...(op.pathItem.parameters ?? []),
+      ...(op.operation.parameters ?? []),
+    ];
+    const queryParams = params
+      .filter((p) => p.in === "query")
+      .map((p) => p.name);
+
+    return {
+      operationId: op.operation.operationId ?? "",
+      method: op.method,
+      path: op.path,
+      summary: op.operation.summary,
+      queryParams: queryParams.length > 0 ? queryParams : undefined,
+    };
+  });
+
+  // Collect schema names referenced by operations
+  const schemaNames = collectSchemaNames(spec, ops);
+
+  // Collect x-* extensions from the tag object
+  const tagObj = spec.tags?.find((t) => t.name === tag);
+  const extensions: Record<string, unknown> = {};
+  if (tagObj) {
+    for (const [key, value] of Object.entries(tagObj)) {
+      if (key.startsWith("x-")) {
+        extensions[key] = value;
+      }
+    }
+  }
+
+  return {
+    tag: tag !== "default" ? tag : undefined,
+    paths,
+    operations,
+    schemaNames,
+    extensions,
+  };
+}
+
+function collectSchemaNames(
+  spec: OpenAPISpec,
+  ops: RawOperation[],
+): string[] {
+  const names = new Set<string>();
+  for (const op of ops) {
+    // Response schemas
+    if (op.operation.responses) {
+      for (const code of Object.keys(op.operation.responses)) {
+        if (!code.startsWith("2")) continue;
+        const schema = op.operation.responses[code]?.content?.["application/json"]?.schema;
+        if (schema?.$ref) {
+          names.add(extractRefName(schema.$ref));
+        }
+      }
+    }
+    // Request body schemas
+    const bodySchema = op.operation.requestBody?.content?.["application/json"]?.schema;
+    if (bodySchema?.$ref) {
+      names.add(extractRefName(bodySchema.$ref));
+    }
+  }
+  return [...names];
 }
 
 // --- Raw operation collection ---
@@ -242,13 +328,14 @@ function buildEntityFromOps(
   spec: OpenAPISpec,
   group: EntityGroup,
   crudPatterns?: CrudPatterns,
+  resolvedName?: string,
 ): ExtractedEntity | null {
   if (group.ops.length === 0) return null;
 
   const { basePath, resourceName } = group;
-  const name = toCamelCase(singularize(resourceName));
-  const pascalName = toPascalCase(singularize(resourceName));
-  const pluralName = resourceName;
+  const name = resolvedName || toCamelCase(singularize(resourceName));
+  const pascalName = toPascalCase(resolvedName || singularize(resourceName));
+  const pluralName = resolvedName ? resolvedName + "s" : resourceName;
 
   // Convert OpenAPI {param} to :param format in all paths
   const operations = group.ops.map((op) =>
@@ -333,6 +420,7 @@ function buildExtractedOperation(
     .map((p) => ({
       name: p.name,
       type: p.schema?.type ?? "string",
+      format: p.schema?.format,
       required: p.required ?? false,
       description: p.description,
     }));
@@ -547,7 +635,11 @@ function extractEntitySchemaFromOps(
   );
   if (getItem) {
     const schema = extractResponseSchema(spec, getItem.path, "get");
-    if (schema?.properties) return schema;
+    if (schema?.properties) {
+      // Unwrap boot envelope if detected (has type + message + body)
+      const inner = unwrapBootEnvelopeSchema(schema);
+      return inner ?? schema;
+    }
   }
 
   const getList = ops.find(
@@ -566,11 +658,34 @@ function extractEntitySchemaFromOps(
   // Any 2xx response from any operation
   for (const op of ops) {
     const schema = extractResponseSchema(spec, op.path, methodToKey(op.method));
-    if (schema?.properties) return schema;
+    if (schema?.properties) {
+      const inner = unwrapBootEnvelopeSchema(schema);
+      return inner ?? schema;
+    }
   }
 
   // No schema found
   return { type: "object" };
+}
+
+/**
+ * Detect and unwrap boot envelope schemas.
+ * Boot envelopes have top-level: type, message, body, timestamp, errorCode, errorDetail.
+ * Returns the `body` sub-schema which contains the actual entity fields.
+ */
+function unwrapBootEnvelopeSchema(schema: SchemaObject): SchemaObject | undefined {
+  if (!schema.properties) return undefined;
+  const { body, type, message } = schema.properties;
+  if (
+    type?.type === "string" &&
+    message?.type === "string" &&
+    body?.type === "object" &&
+    body.properties &&
+    Object.keys(body.properties).length > 0
+  ) {
+    return body;
+  }
+  return undefined;
 }
 
 function isNonStandardSchema(schema: SchemaObject): boolean {
@@ -645,6 +760,7 @@ function collectQueryParams(ops: RawOperation[]): QueryParam[] {
         result.push({
           name: p.name,
           type: p.schema?.type ?? "string",
+          format: p.schema?.format,
           required: p.required ?? false,
           description: p.description,
         });
@@ -708,6 +824,14 @@ function deduplicateEntities(entities: ExtractedEntity[]): ExtractedEntity[] {
   for (const entity of entities) {
     const existing = map.get(entity.name);
     if (existing) {
+      // Warn when merging entities from different tags (possible naming collision)
+      const existingTags = existing.tags.join(", ");
+      const incomingTags = entity.tags.join(", ");
+      if (existingTags !== incomingTags) {
+        log.warn(
+          `Entity "${entity.name}" resolved from multiple tags [${existingTags}] + [${incomingTags}] — operations will be merged`,
+        );
+      }
       // Merge operations
       const opNames = new Set(existing.operations.map((o) => o.name));
       for (const op of entity.operations) {
@@ -746,4 +870,210 @@ export function toPascalCase(str: string): string {
     .split(/[-_\s]+/)
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join("");
+}
+
+// --- Response type enrichment (requires raw spec before resolveRefs) ---
+
+/**
+ * Enrich extracted entities with response type info from the raw (unresolved) spec.
+ * This must be called with the spec BEFORE resolveRefs, since $ref names are needed.
+ *
+ * Also derives `modelType` — the actual Orval-generated TypeScript type name —
+ * by inspecting request/response $ref names.
+ *
+ * For boot specs, strips the `SimpliXApiResponse` envelope prefix from response types
+ * so that `responseEntityType` reflects the inner DTO type (e.g., `UserAccountDetailDTO`).
+ */
+export function enrichWithResponseInfo(
+  rawSpec: OpenAPISpec,
+  entities: ExtractedEntity[],
+): void {
+  const responseMap = buildResponseMap(rawSpec);
+  const requestBodyMap = buildRequestBodyMap(rawSpec);
+
+  for (const entity of entities) {
+    for (const op of entity.operations) {
+      if (!op.operationId) continue;
+      const info = responseMap.get(op.operationId);
+      if (info?.entityType) {
+        // Strip boot envelope prefix so responseEntityType is the inner DTO type
+        op.responseEntityType = stripBootEnvelopePrefix(info.entityType);
+        op.isArrayResponse = info.isArray;
+      }
+    }
+
+    // Derive modelType from request/response schema refs
+    entity.modelType = deriveModelType(entity, responseMap, requestBodyMap);
+  }
+}
+
+interface ResponseInfo {
+  entityType?: string;
+  isArray: boolean;
+}
+
+function buildResponseMap(
+  spec: OpenAPISpec,
+): Map<string, ResponseInfo> {
+  const map = new Map<string, ResponseInfo>();
+
+  for (const pathItem of Object.values(spec.paths)) {
+    if (!pathItem) continue;
+    for (const method of ["get", "post", "put", "patch", "delete"] as const) {
+      const op = pathItem[method];
+      if (!op?.operationId) continue;
+
+      const schema = extractRawResponseSchema(op);
+      if (!schema) {
+        map.set(op.operationId, { isArray: false });
+        continue;
+      }
+
+      if (schema.type === "array" && schema.items?.$ref) {
+        map.set(op.operationId, {
+          entityType: extractRefName(schema.items.$ref),
+          isArray: true,
+        });
+      } else if (schema.$ref) {
+        map.set(op.operationId, {
+          entityType: extractRefName(schema.$ref),
+          isArray: false,
+        });
+      } else if (schema.properties?.body) {
+        // Boot-style inline envelope: extract inner body type
+        const body = schema.properties.body;
+        if (body.$ref) {
+          map.set(op.operationId, {
+            entityType: extractRefName(body.$ref),
+            isArray: false,
+          });
+        } else if (body.properties?.content?.type === "array" && body.properties.content.items?.$ref) {
+          map.set(op.operationId, {
+            entityType: extractRefName(body.properties.content.items.$ref),
+            isArray: true,
+          });
+        } else {
+          map.set(op.operationId, { isArray: false });
+        }
+      } else {
+        map.set(op.operationId, { isArray: false });
+      }
+    }
+  }
+
+  return map;
+}
+
+function extractRawResponseSchema(
+  op: OperationObject,
+): SchemaObject | undefined {
+  if (!op.responses) return undefined;
+  for (const code of Object.keys(op.responses)) {
+    if (!code.startsWith("2")) continue;
+    const schema = op.responses[code]?.content?.["application/json"]?.schema;
+    if (schema) return schema;
+  }
+  return undefined;
+}
+
+function extractRefName(ref: string): string {
+  const parts = ref.split("/");
+  return parts[parts.length - 1];
+}
+
+// --- Model type derivation ---
+
+const BOOT_ENVELOPE_PREFIX = "SimpliXApiResponse";
+
+/**
+ * Strip the boot envelope prefix from a response type name.
+ * e.g., "SimpliXApiResponseUserAccountDetailDTO" → "UserAccountDetailDTO"
+ */
+function stripBootEnvelopePrefix(typeName: string): string {
+  if (typeName.startsWith(BOOT_ENVELOPE_PREFIX)) {
+    return typeName.slice(BOOT_ENVELOPE_PREFIX.length);
+  }
+  return typeName;
+}
+
+/**
+ * Derive the actual Orval model type name from response schema refs.
+ *
+ * Strategy:
+ * 1. Find the GET single-item response type (e.g., GET /{id}).
+ *    - For standard specs: this is the entity type directly (e.g., "Pet") → no modelType needed.
+ *    - For boot specs: responseEntityType is already envelope-stripped (e.g., "UserAccountDetailDTO").
+ * 2. If no GET single-item is found, fall back to request body DTO suffix stripping.
+ */
+function deriveModelType(
+  entity: ExtractedEntity,
+  _responseMap: Map<string, ResponseInfo>,
+  requestBodyMap: Map<string, string>,
+): string | undefined {
+  // 1. Find GET single-item response type (already envelope-stripped on op.responseEntityType)
+  for (const op of entity.operations) {
+    if (op.method !== "GET" || !op.responseEntityType) continue;
+    // GET /{id}: has path param, path ends with :param (no trailing action suffix)
+    const pathParts = op.path.split("/").filter(Boolean);
+    const lastPart = pathParts[pathParts.length - 1];
+    if (lastPart?.startsWith(":")) {
+      // This is the GET single-item operation
+      if (op.responseEntityType === entity.pascalName) return undefined;
+      return op.responseEntityType;
+    }
+  }
+
+  // 2. Fallback: derive from request body refs by stripping DTO suffixes
+  const baseNames = new Set<string>();
+  for (const op of entity.operations) {
+    if (!op.operationId) continue;
+    const bodyRef = requestBodyMap.get(op.operationId);
+    if (bodyRef) {
+      const baseName = stripDtoSuffix(bodyRef);
+      if (baseName) baseNames.add(baseName);
+    }
+  }
+
+  if (baseNames.size === 0) return undefined;
+  if (baseNames.has(entity.pascalName)) return undefined;
+  return [...baseNames][0];
+}
+
+const DTO_SUFFIXES = [
+  "DetailDTO", "ListDTO", "CreateDTO", "UpdateDTO",
+  "BatchUpdateDTO", "UpdateFormDTO", "OrderUpdateDTO",
+];
+
+function stripDtoSuffix(typeName: string): string | undefined {
+  for (const suffix of DTO_SUFFIXES) {
+    if (typeName.endsWith(suffix)) {
+      const base = typeName.slice(0, -suffix.length);
+      if (base) return base;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Build operationId → request body $ref type name map from raw spec.
+ */
+function buildRequestBodyMap(spec: OpenAPISpec): Map<string, string> {
+  const map = new Map<string, string>();
+
+  for (const pathItem of Object.values(spec.paths)) {
+    if (!pathItem) continue;
+    for (const method of ["get", "post", "put", "patch", "delete"] as const) {
+      const op = pathItem[method];
+      if (!op?.operationId) continue;
+
+      const bodySchema = op.requestBody?.content?.["application/json"]?.schema;
+      if (bodySchema?.$ref) {
+        map.set(op.operationId, extractRefName(bodySchema.$ref));
+      } else if (bodySchema?.type === "array" && bodySchema.items?.$ref) {
+        map.set(op.operationId, extractRefName(bodySchema.items.$ref));
+      }
+    }
+  }
+
+  return map;
 }

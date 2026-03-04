@@ -1,13 +1,15 @@
 // {{EntityPascal}} CRUD Widgets
 // FSD widgets/ layer — composable CRUD screen components
 
-{{#if hasList}}
-export { {{EntityPascal}}List } from "./{{entityKebab}}-list";
+{{#if hasTree}}
+export { {{EntityPascal}}Tree, use{{EntityPascal}}Tree } from "./tree";
+{{else if hasList}}
+export { {{EntityPascal}}List, {{EntityPascal}}ListToolbar, use{{EntityPascal}}List } from "./list";
 {{/if}}
 {{#if hasForm}}
-export { {{EntityPascal}}Form } from "./{{entityKebab}}-form";
-export type { {{EntityPascal}}FormValues } from "./{{entityKebab}}-form";
+export { {{EntityPascal}}Form } from "./form";
+export type { {{EntityPascal}}FormValues } from "./form";
 {{/if}}
 {{#if hasDetail}}
-export { {{EntityPascal}}Detail } from "./{{entityKebab}}-detail";
+export { {{EntityPascal}}Detail } from "./detail";
 {{/if}}
