@@ -14,7 +14,7 @@ Each top-level operation in the contract produces an object with a single `useMu
 
 ## See
 
-[deriveHooks](../functions/deriveHooks.md) for generating hooks from a contract.
+[deriveEntityHooks](../functions/deriveEntityHooks.md) for generating hooks from a contract.
 
 ## Type Parameters
 

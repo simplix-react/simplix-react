@@ -2,11 +2,11 @@
 
 ***
 
-[Documentation](../../../README.md) / [@simplix-react/form](../README.md) / DerivedFormHooksResult
+[Documentation](../../../README.md) / [@simplix-react/form](../README.md) / DerivedEntityFormHooksResult
 
-# Type Alias: DerivedFormHooksResult\<TEntities\>
+# Type Alias: DerivedEntityFormHooksResult\<TEntities\>
 
-> **DerivedFormHooksResult**\<`TEntities`\> = `{ [K in keyof TEntities]: EntityFormHooks<TEntities[K]["schema"]> }`
+> **DerivedEntityFormHooksResult**\<`TEntities`\> = `{ [K in keyof TEntities]: EntityFormHooks<TEntities[K]["schema"]> }`
 
 Defined in: [derive-form-hooks.ts:69](https://github.com/simplix-react/simplix-react/blob/main/derive-form-hooks.ts#L69)
 

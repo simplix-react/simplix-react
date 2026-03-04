@@ -90,9 +90,9 @@ await projectApi.client.transferTask("proj-1", "task-1", {
 Operations produce a `useMutation` hook in `@simplix-react/react`.
 
 ```tsx
-import { deriveHooks } from "@simplix-react/react";
+import { deriveEntityHooks } from "@simplix-react/react";
 
-const hooks = deriveHooks(projectApi);
+const hooks = deriveEntityHooks(projectApi);
 
 function AssignButton({ taskId }: { taskId: string }) {
   const { mutate, isPending } = hooks.assignTask.useMutation();

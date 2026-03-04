@@ -16,7 +16,7 @@ Contract (Zod schemas)
     |
     +---> Client (type-safe HTTP)     -- deriveClient()
     +---> QueryKeys (cache keys)      -- deriveQueryKeys()
-    +---> Hooks (React Query)         -- deriveHooks()
+    +---> Hooks (React Query)         -- deriveEntityHooks()
     +---> Mock Handlers (MSW)         -- deriveMockHandlers()
 ```
 
@@ -75,7 +75,7 @@ interface OperationDefinition<TInput, TOutput> {
 }
 ```
 
-### deriveHooks(contract)
+### deriveEntityHooks(contract)
 
 Generates per-entity hooks + per-operation useMutation.
 
@@ -84,8 +84,8 @@ Entity hooks: `useList`, `useGet`, `useCreate`, `useUpdate`, `useDelete`, `useIn
 Operation hooks: `useMutation`
 
 ```ts
-import { deriveHooks } from "@simplix-react/react";
-const hooks = deriveHooks(api);
+import { deriveEntityHooks } from "@simplix-react/react";
+const hooks = deriveEntityHooks(api);
 
 // Entity hooks
 hooks.task.useList(parentId?, params?, options?);
@@ -200,7 +200,7 @@ Activate when:
 
 - Defining new API contracts with `defineApi`
 - Adding entities or operations to existing contracts
-- Setting up React Query hooks via `deriveHooks`
+- Setting up React Query hooks via `deriveEntityHooks`
 - Configuring mock data layer with MSW + in-memory stores
 - Configuring `simplix.config.ts` project settings
 - Debugging type errors in the derivation pipeline

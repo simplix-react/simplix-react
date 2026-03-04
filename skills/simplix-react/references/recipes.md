@@ -52,10 +52,10 @@ export const shopApi = defineApi({
 
 ```ts
 // src/hooks.ts
-import { deriveHooks } from "@simplix-react/react";
+import { deriveEntityHooks } from "@simplix-react/react";
 import { shopApi } from "./contract";
 
-export const hooks = deriveHooks(shopApi);
+export const hooks = deriveEntityHooks(shopApi);
 ```
 
 ### 3. Use in Component
@@ -154,9 +154,9 @@ export const projectApi = defineApi({
 ### Use Child Entity Hooks
 
 ```tsx
-import { deriveHooks } from "@simplix-react/react";
+import { deriveEntityHooks } from "@simplix-react/react";
 
-const hooks = deriveHooks(projectApi);
+const hooks = deriveEntityHooks(projectApi);
 
 function TaskList({ projectId }: { projectId: string }) {
   // Scoped to parent: GET /api/v1/projects/:projectId/tasks
@@ -254,7 +254,7 @@ await api.client.assignTask("task-1", { userId: "user-42" });
 ### Use Hook
 
 ```tsx
-const hooks = deriveHooks(api);
+const hooks = deriveEntityHooks(api);
 
 function AssignButton({ taskId }: { taskId: string }) {
   const { mutate, isPending } = hooks.assignTask.useMutation();

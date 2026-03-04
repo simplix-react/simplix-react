@@ -77,15 +77,15 @@ export const projectApi = defineApi({
 
 ## Step 3: Derive React Query Hooks
 
-Use `deriveHooks` to generate type-safe React Query hooks from the contract.
+Use `deriveEntityHooks` to generate type-safe React Query hooks from the contract.
 
 Create `src/hooks.ts`:
 
 ```ts
-import { deriveHooks } from "@simplix-react/react";
+import { deriveEntityHooks } from "@simplix-react/react";
 import { projectApi } from "./contract";
 
-export const hooks = deriveHooks(projectApi);
+export const hooks = deriveEntityHooks(projectApi);
 ```
 
 This single call produces hooks for every CRUD operation:
@@ -550,7 +550,7 @@ export default function App() {
 In this tutorial you:
 
 1. Defined an API contract with `defineApi` using Zod schemas for both project and task entities
-2. Derived type-safe React Query hooks with a single `deriveHooks` call
+2. Derived type-safe React Query hooks with a single `deriveEntityHooks` call
 3. Built CRUD components (`useList`, `useGet`, `useCreate`, `useUpdate`, `useDelete`)
 4. Modeled a parent-child relationship between projects and tasks using the `parent` field
 5. Scoped task queries and mutations to a specific project via `parentId`

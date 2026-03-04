@@ -219,10 +219,10 @@ function camelToSnake(str: string): string;
 
 ## @simplix-react/react
 
-### deriveHooks(contract)
+### deriveEntityHooks(contract)
 
 ```ts
-function deriveHooks<TEntities, TOperations>(
+function deriveEntityHooks<TEntities, TOperations>(
   contract: {
     config: ApiContractConfig<TEntities, TOperations>;
     client: Record<string, unknown>;

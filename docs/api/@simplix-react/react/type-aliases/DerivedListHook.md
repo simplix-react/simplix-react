@@ -48,9 +48,9 @@ The entity type returned by the query
 ## Example
 
 ```ts
-import { deriveHooks } from "@simplix-react/react";
+import { deriveEntityHooks } from "@simplix-react/react";
 
-const hooks = deriveHooks(projectContract);
+const hooks = deriveEntityHooks(projectContract);
 const { data: tasks } = hooks.task.useList(projectId, {
   filters: { status: "open" },
   sort: { field: "createdAt", direction: "desc" },

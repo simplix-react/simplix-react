@@ -43,9 +43,9 @@ The entity type returned after update
 ## Example
 
 ```ts
-import { deriveHooks } from "@simplix-react/react";
+import { deriveEntityHooks } from "@simplix-react/react";
 
-const hooks = deriveHooks(projectContract);
+const hooks = deriveEntityHooks(projectContract);
 const updateTask = hooks.task.useUpdate({ optimistic: true });
 updateTask.mutate({ id: taskId, dto: { status: "done" } });
 ```

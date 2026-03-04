@@ -17,7 +17,7 @@ by `@simplix-react/react` and `@simplix-react/mock`.
 ## See
 
  - [defineApi](../functions/defineApi.md) for constructing this contract.
- - [deriveHooks](../../react/functions/deriveHooks.md) for deriving React hooks.
+ - [deriveEntityHooks](../../react/functions/deriveEntityHooks.md) for deriving React hooks.
  - [deriveMockHandlers](../../mock/functions/deriveMockHandlers.md) for deriving mock handlers.
 
 ## Type Parameters

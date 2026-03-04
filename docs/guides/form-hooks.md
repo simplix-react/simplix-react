@@ -46,24 +46,24 @@ export const projectContract = defineApi({
 });
 
 // hooks.ts
-import { deriveHooks } from "@simplix-react/react";
+import { deriveEntityHooks } from "@simplix-react/react";
 import { projectContract } from "./contract.js";
 
-export const projectHooks = deriveHooks(projectContract);
+export const projectHooks = deriveEntityHooks(projectContract);
 ```
 
 ## Solution
 
 ### Step 1 -- Derive Form Hooks from an Existing Contract
 
-Call `deriveFormHooks` with your contract and the derived query hooks. This produces `useCreateForm` and `useUpdateForm` for every entity in a single call.
+Call `deriveEntityFormHooks` with your contract and the derived query hooks. This produces `useCreateForm` and `useUpdateForm` for every entity in a single call.
 
 ```ts
-import { deriveFormHooks } from "@simplix-react/form";
+import { deriveEntityFormHooks } from "@simplix-react/form";
 import { projectContract } from "./contract.js";
 import { projectHooks } from "./hooks.js";
 
-export const projectFormHooks = deriveFormHooks(projectContract, projectHooks);
+export const projectFormHooks = deriveEntityFormHooks(projectContract, projectHooks);
 
 // projectFormHooks.task.useCreateForm  -- create form hook
 // projectFormHooks.task.useUpdateForm  -- update form hook

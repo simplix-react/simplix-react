@@ -30,9 +30,9 @@ The Zod schema defining the entity shape
 ## Example
 
 ```ts
-import { deriveHooks } from "@simplix-react/react";
+import { deriveEntityHooks } from "@simplix-react/react";
 
-const hooks = deriveHooks(inventoryContract);
+const hooks = deriveEntityHooks(inventoryContract);
 
 // CRUD hooks (from operations with CRUD roles)
 const { data } = hooks.product.useList();
@@ -49,4 +49,4 @@ const { data: results } = hooks.product.useSearch({ q: "keyword" });
 
 ## See
 
-[deriveHooks](../functions/deriveHooks.md) for generating these hooks from a contract.
+[deriveEntityHooks](../functions/deriveEntityHooks.md) for generating these hooks from a contract.

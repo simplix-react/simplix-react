@@ -46,9 +46,9 @@ The entity type returned after creation
 ## Example
 
 ```ts
-import { deriveHooks } from "@simplix-react/react";
+import { deriveEntityHooks } from "@simplix-react/react";
 
-const hooks = deriveHooks(projectContract);
+const hooks = deriveEntityHooks(projectContract);
 const createTask = hooks.task.useCreate(projectId);
 createTask.mutate({ title: "New task", status: "open" });
 ```

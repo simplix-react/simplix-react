@@ -64,7 +64,7 @@ This project uses simplix-react, a contract-driven React framework.
 
 Core pipeline:
 1. defineApi() — Zod schemas → { config, client, queryKeys }
-2. deriveHooks() — contract → React Query hooks
+2. deriveEntityHooks() — contract → React Query hooks
 3. deriveMockHandlers() — contract → MSW handlers (backed by in-memory stores)
 
 Key rules:
@@ -86,7 +86,7 @@ This project uses simplix-react, a contract-driven React framework.
 
 Core pipeline:
 1. defineApi() — Zod schemas → { config, client, queryKeys }
-2. deriveHooks() — contract → React Query hooks
+2. deriveEntityHooks() — contract → React Query hooks
 3. deriveMockHandlers() — contract → MSW handlers (backed by in-memory stores)
 
 Key rules:
@@ -108,7 +108,7 @@ This project uses simplix-react, a contract-driven React framework.
 
 Core pipeline:
 1. defineApi() — Zod schemas → { config, client, queryKeys }
-2. deriveHooks() — contract → React Query hooks
+2. deriveEntityHooks() — contract → React Query hooks
 3. deriveMockHandlers() — contract → MSW handlers (backed by in-memory stores)
 
 Key rules:
@@ -118,7 +118,7 @@ Key rules:
 
 Package map:
 - @simplix-react/contract — defineApi, EntityDefinition, OperationDefinition
-- @simplix-react/react — deriveHooks
+- @simplix-react/react — deriveEntityHooks
 - @simplix-react/mock — deriveMockHandlers, setupMockWorker
 - @simplix-react/i18n — deriveI18n, I18nextAdapter
 - @simplix-react/cli — project scaffolding
@@ -145,7 +145,7 @@ This project uses simplix-react, a contract-driven React framework.
 
 Core pipeline:
 1. defineApi() — Zod schemas → { config, client, queryKeys }
-2. deriveHooks() — contract → React Query hooks
+2. deriveEntityHooks() — contract → React Query hooks
 3. deriveMockHandlers() — contract → MSW handlers (backed by in-memory stores)
 
 Key rules:
@@ -194,7 +194,7 @@ This project uses simplix-react, a contract-driven React framework.
 
 ### Core Pipeline
 1. defineApi() — Zod schemas → { config, client, queryKeys }
-2. deriveHooks() — contract → React Query hooks (useList, useGet, useCreate, useUpdate, useDelete, useInfiniteList)
+2. deriveEntityHooks() — contract → React Query hooks (useList, useGet, useCreate, useUpdate, useDelete, useInfiniteList)
 3. deriveMockHandlers() — contract → MSW handlers (backed by in-memory stores)
 
 ### Key Rules
@@ -205,7 +205,7 @@ This project uses simplix-react, a contract-driven React framework.
 
 ### Package Map
 - @simplix-react/contract — defineApi, EntityDefinition, OperationDefinition
-- @simplix-react/react — deriveHooks
+- @simplix-react/react — deriveEntityHooks
 - @simplix-react/mock — deriveMockHandlers, setupMockWorker
 - @simplix-react/i18n — deriveI18n, I18nextAdapter
 - @simplix-react/testing — test utilities
@@ -253,7 +253,7 @@ Test prompts to verify that the agent correctly understands simplix-react contex
 
 **Expected result:**
 
-- Should use `deriveHooks` → `useInfiniteList` hook
+- Should use `deriveEntityHooks` → `useInfiniteList` hook
 - Should have correct Provider setup
 
 ## Related

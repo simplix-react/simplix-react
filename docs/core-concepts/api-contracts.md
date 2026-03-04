@@ -115,6 +115,6 @@ The only exception is the optional `invalidates` function on operations, which i
 
 ### For the Framework
 
-- Contracts are the input to every derivation function (`deriveClient`, `deriveQueryKeys`, `deriveHooks`, `deriveMockHandlers`)
+- Contracts are the input to every derivation function (`deriveClient`, `deriveQueryKeys`, `deriveEntityHooks`, `deriveMockHandlers`)
 - The framework never needs to parse URLs, guess types, or infer structure --- the contract declares everything explicitly
 - New derivation targets (e.g. OpenAPI spec generation, form builders) can be added without modifying existing contracts

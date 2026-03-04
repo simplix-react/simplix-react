@@ -122,7 +122,7 @@ When you define a contract, the types propagate automatically:
 ```ts
 import { z } from "zod";
 import { defineApi, simpleQueryBuilder } from "@simplix-react/contract";
-import { deriveHooks } from "@simplix-react/react";
+import { deriveEntityHooks } from "@simplix-react/react";
 
 const projectApi = defineApi({
   domain: "project",
@@ -138,7 +138,7 @@ const projectApi = defineApi({
   queryBuilder: simpleQueryBuilder,
 });
 
-const hooks = deriveHooks(projectApi);
+const hooks = deriveEntityHooks(projectApi);
 
 // All fully typed — no manual annotations needed:
 // hooks.task.useList()    → UseQueryResult<{ id: string; title: string }[]>

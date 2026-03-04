@@ -2,11 +2,11 @@
 
 ***
 
-[Documentation](../../../README.md) / [@simplix-react/react](../README.md) / deriveHooks
+[Documentation](../../../README.md) / [@simplix-react/react](../README.md) / deriveEntityHooks
 
-# Function: deriveHooks()
+# Function: deriveEntityHooks()
 
-> **deriveHooks**\<`TEntities`, `TOperations`\>(`contract`): [`DerivedHooksResult`](../type-aliases/DerivedHooksResult.md)\<`TEntities`, `TOperations`\>
+> **deriveEntityHooks**\<`TEntities`, `TOperations`\>(`contract`): [`DerivedEntityHooksResult`](../type-aliases/DerivedEntityHooksResult.md)\<`TEntities`, `TOperations`\>
 
 Defined in: [derive-hooks.ts:75](https://github.com/simplix-react/simplix-react/blob/main/derive-hooks.ts#L75)
 
@@ -52,7 +52,7 @@ The API contract produced by `defineApi()` from `@simplix-react/contract`,
 
 ## Returns
 
-[`DerivedHooksResult`](../type-aliases/DerivedHooksResult.md)\<`TEntities`, `TOperations`\>
+[`DerivedEntityHooksResult`](../type-aliases/DerivedEntityHooksResult.md)\<`TEntities`, `TOperations`\>
 
 An object keyed by entity/operation name, each containing its derived hooks.
 
@@ -60,7 +60,7 @@ An object keyed by entity/operation name, each containing its derived hooks.
 
 ```ts
 import { defineApi } from "@simplix-react/contract";
-import { deriveHooks } from "@simplix-react/react";
+import { deriveEntityHooks } from "@simplix-react/react";
 
 const inventoryContract = defineApi({
   domain: "inventory",
@@ -80,7 +80,7 @@ const inventoryContract = defineApi({
   },
 });
 
-const hooks = deriveHooks(inventoryContract);
+const hooks = deriveEntityHooks(inventoryContract);
 
 // CRUD hooks
 hooks.product.useList();

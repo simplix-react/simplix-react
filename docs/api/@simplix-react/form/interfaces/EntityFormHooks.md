@@ -16,16 +16,16 @@ If an entity lacks a create or update operation, the corresponding hook will be 
 ## Example
 
 ```ts
-import { deriveFormHooks } from "@simplix-react/form";
+import { deriveEntityFormHooks } from "@simplix-react/form";
 
-const formHooks = deriveFormHooks(inventoryApi, inventoryHooks);
+const formHooks = deriveEntityFormHooks(inventoryApi, inventoryHooks);
 // formHooks.product.useCreateForm(parentId?, options?)
 // formHooks.product.useUpdateForm(entityId, options?)
 ```
 
 ## See
 
-[deriveFormHooks](../functions/deriveFormHooks.md) — derives form hooks from a contract
+[deriveEntityFormHooks](../functions/deriveEntityFormHooks.md) — derives form hooks from a contract
 
 ## Type Parameters
 

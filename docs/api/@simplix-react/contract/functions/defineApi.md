@@ -103,5 +103,5 @@ inventoryApi.queryKeys.product.detail("product-1"); // ["inventory", "product", 
 ## See
 
  - [ApiContractConfig](../interfaces/ApiContractConfig.md) for the full config shape.
- - [deriveHooks](../../react/functions/deriveHooks.md) for deriving React Query hooks.
+ - [deriveEntityHooks](../../react/functions/deriveEntityHooks.md) for deriving React Query hooks.
  - [deriveMockHandlers](../../mock/functions/deriveMockHandlers.md) for deriving MSW handlers.

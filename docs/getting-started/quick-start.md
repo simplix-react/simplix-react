@@ -66,14 +66,14 @@ This single definition gives you:
 
 ## Step 3: Derive Hooks
 
-Pass the contract to `deriveHooks` to generate TanStack Query hooks for every CRUD operation.
+Pass the contract to `deriveEntityHooks` to generate TanStack Query hooks for every CRUD operation.
 
 ```ts
 // src/hooks/project-hooks.ts
-import { deriveHooks } from "@simplix-react/react";
+import { deriveEntityHooks } from "@simplix-react/react";
 import { projectApi } from "../contracts/project";
 
-export const projectHooks = deriveHooks(projectApi);
+export const projectHooks = deriveEntityHooks(projectApi);
 
 // Available hooks:
 // projectHooks.task.useList()       — fetch all tasks

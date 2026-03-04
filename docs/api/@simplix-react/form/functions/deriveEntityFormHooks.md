@@ -2,11 +2,11 @@
 
 ***
 
-[Documentation](../../../README.md) / [@simplix-react/form](../README.md) / deriveFormHooks
+[Documentation](../../../README.md) / [@simplix-react/form](../README.md) / deriveEntityFormHooks
 
-# Function: deriveFormHooks()
+# Function: deriveEntityFormHooks()
 
-> **deriveFormHooks**\<`TEntities`\>(`contract`, `hooks`): [`DerivedFormHooksResult`](../type-aliases/DerivedFormHooksResult.md)\<`TEntities`\>
+> **deriveEntityFormHooks**\<`TEntities`\>(`contract`, `hooks`): [`DerivedEntityFormHooksResult`](../type-aliases/DerivedEntityFormHooksResult.md)\<`TEntities`\>
 
 Defined in: [derive-form-hooks.ts:34](https://github.com/simplix-react/simplix-react/blob/main/derive-form-hooks.ts#L34)
 
@@ -37,22 +37,22 @@ The API contract produced by `defineApi()` from `@simplix-react/contract`
 
 \{ \[K in string \| number \| symbol\]: EntityHooks\<TEntities\[K\]\["schema"\]\> \}
 
-The React Query hooks produced by `deriveHooks()` from `@simplix-react/react`
+The React Query hooks produced by `deriveEntityHooks()` from `@simplix-react/react`
 
 ## Returns
 
-[`DerivedFormHooksResult`](../type-aliases/DerivedFormHooksResult.md)\<`TEntities`\>
+[`DerivedEntityFormHooksResult`](../type-aliases/DerivedEntityFormHooksResult.md)\<`TEntities`\>
 
 An object keyed by entity name, each containing form hooks
 
 ## Example
 
 ```ts
-import { deriveFormHooks } from "@simplix-react/form";
+import { deriveEntityFormHooks } from "@simplix-react/form";
 import { inventoryApi } from "./contract";
 import { inventoryHooks } from "./hooks";
 
-export const inventoryFormHooks = deriveFormHooks(inventoryApi, inventoryHooks);
+export const inventoryFormHooks = deriveEntityFormHooks(inventoryApi, inventoryHooks);
 
 // Use in components
 function CreateProductForm() {

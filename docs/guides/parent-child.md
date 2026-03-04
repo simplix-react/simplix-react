@@ -146,9 +146,9 @@ projectApi.queryKeys.task.all;
 When using `@simplix-react/react`, pass the parent ID to query and mutation hooks.
 
 ```tsx
-import { deriveHooks } from "@simplix-react/react";
+import { deriveEntityHooks } from "@simplix-react/react";
 
-const hooks = deriveHooks(projectApi);
+const hooks = deriveEntityHooks(projectApi);
 
 function TaskList({ projectId }: { projectId: string }) {
   // useList automatically includes projectId in the query key

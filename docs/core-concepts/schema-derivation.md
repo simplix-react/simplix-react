@@ -17,7 +17,7 @@ The derivation pipeline has five stages, each consuming the contract and produci
 graph LR
     A[defineApi] --> B[deriveClient]
     A --> C[deriveQueryKeys]
-    B --> D[deriveHooks]
+    B --> D[deriveEntityHooks]
     C --> D
     A --> E[deriveMockHandlers]
 ```
@@ -79,9 +79,9 @@ queryKeys.task.detail(id)       // ["project", "task", "detail", id]
 
 The hierarchy enables granular cache invalidation: invalidating `queryKeys.task.all` clears everything, while invalidating `queryKeys.task.lists()` only clears list queries without touching detail queries.
 
-### Stage 4: deriveHooks (React Query Hook Generation)
+### Stage 4: deriveEntityHooks (React Query Hook Generation)
 
-`deriveHooks()` from `@simplix-react/react` takes the full contract object (config + client + queryKeys) and generates React Query hooks for each entity and operation.
+`deriveEntityHooks()` from `@simplix-react/react` takes the full contract object (config + client + queryKeys) and generates React Query hooks for each entity and operation.
 
 For entities, six hooks are generated:
 
@@ -124,15 +124,15 @@ Derivation eliminates all three problems. Since every artifact traces back to th
 
 ### Why Each Stage Is a Separate Function
 
-The derivation pipeline is decomposed into independent functions (`deriveClient`, `deriveQueryKeys`, `deriveHooks`, `deriveMockHandlers`) rather than a single monolithic generator. This decomposition enables:
+The derivation pipeline is decomposed into independent functions (`deriveClient`, `deriveQueryKeys`, `deriveEntityHooks`, `deriveMockHandlers`) rather than a single monolithic generator. This decomposition enables:
 
-- **Package separation** --- `deriveClient` and `deriveQueryKeys` live in `@simplix-react/contract`, `deriveHooks` lives in `@simplix-react/react`, and `deriveMockHandlers` lives in `@simplix-react/mock`. Consumers only install the packages they need.
+- **Package separation** --- `deriveClient` and `deriveQueryKeys` live in `@simplix-react/contract`, `deriveEntityHooks` lives in `@simplix-react/react`, and `deriveMockHandlers` lives in `@simplix-react/mock`. Consumers only install the packages they need.
 - **Tree-shaking** --- if you don't use mocks in production, `@simplix-react/mock` is never bundled.
 - **Extensibility** --- new derivation targets can be added as new packages without modifying existing ones.
 
 ### Why the Contract Object Bundles Config, Client, and QueryKeys
 
-The `defineApi()` return value bundles all three because downstream consumers need different subsets. `deriveHooks()` needs all three (config for entity definitions, client for query/mutation functions, queryKeys for cache management). `deriveMockHandlers()` only needs config. Bundling them together means you pass a single object everywhere, and TypeScript ensures the types flow through correctly.
+The `defineApi()` return value bundles all three because downstream consumers need different subsets. `deriveEntityHooks()` needs all three (config for entity definitions, client for query/mutation functions, queryKeys for cache management). `deriveMockHandlers()` only needs config. Bundling them together means you pass a single object everywhere, and TypeScript ensures the types flow through correctly.
 
 ## Implications
 

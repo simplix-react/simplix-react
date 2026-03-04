@@ -6,7 +6,7 @@
 
 - Node.js 18+
 - pnpm installed globally
-- Completed the [Project Management App tutorial](./project-app.md) or equivalent familiarity with `defineApi` and `deriveHooks`
+- Completed the [Project Management App tutorial](./project-app.md) or equivalent familiarity with `defineApi` and `deriveEntityHooks`
 
 ## Step 1: Install the Auth Package
 

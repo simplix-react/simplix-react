@@ -177,12 +177,12 @@ packages/
     src/
       index.ts                        # User-owned entry point
       contract.ts                     # User-owned contract (customizeApi)
-      hooks.ts                        # User-owned hooks (deriveHooks)
+      hooks.ts                        # User-owned hooks (deriveEntityHooks)
       generated/
         schemas.ts                    # Zod schemas from OpenAPI
         contract.ts                   # defineApi() contract
-        hooks.ts                      # deriveHooks() React Query hooks
-        form-hooks.ts                 # deriveFormHooks() TanStack Form hooks
+        hooks.ts                      # deriveEntityHooks() React Query hooks
+        form-hooks.ts                 # deriveEntityFormHooks() TanStack Form hooks
         index.ts                      # Generated barrel export
       mock/
         index.ts                      # User-owned mock entry point
@@ -205,13 +205,13 @@ packages/
 | --- | --- | --- | --- |
 | `src/generated/schemas.ts` | OpenAPI schemas | No (regenerated) | Zod schemas derived from OpenAPI components |
 | `src/generated/contract.ts` | OpenAPI paths + schemas | No (regenerated) | `defineApi()` contract with entity definitions |
-| `src/generated/hooks.ts` | contract | No (regenerated) | `deriveHooks()` — one line that produces all hooks from operations |
-| `src/generated/form-hooks.ts` | contract + hooks | No (regenerated) | `deriveFormHooks()` — TanStack Form hooks for create/update |
+| `src/generated/hooks.ts` | contract | No (regenerated) | `deriveEntityHooks()` — one line that produces all hooks from operations |
+| `src/generated/form-hooks.ts` | contract + hooks | No (regenerated) | `deriveEntityFormHooks()` — TanStack Form hooks for create/update |
 | `src/mock/generated/handlers.ts` | contract | No (regenerated) | `deriveMockHandlers()` — MSW request handlers |
 | `src/mock/generated/seed.ts` | OpenAPI schemas | No (regenerated) | Mock seed data for in-memory stores |
 | `src/index.ts` | scaffold | Yes (user-owned) | Package entry point — add custom exports here |
 | `src/contract.ts` | scaffold | Yes (user-owned) | Contract entry — use `customizeApi()` to patch generated contract |
-| `src/hooks.ts` | scaffold | Yes (user-owned) | Hooks entry — `deriveHooks()` from user-owned contract |
+| `src/hooks.ts` | scaffold | Yes (user-owned) | Hooks entry — `deriveEntityHooks()` from user-owned contract |
 | `src/mock/index.ts` | scaffold | Yes (user-owned) | Mock entry point — customize handler composition |
 | `src/mock/seed.ts` | scaffold | Yes (user-owned) | Seed data for development |
 | `package.json` | scaffold | Yes (user-owned) | Package metadata and dependencies |
@@ -290,13 +290,13 @@ The `defineApi()` call produces a typed contract object that includes:
 
 ### Hooks (`src/generated/hooks.ts`)
 
-A single `deriveHooks()` call produces all hooks from the operations map:
+A single `deriveEntityHooks()` call produces all hooks from the operations map:
 
 ```ts
-import { deriveHooks } from "@simplix-react/react";
+import { deriveEntityHooks } from "@simplix-react/react";
 import { petApi } from "./contract.js";
 
-export const petHooks = deriveHooks(petApi);
+export const petHooks = deriveEntityHooks(petApi);
 ```
 
 This derives hooks such as `petHooks.pet.useGet()`, `petHooks.pet.useCreate()`,
@@ -557,7 +557,7 @@ simplix openapi ──> Zod Schemas (schemas.ts)
                     defineApi() (contract.ts)
                     /       |        \
                    v        v         v
-          deriveHooks()  deriveFormHooks()  deriveMockHandlers()
+          deriveEntityHooks()  deriveEntityFormHooks()  deriveMockHandlers()
           (hooks.ts)     (form-hooks.ts)   (handlers.ts)
                                |
                                v

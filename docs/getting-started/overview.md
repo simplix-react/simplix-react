@@ -51,12 +51,12 @@ const projectApi = defineApi({
 
 **Step 2 — Derive Hooks**
 
-Pass the contract to `deriveHooks` to get React Query hooks for every entity — `useList`, `useGet`, `useCreate`, `useUpdate`, `useDelete`, and `useInfiniteList`.
+Pass the contract to `deriveEntityHooks` to get React Query hooks for every entity — `useList`, `useGet`, `useCreate`, `useUpdate`, `useDelete`, and `useInfiniteList`.
 
 ```ts
-import { deriveHooks } from "@simplix-react/react";
+import { deriveEntityHooks } from "@simplix-react/react";
 
-const hooks = deriveHooks(projectApi);
+const hooks = deriveEntityHooks(projectApi);
 
 // hooks.task.useList()
 // hooks.task.useGet(id)
@@ -96,8 +96,8 @@ simplix-react is designed for React developers who:
 | Package | npm | Description |
 | --- | --- | --- |
 | `@simplix-react/contract` | `@simplix-react/contract` | Zod-based type-safe API contract definitions. Entry point for `defineApi`. |
-| `@simplix-react/react` | `@simplix-react/react` | Derives TanStack Query hooks from a contract via `deriveHooks`. |
-| `@simplix-react/form` | `@simplix-react/form` | TanStack Form hooks derived from contracts via `deriveFormHooks`. |
+| `@simplix-react/react` | `@simplix-react/react` | Derives TanStack Query hooks from a contract via `deriveEntityHooks`. |
+| `@simplix-react/form` | `@simplix-react/form` | TanStack Form hooks derived from contracts via `deriveEntityFormHooks`. |
 | `@simplix-react/mock` | `@simplix-react/mock` | Auto-generated MSW handlers with in-memory stores from contracts. |
 | `@simplix-react/auth` | `@simplix-react/auth` | Authentication middleware with Bearer, API Key, OAuth2, and custom schemes. |
 | `@simplix-react/i18n` | `@simplix-react/i18n` | Internationalization framework built on i18next. |

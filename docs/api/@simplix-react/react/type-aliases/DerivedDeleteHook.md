@@ -28,9 +28,9 @@ all entity queries on success.
 ## Example
 
 ```ts
-import { deriveHooks } from "@simplix-react/react";
+import { deriveEntityHooks } from "@simplix-react/react";
 
-const hooks = deriveHooks(projectContract);
+const hooks = deriveEntityHooks(projectContract);
 const deleteTask = hooks.task.useDelete();
 deleteTask.mutate(taskId);
 ```

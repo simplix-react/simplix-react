@@ -215,10 +215,10 @@ Create the hooks and a simple UI to test the full stack.
 Create `src/hooks.ts`:
 
 ```ts
-import { deriveHooks } from "@simplix-react/react";
+import { deriveEntityHooks } from "@simplix-react/react";
 import { projectApi } from "./contract";
 
-export const hooks = deriveHooks(projectApi);
+export const hooks = deriveEntityHooks(projectApi);
 ```
 
 Update `src/App.tsx`:

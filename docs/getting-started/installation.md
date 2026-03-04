@@ -30,7 +30,7 @@ This includes contract, react, form, auth, mock, i18n, cli, and testing packages
 
 ```ts
 import { defineApi } from "@simplix-react/contract";
-import { deriveHooks } from "@simplix-react/react";
+import { deriveEntityHooks } from "@simplix-react/react";
 ```
 
 #### pnpm Hoist Configuration
