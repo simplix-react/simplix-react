@@ -368,6 +368,154 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
   );
 });
 
+// ── MapControls component ──
+
+type MapControlsPosition = "top-left" | "top-right" | "bottom-left" | "bottom-right";
+
+/** Props for the {@link MapControls} component. */
+type MapControlsProps = {
+  /** Placement location for the controls. */
+  position?: MapControlsPosition;
+  /** Enable zoom in/out buttons. */
+  showZoom?: boolean;
+  /** Enable compass button to reset bearing. */
+  showCompass?: boolean;
+  /** Enable locate button for user's location. */
+  showLocate?: boolean;
+  /** Enable fullscreen toggle button. */
+  showFullscreen?: boolean;
+  /** Additional CSS classes for the control group. */
+  className?: string;
+  /** Callback with user coordinates when located. */
+  onLocate?: (coords: { longitude: number; latitude: number }) => void;
+  /** Custom handler for compass button. Replaces default resetNorthPitch. */
+  onCompass?: () => void;
+};
+
+const POSITION_CLASSES: Record<MapControlsPosition, string> = {
+  "top-left": "top-0 left-0",
+  "top-right": "top-0 right-0",
+  "bottom-left": "bottom-0 left-0",
+  "bottom-right": "bottom-0 right-0",
+};
+
+function MapControlButton({ onClick, children, className: cls }: { onClick: () => void; children: ReactNode; className?: string }) {
+  return (
+    <button
+      type="button"
+      className={cn(
+        "flex h-8 w-8 items-center justify-center text-foreground/80 hover:bg-accent hover:text-foreground transition-colors",
+        cls,
+      )}
+      onClick={onClick}
+    >
+      {children}
+    </button>
+  );
+}
+
+/**
+ * Map control buttons rendered inside a {@link Map} component.
+ * Uses `useMap()` context to control the map instance.
+ */
+function MapControls({
+  position = "bottom-right",
+  showZoom = true,
+  showCompass = false,
+  showLocate = false,
+  showFullscreen = false,
+  className,
+  onLocate,
+  onCompass,
+}: MapControlsProps) {
+  const { map } = useMap();
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const handleLocate = useCallback(() => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition((pos) => {
+      const coords = { longitude: pos.coords.longitude, latitude: pos.coords.latitude };
+      if (map) map.flyTo({ center: [coords.longitude, coords.latitude], zoom: 15 });
+      onLocate?.(coords);
+    });
+  }, [map, onLocate]);
+
+  const handleFullscreen = useCallback(() => {
+    const container = map?.getContainer()?.parentElement;
+    if (!container) return;
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    } else {
+      container.requestFullscreen();
+      setIsFullscreen(true);
+    }
+  }, [map]);
+
+  useEffect(() => {
+    const handler = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener("fullscreenchange", handler);
+    return () => document.removeEventListener("fullscreenchange", handler);
+  }, []);
+
+  const controls: ReactNode[] = [];
+
+  if (showZoom) {
+    controls.push(
+      <MapControlButton key="zoom-in" onClick={() => map?.zoomIn()}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
+      </MapControlButton>,
+      <div key="zoom-sep" className="h-px w-full bg-border" />,
+      <MapControlButton key="zoom-out" onClick={() => map?.zoomOut()}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /></svg>
+      </MapControlButton>,
+    );
+  }
+
+  if (showCompass) {
+    if (controls.length > 0) controls.push(<div key="compass-sep" className="h-px w-full bg-border" />);
+    controls.push(
+      <MapControlButton key="compass" onClick={() => onCompass ? onCompass() : map?.resetNorthPitch({ duration: 300 })}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" /></svg>
+      </MapControlButton>,
+    );
+  }
+
+  if (showLocate) {
+    if (controls.length > 0) controls.push(<div key="locate-sep" className="h-px w-full bg-border" />);
+    controls.push(
+      <MapControlButton key="locate" onClick={handleLocate}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="2" x2="5" y1="12" y2="12" /><line x1="19" x2="22" y1="12" y2="12" /><line x1="12" x2="12" y1="2" y2="5" /><line x1="12" x2="12" y1="19" y2="22" /><circle cx="12" cy="12" r="7" /><circle cx="12" cy="12" r="3" /></svg>
+      </MapControlButton>,
+    );
+  }
+
+  if (showFullscreen) {
+    if (controls.length > 0) controls.push(<div key="fs-sep" className="h-px w-full bg-border" />);
+    controls.push(
+      <MapControlButton key="fullscreen" onClick={handleFullscreen}>
+        {isFullscreen ? (
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3" /><path d="M21 8h-3a2 2 0 0 1-2-2V3" /><path d="M3 16h3a2 2 0 0 1 2 2v3" /><path d="M16 21v-3a2 2 0 0 1 2-2h3" /></svg>
+        ) : (
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2" /><path d="M17 3h2a2 2 0 0 1 2 2v2" /><path d="M21 17v2a2 2 0 0 1-2 2h-2" /><path d="M7 21H5a2 2 0 0 1-2-2v-2" /></svg>
+        )}
+      </MapControlButton>,
+    );
+  }
+
+  if (controls.length === 0) return null;
+
+  return (
+    <div
+      className={cn("pointer-events-none absolute z-10 p-3", POSITION_CLASSES[position])}
+    >
+      <div className={cn("pointer-events-auto flex flex-col rounded-md border bg-background shadow-md overflow-hidden", className)}>
+        {controls}
+      </div>
+    </div>
+  );
+}
+
 // ── MapMarker component ──
 
 /** Props for the {@link MapMarker} component. */
@@ -476,5 +624,5 @@ function MapPinContainer({ children, className }: MapPinContainerProps) {
   );
 }
 
-export { Map, MapMarker, MapPinContainer, useMap };
-export type { MapProps, MapMarkerProps, MapPinContainerProps, MapRef, MapContextValue };
+export { Map, MapControls, MapMarker, MapPinContainer, useMap };
+export type { MapProps, MapControlsProps, MapMarkerProps, MapPinContainerProps, MapRef, MapContextValue };

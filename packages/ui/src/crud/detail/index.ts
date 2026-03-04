@@ -4,5 +4,6 @@ export type {
   CrudDetailDefaultActionsProps,
   CrudDetailProps,
   CrudDetailSectionProps,
+  CrudDetailVariant,
 } from "./crud-detail";
 export { usePreviousData } from "./use-previous-data";

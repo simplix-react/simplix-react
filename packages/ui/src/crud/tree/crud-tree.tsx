@@ -39,7 +39,7 @@ import { Flex, Stack } from "../../primitives";
 import { cn } from "../../utils/cn";
 import type { ColumnInfo, EmptyReason, SortState } from "../shared";
 import type { ActionType, ActionVariant, ListColumnProps, RowActionDef } from "../list/crud-list";
-import { ArrowUpDownIcon, ChevronsDownUpIcon, ChevronsUpDownIcon, EyeIcon, FolderTreeIcon, MagnifyingGlassIcon, PencilIcon, PlusIcon, TrashIcon, XIcon } from "../shared/icons";
+import { ArrowUpDownIcon, ChevronsDownUpIcon, ChevronsUpDownIcon, EyeIcon, FolderTreeIcon, MagnifyingGlassIcon, MapPinIcon, PencilIcon, PlusIcon, TrashIcon, XIcon } from "../shared/icons";
 import type { TreeConfig, TreeNodeMetadata } from "./tree-types";
 import { useTreeExpansion } from "./use-tree-expansion";
 import { filterTreeWithAncestors, getAllNodeIds, treeToFlat } from "./tree-utils";
@@ -237,6 +237,7 @@ const ACTION_LABEL_KEYS: Record<ActionType, string> = {
   view: "common.view",
   edit: "common.edit",
   delete: "common.delete",
+  locate: "common.locate",
   "add-child": "tree.addChild",
   reorder: "tree.reorder",
   move: "tree.move",
@@ -246,6 +247,7 @@ const ACTION_ICONS: Record<ActionType, ReactNode> = {
   view: <EyeIcon className="size-4" />,
   edit: <PencilIcon className="size-4" />,
   delete: <TrashIcon className="size-4" />,
+  locate: <MapPinIcon className="size-4" />,
   "add-child": <PlusIcon className="size-4" />,
   reorder: <ArrowUpDownIcon className="size-4" />,
   move: <FolderTreeIcon className="size-4" />,

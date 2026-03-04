@@ -282,6 +282,9 @@ importers:
 
   packages/form:
     devDependencies:
+      '@simplix-react/api':
+        specifier: workspace:*
+        version: link:../api
       '@simplix-react/config-eslint':
         specifier: workspace:*
         version: link:../config-eslint

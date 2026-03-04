@@ -50,6 +50,7 @@ export function createUseCreateForm(
     const [submitError, setSubmitError] = useState<Error | null>(null);
 
     const createMutation = entityHooks.useCreate(parentId, {
+      meta: { handledByForm: true },
       onSuccess: (data: unknown) => {
         setSubmitError(null);
         options?.onSuccess?.(data);
@@ -68,8 +69,8 @@ export function createUseCreateForm(
           }
         } catch (error) {
           const err = error instanceof Error ? error : new Error(String(error));
-          setSubmitError(err);
           mapServerErrorsToForm(error, form);
+          setSubmitError(err);
           options?.onError?.(err);
         }
       },

@@ -65,7 +65,7 @@ function FormRoot({
   const content = (
     <form onSubmit={handleSubmit} className={cn("flex flex-col w-full flex-1 min-h-0", className)} data-testid="crud-form">
       {(onClose || header) && (
-        <Flex justify={header ? "between" : "end"} align="center" className="shrink-0 border-b pb-2 px-2">
+        <Flex data-crud-slot="header" justify={header ? "between" : "end"} align="center" className="shrink-0 border-b pb-2 px-2">
           {header}
           {onClose && (
             <Button type="button" variant="ghost" size="icon-xs" onClick={onClose}>
@@ -74,13 +74,13 @@ function FormRoot({
           )}
         </Flex>
       )}
-      <div className="min-h-0 overflow-auto [scrollbar-gutter:stable]">
+      <div data-crud-slot="body" className="flex-1 min-h-0 overflow-auto [scrollbar-gutter:stable]">
         <Stack gap="sm" className={cn("relative py-2", !(onClose || header) && "pt-2")}>
           {children}
         </Stack>
       </div>
       {footer && (
-        <div className="shrink-0 mt-2">{footer}</div>
+        <div data-crud-slot="footer" className="shrink-0">{footer}</div>
       )}
     </form>
   );

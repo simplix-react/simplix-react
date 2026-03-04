@@ -23,6 +23,7 @@ export interface UseCrudListOptions {
   maxRows?: number;
   defaultSort?: SortState;
   defaultPageSize?: number;
+  defaultFilters?: Record<string, unknown>;
 }
 
 /** Filter state returned by {@link useCrudList}. */
@@ -91,14 +92,15 @@ export function useCrudList<T>(
     filterMode = "deferred",
     defaultSort,
     defaultPageSize = 10,
+    defaultFilters,
   } = options ?? {};
 
   const isImmediate = filterMode === "immediate";
 
   // ── Filter state ──
   const [search, setSearch] = useState("");
-  const [pendingFilterValues, setPendingFilterValues] = useState(EMPTY_FILTERS);
-  const [committedFilterValues, setCommittedFilterValues] = useState(EMPTY_FILTERS);
+  const [pendingFilterValues, setPendingFilterValues] = useState(defaultFilters ?? EMPTY_FILTERS);
+  const [committedFilterValues, setCommittedFilterValues] = useState(defaultFilters ?? EMPTY_FILTERS);
 
   const setFilterValue = useCallback((key: string, value: unknown) => {
     const updater = (prev: Record<string, unknown>) => ({ ...prev, [key]: value });
@@ -296,13 +298,14 @@ export function useCrudList<T>(
   const emptyReason = useMemo((): EmptyReason | null => {
     if (paginatedData.length > 0) return null;
     if (queryResult.isLoading) return null;
+    if (queryResult.error) return "error";
 
     if (search) return "no-search";
     if (Object.values(committedFilterValues).some((v) => v !== undefined && v !== null && v !== "")) {
       return "no-filter";
     }
     return "no-data";
-  }, [paginatedData.length, queryResult.isLoading, search, committedFilterValues]);
+  }, [paginatedData.length, queryResult.isLoading, queryResult.error, search, committedFilterValues]);
 
   return {
     data: paginatedData,

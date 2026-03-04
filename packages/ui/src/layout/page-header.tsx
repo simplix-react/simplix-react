@@ -3,6 +3,9 @@ import { createContext, useContext, useEffect, useRef, useState, type ReactNode 
 export interface PageHeaderState {
   title?: ReactNode;
   description?: ReactNode;
+  metadata?: ReactNode;
+  /** Stable primitive key to trigger header updates when metadata changes */
+  metadataKey?: string;
   actions?: ReactNode;
 }
 
@@ -25,11 +28,11 @@ export function usePageHeader(header: PageHeaderState) {
   const ref = useRef(header);
   ref.current = header;
 
-  // Update when title or description changes (string deps are stable)
-  // actions is read from ref.current so it's always up-to-date
+  // Update when stable deps change (title, description, metadataKey are primitives)
+  // actions and metadata are read from ref.current so they're always up-to-date
   useEffect(() => {
     setHeader(ref.current);
-  }, [header.title, header.description, setHeader]);
+  }, [header.title, header.description, header.metadataKey, setHeader]);
 
   // Clear header on unmount
   useEffect(() => {

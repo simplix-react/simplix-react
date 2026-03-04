@@ -7,8 +7,6 @@ export interface QueryFallbackProps {
   isLoading: boolean;
   /** Message to display when data is not found. Defaults to `"Not found."`. */
   notFoundMessage?: string;
-  /** Message to display while loading. Defaults to `"Loading..."`. */
-  loadingMessage?: string;
 }
 
 /**
@@ -24,12 +22,20 @@ export interface QueryFallbackProps {
 export function QueryFallback({
   isLoading,
   notFoundMessage,
-  loadingMessage,
 }: QueryFallbackProps): ReactNode {
   const { t } = useTranslation("simplix/ui");
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-1 items-center justify-center py-12">
+        <span className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
   return (
     <div className="text-muted-foreground">
-      {isLoading ? (loadingMessage ?? t("common.loading")) : (notFoundMessage ?? t("common.notFound"))}
+      {notFoundMessage ?? t("common.notFound")}
     </div>
   );
 }

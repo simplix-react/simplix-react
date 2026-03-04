@@ -25,6 +25,7 @@
     "clean": "rm -rf dist .turbo"
   },
   "peerDependencies": {
+    "@simplix-react/api": "workspace:*",
     "@simplix-react/contract": "workspace:*",
     "@simplix-react/react": "workspace:*",
     "@tanstack/react-form": ">=1.0.0",
@@ -33,6 +34,7 @@
     "zod": ">=4.0.0"
   },
   "devDependencies": {
+    "@simplix-react/api": "workspace:*",
     "@simplix-react/config-eslint": "workspace:*",
     "@simplix-react/config-typescript": "workspace:*",
     "@simplix-react/contract": "workspace:*",

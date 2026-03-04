@@ -36,7 +36,7 @@ import {Flex, Stack} from "../../primitives";
 import {cn} from "../../utils/cn";
 import type {ColumnInfo, EmptyReason, SortState} from "../shared";
 import {CrudListColumnContext, useCrudListColumns} from "../shared";
-import {ArrowUpDownIcon, EyeIcon, FolderTreeIcon, PencilIcon, PlusIcon, TrashIcon} from "../shared/icons";
+import {AlertTriangleIcon, ArrowUpDownIcon, EyeIcon, FolderTreeIcon, MapPinIcon, PencilIcon, PlusIcon, TrashIcon} from "../shared/icons";
 import {
   AdvancedSelectFilter,
   AdvancedTextFilter,
@@ -59,6 +59,20 @@ import { DragHandleHeader } from "../reorder/drag-handle";
 import { DraggableRow } from "../reorder/draggable-row";
 import { DraggableCard } from "../reorder/draggable-card";
 import {useContainerWidth} from "./use-container-width";
+
+// ── Error Card ──
+
+function ErrorCard({ title, description }: { title: string; description: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center rounded-lg border py-16 text-center">
+      <div className="mb-3 rounded-full bg-destructive/10 p-4 text-destructive [&_svg]:size-8">
+        <AlertTriangleIcon />
+      </div>
+      <p className="text-base font-semibold">{title}</p>
+      <p className="mt-1 max-w-sm text-sm text-muted-foreground">{description}</p>
+    </div>
+  );
+}
 
 // ── List Root ──
 
@@ -224,7 +238,7 @@ function formatCellValue(value: unknown, format?: "date" | "datetime" | "relativ
 
 // ── Action types ──
 
-export type ActionType = "view" | "edit" | "delete" | "add-child" | "reorder" | "move";
+export type ActionType = "view" | "edit" | "delete" | "locate" | "add-child" | "reorder" | "move";
 export type ActionVariant = "outline" | "ghost" | "icon";
 
 export interface RowActionDef<T> {
@@ -292,6 +306,7 @@ const ACTION_LABEL_KEYS: Record<ActionType, string> = {
   view: "common.view",
   edit: "common.edit",
   delete: "common.delete",
+  locate: "common.locate",
   "add-child": "tree.addChild",
   reorder: "tree.reorder",
   move: "tree.move",
@@ -301,6 +316,7 @@ const ACTION_ICONS: Record<ActionType, ReactNode> = {
   view: <EyeIcon className="size-4" />,
   edit: <PencilIcon className="size-4" />,
   delete: <TrashIcon className="size-4" />,
+  locate: <MapPinIcon className="size-4" />,
   "add-child": <PlusIcon className="size-4" />,
   reorder: <ArrowUpDownIcon className="size-4" />,
   move: <FolderTreeIcon className="size-4" />,
@@ -311,7 +327,7 @@ function getActionColumnWidth(actions: RowActionDef<unknown>[], variant: ActionV
   return 120;
 }
 
-function RowActionCell<T>({ row, actions, variant, compact }: { row: T; actions: RowActionDef<T>[]; variant: ActionVariant; compact?: boolean }) {
+function RowActionCell<T>({ row, actions, variant }: { row: T; actions: RowActionDef<T>[]; variant: ActionVariant }) {
   const { t } = useTranslation("simplix/ui");
   const visible = actions.filter((a) => !a.when || a.when(row));
   if (visible.length === 0) return null;
@@ -325,7 +341,7 @@ function RowActionCell<T>({ row, actions, variant, compact }: { row: T; actions:
     return (
       <TooltipProvider>
         <Flex justify="end" align="center">
-          <div className={cn("inline-flex items-center rounded-md border overflow-hidden", compact && "border-none gap-0.5")}>
+          <div className="inline-flex items-center rounded-md border overflow-hidden">
             {visible.map((action, i) => {
               const label = action.label ?? t(ACTION_LABEL_KEYS[action.type]);
               const icon = action.icon ?? ACTION_ICONS[action.type];
@@ -337,8 +353,8 @@ function RowActionCell<T>({ row, actions, variant, compact }: { row: T; actions:
                       size="icon-xs"
                       variant="ghost"
                       className={cn(
-                        compact ? "size-5 [&_svg]:size-3" : "rounded-none",
-                        !compact && i > 0 && "border-l",
+                        "rounded-none",
+                        i > 0 && "border-l",
                         isDelete && "text-destructive",
                       )}
                       onClick={(e) => handleClick(e, action)}
@@ -439,6 +455,7 @@ function ReorderableTable<T>({
     "no-data": t("list.noData"),
     "no-filter": t("list.noFilter"),
     "no-search": t("list.noSearch"),
+    "error": t("list.error"),
   };
   const {
     sensors,
@@ -513,6 +530,9 @@ function ReorderableTable<T>({
   }
 
   if (emptyReason && data.length === 0) {
+    if (emptyReason === "error") {
+      return <ErrorCard title={t("list.errorTitle")} description={t("list.errorDescription")} />;
+    }
     if (emptyReason === "no-data" && emptyState) {
       return (
         <div className="flex flex-col items-center justify-center rounded-lg border py-16 text-center">
@@ -634,6 +654,7 @@ function ReorderableCardList<T>({
     "no-data": t("list.noData"),
     "no-filter": t("list.noFilter"),
     "no-search": t("list.noSearch"),
+    "error": t("list.error"),
   };
   const {
     sensors,
@@ -668,6 +689,9 @@ function ReorderableCardList<T>({
   }
 
   if (emptyReason && data.length === 0) {
+    if (emptyReason === "error") {
+      return <ErrorCard title={t("list.errorTitle")} description={t("list.errorDescription")} />;
+    }
     if (emptyReason === "no-data" && emptyState) {
       return (
         <div className="flex flex-col items-center justify-center rounded-lg border py-16 text-center">
@@ -718,7 +742,7 @@ function ReorderableCardList<T>({
                 density={density}
                 onRowClick={onRowClick}
                 onSelectionChange={onSelectionChange}
-                cardActions={actions && actions.length > 0 ? <RowActionCell row={row} actions={actions} variant={actionVariant} compact /> : undefined}
+                cardActions={actions && actions.length > 0 ? <RowActionCell row={row} actions={actions} variant={actionVariant} /> : undefined}
                 cardTitle={createElement(cardTitle, { row, index })}
                 cardContent={createElement(cardContent, { row, index })}
               />
@@ -763,6 +787,7 @@ function ListTable<T>({
     "no-data": t("list.noData"),
     "no-filter": t("list.noFilter"),
     "no-search": t("list.noSearch"),
+    "error": t("list.error"),
   };
   const containerRef = useRef<HTMLDivElement>(null);
   const containerWidth = useContainerWidth(containerRef);
@@ -931,6 +956,15 @@ function ListTable<T>({
     manualSorting: true,
   });
 
+  // Error state — replaces the entire table/card area
+  if (emptyReason === "error" && data.length === 0 && !isLoading) {
+    return (
+      <div ref={containerRef} className="w-full">
+        <ErrorCard title={t("list.errorTitle")} description={t("list.errorDescription")} />
+      </div>
+    );
+  }
+
   // Rich empty state for "no-data" — replaces the entire table/card area
   if (emptyReason === "no-data" && emptyState && data.length === 0 && !isLoading) {
     return (
@@ -1024,7 +1058,7 @@ function ListTable<T>({
                           <div className="min-w-0 flex-1">{createElement(cardTitle, { row, index })}</div>
                           <Flex gap="xs" align="center" className="shrink-0 ml-2">
                             {actions && actions.length > 0 && (
-                              <RowActionCell row={row} actions={actions} variant={actionVariant} compact />
+                              <RowActionCell row={row} actions={actions} variant={actionVariant} />
                             )}
                             {selectable && (
                               <input
@@ -1379,6 +1413,7 @@ function ListEmpty({ reason = "no-data", messages, className, children }: ListEm
     "no-data": t("list.noData"),
     "no-filter": t("list.noFilter"),
     "no-search": t("list.noSearch"),
+    "error": t("list.error"),
   };
   const mergedMessages = messages ? { ...defaultMessages, ...messages } : defaultMessages;
   const content = typeof children === "function"

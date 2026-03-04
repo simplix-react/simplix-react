@@ -9,6 +9,7 @@ export class HttpError extends Error {
   constructor(
     public readonly status: number,
     message: string,
+    public readonly data?: unknown,
   ) {
     super(message);
     this.name = "HttpError";
@@ -44,7 +45,7 @@ export function createAppFetch(options: {
       }
       const message =
         (body as Record<string, unknown> | null)?.message ?? response.statusText;
-      throw new HttpError(response.status, `HTTP ${response.status}: ${message}`);
+      throw new HttpError(response.status, `HTTP ${response.status}: ${message}`, body);
     }
 
     if (response.status === 204) return undefined as T;
@@ -88,3 +89,15 @@ export function getMutator(strategy = "default"): OrvalMutator {
 // Types that Orval imports in generated code
 export type ErrorType<T = unknown> = Error & { data?: T };
 export type BodyType<T> = T;
+
+export {
+  type ValidationFieldError,
+  type ErrorCategory,
+  type ServerErrorEvent,
+  getValidationErrors,
+  getErrorMessage,
+  getErrorCode,
+  getHttpStatus,
+  classifyError,
+  createMutationErrorHandler,
+} from "./error-utils.js";

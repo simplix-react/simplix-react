@@ -126,20 +126,31 @@ export {
   TabsTrigger,
   Textarea,
   Map,
+  MapAutoFit,
+  MapBoundsOverlay,
+  MapControls,
   MapMarker,
+  MapNavigator,
   MapPinContainer,
   useMap,
+  useMapNavigator,
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "./base";
 export type {
+  MapAutoFitProps,
+  MapBoundsOverlayProps,
   MapProps,
+  MapControlsProps,
   MapMarkerProps,
+  MapNavigatorProps,
   MapPinContainerProps,
   MapRef,
   MapContextValue,
+  UseMapNavigatorOptions,
+  UseMapNavigatorResult,
   BadgeProps,
   BadgeVariants,
   ButtonProps,
@@ -298,6 +309,7 @@ export type {
   CrudDetailDefaultActionsProps,
   CrudDetailProps,
   CrudDetailSectionProps,
+  CrudDetailVariant,
 } from "./crud/detail";
 
 // Filters
@@ -424,6 +436,10 @@ export type { UseVirtualListOptions } from "./crud/list/use-virtual";
 // Layout
 export { PageHeaderProvider, usePageHeader, usePageHeaderState } from "./layout/page-header";
 export type { PageHeaderState } from "./layout/page-header";
+
+// Geo utilities
+export { isValidCoord, computeBounds, fitMapToBounds, DEFAULT_MAP_FIT_OPTIONS, toRad, haversineDistance, destinationPoint, geoCircle, computeBoundingCircle } from "./utils/geo";
+export type { Bounds, GeoPoint, HasCoords, MapFitOptions, WithValidCoords } from "./utils/geo";
 
 // Utilities
 export { cn, toTestId } from "./utils/cn";

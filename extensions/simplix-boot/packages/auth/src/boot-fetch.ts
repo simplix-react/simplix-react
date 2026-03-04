@@ -12,7 +12,7 @@ export const bootResponseAdapter: ResponseAdapter = {
         env.message,
         env.timestamp,
         env.errorCode ?? undefined,
-        (env.errorDetail as Record<string, unknown>) ?? undefined,
+        env.errorDetail ?? undefined,
       );
     }
     return new ApiResponseError(

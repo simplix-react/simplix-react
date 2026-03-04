@@ -76,6 +76,7 @@ export function createUseUpdateForm(
     const { data: entity, isLoading, dataUpdatedAt } = queryResult;
 
     const updateMutation = entityHooks.useUpdate({
+      meta: { handledByForm: true },
       onSuccess: (data: unknown) => {
         setSubmitError(null);
         options?.onSuccess?.(data);
@@ -99,8 +100,8 @@ export function createUseUpdateForm(
           await updateMutation.mutateAsync({ id: entityId, dto });
         } catch (error) {
           const err = error instanceof Error ? error : new Error(String(error));
-          setSubmitError(err);
           mapServerErrorsToForm(error, form);
+          setSubmitError(err);
           options?.onError?.(err);
         }
       },

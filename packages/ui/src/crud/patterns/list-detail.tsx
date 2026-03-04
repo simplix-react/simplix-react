@@ -313,8 +313,13 @@ const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }
           aria-describedby={undefined}
           className={cn(
             "fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2",
-            "w-full max-w-2xl max-h-[85vh] overflow-auto",
-            "rounded-lg border bg-background p-6 shadow-lg",
+            "w-full max-w-2xl max-h-[85vh] min-h-[40vh]",
+            "flex flex-col overflow-hidden",
+            "rounded-lg border bg-background py-4 shadow-lg",
+            // Push horizontal padding into CrudDetail/CrudForm slots so border lines span full dialog width
+            "[&_[data-crud-slot=header]]:px-6",
+            "[&_[data-crud-slot=body]>*]:px-6",
+            "[&_[data-crud-slot=footer]>*]:px-6",
             "data-[state=open]:animate-in data-[state=closed]:animate-out",
             "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
             "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
@@ -322,12 +327,6 @@ const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }
           )}
         >
           <DialogPrimitive.Title className="sr-only">Detail</DialogPrimitive.Title>
-          <DialogPrimitive.Close
-            className="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
-            <span className="sr-only">Close</span>
-          </DialogPrimitive.Close>
           {children}
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>

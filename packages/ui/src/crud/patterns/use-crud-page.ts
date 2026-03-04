@@ -80,7 +80,7 @@ export function useCrudPageState(
     showEdit,
   };
 
-  const closePanel = variant === "panel" ? showList : undefined;
+  const closePanel = variant === "page" ? undefined : showList;
 
   return { state, fade, closePanel };
 }

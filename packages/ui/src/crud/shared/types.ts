@@ -57,8 +57,8 @@ export interface FilterState {
   values: Record<string, unknown>;
 }
 
-/** Reason for an empty list state (no data, no filter match, no search match). */
-export type EmptyReason = "no-data" | "no-filter" | "no-search";
+/** Reason for an empty list state (no data, no filter match, no search match, or error). */
+export type EmptyReason = "no-data" | "no-filter" | "no-search" | "error";
 
 /** Configuration for drag-and-drop row reordering. */
 export interface ReorderConfig<T> {

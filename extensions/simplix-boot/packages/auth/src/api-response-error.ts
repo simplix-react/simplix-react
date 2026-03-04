@@ -1,6 +1,6 @@
-export interface ErrorDetail {
-  [key: string]: unknown;
-}
+export type ErrorDetail =
+  | Array<{ field: string; message: string }>
+  | Record<string, unknown>;
 
 export class ApiResponseError extends Error {
   constructor(

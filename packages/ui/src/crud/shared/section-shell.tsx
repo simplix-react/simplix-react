@@ -114,7 +114,7 @@ export function SectionShell({
       {headerContent}
     </div>
   ) : (
-    <div className="pl-2">{headerContent}</div>
+    <div className="pl-0">{headerContent}</div>
   );
 
   const body = isCard ? (

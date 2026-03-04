@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { ErrorDetail } from "./api-response-error.js";
 
 export interface BootEnvelope<T = unknown> {
   type: string;
@@ -6,7 +7,7 @@ export interface BootEnvelope<T = unknown> {
   body: T;
   timestamp: string;
   errorCode?: string | null;
-  errorDetail?: Record<string, unknown> | null;
+  errorDetail?: ErrorDetail | null;
 }
 
 export function envelopeSchema<T extends z.ZodType>(bodySchema: T) {
@@ -16,7 +17,15 @@ export function envelopeSchema<T extends z.ZodType>(bodySchema: T) {
     body: bodySchema,
     timestamp: z.string(),
     errorCode: z.string().nullable().optional(),
-    errorDetail: z.record(z.string(), z.unknown()).nullable().optional(),
+    errorDetail: z
+      .union([
+        z.array(
+          z.object({ field: z.string(), message: z.string() }).passthrough(),
+        ),
+        z.record(z.string(), z.unknown()),
+      ])
+      .nullable()
+      .optional(),
   });
 }
 

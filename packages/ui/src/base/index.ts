@@ -74,8 +74,17 @@ export type { InputProps } from "./input";
 export { Label } from "./label";
 export type { LabelProps } from "./label";
 
-export { Map, MapMarker, MapPinContainer, useMap } from "./map";
-export type { MapProps, MapMarkerProps, MapPinContainerProps, MapRef, MapContextValue } from "./map";
+export { Map, MapControls, MapMarker, MapPinContainer, useMap } from "./map";
+export type { MapProps, MapControlsProps, MapMarkerProps, MapPinContainerProps, MapRef, MapContextValue } from "./map";
+
+export { MapAutoFit } from "./map-auto-fit";
+export type { MapAutoFitProps } from "./map-auto-fit";
+
+export { MapBoundsOverlay } from "./map-bounds-overlay";
+export type { MapBoundsOverlayProps } from "./map-bounds-overlay";
+
+export { MapNavigator, useMapNavigator } from "./map-navigator";
+export type { MapNavigatorProps, UseMapNavigatorOptions, UseMapNavigatorResult } from "./map-navigator";
 
 export {
   NavigationMenu,

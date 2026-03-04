@@ -43,6 +43,9 @@ import { type FieldVariant, FieldVariantContext } from "../shared/types";
 // │ └─────────────────────────────────┘ │
 // └─────────────────────────────────────┘
 
+/** Layout variant for {@link CrudDetail}. */
+export type CrudDetailVariant = "default" | "dialog";
+
 /** Props for the {@link CrudDetail} compound component root. */
 export interface CrudDetailProps {
   /** Shows a semi-transparent overlay with a spinner on top of the detail content. */
@@ -53,16 +56,25 @@ export interface CrudDetailProps {
   header?: ReactNode;
   /** Fixed footer rendered below the scrollable content (e.g. action buttons). */
   footer?: ReactNode;
+  /**
+   * Layout variant.
+   * - `"default"` — compact padding for side panels (px-2).
+   * - `"dialog"` — generous padding for use inside Dialog (px-5, extra vertical padding on header/footer).
+   */
+  variant?: CrudDetailVariant;
   fieldVariant?: FieldVariant;
   className?: string;
   children?: ReactNode;
 }
 
-function DetailRoot({ isLoading, onClose, header, footer, fieldVariant, className, children }: CrudDetailProps) {
+function DetailRoot({ isLoading, onClose, header, footer, variant = "default", fieldVariant, className, children }: CrudDetailProps) {
+  const isDialog = variant === "dialog";
+  const px = isDialog ? "px-5" : "px-2";
+
   const content = (
     <div className={cn("flex flex-col flex-1 min-h-0 w-full", className)} data-testid="crud-detail">
       {(onClose || header) && (
-        <Flex justify={header ? "between" : "end"} align="center" className="shrink-0 border-b pb-2 px-2">
+        <Flex data-crud-slot="header" justify={header ? "between" : "end"} align="center" className={cn("shrink-0 border-b pb-2", px, isDialog && "pt-3")}>
           {header}
           {onClose && (
             <Button type="button" variant="ghost" size="icon-xs" onClick={onClose}>
@@ -71,7 +83,7 @@ function DetailRoot({ isLoading, onClose, header, footer, fieldVariant, classNam
           )}
         </Flex>
       )}
-      <div className="min-h-0 overflow-auto [scrollbar-gutter:stable]">
+      <div data-crud-slot="body" className={cn("flex-1 min-h-0 overflow-auto [scrollbar-gutter:stable]", px)}>
         <Stack gap="sm" className={cn("relative py-2", !(onClose || header) && "pt-2")}>
           {isLoading && (
             <output
@@ -86,7 +98,7 @@ function DetailRoot({ isLoading, onClose, header, footer, fieldVariant, classNam
         </Stack>
       </div>
       {footer && (
-        <div className="shrink-0 mt-2">{footer}</div>
+        <div data-crud-slot="footer" className={cn("shrink-0", px, isDialog && "pb-3")}>{footer}</div>
       )}
     </div>
   );
