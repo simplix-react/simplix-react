@@ -86,11 +86,17 @@ export interface AuthConfig {
   /** Maximum retry attempts after 401. Defaults to `1`. */
   maxRetries?: number;
 
+  /** Custom 401 detection predicate. Defaults to duck-typing `error.status === 401`. */
+  is401?: (error: unknown) => boolean;
+
   /** Validates a stored access token on rehydration. Return `true` if valid. */
   onRehydrate?: (accessToken: string) => Promise<boolean>;
 
   /** Returns additional headers to merge into every authenticated request. */
   globalHeaders?: () => Promise<Record<string, string>> | Record<string, string>;
+
+  /** Base fetch function to wrap with auth headers. Defaults to defaultFetch. */
+  fetchFn?: FetchFn;
 }
 
 // ── Auth Instance ──

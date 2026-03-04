@@ -13,16 +13,16 @@ import { createEntityFormHooks } from "./create-entity-form-hooks.js";
  * and server error mapping.
  *
  * @param contract - The API contract produced by `defineApi()` from `@simplix-react/contract`
- * @param hooks - The React Query hooks produced by `deriveHooks()` from `@simplix-react/react`
+ * @param hooks - The React Query hooks produced by `deriveEntityHooks()` from `@simplix-react/react`
  * @returns An object keyed by entity name, each containing form hooks
  *
  * @example
  * ```ts
- * import { deriveFormHooks } from "@simplix-react/form";
+ * import { deriveEntityFormHooks } from "@simplix-react/form";
  * import { inventoryApi } from "./contract";
  * import { inventoryHooks } from "./hooks";
  *
- * export const inventoryFormHooks = deriveFormHooks(inventoryApi, inventoryHooks);
+ * export const inventoryFormHooks = deriveEntityFormHooks(inventoryApi, inventoryHooks);
  *
  * // Use in components
  * function CreateProductForm() {
@@ -31,7 +31,7 @@ import { createEntityFormHooks } from "./create-entity-form-hooks.js";
  * }
  * ```
  */
-export function deriveFormHooks<
+export function deriveEntityFormHooks<
   TEntities extends Record<string, AnyEntityDef>,
 >(
   contract: {
@@ -41,7 +41,7 @@ export function deriveFormHooks<
   hooks: {
     [K in keyof TEntities]: EntityHooks<TEntities[K]["schema"]>;
   },
-): DerivedFormHooksResult<TEntities> {
+): DerivedEntityFormHooksResult<TEntities> {
   const { config } = contract;
   const result: Record<string, unknown> = {};
 
@@ -62,10 +62,10 @@ export function deriveFormHooks<
     result[entityName] = createEntityFormHooks(entityHooks, hasCreate, hasUpdate);
   }
 
-  return result as DerivedFormHooksResult<TEntities>;
+  return result as DerivedEntityFormHooksResult<TEntities>;
 }
 
 /** Mapped type that produces per-entity {@link EntityFormHooks} from the contract's entity map. */
-export type DerivedFormHooksResult<TEntities extends Record<string, AnyEntityDef>> = {
+export type DerivedEntityFormHooksResult<TEntities extends Record<string, AnyEntityDef>> = {
   [K in keyof TEntities]: EntityFormHooks<TEntities[K]["schema"]>;
 };

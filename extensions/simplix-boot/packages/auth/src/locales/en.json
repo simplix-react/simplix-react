@@ -1,0 +1,18 @@
+{
+  "user": {
+    "fields": {
+      "userId": "User ID",
+      "username": "Username",
+      "displayName": "Display Name",
+      "email": "Email",
+      "roles": "Roles",
+      "isSuperAdmin": "Super Admin"
+    }
+  },
+  "role": {
+    "fields": {
+      "roleCode": "Role Code",
+      "roleName": "Role Name"
+    }
+  }
+}

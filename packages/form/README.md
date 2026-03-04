@@ -29,8 +29,8 @@ pnpm add @simplix-react/form @tanstack/react-form
 
 ```ts
 import { defineApi, simpleQueryBuilder } from "@simplix-react/contract";
-import { deriveHooks } from "@simplix-react/react";
-import { deriveFormHooks } from "@simplix-react/form";
+import { deriveEntityHooks } from "@simplix-react/react";
+import { deriveEntityFormHooks } from "@simplix-react/form";
 import { z } from "zod";
 
 // 1. Define the contract
@@ -49,10 +49,10 @@ const projectContract = defineApi({
 });
 
 // 2. Derive React Query hooks
-const hooks = deriveHooks(projectContract);
+const hooks = deriveEntityHooks(projectContract);
 
 // 3. Derive form hooks — one call generates everything
-const formHooks = deriveFormHooks(projectContract, hooks);
+const formHooks = deriveEntityFormHooks(projectContract, hooks);
 
 // 4. Use in components
 function CreateTaskForm({ projectId }: { projectId: string }) {
@@ -74,7 +74,7 @@ function CreateTaskForm({ projectId }: { projectId: string }) {
 
 | Export | Kind | Description |
 | --- | --- | --- |
-| `deriveFormHooks` | Function | Derives entity form hooks from contract + hooks |
+| `deriveEntityFormHooks` | Function | Derives entity form hooks from contract + hooks |
 | `extractDirtyFields` | Function | Extracts only changed fields (for PATCH requests) |
 | `mapServerErrorsToForm` | Function | Maps 422 server errors to form field errors |
 | `CreateFormOptions` | Type | Options interface for `useCreateForm` |
@@ -89,10 +89,10 @@ function CreateTaskForm({ projectId }: { projectId: string }) {
 
 ### Hook Derivation
 
-`deriveFormHooks()` reads the entity definitions from the API contract and generates `useCreateForm` and `useUpdateForm` hooks for each entity. Internally, it connects the mutation hooks from `@simplix-react/react` to TanStack Form.
+`deriveEntityFormHooks()` reads the entity definitions from the API contract and generates `useCreateForm` and `useUpdateForm` hooks for each entity. Internally, it connects the mutation hooks from `@simplix-react/react` to TanStack Form.
 
 ```ts
-const formHooks = deriveFormHooks(projectContract, projectHooks);
+const formHooks = deriveEntityFormHooks(projectContract, projectHooks);
 // formHooks.task.useCreateForm  → create mutation + TanStack Form
 // formHooks.task.useUpdateForm  → update mutation + TanStack Form + dirty tracking
 ```

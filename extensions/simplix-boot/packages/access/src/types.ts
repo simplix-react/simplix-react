@@ -1,5 +1,5 @@
 import type { AccessRule } from "@simplix-react/access";
-import type { FetchFn } from "@simplix-react/contract";
+import type { OrvalMutator } from "@simplix-react/api";
 
 /**
  * Response shape returned by Spring Security permission endpoints.
@@ -40,8 +40,8 @@ export interface SpringAccessAdapterOptions {
   publicPermissionsEndpoint?: string;
   /** Role code that identifies a system admin. Defaults to `"ROLE_SYSTEM_ADMIN"`. */
   systemAdminRole?: string;
-  /** Custom fetch function. Defaults to `defaultFetch` from `@simplix-react/contract`. */
-  fetchFn?: FetchFn;
+  /** Custom fetch function. Required. */
+  fetchFn?: OrvalMutator;
 }
 
 /** Result of converting Spring permissions, including rules and metadata. */

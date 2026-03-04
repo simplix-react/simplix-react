@@ -20,7 +20,41 @@ import type { TreeNode } from "@simplix-react/contract";
  * // [{ data: { id: "1", ... }, children: [{ data: { id: "2", ... }, children: [] }] }]
  * ```
  */
-export function buildTreeFromFlatRows<T extends Record<string, unknown>>(
+export function buildEmbeddedTree<T extends object>(
+  rows: T[],
+  identityField = "id",
+  parentField = "parentId",
+): (T & { children: unknown[] })[] {
+  type EmbeddedNode = T & { children: unknown[] };
+  const nodeMap = new Map<unknown, EmbeddedNode>();
+  const roots: EmbeddedNode[] = [];
+
+  for (const row of rows) {
+    const r = row as Record<string, unknown>;
+    nodeMap.set(r[identityField], { ...row, children: [] });
+  }
+
+  for (const row of rows) {
+    const r = row as Record<string, unknown>;
+    const node = nodeMap.get(r[identityField])!;
+    const parentId = r[parentField];
+
+    if (parentId == null) {
+      roots.push(node);
+    } else {
+      const parentNode = nodeMap.get(parentId);
+      if (parentNode) {
+        parentNode.children.push(node);
+      } else {
+        roots.push(node);
+      }
+    }
+  }
+
+  return roots;
+}
+
+export function buildTreeFromFlatRows<T extends object>(
   rows: T[],
   identityField = "id",
 ): TreeNode<T>[] {
@@ -29,13 +63,15 @@ export function buildTreeFromFlatRows<T extends Record<string, unknown>>(
 
   // Create all nodes first
   for (const row of rows) {
-    nodeMap.set(row[identityField], { data: row, children: [] });
+    const r = row as Record<string, unknown>;
+    nodeMap.set(r[identityField], { data: row, children: [] });
   }
 
   // Build parent-child relationships
   for (const row of rows) {
-    const node = nodeMap.get(row[identityField])!;
-    const parentId = row.parentId;
+    const r = row as Record<string, unknown>;
+    const node = nodeMap.get(r[identityField])!;
+    const parentId = r.parentId;
 
     if (parentId == null) {
       roots.push(node);

@@ -1,7 +1,16 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { createI18nConfig } from "../create-i18n-config.js";
-import { buildModuleTranslations } from "../module-translations.js";
+import {
+  buildModuleTranslations,
+  registerModuleTranslations,
+  getModuleTranslationRegistry,
+} from "../module-translations.js";
 import { DEFAULT_LOCALES, SUPPORTED_LOCALES } from "../utils/locale-config.js";
+
+function clearModuleRegistry() {
+  const registry = getModuleTranslationRegistry() as Map<string, unknown>;
+  registry.clear();
+}
 
 describe("createI18nConfig", () => {
   it("returns adapter and i18nReady promise", () => {
@@ -201,6 +210,96 @@ describe("DEFAULT_LOCALES", () => {
 describe("SUPPORTED_LOCALES", () => {
   it("lists locale codes from DEFAULT_LOCALES", () => {
     expect(SUPPORTED_LOCALES).toEqual(DEFAULT_LOCALES.map((l) => l.code));
+  });
+});
+
+describe("registerModuleTranslations", () => {
+  beforeEach(() => {
+    clearModuleRegistry();
+  });
+
+  it("registers module translations into the global registry", () => {
+    const translations = buildModuleTranslations({
+      namespace: "dashboard",
+      locales: ["en"],
+      components: {
+        header: {
+          en: () => Promise.resolve({ default: { title: "Header" } }),
+        },
+      },
+    });
+
+    registerModuleTranslations(translations);
+
+    const registry = getModuleTranslationRegistry();
+    expect(registry.has("dashboard")).toBe(true);
+  });
+
+  it("overwrites duplicate namespace registrations", () => {
+    registerModuleTranslations(
+      buildModuleTranslations({ namespace: "dashboard", locales: ["en"], components: {} }),
+    );
+    registerModuleTranslations(
+      buildModuleTranslations({ namespace: "dashboard", locales: ["en", "ko"], components: {} }),
+    );
+
+    const registry = getModuleTranslationRegistry();
+    expect(registry.size).toBe(1);
+    expect(registry.get("dashboard")!.locales).toEqual(["en", "ko"]);
+  });
+
+  it("loads registry-based module translations via createI18nConfig", async () => {
+    const translations = buildModuleTranslations({
+      namespace: "settings",
+      locales: ["en"],
+      components: {
+        general: {
+          en: () => Promise.resolve({ default: { title: "General Settings" } }),
+        },
+      },
+    });
+
+    registerModuleTranslations(translations);
+
+    const { adapter, i18nReady } = createI18nConfig({
+      defaultLocale: "en",
+    });
+
+    await i18nReady;
+    expect(adapter.tn("settings/general", "title")).toBe("General Settings");
+  });
+
+  it("merges explicit and registry-based module translations", async () => {
+    const explicitTranslations = buildModuleTranslations({
+      namespace: "explicit-mod",
+      locales: ["en"],
+      components: {
+        page: {
+          en: () => Promise.resolve({ default: { title: "Explicit" } }),
+        },
+      },
+    });
+
+    const registryTranslations = buildModuleTranslations({
+      namespace: "registry-mod",
+      locales: ["en"],
+      components: {
+        page: {
+          en: () => Promise.resolve({ default: { title: "Registry" } }),
+        },
+      },
+    });
+
+    registerModuleTranslations(registryTranslations);
+
+    const { adapter, i18nReady } = createI18nConfig({
+      defaultLocale: "en",
+      moduleTranslations: [explicitTranslations],
+    });
+
+    await i18nReady;
+    expect(adapter.tn("explicit-mod/page", "title")).toBe("Explicit");
+    expect(adapter.tn("registry-mod/page", "title")).toBe("Registry");
   });
 });
 

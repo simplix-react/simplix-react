@@ -7,7 +7,7 @@ import { createUseUpdateForm } from "./hooks/use-update-form.js";
  * Assembles form hooks for a single entity based on available CRUD roles.
  *
  * @remarks
- * This is the per-entity factory used internally by {@link deriveFormHooks}.
+ * This is the per-entity factory used internally by {@link deriveEntityFormHooks}.
  * It only creates `useCreateForm` and `useUpdateForm` when the entity has
  * corresponding create/update role operations.
  *
@@ -16,7 +16,7 @@ import { createUseUpdateForm } from "./hooks/use-update-form.js";
  * @param hasUpdate - Whether the entity has an update role operation
  * @returns An object containing available form hooks
  *
- * @see {@link deriveFormHooks} — the public entry point that calls this factory
+ * @see {@link deriveEntityFormHooks} — the public entry point that calls this factory
  * @see {@link EntityFormHooks} for the returned hook set shape
  */
 export function createEntityFormHooks(

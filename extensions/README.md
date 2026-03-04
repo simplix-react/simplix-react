@@ -22,7 +22,7 @@ Core packages define abstract contracts (e.g., `AccessAdapter`, `TokenPair`). Ex
 
 | Extension                       | Target Environment     | Packages                                     | Description                                              |
 | ------------------------------- | ---------------------- | -------------------------------------------- | -------------------------------------------------------- |
-| [simplix-boot](./simplix-boot/) | SimpliX (Spring Boot)  | `@simplix-boot/auth`, `@simplix-boot/access` | SimpliX Spring Security auth and authorization adapters  |
+| [simplix-boot](./simplix-boot/) | SimpliX (Spring Boot)  | `@simplix-react-ext/simplix-boot-access`, `@simplix-react-ext/simplix-boot-auth` | SimpliX Spring Security authentication and authorization adapters |
 
 ## Creating a New Extension
 
@@ -88,6 +88,6 @@ pnpm build
 pnpm test
 
 # Build/test a specific extension package
-pnpm --filter @simplix-boot/auth build
-pnpm --filter @simplix-boot/access test
+pnpm --filter @simplix-react-ext/simplix-boot-access build
+pnpm --filter @simplix-react-ext/simplix-boot-access test
 ```

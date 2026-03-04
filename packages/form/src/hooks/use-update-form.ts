@@ -35,7 +35,7 @@ import { mapServerErrorsToForm } from "../utils/server-error-mapping.js";
  * // Internal usage within createEntityFormHooks:
  * const useUpdateForm = createUseUpdateForm(entityHooks);
  *
- * // Consumer usage (via deriveFormHooks):
+ * // Consumer usage (via deriveEntityFormHooks):
  * const { form, isLoading, isSubmitting, entity } = formHooks.task.useUpdateForm(taskId, {
  *   dirtyOnly: true,
  *   onSuccess: (data) => console.log("Updated:", data),

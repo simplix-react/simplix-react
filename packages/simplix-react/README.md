@@ -44,8 +44,8 @@ Import directly from individual packages:
 
 ```ts
 import { defineApi, simpleQueryBuilder } from "@simplix-react/contract";
-import { deriveHooks } from "@simplix-react/react";
-import { deriveFormHooks } from "@simplix-react/form";
+import { deriveEntityHooks } from "@simplix-react/react";
+import { deriveEntityFormHooks } from "@simplix-react/form";
 import { createAuth, bearerScheme } from "@simplix-react/auth";
 import { deriveMockHandlers } from "@simplix-react/mock";
 import { I18nextAdapter } from "@simplix-react/i18n";

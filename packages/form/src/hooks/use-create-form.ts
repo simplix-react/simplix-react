@@ -28,7 +28,7 @@ import { mapServerErrorsToForm } from "../utils/server-error-mapping.js";
  * // Internal usage within createEntityFormHooks:
  * const useCreateForm = createUseCreateForm(entityHooks);
  *
- * // Consumer usage (via deriveFormHooks):
+ * // Consumer usage (via deriveEntityFormHooks):
  * const { form, isSubmitting, submitError, reset } = formHooks.task.useCreateForm(projectId, {
  *   defaultValues: { title: "", status: "open" },
  *   resetOnSuccess: true,

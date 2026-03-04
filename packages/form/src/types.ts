@@ -134,14 +134,14 @@ export type DerivedUpdateFormHook<TSchema extends z.ZodTypeAny> = (
  *
  * @example
  * ```ts
- * import { deriveFormHooks } from "@simplix-react/form";
+ * import { deriveEntityFormHooks } from "@simplix-react/form";
  *
- * const formHooks = deriveFormHooks(inventoryApi, inventoryHooks);
+ * const formHooks = deriveEntityFormHooks(inventoryApi, inventoryHooks);
  * // formHooks.product.useCreateForm(parentId?, options?)
  * // formHooks.product.useUpdateForm(entityId, options?)
  * ```
  *
- * @see {@link deriveFormHooks} — derives form hooks from a contract
+ * @see {@link deriveEntityFormHooks} — derives form hooks from a contract
  */
 export interface EntityFormHooks<
   TSchema extends z.ZodTypeAny = z.ZodTypeAny,

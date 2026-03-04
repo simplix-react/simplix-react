@@ -99,6 +99,44 @@ describe("bearerScheme", () => {
       expect(headers).toEqual({ Authorization: "Bearer old-token" });
     });
 
+    it("deduplicates concurrent proactive refreshes (single-flight)", async () => {
+      let resolveRefresh!: (value: unknown) => void;
+      const refreshFn = vi.fn().mockImplementation(
+        () => new Promise((resolve) => { resolveRefresh = resolve; }),
+      );
+
+      // Set token expiring in 10 seconds (within 30-second buffer)
+      store.set("access_token", "old-token");
+      store.set("expires_at", String(Date.now() + 10_000));
+
+      const scheme = bearerScheme({
+        store,
+        token: () => store.get("access_token"),
+        refresh: {
+          refreshFn,
+          refreshBeforeExpiry: 30,
+        },
+      });
+
+      // Fire two concurrent getHeaders calls
+      const p1 = scheme.getHeaders();
+      const p2 = scheme.getHeaders();
+
+      // Resolve the single refresh
+      resolveRefresh({
+        accessToken: "new-token",
+        refreshToken: "new-refresh",
+        expiresIn: 3600,
+      });
+
+      const [h1, h2] = await Promise.all([p1, p2]);
+
+      // Only one refresh call should have been made
+      expect(refreshFn).toHaveBeenCalledOnce();
+      expect(h1).toEqual({ Authorization: "Bearer new-token" });
+      expect(h2).toEqual({ Authorization: "Bearer new-token" });
+    });
+
     it("does not proactively refresh when refreshBeforeExpiry is not set", async () => {
       const refreshFn = vi.fn();
 

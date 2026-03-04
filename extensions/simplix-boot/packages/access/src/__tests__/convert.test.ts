@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { convertSpringPermissionsToCasl } from "../convert-permissions.js";
+import { convertSpringPermissionsToCasl } from "../convert.js";
 
 describe("convertSpringPermissionsToCasl", () => {
   it("converts permission map to CASL rules", () => {

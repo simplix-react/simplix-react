@@ -16,7 +16,7 @@ import type { SpringConvertResult, SpringPermissionsResponse } from "./types.js"
  *
  * @example
  * ```ts
- * import { convertSpringPermissionsToCasl } from "@simplix-boot/access";
+ * import { convertSpringPermissionsToCasl } from "@simplix-react-ext/simplix-boot-access";
  *
  * const result = convertSpringPermissionsToCasl({
  *   permissions: { Pet: ["list", "view"] },

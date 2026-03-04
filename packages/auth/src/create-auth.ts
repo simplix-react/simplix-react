@@ -42,7 +42,7 @@ export function createAuth(config: AuthConfig): AuthInstance {
     }
   }
 
-  const fetchFn = createAuthFetch(config);
+  const fetchFn = createAuthFetch(config, config.fetchFn);
 
   return {
     fetchFn,

@@ -27,7 +27,7 @@ pnpm add @simplix-react/react
 
 ```ts
 import { defineApi, simpleQueryBuilder } from "@simplix-react/contract";
-import { deriveHooks } from "@simplix-react/react";
+import { deriveEntityHooks } from "@simplix-react/react";
 import { z } from "zod";
 
 // 1. Define the contract
@@ -46,7 +46,7 @@ const projectContract = defineApi({
 });
 
 // 2. Derive hooks — one call generates everything
-const hooks = deriveHooks(projectContract);
+const hooks = deriveEntityHooks(projectContract);
 
 // 3. Use in components
 function TaskList() {
@@ -71,7 +71,7 @@ The package exports a single function and a set of type definitions:
 
 | Export | Kind | Description |
 | --- | --- | --- |
-| `deriveHooks` | Function | Derives all hooks from a contract |
+| `deriveEntityHooks` | Function | Derives all hooks from a contract |
 | `EntityHooks` | Type | Hook interface for a single entity |
 | `OperationHooks` | Type | Hook interface for a custom operation |
 | `DerivedListHook` | Type | List query hook signature |
@@ -86,10 +86,10 @@ The package exports a single function and a set of type definitions:
 
 ### Hook Derivation
 
-`deriveHooks()` reads the entity and operation definitions from a contract and generates a typed hook object. Each entity key maps to an `EntityHooks` object, and each operation key maps to an `OperationHooks` object.
+`deriveEntityHooks()` reads the entity and operation definitions from a contract and generates a typed hook object. Each entity key maps to an `EntityHooks` object, and each operation key maps to an `OperationHooks` object.
 
 ```ts
-const hooks = deriveHooks(projectContract);
+const hooks = deriveEntityHooks(projectContract);
 // hooks.task    → EntityHooks<TaskSchema, CreateTaskSchema, UpdateTaskSchema>
 // hooks.archiveProject → OperationHooks<ArchiveInput, ArchiveOutput>
 ```

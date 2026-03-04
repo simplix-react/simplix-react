@@ -68,17 +68,27 @@ export function bearerScheme(options: BearerSchemeOptions): AuthScheme {
     return Date.now() >= expiresAtMs - bufferMs;
   }
 
+  let proactiveInflight: Promise<void> | null = null;
+
   return {
     name: "bearer",
 
     async getHeaders() {
-      if (refresh && isExpiringSoon()) {
-        try {
-          const pair = await refresh.refreshFn();
-          storeTokenPair(store, pair);
-        } catch {
-          // Proactive refresh failed; proceed with current token
-        }
+      if (refresh && isExpiringSoon() && !proactiveInflight) {
+        proactiveInflight = (async () => {
+          try {
+            const pair = await refresh.refreshFn();
+            storeTokenPair(store, pair);
+          } catch {
+            // Proactive refresh failed; proceed with current token
+          } finally {
+            proactiveInflight = null;
+          }
+        })();
+      }
+
+      if (proactiveInflight) {
+        await proactiveInflight;
       }
 
       const currentToken = resolveToken();

@@ -1,9 +1,8 @@
 {
-  "name": "@simplix-boot/access",
+  "name": "@simplix-react-ext/simplix-boot-access",
   "version": "0.1.0",
   "description": "Spring Security authorization adapter for @simplix-react/access",
   "type": "module",
-  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -21,11 +20,11 @@
   },
   "peerDependencies": {
     "@simplix-react/access": "workspace:*",
-    "@simplix-react/contract": "workspace:*"
+    "@simplix-react/api": "workspace:*"
   },
   "devDependencies": {
     "@simplix-react/access": "workspace:*",
-    "@simplix-react/contract": "workspace:*",
+    "@simplix-react/api": "workspace:*",
     "@simplix-react/config-eslint": "workspace:*",
     "@simplix-react/config-typescript": "workspace:*",
     "@casl/ability": "^6.8.0",

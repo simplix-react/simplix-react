@@ -16,7 +16,7 @@ const DEFAULT_RESOURCE = "BACKOFFICE_ACCESS";
  *
  * @example
  * ```ts
- * import { hasBackofficeAccess } from "@simplix-boot/access";
+ * import { hasBackofficeAccess } from "@simplix-react-ext/simplix-boot-access";
  *
  * hasBackofficeAccess(rules, true);  // true (super admin)
  * hasBackofficeAccess(rules, false); // checks rules for BACKOFFICE_ACCESS

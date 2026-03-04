@@ -38,7 +38,7 @@ import type { EntityHooks, OperationHooks } from "./types.js";
  * @example
  * ```ts
  * import { defineApi } from "@simplix-react/contract";
- * import { deriveHooks } from "@simplix-react/react";
+ * import { deriveEntityHooks } from "@simplix-react/react";
  *
  * const inventoryContract = defineApi({
  *   domain: "inventory",
@@ -58,7 +58,7 @@ import type { EntityHooks, OperationHooks } from "./types.js";
  *   },
  * });
  *
- * const hooks = deriveHooks(inventoryContract);
+ * const hooks = deriveEntityHooks(inventoryContract);
  *
  * // CRUD hooks
  * hooks.product.useList();
@@ -72,7 +72,7 @@ import type { EntityHooks, OperationHooks } from "./types.js";
  * @see {@link EntityHooks} for the per-entity hook interface.
  * @see {@link OperationHooks} for the per-operation hook interface.
  */
-export function deriveHooks<
+export function deriveEntityHooks<
   TEntities extends Record<string, AnyEntityDef>,
   TOperations extends Record<string, AnyOperationDef>,
 >(
@@ -81,7 +81,7 @@ export function deriveHooks<
     client: Record<string, unknown>;
     queryKeys: Record<string, QueryKeyFactory>;
   },
-): DerivedHooksResult<TEntities, TOperations> {
+): DerivedEntityHooksResult<TEntities, TOperations> {
   const { config, client, queryKeys } = contract;
   const result: Record<string, unknown> = {};
 
@@ -104,7 +104,7 @@ export function deriveHooks<
     }
   }
 
-  return result as DerivedHooksResult<TEntities, TOperations>;
+  return result as DerivedEntityHooksResult<TEntities, TOperations>;
 }
 
 // ── Entity Hook Creators ──
@@ -190,9 +190,12 @@ function createUseListHook(
         const result = entity.parent
           ? await listFn(parentId, listParams)
           : await listFn(listParams);
-        // Unwrap { data: T[], meta?: ... } envelope from paginated responses
-        if (result && typeof result === "object" && !Array.isArray(result) && "data" in (result as Record<string, unknown>)) {
-          return (result as { data: unknown[] }).data;
+        // Unwrap paginated response: { data: T[] } → T[]
+        if (result && typeof result === "object" && !Array.isArray(result)) {
+          const obj = result as Record<string, unknown>;
+          if ("data" in obj && Array.isArray(obj.data)) {
+            return obj.data as unknown[];
+          }
         }
         return result as unknown[];
       },
@@ -531,7 +534,7 @@ function resolveListArgs(
 
 // ── Result Type ──
 
-export type DerivedHooksResult<
+export type DerivedEntityHooksResult<
   TEntities extends Record<string, AnyEntityDef>,
   TOperations extends Record<string, AnyOperationDef>,
 > = {

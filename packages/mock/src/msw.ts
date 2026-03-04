@@ -127,6 +127,18 @@ export async function setupMockWorker(config: MockServerConfig): Promise<void> {
 
   // Start MSW worker (dynamic import to avoid bundling msw in non-mock builds)
   const { setupWorker } = await import("msw/browser");
+  const { http, passthrough } = await import("msw");
+
+  // Explicitly passthrough cross-origin requests so the service worker
+  // does not re-fetch them (which causes CORS failures for CDN tiles, etc.).
+  handlers.push(
+    http.all("*", ({ request }) => {
+      if (new URL(request.url).origin !== globalThis.location.origin) {
+        return passthrough();
+      }
+    }),
+  );
+
   const worker = setupWorker(...(handlers as Parameters<typeof setupWorker>));
 
   await worker.start({

@@ -1,10 +1,10 @@
-import type { FetchFn } from "@simplix-react/contract";
+import type { OrvalMutator } from "@simplix-react/api";
 import { describe, expect, it, vi } from "vitest";
 
-import { createSpringAccessAdapter } from "../spring-access-adapter.js";
+import { createSpringAccessAdapter } from "../adapter.js";
 
-function createMockFetch(response: unknown): FetchFn {
-  return vi.fn().mockResolvedValue(response) as FetchFn;
+function createMockFetch(response: unknown): OrvalMutator {
+  return vi.fn().mockResolvedValue(response) as OrvalMutator;
 }
 
 describe("createSpringAccessAdapter", () => {

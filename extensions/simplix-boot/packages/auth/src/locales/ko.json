@@ -1,0 +1,18 @@
+{
+  "user": {
+    "fields": {
+      "userId": "사용자 ID",
+      "username": "사용자명",
+      "displayName": "표시 이름",
+      "email": "이메일",
+      "roles": "역할",
+      "isSuperAdmin": "슈퍼 관리자"
+    }
+  },
+  "role": {
+    "fields": {
+      "roleCode": "역할 코드",
+      "roleName": "역할 이름"
+    }
+  }
+}

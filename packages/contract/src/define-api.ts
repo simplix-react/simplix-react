@@ -56,7 +56,7 @@ import { deriveQueryKeys } from "./derive/query-keys.js";
  * ```
  *
  * @see {@link ApiContractConfig} for the full config shape.
- * @see {@link @simplix-react/react!deriveHooks | deriveHooks} for deriving React Query hooks.
+ * @see {@link @simplix-react/react!deriveEntityHooks | deriveEntityHooks} for deriving React Query hooks.
  * @see {@link @simplix-react/mock!deriveMockHandlers | deriveMockHandlers} for deriving MSW handlers.
  */
 export function defineApi<

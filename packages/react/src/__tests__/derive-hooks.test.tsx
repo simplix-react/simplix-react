@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { createElement } from "react";
 import { z } from "zod";
-import { deriveHooks } from "../derive-hooks.js";
+import { deriveEntityHooks } from "../derive-hooks.js";
 import type { EntityId, QueryKeyFactory } from "@simplix-react/contract";
 
 // ── Schemas ──
@@ -107,7 +107,7 @@ function createWrapper(queryClient: QueryClient) {
 
 // ── Tests ──
 
-describe("deriveHooks", () => {
+describe("deriveEntityHooks", () => {
   let queryClient: QueryClient;
 
   beforeEach(() => {
@@ -124,7 +124,7 @@ describe("deriveHooks", () => {
   describe("hook structure", () => {
     it("returns entity hooks for each entity in the contract", () => {
       const contract = createMockContract();
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       expect(hooks).toHaveProperty("task");
       expect(hooks.task).toHaveProperty("useList");
@@ -169,7 +169,7 @@ describe("deriveHooks", () => {
         queryKeys: createMockQueryKeys(),
       };
 
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       expect(hooks).toHaveProperty("archiveTask");
       expect(hooks.archiveTask).toHaveProperty("useMutation");
@@ -182,7 +182,7 @@ describe("deriveHooks", () => {
     it("fetches a list of entities", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const { result } = renderHook(() => hooks.task.useList(), {
         wrapper: createWrapper(queryClient),
@@ -200,7 +200,7 @@ describe("deriveHooks", () => {
     it("passes list params (filters, sort, pagination)", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const listParams = {
         filters: { status: "open" },
@@ -217,7 +217,7 @@ describe("deriveHooks", () => {
     it("passes parentId for child entities", async () => {
       const client = createMockClient();
       const contract = createMockContractWithParent(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       renderHook(() => hooks.task.useList("parent-1"), {
         wrapper: createWrapper(queryClient),
@@ -231,7 +231,7 @@ describe("deriveHooks", () => {
     it("passes parentId with list params for child entities", async () => {
       const client = createMockClient();
       const contract = createMockContractWithParent(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const listParams = { filters: { status: "open" } };
 
@@ -247,7 +247,7 @@ describe("deriveHooks", () => {
     it("is disabled when parent entity has no parentId", async () => {
       const client = createMockClient();
       const contract = createMockContractWithParent(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const { result } = renderHook(() => hooks.task.useList(undefined as unknown as string), {
         wrapper: createWrapper(queryClient),
@@ -261,7 +261,7 @@ describe("deriveHooks", () => {
     it("merges custom query options", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const { result } = renderHook(
         () => hooks.task.useList({ enabled: false }),
@@ -279,7 +279,7 @@ describe("deriveHooks", () => {
     it("fetches a single entity by ID", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const { result } = renderHook(() => hooks.task.useGet("1"), {
         wrapper: createWrapper(queryClient),
@@ -294,7 +294,7 @@ describe("deriveHooks", () => {
     it("is disabled when id is empty string", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const { result } = renderHook(() => hooks.task.useGet(""), {
         wrapper: createWrapper(queryClient),
@@ -307,7 +307,7 @@ describe("deriveHooks", () => {
     it("merges custom query options", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const { result } = renderHook(
         () => hooks.task.useGet("1", { enabled: false }),
@@ -323,7 +323,7 @@ describe("deriveHooks", () => {
       const compositeId = { tenantId: "t1", taskId: "1" };
       client.task.get.mockResolvedValue({ tenantId: "t1", taskId: "1", title: "Task 1", status: "open" });
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const { result } = renderHook(() => hooks.task.useGet(compositeId), {
         wrapper: createWrapper(queryClient),
@@ -341,7 +341,7 @@ describe("deriveHooks", () => {
     it("creates an entity and invalidates cache", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
       const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
 
       const { result } = renderHook(() => hooks.task.useCreate(), {
@@ -363,7 +363,7 @@ describe("deriveHooks", () => {
     it("passes parentId for child entities", async () => {
       const client = createMockClient();
       const contract = createMockContractWithParent(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const { result } = renderHook(() => hooks.task.useCreate("parent-1"), {
         wrapper: createWrapper(queryClient),
@@ -381,7 +381,7 @@ describe("deriveHooks", () => {
     it("calls user-provided onSuccess callback", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
       const onSuccess = vi.fn();
 
       const { result } = renderHook(
@@ -405,7 +405,7 @@ describe("deriveHooks", () => {
     it("updates an entity and invalidates cache on settled", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
       const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
 
       const { result } = renderHook(() => hooks.task.useUpdate(), {
@@ -427,7 +427,7 @@ describe("deriveHooks", () => {
     it("calls user-provided onSuccess callback", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
       const onSuccess = vi.fn();
 
       const { result } = renderHook(
@@ -451,7 +451,7 @@ describe("deriveHooks", () => {
         () => new Promise((resolve) => setTimeout(() => resolve({ id: "1", title: "Server Updated", status: "done" }), 50)),
       );
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       // Pre-populate cache with list data
       queryClient.setQueryData(["test", "task", "list", {}], [
@@ -477,7 +477,7 @@ describe("deriveHooks", () => {
       const client = createMockClient();
       client.task.update.mockRejectedValue(new Error("Server error"));
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const originalData = [
         { id: "1", title: "Task 1", status: "open" },
@@ -508,7 +508,7 @@ describe("deriveHooks", () => {
       const compositeId = { tenantId: "t1", taskId: "1" };
       client.task.update.mockResolvedValue({ tenantId: "t1", taskId: "1", title: "Updated", status: "done" });
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const { result } = renderHook(() => hooks.task.useUpdate(), {
         wrapper: createWrapper(queryClient),
@@ -530,7 +530,7 @@ describe("deriveHooks", () => {
         () => new Promise((resolve) => setTimeout(() => resolve({ tenantId: "t1", taskId: "1", title: "Server Updated", status: "done" }), 50)),
       );
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       queryClient.setQueryData(["test", "task", "list", {}], [
         { tenantId: "t1", taskId: "1", title: "Task 1", status: "open" },
@@ -558,7 +558,7 @@ describe("deriveHooks", () => {
     it("deletes an entity and invalidates cache", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
       const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
 
       const { result } = renderHook(() => hooks.task.useDelete(), {
@@ -580,7 +580,7 @@ describe("deriveHooks", () => {
     it("calls user-provided onSuccess callback", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
       const onSuccess = vi.fn();
 
       const { result } = renderHook(
@@ -601,7 +601,7 @@ describe("deriveHooks", () => {
       const client = createMockClient();
       const compositeId = { tenantId: "t1", taskId: "1" };
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const { result } = renderHook(() => hooks.task.useDelete(), {
         wrapper: createWrapper(queryClient),
@@ -627,7 +627,7 @@ describe("deriveHooks", () => {
         meta: { hasNextPage: true, nextCursor: "cursor-1" },
       });
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const { result } = renderHook(
         () => hooks.task.useInfiniteList(),
@@ -647,7 +647,7 @@ describe("deriveHooks", () => {
         meta: { hasNextPage: true, nextCursor: "cursor-1" },
       });
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const { result } = renderHook(
         () => hooks.task.useInfiniteList(),
@@ -665,7 +665,7 @@ describe("deriveHooks", () => {
         meta: { hasNextPage: false },
       });
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const { result } = renderHook(
         () => hooks.task.useInfiniteList(),
@@ -683,7 +683,7 @@ describe("deriveHooks", () => {
         meta: { hasNextPage: false },
       });
       const contract = createMockContractWithParent(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       renderHook(
         () => hooks.task.useInfiniteList("parent-1"),
@@ -703,7 +703,7 @@ describe("deriveHooks", () => {
     it("is disabled when parent entity has no parentId", async () => {
       const client = createMockClient();
       const contract = createMockContractWithParent(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const { result } = renderHook(
         () => hooks.task.useInfiniteList(undefined),
@@ -721,7 +721,7 @@ describe("deriveHooks", () => {
         meta: { hasNextPage: false },
       });
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       renderHook(
         () => hooks.task.useInfiniteList(undefined, { limit: 50 }),
@@ -744,7 +744,7 @@ describe("deriveHooks", () => {
         meta: { hasNextPage: false },
       });
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const params = {
         filters: { status: "open" },
@@ -773,7 +773,7 @@ describe("deriveHooks", () => {
     it("uses correct query keys for useList", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       renderHook(() => hooks.task.useList(), {
         wrapper: createWrapper(queryClient),
@@ -791,7 +791,7 @@ describe("deriveHooks", () => {
     it("uses correct query keys for useGet", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       renderHook(() => hooks.task.useGet("abc"), {
         wrapper: createWrapper(queryClient),
@@ -808,7 +808,7 @@ describe("deriveHooks", () => {
     it("includes filter params in list query key", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const listParams = { filters: { status: "open" } };
 
@@ -837,7 +837,7 @@ describe("deriveHooks", () => {
     it("invalidates list cache after create mutation", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       // Pre-populate list cache
       queryClient.setQueryData(["test", "task", "list", {}], [
@@ -864,7 +864,7 @@ describe("deriveHooks", () => {
     it("invalidates all entity queries after delete mutation", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       // Pre-populate both list and detail cache
       queryClient.setQueryData(["test", "task", "list", {}], [
@@ -903,7 +903,7 @@ describe("deriveHooks", () => {
       const client = createMockClient();
       client.task.list.mockRejectedValue(new Error("Network error"));
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const { result } = renderHook(() => hooks.task.useList(), {
         wrapper: createWrapper(queryClient),
@@ -917,7 +917,7 @@ describe("deriveHooks", () => {
       const client = createMockClient();
       client.task.get.mockRejectedValue(new Error("Not found"));
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const { result } = renderHook(() => hooks.task.useGet("999"), {
         wrapper: createWrapper(queryClient),
@@ -931,7 +931,7 @@ describe("deriveHooks", () => {
       const client = createMockClient();
       client.task.create.mockRejectedValue(new Error("Validation failed"));
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const { result } = renderHook(() => hooks.task.useCreate(), {
         wrapper: createWrapper(queryClient),
@@ -949,7 +949,7 @@ describe("deriveHooks", () => {
       const client = createMockClient();
       client.task.update.mockRejectedValue(new Error("Conflict"));
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const { result } = renderHook(() => hooks.task.useUpdate(), {
         wrapper: createWrapper(queryClient),
@@ -967,7 +967,7 @@ describe("deriveHooks", () => {
       const client = createMockClient();
       client.task.delete.mockRejectedValue(new Error("Forbidden"));
       const contract = createMockContract(client);
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const { result } = renderHook(() => hooks.task.useDelete(), {
         wrapper: createWrapper(queryClient),
@@ -1019,7 +1019,7 @@ describe("deriveHooks", () => {
         queryKeys: createMockQueryKeys(),
       };
 
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const { result } = renderHook(() => hooks.archiveTask.useMutation(), {
         wrapper: createWrapper(queryClient),
@@ -1075,7 +1075,7 @@ describe("deriveHooks", () => {
         queryKeys: mockQueryKeys,
       };
 
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const { result } = renderHook(() => hooks.archiveTask.useMutation(), {
         wrapper: createWrapper(queryClient),
@@ -1128,7 +1128,7 @@ describe("deriveHooks", () => {
         queryKeys: createMockQueryKeys(),
       };
 
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const { result } = renderHook(
         () => hooks.archiveTask.useMutation({ onSuccess }),
@@ -1179,7 +1179,7 @@ describe("deriveHooks", () => {
         queryKeys: createMockQueryKeys(),
       };
 
-      const hooks = deriveHooks(contract);
+      const hooks = deriveEntityHooks(contract);
 
       const { result } = renderHook(() => hooks.archiveTask.useMutation(), {
         wrapper: createWrapper(queryClient),

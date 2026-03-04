@@ -131,6 +131,7 @@ export class I18nextAdapter implements II18nAdapter {
         debug: this.debug,
         returnNull: false,
         returnEmptyString: false,
+        showSupportNotice: false,
       });
     }
 

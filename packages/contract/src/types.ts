@@ -1,6 +1,140 @@
 import type { z } from "zod";
 import type { QueryBuilder } from "./helpers/query-types.js";
 
+// ── WiredSchema ──
+
+/**
+ * Compound output type carrying both the server wire format and the business
+ * data schema. Used for operations where the transport envelope (e.g. a
+ * `SimpliXApiResponse` wrapper) differs from the payload the client needs.
+ *
+ * @typeParam TWire - Zod schema for the full server response shape.
+ * @typeParam TData - Zod schema for the business data after envelope removal.
+ *
+ * @example
+ * ```ts
+ * import { wired } from "@simplix-react/contract";
+ * import { z } from "zod";
+ *
+ * const output = wired(
+ *   z.object({ type: z.string(), body: petSchema, timestamp: z.string() }),
+ *   petSchema,
+ *   (data) => ({ type: "SUCCESS", body: data, timestamp: new Date().toISOString() }),
+ *   (wire) => wire.body,
+ * );
+ * ```
+ *
+ * @see {@link wired} for the factory function.
+ * @see {@link isWiredSchema} for the runtime type guard.
+ */
+export interface WiredSchema<
+  TWire extends z.ZodType = z.ZodType,
+  TData extends z.ZodType = z.ZodType,
+> {
+  readonly _tag: "WiredSchema";
+  /** Zod schema describing the full server response (wire format). */
+  readonly wire: TWire;
+  /** Zod schema describing the business data after transport envelope removal. */
+  readonly data: TData;
+  /** Wraps business data into the wire format (used by mock handlers). */
+  wrap: (data: z.infer<TData>) => z.infer<TWire>;
+  /** Extracts business data from the wire format (used for type inference). */
+  unwrap: (wire: z.infer<TWire>) => z.infer<TData>;
+}
+
+/**
+ * Creates a {@link WiredSchema} that pairs a wire-format schema with a
+ * business-data schema, along with `wrap` / `unwrap` transform functions.
+ *
+ * @param wire - Zod schema for the full server response.
+ * @param data - Zod schema for the business payload after envelope removal.
+ * @param wrap - Transforms business data into the wire format.
+ * @param unwrap - Extracts business data from the wire format.
+ *
+ * @example
+ * ```ts
+ * import { wired } from "@simplix-react/contract";
+ *
+ * const output = wired(wireSchema, dataSchema,
+ *   (data) => ({ type: "SUCCESS", body: data, timestamp: new Date().toISOString() }),
+ *   (wire) => wire.body,
+ * );
+ * ```
+ */
+export function wired<TWire extends z.ZodType, TData extends z.ZodType>(
+  wire: TWire,
+  data: TData,
+  wrap: (data: z.infer<TData>) => z.infer<TWire>,
+  unwrap: (wire: z.infer<TWire>) => z.infer<TData>,
+): WiredSchema<TWire, TData> {
+  return { _tag: "WiredSchema" as const, wire, data, wrap, unwrap };
+}
+
+/**
+ * Runtime type guard that checks whether a value is a {@link WiredSchema}.
+ */
+export function isWiredSchema(value: unknown): value is WiredSchema {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "_tag" in value &&
+    (value as { _tag: unknown })._tag === "WiredSchema"
+  );
+}
+
+// ── Output Type Inference ──
+
+/**
+ * Extracts the business data type from an operation output.
+ *
+ * - {@link WiredSchema} → `z.infer<TData>` (the unwrapped business payload)
+ * - `z.ZodType` → `z.infer<T>` (direct schema inference)
+ * - `unknown` / `undefined` → `unknown`
+ */
+export type InferOutputData<T> =
+  T extends WiredSchema<infer _W, infer TData>
+    ? z.infer<TData>
+    : T extends z.ZodType
+      ? z.infer<T>
+      : unknown;
+
+// ── Transform Types ──
+
+/**
+ * Describes how to override the default HTTP request built by the client.
+ *
+ * Returned from {@link EntityOperationDef.transformRequest} or
+ * {@link OperationDefinition.transformRequest} to customize headers, body,
+ * or URL for non-standard HTTP patterns (Basic Auth, form-encoded, query params, etc.).
+ *
+ * @example
+ * ```ts
+ * // Basic Auth
+ * transformRequest: (input) => ({
+ *   headers: { Authorization: `Basic ${btoa(`${input.username}:${input.password}`)}` },
+ * })
+ *
+ * // Form-encoded body
+ * transformRequest: (input) => ({
+ *   headers: { "Content-Type": "application/x-www-form-urlencoded" },
+ *   body: new URLSearchParams(input).toString(),
+ * })
+ *
+ * // Query params
+ * transformRequest: (input, url) => ({
+ *   url: `${url}?${new URLSearchParams(input).toString()}`,
+ * })
+ * ```
+ */
+export interface TransformedRequest {
+  /** Override or add request headers. Merged OVER auth scheme headers. */
+  headers?: Record<string, string>;
+  /** Override request body. `null` = explicitly no body, `undefined` = default behavior. */
+  body?: BodyInit | null;
+  /** Override or replace the URL (e.g., add query params). */
+  url?: string;
+}
+
 // ── Entity Definition ──
 
 /**
@@ -49,7 +183,7 @@ export interface EntityQuery {
  *
  * @see {@link EntityOperationDef.role} for explicit role assignment.
  */
-export type CrudRole = "list" | "get" | "create" | "update" | "delete" | "tree";
+export type CrudRole = "list" | "get" | "getForEdit" | "create" | "update" | "delete" | "order" | "tree" | "subtree" | "multiUpdate" | "batchUpdate" | "batchDelete" | "search";
 
 /**
  * Defines a single API operation within an entity.
@@ -82,7 +216,7 @@ export type CrudRole = "list" | "get" | "create" | "update" | "delete" | "tree";
  */
 export interface EntityOperationDef<
   TInput extends z.ZodType = z.ZodType,
-  TOutput extends z.ZodType = z.ZodType,
+  TOutput = unknown,
 > {
   /** HTTP method for this operation. */
   method: HttpMethod;
@@ -106,6 +240,16 @@ export interface EntityOperationDef<
   contentType?: "json" | "multipart";
   /** Expected response format. Defaults to `"json"`. */
   responseType?: "json" | "blob";
+  /**
+   * Transforms the input into a custom HTTP request.
+   * When provided, replaces the default JSON body serialization.
+   */
+  transformRequest?: (input: unknown, url: string) => TransformedRequest;
+  /**
+   * Transforms the raw API response before returning to the caller.
+   * Useful for mapping server field names to client-side conventions.
+   */
+  transformResponse?: (raw: unknown) => unknown;
 }
 
 /**
@@ -251,6 +395,16 @@ export interface OperationDefinition<
     queryKeys: Record<string, QueryKeyFactory>,
     params: Record<string, string>,
   ) => readonly unknown[][];
+  /**
+   * Transforms the input into a custom HTTP request.
+   * When provided, replaces the default JSON body serialization.
+   */
+  transformRequest?: (input: unknown, url: string) => TransformedRequest;
+  /**
+   * Transforms the raw API response before returning to the caller.
+   * Useful for mapping server field names to client-side conventions.
+   */
+  transformResponse?: (raw: unknown) => unknown;
 }
 
 // ── API Contract Config ──
@@ -389,7 +543,9 @@ export type EntityClient<
   _TSchema extends z.ZodType,
   TOperations extends Record<string, EntityOperationDef>,
 > = {
-  [K in keyof TOperations]: (...args: unknown[]) => Promise<unknown>;
+  [K in keyof TOperations]: (
+    ...args: unknown[]
+  ) => Promise<InferOutputData<TOperations[K]["output"]>>;
 };
 
 /**
@@ -418,7 +574,7 @@ export type FetchFn = <T>(path: string, options?: RequestInit) => Promise<T>;
  * @typeParam TOperations - Map of operation names to their definitions.
  *
  * @see {@link defineApi} for constructing this contract.
- * @see {@link @simplix-react/react!deriveHooks | deriveHooks} for deriving React hooks.
+ * @see {@link @simplix-react/react!deriveEntityHooks | deriveEntityHooks} for deriving React hooks.
  * @see {@link @simplix-react/mock!deriveMockHandlers | deriveMockHandlers} for deriving mock handlers.
  */
 export interface ApiContract<

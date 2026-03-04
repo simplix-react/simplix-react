@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org).
 
 ### Added
 
-- `deriveHooks` function for auto-generating React Query hooks from API contracts
+- `deriveEntityHooks` function for auto-generating React Query hooks from API contracts
 - Derived `useList` hook for paginated list queries
 - Derived `useGet` hook for single entity retrieval
 - Derived `useCreate` mutation hook for entity creation

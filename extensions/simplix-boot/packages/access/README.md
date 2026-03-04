@@ -1,11 +1,11 @@
-# @simplix-boot/access
+# @simplix-react-ext/simplix-boot-access
 
 Spring Security authorization adapter for `@simplix-react/access`. Converts Spring Security permission responses into CASL rules and provides a ready-to-use `AccessAdapter`.
 
 ## Installation
 
 ```bash
-pnpm add @simplix-boot/access
+pnpm add @simplix-react-ext/simplix-boot-access
 ```
 
 > **Prerequisites:** Requires `@simplix-react/access` and `@simplix-react/contract` as peer dependencies.
@@ -18,7 +18,7 @@ pnpm add @simplix-boot/access
 
 ```ts
 import { createAccess } from "@simplix-react/access";
-import { createSpringAccessAdapter } from "@simplix-boot/access";
+import { createSpringAccessAdapter } from "@simplix-react-ext/simplix-boot-access";
 
 const adapter = createSpringAccessAdapter({
   permissionsEndpoint: "/api/v1/user/me/permissions",
@@ -35,7 +35,7 @@ const access = createAccess({ adapter });
 If you need to convert a Spring permissions response without the full adapter:
 
 ```ts
-import { convertSpringPermissionsToCasl } from "@simplix-boot/access";
+import { convertSpringPermissionsToCasl } from "@simplix-react-ext/simplix-boot-access";
 
 const result = convertSpringPermissionsToCasl({
   permissions: { Pet: ["list", "view"], Order: ["list", "create"] },
@@ -61,7 +61,7 @@ When `isSuperAdmin` is `true` (or `"true"`), a `{ action: "manage", subject: "al
 A utility to check if the current user has backoffice access:
 
 ```ts
-import { hasBackofficeAccess } from "@simplix-boot/access";
+import { hasBackofficeAccess } from "@simplix-react-ext/simplix-boot-access";
 
 hasBackofficeAccess(rules, true);              // true (super admin bypasses)
 hasBackofficeAccess(rules, false);             // checks for BACKOFFICE_ACCESS resource
@@ -92,7 +92,7 @@ Creates an `AccessAdapter` for Spring Security permission endpoints.
 
 **Note on the `user` field in `extract()` result:**
 
-The `user` object returned by `extract()` has empty strings for `userId` and `username`, because the permissions endpoint does not include user identification data. If you need user info, fetch it separately via `@simplix-boot/auth`'s `userInfoFn`.
+The `user` object returned by `extract()` has empty strings for `userId` and `username`, because the permissions endpoint does not include user identification data. If you need user info, fetch it separately via the auth domain contract's `getMe` operation.
 
 ```ts
 // Fetch user info from the auth adapter
@@ -165,5 +165,4 @@ interface SpringConvertResult {
 
 Errors thrown by `fetchFn` propagate directly to the caller. There is no built-in retry or error transformation logic. If you need error interceptors, pass a custom fetch function via the `fetchFn` option.
 
-> **Prerequisites:** Set up authentication first with `@simplix-boot/auth`.
-> See [@simplix-boot/auth](../auth/README.md).
+> **Prerequisites:** Set up authentication first via the auth domain contract's `transformRequest`/`transformResponse`.

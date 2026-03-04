@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { z } from "zod";
 import { simpleQueryBuilder } from "@simplix-react/contract";
-import { deriveFormHooks } from "../derive-form-hooks.js";
+import { deriveEntityFormHooks } from "../derive-form-hooks.js";
 
 function createMockEntityHooks() {
   return {
@@ -14,7 +14,7 @@ function createMockEntityHooks() {
   };
 }
 
-describe("deriveFormHooks", () => {
+describe("deriveEntityFormHooks", () => {
   it("returns form hooks for each entity in the contract", () => {
     const mockContract = {
       config: {
@@ -51,7 +51,7 @@ describe("deriveFormHooks", () => {
       project: createMockEntityHooks(),
     };
 
-    const result = deriveFormHooks(mockContract, mockHooks);
+    const result = deriveEntityFormHooks(mockContract, mockHooks);
 
     expect(result).toHaveProperty("task");
     expect(result).toHaveProperty("project");

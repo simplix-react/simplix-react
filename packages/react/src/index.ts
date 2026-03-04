@@ -1,5 +1,5 @@
-export { deriveHooks } from "./derive-hooks.js";
-export type { DerivedHooksResult } from "./derive-hooks.js";
+export { deriveEntityHooks } from "./derive-hooks.js";
+export type { DerivedEntityHooksResult } from "./derive-hooks.js";
 
 export type {
   EntityHooks,

@@ -25,11 +25,23 @@ const QUERY_PARAMS_HEADER = "X-Auth-Query-Params";
  * const api = defineApi(config, { fetchFn });
  * ```
  */
+function defaultIs401(error: unknown): boolean {
+  if (error instanceof ApiError && error.status === 401) return true;
+  if (
+    error instanceof Error &&
+    "status" in error &&
+    (error as Error & { status: number }).status === 401
+  ) {
+    return true;
+  }
+  return false;
+}
+
 export function createAuthFetch(
   config: AuthConfig,
   baseFetchFn: FetchFn = defaultFetch,
 ): FetchFn {
-  const { schemes, maxRetries = 1, onRefreshFailure } = config;
+  const { schemes, maxRetries = 1, onRefreshFailure, is401 = defaultIs401 } = config;
   const refreshManager = new RefreshManager(schemes);
 
   async function mergeHeaders(): Promise<Record<string, string>> {
@@ -90,7 +102,7 @@ export function createAuthFetch(
         return await buildAndFetch<T>(path, options);
       } catch (error) {
         lastError = error;
-        if (!(error instanceof ApiError && error.status === 401) || attempt >= maxRetries) break;
+        if (!is401(error) || attempt >= maxRetries) break;
         await handleRefresh();
       }
     }

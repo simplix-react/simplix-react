@@ -538,3 +538,261 @@ describe("deriveClient with queryBuilder", () => {
     expect(mockFetch).toHaveBeenCalledWith("/api/v1/tasks");
   });
 });
+
+describe("deriveClient with transformRequest", () => {
+  it("sends Basic Auth header via transformRequest (top-level operation)", async () => {
+    const config = {
+      domain: "auth",
+      basePath: "/api/v1",
+      entities: {},
+      operations: {
+        issueToken: {
+          method: "POST" as const,
+          path: "/auth/token/issue",
+          input: z.object({ username: z.string(), password: z.string() }),
+          output: z.object({ accessToken: z.string() }),
+          transformRequest: (input: unknown) => ({
+            headers: {
+              Authorization: `Basic ${btoa(`${(input as { username: string; password: string }).username}:${(input as { username: string; password: string }).password}`)}`,
+            },
+          }),
+        },
+      },
+    };
+
+    const mockFetch = vi.fn().mockResolvedValue({ accessToken: "abc" });
+    const client = deriveClient(config, mockFetch);
+    const issueToken = client.issueToken as (...args: unknown[]) => Promise<unknown>;
+
+    await issueToken({ username: "admin", password: "secret" });
+    expect(mockFetch).toHaveBeenCalledWith("/api/v1/auth/token/issue", {
+      method: "POST",
+      headers: { Authorization: `Basic ${btoa("admin:secret")}` },
+    });
+  });
+
+  it("sends form-encoded body via transformRequest", async () => {
+    const config = {
+      domain: "auth",
+      basePath: "/api",
+      entities: {},
+      operations: {
+        login: {
+          method: "POST" as const,
+          path: "/login",
+          input: z.object({ username: z.string(), password: z.string() }),
+          output: z.object({ token: z.string() }),
+          transformRequest: (input: unknown) => ({
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams(input as Record<string, string>).toString(),
+          }),
+        },
+      },
+    };
+
+    const mockFetch = vi.fn().mockResolvedValue({ token: "xyz" });
+    const client = deriveClient(config, mockFetch);
+    const login = client.login as (...args: unknown[]) => Promise<unknown>;
+
+    await login({ username: "user", password: "pass" });
+    expect(mockFetch).toHaveBeenCalledWith("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "username=user&password=pass",
+    });
+  });
+
+  it("overrides URL via transformRequest (query params)", async () => {
+    const config = {
+      domain: "search",
+      basePath: "/api",
+      entities: {},
+      operations: {
+        search: {
+          method: "GET" as const,
+          path: "/search",
+          input: z.object({ q: z.string() }),
+          output: z.object({ results: z.array(z.string()) }),
+          transformRequest: (input: unknown, url: string) => ({
+            url: `${url}?${new URLSearchParams(input as Record<string, string>).toString()}`,
+          }),
+        },
+      },
+    };
+
+    const mockFetch = vi.fn().mockResolvedValue({ results: [] });
+    const client = deriveClient(config, mockFetch);
+    const search = client.search as (...args: unknown[]) => Promise<unknown>;
+
+    await search({ q: "hello" });
+    expect(mockFetch).toHaveBeenCalledWith("/api/search?q=hello", {
+      method: "GET",
+    });
+  });
+
+  it("applies transformRequest on entity generic operations", async () => {
+    const config = {
+      domain: "project",
+      basePath: "/api/v1",
+      entities: {
+        task: {
+          schema: taskSchema,
+          operations: {
+            customAction: {
+              method: "POST" as const,
+              path: "/tasks/:id/custom",
+              input: z.object({ data: z.string() }),
+              transformRequest: (input: unknown) => ({
+                headers: { "X-Custom": "true" },
+                body: JSON.stringify(input),
+              }),
+            },
+          },
+        },
+      },
+    };
+
+    const mockFetch = vi.fn().mockResolvedValue({ ok: true });
+    const client = deriveClient(config, mockFetch);
+    const taskClient = client.task as { customAction: (...args: unknown[]) => Promise<unknown> };
+
+    await taskClient.customAction("task-1", { data: "value" });
+    expect(mockFetch).toHaveBeenCalledWith("/api/v1/tasks/task-1/custom", {
+      method: "POST",
+      headers: { "X-Custom": "true" },
+      body: JSON.stringify({ data: "value" }),
+    });
+  });
+});
+
+describe("deriveClient with transformResponse", () => {
+  it("applies transformResponse to top-level operation", async () => {
+    const config = {
+      domain: "auth",
+      basePath: "/api",
+      entities: {},
+      operations: {
+        getToken: {
+          method: "POST" as const,
+          path: "/token",
+          input: z.object({}),
+          output: z.object({ accessToken: z.string(), accessTokenExpiry: z.string() }),
+          transformResponse: (raw: unknown) => ({
+            token: (raw as { accessToken: string }).accessToken,
+            expiresAt: (raw as { accessTokenExpiry: string }).accessTokenExpiry,
+          }),
+        },
+      },
+    };
+
+    const mockFetch = vi.fn().mockResolvedValue({
+      accessToken: "abc",
+      accessTokenExpiry: "2026-01-01",
+    });
+    const client = deriveClient(config, mockFetch);
+    const getToken = client.getToken as (...args: unknown[]) => Promise<unknown>;
+
+    const result = await getToken({});
+    expect(result).toEqual({ token: "abc", expiresAt: "2026-01-01" });
+  });
+
+  it("applies transformResponse without transformRequest (default request)", async () => {
+    const config = {
+      domain: "auth",
+      basePath: "/api",
+      entities: {},
+      operations: {
+        refresh: {
+          method: "POST" as const,
+          path: "/token/refresh",
+          input: z.object({}),
+          output: z.object({ accessToken: z.string(), refreshToken: z.string() }),
+          transformResponse: (raw: unknown) => ({
+            access: (raw as { accessToken: string }).accessToken,
+            refresh: (raw as { refreshToken: string }).refreshToken,
+          }),
+        },
+      },
+    };
+
+    const mockFetch = vi.fn().mockResolvedValue({
+      accessToken: "new-access",
+      refreshToken: "new-refresh",
+    });
+    const client = deriveClient(config, mockFetch);
+    const refresh = client.refresh as (...args: unknown[]) => Promise<unknown>;
+
+    const result = await refresh({});
+    expect(result).toEqual({ access: "new-access", refresh: "new-refresh" });
+  });
+
+  it("applies both transformRequest and transformResponse together", async () => {
+    const config = {
+      domain: "auth",
+      basePath: "/api",
+      entities: {},
+      operations: {
+        login: {
+          method: "POST" as const,
+          path: "/login",
+          input: z.object({ user: z.string(), pass: z.string() }),
+          output: z.object({ accessToken: z.string(), accessTokenExpiry: z.string() }),
+          transformRequest: (input: unknown) => ({
+            headers: {
+              Authorization: `Basic ${btoa(`${(input as { user: string }).user}:${(input as { pass: string }).pass}`)}`,
+            },
+          }),
+          transformResponse: (raw: unknown) => ({
+            token: (raw as { accessToken: string }).accessToken,
+            expiresAt: (raw as { accessTokenExpiry: string }).accessTokenExpiry,
+          }),
+        },
+      },
+    };
+
+    const mockFetch = vi.fn().mockResolvedValue({
+      accessToken: "tok",
+      accessTokenExpiry: "2026-12-31",
+    });
+    const client = deriveClient(config, mockFetch);
+    const login = client.login as (...args: unknown[]) => Promise<unknown>;
+
+    const result = await login({ user: "admin", pass: "pw" });
+
+    expect(mockFetch).toHaveBeenCalledWith("/api/login", {
+      method: "POST",
+      headers: { Authorization: `Basic ${btoa("admin:pw")}` },
+    });
+    expect(result).toEqual({ token: "tok", expiresAt: "2026-12-31" });
+  });
+
+  it("applies transformResponse on entity generic operations", async () => {
+    const config = {
+      domain: "project",
+      basePath: "/api/v1",
+      entities: {
+        task: {
+          schema: taskSchema,
+          operations: {
+            status: {
+              method: "GET" as const,
+              path: "/tasks/:id/status",
+              output: z.object({ statusCode: z.number(), statusName: z.string() }),
+              transformResponse: (raw: unknown) => ({
+                code: (raw as { statusCode: number }).statusCode,
+                name: (raw as { statusName: string }).statusName,
+              }),
+            },
+          },
+        },
+      },
+    };
+
+    const mockFetch = vi.fn().mockResolvedValue({ statusCode: 1, statusName: "active" });
+    const client = deriveClient(config, mockFetch);
+    const taskClient = client.task as { status: (...args: unknown[]) => Promise<unknown> };
+
+    const result = await taskClient.status("task-1");
+    expect(result).toEqual({ code: 1, name: "active" });
+  });
+});

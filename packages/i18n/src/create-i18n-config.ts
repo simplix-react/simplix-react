@@ -2,6 +2,7 @@ import { getDomainTranslationRegistry } from "./domain-translations.js";
 import { I18nextAdapter } from "./i18next-adapter.js";
 import type { TranslationResources } from "./i18next-adapter.js";
 import type { ModuleTranslations } from "./module-translations.js";
+import { getModuleTranslationRegistry } from "./module-translations.js";
 import type { LocaleCode, LocaleConfig } from "./types.js";
 import { DEFAULT_LOCALES } from "./utils/locale-config.js";
 
@@ -130,7 +131,12 @@ export function createI18nConfig(
       persistLocale(adapter, storageKey);
     }
 
-    for (const mod of moduleTranslations) {
+    const allModuleTranslations = [
+      ...moduleTranslations,
+      ...getModuleTranslationRegistry().values(),
+    ];
+
+    for (const mod of allModuleTranslations) {
       for (const locale of mod.locales) {
         const translations = await mod.load(locale);
         for (const [componentPath, data] of Object.entries(translations)) {

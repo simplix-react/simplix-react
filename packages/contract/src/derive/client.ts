@@ -9,7 +9,7 @@ import type { ListParams, QueryBuilder } from "../helpers/query-types.js";
 import { buildPath } from "../helpers/path-builder.js";
 import { interpolatePath, extractPathParams } from "../helpers/path-params.js";
 import { resolveRole } from "../helpers/resolve-role.js";
-import { ApiError, defaultFetch } from "../helpers/fetch.js";
+import { ApiError, getDefaultFetch } from "../helpers/fetch.js";
 
 /**
  * Derives a type-safe HTTP client from an {@link ApiContractConfig}.
@@ -42,18 +42,20 @@ export function deriveClient<
   TOperations extends Record<string, OperationDefinition>,
 >(
   config: ApiContractConfig<TEntities, TOperations>,
-  fetchFn: FetchFn = defaultFetch,
+  fetchFn?: FetchFn,
 ) {
+  const resolvedFetch: FetchFn = fetchFn
+    ?? (<T>(path: string, options?: RequestInit) => getDefaultFetch()<T>(path, options));
   const { basePath, entities, operations, queryBuilder } = config;
   const result: Record<string, unknown> = {};
 
   for (const [name, entity] of Object.entries(entities)) {
-    result[name] = createEntityClient(basePath, entity, fetchFn, queryBuilder);
+    result[name] = createEntityClient(basePath, entity, resolvedFetch, queryBuilder);
   }
 
   if (operations) {
     for (const [name, operation] of Object.entries(operations)) {
-      result[name] = createTopLevelOperationClient(basePath, operation, fetchFn);
+      result[name] = createTopLevelOperationClient(basePath, operation, resolvedFetch);
     }
   }
 
@@ -251,7 +253,7 @@ function createGenericOperationFn(
 ) {
   const paramNames = extractPathParams(op.path);
 
-  return (...args: unknown[]) => {
+  return async (...args: unknown[]) => {
     const pathParams: Record<string, string> = {};
     let argIndex = 0;
 
@@ -269,6 +271,16 @@ function createGenericOperationFn(
 
     const url = `${basePath}${buildPath(op.path, pathParams)}`;
 
+    if (op.transformRequest) {
+      const transformed = op.transformRequest(inputData, url);
+      const reqUrl = transformed.url ?? url;
+      const reqOptions: RequestInit = { method: op.method };
+      if (transformed.headers) reqOptions.headers = transformed.headers;
+      if (transformed.body !== undefined) reqOptions.body = transformed.body;
+      const raw = await fetchFn(reqUrl, reqOptions);
+      return op.transformResponse ? op.transformResponse(raw) : raw;
+    }
+
     if (op.contentType === "multipart" && inputData !== undefined) {
       return multipartFetch(url, op.method, toFormData(inputData), op.responseType);
     }
@@ -282,7 +294,8 @@ function createGenericOperationFn(
       options.body = JSON.stringify(inputData);
     }
 
-    return fetchFn(url, options);
+    const result = await fetchFn(url, options);
+    return op.transformResponse ? op.transformResponse(result) : result;
   };
 }
 
@@ -293,7 +306,7 @@ function createTopLevelOperationClient(
   operation: OperationDefinition,
   fetchFn: FetchFn,
 ) {
-  return (...args: unknown[]) => {
+  return async (...args: unknown[]) => {
     const pathParams: Record<string, string> = {};
     const paramNames = (operation.path.match(/:(\w+)/g) ?? []).map((p) =>
       p.slice(1),
@@ -315,6 +328,16 @@ function createTopLevelOperationClient(
 
     const url = `${basePath}${buildPath(operation.path, pathParams)}`;
 
+    if (operation.transformRequest) {
+      const transformed = operation.transformRequest(inputData, url);
+      const reqUrl = transformed.url ?? url;
+      const reqOptions: RequestInit = { method: operation.method };
+      if (transformed.headers) reqOptions.headers = transformed.headers;
+      if (transformed.body !== undefined) reqOptions.body = transformed.body;
+      const raw = await fetchFn(reqUrl, reqOptions);
+      return operation.transformResponse ? operation.transformResponse(raw) : raw;
+    }
+
     if (operation.contentType === "multipart" && inputData !== undefined) {
       return multipartFetch(url, operation.method, toFormData(inputData), operation.responseType);
     }
@@ -328,7 +351,8 @@ function createTopLevelOperationClient(
       options.body = JSON.stringify(inputData);
     }
 
-    return fetchFn(url, options);
+    const result = await fetchFn(url, options);
+    return operation.transformResponse ? operation.transformResponse(result) : result;
   };
 }
 

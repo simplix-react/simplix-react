@@ -148,6 +148,41 @@ describe("createAuthFetch", () => {
       expect(mockBaseFetch).toHaveBeenCalledTimes(1);
     });
 
+    it("retries after 401 with duck-typed error (has .status property)", async () => {
+      store.set("access_token", "old-token");
+
+      const refreshFn = vi.fn().mockResolvedValue({
+        accessToken: "new-token",
+      });
+
+      const scheme = bearerScheme({
+        store,
+        token: () => store.get("access_token"),
+        refresh: { refreshFn },
+      });
+
+      // Error with .status property but not an ApiError instance
+      class CustomError extends Error {
+        constructor(public readonly status: number, message: string) {
+          super(message);
+        }
+      }
+
+      const authFetch = createAuthFetch(
+        { schemes: [scheme] },
+        mockBaseFetch,
+      );
+
+      (mockBaseFetch as ReturnType<typeof vi.fn>)
+        .mockRejectedValueOnce(new CustomError(401, "Unauthorized"))
+        .mockResolvedValueOnce({ data: "success" });
+
+      const result = await authFetch("/api/protected");
+      expect(result).toEqual({ data: "success" });
+      expect(mockBaseFetch).toHaveBeenCalledTimes(2);
+      expect(refreshFn).toHaveBeenCalledOnce();
+    });
+
     it("does not retry non-ApiError errors", async () => {
       store.set("access_token", "token");
 
@@ -166,6 +201,46 @@ describe("createAuthFetch", () => {
 
       await expect(authFetch("/api/data")).rejects.toThrow(TypeError);
       expect(mockBaseFetch).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("custom is401 predicate", () => {
+    it("uses custom is401 predicate for 401 detection", async () => {
+      store.set("access_token", "token");
+
+      const refreshFn = vi.fn().mockResolvedValue({
+        accessToken: "new-token",
+      });
+
+      const scheme = bearerScheme({
+        store,
+        token: () => store.get("access_token"),
+        refresh: { refreshFn },
+      });
+
+      // Custom predicate that treats 403 as "needs refresh"
+      const is401 = (error: unknown) =>
+        error instanceof Error && "status" in error &&
+        (error as Error & { status: number }).status === 403;
+
+      const authFetch = createAuthFetch(
+        { schemes: [scheme], is401 },
+        mockBaseFetch,
+      );
+
+      class HttpError extends Error {
+        constructor(public readonly status: number) {
+          super(`HTTP ${status}`);
+        }
+      }
+
+      (mockBaseFetch as ReturnType<typeof vi.fn>)
+        .mockRejectedValueOnce(new HttpError(403))
+        .mockResolvedValueOnce("ok");
+
+      const result = await authFetch("/api/data");
+      expect(result).toBe("ok");
+      expect(refreshFn).toHaveBeenCalledOnce();
     });
   });
 
@@ -326,6 +401,31 @@ describe("createAuthFetch", () => {
       expect(call[1].headers).toMatchObject({
         Authorization: "Bearer bearer-token",
         "X-API-Key": "api-key",
+      });
+    });
+  });
+
+  describe("custom base fetch", () => {
+    it("uses provided baseFetchFn instead of defaultFetch", async () => {
+      const customFetch = vi.fn().mockResolvedValue({ transformed: true });
+      store.set("access_token", "token");
+
+      const authFetch = createAuthFetch(
+        {
+          schemes: [
+            bearerScheme({ store, token: () => store.get("access_token") }),
+          ],
+        },
+        customFetch,
+      );
+
+      await authFetch("/api/data");
+
+      expect(customFetch).toHaveBeenCalledTimes(1);
+      const call = customFetch.mock.calls[0];
+      expect(call[0]).toBe("/api/data");
+      expect(call[1].headers).toMatchObject({
+        Authorization: "Bearer token",
       });
     });
   });

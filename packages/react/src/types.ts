@@ -22,9 +22,9 @@ import type { z } from "zod";
  *
  * @example
  * ```ts
- * import { deriveHooks } from "@simplix-react/react";
+ * import { deriveEntityHooks } from "@simplix-react/react";
  *
- * const hooks = deriveHooks(projectContract);
+ * const hooks = deriveEntityHooks(projectContract);
  * const { data: tasks } = hooks.task.useList(projectId, {
  *   filters: { status: "open" },
  *   sort: { field: "createdAt", direction: "desc" },
@@ -48,9 +48,9 @@ export type DerivedListHook<TData> = (
  *
  * @example
  * ```ts
- * import { deriveHooks } from "@simplix-react/react";
+ * import { deriveEntityHooks } from "@simplix-react/react";
  *
- * const hooks = deriveHooks(projectContract);
+ * const hooks = deriveEntityHooks(projectContract);
  * const { data: task } = hooks.task.useGet(taskId);
  * ```
  *
@@ -72,9 +72,9 @@ export type DerivedGetHook<TData> = (
  *
  * @example
  * ```ts
- * import { deriveHooks } from "@simplix-react/react";
+ * import { deriveEntityHooks } from "@simplix-react/react";
  *
- * const hooks = deriveHooks(projectContract);
+ * const hooks = deriveEntityHooks(projectContract);
  * const createTask = hooks.task.useCreate(projectId);
  * createTask.mutate({ title: "New task", status: "open" });
  * ```
@@ -101,9 +101,9 @@ export type DerivedCreateHook<TInput, TOutput> = (
  *
  * @example
  * ```ts
- * import { deriveHooks } from "@simplix-react/react";
+ * import { deriveEntityHooks } from "@simplix-react/react";
  *
- * const hooks = deriveHooks(projectContract);
+ * const hooks = deriveEntityHooks(projectContract);
  * const updateTask = hooks.task.useUpdate({ optimistic: true });
  * updateTask.mutate({ id: taskId, dto: { status: "done" } });
  * ```
@@ -125,9 +125,9 @@ export type DerivedUpdateHook<TInput, TOutput> = (
  *
  * @example
  * ```ts
- * import { deriveHooks } from "@simplix-react/react";
+ * import { deriveEntityHooks } from "@simplix-react/react";
  *
- * const hooks = deriveHooks(projectContract);
+ * const hooks = deriveEntityHooks(projectContract);
  * const deleteTask = hooks.task.useDelete();
  * deleteTask.mutate(taskId);
  * ```
@@ -171,9 +171,9 @@ export type DerivedInfiniteListHook<TData> = (
  *
  * @example
  * ```ts
- * import { deriveHooks } from "@simplix-react/react";
+ * import { deriveEntityHooks } from "@simplix-react/react";
  *
- * const hooks = deriveHooks(inventoryContract);
+ * const hooks = deriveEntityHooks(inventoryContract);
  *
  * // CRUD hooks (from operations with CRUD roles)
  * const { data } = hooks.product.useList();
@@ -188,7 +188,7 @@ export type DerivedInfiniteListHook<TData> = (
  * const { data: results } = hooks.product.useSearch({ q: "keyword" });
  * ```
  *
- * @see {@link deriveHooks} for generating these hooks from a contract.
+ * @see {@link deriveEntityHooks} for generating these hooks from a contract.
  */
 export type EntityHooks<
   _TSchema extends z.ZodTypeAny = z.ZodTypeAny,
@@ -220,7 +220,7 @@ export type OperationMutationHook<TInput, TOutput> = (
  * @typeParam TInput - The Zod schema defining the operation input
  * @typeParam TOutput - The Zod schema defining the operation output
  *
- * @see {@link deriveHooks} for generating hooks from a contract.
+ * @see {@link deriveEntityHooks} for generating hooks from a contract.
  */
 export interface OperationHooks<
   TInput extends z.ZodTypeAny,

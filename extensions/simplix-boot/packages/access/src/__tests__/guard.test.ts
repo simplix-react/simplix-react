@@ -1,7 +1,7 @@
 import type { AccessRule } from "@simplix-react/access";
 import { describe, expect, it } from "vitest";
 
-import { hasBackofficeAccess } from "../backoffice-guard.js";
+import { hasBackofficeAccess } from "../guard.js";
 
 type WideRule = AccessRule<string, string>;
 

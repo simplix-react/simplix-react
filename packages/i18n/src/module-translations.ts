@@ -42,6 +42,48 @@ export interface ModuleTranslations {
   load: (locale: string) => Promise<Record<string, Record<string, unknown>>>;
 }
 
+const moduleRegistry = new Map<string, ModuleTranslations>();
+
+/**
+ * Registers module translations into the global registry.
+ *
+ * Call this as a side-effect import in your module package's entry point
+ * so translations are available when the package is imported.
+ *
+ * @param translations - The module translation descriptor built via {@link buildModuleTranslations}.
+ *
+ * @example
+ * ```ts
+ * import { buildModuleTranslations, registerModuleTranslations } from "@simplix-react/i18n";
+ *
+ * const translations = buildModuleTranslations({
+ *   namespace: "dashboard",
+ *   locales: ["en", "ko"],
+ *   components: { ... },
+ * });
+ *
+ * registerModuleTranslations(translations);
+ * ```
+ */
+export function registerModuleTranslations(
+  translations: ModuleTranslations,
+): void {
+  moduleRegistry.set(translations.namespace, translations);
+}
+
+/**
+ * Returns a read-only view of the module translation registry.
+ *
+ * Used internally by {@link createI18nConfig} to load all registered
+ * module translations during initialization.
+ */
+export function getModuleTranslationRegistry(): ReadonlyMap<
+  string,
+  ModuleTranslations
+> {
+  return moduleRegistry;
+}
+
 /**
  * Builds a lazy-loadable module translation descriptor from per-component translation loaders.
  *

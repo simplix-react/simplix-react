@@ -1,0 +1,18 @@
+{
+  "user": {
+    "fields": {
+      "userId": "ユーザーID",
+      "username": "ユーザー名",
+      "displayName": "表示名",
+      "email": "メール",
+      "roles": "ロール",
+      "isSuperAdmin": "スーパー管理者"
+    }
+  },
+  "role": {
+    "fields": {
+      "roleCode": "ロールコード",
+      "roleName": "ロール名"
+    }
+  }
+}

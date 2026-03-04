@@ -1,18 +1,21 @@
 {
-  "name": "@simplix-boot/auth",
+  "name": "@simplix-react-ext/simplix-boot-auth",
   "version": "0.1.0",
-  "description": "Spring Security authentication adapter for @simplix-react/auth",
+  "description": "Spring Security authentication for simplix-boot",
   "type": "module",
-  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./mock": {
+      "types": "./dist/mock.d.ts",
+      "import": "./dist/mock.js"
     }
   },
   "files": ["dist"],
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && cp -r src/locales dist/",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src",
@@ -20,17 +23,23 @@
     "clean": "rm -rf dist .turbo"
   },
   "peerDependencies": {
+    "@simplix-react/api": "workspace:*",
     "@simplix-react/auth": "workspace:*",
-    "@simplix-react/contract": "workspace:*"
+    "@simplix-react/i18n": "workspace:*",
+    "zod": "^4.0.0"
   },
   "devDependencies": {
+    "@simplix-react/api": "workspace:*",
     "@simplix-react/auth": "workspace:*",
-    "@simplix-react/contract": "workspace:*",
+    "@simplix-react/i18n": "workspace:*",
+    "@simplix-react/mock": "workspace:*",
     "@simplix-react/config-eslint": "workspace:*",
     "@simplix-react/config-typescript": "workspace:*",
     "eslint": "^9.39.2",
+    "msw": "^2.7.0",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
-    "vitest": "^3.0.0"
+    "vitest": "^3.0.0",
+    "zod": "^4.0.0"
   }
 }

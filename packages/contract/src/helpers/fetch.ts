@@ -19,6 +19,22 @@
  * }
  * ```
  */
+// ── Global default fetch configuration ──
+
+let _configuredFetchFn: FetchFn | undefined;
+
+/** Sets the default fetch function used by all contracts without explicit fetchFn. */
+export function configureDefaultFetch(fn: FetchFn): void {
+  _configuredFetchFn = fn;
+}
+
+/** Returns the configured default fetch, falling back to defaultFetch. */
+export function getDefaultFetch(): FetchFn {
+  return _configuredFetchFn ?? defaultFetch;
+}
+
+type FetchFn = <T>(path: string, options?: RequestInit) => Promise<T>;
+
 export class ApiError extends Error {
   constructor(
     /** HTTP status code of the failed response. */

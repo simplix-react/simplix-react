@@ -98,6 +98,7 @@ export function AccessProvider({
   children,
 }: AccessProviderProps) {
   const initializedRef = useRef(false);
+  const lastSyncedTokenRef = useRef<string | null | undefined>(undefined);
 
   useEffect(() => {
     if (!auth) return;
@@ -105,10 +106,12 @@ export function AccessProvider({
     async function sync() {
       if (auth!.isAuthenticated()) {
         const token = auth!.getAccessToken();
-        if (token) {
+        if (token && token !== lastSyncedTokenRef.current) {
+          lastSyncedTokenRef.current = token;
           await policy.update(token);
         }
-      } else {
+      } else if (lastSyncedTokenRef.current !== null) {
+        lastSyncedTokenRef.current = null;
         policy.clear();
         await policy.loadPublicAccess();
       }

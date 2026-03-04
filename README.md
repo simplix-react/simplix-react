@@ -17,7 +17,7 @@ simplix-react is a package-first React framework that auto-generates reusable do
 
 - **Contract-Driven** -- Define entities and operations once with Zod schemas; everything else is derived.
 - **Type-Safe End-to-End** -- Full TypeScript inference from API contract through React hooks to UI components.
-- **Auto-Generated Hooks** -- `deriveHooks` produces `useList`, `useGet`, `useCreate`, `useUpdate`, `useDelete`, and `useInfiniteList` per entity.
+- **Auto-Generated Hooks** -- `deriveEntityHooks` produces `useList`, `useGet`, `useCreate`, `useUpdate`, `useDelete`, and `useInfiniteList` per entity.
 - **Mock-First Development** -- Auto-generate MSW handlers and in-memory mock stores from the same contract.
 - **Monorepo Architecture** -- Modular packages that can be adopted incrementally.
 
@@ -89,9 +89,9 @@ const api = defineApi({
 ### 3. Derive hooks
 
 ```ts
-import { deriveHooks } from "@simplix-react/react";
+import { deriveEntityHooks } from "@simplix-react/react";
 
-const hooks = deriveHooks(api);
+const hooks = deriveEntityHooks(api);
 ```
 
 ### 4. Use in a component

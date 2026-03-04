@@ -1,7 +1,6 @@
 import type { AccessAdapter, AccessExtractResult } from "@simplix-react/access";
-import { defaultFetch } from "@simplix-react/contract";
 
-import { convertSpringPermissionsToCasl } from "./convert-permissions.js";
+import { convertSpringPermissionsToCasl } from "./convert.js";
 import type {
   SpringAccessAdapterOptions,
   SpringPermissionsResponse,
@@ -15,23 +14,8 @@ const DEFAULT_SYSTEM_ADMIN_ROLE = "ROLE_SYSTEM_ADMIN";
 /**
  * Creates an {@link AccessAdapter} for Spring Security permission endpoints.
  *
- * @remarks
- * The adapter fetches permissions from the configured endpoint, converts
- * the Spring Security response format into CASL rules, and determines
- * super-admin status from roles.
- *
  * @param options - Adapter configuration.
  * @returns An {@link AccessAdapter} compatible with `@simplix-react/access`.
- *
- * @example
- * ```ts
- * import { createSpringAccessAdapter } from "@simplix-boot/access";
- *
- * const adapter = createSpringAccessAdapter({
- *   permissionsEndpoint: "/api/v1/user/me/permissions",
- *   fetchFn: auth.fetchFn,
- * });
- * ```
  */
 export function createSpringAccessAdapter(
   options: SpringAccessAdapterOptions = {},
@@ -40,8 +24,12 @@ export function createSpringAccessAdapter(
     permissionsEndpoint = DEFAULT_PERMISSIONS_ENDPOINT,
     publicPermissionsEndpoint = DEFAULT_PUBLIC_PERMISSIONS_ENDPOINT,
     systemAdminRole = DEFAULT_SYSTEM_ADMIN_ROLE,
-    fetchFn = defaultFetch,
+    fetchFn,
   } = options;
+
+  if (!fetchFn) {
+    throw new Error("fetchFn is required for createSpringAccessAdapter");
+  }
 
   return {
     async extract(authData: unknown): Promise<AccessExtractResult> {

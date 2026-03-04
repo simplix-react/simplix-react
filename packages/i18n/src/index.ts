@@ -32,7 +32,10 @@ export type {
 } from "./i18next-adapter.js";
 
 // Utilities
-export { buildModuleTranslations } from "./module-translations.js";
+export {
+  buildModuleTranslations,
+  registerModuleTranslations,
+} from "./module-translations.js";
 export type {
   ComponentTranslations,
   BuildModuleTranslationsOptions,

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { defaultFetch, ApiError } from "../helpers/fetch.js";
+import { defaultFetch, ApiError, configureDefaultFetch, getDefaultFetch } from "../helpers/fetch.js";
 
 describe("ApiError", () => {
   it("constructs with status and body", () => {
@@ -213,5 +213,32 @@ describe("defaultFetch", () => {
 
     const result = await defaultFetch("/api/value");
     expect(result).toBe("");
+  });
+});
+
+describe("configureDefaultFetch / getDefaultFetch", () => {
+  afterEach(() => {
+    // Reset to defaultFetch by configuring with undefined-like reset
+    configureDefaultFetch(defaultFetch);
+  });
+
+  it("returns defaultFetch when nothing is configured", () => {
+    configureDefaultFetch(defaultFetch); // reset first
+    expect(getDefaultFetch()).toBe(defaultFetch);
+  });
+
+  it("returns custom fetchFn after configureDefaultFetch", () => {
+    const customFn = vi.fn() as unknown as typeof defaultFetch;
+    configureDefaultFetch(customFn);
+    expect(getDefaultFetch()).toBe(customFn);
+  });
+
+  it("overrides previous configuration", () => {
+    const fn1 = vi.fn() as unknown as typeof defaultFetch;
+    const fn2 = vi.fn() as unknown as typeof defaultFetch;
+    configureDefaultFetch(fn1);
+    expect(getDefaultFetch()).toBe(fn1);
+    configureDefaultFetch(fn2);
+    expect(getDefaultFetch()).toBe(fn2);
   });
 });

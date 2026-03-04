@@ -18,6 +18,24 @@ function getMswWorkerScript(): string {
  * - **Dev**: serves it via middleware at `/mockServiceWorker.js`
  * - **Build**: emits it as a static asset in the output directory
  *
+ * @remarks
+ * ## Why `any` return type instead of `Plugin`?
+ *
+ * When this package is consumed via pnpm `link:` dependencies across separate
+ * workspaces (e.g. simplix-react ↔ consumer app), each workspace resolves its
+ * own `vite` instance from a different pnpm virtual store path — even when
+ * both are the same version. TypeScript treats these as distinct nominal types,
+ * causing TS2769 ("No overload matches this call") in the consumer's
+ * `vite.config.ts`.
+ *
+ * Returning `any` instead of `Plugin` removes the vite type import from the
+ * generated `.d.ts`, eliminating the cross-workspace type conflict entirely.
+ *
+ * - **External safety**: consumers only pass the result to vite's `plugins`
+ *   array, so `any` is sufficient.
+ * - **Internal safety**: the local `plugin` variable is typed as `Plugin`,
+ *   preserving full type-checking within this file.
+ *
  * @example
  * ```ts
  * // vite.config.ts
@@ -28,10 +46,11 @@ function getMswWorkerScript(): string {
  * });
  * ```
  */
-export function mswPlugin(): Plugin {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function mswPlugin(): any {
   let workerScript: string;
 
-  return {
+  const plugin: Plugin = {
     name: "simplix-react:msw-worker",
     apply: (_config, env) => {
       // Only apply in dev or when building for non-production
@@ -63,4 +82,6 @@ export function mswPlugin(): Plugin {
       });
     },
   };
+
+  return plugin;
 }

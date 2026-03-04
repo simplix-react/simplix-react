@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useSyncExternalStore } from "react";
+import { createContext, useContext, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { ReactNode } from "react";
 import type { AuthInstance } from "../types.js";
 
@@ -36,7 +36,16 @@ export interface AuthProviderProps {
  */
 export function AuthProvider({ auth, children, userLoader }: AuthProviderProps) {
   const [isLoading, setIsLoading] = useState(!!userLoader);
+  const initDone = useRef(false);
 
+  // Track authentication state to detect login
+  const isAuthenticated = useSyncExternalStore(
+    auth.subscribe,
+    () => auth.isAuthenticated(),
+    () => false,
+  );
+
+  // Initialization: rehydrate tokens from store and load user info
   useEffect(() => {
     if (!userLoader) return;
 
@@ -55,7 +64,10 @@ export function AuthProvider({ auth, children, userLoader }: AuthProviderProps) 
         }
       }
 
-      if (!cancelled) setIsLoading(false);
+      if (!cancelled) {
+        initDone.current = true;
+        setIsLoading(false);
+      }
     }
 
     void init();
@@ -64,6 +76,28 @@ export function AuthProvider({ auth, children, userLoader }: AuthProviderProps) 
       cancelled = true;
     };
   }, [auth, userLoader]);
+
+  // Post-login: reload user info when auth state transitions to authenticated
+  useEffect(() => {
+    if (!userLoader || !initDone.current) return;
+    if (!isAuthenticated || auth.getUser()) return;
+
+    let cancelled = false;
+    const token = auth.getAccessToken();
+    if (!token) return;
+
+    userLoader(token)
+      .then((user) => {
+        if (!cancelled) auth.setUser(user);
+      })
+      .catch(() => {
+        // Don't clear auth — tokens are valid, user info load is transient
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [auth, userLoader, isAuthenticated]);
 
   return (
     <AuthContext.Provider value={auth}>
