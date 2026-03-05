@@ -1,5 +1,8 @@
 import { Button, Container, Heading, Stack, Text } from "@simplix-react/ui";
 import { useTranslation } from "@simplix-react/i18n/react";
+{{#if hasCreate}}
+import { PlusIcon } from "lucide-react";
+{{/if}}
 
 interface {{EntityPascal}}ListPageProps {
 {{#if hasCreate}}
@@ -17,7 +20,7 @@ export function {{EntityPascal}}ListPage({ {{#if hasCreate}}onCreate{{EntityPasc
           {t("{{entity}}.description")}
         </Text>
 {{#if hasCreate}}
-        <Button onClick={onCreate{{EntityPascal}} }>{t("{{entity}}.new{{EntityPascal}}")}</Button>
+        <Button onClick={onCreate{{EntityPascal}} }><PlusIcon className="size-4" />{t("{{entity}}.addNew{{EntityPascal}}")}</Button>
 {{/if}}
       </Stack>
     </Container>

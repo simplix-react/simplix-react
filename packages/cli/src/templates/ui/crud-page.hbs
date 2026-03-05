@@ -1,6 +1,9 @@
 import type { CrudSearch } from "@simplix-react/ui";
 import { {{#if hasCreate}}Button, {{/if}}Container, ListDetail, Stack{{#if hasDelete}}, adaptOrvalDelete{{/if}}{{#if hasDelete}}, useCrudDeleteWired{{/if}}, useCrudNavigation, useCrudPageState{{#if hasDelete}}, useInvalidateEntity{{/if}}, usePageHeader } from "@simplix-react/ui";
 import { useTranslation } from "@simplix-react/i18n/react";
+{{#if hasCreate}}
+import { PlusIcon } from "lucide-react";
+{{/if}}
 {{#if hookDelete}}
 import { {{hookDelete}} } from "{{packageName}}";
 {{/if}}
@@ -67,7 +70,7 @@ export function {{EntityPascal}}CrudPage({ variant = "panel", search, onNavigate
       return {
         title: t("{{entity}}.{{entityPlural}}"),
 {{#if hasCreate}}
-        actions: <Button onClick={showNew}>{t("{{entity}}.new{{EntityPascal}}")}</Button>,
+        actions: <Button onClick={showNew}><PlusIcon className="size-4" />{t("{{entity}}.addNew{{EntityPascal}}")}</Button>,
 {{/if}}
       };
     }
@@ -75,7 +78,7 @@ export function {{EntityPascal}}CrudPage({ variant = "panel", search, onNavigate
       title: t("{{entity}}.{{entityPlural}}"),
       description: t("{{entity}}.{{entityPlural}}Description"),
 {{#if hasCreate}}
-      actions: <Button onClick={showNew}>{t("{{entity}}.new{{EntityPascal}}")}</Button>,
+      actions: <Button onClick={showNew}><PlusIcon className="size-4" />{t("{{entity}}.addNew{{EntityPascal}}")}</Button>,
 {{/if}}
     };
   })());

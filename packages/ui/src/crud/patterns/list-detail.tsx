@@ -82,27 +82,33 @@ const DIVIDER_TRACK = 17;
 // │ └─────────────────────┘ │    │ └─────────────────┘ │
 // └─────────────────────────┘    └─────────────────────┘
 
-/** Props for the {@link ListDetail} compound component. */
-export interface ListDetailProps {
+/** Common props shared by all width variants. */
+interface ListDetailBaseProps {
   /** Layout variant. `"panel"` renders side-by-side, `"dialog"` renders detail in a modal. */
   variant?: ListDetailVariant;
   /** Controlled active panel. When provided, overrides internal state. */
   activePanel?: "list" | "detail";
-  /** Fixed detail panel width in px (only applies to `"panel"` variant). */
-  detailWidth?: number;
   /** Called when the dialog is dismissed (only applies to `"dialog"` variant). */
   onClose?: () => void;
   className?: string;
   children: ReactNode;
 }
 
+/** Props for the {@link ListDetail} compound component. Use either `detailWidth` or `listWidth`, not both. */
+export type ListDetailProps = ListDetailBaseProps & (
+  | { /** Fixed detail panel width in px. The list panel fills remaining space. */ detailWidth?: number; listWidth?: never }
+  | { detailWidth?: never; /** Fixed list panel width in px. The detail panel fills remaining space. */ listWidth?: number }
+);
+
 /** Minimum width (px) for both list and detail panels during drag. */
 const MIN_PANEL_WIDTH = 280;
 
-export function ListDetailRoot({ variant = "panel", activePanel: activePanelProp, detailWidth = 480, onClose, className, children }: ListDetailProps) {
+export function ListDetailRoot({ variant = "panel", activePanel: activePanelProp, detailWidth = 480, listWidth, onClose, className, children }: ListDetailProps) {
+
   const [activePanelState, setActivePanel] = useState<"list" | "detail">("list");
   const activePanel = activePanelProp ?? activePanelState;
   const [dragDetailWidth, setDragDetailWidth] = useState<number | null>(null);
+  const [dragListWidth, setDragListWidth] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
 
@@ -114,8 +120,9 @@ export function ListDetailRoot({ variant = "panel", activePanel: activePanelProp
       const maxListWidth = totalWidth - DIVIDER_TRACK - MIN_PANEL_WIDTH;
       const clamped = Math.max(MIN_PANEL_WIDTH, Math.min(maxListWidth, newListWidth));
       setDragDetailWidth(totalWidth - clamped - DIVIDER_TRACK);
+      if (listWidth != null) setDragListWidth(clamped);
     },
-    [],
+    [listWidth],
   );
 
   const handleDragStart = useCallback(() => setIsDragging(true), []);
@@ -141,10 +148,13 @@ export function ListDetailRoot({ variant = "panel", activePanel: activePanelProp
     );
   }
 
+  const effectiveListWidth = dragListWidth ?? listWidth;
   const effectiveDetailWidth = dragDetailWidth ?? detailWidth;
   const isDetailOpen = activePanel === "detail";
+  const listCol = effectiveListWidth != null ? `${effectiveListWidth}px` : "1fr";
+  const detailCol = effectiveListWidth != null ? "1fr" : `${effectiveDetailWidth}px`;
   const gridCols = isDetailOpen
-    ? `1fr ${DIVIDER_TRACK}px ${effectiveDetailWidth}px`
+    ? `${listCol} ${DIVIDER_TRACK}px ${detailCol}`
     : undefined;
 
   return (

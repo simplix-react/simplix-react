@@ -432,6 +432,21 @@ function normalizeDomainName(title: string): string {
 
 function camelToLabel(name: string): string {
   if (name.toLowerCase() === "id") return "ID";
+
+  // SCREAMING_SNAKE_CASE (e.g. NULL_FORMAT → Null Format)
+  if (name.includes("_")) {
+    return name
+      .split("_")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+      .join(" ");
+  }
+
+  // ALL_CAPS without underscores (e.g. WIEGAND → Wiegand, RED → Red)
+  if (name === name.toUpperCase() && name.length > 1) {
+    return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+  }
+
+  // camelCase (e.g. formatType → Format Type)
   return name
     .replace(/([A-Z])/g, " $1")
     .replace(/^./, (c) => c.toUpperCase())

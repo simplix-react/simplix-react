@@ -807,6 +807,7 @@ async function updateLocaleJsons(
       entityKeys.sectionTitle = `${EntityPascal} Information`;
     }
     if (ops.hasCreate) entityKeys[`new${EntityPascal}`] = `New ${EntityPascal}`;
+    if (ops.hasCreate) entityKeys[`addNew${EntityPascal}`] = `Add New ${EntityPascal}`;
     if (ops.hasCreate || ops.hasUpdate) entityKeys[`save${EntityPascal}`] = `Save ${EntityPascal}`;
     if (ops.hasUpdate) entityKeys[`edit${EntityPascal}`] = `Edit ${EntityPascal}`;
     if (ops.hasDelete) {
@@ -1535,7 +1536,7 @@ export const scaffoldCrudCommand = new Command("scaffold")
       // Resolve module namespace early (needed by tree/form templates)
       const moduleNamespace = moduleDir ? await resolveModuleNamespace(moduleDir) : entity;
       const hasListDetail = (hasTree || ctx.hasList) && ctx.hasDetail;
-      const moduleName = moduleDir ? path.basename(moduleDir) : entity;
+      const moduleName = moduleDir ? basename(moduleDir) : entity;
       const fullCtx = { ...ctx, moduleNamespace, moduleName, entityIcon: "FileTextIcon", hasListDetail };
 
       const files: Record<string, string> = {};
