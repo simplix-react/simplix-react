@@ -1,18 +1,13 @@
 import Handlebars from "handlebars";
 
-import { toCamelCase, toPascalCase } from "./case.js";
+import { toCamelCase, toPascalCase, toKebabCase } from "./case.js";
 
 // Register helpers
 Handlebars.registerHelper("pascalCase", (str: string) => toPascalCase(str));
 
 Handlebars.registerHelper("camelCase", (str: string) => toCamelCase(str));
 
-Handlebars.registerHelper("kebabCase", (str: string) => {
-  return str
-    .replace(/([a-z])([A-Z])/g, "$1-$2")
-    .replace(/[\s_]+/g, "-")
-    .toLowerCase();
-});
+Handlebars.registerHelper("kebabCase", (str: string) => toKebabCase(str));
 
 Handlebars.registerHelper("json", (obj: unknown) => {
   return JSON.stringify(obj, null, 2);
