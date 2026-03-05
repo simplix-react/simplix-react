@@ -12,6 +12,7 @@ import {createElement, type ReactNode, useCallback, useEffect, useMemo, useRef, 
 import {
   Badge,
   type BadgeVariants,
+  BooleanBadge,
   Button,
   Input,
   Select,
@@ -205,7 +206,7 @@ export interface ListColumnProps<T> {
   header?: string;
   sortable?: boolean;
   width?: number;
-  display?: "badge";
+  display?: "badge" | "boolean";
   format?: "date" | "datetime" | "relative";
   variants?: Record<string, BadgeVariants["variant"]>;
   children?: (props: { value: unknown; row: T }) => ReactNode;
@@ -918,6 +919,11 @@ function ListTable<T>({
             const strVal = String(value ?? "");
             const variant = colDef.variants[strVal] ?? "default";
             return <Badge variant={variant}>{strVal}</Badge>;
+          }
+
+          // Boolean display
+          if (colDef.display === "boolean") {
+            return <BooleanBadge value={!!value} />;
           }
 
           // Format

@@ -1,6 +1,9 @@
 export { Badge, badgeVariants } from "./badge";
 export type { BadgeProps, BadgeVariants } from "./badge";
 
+export { BooleanBadge } from "./boolean-badge";
+export type { BooleanBadgeProps } from "./boolean-badge";
+
 export { Button, buttonVariants } from "./button";
 export type { ButtonProps, ButtonVariants } from "./button";
 

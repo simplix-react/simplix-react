@@ -41,6 +41,7 @@ export type {
 export {
   Badge,
   badgeVariants,
+  BooleanBadge,
   Button,
   buttonVariants,
   Calendar,
@@ -153,6 +154,7 @@ export type {
   UseMapNavigatorResult,
   BadgeProps,
   BadgeVariants,
+  BooleanBadgeProps,
   ButtonProps,
   ButtonVariants,
   CalendarProps,
