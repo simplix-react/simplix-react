@@ -78,6 +78,7 @@ export {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
   Input,
+  NumberInput,
   Label,
   NavigationMenu,
   NavigationMenuContent,
@@ -103,6 +104,7 @@ export {
   SelectTrigger,
   SelectValue,
   Separator,
+  SettingSwitch,
   Table,
   TableBody,
   TableCaption,
@@ -133,7 +135,9 @@ export {
   MapMarker,
   MapNavigator,
   MapPinContainer,
+  MapProvider,
   useMap,
+  useMapDefaults,
   useMapNavigator,
   Tooltip,
   TooltipContent,
@@ -148,6 +152,7 @@ export type {
   MapMarkerProps,
   MapNavigatorProps,
   MapPinContainerProps,
+  MapProviderProps,
   MapRef,
   MapContextValue,
   UseMapNavigatorOptions,
@@ -175,6 +180,7 @@ export type {
   DropdownMenuSubContentProps,
   DropdownMenuSubTriggerProps,
   InputProps,
+  NumberInputProps,
   LabelProps,
   NavigationMenuContentProps,
   NavigationMenuIndicatorProps,
@@ -193,6 +199,7 @@ export type {
   SelectSeparatorProps,
   SelectTriggerProps,
   SeparatorProps,
+  SettingSwitchProps,
   TableBodyProps,
   TableCaptionProps,
   TableCellProps,
@@ -268,7 +275,7 @@ export type {
   UseCrudListResult,
 } from "./crud/list";
 
-export { CrudForm, useAutosave, useCrudFormSubmit, Wizard } from "./crud/form";
+export { CrudForm, useAutosave, useBeforeUnload, useCrudFormSubmit, useIsDirty, useUnsavedChanges, Wizard } from "./crud/form";
 export { adaptOrvalCreate, adaptOrvalDelete, adaptOrvalOrder, adaptOrvalUpdate, useInvalidateEntity } from "./crud/form";
 export type {
   AutosaveStatus,
@@ -280,6 +287,8 @@ export type {
   UseAutosaveReturn,
   UseCrudFormSubmitOptions,
   UseCrudFormSubmitResult,
+  UseUnsavedChangesOptions,
+  UseUnsavedChangesReturn,
   WizardProps,
   WizardStepProps,
 } from "./crud/form";
@@ -395,6 +404,10 @@ export { CrudErrorBoundary } from "./crud/shared";
 export type { CrudErrorBoundaryProps, ErrorBoundaryState } from "./crud/shared";
 export type { ColumnInfo } from "./crud/shared";
 
+// Confirm dialog
+export { ConfirmDialog } from "./crud/shared";
+export type { ConfirmDialogProps } from "./crud/shared";
+
 // Query fallback
 export { QueryFallback } from "./crud/shared";
 export type { QueryFallbackProps } from "./crud/shared";
@@ -436,8 +449,15 @@ export { useVirtualList } from "./crud/list/use-virtual";
 export type { UseVirtualListOptions } from "./crud/list/use-virtual";
 
 // Layout
+export { EditorFooter } from "./layout/editor-footer";
+export type { EditorFooterProps } from "./layout/editor-footer";
 export { PageHeaderProvider, usePageHeader, usePageHeaderState } from "./layout/page-header";
 export type { PageHeaderState } from "./layout/page-header";
+export { PanelHeader } from "./layout/panel-header";
+export type { PanelHeaderProps } from "./layout/panel-header";
+
+// Map utilities
+export { useMapPageData } from "./map/use-map-page-data";
 
 // Geo utilities
 export { isValidCoord, computeBounds, fitMapToBounds, DEFAULT_MAP_FIT_OPTIONS, toRad, haversineDistance, destinationPoint, geoCircle, computeBoundingCircle } from "./utils/geo";

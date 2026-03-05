@@ -86,6 +86,8 @@ export function getMutator(strategy = "default"): OrvalMutator {
   return mutator;
 }
 
+export { resolveBootEnum } from "./boot-enum.js";
+
 // Types that Orval imports in generated code
 export type ErrorType<T = unknown> = Error & { data?: T };
 export type BodyType<T> = T;

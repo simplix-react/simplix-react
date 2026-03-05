@@ -16,6 +16,7 @@ import {
 import { createPortal } from "react-dom";
 
 import { cn } from "../utils/cn";
+import { useMapDefaults } from "./map-provider";
 
 // ── PMTiles protocol ──
 
@@ -191,9 +192,11 @@ type MapProps = {
 type MapRef = MapLibreGL.Map;
 
 const Map = forwardRef<MapRef, MapProps>(function Map(
-  { children, className, theme: themeProp, styles, projection, center, onError, fallbackTileUrl, ...props },
+  { children, className, theme: themeProp, styles, projection, center, onError, fallbackTileUrl: fallbackTileUrlProp, ...props },
   ref,
 ) {
+  const mapDefaults = useMapDefaults();
+  const fallbackTileUrl = fallbackTileUrlProp ?? mapDefaults.defaultFallbackTileUrl;
   const containerRef = useRef<HTMLDivElement>(null);
   const [mapInstance, setMapInstance] = useState<MapLibreGL.Map | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -575,9 +578,11 @@ function MapMarker({
   const el = marker.getElement();
   if (!el) return null;
 
+  const defaults = useMapDefaults();
+
   return createPortal(
     <div className="relative cursor-pointer">
-      {children ?? <DefaultMarkerIcon />}
+      {children ?? defaults.defaultMarkerIcon ?? <DefaultMarkerIcon />}
     </div>,
     el,
   );

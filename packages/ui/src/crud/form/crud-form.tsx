@@ -2,7 +2,6 @@ import {
   type FormEvent,
   type ReactNode,
   useCallback,
-  useEffect,
 } from "react";
 
 import { Button } from "../../base/button";
@@ -14,6 +13,7 @@ import { useUIComponents } from "../../provider/ui-provider";
 import { XIcon } from "../shared/icons";
 import type { SectionShellProps } from "../shared/section-shell";
 import { type FieldVariant, FieldVariantContext } from "../shared/types";
+import { useBeforeUnload } from "./use-before-unload";
 
 // ── Form Root ──
 
@@ -42,17 +42,7 @@ function FormRoot({
   className,
   children,
 }: CrudFormProps) {
-  // Warn about unsaved changes via beforeunload
-  useEffect(() => {
-    if (!warnOnUnsavedChanges) return;
-
-    const handler = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-    };
-
-    window.addEventListener("beforeunload", handler);
-    return () => window.removeEventListener("beforeunload", handler);
-  }, [warnOnUnsavedChanges]);
+  useBeforeUnload(!!warnOnUnsavedChanges);
 
   const handleSubmit = useCallback(
     (e: FormEvent<HTMLFormElement>) => {

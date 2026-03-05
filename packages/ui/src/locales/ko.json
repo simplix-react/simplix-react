@@ -13,7 +13,12 @@
     "no": "아니오",
     "loading": "로딩 중...",
     "notFound": "찾을 수 없습니다.",
-    "deleting": "삭제 중..."
+    "deleting": "삭제 중...",
+    "confirm": "확인",
+    "continue": "계속",
+    "discard": "취소",
+    "unsavedTitle": "저장하지 않은 변경사항",
+    "unsavedDescription": "저장하지 않은 변경사항이 있습니다. 이 페이지를 떠나시겠습니까? 변경사항이 사라집니다."
   },
   "list": {
     "searchPlaceholder": "검색...",

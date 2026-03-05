@@ -74,11 +74,17 @@ export type {
 export { Input } from "./input";
 export type { InputProps } from "./input";
 
+export { NumberInput } from "./number-input";
+export type { NumberInputProps } from "./number-input";
+
 export { Label } from "./label";
 export type { LabelProps } from "./label";
 
 export { Map, MapControls, MapMarker, MapPinContainer, useMap } from "./map";
 export type { MapProps, MapControlsProps, MapMarkerProps, MapPinContainerProps, MapRef, MapContextValue } from "./map";
+
+export { MapProvider, useMapDefaults } from "./map-provider";
+export type { MapProviderProps } from "./map-provider";
 
 export { MapAutoFit } from "./map-auto-fit";
 export type { MapAutoFitProps } from "./map-auto-fit";
@@ -137,6 +143,9 @@ export type {
 
 export { Separator } from "./separator";
 export type { SeparatorProps } from "./separator";
+
+export { SettingSwitch } from "./setting-switch";
+export type { SettingSwitchProps } from "./setting-switch";
 
 export {
   Table,

@@ -29,4 +29,14 @@ export {
   adaptOrvalUpdate,
 } from "./adapt-orval-mutation";
 
+export { useBeforeUnload } from "./use-before-unload";
+
 export { useInvalidateEntity } from "./use-invalidate-entity";
+
+export { useIsDirty } from "./use-is-dirty";
+
+export { useUnsavedChanges } from "./use-unsaved-changes";
+export type {
+  UseUnsavedChangesOptions,
+  UseUnsavedChangesReturn,
+} from "./use-unsaved-changes";
