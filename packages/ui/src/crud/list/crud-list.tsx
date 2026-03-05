@@ -218,6 +218,18 @@ function ListColumn<T>(_props: ListColumnProps<T>): ReactNode {
 
 // ── Format helpers ──
 
+/**
+ * Resolve enum-like objects to their plain value.
+ * Boot API returns enums as `{ type, value, label }` objects.
+ * This extracts `.value` so rendering/formatting works correctly.
+ */
+function resolveValue(value: unknown): unknown {
+  if (typeof value === "object" && value !== null && "value" in value && "type" in value) {
+    return (value as { value: unknown }).value;
+  }
+  return value;
+}
+
 function formatCellValue(value: unknown, format?: "date" | "datetime" | "relative"): string {
   if (value == null) return "";
   if (!format) return String(value);
@@ -893,11 +905,12 @@ function ListTable<T>({
           return colDef.header ?? "";
         },
         cell: ({ getValue, row }) => {
-          const value = getValue();
+          const raw = getValue();
+          const value = resolveValue(raw);
 
-          // Custom render prop
+          // Custom render prop (pass raw for full access)
           if (colDef.children) {
-            return colDef.children({ value, row: row.original });
+            return colDef.children({ value: raw, row: row.original });
           }
 
           // Badge display
