@@ -144,15 +144,21 @@ function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}I
 {{/unless}}
   const { fieldLabel, enumLabel } = useEntityTranslation("{{entity}}");
   const { t } = useTranslation("{{moduleNamespace}}/widgets");
+  const [values, setValues] = useState<Partial<{{EntityPascal}}FormValues>>({
 {{#each fields}}
 {{#if (eq this.name ../treeParentIdField)}}
-  const [{{this.name}}, set{{this.capitalizedName}}] = useState<string | null>(defaultParentId ?? defaultValues?.{{this.name}} ?? null);
+    {{this.name}}: defaultParentId ?? defaultValues?.{{this.name}} ?? null,
 {{else if (eq this.formComponent "DateField")}}
-  const [{{this.name}}, set{{this.capitalizedName}}] = useState<{{this.tsType}}>(parseDate(defaultValues?.{{this.name}}) ?? {{this.defaultValue}});
+    {{this.name}}: parseDate(defaultValues?.{{this.name}}) ?? {{this.defaultValue}},
 {{else}}
-  const [{{this.name}}, set{{this.capitalizedName}}] = useState<{{this.tsType}}>(defaultValues?.{{this.name}} ?? {{this.defaultValue}});
+    {{this.name}}: defaultValues?.{{this.name}} ?? {{this.defaultValue}},
 {{/if}}
 {{/each}}
+  });
+
+  const updateField = useCallback(<K extends keyof {{EntityPascal}}FormValues>(field: K, value: {{EntityPascal}}FormValues[K]) => {
+    setValues(prev => ({ ...prev, [field]: value }));
+  }, []);
 
 {{#if hasTree}}
 {{#if hookTree}}
@@ -167,9 +173,9 @@ function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}I
 
   const handleSubmit = useCallback(
     () => {
-      onSubmit({ {{fieldNameList}} });
+      onSubmit(values as {{EntityPascal}}FormValues);
     },
-    [onSubmit, {{fieldNameList}}],
+    [onSubmit, values],
   );
 
   return (
@@ -177,25 +183,13 @@ function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}I
       <CrudForm.Actions className={onBack || onCancel ? "justify-between" : "justify-end"}>
         {onBack ? (
           <Button type="button" size="sm" variant="outline" onClick={onBack}>
-            <ArrowLeftIcon className="h-4 w-4" />
-{{#if hasTree}}
+            <ArrowLeftIcon className="size-4" />
             {t("common.back")}
-{{else}}
-            Back
-{{/if}}
           </Button>
         ) : onCancel ? (
-{{#if hasTree}}
           <Button type="button" size="sm" variant="outline" onClick={onCancel}>{t("common.cancel")}</Button>
-{{else}}
-          <Button type="button" size="sm" variant="outline" onClick={onCancel}>Cancel</Button>
-{{/if}}
         ) : null}
-{{#if hasTree}}
         <Button type="submit" size="sm" variant="primary">{t("{{entity}}.save{{EntityPascal}}")}</Button>
-{{else}}
-        <Button type="submit" size="sm" variant="primary">Save {{EntityPascal}}</Button>
-{{/if}}
       </CrudForm.Actions>
     }>
       <CrudForm.Section title={t("{{entity}}.sectionTitle")} variant="flat">
@@ -203,8 +197,8 @@ function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}I
 {{#if (eq this.name ../treeParentIdField)}}
         <TreeSelectField<{{../EntityPascal}}>
           label={fieldLabel("{{this.name}}")}
-          value={ {{~this.name~}} }
-          onChange={set{{this.capitalizedName~}} }
+          value={values.{{this.name}} ?? null}
+          onChange={(v) => updateField("{{this.name}}", v)}
           treeData={treeData}
           isLoading={treeLoading}
           config={{ldb}} idField: "{{../rowIdField}}", childrenField: "children" {{rdb}}
@@ -216,8 +210,8 @@ function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}I
 {{else if (eq this.formComponent "TextField")}}
         <FormFields.TextField
           label={fieldLabel("{{this.name}}")}
-          value={ {{~this.name~}} }
-          onChange={set{{this.capitalizedName~}} }
+          value={values.{{this.name}}!}
+          onChange={(v) => updateField("{{this.name}}", v)}
 {{#if (eq this.inputType "email")}}
           type="email"
 {{/if}}
@@ -228,32 +222,32 @@ function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}I
 {{else if (eq this.formComponent "TextareaField")}}
         <FormFields.TextareaField
           label={fieldLabel("{{this.name}}")}
-          value={ {{~this.name~}} }
-          onChange={set{{this.capitalizedName~}} }
+          value={values.{{this.name}}!}
+          onChange={(v) => updateField("{{this.name}}", v)}
         />
 {{else if (eq this.formComponent "NumberField")}}
         <FormFields.NumberField
           label={fieldLabel("{{this.name}}")}
-          value={ {{~this.name~}} }
-          onChange={(v) => set{{this.capitalizedName}}(v ?? {{this.defaultValue}})}
+          value={values.{{this.name}}!}
+          onChange={(v) => updateField("{{this.name}}", v ?? {{this.defaultValue}})}
         />
 {{else if (eq this.formComponent "SwitchField")}}
         <FormFields.SwitchField
           label={fieldLabel("{{this.name}}")}
-          value={ {{~this.name~}} }
-          onChange={set{{this.capitalizedName~}} }
+          value={values.{{this.name}}!}
+          onChange={(v) => updateField("{{this.name}}", v)}
         />
 {{else if (eq this.formComponent "DateField")}}
         <FormFields.DateField
           label={fieldLabel("{{this.name}}")}
-          value={ {{~this.name~}} }
-          onChange={(v) => set{{this.capitalizedName}}(v ?? {{this.defaultValue}})}
+          value={values.{{this.name}}!}
+          onChange={(v) => updateField("{{this.name}}", v ?? {{this.defaultValue}})}
         />
 {{else if (eq this.formComponent "SelectField")}}
         <FormFields.SelectField
           label={fieldLabel("{{this.name}}")}
-          value={ {{~this.name~}} }
-          onChange={set{{this.capitalizedName~}} }
+          value={values.{{this.name}}!}
+          onChange={(v) => updateField("{{this.name}}", v)}
           options={[
 {{#each this.options}}
             { label: enumLabel("{{../../entity}}{{../capitalizedName}}", "{{this}}"), value: "{{this}}" },

@@ -1,0 +1,135 @@
+import { useCallback, useState } from "react";
+
+import {
+  Button,
+  Card,
+  EditorFooter,
+  PanelHeader,
+  QueryFallback,
+  Stack,
+  useInvalidateEntity,
+  useUnsavedChanges,
+} from "@simplix-react/ui";
+import { useTranslation } from "@simplix-react/i18n/react";
+{{#if packageName}}
+import { {{hookGet}}, {{hookUpdate}} } from "{{packageName}}";
+{{/if}}
+{{#if hasUpdate}}
+import type { {{EntityPascal}}DetailDTO, {{EntityPascal}}UpdateDTO } from "{{packageName}}";
+{{/if}}
+
+// -- Types --
+
+interface {{EntityPascal}}EditorProps {
+  {{entity}}Id: string;
+  variant?: "panel" | "page";
+  onClose?: () => void;
+  onSuccess?: () => void;
+}
+
+// -- Outer Guard --
+
+export function {{EntityPascal}}Editor({
+  {{entity}}Id,
+  variant = "panel",
+  onClose,
+  onSuccess,
+}: {{EntityPascal}}EditorProps) {
+  const { t } = useTranslation("{{moduleNamespace}}/widgets");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, isLoading } = {{hookGet}}({{entity}}Id as any) as any;
+
+  if (isLoading) return <QueryFallback isLoading />;
+  if (!data) return <QueryFallback isLoading={false} notFoundMessage={t("{{entity}}.notFound")} />;
+
+  return (
+    <EditorContent
+      key={`${data.id}-${data.updatedAt}`}
+      data={data}
+      variant={variant}
+      onClose={onClose}
+      onSuccess={onSuccess}
+    />
+  );
+}
+
+// -- Inner Content (remounts on data change) --
+
+interface EditorContentProps {
+  data: {{EntityPascal}}DetailDTO;
+  variant: "panel" | "page";
+  onClose?: () => void;
+  onSuccess?: () => void;
+}
+
+function EditorContent({ data, variant, onClose, onSuccess }: EditorContentProps) {
+  const { t } = useTranslation("{{moduleNamespace}}/widgets");
+  const updateMutation = {{hookUpdate}}();
+  const invalidate = useInvalidateEntity("{{entityPath}}");
+
+  // TODO: Add your domain-specific state here
+  // const [fieldName, setFieldName] = useState(data.fieldName);
+
+  const isDirty = false; // TODO: Compute based on your state vs initial data
+
+  const { guardedNavigate, dialog: unsavedDialog } = useUnsavedChanges({ isDirty });
+
+  const handleSave = useCallback(() => {
+    // TODO: Build your update DTO from state
+    const dto: {{EntityPascal}}UpdateDTO = {
+      id: data.id!,
+      // ...your fields
+    };
+    updateMutation.mutate(
+      { id: data.id!, data: dto },
+      {
+        onSuccess: () => {
+          invalidate();
+          onSuccess?.();
+        },
+        onError: invalidate,
+      },
+    );
+  }, [data, updateMutation, invalidate, onSuccess]);
+
+  const handleClose = useCallback(() => {
+    guardedNavigate(() => onClose?.());
+  }, [guardedNavigate, onClose]);
+
+  return (
+    <Stack className="h-full">
+      {variant === "panel" && (
+        <PanelHeader
+          title={data.name ?? t("{{entity}}.editor")}
+          description={t("{{entity}}.editDescription")}
+          onClose={handleClose}
+        />
+      )}
+
+      <div className="flex-1 overflow-y-auto">
+        <Stack gap="lg" className="p-5 pb-8">
+          {/* TODO: Add your editor content here */}
+          <Card padding="md">
+            <p className="text-sm text-muted-foreground">{t("{{entity}}.editorPlaceholder")}</p>
+          </Card>
+        </Stack>
+      </div>
+
+      <EditorFooter>
+        <Button size="sm" variant="outline" onClick={handleClose}>
+          {t("common.cancel")}
+        </Button>
+        <Button
+          size="sm"
+          variant="primary"
+          onClick={handleSave}
+          disabled={!isDirty || updateMutation.isPending}
+        >
+          {updateMutation.isPending ? t("common.saving") : t("common.save")}
+        </Button>
+      </EditorFooter>
+
+      {unsavedDialog}
+    </Stack>
+  );
+}

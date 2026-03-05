@@ -2,6 +2,7 @@ export { default as listTemplate } from "./list.hbs";
 export { default as treeTemplate } from "./tree.hbs";
 export { default as formTemplate } from "./form.hbs";
 export { default as detailTemplate } from "./detail.hbs";
+export { default as editorTemplate } from "./editor.hbs";
 export { default as featureIndexTemplate } from "./feature-index.hbs";
 export { default as crudPageTemplate } from "./crud-page.hbs";
 export { default as treeCrudPageTemplate } from "./tree-crud-page.hbs";
