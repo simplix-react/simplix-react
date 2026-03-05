@@ -2,7 +2,7 @@ import { Command } from "commander";
 import prompts from "prompts";
 import ora from "ora";
 import { join, relative, resolve } from "node:path";
-import { rm } from "node:fs/promises";
+import { rm, readFile } from "node:fs/promises";
 import { writeFileWithDir, pathExists, readJsonFile } from "../utils/fs.js";
 import { log } from "../utils/logger.js";
 import { toPascalCase } from "../utils/case.js";
@@ -26,6 +26,7 @@ import {
   extractSharedEndpointTypes,
   generateSchemasProxy,
   generateDomainMutatorContent,
+  extractMutatorStrategy,
   buildHookImportMap,
   pruneUnusedModels,
 } from "../openapi/orval-runner.js";
@@ -268,11 +269,21 @@ async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
     // 3. Clean generated dirs
     await cleanGeneratedDirs(targetDir);
 
-    // 4. Ensure mutator.ts exists
+    // 4. Ensure mutator.ts exists (and strategy matches config)
     const mutatorPath = join(targetDir, "src/mutator.ts");
+    const expectedStrategy = resolvedSpecConfig?.mutatorStrategy;
     if (!(await pathExists(mutatorPath))) {
-      const strategy = resolvedSpecConfig?.mutatorStrategy;
-      await writeFileWithDir(mutatorPath, generateDomainMutatorContent(domainName, strategy));
+      await writeFileWithDir(mutatorPath, generateDomainMutatorContent(domainName, expectedStrategy));
+    } else {
+      const currentContent = await readFile(mutatorPath, "utf-8");
+      const currentStrategy = extractMutatorStrategy(currentContent);
+      if (expectedStrategy && currentStrategy !== expectedStrategy) {
+        log.warn(
+          `Mutator strategy mismatch in ${relative(process.cwd(), mutatorPath)}: ` +
+          `found "${currentStrategy ?? "default"}", expected "${expectedStrategy}". Regenerating.`
+        );
+        await writeFileWithDir(mutatorPath, generateDomainMutatorContent(domainName, expectedStrategy));
+      }
     }
 
     // 5. Resolve hook names via NamingStrategy (stored on entities for hook-generator)

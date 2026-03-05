@@ -492,6 +492,16 @@ export async function generateSchemasProxy(targetDir: string): Promise<void> {
 
 // ── Domain Mutator Content ───────────────────────────────────
 
+/**
+ * Extract the mutator strategy from an existing mutator.ts file content.
+ * Returns the strategy string (e.g. "boot") or undefined for the default strategy.
+ */
+export function extractMutatorStrategy(content: string): string | undefined {
+  const match = content.match(/getMutator\((?:"([^"]*)")?\)/);
+  if (!match) return undefined;
+  return match[1] || undefined;
+}
+
 export function generateDomainMutatorContent(domainName: string, strategy?: string): string {
   const strategyArg = !strategy || strategy === "default" ? "" : `"${strategy}"`;
   return [
