@@ -66,7 +66,10 @@
     "mapUnavailable": "Map unavailable offline",
     "locationTitle": "Location",
     "selectLocationPrompt": "Select a location.",
-    "clickOrDragToSelect": "Click the map or drag the marker to select a location"
+    "clickOrDragToSelect": "Click the map or drag the marker to select a location",
+    "selectOption": "Select...",
+    "searchOption": "Search...",
+    "noResults": "No results found."
   },
   "operator": {
     "equals": "Equals",
@@ -101,5 +104,27 @@
     "move": "Move",
     "addChild": "Add Child",
     "reorder": "Reorder"
+  },
+  "date": {
+    "pickDate": "Pick a date",
+    "pickDateRange": "Pick a date range",
+    "custom": "Custom",
+    "hour": "Hour",
+    "minute": "Minute",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "thisWeek": "This Week",
+    "lastWeek": "Last Week",
+    "last7Days": "Last 7 Days",
+    "thisMonth": "This Month",
+    "lastMonth": "Last Month",
+    "thisYear": "This Year",
+    "lastYear": "Last Year",
+    "presets": "Presets",
+    "recent": "Recent",
+    "days": "days",
+    "reset": "Reset",
+    "year": "Year",
+    "month": "Month"
   }
 }

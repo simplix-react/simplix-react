@@ -66,7 +66,10 @@
     "mapUnavailable": "オフラインでは地図を使用できません",
     "locationTitle": "位置",
     "selectLocationPrompt": "位置を選択してください。",
-    "clickOrDragToSelect": "地図をクリックするかマーカーをドラッグして位置を選択してください"
+    "clickOrDragToSelect": "地図をクリックするかマーカーをドラッグして位置を選択してください",
+    "selectOption": "選択...",
+    "searchOption": "検索...",
+    "noResults": "結果が見つかりません。"
   },
   "operator": {
     "equals": "等しい",
@@ -101,5 +104,27 @@
     "move": "移動",
     "addChild": "子要素追加",
     "reorder": "並び替え"
+  },
+  "date": {
+    "pickDate": "日付を選択",
+    "pickDateRange": "日付範囲を選択",
+    "custom": "カスタム",
+    "hour": "時",
+    "minute": "分",
+    "today": "今日",
+    "yesterday": "昨日",
+    "thisWeek": "今週",
+    "lastWeek": "先週",
+    "last7Days": "過去7日間",
+    "thisMonth": "今月",
+    "lastMonth": "先月",
+    "thisYear": "今年",
+    "lastYear": "昨年",
+    "presets": "プリセット",
+    "recent": "最近",
+    "days": "日間",
+    "reset": "リセット",
+    "year": "年",
+    "month": "月"
   }
 }

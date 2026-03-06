@@ -66,7 +66,10 @@
     "mapUnavailable": "오프라인에서는 지도를 사용할 수 없습니다",
     "locationTitle": "위치",
     "selectLocationPrompt": "위치를 선택하세요.",
-    "clickOrDragToSelect": "지도를 클릭하거나 마커를 드래그하여 위치를 선택하세요"
+    "clickOrDragToSelect": "지도를 클릭하거나 마커를 드래그하여 위치를 선택하세요",
+    "selectOption": "선택...",
+    "searchOption": "검색...",
+    "noResults": "결과를 찾을 수 없습니다."
   },
   "operator": {
     "equals": "같음",
@@ -101,5 +104,27 @@
     "move": "이동",
     "addChild": "하위 추가",
     "reorder": "순서 변경"
+  },
+  "date": {
+    "pickDate": "날짜 선택",
+    "pickDateRange": "날짜 범위 선택",
+    "custom": "직접 입력",
+    "hour": "시",
+    "minute": "분",
+    "today": "오늘",
+    "yesterday": "어제",
+    "thisWeek": "이번 주",
+    "lastWeek": "지난 주",
+    "last7Days": "최근 7일",
+    "thisMonth": "이번 달",
+    "lastMonth": "지난 달",
+    "thisYear": "올해",
+    "lastYear": "작년",
+    "presets": "프리셋",
+    "recent": "최근",
+    "days": "일",
+    "reset": "초기화",
+    "year": "년",
+    "month": "월"
   }
 }
