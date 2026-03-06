@@ -1,4 +1,6 @@
 import type { CommonFieldProps } from "../../crud/shared/types";
+import { ColorPicker } from "../../base/inputs";
+import type { PresetColor } from "../../base/inputs";
 import { useUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
 import { FieldWrapper } from "../shared/field-wrapper";
@@ -11,10 +13,16 @@ export interface ColorFieldProps extends CommonFieldProps {
   onChange: (value: string) => void;
   /** Additional props forwarded to the underlying text input element. */
   inputProps?: React.ComponentProps<"input">;
+  /** Preset color palette. Defaults to 16 common colors. */
+  presetColors?: PresetColor[];
+  /** Show the native color picker for custom colors. @defaultValue true */
+  showCustomPicker?: boolean;
+  /** Allow clearing the selected color. @defaultValue true */
+  clearable?: boolean;
 }
 
 /**
- * Color picker field with native color input and hex text input.
+ * Color picker field with a popover palette, optional custom picker, and hex text input.
  *
  * @example
  * ```tsx
@@ -25,6 +33,9 @@ export function ColorField({
   value,
   onChange,
   inputProps,
+  presetColors,
+  showCustomPicker,
+  clearable,
   label,
   labelKey,
   error,
@@ -48,12 +59,13 @@ export function ColorField({
       {...variantProps}
     >
       <span className="flex items-center gap-2">
-        <input
-          type="color"
+        <ColorPicker
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={onChange}
+          presetColors={presetColors}
+          showCustomPicker={showCustomPicker}
+          clearable={clearable}
           disabled={disabled}
-          className="h-10 w-10 shrink-0 cursor-pointer rounded-md border border-input bg-transparent p-0.5 disabled:cursor-not-allowed disabled:opacity-50"
           aria-label={
             variantProps.layout === "hidden" ? label : undefined
           }

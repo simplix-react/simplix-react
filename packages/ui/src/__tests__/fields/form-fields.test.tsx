@@ -352,14 +352,13 @@ describe("ColorField", () => {
     expect(screen.getByText("Brand Color")).toBeDefined();
   });
 
-  it("renders color and text inputs", () => {
+  it("renders color trigger button and text input", () => {
     render(
       <ColorField label="Color" value="#000000" onChange={vi.fn()} />,
     );
-    const wrapper = screen.getByTestId("form-field-color");
-    const inputs = wrapper.querySelectorAll("input");
-    // At least 2 inputs: color picker + text input
-    expect(inputs.length).toBeGreaterThanOrEqual(2);
+    // Popover trigger button + text input
+    expect(screen.getByRole("button")).toBeDefined();
+    expect(screen.getByRole("textbox")).toBeDefined();
   });
 
   it("calls onChange from text input", () => {
