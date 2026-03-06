@@ -270,6 +270,166 @@ const queryClient = new QueryClient({
 const wrapper = createTestWrapper({ queryClient });
 ```
 
+### Testing with Access Control
+
+When testing components or hooks that depend on `@simplix-react/access` (e.g., `useCan`, `Can`), use `createMockPolicy` and `createAccessTestWrapper` to provide an `AccessProvider` in the test tree.
+
+#### `createMockPolicy`
+
+Creates a mock `AccessPolicy` backed by a static adapter. By default it grants full access (`manage` on `all`) so that tests not focused on permissions pass without extra setup.
+
+```ts
+function createMockPolicy(options?: MockPolicyOptions): AccessPolicy<string, string>
+```
+
+Options:
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `rules` | `AccessRule[]` | `[]` | CASL rules to apply |
+| `user` | `AccessUser` | `{ userId: "test-user", username: "testuser", roles: [] }` | Test user identity |
+| `allowAll` | `boolean` | `true` | When `true` and no `rules` are provided, grants `manage` on `all` |
+
+```ts
+import { createMockPolicy } from "@simplix-react/testing";
+
+// Default — full access
+const policy = createMockPolicy();
+policy.can("edit", "Pet"); // true
+
+// Restricted access
+const restricted = createMockPolicy({
+  rules: [{ action: "view", subject: "Pet" }],
+  allowAll: false,
+});
+restricted.can("view", "Pet"); // true
+restricted.can("edit", "Pet"); // false
+```
+
+#### `createAccessTestWrapper`
+
+Creates a React wrapper component that provides both `QueryClientProvider` and `AccessProvider`. Use it as the `wrapper` option for `renderHook` or `render` when the code under test calls `useCan` or renders `Can`.
+
+```ts
+function createAccessTestWrapper(
+  options?: AccessTestWrapperOptions,
+): FC<{ children: ReactNode }>
+```
+
+Options:
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `queryClient` | `QueryClient` | `createTestQueryClient()` | Custom QueryClient |
+| `policy` | `AccessPolicy` | `createMockPolicy()` (full access) | Custom AccessPolicy |
+
+```tsx
+import { renderHook } from "@testing-library/react";
+import { createAccessTestWrapper } from "@simplix-react/testing";
+import { useCan } from "@simplix-react/access/react";
+
+const wrapper = createAccessTestWrapper();
+const { result } = renderHook(() => useCan("view", "Pet"), { wrapper });
+
+expect(result.current).toBe(true);
+```
+
+To test with a restricted policy:
+
+```tsx
+import { createAccessTestWrapper, createMockPolicy } from "@simplix-react/testing";
+
+const policy = createMockPolicy({
+  rules: [{ action: "view", subject: "Pet" }],
+  allowAll: false,
+});
+const wrapper = createAccessTestWrapper({ policy });
+```
+
+#### Full Example -- Queries and Access Control Together
+
+A complete test for a component that fetches data and conditionally renders based on permissions:
+
+```tsx
+import { describe, it, expect, afterEach } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
+import {
+  createTestQueryClient,
+  createAccessTestWrapper,
+  createMockClient,
+  createMockPolicy,
+} from "@simplix-react/testing";
+import { contract } from "@myapp/myapp-domain-inventory";
+import { Can } from "@simplix-react/access/react";
+import { useProducts } from "@myapp/myapp-domain-inventory/react";
+
+function ProductManager() {
+  const { data: products } = useProducts();
+
+  if (!products) return <p>Loading...</p>;
+
+  return (
+    <div>
+      <ul>
+        {products.map((p) => (
+          <li key={p.id}>{p.name}</li>
+        ))}
+      </ul>
+      <Can I="create" a="Product">
+        <button>Add Product</button>
+      </Can>
+    </div>
+  );
+}
+
+describe("ProductManager", () => {
+  const queryClient = createTestQueryClient();
+
+  const mockClient = createMockClient(contract.config, {
+    products: [{ id: "1", name: "Widget", price: 100 }],
+  });
+
+  afterEach(() => {
+    queryClient.clear();
+  });
+
+  it("shows add button when user has create permission", async () => {
+    const policy = createMockPolicy({
+      rules: [
+        { action: "view", subject: "Product" },
+        { action: "create", subject: "Product" },
+      ],
+      allowAll: false,
+    });
+    const wrapper = createAccessTestWrapper({ queryClient, policy });
+
+    render(<ProductManager />, { wrapper });
+
+    await waitFor(() => {
+      expect(screen.getByText("Widget")).toBeInTheDocument();
+    });
+
+    expect(screen.getByText("Add Product")).toBeInTheDocument();
+  });
+
+  it("hides add button when user lacks create permission", async () => {
+    const policy = createMockPolicy({
+      rules: [{ action: "view", subject: "Product" }],
+      allowAll: false,
+    });
+    const wrapper = createAccessTestWrapper({ queryClient, policy });
+
+    render(<ProductManager />, { wrapper });
+
+    await waitFor(() => {
+      expect(screen.getByText("Widget")).toBeInTheDocument();
+    });
+
+    expect(screen.queryByText("Add Product")).not.toBeInTheDocument();
+  });
+});
+```
+
 ## Related
 
 - [Internationalization](./internationalization.md) -- Setting up i18n (relevant for testing i18n components)

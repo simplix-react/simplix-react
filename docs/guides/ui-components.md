@@ -1,0 +1,587 @@
+# How to Build CRUD Interfaces with @simplix-react/ui
+
+> Use `@simplix-react/ui` components to build list, form, and detail views with compound component patterns, explicit field props, and customizable layouts.
+
+## Before You Begin
+
+- A simplix-react project with domain packages and derived hooks
+- Install the UI package:
+
+```bash
+pnpm add @simplix-react/ui
+```
+
+- Peer dependencies:
+
+| Package | Version |
+| --- | --- |
+| `@simplix-react/form` | workspace |
+| `@simplix-react/i18n` | workspace |
+| `@simplix-react/react` | workspace |
+| `react` | >= 18.0.0 |
+
+- An existing contract, hooks, and form hooks setup:
+
+```ts
+// contract.ts
+import { defineApi } from "@simplix-react/contract";
+import { z } from "zod";
+
+export const projectContract = defineApi({
+  domain: "project",
+  basePath: "/api",
+  entities: {
+    user: {
+      path: "/users",
+      schema: z.object({
+        id: z.string(),
+        name: z.string(),
+        email: z.string(),
+        status: z.enum(["active", "inactive"]),
+        createdAt: z.string(),
+      }),
+      createSchema: z.object({
+        name: z.string(),
+        email: z.string(),
+        status: z.enum(["active", "inactive"]),
+      }),
+      updateSchema: z.object({
+        name: z.string().optional(),
+        email: z.string().optional(),
+        status: z.enum(["active", "inactive"]).optional(),
+      }),
+    },
+  },
+});
+
+// hooks.ts
+import { deriveEntityHooks } from "@simplix-react/react";
+import { projectContract } from "./contract.js";
+
+export const projectHooks = deriveEntityHooks(projectContract);
+```
+
+## Solution
+
+### Step 1 -- Set Up UIProvider
+
+Wrap your app with `UIProvider` to enable component overrides and default configurations:
+
+```tsx
+import { UIProvider } from "@simplix-react/ui";
+
+function App() {
+  return (
+    <UIProvider>
+      {/* Your CRUD pages */}
+    </UIProvider>
+  );
+}
+```
+
+To globally override base components (e.g., replace `Input` or `Select` with custom implementations):
+
+```tsx
+import { UIProvider } from "@simplix-react/ui";
+import { MyCustomInput } from "./my-input";
+
+<UIProvider overrides={{
+  Input: MyCustomInput,
+  Select: {
+    Root: MySelect.Root,
+    Trigger: MySelect.Trigger,
+    Value: MySelect.Value,
+    Content: MySelect.Content,
+    Item: MySelect.Item,
+  },
+}}>
+  {/* All fields now use custom input/select */}
+</UIProvider>
+```
+
+Overridable components: `Input`, `Textarea`, `Label`, `Switch`, `Checkbox`, `Badge`, `Calendar`, `Select` (compound), `RadioGroup` (compound).
+
+### Step 2 -- Build a CRUD List Page
+
+Use `useCrudList` to manage list state and `CrudList` for the compound layout:
+
+```tsx
+import { CrudList, useCrudList, FormFields } from "@simplix-react/ui";
+import { projectHooks } from "./hooks.js";
+
+function UserListPage() {
+  const { data, filters, sort, pagination, selection, emptyReason } =
+    useCrudList(projectHooks.user.useList, {
+      stateMode: "server",
+      defaultSort: { field: "name", direction: "asc" },
+      defaultPageSize: 20,
+    });
+
+  return (
+    <CrudList>
+      <CrudList.Toolbar>
+        <CrudList.Search value={filters.search} onChange={filters.setSearch} />
+      </CrudList.Toolbar>
+
+      <CrudList.BulkActions
+        selectedCount={selection.selected.size}
+        onClear={selection.clear}
+      >
+        <CrudList.BulkAction
+          label="Delete Selected"
+          onClick={() => handleBulkDelete(selection.selected)}
+          variant="destructive"
+        />
+      </CrudList.BulkActions>
+
+      {emptyReason ? (
+        <CrudList.Empty reason={emptyReason} />
+      ) : (
+        <CrudList.Table
+          data={data}
+          sort={{ field: sort.field!, direction: sort.direction }}
+          onSortChange={(s) => sort.setSort(s.field, s.direction)}
+          selectable
+          selectedIndices={selection.selected}
+          onSelectionChange={selection.toggle}
+          onSelectAll={() => selection.toggleAll(data)}
+          onRowClick={(row) => navigate(`/users/${row.id}`)}
+        >
+          <CrudList.Column field="name" header="Name" sortable />
+          <CrudList.Column field="email" header="Email" sortable />
+          <CrudList.Column
+            field="status"
+            header="Status"
+            display="badge"
+            variants={{ active: "success", inactive: "secondary" }}
+          />
+          <CrudList.Column field="createdAt" header="Created" format="date" sortable />
+        </CrudList.Table>
+      )}
+
+      <CrudList.Pagination
+        page={pagination.page}
+        pageSize={pagination.pageSize}
+        total={pagination.total}
+        totalPages={pagination.totalPages}
+        onPageChange={pagination.setPage}
+        onPageSizeChange={pagination.setPageSize}
+      />
+    </CrudList>
+  );
+}
+```
+
+`useCrudList` returns:
+
+| Property | Description |
+| --- | --- |
+| `data` | The current page of data |
+| `isLoading` | Loading state |
+| `error` | Error object if query failed |
+| `filters` | `{ search, setSearch, values, setValues }` |
+| `sort` | `{ field, direction, setSort }` |
+| `pagination` | `{ page, pageSize, total, totalPages, setPage, setPageSize }` |
+| `selection` | `{ selected, toggle, toggleAll, clear }` |
+| `emptyReason` | `"no-data"`, `"no-results"`, or `null` |
+
+### Step 3 -- Build a Create/Edit Form
+
+Use `CrudForm` with `FormFields` for explicit value/onChange field components:
+
+```tsx
+import { CrudForm, FormFields, Grid, useCrudFormSubmit } from "@simplix-react/ui";
+import { projectHooks } from "./hooks.js";
+
+function UserFormPage({ userId }: { userId?: string }) {
+  const { data: user, isLoading } = projectHooks.user.useGet(userId ?? "");
+
+  const [name, setName] = useState(user?.name ?? "");
+  const [email, setEmail] = useState(user?.email ?? "");
+  const [status, setStatus] = useState(user?.status ?? "active");
+
+  const { isEdit, handleSubmit, isPending } = useCrudFormSubmit({
+    entityId: userId,
+    create: projectHooks.user.useCreate(),
+    update: projectHooks.user.useUpdate(),
+    onSuccess: () => navigate("/users"),
+  });
+
+  if (userId && isLoading) return <p>Loading...</p>;
+
+  return (
+    <CrudForm
+      onSubmit={() => handleSubmit({ name, email, status })}
+      fieldVariant={{ labelPosition: "top", size: "md" }}
+      warnOnUnsavedChanges
+    >
+      <CrudForm.Section title="Basic Info" layout="two-column">
+        <FormFields.TextField
+          label="Name"
+          value={name}
+          onChange={setName}
+          required
+        />
+        <FormFields.TextField
+          label="Email"
+          value={email}
+          onChange={setEmail}
+          type="email"
+          required
+        />
+      </CrudForm.Section>
+
+      <CrudForm.Section title="Settings" layout="single-column">
+        <FormFields.SelectField
+          label="Status"
+          value={status}
+          onChange={setStatus}
+          options={[
+            { label: "Active", value: "active" },
+            { label: "Inactive", value: "inactive" },
+          ]}
+          required
+        />
+      </CrudForm.Section>
+
+      <CrudForm.Actions>
+        <button type="button" onClick={() => navigate("/users")}>Cancel</button>
+        <button type="submit" disabled={isPending}>
+          {isPending ? "Saving..." : isEdit ? "Save Changes" : "Create User"}
+        </button>
+      </CrudForm.Actions>
+    </CrudForm>
+  );
+}
+```
+
+`CrudForm.Section` layout options: `"single-column"`, `"two-column"`, `"three-column"`.
+
+Available form field components:
+
+| Component | Value Type | Key Props |
+| --- | --- | --- |
+| `FormFields.TextField` | `string` | `type`, `placeholder`, `maxLength` |
+| `FormFields.TextareaField` | `string` | `rows`, `maxLength`, `resize` |
+| `FormFields.NumberField` | `number \| null` | `min`, `max`, `step` |
+| `FormFields.SelectField` | `string` | `options`, `placeholder` |
+| `FormFields.SwitchField` | `boolean` | `switchProps` |
+| `FormFields.CheckboxField` | `boolean` | `checkboxProps` |
+| `FormFields.RadioGroupField` | `string` | `options`, `direction` |
+| `FormFields.DateField` | `Date \| null` | `minDate`, `maxDate`, `format` |
+| `FormFields.ComboboxField` | `string \| null` | `options`, `onSearch`, `loading` |
+| `FormFields.PasswordField` | `string` | `placeholder`, `maxLength` |
+| `FormFields.ColorField` | `string` (hex) | Native color picker + hex input |
+| `FormFields.SliderField` | `number` | `min`, `max`, `step`, `showValue` |
+| `FormFields.MultiSelectField` | `string[]` | `options`, `maxCount` |
+| `FormFields.Field` | `ReactNode` | Generic wrapper for custom content |
+
+All fields share common props: `label`, `error`, `description`, `required`, `disabled`, `className`.
+
+### Step 4 -- Build a Detail View
+
+Use `CrudDetail` with `DetailFields` for read-only display:
+
+```tsx
+import {
+  CrudDetail,
+  DetailFields,
+  CrudDelete,
+  useCrudDeleteDetail,
+  QueryFallback,
+} from "@simplix-react/ui";
+import { projectHooks } from "./hooks.js";
+
+function UserDetailPage({ userId }: { userId: string }) {
+  const { data: user, isLoading } = projectHooks.user.useGet(userId);
+  const deleteMutation = projectHooks.user.useDelete();
+  const del = useCrudDeleteDetail();
+
+  if (isLoading || !user) {
+    return <QueryFallback isLoading={isLoading} notFoundMessage="User not found." />;
+  }
+
+  return (
+    <>
+      <CrudDetail fieldVariant={{ labelPosition: "left" }}>
+        <CrudDetail.Section title="User Info">
+          <DetailFields.DetailTextField label="Name" value={user.name} copyable />
+          <DetailFields.DetailTextField label="Email" value={user.email} copyable />
+          <DetailFields.DetailBadgeField
+            label="Status"
+            value={user.status}
+            variants={{ active: "success", inactive: "secondary" }}
+          />
+          <DetailFields.DetailDateField
+            label="Created"
+            value={user.createdAt}
+            format="relative"
+          />
+        </CrudDetail.Section>
+
+        <CrudDetail.Actions>
+          <button onClick={() => navigate(`/users/${userId}/edit`)}>Edit</button>
+          <button onClick={del.requestDelete}>Delete</button>
+        </CrudDetail.Actions>
+      </CrudDetail>
+
+      <CrudDelete
+        open={del.open}
+        onOpenChange={del.onOpenChange}
+        onConfirm={() => deleteMutation.mutate(userId)}
+        entityName={user.name}
+        loading={deleteMutation.isPending}
+      />
+    </>
+  );
+}
+```
+
+Available detail field components:
+
+| Component | Value Type | Key Props |
+| --- | --- | --- |
+| `DetailFields.DetailTextField` | `string \| null` | `fallback`, `copyable` |
+| `DetailFields.DetailNumberField` | `number \| null` | `format` (decimal/currency/percent), `locale`, `currency` |
+| `DetailFields.DetailDateField` | `Date \| string \| null` | `format` (date/datetime/relative), `fallback` |
+| `DetailFields.DetailBadgeField` | `string` | `variants` (value-to-variant mapping) |
+| `DetailFields.DetailLinkField` | `string` | `href`, `external` |
+| `DetailFields.DetailBooleanField` | `boolean \| null` | `mode` (text/icon), `labels` |
+| `DetailFields.DetailImageField` | `string \| null` (URL) | `alt`, `width`, `height` |
+| `DetailFields.DetailListField` | `string[] \| null` | `mode` (badges/comma/bullet) |
+| `DetailFields.DetailField` | `ReactNode` | Generic wrapper for custom content |
+
+### Step 5 -- Use Layout Primitives
+
+Layout primitives provide semantic, CVA-based layout components:
+
+```tsx
+import { Stack, Grid, Section, Card, Container, Heading, Text } from "@simplix-react/ui";
+
+function UserProfilePage() {
+  return (
+    <Container size="lg">
+      <Stack gap="lg">
+        <Heading level={1}>User Profile</Heading>
+
+        <Section title="Basic Info" description="Contact and account details">
+          <Grid columns={2} gap="md">
+            <FormFields.TextField label="First Name" value={first} onChange={setFirst} />
+            <FormFields.TextField label="Last Name" value={last} onChange={setLast} />
+          </Grid>
+        </Section>
+
+        <Card padding="md">
+          <Text size="sm" tone="muted">
+            Last updated 3 hours ago
+          </Text>
+        </Card>
+      </Stack>
+    </Container>
+  );
+}
+```
+
+| Component | Key Props | Description |
+| --- | --- | --- |
+| `Stack` | `direction`, `gap`, `align`, `justify`, `wrap` | Vertical/horizontal flex layout |
+| `Flex` | Same as Stack | Horizontal flex (alias for `Stack direction="row"`) |
+| `Grid` | `columns` (1-6), `gap` | CSS Grid layout |
+| `Container` | `size` (sm/md/lg/xl/full) | Centered max-width wrapper |
+| `Section` | `title`, `description` | Content section with title/description |
+| `Card` | `padding` (none/sm/md/lg), `interactive` | Card container with border and shadow |
+| `Heading` | `level` (1-6), `tone`, `font` | Semantic heading (h1-h6) |
+| `Text` | `size` (lg/base/sm/caption), `tone`, `font` | Body text with typography scale |
+
+## Variations
+
+### Field Variant Context
+
+Control field label position and size across a section or page:
+
+```tsx
+import { FieldVariantContext } from "@simplix-react/ui";
+
+<FieldVariantContext.Provider value={{ labelPosition: "left", size: "sm" }}>
+  <FormFields.TextField label="Name" value={name} onChange={setName} />
+  <FormFields.TextField label="Email" value={email} onChange={setEmail} />
+</FieldVariantContext.Provider>
+```
+
+Options: `labelPosition` (`"top"` | `"left"` | `"hidden"`), `size` (`"sm"` | `"md"` | `"lg"`).
+
+### Card-Based List Layout
+
+Use `CardList` for mobile-friendly card layouts:
+
+```tsx
+import { CardList } from "@simplix-react/ui";
+
+<CardList
+  data={users}
+  columns={2}
+  renderCard={(user, index) => (
+    <div key={index} className="rounded-lg border p-4">
+      <h3>{user.name}</h3>
+      <p>{user.email}</p>
+    </div>
+  )}
+/>
+```
+
+### Multi-Step Form Wizard
+
+```tsx
+import { Wizard, FormFields } from "@simplix-react/ui";
+
+<Wizard onComplete={handleSubmit}>
+  <Wizard.Step title="Basic Info" validate={validateStep1}>
+    <FormFields.TextField label="Name" value={name} onChange={setName} />
+    <FormFields.TextField label="Email" value={email} onChange={setEmail} />
+  </Wizard.Step>
+  <Wizard.Step title="Details">
+    <FormFields.TextareaField label="Bio" value={bio} onChange={setBio} />
+  </Wizard.Step>
+  <Wizard.Step title="Review">
+    <p>Confirm your details before submitting.</p>
+  </Wizard.Step>
+</Wizard>
+```
+
+### Delete Confirmation in List Views
+
+Use `useCrudDeleteList` for managing delete state in list pages:
+
+```tsx
+import { CrudDelete, useCrudDeleteList } from "@simplix-react/ui";
+
+function UserList() {
+  const del = useCrudDeleteList();
+  const deleteMutation = projectHooks.user.useDelete();
+
+  // In row actions: del.requestDelete({ id: row.id, name: row.name })
+
+  return (
+    <>
+      {/* List content... */}
+      <CrudDelete
+        open={del.open}
+        onOpenChange={(o) => { if (!o) del.cancel(); }}
+        onConfirm={() => deleteMutation.mutate(del.target!.id)}
+        entityName={del.target?.name}
+        loading={deleteMutation.isPending}
+      />
+    </>
+  );
+}
+```
+
+### ListDetail Pattern
+
+Two-panel layout with list and detail side by side:
+
+```tsx
+import { ListDetail } from "@simplix-react/ui";
+
+// Panel variant (side-by-side with draggable divider)
+<ListDetail variant="panel" listWidth="1/3">
+  <ListDetail.List>
+    {/* List content */}
+  </ListDetail.List>
+  <ListDetail.Detail>
+    {/* Detail content */}
+  </ListDetail.Detail>
+</ListDetail>
+
+// Dialog variant (full-width list, detail in modal)
+<ListDetail variant="dialog" onClose={() => setSelected(null)}>
+  <ListDetail.List>
+    {/* List takes full width */}
+  </ListDetail.List>
+  <ListDetail.Detail>
+    {/* Opens in a modal dialog */}
+  </ListDetail.Detail>
+</ListDetail>
+```
+
+### Custom Field Components
+
+Use `FieldWrapper` to build custom fields that integrate with the field variant system:
+
+```tsx
+import { FieldWrapper } from "@simplix-react/ui";
+
+function CustomRatingField({
+  label,
+  value,
+  onChange,
+  error,
+}: {
+  label: string;
+  value: number;
+  onChange: (v: number) => void;
+  error?: string;
+}) {
+  return (
+    <FieldWrapper label={label} error={error}>
+      <div className="flex gap-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            type="button"
+            onClick={() => onChange(star)}
+            className={star <= value ? "text-yellow-500" : "text-gray-300"}
+          >
+            ★
+          </button>
+        ))}
+      </div>
+    </FieldWrapper>
+  );
+}
+```
+
+### Router Adapter
+
+The package is router-agnostic. Inject a router via `CrudProvider`:
+
+```tsx
+import { CrudProvider, createReactRouterAdapter } from "@simplix-react/ui";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
+
+function AppShell() {
+  const adapter = createReactRouterAdapter({ useNavigate, useSearchParams, useLocation });
+
+  return (
+    <CrudProvider router={adapter}>
+      {/* CRUD pages can now use useRouter(), useUrlSync(), etc. */}
+    </CrudProvider>
+  );
+}
+```
+
+### Error Boundary
+
+Wrap CRUD views with `CrudErrorBoundary` to catch render errors:
+
+```tsx
+import { CrudErrorBoundary } from "@simplix-react/ui";
+
+<CrudErrorBoundary
+  fallback={(error, reset) => (
+    <div>
+      <p>Error: {error.message}</p>
+      <button onClick={reset}>Retry</button>
+    </div>
+  )}
+  onError={(error) => logError(error)}
+>
+  <UserListPage />
+</CrudErrorBoundary>
+```
+
+## Related
+
+- [Form Hooks Guide](./form-hooks.md) -- Derive TanStack Form hooks from contracts
+- [Defining Entities](./defining-entities.md) -- Setting up entity schemas in contracts
+- [@simplix-react/ui API Reference](../api/@simplix-react/ui/README.md) -- Full API documentation
