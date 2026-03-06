@@ -25,12 +25,14 @@
   "peerDependencies": {
     "@simplix-react/api": "workspace:*",
     "@simplix-react/auth": "workspace:*",
+    "@simplix-react/contract": "workspace:*",
     "@simplix-react/i18n": "workspace:*",
     "zod": "^4.0.0"
   },
   "devDependencies": {
     "@simplix-react/api": "workspace:*",
     "@simplix-react/auth": "workspace:*",
+    "@simplix-react/contract": "workspace:*",
     "@simplix-react/i18n": "workspace:*",
     "@simplix-react/mock": "workspace:*",
     "@simplix-react/config-eslint": "workspace:*",

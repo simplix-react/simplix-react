@@ -4,7 +4,8 @@ import type {
   TokenPair,
   TokenStore,
 } from "@simplix-react/auth";
-import type { OrvalMutator } from "@simplix-react/api";
+import type { FetchFn } from "@simplix-react/contract";
+import { createFetch } from "@simplix-react/contract";
 import {
   createAuth,
   createAuthFetch,
@@ -12,7 +13,6 @@ import {
   bearerScheme,
   localStorageStore,
 } from "@simplix-react/auth";
-import { createAppFetch } from "@simplix-react/api";
 import { createBootHttpFetch, type BootFetchOptions } from "./boot-fetch.js";
 import { unwrapEnvelope, type BootEnvelope } from "./envelope.js";
 
@@ -20,7 +20,7 @@ export interface BootAuthOptions {
   storePrefix?: string;
   store?: TokenStore;
   basePath?: string;
-  fetchFn?: OrvalMutator;
+  fetchFn?: FetchFn;
   fetchOptions?: BootFetchOptions;
   refreshBeforeExpiry?: number;
   onRefreshFailure?: (error: Error) => void;
@@ -44,11 +44,11 @@ export interface BootAuthResult {
   auth: AuthInstance;
   authClient: BootAuthClient;
   store: TokenStore;
-  baseFetch: OrvalMutator;
+  baseFetch: FetchFn;
   /** Auth-wrapped fetch without Boot error handling (401 retry + proactive refresh included) */
-  rawAuthFetch: OrvalMutator;
+  rawAuthFetch: FetchFn;
   /** Auth-wrapped fetch WITH Boot envelope unwrapping (for Boot domain packages) */
-  bootMutator: OrvalMutator;
+  bootMutator: FetchFn;
   getToken: () => string | null;
 }
 
@@ -130,16 +130,16 @@ export function createBootAuth(options: BootAuthOptions = {}): BootAuthResult {
   });
 
   // Raw auth fetch: 401 retry included, Boot error handling excluded
-  let rawAuthFetch: OrvalMutator;
+  let rawAuthFetch: FetchFn;
   if (options.rawFetchOptions) {
-    const rawBaseFetch = createAppFetch({
+    const rawBaseFetch = createFetch({
       baseUrl: options.rawFetchOptions.baseUrl,
       getToken: () => store.get("access_token"),
     });
     rawAuthFetch = createAuthFetch(
       authFetchConfig as AuthConfig,
-      rawBaseFetch as unknown as Parameters<typeof createAuthFetch>[1],
-    ) as unknown as OrvalMutator;
+      rawBaseFetch,
+    );
   } else {
     rawAuthFetch = baseFetch;
   }
@@ -170,7 +170,7 @@ export function createBootAuth(options: BootAuthOptions = {}): BootAuthResult {
     refreshFn,
     revokeFn: async () => {
       const refreshToken = store.get("refresh_token");
-      await (auth.fetchFn as OrvalMutator)<void>(
+      await (auth.fetchFn as FetchFn)<void>(
         `${basePath}/auth/token/revoke`,
         {
           method: "POST",
@@ -179,7 +179,7 @@ export function createBootAuth(options: BootAuthOptions = {}): BootAuthResult {
       );
     },
     userInfoFn: async () => {
-      const envelope = await (auth.fetchFn as OrvalMutator)<BootEnvelope>(
+      const envelope = await (auth.fetchFn as FetchFn)<BootEnvelope>(
         `${basePath}/user/me`,
         { method: "GET" },
       );
@@ -191,9 +191,9 @@ export function createBootAuth(options: BootAuthOptions = {}): BootAuthResult {
 
   // Boot mutator: auth.fetchFn + envelope unwrapping (for Boot domain packages)
   const bootMutator = (async (url: string, options?: RequestInit) => {
-    const envelope = await (auth.fetchFn as OrvalMutator)(url, options);
+    const envelope = await (auth.fetchFn as FetchFn)(url, options);
     return unwrapEnvelope(envelope);
-  }) as OrvalMutator;
+  }) as FetchFn;
 
   return { auth, authClient, store, baseFetch, rawAuthFetch, bootMutator, getToken };
 }

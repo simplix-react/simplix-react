@@ -1,28 +1,31 @@
-import { createAppFetch, type OrvalMutator, type ResponseAdapter } from "@simplix-react/api";
+import type { FetchFn } from "@simplix-react/contract";
+import { createFetch } from "@simplix-react/contract";
 import { ApiResponseError } from "./api-response-error.js";
 import type { BootEnvelope } from "./envelope.js";
 
-export const bootResponseAdapter: ResponseAdapter = {
-  toError: (raw: unknown, status: number): Error => {
-    if (raw && typeof raw === "object" && "type" in raw) {
-      const env = raw as BootEnvelope;
-      return new ApiResponseError(
-        status,
-        env.type,
-        env.message,
-        env.timestamp,
-        env.errorCode ?? undefined,
-        env.errorDetail ?? undefined,
-      );
-    }
+export const bootResponseAdapter = {
+  toError: (raw: unknown, status: number): Error => toBootError(raw, status),
+};
+
+function toBootError(body: unknown, status: number): Error {
+  if (body && typeof body === "object" && "type" in body) {
+    const env = body as BootEnvelope;
     return new ApiResponseError(
       status,
-      "ERROR",
-      `HTTP ${status}`,
-      new Date().toISOString(),
+      env.type,
+      env.message,
+      env.timestamp,
+      env.errorCode ?? undefined,
+      env.errorDetail ?? undefined,
     );
-  },
-};
+  }
+  return new ApiResponseError(
+    status,
+    "ERROR",
+    `HTTP ${status}`,
+    new Date().toISOString(),
+  );
+}
 
 export interface BootFetchOptions {
   baseUrl?: string;
@@ -30,10 +33,12 @@ export interface BootFetchOptions {
 }
 
 /** HTTP + Boot error conversion only (no envelope unwrap) */
-export function createBootHttpFetch(options?: BootFetchOptions): OrvalMutator {
-  return createAppFetch({
+export function createBootHttpFetch(options?: BootFetchOptions): FetchFn {
+  return createFetch({
     baseUrl: options?.baseUrl,
     getToken: options?.getToken,
-    responseAdapter: { toError: bootResponseAdapter.toError },
+    onError: ({ status, body }) => {
+      throw toBootError(body, status);
+    },
   });
 }

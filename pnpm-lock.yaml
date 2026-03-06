@@ -74,6 +74,9 @@ importers:
       '@simplix-react/config-typescript':
         specifier: workspace:*
         version: link:../../../../packages/config-typescript
+      '@simplix-react/contract':
+        specifier: workspace:*
+        version: link:../../../../packages/contract
       '@simplix-react/i18n':
         specifier: workspace:*
         version: link:../../../../packages/i18n
@@ -98,6 +101,54 @@ importers:
       zod:
         specifier: ^4.0.0
         version: 4.3.6
+
+  extensions/simplix-boot/packages/cli-plugin:
+    devDependencies:
+      '@simplix-react/cli':
+        specifier: workspace:*
+        version: link:../../../../packages/cli
+      '@simplix-react/config-eslint':
+        specifier: workspace:*
+        version: link:../../../../packages/config-eslint
+      '@simplix-react/config-typescript':
+        specifier: workspace:*
+        version: link:../../../../packages/config-typescript
+      '@simplix-react/contract':
+        specifier: workspace:*
+        version: link:../../../../packages/contract
+      eslint:
+        specifier: ^9.39.2
+        version: 9.39.2(jiti@2.6.1)
+      tsup:
+        specifier: ^8.5.1
+        version: 8.5.1(jiti@2.6.1)(postcss@8.5.6)(typescript@5.9.3)(yaml@2.8.2)
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@25.2.3)(jiti@2.6.1)(jsdom@28.0.0)(msw@2.12.10(@types/node@25.2.3)(typescript@5.9.3))(yaml@2.8.2)
+
+  extensions/simplix-boot/packages/utils:
+    devDependencies:
+      '@simplix-react/config-eslint':
+        specifier: workspace:*
+        version: link:../../../../packages/config-eslint
+      '@simplix-react/config-typescript':
+        specifier: workspace:*
+        version: link:../../../../packages/config-typescript
+      eslint:
+        specifier: ^9.39.2
+        version: 9.39.2(jiti@2.6.1)
+      tsup:
+        specifier: ^8.5.1
+        version: 8.5.1(jiti@2.6.1)(postcss@8.5.6)(typescript@5.9.3)(yaml@2.8.2)
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@25.2.3)(jiti@2.6.1)(jsdom@28.0.0)(msw@2.12.10(@types/node@25.2.3)(typescript@5.9.3))(yaml@2.8.2)
 
   packages/access:
     devDependencies:
@@ -194,6 +245,9 @@ importers:
 
   packages/cli:
     dependencies:
+      '@simplix-react-ext/simplix-boot-cli-plugin':
+        specifier: workspace:*
+        version: link:../../extensions/simplix-boot/packages/cli-plugin
       '@simplix-react/contract':
         specifier: workspace:*
         version: link:../contract

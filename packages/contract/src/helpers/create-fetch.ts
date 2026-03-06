@@ -1,5 +1,5 @@
 import type { FetchFn } from "../types.js";
-import { ApiError } from "./fetch.js";
+import { ApiError } from "./api-error.js";
 
 export interface FetchContext {
   path: string;
@@ -11,6 +11,12 @@ export interface FetchErrorContext extends FetchContext {
 }
 
 export interface CreateFetchOptions {
+  /** Base URL prepended to relative paths. Absolute URLs bypass this. */
+  baseUrl?: string;
+
+  /** Returns a bearer token to attach as `Authorization: Bearer <token>`. */
+  getToken?: () => string | null;
+
   /**
    * Transforms the parsed JSON response before returning.
    * Receives the raw JSON and request context for endpoint-specific branching.
@@ -46,9 +52,10 @@ export interface CreateFetchOptions {
 }
 
 export function createFetch(options: CreateFetchOptions = {}): FetchFn {
-  const { transformResponse, onError } = options;
+  const { baseUrl = "", getToken, transformResponse, onError } = options;
 
   return async function <T>(path: string, reqOptions?: RequestInit): Promise<T> {
+    const fullUrl = path.startsWith("http") ? path : `${baseUrl}${path}`;
     const method = reqOptions?.method?.toUpperCase() ?? "GET";
     const hasBody = method === "POST" || method === "PUT" || method === "PATCH";
     const headers: Record<string, string> = {
@@ -56,7 +63,12 @@ export function createFetch(options: CreateFetchOptions = {}): FetchFn {
       ...(reqOptions?.headers as Record<string, string>),
     };
 
-    const res = await fetch(path, { ...reqOptions, headers });
+    const token = getToken?.();
+    if (token && !headers["Authorization"]) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const res = await fetch(fullUrl, { ...reqOptions, headers });
 
     if (!res.ok) {
       const text = await res.text();
