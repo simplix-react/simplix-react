@@ -35,6 +35,7 @@ import {
 } from "../../base";
 import {Flex, Stack} from "../../primitives";
 import {cn} from "../../utils/cn";
+import {formatDateMedium, formatDateTime, formatRelativeTime} from "../../utils/format-date";
 import type {ColumnInfo, EmptyReason, SortState} from "../shared";
 import {CrudListColumnContext, useCrudListColumns} from "../shared";
 import {AlertTriangleIcon, ArrowUpDownIcon, EyeIcon, FolderTreeIcon, FunnelIcon, MagnifyingGlassIcon, MapPinIcon, PencilIcon, PlusIcon, TrashIcon} from "../shared/icons";
@@ -249,23 +250,9 @@ function formatCellValue(value: unknown, format?: "date" | "datetime" | "relativ
   const date = value instanceof Date ? value : new Date(String(value));
   if (Number.isNaN(date.getTime())) return String(value);
 
-  if (format === "date") {
-    return date.toLocaleDateString(locale);
-  }
-  if (format === "datetime") {
-    return date.toLocaleString(locale);
-  }
-  // relative
-  const now = Date.now();
-  const diff = now - date.getTime();
-  const seconds = Math.floor(diff / 1000);
-  if (seconds < 60) return `${seconds}s ago`;
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
+  if (format === "date") return formatDateMedium(date, locale);
+  if (format === "datetime") return formatDateTime(date, locale);
+  return formatRelativeTime(date, locale);
 }
 
 // ── Action types ──

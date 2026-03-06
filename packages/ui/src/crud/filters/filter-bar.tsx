@@ -31,6 +31,7 @@ import { Switch } from "../../base/inputs/switch";
 import { Flex } from "../../primitives/flex";
 import { Stack } from "../../primitives/stack";
 import { cn } from "../../utils/cn";
+import { formatDateRange } from "../../utils/format-date";
 import { useCrudListColumns } from "../shared/column-context";
 import { CheckIcon, ColumnsIcon, FunnelIcon, XIcon } from "../shared/icons";
 import { CountryFormField } from "./country-form-field";
@@ -103,12 +104,6 @@ export interface FilterBarProps {
   /** Max number of visible filter badges before collapsing into "+N". */
   maxBadges?: number;
   className?: string;
-}
-
-// ── Helper: format date for badge display ──
-
-function formatDate(date: Date, locale?: string): string {
-  return new Intl.DateTimeFormat(locale, { month: "short", day: "numeric" }).format(date);
 }
 
 // ── FilterBar Component ──
@@ -220,10 +215,7 @@ export function FilterBar({ filters, state, leading, maxBadges, className }: Fil
           const lteKey = makeFilterKey(def.field, SearchOperator.LESS_THAN_OR_EQUAL);
           const from = state.values[gteKey] ? new Date(state.values[gteKey] as string) : undefined;
           const to = state.values[lteKey] ? new Date(state.values[lteKey] as string) : undefined;
-          if (from && to) return `${formatDate(from, locale)} \u2013 ${formatDate(to, locale)}`;
-          if (from) return `${formatDate(from, locale)} \u2013 ...`;
-          if (to) return `... \u2013 ${formatDate(to, locale)}`;
-          return "";
+          return formatDateRange(from, to, locale) ?? "";
         }
       }
     },
@@ -693,10 +685,7 @@ function DateRangeFormField({
   const hasValue = from || to;
 
   const rangeText = useMemo(() => {
-    if (from && to) return `${formatDate(from, locale)} \u2013 ${formatDate(to, locale)}`;
-    if (from) return `${formatDate(from, locale)} \u2013 ...`;
-    if (to) return `... \u2013 ${formatDate(to, locale)}`;
-    return null;
+    return formatDateRange(from, to, locale);
   }, [from, to, locale]);
 
   const handleRangeSelect = useCallback(

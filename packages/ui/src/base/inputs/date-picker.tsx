@@ -9,51 +9,13 @@ import {
   PopoverTrigger,
 } from "../overlay/popover";
 import { cn } from "../../utils/cn";
-
-// ── Locale utilities ──
-
-const LOCALE_TO_BCP47: Record<string, string> = {
-  ko: "ko-KR",
-  en: "en-US",
-  ja: "ja-JP",
-  zh: "zh-CN",
-};
-
-function toBcp47(locale: string): string {
-  return LOCALE_TO_BCP47[locale] ?? locale;
-}
-
-function isYearFirstLocale(locale: string): boolean {
-  return ["ko", "ja", "zh", "zh-CN", "zh-TW"].includes(locale);
-}
-
-function formatDateLocalized(date: Date, locale: string): string {
-  const bcp47 = toBcp47(locale);
-  try {
-    return new Intl.DateTimeFormat(bcp47, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    }).format(date);
-  } catch {
-    return new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    }).format(date);
-  }
-}
-
-function getMonthNames(locale: string): string[] {
-  const bcp47 = toBcp47(locale);
-  const formatter = new Intl.DateTimeFormat(bcp47, { month: "short" });
-  return Array.from({ length: 12 }, (_, i) => formatter.format(new Date(2024, i, 1)));
-}
-
-function generateYears(start: number, end: number, reverse = false): number[] {
-  const years = Array.from({ length: end - start + 1 }, (_, i) => start + i);
-  return reverse ? years.reverse() : years;
-}
+import {
+  formatDateMedium,
+  generateYears,
+  getMonthNames,
+  isYearFirstLocale,
+  toBcp47,
+} from "../../utils/format-date";
 
 // ── MonthYearSelect (internal) ──
 
@@ -231,7 +193,7 @@ export function DatePicker({
         >
           <CalendarDotIcon className="h-4 w-4 shrink-0 opacity-50" />
           <span className="flex-1 truncate text-start">
-            {value ? formatDateLocalized(value, locale) : defaultPlaceholder}
+            {value ? formatDateMedium(value, bcp47) : defaultPlaceholder}
           </span>
           {clearable && value && !disabled && (
             <span

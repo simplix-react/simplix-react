@@ -9,6 +9,13 @@ import {
   PopoverTrigger,
 } from "../overlay/popover";
 import { cn } from "../../utils/cn";
+import {
+  formatDateMedium,
+  generateYears,
+  getMonthNames,
+  isYearFirstLocale,
+  toBcp47,
+} from "../../utils/format-date";
 
 // ── Date arithmetic helpers (no date-fns) ──
 
@@ -49,43 +56,6 @@ function endOfYear(d: Date): Date {
 
 function subDays(d: Date, n: number): Date {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate() - n);
-}
-
-// ── Locale utilities ──
-
-const LOCALE_TO_BCP47: Record<string, string> = {
-  ko: "ko-KR",
-  en: "en-US",
-  ja: "ja-JP",
-  zh: "zh-CN",
-};
-
-function toBcp47(locale: string): string {
-  return LOCALE_TO_BCP47[locale] ?? locale;
-}
-
-function isYearFirstLocale(locale: string): boolean {
-  return ["ko", "ja", "zh", "zh-CN", "zh-TW"].includes(locale);
-}
-
-function formatDateShort(date: Date, locale: string): string {
-  const bcp47 = toBcp47(locale);
-  try {
-    return new Intl.DateTimeFormat(bcp47, { month: "short", day: "numeric", year: "numeric" }).format(date);
-  } catch {
-    return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(date);
-  }
-}
-
-function getMonthNames(locale: string): string[] {
-  const bcp47 = toBcp47(locale);
-  const formatter = new Intl.DateTimeFormat(bcp47, { month: "short" });
-  return Array.from({ length: 12 }, (_, i) => formatter.format(new Date(2024, i, 1)));
-}
-
-function generateYears(center: number, range: number): number[] {
-  const start = center - Math.floor(range / 2);
-  return Array.from({ length: range + 1 }, (_, i) => start + i);
 }
 
 // ── MonthYearSelect (internal) ──
@@ -180,7 +150,11 @@ export function DateRangePicker({
 
   const [viewMonth, setViewMonth] = useState<Date>(value.from ?? today);
 
-  const years = useMemo(() => generateYears(today.getFullYear(), yearsRange), [today, yearsRange]);
+  const currentYear = today.getFullYear();
+  const years = useMemo(
+    () => generateYears(currentYear - Math.floor(yearsRange / 2), currentYear + Math.ceil(yearsRange / 2)),
+    [currentYear, yearsRange],
+  );
   const monthNames = useMemo(() => getMonthNames(locale), [locale]);
 
   const yearOptions = useMemo(
@@ -262,11 +236,11 @@ export function DateRangePicker({
     if (!value.from) return null;
     if (value.from && value.to) {
       return numberOfMonths === 2
-        ? `${formatDateShort(value.from, locale)} – ${formatDateShort(value.to, locale)}`
-        : formatDateShort(value.from, locale);
+        ? `${formatDateMedium(value.from, bcp47)} – ${formatDateMedium(value.to, bcp47)}`
+        : formatDateMedium(value.from, bcp47);
     }
-    return `${formatDateShort(value.from, locale)} – ...`;
-  }, [value, locale, numberOfMonths]);
+    return `${formatDateMedium(value.from, bcp47)} – ...`;
+  }, [value, bcp47, numberOfMonths]);
 
   const YearSelect = (
     <MonthYearSelect

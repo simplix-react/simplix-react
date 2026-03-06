@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "@simplix-react/i18n/react";
 import { cn } from "../../utils/cn";
+import { formatDateRange } from "../../utils/format-date";
 import { CalendarDotsIcon, XIcon } from "../shared/icons";
 import { Badge } from "../../base/display/badge";
 import { Separator } from "../../base/display/separator";
@@ -22,12 +23,6 @@ export interface DateRangeFilterProps {
   className?: string;
 }
 
-function formatDate(date: Date, locale?: string): string {
-  return new Intl.DateTimeFormat(locale, {
-    month: "short",
-    day: "numeric",
-  }).format(date);
-}
 
 /**
  * Date range filter with dual-month calendar popover.
@@ -72,11 +67,10 @@ export function DateRangeFilter({
 
   const hasValue = from || to;
 
-  const rangeText = useMemo(() => {
-    if (from && to) return `${formatDate(from, i18nLocale)} – ${formatDate(to, i18nLocale)}`;
-    if (from) return `${formatDate(from, i18nLocale)} – ...`;
-    return "–";
-  }, [from, to, i18nLocale]);
+  const rangeText = useMemo(
+    () => formatDateRange(from, to, i18nLocale) ?? "–",
+    [from, to, i18nLocale],
+  );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "@simplix-react/i18n/react";
 import { cn } from "../../utils/cn";
+import { formatDateMedium, formatDateRange } from "../../utils/format-date";
 import { CalendarDotIcon, CalendarDotsIcon, XIcon, CaretDownIcon } from "../shared/icons";
 import { Flex } from "../../primitives/flex";
 import { Badge } from "../../base/display/badge";
@@ -28,13 +29,6 @@ export interface DateFilterProps {
   className?: string;
 }
 
-function formatDate(date: Date, locale?: string): string {
-  return new Intl.DateTimeFormat(locale, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(date);
-}
 
 export function DateFilter({
   label,
@@ -92,11 +86,9 @@ export function DateFilter({
   // Display text
   const displayText = useMemo(() => {
     if (!value) return null;
-    if (value instanceof Date) return formatDate(value, i18nLocale);
+    if (value instanceof Date) return formatDateMedium(value, i18nLocale);
     const range = value as DateRange;
-    if (range.from && range.to) return `${formatDate(range.from, i18nLocale)} - ${formatDate(range.to, i18nLocale)}`;
-    if (range.from) return `${formatDate(range.from, i18nLocale)} - ...`;
-    return null;
+    return formatDateRange(range.from, range.to, i18nLocale);
   }, [value, i18nLocale]);
 
   const hasValue = !!displayText;
