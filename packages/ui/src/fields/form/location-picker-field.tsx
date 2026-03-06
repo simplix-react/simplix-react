@@ -5,7 +5,7 @@ import type { CommonFieldProps } from "../../crud/shared/types";
 import { MapPinIcon, MagnifyingGlassIcon, LocateIcon, SunIcon, MoonIcon, XIcon } from "../../crud/shared/icons";
 import { useUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
-import { Map, MapMarker } from "../../base/map";
+import { Map, MapMarker } from "../../base/map/map";
 import {
   Dialog,
   DialogContent,
@@ -13,7 +13,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../../base/dialog";
+} from "../../base/overlay/dialog";
 import { FieldWrapper } from "../shared/field-wrapper";
 
 /** Props for the {@link LocationPickerField} component. */

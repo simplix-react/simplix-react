@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { Button } from "../base/button";
+import { Button } from "../base/controls/button";
 import { Flex } from "../primitives/flex";
 import { Heading } from "../primitives/heading";
 import { Stack } from "../primitives/stack";

@@ -4,7 +4,7 @@ import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
 
 export type BadgeVariant = NonNullable<
   import("class-variance-authority").VariantProps<
-    typeof import("../../base/badge").badgeVariants
+    typeof import("../../base/display/badge").badgeVariants
   >["variant"]
 >;
 

@@ -2,10 +2,10 @@ import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "@simplix-react/i18n/react";
 import { cn } from "../../utils/cn";
 import { CalendarDotsIcon, XIcon } from "../shared/icons";
-import { Badge } from "../../base/badge";
-import { Separator } from "../../base/separator";
-import { Popover, PopoverContent, PopoverTrigger } from "../../base/popover";
-import { Calendar, type DateRange } from "../../base/calendar";
+import { Badge } from "../../base/display/badge";
+import { Separator } from "../../base/display/separator";
+import { Popover, PopoverContent, PopoverTrigger } from "../../base/overlay/popover";
+import { Calendar, type DateRange } from "../../base/controls/calendar";
 
 export interface DateRangeFilterProps {
   label: string;

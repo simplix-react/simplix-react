@@ -3,7 +3,7 @@ import { createRef } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { Switch } from "../../base/switch";
+import { Switch } from "../../base/inputs/switch";
 
 afterEach(cleanup);
 

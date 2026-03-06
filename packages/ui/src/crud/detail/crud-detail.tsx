@@ -1,7 +1,7 @@
 import { useTranslation } from "@simplix-react/i18n/react";
 import type { ReactNode } from "react";
 
-import { Button } from "../../base/button";
+import { Button } from "../../base/controls/button";
 import { Flex } from "../../primitives/flex";
 import { Stack } from "../../primitives/stack";
 import { cn } from "../../utils/cn";

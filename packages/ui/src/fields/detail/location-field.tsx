@@ -5,14 +5,14 @@ import type { CommonDetailFieldProps } from "../../crud/shared/types";
 import { MapPinIcon, LocateIcon, SunIcon, MoonIcon } from "../../crud/shared/icons";
 import { cn } from "../../utils/cn";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
-import { Map, MapMarker } from "../../base/map";
+import { Map, MapMarker } from "../../base/map/map";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "../../base/dialog";
+} from "../../base/overlay/dialog";
 
 /** Props for the {@link DetailLocationField} component. */
 export interface DetailLocationFieldProps extends CommonDetailFieldProps {

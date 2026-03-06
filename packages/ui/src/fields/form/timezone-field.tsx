@@ -5,7 +5,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "../../base/popover";
+} from "../../base/overlay/popover";
 import {
   Command,
   CommandEmpty,
@@ -13,7 +13,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "../../base/command";
+} from "../../base/inputs/command";
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { MapPinIcon } from "../../crud/shared/icons";
 import { Flex } from "../../primitives/flex";

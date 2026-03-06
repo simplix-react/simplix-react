@@ -4,7 +4,7 @@ import {
   useCallback,
 } from "react";
 
-import { Button } from "../../base/button";
+import { Button } from "../../base/controls/button";
 import { Flex } from "../../primitives/flex";
 import { Grid } from "../../primitives/grid";
 import { Stack } from "../../primitives/stack";

@@ -1,13 +1,13 @@
 import { useCallback } from "react";
 import { useTranslation } from "@simplix-react/i18n/react";
 
-import { Input } from "../../base/input";
+import { Input } from "../../base/inputs/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../../base/dropdown-menu";
+} from "../../base/navigation/dropdown-menu";
 import { Flex } from "../../primitives/flex";
 import { cn } from "../../utils/cn";
 import { CaretDownIcon, XIcon } from "../shared/icons";

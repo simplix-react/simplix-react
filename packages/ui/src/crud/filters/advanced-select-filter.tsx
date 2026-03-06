@@ -4,15 +4,15 @@ import { useTranslation } from "@simplix-react/i18n/react";
 import { cn } from "../../utils/cn";
 import { CheckIcon, CaretDownIcon, XIcon } from "../shared/icons";
 import { Flex } from "../../primitives/flex";
-import { Badge } from "../../base/badge";
-import { Separator } from "../../base/separator";
-import { Popover, PopoverContent, PopoverTrigger } from "../../base/popover";
+import { Badge } from "../../base/display/badge";
+import { Separator } from "../../base/display/separator";
+import { Popover, PopoverContent, PopoverTrigger } from "../../base/overlay/popover";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../../base/dropdown-menu";
+} from "../../base/navigation/dropdown-menu";
 import {
   Command,
   CommandEmpty,
@@ -21,7 +21,7 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from "../../base/command";
+} from "../../base/inputs/command";
 import type { SearchOperator } from "./filter-types";
 import { selectOperatorConfig } from "./filter-types";
 import { operatorConfig } from "./filter-icons";

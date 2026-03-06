@@ -1,7 +1,7 @@
 import type { ComponentProps } from "react";
 
 import type { CommonFieldProps } from "../../crud/shared/types";
-import type { Switch as SwitchBase } from "../../base/switch";
+import type { Switch as SwitchBase } from "../../base/inputs/switch";
 import { useUIComponents } from "../../provider/ui-provider";
 import { FieldWrapper } from "../shared/field-wrapper";
 

@@ -3,7 +3,7 @@ import { createRef } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { Input } from "../../base/input";
+import { Input } from "../../base/inputs/input";
 
 afterEach(cleanup);
 

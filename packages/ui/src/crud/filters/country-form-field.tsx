@@ -8,8 +8,8 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "../../base/command";
-import { Label } from "../../base/label";
+} from "../../base/inputs/command";
+import { Label } from "../../base/controls/label";
 import { Flex } from "../../primitives/flex";
 import { Stack } from "../../primitives/stack";
 import { cn } from "../../utils/cn";

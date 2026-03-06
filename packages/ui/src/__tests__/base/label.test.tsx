@@ -3,7 +3,7 @@ import { createRef } from "react";
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { Label } from "../../base/label";
+import { Label } from "../../base/controls/label";
 
 afterEach(cleanup);
 

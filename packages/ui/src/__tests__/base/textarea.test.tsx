@@ -3,7 +3,7 @@ import { createRef } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { Textarea } from "../../base/textarea";
+import { Textarea } from "../../base/inputs/textarea";
 
 afterEach(cleanup);
 

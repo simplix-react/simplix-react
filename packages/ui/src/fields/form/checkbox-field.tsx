@@ -1,7 +1,7 @@
 import type { ComponentProps } from "react";
 
 import type { CommonFieldProps } from "../../crud/shared/types";
-import type { Checkbox as CheckboxBase } from "../../base/checkbox";
+import type { Checkbox as CheckboxBase } from "../../base/inputs/checkbox";
 import { useUIComponents } from "../../provider/ui-provider";
 import { FieldWrapper } from "../shared/field-wrapper";
 

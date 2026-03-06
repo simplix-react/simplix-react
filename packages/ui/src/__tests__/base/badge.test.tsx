@@ -3,7 +3,7 @@ import { createRef } from "react";
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { Badge } from "../../base/badge";
+import { Badge } from "../../base/display/badge";
 
 afterEach(cleanup);
 

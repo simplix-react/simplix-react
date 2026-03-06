@@ -1,7 +1,7 @@
 import { useTranslation } from "@simplix-react/i18n/react";
 
 import { cn } from "../../utils/cn";
-import { Button } from "../../base/button";
+import { Button } from "../../base/controls/button";
 import { MagnifyingGlassIcon, XIcon } from "../shared/icons";
 
 export interface FilterActionsProps {

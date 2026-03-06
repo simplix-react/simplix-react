@@ -1,7 +1,7 @@
 import { useTranslation } from "@simplix-react/i18n/react";
 import { cn } from "../../utils/cn";
-import { Badge } from "../../base/badge";
-import { Separator } from "../../base/separator";
+import { Badge } from "../../base/display/badge";
+import { Separator } from "../../base/display/separator";
 import { ToggleLeftIcon, XIcon } from "../shared/icons";
 
 export interface ToggleFilterProps {

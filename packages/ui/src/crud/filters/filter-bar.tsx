@@ -1,9 +1,9 @@
 import { type ComponentType, type ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslation } from "@simplix-react/i18n/react";
 
-import { Badge } from "../../base/badge";
-import { Button } from "../../base/button";
-import { Calendar, type DateRange } from "../../base/calendar";
+import { Badge } from "../../base/display/badge";
+import { Button } from "../../base/controls/button";
+import { Calendar, type DateRange } from "../../base/controls/calendar";
 import {
   Command,
   CommandEmpty,
@@ -11,23 +11,23 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "../../base/command";
+} from "../../base/inputs/command";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "../../base/dropdown-menu";
-import { Input } from "../../base/input";
-import { Label } from "../../base/label";
-import { Popover, PopoverContent, PopoverTrigger } from "../../base/popover";
+} from "../../base/navigation/dropdown-menu";
+import { Input } from "../../base/inputs/input";
+import { Label } from "../../base/controls/label";
+import { Popover, PopoverContent, PopoverTrigger } from "../../base/overlay/popover";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-} from "../../base/select";
-import { Switch } from "../../base/switch";
+} from "../../base/inputs/select";
+import { Switch } from "../../base/inputs/switch";
 import { Flex } from "../../primitives/flex";
 import { Stack } from "../../primitives/stack";
 import { cn } from "../../utils/cn";

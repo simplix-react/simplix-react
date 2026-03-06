@@ -3,16 +3,16 @@ import { useTranslation } from "@simplix-react/i18n/react";
 import { cn } from "../../utils/cn";
 import { CalendarDotIcon, CalendarDotsIcon, XIcon, CaretDownIcon } from "../shared/icons";
 import { Flex } from "../../primitives/flex";
-import { Badge } from "../../base/badge";
-import { Separator } from "../../base/separator";
-import { Popover, PopoverContent, PopoverTrigger } from "../../base/popover";
-import { Calendar, type DateRange } from "../../base/calendar";
+import { Badge } from "../../base/display/badge";
+import { Separator } from "../../base/display/separator";
+import { Popover, PopoverContent, PopoverTrigger } from "../../base/overlay/popover";
+import { Calendar, type DateRange } from "../../base/controls/calendar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../../base/dropdown-menu";
+} from "../../base/navigation/dropdown-menu";
 import type { SearchOperator } from "./filter-types";
 import { dateOperatorConfig } from "./filter-types";
 import { operatorConfig } from "./filter-icons";

@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useTranslation } from "@simplix-react/i18n/react";
 
-import { Input } from "../../base/input";
+import { Input } from "../../base/inputs/input";
 import { Flex } from "../../primitives/flex";
 import { cn } from "../../utils/cn";
 import { MagnifyingGlassIcon, XIcon } from "../shared/icons";
