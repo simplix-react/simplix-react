@@ -1,13 +1,7 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 
 import type { CommonFieldProps } from "../../crud/shared/types";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "../../base/overlay/popover";
-import { useUIComponents } from "../../provider/ui-provider";
-import { cn } from "../../utils/cn";
+import { DatePicker } from "../../base/inputs/date-picker";
 import type { DateLike } from "../../utils/parse-date";
 import { parseDate } from "../../utils/parse-date";
 import { FieldWrapper } from "../shared/field-wrapper";
@@ -22,14 +16,20 @@ export interface DateFieldProps extends CommonFieldProps {
   minDate?: Date;
   /** Latest selectable date. */
   maxDate?: Date;
-  /** Date format string (reserved for future use). */
-  format?: string;
+  /** Short locale code (e.g. `"ko"`, `"en"`, `"ja"`). */
+  locale?: string;
   /** Placeholder text when no date is selected. */
   placeholder?: string;
+  /** Start year for the year dropdown. */
+  startYear?: number;
+  /** End year for the year dropdown. */
+  endYear?: number;
+  /** Reverse year order in dropdown. */
+  reverseYears?: boolean;
 }
 
 /**
- * Date picker field with calendar popover.
+ * Date picker field with calendar popover, month/year dropdowns, and i18n support.
  *
  * @example
  * ```tsx
@@ -38,6 +38,7 @@ export interface DateFieldProps extends CommonFieldProps {
  *   value={birthDate}
  *   onChange={setBirthDate}
  *   maxDate={new Date()}
+ *   locale="ko"
  * />
  * ```
  */
@@ -46,8 +47,11 @@ export function DateField({
   onChange,
   minDate,
   maxDate,
-  format,
-  placeholder = "Pick a date",
+  locale,
+  placeholder,
+  startYear,
+  endYear,
+  reverseYears,
   label,
   labelKey,
   error,
@@ -57,14 +61,12 @@ export function DateField({
   className,
   ...variantProps
 }: DateFieldProps) {
-  const { Calendar } = useUIComponents();
-  const [open, setOpen] = useState(false);
   const parsed = useMemo(() => parseDate(value), [value]);
 
-  function handleSelect(date: Date) {
-    onChange(date);
-    setOpen(false);
-  }
+  const handleChange = useCallback(
+    (date: Date | undefined) => onChange(date ?? null),
+    [onChange],
+  );
 
   return (
     <FieldWrapper
@@ -77,51 +79,18 @@ export function DateField({
       className={className}
       {...variantProps}
     >
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <button
-            type="button"
-            disabled={disabled}
-            aria-invalid={!!error}
-            aria-label={
-              variantProps.layout === "hidden" ? label : undefined
-            }
-            className={cn(
-              "flex h-8 w-full items-center rounded-md border border-input bg-background px-3 py-1.5 text-sm",
-              "focus-visible:outline-none focus-visible:border-foreground",
-              "disabled:cursor-not-allowed disabled:opacity-50",
-              !parsed && "text-muted-foreground",
-              error && "border-destructive",
-            )}
-          >
-            <svg
-              width="15"
-              height="15"
-              viewBox="0 0 15 15"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="mr-2 h-4 w-4"
-              aria-hidden="true"
-            >
-              <path
-                d="M4.5 1C4.77614 1 5 1.22386 5 1.5V2H10V1.5C10 1.22386 10.2239 1 10.5 1C10.7761 1 11 1.22386 11 1.5V2H12.5C13.3284 2 14 2.67157 14 3.5V12.5C14 13.3284 13.3284 14 12.5 14H2.5C1.67157 14 1 13.3284 1 12.5V3.5C1 2.67157 1.67157 2 2.5 2H4V1.5C4 1.22386 4.22386 1 4.5 1ZM10 3V3.5C10 3.77614 10.2239 4 10.5 4C10.7761 4 11 3.77614 11 3.5V3H12.5C12.7761 3 13 3.22386 13 3.5V5H2V3.5C2 3.22386 2.22386 3 2.5 3H4V3.5C4 3.77614 4.22386 4 4.5 4C4.77614 4 5 3.77614 5 3.5V3H10ZM2 6V12.5C2 12.7761 2.22386 13 2.5 13H12.5C12.7761 13 13 12.7761 13 12.5V6H2Z"
-                fill="currentColor"
-                fillRule="evenodd"
-                clipRule="evenodd"
-              />
-            </svg>
-            {parsed ? parsed.toLocaleDateString() : placeholder}
-          </button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-          <Calendar
-            selected={parsed}
-            onSelect={handleSelect}
-            minDate={minDate}
-            maxDate={maxDate}
-          />
-        </PopoverContent>
-      </Popover>
+      <DatePicker
+        value={parsed}
+        onChange={handleChange}
+        minDate={minDate}
+        maxDate={maxDate}
+        locale={locale}
+        placeholder={placeholder}
+        startYear={startYear}
+        endYear={endYear}
+        reverseYears={reverseYears}
+        disabled={disabled}
+      />
     </FieldWrapper>
   );
 }
