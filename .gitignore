@@ -12,6 +12,9 @@ dist/
 .mcp.json
 modules/
 
-# Stale JS artifacts in TypeScript source directories
+# Stale build artifacts in TypeScript source directories
 **/src/**/*.js
 **/src/**/*.js.map
+**/src/**/*.d.ts
+**/src/**/*.d.ts.map
+!packages/cli/src/types/hbs.d.ts
