@@ -106,6 +106,23 @@ function useCrudTreeContext() {
 
 // ── TreeRoot ──
 
+/**
+ * Props for the {@link CrudTree} compound component root.
+ *
+ * ```
+ * ┌─────────────────────────────────────────┐
+ * │ Toolbar                                 │
+ * │ [Search...]  [Expand All] [Collapse]    │
+ * ├────┬─────────────────┬─────────┬────────┤
+ * │    │ Name            │ Status  │ Action │
+ * ├────┼─────────────────┼─────────┼────────┤
+ * │ ▼  │ Category A      │ Active  │ [Edit] │
+ * │    │  ├─ Item A-1    │ Active  │ [Edit] │
+ * │    │  └─ Item A-2    │ Draft   │ [Edit] │
+ * │ ▶  │ Category B      │ Active  │ [Edit] │
+ * └────┴─────────────────┴─────────┴────────┘
+ * ```
+ */
 export interface TreeProps {
   className?: string;
   children?: ReactNode;
@@ -760,6 +777,25 @@ function TreeEmpty({ reason = "no-data", messages, className, children }: TreeEm
 
 // ── Compound component assembly ──
 
+/**
+ * Compound component for building hierarchical tree views with
+ * expand/collapse, search filtering, sorting, and row actions.
+ *
+ * ```
+ * ┌─────────────────────────────────────────┐
+ * │ <CrudTree.Toolbar>                      │
+ * │   <CrudTree.Search />                   │
+ * │   <CrudTree.ExpandToggle />             │
+ * │ </CrudTree.Toolbar>                     │
+ * │ <CrudTree.Table data={nodes} tree={..}> │
+ * │   <CrudTree.Column field="name" ... />  │
+ * │ </CrudTree.Table>                       │
+ * └─────────────────────────────────────────┘
+ * ```
+ *
+ * Sub-components: Toolbar, Search, ExpandToggle, HeaderActions,
+ * Table, Column, Empty.
+ */
 export const CrudTree = Object.assign(TreeRoot, {
   Toolbar: TreeToolbar,
   Search: TreeSearch,

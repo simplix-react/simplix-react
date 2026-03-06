@@ -22,7 +22,18 @@ export interface CrudDeleteProps {
 
 /**
  * Delete confirmation dialog using Radix AlertDialog.
- * Requires explicit user confirmation before deletion proceeds.
+ *
+ * ```
+ * ┌─────────────────────────────────┐
+ * │ Delete user?                    │
+ * │                                 │
+ * │ This action cannot be undone.   │
+ * │                                 │
+ * │         [Cancel] [Delete]       │
+ * └─────────────────────────────────┘
+ * ```
+ *
+ * @param props - {@link CrudDeleteProps}
  *
  * @example
  * ```tsx

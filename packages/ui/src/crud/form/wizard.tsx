@@ -12,11 +12,20 @@ import { cn } from "../../utils/cn";
 
 // ── Wizard.Step ──
 
-/** Props for the Wizard.Step sub-component. */
+/**
+ * Props for the Wizard.Step sub-component.
+ *
+ * Each step defines its title, optional description, and an optional
+ * async validation function that must return `true` to proceed.
+ */
 export interface WizardStepProps {
+  /** Step title displayed in the step indicator. */
   title: string;
+  /** Optional description shown below the title. */
   description?: string;
+  /** Validation function called before advancing. Return `false` to block navigation. */
   validate?: () => boolean | Promise<boolean>;
+  /** Step content. */
   children: ReactNode;
 }
 
@@ -106,10 +115,26 @@ function StepIndicator({ steps, currentStep }: StepIndicatorProps) {
 
 // ── Wizard Root ──
 
-/** Props for the {@link Wizard} compound component root. */
+/**
+ * Props for the {@link Wizard} compound component root.
+ *
+ * ```
+ * ┌─────────────────────────────────────────┐
+ * │  (1) Basic ── (2) Details ── (3) Review │
+ * ├─────────────────────────────────────────┤
+ * │                                         │
+ * │  Active step content                    │
+ * │                                         │
+ * ├─────────────────────────────────────────┤
+ * │  [Previous]                     [Next]  │
+ * └─────────────────────────────────────────┘
+ * ```
+ */
 export interface WizardProps {
+  /** Called when the user completes the final step. */
   onComplete: () => void;
   className?: string;
+  /** One or more `<Wizard.Step>` children. */
   children: ReactNode;
 }
 
@@ -208,10 +233,32 @@ function WizardRoot({ onComplete, className, children }: WizardProps) {
 /**
  * Multi-step form wizard with step indicator, validation, and navigation.
  *
+ * ```
+ * ┌─────────────────────────────────────────┐
+ * │  (1) Basic ── (2) Details ── (3) Review │
+ * ├─────────────────────────────────────────┤
+ * │  <Wizard.Step title="Basic">            │
+ * │    form fields...                       │
+ * │  </Wizard.Step>                         │
+ * ├─────────────────────────────────────────┤
+ * │  [Previous]                  [Next]     │
+ * └─────────────────────────────────────────┘
+ * ```
+ *
  * Sub-components: Step (with title, description, and optional validate function).
  *
  * @example
- * \\n */
+ * ```tsx
+ * <Wizard onComplete={handleSubmit}>
+ *   <Wizard.Step title="Basic" validate={() => form.validate()}>
+ *     <TextField label="Name" ... />
+ *   </Wizard.Step>
+ *   <Wizard.Step title="Review">
+ *     <p>Confirm your data.</p>
+ *   </Wizard.Step>
+ * </Wizard>
+ * ```
+ */
 export const Wizard = Object.assign(WizardRoot, {
   Step: WizardStep,
 });

@@ -351,9 +351,25 @@ function UserMenu() {
 | Property | Type | Description |
 | --- | --- | --- |
 | `isAuthenticated` | `boolean` | Whether any scheme has valid credentials |
+| `isLoading` | `boolean` | Whether auth state is being initialized |
+| `user` | `unknown` | Current user data (if available) |
 | `login` | `(tokens: TokenPair) => void` | Stores tokens and notifies subscribers |
 | `logout` | `() => void` | Clears all auth state |
 | `getAccessToken` | `() => string \| null` | Returns the current access token |
+
+### useAuthContext
+
+Alternative hook that returns the raw `AuthInstance` from context. Useful when you need direct access to the auth instance rather than the convenience wrapper provided by `useAuth`.
+
+```tsx
+import { useAuthContext } from "@simplix-react/auth/react";
+
+function AuthDebug() {
+  const auth = useAuthContext();
+  // Access the full AuthInstance API directly
+  return <pre>{JSON.stringify({ authenticated: auth.isAuthenticated() })}</pre>;
+}
+```
 
 ### useAuthFetch
 
@@ -374,6 +390,13 @@ function FileUploader() {
   return <input type="file" onChange={(e) => upload(e.target.files![0])} />;
 }
 ```
+
+### Type Exports (React)
+
+| Export | Description |
+| --- | --- |
+| `AuthProviderProps` | Props for `AuthProvider` (`auth`, `children`, `userLoader?`) |
+| `UseAuthReturn` | Return type of `useAuth` (`isAuthenticated`, `isLoading`, `user`, `login`, `logout`, `getAccessToken`) |
 
 ## Advanced Examples
 

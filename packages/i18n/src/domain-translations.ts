@@ -45,6 +45,8 @@ export function registerDomainTranslations(
  *
  * Used internally by {@link createI18nConfig} to load all registered
  * domain translations during initialization.
+ *
+ * @returns A `ReadonlyMap` keyed by domain name to {@link DomainTranslationConfig}.
  */
 export function getDomainTranslationRegistry(): ReadonlyMap<
   string,

@@ -48,6 +48,19 @@ export interface StackProps
 /**
  * Flexbox layout primitive that stacks children vertically (default) or horizontally.
  *
+ * ```
+ * direction="column" (default)    direction="row"
+ * ┌──────────────┐                ┌────┬────┬────┐
+ * │   Child A    │                │ A  │ B  │ C  │
+ * ├──────────────┤  gap           └────┴────┴────┘
+ * │   Child B    │                  gap   gap
+ * ├──────────────┤
+ * │   Child C    │
+ * └──────────────┘
+ * ```
+ *
+ * @param props - {@link StackProps}
+ *
  * @example
  * ```tsx
  * <Stack gap="lg" align="center">

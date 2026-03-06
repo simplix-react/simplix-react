@@ -1,8 +1,18 @@
 import { useMemo } from "react";
 
 /**
- * Shallow comparison of two objects to detect form dirty state.
- * For deep comparison needs, use useMemo directly.
+ * Detect whether form values have changed via shallow comparison.
+ *
+ * @typeParam T - Form values object type.
+ * @param current - Current form values.
+ * @param initial - Initial (clean) form values.
+ * @returns `true` if any top-level value differs.
+ *
+ * @example
+ * ```ts
+ * const isDirty = useIsDirty(formValues, initialValues);
+ * useBeforeUnload(isDirty);
+ * ```
  */
 export function useIsDirty<T extends Record<string, unknown>>(
   current: T,

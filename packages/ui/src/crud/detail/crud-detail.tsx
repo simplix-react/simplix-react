@@ -46,7 +46,25 @@ import { type FieldVariant, FieldVariantContext } from "../shared/types";
 /** Layout variant for {@link CrudDetail}. */
 export type CrudDetailVariant = "default" | "dialog";
 
-/** Props for the {@link CrudDetail} compound component root. */
+/**
+ * Props for the {@link CrudDetail} compound component root.
+ *
+ * ```
+ * ┌─────────────────────────────────────┐
+ * │  header                       [X]   │
+ * ├─────────────────────────────────────┤
+ * │  Section: "Basic Info"              │
+ * │  Name:    Pet A                     │
+ * │  Status:  Active                    │
+ * │                                     │
+ * │  Section: "Location"               │
+ * │  Address: 123 Main St              │
+ * │           [loading overlay...]      │
+ * ├─────────────────────────────────────┤
+ * │  [← Back]        [Delete] [Edit]   │
+ * └─────────────────────────────────────┘
+ * ```
+ */
 export interface CrudDetailProps {
   /** Shows a semi-transparent overlay with a spinner on top of the detail content. */
   isLoading?: boolean;
@@ -250,6 +268,19 @@ function DetailDefaultActions({ onClose, onBack, onDelete, onEdit, closeLabel, b
 
 /**
  * Compound component for building read-only CRUD detail views.
+ *
+ * ```
+ * ┌─────────────────────────────────────┐
+ * │  header                       [X]   │
+ * ├─────────────────────────────────────┤
+ * │  <CrudDetail.Section>               │
+ * │    field rows (label: value)        │
+ * │  </CrudDetail.Section>             │
+ * ├─────────────────────────────────────┤
+ * │  <CrudDetail.DefaultActions>        │
+ * │  [← Back]        [Delete] [Edit]   │
+ * └─────────────────────────────────────┘
+ * ```
  *
  * Sub-components: Section, Actions, DefaultActions.
  */

@@ -459,6 +459,50 @@ simplix openapi ./spec.yaml --dry-run
 #   ...
 ```
 
+### simplix init-ui
+
+Initialize `@simplix-react/ui` with shadcn/ui integration. Installs required shadcn components and generates a `UIProvider` configuration file.
+
+```bash
+simplix init-ui [-y]
+```
+
+**Options:**
+
+| Flag | Description |
+| --- | --- |
+| `-y, --yes` | Non-interactive mode |
+
+**Prerequisites:** shadcn must be initialized first (`npx shadcn@latest init`). The command installs these shadcn components: `input`, `textarea`, `select`, `switch`, `checkbox`, `badge`, `calendar`, `label`.
+
+### simplix scaffold
+
+Generate CRUD widgets into an FSD module's `widgets/` layer. Reads entity schema definitions and generates list, form, detail, and tree page components.
+
+```bash
+simplix scaffold <entity> [options]
+```
+
+**Arguments:**
+
+| Argument | Description |
+| --- | --- |
+| `<entity>` | Entity name (e.g., `product`, `user`) |
+
+**Options:**
+
+| Flag | Description |
+| --- | --- |
+| `--module <dir>` | Target FSD module directory (relative to `modules/`) |
+| `--output <dir>` | Custom output directory (overrides `--module`, relative to cwd) |
+
+**Example:**
+
+```bash
+# Generate CRUD widgets for the "product" entity
+simplix scaffold product --module store
+```
+
 ## Configuration
 
 The CLI reads an optional `simplix.config.ts` file from the project root. If the file does not exist, default values are used.
@@ -503,6 +547,159 @@ export default {
 | `openapi.domains` | Tag-based domain splitting map: domain name → tag patterns (exact or `/regex/`) | `undefined` (single domain) |
 
 The config file is loaded using [jiti](https://github.com/unjs/jiti), so TypeScript syntax is supported without compilation.
+
+### defineConfig
+
+Identity function that provides type-safe autocompletion for `simplix.config.ts`.
+
+```ts
+import { defineConfig } from "@simplix-react/cli";
+
+export default defineConfig({
+  api: { baseUrl: "/api/v1" },
+  packages: { prefix: "my-app" },
+  codegen: { header: true },
+});
+```
+
+### defineCrudMap
+
+Identity function that provides type-safe autocompletion for per-entity CRUD operation mapping. Use in a `crud.config.ts` file to map entity names to their operation IDs.
+
+```ts
+import { defineCrudMap } from "@simplix-react/cli";
+
+export default defineCrudMap({
+  pet: {
+    list: "findPetsByStatus",
+    get: "getPetById",
+    create: "addPet",
+    update: "updatePet",
+    delete: "deletePet",
+  },
+});
+```
+
+## Plugin System
+
+The CLI provides a plugin registry for extending OpenAPI code generation with custom naming strategies, response adapters, and schema adapters.
+
+### Registration Functions
+
+| Export | Kind | Description |
+| --- | --- | --- |
+| `registerSpecProfile` | Function | Register a named spec profile (naming + response adapter bundle) |
+| `registerResponseAdapterPreset` | Function | Register a named response adapter preset |
+| `registerSchemaAdapter` | Function | Register a schema adapter for unwrapping wrapper types |
+| `registerPlugin` | Function | Register a complete plugin (bulk-registers spec profiles and response adapters) |
+
+### Retrieval Functions
+
+| Export | Kind | Description |
+| --- | --- | --- |
+| `getSpecProfile` | Function | Get a registered spec profile by name |
+| `getResponseAdapterPreset` | Function | Get a registered response adapter preset by name |
+| `getSchemaAdapters` | Function | Get all registered schema adapters |
+
+### registerSpecProfile
+
+Registers a named `SpecProfile` that bundles a naming strategy and response adapter configuration. Reference the profile name in `simplix.config.ts` via the `profile` field.
+
+```ts
+import { registerSpecProfile } from "@simplix-react/cli";
+import type { SpecProfile } from "@simplix-react/cli";
+
+const myProfile: SpecProfile = {
+  naming: {
+    resolveEntityName: (ctx) => ctx.tag ?? "unknown",
+    resolveOperation: (ctx) => ({
+      role: "list",
+      hookName: `list${ctx.entityName}`,
+    }),
+  },
+  responseAdapter: "raw",
+};
+
+registerSpecProfile("my-api", myProfile);
+```
+
+Then reference it in config:
+
+```ts
+export default defineConfig({
+  openapi: [
+    { spec: "openapi.json", profile: "my-api", domains: { main: ["*"] } },
+  ],
+});
+```
+
+### registerResponseAdapterPreset
+
+Registers a named response adapter preset for reuse across specs.
+
+```ts
+import { registerResponseAdapterPreset } from "@simplix-react/cli";
+
+registerResponseAdapterPreset("my-envelope", {
+  unwrapExpression: "data?.result",
+  errorAdapterImport: 'import { adaptError } from "./error-adapter"',
+  errorAdapterName: "adaptError",
+});
+```
+
+### registerSchemaAdapter
+
+Registers a schema adapter that can unwrap wrapper types in OpenAPI schemas (e.g., stripping generic envelope types).
+
+```ts
+import { registerSchemaAdapter } from "@simplix-react/cli";
+
+registerSchemaAdapter({
+  id: "my-wrapper",
+  canUnwrap: (schema) => !!schema["x-wrapper"],
+  unwrap: (schema) => schema.properties?.data as Record<string, unknown>,
+  stripPrefix: (typeName) => typeName.replace(/^Wrapper/, ""),
+});
+```
+
+### registerPlugin
+
+Convenience function that bulk-registers spec profiles and response adapter presets from a single plugin object.
+
+```ts
+import { registerPlugin } from "@simplix-react/cli";
+
+registerPlugin({
+  id: "my-backend",
+  specs: {
+    "my-backend": mySpecProfile,
+  },
+  responseAdapters: {
+    "my-envelope": myResponseAdapterPreset,
+  },
+});
+```
+
+### Type Exports
+
+| Export | Description |
+| --- | --- |
+| `SimplixConfig` | Project-level configuration for `simplix.config.ts` |
+| `OpenAPISpecConfig` | Per-spec OpenAPI configuration within `SimplixConfig.openapi` |
+| `CrudEndpointPattern` | CRUD role to HTTP method/path pattern mapping |
+| `CrudEntityConfig` | Per-entity CRUD role to operationId mapping |
+| `CrudMap` | Entity name to `CrudEntityConfig` mapping (used by `defineCrudMap`) |
+| `SpecProfile` | Bundles naming strategy + response adapter as a reusable preset |
+| `ResponseAdapterPreset` | Preset definition for a response adapter |
+| `ResponseAdapterConfig` | Response adapter configuration (string preset or object) |
+| `OpenApiNamingStrategy` | Strategy interface for entity/operation name derivation |
+| `EntityNameContext` | Context provided to `resolveEntityName()` |
+| `OperationContext` | Context provided to `resolveOperation()` |
+| `ResolvedOperation` | Result of resolving an operation (role + hookName) |
+| `CliPlugin` | Plugin object for `registerPlugin` |
+| `SchemaAdapter` | Schema adapter interface for `registerSchemaAdapter` |
+| `I18nEntityInfo` | Entity info for i18n key mapping |
+| `I18nDownloader` | Callback for downloading i18n data from a server |
 
 ## Related Packages
 

@@ -89,8 +89,27 @@ function paramsToState(params: URLSearchParams) {
   return { filters, sort, page };
 }
 
-/** Syncs list state (filters, sort, pagination) with URL query parameters. Reads from URL on mount and writes changes with 300ms debounce. */
-// Sync list state ↔ URL query string
+/**
+ * Sync list state (filters, sort, pagination) with URL query parameters.
+ *
+ * @remarks
+ * Reads initial state from URL on mount. Writes state changes to URL
+ * with a 300ms debounce using `history.replaceState` (no page reload).
+ *
+ * @param options - {@link UseUrlSyncOptions}
+ *
+ * @example
+ * ```ts
+ * useUrlSync({
+ *   filters: list.filters,
+ *   sort: list.sort,
+ *   pagination: list.pagination,
+ *   setFilters: list.filters.setAll,
+ *   setSort: list.sort.setSort,
+ *   setPage: list.pagination.setPage,
+ * });
+ * ```
+ */
 export function useUrlSync(options: UseUrlSyncOptions): void {
   const { filters, sort, pagination, setFilters, setSort, setPage } = options;
   const router = useRouter();

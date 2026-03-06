@@ -148,6 +148,17 @@ export type DerivedDeleteHook = (
  *
  * @typeParam TData - The entity type returned in each page
  *
+ * @example
+ * ```ts
+ * import { deriveEntityHooks } from "@simplix-react/react";
+ *
+ * const hooks = deriveEntityHooks(projectContract);
+ * const { data, fetchNextPage, hasNextPage } = hooks.task.useInfiniteList(
+ *   projectId,
+ *   { limit: 20, filters: { status: "open" } },
+ * );
+ * ```
+ *
  * @see {@link EntityHooks} for the complete set of entity hooks.
  */
 export type DerivedInfiniteListHook<TData> = (

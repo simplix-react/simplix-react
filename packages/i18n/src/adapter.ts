@@ -41,21 +41,27 @@ export interface II18nAdapter {
   /**
    * Initializes the adapter with an optional default locale.
    * @param defaultLocale - The locale to activate on initialization.
+   * @returns A promise that resolves when initialization is complete.
    */
   initialize(defaultLocale?: LocaleCode): Promise<void>;
 
-  /** Disposes of the adapter and releases all resources. */
+  /**
+   * Disposes of the adapter and releases all resources.
+   * @returns A promise that resolves when disposal is complete.
+   */
   dispose(): Promise<void>;
 
   /**
    * Changes the active locale.
    * @param locale - The target locale code.
+   * @returns A promise that resolves when the locale change is applied.
    */
   setLocale(locale: LocaleCode): Promise<void>;
 
   /**
    * Returns metadata for the given locale, or `null` if unsupported.
    * @param locale - The locale code to look up.
+   * @returns The {@link LocaleInfo} for the locale, or `null` if not supported.
    */
   getLocaleInfo(locale: LocaleCode): LocaleInfo | null;
 
@@ -63,6 +69,7 @@ export interface II18nAdapter {
    * Translates a key with optional interpolation values.
    * @param key - The translation key.
    * @param values - Interpolation values.
+   * @returns The translated string.
    */
   t(key: string, values?: TranslationValues): string;
 
@@ -71,6 +78,7 @@ export interface II18nAdapter {
    * @param namespace - The translation namespace.
    * @param key - The translation key within the namespace.
    * @param values - Interpolation values.
+   * @returns The translated string.
    */
   tn(
     namespace: TranslationNamespace,
@@ -83,6 +91,7 @@ export interface II18nAdapter {
    * @param key - The translation key.
    * @param count - The count for plural selection.
    * @param values - Additional interpolation values.
+   * @returns The translated string with the appropriate plural form.
    */
   tp(key: string, count: number, values?: TranslationValues): string;
 
@@ -90,6 +99,7 @@ export interface II18nAdapter {
    * Checks whether a translation key exists.
    * @param key - The translation key to check.
    * @param namespace - Optional namespace to scope the lookup.
+   * @returns `true` if the key exists in the given namespace.
    */
   exists(key: string, namespace?: TranslationNamespace): boolean;
 
@@ -97,6 +107,7 @@ export interface II18nAdapter {
    * Formats a date according to the active locale.
    * @param date - The date to format.
    * @param options - Formatting options.
+   * @returns The formatted date string.
    */
   formatDate(date: Date, options?: DateTimeFormatOptions): string;
 
@@ -104,6 +115,7 @@ export interface II18nAdapter {
    * Formats a time according to the active locale.
    * @param date - The date/time to format.
    * @param options - Formatting options.
+   * @returns The formatted time string.
    */
   formatTime(date: Date, options?: DateTimeFormatOptions): string;
 
@@ -111,12 +123,14 @@ export interface II18nAdapter {
    * Formats a date and time together according to the active locale.
    * @param date - The date/time to format.
    * @param options - Formatting options.
+   * @returns The formatted date-time string.
    */
   formatDateTime(date: Date, options?: DateTimeFormatOptions): string;
 
   /**
    * Formats a date as a human-readable relative time string (e.g., "3 hours ago").
    * @param date - The date to compare against the current time.
+   * @returns The relative time string.
    */
   formatRelativeTime(date: Date): string;
 
@@ -124,6 +138,7 @@ export interface II18nAdapter {
    * Formats a number according to the active locale.
    * @param value - The number to format.
    * @param options - Formatting options.
+   * @returns The formatted number string.
    */
   formatNumber(value: number, options?: NumberFormatOptions): string;
 
@@ -131,6 +146,7 @@ export interface II18nAdapter {
    * Formats a number as a currency string according to the active locale.
    * @param value - The monetary value to format.
    * @param currency - ISO 4217 currency code override (defaults to the locale's currency).
+   * @returns The formatted currency string.
    */
   formatCurrency(value: number, currency?: string): string;
 
@@ -150,6 +166,7 @@ export interface II18nAdapter {
    * Returns the loading state of translation resources.
    * @param locale - The locale to check.
    * @param namespace - Optional namespace to check (defaults to `"translation"`).
+   * @returns The current {@link TranslationLoadState} for the locale/namespace pair.
    */
   getLoadState(
     locale: LocaleCode,

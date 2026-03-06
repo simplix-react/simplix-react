@@ -76,6 +76,8 @@ export function registerModuleTranslations(
  *
  * Used internally by {@link createI18nConfig} to load all registered
  * module translations during initialization.
+ *
+ * @returns A `ReadonlyMap` keyed by namespace to {@link ModuleTranslations}.
  */
 export function getModuleTranslationRegistry(): ReadonlyMap<
   string,

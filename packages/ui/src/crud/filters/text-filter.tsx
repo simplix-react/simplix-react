@@ -6,14 +6,32 @@ import { Flex } from "../../primitives/flex";
 import { cn } from "../../utils/cn";
 import { MagnifyingGlassIcon, XIcon } from "../shared/icons";
 
+/**
+ * Props for the {@link TextFilter} component.
+ */
 export interface TextFilterProps {
+  /** Label used for accessibility `aria-label` and as fallback placeholder. */
   label: string;
+  /** Current filter value. */
   value: string;
+  /** Called when the user types or clears the filter. */
   onChange: (value: string) => void;
+  /** Placeholder text (defaults to `label`). */
   placeholder?: string;
   className?: string;
 }
 
+/**
+ * Text input filter with search icon and clear button.
+ *
+ * ```
+ * ┌──────────────────────────┐
+ * │ [Q] Search pets...   [X] │
+ * └──────────────────────────┘
+ * ```
+ *
+ * @param props - {@link TextFilterProps}
+ */
 export function TextFilter({ label, value, onChange, placeholder, className }: TextFilterProps) {
   const { t } = useTranslation("simplix/ui");
   const handleClear = useCallback(() => onChange(""), [onChange]);

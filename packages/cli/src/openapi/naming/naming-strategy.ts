@@ -1,8 +1,13 @@
 import type { CrudRole } from "@simplix-react/contract";
 
 /**
- * Context provided to `resolveEntityName()` for deriving the entity name
- * from an OpenAPI tag group.
+ * Context provided to {@link OpenApiNamingStrategy.resolveEntityName} for deriving
+ * the entity name from an OpenAPI tag group.
+ *
+ * @remarks
+ * Contains the tag name, all paths and operations under that tag, referenced
+ * schema names, and any `x-*` extensions from the tag object. The strategy
+ * uses this information to produce a camelCase entity name.
  */
 export interface EntityNameContext {
   /** OpenAPI tag name — undefined for tag-less specs */
@@ -66,9 +71,38 @@ export interface ResolvedOperation {
 
 /**
  * Strategy interface for per-spec naming customization.
- * Injected into the CLI pipeline to control entity/operation name derivation.
+ *
+ * @remarks
+ * Injected into the CLI pipeline to control how entity names and operation
+ * hook names are derived from OpenAPI tags and operations. Each {@link SpecProfile}
+ * includes a naming strategy.
+ *
+ * @example
+ * ```ts
+ * import type { OpenApiNamingStrategy } from "@simplix-react/cli";
+ *
+ * const strategy: OpenApiNamingStrategy = {
+ *   resolveEntityName: (ctx) => camelCase(ctx.tag ?? "unknown"),
+ *   resolveOperation: (ctx) => ({
+ *     role: inferRole(ctx.method, ctx.path),
+ *     hookName: camelCase(ctx.operationId),
+ *   }),
+ * };
+ * ```
  */
 export interface OpenApiNamingStrategy {
+  /**
+   * Derives a camelCase entity name from an OpenAPI tag group.
+   *
+   * @param context - The tag group context containing tag name, paths, operations, and schemas
+   * @returns A camelCase entity name (e.g., `"projectTask"`)
+   */
   resolveEntityName(context: EntityNameContext): string;
+  /**
+   * Maps an OpenAPI operation to a CRUD role and hook name.
+   *
+   * @param context - The operation context containing method, path, entity name, and schema info
+   * @returns A {@link ResolvedOperation} with the determined role and hook name
+   */
   resolveOperation(context: OperationContext): ResolvedOperation;
 }

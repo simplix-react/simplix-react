@@ -107,6 +107,7 @@ const sharedConfig: import("tsup").Options = {
     /^prompts/,
     /^picocolors/,
     /^yaml/,
+    /^@simplix-react-ext\//,
   ],
 };
 

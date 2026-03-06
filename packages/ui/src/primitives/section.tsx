@@ -15,7 +15,20 @@ export interface SectionProps
 }
 
 /**
- * Semantic section with optional title and description.
+ * Semantic section container with optional title and description.
+ *
+ * ```
+ * ┌─────────────────────────────────────┐
+ * │ Account Settings                    │
+ * │ Manage your account preferences     │
+ * │                                     │
+ * │ ┌─────────────────────────────────┐ │
+ * │ │  children...                    │ │
+ * │ └─────────────────────────────────┘ │
+ * └─────────────────────────────────────┘
+ * ```
+ *
+ * @param props - {@link SectionProps}
  *
  * @example
  * ```tsx

@@ -767,5 +767,7 @@ function resolveHookId(op: ExtractedOperation): string {
     return op.resolvedHookName.replace(/^use/, "").charAt(0).toLowerCase()
       + op.resolvedHookName.replace(/^use/, "").slice(1);
   }
-  return op.operationId ?? op.name;
+  const raw = op.operationId ?? op.name;
+  // Remove underscores and capitalize following char to match Orval's pascal conversion
+  return raw.replace(/_(\w)/g, (_: string, c: string) => c.toUpperCase());
 }

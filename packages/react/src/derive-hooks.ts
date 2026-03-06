@@ -534,6 +534,29 @@ function resolveListArgs(
 
 // ── Result Type ──
 
+/**
+ * The fully typed return value of {@link deriveEntityHooks}.
+ *
+ * @remarks
+ * Combines two mapped types:
+ * - **Entity hooks** — for each entity key `K` in the contract, produces an
+ *   {@link EntityHooks} object with CRUD hooks (`useList`, `useGet`, `useCreate`,
+ *   `useUpdate`, `useDelete`, `useInfiniteList`) and any custom operation hooks.
+ * - **Operation hooks** — for each top-level operation key `K`, produces an
+ *   {@link OperationHooks} object with a `useMutation` hook.
+ *
+ * @typeParam TEntities - Record of entity definitions from the contract
+ * @typeParam TOperations - Record of top-level operation definitions from the contract
+ *
+ * @example
+ * ```ts
+ * import { deriveEntityHooks } from "@simplix-react/react";
+ *
+ * const hooks = deriveEntityHooks(inventoryContract);
+ * // hooks.product -> EntityHooks (useList, useGet, useCreate, ...)
+ * // hooks.bulkImport -> OperationHooks (useMutation)
+ * ```
+ */
 export type DerivedEntityHooksResult<
   TEntities extends Record<string, AnyEntityDef>,
   TOperations extends Record<string, AnyOperationDef>,

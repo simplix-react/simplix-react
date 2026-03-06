@@ -7,10 +7,17 @@ import { Separator } from "../../base/display/separator";
 import { Popover, PopoverContent, PopoverTrigger } from "../../base/overlay/popover";
 import { Calendar, type DateRange } from "../../base/controls/calendar";
 
+/**
+ * Props for the {@link DateRangeFilter} component.
+ */
 export interface DateRangeFilterProps {
+  /** Button label (e.g. `"Created"`, `"Updated"`). */
   label: string;
+  /** Start date of the range, or `undefined` if unset. */
   from: Date | undefined;
+  /** End date of the range, or `undefined` if unset. */
   to: Date | undefined;
+  /** Called when the user selects or clears a date range. */
   onChange: (from?: Date, to?: Date) => void;
   className?: string;
 }
@@ -22,6 +29,22 @@ function formatDate(date: Date): string {
   }).format(date);
 }
 
+/**
+ * Date range filter with dual-month calendar popover.
+ *
+ * ```
+ * ┌──────────────────────────────────────┐
+ * │ [cal] Created | Jan 1 – Jan 31 [X]  │
+ * └──────────────────────────────────────┘
+ *   └─ popover ─────────────────────────┐
+ *   │  [  January  ]  [  February  ]    │
+ *   │  Mo Tu We Th Fr  Mo Tu We Th Fr   │
+ *   │  ...              ...             │
+ *   └──────────────────────────────────┘
+ * ```
+ *
+ * @param props - {@link DateRangeFilterProps}
+ */
 export function DateRangeFilter({
   label,
   from,

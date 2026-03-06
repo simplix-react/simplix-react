@@ -95,6 +95,8 @@ export function useTranslation<TKeys extends string = string>(
  * Returns the {@link II18nAdapter} from context for direct adapter access.
  *
  * Shorthand for {@link useI18nAdapter}. Use {@link useTranslation} for namespace-scoped translations.
+ *
+ * @returns The {@link II18nAdapter} instance, or `null` if no provider is present.
  */
 export function useI18n() {
   return useI18nAdapter();

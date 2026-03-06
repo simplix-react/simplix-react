@@ -85,7 +85,18 @@ function EmptyReasonCard({ reason }: { reason: Exclude<EmptyReason, "no-data"> }
 
 // ── List Root ──
 
-/** Props for the {@link CrudList} compound component root. */
+/**
+ * Props for the {@link CrudList} compound component root.
+ *
+ * @example
+ * ```tsx
+ * <CrudList>
+ *   <CrudList.Toolbar>...</CrudList.Toolbar>
+ *   <CrudList.Table data={items}>...</CrudList.Table>
+ *   <CrudList.Pagination ... />
+ * </CrudList>
+ * ```
+ */
 export interface ListProps {
   className?: string;
   children?: ReactNode;
@@ -1453,8 +1464,24 @@ function ListEmpty({ reason = "no-data", messages, className, children }: ListEm
  * Compound component for building CRUD list views with toolbar, table,
  * pagination, selection, and bulk actions.
  *
- * Sub-components: Toolbar, Search, Filter, Table, Column,
- * Pagination, BulkActions, BulkAction, Empty.
+ * ```
+ * ┌─────────────────────────────────────────┐
+ * │ Toolbar                                 │
+ * │ [Search...]   [Filter ▼]   [+ Create]   │
+ * ├─────┬────────┬────────┬────────┬────────┤
+ * │ [x] │ Name   │ Status │ Date   │ Action │
+ * ├─────┼────────┼────────┼────────┼────────┤
+ * │ [ ] │ Item A │ Active │ 01-01  │ [Edit] │
+ * │ [x] │ Item B │ Draft  │ 01-02  │ [Edit] │
+ * ├─────┴────────┴────────┴────────┴────────┤
+ * │ BulkActions: 1 selected  [Delete]       │
+ * ├─────────────────────────────────────────┤
+ * │          Pagination < 1  2  3 >         │
+ * └─────────────────────────────────────────┘
+ * ```
+ *
+ * Sub-components: Toolbar, Search, Table, Column, Pagination,
+ * BulkActions, BulkAction, Empty, and 10+ filter types.
  */
 export const CrudList = Object.assign(ListRoot, {
   Toolbar: ListToolbar,

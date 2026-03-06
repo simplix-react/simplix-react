@@ -1,10 +1,30 @@
 // ── Types ──
 
+/**
+ * A single field-level validation error returned by the server.
+ *
+ * @example
+ * ```ts
+ * const err: ValidationFieldError = { field: "email", message: "must be valid" };
+ * ```
+ */
 export interface ValidationFieldError {
+  /** The form field name that failed validation (e.g. `"email"`, `"name"`). */
   field: string;
+  /** Human-readable validation message for the field. */
   message: string;
 }
 
+/**
+ * Classification category for server errors.
+ *
+ * - `"validation"` — 4xx with field-level errors (e.g. 400, 422).
+ * - `"auth"` — 401 Unauthorized or 403 Forbidden.
+ * - `"client"` — 4xx without validation errors (e.g. 404, 409).
+ * - `"server"` — 5xx server errors.
+ * - `"network"` — `TypeError` with no HTTP status (fetch failure).
+ * - `"unknown"` — Unclassifiable errors.
+ */
 export type ErrorCategory =
   | "validation"
   | "auth"
@@ -13,12 +33,24 @@ export type ErrorCategory =
   | "network"
   | "unknown";
 
+/**
+ * Structured error event produced by {@link classifyError}.
+ *
+ * @remarks
+ * Consumed by the category-specific handlers in {@link createMutationErrorHandler}.
+ */
 export interface ServerErrorEvent {
+  /** Classification category of the error. */
   category: ErrorCategory;
+  /** HTTP status code, if available. */
   status?: number;
+  /** Application-specific error code (e.g. `"PET_NOT_FOUND"`). */
   errorCode?: string;
+  /** Human-readable error message. */
   message: string;
+  /** Field-level validation errors, present only for `"validation"` category. */
   validationErrors?: ValidationFieldError[];
+  /** Original error object for debugging. */
   raw: unknown;
 }
 
@@ -89,10 +121,25 @@ function extractFromObject(
 /**
  * Extract validation field errors from any error shape using duck typing.
  *
- * Extraction order:
- * 1. Direct properties on error (errorDetail, errors) — ApiResponseError / plain object
- * 2. error.data (HttpError shape)
- * 3. JSON.parse(error.body) fallback (ApiError / string body)
+ * @remarks
+ * Supports multiple server error formats:
+ * 1. Direct properties (`errorDetail`, `errors`) — Spring Boot / ApiResponseError.
+ * 2. `error.data` — {@link HttpError} shape.
+ * 3. `JSON.parse(error.body)` — ApiError with string body.
+ * 4. Rails-style `{ errors: { [field]: string[] } }`.
+ *
+ * @param error - Any caught error value.
+ * @returns Array of field errors, or `null` if none found.
+ *
+ * @example
+ * ```ts
+ * try {
+ *   await createPet(data);
+ * } catch (err) {
+ *   const fieldErrors = getValidationErrors(err);
+ *   // [{ field: "name", message: "is required" }]
+ * }
+ * ```
  */
 export function getValidationErrors(
   error: unknown,
@@ -124,12 +171,27 @@ export function getValidationErrors(
   return null;
 }
 
+/**
+ * Extract a human-readable message from any error value.
+ *
+ * @param error - Any caught error value.
+ * @returns The `Error.message`, the string itself, or a generic fallback.
+ */
 export function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
   if (typeof error === "string") return error;
   return "An unknown error occurred";
 }
 
+/**
+ * Extract an application-specific error code from any error value.
+ *
+ * @remarks
+ * Looks for `errorCode` on the error object itself, then on `error.data`.
+ *
+ * @param error - Any caught error value.
+ * @returns The error code string, or `null` if not found.
+ */
 export function getErrorCode(error: unknown): string | null {
   if (typeof error !== "object" || error === null) return null;
   const err = error as Record<string, unknown>;
@@ -144,7 +206,12 @@ export function getErrorCode(error: unknown): string | null {
   return null;
 }
 
-/** Duck typing: extract status from any error with a numeric `status` property. */
+/**
+ * Extract the HTTP status code from any error with a numeric `status` property.
+ *
+ * @param error - Any caught error value.
+ * @returns The numeric status code, or `null` if not present.
+ */
 export function getHttpStatus(error: unknown): number | null {
   if (typeof error !== "object" || error === null) return null;
   const err = error as Record<string, unknown>;
@@ -152,6 +219,29 @@ export function getHttpStatus(error: unknown): number | null {
   return null;
 }
 
+/**
+ * Classify an error into a structured {@link ServerErrorEvent}.
+ *
+ * @remarks
+ * Classification logic:
+ * - `TypeError` without status → `"network"`.
+ * - 401/403 → `"auth"`.
+ * - 5xx → `"server"`.
+ * - 4xx with validation errors → `"validation"`.
+ * - 4xx without validation errors → `"client"`.
+ * - Everything else → `"unknown"`.
+ *
+ * @param error - Any caught error value.
+ * @returns A structured {@link ServerErrorEvent} with category, status, message, and validation errors.
+ *
+ * @example
+ * ```ts
+ * const event = classifyError(err);
+ * if (event.category === "validation") {
+ *   setFieldErrors(event.validationErrors);
+ * }
+ * ```
+ */
 export function classifyError(error: unknown): ServerErrorEvent {
   const status = getHttpStatus(error);
   const message = getErrorMessage(error);
@@ -225,6 +315,27 @@ export function classifyError(error: unknown): ServerErrorEvent {
   };
 }
 
+/**
+ * Create a React Query `onError` handler that routes errors to category-specific callbacks.
+ *
+ * @remarks
+ * Uses {@link classifyError} internally, then dispatches to the matching
+ * `on*Error` callback. Designed for use with `useMutation({ onError })`.
+ *
+ * @param config - Map of category-specific error handlers. All callbacks are optional.
+ * @returns An `onError` function compatible with React Query mutation options.
+ *
+ * @example
+ * ```ts
+ * const onError = createMutationErrorHandler({
+ *   onValidationError: (e) => setFieldErrors(e.validationErrors),
+ *   onAuthError: () => router.push("/login"),
+ *   onServerError: (e) => toast.error(e.message),
+ * });
+ *
+ * useMutation({ mutationFn: createPet, onError });
+ * ```
+ */
 export function createMutationErrorHandler(config: {
   onValidationError?: (event: ServerErrorEvent) => void;
   onAuthError?: (event: ServerErrorEvent) => void;

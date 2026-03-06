@@ -5,24 +5,44 @@ import type { EmptyReason, SortState } from "../shared/types";
 const EMPTY_FILTERS: Record<string, unknown> = {};
 
 // Minimal hook shape to avoid tight coupling with @simplix-react/react generics
+/**
+ * Minimal return shape for list data hooks passed to {@link useCrudList}.
+ *
+ * @typeParam T - Row data type.
+ */
 export interface ListHookResult<T> {
+  /** Array of row items, or `undefined` while loading. */
   data: T[] | undefined;
+  /** Total number of items (for server-side pagination). */
   total?: number;
+  /** Whether the query is currently loading. */
   isLoading: boolean;
+  /** Error object if the query failed, otherwise `null`. */
   error: Error | null;
 }
 
+/**
+ * Hook signature for list data fetching, compatible with Orval-generated query hooks.
+ *
+ * @typeParam T - Row data type.
+ */
 export interface ListHook<T> {
   (params?: Record<string, unknown>, options?: Record<string, unknown>): ListHookResult<T>;
 }
 
 /** Configuration options for the {@link useCrudList} hook. */
 export interface UseCrudListOptions {
+  /** Whether filtering/sorting/pagination is handled by the server or client. Defaults to `"server"`. */
   stateMode?: "server" | "client";
+  /** Whether filter changes apply immediately or require an explicit `apply()` call. Defaults to `"deferred"`. */
   filterMode?: "immediate" | "deferred";
+  /** Maximum number of rows to display. */
   maxRows?: number;
+  /** Initial sort field and direction. */
   defaultSort?: SortState;
+  /** Initial page size. Defaults to `10`. */
   defaultPageSize?: number;
+  /** Initial filter values. */
   defaultFilters?: Record<string, unknown>;
 }
 
@@ -80,8 +100,30 @@ export interface UseCrudListResult<T> {
 
 /**
  * State management hook for CRUD list views.
- * Handles filtering, sorting, pagination, and selection with
+ *
+ * @remarks
+ * Handles filtering, sorting, pagination, and row selection with
  * support for both server-side and client-side data processing.
+ * In `"server"` mode, filter/sort/pagination params are forwarded to the list hook.
+ * In `"client"` mode, all processing happens in-memory.
+ *
+ * @typeParam T - Row data type.
+ * @param useList - Data fetching hook (e.g. Orval-generated `useListPets`).
+ * @param options - Configuration for state mode, defaults, and filter behavior.
+ * @returns Unified state object for data, filters, sort, pagination, selection, and empty detection.
+ *
+ * @example
+ * ```ts
+ * const list = useCrudList(useListPets, {
+ *   stateMode: "server",
+ *   defaultPageSize: 20,
+ *   defaultSort: { field: "name", direction: "asc" },
+ * });
+ *
+ * // Use in CrudList component
+ * <CrudList.Table data={list.data} sort={list.sort} ... />
+ * <CrudList.Pagination {...list.pagination} ... />
+ * ```
  */
 export function useCrudList<T>(
   useList: ListHook<T>,

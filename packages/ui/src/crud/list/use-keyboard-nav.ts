@@ -2,21 +2,31 @@ import { type RefObject, useEffect, useRef } from "react";
 
 /** Options for the {@link useKeyboardNav} hook. */
 export interface UseKeyboardNavOptions {
+  /** Called on ArrowUp/ArrowDown key press. */
   onNavigate: (direction: "up" | "down") => void;
+  /** Called on Enter key press. */
   onSelect: () => void;
+  /** Called on Space key press (skipped inside input/textarea/button). */
   onToggle: () => void;
+  /** Called on Ctrl+K / Cmd+K key press. */
   onSearch: () => void;
+  /** Called on Escape key press. */
   onEscape?: () => void;
+  /** Enable or disable keyboard listeners. Defaults to `true`. */
   enabled?: boolean;
 }
 
 /**
  * Keyboard navigation hook for list components.
+ *
+ * @remarks
  * Bindings: ArrowUp/Down (navigate), Enter (select), Space (toggle),
  * Ctrl+K / Cmd+K (search), Escape (dismiss).
+ * Attach the returned `containerRef` to the element that should capture keyboard events.
+ *
+ * @param options - {@link UseKeyboardNavOptions}
+ * @returns Object containing a `containerRef` to attach to the list container element.
  */
-// Bindings: ArrowUp/Down (navigate), Enter (select), Space (toggle),
-// Ctrl+K (search), Escape (close/dismiss)
 export function useKeyboardNav(
   options: UseKeyboardNavOptions,
 ): { containerRef: RefObject<HTMLElement | null> } {

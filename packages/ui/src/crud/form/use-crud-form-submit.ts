@@ -2,22 +2,31 @@ import { useCallback } from "react";
 
 /** Minimal mutation shape used by {@link useCrudFormSubmit}. */
 export interface CrudMutation<TInput> {
+  /** Trigger the mutation with the given input. */
   mutate: (input: TInput, options?: { onSuccess?: () => void }) => void;
+  /** Whether the mutation is currently in flight. */
   isPending: boolean;
 }
 
 /** Options for the {@link useCrudFormSubmit} hook. */
 export interface UseCrudFormSubmitOptions<T, TId = unknown> {
+  /** Entity ID for edit mode. When nullish, create mode is used. */
   entityId?: TId;
+  /** Create mutation hook result. */
   create: CrudMutation<T>;
+  /** Update mutation hook result. Required for edit mode. */
   update?: CrudMutation<{ id: TId; dto: T }>;
+  /** Called after a successful create or update. */
   onSuccess?: () => void;
 }
 
 /** Return type of {@link useCrudFormSubmit}. */
 export interface UseCrudFormSubmitResult<T> {
+  /** Whether the form is in edit mode (entity already exists). */
   isEdit: boolean;
+  /** Submit handler that dispatches to create or update mutation. */
   handleSubmit: (values: T) => void;
+  /** Whether the active mutation is pending. */
   isPending: boolean;
 }
 

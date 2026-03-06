@@ -26,14 +26,26 @@ interface AdaptOrvalListOptions {
 }
 
 /**
- * Adapts an Orval-generated list hook to the {@link ListHook} interface
- * expected by `useCrudList` with `stateMode: "server"`.
+ * Adapt an Orval-generated list hook to the {@link ListHook} interface
+ * expected by {@link useCrudList} with `stateMode: "server"`.
  *
- * Handles:
- * - Page conversion: 1-based (useCrudList) to 0-based (Spring Data)
- * - Size mapping: `pagination.limit` to `size`
- * - Sort formatting: `{ field, direction }` to `["field.direction"]`
- * - Response extraction: Spring Data Page (`content`, `totalElements`)
+ * @remarks
+ * Handles the following conversions:
+ * - Page: 1-based (`useCrudList`) to 0-based (Spring Data).
+ * - Size: `pagination.limit` to `size`.
+ * - Sort: `{ field, direction }` to `["field.direction"]`.
+ * - Response: Spring Data Page (`content`, `totalElements`) to `ListHookResult`.
+ *
+ * @typeParam T - Row data type.
+ * @param useApiHook - Orval-generated list query hook.
+ * @param options - Optional query configuration (e.g. cache overrides).
+ * @returns A {@link ListHook} compatible with `useCrudList`.
+ *
+ * @example
+ * ```ts
+ * const useListPetsAdapted = adaptOrvalList<Pet>(useGetPets);
+ * const list = useCrudList(useListPetsAdapted, { stateMode: "server" });
+ * ```
  */
 export function adaptOrvalList<T>(
   useApiHook: OrvalListHookLike,

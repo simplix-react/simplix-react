@@ -29,8 +29,22 @@ export interface UseAutosaveReturn {
 
 /**
  * Debounced autosave hook that watches form values for changes.
+ *
+ * @remarks
  * Automatically saves after a configurable debounce interval.
- * Skips save when the form has validation errors.
+ * Skips save when the form has validation errors or when disabled.
+ *
+ * @param options - {@link UseAutosaveOptions}
+ * @returns Autosave status including `isSaving`, `lastSavedAt`, and `status`.
+ *
+ * @example
+ * ```ts
+ * const { isSaving, lastSavedAt } = useAutosave({
+ *   values: formValues,
+ *   onSave: (v) => updateEntity(v),
+ *   debounceMs: 1500,
+ * });
+ * ```
  */
 export function useAutosave({
   values,

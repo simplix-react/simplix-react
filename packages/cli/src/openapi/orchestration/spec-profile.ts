@@ -20,11 +20,20 @@ export type I18nDownloader = (
 ) => Promise<Map<string, Record<string, unknown>> | undefined>;
 
 /**
- * Spec Profile bundles naming strategy + response adapter as a reusable preset.
+ * Bundles a naming strategy and response adapter as a reusable preset for a backend convention.
  *
- * Usage in simplix.config.ts:
+ * @remarks
+ * Registered via {@link registerSpecProfile} or as part of a {@link CliPlugin}.
+ * Referenced by name in `simplix.config.ts` via the `profile` field.
+ *
+ * @example
  * ```ts
- * { spec: "openapi/boot.json", profile: "simplix-boot", domains: { ... } }
+ * // simplix.config.ts
+ * export default {
+ *   specs: [
+ *     { spec: "openapi/boot.json", profile: "simplix-boot", domains: { ... } },
+ *   ],
+ * };
  * ```
  */
 export interface SpecProfile {

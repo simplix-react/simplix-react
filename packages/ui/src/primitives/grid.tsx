@@ -40,6 +40,17 @@ export interface GridProps
 /**
  * CSS Grid layout primitive with configurable columns and gap.
  *
+ * ```
+ * columns={2}, gap="md"
+ * ┌─────────────┬─────────────┐
+ * │  [Input A]  │  [Input B]  │
+ * ├─────────────┼─────────────┤
+ * │  [Input C]  │  [Input D]  │
+ * └─────────────┴─────────────┘
+ * ```
+ *
+ * @param props - {@link GridProps}
+ *
  * @example
  * ```tsx
  * <Grid columns={2} gap="md">

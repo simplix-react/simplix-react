@@ -1,8 +1,15 @@
 import { useEffect } from "react";
 
 /**
- * Registers a beforeunload handler when enabled.
- * Use with isDirty state to prevent accidental tab close.
+ * Register a `beforeunload` handler to warn users before leaving the page.
+ *
+ * @param enabled - Whether the handler is active (typically bound to form dirty state).
+ *
+ * @example
+ * ```ts
+ * const isDirty = useIsDirty(current, initial);
+ * useBeforeUnload(isDirty);
+ * ```
  */
 export function useBeforeUnload(enabled: boolean) {
   useEffect(() => {

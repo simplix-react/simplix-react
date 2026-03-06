@@ -17,22 +17,56 @@ import {
   CommandSeparator,
 } from "../../base/inputs/command";
 
+/**
+ * A single option in a {@link FacetedFilter}.
+ */
 export interface FacetedFilterOption {
+  /** Display label. */
   label: string;
+  /** Unique value identifier. */
   value: string;
+  /** Optional icon component rendered before the label. */
   icon?: ComponentType<{ className?: string }>;
 }
 
+/**
+ * Props for the {@link FacetedFilter} component.
+ */
 export interface FacetedFilterProps {
+  /** Button label (e.g. `"Status"`, `"Category"`). */
   label: string;
+  /** Currently selected value(s). String for single-select, string array for multi-select. */
   value: string | string[];
+  /** Called when selection changes. */
   onChange: (value: string | string[]) => void;
+  /** Available filter options. */
   options: FacetedFilterOption[];
+  /** Enable multi-select mode. Defaults to `true`. */
   multiSelect?: boolean;
+  /** Max badges to show before collapsing to count. Defaults to `5`. */
   maxDisplayCount?: number;
   className?: string;
 }
 
+/**
+ * Faceted filter with searchable command popover and badge display.
+ *
+ * ```
+ * ┌─────────────────────────────────┐
+ * │ Status | Active | Draft    [X]  │
+ * └─────────────────────────────────┘
+ *   └─ popover ───────────────────┐
+ *   │ [Search...]                 │
+ *   │ [x] Active                  │
+ *   │ [x] Draft                   │
+ *   │ [ ] Archived                │
+ *   │ ─────────────               │
+ *   │ Clear filters               │
+ *   └────────────────────────────┘
+ * ```
+ *
+ * @param props - {@link FacetedFilterProps}
+ */
 export function FacetedFilter({
   label,
   value,

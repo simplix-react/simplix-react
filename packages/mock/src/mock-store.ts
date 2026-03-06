@@ -13,6 +13,15 @@ const counters = new Map<string, number>();
  *
  * @param storeName - Unique identifier for the entity store.
  * @returns The entity map keyed by record id.
+ *
+ * @example
+ * ```ts
+ * import { getEntityStore } from "@simplix-react/mock";
+ *
+ * const store = getEntityStore("pets");
+ * store.set(1, { id: 1, name: "Buddy", status: "available" });
+ * console.log(store.get(1)); // { id: 1, name: "Buddy", status: "available" }
+ * ```
  */
 export function getEntityStore(
   storeName: string,
@@ -29,7 +38,15 @@ export function getEntityStore(
  * Returns the next auto-increment id for the given store and advances the counter.
  *
  * @param storeName - Unique identifier for the entity store.
- * @returns The next numeric id.
+ * @returns The next numeric id (starting from 1).
+ *
+ * @example
+ * ```ts
+ * import { getNextId } from "@simplix-react/mock";
+ *
+ * const id1 = getNextId("pets"); // 1
+ * const id2 = getNextId("pets"); // 2
+ * ```
  */
 export function getNextId(storeName: string): number {
   const current = counters.get(storeName) ?? 0;
@@ -44,6 +61,19 @@ export function getNextId(storeName: string): number {
  *
  * @param storeName - Unique identifier for the entity store.
  * @param records - The records to seed. Each must have an `id` field.
+ *
+ * @example
+ * ```ts
+ * import { seedEntityStore, getEntityStore } from "@simplix-react/mock";
+ *
+ * seedEntityStore("pets", [
+ *   { id: 1, name: "Buddy", status: "available" },
+ *   { id: 2, name: "Max", status: "pending" },
+ * ]);
+ *
+ * const store = getEntityStore("pets");
+ * console.log(store.size); // 2
+ * ```
  */
 export function seedEntityStore(
   storeName: string,
@@ -65,6 +95,15 @@ export function seedEntityStore(
 
 /**
  * Clears all entity stores and resets all auto-increment counters.
+ *
+ * @example
+ * ```ts
+ * import { resetStore } from "@simplix-react/mock";
+ *
+ * afterEach(() => {
+ *   resetStore();
+ * });
+ * ```
  */
 export function resetStore(): void {
   stores.clear();
