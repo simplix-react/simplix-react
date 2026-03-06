@@ -10,14 +10,14 @@ import { renderTemplate } from "../utils/template.js";
 import { loadConfig } from "../config/config-loader.js";
 import { findSpecBySource } from "../config/types.js";
 import type { SimplixConfig } from "../config/types.js";
-import { loadOpenAPISpec, isSpecUrl } from "../openapi/parser.js";
-import { resolveRefs } from "../openapi/schema-resolver.js";
-import { extractEntities, enrichWithResponseInfo } from "../openapi/entity-extractor.js";
-import { computeDiff, formatDiff } from "../openapi/diff-engine.js";
-import { groupEntitiesByDomain, entityMatchesDomain } from "../openapi/domain-splitter.js";
-import { generateMockFiles } from "../openapi/mock-generator.js";
-import { generateHookFiles } from "../openapi/hook-generator.js";
-import { generateHttpFile, generateHttpEnvJson } from "../openapi/http-file-gen.js";
+import { loadOpenAPISpec, isSpecUrl } from "../openapi/pipeline/parser.js";
+import { resolveRefs } from "../openapi/pipeline/schema-resolver.js";
+import { extractEntities, enrichWithResponseInfo } from "../openapi/pipeline/entity-extractor.js";
+import { computeDiff, formatDiff } from "../openapi/adaptation/diff-engine.js";
+import { groupEntitiesByDomain, entityMatchesDomain } from "../openapi/pipeline/domain-splitter.js";
+import { generateMockFiles } from "../openapi/generation/mock-generator.js";
+import { generateHookFiles } from "../openapi/generation/hook-generator.js";
+import { generateHttpFile, generateHttpEnvJson } from "../openapi/generation/http-file-gen.js";
 import {
   runOrval,
   narrowResponseTypes,
@@ -29,16 +29,10 @@ import {
   extractMutatorStrategy,
   buildHookImportMap,
   pruneUnusedModels,
-} from "../openapi/orval-runner.js";
-import { resolveSpecConfig } from "../openapi/resolve-spec-config.js";
-import {
-  downloadI18nMessages,
-  buildEntityKeyMap,
-  transformToLocaleData,
-  overlayLocaleJson,
-} from "../openapi/presets/simplix-boot-i18n.js";
-import type { OperationContext } from "../openapi/naming-strategy.js";
-import type { OpenApiNamingStrategy } from "../openapi/naming-strategy.js";
+} from "../openapi/orchestration/orval-runner.js";
+import { resolveSpecConfig } from "../openapi/orchestration/resolve-spec-config.js";
+import type { OperationContext } from "../openapi/naming/naming-strategy.js";
+import type { OpenApiNamingStrategy } from "../openapi/naming/naming-strategy.js";
 import type { ExtractedEntity, ExtractedOperation, DomainGroup, OpenAPISnapshot, OpenAPISpec } from "../openapi/types.js";
 import { domainIndexTs } from "../templates/domain/index.js";
 
@@ -358,12 +352,12 @@ async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
       await generateLocaleFiles(targetDir, entities, locales);
     }
 
-    // 13b. Overlay server i18n translations (simplix-boot profile only)
-    if (hasTranslations && resolvedSpecConfig?.i18nEndpoint) {
+    // 13b. Overlay server i18n translations (via profile i18nDownloader)
+    if (hasTranslations && resolvedSpecConfig?.i18nDownloader) {
       const serverOrigin = resolveServerOrigin(specSource, spec);
       if (serverOrigin) {
         await overlayServerTranslations(
-          targetDir, entities, locales, serverOrigin, resolvedSpecConfig.i18nEndpoint,
+          targetDir, entities, locales, serverOrigin, resolvedSpecConfig.i18nDownloader,
         );
       }
     }
@@ -718,15 +712,14 @@ async function overlayServerTranslations(
   entities: ExtractedEntity[],
   locales: string[],
   serverOrigin: string,
-  i18nEndpoint: string,
+  i18nDownloader: (
+    origin: string,
+    entities: Array<{ pascalName: string; name: string }>,
+    locales: string[],
+  ) => Promise<Map<string, Record<string, unknown>> | undefined>,
 ): Promise<void> {
-  const serverData = await downloadI18nMessages(serverOrigin, i18nEndpoint);
-  if (!serverData) return;
-
-  const entityKeyMap = buildEntityKeyMap(entities);
-  const localeDataMap = transformToLocaleData(serverData, entityKeyMap, locales);
-
-  if (localeDataMap.size === 0) return;
+  const localeDataMap = await i18nDownloader(serverOrigin, entities, locales);
+  if (!localeDataMap) return;
 
   const localesDir = join(targetDir, "src/locales");
   for (const locale of locales) {
@@ -735,11 +728,33 @@ async function overlayServerTranslations(
 
     const filePath = join(localesDir, `${locale}.json`);
     const existing = await readJsonFile<Record<string, unknown>>(filePath).catch(() => ({}));
-    const merged = overlayLocaleJson(existing, overlay);
+    const merged = deepMerge(existing, overlay);
     await writeFileWithDir(filePath, JSON.stringify(merged, null, 2) + "\n");
   }
 
   log.info("Applied server i18n translations.");
+}
+
+function deepMerge(
+  base: Record<string, unknown>,
+  overlay: Record<string, unknown>,
+): Record<string, unknown> {
+  const result: Record<string, unknown> = { ...base };
+  for (const [key, overlayValue] of Object.entries(overlay)) {
+    const baseValue = result[key];
+    if (
+      baseValue && typeof baseValue === "object" && !Array.isArray(baseValue) &&
+      overlayValue && typeof overlayValue === "object" && !Array.isArray(overlayValue)
+    ) {
+      result[key] = deepMerge(
+        baseValue as Record<string, unknown>,
+        overlayValue as Record<string, unknown>,
+      );
+    } else {
+      result[key] = overlayValue;
+    }
+  }
+  return result;
 }
 
 /**

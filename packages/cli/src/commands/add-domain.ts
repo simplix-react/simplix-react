@@ -8,12 +8,12 @@ import { toPascalCase } from "../utils/case.js";
 import { renderTemplate } from "../utils/template.js";
 import { loadConfig } from "../config/config-loader.js";
 import { withVersions } from "../versions.js";
-import { isSpecUrl } from "../openapi/parser.js";
+import { isSpecUrl } from "../openapi/pipeline/parser.js";
 import { findSpecForDomain } from "../config/types.js";
 import {
   generateDomainMutatorContent,
-} from "../openapi/orval-runner.js";
-import { SPEC_PROFILES } from "../openapi/presets/spec-profiles.js";
+} from "../openapi/orchestration/orval-runner.js";
+import { getSpecProfile } from "../openapi/plugin-registry.js";
 import {
   domainEslintConfig,
   domainPackageJson,
@@ -172,7 +172,7 @@ export const addDomainCommand = new Command("add-domain")
 
         // Add profile-specific dependencies (data-driven from SpecProfile)
         if (specConfig?.profile) {
-          const profile = SPEC_PROFILES[specConfig.profile];
+          const profile = getSpecProfile(specConfig.profile);
           if (profile?.dependencies) {
             Object.assign(pkgJson.dependencies, profile.dependencies);
           }

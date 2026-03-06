@@ -1,10 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { resolveRefs } from "../openapi/schema-resolver.js";
-import { extractEntities } from "../openapi/entity-extractor.js";
-import { toZodType, generateZodSchemas } from "../openapi/zod-codegen.js";
-import { generateHttpFile, generateHttpEnvJson } from "../openapi/http-file-gen.js";
-import { computeDiff, formatDiff } from "../openapi/diff-engine.js";
-import { createTagMatcher, entityMatchesDomain, groupEntitiesByDomain } from "../openapi/domain-splitter.js";
+import { resolveRefs } from "../openapi/pipeline/schema-resolver.js";
+import { extractEntities } from "../openapi/pipeline/entity-extractor.js";
+import { toZodType, generateZodSchemas } from "../openapi/generation/zod-codegen.js";
+import { generateHttpFile, generateHttpEnvJson } from "../openapi/generation/http-file-gen.js";
+import { computeDiff, formatDiff } from "../openapi/adaptation/diff-engine.js";
+import { createTagMatcher, entityMatchesDomain, groupEntitiesByDomain } from "../openapi/pipeline/domain-splitter.js";
 import type { OpenAPISpec, ExtractedEntity, OpenAPISnapshot } from "../openapi/types.js";
 import type { CrudEndpointPattern } from "../config/types.js";
 import type { CrudRole } from "@simplix-react/contract";

@@ -9,6 +9,14 @@ import { openapiCommand } from "./commands/openapi.js";
 import { scaffoldCrudCommand } from "./commands/scaffold-crud.js";
 import { frameworkVersion } from "./versions.js";
 
+// Load extension plugins dynamically (optional — no hard dependency)
+try {
+  // @ts-expect-error optional plugin — may not be installed
+  await import("@simplix-react-ext/simplix-boot-cli-plugin");
+} catch {
+  // Plugin not installed — boot profile won't be available
+}
+
 const program = new Command();
 
 program

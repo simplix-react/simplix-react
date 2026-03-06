@@ -1,7 +1,7 @@
 import { resolve } from "node:path";
 import type { HttpMethod, CrudRole } from "@simplix-react/contract";
-import type { OpenApiNamingStrategy } from "../openapi/naming-strategy.js";
-import type { ResponseAdapterConfig } from "../openapi/response-adapter.js";
+import type { OpenApiNamingStrategy } from "../openapi/naming/naming-strategy.js";
+import type { ResponseAdapterConfig } from "../openapi/adaptation/response-adapter.js";
 
 /**
  * Defines how a CRUD role maps to HTTP method(s) and path pattern(s).

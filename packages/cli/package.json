@@ -3,7 +3,9 @@
   "version": "0.1.3",
   "description": "CLI for scaffolding and validating simplix-react projects",
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": [
+    "dist/bin.js"
+  ],
   "bin": {
     "simplix": "./dist/bin.js"
   },

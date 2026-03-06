@@ -15,13 +15,29 @@ export type {
   OperationContext,
   ResolvedOperation,
   OpenApiNamingStrategy,
-} from "./openapi/naming-strategy.js";
+} from "./openapi/naming/naming-strategy.js";
 
 // ResponseAdapter types
 export type {
   ResponseAdapterConfig,
   ResponseAdapterPreset,
-} from "./openapi/response-adapter.js";
+} from "./openapi/adaptation/response-adapter.js";
 
 // SpecProfile types
-export type { SpecProfile } from "./openapi/spec-profile.js";
+export type {
+  SpecProfile,
+  I18nEntityInfo,
+  I18nDownloader,
+} from "./openapi/orchestration/spec-profile.js";
+
+// Plugin registry
+export type { CliPlugin, SchemaAdapter } from "./openapi/plugin-registry.js";
+export {
+  registerSpecProfile,
+  registerResponseAdapterPreset,
+  registerSchemaAdapter,
+  registerPlugin,
+  getSpecProfile,
+  getResponseAdapterPreset,
+  getSchemaAdapters,
+} from "./openapi/plugin-registry.js";
