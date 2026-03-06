@@ -148,16 +148,9 @@ Alternatives considered:
 - **Proxy server** --- requires running a separate process, adds latency, complicates CI
 - **In-memory interceptors** --- don't exercise the full HTTP stack (headers, status codes, content types)
 
-### Why In-Memory Stores Instead of PGlite
+### Why In-Memory Map Stores
 
-The original mock layer used PGlite (an in-browser PostgreSQL implementation via WebAssembly) for data persistence. While this provided real SQL capabilities, it introduced significant complexity:
-
-- **Large bundle size** --- PGlite's WASM binary added substantial weight to development builds
-- **Initialization latency** --- starting a WebAssembly PostgreSQL instance takes noticeable time
-- **Migration management** --- every schema change required writing and maintaining SQL migration scripts
-- **Debugging difficulty** --- data lived in IndexedDB, making it hard to inspect and debug
-
-The in-memory Map-based store eliminates all of these issues. JavaScript `Map` instances are instant to create, trivial to inspect in DevTools, and require zero configuration. Seed data is plain JavaScript objects --- no SQL, no migrations, no schema definitions.
+JavaScript `Map` instances were chosen as the storage backend because they provide the simplest possible stateful data layer. They are instant to create, trivial to inspect in DevTools, and require zero configuration. Seed data is plain JavaScript objects --- no SQL, no migrations, no schema definitions.
 
 The tradeoff is that data does not persist across page refreshes. In practice, this is acceptable because `setupMockWorker()` re-seeds data on every bootstrap, and the instant startup time makes this imperceptible.
 
@@ -169,7 +162,7 @@ Mock handlers follow the same derivation pattern as clients and hooks. This mean
 
 ### For Development Workflow
 
-Developers can build and iterate on the entire frontend without any backend running. The mock layer provides realistic behavior --- creating a task, navigating to a different page, and coming back shows the created task. The instant startup (no WASM initialization, no migrations) means mock bootstrapping adds negligible time to the development server start.
+Developers can build and iterate on the entire frontend without any backend running. The mock layer provides realistic behavior --- creating a task, navigating to a different page, and coming back shows the created task. The instant startup means mock bootstrapping adds negligible time to the development server start.
 
 ### For Testing
 

@@ -30,10 +30,22 @@ simplix-react is a package-first React framework that auto-generates reusable do
 | [form](./packages/form) | [![npm](https://img.shields.io/npm/v/@simplix-react/form.svg)](https://www.npmjs.com/package/@simplix-react/form) | TanStack Form hooks derived from contracts |
 | [auth](./packages/auth) | [![npm](https://img.shields.io/npm/v/@simplix-react/auth.svg)](https://www.npmjs.com/package/@simplix-react/auth) | Authentication middleware (Bearer, API Key, OAuth2) |
 | [access](./packages/access) | [![npm](https://img.shields.io/npm/v/@simplix-react/access.svg)](https://www.npmjs.com/package/@simplix-react/access) | CASL-based authorization (RBAC/ABAC) with React bindings |
+| [ui](./packages/ui) | [![npm](https://img.shields.io/npm/v/@simplix-react/ui.svg)](https://www.npmjs.com/package/@simplix-react/ui) | CRUD UI component library (list, form, detail, tree, filters) |
+| [api](./packages/api) | [![npm](https://img.shields.io/npm/v/@simplix-react/api.svg)](https://www.npmjs.com/package/@simplix-react/api) | Orval mutator singleton for generated domain packages |
 | [mock](./packages/mock) | [![npm](https://img.shields.io/npm/v/@simplix-react/mock.svg)](https://www.npmjs.com/package/@simplix-react/mock) | MSW handlers + in-memory stores |
 | [i18n](./packages/i18n) | [![npm](https://img.shields.io/npm/v/@simplix-react/i18n.svg)](https://www.npmjs.com/package/@simplix-react/i18n) | i18next-based internationalization |
 | [testing](./packages/testing) | [![npm](https://img.shields.io/npm/v/@simplix-react/testing.svg)](https://www.npmjs.com/package/@simplix-react/testing) | Testing utilities |
 | [cli](./packages/cli) | [![npm](https://img.shields.io/npm/v/@simplix-react/cli.svg)](https://www.npmjs.com/package/@simplix-react/cli) | Project scaffolding and validation CLI |
+
+## Extensions
+
+Extensions provide backend-specific implementations that adapt the core framework to particular server environments. While core packages are universally applicable, extensions implement abstract interfaces for specific platforms.
+
+Extensions live in the [extensions/](./extensions/) directory. See the [Extensions README](./extensions/README.md) for architecture details and how to create new extensions.
+
+| Extension | Description |
+| --- | --- |
+| [simplix-boot](./extensions/simplix-boot/) | Spring Boot adapters -- auth, access, CLI plugin, and shared utilities for SimpliX (Spring Security) backends |
 
 ## Quick Start
 
@@ -129,6 +141,11 @@ Detailed guides are available in the [docs/](./docs/) directory:
 - [API Contracts](./docs/core-concepts/api-contracts.md) -- Defining entities and operations
 - [Schema Derivation](./docs/core-concepts/schema-derivation.md) -- The five-stage derivation pipeline
 - [Authentication](./docs/core-concepts/authentication.md) -- Auth architecture and strategy pattern
+- [Authorization](./docs/core-concepts/authorization.md) -- CASL-based RBAC/ABAC access control
+- [Form Derivation](./docs/core-concepts/form-derivation.md) -- Auto-derived form hooks from contracts
+- [UI Components](./docs/core-concepts/ui-components.md) -- CRUD UI component architecture
+- [Internationalization](./docs/core-concepts/internationalization.md) -- i18n framework architecture
+- [Extensions](./docs/core-concepts/extensions.md) -- Extension system for backend-specific adapters
 - [Cache Invalidation](./docs/core-concepts/cache-invalidation.md) -- Automatic query invalidation
 - [Mock Data Layer](./docs/core-concepts/mock-data-layer.md) -- MSW + in-memory store architecture
 
@@ -136,11 +153,16 @@ Detailed guides are available in the [docs/](./docs/) directory:
 
 - [Defining Entities](./docs/guides/defining-entities.md) -- Type-safe CRUD entities with Zod
 - [Authentication](./docs/guides/authentication.md) -- Bearer, API Key, OAuth2, and custom auth
+- [Authorization](./docs/guides/authorization.md) -- Setting up CASL-based access control
 - [Custom Fetch](./docs/guides/custom-fetch.md) -- HTTP layer customization
 - [Custom Operations](./docs/guides/custom-operations.md) -- Non-CRUD endpoints
 - [Mock Handlers](./docs/guides/mock-handlers.md) -- Setting up MSW handlers
 - [Form Hooks](./docs/guides/form-hooks.md) -- TanStack Form integration
+- [UI Components](./docs/guides/ui-components.md) -- Using CRUD list, form, detail, and tree components
+- [React Hooks Reference](./docs/guides/react-hooks-reference.md) -- Complete hooks API reference
 - [Internationalization](./docs/guides/internationalization.md) -- Multi-language setup
+- [Extensions](./docs/guides/extensions.md) -- Creating and using backend extensions
+- [LLM Integration](./docs/guides/llm-integration.md) -- Integrating LLM capabilities
 - [Parent-Child Relationships](./docs/guides/parent-child.md) -- Nested entity hierarchies
 - [Testing with Mocks](./docs/guides/testing-with-mocks.md) -- Vitest and MSW integration
 - [CLI Usage](./docs/guides/cli-usage.md) -- Project scaffolding and validation

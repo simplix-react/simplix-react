@@ -37,14 +37,27 @@ pnpm test         # Run test suites
 ```
 simplix-react/
 ├── packages/
-│   ├── contract/     # @simplix-react/contract
-│   ├── react/        # @simplix-react/react
-│   ├── mock/         # @simplix-react/mock
-│   ├── i18n/         # @simplix-react/i18n
-│   ├── testing/      # @simplix-react/testing
-│   ├── cli/          # @simplix-react/cli
-│   ├── config-eslint/
-│   └── config-typescript/
+│   ├── contract/          # @simplix-react/contract -- Zod-based API contracts
+│   ├── react/             # @simplix-react/react -- React Query hooks
+│   ├── form/              # @simplix-react/form -- TanStack Form hooks
+│   ├── auth/              # @simplix-react/auth -- Authentication middleware
+│   ├── access/            # @simplix-react/access -- CASL authorization
+│   ├── ui/                # @simplix-react/ui -- CRUD UI components
+│   ├── api/               # @simplix-react/api -- Orval mutator singleton
+│   ├── mock/              # @simplix-react/mock -- MSW handlers + stores
+│   ├── i18n/              # @simplix-react/i18n -- Internationalization
+│   ├── cli/               # @simplix-react/cli -- Scaffolding CLI
+│   ├── testing/           # @simplix-react/testing -- Test utilities
+│   ├── simplix-react/     # simplix-react -- Meta package
+│   ├── config-eslint/     # Shared ESLint config
+│   └── config-typescript/ # Shared TypeScript config
+├── extensions/
+│   └── simplix-boot/      # Spring Boot extension
+│       └── packages/
+│           ├── auth/        # @simplix-react-ext/simplix-boot-auth
+│           ├── access/      # @simplix-react-ext/simplix-boot-access
+│           ├── cli-plugin/  # @simplix-react-ext/simplix-boot-cli-plugin
+│           └── utils/       # @simplix-react-ext/simplix-boot-utils
 ├── turbo.json
 ├── pnpm-workspace.yaml
 └── package.json
