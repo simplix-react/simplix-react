@@ -249,7 +249,7 @@ export type {
 } from "./crud/shared";
 
 // CRUD layout components
-export { adaptOrvalList, CardList, CrudList, useCrudList, useKeyboardNav, useMediaQuery } from "./crud/list";
+export { adaptOrvalList, CardList, CrudList, useCrudList, useKeyboardNav, useMediaQuery, useOrvalOptions } from "./crud/list";
 export type {
   ActionType,
   ActionVariant,
@@ -272,6 +272,8 @@ export type {
   RowActionDef,
   UseKeyboardNavOptions,
   UseCrudListOptions,
+  UseOrvalOptionsConfig,
+  UseOrvalOptionsResult,
   UseCrudListResult,
 } from "./crud/list";
 

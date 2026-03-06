@@ -1,12 +1,14 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useTranslation } from "@simplix-react/i18n/react";
+import { useCallback, useMemo, useState } from "react";
 
 import type { CommonFieldProps } from "../../crud/shared/types";
 import {
+  Input,
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "../../base/overlay/popover";
-import { useUIComponents } from "../../provider/ui-provider";
+} from "../../base";
+import { Stack } from "../../primitives";
 import { cn } from "../../utils/cn";
 import { FieldWrapper } from "../shared/field-wrapper";
 
@@ -23,8 +25,8 @@ export interface ComboboxFieldProps<T extends string = string>
 }
 
 /**
- * Searchable dropdown field with type-ahead filtering.
- * Supports async search via onSearch callback and loading state.
+ * Searchable dropdown field with popover-based filtering.
+ * Trigger displays selected value as text; search input is inside the popover.
  *
  * @example
  * ```tsx
@@ -44,8 +46,8 @@ export function ComboboxField<T extends string = string>({
   options,
   onSearch,
   loading = false,
-  placeholder = "Search...",
-  emptyMessage = "No results found.",
+  placeholder,
+  emptyMessage,
   label,
   labelKey,
   error,
@@ -55,10 +57,13 @@ export function ComboboxField<T extends string = string>({
   className,
   ...variantProps
 }: ComboboxFieldProps<T>) {
-  const { Input } = useUIComponents();
+  const { t } = useTranslation("simplix/ui");
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
+
+  const selectPlaceholder = placeholder ?? t("field.selectOption");
+  const searchPlaceholder = t("field.searchOption");
+  const noResultsMessage = emptyMessage ?? t("field.noResults");
 
   const selectedLabel = useMemo(
     () => options.find((o) => o.value === value)?.label ?? "",
@@ -76,9 +81,8 @@ export function ComboboxField<T extends string = string>({
       const q = e.target.value;
       setQuery(q);
       onSearch?.(q);
-      if (!open) setOpen(true);
     },
-    [onSearch, open],
+    [onSearch],
   );
 
   function handleSelect(optValue: T) {
@@ -103,29 +107,19 @@ export function ComboboxField<T extends string = string>({
       className={className}
       {...variantProps}
     >
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover open={open} onOpenChange={(v) => { setOpen(v); if (!v) setQuery(""); }}>
         <PopoverTrigger asChild>
           <span
             className={cn(
-              "relative flex h-8 w-full items-center rounded-md border border-input bg-background text-sm",
+              "relative flex h-8 w-full items-center rounded-md border border-input bg-background px-3 text-sm",
               "focus-within:border-foreground",
               disabled && "cursor-not-allowed opacity-50",
               error && "border-destructive",
             )}
           >
-            <Input
-              ref={inputRef}
-              value={open ? query : selectedLabel}
-              onChange={handleInputChange}
-              onFocus={() => setOpen(true)}
-              placeholder={placeholder}
-              disabled={disabled}
-              aria-invalid={!!error}
-              aria-label={
-                variantProps.layout === "hidden" ? label : undefined
-              }
-              className="border-0 shadow-none"
-            />
+            <span className={cn("truncate", !value && "text-muted-foreground")}>
+              {value ? selectedLabel : selectPlaceholder}
+            </span>
             {value && !disabled && (
               <button
                 type="button"
@@ -160,78 +154,88 @@ export function ComboboxField<T extends string = string>({
           align="start"
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
-          <ul className="max-h-60 overflow-y-auto p-1" role="listbox">
-            {loading && (
-              <li className="flex items-center justify-center py-4 text-sm text-muted-foreground">
-                <svg
-                  className="mr-2 h-4 w-4 animate-spin"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                  />
-                </svg>
-                Loading...
-              </li>
-            )}
-            {!loading && filtered.length === 0 && (
-              <li className="py-4 text-center text-sm text-muted-foreground">
-                {emptyMessage}
-              </li>
-            )}
-            {!loading &&
-              filtered.map((opt) => (
-                <li
-                  key={opt.value}
-                  role="option"
-                  aria-selected={opt.value === value}
-                  className={cn(
-                    "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none",
-                    "hover:bg-accent hover:text-accent-foreground",
-                    opt.value === value && "bg-accent text-accent-foreground",
-                  )}
-                  onClick={() => handleSelect(opt.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      handleSelect(opt.value);
-                    }
-                  }}
-                >
-                  {opt.value === value && (
-                    <svg
-                      width="15"
-                      height="15"
-                      viewBox="0 0 15 15"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="mr-2 h-4 w-4"
-                    >
-                      <path
-                        d="M11.4669 3.72684C11.7558 3.91574 11.8369 4.30308 11.648 4.59198L7.39799 11.092C7.29783 11.2452 7.13556 11.3467 6.95402 11.3699C6.77247 11.3931 6.58989 11.3354 6.45446 11.2124L3.70446 8.71241C3.44905 8.48022 3.43023 8.08494 3.66242 7.82953C3.89461 7.57412 4.28989 7.5553 4.5453 7.78749L6.75292 9.79441L10.6018 3.90792C10.7907 3.61902 11.178 3.53795 11.4669 3.72684Z"
-                        fill="currentColor"
-                        fillRule="evenodd"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  )}
-                  <span className={cn(opt.value === value && "ml-0")}>
-                    {opt.label}
-                  </span>
+          <Stack gap="none" className="p-2">
+            <Input
+              type="search"
+              value={query}
+              onChange={handleInputChange}
+              placeholder={searchPlaceholder}
+              className="mb-2"
+              autoFocus
+            />
+            <ul className="max-h-60 overflow-y-auto" role="listbox">
+              {loading && (
+                <li className="flex items-center justify-center py-4 text-sm text-muted-foreground">
+                  <svg
+                    className="mr-2 h-4 w-4 animate-spin"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                    />
+                  </svg>
+                  Loading...
                 </li>
-              ))}
-          </ul>
+              )}
+              {!loading && filtered.length === 0 && (
+                <li className="py-4 text-center text-sm text-muted-foreground">
+                  {noResultsMessage}
+                </li>
+              )}
+              {!loading &&
+                filtered.map((opt) => (
+                  <li
+                    key={opt.value}
+                    role="option"
+                    aria-selected={opt.value === value}
+                    className={cn(
+                      "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none",
+                      "hover:bg-accent hover:text-accent-foreground",
+                      opt.value === value && "bg-accent text-accent-foreground",
+                    )}
+                    onClick={() => handleSelect(opt.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        handleSelect(opt.value);
+                      }
+                    }}
+                  >
+                    {opt.value === value && (
+                      <svg
+                        width="15"
+                        height="15"
+                        viewBox="0 0 15 15"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="mr-2 h-4 w-4"
+                      >
+                        <path
+                          d="M11.4669 3.72684C11.7558 3.91574 11.8369 4.30308 11.648 4.59198L7.39799 11.092C7.29783 11.2452 7.13556 11.3467 6.95402 11.3699C6.77247 11.3931 6.58989 11.3354 6.45446 11.2124L3.70446 8.71241C3.44905 8.48022 3.43023 8.08494 3.66242 7.82953C3.89461 7.57412 4.28989 7.5553 4.5453 7.78749L6.75292 9.79441L10.6018 3.90792C10.7907 3.61902 11.178 3.53795 11.4669 3.72684Z"
+                          fill="currentColor"
+                          fillRule="evenodd"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                    <span className={cn(opt.value === value && "ml-0")}>
+                      {opt.label}
+                    </span>
+                  </li>
+                ))}
+            </ul>
+          </Stack>
         </PopoverContent>
       </Popover>
     </FieldWrapper>
