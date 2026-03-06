@@ -8,31 +8,55 @@
 
 > `const` **CrudList**: (`__namedParameters`) => `Element` & `object`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:815](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L815)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:1486](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1486)
 
 Compound component for building CRUD list views with toolbar, table,
 pagination, selection, and bulk actions.
 
-Sub-components: Toolbar, Search, Filter, Table, Column, RowActions,
-Action, Pagination, BulkActions, BulkAction, Empty.
+```
+┌─────────────────────────────────────────┐
+│ Toolbar                                 │
+│ [Search...]   [Filter ▼]   [+ Create]   │
+├─────┬────────┬────────┬────────┬────────┤
+│ [x] │ Name   │ Status │ Date   │ Action │
+├─────┼────────┼────────┼────────┼────────┤
+│ [ ] │ Item A │ Active │ 01-01  │ [Edit] │
+│ [x] │ Item B │ Draft  │ 01-02  │ [Edit] │
+├─────┴────────┴────────┴────────┴────────┤
+│ BulkActions: 1 selected  [Delete]       │
+├─────────────────────────────────────────┤
+│          Pagination < 1  2  3 >         │
+└─────────────────────────────────────────┘
+```
+
+Sub-components: Toolbar, Search, Table, Column, Pagination,
+BulkActions, BulkAction, Empty, and 10+ filter types.
 
 ## Type Declaration
 
-### Action()
+### AdvancedSelectFilter()
 
-> **Action**: \<`T`\>(`__namedParameters`) => `Element` = `ListAction`
-
-#### Type Parameters
-
-##### T
-
-`T`
+> **AdvancedSelectFilter**: (`__namedParameters`) => `Element`
 
 #### Parameters
 
 ##### \_\_namedParameters
 
-[`ListActionProps`](../interfaces/ListActionProps.md)\<`T`\>
+[`AdvancedSelectFilterProps`](../interfaces/AdvancedSelectFilterProps.md)
+
+#### Returns
+
+`Element`
+
+### AdvancedTextFilter()
+
+> **AdvancedTextFilter**: (`__namedParameters`) => `Element`
+
+#### Parameters
+
+##### \_\_namedParameters
+
+[`AdvancedTextFilterProps`](../interfaces/AdvancedTextFilterProps.md)
 
 #### Returns
 
@@ -86,6 +110,49 @@ Action, Pagination, BulkActions, BulkAction, Empty.
 
 `ReactNode`
 
+### DateFilter()
+
+> **DateFilter**: (`__namedParameters`) => `Element`
+
+#### Parameters
+
+##### \_\_namedParameters
+
+[`DateFilterProps`](../interfaces/DateFilterProps.md)
+
+#### Returns
+
+`Element`
+
+### DateRangeFilter()
+
+> **DateRangeFilter**: (`props`) => `Element`
+
+Date range filter with dual-month calendar popover.
+
+```
+┌──────────────────────────────────────┐
+│ [cal] Created | Jan 1 – Jan 31 [X]  │
+└──────────────────────────────────────┘
+  └─ popover ─────────────────────────┐
+  │  [  January  ]  [  February  ]    │
+  │  Mo Tu We Th Fr  Mo Tu We Th Fr   │
+  │  ...              ...             │
+  └──────────────────────────────────┘
+```
+
+#### Parameters
+
+##### props
+
+[`DateRangeFilterProps`](../interfaces/DateRangeFilterProps.md)
+
+[DateRangeFilterProps](../interfaces/DateRangeFilterProps.md)
+
+#### Returns
+
+`Element`
+
 ### Empty()
 
 > **Empty**: (`__namedParameters`) => `Element` = `ListEmpty`
@@ -100,15 +167,89 @@ Action, Pagination, BulkActions, BulkAction, Empty.
 
 `Element`
 
-### Filter()
+### FacetedFilter()
 
-> **Filter**: (`__namedParameters`) => `Element` = `ListFilter`
+> **FacetedFilter**: (`props`) => `Element`
+
+Faceted filter with searchable command popover and badge display.
+
+```
+┌─────────────────────────────────┐
+│ Status | Active | Draft    [X]  │
+└─────────────────────────────────┘
+  └─ popover ───────────────────┐
+  │ [Search...]                 │
+  │ [x] Active                  │
+  │ [x] Draft                   │
+  │ [ ] Archived                │
+  │ ─────────────               │
+  │ Clear filters               │
+  └────────────────────────────┘
+```
+
+#### Parameters
+
+##### props
+
+[`FacetedFilterProps`](../interfaces/FacetedFilterProps.md)
+
+[FacetedFilterProps](../interfaces/FacetedFilterProps.md)
+
+#### Returns
+
+`Element`
+
+### FilterActions()
+
+> **FilterActions**: (`__namedParameters`) => `Element`
 
 #### Parameters
 
 ##### \_\_namedParameters
 
-[`ListFilterProps`](../interfaces/ListFilterProps.md)
+[`FilterActionsProps`](../interfaces/FilterActionsProps.md)
+
+#### Returns
+
+`Element`
+
+### FilterBar()
+
+> **FilterBar**: (`__namedParameters`) => `Element`
+
+#### Parameters
+
+##### \_\_namedParameters
+
+[`FilterBarProps`](../interfaces/FilterBarProps.md)
+
+#### Returns
+
+`Element`
+
+### MultiTextFilter()
+
+> **MultiTextFilter**: (`__namedParameters`) => `Element`
+
+#### Parameters
+
+##### \_\_namedParameters
+
+[`MultiTextFilterProps`](../interfaces/MultiTextFilterProps.md)
+
+#### Returns
+
+`Element`
+
+### NumberFilter()
+
+> **NumberFilter**: (`__namedParameters`) => `Element`
+
+#### Parameters
+
+##### \_\_namedParameters
+
+[`NumberFilterProps`](../interfaces/NumberFilterProps.md)
 
 #### Returns
 
@@ -123,20 +264,6 @@ Action, Pagination, BulkActions, BulkAction, Empty.
 ##### \_\_namedParameters
 
 [`ListPaginationProps`](../interfaces/ListPaginationProps.md)
-
-#### Returns
-
-`Element`
-
-### RowActions()
-
-> **RowActions**: (`__namedParameters`) => `Element` = `ListRowActions`
-
-#### Parameters
-
-##### \_\_namedParameters
-
-[`ListRowActionsProps`](../interfaces/ListRowActionsProps.md)
 
 #### Returns
 
@@ -176,6 +303,44 @@ Action, Pagination, BulkActions, BulkAction, Empty.
 
 `Element`
 
+### TextFilter()
+
+> **TextFilter**: (`props`) => `Element`
+
+Text input filter with search icon and clear button.
+
+```
+┌──────────────────────────┐
+│ [Q] Search pets...   [X] │
+└──────────────────────────┘
+```
+
+#### Parameters
+
+##### props
+
+[`TextFilterProps`](../interfaces/TextFilterProps.md)
+
+[TextFilterProps](../interfaces/TextFilterProps.md)
+
+#### Returns
+
+`Element`
+
+### ToggleFilter()
+
+> **ToggleFilter**: (`__namedParameters`) => `Element`
+
+#### Parameters
+
+##### \_\_namedParameters
+
+[`ToggleFilterProps`](../interfaces/ToggleFilterProps.md)
+
+#### Returns
+
+`Element`
+
 ### Toolbar()
 
 > **Toolbar**: (`__namedParameters`) => `Element` = `ListToolbar`
@@ -185,6 +350,20 @@ Action, Pagination, BulkActions, BulkAction, Empty.
 ##### \_\_namedParameters
 
 [`ListToolbarProps`](../interfaces/ListToolbarProps.md)
+
+#### Returns
+
+`Element`
+
+### UnifiedTextFilter()
+
+> **UnifiedTextFilter**: (`__namedParameters`) => `Element`
+
+#### Parameters
+
+##### \_\_namedParameters
+
+[`UnifiedTextFilterProps`](../interfaces/UnifiedTextFilterProps.md)
 
 #### Returns
 

@@ -8,4 +8,4 @@
 
 > **SelectTriggerProps** = `ComponentPropsWithRef`\<*typeof* `SelectPrimitive.Trigger`\>
 
-Defined in: [packages/ui/src/base/select.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/select.tsx#L16)
+Defined in: [packages/ui/src/base/inputs/select.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/select.tsx#L16)

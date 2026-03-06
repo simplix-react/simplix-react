@@ -8,9 +8,13 @@
 
 > **TableProps** = `ComponentPropsWithRef`\<`"table"`\> & `object`
 
-Defined in: [packages/ui/src/base/table.tsx:58](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/table.tsx#L58)
+Defined in: [packages/ui/src/base/display/table.tsx:56](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/table.tsx#L56)
 
 ## Type Declaration
+
+### density?
+
+> `optional` **density**: `"compact"` \| `"default"` \| `"comfortable"`
 
 ### rounded?
 

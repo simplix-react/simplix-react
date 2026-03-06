@@ -6,7 +6,7 @@
 
 # Interface: CrudEndpointPattern
 
-Defined in: [types.ts:12](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L12)
+Defined in: [config/types.ts:15](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L15)
 
 Defines how a CRUD role maps to HTTP method(s) and path pattern(s).
 
@@ -22,7 +22,7 @@ Path patterns use basePath-relative segments:
 
 > **method**: `HttpMethod` \| `HttpMethod`[]
 
-Defined in: [types.ts:14](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L14)
+Defined in: [config/types.ts:17](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L17)
 
 HTTP method(s). Array for multiple methods (e.g., `["PUT", "PATCH"]`).
 
@@ -32,6 +32,6 @@ HTTP method(s). Array for multiple methods (e.g., `["PUT", "PATCH"]`).
 
 > **path**: `string` \| `string`[]
 
-Defined in: [types.ts:16](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L16)
+Defined in: [config/types.ts:19](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L19)
 
 BasePath-relative path pattern(s). Array for multiple patterns.

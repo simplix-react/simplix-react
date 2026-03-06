@@ -12,9 +12,9 @@ Field display configuration for label position and size.
 
 ## Properties
 
-### labelPosition?
+### layout?
 
-> `optional` **labelPosition**: `"hidden"` \| `"top"` \| `"left"`
+> `optional` **layout**: `"hidden"` \| `"inline"` \| `"left"` \| `"top"`
 
 Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L5)
 
@@ -22,6 +22,6 @@ Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-
 
 ### size?
 
-> `optional` **size**: `"lg"` \| `"md"` \| `"sm"`
+> `optional` **size**: `"sm"` \| `"lg"` \| `"md"`
 
 Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L6)

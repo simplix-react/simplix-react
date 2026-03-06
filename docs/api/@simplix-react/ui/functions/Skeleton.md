@@ -8,7 +8,7 @@
 
 > **Skeleton**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/base/skeleton.tsx:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/skeleton.tsx#L6)
+Defined in: [packages/ui/src/base/display/skeleton.tsx:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/skeleton.tsx#L6)
 
 ## Parameters
 

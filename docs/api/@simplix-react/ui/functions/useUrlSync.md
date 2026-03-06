@@ -8,9 +8,9 @@
 
 > **useUrlSync**(`options`): `void`
 
-Defined in: [packages/ui/src/crud/list/use-url-sync.ts:80](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-url-sync.ts#L80)
+Defined in: [packages/ui/src/crud/list/use-url-sync.ts:113](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-url-sync.ts#L113)
 
-Syncs list state (filters, sort, pagination) with URL query parameters. Reads from URL on mount and writes changes with 300ms debounce.
+Sync list state (filters, sort, pagination) with URL query parameters.
 
 ## Parameters
 
@@ -18,6 +18,26 @@ Syncs list state (filters, sort, pagination) with URL query parameters. Reads fr
 
 [`UseUrlSyncOptions`](../interfaces/UseUrlSyncOptions.md)
 
+[UseUrlSyncOptions](../interfaces/UseUrlSyncOptions.md)
+
 ## Returns
 
 `void`
+
+## Remarks
+
+Reads initial state from URL on mount. Writes state changes to URL
+with a 300ms debounce using `history.replaceState` (no page reload).
+
+## Example
+
+```ts
+useUrlSync({
+  filters: list.filters,
+  sort: list.sort,
+  pagination: list.pagination,
+  setFilters: list.filters.setAll,
+  setSort: list.sort.setSort,
+  setPage: list.pagination.setPage,
+});
+```

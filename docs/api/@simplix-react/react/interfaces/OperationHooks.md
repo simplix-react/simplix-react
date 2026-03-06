@@ -6,7 +6,7 @@
 
 # Interface: OperationHooks\<TInput, TOutput\>
 
-Defined in: [types.ts:225](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L225)
+Defined in: [types.ts:236](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L236)
 
 Represents the hook container for a custom operation defined in the contract.
 
@@ -36,4 +36,4 @@ The Zod schema defining the operation output
 
 > **useMutation**: [`OperationMutationHook`](../type-aliases/OperationMutationHook.md)\<`output`\<`TInput`\>, `output`\<`TOutput`\>\>
 
-Defined in: [types.ts:229](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L229)
+Defined in: [types.ts:240](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L240)

@@ -8,7 +8,7 @@
 
 > **NavigationMenu**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/base/navigation-menu.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation-menu.tsx#L14)
+Defined in: [packages/ui/src/base/navigation/navigation-menu.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/navigation-menu.tsx#L14)
 
 ## Parameters
 

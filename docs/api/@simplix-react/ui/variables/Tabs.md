@@ -8,4 +8,4 @@
 
 > `const` **Tabs**: `ForwardRefExoticComponent`\<`TabsProps` & `RefAttributes`\<`HTMLDivElement`\>\> = `TabsPrimitive.Root`
 
-Defined in: [packages/ui/src/base/tabs.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/tabs.tsx#L7)
+Defined in: [packages/ui/src/base/navigation/tabs.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/tabs.tsx#L7)

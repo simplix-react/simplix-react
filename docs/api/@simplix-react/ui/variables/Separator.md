@@ -8,4 +8,4 @@
 
 > `const` **Separator**: `ForwardRefExoticComponent`\<`Omit`\<`SeparatorProps` & `RefAttributes`\<`HTMLDivElement`\>, `"ref"`\> & `RefAttributes`\<`HTMLDivElement`\>\>
 
-Defined in: [packages/ui/src/base/separator.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/separator.tsx#L10)
+Defined in: [packages/ui/src/base/display/separator.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/separator.tsx#L10)

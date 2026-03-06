@@ -6,17 +6,17 @@
 
 # Interface: CrudListFilters
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:25](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L25)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:50](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L50)
 
 Filter state returned by [useCrudList](../functions/useCrudList.md).
 
 ## Properties
 
-### clear()
+### apply()
 
-> **clear**: () => `void`
+> **apply**: () => `void`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L30)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:58](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L58)
 
 #### Returns
 
@@ -24,11 +24,55 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:30](https://github.com/s
 
 ***
 
+### clear()
+
+> **clear**: () => `void`
+
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:57](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L57)
+
+#### Returns
+
+`void`
+
+***
+
+### isPending
+
+> **isPending**: `boolean`
+
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:59](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L59)
+
+***
+
 ### search
 
 > **search**: `string`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L26)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:51](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L51)
+
+***
+
+### setAll()
+
+> **setAll**: (`filters`) => `void`
+
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:56](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L56)
+
+#### Parameters
+
+##### filters
+
+###### search
+
+`string`
+
+###### values
+
+`Record`\<`string`, `unknown`\>
+
+#### Returns
+
+`void`
 
 ***
 
@@ -36,7 +80,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:26](https://github.com/s
 
 > **setSearch**: (`value`) => `void`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L27)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:52](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L52)
 
 #### Parameters
 
@@ -54,7 +98,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:27](https://github.com/s
 
 > **setValue**: (`key`, `value`) => `void`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L29)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:54](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L54)
 
 #### Parameters
 
@@ -72,8 +116,26 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:29](https://github.com/s
 
 ***
 
+### setValues()
+
+> **setValues**: (`updates`) => `void`
+
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:55](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L55)
+
+#### Parameters
+
+##### updates
+
+`Record`\<`string`, `unknown`\>
+
+#### Returns
+
+`void`
+
+***
+
 ### values
 
 > **values**: `Record`\<`string`, `unknown`\>
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L28)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:53](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L53)

@@ -8,9 +8,22 @@
 
 > `const` **CrudDetail**: (`__namedParameters`) => `Element` & `object`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:156](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L156)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:287](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L287)
 
 Compound component for building read-only CRUD detail views.
+
+```
+┌─────────────────────────────────────┐
+│  header                       [X]   │
+├─────────────────────────────────────┤
+│  <CrudDetail.Section>               │
+│    field rows (label: value)        │
+│  </CrudDetail.Section>             │
+├─────────────────────────────────────┤
+│  <CrudDetail.DefaultActions>        │
+│  [← Back]        [Delete] [Edit]   │
+└─────────────────────────────────────┘
+```
 
 Sub-components: Section, Actions, DefaultActions.
 
@@ -46,13 +59,13 @@ Sub-components: Section, Actions, DefaultActions.
 
 ### Section()
 
-> **Section**: (`__namedParameters`) => `Element` = `DetailSection`
+> **Section**: (`props`) => `Element` = `DetailSection`
 
 #### Parameters
 
-##### \_\_namedParameters
+##### props
 
-[`CrudDetailSectionProps`](../interfaces/CrudDetailSectionProps.md)
+`SectionShellProps`
 
 #### Returns
 

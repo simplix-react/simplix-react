@@ -326,18 +326,23 @@ try {
 - [ApiContract](interfaces/ApiContract.md)
 - [ApiContractConfig](interfaces/ApiContractConfig.md)
 - [ApiPatch](interfaces/ApiPatch.md)
+- [CreateFetchOptions](interfaces/CreateFetchOptions.md)
 - [EntityDefinition](interfaces/EntityDefinition.md)
 - [EntityOperationDef](interfaces/EntityOperationDef.md)
 - [EntityParent](interfaces/EntityParent.md)
 - [EntityPatch](interfaces/EntityPatch.md)
 - [EntityQuery](interfaces/EntityQuery.md)
+- [FetchContext](interfaces/FetchContext.md)
+- [FetchErrorContext](interfaces/FetchErrorContext.md)
 - [ListParams](interfaces/ListParams.md)
 - [OperationDefinition](interfaces/OperationDefinition.md)
 - [PageInfo](interfaces/PageInfo.md)
 - [QueryBuilder](interfaces/QueryBuilder.md)
 - [QueryKeyFactory](interfaces/QueryKeyFactory.md)
 - [SortParam](interfaces/SortParam.md)
+- [TransformedRequest](interfaces/TransformedRequest.md)
 - [TreeNode](interfaces/TreeNode.md)
+- [WiredSchema](interfaces/WiredSchema.md)
 
 ## Type Aliases
 
@@ -348,22 +353,27 @@ try {
 - [EntityId](type-aliases/EntityId.md)
 - [FetchFn](type-aliases/FetchFn.md)
 - [HttpMethod](type-aliases/HttpMethod.md)
+- [InferOutputData](type-aliases/InferOutputData.md)
 - [PaginationParam](type-aliases/PaginationParam.md)
 
 ## Variables
 
 - [CRUD\_OPERATIONS](variables/CRUD_OPERATIONS.md)
+- [defaultFetch](variables/defaultFetch.md)
 - [simpleQueryBuilder](variables/simpleQueryBuilder.md)
 
 ## Functions
 
 - [buildPath](functions/buildPath.md)
 - [camelToSnake](functions/camelToSnake.md)
+- [configureDefaultFetch](functions/configureDefaultFetch.md)
+- [createFetch](functions/createFetch.md)
 - [customizeApi](functions/customizeApi.md)
-- [defaultFetch](functions/defaultFetch.md)
 - [defineApi](functions/defineApi.md)
 - [deriveClient](functions/deriveClient.md)
 - [deriveQueryKeys](functions/deriveQueryKeys.md)
 - [extractPathParams](functions/extractPathParams.md)
 - [interpolatePath](functions/interpolatePath.md)
+- [isWiredSchema](functions/isWiredSchema.md)
 - [resolveRole](functions/resolveRole.md)
+- [wired](functions/wired.md)

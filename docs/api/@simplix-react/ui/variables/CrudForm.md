@@ -8,9 +8,22 @@
 
 > `const` **CrudForm**: (`__namedParameters`) => `Element` & `object`
 
-Defined in: [packages/ui/src/crud/form/crud-form.tsx:160](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/crud-form.tsx#L160)
+Defined in: [packages/ui/src/crud/form/crud-form.tsx:189](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/crud-form.tsx#L189)
 
-Compound component for building CRUD form layouts with sections and actions.
+Compound component for building CRUD create/edit form layouts.
+
+```
+┌─────────────────────────────────────┐
+│  header                       [X]   │
+├─────────────────────────────────────┤
+│  <CrudForm.Section>                 │
+│    form fields (Grid layout)        │
+│  </CrudForm.Section>               │
+├─────────────────────────────────────┤
+│  <CrudForm.Actions>                 │
+│              [Cancel]  [Save]       │
+└─────────────────────────────────────┘
+```
 
 Sub-components: Section (with layout variants), Actions.
 

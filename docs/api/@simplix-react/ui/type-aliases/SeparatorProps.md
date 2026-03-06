@@ -8,4 +8,4 @@
 
 > **SeparatorProps** = `ComponentPropsWithRef`\<*typeof* `SeparatorPrimitive.Root`\>
 
-Defined in: [packages/ui/src/base/separator.tsx:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/separator.tsx#L6)
+Defined in: [packages/ui/src/base/display/separator.tsx:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/separator.tsx#L6)

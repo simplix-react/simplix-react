@@ -8,7 +8,7 @@
 
 > **useUIComponents**(): [`UIComponents`](../interfaces/UIComponents.md)
 
-Defined in: [packages/ui/src/provider/ui-provider.tsx:95](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/ui-provider.tsx#L95)
+Defined in: [packages/ui/src/provider/ui-provider.tsx:166](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/ui-provider.tsx#L166)
 
 Returns the resolved set of UI base components, merging defaults with
 any overrides provided by ancestor [UIProvider](UIProvider.md) instances.

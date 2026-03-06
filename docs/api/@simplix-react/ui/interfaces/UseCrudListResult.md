@@ -6,7 +6,7 @@
 
 # Interface: UseCrudListResult\<T\>
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:61](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L61)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:90](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L90)
 
 Complete state returned by [useCrudList](../functions/useCrudList.md).
 
@@ -22,7 +22,7 @@ Complete state returned by [useCrudList](../functions/useCrudList.md).
 
 > **data**: `T`[]
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:62](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L62)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:91](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L91)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:62](https://github.com/s
 
 > **emptyReason**: [`EmptyReason`](../type-aliases/EmptyReason.md) \| `null`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:69](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L69)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:98](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L98)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:69](https://github.com/s
 
 > **error**: `Error` \| `null`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:64](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L64)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:93](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L93)
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:64](https://github.com/s
 
 > **filters**: [`CrudListFilters`](CrudListFilters.md)
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:65](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L65)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:94](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L94)
 
 ***
 
@@ -54,7 +54,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:65](https://github.com/s
 
 > **isLoading**: `boolean`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:63](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L63)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:92](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L92)
 
 ***
 
@@ -62,7 +62,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:63](https://github.com/s
 
 > **pagination**: [`CrudListPagination`](CrudListPagination.md)
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:67](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L67)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:96](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L96)
 
 ***
 
@@ -70,7 +70,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:67](https://github.com/s
 
 > **selection**: [`CrudListSelection`](CrudListSelection.md)\<`T`\>
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:68](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L68)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:97](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L97)
 
 ***
 
@@ -78,4 +78,4 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:68](https://github.com/s
 
 > **sort**: [`CrudListSort`](CrudListSort.md)
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:66](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L66)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:95](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L95)

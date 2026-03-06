@@ -8,4 +8,4 @@
 
 > **RadioGroupProps** = `ComponentPropsWithRef`\<*typeof* `RadioGroupPrimitive.Root`\>
 
-Defined in: [packages/ui/src/base/radio-group.tsx:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/radio-group.tsx#L6)
+Defined in: [packages/ui/src/base/inputs/radio-group.tsx:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/radio-group.tsx#L6)

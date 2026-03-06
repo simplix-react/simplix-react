@@ -52,18 +52,6 @@ Defined in: [packages/ui/src/crud/shared/types.ts:35](https://github.com/simplix
 
 ***
 
-### labelPosition?
-
-> `optional` **labelPosition**: `"hidden"` \| `"top"` \| `"left"`
-
-Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L5)
-
-#### Inherited from
-
-[`FieldVariant`](../../../interfaces/FieldVariant.md).[`labelPosition`](../../../interfaces/FieldVariant.md#labelposition)
-
-***
-
 ### labels?
 
 > `optional` **labels**: `object`
@@ -82,6 +70,18 @@ Custom labels for true/false values when using `"text"` mode.
 
 ***
 
+### layout?
+
+> `optional` **layout**: `"hidden"` \| `"inline"` \| `"left"` \| `"top"`
+
+Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L5)
+
+#### Inherited from
+
+[`FieldVariant`](../../../interfaces/FieldVariant.md).[`layout`](../../../interfaces/FieldVariant.md#layout)
+
+***
+
 ### mode?
 
 > `optional` **mode**: [`BooleanDisplayMode`](../type-aliases/BooleanDisplayMode.md)
@@ -94,7 +94,7 @@ Display mode: `"text"` shows Yes/No, `"icon"` shows check/x icons. Defaults to `
 
 ### size?
 
-> `optional` **size**: `"lg"` \| `"md"` \| `"sm"`
+> `optional` **size**: `"sm"` \| `"lg"` \| `"md"`
 
 Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L6)
 

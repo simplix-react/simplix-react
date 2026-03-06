@@ -6,18 +6,29 @@
 
 # Function: CrudDelete()
 
-> **CrudDelete**(`__namedParameters`): `Element`
+> **CrudDelete**(`props`): `Element`
 
-Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:37](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/crud-delete.tsx#L37)
+Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:49](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/crud-delete.tsx#L49)
 
 Delete confirmation dialog using Radix AlertDialog.
-Requires explicit user confirmation before deletion proceeds.
+
+```
+┌─────────────────────────────────┐
+│ Delete user?                    │
+│                                 │
+│ This action cannot be undone.   │
+│                                 │
+│         [Cancel] [Delete]       │
+└─────────────────────────────────┘
+```
 
 ## Parameters
 
-### \_\_namedParameters
+### props
 
 [`CrudDeleteProps`](../interfaces/CrudDeleteProps.md)
+
+[CrudDeleteProps](../interfaces/CrudDeleteProps.md)
 
 ## Returns
 

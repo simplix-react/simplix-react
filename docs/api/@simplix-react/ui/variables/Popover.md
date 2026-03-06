@@ -8,4 +8,4 @@
 
 > `const` **Popover**: `FC`\<`PopoverProps`\> = `PopoverPrimitive.Root`
 
-Defined in: [packages/ui/src/base/popover.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/popover.tsx#L7)
+Defined in: [packages/ui/src/base/overlay/popover.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/popover.tsx#L7)

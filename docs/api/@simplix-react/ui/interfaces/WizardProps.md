@@ -6,9 +6,21 @@
 
 # Interface: WizardProps
 
-Defined in: [packages/ui/src/crud/form/wizard.tsx:110](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/wizard.tsx#L110)
+Defined in: [packages/ui/src/crud/form/wizard.tsx:133](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/wizard.tsx#L133)
 
 Props for the [Wizard](../variables/Wizard.md) compound component root.
+
+```
+┌─────────────────────────────────────────┐
+│  (1) Basic ── (2) Details ── (3) Review │
+├─────────────────────────────────────────┤
+│                                         │
+│  Active step content                    │
+│                                         │
+├─────────────────────────────────────────┤
+│  [Previous]                     [Next]  │
+└─────────────────────────────────────────┘
+```
 
 ## Properties
 
@@ -16,7 +28,9 @@ Props for the [Wizard](../variables/Wizard.md) compound component root.
 
 > **children**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/form/wizard.tsx:113](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/wizard.tsx#L113)
+Defined in: [packages/ui/src/crud/form/wizard.tsx:138](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/wizard.tsx#L138)
+
+One or more `<Wizard.Step>` children.
 
 ***
 
@@ -24,7 +38,7 @@ Defined in: [packages/ui/src/crud/form/wizard.tsx:113](https://github.com/simpli
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/form/wizard.tsx:112](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/wizard.tsx#L112)
+Defined in: [packages/ui/src/crud/form/wizard.tsx:136](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/wizard.tsx#L136)
 
 ***
 
@@ -32,7 +46,9 @@ Defined in: [packages/ui/src/crud/form/wizard.tsx:112](https://github.com/simpli
 
 > **onComplete**: () => `void`
 
-Defined in: [packages/ui/src/crud/form/wizard.tsx:111](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/wizard.tsx#L111)
+Defined in: [packages/ui/src/crud/form/wizard.tsx:135](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/wizard.tsx#L135)
+
+Called when the user completes the final step.
 
 #### Returns
 

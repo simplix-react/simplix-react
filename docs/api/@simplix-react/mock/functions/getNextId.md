@@ -8,7 +8,7 @@
 
 > **getNextId**(`storeName`): `number`
 
-Defined in: [mock-store.ts:34](https://github.com/simplix-react/simplix-react/blob/main/mock-store.ts#L34)
+Defined in: [mock-store.ts:51](https://github.com/simplix-react/simplix-react/blob/main/mock-store.ts#L51)
 
 Returns the next auto-increment id for the given store and advances the counter.
 
@@ -24,4 +24,13 @@ Unique identifier for the entity store.
 
 `number`
 
-The next numeric id.
+The next numeric id (starting from 1).
+
+## Example
+
+```ts
+import { getNextId } from "@simplix-react/mock";
+
+const id1 = getNextId("pets"); // 1
+const id2 = getNextId("pets"); // 2
+```

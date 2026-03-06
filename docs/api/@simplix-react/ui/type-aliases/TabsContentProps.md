@@ -8,4 +8,4 @@
 
 > **TabsContentProps** = `ComponentPropsWithRef`\<*typeof* `TabsPrimitive.Content`\>
 
-Defined in: [packages/ui/src/base/tabs.tsx:48](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/tabs.tsx#L48)
+Defined in: [packages/ui/src/base/navigation/tabs.tsx:48](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/tabs.tsx#L48)

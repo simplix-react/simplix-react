@@ -8,4 +8,4 @@
 
 > `const` **SheetContent**: `ForwardRefExoticComponent`\<`Omit`\<[`SheetContentProps`](../type-aliases/SheetContentProps.md), `"ref"`\> & `RefAttributes`\<`HTMLDivElement`\>\>
 
-Defined in: [packages/ui/src/base/sheet.tsx:40](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/sheet.tsx#L40)
+Defined in: [packages/ui/src/base/overlay/sheet.tsx:40](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/sheet.tsx#L40)

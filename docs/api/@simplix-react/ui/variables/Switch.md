@@ -6,6 +6,6 @@
 
 # Variable: Switch
 
-> `const` **Switch**: `ForwardRefExoticComponent`\<`Omit`\<`SwitchProps` & `RefAttributes`\<`HTMLButtonElement`\>, `"ref"`\> & `RefAttributes`\<`HTMLButtonElement`\>\>
+> `const` **Switch**: `ForwardRefExoticComponent`\<`Omit`\<[`SwitchProps`](../type-aliases/SwitchProps.md), `"ref"`\> & `RefAttributes`\<`HTMLButtonElement`\>\>
 
-Defined in: [packages/ui/src/base/switch.tsx:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/switch.tsx#L8)
+Defined in: [packages/ui/src/base/inputs/switch.tsx:40](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/switch.tsx#L40)

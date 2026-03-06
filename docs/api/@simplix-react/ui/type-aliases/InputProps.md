@@ -8,4 +8,4 @@
 
 > **InputProps** = `ComponentPropsWithRef`\<`"input"`\>
 
-Defined in: [packages/ui/src/base/input.tsx:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/input.tsx#L5)
+Defined in: [packages/ui/src/base/inputs/input.tsx:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/input.tsx#L5)

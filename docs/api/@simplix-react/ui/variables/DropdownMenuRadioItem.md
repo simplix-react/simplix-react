@@ -8,4 +8,4 @@
 
 > `const` **DropdownMenuRadioItem**: `ForwardRefExoticComponent`\<`Omit`\<`DropdownMenuRadioItemProps` & `RefAttributes`\<`HTMLDivElement`\>, `"ref"`\> & `RefAttributes`\<`HTMLDivElement`\>\>
 
-Defined in: [packages/ui/src/base/dropdown-menu.tsx:122](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/dropdown-menu.tsx#L122)
+Defined in: [packages/ui/src/base/navigation/dropdown-menu.tsx:122](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/dropdown-menu.tsx#L122)

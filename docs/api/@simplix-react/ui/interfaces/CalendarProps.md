@@ -6,7 +6,7 @@
 
 # Interface: CalendarProps
 
-Defined in: [packages/ui/src/base/calendar.tsx:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/calendar.tsx#L5)
+Defined in: [packages/ui/src/base/controls/calendar.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L10)
 
 ## Extends
 
@@ -68,7 +68,7 @@ Indicates whether assistive technologies will present all, or only parts of, the
 
 ### aria-autocomplete?
 
-> `optional` **aria-autocomplete**: `"none"` \| `"list"` \| `"inline"` \| `"both"`
+> `optional` **aria-autocomplete**: `"list"` \| `"none"` \| `"inline"` \| `"both"`
 
 Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2490](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2490)
 
@@ -329,7 +329,7 @@ Indicates that the element is perceivable but disabled, so it is not editable or
 
 ### ~~aria-dropeffect?~~
 
-> `optional` **aria-dropeffect**: `"none"` \| `"link"` \| `"copy"` \| `"execute"` \| `"move"` \| `"popup"`
+> `optional` **aria-dropeffect**: `"link"` \| `"none"` \| `"copy"` \| `"execute"` \| `"move"` \| `"popup"`
 
 Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2559](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2559)
 
@@ -413,7 +413,7 @@ in ARIA 1.1
 
 ### aria-haspopup?
 
-> `optional` **aria-haspopup**: `boolean` \| `"true"` \| `"false"` \| `"dialog"` \| `"menu"` \| `"grid"` \| `"listbox"` \| `"tree"`
+> `optional` **aria-haspopup**: `boolean` \| `"tree"` \| `"true"` \| `"false"` \| `"dialog"` \| `"menu"` \| `"grid"` \| `"listbox"`
 
 Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2578](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2578)
 
@@ -917,7 +917,7 @@ Defines the human readable text alternative of aria-valuenow for a range widget.
 
 ### autoCapitalize?
 
-> `optional` **autoCapitalize**: `"none"` \| `"off"` \| `"on"` \| `"sentences"` \| `"words"` \| `"characters"` \| `string` & `object`
+> `optional` **autoCapitalize**: `"off"` \| `"none"` \| `"on"` \| `"sentences"` \| `"words"` \| `"characters"` \| `string` & `object`
 
 Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2786](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2786)
 
@@ -1193,7 +1193,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react
 
 ### inputMode?
 
-> `optional` **inputMode**: `"none"` \| `"search"` \| `"text"` \| `"tel"` \| `"url"` \| `"email"` \| `"numeric"` \| `"decimal"`
+> `optional` **inputMode**: `"search"` \| `"text"` \| `"none"` \| `"tel"` \| `"url"` \| `"email"` \| `"numeric"` \| `"decimal"`
 
 Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2851](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2851)
 
@@ -1315,7 +1315,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react
 
 > `optional` **maxDate**: `Date`
 
-Defined in: [packages/ui/src/base/calendar.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/calendar.tsx#L10)
+Defined in: [packages/ui/src/base/controls/calendar.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L15)
 
 ***
 
@@ -1323,7 +1323,15 @@ Defined in: [packages/ui/src/base/calendar.tsx:10](https://github.com/simplix-re
 
 > `optional` **minDate**: `Date`
 
-Defined in: [packages/ui/src/base/calendar.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/calendar.tsx#L9)
+Defined in: [packages/ui/src/base/controls/calendar.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L14)
+
+***
+
+### mode?
+
+> `optional` **mode**: `"single"` \| `"range"`
+
+Defined in: [packages/ui/src/base/controls/calendar.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L16)
 
 ***
 
@@ -1336,6 +1344,14 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react
 #### Inherited from
 
 [`CardProps`](CardProps.md).[`nonce`](CardProps.md#nonce)
+
+***
+
+### numberOfMonths?
+
+> `optional` **numberOfMonths**: `number`
+
+Defined in: [packages/ui/src/base/controls/calendar.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L19)
 
 ***
 
@@ -2971,7 +2987,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react
 
 > `optional` **onSelect**: (`date`) => `void`
 
-Defined in: [packages/ui/src/base/calendar.tsx:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/calendar.tsx#L8)
+Defined in: [packages/ui/src/base/controls/calendar.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L13)
 
 #### Parameters
 
@@ -2994,6 +3010,24 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react
 #### Inherited from
 
 `Omit.onSelectCapture`
+
+***
+
+### onSelectRange()?
+
+> `optional` **onSelectRange**: (`range`) => `void`
+
+Defined in: [packages/ui/src/base/controls/calendar.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L18)
+
+#### Parameters
+
+##### range
+
+[`DateRange`](DateRange.md)
+
+#### Returns
+
+`void`
 
 ***
 
@@ -3553,7 +3587,15 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react
 
 > `optional` **selected**: `Date`
 
-Defined in: [packages/ui/src/base/calendar.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/calendar.tsx#L7)
+Defined in: [packages/ui/src/base/controls/calendar.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L12)
+
+***
+
+### selectedRange?
+
+> `optional` **selectedRange**: [`DateRange`](DateRange.md)
+
+Defined in: [packages/ui/src/base/controls/calendar.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L17)
 
 ***
 

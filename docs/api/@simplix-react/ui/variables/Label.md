@@ -8,4 +8,4 @@
 
 > `const` **Label**: `ForwardRefExoticComponent`\<`Omit`\<`LabelProps` & `RefAttributes`\<`HTMLLabelElement`\>, `"ref"`\> & `RefAttributes`\<`HTMLLabelElement`\>\>
 
-Defined in: [packages/ui/src/base/label.tsx:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/label.tsx#L8)
+Defined in: [packages/ui/src/base/controls/label.tsx:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/label.tsx#L8)

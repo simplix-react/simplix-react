@@ -88,15 +88,15 @@ Defined in: [packages/ui/src/crud/shared/types.ts:24](https://github.com/simplix
 
 ***
 
-### labelPosition?
+### layout?
 
-> `optional` **labelPosition**: `"hidden"` \| `"top"` \| `"left"`
+> `optional` **layout**: `"hidden"` \| `"inline"` \| `"left"` \| `"top"`
 
 Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L5)
 
 #### Inherited from
 
-[`FieldVariant`](../../../interfaces/FieldVariant.md).[`labelPosition`](../../../interfaces/FieldVariant.md#labelposition)
+[`FieldVariant`](../../../interfaces/FieldVariant.md).[`layout`](../../../interfaces/FieldVariant.md#layout)
 
 ***
 
@@ -134,7 +134,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:27](https://github.com/simplix
 
 ### size?
 
-> `optional` **size**: `"lg"` \| `"md"` \| `"sm"`
+> `optional` **size**: `"sm"` \| `"lg"` \| `"md"`
 
 Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L6)
 
@@ -146,7 +146,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-
 
 ### switchProps?
 
-> `optional` **switchProps**: `Omit`\<`SwitchProps` & `RefAttributes`\<`HTMLButtonElement`\>, `"ref"`\> & `RefAttributes`\<`HTMLButtonElement`\>
+> `optional` **switchProps**: `Omit`\<[`SwitchProps`](../../../type-aliases/SwitchProps.md), `"ref"`\> & `RefAttributes`\<`HTMLButtonElement`\>
 
 Defined in: [packages/ui/src/fields/form/switch-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/switch-field.tsx#L15)
 

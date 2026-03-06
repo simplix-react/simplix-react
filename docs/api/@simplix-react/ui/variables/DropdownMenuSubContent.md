@@ -8,4 +8,4 @@
 
 > `const` **DropdownMenuSubContent**: `ForwardRefExoticComponent`\<`Omit`\<`DropdownMenuSubContentProps` & `RefAttributes`\<`HTMLDivElement`\>, `"ref"`\> & `RefAttributes`\<`HTMLDivElement`\>\>
 
-Defined in: [packages/ui/src/base/dropdown-menu.tsx:242](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/dropdown-menu.tsx#L242)
+Defined in: [packages/ui/src/base/navigation/dropdown-menu.tsx:242](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/dropdown-menu.tsx#L242)

@@ -6,11 +6,20 @@
 
 # Function: CardList()
 
-> **CardList**\<`T`\>(`__namedParameters`): `Element`
+> **CardList**\<`T`\>(`props`): `Element`
 
-Defined in: [packages/ui/src/crud/list/card-list.tsx:25](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/card-list.tsx#L25)
+Defined in: [packages/ui/src/crud/list/card-list.tsx:40](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/card-list.tsx#L40)
 
 Mobile-friendly card-based list layout alternative to the table view.
+
+```
+columns={2}
+┌───────────────┬───────────────┐
+│   Card A      │   Card B      │
+├───────────────┼───────────────┤
+│   Card C      │   Card D      │
+└───────────────┴───────────────┘
+```
 
 ## Type Parameters
 
@@ -18,11 +27,15 @@ Mobile-friendly card-based list layout alternative to the table view.
 
 `T`
 
+Row data type.
+
 ## Parameters
 
-### \_\_namedParameters
+### props
 
 [`CardListProps`](../interfaces/CardListProps.md)\<`T`\>
+
+[CardListProps](../interfaces/CardListProps.md)
 
 ## Returns
 

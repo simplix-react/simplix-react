@@ -6,28 +6,7 @@
 
 # Class: ApiError
 
-Defined in: [packages/contract/src/helpers/fetch.ts:22](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/helpers/fetch.ts#L22)
-
-Represents an HTTP error response from the API.
-
-Thrown by [defaultFetch](../functions/defaultFetch.md) and the internal multipart/blob fetchers when
-the server responds with a non-2xx status code. Captures both the HTTP status
-and the raw response body for debugging.
-
-## Example
-
-```ts
-import { ApiError } from "@simplix-react/contract";
-
-try {
-  await api.client.task.get("nonexistent");
-} catch (error) {
-  if (error instanceof ApiError) {
-    console.log(error.status); // 404
-    console.log(error.body);   // "Not Found"
-  }
-}
-```
+Defined in: [packages/contract/src/helpers/api-error.ts:1](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/helpers/api-error.ts#L1)
 
 ## Extends
 
@@ -39,7 +18,7 @@ try {
 
 > **new ApiError**(`status`, `body`): `ApiError`
 
-Defined in: [packages/contract/src/helpers/fetch.ts:23](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/helpers/fetch.ts#L23)
+Defined in: [packages/contract/src/helpers/api-error.ts:2](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/helpers/api-error.ts#L2)
 
 #### Parameters
 
@@ -69,7 +48,7 @@ Raw response body text.
 
 > `readonly` **body**: `string`
 
-Defined in: [packages/contract/src/helpers/fetch.ts:27](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/helpers/fetch.ts#L27)
+Defined in: [packages/contract/src/helpers/api-error.ts:6](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/helpers/api-error.ts#L6)
 
 Raw response body text.
 
@@ -127,7 +106,7 @@ Defined in: [node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/l
 
 > `readonly` **status**: `number`
 
-Defined in: [packages/contract/src/helpers/fetch.ts:25](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/helpers/fetch.ts#L25)
+Defined in: [packages/contract/src/helpers/api-error.ts:4](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/helpers/api-error.ts#L4)
 
 HTTP status code of the failed response.
 

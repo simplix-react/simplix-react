@@ -8,4 +8,4 @@
 
 > **DropdownMenuSubContentProps** = `ComponentPropsWithRef`\<*typeof* `DropdownMenuPrimitive.SubContent`\>
 
-Defined in: [packages/ui/src/base/dropdown-menu.tsx:238](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/dropdown-menu.tsx#L238)
+Defined in: [packages/ui/src/base/navigation/dropdown-menu.tsx:238](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/dropdown-menu.tsx#L238)

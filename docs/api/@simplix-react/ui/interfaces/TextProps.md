@@ -70,7 +70,7 @@ Indicates whether assistive technologies will present all, or only parts of, the
 
 ### aria-autocomplete?
 
-> `optional` **aria-autocomplete**: `"none"` \| `"list"` \| `"inline"` \| `"both"`
+> `optional` **aria-autocomplete**: `"list"` \| `"none"` \| `"inline"` \| `"both"`
 
 Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2490](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2490)
 
@@ -331,7 +331,7 @@ Indicates that the element is perceivable but disabled, so it is not editable or
 
 ### ~~aria-dropeffect?~~
 
-> `optional` **aria-dropeffect**: `"none"` \| `"link"` \| `"copy"` \| `"execute"` \| `"move"` \| `"popup"`
+> `optional` **aria-dropeffect**: `"link"` \| `"none"` \| `"copy"` \| `"execute"` \| `"move"` \| `"popup"`
 
 Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2559](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2559)
 
@@ -415,7 +415,7 @@ in ARIA 1.1
 
 ### aria-haspopup?
 
-> `optional` **aria-haspopup**: `boolean` \| `"true"` \| `"false"` \| `"dialog"` \| `"menu"` \| `"grid"` \| `"listbox"` \| `"tree"`
+> `optional` **aria-haspopup**: `boolean` \| `"tree"` \| `"true"` \| `"false"` \| `"dialog"` \| `"menu"` \| `"grid"` \| `"listbox"`
 
 Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2578](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2578)
 
@@ -929,7 +929,7 @@ Override the rendered HTML tag (default: "p", "code" when font="mono").
 
 ### autoCapitalize?
 
-> `optional` **autoCapitalize**: `"none"` \| `"off"` \| `"on"` \| `"sentences"` \| `"words"` \| `"characters"` \| `string` & `object`
+> `optional` **autoCapitalize**: `"off"` \| `"none"` \| `"on"` \| `"sentences"` \| `"words"` \| `"characters"` \| `string` & `object`
 
 Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2786](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2786)
 
@@ -1153,7 +1153,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react
 
 ### font?
 
-> `optional` **font**: `"sans"` \| `"display"` \| `"mono"` \| `null`
+> `optional` **font**: `"display"` \| `"sans"` \| `"mono"` \| `null`
 
 Defined in: [packages/ui/src/primitives/text.tsx:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/text.tsx#L27)
 
@@ -1217,7 +1217,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react
 
 ### inputMode?
 
-> `optional` **inputMode**: `"none"` \| `"search"` \| `"text"` \| `"tel"` \| `"url"` \| `"email"` \| `"numeric"` \| `"decimal"`
+> `optional` **inputMode**: `"search"` \| `"text"` \| `"none"` \| `"tel"` \| `"url"` \| `"email"` \| `"numeric"` \| `"decimal"`
 
 Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2851](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2851)
 
@@ -3553,7 +3553,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react
 
 ### size?
 
-> `optional` **size**: `"lg"` \| `"sm"` \| `"base"` \| `"caption"` \| `null`
+> `optional` **size**: `"sm"` \| `"lg"` \| `"base"` \| `"caption"` \| `null`
 
 Defined in: [packages/ui/src/primitives/text.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/text.tsx#L15)
 
@@ -3649,7 +3649,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react
 
 ### tone?
 
-> `optional` **tone**: `"default"` \| `"destructive"` \| `"muted"` \| `"primary"` \| `null`
+> `optional` **tone**: `"default"` \| `"primary"` \| `"destructive"` \| `"muted"` \| `null`
 
 Defined in: [packages/ui/src/primitives/text.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/text.tsx#L21)
 

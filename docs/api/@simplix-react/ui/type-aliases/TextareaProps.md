@@ -8,4 +8,4 @@
 
 > **TextareaProps** = `ComponentPropsWithRef`\<`"textarea"`\>
 
-Defined in: [packages/ui/src/base/textarea.tsx:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/textarea.tsx#L5)
+Defined in: [packages/ui/src/base/inputs/textarea.tsx:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/textarea.tsx#L5)

@@ -8,4 +8,4 @@
 
 > `const` **Tooltip**: `FC`\<`TooltipProps`\> = `TooltipPrimitive.Root`
 
-Defined in: [packages/ui/src/base/tooltip.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/tooltip.tsx#L19)
+Defined in: [packages/ui/src/base/overlay/tooltip.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/tooltip.tsx#L19)

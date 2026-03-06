@@ -8,4 +8,4 @@
 
 > `const` **Button**: `ForwardRefExoticComponent`\<`Omit`\<[`ButtonProps`](../interfaces/ButtonProps.md), `"ref"`\> & `RefAttributes`\<`HTMLButtonElement`\>\>
 
-Defined in: [packages/ui/src/base/button.tsx:44](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/button.tsx#L44)
+Defined in: [packages/ui/src/base/controls/button.tsx:46](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L46)

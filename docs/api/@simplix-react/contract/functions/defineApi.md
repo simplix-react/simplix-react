@@ -21,7 +21,7 @@ by `@simplix-react/react` for hooks and `@simplix-react/mock` for MSW handlers.
 
 ### TEntities
 
-`TEntities` *extends* `Record`\<`string`, [`EntityDefinition`](../interfaces/EntityDefinition.md)\<`ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `Record`\<`string`, [`EntityOperationDef`](../interfaces/EntityOperationDef.md)\<`ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>\>\>\>\>
+`TEntities` *extends* `Record`\<`string`, [`EntityDefinition`](../interfaces/EntityDefinition.md)\<`ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `Record`\<`string`, [`EntityOperationDef`](../interfaces/EntityOperationDef.md)\<`ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `unknown`\>\>\>\>
 
 Map of entity names to their [EntityDefinition](../interfaces/EntityDefinition.md)s.
 
@@ -47,7 +47,7 @@ Optional settings for customizing the contract.
 
 [`FetchFn`](../type-aliases/FetchFn.md)
 
-Custom fetch function replacing the built-in [defaultFetch](defaultFetch.md).
+Custom fetch function replacing the built-in [defaultFetch](../variables/defaultFetch.md).
 
 ## Returns
 

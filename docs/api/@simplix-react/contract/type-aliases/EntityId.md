@@ -8,7 +8,7 @@
 
 > **EntityId** = `string` \| `Record`\<`string`, `string`\>
 
-Defined in: [packages/contract/src/types.ts:465](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L465)
+Defined in: [packages/contract/src/types.ts:621](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L621)
 
 Represents an entity identifier that supports both simple string IDs
 and composite keys (e.g. tenant ID + item ID).

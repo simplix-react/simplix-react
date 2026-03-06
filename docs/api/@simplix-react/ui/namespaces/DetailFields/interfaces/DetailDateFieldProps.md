@@ -6,7 +6,7 @@
 
 # Interface: DetailDateFieldProps
 
-Defined in: [packages/ui/src/fields/detail/date-field.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/date-field.tsx#L7)
+Defined in: [packages/ui/src/fields/detail/date-field.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/date-field.tsx#L9)
 
 Props for the [DetailDateField](../functions/DetailDateField.md) component.
 
@@ -32,7 +32,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:36](https://github.com/simplix
 
 > `optional` **fallback**: `string`
 
-Defined in: [packages/ui/src/fields/detail/date-field.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/date-field.tsx#L13)
+Defined in: [packages/ui/src/fields/detail/date-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/date-field.tsx#L15)
 
 Fallback text when value is null. Defaults to em-dash.
 
@@ -42,7 +42,7 @@ Fallback text when value is null. Defaults to em-dash.
 
 > `optional` **format**: `string`
 
-Defined in: [packages/ui/src/fields/detail/date-field.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/date-field.tsx#L11)
+Defined in: [packages/ui/src/fields/detail/date-field.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/date-field.tsx#L13)
 
 Display format. Defaults to `"date"`.
 
@@ -72,21 +72,21 @@ Defined in: [packages/ui/src/crud/shared/types.ts:35](https://github.com/simplix
 
 ***
 
-### labelPosition?
+### layout?
 
-> `optional` **labelPosition**: `"hidden"` \| `"top"` \| `"left"`
+> `optional` **layout**: `"hidden"` \| `"inline"` \| `"left"` \| `"top"`
 
 Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L5)
 
 #### Inherited from
 
-[`FieldVariant`](../../../interfaces/FieldVariant.md).[`labelPosition`](../../../interfaces/FieldVariant.md#labelposition)
+[`FieldVariant`](../../../interfaces/FieldVariant.md).[`layout`](../../../interfaces/FieldVariant.md#layout)
 
 ***
 
 ### size?
 
-> `optional` **size**: `"lg"` \| `"md"` \| `"sm"`
+> `optional` **size**: `"sm"` \| `"lg"` \| `"md"`
 
 Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L6)
 
@@ -98,8 +98,8 @@ Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-
 
 ### value
 
-> **value**: `string` \| `Date` \| `null`
+> **value**: [`DateLike`](../../../type-aliases/DateLike.md) \| `null`
 
-Defined in: [packages/ui/src/fields/detail/date-field.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/date-field.tsx#L9)
+Defined in: [packages/ui/src/fields/detail/date-field.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/date-field.tsx#L11)
 
-Date value as Date object or ISO string.
+Date value as Date object, ISO string, or unix timestamp.

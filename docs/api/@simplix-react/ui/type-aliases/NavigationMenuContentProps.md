@@ -8,4 +8,4 @@
 
 > **NavigationMenuContentProps** = `ComponentPropsWithRef`\<*typeof* `NavigationMenuPrimitive.Content`\>
 
-Defined in: [packages/ui/src/base/navigation-menu.tsx:120](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation-menu.tsx#L120)
+Defined in: [packages/ui/src/base/navigation/navigation-menu.tsx:120](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/navigation-menu.tsx#L120)

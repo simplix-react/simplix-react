@@ -6,9 +6,9 @@
 
 # Type Alias: CrudRole
 
-> **CrudRole** = `"list"` \| `"get"` \| `"create"` \| `"update"` \| `"delete"` \| `"tree"`
+> **CrudRole** = `"list"` \| `"get"` \| `"getForEdit"` \| `"create"` \| `"update"` \| `"delete"` \| `"order"` \| `"tree"` \| `"subtree"` \| `"multiUpdate"` \| `"batchUpdate"` \| `"batchDelete"` \| `"search"`
 
-Defined in: [packages/contract/src/types.ts:52](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L52)
+Defined in: [packages/contract/src/types.ts:186](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L186)
 
 CRUD role identifier. Used for automatic mapping between operation names
 and their semantic roles (list, get, create, update, delete, tree).

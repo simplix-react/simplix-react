@@ -8,18 +8,15 @@
 
 > **buildTreeFromFlatRows**\<`T`\>(`rows`, `identityField?`): `TreeNode`\<`T`\>[]
 
-Defined in: [tree-builder.ts:23](https://github.com/simplix-react/simplix-react/blob/main/tree-builder.ts#L23)
+Defined in: [tree-builder.ts:87](https://github.com/simplix-react/simplix-react/blob/main/tree-builder.ts#L87)
 
-Converts flat database rows into a recursive tree structure.
-
-Expects each row to have an identity field and a `parentId` field.
-Rows with `null` parentId become root nodes.
+Converts flat database rows into a recursive `TreeNode` structure.
 
 ## Type Parameters
 
 ### T
 
-`T` *extends* `Record`\<`string`, `unknown`\>
+`T` *extends* `object`
 
 ## Parameters
 
@@ -27,7 +24,7 @@ Rows with `null` parentId become root nodes.
 
 `T`[]
 
-Flat array of entity data rows.
+Flat array of entity data rows. Each row must have a `parentId` field.
 
 ### identityField?
 
@@ -39,15 +36,24 @@ The field name used as the node identifier. Defaults to `"id"`.
 
 `TreeNode`\<`T`\>[]
 
-Array of root-level tree nodes with nested children.
+Array of root-level TreeNode instances with nested children.
+
+## Remarks
+
+Each row is wrapped in a `TreeNode<T>` with `data` and `children` fields.
+Rows whose `parentId` is `null`/`undefined` or references a missing parent
+become root nodes.
 
 ## Example
 
 ```ts
+import { buildTreeFromFlatRows } from "@simplix-react/mock";
+
 const rows = [
-  { id: "1", name: "Root", parentId: null },
-  { id: "2", name: "Child", parentId: "1" },
+  { id: 1, name: "Root", parentId: null },
+  { id: 2, name: "Child A", parentId: 1 },
+  { id: 3, name: "Child B", parentId: 1 },
 ];
 const tree = buildTreeFromFlatRows(rows);
-// [{ data: { id: "1", ... }, children: [{ data: { id: "2", ... }, children: [] }] }]
+// [{ data: { id: 1, ... }, children: [{ data: { id: 2, ... } }, { data: { id: 3, ... } }] }]
 ```

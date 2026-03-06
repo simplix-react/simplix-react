@@ -23,7 +23,7 @@ Typically called internally by [defineApi](defineApi.md) rather than used direct
 
 ### TEntities
 
-`TEntities` *extends* `Record`\<`string`, [`EntityDefinition`](../interfaces/EntityDefinition.md)\<`ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `Record`\<`string`, [`EntityOperationDef`](../interfaces/EntityOperationDef.md)\<`ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>\>\>\>\>
+`TEntities` *extends* `Record`\<`string`, [`EntityDefinition`](../interfaces/EntityDefinition.md)\<`ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `Record`\<`string`, [`EntityOperationDef`](../interfaces/EntityOperationDef.md)\<`ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `unknown`\>\>\>\>
 
 Map of entity names to their definitions.
 
@@ -43,9 +43,9 @@ The API contract configuration.
 
 ### fetchFn?
 
-[`FetchFn`](../type-aliases/FetchFn.md) = `defaultFetch`
+[`FetchFn`](../type-aliases/FetchFn.md)
 
-Custom fetch function; defaults to [defaultFetch](defaultFetch.md).
+Custom fetch function; defaults to [defaultFetch](../variables/defaultFetch.md).
 
 ## Returns
 

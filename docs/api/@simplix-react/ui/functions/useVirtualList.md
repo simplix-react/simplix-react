@@ -8,9 +8,9 @@
 
 > **useVirtualList**(`options`): `object`
 
-Defined in: [packages/ui/src/crud/list/use-virtual.ts:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-virtual.ts#L13)
+Defined in: [packages/ui/src/crud/list/use-virtual.ts:31](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-virtual.ts#L31)
 
-Virtual scrolling hook wrapping @tanstack/react-virtual for large list performance.
+Virtual scrolling hook for large lists, wrapping `@tanstack/react-virtual`.
 
 ## Parameters
 
@@ -18,9 +18,13 @@ Virtual scrolling hook wrapping @tanstack/react-virtual for large list performan
 
 [`UseVirtualListOptions`](../interfaces/UseVirtualListOptions.md)
 
+[UseVirtualListOptions](../interfaces/UseVirtualListOptions.md)
+
 ## Returns
 
 `object`
+
+`virtualizer` instance, `virtualRows` to render, and `totalHeight` for spacer.
 
 ### totalHeight
 
@@ -33,3 +37,13 @@ Virtual scrolling hook wrapping @tanstack/react-virtual for large list performan
 ### virtualRows
 
 > **virtualRows**: `VirtualItem`[]
+
+## Example
+
+```ts
+const { virtualRows, totalHeight } = useVirtualList({
+  count: items.length,
+  estimateSize: () => 48,
+  parentRef: scrollRef,
+});
+```

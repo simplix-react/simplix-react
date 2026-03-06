@@ -8,4 +8,4 @@
 
 > `const` **DialogClose**: `ForwardRefExoticComponent`\<`DialogCloseProps` & `RefAttributes`\<`HTMLButtonElement`\>\> = `DialogPrimitive.Close`
 
-Defined in: [packages/ui/src/base/dialog.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/dialog.tsx#L16)
+Defined in: [packages/ui/src/base/overlay/dialog.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/dialog.tsx#L16)

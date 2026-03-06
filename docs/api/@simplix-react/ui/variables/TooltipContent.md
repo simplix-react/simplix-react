@@ -8,4 +8,4 @@
 
 > `const` **TooltipContent**: `ForwardRefExoticComponent`\<`Omit`\<`TooltipContentProps` & `RefAttributes`\<`HTMLDivElement`\>, `"ref"`\> & `RefAttributes`\<`HTMLDivElement`\>\>
 
-Defined in: [packages/ui/src/base/tooltip.tsx:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/tooltip.tsx#L29)
+Defined in: [packages/ui/src/base/overlay/tooltip.tsx:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/tooltip.tsx#L29)

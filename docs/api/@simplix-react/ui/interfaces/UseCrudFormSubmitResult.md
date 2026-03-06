@@ -6,7 +6,7 @@
 
 # Interface: UseCrudFormSubmitResult\<T\>
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L18)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L24)
 
 Return type of [useCrudFormSubmit](../functions/useCrudFormSubmit.md).
 
@@ -22,7 +22,9 @@ Return type of [useCrudFormSubmit](../functions/useCrudFormSubmit.md).
 
 > **handleSubmit**: (`values`) => `void`
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L20)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L28)
+
+Submit handler that dispatches to create or update mutation.
 
 #### Parameters
 
@@ -40,7 +42,9 @@ Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:20](https://githu
 
 > **isEdit**: `boolean`
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L19)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L26)
+
+Whether the form is in edit mode (entity already exists).
 
 ***
 
@@ -48,4 +52,6 @@ Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:19](https://githu
 
 > **isPending**: `boolean`
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L21)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L30)
+
+Whether the active mutation is pending.

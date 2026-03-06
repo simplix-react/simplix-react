@@ -6,7 +6,7 @@
 
 # Interface: SimplixConfig
 
-Defined in: [types.ts:56](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L56)
+Defined in: [config/types.ts:59](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L59)
 
 Project-level configuration loaded from `simplix.config.ts` at the project root.
 
@@ -44,7 +44,7 @@ export default defineConfig({
 
 > `optional` **api**: `object`
 
-Defined in: [types.ts:58](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L58)
+Defined in: [config/types.ts:61](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L61)
 
 API settings — used for basePath in code generation
 
@@ -60,7 +60,7 @@ API base path (default: "/api")
 
 > `optional` **codegen**: `object`
 
-Defined in: [types.ts:78](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L78)
+Defined in: [config/types.ts:81](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L81)
 
 Code generation options
 
@@ -76,7 +76,7 @@ Prepend auto-generated header comment to generated files (default: true)
 
 > `optional` **http**: `object`
 
-Defined in: [types.ts:73](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L73)
+Defined in: [config/types.ts:76](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L76)
 
 .http file environment settings
 
@@ -90,7 +90,7 @@ Defined in: [types.ts:73](https://github.com/simplix-react/simplix-react/blob/ma
 
 > `optional` **i18n**: `object`
 
-Defined in: [types.ts:84](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L84)
+Defined in: [config/types.ts:87](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L87)
 
 Internationalization settings
 
@@ -110,23 +110,11 @@ Supported locale codes (default: ["en", "ko", "ja"])
 
 ### openapi?
 
-> `optional` **openapi**: `object`
+> `optional` **openapi**: [`OpenAPISpecConfig`](OpenAPISpecConfig.md)[]
 
-Defined in: [types.ts:92](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L92)
+Defined in: [config/types.ts:95](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L95)
 
-OpenAPI code generation options
-
-#### crud?
-
-> `optional` **crud**: `Partial`\<`Record`\<`CrudRole`, [`CrudEndpointPattern`](CrudEndpointPattern.md)\>\>
-
-CRUD role detection patterns. When omitted, no CRUD roles are assigned.
-
-#### domains?
-
-> `optional` **domains**: `Record`\<`string`, `string`[]\>
-
-Tag-based domain splitting: domainName → tagPatterns (exact string or /regex/)
+OpenAPI code generation — array of per-spec configurations
 
 ***
 
@@ -134,7 +122,7 @@ Tag-based domain splitting: domainName → tagPatterns (exact string or /regex/)
 
 > `optional` **packages**: `object`
 
-Defined in: [types.ts:67](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L67)
+Defined in: [config/types.ts:70](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L70)
 
 Package naming options
 
@@ -150,6 +138,6 @@ Short prefix for generated package names (default: derived from root package.jso
 
 > `optional` **queryBuilder**: `unknown`
 
-Defined in: [types.ts:64](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L64)
+Defined in: [config/types.ts:67](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L67)
 
 Global QueryBuilder — applied to all domains

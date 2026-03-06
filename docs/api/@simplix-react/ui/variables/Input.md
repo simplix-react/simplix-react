@@ -8,4 +8,4 @@
 
 > `const` **Input**: `ForwardRefExoticComponent`\<`Omit`\<`DetailedHTMLProps`\<`InputHTMLAttributes`\<`HTMLInputElement`\>, `HTMLInputElement`\>, `"ref"`\> & `RefAttributes`\<`HTMLInputElement`\>\>
 
-Defined in: [packages/ui/src/base/input.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/input.tsx#L7)
+Defined in: [packages/ui/src/base/inputs/input.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/input.tsx#L7)

@@ -20,7 +20,7 @@ re-derived `client` and `queryKeys` reflecting the patched configuration.
 
 ### TEntities
 
-`TEntities` *extends* `Record`\<`string`, [`EntityDefinition`](../interfaces/EntityDefinition.md)\<`ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `Record`\<`string`, [`EntityOperationDef`](../interfaces/EntityOperationDef.md)\<`ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>\>\>\>\>
+`TEntities` *extends* `Record`\<`string`, [`EntityDefinition`](../interfaces/EntityDefinition.md)\<`ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `Record`\<`string`, [`EntityOperationDef`](../interfaces/EntityOperationDef.md)\<`ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `unknown`\>\>\>\>
 
 ### TOperations
 
@@ -50,7 +50,7 @@ Optional settings forwarded to the derived client.
 
 [`FetchFn`](../type-aliases/FetchFn.md)
 
-Custom fetch function; defaults to the built-in [defaultFetch](defaultFetch.md).
+Custom fetch function; defaults to the built-in [defaultFetch](../variables/defaultFetch.md).
 
 ## Returns
 

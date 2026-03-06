@@ -8,7 +8,7 @@
 
 > **FetchFn** = \<`T`\>(`path`, `options?`) => `Promise`\<`T`\>
 
-Defined in: [packages/contract/src/types.ts:406](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L406)
+Defined in: [packages/contract/src/types.ts:562](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L562)
 
 Represents a customizable fetch function signature.
 
@@ -39,5 +39,5 @@ The expected response type after deserialization.
 
 ## See
 
- - [defaultFetch](../functions/defaultFetch.md) for the built-in implementation.
+ - [defaultFetch](../variables/defaultFetch.md) for the built-in implementation.
  - [defineApi](../functions/defineApi.md) where this is provided via `options.fetchFn`.

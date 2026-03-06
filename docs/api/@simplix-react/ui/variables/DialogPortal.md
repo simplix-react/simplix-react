@@ -8,4 +8,4 @@
 
 > `const` **DialogPortal**: `FC`\<`DialogPortalProps`\> = `DialogPrimitive.Portal`
 
-Defined in: [packages/ui/src/base/dialog.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/dialog.tsx#L13)
+Defined in: [packages/ui/src/base/overlay/dialog.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/dialog.tsx#L13)

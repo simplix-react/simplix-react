@@ -8,4 +8,4 @@
 
 > **TooltipProviderProps** = `ComponentPropsWithRef`\<*typeof* `TooltipPrimitive.Provider`\>
 
-Defined in: [packages/ui/src/base/tooltip.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/tooltip.tsx#L7)
+Defined in: [packages/ui/src/base/overlay/tooltip.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/tooltip.tsx#L7)

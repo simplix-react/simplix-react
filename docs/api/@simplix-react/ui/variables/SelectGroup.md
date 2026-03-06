@@ -8,4 +8,4 @@
 
 > `const` **SelectGroup**: `ForwardRefExoticComponent`\<`SelectGroupProps` & `RefAttributes`\<`HTMLDivElement`\>\> = `SelectPrimitive.Group`
 
-Defined in: [packages/ui/src/base/select.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/select.tsx#L13)
+Defined in: [packages/ui/src/base/inputs/select.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/select.tsx#L13)

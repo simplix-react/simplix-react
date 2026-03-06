@@ -385,12 +385,18 @@ describe("task store", () => {
 
 - [MockDomainConfig](interfaces/MockDomainConfig.md)
 - [MockEntityConfig](interfaces/MockEntityConfig.md)
+- [MockEntityStore](interfaces/MockEntityStore.md)
+- [MockHandlerOptions](interfaces/MockHandlerOptions.md)
+- [MockResponseWrapper](interfaces/MockResponseWrapper.md)
 - [MockResult](interfaces/MockResult.md)
 - [MockServerConfig](interfaces/MockServerConfig.md)
+- [PagedResult](interfaces/PagedResult.md)
 
 ## Functions
 
+- [buildEmbeddedTree](functions/buildEmbeddedTree.md)
 - [buildTreeFromFlatRows](functions/buildTreeFromFlatRows.md)
+- [createMockEntityStore](functions/createMockEntityStore.md)
 - [deriveMockHandlers](functions/deriveMockHandlers.md)
 - [getEntityStore](functions/getEntityStore.md)
 - [getNextId](functions/getNextId.md)

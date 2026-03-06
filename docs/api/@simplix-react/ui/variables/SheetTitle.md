@@ -8,4 +8,4 @@
 
 > `const` **SheetTitle**: `ForwardRefExoticComponent`\<`Omit`\<`DialogTitleProps` & `RefAttributes`\<`HTMLHeadingElement`\>, `"ref"`\> & `RefAttributes`\<`HTMLHeadingElement`\>\>
 
-Defined in: [packages/ui/src/base/sheet.tsx:120](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/sheet.tsx#L120)
+Defined in: [packages/ui/src/base/overlay/sheet.tsx:120](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/sheet.tsx#L120)

@@ -6,7 +6,7 @@
 
 # Interface: EntityParent
 
-Defined in: [packages/contract/src/types.ts:21](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L21)
+Defined in: [packages/contract/src/types.ts:155](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L155)
 
 Describes the parent resource in a nested entity relationship.
 
@@ -31,7 +31,7 @@ const parent: EntityParent = {
 
 > **param**: `string`
 
-Defined in: [packages/contract/src/types.ts:23](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L23)
+Defined in: [packages/contract/src/types.ts:157](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L157)
 
 Route parameter name used to identify the parent resource (e.g. `"projectId"`).
 
@@ -41,6 +41,6 @@ Route parameter name used to identify the parent resource (e.g. `"projectId"`).
 
 > **path**: `string`
 
-Defined in: [packages/contract/src/types.ts:25](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L25)
+Defined in: [packages/contract/src/types.ts:159](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L159)
 
 Base path segment for the parent resource (e.g. `"/projects"`).

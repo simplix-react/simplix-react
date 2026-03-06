@@ -8,4 +8,4 @@
 
 > **SheetHeaderProps** = `React.HTMLAttributes`\<`HTMLDivElement`\>
 
-Defined in: [packages/ui/src/base/sheet.tsx:92](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/sheet.tsx#L92)
+Defined in: [packages/ui/src/base/overlay/sheet.tsx:92](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/sheet.tsx#L92)

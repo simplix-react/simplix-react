@@ -8,4 +8,4 @@
 
 > `const` **PopoverAnchor**: `ForwardRefExoticComponent`\<`PopoverAnchorProps` & `RefAttributes`\<`HTMLDivElement`\>\> = `PopoverPrimitive.Anchor`
 
-Defined in: [packages/ui/src/base/popover.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/popover.tsx#L13)
+Defined in: [packages/ui/src/base/overlay/popover.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/popover.tsx#L13)

@@ -6,9 +6,9 @@
 
 # Type Alias: EntityClient\<_TSchema, TOperations\>
 
-> **EntityClient**\<`_TSchema`, `TOperations`\> = `{ [K in keyof TOperations]: (args: unknown[]) => Promise<unknown> }`
+> **EntityClient**\<`_TSchema`, `TOperations`\> = `{ [K in keyof TOperations]: (args: unknown[]) => Promise<InferOutputData<TOperations[K]["output"]>> }`
 
-Defined in: [packages/contract/src/types.ts:388](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L388)
+Defined in: [packages/contract/src/types.ts:542](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L542)
 
 Provides a type-safe client for a single entity, derived from its
 [EntityDefinition](../interfaces/EntityDefinition.md) operations.

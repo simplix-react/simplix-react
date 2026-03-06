@@ -1,0 +1,4012 @@
+[**Documentation**](../../../README.md)
+
+***
+
+[Documentation](../../../README.md) / [@simplix-react/ui](../README.md) / NumberInputProps
+
+# Interface: NumberInputProps
+
+Defined in: [packages/ui/src/base/inputs/number-input.tsx:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/number-input.tsx#L5)
+
+## Extends
+
+- `Omit`\<`ComponentPropsWithRef`\<`"input"`\>, `"type"` \| `"onChange"`\>
+
+## Properties
+
+### about?
+
+> `optional` **about**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2812](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2812)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`about`](CardProps.md#about)
+
+***
+
+### accept?
+
+> `optional` **accept**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3270](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3270)
+
+#### Inherited from
+
+`Omit.accept`
+
+***
+
+### accessKey?
+
+> `optional` **accessKey**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2785](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2785)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`accessKey`](CardProps.md#accesskey)
+
+***
+
+### alt?
+
+> `optional` **alt**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3271](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3271)
+
+#### Inherited from
+
+`Omit.alt`
+
+***
+
+### aria-activedescendant?
+
+> `optional` **aria-activedescendant**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2483](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2483)
+
+Identifies the currently active element when DOM focus is on a composite widget, textbox, group, or application.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-activedescendant`](CardProps.md#aria-activedescendant)
+
+***
+
+### aria-atomic?
+
+> `optional` **aria-atomic**: `Booleanish`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2485](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2485)
+
+Indicates whether assistive technologies will present all, or only parts of, the changed region based on the change notifications defined by the aria-relevant attribute.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-atomic`](CardProps.md#aria-atomic)
+
+***
+
+### aria-autocomplete?
+
+> `optional` **aria-autocomplete**: `"list"` \| `"none"` \| `"inline"` \| `"both"`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2490](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2490)
+
+Indicates whether inputting text could trigger display of one or more predictions of the user's intended value for an input and specifies how predictions would be
+presented if they are made.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-autocomplete`](CardProps.md#aria-autocomplete)
+
+***
+
+### aria-braillelabel?
+
+> `optional` **aria-braillelabel**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2496](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2496)
+
+Defines a string value that labels the current element, which is intended to be converted into Braille.
+
+#### See
+
+aria-label.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-braillelabel`](CardProps.md#aria-braillelabel)
+
+***
+
+### aria-brailleroledescription?
+
+> `optional` **aria-brailleroledescription**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2501](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2501)
+
+Defines a human-readable, author-localized abbreviated description for the role of an element, which is intended to be converted into Braille.
+
+#### See
+
+aria-roledescription.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-brailleroledescription`](CardProps.md#aria-brailleroledescription)
+
+***
+
+### aria-busy?
+
+> `optional` **aria-busy**: `Booleanish`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2502](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2502)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-busy`](CardProps.md#aria-busy)
+
+***
+
+### aria-checked?
+
+> `optional` **aria-checked**: `boolean` \| `"true"` \| `"false"` \| `"mixed"`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2507](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2507)
+
+Indicates the current "checked" state of checkboxes, radio buttons, and other widgets.
+
+#### See
+
+ - aria-pressed
+ - aria-selected.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-checked`](CardProps.md#aria-checked)
+
+***
+
+### aria-colcount?
+
+> `optional` **aria-colcount**: `number`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2512](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2512)
+
+Defines the total number of columns in a table, grid, or treegrid.
+
+#### See
+
+aria-colindex.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-colcount`](CardProps.md#aria-colcount)
+
+***
+
+### aria-colindex?
+
+> `optional` **aria-colindex**: `number`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2517](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2517)
+
+Defines an element's column index or position with respect to the total number of columns within a table, grid, or treegrid.
+
+#### See
+
+ - aria-colcount
+ - aria-colspan.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-colindex`](CardProps.md#aria-colindex)
+
+***
+
+### aria-colindextext?
+
+> `optional` **aria-colindextext**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2522](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2522)
+
+Defines a human readable text alternative of aria-colindex.
+
+#### See
+
+aria-rowindextext.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-colindextext`](CardProps.md#aria-colindextext)
+
+***
+
+### aria-colspan?
+
+> `optional` **aria-colspan**: `number`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2527](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2527)
+
+Defines the number of columns spanned by a cell or gridcell within a table, grid, or treegrid.
+
+#### See
+
+ - aria-colindex
+ - aria-rowspan.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-colspan`](CardProps.md#aria-colspan)
+
+***
+
+### aria-controls?
+
+> `optional` **aria-controls**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2532](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2532)
+
+Identifies the element (or elements) whose contents or presence are controlled by the current element.
+
+#### See
+
+aria-owns.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-controls`](CardProps.md#aria-controls)
+
+***
+
+### aria-current?
+
+> `optional` **aria-current**: `boolean` \| `"true"` \| `"false"` \| `"time"` \| `"page"` \| `"step"` \| `"location"` \| `"date"`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2534](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2534)
+
+Indicates the element that represents the current item within a container or set of related elements.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-current`](CardProps.md#aria-current)
+
+***
+
+### aria-describedby?
+
+> `optional` **aria-describedby**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2539](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2539)
+
+Identifies the element (or elements) that describes the object.
+
+#### See
+
+aria-labelledby
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-describedby`](CardProps.md#aria-describedby)
+
+***
+
+### aria-description?
+
+> `optional` **aria-description**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2544](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2544)
+
+Defines a string value that describes or annotates the current element.
+
+#### See
+
+related aria-describedby.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-description`](CardProps.md#aria-description)
+
+***
+
+### aria-details?
+
+> `optional` **aria-details**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2549](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2549)
+
+Identifies the element that provides a detailed, extended description for the object.
+
+#### See
+
+aria-describedby.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-details`](CardProps.md#aria-details)
+
+***
+
+### aria-disabled?
+
+> `optional` **aria-disabled**: `Booleanish`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2554](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2554)
+
+Indicates that the element is perceivable but disabled, so it is not editable or otherwise operable.
+
+#### See
+
+ - aria-hidden
+ - aria-readonly.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-disabled`](CardProps.md#aria-disabled)
+
+***
+
+### ~~aria-dropeffect?~~
+
+> `optional` **aria-dropeffect**: `"link"` \| `"none"` \| `"copy"` \| `"execute"` \| `"move"` \| `"popup"`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2559](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2559)
+
+Indicates what functions can be performed when a dragged object is released on the drop target.
+
+#### Deprecated
+
+in ARIA 1.1
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-dropeffect`](CardProps.md#aria-dropeffect)
+
+***
+
+### aria-errormessage?
+
+> `optional` **aria-errormessage**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2564](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2564)
+
+Identifies the element that provides an error message for the object.
+
+#### See
+
+ - aria-invalid
+ - aria-describedby.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-errormessage`](CardProps.md#aria-errormessage)
+
+***
+
+### aria-expanded?
+
+> `optional` **aria-expanded**: `Booleanish`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2566](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2566)
+
+Indicates whether the element, or another grouping element it controls, is currently expanded or collapsed.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-expanded`](CardProps.md#aria-expanded)
+
+***
+
+### aria-flowto?
+
+> `optional` **aria-flowto**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2571](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2571)
+
+Identifies the next element (or elements) in an alternate reading order of content which, at the user's discretion,
+allows assistive technology to override the general default of reading in document source order.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-flowto`](CardProps.md#aria-flowto)
+
+***
+
+### ~~aria-grabbed?~~
+
+> `optional` **aria-grabbed**: `Booleanish`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2576](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2576)
+
+Indicates an element's "grabbed" state in a drag-and-drop operation.
+
+#### Deprecated
+
+in ARIA 1.1
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-grabbed`](CardProps.md#aria-grabbed)
+
+***
+
+### aria-haspopup?
+
+> `optional` **aria-haspopup**: `boolean` \| `"tree"` \| `"true"` \| `"false"` \| `"dialog"` \| `"menu"` \| `"grid"` \| `"listbox"`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2578](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2578)
+
+Indicates the availability and type of interactive popup element, such as menu or dialog, that can be triggered by an element.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-haspopup`](CardProps.md#aria-haspopup)
+
+***
+
+### aria-hidden?
+
+> `optional` **aria-hidden**: `Booleanish`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2583](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2583)
+
+Indicates whether the element is exposed to an accessibility API.
+
+#### See
+
+aria-disabled.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-hidden`](CardProps.md#aria-hidden)
+
+***
+
+### aria-invalid?
+
+> `optional` **aria-invalid**: `boolean` \| `"true"` \| `"false"` \| `"grammar"` \| `"spelling"`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2588](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2588)
+
+Indicates the entered value does not conform to the format expected by the application.
+
+#### See
+
+aria-errormessage.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-invalid`](CardProps.md#aria-invalid)
+
+***
+
+### aria-keyshortcuts?
+
+> `optional` **aria-keyshortcuts**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2590](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2590)
+
+Indicates keyboard shortcuts that an author has implemented to activate or give focus to an element.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-keyshortcuts`](CardProps.md#aria-keyshortcuts)
+
+***
+
+### aria-label?
+
+> `optional` **aria-label**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2595](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2595)
+
+Defines a string value that labels the current element.
+
+#### See
+
+aria-labelledby.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-label`](CardProps.md#aria-label)
+
+***
+
+### aria-labelledby?
+
+> `optional` **aria-labelledby**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2600](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2600)
+
+Identifies the element (or elements) that labels the current element.
+
+#### See
+
+aria-describedby.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-labelledby`](CardProps.md#aria-labelledby)
+
+***
+
+### aria-level?
+
+> `optional` **aria-level**: `number`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2602](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2602)
+
+Defines the hierarchical level of an element within a structure.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-level`](CardProps.md#aria-level)
+
+***
+
+### aria-live?
+
+> `optional` **aria-live**: `"off"` \| `"assertive"` \| `"polite"`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2604](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2604)
+
+Indicates that an element will be updated, and describes the types of updates the user agents, assistive technologies, and user can expect from the live region.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-live`](CardProps.md#aria-live)
+
+***
+
+### aria-modal?
+
+> `optional` **aria-modal**: `Booleanish`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2606](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2606)
+
+Indicates whether an element is modal when displayed.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-modal`](CardProps.md#aria-modal)
+
+***
+
+### aria-multiline?
+
+> `optional` **aria-multiline**: `Booleanish`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2608](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2608)
+
+Indicates whether a text box accepts multiple lines of input or only a single line.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-multiline`](CardProps.md#aria-multiline)
+
+***
+
+### aria-multiselectable?
+
+> `optional` **aria-multiselectable**: `Booleanish`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2610](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2610)
+
+Indicates that the user may select more than one item from the current selectable descendants.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-multiselectable`](CardProps.md#aria-multiselectable)
+
+***
+
+### aria-orientation?
+
+> `optional` **aria-orientation**: `"horizontal"` \| `"vertical"`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2612](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2612)
+
+Indicates whether the element's orientation is horizontal, vertical, or unknown/ambiguous.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-orientation`](CardProps.md#aria-orientation)
+
+***
+
+### aria-owns?
+
+> `optional` **aria-owns**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2618](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2618)
+
+Identifies an element (or elements) in order to define a visual, functional, or contextual parent/child relationship
+between DOM elements where the DOM hierarchy cannot be used to represent the relationship.
+
+#### See
+
+aria-controls.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-owns`](CardProps.md#aria-owns)
+
+***
+
+### aria-placeholder?
+
+> `optional` **aria-placeholder**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2623](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2623)
+
+Defines a short hint (a word or short phrase) intended to aid the user with data entry when the control has no value.
+A hint could be a sample value or a brief description of the expected format.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-placeholder`](CardProps.md#aria-placeholder)
+
+***
+
+### aria-posinset?
+
+> `optional` **aria-posinset**: `number`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2628](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2628)
+
+Defines an element's number or position in the current set of listitems or treeitems. Not required if all elements in the set are present in the DOM.
+
+#### See
+
+aria-setsize.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-posinset`](CardProps.md#aria-posinset)
+
+***
+
+### aria-pressed?
+
+> `optional` **aria-pressed**: `boolean` \| `"true"` \| `"false"` \| `"mixed"`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2633](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2633)
+
+Indicates the current "pressed" state of toggle buttons.
+
+#### See
+
+ - aria-checked
+ - aria-selected.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-pressed`](CardProps.md#aria-pressed)
+
+***
+
+### aria-readonly?
+
+> `optional` **aria-readonly**: `Booleanish`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2638](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2638)
+
+Indicates that the element is not editable, but is otherwise operable.
+
+#### See
+
+aria-disabled.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-readonly`](CardProps.md#aria-readonly)
+
+***
+
+### aria-relevant?
+
+> `optional` **aria-relevant**: `"text"` \| `"additions"` \| `"additions removals"` \| `"additions text"` \| `"all"` \| `"removals"` \| `"removals additions"` \| `"removals text"` \| `"text additions"` \| `"text removals"`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2643](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2643)
+
+Indicates what notifications the user agent will trigger when the accessibility tree within a live region is modified.
+
+#### See
+
+aria-atomic.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-relevant`](CardProps.md#aria-relevant)
+
+***
+
+### aria-required?
+
+> `optional` **aria-required**: `Booleanish`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2656](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2656)
+
+Indicates that user input is required on the element before a form may be submitted.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-required`](CardProps.md#aria-required)
+
+***
+
+### aria-roledescription?
+
+> `optional` **aria-roledescription**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2658](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2658)
+
+Defines a human-readable, author-localized description for the role of an element.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-roledescription`](CardProps.md#aria-roledescription)
+
+***
+
+### aria-rowcount?
+
+> `optional` **aria-rowcount**: `number`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2663](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2663)
+
+Defines the total number of rows in a table, grid, or treegrid.
+
+#### See
+
+aria-rowindex.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-rowcount`](CardProps.md#aria-rowcount)
+
+***
+
+### aria-rowindex?
+
+> `optional` **aria-rowindex**: `number`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2668](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2668)
+
+Defines an element's row index or position with respect to the total number of rows within a table, grid, or treegrid.
+
+#### See
+
+ - aria-rowcount
+ - aria-rowspan.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-rowindex`](CardProps.md#aria-rowindex)
+
+***
+
+### aria-rowindextext?
+
+> `optional` **aria-rowindextext**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2673](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2673)
+
+Defines a human readable text alternative of aria-rowindex.
+
+#### See
+
+aria-colindextext.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-rowindextext`](CardProps.md#aria-rowindextext)
+
+***
+
+### aria-rowspan?
+
+> `optional` **aria-rowspan**: `number`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2678](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2678)
+
+Defines the number of rows spanned by a cell or gridcell within a table, grid, or treegrid.
+
+#### See
+
+ - aria-rowindex
+ - aria-colspan.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-rowspan`](CardProps.md#aria-rowspan)
+
+***
+
+### aria-selected?
+
+> `optional` **aria-selected**: `Booleanish`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2683](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2683)
+
+Indicates the current "selected" state of various widgets.
+
+#### See
+
+ - aria-checked
+ - aria-pressed.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-selected`](CardProps.md#aria-selected)
+
+***
+
+### aria-setsize?
+
+> `optional` **aria-setsize**: `number`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2688](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2688)
+
+Defines the number of items in the current set of listitems or treeitems. Not required if all elements in the set are present in the DOM.
+
+#### See
+
+aria-posinset.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-setsize`](CardProps.md#aria-setsize)
+
+***
+
+### aria-sort?
+
+> `optional` **aria-sort**: `"none"` \| `"ascending"` \| `"descending"` \| `"other"`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2690](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2690)
+
+Indicates if items in a table or grid are sorted in ascending or descending order.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-sort`](CardProps.md#aria-sort)
+
+***
+
+### aria-valuemax?
+
+> `optional` **aria-valuemax**: `number`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2692](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2692)
+
+Defines the maximum allowed value for a range widget.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-valuemax`](CardProps.md#aria-valuemax)
+
+***
+
+### aria-valuemin?
+
+> `optional` **aria-valuemin**: `number`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2694](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2694)
+
+Defines the minimum allowed value for a range widget.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-valuemin`](CardProps.md#aria-valuemin)
+
+***
+
+### aria-valuenow?
+
+> `optional` **aria-valuenow**: `number`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2699](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2699)
+
+Defines the current value for a range widget.
+
+#### See
+
+aria-valuetext.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-valuenow`](CardProps.md#aria-valuenow)
+
+***
+
+### aria-valuetext?
+
+> `optional` **aria-valuetext**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2701](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2701)
+
+Defines the human readable text alternative of aria-valuenow for a range widget.
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`aria-valuetext`](CardProps.md#aria-valuetext)
+
+***
+
+### autoCapitalize?
+
+> `optional` **autoCapitalize**: `"off"` \| `"none"` \| `"on"` \| `"sentences"` \| `"words"` \| `"characters"` \| `string` & `object`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2786](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2786)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`autoCapitalize`](CardProps.md#autocapitalize)
+
+***
+
+### autoComplete?
+
+> `optional` **autoComplete**: `HTMLInputAutoCompleteAttribute`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3272](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3272)
+
+#### Inherited from
+
+`Omit.autoComplete`
+
+***
+
+### autoCorrect?
+
+> `optional` **autoCorrect**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2825](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2825)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`autoCorrect`](CardProps.md#autocorrect)
+
+***
+
+### autoFocus?
+
+> `optional` **autoFocus**: `boolean`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2787](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2787)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`autoFocus`](CardProps.md#autofocus)
+
+***
+
+### autoSave?
+
+> `optional` **autoSave**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2826](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2826)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`autoSave`](CardProps.md#autosave)
+
+***
+
+### capture?
+
+> `optional` **capture**: `boolean` \| `"user"` \| `"environment"`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3273](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3273)
+
+#### Inherited from
+
+`Omit.capture`
+
+***
+
+### checked?
+
+> `optional` **checked**: `boolean`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3274](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3274)
+
+#### Inherited from
+
+`Omit.checked`
+
+***
+
+### children?
+
+> `optional` **children**: `ReactNode`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2259](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2259)
+
+#### Inherited from
+
+`Omit.children`
+
+***
+
+### className?
+
+> `optional` **className**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2788](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2788)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`className`](CardProps.md#classname)
+
+***
+
+### color?
+
+> `optional` **color**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2827](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2827)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`color`](CardProps.md#color)
+
+***
+
+### content?
+
+> `optional` **content**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2813](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2813)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`content`](CardProps.md#content)
+
+***
+
+### contentEditable?
+
+> `optional` **contentEditable**: `Booleanish` \| `"inherit"` \| `"plaintext-only"`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2789](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2789)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`contentEditable`](CardProps.md#contenteditable)
+
+***
+
+### contextMenu?
+
+> `optional` **contextMenu**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2790](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2790)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`contextMenu`](CardProps.md#contextmenu)
+
+***
+
+### dangerouslySetInnerHTML?
+
+> `optional` **dangerouslySetInnerHTML**: `object`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2260](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2260)
+
+#### \_\_html
+
+> **\_\_html**: `string` \| `TrustedHTML`
+
+#### Inherited from
+
+`Omit.dangerouslySetInnerHTML`
+
+***
+
+### datatype?
+
+> `optional` **datatype**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2814](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2814)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`datatype`](CardProps.md#datatype)
+
+***
+
+### defaultChecked?
+
+> `optional` **defaultChecked**: `boolean`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2779](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2779)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`defaultChecked`](CardProps.md#defaultchecked)
+
+***
+
+### defaultValue?
+
+> `optional` **defaultValue**: `string` \| `number` \| readonly `string`[]
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2780](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2780)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`defaultValue`](CardProps.md#defaultvalue)
+
+***
+
+### dir?
+
+> `optional` **dir**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2791](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2791)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`dir`](CardProps.md#dir)
+
+***
+
+### disabled?
+
+> `optional` **disabled**: `boolean`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3275](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3275)
+
+#### Inherited from
+
+`Omit.disabled`
+
+***
+
+### draggable?
+
+> `optional` **draggable**: `Booleanish`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2792](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2792)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`draggable`](CardProps.md#draggable)
+
+***
+
+### enterKeyHint?
+
+> `optional` **enterKeyHint**: `"search"` \| `"enter"` \| `"done"` \| `"go"` \| `"next"` \| `"previous"` \| `"send"`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2793](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2793)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`enterKeyHint`](CardProps.md#enterkeyhint)
+
+***
+
+### exportparts?
+
+> `optional` **exportparts**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2860](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2860)
+
+#### See
+
+[https://developer.mozilla.org/en-US/docs/Web/HTML/Global\_attributes/exportparts](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/exportparts)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`exportparts`](CardProps.md#exportparts)
+
+***
+
+### form?
+
+> `optional` **form**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3276](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3276)
+
+#### Inherited from
+
+`Omit.form`
+
+***
+
+### formAction?
+
+> `optional` **formAction**: `string` \| (`formData`) => `void` \| `Promise`\<`void`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3277](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3277)
+
+#### Inherited from
+
+`Omit.formAction`
+
+***
+
+### formEncType?
+
+> `optional` **formEncType**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3284](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3284)
+
+#### Inherited from
+
+`Omit.formEncType`
+
+***
+
+### formMethod?
+
+> `optional` **formMethod**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3285](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3285)
+
+#### Inherited from
+
+`Omit.formMethod`
+
+***
+
+### formNoValidate?
+
+> `optional` **formNoValidate**: `boolean`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3286](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3286)
+
+#### Inherited from
+
+`Omit.formNoValidate`
+
+***
+
+### formTarget?
+
+> `optional` **formTarget**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3287](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3287)
+
+#### Inherited from
+
+`Omit.formTarget`
+
+***
+
+### height?
+
+> `optional` **height**: `string` \| `number`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3288](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3288)
+
+#### Inherited from
+
+`Omit.height`
+
+***
+
+### hidden?
+
+> `optional` **hidden**: `boolean`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2794](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2794)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`hidden`](CardProps.md#hidden)
+
+***
+
+### id?
+
+> `optional` **id**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2795](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2795)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`id`](CardProps.md#id)
+
+***
+
+### inert?
+
+> `optional` **inert**: `boolean`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2846](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2846)
+
+#### See
+
+[https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/inert](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/inert)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`inert`](CardProps.md#inert)
+
+***
+
+### inlist?
+
+> `optional` **inlist**: `any`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2815](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2815)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`inlist`](CardProps.md#inlist)
+
+***
+
+### inputMode?
+
+> `optional` **inputMode**: `"search"` \| `"text"` \| `"none"` \| `"tel"` \| `"url"` \| `"email"` \| `"numeric"` \| `"decimal"`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2851](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2851)
+
+Hints at the type of data that might be entered by the user while editing the element or its contents
+
+#### See
+
+[https://html.spec.whatwg.org/multipage/interaction.html#input-modalities:-the-inputmode-attribute](https://html.spec.whatwg.org/multipage/interaction.html#input-modalities:-the-inputmode-attribute)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`inputMode`](CardProps.md#inputmode)
+
+***
+
+### is?
+
+> `optional` **is**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2856](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2856)
+
+Specify that a standard HTML element should behave like a defined custom built-in element
+
+#### See
+
+[https://html.spec.whatwg.org/multipage/custom-elements.html#attr-is](https://html.spec.whatwg.org/multipage/custom-elements.html#attr-is)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`is`](CardProps.md#is)
+
+***
+
+### itemID?
+
+> `optional` **itemID**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2831](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2831)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`itemID`](CardProps.md#itemid)
+
+***
+
+### itemProp?
+
+> `optional` **itemProp**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2828](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2828)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`itemProp`](CardProps.md#itemprop)
+
+***
+
+### itemRef?
+
+> `optional` **itemRef**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2832](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2832)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`itemRef`](CardProps.md#itemref)
+
+***
+
+### itemScope?
+
+> `optional` **itemScope**: `boolean`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2829](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2829)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`itemScope`](CardProps.md#itemscope)
+
+***
+
+### itemType?
+
+> `optional` **itemType**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2830](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2830)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`itemType`](CardProps.md#itemtype)
+
+***
+
+### key?
+
+> `optional` **key**: `Key` \| `null`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:251](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L251)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`key`](CardProps.md#key)
+
+***
+
+### lang?
+
+> `optional` **lang**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2796](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2796)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`lang`](CardProps.md#lang)
+
+***
+
+### list?
+
+> `optional` **list**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3289](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3289)
+
+#### Inherited from
+
+`Omit.list`
+
+***
+
+### max?
+
+> `optional` **max**: `string` \| `number`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3290](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3290)
+
+#### Inherited from
+
+`Omit.max`
+
+***
+
+### maxLength?
+
+> `optional` **maxLength**: `number`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3291](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3291)
+
+#### Inherited from
+
+`Omit.maxLength`
+
+***
+
+### min?
+
+> `optional` **min**: `string` \| `number`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3292](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3292)
+
+#### Inherited from
+
+`Omit.min`
+
+***
+
+### minLength?
+
+> `optional` **minLength**: `number`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3293](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3293)
+
+#### Inherited from
+
+`Omit.minLength`
+
+***
+
+### multiple?
+
+> `optional` **multiple**: `boolean`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3294](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3294)
+
+#### Inherited from
+
+`Omit.multiple`
+
+***
+
+### name?
+
+> `optional` **name**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3295](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3295)
+
+#### Inherited from
+
+`Omit.name`
+
+***
+
+### nonce?
+
+> `optional` **nonce**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2797](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2797)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`nonce`](CardProps.md#nonce)
+
+***
+
+### onAbort?
+
+> `optional` **onAbort**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2319](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2319)
+
+#### Inherited from
+
+`Omit.onAbort`
+
+***
+
+### onAbortCapture?
+
+> `optional` **onAbortCapture**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2320](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2320)
+
+#### Inherited from
+
+`Omit.onAbortCapture`
+
+***
+
+### onAnimationEnd?
+
+> `optional` **onAnimationEnd**: `AnimationEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2449](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2449)
+
+#### Inherited from
+
+`Omit.onAnimationEnd`
+
+***
+
+### onAnimationEndCapture?
+
+> `optional` **onAnimationEndCapture**: `AnimationEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2450](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2450)
+
+#### Inherited from
+
+`Omit.onAnimationEndCapture`
+
+***
+
+### onAnimationIteration?
+
+> `optional` **onAnimationIteration**: `AnimationEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2451](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2451)
+
+#### Inherited from
+
+`Omit.onAnimationIteration`
+
+***
+
+### onAnimationIterationCapture?
+
+> `optional` **onAnimationIterationCapture**: `AnimationEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2452](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2452)
+
+#### Inherited from
+
+`Omit.onAnimationIterationCapture`
+
+***
+
+### onAnimationStart?
+
+> `optional` **onAnimationStart**: `AnimationEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2447](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2447)
+
+#### Inherited from
+
+`Omit.onAnimationStart`
+
+***
+
+### onAnimationStartCapture?
+
+> `optional` **onAnimationStartCapture**: `AnimationEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2448](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2448)
+
+#### Inherited from
+
+`Omit.onAnimationStartCapture`
+
+***
+
+### onAuxClick?
+
+> `optional` **onAuxClick**: `MouseEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2365](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2365)
+
+#### Inherited from
+
+`Omit.onAuxClick`
+
+***
+
+### onAuxClickCapture?
+
+> `optional` **onAuxClickCapture**: `MouseEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2366](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2366)
+
+#### Inherited from
+
+`Omit.onAuxClickCapture`
+
+***
+
+### onBeforeInput?
+
+> `optional` **onBeforeInput**: `InputEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2291](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2291)
+
+#### Inherited from
+
+`Omit.onBeforeInput`
+
+***
+
+### onBeforeInputCapture?
+
+> `optional` **onBeforeInputCapture**: `InputEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2292](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2292)
+
+#### Inherited from
+
+`Omit.onBeforeInputCapture`
+
+***
+
+### onBeforeToggle?
+
+> `optional` **onBeforeToggle**: `ToggleEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2456](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2456)
+
+#### Inherited from
+
+`Omit.onBeforeToggle`
+
+***
+
+### onBlur?
+
+> `optional` **onBlur**: `FocusEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2285](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2285)
+
+#### Inherited from
+
+`Omit.onBlur`
+
+***
+
+### onBlurCapture?
+
+> `optional` **onBlurCapture**: `FocusEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2286](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2286)
+
+#### Inherited from
+
+`Omit.onBlurCapture`
+
+***
+
+### onCanPlay?
+
+> `optional` **onCanPlay**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2321](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2321)
+
+#### Inherited from
+
+`Omit.onCanPlay`
+
+***
+
+### onCanPlayCapture?
+
+> `optional` **onCanPlayCapture**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2322](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2322)
+
+#### Inherited from
+
+`Omit.onCanPlayCapture`
+
+***
+
+### onCanPlayThrough?
+
+> `optional` **onCanPlayThrough**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2323](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2323)
+
+#### Inherited from
+
+`Omit.onCanPlayThrough`
+
+***
+
+### onCanPlayThroughCapture?
+
+> `optional` **onCanPlayThroughCapture**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2324](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2324)
+
+#### Inherited from
+
+`Omit.onCanPlayThroughCapture`
+
+***
+
+### onChange()?
+
+> `optional` **onChange**: (`value`) => `void`
+
+Defined in: [packages/ui/src/base/inputs/number-input.tsx:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/number-input.tsx#L6)
+
+#### Parameters
+
+##### value
+
+`number`
+
+#### Returns
+
+`void`
+
+***
+
+### onChangeCapture?
+
+> `optional` **onChangeCapture**: `ChangeEventHandler`\<`HTMLInputElement`, `Element`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2290](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2290)
+
+#### Inherited from
+
+`Omit.onChangeCapture`
+
+***
+
+### onClick?
+
+> `optional` **onClick**: `MouseEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2367](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2367)
+
+#### Inherited from
+
+`Omit.onClick`
+
+***
+
+### onClickCapture?
+
+> `optional` **onClickCapture**: `MouseEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2368](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2368)
+
+#### Inherited from
+
+`Omit.onClickCapture`
+
+***
+
+### onCompositionEnd?
+
+> `optional` **onCompositionEnd**: `CompositionEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2275](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2275)
+
+#### Inherited from
+
+`Omit.onCompositionEnd`
+
+***
+
+### onCompositionEndCapture?
+
+> `optional` **onCompositionEndCapture**: `CompositionEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2276](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2276)
+
+#### Inherited from
+
+`Omit.onCompositionEndCapture`
+
+***
+
+### onCompositionStart?
+
+> `optional` **onCompositionStart**: `CompositionEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2277](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2277)
+
+#### Inherited from
+
+`Omit.onCompositionStart`
+
+***
+
+### onCompositionStartCapture?
+
+> `optional` **onCompositionStartCapture**: `CompositionEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2278](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2278)
+
+#### Inherited from
+
+`Omit.onCompositionStartCapture`
+
+***
+
+### onCompositionUpdate?
+
+> `optional` **onCompositionUpdate**: `CompositionEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2279](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2279)
+
+#### Inherited from
+
+`Omit.onCompositionUpdate`
+
+***
+
+### onCompositionUpdateCapture?
+
+> `optional` **onCompositionUpdateCapture**: `CompositionEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2280](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2280)
+
+#### Inherited from
+
+`Omit.onCompositionUpdateCapture`
+
+***
+
+### onContextMenu?
+
+> `optional` **onContextMenu**: `MouseEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2369](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2369)
+
+#### Inherited from
+
+`Omit.onContextMenu`
+
+***
+
+### onContextMenuCapture?
+
+> `optional` **onContextMenuCapture**: `MouseEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2370](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2370)
+
+#### Inherited from
+
+`Omit.onContextMenuCapture`
+
+***
+
+### onCopy?
+
+> `optional` **onCopy**: `ClipboardEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2267](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2267)
+
+#### Inherited from
+
+`Omit.onCopy`
+
+***
+
+### onCopyCapture?
+
+> `optional` **onCopyCapture**: `ClipboardEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2268](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2268)
+
+#### Inherited from
+
+`Omit.onCopyCapture`
+
+***
+
+### onCut?
+
+> `optional` **onCut**: `ClipboardEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2269](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2269)
+
+#### Inherited from
+
+`Omit.onCut`
+
+***
+
+### onCutCapture?
+
+> `optional` **onCutCapture**: `ClipboardEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2270](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2270)
+
+#### Inherited from
+
+`Omit.onCutCapture`
+
+***
+
+### onDoubleClick?
+
+> `optional` **onDoubleClick**: `MouseEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2371](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2371)
+
+#### Inherited from
+
+`Omit.onDoubleClick`
+
+***
+
+### onDoubleClickCapture?
+
+> `optional` **onDoubleClickCapture**: `MouseEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2372](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2372)
+
+#### Inherited from
+
+`Omit.onDoubleClickCapture`
+
+***
+
+### onDrag?
+
+> `optional` **onDrag**: `DragEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2373](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2373)
+
+#### Inherited from
+
+`Omit.onDrag`
+
+***
+
+### onDragCapture?
+
+> `optional` **onDragCapture**: `DragEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2374](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2374)
+
+#### Inherited from
+
+`Omit.onDragCapture`
+
+***
+
+### onDragEnd?
+
+> `optional` **onDragEnd**: `DragEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2375](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2375)
+
+#### Inherited from
+
+`Omit.onDragEnd`
+
+***
+
+### onDragEndCapture?
+
+> `optional` **onDragEndCapture**: `DragEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2376](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2376)
+
+#### Inherited from
+
+`Omit.onDragEndCapture`
+
+***
+
+### onDragEnter?
+
+> `optional` **onDragEnter**: `DragEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2377](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2377)
+
+#### Inherited from
+
+`Omit.onDragEnter`
+
+***
+
+### onDragEnterCapture?
+
+> `optional` **onDragEnterCapture**: `DragEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2378](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2378)
+
+#### Inherited from
+
+`Omit.onDragEnterCapture`
+
+***
+
+### onDragExit?
+
+> `optional` **onDragExit**: `DragEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2379](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2379)
+
+#### Inherited from
+
+`Omit.onDragExit`
+
+***
+
+### onDragExitCapture?
+
+> `optional` **onDragExitCapture**: `DragEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2380](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2380)
+
+#### Inherited from
+
+`Omit.onDragExitCapture`
+
+***
+
+### onDragLeave?
+
+> `optional` **onDragLeave**: `DragEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2381](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2381)
+
+#### Inherited from
+
+`Omit.onDragLeave`
+
+***
+
+### onDragLeaveCapture?
+
+> `optional` **onDragLeaveCapture**: `DragEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2382](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2382)
+
+#### Inherited from
+
+`Omit.onDragLeaveCapture`
+
+***
+
+### onDragOver?
+
+> `optional` **onDragOver**: `DragEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2383](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2383)
+
+#### Inherited from
+
+`Omit.onDragOver`
+
+***
+
+### onDragOverCapture?
+
+> `optional` **onDragOverCapture**: `DragEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2384](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2384)
+
+#### Inherited from
+
+`Omit.onDragOverCapture`
+
+***
+
+### onDragStart?
+
+> `optional` **onDragStart**: `DragEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2385](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2385)
+
+#### Inherited from
+
+`Omit.onDragStart`
+
+***
+
+### onDragStartCapture?
+
+> `optional` **onDragStartCapture**: `DragEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2386](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2386)
+
+#### Inherited from
+
+`Omit.onDragStartCapture`
+
+***
+
+### onDrop?
+
+> `optional` **onDrop**: `DragEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2387](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2387)
+
+#### Inherited from
+
+`Omit.onDrop`
+
+***
+
+### onDropCapture?
+
+> `optional` **onDropCapture**: `DragEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2388](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2388)
+
+#### Inherited from
+
+`Omit.onDropCapture`
+
+***
+
+### onDurationChange?
+
+> `optional` **onDurationChange**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2325](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2325)
+
+#### Inherited from
+
+`Omit.onDurationChange`
+
+***
+
+### onDurationChangeCapture?
+
+> `optional` **onDurationChangeCapture**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2326](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2326)
+
+#### Inherited from
+
+`Omit.onDurationChangeCapture`
+
+***
+
+### onEmptied?
+
+> `optional` **onEmptied**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2327](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2327)
+
+#### Inherited from
+
+`Omit.onEmptied`
+
+***
+
+### onEmptiedCapture?
+
+> `optional` **onEmptiedCapture**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2328](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2328)
+
+#### Inherited from
+
+`Omit.onEmptiedCapture`
+
+***
+
+### onEncrypted?
+
+> `optional` **onEncrypted**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2329](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2329)
+
+#### Inherited from
+
+`Omit.onEncrypted`
+
+***
+
+### onEncryptedCapture?
+
+> `optional` **onEncryptedCapture**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2330](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2330)
+
+#### Inherited from
+
+`Omit.onEncryptedCapture`
+
+***
+
+### onEnded?
+
+> `optional` **onEnded**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2331](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2331)
+
+#### Inherited from
+
+`Omit.onEnded`
+
+***
+
+### onEndedCapture?
+
+> `optional` **onEndedCapture**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2332](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2332)
+
+#### Inherited from
+
+`Omit.onEndedCapture`
+
+***
+
+### onError?
+
+> `optional` **onError**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2305](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2305)
+
+#### Inherited from
+
+`Omit.onError`
+
+***
+
+### onErrorCapture?
+
+> `optional` **onErrorCapture**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2306](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2306)
+
+#### Inherited from
+
+`Omit.onErrorCapture`
+
+***
+
+### onFocus?
+
+> `optional` **onFocus**: `FocusEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2283](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2283)
+
+#### Inherited from
+
+`Omit.onFocus`
+
+***
+
+### onFocusCapture?
+
+> `optional` **onFocusCapture**: `FocusEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2284](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2284)
+
+#### Inherited from
+
+`Omit.onFocusCapture`
+
+***
+
+### onGotPointerCapture?
+
+> `optional` **onGotPointerCapture**: `PointerEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2431](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2431)
+
+#### Inherited from
+
+`Omit.onGotPointerCapture`
+
+***
+
+### onGotPointerCaptureCapture?
+
+> `optional` **onGotPointerCaptureCapture**: `PointerEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2432](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2432)
+
+#### Inherited from
+
+`Omit.onGotPointerCaptureCapture`
+
+***
+
+### onInput?
+
+> `optional` **onInput**: `InputEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2293](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2293)
+
+#### Inherited from
+
+`Omit.onInput`
+
+***
+
+### onInputCapture?
+
+> `optional` **onInputCapture**: `InputEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2294](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2294)
+
+#### Inherited from
+
+`Omit.onInputCapture`
+
+***
+
+### onInvalid?
+
+> `optional` **onInvalid**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2299](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2299)
+
+#### Inherited from
+
+`Omit.onInvalid`
+
+***
+
+### onInvalidCapture?
+
+> `optional` **onInvalidCapture**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2300](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2300)
+
+#### Inherited from
+
+`Omit.onInvalidCapture`
+
+***
+
+### onKeyDown?
+
+> `optional` **onKeyDown**: `KeyboardEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2309](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2309)
+
+#### Inherited from
+
+`Omit.onKeyDown`
+
+***
+
+### onKeyDownCapture?
+
+> `optional` **onKeyDownCapture**: `KeyboardEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2310](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2310)
+
+#### Inherited from
+
+`Omit.onKeyDownCapture`
+
+***
+
+### ~~onKeyPress?~~
+
+> `optional` **onKeyPress**: `KeyboardEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2312](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2312)
+
+#### Deprecated
+
+Use `onKeyUp` or `onKeyDown` instead
+
+#### Inherited from
+
+`Omit.onKeyPress`
+
+***
+
+### ~~onKeyPressCapture?~~
+
+> `optional` **onKeyPressCapture**: `KeyboardEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2314](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2314)
+
+#### Deprecated
+
+Use `onKeyUpCapture` or `onKeyDownCapture` instead
+
+#### Inherited from
+
+`Omit.onKeyPressCapture`
+
+***
+
+### onKeyUp?
+
+> `optional` **onKeyUp**: `KeyboardEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2315](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2315)
+
+#### Inherited from
+
+`Omit.onKeyUp`
+
+***
+
+### onKeyUpCapture?
+
+> `optional` **onKeyUpCapture**: `KeyboardEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2316](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2316)
+
+#### Inherited from
+
+`Omit.onKeyUpCapture`
+
+***
+
+### onLoad?
+
+> `optional` **onLoad**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2303](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2303)
+
+#### Inherited from
+
+`Omit.onLoad`
+
+***
+
+### onLoadCapture?
+
+> `optional` **onLoadCapture**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2304](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2304)
+
+#### Inherited from
+
+`Omit.onLoadCapture`
+
+***
+
+### onLoadedData?
+
+> `optional` **onLoadedData**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2333](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2333)
+
+#### Inherited from
+
+`Omit.onLoadedData`
+
+***
+
+### onLoadedDataCapture?
+
+> `optional` **onLoadedDataCapture**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2334](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2334)
+
+#### Inherited from
+
+`Omit.onLoadedDataCapture`
+
+***
+
+### onLoadedMetadata?
+
+> `optional` **onLoadedMetadata**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2335](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2335)
+
+#### Inherited from
+
+`Omit.onLoadedMetadata`
+
+***
+
+### onLoadedMetadataCapture?
+
+> `optional` **onLoadedMetadataCapture**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2336](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2336)
+
+#### Inherited from
+
+`Omit.onLoadedMetadataCapture`
+
+***
+
+### onLoadStart?
+
+> `optional` **onLoadStart**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2337](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2337)
+
+#### Inherited from
+
+`Omit.onLoadStart`
+
+***
+
+### onLoadStartCapture?
+
+> `optional` **onLoadStartCapture**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2338](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2338)
+
+#### Inherited from
+
+`Omit.onLoadStartCapture`
+
+***
+
+### onLostPointerCapture?
+
+> `optional` **onLostPointerCapture**: `PointerEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2433](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2433)
+
+#### Inherited from
+
+`Omit.onLostPointerCapture`
+
+***
+
+### onLostPointerCaptureCapture?
+
+> `optional` **onLostPointerCaptureCapture**: `PointerEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2434](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2434)
+
+#### Inherited from
+
+`Omit.onLostPointerCaptureCapture`
+
+***
+
+### onMouseDown?
+
+> `optional` **onMouseDown**: `MouseEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2389](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2389)
+
+#### Inherited from
+
+`Omit.onMouseDown`
+
+***
+
+### onMouseDownCapture?
+
+> `optional` **onMouseDownCapture**: `MouseEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2390](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2390)
+
+#### Inherited from
+
+`Omit.onMouseDownCapture`
+
+***
+
+### onMouseEnter?
+
+> `optional` **onMouseEnter**: `MouseEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2391](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2391)
+
+#### Inherited from
+
+`Omit.onMouseEnter`
+
+***
+
+### onMouseLeave?
+
+> `optional` **onMouseLeave**: `MouseEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2392](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2392)
+
+#### Inherited from
+
+`Omit.onMouseLeave`
+
+***
+
+### onMouseMove?
+
+> `optional` **onMouseMove**: `MouseEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2393](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2393)
+
+#### Inherited from
+
+`Omit.onMouseMove`
+
+***
+
+### onMouseMoveCapture?
+
+> `optional` **onMouseMoveCapture**: `MouseEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2394](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2394)
+
+#### Inherited from
+
+`Omit.onMouseMoveCapture`
+
+***
+
+### onMouseOut?
+
+> `optional` **onMouseOut**: `MouseEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2395](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2395)
+
+#### Inherited from
+
+`Omit.onMouseOut`
+
+***
+
+### onMouseOutCapture?
+
+> `optional` **onMouseOutCapture**: `MouseEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2396](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2396)
+
+#### Inherited from
+
+`Omit.onMouseOutCapture`
+
+***
+
+### onMouseOver?
+
+> `optional` **onMouseOver**: `MouseEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2397](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2397)
+
+#### Inherited from
+
+`Omit.onMouseOver`
+
+***
+
+### onMouseOverCapture?
+
+> `optional` **onMouseOverCapture**: `MouseEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2398](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2398)
+
+#### Inherited from
+
+`Omit.onMouseOverCapture`
+
+***
+
+### onMouseUp?
+
+> `optional` **onMouseUp**: `MouseEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2399](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2399)
+
+#### Inherited from
+
+`Omit.onMouseUp`
+
+***
+
+### onMouseUpCapture?
+
+> `optional` **onMouseUpCapture**: `MouseEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2400](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2400)
+
+#### Inherited from
+
+`Omit.onMouseUpCapture`
+
+***
+
+### onPaste?
+
+> `optional` **onPaste**: `ClipboardEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2271](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2271)
+
+#### Inherited from
+
+`Omit.onPaste`
+
+***
+
+### onPasteCapture?
+
+> `optional` **onPasteCapture**: `ClipboardEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2272](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2272)
+
+#### Inherited from
+
+`Omit.onPasteCapture`
+
+***
+
+### onPause?
+
+> `optional` **onPause**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2339](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2339)
+
+#### Inherited from
+
+`Omit.onPause`
+
+***
+
+### onPauseCapture?
+
+> `optional` **onPauseCapture**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2340](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2340)
+
+#### Inherited from
+
+`Omit.onPauseCapture`
+
+***
+
+### onPlay?
+
+> `optional` **onPlay**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2341](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2341)
+
+#### Inherited from
+
+`Omit.onPlay`
+
+***
+
+### onPlayCapture?
+
+> `optional` **onPlayCapture**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2342](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2342)
+
+#### Inherited from
+
+`Omit.onPlayCapture`
+
+***
+
+### onPlaying?
+
+> `optional` **onPlaying**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2343](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2343)
+
+#### Inherited from
+
+`Omit.onPlaying`
+
+***
+
+### onPlayingCapture?
+
+> `optional` **onPlayingCapture**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2344](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2344)
+
+#### Inherited from
+
+`Omit.onPlayingCapture`
+
+***
+
+### onPointerCancel?
+
+> `optional` **onPointerCancel**: `PointerEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2423](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2423)
+
+#### Inherited from
+
+`Omit.onPointerCancel`
+
+***
+
+### onPointerCancelCapture?
+
+> `optional` **onPointerCancelCapture**: `PointerEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2424](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2424)
+
+#### Inherited from
+
+`Omit.onPointerCancelCapture`
+
+***
+
+### onPointerDown?
+
+> `optional` **onPointerDown**: `PointerEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2417](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2417)
+
+#### Inherited from
+
+`Omit.onPointerDown`
+
+***
+
+### onPointerDownCapture?
+
+> `optional` **onPointerDownCapture**: `PointerEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2418](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2418)
+
+#### Inherited from
+
+`Omit.onPointerDownCapture`
+
+***
+
+### onPointerEnter?
+
+> `optional` **onPointerEnter**: `PointerEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2425](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2425)
+
+#### Inherited from
+
+`Omit.onPointerEnter`
+
+***
+
+### onPointerLeave?
+
+> `optional` **onPointerLeave**: `PointerEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2426](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2426)
+
+#### Inherited from
+
+`Omit.onPointerLeave`
+
+***
+
+### onPointerMove?
+
+> `optional` **onPointerMove**: `PointerEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2419](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2419)
+
+#### Inherited from
+
+`Omit.onPointerMove`
+
+***
+
+### onPointerMoveCapture?
+
+> `optional` **onPointerMoveCapture**: `PointerEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2420](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2420)
+
+#### Inherited from
+
+`Omit.onPointerMoveCapture`
+
+***
+
+### onPointerOut?
+
+> `optional` **onPointerOut**: `PointerEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2429](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2429)
+
+#### Inherited from
+
+`Omit.onPointerOut`
+
+***
+
+### onPointerOutCapture?
+
+> `optional` **onPointerOutCapture**: `PointerEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2430](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2430)
+
+#### Inherited from
+
+`Omit.onPointerOutCapture`
+
+***
+
+### onPointerOver?
+
+> `optional` **onPointerOver**: `PointerEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2427](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2427)
+
+#### Inherited from
+
+`Omit.onPointerOver`
+
+***
+
+### onPointerOverCapture?
+
+> `optional` **onPointerOverCapture**: `PointerEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2428](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2428)
+
+#### Inherited from
+
+`Omit.onPointerOverCapture`
+
+***
+
+### onPointerUp?
+
+> `optional` **onPointerUp**: `PointerEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2421](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2421)
+
+#### Inherited from
+
+`Omit.onPointerUp`
+
+***
+
+### onPointerUpCapture?
+
+> `optional` **onPointerUpCapture**: `PointerEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2422](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2422)
+
+#### Inherited from
+
+`Omit.onPointerUpCapture`
+
+***
+
+### onProgress?
+
+> `optional` **onProgress**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2345](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2345)
+
+#### Inherited from
+
+`Omit.onProgress`
+
+***
+
+### onProgressCapture?
+
+> `optional` **onProgressCapture**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2346](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2346)
+
+#### Inherited from
+
+`Omit.onProgressCapture`
+
+***
+
+### onRateChange?
+
+> `optional` **onRateChange**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2347](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2347)
+
+#### Inherited from
+
+`Omit.onRateChange`
+
+***
+
+### onRateChangeCapture?
+
+> `optional` **onRateChangeCapture**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2348](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2348)
+
+#### Inherited from
+
+`Omit.onRateChangeCapture`
+
+***
+
+### onReset?
+
+> `optional` **onReset**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2295](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2295)
+
+#### Inherited from
+
+`Omit.onReset`
+
+***
+
+### onResetCapture?
+
+> `optional` **onResetCapture**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2296](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2296)
+
+#### Inherited from
+
+`Omit.onResetCapture`
+
+***
+
+### onScroll?
+
+> `optional` **onScroll**: `UIEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2437](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2437)
+
+#### Inherited from
+
+`Omit.onScroll`
+
+***
+
+### onScrollCapture?
+
+> `optional` **onScrollCapture**: `UIEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2438](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2438)
+
+#### Inherited from
+
+`Omit.onScrollCapture`
+
+***
+
+### onScrollEnd?
+
+> `optional` **onScrollEnd**: `UIEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2439](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2439)
+
+#### Inherited from
+
+`Omit.onScrollEnd`
+
+***
+
+### onScrollEndCapture?
+
+> `optional` **onScrollEndCapture**: `UIEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2440](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2440)
+
+#### Inherited from
+
+`Omit.onScrollEndCapture`
+
+***
+
+### onSeeked?
+
+> `optional` **onSeeked**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2349](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2349)
+
+#### Inherited from
+
+`Omit.onSeeked`
+
+***
+
+### onSeekedCapture?
+
+> `optional` **onSeekedCapture**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2350](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2350)
+
+#### Inherited from
+
+`Omit.onSeekedCapture`
+
+***
+
+### onSeeking?
+
+> `optional` **onSeeking**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2351](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2351)
+
+#### Inherited from
+
+`Omit.onSeeking`
+
+***
+
+### onSeekingCapture?
+
+> `optional` **onSeekingCapture**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2352](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2352)
+
+#### Inherited from
+
+`Omit.onSeekingCapture`
+
+***
+
+### onSelect?
+
+> `optional` **onSelect**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2403](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2403)
+
+#### Inherited from
+
+`Omit.onSelect`
+
+***
+
+### onSelectCapture?
+
+> `optional` **onSelectCapture**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2404](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2404)
+
+#### Inherited from
+
+`Omit.onSelectCapture`
+
+***
+
+### onStalled?
+
+> `optional` **onStalled**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2353](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2353)
+
+#### Inherited from
+
+`Omit.onStalled`
+
+***
+
+### onStalledCapture?
+
+> `optional` **onStalledCapture**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2354](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2354)
+
+#### Inherited from
+
+`Omit.onStalledCapture`
+
+***
+
+### onSubmit?
+
+> `optional` **onSubmit**: `SubmitEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2297](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2297)
+
+#### Inherited from
+
+`Omit.onSubmit`
+
+***
+
+### onSubmitCapture?
+
+> `optional` **onSubmitCapture**: `SubmitEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2298](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2298)
+
+#### Inherited from
+
+`Omit.onSubmitCapture`
+
+***
+
+### onSuspend?
+
+> `optional` **onSuspend**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2355](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2355)
+
+#### Inherited from
+
+`Omit.onSuspend`
+
+***
+
+### onSuspendCapture?
+
+> `optional` **onSuspendCapture**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2356](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2356)
+
+#### Inherited from
+
+`Omit.onSuspendCapture`
+
+***
+
+### onTimeUpdate?
+
+> `optional` **onTimeUpdate**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2357](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2357)
+
+#### Inherited from
+
+`Omit.onTimeUpdate`
+
+***
+
+### onTimeUpdateCapture?
+
+> `optional` **onTimeUpdateCapture**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2358](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2358)
+
+#### Inherited from
+
+`Omit.onTimeUpdateCapture`
+
+***
+
+### onToggle?
+
+> `optional` **onToggle**: `ToggleEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2455](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2455)
+
+#### Inherited from
+
+`Omit.onToggle`
+
+***
+
+### onTouchCancel?
+
+> `optional` **onTouchCancel**: `TouchEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2407](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2407)
+
+#### Inherited from
+
+`Omit.onTouchCancel`
+
+***
+
+### onTouchCancelCapture?
+
+> `optional` **onTouchCancelCapture**: `TouchEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2408](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2408)
+
+#### Inherited from
+
+`Omit.onTouchCancelCapture`
+
+***
+
+### onTouchEnd?
+
+> `optional` **onTouchEnd**: `TouchEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2409](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2409)
+
+#### Inherited from
+
+`Omit.onTouchEnd`
+
+***
+
+### onTouchEndCapture?
+
+> `optional` **onTouchEndCapture**: `TouchEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2410](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2410)
+
+#### Inherited from
+
+`Omit.onTouchEndCapture`
+
+***
+
+### onTouchMove?
+
+> `optional` **onTouchMove**: `TouchEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2411](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2411)
+
+#### Inherited from
+
+`Omit.onTouchMove`
+
+***
+
+### onTouchMoveCapture?
+
+> `optional` **onTouchMoveCapture**: `TouchEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2412](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2412)
+
+#### Inherited from
+
+`Omit.onTouchMoveCapture`
+
+***
+
+### onTouchStart?
+
+> `optional` **onTouchStart**: `TouchEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2413](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2413)
+
+#### Inherited from
+
+`Omit.onTouchStart`
+
+***
+
+### onTouchStartCapture?
+
+> `optional` **onTouchStartCapture**: `TouchEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2414](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2414)
+
+#### Inherited from
+
+`Omit.onTouchStartCapture`
+
+***
+
+### onTransitionCancel?
+
+> `optional` **onTransitionCancel**: `TransitionEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2459](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2459)
+
+#### Inherited from
+
+`Omit.onTransitionCancel`
+
+***
+
+### onTransitionCancelCapture?
+
+> `optional` **onTransitionCancelCapture**: `TransitionEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2460](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2460)
+
+#### Inherited from
+
+`Omit.onTransitionCancelCapture`
+
+***
+
+### onTransitionEnd?
+
+> `optional` **onTransitionEnd**: `TransitionEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2461](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2461)
+
+#### Inherited from
+
+`Omit.onTransitionEnd`
+
+***
+
+### onTransitionEndCapture?
+
+> `optional` **onTransitionEndCapture**: `TransitionEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2462](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2462)
+
+#### Inherited from
+
+`Omit.onTransitionEndCapture`
+
+***
+
+### onTransitionRun?
+
+> `optional` **onTransitionRun**: `TransitionEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2463](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2463)
+
+#### Inherited from
+
+`Omit.onTransitionRun`
+
+***
+
+### onTransitionRunCapture?
+
+> `optional` **onTransitionRunCapture**: `TransitionEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2464](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2464)
+
+#### Inherited from
+
+`Omit.onTransitionRunCapture`
+
+***
+
+### onTransitionStart?
+
+> `optional` **onTransitionStart**: `TransitionEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2465](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2465)
+
+#### Inherited from
+
+`Omit.onTransitionStart`
+
+***
+
+### onTransitionStartCapture?
+
+> `optional` **onTransitionStartCapture**: `TransitionEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2466](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2466)
+
+#### Inherited from
+
+`Omit.onTransitionStartCapture`
+
+***
+
+### onVolumeChange?
+
+> `optional` **onVolumeChange**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2359](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2359)
+
+#### Inherited from
+
+`Omit.onVolumeChange`
+
+***
+
+### onVolumeChangeCapture?
+
+> `optional` **onVolumeChangeCapture**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2360](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2360)
+
+#### Inherited from
+
+`Omit.onVolumeChangeCapture`
+
+***
+
+### onWaiting?
+
+> `optional` **onWaiting**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2361](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2361)
+
+#### Inherited from
+
+`Omit.onWaiting`
+
+***
+
+### onWaitingCapture?
+
+> `optional` **onWaitingCapture**: `ReactEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2362](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2362)
+
+#### Inherited from
+
+`Omit.onWaitingCapture`
+
+***
+
+### onWheel?
+
+> `optional` **onWheel**: `WheelEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2443](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2443)
+
+#### Inherited from
+
+`Omit.onWheel`
+
+***
+
+### onWheelCapture?
+
+> `optional` **onWheelCapture**: `WheelEventHandler`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2444](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2444)
+
+#### Inherited from
+
+`Omit.onWheelCapture`
+
+***
+
+### part?
+
+> `optional` **part**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2864](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2864)
+
+#### See
+
+[https://developer.mozilla.org/en-US/docs/Web/HTML/Global\_attributes/part](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/part)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`part`](CardProps.md#part)
+
+***
+
+### pattern?
+
+> `optional` **pattern**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3296](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3296)
+
+#### Inherited from
+
+`Omit.pattern`
+
+***
+
+### placeholder?
+
+> `optional` **placeholder**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3297](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3297)
+
+#### Inherited from
+
+`Omit.placeholder`
+
+***
+
+### popover?
+
+> `optional` **popover**: `""` \| `"auto"` \| `"manual"` \| `"hint"`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2838](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2838)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`popover`](CardProps.md#popover)
+
+***
+
+### popoverTarget?
+
+> `optional` **popoverTarget**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2840](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2840)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`popoverTarget`](CardProps.md#popovertarget)
+
+***
+
+### popoverTargetAction?
+
+> `optional` **popoverTargetAction**: `"toggle"` \| `"show"` \| `"hide"`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2839](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2839)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`popoverTargetAction`](CardProps.md#popovertargetaction)
+
+***
+
+### prefix?
+
+> `optional` **prefix**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2816](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2816)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`prefix`](CardProps.md#prefix)
+
+***
+
+### property?
+
+> `optional` **property**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2817](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2817)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`property`](CardProps.md#property)
+
+***
+
+### radioGroup?
+
+> `optional` **radioGroup**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2806](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2806)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`radioGroup`](CardProps.md#radiogroup)
+
+***
+
+### readOnly?
+
+> `optional` **readOnly**: `boolean`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3298](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3298)
+
+#### Inherited from
+
+`Omit.readOnly`
+
+***
+
+### ref?
+
+> `optional` **ref**: `Ref`\<`HTMLInputElement`\>
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:293](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L293)
+
+Allows getting a ref to the component instance.
+Once the component unmounts, React will set `ref.current` to `null`
+(or call the ref with `null` if you passed a callback ref).
+
+#### See
+
+[React Docs](https://react.dev/learn/referencing-values-with-refs#refs-and-the-dom)
+
+#### Inherited from
+
+`Omit.ref`
+
+***
+
+### rel?
+
+> `optional` **rel**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2818](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2818)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`rel`](CardProps.md#rel)
+
+***
+
+### required?
+
+> `optional` **required**: `boolean`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3299](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3299)
+
+#### Inherited from
+
+`Omit.required`
+
+***
+
+### resource?
+
+> `optional` **resource**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2819](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2819)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`resource`](CardProps.md#resource)
+
+***
+
+### results?
+
+> `optional` **results**: `number`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2833](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2833)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`results`](CardProps.md#results)
+
+***
+
+### rev?
+
+> `optional` **rev**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2820](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2820)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`rev`](CardProps.md#rev)
+
+***
+
+### role?
+
+> `optional` **role**: `AriaRole`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2809](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2809)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`role`](CardProps.md#role)
+
+***
+
+### security?
+
+> `optional` **security**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2834](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2834)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`security`](CardProps.md#security)
+
+***
+
+### size?
+
+> `optional` **size**: `number`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3300](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3300)
+
+#### Inherited from
+
+`Omit.size`
+
+***
+
+### slot?
+
+> `optional` **slot**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2798](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2798)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`slot`](CardProps.md#slot)
+
+***
+
+### spellCheck?
+
+> `optional` **spellCheck**: `Booleanish`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2799](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2799)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`spellCheck`](CardProps.md#spellcheck)
+
+***
+
+### src?
+
+> `optional` **src**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3301](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3301)
+
+#### Inherited from
+
+`Omit.src`
+
+***
+
+### step?
+
+> `optional` **step**: `string` \| `number`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3302](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3302)
+
+#### Inherited from
+
+`Omit.step`
+
+***
+
+### style?
+
+> `optional` **style**: `CSSProperties`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2800](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2800)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`style`](CardProps.md#style)
+
+***
+
+### suppressContentEditableWarning?
+
+> `optional` **suppressContentEditableWarning**: `boolean`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2781](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2781)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`suppressContentEditableWarning`](CardProps.md#suppresscontenteditablewarning)
+
+***
+
+### suppressHydrationWarning?
+
+> `optional` **suppressHydrationWarning**: `boolean`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2782](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2782)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`suppressHydrationWarning`](CardProps.md#suppresshydrationwarning)
+
+***
+
+### tabIndex?
+
+> `optional` **tabIndex**: `number`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2801](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2801)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`tabIndex`](CardProps.md#tabindex)
+
+***
+
+### title?
+
+> `optional` **title**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2802](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2802)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`title`](CardProps.md#title)
+
+***
+
+### translate?
+
+> `optional` **translate**: `"yes"` \| `"no"`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2803](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2803)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`translate`](CardProps.md#translate)
+
+***
+
+### typeof?
+
+> `optional` **typeof**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2821](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2821)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`typeof`](CardProps.md#typeof)
+
+***
+
+### unselectable?
+
+> `optional` **unselectable**: `"off"` \| `"on"`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2835](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2835)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`unselectable`](CardProps.md#unselectable)
+
+***
+
+### value?
+
+> `optional` **value**: `string` \| `number` \| readonly `string`[]
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3304](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3304)
+
+#### Inherited from
+
+`Omit.value`
+
+***
+
+### vocab?
+
+> `optional` **vocab**: `string`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2822](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2822)
+
+#### Inherited from
+
+[`CardProps`](CardProps.md).[`vocab`](CardProps.md#vocab)
+
+***
+
+### width?
+
+> `optional` **width**: `string` \| `number`
+
+Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:3305](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L3305)
+
+#### Inherited from
+
+`Omit.width`

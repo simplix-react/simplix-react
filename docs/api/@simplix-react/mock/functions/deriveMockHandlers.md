@@ -6,9 +6,9 @@
 
 # Function: deriveMockHandlers()
 
-> **deriveMockHandlers**\<`TEntities`, `TOperations`\>(`config`, `mockConfig?`): `HttpHandler`[]
+> **deriveMockHandlers**\<`TEntities`, `TOperations`\>(`config`, `mockConfig?`, `options?`): `HttpHandler`[]
 
-Defined in: [derive-mock-handlers.ts:117](https://github.com/simplix-react/simplix-react/blob/main/derive-mock-handlers.ts#L117)
+Defined in: [derive-mock-handlers.ts:142](https://github.com/simplix-react/simplix-react/blob/main/derive-mock-handlers.ts#L142)
 
 Derives MSW request handlers from an [@simplix-react/contract!ApiContractConfig](../../contract/interfaces/ApiContractConfig.md).
 
@@ -52,6 +52,10 @@ The API contract configuration object.
 `Record`\<`string`, [`MockEntityConfig`](../interfaces/MockEntityConfig.md)\>
 
 Optional per-entity mock configuration keyed by entity name.
+
+### options?
+
+[`MockHandlerOptions`](../interfaces/MockHandlerOptions.md)
 
 ## Returns
 

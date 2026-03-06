@@ -10,7 +10,7 @@
 
 Defined in: [packages/ui/src/fields/form/checkbox-field.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/checkbox-field.tsx#L26)
 
-Checkbox field. Defaults to `labelPosition="left"` for natural layout.
+Checkbox field. Defaults to `layout="left"` for natural layout.
 
 ## Parameters
 

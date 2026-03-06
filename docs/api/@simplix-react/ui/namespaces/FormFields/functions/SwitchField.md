@@ -10,7 +10,7 @@
 
 Defined in: [packages/ui/src/fields/form/switch-field.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/switch-field.tsx#L26)
 
-Toggle switch field. Defaults to `labelPosition="left"` for natural layout.
+Toggle switch field. Defaults to `layout="left"` for natural layout.
 
 ## Parameters
 

@@ -6,7 +6,7 @@
 
 # Interface: SelectComponents
 
-Defined in: [packages/ui/src/provider/types.ts:25](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L25)
+Defined in: [packages/ui/src/provider/types.ts:67](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L67)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/provider/types.ts:25](https://github.com/simplix-re
 
 > **Content**: `ComponentType`\<`SelectContentProps` & `RefAttributes`\<`HTMLDivElement`\>\>
 
-Defined in: [packages/ui/src/provider/types.ts:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L29)
+Defined in: [packages/ui/src/provider/types.ts:71](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L71)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [packages/ui/src/provider/types.ts:29](https://github.com/simplix-re
 
 > **Item**: `ComponentType`\<`SelectItemProps` & `RefAttributes`\<`HTMLDivElement`\>\>
 
-Defined in: [packages/ui/src/provider/types.ts:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L30)
+Defined in: [packages/ui/src/provider/types.ts:72](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L72)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [packages/ui/src/provider/types.ts:30](https://github.com/simplix-re
 
 > **Root**: `ComponentType`\<\{ `children?`: `ReactNode`; `defaultValue?`: `string`; `disabled?`: `boolean`; `onValueChange?`: (`value`) => `void`; `value?`: `string`; \}\>
 
-Defined in: [packages/ui/src/provider/types.ts:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L26)
+Defined in: [packages/ui/src/provider/types.ts:68](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L68)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [packages/ui/src/provider/types.ts:26](https://github.com/simplix-re
 
 > **Trigger**: `ComponentType`\<`SelectTriggerProps` & `RefAttributes`\<`HTMLButtonElement`\>\>
 
-Defined in: [packages/ui/src/provider/types.ts:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L27)
+Defined in: [packages/ui/src/provider/types.ts:69](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L69)
 
 ***
 
@@ -46,4 +46,4 @@ Defined in: [packages/ui/src/provider/types.ts:27](https://github.com/simplix-re
 
 > **Value**: `ComponentType`\<\{ `placeholder?`: `string`; \}\>
 
-Defined in: [packages/ui/src/provider/types.ts:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L28)
+Defined in: [packages/ui/src/provider/types.ts:70](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L70)

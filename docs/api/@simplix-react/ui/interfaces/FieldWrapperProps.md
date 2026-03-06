@@ -6,7 +6,7 @@
 
 # Interface: FieldWrapperProps
 
-Defined in: [packages/ui/src/fields/shared/field-wrapper.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/field-wrapper.tsx#L28)
+Defined in: [packages/ui/src/fields/shared/field-wrapper.tsx:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/field-wrapper.tsx#L29)
 
 Props for the [FieldWrapper](../functions/FieldWrapper.md) component.
 
@@ -20,7 +20,7 @@ Props for the [FieldWrapper](../functions/FieldWrapper.md) component.
 
 > **children**: `ReactNode`
 
-Defined in: [packages/ui/src/fields/shared/field-wrapper.tsx:42](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/field-wrapper.tsx#L42)
+Defined in: [packages/ui/src/fields/shared/field-wrapper.tsx:43](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/field-wrapper.tsx#L43)
 
 ***
 
@@ -28,7 +28,7 @@ Defined in: [packages/ui/src/fields/shared/field-wrapper.tsx:42](https://github.
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/fields/shared/field-wrapper.tsx:41](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/field-wrapper.tsx#L41)
+Defined in: [packages/ui/src/fields/shared/field-wrapper.tsx:42](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/field-wrapper.tsx#L42)
 
 ***
 
@@ -36,7 +36,7 @@ Defined in: [packages/ui/src/fields/shared/field-wrapper.tsx:41](https://github.
 
 > `optional` **description**: `string`
 
-Defined in: [packages/ui/src/fields/shared/field-wrapper.tsx:36](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/field-wrapper.tsx#L36)
+Defined in: [packages/ui/src/fields/shared/field-wrapper.tsx:37](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/field-wrapper.tsx#L37)
 
 Help text displayed below the field.
 
@@ -46,7 +46,7 @@ Help text displayed below the field.
 
 > `optional` **disabled**: `boolean`
 
-Defined in: [packages/ui/src/fields/shared/field-wrapper.tsx:40](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/field-wrapper.tsx#L40)
+Defined in: [packages/ui/src/fields/shared/field-wrapper.tsx:41](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/field-wrapper.tsx#L41)
 
 Whether the field is disabled.
 
@@ -56,7 +56,7 @@ Whether the field is disabled.
 
 > `optional` **error**: `string`
 
-Defined in: [packages/ui/src/fields/shared/field-wrapper.tsx:34](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/field-wrapper.tsx#L34)
+Defined in: [packages/ui/src/fields/shared/field-wrapper.tsx:35](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/field-wrapper.tsx#L35)
 
 Error message displayed below the field.
 
@@ -66,7 +66,7 @@ Error message displayed below the field.
 
 > `optional` **label**: `string`
 
-Defined in: [packages/ui/src/fields/shared/field-wrapper.tsx:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/field-wrapper.tsx#L30)
+Defined in: [packages/ui/src/fields/shared/field-wrapper.tsx:31](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/field-wrapper.tsx#L31)
 
 Visible label text for the field.
 
@@ -76,21 +76,21 @@ Visible label text for the field.
 
 > `optional` **labelKey**: `string`
 
-Defined in: [packages/ui/src/fields/shared/field-wrapper.tsx:32](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/field-wrapper.tsx#L32)
+Defined in: [packages/ui/src/fields/shared/field-wrapper.tsx:33](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/field-wrapper.tsx#L33)
 
 i18n key for label resolution.
 
 ***
 
-### labelPosition?
+### layout?
 
-> `optional` **labelPosition**: `"hidden"` \| `"top"` \| `"left"`
+> `optional` **layout**: `"hidden"` \| `"inline"` \| `"left"` \| `"top"`
 
 Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L5)
 
 #### Inherited from
 
-[`FieldVariant`](FieldVariant.md).[`labelPosition`](FieldVariant.md#labelposition)
+[`FieldVariant`](FieldVariant.md).[`layout`](FieldVariant.md#layout)
 
 ***
 
@@ -98,7 +98,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-
 
 > `optional` **required**: `boolean`
 
-Defined in: [packages/ui/src/fields/shared/field-wrapper.tsx:38](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/field-wrapper.tsx#L38)
+Defined in: [packages/ui/src/fields/shared/field-wrapper.tsx:39](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/field-wrapper.tsx#L39)
 
 Whether the field is required (shows asterisk).
 
@@ -106,7 +106,7 @@ Whether the field is required (shows asterisk).
 
 ### size?
 
-> `optional` **size**: `"lg"` \| `"md"` \| `"sm"`
+> `optional` **size**: `"sm"` \| `"lg"` \| `"md"`
 
 Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L6)
 

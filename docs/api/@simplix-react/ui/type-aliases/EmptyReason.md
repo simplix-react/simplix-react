@@ -6,8 +6,8 @@
 
 # Type Alias: EmptyReason
 
-> **EmptyReason** = `"no-data"` \| `"no-filter"` \| `"no-search"`
+> **EmptyReason** = `"no-data"` \| `"no-filter"` \| `"no-search"` \| `"error"`
 
 Defined in: [packages/ui/src/crud/shared/types.ts:61](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L61)
 
-Reason for an empty list state (no data, no filter match, no search match).
+Reason for an empty list state (no data, no filter match, no search match, or error).

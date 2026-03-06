@@ -12,17 +12,47 @@ Configuration for creating an auth instance via [createAuth](../functions/create
 
 ## Properties
 
+### fetchFn?
+
+> `optional` **fetchFn**: [`FetchFn`](../@simplix-react/contract/type-aliases/FetchFn.md)
+
+Defined in: [packages/auth/src/types.ts:99](https://github.com/simplix-react/simplix-react/blob/main/packages/auth/src/types.ts#L99)
+
+Base fetch function to wrap with auth headers. Defaults to defaultFetch.
+
+***
+
 ### globalHeaders()?
 
 > `optional` **globalHeaders**: () => `Record`\<`string`, `string`\> \| `Promise`\<`Record`\<`string`, `string`\>\>
 
-Defined in: [packages/auth/src/types.ts:93](https://github.com/simplix-react/simplix-react/blob/main/packages/auth/src/types.ts#L93)
+Defined in: [packages/auth/src/types.ts:96](https://github.com/simplix-react/simplix-react/blob/main/packages/auth/src/types.ts#L96)
 
 Returns additional headers to merge into every authenticated request.
 
 #### Returns
 
 `Record`\<`string`, `string`\> \| `Promise`\<`Record`\<`string`, `string`\>\>
+
+***
+
+### is401()?
+
+> `optional` **is401**: (`error`) => `boolean`
+
+Defined in: [packages/auth/src/types.ts:90](https://github.com/simplix-react/simplix-react/blob/main/packages/auth/src/types.ts#L90)
+
+Custom 401 detection predicate. Defaults to duck-typing `error.status === 401`.
+
+#### Parameters
+
+##### error
+
+`unknown`
+
+#### Returns
+
+`boolean`
 
 ***
 
@@ -60,7 +90,7 @@ Called when all refresh attempts fail.
 
 > `optional` **onRehydrate**: (`accessToken`) => `Promise`\<`boolean`\>
 
-Defined in: [packages/auth/src/types.ts:90](https://github.com/simplix-react/simplix-react/blob/main/packages/auth/src/types.ts#L90)
+Defined in: [packages/auth/src/types.ts:93](https://github.com/simplix-react/simplix-react/blob/main/packages/auth/src/types.ts#L93)
 
 Validates a stored access token on rehydration. Return `true` if valid.
 

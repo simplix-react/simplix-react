@@ -17,6 +17,6 @@ Patch descriptor for a single entity's operations.
 
 ### operations?
 
-> `optional` **operations**: `Record`\<`string`, [`EntityOperationDef`](EntityOperationDef.md)\<`ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>\> \| `null`\>
+> `optional` **operations**: `Record`\<`string`, [`EntityOperationDef`](EntityOperationDef.md)\<`ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `unknown`\> \| `null`\>
 
 Defined in: [packages/contract/src/customize-api.ts:18](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/customize-api.ts#L18)

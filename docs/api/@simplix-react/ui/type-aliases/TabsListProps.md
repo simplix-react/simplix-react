@@ -8,4 +8,4 @@
 
 > **TabsListProps** = `ComponentPropsWithRef`\<*typeof* `TabsPrimitive.List`\>
 
-Defined in: [packages/ui/src/base/tabs.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/tabs.tsx#L10)
+Defined in: [packages/ui/src/base/navigation/tabs.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/tabs.tsx#L10)

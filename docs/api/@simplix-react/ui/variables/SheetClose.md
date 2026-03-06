@@ -8,4 +8,4 @@
 
 > `const` **SheetClose**: `ForwardRefExoticComponent`\<`DialogCloseProps` & `RefAttributes`\<`HTMLButtonElement`\>\> = `DialogPrimitive.Close`
 
-Defined in: [packages/ui/src/base/sheet.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/sheet.tsx#L13)
+Defined in: [packages/ui/src/base/overlay/sheet.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/sheet.tsx#L13)

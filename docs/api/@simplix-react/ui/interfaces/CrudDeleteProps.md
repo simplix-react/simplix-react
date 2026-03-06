@@ -6,7 +6,7 @@
 
 # Interface: CrudDeleteProps
 
-Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/crud-delete.tsx#L6)
+Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/crud-delete.tsx#L7)
 
 Props for the [CrudDelete](../functions/CrudDelete.md) confirmation dialog.
 
@@ -16,7 +16,7 @@ Props for the [CrudDelete](../functions/CrudDelete.md) confirmation dialog.
 
 > `optional` **cancelLabel**: `string`
 
-Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/crud-delete.tsx#L15)
+Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/crud-delete.tsx#L16)
 
 Label for the cancel button (defaults to `"Cancel"`).
 
@@ -26,7 +26,7 @@ Label for the cancel button (defaults to `"Cancel"`).
 
 > `optional` **deleteLabel**: `string`
 
-Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/crud-delete.tsx#L17)
+Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/crud-delete.tsx#L18)
 
 Label for the delete button (defaults to `"Delete"`).
 
@@ -36,7 +36,7 @@ Label for the delete button (defaults to `"Delete"`).
 
 > `optional` **deletingLabel**: `string`
 
-Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/crud-delete.tsx#L19)
+Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/crud-delete.tsx#L20)
 
 Label shown while deletion is in progress (defaults to `"Deleting..."`).
 
@@ -46,7 +46,7 @@ Label shown while deletion is in progress (defaults to `"Deleting..."`).
 
 > `optional` **description**: `string`
 
-Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/crud-delete.tsx#L11)
+Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/crud-delete.tsx#L12)
 
 ***
 
@@ -54,7 +54,7 @@ Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:11](https://github.com/
 
 > `optional` **entityName**: `string`
 
-Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/crud-delete.tsx#L13)
+Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/crud-delete.tsx#L14)
 
 ***
 
@@ -62,7 +62,7 @@ Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:13](https://github.com/
 
 > `optional` **loading**: `boolean`
 
-Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/crud-delete.tsx#L12)
+Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/crud-delete.tsx#L13)
 
 ***
 
@@ -70,7 +70,7 @@ Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:12](https://github.com/
 
 > **onConfirm**: () => `void`
 
-Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/crud-delete.tsx#L9)
+Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/crud-delete.tsx#L10)
 
 #### Returns
 
@@ -82,7 +82,7 @@ Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:9](https://github.com/s
 
 > **onOpenChange**: (`open`) => `void`
 
-Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/crud-delete.tsx#L8)
+Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/crud-delete.tsx#L9)
 
 #### Parameters
 
@@ -100,7 +100,7 @@ Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:8](https://github.com/s
 
 > **open**: `boolean`
 
-Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/crud-delete.tsx#L7)
+Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/crud-delete.tsx#L8)
 
 ***
 
@@ -108,4 +108,4 @@ Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:7](https://github.com/s
 
 > `optional` **title**: `string`
 
-Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/crud-delete.tsx#L10)
+Defined in: [packages/ui/src/crud/delete/crud-delete.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/delete/crud-delete.tsx#L11)

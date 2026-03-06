@@ -22,7 +22,7 @@ Props for the [CardList](../functions/CardList.md) component.
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/list/card-list.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/card-list.tsx#L14)
+Defined in: [packages/ui/src/crud/list/card-list.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/card-list.tsx#L17)
 
 ***
 
@@ -30,7 +30,9 @@ Defined in: [packages/ui/src/crud/list/card-list.tsx:14](https://github.com/simp
 
 > `optional` **columns**: `1` \| `2` \| `3`
 
-Defined in: [packages/ui/src/crud/list/card-list.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/card-list.tsx#L13)
+Defined in: [packages/ui/src/crud/list/card-list.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/card-list.tsx#L16)
+
+Number of grid columns. Defaults to `1`.
 
 ***
 
@@ -38,7 +40,9 @@ Defined in: [packages/ui/src/crud/list/card-list.tsx:13](https://github.com/simp
 
 > **data**: `T`[]
 
-Defined in: [packages/ui/src/crud/list/card-list.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/card-list.tsx#L11)
+Defined in: [packages/ui/src/crud/list/card-list.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/card-list.tsx#L12)
+
+Array of items to render as cards.
 
 ***
 
@@ -46,7 +50,9 @@ Defined in: [packages/ui/src/crud/list/card-list.tsx:11](https://github.com/simp
 
 > **renderCard**: (`item`, `index`) => `ReactNode`
 
-Defined in: [packages/ui/src/crud/list/card-list.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/card-list.tsx#L12)
+Defined in: [packages/ui/src/crud/list/card-list.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/card-list.tsx#L14)
+
+Render function for each card.
 
 #### Parameters
 

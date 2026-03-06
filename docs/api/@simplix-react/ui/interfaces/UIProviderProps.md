@@ -6,7 +6,7 @@
 
 # Interface: UIProviderProps
 
-Defined in: [packages/ui/src/provider/ui-provider.tsx:59](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/ui-provider.tsx#L59)
+Defined in: [packages/ui/src/provider/ui-provider.tsx:130](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/ui-provider.tsx#L130)
 
 Props for the [UIProvider](../functions/UIProvider.md) component.
 
@@ -16,7 +16,7 @@ Props for the [UIProvider](../functions/UIProvider.md) component.
 
 > **children**: `ReactNode`
 
-Defined in: [packages/ui/src/provider/ui-provider.tsx:62](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/ui-provider.tsx#L62)
+Defined in: [packages/ui/src/provider/ui-provider.tsx:133](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/ui-provider.tsx#L133)
 
 ***
 
@@ -24,6 +24,6 @@ Defined in: [packages/ui/src/provider/ui-provider.tsx:62](https://github.com/sim
 
 > `optional` **overrides**: `Partial`\<[`UIComponents`](UIComponents.md)\>
 
-Defined in: [packages/ui/src/provider/ui-provider.tsx:61](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/ui-provider.tsx#L61)
+Defined in: [packages/ui/src/provider/ui-provider.tsx:132](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/ui-provider.tsx#L132)
 
 Partial overrides for default base and primitive components.
