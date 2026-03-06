@@ -107,8 +107,8 @@ export interface FilterBarProps {
 
 // ── Helper: format date for badge display ──
 
-function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date);
+function formatDate(date: Date, locale?: string): string {
+  return new Intl.DateTimeFormat(locale, { month: "short", day: "numeric" }).format(date);
 }
 
 // ── FilterBar Component ──
@@ -220,9 +220,9 @@ export function FilterBar({ filters, state, leading, maxBadges, className }: Fil
           const lteKey = makeFilterKey(def.field, SearchOperator.LESS_THAN_OR_EQUAL);
           const from = state.values[gteKey] ? new Date(state.values[gteKey] as string) : undefined;
           const to = state.values[lteKey] ? new Date(state.values[lteKey] as string) : undefined;
-          if (from && to) return `${formatDate(from)} \u2013 ${formatDate(to)}`;
-          if (from) return `${formatDate(from)} \u2013 ...`;
-          if (to) return `... \u2013 ${formatDate(to)}`;
+          if (from && to) return `${formatDate(from, locale)} \u2013 ${formatDate(to, locale)}`;
+          if (from) return `${formatDate(from, locale)} \u2013 ...`;
+          if (to) return `... \u2013 ${formatDate(to, locale)}`;
           return "";
         }
       }
@@ -685,6 +685,7 @@ function DateRangeFormField({
   state: CrudListFilters;
   className?: string;
 }) {
+  const locale = useLocale();
   const gteKey = makeFilterKey(def.field, SearchOperator.GREATER_THAN_OR_EQUAL);
   const lteKey = makeFilterKey(def.field, SearchOperator.LESS_THAN_OR_EQUAL);
   const from = state.values[gteKey] ? new Date(state.values[gteKey] as string) : undefined;
@@ -692,11 +693,11 @@ function DateRangeFormField({
   const hasValue = from || to;
 
   const rangeText = useMemo(() => {
-    if (from && to) return `${formatDate(from)} \u2013 ${formatDate(to)}`;
-    if (from) return `${formatDate(from)} \u2013 ...`;
-    if (to) return `... \u2013 ${formatDate(to)}`;
+    if (from && to) return `${formatDate(from, locale)} \u2013 ${formatDate(to, locale)}`;
+    if (from) return `${formatDate(from, locale)} \u2013 ...`;
+    if (to) return `... \u2013 ${formatDate(to, locale)}`;
     return null;
-  }, [from, to]);
+  }, [from, to, locale]);
 
   const handleRangeSelect = useCallback(
     (range: DateRange) => {
@@ -729,6 +730,7 @@ function DateRangeFormField({
           selectedRange={{ from, to }}
           onSelectRange={handleRangeSelect}
           numberOfMonths={1}
+          locale={locale}
           className="w-full p-2"
         />
       </div>

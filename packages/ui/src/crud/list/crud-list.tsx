@@ -242,7 +242,7 @@ function resolveValue(value: unknown): unknown {
   return value;
 }
 
-function formatCellValue(value: unknown, format?: "date" | "datetime" | "relative"): string {
+function formatCellValue(value: unknown, format?: "date" | "datetime" | "relative", locale?: string): string {
   if (value == null) return "";
   if (!format) return String(value);
 
@@ -250,10 +250,10 @@ function formatCellValue(value: unknown, format?: "date" | "datetime" | "relativ
   if (Number.isNaN(date.getTime())) return String(value);
 
   if (format === "date") {
-    return date.toLocaleDateString();
+    return date.toLocaleDateString(locale);
   }
   if (format === "datetime") {
-    return date.toLocaleString();
+    return date.toLocaleString(locale);
   }
   // relative
   const now = Date.now();
@@ -807,7 +807,7 @@ function ListTable<T>({
   className,
   children,
 }: ListTableProps<T>) {
-  const { t } = useTranslation("simplix/ui");
+  const { t, locale } = useTranslation("simplix/ui");
   const emptyMessages: Record<EmptyReason, string> = {
     "no-data": t("list.noData"),
     "no-filter": t("list.noFilter"),
@@ -938,7 +938,7 @@ function ListTable<T>({
           }
 
           // Format
-          return formatCellValue(value, colDef.format);
+          return formatCellValue(value, colDef.format, locale);
         },
         size: colDef.width,
       });

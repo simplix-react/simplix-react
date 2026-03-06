@@ -22,8 +22,8 @@ export interface DateRangeFilterProps {
   className?: string;
 }
 
-function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat("en-US", {
+function formatDate(date: Date, locale?: string): string {
+  return new Intl.DateTimeFormat(locale, {
     month: "short",
     day: "numeric",
   }).format(date);
@@ -52,7 +52,7 @@ export function DateRangeFilter({
   onChange,
   className,
 }: DateRangeFilterProps) {
-  const { t } = useTranslation("simplix/ui");
+  const { t, locale: i18nLocale } = useTranslation("simplix/ui");
   const [open, setOpen] = useState(false);
 
   const handleRangeSelect = useCallback(
@@ -73,10 +73,10 @@ export function DateRangeFilter({
   const hasValue = from || to;
 
   const rangeText = useMemo(() => {
-    if (from && to) return `${formatDate(from)} – ${formatDate(to)}`;
-    if (from) return `${formatDate(from)} – ...`;
+    if (from && to) return `${formatDate(from, i18nLocale)} – ${formatDate(to, i18nLocale)}`;
+    if (from) return `${formatDate(from, i18nLocale)} – ...`;
     return "–";
-  }, [from, to]);
+  }, [from, to, i18nLocale]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -134,6 +134,7 @@ export function DateRangeFilter({
           selectedRange={{ from, to }}
           onSelectRange={handleRangeSelect}
           numberOfMonths={2}
+          locale={i18nLocale}
         />
       </PopoverContent>
     </Popover>

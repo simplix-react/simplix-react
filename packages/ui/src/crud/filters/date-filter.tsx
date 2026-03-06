@@ -28,8 +28,8 @@ export interface DateFilterProps {
   className?: string;
 }
 
-function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat("en-US", {
+function formatDate(date: Date, locale?: string): string {
+  return new Intl.DateTimeFormat(locale, {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -45,7 +45,7 @@ export function DateFilter({
   operators,
   className,
 }: DateFilterProps) {
-  const { t } = useTranslation("simplix/ui");
+  const { t, locale: i18nLocale } = useTranslation("simplix/ui");
   const [open, setOpen] = useState(false);
   const isRange = dateOperatorConfig[operator]?.requiresRange ?? false;
   const currentOp = operatorConfig[operator];
@@ -92,12 +92,12 @@ export function DateFilter({
   // Display text
   const displayText = useMemo(() => {
     if (!value) return null;
-    if (value instanceof Date) return formatDate(value);
+    if (value instanceof Date) return formatDate(value, i18nLocale);
     const range = value as DateRange;
-    if (range.from && range.to) return `${formatDate(range.from)} - ${formatDate(range.to)}`;
-    if (range.from) return `${formatDate(range.from)} - ...`;
+    if (range.from && range.to) return `${formatDate(range.from, i18nLocale)} - ${formatDate(range.to, i18nLocale)}`;
+    if (range.from) return `${formatDate(range.from, i18nLocale)} - ...`;
     return null;
-  }, [value]);
+  }, [value, i18nLocale]);
 
   const hasValue = !!displayText;
 
@@ -108,11 +108,13 @@ export function DateFilter({
         selectedRange: (value && !(value instanceof Date) ? value : { from: undefined, to: undefined }) as DateRange,
         onSelectRange: handleRangeSelect,
         numberOfMonths: 2,
+        locale: i18nLocale,
       }
     : {
         mode: "single" as const,
         selected: value instanceof Date ? value : undefined,
         onSelect: handleSingleSelect,
+        locale: i18nLocale,
       };
 
   const badgeWidth = isRange ? "w-[13rem]" : "w-[7rem]";
