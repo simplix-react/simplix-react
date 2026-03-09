@@ -12,18 +12,17 @@ describe("Grid", () => {
     render(<Grid data-testid="grid">content</Grid>);
     const el = screen.getByTestId("grid");
     expect(el.tagName).toBe("DIV");
-    expect(el.className).toContain("grid");
     expect(el.textContent).toBe("content");
   });
 
-  it("applies default variant classes", () => {
+  it("applies default variant classes when columns=1", () => {
     render(<Grid data-testid="grid" />);
     const classes = screen.getByTestId("grid").className;
     expect(classes).toContain("grid-cols-1");
     expect(classes).toContain("gap-4");
   });
 
-  it("applies columns variants", () => {
+  it("applies fixed columns when responsive=false", () => {
     const cols = {
       1: "grid-cols-1",
       2: "grid-cols-2",
@@ -35,11 +34,38 @@ describe("Grid", () => {
 
     for (const [col, expected] of Object.entries(cols)) {
       const { unmount } = render(
-        <Grid data-testid="grid" columns={Number(col) as 1 | 2 | 3 | 4 | 5 | 6} />,
+        <Grid data-testid="grid" columns={Number(col) as 1 | 2 | 3 | 4 | 5 | 6} responsive={false} />,
       );
       expect(screen.getByTestId("grid").className).toContain(expected);
       unmount();
     }
+  });
+
+  it("wraps in @container and uses responsive classes when columns > 1", () => {
+    render(<Grid data-testid="grid" columns={2}>content</Grid>);
+    const wrapper = screen.getByTestId("grid");
+    // Wrapper has @container class
+    expect(wrapper.className).toContain("@container");
+    // Inner grid has responsive column classes
+    const inner = wrapper.firstElementChild!;
+    expect(inner.className).toContain("grid");
+    expect(inner.className).toContain("grid-cols-1");
+    expect(inner.className).toContain("@md:grid-cols-2");
+  });
+
+  it("does not wrap when columns=1", () => {
+    render(<Grid data-testid="grid" columns={1}>content</Grid>);
+    const el = screen.getByTestId("grid");
+    expect(el.className).toContain("grid");
+    expect(el.className).toContain("grid-cols-1");
+    expect(el.className).not.toContain("@container");
+  });
+
+  it("applies responsive classes for columns=3", () => {
+    render(<Grid data-testid="grid" columns={3}>content</Grid>);
+    const inner = screen.getByTestId("grid").firstElementChild!;
+    expect(inner.className).toContain("@md:grid-cols-2");
+    expect(inner.className).toContain("@2xl:grid-cols-3");
   });
 
   it("applies gap variants", () => {
@@ -61,6 +87,12 @@ describe("Grid", () => {
     }
   });
 
+  it("applies gap to inner grid when responsive", () => {
+    render(<Grid data-testid="grid" columns={2} gap="lg">content</Grid>);
+    const inner = screen.getByTestId("grid").firstElementChild!;
+    expect(inner.className).toContain("gap-6");
+  });
+
   it("merges custom className", () => {
     render(<Grid data-testid="grid" className="custom" />);
     const classes = screen.getByTestId("grid").className;
@@ -68,9 +100,22 @@ describe("Grid", () => {
     expect(classes).toContain("custom");
   });
 
+  it("merges custom className to inner grid when responsive", () => {
+    render(<Grid data-testid="grid" columns={2} className="custom">content</Grid>);
+    const inner = screen.getByTestId("grid").firstElementChild!;
+    expect(inner.className).toContain("custom");
+  });
+
   it("forwards ref", () => {
     const ref = createRef<HTMLDivElement>();
     render(<Grid ref={ref}>child</Grid>);
     expect(ref.current).toBeInstanceOf(HTMLDivElement);
+  });
+
+  it("forwards ref to wrapper when responsive", () => {
+    const ref = createRef<HTMLDivElement>();
+    render(<Grid ref={ref} columns={2}>child</Grid>);
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(ref.current?.className).toContain("@container");
   });
 });
