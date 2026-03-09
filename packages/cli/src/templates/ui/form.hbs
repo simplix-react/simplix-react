@@ -181,7 +181,7 @@ function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}I
 
   return (
     <CrudForm onSubmit={handleSubmit} header={header} onClose={onClose} footer={
-      <CrudForm.Actions className={onBack || onCancel ? "justify-between" : "justify-end"}>
+      <CrudForm.Actions spread={!!(onBack || onCancel)}>
         {onBack ? (
           <Button type="button" size="sm" variant="outline" onClick={onBack}>
             <ArrowLeftIcon className="size-4" />

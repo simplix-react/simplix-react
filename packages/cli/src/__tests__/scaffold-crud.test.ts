@@ -413,7 +413,7 @@ describe("formTemplate", () => {
 
   it("renders CrudForm.Actions with children", () => {
     const result = renderTemplate(formTemplate, baseCtx);
-    expect(result).toContain('<CrudForm.Actions className={onBack || onCancel ? "justify-between" : "justify-end"}>');
+    expect(result).toContain('<CrudForm.Actions spread={!!(onBack || onCancel)}>');
     expect(result).toContain("</CrudForm.Actions>");
   });
 });

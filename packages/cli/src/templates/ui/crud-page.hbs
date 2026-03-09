@@ -161,7 +161,7 @@ export function {{EntityPascal}}CrudPage({ variant = "panel", search, onNavigate
 
   return (
     <>
-    <Stack className="flex-1 min-h-0" gap="md">
+    <Stack flex gap="md">
       <ListDetail variant={variant} activePanel={view === "list" ? "list" : "detail"} detailWidth={480}
                   onClose={showList} className="min-h-0 flex-1">
         <ListDetail.List>

@@ -97,7 +97,7 @@ function EditorContent({ data, variant, onClose, onSuccess }: EditorContentProps
   }, [guardedNavigate, onClose]);
 
   return (
-    <Stack className="h-full">
+    <Stack fill>
       {variant === "panel" && (
         <PanelHeader
           title={data.name ?? t("{{entity}}.editor")}
