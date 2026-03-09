@@ -245,9 +245,6 @@ importers:
 
   packages/cli:
     dependencies:
-      '@simplix-react-ext/simplix-boot-cli-plugin':
-        specifier: workspace:*
-        version: link:../../extensions/simplix-boot/packages/cli-plugin
       '@simplix-react/contract':
         specifier: workspace:*
         version: link:../contract
@@ -646,6 +643,9 @@ importers:
         specifier: ^3.3.0
         version: 3.4.1
     devDependencies:
+      '@simplix-react/api':
+        specifier: workspace:*
+        version: link:../api
       '@simplix-react/config-eslint':
         specifier: workspace:*
         version: link:../config-eslint

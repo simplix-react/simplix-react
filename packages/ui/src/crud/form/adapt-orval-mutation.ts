@@ -6,10 +6,11 @@ import type { CrudMutation } from "./use-crud-form-submit";
  * that are incompatible with generic `Record<string, unknown>` due to contravariance.
  * We use `any` at this adapter boundary intentionally.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface OrvalMutationLike {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   mutate: (...args: any[]) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  mutateAsync: (...args: any[]) => Promise<any>;
   isPending: boolean;
 }
 
@@ -24,6 +25,8 @@ export function adaptOrvalCreate<T>(
   return {
     mutate: (values, options) =>
       mutation.mutate({ data: values }, { ...options, onSettled: opts?.onSettled }),
+    mutateAsync: (values) =>
+      mutation.mutateAsync({ data: values }, { onSettled: opts?.onSettled }),
     isPending: mutation.isPending,
   };
 }
@@ -49,6 +52,10 @@ export function adaptOrvalUpdate<T, TId = string>(
       pathParam
         ? mutation.mutate({ [pathParam]: id, data: dto }, { ...options, onSettled: opts?.onSettled })
         : mutation.mutate({ data: dto }, { ...options, onSettled: opts?.onSettled }),
+    mutateAsync: ({ id, dto }) =>
+      pathParam
+        ? mutation.mutateAsync({ [pathParam]: id, data: dto }, { onSettled: opts?.onSettled })
+        : mutation.mutateAsync({ data: dto }, { onSettled: opts?.onSettled }),
     isPending: mutation.isPending,
   };
 }
@@ -68,6 +75,8 @@ export function adaptOrvalDelete<TId = string | number>(
   return {
     mutate: (id, options) =>
       mutation.mutate({ [pathParam]: id }, { ...options, onSettled: opts?.onSettled }),
+    mutateAsync: (id) =>
+      mutation.mutateAsync({ [pathParam]: id }, { onSettled: opts?.onSettled }),
     isPending: mutation.isPending,
   };
 }

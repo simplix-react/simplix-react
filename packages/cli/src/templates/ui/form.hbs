@@ -80,7 +80,7 @@ export function {{EntityPascal}}Form({ {{#if hasUpdate}}{{entity}}Id, {{/if}}{{#
   const invalidate = useInvalidateEntity("{{entityPath}}");
 {{/if}}
 
-  const { handleSubmit } = useCrudFormSubmit<{{EntityPascal}}FormValues>({
+  const { handleSubmit, fieldErrors } = useCrudFormSubmit<{{EntityPascal}}FormValues>({
 {{#if hasUpdate}}
     entityId: {{entity}}Id,
 {{/if}}
@@ -117,9 +117,9 @@ export function {{EntityPascal}}Form({ {{#if hasUpdate}}{{entity}}Id, {{/if}}{{#
 {{#if hasUpdate}}
   if (isEdit && (isLoading || !data)) return <QueryFallback isLoading={isLoading} notFoundMessage="{{EntityPascal}} not found." />;
 
-  return <{{EntityPascal}}FormInner {{#if hasTree}}{{entity}}Id={ {{entity}}Id} defaultParentId={defaultParentId} {{/if}}defaultValues={isEdit ? data ?? undefined : undefined} onSubmit={handleSubmit} header={header} onClose={onClose} onCancel={onCancel} onBack={onBack} />;
+  return <{{EntityPascal}}FormInner {{#if hasTree}}{{entity}}Id={ {{entity}}Id} defaultParentId={defaultParentId} {{/if}}defaultValues={isEdit ? data ?? undefined : undefined} onSubmit={handleSubmit} fieldErrors={fieldErrors} header={header} onClose={onClose} onCancel={onCancel} onBack={onBack} />;
 {{else}}
-  return <{{EntityPascal}}FormInner {{#if hasTree}}defaultParentId={defaultParentId} {{/if}}onSubmit={handleSubmit} header={header} onClose={onClose} onCancel={onCancel} onBack={onBack} />;
+  return <{{EntityPascal}}FormInner {{#if hasTree}}defaultParentId={defaultParentId} {{/if}}onSubmit={handleSubmit} fieldErrors={fieldErrors} header={header} onClose={onClose} onCancel={onCancel} onBack={onBack} />;
 {{/if}}
 }
 
@@ -132,13 +132,14 @@ interface {{EntityPascal}}FormInnerProps {
 {{/if}}
   defaultValues?: Partial<{{EntityPascal}}FormValues>;
   onSubmit: (values: {{EntityPascal}}FormValues) => void;
+  fieldErrors?: Record<string, string>;
   header?: ReactNode;
   onClose?: () => void;
   onCancel?: () => void;
   onBack?: () => void;
 }
 
-function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}Id, {{/if}}defaultParentId, {{/if}}defaultValues, onSubmit, header, onClose, onCancel, onBack }: {{EntityPascal}}FormInnerProps) {
+function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}Id, {{/if}}defaultParentId, {{/if}}defaultValues, onSubmit, fieldErrors, header, onClose, onCancel, onBack }: {{EntityPascal}}FormInnerProps) {
 {{#unless hasEnumFields}}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
 {{/unless}}
@@ -199,6 +200,7 @@ function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}I
           label={fieldLabel("{{this.name}}")}
           value={values.{{this.name}} ?? null}
           onChange={(v) => updateField("{{this.name}}", v)}
+          error={fieldErrors?.["{{this.name}}"]}
           treeData={treeData}
           isLoading={treeLoading}
           config={{ldb}} idField: "{{../rowIdField}}", childrenField: "children" {{rdb}}
@@ -212,6 +214,7 @@ function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}I
           label={fieldLabel("{{this.name}}")}
           value={values.{{this.name}}!}
           onChange={(v) => updateField("{{this.name}}", v)}
+          error={fieldErrors?.["{{this.name}}"]}
 {{#if (eq this.inputType "email")}}
           type="email"
 {{/if}}
@@ -224,30 +227,35 @@ function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}I
           label={fieldLabel("{{this.name}}")}
           value={values.{{this.name}}!}
           onChange={(v) => updateField("{{this.name}}", v)}
+          error={fieldErrors?.["{{this.name}}"]}
         />
 {{else if (eq this.formComponent "NumberField")}}
         <FormFields.NumberField
           label={fieldLabel("{{this.name}}")}
           value={values.{{this.name}}!}
           onChange={(v) => updateField("{{this.name}}", v ?? {{this.defaultValue}})}
+          error={fieldErrors?.["{{this.name}}"]}
         />
 {{else if (eq this.formComponent "SwitchField")}}
         <FormFields.SwitchField
           label={fieldLabel("{{this.name}}")}
           value={values.{{this.name}}!}
           onChange={(v) => updateField("{{this.name}}", v)}
+          error={fieldErrors?.["{{this.name}}"]}
         />
 {{else if (eq this.formComponent "DateField")}}
         <FormFields.DateField
           label={fieldLabel("{{this.name}}")}
           value={values.{{this.name}}!}
           onChange={(v) => updateField("{{this.name}}", v ?? {{this.defaultValue}})}
+          error={fieldErrors?.["{{this.name}}"]}
         />
 {{else if (eq this.formComponent "SelectField")}}
         <FormFields.SelectField
           label={fieldLabel("{{this.name}}")}
           value={values.{{this.name}}!}
           onChange={(v) => updateField("{{this.name}}", v)}
+          error={fieldErrors?.["{{this.name}}"]}
           options={[
 {{#each this.options}}
             { label: enumLabel("{{../../entity}}{{../capitalizedName}}", "{{this}}"), value: "{{this}}" },
