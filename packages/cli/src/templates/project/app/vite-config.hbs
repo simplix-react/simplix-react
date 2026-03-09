@@ -1,11 +1,26 @@
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import { mswPlugin } from "@simplix-react/mock/vite";
 
+function localeReload(): Plugin {
+  return {
+    name: "locale-reload",
+    handleHotUpdate({ file, server }) {
+      if (file.endsWith(".json") && file.includes("/locales/")) {
+        server.ws.send({ type: "full-reload" });
+        return [];
+      }
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [tanstackRouter(), react(), tailwindcss(), mswPlugin()],
+  plugins: [tanstackRouter(), react(), tailwindcss(), mswPlugin(), localeReload()],
+  resolve: {
+    conditions: ["source"],
+  },
   server: {
     port: 3000,
     open: true,

@@ -7,18 +7,22 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
     "./features": {
+      "source": "./src/features/index.ts",
       "types": "./dist/features/index.d.ts",
       "import": "./dist/features/index.js"
     },
     "./widgets": {
+      "source": "./src/widgets/index.ts",
       "types": "./dist/widgets/index.d.ts",
       "import": "./dist/widgets/index.js"
     }{{#if enableI18n}},
     "./locales": {
+      "source": "./src/locales/index.ts",
       "types": "./dist/locales/index.d.ts",
       "import": "./dist/locales/index.js"
     }{{/if}}
