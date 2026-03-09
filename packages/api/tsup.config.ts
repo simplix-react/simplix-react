@@ -1,10 +1,10 @@
 import { defineConfig } from "tsup";
 
-export default defineConfig({
+export default defineConfig((options) => ({
   entry: { index: "src/index.ts" },
   format: ["esm"],
-  dts: true,
+  dts: !options.watch,
   splitting: true,
   treeshake: true,
-  clean: true,
-});
+  clean: !options.watch,
+}));

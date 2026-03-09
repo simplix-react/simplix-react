@@ -8,7 +8,7 @@ export default defineConfig((options) => ({
     "locales/index": "src/locales/index.ts",{{/if}}
   },
   format: ["esm"],
-  dts: true,
+  dts: !options.watch,
   splitting: true,
   sourcemap: true,
   clean: !options.watch,
