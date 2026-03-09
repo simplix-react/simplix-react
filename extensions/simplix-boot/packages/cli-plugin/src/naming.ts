@@ -18,6 +18,27 @@ function toCamelCase(str: string): string {
 }
 
 /**
+ * Scan path segments backwards to find a custom action suffix.
+ * Skips params, the entity's kebab-case name, API prefix, and version segments.
+ * Returns the camelCase action name, or undefined if no action found.
+ *
+ * Examples:
+ * - /api/v1/access-point/{id}/unpair → "unpair"
+ * - /api/v1/access-point/{id}/pair/{targetId} → "pair"
+ * - /api/v1/access-point → undefined
+ */
+function findActionSuffix(segments: string[], entityName: string): string | undefined {
+  const entityKebab = entityName.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
+  for (let i = segments.length - 1; i >= 0; i--) {
+    const seg = segments[i];
+    if (seg.startsWith("{")) continue;
+    if (seg === entityKebab || seg === "api" || /^v\d+$/.test(seg)) return undefined;
+    return toCamelCase(seg);
+  }
+  return undefined;
+}
+
+/**
  * NamingStrategy for simplix-boot style OpenAPI specs.
  *
  * Handles Boot conventions:
@@ -80,6 +101,11 @@ export const simplixBootNaming: OpenApiNamingStrategy = {
       }
       if (lastSegment === "search") {
         return { role: "search", hookName: `search${pascal}s` };
+      }
+      // Custom POST action: /entity/{id}/unpair, /entity/{id}/pair/{targetId}
+      const postAction = findActionSuffix(pathSegments, entity);
+      if (postAction) {
+        return { role: postAction, hookName: `${postAction}${pascal}` };
       }
       return { role: "create", hookName: `create${pascal}` };
     }
