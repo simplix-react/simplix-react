@@ -20,5 +20,8 @@ export type { CrudErrorBoundaryProps, ErrorBoundaryState } from "./error-boundar
 export { QueryFallback } from "./query-fallback";
 export type { QueryFallbackProps } from "./query-fallback";
 
+export { SectionShell } from "./section-shell";
+export type { SectionShellProps } from "./section-shell";
+
 export { ConfirmDialog } from "./confirm-dialog";
 export type { ConfirmDialogProps } from "./confirm-dialog";

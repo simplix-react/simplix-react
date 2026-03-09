@@ -1,5 +1,6 @@
 export { ListDetail, ListDetailRoot } from "./list-detail";
 export type {
+  ListDetailBaseProps,
   ListDetailProps,
   ListDetailVariant,
   ListDetailContextValue,

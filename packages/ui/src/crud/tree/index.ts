@@ -1,8 +1,8 @@
 export { CrudTree } from "./crud-tree";
-export type { TreeProps, TreeToolbarProps, TreeSearchProps, TreeTableProps, TreeEmptyProps } from "./crud-tree";
+export type { TreeHeaderActionsProps, TreeProps, TreeToolbarProps, TreeSearchProps, TreeTableProps, TreeEmptyProps } from "./crud-tree";
 export type { TreeConfig, TreeReorderConfig, TreeMoveConfig, TreeNodeMetadata } from "./tree-types";
 export { useTreeExpansion } from "./use-tree-expansion";
-export type { UseTreeExpansionResult } from "./use-tree-expansion";
+export type { UseTreeExpansionOptions, UseTreeExpansionResult } from "./use-tree-expansion";
 export { TreeReorderDialog } from "./tree-reorder-dialog";
 export type { TreeReorderDialogProps } from "./tree-reorder-dialog";
 export { TreeMoveDialog } from "./tree-move-dialog";

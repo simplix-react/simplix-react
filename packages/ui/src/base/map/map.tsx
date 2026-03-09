@@ -110,7 +110,7 @@ const defaultStyles = {
   light: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
 };
 
-type Theme = "light" | "dark";
+export type Theme = "light" | "dark";
 
 /** Detect theme from document class (Tailwind convention: "dark" class = dark, else light). */
 function getDocumentTheme(): Theme {
@@ -175,7 +175,7 @@ function useMap() {
 
 // ── Map component ──
 
-type MapStyleOption = string | MapLibreGL.StyleSpecification;
+export type MapStyleOption = string | MapLibreGL.StyleSpecification;
 
 /** Props for the {@link Map} component. */
 type MapProps = {
@@ -373,7 +373,7 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
 
 // ── MapControls component ──
 
-type MapControlsPosition = "top-left" | "top-right" | "bottom-left" | "bottom-right";
+export type MapControlsPosition = "top-left" | "top-right" | "bottom-left" | "bottom-right";
 
 /** Props for the {@link MapControls} component. */
 type MapControlsProps = {

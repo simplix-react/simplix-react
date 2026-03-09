@@ -28,6 +28,7 @@ export {
   adaptOrvalOrder,
   adaptOrvalUpdate,
 } from "./adapt-orval-mutation";
+export type { OrvalMutationLike } from "./adapt-orval-mutation";
 
 export { useBeforeUnload } from "./use-before-unload";
 

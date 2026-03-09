@@ -47,7 +47,7 @@ export type {
   SelectTriggerProps,
 } from "./select";
 
-export { Switch } from "./switch";
+export { Switch, switchVariants } from "./switch";
 export type { SwitchProps } from "./switch";
 
 export { Textarea } from "./textarea";

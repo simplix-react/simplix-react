@@ -5,7 +5,7 @@ import { useMemo, type ReactNode } from "react";
  * Reuses the same boundary type as {@link adaptOrvalList}.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type OrvalOptionsHookLike = (params?: any, options?: any) => {
+export type OrvalOptionsHookLike = (params?: any, options?: any) => {
   data: unknown;
   isLoading: boolean;
 };
@@ -26,7 +26,7 @@ export interface UseOrvalOptionsResult {
 
 /**
  * Convert an Orval-generated list/search hook result into `{ label, value }[]` options
- * suitable for {@link ComboboxField}, {@link SelectField}, or {@link MultiSelectField}.
+ * suitable for ComboboxField, SelectField, or MultiSelectField.
  *
  * Handles Boot-envelope-unwrapped responses (Spring Data Page: `{ content: T[] }`).
  *

@@ -83,9 +83,6 @@ export function getRequestLocale(): string | undefined {
  * Supports named strategies for multi-backend setups.
  * When called with a single argument, registers under the `"default"` strategy.
  *
- * @param fetchOrStrategy - The fetch function, or a strategy name when followed by a fetch argument.
- * @param fetch - The fetch function (only when the first argument is a strategy name).
- *
  * @example
  * ```ts
  * // Default strategy

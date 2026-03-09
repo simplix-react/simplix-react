@@ -1,6 +1,14 @@
 export type {
+  CommandComponents,
+  DialogComponents,
+  DropdownMenuComponents,
+  PopoverComponents,
   RadioGroupComponents,
   SelectComponents,
+  SheetComponents,
+  TableComponents,
+  TabsComponents,
+  TooltipComponents,
   UIComponents,
 } from "./types";
 

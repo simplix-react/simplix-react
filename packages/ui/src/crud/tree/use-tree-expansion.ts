@@ -4,7 +4,7 @@ import type { TreeConfig } from "./tree-types";
 import { getAllNodeIds, getAncestorIds, getNodeIdsUpToDepth } from "./tree-utils";
 
 /** @internal Options for the {@link useTreeExpansion} hook. */
-interface UseTreeExpansionOptions<T> {
+export interface UseTreeExpansionOptions<T> {
   /** Flat or nested tree data array. */
   data: T[];
   /** Tree structure configuration (id field, children field, etc.). */

@@ -8,7 +8,7 @@ export interface MapProviderProps {
   children: ReactNode;
 }
 
-interface MapProviderContextValue {
+export interface MapProviderContextValue {
   defaultFallbackTileUrl?: string;
   defaultMarkerIcon?: ReactNode;
 }

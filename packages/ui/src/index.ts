@@ -124,6 +124,7 @@ export {
   SheetTrigger,
   Skeleton,
   Switch,
+  switchVariants,
   Tabs,
   TabsContent,
   TabsList,
@@ -148,14 +149,18 @@ export {
 export type {
   MapAutoFitProps,
   MapBoundsOverlayProps,
+  MapControlsPosition,
   MapProps,
   MapControlsProps,
   MapMarkerProps,
   MapNavigatorProps,
   MapPinContainerProps,
+  MapProviderContextValue,
   MapProviderProps,
   MapRef,
   MapContextValue,
+  MapStyleOption,
+  MapTheme,
   UseMapNavigatorOptions,
   UseMapNavigatorResult,
   BadgeProps,
@@ -216,6 +221,8 @@ export type {
   SheetTitleProps,
   SkeletonProps,
   SwitchProps,
+  ColorPickerProps,
+  PresetColor,
   TabsContentProps,
   TabsListProps,
   TabsTriggerProps,
@@ -227,8 +234,16 @@ export type {
 // Provider
 export { UIComponentContext, UIProvider, useUIComponents } from "./provider";
 export type {
+  CommandComponents,
+  DialogComponents,
+  DropdownMenuComponents,
+  PopoverComponents,
   RadioGroupComponents,
   SelectComponents,
+  SheetComponents,
+  TableComponents,
+  TabsComponents,
+  TooltipComponents,
   UIComponents,
   UIProviderProps,
 } from "./provider";
@@ -254,6 +269,7 @@ export { adaptOrvalList, CardList, CrudList, useCrudList, useKeyboardNav, useMed
 export type {
   ActionType,
   ActionVariant,
+  AdaptOrvalListOptions,
   CardListProps,
   CrudListFilters,
   CrudListPagination,
@@ -270,6 +286,8 @@ export type {
   ListSearchProps,
   ListTableProps,
   ListToolbarProps,
+  OrvalListHookLike,
+  OrvalOptionsHookLike,
   RowActionDef,
   UseKeyboardNavOptions,
   UseCrudListOptions,
@@ -286,6 +304,7 @@ export type {
   CrudFormProps,
   CrudFormSectionProps,
   CrudMutation,
+  OrvalMutationLike,
   UseAutosaveOptions,
   UseAutosaveReturn,
   UseCrudFormSubmitOptions,
@@ -300,6 +319,7 @@ export type {
 export { CrudTree, useTreeExpansion, TreeReorderDialog, TreeMoveDialog, getSiblings } from "./crud/tree";
 export type {
   TreeConfig,
+  TreeHeaderActionsProps,
   TreeReorderConfig,
   TreeMoveConfig,
   TreeNodeMetadata,
@@ -308,6 +328,7 @@ export type {
   TreeSearchProps,
   TreeTableProps,
   TreeEmptyProps,
+  UseTreeExpansionOptions,
   UseTreeExpansionResult,
   TreeReorderDialogProps,
   TreeMoveDialogProps,
@@ -410,6 +431,10 @@ export { CrudErrorBoundary } from "./crud/shared";
 export type { CrudErrorBoundaryProps, ErrorBoundaryState } from "./crud/shared";
 export type { ColumnInfo } from "./crud/shared";
 
+// Section shell
+export { SectionShell } from "./crud/shared";
+export type { SectionShellProps } from "./crud/shared";
+
 // Confirm dialog
 export { ConfirmDialog } from "./crud/shared";
 export type { ConfirmDialogProps } from "./crud/shared";
@@ -435,6 +460,7 @@ export type {
   CrudSearch,
   CrudView,
   DetailView,
+  ListDetailBaseProps,
   ListDetailContextValue,
   ListDetailPanelProps,
   ListDetailProps,
@@ -464,6 +490,7 @@ export type { PanelHeaderProps } from "./layout/panel-header";
 
 // Map utilities
 export { useMapPageData } from "./map/use-map-page-data";
+export type { UseMapPageDataOptions, UseMapPageDataReturn } from "./map/use-map-page-data";
 
 // Geo utilities
 export { isValidCoord, computeBounds, fitMapToBounds, DEFAULT_MAP_FIT_OPTIONS, toRad, haversineDistance, destinationPoint, geoCircle, computeBoundingCircle } from "./utils/geo";

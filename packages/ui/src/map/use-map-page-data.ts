@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-interface UseMapPageDataOptions<T> {
+export interface UseMapPageDataOptions<T> {
   /** List hook result data array */
   data: T[];
   isLoading: boolean;
@@ -8,7 +8,7 @@ interface UseMapPageDataOptions<T> {
   hasValidCoords: (item: T) => boolean;
 }
 
-interface UseMapPageDataReturn<T> {
+export interface UseMapPageDataReturn<T> {
   /** Items with valid coordinates */
   validItems: T[];
   isLoading: boolean;

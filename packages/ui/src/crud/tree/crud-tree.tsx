@@ -663,7 +663,7 @@ function TreeTable<T>({
 
 // ── TreeHeaderActions ──
 
-interface TreeHeaderActionsProps {
+export interface TreeHeaderActionsProps {
   searchPlaceholder?: string;
   className?: string;
 }

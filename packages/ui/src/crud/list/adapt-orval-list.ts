@@ -7,7 +7,7 @@ import type { ListHook, ListHookResult } from "./use-crud-list";
  * We use `any` at this adapter boundary intentionally.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type OrvalListHookLike = (params?: any, options?: any) => {
+export type OrvalListHookLike = (params?: any, options?: any) => {
   data: unknown;
   isLoading: boolean;
   error: unknown;
@@ -19,7 +19,7 @@ const DEFAULT_QUERY_OPTIONS: Record<string, unknown> = {
   gcTime: 0,
 };
 
-interface AdaptOrvalListOptions {
+export interface AdaptOrvalListOptions {
   /** Extra query options forwarded to Orval's second argument (`{ query: {...} }`).
    *  Merged with defaults (`staleTime: 0, gcTime: 0`). */
   queryOptions?: Record<string, unknown>;

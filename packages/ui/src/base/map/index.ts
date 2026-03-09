@@ -1,8 +1,8 @@
 export { Map, MapControls, MapMarker, MapPinContainer, useMap } from "./map";
-export type { MapProps, MapControlsProps, MapMarkerProps, MapPinContainerProps, MapRef, MapContextValue } from "./map";
+export type { MapControlsPosition, MapProps, MapControlsProps, MapMarkerProps, MapPinContainerProps, MapRef, MapContextValue, MapStyleOption, Theme as MapTheme } from "./map";
 
 export { MapProvider, useMapDefaults } from "./map-provider";
-export type { MapProviderProps } from "./map-provider";
+export type { MapProviderContextValue, MapProviderProps } from "./map-provider";
 
 export { MapAutoFit } from "./map-auto-fit";
 export type { MapAutoFitProps } from "./map-auto-fit";

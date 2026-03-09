@@ -6,7 +6,7 @@ import type { CrudMutation } from "./use-crud-form-submit";
  * that are incompatible with generic `Record<string, unknown>` due to contravariance.
  * We use `any` at this adapter boundary intentionally.
  */
-interface OrvalMutationLike {
+export interface OrvalMutationLike {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   mutate: (...args: any[]) => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

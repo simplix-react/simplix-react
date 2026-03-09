@@ -83,7 +83,7 @@ const DIVIDER_TRACK = 17;
 // └─────────────────────────┘    └─────────────────────┘
 
 /** Common props shared by all width variants. */
-interface ListDetailBaseProps {
+export interface ListDetailBaseProps {
   /** Layout variant. `"panel"` renders side-by-side, `"dialog"` renders detail in a modal. */
   variant?: ListDetailVariant;
   /** Controlled active panel. When provided, overrides internal state. */

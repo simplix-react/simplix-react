@@ -18,9 +18,10 @@ export type {
 } from "./crud-list";
 
 export { adaptOrvalList } from "./adapt-orval-list";
+export type { OrvalListHookLike, AdaptOrvalListOptions } from "./adapt-orval-list";
 
 export { useOrvalOptions } from "./use-orval-options";
-export type { UseOrvalOptionsConfig, UseOrvalOptionsResult } from "./use-orval-options";
+export type { OrvalOptionsHookLike, UseOrvalOptionsConfig, UseOrvalOptionsResult } from "./use-orval-options";
 
 export { useCrudList } from "./use-crud-list";
 export type {
