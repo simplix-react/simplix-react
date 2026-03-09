@@ -9,12 +9,12 @@
     "pnpm": ">=9.0.0"
   },
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev --concurrency=15",
-    "dev:watch": "turbo watch dev --concurrency=25",
+    "build": "turbo run clean && turbo run build",
+    "dev": "turbo run clean && turbo run build && turbo watch dev:app",
     "lint": "turbo run lint",
     "test": "turbo run test",
-    "typecheck": "turbo run typecheck"
+    "typecheck": "turbo run typecheck",
+    "clean": "turbo run clean"
   },
   "devDependencies": {
     "simplix-react": "{{fw.meta}}",
