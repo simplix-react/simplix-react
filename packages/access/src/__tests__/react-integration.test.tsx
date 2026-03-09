@@ -1,17 +1,17 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, render, screen, act } from "@testing-library/react";
-import { createElement, type ReactNode } from "react";
+import React, { type ReactNode } from "react";
 import { createAccessPolicy } from "../create-access-policy.js";
 import { createStaticAdapter } from "../adapters/static-adapter.js";
 import { AccessDeniedError } from "../errors.js";
-import { AccessProvider, AccessContext } from "../react/access-provider.js";
+import { AccessProvider } from "../react/access-provider.js";
 import { useAccess } from "../react/use-access.js";
 import { useCan } from "../react/use-can.js";
 import { Can } from "../react/can.js";
 import { useMenuFilter } from "../react/use-menu-filter.js";
 import { requireAccess } from "../react/route-guard.js";
-import type { AccessPolicy, AccessUser } from "../types.js";
+import type { AccessUser, DefaultActions, DefaultSubjects } from "../types.js";
 import type { AuthLike } from "../react/access-provider.js";
 
 // ── Helpers ──
@@ -24,11 +24,11 @@ const testUser: AccessUser = {
 };
 
 function createPolicy(
-  rules: Array<{ action: string; subject: string }> = [],
+  rules: Array<{ action: DefaultActions; subject: string }> = [],
   user?: AccessUser,
-): AccessPolicy<string, string> {
-  const policy = createAccessPolicy({
-    adapter: createStaticAdapter(rules, user),
+) {
+  const policy = createAccessPolicy<DefaultActions, DefaultSubjects>({
+    adapter: createStaticAdapter(rules, user) as never,
   });
   if (rules.length > 0 || user) {
     policy.setRules(rules, user, user?.roles);
@@ -36,9 +36,9 @@ function createPolicy(
   return policy;
 }
 
-function createWrapper(policy: AccessPolicy<string, string>) {
+function createWrapper(policy: ReturnType<typeof createPolicy>) {
   return function Wrapper({ children }: { children: ReactNode }) {
-    return createElement(AccessProvider, { policy }, children);
+    return <AccessProvider policy={policy}>{children}</AccessProvider>;
   };
 }
 
@@ -49,7 +49,9 @@ describe("AccessProvider", () => {
     const policy = createPolicy();
 
     render(
-      createElement(AccessProvider, { policy }, createElement("span", null, "child content")),
+      <AccessProvider policy={policy}>
+        <span>child content</span>
+      </AccessProvider>,
     );
 
     expect(screen.getByText("child content")).toBeDefined();
@@ -81,11 +83,12 @@ describe("AccessProvider", () => {
     };
 
     render(
-      createElement(AccessProvider, { policy, auth }, createElement("div", null, "test")),
+      <AccessProvider policy={policy} auth={auth}>
+        <div>test</div>
+      </AccessProvider>,
     );
 
     expect(rehydrateSpy).toHaveBeenCalledOnce();
-    // update is called asynchronously via sync()
     await vi.waitFor(() => expect(updateSpy).toHaveBeenCalledWith("test-token"));
   });
 
@@ -100,7 +103,9 @@ describe("AccessProvider", () => {
     };
 
     render(
-      createElement(AccessProvider, { policy, auth }, createElement("div", null, "test")),
+      <AccessProvider policy={policy} auth={auth}>
+        <div>test</div>
+      </AccessProvider>,
     );
 
     expect(subscribeFn).toHaveBeenCalledOnce();
@@ -118,7 +123,9 @@ describe("AccessProvider", () => {
     };
 
     render(
-      createElement(AccessProvider, { policy, auth }, createElement("div", null, "test")),
+      <AccessProvider policy={policy} auth={auth}>
+        <div>test</div>
+      </AccessProvider>,
     );
 
     await vi.waitFor(() => {
@@ -204,11 +211,9 @@ describe("Can", () => {
     const policy = createPolicy([{ action: "edit", subject: "Pet" }]);
 
     render(
-      createElement(
-        AccessProvider,
-        { policy },
-        createElement(Can, { I: "edit", a: "Pet" }, createElement("span", null, "Edit Button")),
-      ),
+      <AccessProvider policy={policy}>
+        <Can I="edit" a="Pet"><span>Edit Button</span></Can>
+      </AccessProvider>,
     );
 
     expect(screen.getByText("Edit Button")).toBeDefined();
@@ -218,11 +223,9 @@ describe("Can", () => {
     const policy = createPolicy([{ action: "view", subject: "Pet" }]);
 
     render(
-      createElement(
-        AccessProvider,
-        { policy },
-        createElement(Can, { I: "delete", a: "Pet" }, createElement("span", null, "Delete Button")),
-      ),
+      <AccessProvider policy={policy}>
+        <Can I="delete" a="Pet"><span>Delete Button</span></Can>
+      </AccessProvider>,
     );
 
     expect(screen.queryByText("Delete Button")).toBeNull();
@@ -232,19 +235,11 @@ describe("Can", () => {
     const policy = createPolicy([{ action: "view", subject: "Pet" }]);
 
     render(
-      createElement(
-        AccessProvider,
-        { policy },
-        createElement(
-          Can,
-          {
-            I: "delete",
-            a: "Pet",
-            fallback: createElement("span", null, "No permission"),
-          },
-          createElement("span", null, "Delete Button"),
-        ),
-      ),
+      <AccessProvider policy={policy}>
+        <Can I="delete" a="Pet" fallback={<span>No permission</span>}>
+          <span>Delete Button</span>
+        </Can>
+      </AccessProvider>,
     );
 
     expect(screen.queryByText("Delete Button")).toBeNull();
@@ -255,15 +250,9 @@ describe("Can", () => {
     const policy = createPolicy([{ action: "view", subject: "Pet" }]);
 
     render(
-      createElement(
-        AccessProvider,
-        { policy },
-        createElement(
-          Can,
-          { I: "view", a: "Pet", not: true },
-          createElement("span", null, "Hidden when allowed"),
-        ),
-      ),
+      <AccessProvider policy={policy}>
+        <Can I="view" a="Pet" not><span>Hidden when allowed</span></Can>
+      </AccessProvider>,
     );
 
     expect(screen.queryByText("Hidden when allowed")).toBeNull();
@@ -273,15 +262,9 @@ describe("Can", () => {
     const policy = createPolicy([]);
 
     render(
-      createElement(
-        AccessProvider,
-        { policy },
-        createElement(
-          Can,
-          { I: "edit", a: "Pet", not: true },
-          createElement("span", null, "Shown when denied"),
-        ),
-      ),
+      <AccessProvider policy={policy}>
+        <Can I="edit" a="Pet" not><span>Shown when denied</span></Can>
+      </AccessProvider>,
     );
 
     expect(screen.getByText("Shown when denied")).toBeDefined();
@@ -289,7 +272,7 @@ describe("Can", () => {
 
   it("renders children when no AccessProvider is present (opt-in)", () => {
     render(
-      createElement(Can, { I: "anything", a: "anywhere" }, createElement("span", null, "Always shown")),
+      <Can I="anything" a="anywhere"><span>Always shown</span></Can>,
     );
 
     expect(screen.getByText("Always shown")).toBeDefined();
@@ -420,7 +403,6 @@ describe("requireAccess", () => {
       key: () => null,
     } as Storage;
 
-    // Assign to globalThis for storage fallback tests
     Object.defineProperty(globalThis, "localStorage", {
       value: storage,
       writable: true,

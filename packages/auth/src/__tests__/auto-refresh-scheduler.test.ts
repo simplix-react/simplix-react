@@ -12,7 +12,7 @@ describe("AutoRefreshScheduler", () => {
   });
 
   function createRefreshFn() {
-    return vi.fn<[], Promise<TokenPair>>().mockResolvedValue({
+    return vi.fn<() => Promise<TokenPair>>().mockResolvedValue({
       accessToken: "new-token",
       refreshToken: "new-refresh",
       expiresIn: 3600,
@@ -146,7 +146,7 @@ describe("AutoRefreshScheduler", () => {
       });
 
       let expiresAt = Date.now() + 2 * 60 * 1000; // 2 minutes
-      const refreshFn = vi.fn<[], Promise<TokenPair>>().mockImplementation(async () => {
+      const refreshFn = vi.fn<() => Promise<TokenPair>>().mockImplementation(async () => {
         // After refresh, token expires in another 2 minutes from "now"
         expiresAt = Date.now() + 2 * 60 * 1000;
         return { accessToken: "new", expiresIn: 120 };
@@ -172,7 +172,7 @@ describe("AutoRefreshScheduler", () => {
       });
 
       let expiresAt = Date.now() + 30 * 1000; // Expires in 30s
-      const refreshFn = vi.fn<[], Promise<TokenPair>>().mockImplementation(async () => {
+      const refreshFn = vi.fn<() => Promise<TokenPair>>().mockImplementation(async () => {
         // After refresh, expires in another 30s
         expiresAt = Date.now() + 30 * 1000;
         return { accessToken: "new", expiresIn: 30 };

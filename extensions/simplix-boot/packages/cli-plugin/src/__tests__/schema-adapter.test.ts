@@ -112,19 +112,19 @@ describe("bootSchemaAdapter", () => {
 
   describe("stripPrefix", () => {
     it("strips SimpliXApiResponse prefix", () => {
-      expect(bootSchemaAdapter.stripPrefix("SimpliXApiResponsePet")).toBe("Pet");
+      expect(bootSchemaAdapter.stripPrefix!("SimpliXApiResponsePet")).toBe("Pet");
     });
 
     it("strips prefix from multi-word type names", () => {
-      expect(bootSchemaAdapter.stripPrefix("SimpliXApiResponseAccessPoint")).toBe("AccessPoint");
+      expect(bootSchemaAdapter.stripPrefix!("SimpliXApiResponseAccessPoint")).toBe("AccessPoint");
     });
 
     it("returns unchanged name without prefix", () => {
-      expect(bootSchemaAdapter.stripPrefix("Pet")).toBe("Pet");
+      expect(bootSchemaAdapter.stripPrefix!("Pet")).toBe("Pet");
     });
 
     it("returns empty string when name equals prefix exactly", () => {
-      expect(bootSchemaAdapter.stripPrefix("SimpliXApiResponse")).toBe("");
+      expect(bootSchemaAdapter.stripPrefix!("SimpliXApiResponse")).toBe("");
     });
   });
 });

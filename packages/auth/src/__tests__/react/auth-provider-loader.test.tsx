@@ -114,7 +114,7 @@ describe("AuthProvider with userLoader", () => {
   });
 
   it("reloads user when auth state transitions to authenticated after init", async () => {
-    const { auth, store } = createTestAuth();
+    const { auth } = createTestAuth();
 
     const user = { id: 2, name: "Bob" };
     const userLoader = vi.fn().mockResolvedValue(user);

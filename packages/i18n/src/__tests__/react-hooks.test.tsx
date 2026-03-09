@@ -59,7 +59,7 @@ function createMockAdapter(overrides: Partial<II18nAdapter> = {}): II18nAdapter 
 
 function createWrapper(adapter: II18nAdapter) {
   return function Wrapper({ children }: { children: ReactNode }) {
-    return createElement(I18nProvider, { adapter }, children);
+    return createElement(I18nProvider, { adapter, children });
   };
 }
 

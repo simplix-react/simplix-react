@@ -1,4 +1,4 @@
-import type { AccessPolicy, AccessRule, AccessUser } from "@simplix-react/access";
+import type { AccessPolicy, AccessRule, AccessUser, DefaultActions, DefaultSubjects } from "@simplix-react/access";
 import { createAccessPolicy, createStaticAdapter } from "@simplix-react/access";
 
 /**
@@ -41,7 +41,7 @@ export interface MockPolicyOptions {
  * policy.can("edit", "Pet"); // false
  * ```
  */
-export function createMockPolicy(options: MockPolicyOptions = {}): AccessPolicy<string, string> {
+export function createMockPolicy(options: MockPolicyOptions = {}): AccessPolicy {
   const { rules, user, allowAll = true } = options;
 
   const effectiveRules: AccessRule[] =
@@ -53,8 +53,8 @@ export function createMockPolicy(options: MockPolicyOptions = {}): AccessPolicy<
     roles: [],
   };
 
-  const policy = createAccessPolicy({
-    adapter: createStaticAdapter(effectiveRules, effectiveUser),
+  const policy = createAccessPolicy<DefaultActions, DefaultSubjects>({
+    adapter: createStaticAdapter(effectiveRules, effectiveUser) as never,
   });
 
   policy.setRules(effectiveRules, effectiveUser, effectiveUser.roles);

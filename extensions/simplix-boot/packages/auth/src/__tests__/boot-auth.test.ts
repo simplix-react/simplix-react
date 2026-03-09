@@ -76,6 +76,7 @@ describe("createBootAuth", () => {
       get: vi.fn(),
       set: vi.fn(),
       remove: vi.fn(),
+      clear: vi.fn(),
     };
     createBootAuth({ store: customStore });
     // localStorageStore is still called for its fallback but customStore is used

@@ -3,9 +3,17 @@ import { describe, expect, it } from "vitest";
 import { simplixBootNaming } from "../naming.js";
 
 describe("simplixBootNaming", () => {
+  const baseEntityCtx = {
+    paths: [] as string[],
+    operations: [] as Array<{ operationId: string; method: string; path: string }>,
+    schemaNames: [] as string[],
+    extensions: {} as Record<string, unknown>,
+  };
+
   describe("resolveEntityName", () => {
     it("extracts entity name from Boot tag convention (scope.crud.Entity)", () => {
       const result = simplixBootNaming.resolveEntityName({
+        ...baseEntityCtx,
         tag: "admin.crud.AccessPoint",
       });
       expect(result).toBe("accessPoint");
@@ -13,6 +21,7 @@ describe("simplixBootNaming", () => {
 
     it("extracts entity name from two-segment tag (scope.Entity)", () => {
       const result = simplixBootNaming.resolveEntityName({
+        ...baseEntityCtx,
         tag: "admin.Pet",
       });
       expect(result).toBe("pet");
@@ -20,13 +29,14 @@ describe("simplixBootNaming", () => {
 
     it("handles single-segment tag", () => {
       const result = simplixBootNaming.resolveEntityName({
+        ...baseEntityCtx,
         tag: "Order",
       });
       expect(result).toBe("order");
     });
 
     it("returns empty string when tag is undefined", () => {
-      const result = simplixBootNaming.resolveEntityName({});
+      const result = simplixBootNaming.resolveEntityName({ ...baseEntityCtx });
       expect(result).toBe("");
     });
   });
@@ -36,6 +46,8 @@ describe("simplixBootNaming", () => {
       operationId: "search_1",
       entityName: "pet",
       pathParams: [] as string[],
+      queryParams: [] as string[],
+      extensions: {} as Record<string, unknown>,
     };
 
     // --- GET patterns ---
