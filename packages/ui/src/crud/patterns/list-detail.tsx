@@ -140,7 +140,7 @@ export function ListDetailRoot({ variant = "panel", activePanel: activePanelProp
             if (!open) onClose?.();
           }}
         >
-          <section className={cn("h-full", className)}>
+          <section className={cn("h-full flex-1 min-h-0", className)}>
             {children}
           </section>
         </DialogPrimitive.Root>
@@ -162,7 +162,7 @@ export function ListDetailRoot({ variant = "panel", activePanel: activePanelProp
       <section
         ref={sectionRef}
         className={cn(
-          "h-full overflow-hidden",
+          "h-full flex-1 min-h-0 overflow-hidden",
           isDetailOpen && "md:grid md:grid-rows-1",
           isDetailOpen && !isDragging && "md:transition-[grid-template-columns] md:duration-300 md:ease-in-out",
           "max-md:flex max-md:flex-col",
