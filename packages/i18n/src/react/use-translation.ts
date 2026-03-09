@@ -70,7 +70,10 @@ export function useTranslation<TKeys extends string = string>(
       if (!i18n) return key;
       return i18n.tn(namespace, key, values);
     },
-    [i18n, namespace],
+    // locale is included so that t's reference changes on locale switch,
+    // ensuring any useMemo/useCallback depending on t recomputes correctly.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [i18n, namespace, locale],
   ) as TranslateFunction<TKeys>;
 
   const exists = useCallback(
@@ -78,7 +81,8 @@ export function useTranslation<TKeys extends string = string>(
       if (!i18n) return false;
       return i18n.exists(key, namespace);
     },
-    [i18n, namespace],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [i18n, namespace, locale],
   );
 
   return useMemo(
