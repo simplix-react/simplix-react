@@ -6,15 +6,29 @@ import { cn } from "../../utils/cn";
 // Root - pass through
 export const Tabs = TabsPrimitive.Root;
 
-// List
-export type TabsListProps = ComponentPropsWithRef<typeof TabsPrimitive.List>;
+// ── List ──
+
+export interface TabsListProps
+  extends ComponentPropsWithRef<typeof TabsPrimitive.List> {
+  /**
+   * Visual style variant.
+   * - `"default"` — inline, auto-width.
+   * - `"full"` — spans full width with top margin; triggers auto-expand to equal widths.
+   *
+   * @default "default"
+   */
+  variant?: "default" | "full";
+}
 
 export const TabsList = forwardRef<HTMLDivElement, TabsListProps>(
-  ({ className, ...rest }, ref) => (
+  ({ className, variant = "default", ...rest }, ref) => (
     <TabsPrimitive.List
       ref={ref}
       className={cn(
-        "inline-flex h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground",
+        "h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground",
+        variant === "full"
+          ? "mt-3 flex w-full [&>*]:flex-1"
+          : "inline-flex",
         className,
       )}
       {...rest}
@@ -24,7 +38,8 @@ export const TabsList = forwardRef<HTMLDivElement, TabsListProps>(
 
 TabsList.displayName = "TabsList";
 
-// Trigger
+// ── Trigger ──
+
 export type TabsTriggerProps = ComponentPropsWithRef<
   typeof TabsPrimitive.Trigger
 >;
@@ -44,16 +59,23 @@ export const TabsTrigger = forwardRef<HTMLButtonElement, TabsTriggerProps>(
 
 TabsTrigger.displayName = "TabsTrigger";
 
-// Content
-export type TabsContentProps = ComponentPropsWithRef<
-  typeof TabsPrimitive.Content
->;
+// ── Content ──
+
+export interface TabsContentProps
+  extends ComponentPropsWithRef<typeof TabsPrimitive.Content> {
+  /**
+   * Adds bottom padding for scrollable containers.
+   *
+   * @default false
+   */
+  padded?: boolean;
+}
 
 export const TabsContent = forwardRef<HTMLDivElement, TabsContentProps>(
-  ({ className, ...rest }, ref) => (
+  ({ className, padded = false, ...rest }, ref) => (
     <TabsPrimitive.Content
       ref={ref}
-      className={cn("flex-1 outline-none", className)}
+      className={cn("flex-1 outline-none", padded && "pb-8", className)}
       {...rest}
     />
   ),
