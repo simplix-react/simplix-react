@@ -43,6 +43,21 @@ import { CaretDownIcon } from "./icons";
 // │ └────────────────────────────────────┘ │
 // └────────────────────────────────────────┘
 //
+// variant="lined"
+//
+// ┌─ <section> border-b, no shadow ────────┐
+// │ ┌────────────────────────────────────┐ │
+// │ │ Header  (no bg)                    │ │
+// │ │                                    │ │
+// │ │ <h3> title (text-lg)  [trailing]   │ │
+// │ │ description (muted)   [▼ toggle]   │ │
+// │ └────────────────────────────────────┘ │
+// │ ┌────────────────────────────────────┐ │
+// │ │ Body  (border-l pl-4)              │ │
+// │ │  {children}                        │ │
+// │ └────────────────────────────────────┘ │
+// └────────────────────────────────────────┘
+//
 // collapsible=true → Body wraps in Collapsible.Content (animate up/down)
 
 /** Shared props for section components (CrudDetail.Section, CrudForm.Section). */
@@ -51,8 +66,8 @@ export interface SectionShellProps {
   description?: ReactNode;
   /** Group title rendered above the card. */
   sectionTitle?: ReactNode;
-  /** Visual style: `"card"` (default) renders with border and shadow, `"flat"` renders without. */
-  variant?: "card" | "flat";
+  /** Visual style: `"card"` (default) renders with border and shadow, `"flat"` renders without, `"lined"` adds a left border on the body. */
+  variant?: "card" | "flat" | "lined";
   /** Content rendered on the right side of the section header. */
   trailing?: ReactNode;
   /** Enable collapsible behavior (default: false). */
@@ -78,7 +93,8 @@ export function SectionShell({
 
   const TitleTag = sectionTitle ? "h4" : "h3";
   const isCard = variant === "card";
-  const titleClass = isCard
+  const isLined = variant === "lined";
+  const titleClass = isCard || isLined
     ? "text-sm font-semibold tracking-tight"
     : "text-lg font-semibold tracking-tight";
   const headerContent = (
@@ -119,6 +135,8 @@ export function SectionShell({
 
   const body = isCard ? (
     <div className="px-4 py-3">{children}</div>
+  ) : isLined ? (
+    <div className="border-l-2 border-border/50 pl-4">{children}</div>
   ) : (
     <div>{children}</div>
   );
@@ -144,7 +162,8 @@ export function SectionShell({
       className={cn(
         isCard &&
           "overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm",
-        !isCard && "flex flex-col gap-4 pb-2 border-b border-border/50 last:border-b-0 last:pb-0",
+        variant === "flat" && "flex flex-col gap-4 pb-2 border-b border-border/50 last:border-b-0 last:pb-0",
+        isLined && "flex flex-col gap-2 py-2",
         className,
       )}
     >

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { TreeConfig } from "./tree-types";
 import { getAllNodeIds, getAncestorIds, getNodeIdsUpToDepth } from "./tree-utils";
@@ -52,15 +52,24 @@ export function useTreeExpansion<T>({
   data,
   config,
 }: UseTreeExpansionOptions<T>): UseTreeExpansionResult {
-  const initialIds = useMemo(
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(
     () => new Set(getNodeIdsUpToDepth(data, config.initialExpandedDepth ?? 1, config)),
-    // Only compute on mount
-    [],
   );
 
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(initialIds);
+  // Re-apply initial expansion on data changes until user manually interacts.
+  // This handles async multi-stage loading (e.g. parent loads first, children later).
+  const userHasInteracted = useRef(false);
+  useEffect(() => {
+    if (!userHasInteracted.current && data.length > 0) {
+      const ids = getNodeIdsUpToDepth(data, config.initialExpandedDepth ?? 1, config);
+      if (ids.length > 0) {
+        setExpandedIds(new Set(ids));
+      }
+    }
+  }, [data, config]);
 
   const toggleExpand = useCallback((id: string) => {
+    userHasInteracted.current = true;
     setExpandedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
@@ -73,10 +82,12 @@ export function useTreeExpansion<T>({
   }, []);
 
   const expandAll = useCallback(() => {
+    userHasInteracted.current = true;
     setExpandedIds(new Set(getAllNodeIds(data, config)));
   }, [data, config]);
 
   const collapseAll = useCallback(() => {
+    userHasInteracted.current = true;
     setExpandedIds(new Set());
   }, []);
 

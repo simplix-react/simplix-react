@@ -6,6 +6,7 @@ export interface PageHeaderState {
   metadata?: ReactNode;
   /** Stable primitive key to trigger header updates when metadata changes */
   metadataKey?: string;
+  center?: ReactNode;
   actions?: ReactNode;
 }
 

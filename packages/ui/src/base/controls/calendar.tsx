@@ -236,7 +236,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
                 {weekdayNames.map((day, i) => (
                   <span
                     key={i}
-                    className="flex h-8 items-center justify-center text-xs font-medium text-muted-foreground"
+                    className="flex h-8 w-8 items-center justify-center text-xs font-medium text-muted-foreground"
                   >
                     {day}
                   </span>
@@ -265,7 +265,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
                       disabled={disabled}
                       onClick={() => handleDayClick(date)}
                       className={cn(
-                        "flex h-8 items-center justify-center rounded-md text-sm",
+                        "flex h-8 w-8 items-center justify-center rounded-md text-sm",
                         "hover:bg-accent hover:text-accent-foreground",
                         "focus-visible:outline-none",
                         "disabled:pointer-events-none disabled:opacity-50",

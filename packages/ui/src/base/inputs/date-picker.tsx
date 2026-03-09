@@ -2,12 +2,19 @@ import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "@simplix-react/i18n/react";
 
 import { Calendar } from "../controls/calendar";
-import { CalendarDotIcon, XIcon, CaretDownIcon } from "../../crud/shared/icons";
+import { CalendarDotIcon, XIcon } from "../../crud/shared/icons";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "../overlay/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./select";
 import { cn } from "../../utils/cn";
 import {
   formatDateMedium,
@@ -31,24 +38,18 @@ function MonthYearSelect({
   className?: string;
 }) {
   return (
-    <div className={cn("relative inline-flex", className)}>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className={cn(
-          "h-8 appearance-none rounded-md border border-input bg-background px-2 pr-6 text-sm font-medium",
-          "hover:bg-accent hover:text-accent-foreground",
-          "focus:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-        )}
-      >
+    <Select value={value} onValueChange={onChange}>
+      <SelectTrigger className={cn("h-8 gap-1 text-sm font-medium", className)}>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
         {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
+          <SelectItem key={opt.value} value={opt.value}>
             {opt.label}
-          </option>
+          </SelectItem>
         ))}
-      </select>
-      <CaretDownIcon className="pointer-events-none absolute right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 opacity-50" />
-    </div>
+      </SelectContent>
+    </Select>
   );
 }
 

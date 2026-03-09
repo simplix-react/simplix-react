@@ -40,6 +40,9 @@ export type { SelectFieldProps } from "./select-field";
 export { SliderField } from "./slider-field";
 export type { SliderFieldProps } from "./slider-field";
 
+export { StaticField } from "./static-field";
+export type { StaticFieldProps } from "./static-field";
+
 export { SwitchField } from "./switch-field";
 export type { SwitchFieldProps } from "./switch-field";
 
