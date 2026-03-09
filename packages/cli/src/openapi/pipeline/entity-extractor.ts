@@ -803,6 +803,7 @@ function schemaToFields(schema: SchemaObject): EntityField[] {
       nullable: isNullable,
       default: prop.default,
       enum: prop.enum,
+      enumTypeName: prop.enum?.length ? prop._refName : undefined,
     });
   }
 

@@ -461,6 +461,13 @@ export async function pruneUnusedModels(targetDir: string): Promise<number> {
 
 // ── Schemas Proxy ────────────────────────────────────────────
 
+/**
+ * Generate or update the schemas proxy file.
+ *
+ * When the file already exists, only the auto-generated re-export lines are
+ * updated (added/removed to match current endpoints). Any custom overrides
+ * below the marker comment are preserved.
+ */
 export async function generateSchemasProxy(targetDir: string): Promise<void> {
   const endpointsDir = join(targetDir, "src/generated/endpoints");
   if (!(await pathExists(endpointsDir))) return;
@@ -470,10 +477,35 @@ export async function generateSchemasProxy(targetDir: string): Promise<void> {
 
   if (zodFiles.length === 0) return;
 
+  const CUSTOM_MARKER = "// Custom schema overrides and additions:";
+
   const reExports = zodFiles.map((f) => {
     const modulePath = `./generated/endpoints/${f.replace(".ts", "")}`;
     return `export * from "${modulePath}";`;
   });
+
+  const schemasPath = join(targetDir, "src/schemas.ts");
+  const existingContent = (await pathExists(schemasPath))
+    ? await readFile(schemasPath, "utf-8")
+    : "";
+
+  // Extract custom section from existing file (everything after the marker)
+  let customSection = "";
+  if (existingContent) {
+    const markerIdx = existingContent.indexOf(CUSTOM_MARKER);
+    if (markerIdx !== -1) {
+      customSection = existingContent.slice(markerIdx);
+    }
+  }
+
+  if (!customSection) {
+    customSection = [
+      CUSTOM_MARKER,
+      '// import { z } from "zod";',
+      '// export const updatePetBody = z.object({ ... });',
+      "",
+    ].join("\n");
+  }
 
   const content = [
     "// Re-export all Orval-generated Zod schemas.",
@@ -481,13 +513,10 @@ export async function generateSchemasProxy(targetDir: string): Promise<void> {
     "// Local exports take precedence over wildcard re-exports.",
     ...reExports,
     "",
-    "// Custom schema overrides and additions:",
-    '// import { z } from "zod";',
-    '// export const updatePetBody = z.object({ ... });',
-    "",
+    customSection,
   ].join("\n");
 
-  await writeFileWithDir(join(targetDir, "src/schemas.ts"), content);
+  await writeFileWithDir(schemasPath, content);
 }
 
 // ── Domain Mutator Content ───────────────────────────────────

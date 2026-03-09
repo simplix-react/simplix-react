@@ -10,6 +10,8 @@ export interface ResolvedSpecConfig {
   responseAdapter: ResponseAdapterConfig;
   mutatorHint?: SpecProfile["mutatorHint"];
   mutatorStrategy?: string;
+  /** Extra dependencies to inject into the domain package.json */
+  dependencies?: Record<string, string>;
   i18nEndpoint?: string;
   i18nDownloader?: I18nDownloader;
 }
@@ -27,6 +29,7 @@ export function resolveSpecConfig(config: OpenAPISpecConfig): ResolvedSpecConfig
     responseAdapter: config.responseAdapter ?? profile?.responseAdapter ?? "raw",
     mutatorHint: profile?.mutatorHint,
     mutatorStrategy: profile?.mutatorStrategy,
+    dependencies: profile?.dependencies,
     i18nEndpoint: profile?.i18nEndpoint,
     i18nDownloader: profile?.i18nDownloader,
   };

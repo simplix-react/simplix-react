@@ -78,7 +78,8 @@ function generateFieldValue(
     case "array":
       return generateArrayValue(field, index);
     case "object":
-      return generateObjectValue(field, index);
+      // Skip relation/nested object fields — they are not part of flat DetailDTOs
+      return undefined;
     default:
       if (!field.required) return undefined;
       return `"${entityName}-${field.name}-${index}"`;
@@ -178,17 +179,6 @@ function generateArrayValue(field: EntityField, index: number): string {
   }
 
   return `[]`;
-}
-
-function generateObjectValue(field: EntityField, index: number): string {
-  const name = field.name.toLowerCase();
-
-  if (name.includes("category")) {
-    return `{ id: ${index}, name: "Category ${index}" }`;
-  }
-
-  // Nested entity reference — use string id to match UUID patterns
-  return `{ id: "${index}" }`;
 }
 
 function capitalize(str: string): string {

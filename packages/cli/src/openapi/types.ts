@@ -72,6 +72,8 @@ export interface SchemaObject {
   maximum?: number;
   pattern?: string;
   additionalProperties?: boolean | SchemaObject;
+  /** Original $ref schema name, preserved after resolveRefs inlines the reference. */
+  _refName?: string;
 }
 
 // --- Extracted entity types ---
@@ -86,6 +88,8 @@ export interface EntityField {
   nullable: boolean;
   default?: unknown;
   enum?: string[];
+  /** Original schema type name for enum fields (e.g., "EscortCode" from $ref). */
+  enumTypeName?: string;
 }
 
 export interface QueryParam {

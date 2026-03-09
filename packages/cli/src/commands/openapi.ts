@@ -331,20 +331,40 @@ async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
     // 10. Generate mock files (with optional responseAdapter for envelope wrapping)
     await generateMockFiles(targetDir, domainName, entities, responseAdapter);
 
-    // 11. Generate schemas proxy if missing
-    const schemasPath = join(targetDir, "src/schemas.ts");
-    if (!(await pathExists(schemasPath))) {
-      await generateSchemasProxy(targetDir);
-    }
+    // 11. Generate or update schemas proxy (preserve custom overrides)
+    await generateSchemasProxy(targetDir);
 
-    // 12. Regenerate index.ts
+    // 12. Regenerate index.ts (preserve custom exports)
     const hasTranslations = await pathExists(join(targetDir, "src/translations.ts"));
-    const indexContent = renderTemplate(domainIndexTs, {
+    const newIndexContent = renderTemplate(domainIndexTs, {
       enableI18n: hasTranslations,
       enableOrval: true,
       PascalName: toPascalCase(domainName),
     });
-    await writeFileWithDir(join(targetDir, "src/index.ts"), indexContent);
+    const indexPath = join(targetDir, "src/index.ts");
+    const existingIndex = (await pathExists(indexPath)) ? await readFile(indexPath, "utf-8") : "";
+    const mergedIndex = mergeIndexWithCustomExports(newIndexContent, existingIndex);
+    await writeFileWithDir(indexPath, mergedIndex);
+
+    // 12b. Ensure profile dependencies are in package.json
+    if (resolvedSpecConfig?.dependencies) {
+      const pkgJsonPath = join(targetDir, "package.json");
+      const pkgJson = await readJsonFile<Record<string, Record<string, string>>>(pkgJsonPath);
+      if (pkgJson) {
+        let changed = false;
+        for (const [dep, ver] of Object.entries(resolvedSpecConfig.dependencies)) {
+          if (!pkgJson.dependencies?.[dep]) {
+            pkgJson.dependencies ??= {};
+            pkgJson.dependencies[dep] = ver;
+            changed = true;
+          }
+        }
+        if (changed) {
+          await writeFileWithDir(pkgJsonPath, JSON.stringify(pkgJson, null, 2) + "\n");
+          log.info(`Added missing profile dependencies to ${domainPkgName}/package.json`);
+        }
+      }
+    }
 
     // 13. Update locale files
     const locales = config.i18n?.locales ?? ["en", "ko", "ja"];
@@ -473,7 +493,7 @@ function buildLocaleJson(
     for (const field of entity.fields) {
       fields[field.name] = camelToLabel(field.name);
       if (field.enum?.length) {
-        const eName = enumName(entity.name, field.name);
+        const eName = field.enumTypeName ?? enumName(entity.name, field.name);
         enums[eName] = {};
         for (const v of field.enum) {
           enums[eName][v] = camelToLabel(v);
@@ -755,6 +775,37 @@ function deepMerge(
     }
   }
   return result;
+}
+
+// ── index.ts merge ───────────────────────────────────────────
+
+/**
+ * Merge generated index.ts content with custom exports from an existing file.
+ *
+ * Custom exports are lines that exist in the old file but NOT in the new template
+ * (e.g., `export * from "./constants"`). These are appended to the generated content
+ * to prevent them from being lost during regeneration.
+ */
+function mergeIndexWithCustomExports(newContent: string, existingContent: string): string {
+  if (!existingContent.trim()) return newContent;
+
+  const newLines = new Set(newContent.split("\n").map((l) => l.trim()).filter(Boolean));
+
+  // Find export lines in the existing file that are not in the generated template
+  const customExports = existingContent
+    .split("\n")
+    .filter((line) => {
+      const trimmed = line.trim();
+      if (!trimmed) return false;
+      // Only preserve export statements (not imports or other code)
+      if (!trimmed.startsWith("export ")) return false;
+      // Skip if already in the generated content
+      return !newLines.has(trimmed);
+    });
+
+  if (customExports.length === 0) return newContent;
+
+  return newContent.trimEnd() + "\n" + customExports.join("\n") + "\n";
 }
 
 /**

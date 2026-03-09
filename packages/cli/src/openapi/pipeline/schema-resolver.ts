@@ -145,6 +145,7 @@ class SchemaResolver {
     this.resolving.add(schemaName);
     const resolved = this.resolveSchema(JSON.parse(JSON.stringify(schema)));
     this.resolving.delete(schemaName);
+    resolved._refName = schemaName;
     return resolved;
   }
 
