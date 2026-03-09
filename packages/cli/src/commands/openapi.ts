@@ -3,7 +3,7 @@ import prompts from "prompts";
 import ora from "ora";
 import { join, relative, resolve } from "node:path";
 import { rm, readFile } from "node:fs/promises";
-import { writeFileWithDir, pathExists, readJsonFile } from "../utils/fs.js";
+import { writeFileWithDir, pathExists, readJsonFile, findProjectRoot } from "../utils/fs.js";
 import { log } from "../utils/logger.js";
 import { toPascalCase } from "../utils/case.js";
 import { renderTemplate } from "../utils/template.js";
@@ -65,7 +65,7 @@ export const openapiCommand = new Command("openapi")
   .option("--no-http", "Skip .http file generation")
   .option("-y, --yes", "Auto-confirm without prompts")
   .action(async (specSource: string, flags: OpenAPIFlags) => {
-    const rootDir = resolve(process.cwd());
+    const rootDir = await findProjectRoot(process.cwd());
 
     // 1. Validate project root
     const rootPkg = await readJsonFile<{ name: string }>(

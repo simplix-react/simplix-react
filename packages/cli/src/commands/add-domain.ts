@@ -2,7 +2,7 @@ import { Command } from "commander";
 import prompts from "prompts";
 import ora from "ora";
 import { join, resolve } from "node:path";
-import { writeFileWithDir, pathExists, readJsonFile } from "../utils/fs.js";
+import { writeFileWithDir, pathExists, readJsonFile, findProjectRoot } from "../utils/fs.js";
 import { log } from "../utils/logger.js";
 import { toPascalCase } from "../utils/case.js";
 import { renderTemplate } from "../utils/template.js";
@@ -35,7 +35,7 @@ export const addDomainCommand = new Command("add-domain")
   .option("--no-i18n", "Skip i18n translations setup")
   .option("-y, --yes", "Accept all defaults (non-interactive)")
   .action(async (name: string, flags: Record<string, unknown>) => {
-    const rootDir = resolve(process.cwd());
+    const rootDir = await findProjectRoot(process.cwd());
     const rootPkg = await readJsonFile<{ name: string }>(
       join(rootDir, "package.json"),
     ).catch(() => null);

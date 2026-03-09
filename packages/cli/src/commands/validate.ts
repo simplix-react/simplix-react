@@ -1,8 +1,8 @@
 import { Command } from "commander";
-import { resolve, join, relative } from "node:path";
+import { join, relative } from "node:path";
 import { readdir } from "node:fs/promises";
 import { log } from "../utils/logger.js";
-import { pathExists } from "../utils/fs.js";
+import { pathExists, findProjectRoot } from "../utils/fs.js";
 import {
   validateFsdRules,
   validateImportRules,
@@ -23,7 +23,7 @@ export const validateCommand = new Command("validate")
   .description("Validate project structure, FSD rules, imports, and i18n")
   .option("--fix", "Auto-fix issues where possible", false)
   .action(async (flags: { fix: boolean }) => {
-    const rootDir = resolve(process.cwd());
+    const rootDir = await findProjectRoot(process.cwd());
 
     if (!(await pathExists(join(rootDir, "package.json")))) {
       log.error("No package.json found. Run from a simplix project root.");

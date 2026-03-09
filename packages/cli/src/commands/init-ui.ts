@@ -1,10 +1,10 @@
 import { execFileSync } from "node:child_process";
-import { join, resolve } from "node:path";
+import { join } from "node:path";
 
 import { Command } from "commander";
 import ora from "ora";
 
-import { pathExists, writeFileWithDir } from "../utils/fs.js";
+import { pathExists, writeFileWithDir, findProjectRoot } from "../utils/fs.js";
 import { log } from "../utils/logger.js";
 
 const SHADCN_COMPONENTS = [
@@ -56,7 +56,7 @@ export const initUiCommand = new Command("init-ui")
   .description("Initialize @simplix-react/ui with shadcn/ui integration")
   .option("-y, --yes", "Non-interactive mode")
   .action(async () => {
-    const rootDir = resolve(process.cwd());
+    const rootDir = await findProjectRoot(process.cwd());
     const componentsJsonPath = join(rootDir, "components.json");
 
     // Check if shadcn is initialized

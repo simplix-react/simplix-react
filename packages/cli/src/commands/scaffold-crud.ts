@@ -19,7 +19,7 @@ import {
 } from "../templates/ui/index.js";
 import type { EntityField, ExtractedEntity, OpenAPISnapshot, QueryParam } from "../openapi/types.js";
 import { toKebabCase, toPascalCase } from "../utils/case.js";
-import { pathExists, readJsonFile, writeFileWithDir } from "../utils/fs.js";
+import { pathExists, readJsonFile, writeFileWithDir, findProjectRoot } from "../utils/fs.js";
 import { log } from "../utils/logger.js";
 import { renderTemplate } from "../utils/template.js";
 import { depVersion } from "../versions.js";
@@ -1240,7 +1240,7 @@ export const scaffoldCrudCommand = new Command("scaffold")
     "Custom output directory (overrides --module, relative to cwd)",
   )
   .action(async (entity: string, options: { module?: string; output?: string }) => {
-    const rootDir = resolve(process.cwd());
+    const rootDir = await findProjectRoot(process.cwd());
     const entityKebab = toKebabCase(entity);
     const EntityPascal = toPascalCase(entity);
 

@@ -1,15 +1,15 @@
 import { Command } from "commander";
-import { resolve, join, basename } from "node:path";
+import { join, basename } from "node:path";
 import { readdir, readFile, writeFile, watch } from "node:fs/promises";
 import { log } from "../utils/logger.js";
-import { pathExists } from "../utils/fs.js";
+import { pathExists, findProjectRoot } from "../utils/fs.js";
 import pc from "picocolors";
 
 export const i18nCodegenCommand = new Command("i18n-codegen")
   .description("Generate TypeScript types from i18n JSON files")
   .option("--watch", "Watch for file changes", false)
   .action(async (flags: { watch: boolean }) => {
-    const rootDir = resolve(process.cwd());
+    const rootDir = await findProjectRoot(process.cwd());
     const modulesDir = join(rootDir, "modules");
 
     if (!(await pathExists(modulesDir))) {
