@@ -10,7 +10,7 @@ export interface SelectFieldProps<T extends string = string>
   /** Called when the selection changes. */
   onChange: (value: T) => void;
   /** Available options with label/value pairs. */
-  options: Array<{ label: string; value: T; disabled?: boolean }>;
+  options: Array<{ label: string; value: T; disabled?: boolean; icon?: React.ReactNode }>;
   placeholder?: string;
 }
 
@@ -77,7 +77,14 @@ export function SelectField<T extends string = string>({
               value={opt.value}
               disabled={opt.disabled}
             >
-              {opt.label}
+              {opt.icon ? (
+                <span className="inline-flex items-center gap-1.5">
+                  {opt.icon}
+                  {opt.label}
+                </span>
+              ) : (
+                opt.label
+              )}
             </Select.Item>
           ))}
         </Select.Content>

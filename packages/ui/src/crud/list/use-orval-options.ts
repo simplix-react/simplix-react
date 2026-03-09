@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 
 /**
  * Loose hook shape for Orval-generated list/search hooks.
@@ -13,14 +13,14 @@ type OrvalOptionsHookLike = (params?: any, options?: any) => {
 /** Configuration for {@link useOrvalOptions}. */
 export interface UseOrvalOptionsConfig<TItem> {
   /** Map each item to a combobox option. */
-  toOption: (item: TItem) => { label: string; value: string };
+  toOption: (item: TItem) => { label: string; value: string; icon?: ReactNode };
   /** Query params forwarded to the Orval hook (default: `{ page: 0, size: 100 }`). */
   params?: Record<string, unknown>;
 }
 
 /** Return type of {@link useOrvalOptions}. */
 export interface UseOrvalOptionsResult {
-  options: Array<{ label: string; value: string }>;
+  options: Array<{ label: string; value: string; icon?: ReactNode }>;
   isLoading: boolean;
 }
 

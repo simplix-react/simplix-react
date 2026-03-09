@@ -17,7 +17,7 @@ export interface ComboboxFieldProps<T extends string = string>
   extends CommonFieldProps {
   value: T | null;
   onChange: (value: T | null) => void;
-  options: Array<{ label: string; value: T }>;
+  options: Array<{ label: string; value: T; icon?: React.ReactNode }>;
   onSearch?: (query: string) => void;
   loading?: boolean;
   placeholder?: string;
@@ -65,8 +65,8 @@ export function ComboboxField<T extends string = string>({
   const searchPlaceholder = t("field.searchOption");
   const noResultsMessage = emptyMessage ?? t("field.noResults");
 
-  const selectedLabel = useMemo(
-    () => options.find((o) => o.value === value)?.label ?? "",
+  const selectedOption = useMemo(
+    () => options.find((o) => o.value === value),
     [options, value],
   );
 
@@ -117,8 +117,9 @@ export function ComboboxField<T extends string = string>({
               error && "border-destructive",
             )}
           >
-            <span className={cn("truncate", !value && "text-muted-foreground")}>
-              {value ? selectedLabel : selectPlaceholder}
+            <span className={cn("flex items-center gap-1.5 truncate", !value && "text-muted-foreground")}>
+              {selectedOption?.icon}
+              {value ? selectedOption?.label ?? "" : selectPlaceholder}
             </span>
             {value && !disabled && (
               <button
@@ -229,7 +230,8 @@ export function ComboboxField<T extends string = string>({
                         />
                       </svg>
                     )}
-                    <span className={cn(opt.value === value && "ml-0")}>
+                    <span className={cn("flex items-center gap-1.5", opt.value === value && "ml-0")}>
+                      {opt.icon}
                       {opt.label}
                     </span>
                   </li>

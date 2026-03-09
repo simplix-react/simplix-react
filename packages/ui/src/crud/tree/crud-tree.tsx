@@ -324,6 +324,7 @@ function RowActionCell<T>({ row, actions, variant }: { row: T; actions: RowActio
     <Flex gap="xs" justify="end">
       {visible.map((action) => {
         const label = action.label ?? t(ACTION_LABEL_KEYS[action.type]);
+        const icon = action.icon ?? ACTION_ICONS[action.type];
         const isDelete = action.type === "delete";
         return (
           <Button
@@ -332,6 +333,7 @@ function RowActionCell<T>({ row, actions, variant }: { row: T; actions: RowActio
             variant={isDelete ? "destructive" : variant}
             onClick={(e) => handleClick(e, action)}
           >
+            {icon}
             {label}
           </Button>
         );
