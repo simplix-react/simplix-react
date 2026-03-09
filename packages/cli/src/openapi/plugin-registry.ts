@@ -57,9 +57,28 @@ export interface SchemaAdapter {
   stripPrefix?(typeName: string): string;
 }
 
-const specProfiles = new Map<string, SpecProfile>();
-const responseAdapterPresets = new Map<string, ResponseAdapterPreset>();
-const schemaAdapters: SchemaAdapter[] = [];
+// Use globalThis to share registry state across module instances.
+// tsup bundles bin.js with an inlined copy of this module, while plugins
+// import @simplix-react/cli which resolves to dist/index.js — a separate
+// module instance. Without globalThis, each instance has its own Map and
+// plugins register into a different registry than the one bin.js reads.
+const REGISTRY_KEY = Symbol.for("__simplix_cli_plugin_registry__");
+
+interface PluginRegistry {
+  specProfiles: Map<string, SpecProfile>;
+  responseAdapterPresets: Map<string, ResponseAdapterPreset>;
+  schemaAdapters: SchemaAdapter[];
+}
+
+const registry: PluginRegistry = ((globalThis as Record<symbol, unknown>)[REGISTRY_KEY] ??= {
+  specProfiles: new Map<string, SpecProfile>(),
+  responseAdapterPresets: new Map<string, ResponseAdapterPreset>(),
+  schemaAdapters: [] as SchemaAdapter[],
+}) as PluginRegistry;
+
+const specProfiles = registry.specProfiles;
+const responseAdapterPresets = registry.responseAdapterPresets;
+const schemaAdapters = registry.schemaAdapters;
 
 /**
  * Registers a named spec profile into the global registry.

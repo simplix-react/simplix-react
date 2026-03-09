@@ -20,7 +20,7 @@ interface {{EntityPascal}} {
 {{/each}}
 }
 
-{{#unless packageName}}
+{{#unless hookList}}
 function useMockList(): { data: {{EntityPascal}}[] | undefined; isLoading: boolean; error: Error | null } {
   const data = useMemo<{{EntityPascal}}[]>(() => [], []);
   return { data, isLoading: false, error: null };

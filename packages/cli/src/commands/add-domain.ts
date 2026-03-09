@@ -168,7 +168,7 @@ export const addDomainCommand = new Command("add-domain")
         pkgJson.dependencies["@simplix-react/api"] = "workspace:*";
         pkgJson.devDependencies["orval"] = "^8.4.1";
         pkgJson.devDependencies["@faker-js/faker"] = "^9.0.0";
-        pkgJson.scripts["codegen"] = `simplix openapi ${openapiSpec}`;
+        pkgJson.scripts["codegen"] = `simplix openapi ${openapiSpec} -d ${name}`;
 
         // Add profile-specific dependencies (data-driven from SpecProfile)
         if (specConfig?.profile) {

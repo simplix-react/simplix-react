@@ -330,6 +330,12 @@ describe("listTemplate", () => {
     expect(result).not.toContain("productHooks");
   });
 
+  it("renders mock fallback when packageName set but hookList missing", () => {
+    const result = renderTemplate(listTemplate, { ...baseCtx, hookList: null });
+    expect(result).toContain("useMockList");
+    expect(result).toContain("function useMockList");
+  });
+
   it("renders navigation callback props", () => {
     const result = renderTemplate(listTemplate, baseCtx);
     expect(result).toContain("onView?: (row: Product) => void;");
