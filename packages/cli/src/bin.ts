@@ -11,6 +11,7 @@ import { frameworkVersion } from "./versions.js";
 
 // Load extension plugins dynamically (optional — no hard dependency)
 try {
+  // @ts-ignore — plugin may not be installed
   await import("@simplix-react-ext/simplix-boot-cli-plugin");
 } catch {
   // Plugin not installed — boot profile won't be available
