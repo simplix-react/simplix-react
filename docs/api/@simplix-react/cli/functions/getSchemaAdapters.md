@@ -8,7 +8,7 @@
 
 > **getSchemaAdapters**(): readonly [`SchemaAdapter`](../interfaces/SchemaAdapter.md)[]
 
-Defined in: [openapi/plugin-registry.ts:181](https://github.com/simplix-react/simplix-react/blob/main/openapi/plugin-registry.ts#L181)
+Defined in: [openapi/plugin-registry.ts:200](https://github.com/simplix-react/simplix-react/blob/main/openapi/plugin-registry.ts#L200)
 
 Returns all registered schema adapters in registration order.
 

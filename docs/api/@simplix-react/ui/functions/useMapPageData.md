@@ -6,7 +6,7 @@
 
 # Function: useMapPageData()
 
-> **useMapPageData**\<`T`\>(`__namedParameters`): `UseMapPageDataReturn`\<`T`\>
+> **useMapPageData**\<`T`\>(`__namedParameters`): [`UseMapPageDataReturn`](../interfaces/UseMapPageDataReturn.md)\<`T`\>
 
 Defined in: [packages/ui/src/map/use-map-page-data.ts:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/map/use-map-page-data.ts#L17)
 
@@ -20,8 +20,8 @@ Defined in: [packages/ui/src/map/use-map-page-data.ts:17](https://github.com/sim
 
 ### \_\_namedParameters
 
-`UseMapPageDataOptions`\<`T`\>
+[`UseMapPageDataOptions`](../interfaces/UseMapPageDataOptions.md)\<`T`\>
 
 ## Returns
 
-`UseMapPageDataReturn`\<`T`\>
+[`UseMapPageDataReturn`](../interfaces/UseMapPageDataReturn.md)\<`T`\>

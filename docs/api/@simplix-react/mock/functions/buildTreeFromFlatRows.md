@@ -6,7 +6,7 @@
 
 # Function: buildTreeFromFlatRows()
 
-> **buildTreeFromFlatRows**\<`T`\>(`rows`, `identityField?`): `TreeNode`\<`T`\>[]
+> **buildTreeFromFlatRows**\<`T`\>(`rows`, `identityField?`): [`TreeNode`](../@simplix-react/contract/type-aliases/TreeNode.md)\<`T`\>[]
 
 Defined in: [tree-builder.ts:87](https://github.com/simplix-react/simplix-react/blob/main/tree-builder.ts#L87)
 
@@ -34,9 +34,9 @@ The field name used as the node identifier. Defaults to `"id"`.
 
 ## Returns
 
-`TreeNode`\<`T`\>[]
+[`TreeNode`](../@simplix-react/contract/type-aliases/TreeNode.md)\<`T`\>[]
 
-Array of root-level TreeNode instances with nested children.
+Array of root-level [TreeNode](../@simplix-react/contract/type-aliases/TreeNode.md) instances with nested children.
 
 ## Remarks
 

@@ -16,7 +16,7 @@ Filter state returned by [useCrudList](../functions/useCrudList.md).
 
 > **apply**: () => `void`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:58](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L58)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:59](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L59)
 
 #### Returns
 
@@ -28,7 +28,61 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:58](https://github.com/s
 
 > **clear**: () => `void`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:57](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L57)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:58](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L58)
+
+#### Returns
+
+`void`
+
+***
+
+### committedValues
+
+> **committedValues**: `Record`\<`string`, `unknown`\>
+
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:62](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L62)
+
+Committed (applied) filter values — used by badges, URL sync, and queries.
+
+***
+
+### commitValue()
+
+> **commitValue**: (`key`, `value`) => `void`
+
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:64](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L64)
+
+Update a single filter in both pending and committed state, triggering a re-query.
+
+#### Parameters
+
+##### key
+
+`string`
+
+##### value
+
+`unknown`
+
+#### Returns
+
+`void`
+
+***
+
+### commitValues()
+
+> **commitValues**: (`updates`) => `void`
+
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:66](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L66)
+
+Update multiple filters in both pending and committed state, triggering a re-query.
+
+#### Parameters
+
+##### updates
+
+`Record`\<`string`, `unknown`\>
 
 #### Returns
 
@@ -40,7 +94,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:57](https://github.com/s
 
 > **isPending**: `boolean`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:59](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L59)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:60](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L60)
 
 ***
 
@@ -56,7 +110,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:51](https://github.com/s
 
 > **setAll**: (`filters`) => `void`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:56](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L56)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:57](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L57)
 
 #### Parameters
 
@@ -98,7 +152,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:52](https://github.com/s
 
 > **setValue**: (`key`, `value`) => `void`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:54](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L54)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:55](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L55)
 
 #### Parameters
 
@@ -120,7 +174,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:54](https://github.com/s
 
 > **setValues**: (`updates`) => `void`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:55](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L55)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:56](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L56)
 
 #### Parameters
 
@@ -138,4 +192,6 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:55](https://github.com/s
 
 > **values**: `Record`\<`string`, `unknown`\>
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:53](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L53)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:54](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L54)
+
+Pending (draft) filter values — used by popover form fields.

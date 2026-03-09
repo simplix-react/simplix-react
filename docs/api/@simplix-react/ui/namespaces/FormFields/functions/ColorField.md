@@ -8,9 +8,9 @@
 
 > **ColorField**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/form/color-field.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/color-field.tsx#L24)
+Defined in: [packages/ui/src/fields/form/color-field.tsx:32](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/color-field.tsx#L32)
 
-Color picker field with native color input and hex text input.
+Color picker field with a popover palette, optional custom picker, and hex text input.
 
 ## Parameters
 

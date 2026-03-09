@@ -24,7 +24,7 @@ Tree node data type.
 
 ### options
 
-`UseTreeExpansionOptions`\<`T`\>
+[`UseTreeExpansionOptions`](../interfaces/UseTreeExpansionOptions.md)\<`T`\>
 
 Tree data and configuration.
 

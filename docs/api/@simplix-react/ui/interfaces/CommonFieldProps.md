@@ -22,6 +22,8 @@ Shared props for all form field components.
 - [`ComboboxFieldProps`](../namespaces/FormFields/interfaces/ComboboxFieldProps.md)
 - [`CountryFieldProps`](../namespaces/FormFields/interfaces/CountryFieldProps.md)
 - [`DateFieldProps`](../namespaces/FormFields/interfaces/DateFieldProps.md)
+- [`DateRangeFieldProps`](../namespaces/FormFields/interfaces/DateRangeFieldProps.md)
+- [`DateTimeFieldProps`](../namespaces/FormFields/interfaces/DateTimeFieldProps.md)
 - [`FormFieldProps`](../namespaces/FormFields/interfaces/FormFieldProps.md)
 - [`MultiSelectFieldProps`](../namespaces/FormFields/interfaces/MultiSelectFieldProps.md)
 - [`NumberFieldProps`](../namespaces/FormFields/interfaces/NumberFieldProps.md)
@@ -29,6 +31,7 @@ Shared props for all form field components.
 - [`RadioGroupFieldProps`](../namespaces/FormFields/interfaces/RadioGroupFieldProps.md)
 - [`SelectFieldProps`](../namespaces/FormFields/interfaces/SelectFieldProps.md)
 - [`SliderFieldProps`](../namespaces/FormFields/interfaces/SliderFieldProps.md)
+- [`StaticFieldProps`](../namespaces/FormFields/interfaces/StaticFieldProps.md)
 - [`SwitchFieldProps`](../namespaces/FormFields/interfaces/SwitchFieldProps.md)
 - [`TextFieldProps`](../namespaces/FormFields/interfaces/TextFieldProps.md)
 - [`TextareaFieldProps`](../namespaces/FormFields/interfaces/TextareaFieldProps.md)
@@ -41,7 +44,7 @@ Shared props for all form field components.
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L29)
+Defined in: [packages/ui/src/crud/shared/types.ts:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L30)
 
 ***
 
@@ -49,7 +52,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:29](https://github.com/simplix
 
 > `optional` **description**: `string`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L26)
+Defined in: [packages/ui/src/crud/shared/types.ts:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L27)
 
 ***
 
@@ -57,7 +60,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:26](https://github.com/simplix
 
 > `optional` **disabled**: `boolean`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L28)
+Defined in: [packages/ui/src/crud/shared/types.ts:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L29)
 
 ***
 
@@ -101,7 +104,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-
 
 > `optional` **required**: `boolean`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L27)
+Defined in: [packages/ui/src/crud/shared/types.ts:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L28)
 
 ***
 
@@ -114,3 +117,11 @@ Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-
 #### Inherited from
 
 [`FieldVariant`](FieldVariant.md).[`size`](FieldVariant.md#size)
+
+***
+
+### warning?
+
+> `optional` **warning**: `string`
+
+Defined in: [packages/ui/src/crud/shared/types.ts:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L26)

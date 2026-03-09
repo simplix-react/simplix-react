@@ -10,7 +10,7 @@
 
 > **configureMutator**(`fetch`): `void`
 
-Defined in: [packages/api/src/index.ts:66](https://github.com/simplix-react/simplix-react/blob/main/packages/api/src/index.ts#L66)
+Defined in: [packages/api/src/index.ts:95](https://github.com/simplix-react/simplix-react/blob/main/packages/api/src/index.ts#L95)
 
 Register a fetch function for Orval-generated API clients.
 
@@ -19,8 +19,6 @@ Register a fetch function for Orval-generated API clients.
 #### fetch
 
 [`OrvalMutator`](../type-aliases/OrvalMutator.md)
-
-The fetch function (only when the first argument is a strategy name).
 
 ### Returns
 
@@ -45,7 +43,7 @@ configureMutator("admin", adminFetcher);
 
 > **configureMutator**(`strategy`, `fetch`): `void`
 
-Defined in: [packages/api/src/index.ts:67](https://github.com/simplix-react/simplix-react/blob/main/packages/api/src/index.ts#L67)
+Defined in: [packages/api/src/index.ts:96](https://github.com/simplix-react/simplix-react/blob/main/packages/api/src/index.ts#L96)
 
 Register a fetch function for Orval-generated API clients.
 
@@ -58,8 +56,6 @@ Register a fetch function for Orval-generated API clients.
 #### fetch
 
 [`OrvalMutator`](../type-aliases/OrvalMutator.md)
-
-The fetch function (only when the first argument is a strategy name).
 
 ### Returns
 

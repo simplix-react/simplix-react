@@ -65,7 +65,7 @@ Sub-components: Section, Actions, DefaultActions.
 
 ##### props
 
-`SectionShellProps`
+[`SectionShellProps`](../interfaces/SectionShellProps.md)
 
 #### Returns
 

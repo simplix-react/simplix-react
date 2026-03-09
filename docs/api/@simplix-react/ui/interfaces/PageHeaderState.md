@@ -14,6 +14,14 @@ Defined in: [packages/ui/src/layout/page-header.tsx:3](https://github.com/simpli
 
 > `optional` **actions**: `ReactNode`
 
+Defined in: [packages/ui/src/layout/page-header.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L10)
+
+***
+
+### center?
+
+> `optional` **center**: `ReactNode`
+
 Defined in: [packages/ui/src/layout/page-header.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L9)
 
 ***

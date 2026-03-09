@@ -6,7 +6,7 @@
 
 # Interface: DateFieldProps
 
-Defined in: [packages/ui/src/fields/form/date-field.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/date-field.tsx#L16)
+Defined in: [packages/ui/src/fields/form/date-field.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/date-field.tsx#L10)
 
 Props for the [DateField](../functions/DateField.md) form component.
 
@@ -20,7 +20,7 @@ Props for the [DateField](../functions/DateField.md) form component.
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L29)
+Defined in: [packages/ui/src/crud/shared/types.ts:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L30)
 
 #### Inherited from
 
@@ -32,7 +32,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:29](https://github.com/simplix
 
 > `optional` **description**: `string`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L26)
+Defined in: [packages/ui/src/crud/shared/types.ts:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L27)
 
 #### Inherited from
 
@@ -44,11 +44,21 @@ Defined in: [packages/ui/src/crud/shared/types.ts:26](https://github.com/simplix
 
 > `optional` **disabled**: `boolean`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L28)
+Defined in: [packages/ui/src/crud/shared/types.ts:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L29)
 
 #### Inherited from
 
 [`CommonFieldProps`](../../../interfaces/CommonFieldProps.md).[`disabled`](../../../interfaces/CommonFieldProps.md#disabled)
+
+***
+
+### endYear?
+
+> `optional` **endYear**: `number`
+
+Defined in: [packages/ui/src/fields/form/date-field.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/date-field.tsx#L26)
+
+End year for the year dropdown.
 
 ***
 
@@ -61,16 +71,6 @@ Defined in: [packages/ui/src/crud/shared/types.ts:25](https://github.com/simplix
 #### Inherited from
 
 [`CommonFieldProps`](../../../interfaces/CommonFieldProps.md).[`error`](../../../interfaces/CommonFieldProps.md#error)
-
-***
-
-### format?
-
-> `optional` **format**: `string`
-
-Defined in: [packages/ui/src/fields/form/date-field.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/date-field.tsx#L26)
-
-Date format string (reserved for future use).
 
 ***
 
@@ -110,11 +110,21 @@ Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-
 
 ***
 
+### locale?
+
+> `optional` **locale**: `string`
+
+Defined in: [packages/ui/src/fields/form/date-field.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/date-field.tsx#L20)
+
+Short locale code (e.g. `"ko"`, `"en"`, `"ja"`).
+
+***
+
 ### maxDate?
 
 > `optional` **maxDate**: `Date`
 
-Defined in: [packages/ui/src/fields/form/date-field.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/date-field.tsx#L24)
+Defined in: [packages/ui/src/fields/form/date-field.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/date-field.tsx#L18)
 
 Latest selectable date.
 
@@ -124,7 +134,7 @@ Latest selectable date.
 
 > `optional` **minDate**: `Date`
 
-Defined in: [packages/ui/src/fields/form/date-field.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/date-field.tsx#L22)
+Defined in: [packages/ui/src/fields/form/date-field.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/date-field.tsx#L16)
 
 Earliest selectable date.
 
@@ -134,7 +144,7 @@ Earliest selectable date.
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/fields/form/date-field.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/date-field.tsx#L20)
+Defined in: [packages/ui/src/fields/form/date-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/date-field.tsx#L14)
 
 Called when the date selection changes.
 
@@ -154,7 +164,7 @@ Called when the date selection changes.
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/fields/form/date-field.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/date-field.tsx#L28)
+Defined in: [packages/ui/src/fields/form/date-field.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/date-field.tsx#L22)
 
 Placeholder text when no date is selected.
 
@@ -164,11 +174,21 @@ Placeholder text when no date is selected.
 
 > `optional` **required**: `boolean`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L27)
+Defined in: [packages/ui/src/crud/shared/types.ts:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L28)
 
 #### Inherited from
 
 [`CommonFieldProps`](../../../interfaces/CommonFieldProps.md).[`required`](../../../interfaces/CommonFieldProps.md#required)
+
+***
+
+### reverseYears?
+
+> `optional` **reverseYears**: `boolean`
+
+Defined in: [packages/ui/src/fields/form/date-field.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/date-field.tsx#L28)
+
+Reverse year order in dropdown.
 
 ***
 
@@ -184,10 +204,32 @@ Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-
 
 ***
 
+### startYear?
+
+> `optional` **startYear**: `number`
+
+Defined in: [packages/ui/src/fields/form/date-field.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/date-field.tsx#L24)
+
+Start year for the year dropdown.
+
+***
+
 ### value
 
 > **value**: [`DateLike`](../../../type-aliases/DateLike.md) \| `null`
 
-Defined in: [packages/ui/src/fields/form/date-field.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/date-field.tsx#L18)
+Defined in: [packages/ui/src/fields/form/date-field.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/date-field.tsx#L12)
 
 Currently selected date. Accepts Date, ISO string, or unix timestamp.
+
+***
+
+### warning?
+
+> `optional` **warning**: `string`
+
+Defined in: [packages/ui/src/crud/shared/types.ts:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L26)
+
+#### Inherited from
+
+[`CommonFieldProps`](../../../interfaces/CommonFieldProps.md).[`warning`](../../../interfaces/CommonFieldProps.md#warning)

@@ -26,7 +26,7 @@ Section sub-component for CrudForm.
 
 ## Extends
 
-- `SectionShellProps`
+- [`SectionShellProps`](SectionShellProps.md)
 
 ## Properties
 
@@ -34,11 +34,11 @@ Section sub-component for CrudForm.
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/shared/section-shell.tsx:63](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/section-shell.tsx#L63)
+Defined in: [packages/ui/src/crud/shared/section-shell.tsx:78](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/section-shell.tsx#L78)
 
 #### Inherited from
 
-`SectionShellProps.children`
+[`SectionShellProps`](SectionShellProps.md).[`children`](SectionShellProps.md#children)
 
 ***
 
@@ -46,11 +46,11 @@ Defined in: [packages/ui/src/crud/shared/section-shell.tsx:63](https://github.co
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/shared/section-shell.tsx:62](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/section-shell.tsx#L62)
+Defined in: [packages/ui/src/crud/shared/section-shell.tsx:77](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/section-shell.tsx#L77)
 
 #### Inherited from
 
-`SectionShellProps.className`
+[`SectionShellProps`](SectionShellProps.md).[`className`](SectionShellProps.md#classname)
 
 ***
 
@@ -58,13 +58,13 @@ Defined in: [packages/ui/src/crud/shared/section-shell.tsx:62](https://github.co
 
 > `optional` **collapsible**: `boolean`
 
-Defined in: [packages/ui/src/crud/shared/section-shell.tsx:59](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/section-shell.tsx#L59)
+Defined in: [packages/ui/src/crud/shared/section-shell.tsx:74](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/section-shell.tsx#L74)
 
 Enable collapsible behavior (default: false).
 
 #### Inherited from
 
-`SectionShellProps.collapsible`
+[`SectionShellProps`](SectionShellProps.md).[`collapsible`](SectionShellProps.md#collapsible)
 
 ***
 
@@ -72,13 +72,13 @@ Enable collapsible behavior (default: false).
 
 > `optional` **defaultOpen**: `boolean`
 
-Defined in: [packages/ui/src/crud/shared/section-shell.tsx:61](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/section-shell.tsx#L61)
+Defined in: [packages/ui/src/crud/shared/section-shell.tsx:76](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/section-shell.tsx#L76)
 
 Initial open state when collapsible (default: true).
 
 #### Inherited from
 
-`SectionShellProps.defaultOpen`
+[`SectionShellProps`](SectionShellProps.md).[`defaultOpen`](SectionShellProps.md#defaultopen)
 
 ***
 
@@ -86,11 +86,11 @@ Initial open state when collapsible (default: true).
 
 > `optional` **description**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/shared/section-shell.tsx:51](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/section-shell.tsx#L51)
+Defined in: [packages/ui/src/crud/shared/section-shell.tsx:66](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/section-shell.tsx#L66)
 
 #### Inherited from
 
-`SectionShellProps.description`
+[`SectionShellProps`](SectionShellProps.md).[`description`](SectionShellProps.md#description)
 
 ***
 
@@ -106,13 +106,13 @@ Defined in: [packages/ui/src/crud/form/crud-form.tsx:134](https://github.com/sim
 
 > `optional` **sectionTitle**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/shared/section-shell.tsx:53](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/section-shell.tsx#L53)
+Defined in: [packages/ui/src/crud/shared/section-shell.tsx:68](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/section-shell.tsx#L68)
 
 Group title rendered above the card.
 
 #### Inherited from
 
-`SectionShellProps.sectionTitle`
+[`SectionShellProps`](SectionShellProps.md).[`sectionTitle`](SectionShellProps.md#sectiontitle)
 
 ***
 
@@ -120,11 +120,11 @@ Group title rendered above the card.
 
 > `optional` **title**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/shared/section-shell.tsx:50](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/section-shell.tsx#L50)
+Defined in: [packages/ui/src/crud/shared/section-shell.tsx:65](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/section-shell.tsx#L65)
 
 #### Inherited from
 
-`SectionShellProps.title`
+[`SectionShellProps`](SectionShellProps.md).[`title`](SectionShellProps.md#title)
 
 ***
 
@@ -132,24 +132,24 @@ Defined in: [packages/ui/src/crud/shared/section-shell.tsx:50](https://github.co
 
 > `optional` **trailing**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/shared/section-shell.tsx:57](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/section-shell.tsx#L57)
+Defined in: [packages/ui/src/crud/shared/section-shell.tsx:72](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/section-shell.tsx#L72)
 
 Content rendered on the right side of the section header.
 
 #### Inherited from
 
-`SectionShellProps.trailing`
+[`SectionShellProps`](SectionShellProps.md).[`trailing`](SectionShellProps.md#trailing)
 
 ***
 
 ### variant?
 
-> `optional` **variant**: `"flat"` \| `"card"`
+> `optional` **variant**: `"flat"` \| `"card"` \| `"lined"`
 
-Defined in: [packages/ui/src/crud/shared/section-shell.tsx:55](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/section-shell.tsx#L55)
+Defined in: [packages/ui/src/crud/shared/section-shell.tsx:70](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/section-shell.tsx#L70)
 
-Visual style: `"card"` (default) renders with border and shadow, `"flat"` renders without.
+Visual style: `"card"` (default) renders with border and shadow, `"flat"` renders without, `"lined"` adds a left border on the body.
 
 #### Inherited from
 
-`SectionShellProps.variant`
+[`SectionShellProps`](SectionShellProps.md).[`variant`](SectionShellProps.md#variant)

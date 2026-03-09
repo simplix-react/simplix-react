@@ -8,7 +8,7 @@
 
 > **adaptOrvalList**\<`T`\>(`useApiHook`, `options?`): [`ListHook`](../interfaces/ListHook.md)\<`T`\>
 
-Defined in: [packages/ui/src/crud/list/adapt-orval-list.ts:50](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/adapt-orval-list.ts#L50)
+Defined in: [packages/ui/src/crud/list/adapt-orval-list.ts:54](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/adapt-orval-list.ts#L54)
 
 Adapt an Orval-generated list hook to the [ListHook](../interfaces/ListHook.md) interface
 expected by [useCrudList](useCrudList.md) with `stateMode: "server"`.
@@ -25,13 +25,13 @@ Row data type.
 
 ### useApiHook
 
-`OrvalListHookLike`
+[`OrvalListHookLike`](../type-aliases/OrvalListHookLike.md)
 
 Orval-generated list query hook.
 
 ### options?
 
-`AdaptOrvalListOptions`
+[`AdaptOrvalListOptions`](../interfaces/AdaptOrvalListOptions.md)
 
 Optional query configuration (e.g. cache overrides).
 

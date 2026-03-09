@@ -33,7 +33,7 @@ with a 300ms debounce using `history.replaceState` (no page reload).
 
 ```ts
 useUrlSync({
-  filters: list.filters,
+  filters: { search: list.filters.search, values: list.filters.committedValues },
   sort: list.sort,
   pagination: list.pagination,
   setFilters: list.filters.setAll,

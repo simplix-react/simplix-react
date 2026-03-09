@@ -8,7 +8,7 @@
 
 > **PageHeaderProvider**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/layout/page-header.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L17)
+Defined in: [packages/ui/src/layout/page-header.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L18)
 
 ## Parameters
 

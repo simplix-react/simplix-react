@@ -8,7 +8,7 @@
 
 > `const` **CrudList**: (`__namedParameters`) => `Element` & `object`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:1486](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1486)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:1476](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1476)
 
 Compound component for building CRUD list views with toolbar, table,
 pagination, selection, and bulk actions.
@@ -89,6 +89,44 @@ BulkActions, BulkAction, Empty, and 10+ filter types.
 #### Returns
 
 `Element` \| `null`
+
+### ChipFilter()
+
+> **ChipFilter**: \<`T`\>(`__namedParameters`) => `Element`
+
+Toggle chip grid that integrates with [CrudListFilters](../interfaces/CrudListFilters.md) for server-side filtering.
+
+Single-select toggle: clicking an active chip deselects it (shows all).
+
+#### Type Parameters
+
+##### T
+
+`T` *extends* `string` \| `number` = `string`
+
+#### Parameters
+
+##### \_\_namedParameters
+
+[`ChipFilterProps`](../interfaces/ChipFilterProps.md)\<`T`\>
+
+#### Returns
+
+`Element`
+
+#### Example
+
+```tsx
+<CrudList.ChipFilter
+  field="status.equals"
+  columns={3}
+  state={list.filters}
+  options={[
+    { value: "active", label: "Active", icon: <StatusDot color="green" /> },
+    { value: "inactive", label: "Inactive", icon: <StatusDot color="gray" /> },
+  ]}
+/>
+```
 
 ### Column()
 

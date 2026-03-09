@@ -244,7 +244,7 @@ aria-owns.
 
 ### aria-current?
 
-> `optional` **aria-current**: `boolean` \| `"true"` \| `"false"` \| `"time"` \| `"page"` \| `"step"` \| `"location"` \| `"date"`
+> `optional` **aria-current**: `boolean` \| `"date"` \| `"true"` \| `"false"` \| `"time"` \| `"page"` \| `"step"` \| `"location"`
 
 Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2534](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2534)
 

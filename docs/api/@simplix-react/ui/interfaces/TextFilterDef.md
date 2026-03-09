@@ -6,7 +6,7 @@
 
 # Interface: TextFilterDef
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:51](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L51)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:52](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L52)
 
 ## Extends
 
@@ -18,7 +18,7 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:51](https://github.com/
 
 > **defaultOperator**: [`SearchOperator`](../enumerations/SearchOperator.md)
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:54](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L54)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:55](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L55)
 
 ***
 
@@ -26,7 +26,7 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:54](https://github.com/
 
 > **field**: `string`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:47](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L47)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:48](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L48)
 
 #### Inherited from
 
@@ -38,7 +38,7 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:47](https://github.com/
 
 > **label**: `string`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:48](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L48)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:49](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L49)
 
 #### Inherited from
 
@@ -50,7 +50,7 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:48](https://github.com/
 
 > **operators**: [`SearchOperator`](../enumerations/SearchOperator.md)[]
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:53](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L53)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:54](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L54)
 
 ***
 
@@ -58,7 +58,7 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:53](https://github.com/
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:55](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L55)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:56](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L56)
 
 ***
 
@@ -66,4 +66,4 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:55](https://github.com/
 
 > **type**: `"text"`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:52](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L52)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:53](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L53)

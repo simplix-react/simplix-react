@@ -6,7 +6,7 @@
 
 # Interface: CrudMutation\<TInput\>
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:4](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L4)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L9)
 
 Minimal mutation shape used by [useCrudFormSubmit](../functions/useCrudFormSubmit.md).
 
@@ -22,7 +22,7 @@ Minimal mutation shape used by [useCrudFormSubmit](../functions/useCrudFormSubmi
 
 > **isPending**: `boolean`
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L8)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L15)
 
 Whether the mutation is currently in flight.
 
@@ -32,7 +32,7 @@ Whether the mutation is currently in flight.
 
 > **mutate**: (`input`, `options?`) => `void`
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L6)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L11)
 
 Trigger the mutation with the given input.
 
@@ -51,3 +51,23 @@ Trigger the mutation with the given input.
 #### Returns
 
 `void`
+
+***
+
+### mutateAsync()
+
+> **mutateAsync**: (`input`) => `Promise`\<`unknown`\>
+
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L13)
+
+Promise-based mutation trigger for error handling.
+
+#### Parameters
+
+##### input
+
+`TInput`
+
+#### Returns
+
+`Promise`\<`unknown`\>

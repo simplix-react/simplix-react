@@ -8,7 +8,7 @@
 
 > **getSpecProfile**(`name`): [`SpecProfile`](../interfaces/SpecProfile.md) \| `undefined`
 
-Defined in: [openapi/plugin-registry.ts:150](https://github.com/simplix-react/simplix-react/blob/main/openapi/plugin-registry.ts#L150)
+Defined in: [openapi/plugin-registry.ts:169](https://github.com/simplix-react/simplix-react/blob/main/openapi/plugin-registry.ts#L169)
 
 Looks up a spec profile by name.
 

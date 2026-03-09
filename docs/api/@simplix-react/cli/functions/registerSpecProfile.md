@@ -8,7 +8,7 @@
 
 > **registerSpecProfile**(`name`, `profile`): `void`
 
-Defined in: [openapi/plugin-registry.ts:83](https://github.com/simplix-react/simplix-react/blob/main/openapi/plugin-registry.ts#L83)
+Defined in: [openapi/plugin-registry.ts:102](https://github.com/simplix-react/simplix-react/blob/main/openapi/plugin-registry.ts#L102)
 
 Registers a named spec profile into the global registry.
 

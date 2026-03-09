@@ -8,10 +8,10 @@
 
 > **ComboboxField**\<`T`\>(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/form/combobox-field.tsx:41](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L41)
+Defined in: [packages/ui/src/fields/form/combobox-field.tsx:43](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L43)
 
-Searchable dropdown field with type-ahead filtering.
-Supports async search via onSearch callback and loading state.
+Searchable dropdown field with popover-based filtering.
+Trigger displays selected value as text; search input is inside the popover.
 
 ## Type Parameters
 

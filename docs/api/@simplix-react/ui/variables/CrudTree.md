@@ -8,7 +8,7 @@
 
 > `const` **CrudTree**: (`__namedParameters`) => `Element` & `object`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:799](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L799)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:801](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L801)
 
 Compound component for building hierarchical tree views with
 expand/collapse, search filtering, sorting, and row actions.
@@ -88,7 +88,7 @@ Table, Column, Empty.
 
 ##### \_\_namedParameters
 
-`TreeHeaderActionsProps`
+[`TreeHeaderActionsProps`](../interfaces/TreeHeaderActionsProps.md)
 
 #### Returns
 

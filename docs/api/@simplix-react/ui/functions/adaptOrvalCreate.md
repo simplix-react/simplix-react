@@ -8,7 +8,7 @@
 
 > **adaptOrvalCreate**\<`T`\>(`mutation`, `opts?`): [`CrudMutation`](../interfaces/CrudMutation.md)\<`T`\>
 
-Defined in: [packages/ui/src/crud/form/adapt-orval-mutation.ts:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/adapt-orval-mutation.ts#L20)
+Defined in: [packages/ui/src/crud/form/adapt-orval-mutation.ts:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/adapt-orval-mutation.ts#L21)
 
 Adapts an Orval **create** mutation (`mutate({ data: T })`) to the
 [CrudMutation](../interfaces/CrudMutation.md) interface (`mutate(values)`).
@@ -23,7 +23,7 @@ Adapts an Orval **create** mutation (`mutate({ data: T })`) to the
 
 ### mutation
 
-`OrvalMutationLike`
+[`OrvalMutationLike`](../interfaces/OrvalMutationLike.md)
 
 ### opts?
 

@@ -6,7 +6,7 @@
 
 # Interface: CalendarProps
 
-Defined in: [packages/ui/src/base/controls/calendar.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L10)
+Defined in: [packages/ui/src/base/controls/calendar.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L11)
 
 ## Extends
 
@@ -242,7 +242,7 @@ aria-owns.
 
 ### aria-current?
 
-> `optional` **aria-current**: `boolean` \| `"true"` \| `"false"` \| `"time"` \| `"page"` \| `"step"` \| `"location"` \| `"date"`
+> `optional` **aria-current**: `boolean` \| `"date"` \| `"true"` \| `"false"` \| `"time"` \| `"page"` \| `"step"` \| `"location"`
 
 Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react/index.d.ts:2534](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.13/node_modules/@types/react/index.d.ts#L2534)
 
@@ -1151,6 +1151,26 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react
 
 ***
 
+### hideHeader?
+
+> `optional` **hideHeader**: `boolean`
+
+Defined in: [packages/ui/src/base/controls/calendar.tsx:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L30)
+
+Hide month/year header row.
+
+***
+
+### hideNavigation?
+
+> `optional` **hideNavigation**: `boolean`
+
+Defined in: [packages/ui/src/base/controls/calendar.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L28)
+
+Hide built-in prev/next navigation (for parent-controlled navigation).
+
+***
+
 ### id?
 
 > `optional` **id**: `string`
@@ -1311,11 +1331,21 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react
 
 ***
 
+### locale?
+
+> `optional` **locale**: `string`
+
+Defined in: [packages/ui/src/base/controls/calendar.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L22)
+
+BCP 47 locale tag for weekday/month names (e.g. `"ko-KR"`). Defaults to browser locale.
+
+***
+
 ### maxDate?
 
 > `optional` **maxDate**: `Date`
 
-Defined in: [packages/ui/src/base/controls/calendar.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L15)
+Defined in: [packages/ui/src/base/controls/calendar.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L16)
 
 ***
 
@@ -1323,7 +1353,7 @@ Defined in: [packages/ui/src/base/controls/calendar.tsx:15](https://github.com/s
 
 > `optional` **minDate**: `Date`
 
-Defined in: [packages/ui/src/base/controls/calendar.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L14)
+Defined in: [packages/ui/src/base/controls/calendar.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L15)
 
 ***
 
@@ -1331,7 +1361,17 @@ Defined in: [packages/ui/src/base/controls/calendar.tsx:14](https://github.com/s
 
 > `optional` **mode**: `"single"` \| `"range"`
 
-Defined in: [packages/ui/src/base/controls/calendar.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L16)
+Defined in: [packages/ui/src/base/controls/calendar.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L17)
+
+***
+
+### month?
+
+> `optional` **month**: `Date`
+
+Defined in: [packages/ui/src/base/controls/calendar.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L24)
+
+Controlled displayed month. When set, the calendar shows this month.
 
 ***
 
@@ -1351,7 +1391,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react
 
 > `optional` **numberOfMonths**: `number`
 
-Defined in: [packages/ui/src/base/controls/calendar.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L19)
+Defined in: [packages/ui/src/base/controls/calendar.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L20)
 
 ***
 
@@ -2407,6 +2447,26 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react
 
 ***
 
+### onMonthChange()?
+
+> `optional` **onMonthChange**: (`date`) => `void`
+
+Defined in: [packages/ui/src/base/controls/calendar.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L26)
+
+Callback when the displayed month changes (controlled mode).
+
+#### Parameters
+
+##### date
+
+`Date`
+
+#### Returns
+
+`void`
+
+***
+
 ### onMouseDown?
 
 > `optional` **onMouseDown**: `MouseEventHandler`\<`HTMLDivElement`\>
@@ -2987,7 +3047,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react
 
 > `optional` **onSelect**: (`date`) => `void`
 
-Defined in: [packages/ui/src/base/controls/calendar.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L13)
+Defined in: [packages/ui/src/base/controls/calendar.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L14)
 
 #### Parameters
 
@@ -3017,7 +3077,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react
 
 > `optional` **onSelectRange**: (`range`) => `void`
 
-Defined in: [packages/ui/src/base/controls/calendar.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L18)
+Defined in: [packages/ui/src/base/controls/calendar.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L19)
 
 #### Parameters
 
@@ -3587,7 +3647,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react
 
 > `optional` **selected**: `Date`
 
-Defined in: [packages/ui/src/base/controls/calendar.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L12)
+Defined in: [packages/ui/src/base/controls/calendar.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L13)
 
 ***
 
@@ -3595,7 +3655,7 @@ Defined in: [packages/ui/src/base/controls/calendar.tsx:12](https://github.com/s
 
 > `optional` **selectedRange**: [`DateRange`](DateRange.md)
 
-Defined in: [packages/ui/src/base/controls/calendar.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L17)
+Defined in: [packages/ui/src/base/controls/calendar.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L18)
 
 ***
 

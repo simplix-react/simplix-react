@@ -8,7 +8,7 @@
 
 > **adaptOrvalUpdate**\<`T`, `TId`\>(`mutation`, `pathParam?`, `opts?`): [`CrudMutation`](../interfaces/CrudMutation.md)\<\{ `dto`: `T`; `id`: `TId`; \}\>
 
-Defined in: [packages/ui/src/crud/form/adapt-orval-mutation.ts:42](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/adapt-orval-mutation.ts#L42)
+Defined in: [packages/ui/src/crud/form/adapt-orval-mutation.ts:45](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/adapt-orval-mutation.ts#L45)
 
 Adapts an Orval **update** mutation to the [CrudMutation](../interfaces/CrudMutation.md) interface
 (`mutate({ id, dto })`).
@@ -30,7 +30,7 @@ Adapts an Orval **update** mutation to the [CrudMutation](../interfaces/CrudMuta
 
 ### mutation
 
-`OrvalMutationLike`
+[`OrvalMutationLike`](../interfaces/OrvalMutationLike.md)
 
 Orval update mutation hook result
 

@@ -8,7 +8,7 @@
 
 > **registerSchemaAdapter**(`adapter`): `void`
 
-Defined in: [openapi/plugin-registry.ts:130](https://github.com/simplix-react/simplix-react/blob/main/openapi/plugin-registry.ts#L130)
+Defined in: [openapi/plugin-registry.ts:149](https://github.com/simplix-react/simplix-react/blob/main/openapi/plugin-registry.ts#L149)
 
 Registers a schema adapter for unwrapping vendor-specific schema wrappers.
 

@@ -46,12 +46,12 @@ PMTiles file URL for offline fallback (e.g. "/offline-map.pmtiles").
 
 #### styles.dark?
 
-> `optional` **dark**: `MapStyleOption`
+> `optional` **dark**: [`MapStyleOption`](MapStyleOption.md)
 
 #### styles.light?
 
-> `optional` **light**: `MapStyleOption`
+> `optional` **light**: [`MapStyleOption`](MapStyleOption.md)
 
 ### theme?
 
-> `optional` **theme**: `Theme`
+> `optional` **theme**: [`MapTheme`](MapTheme.md)

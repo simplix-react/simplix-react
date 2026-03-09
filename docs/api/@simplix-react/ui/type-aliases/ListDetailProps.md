@@ -6,7 +6,7 @@
 
 # Type Alias: ListDetailProps
 
-> **ListDetailProps** = `ListDetailBaseProps` & \{ `detailWidth?`: `number`; `listWidth?`: `never`; \} \| \{ `detailWidth?`: `never`; `listWidth?`: `number`; \}
+> **ListDetailProps** = [`ListDetailBaseProps`](../interfaces/ListDetailBaseProps.md) & \{ `detailWidth?`: `number`; `listWidth?`: `never`; \} \| \{ `detailWidth?`: `never`; `listWidth?`: `number`; \}
 
 Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:98](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L98)
 

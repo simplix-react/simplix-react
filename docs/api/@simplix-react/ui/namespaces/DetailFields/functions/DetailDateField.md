@@ -8,7 +8,7 @@
 
 > **DetailDateField**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/detail/date-field.tsx:80](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/date-field.tsx#L80)
+Defined in: [packages/ui/src/fields/detail/date-field.tsx:43](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/date-field.tsx#L43)
 
 Read-only date display field with support for date, datetime, and relative formats.
 

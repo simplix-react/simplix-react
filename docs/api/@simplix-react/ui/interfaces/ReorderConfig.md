@@ -6,7 +6,7 @@
 
 # Interface: ReorderConfig\<T\>
 
-Defined in: [packages/ui/src/crud/shared/types.ts:64](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L64)
+Defined in: [packages/ui/src/crud/shared/types.ts:65](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L65)
 
 Configuration for drag-and-drop row reordering.
 
@@ -22,7 +22,7 @@ Configuration for drag-and-drop row reordering.
 
 > `optional` **canDrag**: (`row`) => `boolean`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:72](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L72)
+Defined in: [packages/ui/src/crud/shared/types.ts:73](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L73)
 
 Per-row drag gate — return false to disable drag for specific rows.
 
@@ -42,7 +42,7 @@ Per-row drag gate — return false to disable drag for specific rows.
 
 > `optional` **idField**: keyof `T` & `string`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:68](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L68)
+Defined in: [packages/ui/src/crud/shared/types.ts:69](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L69)
 
 Field name for row ID (default: "id").
 
@@ -52,7 +52,7 @@ Field name for row ID (default: "id").
 
 > **onReorder**: (`items`) => `void` \| `Promise`\<`void`\>
 
-Defined in: [packages/ui/src/crud/shared/types.ts:70](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L70)
+Defined in: [packages/ui/src/crud/shared/types.ts:71](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L71)
 
 Callback invoked with reordered data after drag ends.
 
@@ -72,6 +72,6 @@ Callback invoked with reordered data after drag ends.
 
 > **orderField**: keyof `T` & `string`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:66](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L66)
+Defined in: [packages/ui/src/crud/shared/types.ts:67](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L67)
 
 Field name used for ordering (e.g. "displayOrder", "sortOrder").

@@ -6,7 +6,7 @@
 
 # Interface: ComboboxFieldProps\<T\>
 
-Defined in: [packages/ui/src/fields/form/combobox-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L14)
+Defined in: [packages/ui/src/fields/form/combobox-field.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L16)
 
 Props for the [ComboboxField](../functions/ComboboxField.md) form component.
 
@@ -26,7 +26,7 @@ Props for the [ComboboxField](../functions/ComboboxField.md) form component.
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L29)
+Defined in: [packages/ui/src/crud/shared/types.ts:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L30)
 
 #### Inherited from
 
@@ -38,7 +38,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:29](https://github.com/simplix
 
 > `optional` **description**: `string`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L26)
+Defined in: [packages/ui/src/crud/shared/types.ts:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L27)
 
 #### Inherited from
 
@@ -50,7 +50,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:26](https://github.com/simplix
 
 > `optional` **disabled**: `boolean`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L28)
+Defined in: [packages/ui/src/crud/shared/types.ts:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L29)
 
 #### Inherited from
 
@@ -62,7 +62,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:28](https://github.com/simplix
 
 > `optional` **emptyMessage**: `string`
 
-Defined in: [packages/ui/src/fields/form/combobox-field.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L22)
+Defined in: [packages/ui/src/fields/form/combobox-field.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L24)
 
 ***
 
@@ -118,7 +118,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-
 
 > `optional` **loading**: `boolean`
 
-Defined in: [packages/ui/src/fields/form/combobox-field.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L20)
+Defined in: [packages/ui/src/fields/form/combobox-field.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L22)
 
 ***
 
@@ -126,7 +126,7 @@ Defined in: [packages/ui/src/fields/form/combobox-field.tsx:20](https://github.c
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/fields/form/combobox-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L17)
+Defined in: [packages/ui/src/fields/form/combobox-field.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L19)
 
 #### Parameters
 
@@ -144,7 +144,7 @@ Defined in: [packages/ui/src/fields/form/combobox-field.tsx:17](https://github.c
 
 > `optional` **onSearch**: (`query`) => `void`
 
-Defined in: [packages/ui/src/fields/form/combobox-field.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L19)
+Defined in: [packages/ui/src/fields/form/combobox-field.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L21)
 
 #### Parameters
 
@@ -162,7 +162,11 @@ Defined in: [packages/ui/src/fields/form/combobox-field.tsx:19](https://github.c
 
 > **options**: `object`[]
 
-Defined in: [packages/ui/src/fields/form/combobox-field.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L18)
+Defined in: [packages/ui/src/fields/form/combobox-field.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L20)
+
+#### icon?
+
+> `optional` **icon**: `ReactNode`
 
 #### label
 
@@ -178,7 +182,7 @@ Defined in: [packages/ui/src/fields/form/combobox-field.tsx:18](https://github.c
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/fields/form/combobox-field.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L21)
+Defined in: [packages/ui/src/fields/form/combobox-field.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L23)
 
 ***
 
@@ -186,7 +190,7 @@ Defined in: [packages/ui/src/fields/form/combobox-field.tsx:21](https://github.c
 
 > `optional` **required**: `boolean`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L27)
+Defined in: [packages/ui/src/crud/shared/types.ts:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L28)
 
 #### Inherited from
 
@@ -210,4 +214,16 @@ Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-
 
 > **value**: `T` \| `null`
 
-Defined in: [packages/ui/src/fields/form/combobox-field.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L16)
+Defined in: [packages/ui/src/fields/form/combobox-field.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L18)
+
+***
+
+### warning?
+
+> `optional` **warning**: `string`
+
+Defined in: [packages/ui/src/crud/shared/types.ts:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L26)
+
+#### Inherited from
+
+[`CommonFieldProps`](../../../interfaces/CommonFieldProps.md).[`warning`](../../../interfaces/CommonFieldProps.md#warning)

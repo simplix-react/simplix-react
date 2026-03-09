@@ -8,7 +8,7 @@
 
 > **registerPlugin**(`plugin`): `void`
 
-Defined in: [openapi/plugin-registry.ts:204](https://github.com/simplix-react/simplix-react/blob/main/openapi/plugin-registry.ts#L204)
+Defined in: [openapi/plugin-registry.ts:223](https://github.com/simplix-react/simplix-react/blob/main/openapi/plugin-registry.ts#L223)
 
 Registers all spec profiles and response adapter presets bundled in a plugin.
 

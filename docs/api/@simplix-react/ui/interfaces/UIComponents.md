@@ -95,7 +95,7 @@ Defined in: [packages/ui/src/provider/types.ts:210](https://github.com/simplix-r
 
 ### Command
 
-> **Command**: `CommandComponents`
+> **Command**: [`CommandComponents`](CommandComponents.md)
 
 Defined in: [packages/ui/src/provider/types.ts:224](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L224)
 
@@ -127,7 +127,7 @@ Defined in: [packages/ui/src/provider/types.ts:241](https://github.com/simplix-r
 
 ### Dialog
 
-> **Dialog**: `DialogComponents`
+> **Dialog**: [`DialogComponents`](DialogComponents.md)
 
 Defined in: [packages/ui/src/provider/types.ts:218](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L218)
 
@@ -135,7 +135,7 @@ Defined in: [packages/ui/src/provider/types.ts:218](https://github.com/simplix-r
 
 ### DropdownMenu
 
-> **DropdownMenu**: `DropdownMenuComponents`
+> **DropdownMenu**: [`DropdownMenuComponents`](DropdownMenuComponents.md)
 
 Defined in: [packages/ui/src/provider/types.ts:222](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L222)
 
@@ -191,7 +191,7 @@ Defined in: [packages/ui/src/provider/types.ts:208](https://github.com/simplix-r
 
 ### Popover
 
-> **Popover**: `PopoverComponents`
+> **Popover**: [`PopoverComponents`](PopoverComponents.md)
 
 Defined in: [packages/ui/src/provider/types.ts:220](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L220)
 
@@ -223,7 +223,7 @@ Defined in: [packages/ui/src/provider/types.ts:234](https://github.com/simplix-r
 
 ### SectionShell
 
-> **SectionShell**: `ComponentType`\<`SectionShellProps`\>
+> **SectionShell**: `ComponentType`\<[`SectionShellProps`](SectionShellProps.md)\>
 
 Defined in: [packages/ui/src/provider/types.ts:236](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L236)
 
@@ -239,7 +239,7 @@ Defined in: [packages/ui/src/provider/types.ts:216](https://github.com/simplix-r
 
 ### Sheet
 
-> **Sheet**: `SheetComponents`
+> **Sheet**: [`SheetComponents`](SheetComponents.md)
 
 Defined in: [packages/ui/src/provider/types.ts:219](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L219)
 
@@ -271,7 +271,7 @@ Defined in: [packages/ui/src/provider/types.ts:209](https://github.com/simplix-r
 
 ### Table
 
-> **Table**: `TableComponents`
+> **Table**: [`TableComponents`](TableComponents.md)
 
 Defined in: [packages/ui/src/provider/types.ts:225](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L225)
 
@@ -279,7 +279,7 @@ Defined in: [packages/ui/src/provider/types.ts:225](https://github.com/simplix-r
 
 ### Tabs
 
-> **Tabs**: `TabsComponents`
+> **Tabs**: [`TabsComponents`](TabsComponents.md)
 
 Defined in: [packages/ui/src/provider/types.ts:223](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L223)
 
@@ -303,6 +303,6 @@ Defined in: [packages/ui/src/provider/types.ts:207](https://github.com/simplix-r
 
 ### Tooltip
 
-> **Tooltip**: `TooltipComponents`
+> **Tooltip**: [`TooltipComponents`](TooltipComponents.md)
 
 Defined in: [packages/ui/src/provider/types.ts:221](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L221)

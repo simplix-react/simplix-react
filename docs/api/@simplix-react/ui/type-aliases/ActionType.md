@@ -8,4 +8,4 @@
 
 > **ActionType** = `"view"` \| `"edit"` \| `"delete"` \| `"locate"` \| `"add-child"` \| `"reorder"` \| `"move"`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:273](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L273)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:261](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L261)

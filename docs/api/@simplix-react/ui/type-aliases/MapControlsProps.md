@@ -66,7 +66,7 @@ Callback with user coordinates when located.
 
 ### position?
 
-> `optional` **position**: `MapControlsPosition`
+> `optional` **position**: [`MapControlsPosition`](MapControlsPosition.md)
 
 Defined in: [packages/ui/src/base/map/map.tsx:381](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/map/map.tsx#L381)
 

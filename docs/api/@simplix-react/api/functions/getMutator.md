@@ -8,7 +8,7 @@
 
 > **getMutator**(`strategy?`): [`OrvalMutator`](../type-aliases/OrvalMutator.md)
 
-Defined in: [packages/api/src/index.ts:92](https://github.com/simplix-react/simplix-react/blob/main/packages/api/src/index.ts#L92)
+Defined in: [packages/api/src/index.ts:121](https://github.com/simplix-react/simplix-react/blob/main/packages/api/src/index.ts#L121)
 
 Retrieve a previously registered mutator by strategy name.
 

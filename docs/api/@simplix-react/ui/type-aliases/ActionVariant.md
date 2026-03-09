@@ -8,4 +8,4 @@
 
 > **ActionVariant** = `"outline"` \| `"ghost"` \| `"icon"`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:274](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L274)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:262](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L262)

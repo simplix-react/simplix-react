@@ -6,7 +6,7 @@
 
 # Interface: CrudListPagination
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:71](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L71)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:78](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L78)
 
 Pagination state returned by [useCrudList](../functions/useCrudList.md).
 
@@ -16,7 +16,7 @@ Pagination state returned by [useCrudList](../functions/useCrudList.md).
 
 > **page**: `number`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:72](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L72)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:79](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L79)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:72](https://github.com/s
 
 > **pageSize**: `number`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:73](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L73)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:80](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L80)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:73](https://github.com/s
 
 > **setPage**: (`page`) => `void`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:76](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L76)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:83](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L83)
 
 #### Parameters
 
@@ -50,7 +50,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:76](https://github.com/s
 
 > **setPageSize**: (`size`) => `void`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:77](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L77)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:84](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L84)
 
 #### Parameters
 
@@ -68,7 +68,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:77](https://github.com/s
 
 > **total**: `number`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:74](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L74)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:81](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L81)
 
 ***
 
@@ -76,4 +76,4 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:74](https://github.com/s
 
 > **totalPages**: `number`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:75](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L75)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:82](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L82)

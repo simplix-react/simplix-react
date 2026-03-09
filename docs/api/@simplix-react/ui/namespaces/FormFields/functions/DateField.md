@@ -8,9 +8,9 @@
 
 > **DateField**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/form/date-field.tsx:44](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/date-field.tsx#L44)
+Defined in: [packages/ui/src/fields/form/date-field.tsx:45](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/date-field.tsx#L45)
 
-Date picker field with calendar popover.
+Date picker field with calendar popover, month/year dropdowns, and i18n support.
 
 ## Parameters
 
@@ -30,5 +30,6 @@ Date picker field with calendar popover.
   value={birthDate}
   onChange={setBirthDate}
   maxDate={new Date()}
+  locale="ko"
 />
 ```

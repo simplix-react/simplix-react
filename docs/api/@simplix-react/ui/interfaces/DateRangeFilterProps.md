@@ -6,7 +6,7 @@
 
 # Interface: DateRangeFilterProps
 
-Defined in: [packages/ui/src/crud/filters/date-range-filter.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/date-range-filter.tsx#L13)
+Defined in: [packages/ui/src/crud/filters/date-range-filter.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/date-range-filter.tsx#L14)
 
 Props for the [DateRangeFilter](../functions/DateRangeFilter.md) component.
 
@@ -16,7 +16,7 @@ Props for the [DateRangeFilter](../functions/DateRangeFilter.md) component.
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/filters/date-range-filter.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/date-range-filter.tsx#L22)
+Defined in: [packages/ui/src/crud/filters/date-range-filter.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/date-range-filter.tsx#L23)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [packages/ui/src/crud/filters/date-range-filter.tsx:22](https://gith
 
 > **from**: `Date` \| `undefined`
 
-Defined in: [packages/ui/src/crud/filters/date-range-filter.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/date-range-filter.tsx#L17)
+Defined in: [packages/ui/src/crud/filters/date-range-filter.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/date-range-filter.tsx#L18)
 
 Start date of the range, or `undefined` if unset.
 
@@ -34,7 +34,7 @@ Start date of the range, or `undefined` if unset.
 
 > **label**: `string`
 
-Defined in: [packages/ui/src/crud/filters/date-range-filter.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/date-range-filter.tsx#L15)
+Defined in: [packages/ui/src/crud/filters/date-range-filter.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/date-range-filter.tsx#L16)
 
 Button label (e.g. `"Created"`, `"Updated"`).
 
@@ -44,7 +44,7 @@ Button label (e.g. `"Created"`, `"Updated"`).
 
 > **onChange**: (`from?`, `to?`) => `void`
 
-Defined in: [packages/ui/src/crud/filters/date-range-filter.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/date-range-filter.tsx#L21)
+Defined in: [packages/ui/src/crud/filters/date-range-filter.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/date-range-filter.tsx#L22)
 
 Called when the user selects or clears a date range.
 
@@ -68,6 +68,6 @@ Called when the user selects or clears a date range.
 
 > **to**: `Date` \| `undefined`
 
-Defined in: [packages/ui/src/crud/filters/date-range-filter.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/date-range-filter.tsx#L19)
+Defined in: [packages/ui/src/crud/filters/date-range-filter.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/date-range-filter.tsx#L20)
 
 End date of the range, or `undefined` if unset.

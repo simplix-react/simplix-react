@@ -8,7 +8,7 @@
 
 > **adaptOrvalDelete**\<`TId`\>(`mutation`, `pathParam`, `opts?`): [`CrudMutation`](../interfaces/CrudMutation.md)\<`TId`\>
 
-Defined in: [packages/ui/src/crud/form/adapt-orval-mutation.ts:63](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/adapt-orval-mutation.ts#L63)
+Defined in: [packages/ui/src/crud/form/adapt-orval-mutation.ts:70](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/adapt-orval-mutation.ts#L70)
 
 Adapts an Orval **delete** mutation (`mutate({ [pathParam]: id })`) to the
 [CrudMutation](../interfaces/CrudMutation.md) interface (`mutate(id)`).
@@ -23,7 +23,7 @@ Adapts an Orval **delete** mutation (`mutate({ [pathParam]: id })`) to the
 
 ### mutation
 
-`OrvalMutationLike`
+[`OrvalMutationLike`](../interfaces/OrvalMutationLike.md)
 
 Orval delete mutation hook result
 
