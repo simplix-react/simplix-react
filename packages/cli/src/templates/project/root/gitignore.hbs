@@ -1,15 +1,39 @@
+# Dependencies
 node_modules/
+
+# Build outputs
 dist/
-.turbo/
 *.tsbuildinfo
+
+# Turbo
+.turbo/
+
+# IDE
 .idea/
 .vscode/
+*.swp
+*.swo
+
+# OS
 .DS_Store
-*.local
+Thumbs.db
+
+# Environment
 .env
 .env.*
+*.local
+*.local.json
+
+# Test
 coverage/
 
+# TanStack Router generated
+.tanstack/
+
 # Stale JS artifacts in TypeScript source directories
+# Vite resolves .js before .ts, causing runtime errors when stale .js files remain
 **/src/**/*.js
 **/src/**/*.js.map
+
+# tsup bundled config artifacts
+tsup.config.bundled_*.mjs
