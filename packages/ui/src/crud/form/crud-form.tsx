@@ -154,13 +154,15 @@ function FormSection({
 
 /** Props for the CrudForm.Actions sub-component. */
 export interface CrudFormActionsProps {
+  /** When true, uses justify-between (e.g. back button on left, save on right). Defaults to justify-end. */
+  spread?: boolean;
   className?: string;
   children?: ReactNode;
 }
 
-function FormActions({ className, children }: CrudFormActionsProps) {
+function FormActions({ spread, className, children }: CrudFormActionsProps) {
   return (
-    <Flex gap="sm" justify="end" className={cn("border-t pt-2 px-2", className)}>
+    <Flex gap="sm" justify={spread ? "between" : "end"} className={cn("border-t pt-2 px-2", className)}>
       {children}
     </Flex>
   );

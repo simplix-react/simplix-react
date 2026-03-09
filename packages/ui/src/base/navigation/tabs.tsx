@@ -75,7 +75,7 @@ export const TabsContent = forwardRef<HTMLDivElement, TabsContentProps>(
   ({ className, padded = false, ...rest }, ref) => (
     <TabsPrimitive.Content
       ref={ref}
-      className={cn("flex-1 outline-none", padded && "pb-8", className)}
+      className={cn("flex-1 outline-none", padded && "pt-4 pb-8", className)}
       {...rest}
     />
   ),

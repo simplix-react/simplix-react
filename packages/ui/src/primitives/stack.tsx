@@ -31,6 +31,9 @@ const stackVariants = cva("flex", {
       around: "justify-around",
     },
     wrap: { true: "flex-wrap", false: "flex-nowrap" },
+    fill: { true: "h-full" },
+    flex: { true: "flex-1 min-h-0" },
+    padded: { true: "pt-4 pb-8" },
   },
   defaultVariants: { direction: "column", gap: "md", align: "stretch" },
 });
@@ -71,13 +74,13 @@ export interface StackProps
  */
 const StackBase = forwardRef<HTMLDivElement, StackProps>(
   (
-    { className, direction, gap, align, justify, wrap, children, ...rest },
+    { className, direction, gap, align, justify, wrap, fill, flex, padded, children, ...rest },
     ref,
   ) => (
     <div
       ref={ref}
       className={cn(
-        stackVariants({ direction, gap, align, justify, wrap }),
+        stackVariants({ direction, gap, align, justify, wrap, fill, flex, padded }),
         className,
       )}
       {...rest}
