@@ -266,7 +266,7 @@ describe("useCrudList", () => {
 
     it("returns 'no-filter' when filters are active but no results", () => {
       const useList = createMockListHook([]);
-      const { result } = renderHook(() => useCrudList(useList));
+      const { result } = renderHook(() => useCrudList(useList, { filterMode: "immediate" }));
 
       act(() => result.current.filters.setValue("status", "archived"));
       expect(result.current.emptyReason).toBe("no-filter");
@@ -351,7 +351,7 @@ describe("useCrudList", () => {
       ];
       const useList = createMockListHook(items);
       const { result } = renderHook(() =>
-        useCrudList(useList, { stateMode: "client" }),
+        useCrudList(useList, { stateMode: "client", filterMode: "immediate" }),
       );
 
       act(() => result.current.filters.setValue("status", "active"));

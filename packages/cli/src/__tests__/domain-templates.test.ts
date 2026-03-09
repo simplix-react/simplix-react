@@ -29,40 +29,25 @@ const domainCtx = {
 // --- Domain template tests ---
 
 describe("domainContractTs", () => {
-  it("renders TODO guide comments with example fields", () => {
+  it("imports schemas from ./schemas file", () => {
     const result = renderTemplate(domainContractTs, domainCtx);
 
-    expect(result).toContain("TODO: Add your domain fields here");
-  });
-
-  it("renders example field comments", () => {
-    const result = renderTemplate(domainContractTs, domainCtx);
-
-    expect(result).toContain("description: z.string().max(500).optional()");
-    expect(result).toContain("price: z.number().min(0)");
-    expect(result).toContain('status: z.enum(["active", "inactive"])');
-    expect(result).toContain("categoryId: z.string().uuid()");
-    expect(result).toContain("tags: z.array(z.string())");
-  });
-
-  it("preserves standard schema structure", () => {
-    const result = renderTemplate(domainContractTs, domainCtx);
-
-    expect(result).toContain("id: z.string().uuid()");
-    expect(result).toContain("name: z.string().min(1)");
-    expect(result).toContain("createdAt: z.string().datetime()");
-    expect(result).toContain("updatedAt: z.string().datetime()");
+    expect(result).toContain('from "./schemas"');
+    expect(result).toContain("productSchema,");
+    expect(result).toContain("createProductSchema,");
+    expect(result).toContain("updateProductSchema,");
+    expect(result).toContain("categorySchema,");
+    expect(result).toContain("createCategorySchema,");
+    expect(result).toContain("updateCategorySchema,");
   });
 
   it("renders entity names correctly for multiple entities", () => {
     const result = renderTemplate(domainContractTs, domainCtx);
 
-    expect(result).toContain("export const productSchema = z.object(");
-    expect(result).toContain("export const categorySchema = z.object(");
-    expect(result).toContain("export const createProductSchema");
-    expect(result).toContain("export const createCategorySchema");
-    expect(result).toContain("export type Product =");
-    expect(result).toContain("export type Category =");
+    expect(result).toContain("product: {");
+    expect(result).toContain("schema: productSchema,");
+    expect(result).toContain("category: {");
+    expect(result).toContain("schema: categorySchema,");
   });
 
   it("renders the defineApi call with domain, entities, and operations", () => {
@@ -142,7 +127,7 @@ describe("domainMockHandlersTs", () => {
   it("renders deriveMockHandlers call with correct api config", () => {
     const result = renderTemplate(domainMockHandlersTs, domainCtx);
 
-    expect(result).toContain("deriveMockHandlers(inventoryApi.config)");
+    expect(result).toContain("deriveMockHandlers(inventoryApi.config, undefined, options)");
   });
 });
 

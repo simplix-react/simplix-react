@@ -44,7 +44,8 @@ describe("setupMockWorker", () => {
 
     expect(mockSeedEntityStore).toHaveBeenCalledWith("store_a", [{ id: 1, name: "A" }]);
     expect(mockSeedEntityStore).not.toHaveBeenCalledWith("store_b", expect.anything());
-    expect(mockSetupWorker).toHaveBeenCalledWith("handler-a");
+    // setupWorker receives domain handlers + a catch-all passthrough handler
+    expect(mockSetupWorker).toHaveBeenCalledWith("handler-a", expect.anything());
   });
 
   it("treats domains without explicit enabled field as enabled", async () => {
@@ -59,7 +60,7 @@ describe("setupMockWorker", () => {
     await setupMockWorker({ domains });
 
     expect(mockSeedEntityStore).toHaveBeenCalledWith("store_x", [{ id: 1 }]);
-    expect(mockSetupWorker).toHaveBeenCalledWith("handler-default");
+    expect(mockSetupWorker).toHaveBeenCalledWith("handler-default", expect.anything());
   });
 
   it("calls resetStore before seeding", async () => {
@@ -99,7 +100,8 @@ describe("setupMockWorker", () => {
 
     await setupMockWorker({ domains });
 
-    expect(mockSetupWorker).toHaveBeenCalledWith("h1", "h2", "h3");
+    // setupWorker receives domain handlers + a catch-all passthrough handler
+    expect(mockSetupWorker).toHaveBeenCalledWith("h1", "h2", "h3", expect.anything());
   });
 
   it("handles empty domains array without error", async () => {
@@ -121,7 +123,7 @@ describe("setupMockWorker", () => {
     await setupMockWorker({ domains });
 
     expect(mockSeedEntityStore).not.toHaveBeenCalled();
-    expect(mockSetupWorker).toHaveBeenCalledWith("handler-ns");
+    expect(mockSetupWorker).toHaveBeenCalledWith("handler-ns", expect.anything());
     expect(mockStart).toHaveBeenCalled();
   });
 

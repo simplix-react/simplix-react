@@ -272,9 +272,9 @@ const baseCtx = {
 describe("listTemplate", () => {
   it("renders with correct imports", () => {
     const result = renderTemplate(listTemplate, baseCtx);
-    expect(result).toContain('import { Button, CrudList, Flex, Stack, Text, useCrudList } from "@simplix-react/ui"');
-    expect(result).toContain('import { useEntityTranslation } from "@simplix-react/i18n/react"');
-    expect(result).toContain('import { productHooks } from "@myapp/myapp-domain-product"');
+    expect(result).toContain('import { Badge, CrudList, DetailFieldWrapper,');
+    expect(result).toContain('useCrudList } from "@simplix-react/ui"');
+    expect(result).toContain('import { useEntityTranslation, useTranslation } from "@simplix-react/i18n/react"');
   });
 
   it("renders interface fields", () => {
@@ -283,12 +283,17 @@ describe("listTemplate", () => {
     expect(result).toContain("name: string;");
   });
 
-  it("uses useCrudList with domain hooks and type assertion", () => {
+  it("uses useCrudList with mock fallback when hookList not set", () => {
     const result = renderTemplate(listTemplate, baseCtx);
-    expect(result).toContain("useCrudList<Product>(productHooks.product.useList as any)");
+    expect(result).toContain("useCrudList<Product>(useMockList)");
   });
 
-  it("renders List compound components", () => {
+  it("uses adaptOrvalList when hookList is set", () => {
+    const result = renderTemplate(listTemplate, { ...baseCtx, hookList: "useListProduct" });
+    expect(result).toContain("adaptOrvalList(useListProduct)");
+  });
+
+  it("renders CrudList compound components", () => {
     const result = renderTemplate(listTemplate, baseCtx);
     expect(result).toContain("list.filters.search");
     expect(result).toContain("list.filters.setSearch");
@@ -296,7 +301,7 @@ describe("listTemplate", () => {
     expect(result).toContain("list.selection.selected");
     expect(result).toContain("list.pagination.page");
     expect(result).toContain("list.pagination.totalPages");
-    expect(result).toContain("list.emptyReason &&");
+    expect(result).toContain("list.emptyReason");
   });
 
   it("uses useEntityTranslation for field labels", () => {
@@ -304,30 +309,18 @@ describe("listTemplate", () => {
     expect(result).toContain('useEntityTranslation("product")');
     expect(result).toContain('header={fieldLabel("id")}');
     expect(result).toContain('header={fieldLabel("name")}');
-    expect(result).toContain('{fieldLabel("name")}: {row.name');
   });
 
-  it("renders List.Column for each field", () => {
+  it("renders CrudList.Column for each field", () => {
     const result = renderTemplate(listTemplate, baseCtx);
     expect(result).toContain('field="id"');
     expect(result).toContain('field="name"');
     expect(result).toContain('field="price"');
   });
 
-  it("includes create button when hasCreate", () => {
-    const result = renderTemplate(listTemplate, baseCtx);
-    expect(result).toContain("<Button onClick={onCreate}>New Product</Button>");
-  });
-
-  it("omits create button when hasCreate is false", () => {
-    const result = renderTemplate(listTemplate, { ...baseCtx, hasCreate: false });
-    expect(result).not.toContain("New Product");
-  });
-
   it("renders mock fallback when no packageName", () => {
     const result = renderTemplate(listTemplate, { ...baseCtx, packageName: null });
     expect(result).toContain("useMockList");
-    expect(result).not.toContain("productHooks");
   });
 
   it("renders mock fallback when packageName set but hookList missing", () => {
@@ -336,29 +329,22 @@ describe("listTemplate", () => {
     expect(result).toContain("function useMockList");
   });
 
-  it("renders navigation callback props", () => {
+  it("renders ProductListProps with actions and onRowClick", () => {
     const result = renderTemplate(listTemplate, baseCtx);
-    expect(result).toContain("onView?: (row: Product) => void;");
-    expect(result).toContain("onCreate?: () => void;");
-    expect(result).toContain("onEdit?: (row: Product) => void;");
-    expect(result).toContain("onDelete?: (row: Product) => void;");
+    expect(result).toContain("actions?: RowActionDef<Product>[];");
+    expect(result).toContain("actionVariant?: ActionVariant;");
+    expect(result).toContain("onRowClick?: (row: Product) => void;");
   });
 
-  it("renders onRowClick with onView", () => {
+  it("renders onRowClick prop in CrudList.Table", () => {
     const result = renderTemplate(listTemplate, baseCtx);
-    expect(result).toContain("onRowClick={(row) => onView?.(row)}");
+    expect(result).toContain("onRowClick={onRowClick}");
   });
 
-  it("renders row actions column with edit and delete buttons", () => {
+  it("renders card content with DetailFieldWrapper for mobile view", () => {
     const result = renderTemplate(listTemplate, baseCtx);
-    expect(result).toContain("e.stopPropagation()");
-    expect(result).toContain("onEdit?.(row)");
-    expect(result).toContain("onDelete?.(row)");
-  });
-
-  it("omits row actions column when neither hasUpdate nor hasDelete", () => {
-    const result = renderTemplate(listTemplate, { ...baseCtx, hasUpdate: false, hasDelete: false });
-    expect(result).not.toContain("e.stopPropagation()");
+    expect(result).toContain("cardContent");
+    expect(result).toContain("DetailFieldWrapper");
   });
 });
 
@@ -366,8 +352,9 @@ describe("formTemplate", () => {
   it("renders with correct imports", () => {
     const result = renderTemplate(formTemplate, baseCtx);
     expect(result).toContain('import type { ReactNode } from "react"');
-    expect(result).toContain('import { QueryFallback, Button, CrudForm, FormFields, useCrudFormSubmit } from "@simplix-react/ui"');
-    expect(result).toContain('import { useEntityTranslation } from "@simplix-react/i18n/react"');
+    expect(result).toContain('Button, CrudForm, FormFields,');
+    expect(result).toContain('useCrudFormSubmit');
+    expect(result).toContain('import { useEntityTranslation, useTranslation } from "@simplix-react/i18n/react"');
   });
 
   it("renders FormValues interface", () => {
@@ -376,10 +363,10 @@ describe("formTemplate", () => {
     expect(result).toContain("id: number;");
   });
 
-  it("renders useState for each field", () => {
+  it("renders values state with useState and updateField callback", () => {
     const result = renderTemplate(formTemplate, baseCtx);
-    expect(result).toContain("const [id, setId] = useState<number>");
-    expect(result).toContain("const [name, setName] = useState<string>");
+    expect(result).toContain("const [values, setValues] = useState<Partial<ProductFormValues>>");
+    expect(result).toContain("const updateField = useCallback(");
   });
 
   it("uses useEntityTranslation for field labels", () => {
@@ -389,17 +376,16 @@ describe("formTemplate", () => {
     expect(result).toContain('label={fieldLabel("name")}');
   });
 
-  it("renders NumberField with null-safe onChange", () => {
+  it("renders NumberField with null-safe onChange via updateField", () => {
     const result = renderTemplate(formTemplate, baseCtx);
-    expect(result).toContain("(v) => setId(v ?? 0)");
-    expect(result).toContain("(v) => setPrice(v ?? 0)");
+    expect(result).toContain('(v) => updateField("id", v ?? 0)');
+    expect(result).toContain('(v) => updateField("price", v ?? 0)');
   });
 
-  it("renders Button components instead of inline buttons", () => {
+  it("renders Button components with variant", () => {
     const result = renderTemplate(formTemplate, baseCtx);
-    expect(result).toContain('<Button type="button" variant="outline" onClick={onCancel}>');
-    expect(result).toContain("<Button type=\"submit\" variant=\"primary\">Save Product</Button>");
-    expect(result).not.toContain("className=\"inline-flex");
+    expect(result).toContain('variant="outline"');
+    expect(result).toContain('variant="primary"');
   });
 
   it("renders enumLabel for SelectField options", () => {
@@ -427,8 +413,7 @@ describe("formTemplate", () => {
 
   it("renders CrudForm.Actions with children", () => {
     const result = renderTemplate(formTemplate, baseCtx);
-    expect(result).toContain('<CrudForm.Actions className={onCancel ? "justify-between" : "justify-end"}>');
-
+    expect(result).toContain('<CrudForm.Actions className={onBack || onCancel ? "justify-between" : "justify-end"}>');
     expect(result).toContain("</CrudForm.Actions>");
   });
 });
@@ -436,11 +421,13 @@ describe("formTemplate", () => {
 describe("detailTemplate", () => {
   it("renders with correct imports", () => {
     const result = renderTemplate(detailTemplate, baseCtx);
-    expect(result).toContain('import { QueryFallback, CrudDelete, useCrudDeleteDetail, CrudDetail, DetailFields, usePreviousData } from "@simplix-react/ui"');
-    expect(result).toContain('import { useEntityTranslation } from "@simplix-react/i18n/react"');
-    expect(result).toContain('import type { ReactNode } from "react"');
-    expect(result).not.toContain('import { useRef');
-    expect(result).not.toContain('useState } from "react"');
+    expect(result).toContain("QueryFallback");
+    expect(result).toContain("CrudDelete");
+    expect(result).toContain("useCrudDeleteDetail");
+    expect(result).toContain("CrudDetail");
+    expect(result).toContain("DetailFields");
+    expect(result).toContain("usePreviousData");
+    expect(result).toContain('import { useEntityTranslation, useTranslation } from "@simplix-react/i18n/react"');
   });
 
   it("uses useEntityTranslation for field labels", () => {
@@ -468,7 +455,7 @@ describe("detailTemplate", () => {
     expect(result).toContain("CrudDelete");
     expect(result).toContain("del.open");
     expect(result).toContain("del.onOpenChange");
-    expect(result).toContain("deleteProduct.mutate");
+    expect(result).toContain("deleteMutation.mutate");
   });
 
   it("includes onEdit when hasUpdate", () => {
@@ -483,10 +470,10 @@ describe("detailTemplate", () => {
     expect(result).toContain("onSuccess: onDeleted");
   });
 
-  it("includes header and onClose props", () => {
+  it("includes onClose and onBack props", () => {
     const result = renderTemplate(detailTemplate, baseCtx);
-    expect(result).toContain("header?: ReactNode;");
     expect(result).toContain("onClose?: () => void;");
+    expect(result).toContain("onBack?: () => void;");
   });
 
   it("omits onEdit when hasUpdate is false", () => {
