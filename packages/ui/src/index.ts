@@ -422,8 +422,8 @@ export type { QueryFallbackProps } from "./crud/shared";
 export { ArrowLeftIcon } from "./crud/shared/icons";
 
 // Field components
-export { DetailFields, DetailFieldWrapper, FieldWrapper, FormFields } from "./fields";
-export type { DetailFieldWrapperProps, FieldWrapperProps } from "./fields";
+export { DetailFields, DetailFieldWrapper, FieldMessage, FieldWrapper, FormFields } from "./fields";
+export type { DetailFieldWrapperProps, FieldMessageProps, FieldWrapperProps } from "./fields";
 
 // Router adapters
 export { CrudProvider, createReactRouterAdapter, RouterContext, useRouter } from "./adapters";
@@ -471,6 +471,7 @@ export type { Bounds, GeoPoint, HasCoords, MapFitOptions, WithValidCoords } from
 
 // Utilities
 export { cn, toTestId } from "./utils/cn";
+export { formatDateShort, formatDateMedium, formatDateTime, formatRelativeTime, formatDateRange } from "./utils/format-date";
 export { parseDate } from "./utils/parse-date";
 export type { DateLike } from "./utils/parse-date";
 export { sanitizeHtml } from "./utils/sanitize";

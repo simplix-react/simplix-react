@@ -23,6 +23,7 @@ export interface CommonFieldProps extends Partial<FieldVariant> {
   label?: string;
   labelKey?: string;
   error?: string;
+  warning?: string;
   description?: string;
   required?: boolean;
   disabled?: boolean;

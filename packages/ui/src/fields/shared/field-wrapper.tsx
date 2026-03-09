@@ -4,6 +4,7 @@ import { type ReactNode, useId } from "react";
 import { type FieldVariant, useFieldVariant } from "../../crud/shared/types";
 import { useUIComponents } from "../../provider/ui-provider";
 import { cn, toTestId } from "../../utils/cn";
+import { FieldMessage } from "./field-message";
 
 const fieldWrapperVariants = cva("", {
   variants: {
@@ -31,8 +32,10 @@ export interface FieldWrapperProps extends Partial<FieldVariant> {
   label?: string;
   /** i18n key for label resolution. */
   labelKey?: string;
-  /** Error message displayed below the field. */
+  /** Error message displayed below the field (highest priority). */
   error?: string;
+  /** Warning message displayed below the field (shown when no error). */
+  warning?: string;
   /** Help text displayed below the field. */
   description?: string;
   /** Whether the field is required (shows asterisk). */
@@ -44,12 +47,15 @@ export interface FieldWrapperProps extends Partial<FieldVariant> {
 }
 
 /**
- * Wraps a form input with label, description, and error display.
+ * Wraps a form input with label, description, and error/warning display.
  * Handles label positioning, accessibility attributes, and field variants.
+ *
+ * Message priority: error > warning > (description is always shown).
  */
 export function FieldWrapper({
   label,
   error,
+  warning,
   description,
   required,
   className,
@@ -62,6 +68,10 @@ export function FieldWrapper({
 
   const isHidden = layout === "hidden";
   const testId = label ? `form-field-${toTestId(label)}` : undefined;
+
+  // Determine which status message to show (error takes priority over warning)
+  const statusMessage = error ?? warning;
+  const statusVariant = error ? "error" : warning ? "warning" : undefined;
 
   return (
     <fieldset
@@ -94,19 +104,17 @@ export function FieldWrapper({
       {layout === "left" ? (
         <>
           {children}
-          {/* Description and error occupy the second column */}
+          {/* Description and status message occupy the second column */}
           {description && (
             <>
               <span />
-              <p className="text-muted-foreground text-sm">{description}</p>
+              <FieldMessage variant="description">{description}</FieldMessage>
             </>
           )}
-          {error && (
+          {statusMessage && statusVariant && (
             <>
               <span />
-              <p className="text-destructive text-sm" role="alert">
-                {error}
-              </p>
+              <FieldMessage variant={statusVariant}>{statusMessage}</FieldMessage>
             </>
           )}
         </>
@@ -114,12 +122,10 @@ export function FieldWrapper({
         <>
           {children}
           {description && (
-            <p className="text-muted-foreground text-sm">{description}</p>
+            <FieldMessage variant="description">{description}</FieldMessage>
           )}
-          {error && (
-            <p className="text-destructive text-sm" role="alert">
-              {error}
-            </p>
+          {statusMessage && statusVariant && (
+            <FieldMessage variant={statusVariant}>{statusMessage}</FieldMessage>
           )}
         </>
       )}
