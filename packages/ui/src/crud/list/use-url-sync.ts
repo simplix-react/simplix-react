@@ -101,7 +101,7 @@ function paramsToState(params: URLSearchParams) {
  * @example
  * ```ts
  * useUrlSync({
- *   filters: list.filters,
+ *   filters: { search: list.filters.search, values: list.filters.committedValues },
  *   sort: list.sort,
  *   pagination: list.pagination,
  *   setFilters: list.filters.setAll,

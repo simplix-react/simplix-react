@@ -50,6 +50,7 @@ export interface UseCrudListOptions {
 export interface CrudListFilters {
   search: string;
   setSearch: (value: string) => void;
+  /** Pending (draft) filter values — used by popover form fields. */
   values: Record<string, unknown>;
   setValue: (key: string, value: unknown) => void;
   setValues: (updates: Record<string, unknown>) => void;
@@ -57,6 +58,12 @@ export interface CrudListFilters {
   clear: () => void;
   apply: () => void;
   isPending: boolean;
+  /** Committed (applied) filter values — used by badges, URL sync, and queries. */
+  committedValues: Record<string, unknown>;
+  /** Update a single filter in both pending and committed state, triggering a re-query. */
+  commitValue: (key: string, value: unknown) => void;
+  /** Update multiple filters in both pending and committed state, triggering a re-query. */
+  commitValues: (updates: Record<string, unknown>) => void;
 }
 
 /** Sort state returned by {@link useCrudList}. */
@@ -166,6 +173,7 @@ export function useCrudList<T>(
     setSearch("");
     setPendingFilterValues({});
     setCommittedFilterValues({});
+    setPage(1);
   }, []);
 
   const setAllFilters = useCallback((state: { search: string; values: Record<string, unknown> }) => {
@@ -178,6 +186,20 @@ export function useCrudList<T>(
     setCommittedFilterValues(pendingFilterValues);
     setPage(1);
   }, [pendingFilterValues]);
+
+  const commitFilterValue = useCallback((key: string, value: unknown) => {
+    const updater = (prev: Record<string, unknown>) => ({ ...prev, [key]: value });
+    setPendingFilterValues(updater);
+    setCommittedFilterValues(updater);
+    setPage(1);
+  }, []);
+
+  const commitFilterValuesBatch = useCallback((updates: Record<string, unknown>) => {
+    const updater = (prev: Record<string, unknown>) => ({ ...prev, ...updates });
+    setPendingFilterValues(updater);
+    setCommittedFilterValues(updater);
+    setPage(1);
+  }, []);
 
   const filtersPending = !isImmediate && pendingFilterValues !== committedFilterValues;
 
@@ -363,6 +385,9 @@ export function useCrudList<T>(
       clear: clearFilters,
       apply: applyFilters,
       isPending: filtersPending,
+      committedValues: committedFilterValues,
+      commitValue: commitFilterValue,
+      commitValues: commitFilterValuesBatch,
     },
     sort: {
       field: sortField,

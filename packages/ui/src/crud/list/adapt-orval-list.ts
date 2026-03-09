@@ -23,6 +23,10 @@ interface AdaptOrvalListOptions {
   /** Extra query options forwarded to Orval's second argument (`{ query: {...} }`).
    *  Merged with defaults (`staleTime: 0, gcTime: 0`). */
   queryOptions?: Record<string, unknown>;
+  /** Transform filter key-value pairs before sending to the API.
+   *  Use this to convert generic filter formats to backend-specific formats
+   *  (e.g., searchable-jpa BETWEEN operator, date format conversion). */
+  transformFilters?: (filters: Record<string, unknown>) => Record<string, unknown>;
 }
 
 /**
@@ -74,8 +78,11 @@ export function adaptOrvalList<T>(
         apiParams.sort = [`${sort.field}.${sort.direction}`];
       }
 
-      const filters = params.filters as Record<string, unknown> | undefined;
+      let filters = params.filters as Record<string, unknown> | undefined;
       if (filters) {
+        if (options?.transformFilters) {
+          filters = options.transformFilters(filters);
+        }
         for (const [key, value] of Object.entries(filters)) {
           if (key === "_search") continue;
           if (value === undefined || value === null || value === "") continue;

@@ -13,3 +13,4 @@ export { AdvancedSelectFilter, type AdvancedSelectFilterProps, type AdvancedSele
 export { ToggleFilter, type ToggleFilterProps } from "./toggle-filter";
 export { FilterActions, type FilterActionsProps } from "./filter-actions";
 export { FilterBar, type FilterBarProps, type FilterDef, type TextFilterDef, type NumberFilterDef, type FacetedFilterDef, type ToggleFilterDef, type DateRangeFilterDef, type CountryFilterDef, type TimezoneFilterDef } from "./filter-bar";
+export { ChipFilter, type ChipFilterProps, type ChipFilterOption } from "./chip-filter";

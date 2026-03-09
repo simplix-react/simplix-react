@@ -138,7 +138,7 @@ export function FilterBar({ filters, state, leading, maxBadges, className }: Fil
         case "toggle":
           return makeFilterKey(def.field, SearchOperator.EQUALS);
         case "dateRange":
-          return ""; // handled separately
+          return ""; // handled separately via gte/lte pair
       }
     },
     [operators],
@@ -146,22 +146,23 @@ export function FilterBar({ filters, state, leading, maxBadges, className }: Fil
 
   const isFilterActive = useCallback(
     (def: FilterDef): boolean => {
+      const vals = state.committedValues;
       if (def.type === "dateRange") {
         const gteKey = makeFilterKey(def.field, SearchOperator.GREATER_THAN_OR_EQUAL);
         const lteKey = makeFilterKey(def.field, SearchOperator.LESS_THAN_OR_EQUAL);
-        return state.values[gteKey] != null || state.values[lteKey] != null;
+        return vals[gteKey] != null || vals[lteKey] != null;
       }
       if (def.type === "toggle") {
-        return typeof state.values[getFilterKey(def)] === "boolean";
+        return typeof vals[getFilterKey(def)] === "boolean";
       }
       if (def.type === "faceted" || def.type === "country" || def.type === "timezone") {
-        const val = state.values[getFilterKey(def)];
+        const val = vals[getFilterKey(def)];
         return Array.isArray(val) && val.length > 0;
       }
-      const val = state.values[getFilterKey(def)];
+      const val = vals[getFilterKey(def)];
       return val != null && val !== "";
     },
-    [state.values, getFilterKey],
+    [state.committedValues, getFilterKey],
   );
 
   const getBadgeIcon = useCallback(
@@ -177,15 +178,16 @@ export function FilterBar({ filters, state, leading, maxBadges, className }: Fil
 
   const getBadgeText = useCallback(
     (def: FilterDef): string => {
+      const vals = state.committedValues;
       switch (def.type) {
         case "text": {
-          return (state.values[getFilterKey(def)] as string) ?? "";
+          return (vals[getFilterKey(def)] as string) ?? "";
         }
         case "number": {
-          return String(state.values[getFilterKey(def)] ?? "");
+          return String(vals[getFilterKey(def)] ?? "");
         }
         case "faceted": {
-          const val = state.values[getFilterKey(def)] as string[];
+          const val = vals[getFilterKey(def)] as string[];
           if (val.length <= 2) {
             return val
               .map((v) => def.options.find((o) => o.value === v)?.label ?? v)
@@ -194,7 +196,7 @@ export function FilterBar({ filters, state, leading, maxBadges, className }: Fil
           return t("list.selected", { count: val.length });
         }
         case "country": {
-          const val = state.values[getFilterKey(def)] as string[];
+          const val = vals[getFilterKey(def)] as string[];
           if (val.length <= 2) {
             const displayNames = new Intl.DisplayNames([locale], { type: "region" });
             return val.map((v) => displayNames.of(v) ?? v).join(", ");
@@ -202,24 +204,24 @@ export function FilterBar({ filters, state, leading, maxBadges, className }: Fil
           return t("list.selected", { count: val.length });
         }
         case "timezone": {
-          const val = state.values[getFilterKey(def)] as string[];
+          const val = vals[getFilterKey(def)] as string[];
           if (val.length <= 2) return val.join(", ");
           return t("list.selected", { count: val.length });
         }
         case "toggle": {
-          const val = state.values[getFilterKey(def)] as boolean;
+          const val = vals[getFilterKey(def)] as boolean;
           return val ? t("common.yes") : t("common.no");
         }
         case "dateRange": {
           const gteKey = makeFilterKey(def.field, SearchOperator.GREATER_THAN_OR_EQUAL);
           const lteKey = makeFilterKey(def.field, SearchOperator.LESS_THAN_OR_EQUAL);
-          const from = state.values[gteKey] ? new Date(state.values[gteKey] as string) : undefined;
-          const to = state.values[lteKey] ? new Date(state.values[lteKey] as string) : undefined;
+          const from = vals[gteKey] ? new Date(vals[gteKey] as string) : undefined;
+          const to = vals[lteKey] ? new Date(vals[lteKey] as string) : undefined;
           return formatDateRange(from, to, locale) ?? "";
         }
       }
     },
-    [state.values, getFilterKey, operators, locale],
+    [state.committedValues, getFilterKey, locale, t],
   );
 
   const removeFilter = useCallback(
@@ -227,10 +229,10 @@ export function FilterBar({ filters, state, leading, maxBadges, className }: Fil
       if (def.type === "dateRange") {
         const gteKey = makeFilterKey(def.field, SearchOperator.GREATER_THAN_OR_EQUAL);
         const lteKey = makeFilterKey(def.field, SearchOperator.LESS_THAN_OR_EQUAL);
-        state.setValues({ [gteKey]: undefined, [lteKey]: undefined });
+        state.commitValues({ [gteKey]: undefined, [lteKey]: undefined });
         return;
       }
-      state.setValue(getFilterKey(def), undefined);
+      state.commitValue(getFilterKey(def), undefined);
     },
     [state, getFilterKey],
   );
@@ -327,6 +329,17 @@ export function FilterBar({ filters, state, leading, maxBadges, className }: Fil
             align="end"
             collisionPadding={16}
           >
+            <Flex align="center" justify="between" className="border-b px-4 py-2.5">
+              <span className="text-sm font-medium">{t("filter.label")}</span>
+              <Flex gap="xs" align="center">
+                <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={clearAll} disabled={!hasActiveFilters && !state.isPending}>
+                  {t("common.clear")}
+                </Button>
+                <Button size="sm" className="h-7 px-3 text-xs" disabled={!state.isPending} onClick={() => { state.apply(); setOpen(false); }}>
+                  {t("filter.apply")}
+                </Button>
+              </Flex>
+            </Flex>
             <Stack gap="none" className="flex-1 overflow-y-auto p-4">
               {filters.map((def, i) => (
                 <FilterFormField
@@ -339,14 +352,6 @@ export function FilterBar({ filters, state, leading, maxBadges, className }: Fil
                 />
               ))}
             </Stack>
-            <Flex justify="end" gap="xs" className="border-t p-3">
-              <Button variant="ghost" size="sm" onClick={clearAll} disabled={!hasActiveFilters}>
-                {t("common.clear")}
-              </Button>
-              <Button size="sm" onClick={() => { state.apply(); setOpen(false); }}>
-                {t("filter.apply")}
-              </Button>
-            </Flex>
           </PopoverContent>
         </Popover>
         {columnCtx && columnCtx.columns.length > 0 && !columnCtx.isCardMode && (
