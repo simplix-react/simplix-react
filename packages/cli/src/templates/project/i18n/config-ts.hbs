@@ -1,3 +1,4 @@
+import { setRequestLocale } from "@simplix-react/api";
 import { createI18nConfig } from "@simplix-react/i18n";
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "../../shared/config/app";
 
@@ -11,3 +12,7 @@ export const { adapter: i18nAdapter, i18nReady } = createI18nConfig({
   detection: { order: ["localStorage", "navigator"] },
   appTranslations,
 });
+
+// Sync i18n locale to API request headers (Accept-Language)
+i18nAdapter.onLocaleChange(setRequestLocale);
+i18nReady.then(() => setRequestLocale(i18nAdapter.locale));

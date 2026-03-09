@@ -256,5 +256,6 @@ const projectApi = defineApi(projectConfig, { fetchFn: prefixedFetch });
 ## Related
 
 - [Authentication Guide](./authentication.md) --- set up token-based auth with `@simplix-react/auth`
+- [Internationalization Guide](./internationalization.md) --- includes `Accept-Language` header sync via `setRequestLocale`
 - [Mock Handlers](./mock-handlers.md) --- set up MSW handlers for development without a backend
 - `@simplix-react/contract` types: `FetchFn`, `ApiError`, `defaultFetch`

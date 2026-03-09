@@ -20,6 +20,8 @@ pnpm add @simplix-react/api
 | --- | --- | --- |
 | `configureMutator` | Function | Register an `OrvalMutator` fetch function (default or named strategy) |
 | `getMutator` | Function | Retrieve a registered mutator by strategy name |
+| `setRequestLocale` | Function | Set locale for automatic `Accept-Language` header injection |
+| `getRequestLocale` | Function | Get the currently configured request locale |
 | `HttpError` | Class | Typed HTTP error with `status`, `message`, and optional `data` |
 | `getValidationErrors` | Function | Extract validation field errors from any error shape |
 | `getErrorMessage` | Function | Extract a human-readable message from any error |
@@ -83,6 +85,54 @@ configureMutator("admin-api", async (url, options) => {
 const mutator = getMutator();            // default strategy
 const adminMutator = getMutator("admin-api"); // named strategy
 ```
+
+### Request Locale (Accept-Language Header)
+
+When a locale is configured via `setRequestLocale`, `getMutator` automatically injects an `Accept-Language` header into every outgoing request. This ensures the server receives the application's selected language rather than the browser's OS-level language preference.
+
+```ts
+import { setRequestLocale, getRequestLocale } from "@simplix-react/api";
+
+// Set the locale (typically wired to i18n adapter)
+setRequestLocale("en");
+
+// All subsequent API requests include: Accept-Language: en
+const mutator = getMutator();
+await mutator("/api/pets"); // → Accept-Language: en
+
+// Check current locale
+getRequestLocale(); // "en"
+```
+
+#### How It Works
+
+1. `setRequestLocale(locale)` stores the locale in a module-scoped variable (tab-local, not shared across tabs)
+2. `getMutator()` returns a wrapper that merges `Accept-Language` into the request headers as a plain object
+3. If the caller already sets an explicit `Accept-Language` header, it is **not** overwritten
+4. If no locale is configured, `getMutator()` returns the raw mutator without modification
+
+#### Why This Is Needed
+
+Browsers set the `Accept-Language` header automatically on all HTTP requests, but the value reflects **OS/browser language settings**, not the application's i18n selection. For example, a user with a Korean OS who selects English in the app would still send `Accept-Language: ko` without this feature. `setRequestLocale` ensures the server receives the correct language.
+
+#### Integration with @simplix-react/i18n
+
+Wire the i18n adapter's locale changes to `setRequestLocale` in the app's i18n config:
+
+```ts
+import { setRequestLocale } from "@simplix-react/api";
+import { createI18nConfig } from "@simplix-react/i18n";
+
+export const { adapter: i18nAdapter, i18nReady } = createI18nConfig({ ... });
+
+// Sync locale changes to API request headers
+i18nAdapter.onLocaleChange(setRequestLocale);
+i18nReady.then(() => setRequestLocale(i18nAdapter.locale));
+```
+
+After this setup, every API request automatically includes `Accept-Language` matching the app's active locale. When the user switches language, subsequent requests reflect the new locale immediately.
+
+> **Note:** `@simplix-react/api` and `@simplix-react/i18n` have no direct dependency on each other. The wiring happens at the application level, keeping both packages decoupled.
 
 ### Error Utilities
 

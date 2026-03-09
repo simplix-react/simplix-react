@@ -141,6 +141,21 @@ The initialization sequence:
 
 The function returns both the `adapter` and an `i18nReady` promise. The adapter is available immediately for provider setup; the promise resolves when all async translation loading completes.
 
+### API Request Locale Synchronization
+
+When the server returns localized responses based on the `Accept-Language` header, the i18n adapter can be wired to `@simplix-react/api` to automatically inject the header on every API request:
+
+```ts
+import { setRequestLocale } from "@simplix-react/api";
+
+i18nAdapter.onLocaleChange(setRequestLocale);
+i18nReady.then(() => setRequestLocale(i18nAdapter.locale));
+```
+
+This is necessary because browsers set `Accept-Language` from OS/browser language preferences, which may differ from the application's selected language. For example, a user with a Korean OS who selects English in the app would send `Accept-Language: ko` without this feature. `setRequestLocale` ensures `getMutator()` injects the correct locale.
+
+The design keeps `@simplix-react/api` and `@simplix-react/i18n` fully decoupled --- there is no direct dependency between them. The wiring happens at the application level through the adapter's `onLocaleChange` callback, following the same pattern as locale persistence to `localStorage`.
+
 ### Locale Configuration
 
 Each locale is described by a `LocaleConfig`:

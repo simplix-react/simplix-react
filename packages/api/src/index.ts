@@ -44,6 +44,38 @@ export class HttpError extends Error {
 
 const _registry = new Map<string, OrvalMutator>();
 
+// ── Request Locale ──────────────────────────────────────────
+
+let _locale: string | undefined;
+
+/**
+ * Set the locale for API requests.
+ *
+ * When set, {@link getMutator} automatically injects an `Accept-Language`
+ * header into every outgoing request. Typically wired to your i18n adapter's
+ * locale-change callback.
+ *
+ * @param locale - BCP 47 locale code (e.g. `"ko"`, `"en-US"`).
+ *
+ * @example
+ * ```ts
+ * import { setRequestLocale } from "@simplix-react/api";
+ *
+ * // Wire to i18n adapter
+ * i18nAdapter.onLocaleChange(setRequestLocale);
+ * ```
+ */
+export function setRequestLocale(locale: string): void {
+  _locale = locale;
+}
+
+/**
+ * Returns the currently configured request locale, or `undefined` if not set.
+ */
+export function getRequestLocale(): string | undefined {
+  return _locale;
+}
+
 /**
  * Register a fetch function for Orval-generated API clients.
  *
@@ -96,7 +128,18 @@ export function getMutator(strategy = "default"): OrvalMutator {
       `Mutator "${strategy}" not configured. Call configureMutator() first.`,
     );
   }
-  return mutator;
+  if (!_locale) return mutator;
+
+  return <T>(url: string, options?: RequestInit): Promise<T> => {
+    const existing = (options?.headers ?? {}) as Record<string, string>;
+    if (existing["Accept-Language"]) {
+      return mutator<T>(url, options);
+    }
+    return mutator<T>(url, {
+      ...options,
+      headers: { ...existing, "Accept-Language": _locale! },
+    });
+  };
 }
 
 /**

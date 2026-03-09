@@ -190,6 +190,49 @@ function LocaleSwitcher() {
 }
 ```
 
+### Step 6 -- Sync Locale to API Requests (Accept-Language Header)
+
+When your server returns localized responses based on the `Accept-Language` header, wire the i18n adapter to `@simplix-react/api` so that every API request includes the app's active locale:
+
+```ts
+// src/app/i18n/index.ts
+import { setRequestLocale } from "@simplix-react/api";
+import { createI18nConfig } from "@simplix-react/i18n";
+import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "../../shared/config/app";
+
+const appTranslations = import.meta.glob("/src/locales/**/*.json", { eager: true });
+
+export const { adapter: i18nAdapter, i18nReady } = createI18nConfig({
+  defaultLocale: DEFAULT_LOCALE,
+  fallbackLocale: DEFAULT_LOCALE,
+  supportedLocales: [...SUPPORTED_LOCALES],
+  detection: { order: ["localStorage", "navigator"] },
+  appTranslations,
+});
+
+// Sync i18n locale to API request headers (Accept-Language)
+i18nAdapter.onLocaleChange(setRequestLocale);
+i18nReady.then(() => setRequestLocale(i18nAdapter.locale));
+```
+
+Two lines do all the work:
+
+| Line | Purpose |
+| --- | --- |
+| `i18nAdapter.onLocaleChange(setRequestLocale)` | Syncs locale on every language switch |
+| `i18nReady.then(() => setRequestLocale(...))` | Sets the initial locale after detection completes |
+
+After this setup, all requests through `getMutator()` automatically include the `Accept-Language` header matching the app's language. For example, if the user selects English:
+
+```
+POST /api/v1/pets HTTP/1.1
+Accept-Language: en
+```
+
+> **Why is this needed?** Without explicit header injection, the browser sends its own `Accept-Language` based on OS settings (e.g., `ko,en-US;q=0.9,...`). This does not reflect the language the user chose in the application. `setRequestLocale` overrides this with the app's active locale.
+
+> **Note:** Projects scaffolded with `simplix init` (i18n enabled) include this wiring automatically. For existing projects, add the two lines manually.
+
 ## Variations
 
 ### Lazy-Loading Module Translations
