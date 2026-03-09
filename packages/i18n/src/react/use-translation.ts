@@ -72,7 +72,6 @@ export function useTranslation<TKeys extends string = string>(
     },
     // locale is included so that t's reference changes on locale switch,
     // ensuring any useMemo/useCallback depending on t recomputes correctly.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [i18n, namespace, locale],
   ) as TranslateFunction<TKeys>;
 
@@ -81,7 +80,6 @@ export function useTranslation<TKeys extends string = string>(
       if (!i18n) return false;
       return i18n.exists(key, namespace);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [i18n, namespace, locale],
   );
 
