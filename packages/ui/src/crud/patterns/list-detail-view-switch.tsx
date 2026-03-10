@@ -38,15 +38,15 @@ export function ListDetailViewSwitch({
   renderEdit,
 }: ListDetailViewSwitchProps) {
   if (state.view === "detail" && fade.displayedId) {
-    return <div style={fade.style} className="flex flex-col flex-1 min-h-0">{renderDetail(fade.displayedId)}</div>;
+    return <div key={`detail-${fade.displayedId}`} style={fade.style} className="flex flex-col flex-1 min-h-0">{renderDetail(fade.displayedId)}</div>;
   }
 
   if (state.view === "new" && renderNew) {
-    return <div className="flex flex-col flex-1 min-h-0">{renderNew()}</div>;
+    return <div key="new" className="flex flex-col flex-1 min-h-0">{renderNew()}</div>;
   }
 
   if (state.view === "edit" && state.selectedId && renderEdit) {
-    return <div className="flex flex-col flex-1 min-h-0">{renderEdit(state.selectedId)}</div>;
+    return <div key={`edit-${state.selectedId}`} className="flex flex-col flex-1 min-h-0">{renderEdit(state.selectedId)}</div>;
   }
 
   return null;
