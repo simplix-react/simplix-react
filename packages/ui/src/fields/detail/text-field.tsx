@@ -8,7 +8,7 @@ import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
 export interface DetailTextFieldProps extends CommonDetailFieldProps {
   /** Text value to display. */
   value: string | null | undefined;
-  /** Fallback text when value is null/undefined. Defaults to em-dash. */
+  /** Fallback text when value is null, undefined, or empty string. Defaults to em-dash. */
   fallback?: string;
   /** Whether to show a copy-to-clipboard button. */
   copyable?: boolean;
@@ -34,14 +34,16 @@ export function DetailTextField({
 }: DetailTextFieldProps) {
   const [copied, setCopied] = useState(false);
 
+  const hasValue = value != null && value !== "";
+
   const handleCopy = useCallback(async () => {
-    if (value == null) return;
+    if (!hasValue) return;
     await navigator.clipboard.writeText(value);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  }, [value]);
+  }, [hasValue, value]);
 
-  const displayValue = value ?? fallback;
+  const displayValue = hasValue ? value : fallback;
 
   return (
     <DetailFieldWrapper
@@ -53,7 +55,7 @@ export function DetailTextField({
     >
       <span className="inline-flex items-center gap-1.5">
         <span>{displayValue}</span>
-        {copyable && value != null && (
+        {copyable && hasValue && (
           <button
             type="button"
             onClick={handleCopy}

@@ -12,11 +12,13 @@ export type BadgeVariant = NonNullable<
 export interface DetailBadgeFieldProps<T extends string = string>
   extends CommonDetailFieldProps {
   /** The current status/category value (used for variant lookup). */
-  value: T;
+  value: T | null | undefined;
   /** Translated or formatted text to display inside the badge. Falls back to {@link value} when omitted. */
   displayValue?: string;
   /** Mapping from value to badge variant for visual differentiation. */
   variants: Record<T, BadgeVariant>;
+  /** Fallback text when value is null, undefined, or empty string. Defaults to em-dash. */
+  fallback?: string;
 }
 
 /**
@@ -35,6 +37,7 @@ export function DetailBadgeField<T extends string = string>({
   value,
   displayValue,
   variants,
+  fallback = "\u2014",
   label,
   labelKey,
   layout,
@@ -42,7 +45,7 @@ export function DetailBadgeField<T extends string = string>({
   className,
 }: DetailBadgeFieldProps<T>) {
   const { Badge } = useUIComponents();
-  const variant = variants[value] ?? "default";
+  const hasValue = value != null && value !== "";
 
   return (
     <DetailFieldWrapper
@@ -52,7 +55,11 @@ export function DetailBadgeField<T extends string = string>({
       size={size}
       className={className}
     >
-      <Badge variant={variant}>{displayValue ?? value}</Badge>
+      {hasValue ? (
+        <Badge variant={variants[value] ?? "default"}>{displayValue ?? value}</Badge>
+      ) : (
+        <span>{fallback}</span>
+      )}
     </DetailFieldWrapper>
   );
 }

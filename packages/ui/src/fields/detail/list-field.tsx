@@ -11,6 +11,8 @@ export interface DetailListFieldProps extends CommonDetailFieldProps {
   value: string[] | null | undefined;
   /** Display mode. Defaults to `"badges"`. */
   mode?: ListDisplayMode;
+  /** Fallback text when value is null, undefined, or empty array. Defaults to em-dash. */
+  fallback?: string;
 }
 
 /**
@@ -26,6 +28,7 @@ export interface DetailListFieldProps extends CommonDetailFieldProps {
 export function DetailListField({
   value,
   mode = "badges",
+  fallback = "\u2014",
   label,
   labelKey,
   layout,
@@ -43,7 +46,7 @@ export function DetailListField({
         size={size}
         className={className}
       >
-        <span>{"\u2014"}</span>
+        <span>{fallback}</span>
       </DetailFieldWrapper>
     );
   }
