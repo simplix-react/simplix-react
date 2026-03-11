@@ -103,7 +103,7 @@ export function MultiSelectField<T extends string = string>({
               "relative flex min-h-8 w-full flex-wrap items-center gap-1 rounded-md border border-input bg-background px-3 py-1 text-sm",
               "focus-within:border-foreground",
               disabled && "cursor-not-allowed opacity-50",
-              error && "border-destructive",
+              error && "border-destructive focus-within:border-destructive",
             )}
             role="combobox"
             aria-expanded={open}

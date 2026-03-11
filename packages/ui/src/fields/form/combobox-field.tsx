@@ -114,7 +114,7 @@ export function ComboboxField<T extends string = string>({
               "relative flex h-8 w-full items-center rounded-md border border-input bg-background px-3 text-sm",
               "focus-within:border-foreground",
               disabled && "cursor-not-allowed opacity-50",
-              error && "border-destructive",
+              error && "border-destructive focus-within:border-destructive",
             )}
           >
             <span className={cn("flex items-center gap-1.5 truncate", !value && "text-muted-foreground")}>

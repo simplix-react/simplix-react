@@ -21,7 +21,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         onChange?.(Math.min(maxVal, Math.max(minVal, v)));
       }}
       className={cn(
-        "flex h-8 w-full rounded-md border border-input bg-background px-1.5 py-1.5 text-sm text-center placeholder:text-muted-foreground focus-visible:outline-none focus-visible:border-foreground disabled:cursor-not-allowed disabled:opacity-50",
+        "flex h-8 w-full rounded-md border border-input bg-background px-1.5 py-1.5 text-sm text-center placeholder:text-muted-foreground focus-visible:outline-none focus-visible:border-foreground aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:border-destructive disabled:cursor-not-allowed disabled:opacity-50",
         className,
       )}
       {...rest}
