@@ -250,9 +250,11 @@ export type {
 
 // CRUD types
 export {
+  EmptyState,
   FieldVariantContext,
   useFieldVariant,
 } from "./crud/shared";
+export type { EmptyStateProps } from "./crud/shared";
 export type {
   CommonDetailFieldProps,
   CommonFieldProps,

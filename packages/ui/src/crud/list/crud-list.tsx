@@ -38,6 +38,7 @@ import {cn} from "../../utils/cn";
 import {formatDateMedium, formatDateTime, formatRelativeTime} from "../../utils/format-date";
 import type {ColumnInfo, EmptyReason, SortState} from "../shared";
 import {CrudListColumnContext, useCrudListColumns} from "../shared";
+import {EmptyState} from "../shared/empty-state";
 import {AlertTriangleIcon, ArrowUpDownIcon, EyeIcon, FolderTreeIcon, FunnelIcon, MagnifyingGlassIcon, MapPinIcon, PencilIcon, PlusIcon, TrashIcon} from "../shared/icons";
 import {
   AdvancedSelectFilter,
@@ -75,7 +76,7 @@ function EmptyReasonCard({ reason }: { reason: Exclude<EmptyReason, "no-data"> }
   const { t } = useTranslation("simplix/ui");
   const config = emptyReasonConfig[reason];
   return (
-    <div className="flex flex-col items-center justify-center rounded-lg border py-16 text-center">
+    <div className="flex flex-col items-center justify-center rounded-lg border px-6 py-16 text-center">
       <div className={`mb-3 rounded-full p-4 [&_svg]:size-8 ${config.iconClassName}`}>
         {config.icon}
       </div>
@@ -555,20 +556,7 @@ function ReorderableTable<T>({
 
   if (emptyReason && data.length === 0) {
     if (emptyReason === "no-data" && emptyState) {
-      return (
-        <div className="flex flex-col items-center justify-center rounded-lg border py-16 text-center">
-          {emptyState.icon && (
-            <div className="mb-3 rounded-full bg-muted p-4 text-muted-foreground [&_svg]:size-8">
-              {emptyState.icon}
-            </div>
-          )}
-          <p className="text-base font-semibold">{emptyState.title}</p>
-          {emptyState.description && (
-            <p className="mt-1 max-w-sm text-sm text-muted-foreground">{emptyState.description}</p>
-          )}
-          {emptyState.action && <div className="mt-4">{emptyState.action}</div>}
-        </div>
-      );
+      return <EmptyState {...emptyState} />;
     }
     if (emptyReason !== "no-data") {
       return <EmptyReasonCard reason={emptyReason} />;
@@ -707,20 +695,7 @@ function ReorderableCardList<T>({
 
   if (emptyReason && data.length === 0) {
     if (emptyReason === "no-data" && emptyState) {
-      return (
-        <div className="flex flex-col items-center justify-center rounded-lg border py-16 text-center">
-          {emptyState.icon && (
-            <div className="mb-3 rounded-full bg-muted p-4 text-muted-foreground [&_svg]:size-8">
-              {emptyState.icon}
-            </div>
-          )}
-          <p className="text-base font-semibold">{emptyState.title}</p>
-          {emptyState.description && (
-            <p className="mt-1 max-w-sm text-sm text-muted-foreground">{emptyState.description}</p>
-          )}
-          {emptyState.action && <div className="mt-4">{emptyState.action}</div>}
-        </div>
-      );
+      return <EmptyState {...emptyState} />;
     }
     if (emptyReason !== "no-data") {
       return <EmptyReasonCard reason={emptyReason} />;
@@ -985,18 +960,7 @@ function ListTable<T>({
     if (emptyReason === "no-data" && emptyState) {
       return (
         <div ref={containerRef} className="w-full">
-          <div className="flex flex-col items-center justify-center rounded-lg border py-16 text-center">
-            {emptyState.icon && (
-              <div className="mb-3 rounded-full bg-muted p-4 text-muted-foreground [&_svg]:size-8">
-                {emptyState.icon}
-              </div>
-            )}
-            <p className="text-base font-semibold">{emptyState.title}</p>
-            {emptyState.description && (
-              <p className="mt-1 max-w-sm text-sm text-muted-foreground">{emptyState.description}</p>
-            )}
-            {emptyState.action && <div className="mt-4">{emptyState.action}</div>}
-          </div>
+          <EmptyState {...emptyState} />
         </div>
       );
     }
