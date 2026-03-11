@@ -156,6 +156,59 @@ export function getDefaultValue(tsType: string): string {
   return '""';
 }
 
+/**
+ * Convert snapshot EntityField[] to FieldInfo[] as a fallback when
+ * Zod schema parsing fails (e.g., read-only entities with no Body schema).
+ */
+export function entityFieldsToFieldInfo(fields: EntityField[]): FieldInfo[] {
+  return fields
+    .filter((f) => f.type !== "object" && f.type !== "array")
+    .map((f) => {
+      let tsType = "string";
+      let formComponent = "TextField";
+      let inputType = "text";
+      let component = "Text";
+      let options: string[] = [];
+
+      if (f.type === "number" || f.type === "integer") {
+        tsType = "number";
+        formComponent = "NumberField";
+        inputType = "number";
+        component = "Number";
+      } else if (f.type === "boolean") {
+        tsType = "boolean";
+        formComponent = "SwitchField";
+        inputType = "checkbox";
+        component = "Boolean";
+      } else if (f.format === "date-time" || f.format === "date") {
+        tsType = "string";
+        formComponent = "DateField";
+        inputType = "date";
+        component = "Date";
+      }
+
+      if (f.enum && f.enum.length > 0) {
+        formComponent = "SelectField";
+        inputType = "select";
+        component = "Select";
+        options = f.enum;
+      }
+
+      const capitalizedName = f.name.charAt(0).toUpperCase() + f.name.slice(1);
+      return {
+        name: f.name,
+        capitalizedName,
+        label: capitalizedName.replace(/([A-Z])/g, " $1").trim(),
+        tsType,
+        formComponent,
+        inputType,
+        component,
+        options,
+        defaultValue: getDefaultValue(tsType),
+      };
+    });
+}
+
 export function parseSchemaFields(content: string, entityName: string): FieldInfo[] {
   const EntityPascal = entityName.charAt(0).toUpperCase() + entityName.slice(1);
 
@@ -180,11 +233,15 @@ export function parseSchemaFields(content: string, entityName: string): FieldInf
   // Try each pattern; find ALL matches and pick the result with the most fields.
   // This ensures we pick the best schema (e.g. UpdateBody with 20 fields over
   // ChangePasswordBody with 2 fields).
+  // Skip search/filter request bodies (e.g. EventRestSearchBody) — they contain
+  // query parameters (conditions, page, size), not entity fields.
+  const searchBodyRe = /Search\w*Body/i;
   let bestFields: FieldInfo[] = [];
 
   for (const schemaPattern of schemaPatterns) {
     let match: RegExpExecArray | null;
     while ((match = schemaPattern.exec(content)) !== null) {
+      if (searchBodyRe.test(match[0])) continue;
       const parsed = parseZodObjectBody(content, match);
       if (parsed.length > bestFields.length) {
         bestFields = parsed;
@@ -1289,6 +1346,9 @@ export const scaffoldCrudCommand = new Command("scaffold")
     try {
       const schemaResult = await findSchemaFile(rootDir, entity);
 
+      // Load snapshot early so it can serve as field fallback
+      const extractedEntity = await findEntityFromSnapshot(rootDir, entity);
+
       let fields: FieldInfo[];
       let packageName: string | null = null;
       if (schemaResult) {
@@ -1296,6 +1356,10 @@ export const scaffoldCrudCommand = new Command("scaffold")
         fields = parseSchemaFields(schemaResult.content, entity);
         packageName = schemaResult.packageName;
 
+        if (fields.length === 0 && extractedEntity?.fields.length) {
+          // Fallback: use snapshot fields (covers read-only entities with no Body schema)
+          fields = entityFieldsToFieldInfo(extractedEntity.fields);
+        }
         if (fields.length === 0) {
           log.warn(
             "Could not parse fields from schema. Generating with placeholder fields.",
@@ -1343,9 +1407,6 @@ export const scaffoldCrudCommand = new Command("scaffold")
       const deletePathParam = crudConfig?.delete
         ? await findMutationPathParam(rootDir, crudConfig.delete)
         : `${entity}Id`;
-
-      // Parse filter params from OpenAPI snapshot
-      const extractedEntity = await findEntityFromSnapshot(rootDir, entity);
 
       // Resolve row ID field from the entity's get operation path param.
       // e.g. "/sites/:id" → "id", "/users/:username" → "username"
