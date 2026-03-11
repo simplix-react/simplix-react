@@ -9,7 +9,7 @@ import { FieldMessage } from "./field-message";
 const fieldWrapperVariants = cva("", {
   variants: {
     layout: {
-      top: "relative flex flex-col gap-1.5",
+      top: "flex flex-col gap-1",
       left: "grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-1",
       inline: "flex items-center justify-between gap-3",
       hidden: "flex flex-col gap-1.5",
@@ -124,13 +124,20 @@ export function FieldWrapper({
           {description && (
             <FieldMessage variant="description">{description}</FieldMessage>
           )}
-          {statusMessage && statusVariant && (
-            <FieldMessage
-              variant={statusVariant}
-              className={layout === "top" ? "absolute left-0 top-full" : undefined}
-            >
-              {statusMessage}
-            </FieldMessage>
+          {layout === "top" ? (
+            <div className="h-3.5">
+              {statusMessage && statusVariant && (
+                <FieldMessage variant={statusVariant}>
+                  {statusMessage}
+                </FieldMessage>
+              )}
+            </div>
+          ) : (
+            statusMessage && statusVariant && (
+              <FieldMessage variant={statusVariant}>
+                {statusMessage}
+              </FieldMessage>
+            )
           )}
         </>
       )}
