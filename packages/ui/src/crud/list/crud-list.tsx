@@ -316,6 +316,8 @@ export interface ListTableProps<T> {
     description?: string;
     action?: ReactNode;
   };
+  /** Callback to compute extra class names for each table/card row. */
+  rowClassName?: (row: T) => string | undefined;
   className?: string;
   children?: ReactNode;
 }
@@ -794,6 +796,7 @@ function ListTable<T>({
   reorder,
   emptyReason,
   emptyState,
+  rowClassName,
   className,
   children,
 }: ListTableProps<T>) {
@@ -1070,6 +1073,7 @@ function ListTable<T>({
                         isSelected && "ring-2 ring-primary",
                         isActive && "bg-muted/50",
                         onRowClick && "cursor-pointer",
+                        rowClassName?.(row),
                       )}
                       onClick={onRowClick ? () => onRowClick(row) : undefined}
                       data-testid={`list-row-${rid}`}
@@ -1170,6 +1174,7 @@ function ListTable<T>({
                             selectedIndices?.has(row.index) && "bg-muted/30",
                             isActive && "bg-muted/50",
                             onRowClick && "cursor-pointer",
+                            rowClassName?.(row.original),
                           )}
                           onClick={onRowClick ? () => onRowClick(row.original) : undefined}
                           data-testid={`list-row-${rid}`}
