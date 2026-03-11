@@ -107,7 +107,7 @@ export function ComboboxField<T extends string = string>({
       className={className}
       {...variantProps}
     >
-      <Popover open={open} onOpenChange={(v) => { setOpen(v); if (!v) setQuery(""); }}>
+      <Popover open={open} onOpenChange={(v) => { if (disabled) return; setOpen(v); if (!v) setQuery(""); }}>
         <PopoverTrigger asChild>
           <span
             className={cn(
