@@ -18,7 +18,8 @@
     "continue": "계속",
     "discard": "취소",
     "unsavedTitle": "저장하지 않은 변경사항",
-    "unsavedDescription": "저장하지 않은 변경사항이 있습니다. 이 페이지를 떠나시겠습니까? 변경사항이 사라집니다."
+    "unsavedDescription": "저장하지 않은 변경사항이 있습니다. 이 페이지를 떠나시겠습니까? 변경사항이 사라집니다.",
+    "unlink": "연결 해제"
   },
   "list": {
     "searchPlaceholder": "검색...",

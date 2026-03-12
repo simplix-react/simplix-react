@@ -39,7 +39,7 @@ import {formatDateMedium, formatDateTime, formatRelativeTime} from "../../utils/
 import type {ColumnInfo, EmptyReason, SortState} from "../shared";
 import {CrudListColumnContext, useCrudListColumns} from "../shared";
 import {EmptyState} from "../shared/empty-state";
-import {AlertTriangleIcon, ArrowUpDownIcon, EyeIcon, FolderTreeIcon, FunnelIcon, MagnifyingGlassIcon, MapPinIcon, PencilIcon, PlusIcon, TrashIcon} from "../shared/icons";
+import {AlertTriangleIcon, ArrowUpDownIcon, EyeIcon, FolderTreeIcon, FunnelIcon, MagnifyingGlassIcon, MapPinIcon, PencilIcon, PlusIcon, TrashIcon, UnlinkIcon} from "../shared/icons";
 import {
   AdvancedSelectFilter,
   AdvancedTextFilter,
@@ -259,7 +259,7 @@ function formatCellValue(value: unknown, format?: "date" | "datetime" | "relativ
 
 // ── Action types ──
 
-export type ActionType = "view" | "edit" | "delete" | "locate" | "add-child" | "reorder" | "move";
+export type ActionType = "view" | "edit" | "delete" | "locate" | "add-child" | "reorder" | "move" | "unlink";
 export type ActionVariant = "outline" | "ghost" | "icon";
 
 export interface RowActionDef<T> {
@@ -333,6 +333,7 @@ const ACTION_LABEL_KEYS: Record<ActionType, string> = {
   "add-child": "tree.addChild",
   reorder: "tree.reorder",
   move: "tree.move",
+  unlink: "common.unlink",
 };
 
 const ACTION_ICONS: Record<ActionType, ReactNode> = {
@@ -343,6 +344,7 @@ const ACTION_ICONS: Record<ActionType, ReactNode> = {
   "add-child": <PlusIcon className="size-4" />,
   reorder: <ArrowUpDownIcon className="size-4" />,
   move: <FolderTreeIcon className="size-4" />,
+  unlink: <UnlinkIcon className="size-4" />,
 };
 
 function getActionColumnWidth(actions: RowActionDef<unknown>[], variant: ActionVariant): number {
@@ -368,7 +370,6 @@ function RowActionCell<T>({ row, actions, variant }: { row: T; actions: RowActio
             {visible.map((action, i) => {
               const label = action.label ?? t(ACTION_LABEL_KEYS[action.type]);
               const icon = action.icon ?? ACTION_ICONS[action.type];
-              const isDelete = action.type === "delete";
               return (
                 <Tooltip key={action.type}>
                   <TooltipTrigger asChild>
@@ -378,7 +379,6 @@ function RowActionCell<T>({ row, actions, variant }: { row: T; actions: RowActio
                       className={cn(
                         "rounded-none",
                         i > 0 && "border-l",
-                        isDelete && "text-destructive",
                       )}
                       onClick={(e) => handleClick(e, action)}
                     >
@@ -401,12 +401,11 @@ function RowActionCell<T>({ row, actions, variant }: { row: T; actions: RowActio
       {visible.map((action) => {
         const label = action.label ?? t(ACTION_LABEL_KEYS[action.type]);
         const icon = action.icon ?? ACTION_ICONS[action.type];
-        const isDelete = action.type === "delete";
         return (
           <Button
             key={action.type}
             size="sm"
-            variant={isDelete ? "destructive" : variant}
+            variant={variant}
             onClick={(e) => handleClick(e, action)}
           >
             {icon}
