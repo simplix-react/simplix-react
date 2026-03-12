@@ -1203,7 +1203,7 @@ function getPageNumbers(page: number, totalPages: number): (number | "ellipsis")
 function ListPagination({
   page,
   pageSize,
-  total,
+  total: _total,
   totalPages,
   onPageChange,
   onPageSizeChange,

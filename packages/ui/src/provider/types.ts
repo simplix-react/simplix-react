@@ -136,6 +136,7 @@ export interface TabsComponents {
   Content: ComponentType<TabsContentProps>;
 }
 
+/* eslint-disable @typescript-eslint/no-explicit-any -- command palette components have library-dependent props */
 export interface CommandComponents {
   Root: ComponentType<any>;
   Input: ComponentType<any>;
@@ -145,6 +146,7 @@ export interface CommandComponents {
   Item: ComponentType<any>;
   Separator: ComponentType<any>;
 }
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 export interface TableComponents {
   Root: ComponentType<TableProps>;

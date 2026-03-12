@@ -72,8 +72,8 @@ describe("useKeyboardNav", () => {
 
   it("attaches and detaches keydown listener", () => {
     const opts = createOptions();
-    const addSpy = vi.spyOn(container, "addEventListener");
-    const removeSpy = vi.spyOn(container, "removeEventListener");
+    const _addSpy = vi.spyOn(container, "addEventListener");
+    const _removeSpy = vi.spyOn(container, "removeEventListener");
 
     // Manually assign ref before effect
     const refObj = { current: container };

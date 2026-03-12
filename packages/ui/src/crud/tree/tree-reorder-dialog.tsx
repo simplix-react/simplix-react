@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../../base";
-import { Flex, Stack } from "../../primitives";
+import { Stack } from "../../primitives";
 import { cn } from "../../utils/cn";
 import type { TreeReorderConfig } from "./tree-types";
 

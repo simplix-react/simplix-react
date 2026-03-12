@@ -8,7 +8,7 @@ import { useContainerWidth } from "../../crud/list/use-container-width";
 describe("useContainerWidth", () => {
   let observeMock: ReturnType<typeof vi.fn>;
   let disconnectMock: ReturnType<typeof vi.fn>;
-  let resizeCallback: ResizeObserverCallback;
+  let _resizeCallback: ResizeObserverCallback;
 
   beforeEach(() => {
     observeMock = vi.fn();
@@ -17,7 +17,7 @@ describe("useContainerWidth", () => {
     vi.stubGlobal(
       "ResizeObserver",
       vi.fn().mockImplementation((cb: ResizeObserverCallback) => {
-        resizeCallback = cb;
+        _resizeCallback = cb;
         return { observe: observeMock, disconnect: disconnectMock, unobserve: vi.fn() };
       }),
     );

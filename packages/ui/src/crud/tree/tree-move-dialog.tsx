@@ -1,5 +1,5 @@
 import { useTranslation } from "@simplix-react/i18n/react";
-import { type ReactNode, useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import {
   Button,
@@ -11,7 +11,7 @@ import {
   DialogTitle,
   Input,
 } from "../../base";
-import { Flex, Stack } from "../../primitives";
+import { Stack } from "../../primitives";
 import { cn } from "../../utils/cn";
 import type { TreeMoveConfig } from "./tree-types";
 import { filterTreeWithAncestors, getDescendantIds } from "./tree-utils";

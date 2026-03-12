@@ -398,7 +398,7 @@ function TreeTable<T>({
   className,
   children,
 }: TreeTableProps<T>) {
-  const { t } = useTranslation("simplix/ui");
+  useTranslation("simplix/ui");
   const treeCtx = useCrudTreeContext();
 
   const config: TreeConfig<T> = useMemo(

@@ -48,7 +48,8 @@ describe("useVirtualList", () => {
     mockedUseVirtualizer.mockReturnValue({
       getVirtualItems: vi.fn().mockReturnValue(mockItems),
       getTotalSize: vi.fn().mockReturnValue(4000),
-    } as any);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- partial mock of useVirtualizer
+  } as any);
 
     const parentRef = { current: document.createElement("div") };
     const { result } = renderHook(() =>

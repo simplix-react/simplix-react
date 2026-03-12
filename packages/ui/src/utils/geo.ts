@@ -53,8 +53,8 @@ const DEFAULT_MAP_FIT_OPTIONS: Required<MapFitOptions> = { padding: 50, maxZoom:
  * Fit a MapLibre map instance to the given points.
  * Single-point case uses flyTo; multi-point uses fitBounds.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function fitMapToBounds(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- MapLibre map duck-type with library-specific signatures
   map: { flyTo: (...args: any[]) => any; fitBounds: (...args: any[]) => any },
   points: GeoPoint[],
   options?: MapFitOptions,
