@@ -107,23 +107,34 @@ function generateMockIndexCode(
     imports.push(adapterPreset.mockResponseWrapperImport);
   }
 
-  const hasStores = validEntities.length > 0 && hasSeedsFile;
+  // Only create stores for entities with standard CRUD operations
+  const CRUD_STORE_ROLES = new Set([
+    "list", "search", "get", "create", "update", "delete",
+    "batchDelete", "batchUpdate", "multiUpdate", "getForEdit", "tree", "subtree",
+  ]);
+  const storeEntities = validEntities.filter((entity) =>
+    entity.operations.some((op) => {
+      const role = op.role ?? inferRole(op, entity);
+      return CRUD_STORE_ROLES.has(role);
+    }),
+  );
+  const hasStores = storeEntities.length > 0 && hasSeedsFile;
 
   if (hasStores) {
     const hasTreeOps = ops.some((o) => o.role === "tree");
     const mockImports = ["createMockEntityStore"];
     if (hasTreeOps) mockImports.push("buildEmbeddedTree");
     imports.push(`import { ${mockImports.join(", ")} } from "@simplix-react/mock";`);
-    const typeNames = validEntities.map((e) => e.modelType ?? e.pascalName).join(", ");
+    const typeNames = storeEntities.map((e) => e.modelType ?? e.pascalName).join(", ");
     imports.push(`import type { ${typeNames} } from "../generated/model";`);
-    const seedNames = validEntities.map((e) => `${e.name}Seeds`).join(", ");
+    const seedNames = storeEntities.map((e) => `${e.name}Seeds`).join(", ");
     imports.push(`import { ${seedNames} } from "./seeds";`);
   }
 
   // Store declarations
   const storeDecls: string[] = [];
   if (hasStores) {
-    for (const entity of validEntities) {
+    for (const entity of storeEntities) {
       const typeName = entity.modelType ?? entity.pascalName;
       const idField = findIdField(entity);
       const idArg = idField !== "id" ? `, "${idField}"` : "";
@@ -144,7 +155,7 @@ function generateMockIndexCode(
   const handlerEntries: string[] = [];
   const wrapFn = adapterPreset?.mockResponseWrapper;
   for (const { entity, operation, role } of sortedOps) {
-    const hasStore = hasStores && validEntities.some((e) => e.name === entity.name);
+    const hasStore = hasStores && storeEntities.some((e) => e.name === entity.name);
     const entry = generateHandlerEntry(entity, operation, role, hasStore, wrapFn);
     handlerEntries.push(entry);
   }
@@ -152,7 +163,7 @@ function generateMockIndexCode(
   // Reset calls
   const resetCalls: string[] = [];
   if (hasStores) {
-    for (const entity of validEntities) {
+    for (const entity of storeEntities) {
       resetCalls.push(`  ${entity.name}Store.reset();`);
     }
   }
