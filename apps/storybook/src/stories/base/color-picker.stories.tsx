@@ -17,6 +17,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
+  args: { value: "#3B82F6", onChange: () => {} },
   render: () => {
     const [color, setColor] = useState("#3B82F6");
     return <ColorPicker value={color} onChange={setColor} />;
@@ -24,6 +25,7 @@ export const Default: Story = {
 };
 
 export const Empty: Story = {
+  args: { value: "", onChange: () => {} },
   render: () => {
     const [color, setColor] = useState("");
     return <ColorPicker value={color} onChange={setColor} />;
@@ -32,6 +34,7 @@ export const Empty: Story = {
 
 export const WithoutCustomPicker: Story = {
   name: "Without Custom Picker",
+  args: { value: "#EF4444", onChange: () => {} },
   render: () => {
     const [color, setColor] = useState("#EF4444");
     return <ColorPicker value={color} onChange={setColor} showCustomPicker={false} />;
@@ -40,6 +43,7 @@ export const WithoutCustomPicker: Story = {
 
 export const NotClearable: Story = {
   name: "Not Clearable",
+  args: { value: "#22C55E", onChange: () => {} },
   render: () => {
     const [color, setColor] = useState("#22C55E");
     return <ColorPicker value={color} onChange={setColor} clearable={false} />;
@@ -56,6 +60,7 @@ export const Disabled: Story = {
 
 export const CustomPresets: Story = {
   name: "Custom Presets",
+  args: { value: "#1E3A5F", onChange: () => {} },
   render: () => {
     const [color, setColor] = useState("#1E3A5F");
     return (

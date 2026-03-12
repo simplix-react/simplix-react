@@ -45,6 +45,7 @@ export const CustomVariants: Story = {
 
 export const Comparison: Story = {
   name: "True vs False",
+  args: { value: true },
   render: () => (
     <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
       <span style={{ fontSize: 14 }}>Active:</span>

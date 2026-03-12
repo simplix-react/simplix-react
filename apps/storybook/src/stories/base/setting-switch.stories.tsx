@@ -53,6 +53,7 @@ export const Disabled: Story = {
 };
 
 export const Interactive: Story = {
+  args: { label: "Auto-save documents", checked: false, onCheckedChange: () => {} },
   render: () => {
     const [checked, setChecked] = useState(false);
     return (
