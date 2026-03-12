@@ -108,7 +108,7 @@ function DetailRoot({ isLoading, onClose, header, footer, variant = "default", a
           )}
         </Flex>
       )}
-      <div data-crud-slot="body" className={cn("flex-1 min-h-0 overflow-auto [scrollbar-gutter:stable]", px)}>
+      <div data-crud-slot="body" className={cn("flex flex-col flex-1 min-h-0 overflow-auto [scrollbar-gutter:stable]", px)}>
         <Stack gap="sm" className={cn("relative py-2", !(onClose || header) && "pt-2")}>
           {isLoading && (
             <output
@@ -122,7 +122,7 @@ function DetailRoot({ isLoading, onClose, header, footer, variant = "default", a
           {children}
         </Stack>
         {auditData && (
-          <div data-crud-slot="audit" className="sticky bottom-0 pb-2 bg-background">
+          <div data-crud-slot="audit" className="mt-auto sticky bottom-0 pb-2 bg-background">
             <DetailAuditFooter auditData={auditData} />
           </div>
         )}
