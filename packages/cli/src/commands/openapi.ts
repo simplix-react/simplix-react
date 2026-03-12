@@ -14,7 +14,7 @@ import { loadOpenAPISpec, isSpecUrl } from "../openapi/pipeline/parser.js";
 import { resolveRefs } from "../openapi/pipeline/schema-resolver.js";
 import { extractEntities, enrichWithResponseInfo } from "../openapi/pipeline/entity-extractor.js";
 import { computeDiff, formatDiff } from "../openapi/adaptation/diff-engine.js";
-import { groupEntitiesByDomain, entityMatchesDomain } from "../openapi/pipeline/domain-splitter.js";
+import { groupEntitiesByDomain } from "../openapi/pipeline/domain-splitter.js";
 import { generateMockFiles } from "../openapi/generation/mock-generator.js";
 import { generateHookFiles } from "../openapi/generation/hook-generator.js";
 import { generateHttpFile, generateHttpEnvJson } from "../openapi/generation/http-file-gen.js";

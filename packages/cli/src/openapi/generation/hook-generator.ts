@@ -16,7 +16,7 @@ export async function generateHookFiles(
   targetDir: string,
   entities: ExtractedEntity[],
   hookImportMap?: Map<string, string>,
-  responseAdapter?: ResponseAdapterConfig,
+  _responseAdapter?: ResponseAdapterConfig,
 ): Promise<void> {
   if (entities.length === 0) return;
 

@@ -1,4 +1,3 @@
-import type { CrudRole } from "@simplix-react/contract";
 
 /**
  * Context provided to {@link OpenApiNamingStrategy.resolveEntityName} for deriving
