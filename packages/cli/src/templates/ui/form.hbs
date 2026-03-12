@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import { useCallback, useState } from "react";
 
 {{#if hasUpdate}}
@@ -108,18 +107,13 @@ export function {{EntityPascal}}Form({ {{#if hasUpdate}}{{entity}}Id, {{/if}}{{#
   });
 
   const { t } = useTranslation("{{moduleNamespace}}/widgets");
-{{#if hasUpdate}}
-  const header = onClose ? <Heading level={4} tone="muted">{isEdit ? t("{{entity}}.editHeader", { id: String({{entity}}Id) }) : t("{{entity}}.newHeader")}</Heading> : undefined;
-{{else}}
-  const header = onClose ? <Heading level={4} tone="muted">{t("{{entity}}.newHeader")}</Heading> : undefined;
-{{/if}}
 
 {{#if hasUpdate}}
   if (isEdit && (isLoading || !data)) return <QueryFallback isLoading={isLoading} notFoundMessage="{{EntityPascal}} not found." />;
 
-  return <{{EntityPascal}}FormInner {{#if hasTree}}{{entity}}Id={ {{entity}}Id} defaultParentId={defaultParentId} {{/if}}defaultValues={isEdit ? data ?? undefined : undefined} onSubmit={handleSubmit} fieldErrors={fieldErrors} header={header} onClose={onClose} onCancel={onCancel} onBack={onBack} />;
+  return <{{EntityPascal}}FormInner {{#if hasTree}}{{entity}}Id={ {{entity}}Id} defaultParentId={defaultParentId} {{/if}}defaultValues={isEdit ? data ?? undefined : undefined} onSubmit={handleSubmit} fieldErrors={fieldErrors} isEdit={isEdit} onClose={onClose} onCancel={onCancel} onBack={onBack} />;
 {{else}}
-  return <{{EntityPascal}}FormInner {{#if hasTree}}defaultParentId={defaultParentId} {{/if}}onSubmit={handleSubmit} fieldErrors={fieldErrors} header={header} onClose={onClose} onCancel={onCancel} onBack={onBack} />;
+  return <{{EntityPascal}}FormInner {{#if hasTree}}defaultParentId={defaultParentId} {{/if}}onSubmit={handleSubmit} fieldErrors={fieldErrors} onClose={onClose} onCancel={onCancel} onBack={onBack} />;
 {{/if}}
 }
 
@@ -133,13 +127,15 @@ interface {{EntityPascal}}FormInnerProps {
   defaultValues?: Partial<{{EntityPascal}}FormValues>;
   onSubmit: (values: {{EntityPascal}}FormValues) => void;
   fieldErrors?: Record<string, string>;
-  header?: ReactNode;
+{{#if hasUpdate}}
+  isEdit: boolean;
+{{/if}}
   onClose?: () => void;
   onCancel?: () => void;
   onBack?: () => void;
 }
 
-function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}Id, {{/if}}defaultParentId, {{/if}}defaultValues, onSubmit, fieldErrors, header, onClose, onCancel, onBack }: {{EntityPascal}}FormInnerProps) {
+function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}Id, {{/if}}defaultParentId, {{/if}}defaultValues, onSubmit, fieldErrors, {{#if hasUpdate}}isEdit, {{/if}}onClose, onCancel, onBack }: {{EntityPascal}}FormInnerProps) {
 {{#unless hasEnumFields}}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
 {{/unless}}
@@ -179,6 +175,16 @@ function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}I
     [onSubmit, values],
   );
 
+{{#if hasUpdate}}
+{{#if displayNameField}}
+  const header = onClose ? <Heading level={4} tone="muted">{isEdit ? (values.{{displayNameField}} as string) : t("{{entity}}.newHeader")}</Heading> : undefined;
+{{else}}
+  const header = onClose ? <Heading level={4} tone="muted">{isEdit ? t("{{entity}}.editHeader") : t("{{entity}}.newHeader")}</Heading> : undefined;
+{{/if}}
+{{else}}
+  const header = onClose ? <Heading level={4} tone="muted">{t("{{entity}}.newHeader")}</Heading> : undefined;
+{{/if}}
+
   return (
     <CrudForm onSubmit={handleSubmit} header={header} onClose={onClose} footer={
       <CrudForm.Actions spread={!!(onBack || onCancel)}>
@@ -195,6 +201,7 @@ function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}I
     }>
       <CrudForm.Section title={t("{{entity}}.sectionTitle")} variant="flat">
 {{#each fields}}
+{{#unless this.isSystemField}}
 {{#if (eq this.name ../treeParentIdField)}}
         <TreeSelectField<{{../EntityPascal}}>
           label={fieldLabel("{{this.name}}")}
@@ -263,6 +270,7 @@ function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}I
           ]}
         />
 {{/if}}
+{{/unless}}
 {{/each}}
       </CrudForm.Section>
     </CrudForm>

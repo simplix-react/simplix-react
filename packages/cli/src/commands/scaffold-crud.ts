@@ -36,9 +36,15 @@ export interface FieldInfo {
   component: string;
   options: string[];
   defaultValue: string;
+  isForeignKey: boolean;
+  fkEntityField: string | null;
+  isSystemField: boolean;
 }
 
-export function parseZodType(zodExpr: string): Omit<FieldInfo, "name" | "label" | "capitalizedName" | "defaultValue"> {
+/** Fields that exist in the data model but should not be displayed or edited by users. */
+const SYSTEM_FIELDS = ["id", "displayOrder", "sortOrder"];
+
+export function parseZodType(zodExpr: string): Omit<FieldInfo, "name" | "label" | "capitalizedName" | "defaultValue" | "isForeignKey" | "fkEntityField" | "isSystemField"> {
   const trimmed = zodExpr.trim();
 
   // z.enum([...]) / zod.enum([...])
@@ -195,6 +201,8 @@ export function entityFieldsToFieldInfo(fields: EntityField[]): FieldInfo[] {
       }
 
       const capitalizedName = f.name.charAt(0).toUpperCase() + f.name.slice(1);
+      const isForeignKey = tsType === "string" && f.name.endsWith("Id") && f.name !== "id";
+      const fkEntityField = isForeignKey ? f.name.slice(0, -2) : null;
       return {
         name: f.name,
         capitalizedName,
@@ -205,6 +213,9 @@ export function entityFieldsToFieldInfo(fields: EntityField[]): FieldInfo[] {
         component,
         options,
         defaultValue: getDefaultValue(tsType),
+        isForeignKey,
+        fkEntityField,
+        isSystemField: SYSTEM_FIELDS.includes(f.name),
       };
     });
 }
@@ -313,12 +324,17 @@ function parseZodObjectBody(content: string, match: RegExpExecArray): FieldInfo[
     if (/^(?:z|zod)\.object\(/.test(zodExpr) || /(?:z|zod)\.array\(\s*(?:z|zod)\.object\(/.test(zodExpr)) continue;
 
     const parsed = parseZodType(zodExpr);
+    const isForeignKey = parsed.tsType === "string" && name.endsWith("Id") && name !== "id";
+    const fkEntityField = isForeignKey ? name.slice(0, -2) : null;
     fields.push({
+      ...parsed,
       name,
       capitalizedName: name.charAt(0).toUpperCase() + name.slice(1),
       label: name.charAt(0).toUpperCase() + name.slice(1).replace(/_/g, " "),
       defaultValue: parsed.options.length > 0 ? `"${parsed.options[0]}"` : getDefaultValue(parsed.tsType),
-      ...parsed,
+      isForeignKey,
+      fkEntityField,
+      isSystemField: SYSTEM_FIELDS.includes(name),
     });
   }
 
@@ -1271,6 +1287,9 @@ const PLACEHOLDER_FIELDS: FieldInfo[] = [
     component: "Text",
     options: [],
     defaultValue: '""',
+    isForeignKey: false,
+    fkEntityField: null,
+    isSystemField: true,
   },
   {
     name: "name",
@@ -1282,6 +1301,9 @@ const PLACEHOLDER_FIELDS: FieldInfo[] = [
     component: "Text",
     options: [],
     defaultValue: '""',
+    isForeignKey: false,
+    fkEntityField: null,
+    isSystemField: false,
   },
 ];
 
@@ -1492,6 +1514,16 @@ export const scaffoldCrudCommand = new Command("scaffold")
         }
       }
 
+      // ── Display name field detection (for all entities) ──
+      const commonNameFields = ["name", "title", "label", "displayName"];
+      const displayNameField = fields.find((f) =>
+        commonNameFields.includes(f.name) && f.tsType === "string",
+      )?.name
+        ?? fields.find((f) =>
+          f.tsType === "string" && f.name !== rowIdField,
+        )?.name
+        ?? null;
+
       // ── Tree entity detection ──
       const hasTree = ops.hasTree || !!hookTree;
 
@@ -1580,6 +1612,7 @@ export const scaffoldCrudCommand = new Command("scaffold")
         hasTreeMove,
         treeParentIdField,
         treeSortOrderField,
+        displayNameField,
         treeDisplayNameField,
         treeSearchFields,
         treeDisplayFields,

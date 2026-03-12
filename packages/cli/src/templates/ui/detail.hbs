@@ -19,7 +19,6 @@ interface {{EntityPascal}}DetailProps {
 
 export function {{EntityPascal}}Detail({ {{entity}}Id, onClose, onBack{{#if hasUpdate}}, onEdit{{/if}}{{#if hasDelete}}, onDeleted{{/if}} }: {{EntityPascal}}DetailProps) {
   const { t } = useTranslation("{{moduleNamespace}}/widgets");
-  const header = onClose ? <Heading level={4} tone="muted">{t("{{entity}}.detailHeader", { id: String({{entity}}Id) })}</Heading> : undefined;
 {{#if hookGet}}
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, isLoading } = {{hookGet}}({{entity}}Id as any) as any;
@@ -50,9 +49,15 @@ export function {{EntityPascal}}Detail({ {{entity}}Id, onClose, onBack{{#if hasU
 
   if (!displayData) return <QueryFallback isLoading={isLoading} notFoundMessage="{{EntityPascal}} not found." />;
 
+{{#if displayNameField}}
+  const header = onClose ? <Heading level={4} tone="muted">{String(displayData.{{displayNameField}} ?? "")}</Heading> : undefined;
+{{else}}
+  const header = onClose ? <Heading level={4} tone="muted">{t("{{entity}}.detailHeader")}</Heading> : undefined;
+{{/if}}
+
   return (
     <>
-      <CrudDetail isLoading={isLoading} header={header} onClose={onClose} footer={
+      <CrudDetail isLoading={isLoading} header={header} onClose={onClose} auditData={{ldb}} id: displayData.id, createdAt: displayData.createdAt, updatedAt: displayData.updatedAt {{rdb}} footer={
         <CrudDetail.DefaultActions
           onClose={onClose}
           onBack={onBack}
@@ -66,6 +71,7 @@ export function {{EntityPascal}}Detail({ {{entity}}Id, onClose, onBack{{#if hasU
       }>
         <CrudDetail.Section title={t("{{entity}}.sectionTitle")} variant="flat">
 {{#each fields}}
+{{#unless this.isSystemField}}
 {{#if (eq this.component "Date")}}
           <DetailFields.DetailDateField
             label={fieldLabel("{{this.name}}")}
@@ -92,6 +98,12 @@ export function {{EntityPascal}}Detail({ {{entity}}Id, onClose, onBack{{#if hasU
             variants={{ldb}} {{#each this.options}}"{{this}}": "default"{{#unless @last}}, {{/unless}}{{/each}} {{rdb}}
             layout="inline"
           />
+{{else if this.isForeignKey}}
+          <DetailFields.DetailTextField
+            label={fieldLabel("{{this.name}}")}
+            value={displayData.{{this.fkEntityField}}?.name ?? String(displayData.{{this.name}} ?? "")}
+            layout="inline"
+          />
 {{else}}
           <DetailFields.DetailTextField
             label={fieldLabel("{{this.name}}")}
@@ -99,6 +111,7 @@ export function {{EntityPascal}}Detail({ {{entity}}Id, onClose, onBack{{#if hasU
             layout="inline"
           />
 {{/if}}
+{{/unless}}
 {{/each}}
         </CrudDetail.Section>
       </CrudDetail>
