@@ -20,6 +20,7 @@ export interface ListDetailContextValue {
   variant: ListDetailVariant;
   activePanel: "list" | "detail";
   setActivePanel: (panel: "list" | "detail") => void;
+  dialogHeight?: string;
 }
 
 const ListDetailContext = createContext<ListDetailContextValue>({
@@ -90,6 +91,8 @@ export interface ListDetailBaseProps {
   activePanel?: "list" | "detail";
   /** Called when the dialog is dismissed (only applies to `"dialog"` variant). */
   onClose?: () => void;
+  /** Fixed dialog height (e.g. `"60vh"`, `"500px"`). When set, the dialog uses a fixed height with internal scrolling. When omitted, height fits content up to `max-h-[85vh]`. Only applies to `"dialog"` variant. */
+  dialogHeight?: string;
   className?: string;
   children: ReactNode;
 }
@@ -103,7 +106,7 @@ export type ListDetailProps = ListDetailBaseProps & (
 /** Minimum width (px) for both list and detail panels during drag. */
 const MIN_PANEL_WIDTH = 280;
 
-export function ListDetailRoot({ variant = "panel", activePanel: activePanelProp, detailWidth = 480, listWidth, onClose, className, children }: ListDetailProps) {
+export function ListDetailRoot({ variant = "panel", activePanel: activePanelProp, detailWidth = 480, listWidth, onClose, dialogHeight, className, children }: ListDetailProps) {
 
   const [activePanelState, setActivePanel] = useState<"list" | "detail">("list");
   const activePanel = activePanelProp ?? activePanelState;
@@ -128,7 +131,7 @@ export function ListDetailRoot({ variant = "panel", activePanel: activePanelProp
   const handleDragStart = useCallback(() => setIsDragging(true), []);
   const handleDragEnd = useCallback(() => setIsDragging(false), []);
 
-  const contextValue: ListDetailContextValue = { variant, activePanel, setActivePanel };
+  const contextValue: ListDetailContextValue = { variant, activePanel, setActivePanel, dialogHeight };
 
   if (variant === "dialog") {
     return (
@@ -162,8 +165,8 @@ export function ListDetailRoot({ variant = "panel", activePanel: activePanelProp
       <section
         ref={sectionRef}
         className={cn(
-          "h-full flex-1 min-h-0 overflow-hidden",
-          isDetailOpen && "md:grid md:grid-rows-1",
+          "h-full flex-1 min-h-0",
+          isDetailOpen && "overflow-hidden md:grid md:grid-rows-1",
           isDetailOpen && !isDragging && "md:transition-[grid-template-columns] md:duration-300 md:ease-in-out",
           "max-md:flex max-md:flex-col",
           className,
@@ -278,7 +281,7 @@ const ListPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }, 
       data-panel="list"
       className={cn(
         "flex flex-col gap-3 min-h-0 min-w-0 overflow-auto",
-        activePanel === "detail" && "md:pr-4",
+        variant === "panel" && activePanel === "detail" && "md:pr-4",
         variant === "panel" && "md:order-1",
         // Panel mode mobile: hide when detail is active
         variant === "panel" && activePanel !== "list" && "max-md:hidden",
@@ -306,7 +309,7 @@ ListPanel.displayName = "ListDetail.List";
 //   pointer-events-none              └────────────────────────────┘
 
 const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }, ref) => {
-  const { variant, activePanel } = useListDetail();
+  const { variant, activePanel, dialogHeight } = useListDetail();
 
   if (variant === "dialog") {
     return (
@@ -323,7 +326,8 @@ const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }
           aria-describedby={undefined}
           className={cn(
             "fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2",
-            "w-full max-w-2xl max-h-[85vh] min-h-[40vh]",
+            "w-full max-w-2xl",
+            !dialogHeight && "max-h-[85vh]",
             "flex flex-col overflow-hidden",
             "rounded-lg border bg-background py-4 shadow-lg",
             // Push horizontal padding into CrudDetail/CrudForm slots so border lines span full dialog width
@@ -335,6 +339,7 @@ const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }
             "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
             className,
           )}
+          style={dialogHeight ? { height: dialogHeight } : undefined}
         >
           <DialogPrimitive.Title className="sr-only">Detail</DialogPrimitive.Title>
           {children}

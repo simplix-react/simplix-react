@@ -25,3 +25,6 @@ export type { SectionShellProps } from "./section-shell";
 
 export { ConfirmDialog } from "./confirm-dialog";
 export type { ConfirmDialogProps } from "./confirm-dialog";
+
+export { EmptyState } from "./empty-state";
+export type { EmptyStateProps } from "./empty-state";

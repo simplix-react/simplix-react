@@ -4,11 +4,13 @@ import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
 /** Props for the {@link DetailLinkField} component. */
 export interface DetailLinkFieldProps extends CommonDetailFieldProps {
   /** Display text for the link. */
-  value: string;
+  value: string | null | undefined;
   /** Link URL. */
-  href: string;
+  href: string | null | undefined;
   /** Whether the link opens in a new tab with `rel="noopener noreferrer"`. */
   external?: boolean;
+  /** Fallback text when value is null, undefined, or empty string. Defaults to em-dash. */
+  fallback?: string;
 }
 
 /**
@@ -23,12 +25,15 @@ export function DetailLinkField({
   value,
   href,
   external,
+  fallback = "\u2014",
   label,
   labelKey,
   layout,
   size,
   className,
 }: DetailLinkFieldProps) {
+  const hasValue = value != null && value !== "" && href != null && href !== "";
+
   return (
     <DetailFieldWrapper
       label={label}
@@ -37,16 +42,20 @@ export function DetailLinkField({
       size={size}
       className={className}
     >
-      <a
-        href={href}
-        className="text-primary underline-offset-4 hover:underline"
-        {...(external && {
-          target: "_blank",
-          rel: "noopener noreferrer",
-        })}
-      >
-        {value}
-      </a>
+      {hasValue ? (
+        <a
+          href={href}
+          className="text-primary underline-offset-4 hover:underline"
+          {...(external && {
+            target: "_blank",
+            rel: "noopener noreferrer",
+          })}
+        >
+          {value}
+        </a>
+      ) : (
+        <span>{fallback}</span>
+      )}
     </DetailFieldWrapper>
   );
 }

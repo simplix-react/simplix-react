@@ -8,7 +8,7 @@ import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
 export interface DetailTimezoneFieldProps extends CommonDetailFieldProps {
   /** IANA timezone ID (e.g. "Asia/Seoul"). */
   value: string | null | undefined;
-  /** Fallback text when value is null/undefined. Defaults to em-dash. */
+  /** Fallback text when value is null, undefined, or empty string. Defaults to em-dash. */
   fallback?: string;
 }
 
@@ -56,7 +56,7 @@ export function DetailTimezoneField({
           )}
         </span>
       ) : (
-        <span>{value ?? fallback}</span>
+        <span>{value || fallback}</span>
       )}
     </DetailFieldWrapper>
   );

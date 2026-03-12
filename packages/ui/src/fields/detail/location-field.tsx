@@ -21,6 +21,8 @@ export interface DetailLocationFieldProps extends CommonDetailFieldProps {
   zoom?: number;
   /** Fallback text when coordinates are empty (0,0). Defaults to em-dash. */
   fallback?: string;
+  /** When true, renders nothing if coordinates are empty. Defaults to false. */
+  hideWhenEmpty?: boolean;
   /** Custom marker icon. Replaces the default blue dot. */
   markerIcon?: ReactNode;
   /** PMTiles file URL for offline map fallback (e.g. "/offline-map.pmtiles"). */
@@ -48,6 +50,7 @@ export function DetailLocationField({
   longitude,
   zoom = 13,
   fallback = "\u2014",
+  hideWhenEmpty = false,
   markerIcon,
   fallbackTileUrl,
   label,
@@ -60,6 +63,8 @@ export function DetailLocationField({
   const [open, setOpen] = useState(false);
   const hasLocation =
     isValidLatLng(latitude, longitude) && !(latitude === 0 && longitude === 0);
+
+  if (!hasLocation && hideWhenEmpty) return null;
 
   const dialogMapRef = useRef<maplibregl.Map | null>(null);
 

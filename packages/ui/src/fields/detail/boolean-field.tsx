@@ -12,6 +12,8 @@ export interface DetailBooleanFieldProps extends CommonDetailFieldProps {
   mode?: BooleanDisplayMode;
   /** Custom labels for true/false values when using `"text"` mode. */
   labels?: { true: string; false: string };
+  /** Fallback text when value is null or undefined. Defaults to em-dash. */
+  fallback?: string;
 }
 
 /**
@@ -27,6 +29,7 @@ export function DetailBooleanField({
   value,
   mode = "text",
   labels = { true: "Yes", false: "No" },
+  fallback = "\u2014",
   label,
   labelKey,
   layout,
@@ -42,7 +45,7 @@ export function DetailBooleanField({
         size={size}
         className={className}
       >
-        <span>{"\u2014"}</span>
+        <span>{fallback}</span>
       </DetailFieldWrapper>
     );
   }
