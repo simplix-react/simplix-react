@@ -8,4 +8,4 @@
 
 > `const` **Grid**: `ForwardRefExoticComponent`\<`Omit`\<[`GridProps`](../interfaces/GridProps.md), `"ref"`\> & `RefAttributes`\<`HTMLDivElement`\>\>
 
-Defined in: [packages/ui/src/primitives/grid.tsx:75](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/grid.tsx#L75)
+Defined in: [packages/ui/src/primitives/grid.tsx:128](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/grid.tsx#L128)

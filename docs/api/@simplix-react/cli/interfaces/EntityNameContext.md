@@ -6,7 +6,7 @@
 
 # Interface: EntityNameContext
 
-Defined in: [openapi/naming/naming-strategy.ts:12](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L12)
+Defined in: [openapi/naming/naming-strategy.ts:11](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L11)
 
 Context provided to [OpenApiNamingStrategy.resolveEntityName](OpenApiNamingStrategy.md#resolveentityname) for deriving
 the entity name from an OpenAPI tag group.
@@ -23,7 +23,7 @@ uses this information to produce a camelCase entity name.
 
 > **extensions**: `Record`\<`string`, `unknown`\>
 
-Defined in: [openapi/naming/naming-strategy.ts:28](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L28)
+Defined in: [openapi/naming/naming-strategy.ts:27](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L27)
 
 x-* extensions from the OpenAPI tag object
 
@@ -33,7 +33,7 @@ x-* extensions from the OpenAPI tag object
 
 > **operations**: `object`[]
 
-Defined in: [openapi/naming/naming-strategy.ts:18](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L18)
+Defined in: [openapi/naming/naming-strategy.ts:17](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L17)
 
 Operation summaries under this tag
 
@@ -63,7 +63,7 @@ Operation summaries under this tag
 
 > **paths**: `string`[]
 
-Defined in: [openapi/naming/naming-strategy.ts:16](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L16)
+Defined in: [openapi/naming/naming-strategy.ts:15](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L15)
 
 All paths belonging to this tag
 
@@ -73,7 +73,7 @@ All paths belonging to this tag
 
 > **schemaNames**: `string`[]
 
-Defined in: [openapi/naming/naming-strategy.ts:26](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L26)
+Defined in: [openapi/naming/naming-strategy.ts:25](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L25)
 
 DTO/schema names referenced by operations in this tag
 
@@ -83,6 +83,6 @@ DTO/schema names referenced by operations in this tag
 
 > `optional` **tag**: `string`
 
-Defined in: [openapi/naming/naming-strategy.ts:14](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L14)
+Defined in: [openapi/naming/naming-strategy.ts:13](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L13)
 
 OpenAPI tag name — undefined for tag-less specs

@@ -6,7 +6,7 @@
 
 # Interface: CrudDetailActionsProps
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:195](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L195)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:207](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L207)
 
 Props for the CrudDetail.Actions sub-component.
 
@@ -16,7 +16,7 @@ Props for the CrudDetail.Actions sub-component.
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:197](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L197)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:209](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L209)
 
 ***
 
@@ -24,4 +24,4 @@ Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:197](https://github.com
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:196](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L196)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:208](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L208)

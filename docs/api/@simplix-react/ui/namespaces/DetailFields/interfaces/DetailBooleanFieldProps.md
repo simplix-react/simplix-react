@@ -28,6 +28,16 @@ Defined in: [packages/ui/src/crud/shared/types.ts:37](https://github.com/simplix
 
 ***
 
+### fallback?
+
+> `optional` **fallback**: `string`
+
+Defined in: [packages/ui/src/fields/detail/boolean-field.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/boolean-field.tsx#L16)
+
+Fallback text when value is null or undefined. Defaults to em-dash.
+
+***
+
 ### label?
 
 > `optional` **label**: `string`

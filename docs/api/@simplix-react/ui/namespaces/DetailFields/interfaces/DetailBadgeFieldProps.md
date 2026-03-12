@@ -44,6 +44,16 @@ Translated or formatted text to display inside the badge. Falls back to [value](
 
 ***
 
+### fallback?
+
+> `optional` **fallback**: `string`
+
+Defined in: [packages/ui/src/fields/detail/badge-field.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/badge-field.tsx#L21)
+
+Fallback text when value is null, undefined, or empty string. Defaults to em-dash.
+
+***
+
 ### label?
 
 > `optional` **label**: `string`
@@ -94,7 +104,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-
 
 ### value
 
-> **value**: `T`
+> **value**: `T` \| `null` \| `undefined`
 
 Defined in: [packages/ui/src/fields/detail/badge-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/badge-field.tsx#L15)
 

@@ -28,6 +28,16 @@ Defined in: [packages/ui/src/crud/shared/types.ts:37](https://github.com/simplix
 
 ***
 
+### fallback?
+
+> `optional` **fallback**: `string`
+
+Defined in: [packages/ui/src/fields/detail/list-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/list-field.tsx#L15)
+
+Fallback text when value is null, undefined, or empty array. Defaults to em-dash.
+
+***
+
 ### label?
 
 > `optional` **label**: `string`

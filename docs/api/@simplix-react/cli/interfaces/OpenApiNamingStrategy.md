@@ -6,7 +6,7 @@
 
 # Interface: OpenApiNamingStrategy
 
-Defined in: [openapi/naming/naming-strategy.ts:93](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L93)
+Defined in: [openapi/naming/naming-strategy.ts:92](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L92)
 
 Strategy interface for per-spec naming customization.
 
@@ -36,7 +36,7 @@ const strategy: OpenApiNamingStrategy = {
 
 > **resolveEntityName**(`context`): `string`
 
-Defined in: [openapi/naming/naming-strategy.ts:100](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L100)
+Defined in: [openapi/naming/naming-strategy.ts:99](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L99)
 
 Derives a camelCase entity name from an OpenAPI tag group.
 
@@ -60,7 +60,7 @@ A camelCase entity name (e.g., `"projectTask"`)
 
 > **resolveOperation**(`context`): [`ResolvedOperation`](ResolvedOperation.md)
 
-Defined in: [openapi/naming/naming-strategy.ts:107](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L107)
+Defined in: [openapi/naming/naming-strategy.ts:106](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L106)
 
 Maps an OpenAPI operation to a CRUD role and hook name.
 

@@ -6,7 +6,7 @@
 
 # Interface: ResolvedOperation
 
-Defined in: [openapi/naming/naming-strategy.ts:65](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L65)
+Defined in: [openapi/naming/naming-strategy.ts:64](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L64)
 
 Result of resolving an operation — determines its CRUD role and hook name.
 
@@ -16,7 +16,7 @@ Result of resolving an operation — determines its CRUD role and hook name.
 
 > **hookName**: `string`
 
-Defined in: [openapi/naming/naming-strategy.ts:69](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L69)
+Defined in: [openapi/naming/naming-strategy.ts:68](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L68)
 
 Hook name without "use" prefix — Orval adds it automatically
 
@@ -26,6 +26,6 @@ Hook name without "use" prefix — Orval adds it automatically
 
 > **role**: `string`
 
-Defined in: [openapi/naming/naming-strategy.ts:67](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L67)
+Defined in: [openapi/naming/naming-strategy.ts:66](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L66)
 
 CRUD role — standard roles (list, get, create, update, delete, getForEdit) or extended roles (search, batchUpdate, batchDelete, multiUpdate, order, etc.)

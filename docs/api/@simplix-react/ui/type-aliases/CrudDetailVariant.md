@@ -8,6 +8,6 @@
 
 > **CrudDetailVariant** = `"default"` \| `"dialog"`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:47](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L47)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:52](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L52)
 
 Layout variant for [CrudDetail](../variables/CrudDetail.md).

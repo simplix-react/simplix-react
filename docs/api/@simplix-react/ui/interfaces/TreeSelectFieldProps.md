@@ -6,7 +6,7 @@
 
 # Interface: TreeSelectFieldProps\<T\>
 
-Defined in: [packages/ui/src/fields/form/tree-select-field.tsx:160](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-select-field.tsx#L160)
+Defined in: [packages/ui/src/fields/form/tree-select-field.tsx:159](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-select-field.tsx#L159)
 
 Shared props for all form field components.
 
@@ -38,7 +38,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:30](https://github.com/simplix
 
 > `optional` **config**: `Pick`\<[`TreeConfig`](TreeConfig.md)\<`T`\>, `"idField"` \| `"childrenField"`\>
 
-Defined in: [packages/ui/src/fields/form/tree-select-field.tsx:165](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-select-field.tsx#L165)
+Defined in: [packages/ui/src/fields/form/tree-select-field.tsx:164](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-select-field.tsx#L164)
 
 ***
 
@@ -70,7 +70,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:29](https://github.com/simplix
 
 > `optional` **disabledItemId**: `string`
 
-Defined in: [packages/ui/src/fields/form/tree-select-field.tsx:167](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-select-field.tsx#L167)
+Defined in: [packages/ui/src/fields/form/tree-select-field.tsx:166](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-select-field.tsx#L166)
 
 ***
 
@@ -90,7 +90,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:25](https://github.com/simplix
 
 > `optional` **getDisplayName**: (`item`) => `string`
 
-Defined in: [packages/ui/src/fields/form/tree-select-field.tsx:166](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-select-field.tsx#L166)
+Defined in: [packages/ui/src/fields/form/tree-select-field.tsx:165](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-select-field.tsx#L165)
 
 #### Parameters
 
@@ -108,7 +108,7 @@ Defined in: [packages/ui/src/fields/form/tree-select-field.tsx:166](https://gith
 
 > `optional` **isLoading**: `boolean`
 
-Defined in: [packages/ui/src/fields/form/tree-select-field.tsx:164](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-select-field.tsx#L164)
+Defined in: [packages/ui/src/fields/form/tree-select-field.tsx:163](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-select-field.tsx#L163)
 
 ***
 
@@ -152,7 +152,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/fields/form/tree-select-field.tsx:162](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-select-field.tsx#L162)
+Defined in: [packages/ui/src/fields/form/tree-select-field.tsx:161](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-select-field.tsx#L161)
 
 #### Parameters
 
@@ -170,7 +170,7 @@ Defined in: [packages/ui/src/fields/form/tree-select-field.tsx:162](https://gith
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/fields/form/tree-select-field.tsx:168](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-select-field.tsx#L168)
+Defined in: [packages/ui/src/fields/form/tree-select-field.tsx:167](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-select-field.tsx#L167)
 
 ***
 
@@ -202,7 +202,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-
 
 > **treeData**: `T`[]
 
-Defined in: [packages/ui/src/fields/form/tree-select-field.tsx:163](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-select-field.tsx#L163)
+Defined in: [packages/ui/src/fields/form/tree-select-field.tsx:162](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-select-field.tsx#L162)
 
 ***
 
@@ -210,7 +210,7 @@ Defined in: [packages/ui/src/fields/form/tree-select-field.tsx:163](https://gith
 
 > **value**: `string` \| `null`
 
-Defined in: [packages/ui/src/fields/form/tree-select-field.tsx:161](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-select-field.tsx#L161)
+Defined in: [packages/ui/src/fields/form/tree-select-field.tsx:160](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-select-field.tsx#L160)
 
 ***
 

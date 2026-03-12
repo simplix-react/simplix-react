@@ -6,6 +6,6 @@
 
 # Variable: TabsContent
 
-> `const` **TabsContent**: `ForwardRefExoticComponent`\<`Omit`\<`TabsContentProps` & `RefAttributes`\<`HTMLDivElement`\>, `"ref"`\> & `RefAttributes`\<`HTMLDivElement`\>\>
+> `const` **TabsContent**: `ForwardRefExoticComponent`\<`Omit`\<[`TabsContentProps`](../interfaces/TabsContentProps.md), `"ref"`\> & `RefAttributes`\<`HTMLDivElement`\>\>
 
-Defined in: [packages/ui/src/base/navigation/tabs.tsx:52](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/tabs.tsx#L52)
+Defined in: [packages/ui/src/base/navigation/tabs.tsx:74](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/tabs.tsx#L74)

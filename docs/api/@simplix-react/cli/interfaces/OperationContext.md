@@ -6,7 +6,7 @@
 
 # Interface: OperationContext
 
-Defined in: [openapi/naming/naming-strategy.ts:35](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L35)
+Defined in: [openapi/naming/naming-strategy.ts:34](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L34)
 
 Context provided to `resolveOperation()` for mapping an OpenAPI operation
 to a CRUD role and a human-friendly hook name.
@@ -17,7 +17,7 @@ to a CRUD role and a human-friendly hook name.
 
 > `optional` **description**: `string`
 
-Defined in: [openapi/naming/naming-strategy.ts:49](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L49)
+Defined in: [openapi/naming/naming-strategy.ts:48](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L48)
 
 Operation description from the spec
 
@@ -27,7 +27,7 @@ Operation description from the spec
 
 > **entityName**: `string`
 
-Defined in: [openapi/naming/naming-strategy.ts:45](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L45)
+Defined in: [openapi/naming/naming-strategy.ts:44](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L44)
 
 Entity name resolved by resolveEntityName() (camelCase)
 
@@ -37,7 +37,7 @@ Entity name resolved by resolveEntityName() (camelCase)
 
 > **extensions**: `Record`\<`string`, `unknown`\>
 
-Defined in: [openapi/naming/naming-strategy.ts:59](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L59)
+Defined in: [openapi/naming/naming-strategy.ts:58](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L58)
 
 x-* extensions from the operation object
 
@@ -47,7 +47,7 @@ x-* extensions from the operation object
 
 > **method**: `string`
 
-Defined in: [openapi/naming/naming-strategy.ts:39](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L39)
+Defined in: [openapi/naming/naming-strategy.ts:38](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L38)
 
 HTTP method (uppercase: GET, POST, PUT, DELETE, PATCH)
 
@@ -57,7 +57,7 @@ HTTP method (uppercase: GET, POST, PUT, DELETE, PATCH)
 
 > **operationId**: `string`
 
-Defined in: [openapi/naming/naming-strategy.ts:37](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L37)
+Defined in: [openapi/naming/naming-strategy.ts:36](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L36)
 
 operationId (may be auto-generated with numeric suffixes)
 
@@ -67,7 +67,7 @@ operationId (may be auto-generated with numeric suffixes)
 
 > **path**: `string`
 
-Defined in: [openapi/naming/naming-strategy.ts:41](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L41)
+Defined in: [openapi/naming/naming-strategy.ts:40](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L40)
 
 Full path (e.g., "/api/v1/admin/user/account/{userId}")
 
@@ -77,7 +77,7 @@ Full path (e.g., "/api/v1/admin/user/account/{userId}")
 
 > **pathParams**: `string`[]
 
-Defined in: [openapi/naming/naming-strategy.ts:55](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L55)
+Defined in: [openapi/naming/naming-strategy.ts:54](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L54)
 
 Path parameter names
 
@@ -87,7 +87,7 @@ Path parameter names
 
 > **queryParams**: `string`[]
 
-Defined in: [openapi/naming/naming-strategy.ts:57](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L57)
+Defined in: [openapi/naming/naming-strategy.ts:56](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L56)
 
 Query parameter names
 
@@ -97,7 +97,7 @@ Query parameter names
 
 > `optional` **requestType**: `string`
 
-Defined in: [openapi/naming/naming-strategy.ts:53](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L53)
+Defined in: [openapi/naming/naming-strategy.ts:52](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L52)
 
 Request body schema name
 
@@ -107,7 +107,7 @@ Request body schema name
 
 > `optional` **responseType**: `string`
 
-Defined in: [openapi/naming/naming-strategy.ts:51](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L51)
+Defined in: [openapi/naming/naming-strategy.ts:50](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L50)
 
 200 response schema name
 
@@ -117,7 +117,7 @@ Defined in: [openapi/naming/naming-strategy.ts:51](https://github.com/simplix-re
 
 > `optional` **summary**: `string`
 
-Defined in: [openapi/naming/naming-strategy.ts:47](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L47)
+Defined in: [openapi/naming/naming-strategy.ts:46](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L46)
 
 Operation summary from the spec
 
@@ -127,6 +127,6 @@ Operation summary from the spec
 
 > `optional` **tag**: `string`
 
-Defined in: [openapi/naming/naming-strategy.ts:43](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L43)
+Defined in: [openapi/naming/naming-strategy.ts:42](https://github.com/simplix-react/simplix-react/blob/main/openapi/naming/naming-strategy.ts#L42)
 
 Tag this operation belongs to

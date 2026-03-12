@@ -12,7 +12,7 @@ Defined in: [packages/ui/src/provider/types.ts:132](https://github.com/simplix-r
 
 ### Content
 
-> **Content**: `ComponentType`\<`TabsContentProps` & `RefAttributes`\<`HTMLDivElement`\>\>
+> **Content**: `ComponentType`\<[`TabsContentProps`](TabsContentProps.md)\>
 
 Defined in: [packages/ui/src/provider/types.ts:136](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L136)
 
@@ -20,7 +20,7 @@ Defined in: [packages/ui/src/provider/types.ts:136](https://github.com/simplix-r
 
 ### List
 
-> **List**: `ComponentType`\<`TabsListProps` & `RefAttributes`\<`HTMLDivElement`\>\>
+> **List**: `ComponentType`\<[`TabsListProps`](TabsListProps.md)\>
 
 Defined in: [packages/ui/src/provider/types.ts:134](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L134)
 

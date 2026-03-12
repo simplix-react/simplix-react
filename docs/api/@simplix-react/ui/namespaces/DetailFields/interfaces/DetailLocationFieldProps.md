@@ -42,9 +42,19 @@ Fallback text when coordinates are empty (0,0). Defaults to em-dash.
 
 > `optional` **fallbackTileUrl**: `string`
 
-Defined in: [packages/ui/src/fields/detail/location-field.tsx:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/location-field.tsx#L27)
+Defined in: [packages/ui/src/fields/detail/location-field.tsx:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/location-field.tsx#L29)
 
 PMTiles file URL for offline map fallback (e.g. "/offline-map.pmtiles").
+
+***
+
+### hideWhenEmpty?
+
+> `optional` **hideWhenEmpty**: `boolean`
+
+Defined in: [packages/ui/src/fields/detail/location-field.tsx:25](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/location-field.tsx#L25)
+
+When true, renders nothing if coordinates are empty. Defaults to false.
 
 ***
 
@@ -104,7 +114,7 @@ Defined in: [packages/ui/src/fields/detail/location-field.tsx:20](https://github
 
 > `optional` **markerIcon**: `ReactNode`
 
-Defined in: [packages/ui/src/fields/detail/location-field.tsx:25](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/location-field.tsx#L25)
+Defined in: [packages/ui/src/fields/detail/location-field.tsx:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/location-field.tsx#L27)
 
 Custom marker icon. Replaces the default blue dot.
 

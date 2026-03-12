@@ -8,9 +8,10 @@
 
 > **FieldMessage**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/shared/field-message.tsx:33](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/field-message.tsx#L33)
+Defined in: [packages/ui/src/fields/shared/field-message.tsx:37](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/field-message.tsx#L37)
 
 Inline message for form fields supporting error, warning, info, and description variants.
+Error and warning variants display an alert icon for visual emphasis.
 
 ## Parameters
 

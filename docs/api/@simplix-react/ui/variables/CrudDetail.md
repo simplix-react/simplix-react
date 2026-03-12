@@ -8,7 +8,7 @@
 
 > `const` **CrudDetail**: (`__namedParameters`) => `Element` & `object`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:287](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L287)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:301](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L301)
 
 Compound component for building read-only CRUD detail views.
 
@@ -20,12 +20,14 @@ Compound component for building read-only CRUD detail views.
 │    field rows (label: value)        │
 │  </CrudDetail.Section>             │
 ├─────────────────────────────────────┤
+│  AuditFooter (via auditData prop)  │
+├─────────────────────────────────────┤
 │  <CrudDetail.DefaultActions>        │
 │  [← Back]        [Delete] [Edit]   │
 └─────────────────────────────────────┘
 ```
 
-Sub-components: Section, Actions, DefaultActions.
+Sub-components: Section, Actions, DefaultActions, AuditFooter.
 
 ## Type Declaration
 
@@ -42,6 +44,20 @@ Sub-components: Section, Actions, DefaultActions.
 #### Returns
 
 `Element`
+
+### AuditFooter()
+
+> **AuditFooter**: (`__namedParameters`) => `Element` \| `null` = `DetailAuditFooter`
+
+#### Parameters
+
+##### \_\_namedParameters
+
+[`CrudDetailAuditFooterProps`](../interfaces/CrudDetailAuditFooterProps.md)
+
+#### Returns
+
+`Element` \| `null`
 
 ### DefaultActions()
 

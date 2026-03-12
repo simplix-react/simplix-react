@@ -38,9 +38,19 @@ Whether the link opens in a new tab with `rel="noopener noreferrer"`.
 
 ***
 
+### fallback?
+
+> `optional` **fallback**: `string`
+
+Defined in: [packages/ui/src/fields/detail/link-field.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/link-field.tsx#L13)
+
+Fallback text when value is null, undefined, or empty string. Defaults to em-dash.
+
+***
+
 ### href
 
-> **href**: `string`
+> **href**: `string` \| `null` \| `undefined`
 
 Defined in: [packages/ui/src/fields/detail/link-field.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/link-field.tsx#L9)
 
@@ -98,7 +108,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-
 
 ### value
 
-> **value**: `string`
+> **value**: `string` \| `null` \| `undefined`
 
 Defined in: [packages/ui/src/fields/detail/link-field.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/link-field.tsx#L7)
 

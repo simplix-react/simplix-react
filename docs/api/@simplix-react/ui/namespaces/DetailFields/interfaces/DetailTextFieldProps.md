@@ -44,7 +44,7 @@ Whether to show a copy-to-clipboard button.
 
 Defined in: [packages/ui/src/fields/detail/text-field.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/text-field.tsx#L12)
 
-Fallback text when value is null/undefined. Defaults to em-dash.
+Fallback text when value is null, undefined, or empty string. Defaults to em-dash.
 
 ***
 

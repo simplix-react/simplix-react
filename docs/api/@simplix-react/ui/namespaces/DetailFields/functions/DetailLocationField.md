@@ -6,9 +6,9 @@
 
 # Function: DetailLocationField()
 
-> **DetailLocationField**(`__namedParameters`): `Element`
+> **DetailLocationField**(`__namedParameters`): `Element` \| `null`
 
-Defined in: [packages/ui/src/fields/detail/location-field.tsx:46](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/location-field.tsx#L46)
+Defined in: [packages/ui/src/fields/detail/location-field.tsx:48](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/location-field.tsx#L48)
 
 Read-only location display with map preview.
 Shows coordinates and a small interactive map.
@@ -22,4 +22,4 @@ Click the map to open a full-size dialog view.
 
 ## Returns
 
-`Element`
+`Element` \| `null`

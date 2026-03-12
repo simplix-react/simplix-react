@@ -3505,6 +3505,23 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react
 
 ***
 
+### responsive?
+
+> `optional` **responsive**: `boolean`
+
+Defined in: [packages/ui/src/primitives/grid.tsx:44](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/grid.tsx#L44)
+
+When true, columns responsively decrease based on container width
+using CSS container queries. Requires Tailwind CSS v4+.
+
+#### Default
+
+```ts
+true
+```
+
+***
+
 ### results?
 
 > `optional` **results**: `number`

@@ -6,7 +6,7 @@
 
 # Interface: CommandComponents
 
-Defined in: [packages/ui/src/provider/types.ts:139](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L139)
+Defined in: [packages/ui/src/provider/types.ts:140](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L140)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/provider/types.ts:139](https://github.com/simplix-r
 
 > **Empty**: `ComponentType`\<`any`\>
 
-Defined in: [packages/ui/src/provider/types.ts:143](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L143)
+Defined in: [packages/ui/src/provider/types.ts:144](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L144)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [packages/ui/src/provider/types.ts:143](https://github.com/simplix-r
 
 > **Group**: `ComponentType`\<`any`\>
 
-Defined in: [packages/ui/src/provider/types.ts:144](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L144)
+Defined in: [packages/ui/src/provider/types.ts:145](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L145)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [packages/ui/src/provider/types.ts:144](https://github.com/simplix-r
 
 > **Input**: `ComponentType`\<`any`\>
 
-Defined in: [packages/ui/src/provider/types.ts:141](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L141)
+Defined in: [packages/ui/src/provider/types.ts:142](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L142)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [packages/ui/src/provider/types.ts:141](https://github.com/simplix-r
 
 > **Item**: `ComponentType`\<`any`\>
 
-Defined in: [packages/ui/src/provider/types.ts:145](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L145)
+Defined in: [packages/ui/src/provider/types.ts:146](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L146)
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: [packages/ui/src/provider/types.ts:145](https://github.com/simplix-r
 
 > **List**: `ComponentType`\<`any`\>
 
-Defined in: [packages/ui/src/provider/types.ts:142](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L142)
+Defined in: [packages/ui/src/provider/types.ts:143](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L143)
 
 ***
 
@@ -54,7 +54,7 @@ Defined in: [packages/ui/src/provider/types.ts:142](https://github.com/simplix-r
 
 > **Root**: `ComponentType`\<`any`\>
 
-Defined in: [packages/ui/src/provider/types.ts:140](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L140)
+Defined in: [packages/ui/src/provider/types.ts:141](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L141)
 
 ***
 
@@ -62,4 +62,4 @@ Defined in: [packages/ui/src/provider/types.ts:140](https://github.com/simplix-r
 
 > **Separator**: `ComponentType`\<`any`\>
 
-Defined in: [packages/ui/src/provider/types.ts:146](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L146)
+Defined in: [packages/ui/src/provider/types.ts:147](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L147)

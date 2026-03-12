@@ -6,7 +6,7 @@
 
 # Interface: UIComponents
 
-Defined in: [packages/ui/src/provider/types.ts:204](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L204)
+Defined in: [packages/ui/src/provider/types.ts:206](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L206)
 
 All UI components that can be overridden via [UIProvider](../functions/UIProvider.md).
 
@@ -57,7 +57,7 @@ Scoped overrides (nesting):
 
 > **Badge**: `ComponentType`\<[`BadgeProps`](BadgeProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:211](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L211)
+Defined in: [packages/ui/src/provider/types.ts:213](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L213)
 
 ***
 
@@ -65,7 +65,7 @@ Defined in: [packages/ui/src/provider/types.ts:211](https://github.com/simplix-r
 
 > **Button**: `ComponentType`\<[`ButtonProps`](ButtonProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:213](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L213)
+Defined in: [packages/ui/src/provider/types.ts:215](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L215)
 
 ***
 
@@ -73,7 +73,7 @@ Defined in: [packages/ui/src/provider/types.ts:213](https://github.com/simplix-r
 
 > **Calendar**: `ComponentType`\<[`CalendarProps`](CalendarProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:212](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L212)
+Defined in: [packages/ui/src/provider/types.ts:214](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L214)
 
 ***
 
@@ -81,7 +81,7 @@ Defined in: [packages/ui/src/provider/types.ts:212](https://github.com/simplix-r
 
 > **Card**: `ComponentType`\<[`CardProps`](CardProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:233](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L233)
+Defined in: [packages/ui/src/provider/types.ts:235](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L235)
 
 ***
 
@@ -89,7 +89,7 @@ Defined in: [packages/ui/src/provider/types.ts:233](https://github.com/simplix-r
 
 > **Checkbox**: `ComponentType`\<`CheckboxProps` & `RefAttributes`\<`HTMLButtonElement`\>\>
 
-Defined in: [packages/ui/src/provider/types.ts:210](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L210)
+Defined in: [packages/ui/src/provider/types.ts:212](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L212)
 
 ***
 
@@ -97,7 +97,7 @@ Defined in: [packages/ui/src/provider/types.ts:210](https://github.com/simplix-r
 
 > **Command**: [`CommandComponents`](CommandComponents.md)
 
-Defined in: [packages/ui/src/provider/types.ts:224](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L224)
+Defined in: [packages/ui/src/provider/types.ts:226](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L226)
 
 ***
 
@@ -105,7 +105,7 @@ Defined in: [packages/ui/src/provider/types.ts:224](https://github.com/simplix-r
 
 > **Container**: `ComponentType`\<[`ContainerProps`](ContainerProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:227](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L227)
+Defined in: [packages/ui/src/provider/types.ts:229](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L229)
 
 ***
 
@@ -113,7 +113,7 @@ Defined in: [packages/ui/src/provider/types.ts:227](https://github.com/simplix-r
 
 > **CrudDelete**: `ComponentType`\<[`CrudDeleteProps`](CrudDeleteProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:238](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L238)
+Defined in: [packages/ui/src/provider/types.ts:240](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L240)
 
 ***
 
@@ -121,7 +121,7 @@ Defined in: [packages/ui/src/provider/types.ts:238](https://github.com/simplix-r
 
 > **DetailFieldWrapper**: `ComponentType`\<[`DetailFieldWrapperProps`](DetailFieldWrapperProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:241](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L241)
+Defined in: [packages/ui/src/provider/types.ts:243](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L243)
 
 ***
 
@@ -129,7 +129,7 @@ Defined in: [packages/ui/src/provider/types.ts:241](https://github.com/simplix-r
 
 > **Dialog**: [`DialogComponents`](DialogComponents.md)
 
-Defined in: [packages/ui/src/provider/types.ts:218](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L218)
+Defined in: [packages/ui/src/provider/types.ts:220](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L220)
 
 ***
 
@@ -137,7 +137,7 @@ Defined in: [packages/ui/src/provider/types.ts:218](https://github.com/simplix-r
 
 > **DropdownMenu**: [`DropdownMenuComponents`](DropdownMenuComponents.md)
 
-Defined in: [packages/ui/src/provider/types.ts:222](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L222)
+Defined in: [packages/ui/src/provider/types.ts:224](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L224)
 
 ***
 
@@ -145,7 +145,7 @@ Defined in: [packages/ui/src/provider/types.ts:222](https://github.com/simplix-r
 
 > **FieldWrapper**: `ComponentType`\<[`FieldWrapperProps`](FieldWrapperProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:240](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L240)
+Defined in: [packages/ui/src/provider/types.ts:242](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L242)
 
 ***
 
@@ -153,7 +153,7 @@ Defined in: [packages/ui/src/provider/types.ts:240](https://github.com/simplix-r
 
 > **Flex**: `ComponentType`\<[`StackProps`](StackProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:229](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L229)
+Defined in: [packages/ui/src/provider/types.ts:231](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L231)
 
 ***
 
@@ -161,7 +161,7 @@ Defined in: [packages/ui/src/provider/types.ts:229](https://github.com/simplix-r
 
 > **Grid**: `ComponentType`\<[`GridProps`](GridProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:230](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L230)
+Defined in: [packages/ui/src/provider/types.ts:232](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L232)
 
 ***
 
@@ -169,7 +169,7 @@ Defined in: [packages/ui/src/provider/types.ts:230](https://github.com/simplix-r
 
 > **Heading**: `ComponentType`\<[`HeadingProps`](HeadingProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:231](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L231)
+Defined in: [packages/ui/src/provider/types.ts:233](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L233)
 
 ***
 
@@ -177,7 +177,7 @@ Defined in: [packages/ui/src/provider/types.ts:231](https://github.com/simplix-r
 
 > **Input**: `ComponentType`\<`DetailedHTMLProps`\<`InputHTMLAttributes`\<`HTMLInputElement`\>, `HTMLInputElement`\>\>
 
-Defined in: [packages/ui/src/provider/types.ts:206](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L206)
+Defined in: [packages/ui/src/provider/types.ts:208](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L208)
 
 ***
 
@@ -185,7 +185,7 @@ Defined in: [packages/ui/src/provider/types.ts:206](https://github.com/simplix-r
 
 > **Label**: `ComponentType`\<`LabelProps` & `RefAttributes`\<`HTMLLabelElement`\>\>
 
-Defined in: [packages/ui/src/provider/types.ts:208](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L208)
+Defined in: [packages/ui/src/provider/types.ts:210](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L210)
 
 ***
 
@@ -193,7 +193,7 @@ Defined in: [packages/ui/src/provider/types.ts:208](https://github.com/simplix-r
 
 > **Popover**: [`PopoverComponents`](PopoverComponents.md)
 
-Defined in: [packages/ui/src/provider/types.ts:220](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L220)
+Defined in: [packages/ui/src/provider/types.ts:222](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L222)
 
 ***
 
@@ -201,7 +201,7 @@ Defined in: [packages/ui/src/provider/types.ts:220](https://github.com/simplix-r
 
 > **QueryFallback**: `ComponentType`\<[`QueryFallbackProps`](QueryFallbackProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:237](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L237)
+Defined in: [packages/ui/src/provider/types.ts:239](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L239)
 
 ***
 
@@ -209,7 +209,7 @@ Defined in: [packages/ui/src/provider/types.ts:237](https://github.com/simplix-r
 
 > **RadioGroup**: [`RadioGroupComponents`](RadioGroupComponents.md)
 
-Defined in: [packages/ui/src/provider/types.ts:217](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L217)
+Defined in: [packages/ui/src/provider/types.ts:219](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L219)
 
 ***
 
@@ -217,7 +217,7 @@ Defined in: [packages/ui/src/provider/types.ts:217](https://github.com/simplix-r
 
 > **Section**: `ComponentType`\<[`SectionProps`](SectionProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:234](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L234)
+Defined in: [packages/ui/src/provider/types.ts:236](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L236)
 
 ***
 
@@ -225,7 +225,7 @@ Defined in: [packages/ui/src/provider/types.ts:234](https://github.com/simplix-r
 
 > **SectionShell**: `ComponentType`\<[`SectionShellProps`](SectionShellProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:236](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L236)
+Defined in: [packages/ui/src/provider/types.ts:238](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L238)
 
 ***
 
@@ -233,7 +233,7 @@ Defined in: [packages/ui/src/provider/types.ts:236](https://github.com/simplix-r
 
 > **Select**: [`SelectComponents`](SelectComponents.md)
 
-Defined in: [packages/ui/src/provider/types.ts:216](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L216)
+Defined in: [packages/ui/src/provider/types.ts:218](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L218)
 
 ***
 
@@ -241,7 +241,7 @@ Defined in: [packages/ui/src/provider/types.ts:216](https://github.com/simplix-r
 
 > **Sheet**: [`SheetComponents`](SheetComponents.md)
 
-Defined in: [packages/ui/src/provider/types.ts:219](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L219)
+Defined in: [packages/ui/src/provider/types.ts:221](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L221)
 
 ***
 
@@ -249,7 +249,7 @@ Defined in: [packages/ui/src/provider/types.ts:219](https://github.com/simplix-r
 
 > **Skeleton**: `ComponentType`\<[`SkeletonProps`](../type-aliases/SkeletonProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:214](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L214)
+Defined in: [packages/ui/src/provider/types.ts:216](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L216)
 
 ***
 
@@ -257,7 +257,7 @@ Defined in: [packages/ui/src/provider/types.ts:214](https://github.com/simplix-r
 
 > **Stack**: `ComponentType`\<[`StackProps`](StackProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:228](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L228)
+Defined in: [packages/ui/src/provider/types.ts:230](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L230)
 
 ***
 
@@ -265,7 +265,7 @@ Defined in: [packages/ui/src/provider/types.ts:228](https://github.com/simplix-r
 
 > **Switch**: `ComponentType`\<[`SwitchProps`](../type-aliases/SwitchProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:209](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L209)
+Defined in: [packages/ui/src/provider/types.ts:211](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L211)
 
 ***
 
@@ -273,7 +273,7 @@ Defined in: [packages/ui/src/provider/types.ts:209](https://github.com/simplix-r
 
 > **Table**: [`TableComponents`](TableComponents.md)
 
-Defined in: [packages/ui/src/provider/types.ts:225](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L225)
+Defined in: [packages/ui/src/provider/types.ts:227](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L227)
 
 ***
 
@@ -281,7 +281,7 @@ Defined in: [packages/ui/src/provider/types.ts:225](https://github.com/simplix-r
 
 > **Tabs**: [`TabsComponents`](TabsComponents.md)
 
-Defined in: [packages/ui/src/provider/types.ts:223](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L223)
+Defined in: [packages/ui/src/provider/types.ts:225](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L225)
 
 ***
 
@@ -289,7 +289,7 @@ Defined in: [packages/ui/src/provider/types.ts:223](https://github.com/simplix-r
 
 > **Text**: `ComponentType`\<[`TextProps`](TextProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:232](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L232)
+Defined in: [packages/ui/src/provider/types.ts:234](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L234)
 
 ***
 
@@ -297,7 +297,7 @@ Defined in: [packages/ui/src/provider/types.ts:232](https://github.com/simplix-r
 
 > **Textarea**: `ComponentType`\<`DetailedHTMLProps`\<`TextareaHTMLAttributes`\<`HTMLTextAreaElement`\>, `HTMLTextAreaElement`\>\>
 
-Defined in: [packages/ui/src/provider/types.ts:207](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L207)
+Defined in: [packages/ui/src/provider/types.ts:209](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L209)
 
 ***
 
@@ -305,4 +305,4 @@ Defined in: [packages/ui/src/provider/types.ts:207](https://github.com/simplix-r
 
 > **Tooltip**: [`TooltipComponents`](TooltipComponents.md)
 
-Defined in: [packages/ui/src/provider/types.ts:221](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L221)
+Defined in: [packages/ui/src/provider/types.ts:223](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L223)

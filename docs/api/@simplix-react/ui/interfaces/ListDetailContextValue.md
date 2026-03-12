@@ -18,6 +18,14 @@ Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:21](https://github.co
 
 ***
 
+### dialogHeight?
+
+> `optional` **dialogHeight**: `string`
+
+Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L23)
+
+***
+
 ### setActivePanel()
 
 > **setActivePanel**: (`panel`) => `void`

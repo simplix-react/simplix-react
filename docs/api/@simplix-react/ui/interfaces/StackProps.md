@@ -6,7 +6,7 @@
 
 # Interface: StackProps
 
-Defined in: [packages/ui/src/primitives/stack.tsx:42](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/stack.tsx#L42)
+Defined in: [packages/ui/src/primitives/stack.tsx:45](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/stack.tsx#L45)
 
 Props for the [Stack](../variables/Stack.md) layout component.
 
@@ -981,7 +981,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/primitives/stack.tsx:45](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/stack.tsx#L45)
+Defined in: [packages/ui/src/primitives/stack.tsx:48](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/stack.tsx#L48)
 
 #### Overrides
 
@@ -1150,6 +1150,30 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react
 #### Inherited from
 
 [`CardProps`](CardProps.md).[`exportparts`](CardProps.md#exportparts)
+
+***
+
+### fill?
+
+> `optional` **fill**: `boolean` \| `null`
+
+Defined in: [packages/ui/src/primitives/stack.tsx:34](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/stack.tsx#L34)
+
+#### Inherited from
+
+`StackVariants.fill`
+
+***
+
+### flex?
+
+> `optional` **flex**: `boolean` \| `null`
+
+Defined in: [packages/ui/src/primitives/stack.tsx:35](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/stack.tsx#L35)
+
+#### Inherited from
+
+`StackVariants.flex`
 
 ***
 
@@ -3382,6 +3406,18 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.13/node\_modules/@types/react
 #### Inherited from
 
 `Omit.onWheelCapture`
+
+***
+
+### padded?
+
+> `optional` **padded**: `boolean` \| `null`
+
+Defined in: [packages/ui/src/primitives/stack.tsx:36](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/stack.tsx#L36)
+
+#### Inherited from
+
+`StackVariants.padded`
 
 ***
 

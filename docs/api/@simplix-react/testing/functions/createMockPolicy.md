@@ -6,7 +6,7 @@
 
 # Function: createMockPolicy()
 
-> **createMockPolicy**(`options?`): [`AccessPolicy`](../@simplix-react/access/interfaces/AccessPolicy.md)\<`string`, `string`\>
+> **createMockPolicy**(`options?`): [`AccessPolicy`](../@simplix-react/access/interfaces/AccessPolicy.md)
 
 Defined in: [mock-policy.ts:44](https://github.com/simplix-react/simplix-react/blob/main/mock-policy.ts#L44)
 
@@ -20,7 +20,7 @@ Creates a mock [AccessPolicy](../@simplix-react/access/interfaces/AccessPolicy.m
 
 ## Returns
 
-[`AccessPolicy`](../@simplix-react/access/interfaces/AccessPolicy.md)\<`string`, `string`\>
+[`AccessPolicy`](../@simplix-react/access/interfaces/AccessPolicy.md)
 
 ## Remarks
 

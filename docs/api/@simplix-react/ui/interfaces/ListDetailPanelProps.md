@@ -6,7 +6,7 @@
 
 # Interface: ListDetailPanelProps
 
-Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:267](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L267)
+Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:270](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L270)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:267](https://github.c
 
 > **children**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:268](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L268)
+Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:271](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L271)
 
 ***
 
@@ -22,4 +22,4 @@ Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:268](https://github.c
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:269](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L269)
+Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:272](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L272)

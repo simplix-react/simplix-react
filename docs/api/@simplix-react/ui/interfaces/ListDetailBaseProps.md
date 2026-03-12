@@ -6,7 +6,7 @@
 
 # Interface: ListDetailBaseProps
 
-Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:86](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L86)
+Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:87](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L87)
 
 Common props shared by all width variants.
 
@@ -16,7 +16,7 @@ Common props shared by all width variants.
 
 > `optional` **activePanel**: `"list"` \| `"detail"`
 
-Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:90](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L90)
+Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:91](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L91)
 
 Controlled active panel. When provided, overrides internal state.
 
@@ -26,7 +26,7 @@ Controlled active panel. When provided, overrides internal state.
 
 > **children**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:94](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L94)
+Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:97](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L97)
 
 ***
 
@@ -34,7 +34,17 @@ Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:94](https://github.co
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:93](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L93)
+Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:96](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L96)
+
+***
+
+### dialogHeight?
+
+> `optional` **dialogHeight**: `string`
+
+Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:95](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L95)
+
+Fixed dialog height (e.g. `"60vh"`, `"500px"`). When set, the dialog uses a fixed height with internal scrolling. When omitted, height fits content up to `max-h-[85vh]`. Only applies to `"dialog"` variant.
 
 ***
 
@@ -42,7 +52,7 @@ Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:93](https://github.co
 
 > `optional` **onClose**: () => `void`
 
-Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:92](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L92)
+Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:93](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L93)
 
 Called when the dialog is dismissed (only applies to `"dialog"` variant).
 
@@ -56,6 +66,6 @@ Called when the dialog is dismissed (only applies to `"dialog"` variant).
 
 > `optional` **variant**: [`ListDetailVariant`](../type-aliases/ListDetailVariant.md)
 
-Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:88](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L88)
+Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:89](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L89)
 
 Layout variant. `"panel"` renders side-by-side, `"dialog"` renders detail in a modal.
