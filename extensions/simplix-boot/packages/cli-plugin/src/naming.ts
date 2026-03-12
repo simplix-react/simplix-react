@@ -39,6 +39,44 @@ function findActionSuffix(segments: string[], entityName: string): string | unde
 }
 
 /**
+ * Build a compound action name from all non-param segments after the entity.
+ * Used for GET sub-path operations (e.g. statistics endpoints).
+ *
+ * Examples:
+ * - /api/v1/event/statistics/summary → "summary"
+ * - /api/v1/event/statistics/controller-ranking → "controllerRanking"
+ * - /api/v1/event/statistics/controller/{id}/timeline → "controllerTimeline"
+ * - /api/v1/event → undefined (no sub-path)
+ */
+function findGetSubpath(segments: string[], entityName: string): string | undefined {
+  const entityKebab = entityName.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
+
+  let entityIdx = -1;
+  for (let i = 0; i < segments.length; i++) {
+    if (segments[i] === entityKebab) {
+      entityIdx = i;
+      break;
+    }
+  }
+
+  if (entityIdx < 0) return undefined;
+
+  const actionParts: string[] = [];
+  for (let i = entityIdx + 1; i < segments.length; i++) {
+    const seg = segments[i];
+    if (!seg.startsWith("{")) {
+      actionParts.push(toCamelCase(seg));
+    }
+  }
+
+  if (actionParts.length === 0) return undefined;
+
+  return actionParts[0] + actionParts.slice(1)
+    .map(p => p.charAt(0).toUpperCase() + p.slice(1))
+    .join("");
+}
+
+/**
  * NamingStrategy for simplix-boot style OpenAPI specs.
  *
  * Handles Boot conventions:
@@ -90,6 +128,12 @@ export const simplixBootNaming: OpenApiNamingStrategy = {
       }
       if (hasPathParam && !pathAfterParam) {
         return { role: "get", hookName: `get${pascal}` };
+      }
+      // Custom GET sub-path: /entity/summary, /entity/controller/{id}/timeline
+      const getAction = findGetSubpath(pathSegments, entity);
+      if (getAction) {
+        const actionPascal = getAction.charAt(0).toUpperCase() + getAction.slice(1);
+        return { role: getAction, hookName: `get${pascal}${actionPascal}` };
       }
       return { role: "list", hookName: `list${pascal}s` };
     }
