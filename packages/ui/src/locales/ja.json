@@ -106,6 +106,12 @@
     "addChild": "子要素追加",
     "reorder": "並び替え"
   },
+  "audit": {
+    "created": "作成日",
+    "modified": "更新日",
+    "clickToCopy": "クリックしてIDをコピー",
+    "copied": "コピーしました!"
+  },
   "date": {
     "pickDate": "日付を選択",
     "pickDateRange": "日付範囲を選択",

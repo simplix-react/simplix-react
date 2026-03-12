@@ -106,6 +106,12 @@
     "addChild": "하위 추가",
     "reorder": "순서 변경"
   },
+  "audit": {
+    "created": "생성일",
+    "modified": "수정일",
+    "clickToCopy": "클릭하여 ID 복사",
+    "copied": "복사됨!"
+  },
   "date": {
     "pickDate": "날짜 선택",
     "pickDateRange": "날짜 범위 선택",

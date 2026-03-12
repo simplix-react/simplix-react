@@ -342,7 +342,9 @@ export type { TreeSelectFieldProps } from "./fields/form/tree-select-field";
 
 export { CrudDetail, usePreviousData } from "./crud/detail";
 export type {
+  AuditData,
   CrudDetailActionsProps,
+  CrudDetailAuditFooterProps,
   CrudDetailDefaultActionsProps,
   CrudDetailProps,
   CrudDetailSectionProps,

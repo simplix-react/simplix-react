@@ -106,6 +106,12 @@
     "addChild": "Add Child",
     "reorder": "Reorder"
   },
+  "audit": {
+    "created": "Created",
+    "modified": "Modified",
+    "clickToCopy": "Click to copy ID",
+    "copied": "Copied!"
+  },
   "date": {
     "pickDate": "Pick a date",
     "pickDateRange": "Pick a date range",

@@ -9,6 +9,7 @@ import { useUIComponents } from "../../provider/ui-provider";
 import { ArrowLeftIcon, XIcon, TrashIcon } from "../shared/icons";
 import type { SectionShellProps } from "../shared/section-shell";
 import { type FieldVariant, FieldVariantContext } from "../shared/types";
+import { DetailAuditFooter, type AuditData } from "./crud-detail-audit-footer";
 
 // ── Detail Root ──
 //
@@ -36,6 +37,10 @@ import { type FieldVariant, FieldVariantContext } from "../shared/types";
 // │ │ │   ├─ Section                │ │ │
 // │ │ │   └─ ...                    │ │ │
 // │ │ └─────────────────────────────┘ │ │
+// │ └─────────────────────────────────┘ │
+// │ ┌─────────────────────────────────┐ │
+// │ │ AuditFooter  (shrink-0)        │ │
+// │ │  [ID] abc..   Created Modified │ │
 // │ └─────────────────────────────────┘ │
 // │ ┌─────────────────────────────────┐ │
 // │ │ Footer  (shrink-0)              │ │
@@ -80,12 +85,14 @@ export interface CrudDetailProps {
    * - `"dialog"` — generous padding for use inside Dialog (px-5, extra vertical padding on header/footer).
    */
   variant?: CrudDetailVariant;
+  /** Audit metadata rendered as a fixed bar between the scrollable body and the footer. */
+  auditData?: AuditData;
   fieldVariant?: FieldVariant;
   className?: string;
   children?: ReactNode;
 }
 
-function DetailRoot({ isLoading, onClose, header, footer, variant = "default", fieldVariant, className, children }: CrudDetailProps) {
+function DetailRoot({ isLoading, onClose, header, footer, variant = "default", auditData, fieldVariant, className, children }: CrudDetailProps) {
   const isDialog = variant === "dialog";
   const px = isDialog ? "px-5" : "px-2";
 
@@ -114,6 +121,11 @@ function DetailRoot({ isLoading, onClose, header, footer, variant = "default", f
           )}
           {children}
         </Stack>
+        {auditData && (
+          <div data-crud-slot="audit" className="sticky bottom-0 pb-2 bg-background">
+            <DetailAuditFooter auditData={auditData} />
+          </div>
+        )}
       </div>
       {footer && (
         <div data-crud-slot="footer" className={cn("shrink-0", px, isDialog && "pb-3")}>{footer}</div>
@@ -277,15 +289,18 @@ function DetailDefaultActions({ onClose, onBack, onDelete, onEdit, closeLabel, b
  * │    field rows (label: value)        │
  * │  </CrudDetail.Section>             │
  * ├─────────────────────────────────────┤
+ * │  AuditFooter (via auditData prop)  │
+ * ├─────────────────────────────────────┤
  * │  <CrudDetail.DefaultActions>        │
  * │  [← Back]        [Delete] [Edit]   │
  * └─────────────────────────────────────┘
  * ```
  *
- * Sub-components: Section, Actions, DefaultActions.
+ * Sub-components: Section, Actions, DefaultActions, AuditFooter.
  */
 export const CrudDetail = Object.assign(DetailRoot, {
   Section: DetailSection,
   Actions: DetailActions,
   DefaultActions: DetailDefaultActions,
+  AuditFooter: DetailAuditFooter,
 });
