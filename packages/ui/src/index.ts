@@ -37,6 +37,31 @@ export type {
   TextVariants,
 } from "./primitives";
 
+// Charts
+export {
+  apexChartsAdapter,
+  ChartProvider,
+  StatCard,
+  useChartAdapter,
+} from "./base";
+export type {
+  AreaChartProps,
+  BarChartProps,
+  BaseChartProps,
+  ChartAdapter,
+  ChartCategory,
+  ChartProviderProps,
+  ChartSeries,
+  DonutChartProps,
+  HeatmapCell,
+  HeatmapChartProps,
+  HeatmapSeries,
+  LineChartProps,
+  PieChartData,
+  PieChartProps,
+  StatCardProps,
+} from "./base";
+
 // Base components
 export {
   Badge,

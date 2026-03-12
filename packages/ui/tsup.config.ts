@@ -7,6 +7,6 @@ export default defineConfig((options) => ({
   splitting: true,
   treeshake: true,
   clean: !options.watch,
-  external: [/^react/, /^@simplix-react/, /^@tanstack/, /^@dnd-kit/, /^maplibre/, /^pmtiles/, /^protomaps/],
+  external: [/^react/, /^@simplix-react/, /^@tanstack/, /^@dnd-kit/, /^maplibre/, /^pmtiles/, /^protomaps/, /^apexcharts/],
   onSuccess: "cp src/styles.css dist/styles.css",
 }));
