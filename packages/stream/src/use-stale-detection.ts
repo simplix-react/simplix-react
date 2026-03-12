@@ -1,10 +1,13 @@
-import { useEffect, useRef, useState } from "react";
 import { useStreamContext } from "./stream-provider";
+import { useTimestampFreshness } from "./use-timestamp-freshness";
 import type { StalenessLevel, StalenessThresholds } from "./types";
+import type { FreshnessThreshold } from "./use-timestamp-freshness";
 
-const DEFAULT_WARNING = 5;
-const DEFAULT_CRITICAL = 10;
-const DEFAULT_STALE = 20;
+const DEFAULT_THRESHOLDS: readonly FreshnessThreshold<StalenessLevel>[] = [
+  { seconds: 5, level: "warning" },
+  { seconds: 10, level: "critical" },
+  { seconds: 20, level: "stale" },
+];
 
 /**
  * Monitor staleness of the SSE connection based on heartbeat timing.
@@ -20,29 +23,14 @@ export function useStaleDetection(thresholds?: StalenessThresholds): {
   elapsedMs: number;
 } {
   const { lastHeartbeat } = useStreamContext();
-  const [elapsed, setElapsed] = useState(0);
-  const lastHeartbeatRef = useRef(lastHeartbeat);
-  lastHeartbeatRef.current = lastHeartbeat;
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setElapsed(Date.now() - lastHeartbeatRef.current);
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
+  const resolved: readonly FreshnessThreshold<StalenessLevel>[] = thresholds
+    ? [
+        { seconds: thresholds.warningSeconds ?? 5, level: "warning" },
+        { seconds: thresholds.criticalSeconds ?? 10, level: "critical" },
+        { seconds: thresholds.staleSeconds ?? 20, level: "stale" },
+      ]
+    : DEFAULT_THRESHOLDS;
 
-  const level = computeLevel(elapsed, thresholds);
-
-  return { level, elapsedMs: elapsed };
-}
-
-function computeLevel(elapsedMs: number, thresholds?: StalenessThresholds): StalenessLevel {
-  const seconds = elapsedMs / 1000;
-  const warning = thresholds?.warningSeconds ?? DEFAULT_WARNING;
-  const critical = thresholds?.criticalSeconds ?? DEFAULT_CRITICAL;
-  const stale = thresholds?.staleSeconds ?? DEFAULT_STALE;
-  if (seconds < warning) return "fresh";
-  if (seconds < critical) return "warning";
-  if (seconds < stale) return "critical";
-  return "stale";
+  return useTimestampFreshness(lastHeartbeat, resolved, "fresh");
 }
