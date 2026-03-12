@@ -1,0 +1,34 @@
+{
+  "name": "@simplix-react/storybook",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "storybook": "storybook dev -p 6006",
+    "build": "storybook build"
+  },
+  "dependencies": {
+    "@simplix-react/ui": "workspace:*",
+    "@simplix-react/api": "workspace:*",
+    "@simplix-react/form": "workspace:*",
+    "@simplix-react/i18n": "workspace:*",
+    "@simplix-react/react": "workspace:*",
+    "@tanstack/react-query": "^5.80.7",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.6.2"
+  },
+  "devDependencies": {
+    "@storybook/addon-a11y": "^10.2.17",
+    "@storybook/addon-designs": "^11.1.2",
+    "@storybook/addon-themes": "^10.2.17",
+    "storybook-addon-pseudo-states": "^10.2.17",
+    "@storybook/react-vite": "^10.2.17",
+    "@tailwindcss/vite": "^4.1.8",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.2.3",
+    "storybook": "^10.2.17",
+    "tailwindcss": "^4.1.8",
+    "typescript": "^5.9.3"
+  }
+}

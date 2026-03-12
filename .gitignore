@@ -11,6 +11,7 @@ dist/
 *.scip
 .mcp.json
 modules/
+storybook-static/
 
 # Stale build artifacts in TypeScript source directories
 **/src/**/*.js

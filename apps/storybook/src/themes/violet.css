@@ -1,0 +1,73 @@
+/* ===== Violet Theme — Premium / Creative ===== */
+
+[data-color-theme='violet'] {
+  /* Primary */
+  --primary: oklch(0.606 0.25 292.717);
+  --primary-foreground: oklch(0.985 0.003 293);
+
+  /* Surfaces — subtle violet tint */
+  --secondary: oklch(0.955 0.02 293);
+  --secondary-foreground: oklch(0.25 0.05 292);
+  --muted: oklch(0.955 0.016 293);
+  --muted-foreground: oklch(0.554 0.03 292);
+  --accent: oklch(0.94 0.024 293);
+  --accent-foreground: oklch(0.25 0.05 292);
+
+  /* UI chrome */
+  --border: oklch(0.916 0.018 293);
+  --input: oklch(0.916 0.018 293);
+  --ring: oklch(0.606 0.25 292.717);
+
+  /* Charts — violet-anchored spectrum */
+  --chart-1: oklch(0.606 0.25 292.717);
+  --chart-2: oklch(0.645 0.246 16.439);
+  --chart-3: oklch(0.6 0.118 184.704);
+  --chart-4: oklch(0.795 0.13 294);
+  --chart-5: oklch(0.705 0.213 47.604);
+
+  /* Sidebar — always dark */
+  --sidebar: oklch(0.208 0.042 265.755);
+  --sidebar-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-primary: oklch(0.984 0.003 247.858);
+  --sidebar-primary-foreground: oklch(0.208 0.042 265.755);
+  --sidebar-accent: oklch(0.279 0.041 260.031);
+  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.551 0.027 264.364);
+}
+
+[data-color-theme='violet'].dark {
+  /* Background — violet-tinted dark */
+  --background: oklch(0.135 0.035 293);
+  --foreground: oklch(0.984 0.003 293);
+  --card: oklch(0.155 0.03 293);
+  --card-foreground: oklch(0.984 0.003 293);
+  --popover: oklch(0.2 0.035 293);
+  --popover-foreground: oklch(0.984 0.003 293);
+
+  /* Primary */
+  --primary: oklch(0.702 0.183 293.541);
+  --primary-foreground: oklch(0.15 0.03 290);
+
+  /* UI chrome */
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+
+  /* Surfaces */
+  --secondary: oklch(0.269 0.035 292);
+  --secondary-foreground: oklch(0.975 0.005 293);
+  --muted: oklch(0.269 0.03 292);
+  --muted-foreground: oklch(0.65 0.025 292);
+  --accent: oklch(0.269 0.035 292);
+  --accent-foreground: oklch(0.975 0.005 293);
+
+  /* UI chrome */
+  --ring: oklch(0.702 0.183 293.541);
+
+  /* Charts */
+  --chart-1: oklch(0.702 0.183 293.541);
+  --chart-2: oklch(0.712 0.194 13.428);
+  --chart-3: oklch(0.696 0.17 162.48);
+  --chart-4: oklch(0.87 0.065 294);
+  --chart-5: oklch(0.769 0.188 70.08);
+}

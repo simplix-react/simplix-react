@@ -11,6 +11,7 @@
     "lint": "turbo run lint",
     "test": "vitest run --reporter=verbose",
     "clean": "turbo run clean",
+    "storybook": "pnpm --filter @simplix-react/storybook storybook",
     "docs:api": "typedoc",
     "changeset": "changeset",
     "version-packages": "changeset version",

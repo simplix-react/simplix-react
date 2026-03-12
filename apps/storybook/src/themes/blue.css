@@ -1,0 +1,73 @@
+/* ===== Blue Theme — Corporate / SaaS ===== */
+
+[data-color-theme='blue'] {
+  /* Primary */
+  --primary: oklch(0.546 0.245 262.881);
+  --primary-foreground: oklch(0.985 0.003 247.858);
+
+  /* Surfaces — subtle blue tint */
+  --secondary: oklch(0.955 0.024 256);
+  --secondary-foreground: oklch(0.233 0.055 260);
+  --muted: oklch(0.955 0.02 256);
+  --muted-foreground: oklch(0.554 0.035 258);
+  --accent: oklch(0.94 0.028 256);
+  --accent-foreground: oklch(0.233 0.055 260);
+
+  /* UI chrome */
+  --border: oklch(0.916 0.022 255);
+  --input: oklch(0.916 0.022 255);
+  --ring: oklch(0.546 0.245 262.881);
+
+  /* Charts — balanced palette for data-viz */
+  --chart-1: oklch(0.546 0.245 262.881);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.705 0.213 47.604);
+  --chart-4: oklch(0.673 0.182 276.935);
+  --chart-5: oklch(0.645 0.246 16.439);
+
+  /* Sidebar — always dark */
+  --sidebar: oklch(0.208 0.042 265.755);
+  --sidebar-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-primary: oklch(0.984 0.003 247.858);
+  --sidebar-primary-foreground: oklch(0.208 0.042 265.755);
+  --sidebar-accent: oklch(0.279 0.041 260.031);
+  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.551 0.027 264.364);
+}
+
+[data-color-theme='blue'].dark {
+  /* Background — blue-tinted dark */
+  --background: oklch(0.135 0.04 258);
+  --foreground: oklch(0.984 0.003 250);
+  --card: oklch(0.155 0.035 258);
+  --card-foreground: oklch(0.984 0.003 250);
+  --popover: oklch(0.2 0.04 258);
+  --popover-foreground: oklch(0.984 0.003 250);
+
+  /* Primary */
+  --primary: oklch(0.623 0.214 259.815);
+  --primary-foreground: oklch(0.15 0.038 263);
+
+  /* UI chrome */
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+
+  /* Surfaces */
+  --secondary: oklch(0.269 0.045 258);
+  --secondary-foreground: oklch(0.975 0.006 250);
+  --muted: oklch(0.269 0.04 258);
+  --muted-foreground: oklch(0.65 0.035 258);
+  --accent: oklch(0.269 0.045 258);
+  --accent-foreground: oklch(0.975 0.006 250);
+
+  /* UI chrome */
+  --ring: oklch(0.623 0.214 259.815);
+
+  /* Charts */
+  --chart-1: oklch(0.623 0.214 259.815);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.707 0.165 254.624);
+  --chart-5: oklch(0.712 0.194 13.428);
+}
