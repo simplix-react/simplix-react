@@ -18,11 +18,9 @@ interface MockResolvedOperation {
 
 /**
  * Generates mock files for an Orval domain package:
- * - `mock/seeds.ts` — typed seed arrays (only on first creation)
- * - `mock/index.ts` — store + inline MSW handler wiring (always regenerated)
- *
- * When `responseAdapter` is a preset (e.g., "boot"), wraps mock responses with
- * the preset's mockResponseWrapper to match the expected API envelope format.
+ * - `mock/seeds.ts`              — typed seed arrays (only on first creation)
+ * - `generated/mock/handlers.ts` — per-entity MSW handler factories (always regenerated)
+ * - `mock/index.ts`              — store wiring + user overrides (only on first creation)
  */
 export async function generateMockFiles(
   targetDir: string,
@@ -45,17 +43,48 @@ export async function generateMockFiles(
   const allOps = collectOperations(entities);
   if (allOps.length === 0) return;
 
-  // 3. Generate mock/index.ts
+  // 3. Resolve adapter preset
   const hasSeedsFile = await pathExists(seedsPath);
   const preset = resolveAdapterPreset(responseAdapter);
-  const content = generateMockIndexCode(domainName, validEntities, allOps, hasSeedsFile, preset);
-  await writeFileWithDir(join(targetDir, "src/mock/index.ts"), content);
+
+  // Determine which entities get stores
+  const storeEntities = validEntities.filter((entity) =>
+    entity.operations.some((op) => {
+      const role = op.role ?? inferRole(op, entity);
+      return CRUD_STORE_ROLES.has(<string>role);
+    }),
+  );
+  const hasStores = storeEntities.length > 0 && hasSeedsFile;
+
+  // Group operations by entity name
+  const sortedOps = sortOps(allOps);
+  const opsByEntity = groupOpsByEntity(sortedOps);
+
+  // 4. Always regenerate generated/mock/handlers.ts
+  const handlersContent = generateHandlersFileCode(
+    storeEntities, opsByEntity, hasStores, preset,
+  );
+  await writeFileWithDir(join(targetDir, "src/generated/mock/handlers.ts"), handlersContent);
+
+  // 5. Generate mock/index.ts only on first creation
+  const entryPath = join(targetDir, "src/mock/index.ts");
+  if (!(await pathExists(entryPath))) {
+    const entryContent = generateMockEntryCode(
+      domainName, storeEntities, hasStores, preset,
+    );
+    await writeFileWithDir(entryPath, entryContent);
+  }
 }
 
-/**
- * Resolve a ResponseAdapterConfig to its preset (if it's a known preset string).
- * Returns undefined for "raw", object configs, or unknown preset names.
- */
+// ── Constants ────────────────────────────────────────────────
+
+const CRUD_STORE_ROLES = new Set([
+  "list", "getAll", "search", "get", "create", "update", "delete",
+  "batchDelete", "batchUpdate", "multiUpdate", "getForEdit", "tree", "subtree",
+]);
+
+// ── Resolver ─────────────────────────────────────────────────
+
 function resolveAdapterPreset(
   adapter?: ResponseAdapterConfig,
 ): ResponseAdapterPreset | undefined {
@@ -88,47 +117,109 @@ function collectOperations(entities: ExtractedEntity[]): MockResolvedOperation[]
   return result;
 }
 
-// ── Code Generator ───────────────────────────────────────────
+function sortOps(ops: MockResolvedOperation[]): MockResolvedOperation[] {
+  return [...ops].sort((a, b) => {
+    const aHasParam = a.operation.path.includes(":");
+    const bHasParam = b.operation.path.includes(":");
+    if (aHasParam === bHasParam) return 0;
+    return aHasParam ? 1 : -1;
+  });
+}
 
-function generateMockIndexCode(
-  domainName: string,
-  validEntities: ExtractedEntity[],
-  ops: MockResolvedOperation[],
-  hasSeedsFile: boolean,
+function groupOpsByEntity(ops: MockResolvedOperation[]): Map<string, MockResolvedOperation[]> {
+  const map = new Map<string, MockResolvedOperation[]>();
+  for (const op of ops) {
+    const key = op.entity.name;
+    if (!map.has(key)) map.set(key, []);
+    map.get(key)!.push(op);
+  }
+  return map;
+}
+
+// ── generated/mock/handlers.ts ──────────────────────────────
+
+function generateHandlersFileCode(
+  storeEntities: ExtractedEntity[],
+  opsByEntity: Map<string, MockResolvedOperation[]>,
+  hasStores: boolean,
   adapterPreset?: ResponseAdapterPreset,
 ): string {
+  const wrapFn = adapterPreset?.mockResponseWrapper;
+  const hasTreeOps = [...opsByEntity.values()].flat().some((o) => o.role === "tree");
+
+  // Imports
   const imports: string[] = [
     'import { http, HttpResponse } from "msw";',
-    'import type { MockDomainConfig } from "@simplix-react/mock";',
   ];
 
-  // Add response wrapper import if adapter preset has one
   if (adapterPreset?.mockResponseWrapperImport) {
     imports.push(adapterPreset.mockResponseWrapperImport);
   }
 
-  // Only create stores for entities with standard CRUD operations
-  const CRUD_STORE_ROLES = new Set([
-    "list", "search", "get", "create", "update", "delete",
-    "batchDelete", "batchUpdate", "multiUpdate", "getForEdit", "tree", "subtree",
-  ]);
-  const storeEntities = validEntities.filter((entity) =>
-    entity.operations.some((op) => {
-      const role = op.role ?? inferRole(op, entity);
-      return CRUD_STORE_ROLES.has(role);
-    }),
-  );
-  const hasStores = storeEntities.length > 0 && hasSeedsFile;
+  if (hasStores) {
+    imports.push(`import type { MockEntityStore } from "@simplix-react/mock";`);
+    if (hasTreeOps) {
+      imports.push(`import { buildEmbeddedTree } from "@simplix-react/mock";`);
+    }
+
+    const typeNames = storeEntities.map((e) => e.modelType ?? e.pascalName).join(", ");
+    imports.push(`import type { ${typeNames} } from "../model";`);
+  }
+
+  // Entity handler functions
+  const functions: string[] = [];
+  for (const entity of storeEntities) {
+    const entityOps = opsByEntity.get(entity.name) ?? [];
+    if (entityOps.length === 0) continue;
+
+    const typeName = entity.modelType ?? entity.pascalName;
+    const fnName = `create${entity.pascalName}Handlers`;
+
+    const handlerEntries: string[] = [];
+    for (const { entity: ent, operation, role } of entityOps) {
+      const entry = generateHandlerEntry(ent, operation, role, hasStores, wrapFn, "store");
+      handlerEntries.push(entry);
+    }
+
+    functions.push([
+      `export function ${fnName}(store: MockEntityStore<${typeName}>) {`,
+      `  return [`,
+      ...handlerEntries,
+      `  ];`,
+      `}`,
+    ].join("\n"));
+  }
+
+  return [
+    ...imports,
+    "",
+    ...functions.map((f) => f + "\n"),
+  ].join("\n");
+}
+
+// ── mock/index.ts (one-time) ────────────────────────────────
+
+function generateMockEntryCode(
+  domainName: string,
+  storeEntities: ExtractedEntity[],
+  hasStores: boolean,
+  adapterPreset?: ResponseAdapterPreset,
+): string {
+  const imports: string[] = [
+    'import type { MockDomainConfig } from "@simplix-react/mock";',
+  ];
 
   if (hasStores) {
-    const hasTreeOps = ops.some((o) => o.role === "tree");
-    const mockImports = ["createMockEntityStore"];
-    if (hasTreeOps) mockImports.push("buildEmbeddedTree");
-    imports.push(`import { ${mockImports.join(", ")} } from "@simplix-react/mock";`);
+    imports.push('import { createMockEntityStore } from "@simplix-react/mock";');
+
     const typeNames = storeEntities.map((e) => e.modelType ?? e.pascalName).join(", ");
     imports.push(`import type { ${typeNames} } from "../generated/model";`);
+
     const seedNames = storeEntities.map((e) => `${e.name}Seeds`).join(", ");
     imports.push(`import { ${seedNames} } from "./seeds";`);
+
+    const fnNames = storeEntities.map((e) => `create${e.pascalName}Handlers`).join(", ");
+    imports.push(`import { ${fnNames} } from "../generated/mock/handlers";`);
   }
 
   // Store declarations
@@ -144,27 +235,19 @@ function generateMockIndexCode(
     }
   }
 
-  // Sort: literal paths before parameterized paths (prevent MSW route shadowing)
-  const sortedOps = [...ops].sort((a, b) => {
-    const aHasParam = a.operation.path.includes(":");
-    const bHasParam = b.operation.path.includes(":");
-    if (aHasParam === bHasParam) return 0;
-    return aHasParam ? 1 : -1;
-  });
-
-  const handlerEntries: string[] = [];
-  const wrapFn = adapterPreset?.mockResponseWrapper;
-  for (const { entity, operation, role } of sortedOps) {
-    const hasStore = hasStores && storeEntities.some((e) => e.name === entity.name);
-    const entry = generateHandlerEntry(entity, operation, role, hasStore, wrapFn);
-    handlerEntries.push(entry);
-  }
-
   // Reset calls
   const resetCalls: string[] = [];
   if (hasStores) {
     for (const entity of storeEntities) {
       resetCalls.push(`  ${entity.name}Store.reset();`);
+    }
+  }
+
+  // Handler spreads
+  const handlerSpreads: string[] = [];
+  if (hasStores) {
+    for (const entity of storeEntities) {
+      handlerSpreads.push(`      ...create${entity.pascalName}Handlers(${entity.name}Store),`);
     }
   }
 
@@ -190,7 +273,10 @@ function generateMockIndexCode(
     "  return {",
     `    name: "${domainName}",`,
     "    handlers: [",
-    ...handlerEntries,
+    "      // Add custom handler overrides here (placed before generated handlers)",
+    "",
+    "      // Generated handlers",
+    ...handlerSpreads,
     "    ],",
     "  };",
     "}",
@@ -208,6 +294,7 @@ function generateHandlerEntry(
   role: string | undefined,
   hasStore: boolean,
   wrapFn?: string,
+  storeName?: string,
 ): string {
   const method = operation.method.toLowerCase();
   const pattern = toMswPattern(operation.path);
@@ -215,10 +302,10 @@ function generateHandlerEntry(
 
   if (!hasStore || !role) {
     const emptyBody = wrapFn ? `${wrapFn}({})` : "{}";
-    return `      http.${method}("${pattern}", () => HttpResponse.json(${emptyBody})),`;
+    return `    http.${method}("${pattern}", () => HttpResponse.json(${emptyBody})),`;
   }
 
-  const store = `${entity.name}Store`;
+  const store = storeName ?? `${entity.name}Store`;
   const idField = findIdField(entity);
   const pathParam = extractPathParam(operation.path);
   const isNumericId = isIdFieldNumeric(entity);
@@ -229,6 +316,9 @@ function generateHandlerEntry(
   switch (role) {
     case "list":
       entry = generateListHandler(method, pattern, store, operation);
+      break;
+    case "getAll":
+      entry = `    http.${method}("${pattern}", () => HttpResponse.json(${store}.list())),`;
       break;
     case "get":
       entry = paramIsIdField
@@ -253,7 +343,6 @@ function generateHandlerEntry(
       entry = generateUpdateHandler(method, pattern, store, typeName, undefined, idField, isNumericId, isVoid);
       break;
     case "getForEdit": {
-      // getForEdit has a path like /:id/edit — extract the param from the parent segment
       const parentParam = extractParentPathParam(operation.path);
       const parentIsIdField = !parentParam || isPathParamIdField(parentParam, idField);
       entry = parentIsIdField
@@ -262,7 +351,7 @@ function generateHandlerEntry(
       break;
     }
     case "batchDelete":
-      entry = `      http.${method}("${pattern}", () => HttpResponse.json({})),`;
+      entry = `    http.${method}("${pattern}", () => HttpResponse.json({})),`;
       break;
     case "search":
       entry = generateSearchHandler(method, pattern, store);
@@ -282,7 +371,7 @@ function generateHandlerEntry(
     }
     default: {
       const emptyBody = wrapFn ? `${wrapFn}({})` : "{}";
-      return `      http.${method}("${pattern}", () => HttpResponse.json(${emptyBody})),`;
+      return `    http.${method}("${pattern}", () => HttpResponse.json(${emptyBody})),`;
     }
   }
 
@@ -306,25 +395,25 @@ function generateListHandler(
   const filterParam = filterParams.length > 0 ? filterParams[0] : undefined;
 
   const lines = [
-    `      http.${method}("${pattern}", ({ request }) => {`,
-    `        const url = new URL(request.url);`,
+    `    http.${method}("${pattern}", ({ request }) => {`,
+    `      const url = new URL(request.url);`,
   ];
 
   if (filterParam) {
     const varName = sanitizeVarName(filterParam.name);
     const fieldName = sanitizeFieldName(filterParam.name);
     lines.push(
-      `        const ${varName} = url.searchParams.get("${filterParam.name}");`,
-      `        if (${varName}) return HttpResponse.json(${store}.filter((item) => item.${fieldName} === ${varName}));`,
+      `      const ${varName} = url.searchParams.get("${filterParam.name}");`,
+      `      if (${varName}) return HttpResponse.json(${store}.filter((item) => item.${fieldName} === ${varName}));`,
     );
   }
 
   lines.push(
-    `        const page = Number(url.searchParams.get("page") ?? "0");`,
-    `        const size = Number(url.searchParams.get("size") ?? "10");`,
-    `        const sort = url.searchParams.get("sort") ?? undefined;`,
-    `        return HttpResponse.json(${store}.listPaged(page, size, sort));`,
-    `      }),`,
+    `      const page = Number(url.searchParams.get("page") ?? "0");`,
+    `      const size = Number(url.searchParams.get("size") ?? "10");`,
+    `      const sort = url.searchParams.get("sort") ?? undefined;`,
+    `      return HttpResponse.json(${store}.listPaged(page, size, sort));`,
+    `    }),`,
   );
 
   return lines.join("\n");
@@ -338,14 +427,14 @@ function generateReadHandler(
   isNumericId: boolean,
 ): string {
   if (!pathParam) {
-    return `      http.${method}("${pattern}", () => HttpResponse.json(${store}.list()[0])),`;
+    return `    http.${method}("${pattern}", () => HttpResponse.json(${store}.list()[0])),`;
   }
 
   const idExpr = isNumericId
     ? `Number(params.${pathParam})`
     : `String(params.${pathParam})`;
 
-  return `      http.${method}("${pattern}", ({ params }) => HttpResponse.json(${store}.getById(${idExpr}) ?? ${store}.list()[0])),`;
+  return `    http.${method}("${pattern}", ({ params }) => HttpResponse.json(${store}.getById(${idExpr}) ?? ${store}.list()[0])),`;
 }
 
 function generateReadByFieldHandler(
@@ -354,7 +443,7 @@ function generateReadByFieldHandler(
   store: string,
   pathParam: string,
 ): string {
-  return `      http.${method}("${pattern}", ({ params }) => HttpResponse.json(${store}.filter((item) => String(item.${pathParam}) === String(params.${pathParam}))[0] ?? ${store}.list()[0])),`;
+  return `    http.${method}("${pattern}", ({ params }) => HttpResponse.json(${store}.filter((item) => String(item.${pathParam}) === String(params.${pathParam}))[0] ?? ${store}.list()[0])),`;
 }
 
 function generateSearchHandler(
@@ -363,13 +452,13 @@ function generateSearchHandler(
   store: string,
 ): string {
   const lines = [
-    `      http.${method}("${pattern}", ({ request }) => {`,
-    `        const url = new URL(request.url);`,
-    `        const page = Number(url.searchParams.get("page") ?? "0");`,
-    `        const size = Number(url.searchParams.get("size") ?? "10");`,
-    `        const sort = url.searchParams.get("sort") ?? undefined;`,
-    `        return HttpResponse.json(${store}.listPaged(page, size, sort));`,
-    `      }),`,
+    `    http.${method}("${pattern}", ({ request }) => {`,
+    `      const url = new URL(request.url);`,
+    `      const page = Number(url.searchParams.get("page") ?? "0");`,
+    `      const size = Number(url.searchParams.get("size") ?? "10");`,
+    `      const sort = url.searchParams.get("sort") ?? undefined;`,
+    `      return HttpResponse.json(${store}.listPaged(page, size, sort));`,
+    `    }),`,
   ];
   return lines.join("\n");
 }
@@ -384,11 +473,11 @@ function generateOrderHandler(
   const orderField = findOrderField(operation, entity);
   const idField = findIdField(entity);
   const lines = [
-    `      http.${method}("${pattern}", async ({ request }) => {`,
-    `        const items = await request.json() as { ${idField}: string | number; ${orderField}: number }[];`,
-    `        for (const item of items) ${store}.update(item.${idField}, { ${orderField}: item.${orderField} } as never);`,
-    `        return HttpResponse.json({});`,
-    `      }),`,
+    `    http.${method}("${pattern}", async ({ request }) => {`,
+    `      const items = await request.json() as { ${idField}: string | number; ${orderField}: number }[];`,
+    `      for (const item of items) ${store}.update(item.${idField}, { ${orderField}: item.${orderField} } as never);`,
+    `      return HttpResponse.json({});`,
+    `    }),`,
   ];
   return lines.join("\n");
 }
@@ -407,15 +496,13 @@ function generateTreeHandler(
     if (idField === "id") args.push(`"id"`);
     args.push(`"${parentField}"`);
   }
-  return `      http.${method}("${pattern}", () => HttpResponse.json(buildEmbeddedTree(${args.join(", ")}))),`;
+  return `    http.${method}("${pattern}", () => HttpResponse.json(buildEmbeddedTree(${args.join(", ")}))),`;
 }
 
-/** Sanitize a param name to a valid JS variable name (e.g., "userId.equals" → "userId_equals") */
 function sanitizeVarName(name: string): string {
   return name.replace(/[^a-zA-Z0-9_$]/g, "_");
 }
 
-/** Extract the field name from a query param (e.g., "userId.equals" → "userId") */
 function sanitizeFieldName(name: string): string {
   const dotIdx = name.indexOf(".");
   return dotIdx >= 0 ? name.slice(0, dotIdx) : name;
@@ -429,9 +516,9 @@ function generateCreateHandler(
   isVoid: boolean,
 ): string {
   if (isVoid) {
-    return `      http.${method}("${pattern}", async ({ request }) => { ${store}.create(await request.json() as ${pascalName}); return new HttpResponse(null, { status: 204 }); }),`;
+    return `    http.${method}("${pattern}", async ({ request }) => { ${store}.create(await request.json() as ${pascalName}); return new HttpResponse(null, { status: 204 }); }),`;
   }
-  return `      http.${method}("${pattern}", async ({ request }) => HttpResponse.json(${store}.create(await request.json() as ${pascalName}))),`;
+  return `    http.${method}("${pattern}", async ({ request }) => HttpResponse.json(${store}.create(await request.json() as ${pascalName}))),`;
 }
 
 function generateUpdateHandler(
@@ -449,27 +536,27 @@ function generateUpdateHandler(
       ? `Number(params.${pathParam})`
       : `String(params.${pathParam})`;
     if (isVoid) {
-      return `      http.${method}("${pattern}", async ({ request, params }) => { ${store}.update(${idExpr}, await request.json() as ${pascalName}); return new HttpResponse(null, { status: 204 }); }),`;
+      return `    http.${method}("${pattern}", async ({ request, params }) => { ${store}.update(${idExpr}, await request.json() as ${pascalName}); return new HttpResponse(null, { status: 204 }); }),`;
     }
-    return `      http.${method}("${pattern}", async ({ request, params }) => HttpResponse.json(${store}.update(${idExpr}, await request.json() as ${pascalName}))),`;
+    return `    http.${method}("${pattern}", async ({ request, params }) => HttpResponse.json(${store}.update(${idExpr}, await request.json() as ${pascalName}))),`;
   }
 
   // Body-based update (PUT /pet — no path param)
   if (isVoid) {
     const lines = [
-      `      http.${method}("${pattern}", async ({ request }) => {`,
-      `        const body = await request.json() as ${pascalName};`,
-      `        ${store}.update(body.${idField}!, body) ?? ${store}.create(body);`,
-      `        return new HttpResponse(null, { status: 204 });`,
-      `      }),`,
+      `    http.${method}("${pattern}", async ({ request }) => {`,
+      `      const body = await request.json() as ${pascalName};`,
+      `      ${store}.update(body.${idField}!, body) ?? ${store}.create(body);`,
+      `      return new HttpResponse(null, { status: 204 });`,
+      `    }),`,
     ];
     return lines.join("\n");
   }
   const lines = [
-    `      http.${method}("${pattern}", async ({ request }) => {`,
-    `        const body = await request.json() as ${pascalName};`,
-    `        return HttpResponse.json(${store}.update(body.${idField}!, body) ?? ${store}.create(body));`,
-    `      }),`,
+    `    http.${method}("${pattern}", async ({ request }) => {`,
+    `      const body = await request.json() as ${pascalName};`,
+    `      return HttpResponse.json(${store}.update(body.${idField}!, body) ?? ${store}.create(body));`,
+    `    }),`,
   ];
   return lines.join("\n");
 }
@@ -484,20 +571,20 @@ function generateUpdateByFieldHandler(
 ): string {
   if (isVoid) {
     const lines = [
-      `      http.${method}("${pattern}", async ({ request, params }) => {`,
-      `        const item = ${store}.filter((item) => String(item.${pathParam}) === String(params.${pathParam}))[0];`,
-      `        if (item) ${store}.update(item.id as string | number, await request.json() as ${pascalName});`,
-      `        return new HttpResponse(null, { status: 204 });`,
-      `      }),`,
+      `    http.${method}("${pattern}", async ({ request, params }) => {`,
+      `      const item = ${store}.filter((item) => String(item.${pathParam}) === String(params.${pathParam}))[0];`,
+      `      if (item) ${store}.update(item.id as string | number, await request.json() as ${pascalName});`,
+      `      return new HttpResponse(null, { status: 204 });`,
+      `    }),`,
     ];
     return lines.join("\n");
   }
   const lines = [
-    `      http.${method}("${pattern}", async ({ request, params }) => {`,
-    `        const item = ${store}.filter((item) => String(item.${pathParam}) === String(params.${pathParam}))[0];`,
-    `        if (!item) return HttpResponse.json(${store}.list()[0]);`,
-    `        return HttpResponse.json(${store}.update(item.id as string | number, await request.json() as ${pascalName}));`,
-    `      }),`,
+    `    http.${method}("${pattern}", async ({ request, params }) => {`,
+    `      const item = ${store}.filter((item) => String(item.${pathParam}) === String(params.${pathParam}))[0];`,
+    `      if (!item) return HttpResponse.json(${store}.list()[0]);`,
+    `      return HttpResponse.json(${store}.update(item.id as string | number, await request.json() as ${pascalName}));`,
+    `    }),`,
   ];
   return lines.join("\n");
 }
@@ -510,14 +597,14 @@ function generateDeleteHandler(
   isNumericId: boolean,
 ): string {
   if (!pathParam) {
-    return `      http.${method}("${pattern}", () => HttpResponse.json(null)),`;
+    return `    http.${method}("${pattern}", () => HttpResponse.json(null)),`;
   }
 
   const idExpr = isNumericId
     ? `Number(params.${pathParam})`
     : `String(params.${pathParam})`;
 
-  return `      http.${method}("${pattern}", ({ params }) => { ${store}.remove(${idExpr}); return HttpResponse.json(null); }),`;
+  return `    http.${method}("${pattern}", ({ params }) => { ${store}.remove(${idExpr}); return HttpResponse.json(null); }),`;
 }
 
 function generateDeleteByFieldHandler(
@@ -527,26 +614,17 @@ function generateDeleteByFieldHandler(
   pathParam: string,
 ): string {
   const lines = [
-    `      http.${method}("${pattern}", ({ params }) => {`,
-    `        const item = ${store}.filter((item) => String(item.${pathParam}) === String(params.${pathParam}))[0];`,
-    `        if (item) ${store}.remove(item.id as string | number);`,
-    `        return HttpResponse.json(null);`,
-    `      }),`,
+    `    http.${method}("${pattern}", ({ params }) => {`,
+    `      const item = ${store}.filter((item) => String(item.${pathParam}) === String(params.${pathParam}))[0];`,
+    `      if (item) ${store}.remove(item.id as string | number);`,
+    `      return HttpResponse.json(null);`,
+    `    }),`,
   ];
   return lines.join("\n");
 }
 
 // ── Response Wrapper ─────────────────────────────────────────
 
-/**
- * Wrap `HttpResponse.json(expr)` payloads with a wrapper function.
- * e.g., `HttpResponse.json(store.list())` → `HttpResponse.json(wrapFn(store.list()))`
- *
- * Uses balanced parenthesis matching to handle nested expressions like
- * `HttpResponse.json(store.create(await request.json() as Pet))`.
- *
- * Only wraps `HttpResponse.json(...)` calls; `new HttpResponse(...)` is left unchanged.
- */
 function wrapJsonPayloads(code: string, wrapFn: string): string {
   const marker = "HttpResponse.json(";
   let result = "";
@@ -570,10 +648,8 @@ function wrapJsonPayloads(code: string, wrapFn: string): string {
       i++;
     }
 
-    // i now points past the closing ')' of HttpResponse.json(...)
-    // The payload is code[start..i-2], the closing ')' is at i-1
-    result += code.slice(start, i - 1) + ")";  // close wrapFn(...)
-    pos = i - 1;  // continue from the closing ')' of HttpResponse.json
+    result += code.slice(start, i - 1) + ")";
+    pos = i - 1;
   }
 
   return result;
@@ -586,10 +662,8 @@ function toMswPattern(path: string): string {
 }
 
 function findIdField(entity: ExtractedEntity): string {
-  // Exact "id" field
   const exact = entity.fields.find((f) => f.name.toLowerCase() === "id");
   if (exact) return exact.name;
-  // Fields ending with "Id" (camelCase, e.g., userId, accountId)
   const idLike = entity.fields.find((f) => /[A-Z]?[Ii]d$/.test(f.name));
   if (idLike) return idLike.name;
   return "id";
@@ -601,12 +675,6 @@ function isIdFieldNumeric(entity: ExtractedEntity): boolean {
   return field ? field.type === "integer" || field.type === "number" : true;
 }
 
-/**
- * Determine if a path param represents the entity's ID field.
- * - "petId" → maps to "id" ✓
- * - "orderId" → maps to "id" ✓
- * - "username" → does NOT map to "id" ✗
- */
 function isPathParamIdField(pathParam: string, idField: string): boolean {
   if (pathParam === idField) return true;
   return pathParam.toLowerCase().endsWith("id");
@@ -617,21 +685,18 @@ function extractPathParam(path: string): string | undefined {
   return match ? match[1] : undefined;
 }
 
-/** Extract path param from a parent segment (e.g., "/:userId/edit" → "userId") */
 function extractParentPathParam(path: string): string | undefined {
   const match = path.match(/:(\w+)\/[^/]+$/);
   return match ? match[1] : undefined;
 }
 
 function findOrderField(operation: ExtractedOperation, entity: ExtractedEntity): string {
-  // 1. Check bodySchema items properties for a non-id field
   const props = operation.bodySchema?.items?.properties;
   if (props) {
     const nonIdField = Object.keys(props).find((k) => k.toLowerCase() !== "id" && !k.toLowerCase().endsWith("id"));
     if (nonIdField) return nonIdField;
   }
 
-  // 2. Fallback: scan entity fields for known order field names
   const orderNames = ["displayOrder", "sortOrder", "orderIndex"];
   for (const name of orderNames) {
     if (entity.fields.some((f) => f.name === name)) return name;
@@ -641,20 +706,12 @@ function findOrderField(operation: ExtractedOperation, entity: ExtractedEntity):
 }
 
 function findParentIdField(entity: ExtractedEntity): string {
-  // Exact "parentId"
   if (entity.fields.some((f) => f.name === "parentId")) return "parentId";
-  // Fields matching *parent*id pattern
   const parentLike = entity.fields.find((f) => /parent.*id/i.test(f.name));
   if (parentLike) return parentLike.name;
   return "parentId";
 }
 
-/**
- * Infer CRUD role from HTTP method + path when explicit role is not set.
- *
- * Operation paths are absolute (e.g. "/pet", "/pet/:petId"), so we compare
- * against the entity's base path to determine if it's a collection or item endpoint.
- */
 function inferRole(op: ExtractedOperation, entity: ExtractedEntity): CrudRole | undefined {
   const basePath = entity.path;
   const suffix = op.path.slice(basePath.length);
@@ -669,7 +726,6 @@ function inferRole(op: ExtractedOperation, entity: ExtractedEntity): CrudRole | 
       if (/^\/:[^/]+\/edit$/.test(suffix)) return "getForEdit";
       if (suffix === "/tree") return "tree";
       if (/^\/tree\/:[^/]+$/.test(suffix)) return "subtree";
-      // Sub-path with query params → likely a filter/search endpoint
       if (op.queryParams.length > 0) return "list";
       return undefined;
     case "POST":
