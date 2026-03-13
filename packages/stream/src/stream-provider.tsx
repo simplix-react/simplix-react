@@ -176,7 +176,10 @@ export function StreamProvider({
       const bodyBuilder = cfg.body ?? DEFAULT_SUBSCRIPTION_SYNC.body!;
       await fetch(cfg.url(sid), {
         method: cfg.method ?? "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+        },
         body: JSON.stringify(bodyBuilder(subscriptions)),
       });
     }, 0);
@@ -293,7 +296,10 @@ export function StreamProvider({
         prev === "disconnected" || retryCountRef.current > 0 ? "reconnecting" : "connecting",
       );
 
-      const es = new EventSource(url);
+      // EventSource does not support custom headers; pass timezone as query param
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const separator = url.includes("?") ? "&" : "?";
+      const es = new EventSource(`${url}${separator}timezone=${encodeURIComponent(tz)}`);
       eventSourceRef.current = es;
 
       const names = evNamesRef.current;

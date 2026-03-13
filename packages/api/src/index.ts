@@ -48,12 +48,6 @@ const _registry = new Map<string, OrvalMutator>();
 
 let _locale: string | undefined;
 
-// ── Request Timezone ────────────────────────────────────────
-
-function getClientTimezone(): string {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone;
-}
-
 /**
  * Set the locale for API requests.
  *
@@ -87,11 +81,11 @@ export function getRequestLocale(): string | undefined {
  *
  * @remarks
  * Auto-detected from the browser/OS via `Intl.DateTimeFormat`.
- * {@link getMutator} automatically injects this as an `X-Timezone` header
- * on every outgoing request.
+ * `X-Timezone` header is injected at the `createFetch()` layer
+ * so all HTTP requests include it automatically.
  */
 export function getRequestTimezone(): string {
-  return getClientTimezone();
+  return Intl.DateTimeFormat().resolvedOptions().timeZone;
 }
 
 /**
@@ -143,16 +137,17 @@ export function getMutator(strategy = "default"): OrvalMutator {
       `Mutator "${strategy}" not configured. Call configureMutator() first.`,
     );
   }
+  if (!_locale) return mutator;
+
   return <T>(url: string, options?: RequestInit): Promise<T> => {
     const existing = (options?.headers ?? {}) as Record<string, string>;
-    const headers = { ...existing };
-    if (_locale && !headers["Accept-Language"]) {
-      headers["Accept-Language"] = _locale;
+    if (existing["Accept-Language"]) {
+      return mutator<T>(url, options);
     }
-    if (!headers["X-Timezone"]) {
-      headers["X-Timezone"] = getClientTimezone();
-    }
-    return mutator<T>(url, { ...options, headers });
+    return mutator<T>(url, {
+      ...options,
+      headers: { ...existing, "Accept-Language": _locale! },
+    });
   };
 }
 

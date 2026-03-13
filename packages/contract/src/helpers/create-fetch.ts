@@ -68,6 +68,10 @@ export function createFetch(options: CreateFetchOptions = {}): FetchFn {
       headers["Authorization"] = `Bearer ${token}`;
     }
 
+    if (!headers["X-Timezone"]) {
+      try { headers["X-Timezone"] = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch { /* SSR or unsupported */ }
+    }
+
     const res = await fetch(fullUrl, { ...reqOptions, headers });
 
     if (!res.ok) {
