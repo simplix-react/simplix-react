@@ -102,14 +102,14 @@ describe("simplixBootNaming", () => {
       expect(result).toEqual({ role: "subtree", hookName: "getPetSubtree" });
     });
 
-    it("resolves GET with no path param as list", () => {
+    it("resolves GET with no path param as getAll", () => {
       const result = simplixBootNaming.resolveOperation({
         ...baseContext,
         method: "get",
         path: "/api/v1/pet",
         pathParams: [],
       });
-      expect(result).toEqual({ role: "list", hookName: "listPets" });
+      expect(result).toEqual({ role: "getAll", hookName: "getAllPets" });
     });
 
     // --- POST patterns ---
@@ -252,6 +252,52 @@ describe("simplixBootNaming", () => {
         pathParams: ["id"],
       });
       expect(result).toEqual({ role: "update", hookName: "updatePet" });
+    });
+
+    // --- GET subpath with mismatched entity name (tag qualifier suffix) ---
+
+    it("resolves GET /policy/summary when entity is policyOverview", () => {
+      const result = simplixBootNaming.resolveOperation({
+        ...baseContext,
+        entityName: "policyOverview",
+        method: "get",
+        path: "/api/v1/policy/summary",
+        pathParams: [],
+      });
+      expect(result).toEqual({ role: "summary", hookName: "getPolicyOverviewSummary" });
+    });
+
+    it("resolves GET /policy/health when entity is policyOverview", () => {
+      const result = simplixBootNaming.resolveOperation({
+        ...baseContext,
+        entityName: "policyOverview",
+        method: "get",
+        path: "/api/v1/policy/health",
+        pathParams: [],
+      });
+      expect(result).toEqual({ role: "health", hookName: "getPolicyOverviewHealth" });
+    });
+
+    it("resolves GET /policy/recent-activity when entity is policyOverview", () => {
+      const result = simplixBootNaming.resolveOperation({
+        ...baseContext,
+        entityName: "policyOverview",
+        method: "get",
+        path: "/api/v1/policy/recent-activity",
+        pathParams: [],
+      });
+      expect(result).toEqual({ role: "recentActivity", hookName: "getPolicyOverviewRecentActivity" });
+    });
+
+    it("resolves GET /policy/relationships when entity is policyOverview", () => {
+      const result = simplixBootNaming.resolveOperation({
+        ...baseContext,
+        entityName: "policyOverview",
+        method: "get",
+        path: "/api/v1/policy/relationships",
+        pathParams: [],
+      });
+      expect(result).toEqual({ role: "relationships", hookName: "getPolicyOverviewRelationships" });
     });
 
     // --- Fallback ---
