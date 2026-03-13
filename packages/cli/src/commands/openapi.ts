@@ -2,7 +2,7 @@ import { Command } from "commander";
 import prompts from "prompts";
 import ora from "ora";
 import { join, relative, resolve } from "node:path";
-import { rm, readFile } from "node:fs/promises";
+import { rm, readFile, readdir } from "node:fs/promises";
 import { writeFileWithDir, pathExists, readJsonFile, findProjectRoot } from "../utils/fs.js";
 import { log } from "../utils/logger.js";
 import { toPascalCase } from "../utils/case.js";
@@ -602,7 +602,7 @@ function resolveEntityHookNames(
 
 // ── CRUD config generation ───────────────────────────────────
 
-type InferredRole = "list" | "get" | "getForEdit" | "create" | "update" | "delete" | "multiUpdate" | "batchUpdate" | "batchDelete" | "search";
+type InferredRole = "list" | "getAll" | "get" | "getForEdit" | "create" | "update" | "delete" | "multiUpdate" | "batchUpdate" | "batchDelete" | "search";
 
 function inferCrudRole(
   method: string,
@@ -612,7 +612,8 @@ function inferCrudRole(
   const relative = opPath === basePath ? "/" : opPath.slice(basePath.length);
   const isItemPath = /^\/[:{][^/}]+\}?$/.test(relative);
 
-  if (method === "GET" && (relative === "/" || relative === "/search")) return "list";
+  if (method === "GET" && relative === "/search") return "list";
+  if (method === "GET" && relative === "/") return "getAll";
   if (method === "GET" && isItemPath) return "get";
   if (method === "GET" && /^\/[:{][^/}]+\}?\/edit$/.test(relative)) return "getForEdit";
   if (method === "POST" && (relative === "/" || relative === "/create")) return "create";
@@ -628,7 +629,7 @@ function inferCrudRole(
 function generateCrudConfigContent(
   entities: ExtractedEntity[],
 ): string {
-  const STANDARD_ROLES = ["list", "get", "create", "update", "delete", "getForEdit", "tree", "subtree", "multiUpdate", "batchUpdate", "batchDelete", "search"] as const;
+  const STANDARD_ROLES = ["list", "getAll", "get", "create", "update", "delete", "getForEdit", "tree", "subtree", "multiUpdate", "batchUpdate", "batchDelete", "search"] as const;
 
   const lines: string[] = [
     `import { defineCrudMap } from "@simplix-react/cli";`,
@@ -641,6 +642,7 @@ function generateCrudConfigContent(
     ` *`,
     ` * Standard roles:`,
     ` *   list        - List/search items`,
+    ` *   getAll      - Get all items (GET /entity, no pagination)`,
     ` *   get         - Get single item by ID`,
     ` *   create      - Create new item`,
     ` *   update      - Update existing item`,
@@ -741,6 +743,21 @@ async function overlayServerTranslations(
   const localeDataMap = await i18nDownloader(serverOrigin, entities, locales);
   if (!localeDataMap) return;
 
+  // Filter enums: only keep enums that have a generated model file in this domain
+  const knownTypes = await resolveKnownModelTypes(targetDir);
+  if (knownTypes) {
+    for (const [, localeData] of localeDataMap) {
+      const enums = localeData["enums"];
+      if (enums && typeof enums === "object" && !Array.isArray(enums)) {
+        const enumRecord = enums as Record<string, unknown>;
+        for (const key of Object.keys(enumRecord)) {
+          if (!knownTypes.has(key)) delete enumRecord[key];
+        }
+        if (Object.keys(enumRecord).length === 0) delete localeData["enums"];
+      }
+    }
+  }
+
   const localesDir = join(targetDir, "src/locales");
   for (const locale of locales) {
     const overlay = localeDataMap.get(locale);
@@ -753,6 +770,24 @@ async function overlayServerTranslations(
   }
 
   log.info("Applied server i18n translations.");
+}
+
+/**
+ * Scan generated model directory and return PascalCase type names.
+ * Used to filter server enum translations to only domain-relevant ones.
+ */
+async function resolveKnownModelTypes(targetDir: string): Promise<Set<string> | undefined> {
+  const modelDir = join(targetDir, "src/generated/model");
+  if (!await pathExists(modelDir)) return undefined;
+
+  const files = await readdir(modelDir);
+  const types = new Set<string>();
+  for (const file of files) {
+    if (!file.endsWith(".ts") || file === "index.ts") continue;
+    const base = file.slice(0, -3);
+    types.add(base.charAt(0).toUpperCase() + base.slice(1));
+  }
+  return types;
 }
 
 function deepMerge(

@@ -18,6 +18,24 @@ function toCamelCase(str: string): string {
 }
 
 /**
+ * Build a set of entity kebab-name prefixes for fuzzy path matching.
+ * When the tag-derived entity name has a qualifier suffix (e.g., "PolicyOverview" → "policy-overview"),
+ * the path may only contain the base resource name ("policy").
+ * Returns a set containing all progressively shorter prefixes (excluding the full name, which is matched exactly).
+ *
+ * Example: "policy-overview" → Set{"policy"}
+ * Example: "access-control-unit" → Set{"access-control", "access"}
+ */
+function buildEntityPrefixes(entityKebab: string): Set<string> {
+  const parts = entityKebab.split("-");
+  const prefixes = new Set<string>();
+  for (let len = parts.length - 1; len >= 1; len--) {
+    prefixes.add(parts.slice(0, len).join("-"));
+  }
+  return prefixes;
+}
+
+/**
  * Scan path segments backwards to find a custom action suffix.
  * Skips params, the entity's kebab-case name, API prefix, and version segments.
  * Returns the camelCase action name, or undefined if no action found.
@@ -29,10 +47,11 @@ function toCamelCase(str: string): string {
  */
 function findActionSuffix(segments: string[], entityName: string): string | undefined {
   const entityKebab = entityName.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
+  const entityPrefixes = buildEntityPrefixes(entityKebab);
   for (let i = segments.length - 1; i >= 0; i--) {
     const seg = segments[i];
     if (seg.startsWith("{")) continue;
-    if (seg === entityKebab || seg === "api" || /^v\d+$/.test(seg)) return undefined;
+    if (seg === entityKebab || entityPrefixes.has(seg) || seg === "api" || /^v\d+$/.test(seg)) return undefined;
     return toCamelCase(seg);
   }
   return undefined;
@@ -52,10 +71,24 @@ function findGetSubpath(segments: string[], entityName: string): string | undefi
   const entityKebab = entityName.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
 
   let entityIdx = -1;
+  // Exact match first
   for (let i = 0; i < segments.length; i++) {
     if (segments[i] === entityKebab) {
       entityIdx = i;
       break;
+    }
+  }
+
+  // Prefix fallback: when entity name from tag has a qualifier suffix
+  // (e.g., tag "pacs.policy.PolicyOverview" → "policy-overview")
+  // but path uses only the base resource name (e.g., "/policy/summary")
+  if (entityIdx < 0) {
+    const prefixes = buildEntityPrefixes(entityKebab);
+    for (let i = 0; i < segments.length; i++) {
+      if (prefixes.has(segments[i])) {
+        entityIdx = i;
+        break;
+      }
     }
   }
 
@@ -135,7 +168,9 @@ export const simplixBootNaming: OpenApiNamingStrategy = {
         const actionPascal = getAction.charAt(0).toUpperCase() + getAction.slice(1);
         return { role: getAction, hookName: `get${pascal}${actionPascal}` };
       }
-      return { role: "list", hookName: `list${pascal}s` };
+      // GET /entity (base path, no sub-path, no path param) → getAll
+      // Distinct from GET /entity/search which is the paginated "list" role
+      return { role: "getAll", hookName: `getAll${pascal}s` };
     }
 
     // --- POST patterns ---
@@ -163,6 +198,18 @@ export const simplixBootNaming: OpenApiNamingStrategy = {
     if (method === "DELETE") {
       if (lastSegment === "batch") {
         return { role: "batchDelete", hookName: `batchDelete${pascal}s` };
+      }
+      // Sub-resource DELETE: /entity/{id}/groups/{groupId}
+      // Detected by counting non-param, non-api, non-version segments.
+      // More than 1 resource segment means a sub-resource path.
+      // Uses "delete" prefix to avoid collision with POST custom actions.
+      const resourceSegments = pathSegments.filter(
+        s => !s.startsWith("{") && s !== "api" && !/^v\d+$/.test(s),
+      );
+      if (resourceSegments.length > 1) {
+        const action = toCamelCase(resourceSegments[resourceSegments.length - 1]);
+        const actionPascal = action.charAt(0).toUpperCase() + action.slice(1);
+        return { role: `delete${actionPascal}`, hookName: `delete${actionPascal}${pascal}` };
       }
       return { role: "delete", hookName: `delete${pascal}` };
     }
