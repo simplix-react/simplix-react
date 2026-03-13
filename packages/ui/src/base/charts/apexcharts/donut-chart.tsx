@@ -24,6 +24,7 @@ export function ApexDonutChart({ labels, series, colors, centerLabel, height = 3
           size: "60%",
           labels: {
             show: !!centerLabel,
+            value: { color: theme.foreground },
             total: {
               show: !!centerLabel,
               showAlways: false,
@@ -33,8 +34,8 @@ export function ApexDonutChart({ labels, series, colors, centerLabel, height = 3
         },
       },
     },
-    tooltip: { theme: "light", fixed: { enabled: false } },
-    stroke: { colors: [theme.background], width: 2 },
+    tooltip: { theme: theme.tooltipTheme, fixed: { enabled: false } },
+    stroke: { width: 0 },
     ...(colors?.length ? { colors } : {}),
   }), [labels, colors, centerLabel, theme]);
 

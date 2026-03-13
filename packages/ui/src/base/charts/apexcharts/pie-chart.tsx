@@ -18,8 +18,8 @@ export function ApexPieChart({ labels, series, colors, height = 350, className }
       position: "bottom",
       labels: { colors: theme.foreground },
     },
-    tooltip: { theme: "light", fixed: { enabled: false } },
-    stroke: { colors: [theme.background], width: 2 },
+    tooltip: { theme: theme.tooltipTheme, fixed: { enabled: false } },
+    stroke: { width: 0 },
     ...(colors?.length ? { colors } : {}),
   }), [labels, colors, theme]);
 
