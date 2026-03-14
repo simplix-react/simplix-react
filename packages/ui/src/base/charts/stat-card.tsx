@@ -6,16 +6,20 @@ export interface StatCardProps {
   value: string | number;
   description?: string;
   icon?: ReactNode;
+  headerExtra?: ReactNode;
   trend?: { value: number; label?: string };
   className?: string;
   children?: ReactNode;
 }
 
-export function StatCard({ title, value, description, icon, trend, className, children }: StatCardProps) {
+export function StatCard({ title, value, description, icon, headerExtra, trend, className, children }: StatCardProps) {
   return (
     <div className={cn("rounded-lg border bg-card p-6 text-card-foreground shadow-sm", className)}>
       <div className="flex items-center justify-between">
-        <p className="text-sm font-medium text-muted-foreground">{title}</p>
+        <div className="flex items-center gap-1.5">
+          <p className="text-sm font-medium text-muted-foreground">{title}</p>
+          {headerExtra}
+        </div>
         {icon && <div className="text-muted-foreground">{icon}</div>}
       </div>
       <div className="mt-2">
