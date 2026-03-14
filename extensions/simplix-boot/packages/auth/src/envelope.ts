@@ -45,22 +45,21 @@ function isBootEnvelope(wire: unknown): wire is BootEnvelope {
     wire != null &&
     typeof wire === "object" &&
     "type" in wire &&
-    "body" in wire &&
-    "message" in wire &&
-    "timestamp" in wire
+    "body" in wire
   );
 }
 
 export function unwrapEnvelope<T>(wire: unknown): T {
   if (isBootEnvelope(wire)) {
     if (wire.type !== "SUCCESS") {
+      const env = wire as Partial<BootEnvelope>;
       throw new ApiResponseError(
         400,
         wire.type,
-        wire.message,
-        wire.timestamp,
-        wire.errorCode ?? undefined,
-        wire.errorDetail ?? undefined,
+        env.message ?? `Response type: ${wire.type}`,
+        env.timestamp ?? new Date().toISOString(),
+        env.errorCode ?? undefined,
+        env.errorDetail ?? undefined,
       );
     }
     return wire.body as T;

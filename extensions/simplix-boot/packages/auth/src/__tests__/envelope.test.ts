@@ -177,9 +177,14 @@ describe("unwrapEnvelope", () => {
     expect(unwrapEnvelope({ body: "content", extra: 1 })).toEqual({ body: "content", extra: 1 });
   });
 
-  it("passes through objects with type+body but missing message/timestamp", () => {
+  it("throws for objects with type+body but non-SUCCESS type", () => {
     const partial = { type: "DOG", body: "large", name: "Rex" };
-    expect(unwrapEnvelope(partial)).toEqual(partial);
+    expect(() => unwrapEnvelope(partial)).toThrow(ApiResponseError);
+  });
+
+  it("extracts body from envelope missing message/timestamp", () => {
+    const envelope = { type: "SUCCESS", body: { id: 1 } };
+    expect(unwrapEnvelope(envelope)).toEqual({ id: 1 });
   });
 
   it("passes through primitive values", () => {
