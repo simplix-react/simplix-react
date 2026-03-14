@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ErrorDetail } from "./api-response-error.js";
+import { ApiResponseError, type ErrorDetail } from "./api-response-error.js";
 
 export interface BootEnvelope<T = unknown> {
   type: string;
@@ -40,6 +40,30 @@ export function wrapEnvelope<T>(body: T): BootEnvelope<T> {
   };
 }
 
+function isBootEnvelope(wire: unknown): wire is BootEnvelope {
+  return (
+    wire != null &&
+    typeof wire === "object" &&
+    "type" in wire &&
+    "body" in wire &&
+    "message" in wire &&
+    "timestamp" in wire
+  );
+}
+
 export function unwrapEnvelope<T>(wire: unknown): T {
-  return (wire as BootEnvelope<T>).body;
+  if (isBootEnvelope(wire)) {
+    if (wire.type !== "SUCCESS") {
+      throw new ApiResponseError(
+        400,
+        wire.type,
+        wire.message,
+        wire.timestamp,
+        wire.errorCode ?? undefined,
+        wire.errorDetail ?? undefined,
+      );
+    }
+    return wire.body as T;
+  }
+  return wire as T;
 }

@@ -6,6 +6,7 @@ import {
   unwrapEnvelope,
   wrapEnvelope,
 } from "../envelope.js";
+import { ApiResponseError } from "../api-response-error.js";
 
 describe("wrapEnvelope", () => {
   it("wraps data in Boot envelope format", () => {
@@ -41,6 +42,8 @@ describe("wrapEnvelope", () => {
 });
 
 describe("unwrapEnvelope", () => {
+  // ── SUCCESS envelope ──
+
   it("extracts body from envelope", () => {
     const envelope = {
       type: "SUCCESS",
@@ -51,8 +54,7 @@ describe("unwrapEnvelope", () => {
       errorDetail: null,
     };
 
-    const result = unwrapEnvelope<{ id: number; name: string }>(envelope);
-    expect(result).toEqual({ id: 1, name: "Buddy" });
+    expect(unwrapEnvelope<{ id: number; name: string }>(envelope)).toEqual({ id: 1, name: "Buddy" });
   });
 
   it("extracts null body", () => {
@@ -75,6 +77,124 @@ describe("unwrapEnvelope", () => {
     };
 
     expect(unwrapEnvelope<number[]>(envelope)).toEqual([1, 2, 3]);
+  });
+
+  it("roundtrips with wrapEnvelope", () => {
+    const data = { id: 1, items: [1, 2] };
+    expect(unwrapEnvelope(wrapEnvelope(data))).toEqual(data);
+  });
+
+  // ── FAILURE envelope ──
+
+  it("throws ApiResponseError for non-SUCCESS type", () => {
+    const envelope = {
+      type: "FAILURE",
+      message: "Controller not found",
+      body: null,
+      timestamp: "2024-01-01T00:00:00Z",
+      errorCode: "NOT_FOUND",
+      errorDetail: null,
+    };
+
+    expect(() => unwrapEnvelope(envelope)).toThrow(ApiResponseError);
+    try {
+      unwrapEnvelope(envelope);
+    } catch (e) {
+      const err = e as ApiResponseError;
+      expect(err.status).toBe(400);
+      expect(err.type).toBe("FAILURE");
+      expect(err.errorMessage).toBe("Controller not found");
+      expect(err.errorCode).toBe("NOT_FOUND");
+    }
+  });
+
+  it("throws ApiResponseError with validation errorDetail", () => {
+    const envelope = {
+      type: "ERROR",
+      message: "Validation failed",
+      body: null,
+      timestamp: "2024-01-01T00:00:00Z",
+      errorCode: "VALIDATION",
+      errorDetail: [{ field: "name", message: "Required" }],
+    };
+
+    expect(() => unwrapEnvelope(envelope)).toThrow(ApiResponseError);
+    try {
+      unwrapEnvelope(envelope);
+    } catch (e) {
+      const err = e as ApiResponseError;
+      expect(err.errorDetail).toEqual([{ field: "name", message: "Required" }]);
+    }
+  });
+
+  it("throws for failure without errorCode/errorDetail", () => {
+    const envelope = {
+      type: "FAILURE",
+      message: "Something went wrong",
+      body: null,
+      timestamp: "2024-01-01T00:00:00Z",
+    };
+
+    expect(() => unwrapEnvelope(envelope)).toThrow(ApiResponseError);
+    try {
+      unwrapEnvelope(envelope);
+    } catch (e) {
+      const err = e as ApiResponseError;
+      expect(err.errorCode).toBeUndefined();
+      expect(err.errorDetail).toBeUndefined();
+    }
+  });
+
+  it("throws for failure with non-null body (409 conflict case)", () => {
+    const envelope = {
+      type: "FAILURE",
+      message: "Sync execution is already running",
+      body: { status: "RUNNING", startedAt: "2024-01-01T00:00:00Z" },
+      timestamp: "2024-01-01T00:00:00Z",
+    };
+
+    expect(() => unwrapEnvelope(envelope)).toThrow(ApiResponseError);
+    try {
+      unwrapEnvelope(envelope);
+    } catch (e) {
+      const err = e as ApiResponseError;
+      expect(err.errorMessage).toBe("Sync execution is already running");
+    }
+  });
+
+  // ── Non-envelope passthrough ──
+
+  it("passes through plain objects", () => {
+    const plain = { id: 1, name: "Buddy" };
+    expect(unwrapEnvelope(plain)).toEqual(plain);
+  });
+
+  it("passes through objects with only type (no body/message/timestamp)", () => {
+    expect(unwrapEnvelope({ type: "DOG", breed: "Poodle" })).toEqual({ type: "DOG", breed: "Poodle" });
+  });
+
+  it("passes through objects with only body (no type/message/timestamp)", () => {
+    expect(unwrapEnvelope({ body: "content", extra: 1 })).toEqual({ body: "content", extra: 1 });
+  });
+
+  it("passes through objects with type+body but missing message/timestamp", () => {
+    const partial = { type: "DOG", body: "large", name: "Rex" };
+    expect(unwrapEnvelope(partial)).toEqual(partial);
+  });
+
+  it("passes through primitive values", () => {
+    expect(unwrapEnvelope("hello")).toBe("hello");
+    expect(unwrapEnvelope(42)).toBe(42);
+    expect(unwrapEnvelope(true)).toBe(true);
+  });
+
+  it("passes through null and undefined", () => {
+    expect(unwrapEnvelope(null)).toBeNull();
+    expect(unwrapEnvelope(undefined)).toBeUndefined();
+  });
+
+  it("passes through arrays", () => {
+    expect(unwrapEnvelope([1, 2, 3])).toEqual([1, 2, 3]);
   });
 });
 
