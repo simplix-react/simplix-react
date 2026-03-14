@@ -130,28 +130,28 @@ describe("createFetch", () => {
 
     await fetchFn("/api/test");
     expect(fetchMock).toHaveBeenLastCalledWith("/api/test", {
-      headers: {},
+      headers: { "X-Timezone": expect.any(String) },
     });
 
     await fetchFn("/api/test", { method: "POST", body: "{}" });
     expect(fetchMock).toHaveBeenLastCalledWith("/api/test", {
       method: "POST",
       body: "{}",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "X-Timezone": expect.any(String) },
     });
 
     await fetchFn("/api/test", { method: "PUT", body: "{}" });
     expect(fetchMock).toHaveBeenLastCalledWith("/api/test", {
       method: "PUT",
       body: "{}",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "X-Timezone": expect.any(String) },
     });
 
     await fetchFn("/api/test", { method: "PATCH", body: "{}" });
     expect(fetchMock).toHaveBeenLastCalledWith("/api/test", {
       method: "PATCH",
       body: "{}",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "X-Timezone": expect.any(String) },
     });
   });
 
@@ -171,7 +171,7 @@ describe("createFetch", () => {
 
     expect(fetchMock).toHaveBeenCalledWith("/api/test", {
       method: "PUT",
-      headers: { "Content-Type": "text/plain" },
+      headers: { "Content-Type": "text/plain", "X-Timezone": expect.any(String) },
     });
   });
 

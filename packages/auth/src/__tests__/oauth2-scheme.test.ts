@@ -10,11 +10,12 @@ describe("oauth2Scheme", () => {
 
   beforeEach(() => {
     store = memoryStore();
+    mockFetch.mockReset();
     vi.stubGlobal("fetch", mockFetch);
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
   describe("getHeaders", () => {

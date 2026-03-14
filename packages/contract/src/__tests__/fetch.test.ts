@@ -51,7 +51,7 @@ describe("defaultFetch", () => {
     await defaultFetch("/api/test");
 
     expect(fetchMock).toHaveBeenCalledWith("/api/test", {
-      headers: {},
+      headers: { "X-Timezone": expect.any(String) },
     });
   });
 
@@ -67,7 +67,7 @@ describe("defaultFetch", () => {
     expect(fetchMock).toHaveBeenCalledWith("/api/test", {
       method: "POST",
       body: "{}",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "X-Timezone": expect.any(String) },
     });
   });
 
@@ -85,7 +85,7 @@ describe("defaultFetch", () => {
 
     expect(fetchMock).toHaveBeenCalledWith("/api/test", {
       method: "PUT",
-      headers: { "Content-Type": "text/plain" },
+      headers: { "Content-Type": "text/plain", "X-Timezone": expect.any(String) },
     });
   });
 
@@ -166,7 +166,7 @@ describe("defaultFetch", () => {
     expect(fetchMock).toHaveBeenCalledWith("/api/items", {
       method: "POST",
       body: JSON.stringify({ title: "New item" }),
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "X-Timezone": expect.any(String) },
     });
   });
 

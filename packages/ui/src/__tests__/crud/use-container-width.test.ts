@@ -16,10 +16,14 @@ describe("useContainerWidth", () => {
 
     vi.stubGlobal(
       "ResizeObserver",
-      vi.fn().mockImplementation((cb: ResizeObserverCallback) => {
-        _resizeCallback = cb;
-        return { observe: observeMock, disconnect: disconnectMock, unobserve: vi.fn() };
-      }),
+      class {
+        constructor(cb: ResizeObserverCallback) {
+          _resizeCallback = cb;
+        }
+        observe = observeMock;
+        disconnect = disconnectMock;
+        unobserve = vi.fn();
+      },
     );
   });
 
