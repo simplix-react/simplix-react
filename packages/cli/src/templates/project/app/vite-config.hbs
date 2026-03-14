@@ -9,7 +9,7 @@ function localeReload(): Plugin {
     name: "locale-reload",
     handleHotUpdate({ file, server }) {
       if (file.endsWith(".json") && file.includes("/locales/")) {
-        server.ws.send({ type: "full-reload" });
+        server.hot.send({ type: "full-reload" });
         return [];
       }
     },
@@ -20,6 +20,7 @@ export default defineConfig({
   plugins: [tanstackRouter(), react(), tailwindcss(), mswPlugin(), localeReload()],
   resolve: {
     conditions: ["source"],
+    dedupe: ["react", "react-dom"],
   },
   server: {
     port: 3000,

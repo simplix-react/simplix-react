@@ -54,14 +54,15 @@ const CONSUMER_DEPS: Record<string, string> = {
   "@types/react-dom": "^19.0.0",
   "@typescript-eslint/eslint-plugin": "^8.33.0",
   "@typescript-eslint/parser": "^8.33.0",
-  "@vitejs/plugin-react": "^4.5.2",
+  "@vitejs/plugin-react": "^6.0.0",
   "@tailwindcss/vite": "^4.1.10",
   "lucide-react": "^0.562.0",
   "react": "^19.0.0",
   "react-dom": "^19.0.0",
   "tailwindcss": "^4.1.10",
   "turbo": "^2.7.5",
-  "vite": "^6.3.5",
+  "vite": "^8.0.0",
+  "vitest": "^4.0.0",
 };
 
 // Step 1: seed with framework dependencies + devDependencies (build tools)
