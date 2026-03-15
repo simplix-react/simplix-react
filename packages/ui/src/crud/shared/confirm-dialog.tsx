@@ -10,7 +10,7 @@ export interface ConfirmDialogProps {
   description: string;
   confirmLabel?: string;
   cancelLabel?: string;
-  variant?: "destructive" | "default";
+
   onConfirm: () => void;
   isPending?: boolean;
   pendingLabel?: string;
@@ -23,7 +23,7 @@ export function ConfirmDialog({
   description,
   confirmLabel,
   cancelLabel,
-  variant = "default",
+
   onConfirm,
   isPending = false,
   pendingLabel,
@@ -75,9 +75,7 @@ export function ConfirmDialog({
                 "inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-medium",
                 "transition-colors focus-visible:outline-none",
                 "disabled:pointer-events-none disabled:opacity-50",
-                variant === "destructive"
-                  ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                  : "bg-primary text-primary-foreground hover:bg-primary/90",
+                "bg-primary text-primary-foreground hover:bg-primary/90",
               )}
               disabled={isPending}
             >

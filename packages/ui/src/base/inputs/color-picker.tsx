@@ -142,7 +142,7 @@ export function ColorPicker({
                 renderClear ? renderClear(() => onChange("")) : (
                   <button
                     type="button"
-                    className="inline-flex h-7 items-center rounded-md px-2 text-xs text-muted-foreground hover:bg-accent hover:text-destructive"
+                    className="inline-flex h-7 items-center rounded-md px-2 text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                     onClick={() => onChange("")}
                   >
                     <XIcon className="size-3 mr-1" />

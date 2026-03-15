@@ -122,7 +122,7 @@ function DetailRoot({ isLoading, onClose, header, footer, variant = "default", a
           {children}
         </Stack>
         {auditData && (
-          <div data-crud-slot="audit" className="mt-auto sticky bottom-0 pb-2 bg-background">
+          <div data-crud-slot="audit" className="pb-2">
             <DetailAuditFooter auditData={auditData} />
           </div>
         )}

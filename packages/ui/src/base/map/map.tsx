@@ -16,6 +16,8 @@ import {
 import { createPortal } from "react-dom";
 
 import { cn } from "../../utils/cn";
+import type { GeoPoint } from "../../utils/geo";
+import { fitMapToBounds } from "../../utils/geo";
 import { useMapDefaults } from "./map-provider";
 
 // ── PMTiles protocol ──
@@ -393,6 +395,8 @@ type MapControlsProps = {
   onLocate?: (coords: { longitude: number; latitude: number }) => void;
   /** Custom handler for compass button. Replaces default resetNorthPitch. */
   onCompass?: () => void;
+  /** Points to fit when compass is clicked. When provided but empty, falls back to geolocation. */
+  compassPoints?: GeoPoint[];
 };
 
 const POSITION_CLASSES: Record<MapControlsPosition, string> = {
@@ -430,6 +434,7 @@ function MapControls({
   className,
   onLocate,
   onCompass,
+  compassPoints,
 }: MapControlsProps) {
   const { map } = useMap();
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -478,7 +483,21 @@ function MapControls({
   if (showCompass) {
     if (controls.length > 0) controls.push(<div key="compass-sep" className="h-px w-full bg-border" />);
     controls.push(
-      <MapControlButton key="compass" onClick={() => onCompass ? onCompass() : map?.resetNorthPitch({ duration: 300 })}>
+      <MapControlButton key="compass" onClick={() => {
+        if (onCompass) {
+          onCompass();
+        } else if (compassPoints) {
+          if (compassPoints.length > 0) {
+            if (map) fitMapToBounds(map, compassPoints);
+          } else if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((pos) => {
+              map?.flyTo({ center: [pos.coords.longitude, pos.coords.latitude], zoom: 15 });
+            });
+          }
+        } else {
+          map?.resetNorthPitch({ duration: 300 });
+        }
+      }}>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" /></svg>
       </MapControlButton>,
     );

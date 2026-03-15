@@ -1375,7 +1375,7 @@ function ListBulkAction({
       className={cn(
         "inline-flex items-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
         variant === "destructive"
-          ? "text-destructive hover:bg-destructive/10"
+          ? "text-foreground hover:bg-muted"
           : "text-foreground hover:bg-muted",
         className,
       )}
