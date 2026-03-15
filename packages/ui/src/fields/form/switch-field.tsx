@@ -57,6 +57,7 @@ export function SwitchField({
         disabled={disabled}
         aria-invalid={!!error}
         aria-label={layout === "hidden" ? label : undefined}
+        size={"sm"}
         {...switchProps}
       />
     </FieldWrapper>
