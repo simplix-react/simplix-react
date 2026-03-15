@@ -125,13 +125,11 @@ export function FieldWrapper({
             <FieldMessage variant="description">{description}</FieldMessage>
           )}
           {layout === "top" ? (
-            <div className="h-3.5">
-              {statusMessage && statusVariant && (
-                <FieldMessage variant={statusVariant}>
-                  {statusMessage}
-                </FieldMessage>
-              )}
-            </div>
+            statusMessage && statusVariant ? (
+              <FieldMessage variant={statusVariant}>
+                {statusMessage}
+              </FieldMessage>
+            ) : null
           ) : (
             statusMessage && statusVariant && (
               <FieldMessage variant={statusVariant}>

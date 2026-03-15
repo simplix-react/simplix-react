@@ -143,7 +143,7 @@ function FormSection({
 
   return (
     <SectionShell {...props}>
-      <Grid columns={columns} gap="md">
+      <Grid columns={columns} gap="sm">
         {props.children}
       </Grid>
     </SectionShell>

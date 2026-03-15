@@ -134,9 +134,9 @@ export function SectionShell({
   );
 
   const body = isCard ? (
-    <div className="px-4 py-3">{children}</div>
+    <div className="px-4 py-2">{children}</div>
   ) : isLined ? (
-    <div className="border-l-2 border-border/50 pl-4">{children}</div>
+    <div className="ml-2 border-l-2 border-border/50 pl-4">{children}</div>
   ) : (
     <div>{children}</div>
   );
@@ -162,7 +162,7 @@ export function SectionShell({
       className={cn(
         isCard &&
           "overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm",
-        variant === "flat" && "flex flex-col gap-4 pb-2 border-b border-border/50 last:border-b-0 last:pb-0",
+        variant === "flat" && "flex flex-col gap-2 pb-2 border-b border-border/50 last:border-b-0 last:pb-0",
         isLined && "flex flex-col gap-2 py-2",
         className,
       )}
