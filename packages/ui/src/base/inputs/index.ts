@@ -53,5 +53,8 @@ export type {
 export { Switch, switchVariants } from "./switch";
 export type { SwitchProps } from "./switch";
 
+export { SearchPopover } from "./search-popover";
+export type { SearchPopoverProps, SearchPopoverGroup } from "./search-popover";
+
 export { Textarea } from "./textarea";
 export type { TextareaProps } from "./textarea";

@@ -1,5 +1,5 @@
 import { type VariantProps, cva } from "class-variance-authority";
-import { type ComponentPropsWithRef, forwardRef, type ReactNode, useContext } from "react";
+import { Children, type ComponentPropsWithRef, forwardRef, type ReactNode, useContext } from "react";
 
 import { UIComponentContext } from "../provider/ui-component-context";
 import { cn } from "../utils/cn";
@@ -46,6 +46,10 @@ export interface StackProps
   extends Omit<ComponentPropsWithRef<"div">, "dir">,
     StackVariants {
   children?: ReactNode;
+  /** Show bottom gradient fade overlay. Wraps content in a clipped container with a gradient from card background. */
+  fade?: boolean;
+  /** Placeholder rendered centered when children are empty. Only shown when no valid children exist. */
+  emptyContent?: ReactNode;
 }
 
 /**
@@ -74,20 +78,44 @@ export interface StackProps
  */
 const StackBase = forwardRef<HTMLDivElement, StackProps>(
   (
-    { className, direction, gap, align, justify, wrap, fill, flex, padded, children, ...rest },
+    { className, direction, gap, align, justify, wrap, fill, flex, padded, fade, emptyContent, children, ...rest },
     ref,
-  ) => (
-    <div
-      ref={ref}
-      className={cn(
-        stackVariants({ direction, gap, align, justify, wrap, fill, flex, padded }),
-        className,
-      )}
-      {...rest}
-    >
-      {children}
-    </div>
-  ),
+  ) => {
+    const hasChildren = Children.toArray(children).filter(Boolean).length > 0;
+    const isEmpty = !hasChildren && emptyContent != null;
+
+    const innerContent = isEmpty ? (
+      <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
+        {emptyContent}
+      </div>
+    ) : children;
+
+    const stackClass = cn(
+      stackVariants({ direction, gap, align, justify, wrap, fill: fade ? undefined : fill, flex: fade ? undefined : flex, padded }),
+      className,
+    );
+
+    if (!fade) {
+      return (
+        <div ref={ref} className={stackClass} {...rest}>
+          {innerContent}
+        </div>
+      );
+    }
+
+    return (
+      <div
+        ref={ref}
+        className={cn("relative", fill && "h-full", flex && "flex-1 min-h-0")}
+        {...rest}
+      >
+        <div className={cn(stackClass, "h-full overflow-hidden")}>
+          {innerContent}
+        </div>
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-card to-transparent" />
+      </div>
+    );
+  },
 );
 StackBase.displayName = "Stack";
 

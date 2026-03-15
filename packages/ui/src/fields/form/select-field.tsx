@@ -12,6 +12,8 @@ export interface SelectFieldProps<T extends string = string>
   /** Available options with label/value pairs. */
   options: Array<{ label: string; value: T; disabled?: boolean; icon?: React.ReactNode }>;
   placeholder?: string;
+  /** Compact mode: renders without FieldWrapper, auto-width based on content. */
+  compact?: boolean;
 }
 
 /**
@@ -28,6 +30,15 @@ export interface SelectFieldProps<T extends string = string>
  *     { label: "User", value: "user" },
  *   ]}
  * />
+ *
+ * // Compact mode (no label, auto-width, for table cells)
+ * <SelectField
+ *   compact
+ *   value={scheduleId}
+ *   onChange={setScheduleId}
+ *   options={scheduleOptions}
+ *   placeholder="Select..."
+ * />
  * ```
  */
 export function SelectField<T extends string = string>({
@@ -35,6 +46,7 @@ export function SelectField<T extends string = string>({
   onChange,
   options,
   placeholder,
+  compact = false,
   label,
   labelKey,
   error,
@@ -45,6 +57,59 @@ export function SelectField<T extends string = string>({
   ...variantProps
 }: SelectFieldProps<T>) {
   const { Select } = useUIComponents();
+
+  const selectElement = (
+    <Select.Root
+      value={value}
+      onValueChange={(v) => onChange(v as T)}
+      disabled={disabled}
+    >
+      <Select.Trigger
+        aria-invalid={!!error}
+        aria-label={compact ? label ?? placeholder : variantProps.layout === "hidden" ? label : undefined}
+        className={compact ? "h-8 text-sm" : undefined}
+      >
+        <Select.Value placeholder={placeholder} />
+      </Select.Trigger>
+      <Select.Content>
+        {options.map((opt) => (
+          <Select.Item
+            key={opt.value}
+            value={opt.value}
+            disabled={opt.disabled}
+          >
+            {opt.icon ? (
+              <span className="inline-flex items-center gap-1.5">
+                {opt.icon}
+                {opt.label}
+              </span>
+            ) : (
+              opt.label
+            )}
+          </Select.Item>
+        ))}
+      </Select.Content>
+    </Select.Root>
+  );
+
+  if (compact) {
+    return (
+      <span className="inline-grid items-center">
+        {/* Hidden native select: browser auto-sizes to longest option label */}
+        <select
+          className="invisible col-start-1 row-start-1 h-8 appearance-none border px-3 pr-8 text-sm"
+          aria-hidden="true"
+          tabIndex={-1}
+        >
+          {placeholder && <option>{placeholder}</option>}
+          {options.map((opt) => (
+            <option key={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+        <span className="col-start-1 row-start-1">{selectElement}</span>
+      </span>
+    );
+  }
 
   return (
     <FieldWrapper
@@ -57,38 +122,7 @@ export function SelectField<T extends string = string>({
       className={className}
       {...variantProps}
     >
-      <Select.Root
-        value={value}
-        onValueChange={(v) => onChange(v as T)}
-        disabled={disabled}
-      >
-        <Select.Trigger
-          aria-invalid={!!error}
-          aria-label={
-            variantProps.layout === "hidden" ? label : undefined
-          }
-        >
-          <Select.Value placeholder={placeholder} />
-        </Select.Trigger>
-        <Select.Content>
-          {options.map((opt) => (
-            <Select.Item
-              key={opt.value}
-              value={opt.value}
-              disabled={opt.disabled}
-            >
-              {opt.icon ? (
-                <span className="inline-flex items-center gap-1.5">
-                  {opt.icon}
-                  {opt.label}
-                </span>
-              ) : (
-                opt.label
-              )}
-            </Select.Item>
-          ))}
-        </Select.Content>
-      </Select.Root>
+      {selectElement}
     </FieldWrapper>
   );
 }

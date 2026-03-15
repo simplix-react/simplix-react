@@ -124,6 +124,7 @@ export {
   PopoverTrigger,
   RadioGroup,
   RadioGroupItem,
+  SearchPopover,
   Select,
   SelectContent,
   SelectGroup,
@@ -227,6 +228,8 @@ export type {
   PopoverContentProps,
   RadioGroupItemProps,
   RadioGroupProps,
+  SearchPopoverProps,
+  SearchPopoverGroup,
   SelectContentProps,
   SelectItemProps,
   SelectLabelProps,
@@ -347,6 +350,10 @@ export type {
   WizardProps,
   WizardStepProps,
 } from "./crud/form";
+
+// Assignment panel
+export { AssignmentPanel } from "./crud/assignment";
+export type { AssignmentChipProps } from "./crud/assignment";
 
 // Tree
 export { CrudTree, useTreeExpansion, TreeReorderDialog, TreeMoveDialog, getSiblings } from "./crud/tree";
@@ -533,6 +540,21 @@ export type { Bounds, GeoPoint, HasCoords, MapFitOptions, WithValidCoords } from
 
 // Utilities
 export { cn, toTestId } from "./utils/cn";
+export {
+  addDays,
+  endOfDay,
+  endOfMonth,
+  endOfWeek,
+  endOfYear,
+  isSameDay,
+  isSameMonth,
+  isSameWeek,
+  startOfDay,
+  startOfMonth,
+  startOfWeek,
+  startOfYear,
+  subDays,
+} from "./utils/date-math";
 export { formatDateShort, formatDateMedium, formatDateTime, formatRelativeTime, formatDateRange } from "./utils/format-date";
 export { parseDate } from "./utils/parse-date";
 export type { DateLike } from "./utils/parse-date";
