@@ -10,53 +10,23 @@ import {
 } from "../overlay/popover";
 import { cn } from "../../utils/cn";
 import {
+  endOfDay,
+  endOfMonth,
+  endOfWeek,
+  endOfYear,
+  startOfDay,
+  startOfMonth,
+  startOfWeek,
+  startOfYear,
+  subDays,
+} from "../../utils/date-math";
+import {
   formatDateMedium,
   generateYears,
   getMonthNames,
   isYearFirstLocale,
   toBcp47,
 } from "../../utils/format-date";
-
-// ── Date arithmetic helpers (no date-fns) ──
-
-function startOfDay(d: Date): Date {
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
-}
-
-function endOfDay(d: Date): Date {
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999);
-}
-
-function startOfWeek(d: Date): Date {
-  const day = d.getDay();
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Monday start
-  return new Date(d.getFullYear(), d.getMonth(), diff);
-}
-
-function endOfWeek(d: Date): Date {
-  const s = startOfWeek(d);
-  return new Date(s.getFullYear(), s.getMonth(), s.getDate() + 6);
-}
-
-function startOfMonth(d: Date): Date {
-  return new Date(d.getFullYear(), d.getMonth(), 1);
-}
-
-function endOfMonth(d: Date): Date {
-  return new Date(d.getFullYear(), d.getMonth() + 1, 0);
-}
-
-function startOfYear(d: Date): Date {
-  return new Date(d.getFullYear(), 0, 1);
-}
-
-function endOfYear(d: Date): Date {
-  return new Date(d.getFullYear(), 11, 31);
-}
-
-function subDays(d: Date, n: number): Date {
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate() - n);
-}
 
 // ── MonthYearSelect (internal) ──
 
