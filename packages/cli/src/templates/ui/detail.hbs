@@ -87,7 +87,7 @@ export function {{EntityPascal}}Detail({ {{entity}}Id, onClose, onBack{{#if hasU
 {{else if (eq this.component "Boolean")}}
           <DetailFields.DetailTextField
             label={fieldLabel("{{this.name}}")}
-            value={displayData.{{this.name}} ? "Yes" : "No"}
+            value={displayData.{{this.name}} ? t("{{../entity}}.yes") : t("{{../entity}}.no")}
             layout="inline"
           />
 {{else if (eq this.component "Select")}}

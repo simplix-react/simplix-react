@@ -896,6 +896,10 @@ async function updateLocaleJsons(
     if (ops.hasCreate) entityKeys.newHeader = "new";
     if (ops.hasUpdate) entityKeys.editHeader = `edit: {{id}}`;
     entityKeys.cancel = "Cancel";
+    entityKeys.emptyTitle = `No ${entityPlural} found`;
+    entityKeys.emptyDescription = `Create a new ${entityName} to get started.`;
+    entityKeys.yes = "Yes";
+    entityKeys.no = "No";
 
     json[entityName] = entityKeys;
     await writeFile(jsonPath, JSON.stringify(json, null, 2) + "\n", "utf-8");

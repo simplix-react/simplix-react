@@ -504,6 +504,84 @@ import { ListDetail } from "@simplix-react/ui";
 </ListDetail>
 ```
 
+### Calendar Selection Modes
+
+`Calendar` supports four selection modes via the `mode` prop:
+
+| Mode | Output | Use Case |
+| --- | --- | --- |
+| `"single"` | `onSelect(date)` | Pick a single day |
+| `"range"` | `onSelectRange({ from, to })` | Free-form date range |
+| `"week"` | `onSelectRange({ from, to })` | Click any day to select its entire week (Mon-Sun) |
+| `"month"` | `onSelectRange({ from, to })` | Pick a month from a 2-column year grid |
+
+**Single mode** -- default, select one date:
+
+```tsx
+import { Calendar } from "@simplix-react/ui";
+
+<Calendar
+  mode="single"
+  selected={date}
+  onSelect={setDate}
+  maxDate={new Date()}
+  className="rounded-md border"
+/>
+```
+
+**Week mode** -- click a day to select the full week. The entire row highlights on hover:
+
+```tsx
+import { Calendar } from "@simplix-react/ui";
+import type { DateRange } from "@simplix-react/ui";
+
+const [range, setRange] = useState<DateRange>({ from: undefined, to: undefined });
+
+<Calendar
+  mode="week"
+  selectedRange={range}
+  onSelectRange={setRange}
+  className="rounded-md border"
+/>
+```
+
+**Month mode** -- displays a year view with 2-column month grid. Navigation switches to year-level:
+
+```tsx
+<Calendar
+  mode="month"
+  selectedRange={range}
+  onSelectRange={setRange}
+  className="rounded-md border"
+/>
+```
+
+**Controlled view month** -- use `month` / `onMonthChange` to control which month is displayed (useful when switching between week and month modes):
+
+```tsx
+const [viewMonth, setViewMonth] = useState(new Date());
+
+<Calendar
+  mode="week"
+  selectedRange={range}
+  onSelectRange={setRange}
+  month={viewMonth}
+  onMonthChange={setViewMonth}
+/>
+```
+
+**Date math utilities** -- helper functions exported from `@simplix-react/ui` for week/month range calculations:
+
+```tsx
+import {
+  startOfWeek, endOfWeek,
+  startOfMonth, endOfMonth,
+  startOfDay, endOfDay,
+  addDays, subDays,
+  isSameDay, isSameWeek, isSameMonth,
+} from "@simplix-react/ui";
+```
+
 ### Custom Field Components
 
 Use `FieldWrapper` to build custom fields that integrate with the field variant system:

@@ -178,7 +178,7 @@ export function {{EntityPascal}}List({ list: externalList, activeRowId, actions,
             </DetailFieldWrapper>
 {{else if (eq this.component "Boolean")}}
             <DetailFieldWrapper label={fieldLabel("{{this.name}}")} layout="inline" size="sm">
-              {row.{{this.name}} ? "Yes" : "No"}
+              {row.{{this.name}} ? t("{{../entity}}.yes") : t("{{../entity}}.no")}
             </DetailFieldWrapper>
 {{else}}
             <DetailFieldWrapper label={fieldLabel("{{this.name}}")} layout="inline" size="sm">
