@@ -36,6 +36,9 @@ export { useInvalidateEntity } from "./use-invalidate-entity";
 
 export { useIsDirty } from "./use-is-dirty";
 
+export { SaveButton } from "./save-button";
+export type { SaveButtonProps } from "./save-button";
+
 export { useUnsavedChanges } from "./use-unsaved-changes";
 export type {
   UseUnsavedChangesOptions,

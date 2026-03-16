@@ -332,7 +332,7 @@ export type {
   UseCrudListResult,
 } from "./crud/list";
 
-export { CrudForm, useAutosave, useBeforeUnload, useCrudFormSubmit, useIsDirty, useUnsavedChanges, Wizard } from "./crud/form";
+export { CrudForm, SaveButton, useAutosave, useBeforeUnload, useCrudFormSubmit, useIsDirty, useUnsavedChanges, Wizard } from "./crud/form";
 export { adaptOrvalCreate, adaptOrvalDelete, adaptOrvalOrder, adaptOrvalUpdate, useInvalidateEntity } from "./crud/form";
 export type {
   AutosaveStatus,
@@ -346,6 +346,7 @@ export type {
   UseCrudFormSubmitOptions,
   UseCrudFormSubmitResult,
   UseUnsavedChangesOptions,
+  SaveButtonProps,
   UseUnsavedChangesReturn,
   WizardProps,
   WizardStepProps,
