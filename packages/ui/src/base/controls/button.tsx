@@ -1,5 +1,5 @@
 import { type VariantProps, cva } from "class-variance-authority";
-import { type ComponentPropsWithRef, forwardRef } from "react";
+import { type ComponentPropsWithRef, type ReactNode, forwardRef } from "react";
 
 import { cn } from "../../utils/cn";
 
@@ -41,16 +41,56 @@ export type ButtonVariants = VariantProps<typeof buttonVariants>;
 
 export interface ButtonProps
   extends ComponentPropsWithRef<"button">,
-    ButtonVariants {}
+    ButtonVariants {
+  /** Show loading spinner and disable button. */
+  loading?: boolean;
+  /** Text to show while loading. Replaces children if provided. */
+  loadingText?: ReactNode;
+}
+
+const spinnerSizeMap: Record<string, string> = {
+  xs: "h-3 w-3",
+  sm: "h-3.5 w-3.5",
+  default: "h-4 w-4",
+  lg: "h-5 w-5",
+  icon: "h-4 w-4",
+  "icon-sm": "h-3.5 w-3.5",
+  "icon-xs": "h-3 w-3",
+};
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, ...rest }, ref) => (
-    <button
-      ref={ref}
-      className={cn(buttonVariants({ variant, size }), className)}
-      {...rest}
-    />
-  ),
+  ({ className, variant, size, loading, loadingText, disabled, children, ...rest }, ref) => {
+    const isIconOnly = typeof size === "string" && size.startsWith("icon");
+    const spinnerSize = spinnerSizeMap[size ?? "default"] ?? "h-4 w-4";
+
+    const spinner = loading ? (
+      <span
+        className={cn(spinnerSize, "animate-spin rounded-full border-2 border-current border-t-transparent")}
+        aria-hidden="true"
+      />
+    ) : null;
+
+    return (
+      <button
+        ref={ref}
+        className={cn(buttonVariants({ variant, size }), className)}
+        disabled={loading || disabled}
+        aria-busy={loading || undefined}
+        {...rest}
+      >
+        {loading ? (
+          isIconOnly ? spinner : (
+            <>
+              {spinner}
+              {loadingText ?? children}
+            </>
+          )
+        ) : (
+          children
+        )}
+      </button>
+    );
+  },
 );
 
 Button.displayName = "Button";

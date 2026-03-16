@@ -45,6 +45,8 @@ export interface CrudFormProps {
   header?: ReactNode;
   /** Fixed footer rendered below the scrollable content (e.g. action buttons). */
   footer?: ReactNode;
+  /** When true, indicates form is being submitted. Propagated via `data-submitting` attribute. */
+  isSubmitting?: boolean;
   fieldVariant?: FieldVariant;
   warnOnUnsavedChanges?: boolean;
   className?: string;
@@ -56,6 +58,7 @@ function FormRoot({
   onClose,
   header,
   footer,
+  isSubmitting,
   fieldVariant,
   warnOnUnsavedChanges,
   className,
@@ -72,7 +75,7 @@ function FormRoot({
   );
 
   const content = (
-    <form onSubmit={handleSubmit} className={cn("flex flex-col w-full flex-1 min-h-0", className)} data-testid="crud-form">
+    <form onSubmit={handleSubmit} className={cn("flex flex-col w-full flex-1 min-h-0", className)} data-testid="crud-form" data-submitting={isSubmitting || undefined}>
       {(onClose || header) && (
         <Flex data-crud-slot="header" justify={header ? "between" : "end"} align="center" className="shrink-0 border-b pb-2 px-2">
           {header}

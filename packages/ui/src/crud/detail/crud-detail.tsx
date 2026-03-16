@@ -236,6 +236,8 @@ export interface CrudDetailDefaultActionsProps {
   onBack?: () => void;
   onDelete?: () => void;
   onEdit?: () => void;
+  /** When true, disables Edit and Delete action buttons. */
+  isPending?: boolean;
   /** Label for the close button (defaults to `"Close"`). */
   closeLabel?: string;
   /** Label for the back button (defaults to `"Back"`). */
@@ -245,7 +247,7 @@ export interface CrudDetailDefaultActionsProps {
   className?: string;
 }
 
-function DetailDefaultActions({ onClose, onBack, onDelete, onEdit, closeLabel, backLabel, editLabel, className }: CrudDetailDefaultActionsProps) {
+function DetailDefaultActions({ onClose, onBack, onDelete, onEdit, isPending, closeLabel, backLabel, editLabel, className }: CrudDetailDefaultActionsProps) {
   const { t } = useTranslation("simplix/ui");
   const hasLeft = onBack || onClose;
   return (
@@ -262,12 +264,12 @@ function DetailDefaultActions({ onClose, onBack, onDelete, onEdit, closeLabel, b
       ) : null}
       <Flex gap="sm">
         {onDelete && (
-          <Button type="button" size="icon-sm" variant="outline" onClick={onDelete}>
+          <Button type="button" size="icon-sm" variant="outline" onClick={onDelete} disabled={isPending}>
             <TrashIcon className="h-4 w-4" />
           </Button>
         )}
         {onEdit && (
-          <Button type="button" size="sm" variant="primary" onClick={onEdit}>
+          <Button type="button" size="sm" variant="primary" onClick={onEdit} disabled={isPending}>
             {editLabel ?? t("common.edit")}
           </Button>
         )}
