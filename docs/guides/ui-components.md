@@ -190,17 +190,22 @@ function UserListPage() {
 Use `CrudForm` with `FormFields` for explicit value/onChange field components:
 
 ```tsx
-import { CrudForm, FormFields, Grid, useCrudFormSubmit } from "@simplix-react/ui";
+import { useRef, useState } from "react";
+import { Button, CrudForm, FormFields, SaveButton, useCrudFormSubmit, useIsDirty } from "@simplix-react/ui";
 import { projectHooks } from "./hooks.js";
 
 function UserFormPage({ userId }: { userId?: string }) {
   const { data: user, isLoading } = projectHooks.user.useGet(userId ?? "");
 
-  const [name, setName] = useState(user?.name ?? "");
-  const [email, setEmail] = useState(user?.email ?? "");
-  const [status, setStatus] = useState(user?.status ?? "active");
+  const [values, setValues] = useState({
+    name: user?.name ?? "",
+    email: user?.email ?? "",
+    status: user?.status ?? "active",
+  });
+  const initialValues = useRef(values).current;
+  const isDirty = useIsDirty(values, initialValues);
 
-  const { isEdit, handleSubmit, isPending } = useCrudFormSubmit({
+  const { isEdit, handleSubmit, isPending, fieldErrors } = useCrudFormSubmit({
     entityId: userId,
     create: projectHooks.user.useCreate(),
     update: projectHooks.user.useUpdate(),
@@ -211,44 +216,45 @@ function UserFormPage({ userId }: { userId?: string }) {
 
   return (
     <CrudForm
-      onSubmit={() => handleSubmit({ name, email, status })}
-      fieldVariant={{ labelPosition: "top", size: "md" }}
+      onSubmit={() => handleSubmit(values)}
+      isSubmitting={isPending}
       warnOnUnsavedChanges
     >
       <CrudForm.Section title="Basic Info" layout="two-column">
         <FormFields.TextField
           label="Name"
-          value={name}
-          onChange={setName}
-          required
+          value={values.name}
+          onChange={(v) => setValues((p) => ({ ...p, name: v }))}
+          error={fieldErrors["name"]}
         />
         <FormFields.TextField
           label="Email"
-          value={email}
-          onChange={setEmail}
+          value={values.email}
+          onChange={(v) => setValues((p) => ({ ...p, email: v }))}
           type="email"
-          required
+          error={fieldErrors["email"]}
         />
       </CrudForm.Section>
 
       <CrudForm.Section title="Settings" layout="single-column">
         <FormFields.SelectField
           label="Status"
-          value={status}
-          onChange={setStatus}
+          value={values.status}
+          onChange={(v) => setValues((p) => ({ ...p, status: v }))}
           options={[
             { label: "Active", value: "active" },
             { label: "Inactive", value: "inactive" },
           ]}
-          required
         />
       </CrudForm.Section>
 
       <CrudForm.Actions>
-        <button type="button" onClick={() => navigate("/users")}>Cancel</button>
-        <button type="submit" disabled={isPending}>
-          {isPending ? "Saving..." : isEdit ? "Save Changes" : "Create User"}
-        </button>
+        <Button type="button" variant="outline" onClick={() => navigate("/users")} disabled={isPending}>
+          Cancel
+        </Button>
+        <SaveButton type="submit" isDirty={isEdit ? isDirty : undefined} isSaving={isPending} fieldErrors={fieldErrors}>
+          {isEdit ? "Save Changes" : "Create User"}
+        </SaveButton>
       </CrudForm.Actions>
     </CrudForm>
   );
@@ -256,6 +262,52 @@ function UserFormPage({ userId }: { userId?: string }) {
 ```
 
 `CrudForm.Section` layout options: `"single-column"`, `"two-column"`, `"three-column"`.
+
+### Save Button
+
+Use `SaveButton` for all save/create/update actions. It handles isDirty, loading, and validation states:
+
+```tsx
+import { SaveButton, useIsDirty } from "@simplix-react/ui";
+
+// Edit mode — disabled until changes, shows server error count badge
+const isDirty = useIsDirty(values, initialValues);
+<SaveButton type="submit" isDirty={isDirty} isSaving={isPending} fieldErrors={fieldErrors}>
+  Save Changes
+</SaveButton>
+
+// Create mode — isDirty omitted (always enabled)
+<SaveButton type="submit" isSaving={isPending} fieldErrors={fieldErrors}>
+  Create
+</SaveButton>
+
+// Editor with client-side validation (validationCount disables button)
+<SaveButton isDirty={isDirty} isSaving={isSaving} validationCount={errors.length} onClick={handleSave}>
+  Save
+</SaveButton>
+```
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `isDirty` | `boolean` | `true` | Disabled when `false`. Omit for create mode. |
+| `isSaving` | `boolean` | `false` | Shows spinner and disables button. |
+| `fieldErrors` | `Record<string, string>` | — | Server validation errors. Shows count badge (informational). |
+| `validationCount` | `number` | — | Client validation errors. Takes priority over fieldErrors. Disables button. |
+| `savingText` | `string` | `"Saving..."` | Text shown during save. |
+
+### Button Loading Prop
+
+All buttons support a `loading` prop for async operations:
+
+```tsx
+import { Button } from "@simplix-react/ui";
+
+<Button loading={mutation.isPending} loadingText="Executing...">
+  Execute
+</Button>
+```
+
+When `loading=true`: shows spinner, replaces text with `loadingText` (or keeps original), auto-disables, sets `aria-busy`.
 
 Available form field components:
 
@@ -319,10 +371,11 @@ function UserDetailPage({ userId }: { userId: string }) {
           />
         </CrudDetail.Section>
 
-        <CrudDetail.Actions>
-          <button onClick={() => navigate(`/users/${userId}/edit`)}>Edit</button>
-          <button onClick={del.requestDelete}>Delete</button>
-        </CrudDetail.Actions>
+        <CrudDetail.DefaultActions
+          onEdit={() => navigate(`/users/${userId}/edit`)}
+          onDelete={del.requestDelete}
+          isPending={deleteMutation.isPending}
+        />
       </CrudDetail>
 
       <CrudDelete
