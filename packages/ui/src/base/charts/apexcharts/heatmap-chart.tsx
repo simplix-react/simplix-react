@@ -23,7 +23,6 @@ export function ApexHeatmapChart({ series, colors, height = 350, className }: He
       // Explicit intensity ranges for consistent legend in both modes
       const allValues = series.flatMap((s) => s.data.map((d) => d.y));
       const maxVal = Math.max(1, ...allValues);
-      const bg = toHex6(theme.background);
       const q1 = Math.ceil(maxVal * 0.25);
       const q2 = Math.ceil(maxVal * 0.5);
       const q3 = Math.ceil(maxVal * 0.75);

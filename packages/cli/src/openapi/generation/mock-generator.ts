@@ -203,7 +203,7 @@ function generateMockEntryCode(
   domainName: string,
   storeEntities: ExtractedEntity[],
   hasStores: boolean,
-  adapterPreset?: ResponseAdapterPreset,
+  _adapterPreset?: ResponseAdapterPreset,
 ): string {
   const imports: string[] = [
     'import type { MockDomainConfig } from "@simplix-react/mock";',

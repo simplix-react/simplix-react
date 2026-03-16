@@ -1,12 +1,12 @@
 import { useTranslation } from "@simplix-react/i18n/react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
-import { Button } from "../controls/button";
+import { Button } from "../controls";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "../overlay/popover";
+} from "../overlay";
 import {
   Command,
   CommandEmpty,
@@ -110,12 +110,6 @@ export function SearchPopover<T>({
 
   const searchPlaceholder = placeholder ?? t("field.searchOption");
   const noResultsMessage = emptyMessage ?? t("field.noResults");
-
-  const allItems = useMemo(() => {
-    if (items) return items;
-    if (groups) return groups.flatMap((g) => g.items);
-    return [];
-  }, [items, groups]);
 
   const handleSelect = (item: T) => {
     onSelect(item);
