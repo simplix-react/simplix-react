@@ -351,9 +351,8 @@ describe("listTemplate", () => {
 describe("formTemplate", () => {
   it("renders with correct imports", () => {
     const result = renderTemplate(formTemplate, baseCtx);
-    expect(result).toContain('import { useCallback, useState } from "react"');
-    expect(result).toContain('Button, CrudForm, FormFields,');
-    expect(result).toContain('useCrudFormSubmit');
+    expect(result).toContain('import { useCallback, useRef, useState } from "react"');
+    expect(result).toContain('SaveButton, useCrudFormSubmit, useIsDirty');
     expect(result).toContain('import { useEntityTranslation, useTranslation } from "@simplix-react/i18n/react"');
   });
 
@@ -382,10 +381,10 @@ describe("formTemplate", () => {
     expect(result).toContain('(v) => updateField("price", v ?? 0)');
   });
 
-  it("renders Button components with variant", () => {
+  it("renders SaveButton and Button with variant", () => {
     const result = renderTemplate(formTemplate, baseCtx);
     expect(result).toContain('variant="outline"');
-    expect(result).toContain('variant="primary"');
+    expect(result).toContain("<SaveButton");
   });
 
   it("renders enumLabel for SelectField options", () => {
