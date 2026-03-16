@@ -151,6 +151,43 @@ Entity mutations have predictable invalidation targets (the entity itself), so t
 
 This keeps the contract as the single source of truth --- invalidation rules live alongside the operation definition, not scattered across component code.
 
+## Manual Invalidation with `useInvalidateEntity`
+
+For Orval-generated endpoints that bypass the derived hook pipeline (e.g. custom PUT endpoints, batch operations), the `useInvalidateEntity` hook provides manual prefix-based invalidation.
+
+### Basic Usage
+
+```ts
+import { useInvalidateEntity } from "@simplix-react/ui";
+
+const invalidate = useInvalidateEntity("/api/v1/holiday-type");
+```
+
+The returned function invalidates all queries whose first key element starts with the given URL prefix. It returns a `Promise<void>` that resolves when all matching queries have been refetched.
+
+### Fire-and-Forget (CrudForm, Scaffolded Code)
+
+When the component navigates away after save, awaiting is unnecessary:
+
+```ts
+// OK --- component unmounts after save, no stale flash risk
+adaptOrvalCreate(_create, { onSettled: invalidate });
+adaptOrvalUpdate(_update, "id", { onSettled: invalidate });
+```
+
+### Awaiting (Inline Editors)
+
+When the component stays mounted after save and resets local state, the invalidation **must** be awaited to prevent a brief flash of stale cached data:
+
+```ts
+// REQUIRED --- inline editor that resets draft state after save
+await saveAll.mutateAsync({ data: { items } });
+await invalidate();   // wait for refetch to complete
+reset();              // now safe --- UI shows fresh server data
+```
+
+Without `await`, `reset()` runs before the refetch completes, causing the component to render with stale cache data for one frame.
+
 ## Implications
 
 ### For UI Consistency
