@@ -459,6 +459,124 @@ export async function pruneUnusedModels(targetDir: string): Promise<number> {
   return toDelete.length;
 }
 
+// ── Deduplicate Generated Files ──────────────────────────────
+
+/**
+ * Remove duplicate export declarations from Orval-generated files.
+ *
+ * In tags-split mode, when a tag has multiple endpoints sharing the same HTTP
+ * method (e.g. three PUT endpoints), Orval appends duplicate type/function
+ * declarations to the same file. This step scans model and endpoint files,
+ * keeping only the first occurrence of each exported symbol.
+ */
+export async function deduplicateGeneratedFiles(targetDir: string): Promise<number> {
+  let totalRemoved = 0;
+
+  const modelDir = join(targetDir, "src/generated/model");
+  const endpointsDir = join(targetDir, "src/generated/endpoints");
+
+  // Process model files
+  if (await pathExists(modelDir)) {
+    const modelFiles = (await readdir(modelDir)).filter(
+      (f) => f.endsWith(".ts") && f !== "index.ts",
+    );
+    for (const file of modelFiles) {
+      const removed = await deduplicateFile(join(modelDir, file));
+      totalRemoved += removed;
+    }
+  }
+
+  // Process endpoint files
+  if (await pathExists(endpointsDir)) {
+    const epFiles = await collectEndpointFiles(endpointsDir);
+    for (const file of epFiles) {
+      if (!file.endsWith(".ts") || file === "index.ts") continue;
+      const removed = await deduplicateFile(join(endpointsDir, file));
+      totalRemoved += removed;
+    }
+  }
+
+  return totalRemoved;
+}
+
+/**
+ * Remove duplicate export blocks from a single file.
+ *
+ * Tracks seen symbols as `kind:name` pairs (e.g. `type:Foo`, `const:Foo`)
+ * because TypeScript allows a `type` and a `const` with the same name to
+ * coexist (companion object pattern).
+ */
+async function deduplicateFile(filePath: string): Promise<number> {
+  const content = await readFile(filePath, "utf-8");
+  const lines = content.split("\n");
+
+  // Track seen symbols as "kind:name" to allow type+const coexistence
+  const seenExports = new Set<string>();
+  const resultLines: string[] = [];
+  let duplicatesRemoved = 0;
+  let skipUntilNextExport = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // Detect export declarations with their kind
+    const exportMatch = line.match(
+      /^export (type|interface|const|function|enum) (\w+)/,
+    );
+
+    if (exportMatch) {
+      const kind = exportMatch[1];
+      const symbolName = exportMatch[2];
+      const key = `${kind}:${symbolName}`;
+
+      if (seenExports.has(key)) {
+        // Duplicate — skip this block
+        duplicatesRemoved++;
+        skipUntilNextExport = true;
+
+        // Also remove preceding blank lines and JSDoc/import lines that belong to this block
+        while (
+          resultLines.length > 0 &&
+          (resultLines[resultLines.length - 1].trim() === "" ||
+            resultLines[resultLines.length - 1].trim().startsWith("*") ||
+            resultLines[resultLines.length - 1].trim().startsWith("/**") ||
+            resultLines[resultLines.length - 1].trim().startsWith("import type"))
+        ) {
+          resultLines.pop();
+        }
+        continue;
+      }
+      seenExports.add(key);
+      skipUntilNextExport = false;
+    }
+
+    if (skipUntilNextExport) {
+      // Skip lines until we hit the next export or end of file
+      // A blank line followed by an export/import signals the end of the duplicate block
+      if (line.trim() === "" && i + 1 < lines.length) {
+        const nextLine = lines[i + 1];
+        if (
+          nextLine.startsWith("export ") ||
+          nextLine.startsWith("import ") ||
+          nextLine.startsWith("/**")
+        ) {
+          skipUntilNextExport = false;
+          resultLines.push(line);
+        }
+      }
+      continue;
+    }
+
+    resultLines.push(line);
+  }
+
+  if (duplicatesRemoved > 0) {
+    await writeFile(filePath, resultLines.join("\n"));
+  }
+
+  return duplicatesRemoved;
+}
+
 // ── Schemas Proxy ────────────────────────────────────────────
 
 /**

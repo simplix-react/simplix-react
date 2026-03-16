@@ -21,6 +21,7 @@ import { generateHttpFile, generateHttpEnvJson } from "../openapi/generation/htt
 import {
   runOrval,
   narrowResponseTypes,
+  deduplicateGeneratedFiles,
   addTsNocheckToEndpoints,
   generateEndpointsBarrel,
   extractSharedEndpointTypes,
@@ -316,6 +317,10 @@ async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
 
     // 8. Post-process endpoints & prune unused models
     await narrowResponseTypes(targetDir);
+    const deduped = await deduplicateGeneratedFiles(targetDir);
+    if (deduped > 0) {
+      log.info(`Deduplicated ${deduped} duplicate export(s) from generated files.`);
+    }
     await addTsNocheckToEndpoints(targetDir);
     await extractSharedEndpointTypes(targetDir);
     await generateEndpointsBarrel(targetDir);
