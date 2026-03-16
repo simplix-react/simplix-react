@@ -63,6 +63,7 @@ export function {{EntityPascal}}Detail({ {{entity}}Id, onClose, onBack{{#if hasU
           onBack={onBack}
 {{#if hasDelete}}
           onDelete={del.requestDelete}
+          isPending={deleteMutation.isPending}
 {{/if}}
 {{#if hasUpdate}}
           onEdit={onEdit}

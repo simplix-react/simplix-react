@@ -1,9 +1,9 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 {{#if hasUpdate}}
-import { QueryFallback, ArrowLeftIcon, Button, CrudForm, FormFields, Heading, {{#if hasTree}}TreeSelectField, {{/if}}useCrudFormSubmit, adaptOrvalCreate{{#if hookUpdate}}, adaptOrvalUpdate{{/if}}{{#if hasDateFields}}, parseDate{{/if}}{{#if hookCreate}}, useInvalidateEntity{{/if}} } from "@simplix-react/ui";
+import { QueryFallback, ArrowLeftIcon, Button, CrudForm, FormFields, Heading, SaveButton, {{#if hasTree}}TreeSelectField, {{/if}}useCrudFormSubmit, useIsDirty, adaptOrvalCreate{{#if hookUpdate}}, adaptOrvalUpdate{{/if}}{{#if hasDateFields}}, parseDate{{/if}}{{#if hookCreate}}, useInvalidateEntity{{/if}} } from "@simplix-react/ui";
 {{else}}
-import { ArrowLeftIcon, Button, CrudForm, FormFields, Heading, {{#if hasTree}}TreeSelectField, {{/if}}useCrudFormSubmit, adaptOrvalCreate{{#if hasDateFields}}, parseDate{{/if}}{{#if hookCreate}}, useInvalidateEntity{{/if}} } from "@simplix-react/ui";
+import { ArrowLeftIcon, Button, CrudForm, FormFields, Heading, SaveButton, {{#if hasTree}}TreeSelectField, {{/if}}useCrudFormSubmit, useIsDirty, adaptOrvalCreate{{#if hasDateFields}}, parseDate{{/if}}{{#if hookCreate}}, useInvalidateEntity{{/if}} } from "@simplix-react/ui";
 {{/if}}
 {{#if hasUpdate}}
 import type { EntityId } from "@simplix-react/contract";
@@ -79,7 +79,7 @@ export function {{EntityPascal}}Form({ {{#if hasUpdate}}{{entity}}Id, {{/if}}{{#
   const invalidate = useInvalidateEntity("{{entityPath}}");
 {{/if}}
 
-  const { handleSubmit, fieldErrors } = useCrudFormSubmit<{{EntityPascal}}FormValues>({
+  const { handleSubmit, fieldErrors, isPending } = useCrudFormSubmit<{{EntityPascal}}FormValues>({
 {{#if hasUpdate}}
     entityId: {{entity}}Id,
 {{/if}}
@@ -111,9 +111,9 @@ export function {{EntityPascal}}Form({ {{#if hasUpdate}}{{entity}}Id, {{/if}}{{#
 {{#if hasUpdate}}
   if (isEdit && (isLoading || !data)) return <QueryFallback isLoading={isLoading} notFoundMessage="{{EntityPascal}} not found." />;
 
-  return <{{EntityPascal}}FormInner {{#if hasTree}}{{entity}}Id={ {{entity}}Id} defaultParentId={defaultParentId} {{/if}}defaultValues={isEdit ? data ?? undefined : undefined} onSubmit={handleSubmit} fieldErrors={fieldErrors} isEdit={isEdit} onClose={onClose} onCancel={onCancel} onBack={onBack} />;
+  return <{{EntityPascal}}FormInner {{#if hasTree}}{{entity}}Id={ {{entity}}Id} defaultParentId={defaultParentId} {{/if}}defaultValues={isEdit ? data ?? undefined : undefined} onSubmit={handleSubmit} fieldErrors={fieldErrors} isPending={isPending} isEdit={isEdit} onClose={onClose} onCancel={onCancel} onBack={onBack} />;
 {{else}}
-  return <{{EntityPascal}}FormInner {{#if hasTree}}defaultParentId={defaultParentId} {{/if}}onSubmit={handleSubmit} fieldErrors={fieldErrors} onClose={onClose} onCancel={onCancel} onBack={onBack} />;
+  return <{{EntityPascal}}FormInner {{#if hasTree}}defaultParentId={defaultParentId} {{/if}}onSubmit={handleSubmit} fieldErrors={fieldErrors} isPending={isPending} onClose={onClose} onCancel={onCancel} onBack={onBack} />;
 {{/if}}
 }
 
@@ -127,6 +127,7 @@ interface {{EntityPascal}}FormInnerProps {
   defaultValues?: Partial<{{EntityPascal}}FormValues>;
   onSubmit: (values: {{EntityPascal}}FormValues) => void;
   fieldErrors?: Record<string, string>;
+  isPending?: boolean;
 {{#if hasUpdate}}
   isEdit: boolean;
 {{/if}}
@@ -135,7 +136,7 @@ interface {{EntityPascal}}FormInnerProps {
   onBack?: () => void;
 }
 
-function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}Id, {{/if}}defaultParentId, {{/if}}defaultValues, onSubmit, fieldErrors, {{#if hasUpdate}}isEdit, {{/if}}onClose, onCancel, onBack }: {{EntityPascal}}FormInnerProps) {
+function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}Id, {{/if}}defaultParentId, {{/if}}defaultValues, onSubmit, fieldErrors, isPending, {{#if hasUpdate}}isEdit, {{/if}}onClose, onCancel, onBack }: {{EntityPascal}}FormInnerProps) {
 {{#unless hasEnumFields}}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
 {{/unless}}
@@ -152,6 +153,8 @@ function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}I
 {{/if}}
 {{/each}}
   });
+  const initialValues = useRef(values).current;
+  const isDirty = useIsDirty(values as Record<string, unknown>, initialValues as Record<string, unknown>);
 
   const updateField = useCallback(<K extends keyof {{EntityPascal}}FormValues>(field: K, value: {{EntityPascal}}FormValues[K]) => {
     setValues(prev => ({ ...prev, [field]: value }));
@@ -186,17 +189,17 @@ function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}I
 {{/if}}
 
   return (
-    <CrudForm onSubmit={handleSubmit} header={header} onClose={onClose} footer={
+    <CrudForm onSubmit={handleSubmit} isSubmitting={isPending} header={header} onClose={onClose} footer={
       <CrudForm.Actions spread={!!(onBack || onCancel)}>
         {onBack ? (
-          <Button type="button" size="sm" variant="outline" onClick={onBack}>
+          <Button type="button" size="sm" variant="outline" onClick={onBack} disabled={isPending}>
             <ArrowLeftIcon className="size-4" />
             {t("common.back")}
           </Button>
         ) : onCancel ? (
-          <Button type="button" size="sm" variant="outline" onClick={onCancel}>{t("common.cancel")}</Button>
+          <Button type="button" size="sm" variant="outline" onClick={onCancel} disabled={isPending}>{t("common.cancel")}</Button>
         ) : null}
-        <Button type="submit" size="sm" variant="primary">{t("{{entity}}.save{{EntityPascal}}")}</Button>
+        <SaveButton type="submit" isDirty={ {{~#if hasUpdate~}} isEdit ? isDirty : undefined {{~else~}} undefined {{~/if~}} } isSaving={isPending}>{t("{{entity}}.save{{EntityPascal}}")}</SaveButton>
       </CrudForm.Actions>
     }>
       <CrudForm.Section title={t("{{entity}}.sectionTitle")} variant="flat">

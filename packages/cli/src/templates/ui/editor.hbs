@@ -6,6 +6,7 @@ import {
   EditorFooter,
   PanelHeader,
   QueryFallback,
+  SaveButton,
   Stack,
   useInvalidateEntity,
   useUnsavedChanges,
@@ -116,17 +117,12 @@ function EditorContent({ data, variant, onClose, onSuccess }: EditorContentProps
       </div>
 
       <EditorFooter>
-        <Button size="sm" variant="outline" onClick={handleClose}>
+        <Button size="sm" variant="outline" onClick={handleClose} disabled={updateMutation.isPending}>
           {t("common.cancel")}
         </Button>
-        <Button
-          size="sm"
-          variant="primary"
-          onClick={handleSave}
-          disabled={!isDirty || updateMutation.isPending}
-        >
-          {updateMutation.isPending ? t("common.saving") : t("common.save")}
-        </Button>
+        <SaveButton isDirty={isDirty} isSaving={updateMutation.isPending} onClick={handleSave}>
+          {t("common.save")}
+        </SaveButton>
       </EditorFooter>
 
       {unsavedDialog}
