@@ -13,6 +13,8 @@
     "no": "No",
     "loading": "Loading...",
     "notFound": "Not found.",
+    "notFoundTitle": "Data Not Found",
+    "notFoundDescription": "The requested data could not be found. It may have been deleted or does not exist.",
     "deleting": "Deleting...",
     "saving": "Saving...",
     "confirm": "Confirm",

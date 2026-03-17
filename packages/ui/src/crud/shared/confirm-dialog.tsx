@@ -7,9 +7,11 @@ export interface ConfirmDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
-  description: string;
+  description?: string;
   confirmLabel?: string;
   cancelLabel?: string;
+  /** When true, hides the cancel button. Useful for info-only dialogs. */
+  hideCancel?: boolean;
 
   onConfirm: () => void;
   isPending?: boolean;
@@ -24,6 +26,7 @@ export function ConfirmDialog({
   confirmLabel,
   cancelLabel,
 
+  hideCancel = false,
   onConfirm,
   isPending = false,
   pendingLabel,
@@ -50,22 +53,26 @@ export function ConfirmDialog({
           <AlertDialog.Title className="text-lg font-semibold">
             {title}
           </AlertDialog.Title>
-          <AlertDialog.Description className="mt-2 text-sm text-muted-foreground">
-            {description}
-          </AlertDialog.Description>
+          {description && (
+            <AlertDialog.Description className="mt-2 text-sm text-muted-foreground">
+              {description}
+            </AlertDialog.Description>
+          )}
           <footer className="mt-6 flex w-full justify-end gap-2">
-            <AlertDialog.Cancel
-              className={cn(
-                "inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-medium",
-                "border border-input bg-background transition-colors",
-                "hover:bg-accent hover:text-accent-foreground",
-                "focus-visible:outline-none",
-                "disabled:pointer-events-none disabled:opacity-50",
-              )}
-              disabled={isPending}
-            >
-              {resolvedCancelLabel}
-            </AlertDialog.Cancel>
+            {!hideCancel && (
+              <AlertDialog.Cancel
+                className={cn(
+                  "inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-medium",
+                  "border border-input bg-background transition-colors",
+                  "hover:bg-accent hover:text-accent-foreground",
+                  "focus-visible:outline-none",
+                  "disabled:pointer-events-none disabled:opacity-50",
+                )}
+                disabled={isPending}
+              >
+                {resolvedCancelLabel}
+              </AlertDialog.Cancel>
+            )}
             <AlertDialog.Action
               onClick={(e) => {
                 e.preventDefault();
