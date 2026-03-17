@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react/react",
-  "version": "0.1.1",
+  "version": "0.2.1",
   "description": "React Query hooks derived from @simplix-react/contract",
   "type": "module",
   "sideEffects": false,
@@ -20,7 +20,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src",
+    "lint": "oxlint src",
     "test": "vitest run --passWithNoTests",
     "clean": "rm -rf dist .turbo"
   },
@@ -31,19 +31,19 @@
     "zod": ">=4.0.0"
   },
   "devDependencies": {
-    "@simplix-react/config-eslint": "workspace:*",
     "@simplix-react/config-typescript": "workspace:*",
     "@simplix-react/contract": "workspace:*",
     "@tanstack/react-query": "^5.0.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/react": "^19.0.0",
-    "eslint": "^9.39.2",
     "jsdom": "^28.0.0",
     "react": "^19.0.0",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
     "vitest": "^4.0.0",
     "zod": "^4.0.0"
-  }
+  },
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js"
 }

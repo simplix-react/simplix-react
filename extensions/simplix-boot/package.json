@@ -7,5 +7,6 @@
     "lint": "turbo lint",
     "test": "turbo test",
     "clean": "turbo clean"
-  }
+  },
+  "version": "0.2.1"
 }

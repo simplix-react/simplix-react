@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react-ext/simplix-boot-cli-plugin",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "description": "CLI plugin for simplix-boot OpenAPI spec profile",
   "type": "module",
   "exports": {
@@ -9,12 +9,14 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src",
+    "lint": "oxlint src",
     "test": "vitest run --passWithNoTests",
     "clean": "rm -rf dist .turbo"
   },
@@ -24,9 +26,7 @@
   "devDependencies": {
     "@simplix-react/cli": "workspace:*",
     "@simplix-react/contract": "workspace:*",
-    "@simplix-react/config-eslint": "workspace:*",
     "@simplix-react/config-typescript": "workspace:*",
-    "eslint": "^9.39.2",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
     "vitest": "^4.0.0"

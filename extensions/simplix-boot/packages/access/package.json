@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react-ext/simplix-boot-access",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "description": "Spring Security authorization adapter for @simplix-react/access",
   "type": "module",
   "exports": {
@@ -9,12 +9,14 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src",
+    "lint": "oxlint src",
     "test": "vitest run --passWithNoTests",
     "clean": "rm -rf dist .turbo"
   },
@@ -25,10 +27,8 @@
   "devDependencies": {
     "@simplix-react/access": "workspace:*",
     "@simplix-react/api": "workspace:*",
-    "@simplix-react/config-eslint": "workspace:*",
     "@simplix-react/config-typescript": "workspace:*",
     "@casl/ability": "^6.8.0",
-    "eslint": "^9.39.2",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
     "vitest": "^4.0.0"
