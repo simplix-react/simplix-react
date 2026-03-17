@@ -12,6 +12,10 @@ import { useRef } from "react";
  */
 export function usePreviousData<T>(data: T | null | undefined): T | undefined {
   const ref = useRef<T | undefined>(undefined);
-  if (data != null) ref.current = data;
-  return (data ?? ref.current) as T | undefined;
+  const isInvalidData = data != null && typeof data === "object" && !Array.isArray(data) && (
+    Object.keys(data as object).length === 0 ||
+    (data as Record<string, unknown>).type === "FAILURE"
+  );
+  if (data != null && !isInvalidData) ref.current = data;
+  return (isInvalidData ? ref.current : (data ?? ref.current)) as T | undefined;
 }
