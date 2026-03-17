@@ -626,14 +626,14 @@ async function ensureModuleDeps(
 
   // @simplix-react/ui
   if (!deps["@simplix-react/ui"]) {
-    deps["@simplix-react/ui"] = "workspace:*";
-    added.push(`@simplix-react/ui@workspace:*`);
+    deps["@simplix-react/ui"] = "catalog:";
+    added.push(`@simplix-react/ui@catalog:`);
   }
 
   // @simplix-react/i18n
   if (!deps["@simplix-react/i18n"]) {
-    deps["@simplix-react/i18n"] = "workspace:*";
-    added.push(`@simplix-react/i18n@workspace:*`);
+    deps["@simplix-react/i18n"] = "catalog:";
+    added.push(`@simplix-react/i18n@catalog:`);
   }
 
   // Domain package (workspace:*)

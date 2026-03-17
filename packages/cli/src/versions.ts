@@ -70,13 +70,18 @@ function pkgNameToKey(name: string): string {
  * Framework versions (caret ranges):
  *   {{fw.meta}}, {{fw.cli}}, {{fw.contract}}, {{fw.react}}, {{fw.mock}}, {{fw.i18n}}
  *
+ * Framework exact versions (for pnpm catalog):
+ *   {{fwExact.meta}}, {{fwExact.cli}}, {{fwExact.contract}}, etc.
+ *
  * Dependency versions (as-is from package.json):
  *   {{deps.zod}}, {{deps.typescript}}, {{deps.tanstackReactQuery}}, etc.
  */
 export function withVersions<T extends Record<string, unknown>>(ctx: T) {
   const fw: Record<string, string> = {};
+  const fwExact: Record<string, string> = {};
   for (const [key, version] of Object.entries(__FW_VERSIONS__)) {
     fw[key] = `^${version}`;
+    fwExact[key] = version;
   }
 
   const deps: Record<string, string> = {};
@@ -84,5 +89,5 @@ export function withVersions<T extends Record<string, unknown>>(ctx: T) {
     deps[pkgNameToKey(name)] = version;
   }
 
-  return { ...ctx, fw, deps };
+  return { ...ctx, fw, fwExact, deps };
 }

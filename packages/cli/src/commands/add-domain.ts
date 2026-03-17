@@ -163,7 +163,7 @@ export const addDomainCommand = new Command("add-domain")
         // Inject OpenAPI-specific dependencies + codegen script
         const pkgJson = JSON.parse(files["package.json"]);
         if (!pkgJson.dependencies) pkgJson.dependencies = {};
-        pkgJson.dependencies["@simplix-react/api"] = "workspace:*";
+        pkgJson.dependencies["@simplix-react/api"] = "catalog:";
         pkgJson.devDependencies["orval"] = "^8.4.1";
         pkgJson.devDependencies["@faker-js/faker"] = "^9.0.0";
         pkgJson.scripts["codegen"] = `simplix openapi ${openapiSpec} -d ${name}`;
@@ -192,8 +192,8 @@ export const addDomainCommand = new Command("add-domain")
         // Inject non-OpenAPI-specific dependencies
         const pkgJson = JSON.parse(files["package.json"]);
         if (!pkgJson.dependencies) pkgJson.dependencies = {};
-        pkgJson.dependencies["@simplix-react/contract"] = "workspace:*";
-        pkgJson.dependencies["@simplix-react/react"] = "workspace:*";
+        pkgJson.dependencies["@simplix-react/contract"] = "catalog:";
+        pkgJson.dependencies["@simplix-react/react"] = "catalog:";
         files["package.json"] = JSON.stringify(pkgJson, null, 2) + "\n";
       }
 
@@ -210,7 +210,7 @@ export const addDomainCommand = new Command("add-domain")
         // Add @simplix-react/i18n dependency
         const pkgJson = JSON.parse(files["package.json"]);
         if (!pkgJson.dependencies) pkgJson.dependencies = {};
-        pkgJson.dependencies["@simplix-react/i18n"] = "workspace:*";
+        pkgJson.dependencies["@simplix-react/i18n"] = "catalog:";
         files["package.json"] = JSON.stringify(pkgJson, null, 2) + "\n";
       }
 
