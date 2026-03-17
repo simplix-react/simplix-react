@@ -44,23 +44,23 @@ const depVersions: Record<string, string> = {};
 
 // Consumer-only deps (not in any framework package.json)
 const CONSUMER_DEPS: Record<string, string> = {
-  "@tanstack/query-core": "^5.90.0",
-  "@tanstack/react-form": "^1.0.0",
-  "@tanstack/react-query": "^5.64.0",
-  "@tanstack/react-router": "^1.151.0",
-  "@tanstack/router-plugin": "^1.151.0",
-  "@types/react": "^19.0.0",
-  "@types/react-dom": "^19.0.0",
-  "@vitejs/plugin-react": "^6.0.0",
-  "@tailwindcss/vite": "^4.1.10",
-  "lucide-react": "^0.562.0",
+  "@tanstack/query-core": "^5.90.20",
+  "@tanstack/react-form": "^1.28.5",
+  "@tanstack/react-query": "^5.90.21",
+  "@tanstack/react-router": "^1.167.4",
+  "@tanstack/router-plugin": "^1.166.13",
+  "@types/react": "^19.2.14",
+  "@types/react-dom": "^19.2.3",
+  "@vitejs/plugin-react": "^6.0.1",
+  "@tailwindcss/vite": "^4.2.1",
+  "lucide-react": "^0.577.0",
   "oxlint": "^1.56.0",
-  "react": "^19.0.0",
-  "react-dom": "^19.0.0",
-  "tailwindcss": "^4.1.10",
-  "turbo": "^2.7.5",
+  "react": "^19.2.4",
+  "react-dom": "^19.2.4",
+  "tailwindcss": "^4.2.1",
+  "turbo": "^2.8.17",
   "vite": "^8.0.0",
-  "vitest": "^4.0.0",
+  "vitest": "^4.1.0",
 };
 
 // Step 1: seed with framework dependencies + devDependencies (build tools)

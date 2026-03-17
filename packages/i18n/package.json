@@ -46,15 +46,15 @@
   },
   "devDependencies": {
     "@simplix-react/config-typescript": "workspace:*",
-    "@testing-library/react": "^16.3.2",
-    "@types/react": "^19.0.0",
-    "i18next": "^25.8.0",
-    "jsdom": "^28.1.0",
-    "react": "^19.0.0",
-    "react-i18next": "^16.0.0",
-    "tsup": "^8.5.1",
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.0"
+    "@testing-library/react": "catalog:",
+    "@types/react": "catalog:",
+    "i18next": "catalog:",
+    "jsdom": "catalog:",
+    "react": "catalog:",
+    "react-i18next": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js"

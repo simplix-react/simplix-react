@@ -38,14 +38,14 @@
     "@simplix-react/access": "workspace:*",
     "@simplix-react/config-typescript": "workspace:*",
     "@simplix-react/contract": "workspace:*",
-    "@tanstack/react-query": "^5.0.0",
-    "@testing-library/react": "^16.3.2",
-    "@types/react": "^19.0.0",
-    "jsdom": "^28.1.0",
-    "react": "^19.0.0",
-    "tsup": "^8.5.1",
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.0"
+    "@tanstack/react-query": "catalog:",
+    "@testing-library/react": "catalog:",
+    "@types/react": "catalog:",
+    "jsdom": "catalog:",
+    "react": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js"

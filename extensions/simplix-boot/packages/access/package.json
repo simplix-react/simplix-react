@@ -28,9 +28,9 @@
     "@simplix-react/access": "workspace:*",
     "@simplix-react/api": "workspace:*",
     "@simplix-react/config-typescript": "workspace:*",
-    "@casl/ability": "^6.8.0",
-    "tsup": "^8.5.1",
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.0"
+    "@casl/ability": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

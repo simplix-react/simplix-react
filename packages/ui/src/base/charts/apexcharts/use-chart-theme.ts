@@ -44,8 +44,9 @@ function resolveTheme() {
 }
 
 /** Hide the grid outer rect (top/right/bottom/left frame) while keeping internal grid lines. */
-export function hideGridRect(chartContext: { el?: Element }) {
-  const rect = chartContext?.el?.querySelector?.(".apexcharts-gridRect");
+export function hideGridRect(chart: ApexCharts) {
+  const el = (chart as unknown as { el?: Element }).el;
+  const rect = el?.querySelector?.(".apexcharts-gridRect");
   if (rect) rect.setAttribute("stroke", "none");
 }
 

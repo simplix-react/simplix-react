@@ -27,8 +27,8 @@
     "@simplix-react/cli": "workspace:*",
     "@simplix-react/contract": "workspace:*",
     "@simplix-react/config-typescript": "workspace:*",
-    "tsup": "^8.5.1",
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.0"
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }
