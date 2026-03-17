@@ -505,6 +505,11 @@ export async function deduplicateGeneratedFiles(targetDir: string): Promise<numb
  * Tracks seen symbols as `kind:name` pairs (e.g. `type:Foo`, `const:Foo`)
  * because TypeScript allows a `type` and a `const` with the same name to
  * coexist (companion object pattern).
+ *
+ * NOTE: `function` exports are excluded from deduplication because
+ * react-query hooks use TypeScript function overloads (multiple
+ * `export function useX(...)` declarations + 1 implementation body).
+ * Treating overloads as duplicates breaks the generated hooks.
  */
 async function deduplicateFile(filePath: string): Promise<number> {
   const content = await readFile(filePath, "utf-8");
@@ -519,9 +524,9 @@ async function deduplicateFile(filePath: string): Promise<number> {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
 
-    // Detect export declarations with their kind
+    // Detect export declarations with their kind (exclude function — overloads are valid)
     const exportMatch = line.match(
-      /^export (type|interface|const|function|enum) (\w+)/,
+      /^export (type|interface|const|enum) (\w+)/,
     );
 
     if (exportMatch) {
@@ -547,6 +552,11 @@ async function deduplicateFile(filePath: string): Promise<number> {
         continue;
       }
       seenExports.add(key);
+      skipUntilNextExport = false;
+    }
+
+    // A new export function also ends any skip state
+    if (skipUntilNextExport && line.match(/^export function /)) {
       skipUntilNextExport = false;
     }
 

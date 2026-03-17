@@ -1,4 +1,3 @@
-export { default as moduleEslintConfig } from "./eslint-config.hbs";
 export { default as modulePackageJson } from "./package-json.hbs";
 export { default as moduleTsupConfig } from "./tsup-config.hbs";
 export { default as moduleTsconfigJson } from "./tsconfig-json.hbs";

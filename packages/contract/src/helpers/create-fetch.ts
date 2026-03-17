@@ -58,8 +58,10 @@ export function createFetch(options: CreateFetchOptions = {}): FetchFn {
     const fullUrl = path.startsWith("http") ? path : `${baseUrl}${path}`;
     const method = reqOptions?.method?.toUpperCase() ?? "GET";
     const hasBody = method === "POST" || method === "PUT" || method === "PATCH";
+    // Skip Content-Type for FormData — browser sets multipart/form-data with boundary
+    const isFormData = typeof FormData !== "undefined" && reqOptions?.body instanceof FormData;
     const headers: Record<string, string> = {
-      ...(hasBody ? { "Content-Type": "application/json" } : {}),
+      ...(hasBody && !isFormData ? { "Content-Type": "application/json" } : {}),
       ...(reqOptions?.headers as Record<string, string>),
     };
 

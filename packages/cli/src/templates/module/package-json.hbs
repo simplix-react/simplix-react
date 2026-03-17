@@ -32,7 +32,7 @@
     "build": "tsup",
     "dev": "tsup --no-clean --no-dts",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src",
+    "lint": "oxlint src",
     "test": "vitest run --passWithNoTests",
     "clean": "rm -rf dist .turbo"
   },
@@ -44,10 +44,6 @@
     "@tanstack/react-query": ">=5.0.0"
   },
   "devDependencies": {
-    "@eslint/js": "{{deps.eslintJs}}",
-    "@typescript-eslint/eslint-plugin": "{{deps.typescriptEslintEslintPlugin}}",
-    "@typescript-eslint/parser": "{{deps.typescriptEslintParser}}",
-    "eslint": "{{deps.eslint}}",
     "react": "{{deps.react}}",
     "@tanstack/react-query": "{{deps.tanstackReactQuery}}",
     "tsup": "{{deps.tsup}}",

@@ -191,6 +191,18 @@ export const simplixBootNaming: OpenApiNamingStrategy = {
 
     // --- PUT patterns ---
     if (method === "PUT") {
+      // PUT with suffix after entity or param → custom action
+      // e.g. /floor/{id}/zones, /floor/{id}/placements
+      const entitySegment = entity.toLowerCase();
+      const isEntityOrParam = lastSegment === entitySegment || lastSegment.startsWith("{");
+      if (!isEntityOrParam) {
+        const actionSuffix = toCamelCase(lastSegment);
+        const actionPascal = actionSuffix.charAt(0).toUpperCase() + actionSuffix.slice(1);
+        return {
+          role: `update${actionPascal}`,
+          hookName: `update${actionPascal}${pascal}`,
+        };
+      }
       return { role: "update", hookName: `update${pascal}` };
     }
 

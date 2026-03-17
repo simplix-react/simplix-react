@@ -7,7 +7,7 @@
     "dev:app": "vite",
     "build": "vite build",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src",
+    "lint": "oxlint src",
     "test": "vitest run --passWithNoTests",
     "clean": "rm -rf dist .turbo"
   },
@@ -22,14 +22,10 @@
   },
   "devDependencies": {
     "@tanstack/router-plugin": "{{deps.tanstackRouterPlugin}}",
-    "@eslint/js": "{{deps.eslintJs}}",
-    "@typescript-eslint/eslint-plugin": "{{deps.typescriptEslintEslintPlugin}}",
-    "@typescript-eslint/parser": "{{deps.typescriptEslintParser}}",
     "@types/react": "{{deps.typesReact}}",
     "@types/react-dom": "{{deps.typesReactDom}}",
     "@vitejs/plugin-react": "{{deps.vitejsPluginReact}}",
     "@tailwindcss/vite": "{{deps.tailwindcssVite}}",
-    "eslint": "{{deps.eslint}}",
     "tailwindcss": "{{deps.tailwindcss}}",
     "typescript": "{{deps.typescript}}",
     "vite": "{{deps.vite}}",

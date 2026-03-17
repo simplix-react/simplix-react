@@ -9,7 +9,6 @@ import { renderTemplate } from "../utils/template.js";
 import { loadConfig } from "../config/config-loader.js";
 import { withVersions } from "../versions.js";
 import {
-  moduleEslintConfig,
   modulePackageJson,
   moduleTsupConfig,
   moduleTsconfigJson,
@@ -93,7 +92,6 @@ export const addModuleCommand = new Command("add-module")
 
       const files: Record<string, string> = {
         "package.json": renderTemplate(modulePackageJson, ctx),
-        "eslint.config.js": moduleEslintConfig,
         "tsup.config.ts": renderTemplate(moduleTsupConfig, ctx),
         "tsconfig.json": renderTemplate(moduleTsconfigJson, ctx),
         "src/index.ts": renderTemplate(moduleIndexTs, ctx),

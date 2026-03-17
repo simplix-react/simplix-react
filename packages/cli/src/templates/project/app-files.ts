@@ -1,4 +1,3 @@
-export { default as appEslintConfig } from "./app/eslint-config.hbs";
 export { default as appPackageJson } from "./app/package-json.hbs";
 export { default as appTsconfigJson } from "./app/tsconfig-json.hbs";
 export { default as viteConfig } from "./app/vite-config.hbs";

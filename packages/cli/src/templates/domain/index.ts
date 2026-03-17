@@ -1,4 +1,3 @@
-export { default as domainEslintConfig } from "./eslint-config.hbs";
 export { default as domainPackageJson } from "./package-json.hbs";
 export { default as domainTsupConfig } from "./tsup-config.hbs";
 export { default as domainTsconfigJson } from "./tsconfig-json.hbs";

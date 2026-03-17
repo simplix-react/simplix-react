@@ -22,7 +22,7 @@
     "build": "tsup",
     "dev": "tsup --no-clean --no-dts",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src",
+    "lint": "oxlint src",
     "test": "vitest run --passWithNoTests",
     "clean": "rm -rf dist .turbo"
   },
@@ -32,10 +32,6 @@
     "zod": "{{deps.zod}}"
   },
   "devDependencies": {
-    "@eslint/js": "{{deps.eslintJs}}",
-    "@typescript-eslint/eslint-plugin": "{{deps.typescriptEslintEslintPlugin}}",
-    "@typescript-eslint/parser": "{{deps.typescriptEslintParser}}",
-    "eslint": "{{deps.eslint}}",
     "msw": "{{deps.msw}}",
     "tsup": "{{deps.tsup}}",
     "typescript": "{{deps.typescript}}",

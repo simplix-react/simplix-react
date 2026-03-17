@@ -15,7 +15,6 @@ import {
 } from "../templates/project/root-files.js";
 import { withVersions } from "../versions.js";
 import {
-  appEslintConfig,
   appPackageJson,
   appTsconfigJson,
   viteConfig,
@@ -213,6 +212,17 @@ export const initCommand = new Command("init")
         "tsconfig.json": renderTemplate(rootTsconfigJson, ctx),
         ".npmrc": npmrc,
         ".gitignore": gitignore,
+        ".oxlintrc.json": JSON.stringify(
+          {
+            $schema: "./node_modules/oxlint/configuration_schema.json",
+            categories: { correctness: "warn" },
+            plugins: ["typescript"],
+            rules: { "no-undef": "off" },
+            ignorePatterns: ["dist", "node_modules", "**/src/generated"],
+          },
+          null,
+          2,
+        ),
         "simplix.config.ts": renderTemplate(simplixConfigTs, ctx),
       });
 
@@ -270,7 +280,6 @@ export const initCommand = new Command("init")
             appPackageJson,
             appCtx,
           ),
-          [`apps/${ctx.projectName}-demo/eslint.config.js`]: appEslintConfig,
           [`apps/${ctx.projectName}-demo/tsconfig.json`]: renderTemplate(
             appTsconfigJson,
             appCtx,

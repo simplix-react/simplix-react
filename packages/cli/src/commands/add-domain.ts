@@ -15,7 +15,6 @@ import {
 } from "../openapi/orchestration/orval-runner.js";
 import { getSpecProfile } from "../openapi/plugin-registry.js";
 import {
-  domainEslintConfig,
   domainPackageJson,
   domainTsupConfig,
   domainTsconfigJson,
@@ -152,7 +151,6 @@ export const addDomainCommand = new Command("add-domain")
       // Scaffolding files (common to both modes)
       const files: Record<string, string> = {
         "package.json": renderTemplate(domainPackageJson, ctx),
-        "eslint.config.js": domainEslintConfig,
         "tsup.config.ts": domainTsupConfig,
         "tsconfig.json": renderTemplate(domainTsconfigJson, ctx),
         "src/index.ts": renderTemplate(domainIndexTs, ctx),

@@ -44,7 +44,6 @@ const depVersions: Record<string, string> = {};
 
 // Consumer-only deps (not in any framework package.json)
 const CONSUMER_DEPS: Record<string, string> = {
-  "@eslint/js": "^9.28.0",
   "@tanstack/query-core": "^5.90.0",
   "@tanstack/react-form": "^1.0.0",
   "@tanstack/react-query": "^5.64.0",
@@ -52,11 +51,10 @@ const CONSUMER_DEPS: Record<string, string> = {
   "@tanstack/router-plugin": "^1.151.0",
   "@types/react": "^19.0.0",
   "@types/react-dom": "^19.0.0",
-  "@typescript-eslint/eslint-plugin": "^8.33.0",
-  "@typescript-eslint/parser": "^8.33.0",
   "@vitejs/plugin-react": "^6.0.0",
   "@tailwindcss/vite": "^4.1.10",
   "lucide-react": "^0.562.0",
+  "oxlint": "^1.56.0",
   "react": "^19.0.0",
   "react-dom": "^19.0.0",
   "tailwindcss": "^4.1.10",
