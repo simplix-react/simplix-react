@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react/form",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "TanStack Form hooks derived from @simplix-react/contract schemas",
   "type": "module",
   "sideEffects": false,

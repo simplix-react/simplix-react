@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react/ui",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "CRUD scaffolding UI components with explicit field components and compound patterns",
   "type": "module",
   "sideEffects": [

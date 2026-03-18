@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react-ext/simplix-boot-cli-plugin",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "CLI plugin for simplix-boot OpenAPI spec profile",
   "type": "module",
   "exports": {
