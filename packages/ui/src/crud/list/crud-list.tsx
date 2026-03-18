@@ -266,8 +266,9 @@ export interface RowActionDef<T> {
   type: ActionType;
   onClick: (row: T) => void;
   label?: string;
-  icon?: ReactNode;
+  icon?: ReactNode | ((row: T) => ReactNode);
   when?: (row: T) => boolean;
+  disabled?: (row: T) => boolean;
 }
 
 // ── List.Table ──
@@ -369,7 +370,9 @@ function RowActionCell<T>({ row, actions, variant }: { row: T; actions: RowActio
           <div className="inline-flex items-center rounded-md border overflow-hidden">
             {visible.map((action, i) => {
               const label = action.label ?? t(ACTION_LABEL_KEYS[action.type]);
-              const icon = action.icon ?? ACTION_ICONS[action.type];
+              const resolvedIcon = typeof action.icon === "function" ? action.icon(row) : action.icon;
+              const icon = resolvedIcon ?? ACTION_ICONS[action.type];
+              const isDisabled = action.disabled?.(row) ?? false;
               return (
                 <Tooltip key={action.type}>
                   <TooltipTrigger asChild>
@@ -381,6 +384,7 @@ function RowActionCell<T>({ row, actions, variant }: { row: T; actions: RowActio
                         i > 0 && "border-l",
                       )}
                       onClick={(e) => handleClick(e, action)}
+                      disabled={isDisabled}
                     >
                       {icon}
                     </Button>
@@ -400,13 +404,16 @@ function RowActionCell<T>({ row, actions, variant }: { row: T; actions: RowActio
     <Flex gap="xs" justify="end">
       {visible.map((action) => {
         const label = action.label ?? t(ACTION_LABEL_KEYS[action.type]);
-        const icon = action.icon ?? ACTION_ICONS[action.type];
+        const resolvedIcon = typeof action.icon === "function" ? action.icon(row) : action.icon;
+        const icon = resolvedIcon ?? ACTION_ICONS[action.type];
+        const isDisabled = action.disabled?.(row) ?? false;
         return (
           <Button
             key={action.type}
             size="sm"
             variant={variant}
             onClick={(e) => handleClick(e, action)}
+            disabled={isDisabled}
           >
             {icon}
             {label}
