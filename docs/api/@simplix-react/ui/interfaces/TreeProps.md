@@ -6,7 +6,7 @@
 
 # Interface: TreeProps
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:126](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L126)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:111](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L111)
 
 Props for the [CrudTree](../variables/CrudTree.md) compound component root.
 
@@ -30,7 +30,7 @@ Props for the [CrudTree](../variables/CrudTree.md) compound component root.
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:128](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L128)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:113](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L113)
 
 ***
 
@@ -38,4 +38,4 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:128](https://github.com/sim
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:127](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L127)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:112](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L112)

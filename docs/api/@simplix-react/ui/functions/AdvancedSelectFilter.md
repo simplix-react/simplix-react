@@ -8,7 +8,7 @@
 
 > **AdvancedSelectFilter**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/crud/filters/advanced-select-filter.tsx:48](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/advanced-select-filter.tsx#L48)
+Defined in: [packages/ui/src/crud/filters/advanced-select-filter.tsx:32](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/advanced-select-filter.tsx#L32)
 
 ## Parameters
 

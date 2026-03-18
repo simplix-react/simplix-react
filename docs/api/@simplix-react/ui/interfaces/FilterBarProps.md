@@ -6,7 +6,7 @@
 
 # Interface: FilterBarProps
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:99](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L99)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:74](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L74)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:99](https://github.com/
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:106](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L106)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:81](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L81)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:106](https://github.com
 
 > **filters**: [`FilterDef`](../type-aliases/FilterDef.md)[]
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:100](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L100)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:75](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L75)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:100](https://github.com
 
 > `optional` **leading**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:103](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L103)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:78](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L78)
 
 Content rendered on the left side of the filter bar.
 
@@ -40,7 +40,7 @@ Content rendered on the left side of the filter bar.
 
 > `optional` **maxBadges**: `number`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:105](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L105)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:80](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L80)
 
 Max number of visible filter badges before collapsing into "+N".
 
@@ -50,4 +50,4 @@ Max number of visible filter badges before collapsing into "+N".
 
 > **state**: [`CrudListFilters`](CrudListFilters.md)
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:101](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L101)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:76](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L76)

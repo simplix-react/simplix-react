@@ -8,7 +8,7 @@
 
 > **ConfirmDialog**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/crud/shared/confirm-dialog.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/confirm-dialog.tsx#L19)
+Defined in: [packages/ui/src/crud/shared/confirm-dialog.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/confirm-dialog.tsx#L21)
 
 ## Parameters
 

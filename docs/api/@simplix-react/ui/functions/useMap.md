@@ -8,7 +8,7 @@
 
 > **useMap**(): [`MapContextValue`](../type-aliases/MapContextValue.md)
 
-Defined in: [packages/ui/src/base/map/map.tsx:168](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/map/map.tsx#L168)
+Defined in: [packages/ui/src/base/map/map.tsx:170](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/map/map.tsx#L170)
 
 Access the MapLibre map instance from a child component.
 

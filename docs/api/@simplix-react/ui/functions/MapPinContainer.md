@@ -8,7 +8,7 @@
 
 > **MapPinContainer**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/base/map/map.tsx:610](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/map/map.tsx#L610)
+Defined in: [packages/ui/src/base/map/map.tsx:629](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/map/map.tsx#L629)
 
 Pin-shaped marker wrapper for use as MapMarker children.
 Uses an SVG teardrop pin shape (based on Lucide MapPin) with children centered in the circle area.

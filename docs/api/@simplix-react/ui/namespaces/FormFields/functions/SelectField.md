@@ -8,7 +8,7 @@
 
 > **SelectField**\<`T`\>(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/form/select-field.tsx:33](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L33)
+Defined in: [packages/ui/src/fields/form/select-field.tsx:44](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L44)
 
 Dropdown select field built on Radix Select primitives.
 
@@ -39,5 +39,14 @@ Dropdown select field built on Radix Select primitives.
     { label: "Admin", value: "admin" },
     { label: "User", value: "user" },
   ]}
+/>
+
+// Compact mode (no label, auto-width, for table cells)
+<SelectField
+  compact
+  value={scheduleId}
+  onChange={setScheduleId}
+  options={scheduleOptions}
+  placeholder="Select..."
 />
 ```

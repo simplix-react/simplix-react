@@ -8,7 +8,7 @@
 
 > **LocationPickerField**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/form/location-picker-field.tsx:65](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/location-picker-field.tsx#L65)
+Defined in: [packages/ui/src/fields/form/location-picker-field.tsx:57](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/location-picker-field.tsx#L57)
 
 Map-based location picker field with dialog.
 Shows coordinates inline with a button to open a map dialog.

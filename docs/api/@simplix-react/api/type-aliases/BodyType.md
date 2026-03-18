@@ -8,7 +8,7 @@
 
 > **BodyType**\<`T`\> = `T`
 
-Defined in: [packages/api/src/index.ts:154](https://github.com/simplix-react/simplix-react/blob/main/packages/api/src/index.ts#L154)
+Defined in: [packages/api/src/index.ts:166](https://github.com/simplix-react/simplix-react/blob/main/packages/api/src/index.ts#L166)
 
 Identity type alias used by Orval for request body parameters.
 

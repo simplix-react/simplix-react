@@ -6,7 +6,7 @@
 
 # Interface: FacetedFilterOption
 
-Defined in: [packages/ui/src/crud/filters/faceted-filter.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/faceted-filter.tsx#L23)
+Defined in: [packages/ui/src/crud/filters/faceted-filter.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/faceted-filter.tsx#L13)
 
 A single option in a [FacetedFilter](../functions/FacetedFilter.md).
 
@@ -16,7 +16,7 @@ A single option in a [FacetedFilter](../functions/FacetedFilter.md).
 
 > `optional` **icon**: `ComponentType`\<\{ `className?`: `string`; \}\>
 
-Defined in: [packages/ui/src/crud/filters/faceted-filter.tsx:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/faceted-filter.tsx#L29)
+Defined in: [packages/ui/src/crud/filters/faceted-filter.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/faceted-filter.tsx#L19)
 
 Optional icon component rendered before the label.
 
@@ -26,7 +26,7 @@ Optional icon component rendered before the label.
 
 > **label**: `string`
 
-Defined in: [packages/ui/src/crud/filters/faceted-filter.tsx:25](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/faceted-filter.tsx#L25)
+Defined in: [packages/ui/src/crud/filters/faceted-filter.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/faceted-filter.tsx#L15)
 
 Display label.
 
@@ -36,6 +36,6 @@ Display label.
 
 > **value**: `string`
 
-Defined in: [packages/ui/src/crud/filters/faceted-filter.tsx:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/faceted-filter.tsx#L27)
+Defined in: [packages/ui/src/crud/filters/faceted-filter.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/faceted-filter.tsx#L17)
 
 Unique value identifier.

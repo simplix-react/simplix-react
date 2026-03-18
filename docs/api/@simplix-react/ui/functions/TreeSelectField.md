@@ -8,7 +8,7 @@
 
 > **TreeSelectField**\<`T`\>(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/form/tree-select-field.tsx:170](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-select-field.tsx#L170)
+Defined in: [packages/ui/src/fields/form/tree-select-field.tsx:165](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-select-field.tsx#L165)
 
 ## Type Parameters
 

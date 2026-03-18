@@ -26,11 +26,21 @@ Defined in: [packages/ui/src/crud/shared/confirm-dialog.tsx:11](https://github.c
 
 ***
 
-### description
+### description?
 
-> **description**: `string`
+> `optional` **description**: `string`
 
 Defined in: [packages/ui/src/crud/shared/confirm-dialog.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/confirm-dialog.tsx#L10)
+
+***
+
+### hideCancel?
+
+> `optional` **hideCancel**: `boolean`
+
+Defined in: [packages/ui/src/crud/shared/confirm-dialog.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/confirm-dialog.tsx#L14)
+
+When true, hides the cancel button. Useful for info-only dialogs.
 
 ***
 
@@ -38,7 +48,7 @@ Defined in: [packages/ui/src/crud/shared/confirm-dialog.tsx:10](https://github.c
 
 > `optional` **isPending**: `boolean`
 
-Defined in: [packages/ui/src/crud/shared/confirm-dialog.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/confirm-dialog.tsx#L15)
+Defined in: [packages/ui/src/crud/shared/confirm-dialog.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/confirm-dialog.tsx#L17)
 
 ***
 
@@ -46,7 +56,7 @@ Defined in: [packages/ui/src/crud/shared/confirm-dialog.tsx:15](https://github.c
 
 > **onConfirm**: () => `void`
 
-Defined in: [packages/ui/src/crud/shared/confirm-dialog.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/confirm-dialog.tsx#L14)
+Defined in: [packages/ui/src/crud/shared/confirm-dialog.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/confirm-dialog.tsx#L16)
 
 #### Returns
 
@@ -84,7 +94,7 @@ Defined in: [packages/ui/src/crud/shared/confirm-dialog.tsx:7](https://github.co
 
 > `optional` **pendingLabel**: `string`
 
-Defined in: [packages/ui/src/crud/shared/confirm-dialog.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/confirm-dialog.tsx#L16)
+Defined in: [packages/ui/src/crud/shared/confirm-dialog.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/confirm-dialog.tsx#L18)
 
 ***
 
@@ -93,11 +103,3 @@ Defined in: [packages/ui/src/crud/shared/confirm-dialog.tsx:16](https://github.c
 > **title**: `string`
 
 Defined in: [packages/ui/src/crud/shared/confirm-dialog.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/confirm-dialog.tsx#L9)
-
-***
-
-### variant?
-
-> `optional` **variant**: `"default"` \| `"destructive"`
-
-Defined in: [packages/ui/src/crud/shared/confirm-dialog.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/confirm-dialog.tsx#L13)

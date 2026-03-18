@@ -16,7 +16,7 @@ Props for the CrudDetail.DefaultActions sub-component.
 
 > `optional` **backLabel**: `string`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:242](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L242)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:244](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L244)
 
 Label for the back button (defaults to `"Back"`).
 
@@ -26,7 +26,7 @@ Label for the back button (defaults to `"Back"`).
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:245](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L245)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:247](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L247)
 
 ***
 
@@ -34,7 +34,7 @@ Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:245](https://github.com
 
 > `optional` **closeLabel**: `string`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:240](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L240)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:242](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L242)
 
 Label for the close button (defaults to `"Close"`).
 
@@ -44,9 +44,19 @@ Label for the close button (defaults to `"Close"`).
 
 > `optional` **editLabel**: `string`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:244](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L244)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:246](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L246)
 
 Label for the edit button (defaults to `"Edit"`).
+
+***
+
+### isPending?
+
+> `optional` **isPending**: `boolean`
+
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:240](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L240)
+
+When true, disables Edit and Delete action buttons.
 
 ***
 

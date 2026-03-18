@@ -6,16 +6,18 @@
 
 # Function: useInvalidateEntity()
 
-> **useInvalidateEntity**(`apiPrefix`): () => `void`
+> **useInvalidateEntity**(`apiPrefix`): () => `Promise`\<`void`\>
 
-Defined in: [packages/ui/src/crud/form/use-invalidate-entity.ts:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-invalidate-entity.ts#L16)
+Defined in: [packages/ui/src/crud/form/use-invalidate-entity.ts:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-invalidate-entity.ts#L18)
 
 Returns a stable callback that invalidates all queries whose first key
 element starts with the given URL prefix.
 
-Invalidation is deferred to the next macrotask so that React can process
-navigation state updates first. This prevents refetching queries for
-components that are about to unmount (e.g. edit forms with gcTime: 0).
+Returns a Promise that resolves when all matching queries have been
+refetched. Callers that need to sequence state resets after invalidation
+(e.g. clearing draft state in inline editors) should `await` the result.
+Fire-and-forget callers (e.g. `onSettled: invalidate`) are unaffected
+by the return type change.
 
 Works with Orval-generated query keys like:
 - `['/api/v1/company/4']` (detail)
@@ -29,8 +31,8 @@ Works with Orval-generated query keys like:
 
 ## Returns
 
-> (): `void`
+> (): `Promise`\<`void`\>
 
 ### Returns
 
-`void`
+`Promise`\<`void`\>

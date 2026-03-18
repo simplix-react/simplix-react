@@ -6,7 +6,7 @@
 
 # Interface: CrudFormSectionProps
 
-Defined in: [packages/ui/src/crud/form/crud-form.tsx:133](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/crud-form.tsx#L133)
+Defined in: [packages/ui/src/crud/form/crud-form.tsx:136](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/crud-form.tsx#L136)
 
 Section sub-component for CrudForm.
 
@@ -98,7 +98,7 @@ Defined in: [packages/ui/src/crud/shared/section-shell.tsx:66](https://github.co
 
 > `optional` **layout**: `"single-column"` \| `"two-column"` \| `"three-column"`
 
-Defined in: [packages/ui/src/crud/form/crud-form.tsx:134](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/crud-form.tsx#L134)
+Defined in: [packages/ui/src/crud/form/crud-form.tsx:137](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/crud-form.tsx#L137)
 
 ***
 

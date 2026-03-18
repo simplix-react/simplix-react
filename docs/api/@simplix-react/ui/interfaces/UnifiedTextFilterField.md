@@ -6,7 +6,7 @@
 
 # Interface: UnifiedTextFilterField
 
-Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L17)
+Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L11)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:17](https://gi
 
 > `optional` **defaultOperator**: [`SearchOperator`](../enumerations/SearchOperator.md)
 
-Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L21)
+Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L15)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:21](https://gi
 
 > **field**: `string`
 
-Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L18)
+Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L12)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:18](https://gi
 
 > **label**: `string`
 
-Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L19)
+Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L13)
 
 ***
 
@@ -38,4 +38,4 @@ Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:19](https://gi
 
 > **operators**: [`SearchOperator`](../enumerations/SearchOperator.md)[]
 
-Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L20)
+Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L14)

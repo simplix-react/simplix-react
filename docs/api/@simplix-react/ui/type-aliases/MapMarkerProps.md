@@ -8,7 +8,7 @@
 
 > **MapMarkerProps** = `object` & `Omit`\<`MarkerOptions`, `"element"`\>
 
-Defined in: [packages/ui/src/base/map/map.tsx:525](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/map/map.tsx#L525)
+Defined in: [packages/ui/src/base/map/map.tsx:544](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/map/map.tsx#L544)
 
 Props for the [MapMarker](../functions/MapMarker.md) component.
 

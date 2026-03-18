@@ -8,7 +8,7 @@
 
 > **MapContextValue** = `object`
 
-Defined in: [packages/ui/src/base/map/map.tsx:160](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/map/map.tsx#L160)
+Defined in: [packages/ui/src/base/map/map.tsx:162](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/map/map.tsx#L162)
 
 ## Properties
 
@@ -16,7 +16,7 @@ Defined in: [packages/ui/src/base/map/map.tsx:160](https://github.com/simplix-re
 
 > **isLoaded**: `boolean`
 
-Defined in: [packages/ui/src/base/map/map.tsx:162](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/map/map.tsx#L162)
+Defined in: [packages/ui/src/base/map/map.tsx:164](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/map/map.tsx#L164)
 
 ***
 
@@ -24,4 +24,4 @@ Defined in: [packages/ui/src/base/map/map.tsx:162](https://github.com/simplix-re
 
 > **map**: `MapLibreGL.Map` \| `null`
 
-Defined in: [packages/ui/src/base/map/map.tsx:161](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/map/map.tsx#L161)
+Defined in: [packages/ui/src/base/map/map.tsx:163](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/map/map.tsx#L163)

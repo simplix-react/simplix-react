@@ -8,7 +8,7 @@
 
 > **MapProps** = `object` & `Omit`\<`MapLibreGL.MapOptions`, `"container"` \| `"style"`\>
 
-Defined in: [packages/ui/src/base/map/map.tsx:181](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/map/map.tsx#L181)
+Defined in: [packages/ui/src/base/map/map.tsx:183](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/map/map.tsx#L183)
 
 Props for the [Map](../variables/Map.md) component.
 

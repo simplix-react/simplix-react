@@ -8,7 +8,7 @@
 
 > **MultiTextFilter**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/crud/filters/multi-text-filter.tsx:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/multi-text-filter.tsx#L29)
+Defined in: [packages/ui/src/crud/filters/multi-text-filter.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/multi-text-filter.tsx#L23)
 
 ## Parameters
 

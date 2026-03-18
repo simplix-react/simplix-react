@@ -6,7 +6,7 @@
 
 # Interface: CountryFieldProps
 
-Defined in: [packages/ui/src/fields/form/country-field.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/country-field.tsx#L26)
+Defined in: [packages/ui/src/fields/form/country-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/country-field.tsx#L14)
 
 Props for the [CountryField](../functions/CountryField.md) form component.
 
@@ -90,7 +90,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:24](https://github.com/simplix
 
 ### layout?
 
-> `optional` **layout**: `"hidden"` \| `"inline"` \| `"left"` \| `"top"`
+> `optional` **layout**: `"inline"` \| `"left"` \| `"top"` \| `"hidden"`
 
 Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L5)
 
@@ -104,7 +104,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/fields/form/country-field.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/country-field.tsx#L28)
+Defined in: [packages/ui/src/fields/form/country-field.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/country-field.tsx#L16)
 
 #### Parameters
 
@@ -122,7 +122,7 @@ Defined in: [packages/ui/src/fields/form/country-field.tsx:28](https://github.co
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/fields/form/country-field.tsx:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/country-field.tsx#L29)
+Defined in: [packages/ui/src/fields/form/country-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/country-field.tsx#L17)
 
 ***
 
@@ -154,7 +154,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-
 
 > **value**: `string`
 
-Defined in: [packages/ui/src/fields/form/country-field.tsx:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/country-field.tsx#L27)
+Defined in: [packages/ui/src/fields/form/country-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/country-field.tsx#L15)
 
 ***
 

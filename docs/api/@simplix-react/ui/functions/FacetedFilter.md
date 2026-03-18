@@ -8,7 +8,7 @@
 
 > **FacetedFilter**(`props`): `Element`
 
-Defined in: [packages/ui/src/crud/filters/faceted-filter.tsx:70](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/faceted-filter.tsx#L70)
+Defined in: [packages/ui/src/crud/filters/faceted-filter.tsx:60](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/faceted-filter.tsx#L60)
 
 Faceted filter with searchable command popover and badge display.
 

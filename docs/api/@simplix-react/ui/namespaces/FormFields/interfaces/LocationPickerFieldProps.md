@@ -6,7 +6,7 @@
 
 # Interface: LocationPickerFieldProps
 
-Defined in: [packages/ui/src/fields/form/location-picker-field.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/location-picker-field.tsx#L20)
+Defined in: [packages/ui/src/fields/form/location-picker-field.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/location-picker-field.tsx#L12)
 
 Props for the [LocationPickerField](../functions/LocationPickerField.md) component.
 
@@ -68,7 +68,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:25](https://github.com/simplix
 
 > `optional` **fallbackTileUrl**: `string`
 
-Defined in: [packages/ui/src/fields/form/location-picker-field.tsx:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/location-picker-field.tsx#L29)
+Defined in: [packages/ui/src/fields/form/location-picker-field.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/location-picker-field.tsx#L21)
 
 PMTiles file URL for offline map fallback (e.g. "/offline-map.pmtiles").
 
@@ -102,13 +102,13 @@ Defined in: [packages/ui/src/crud/shared/types.ts:24](https://github.com/simplix
 
 > **latitude**: `number`
 
-Defined in: [packages/ui/src/fields/form/location-picker-field.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/location-picker-field.tsx#L21)
+Defined in: [packages/ui/src/fields/form/location-picker-field.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/location-picker-field.tsx#L13)
 
 ***
 
 ### layout?
 
-> `optional` **layout**: `"hidden"` \| `"inline"` \| `"left"` \| `"top"`
+> `optional` **layout**: `"inline"` \| `"left"` \| `"top"` \| `"hidden"`
 
 Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L5)
 
@@ -122,7 +122,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-
 
 > **longitude**: `number`
 
-Defined in: [packages/ui/src/fields/form/location-picker-field.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/location-picker-field.tsx#L22)
+Defined in: [packages/ui/src/fields/form/location-picker-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/location-picker-field.tsx#L14)
 
 ***
 
@@ -130,7 +130,7 @@ Defined in: [packages/ui/src/fields/form/location-picker-field.tsx:22](https://g
 
 > `optional` **mapHeight**: `string`
 
-Defined in: [packages/ui/src/fields/form/location-picker-field.tsx:25](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/location-picker-field.tsx#L25)
+Defined in: [packages/ui/src/fields/form/location-picker-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/location-picker-field.tsx#L17)
 
 ***
 
@@ -138,7 +138,7 @@ Defined in: [packages/ui/src/fields/form/location-picker-field.tsx:25](https://g
 
 > `optional` **markerIcon**: `ReactNode`
 
-Defined in: [packages/ui/src/fields/form/location-picker-field.tsx:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/location-picker-field.tsx#L27)
+Defined in: [packages/ui/src/fields/form/location-picker-field.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/location-picker-field.tsx#L19)
 
 Custom marker icon. Replaces the default blue dot.
 
@@ -148,7 +148,7 @@ Custom marker icon. Replaces the default blue dot.
 
 > **onLocationChange**: (`lat`, `lng`) => `void`
 
-Defined in: [packages/ui/src/fields/form/location-picker-field.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/location-picker-field.tsx#L23)
+Defined in: [packages/ui/src/fields/form/location-picker-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/location-picker-field.tsx#L15)
 
 #### Parameters
 
@@ -206,4 +206,4 @@ Defined in: [packages/ui/src/crud/shared/types.ts:26](https://github.com/simplix
 
 > `optional` **zoom**: `number`
 
-Defined in: [packages/ui/src/fields/form/location-picker-field.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/location-picker-field.tsx#L24)
+Defined in: [packages/ui/src/fields/form/location-picker-field.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/location-picker-field.tsx#L16)

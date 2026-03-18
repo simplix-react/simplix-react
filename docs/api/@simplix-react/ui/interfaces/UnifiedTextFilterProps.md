@@ -6,7 +6,7 @@
 
 # Interface: UnifiedTextFilterProps
 
-Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L24)
+Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L18)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:24](https://gi
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:33](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L33)
+Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L27)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:33](https://gi
 
 > **fields**: [`UnifiedTextFilterField`](UnifiedTextFilterField.md)[]
 
-Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:25](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L25)
+Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L19)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:25](https://gi
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L30)
+Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L24)
 
 #### Parameters
 
@@ -48,7 +48,7 @@ Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:30](https://gi
 
 > **onFieldChange**: (`field`) => `void`
 
-Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L29)
+Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L23)
 
 #### Parameters
 
@@ -66,7 +66,7 @@ Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:29](https://gi
 
 > **onOperatorChange**: (`operator`) => `void`
 
-Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:31](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L31)
+Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:25](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L25)
 
 #### Parameters
 
@@ -84,7 +84,7 @@ Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:31](https://gi
 
 > **operator**: [`SearchOperator`](../enumerations/SearchOperator.md)
 
-Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L28)
+Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L22)
 
 ***
 
@@ -92,7 +92,7 @@ Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:28](https://gi
 
 > **selectedField**: `string`
 
-Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L26)
+Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L20)
 
 ***
 
@@ -100,7 +100,7 @@ Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:26](https://gi
 
 > **value**: `string`
 
-Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L27)
+Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L21)
 
 ***
 
@@ -108,4 +108,4 @@ Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:27](https://gi
 
 > `optional` **width**: `string` \| `number`
 
-Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:32](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L32)
+Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L26)

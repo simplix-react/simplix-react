@@ -20,7 +20,7 @@ Props for the [ChipFilter](../functions/ChipFilter.md) component.
 
 ### columns?
 
-> `optional` **columns**: `1` \| `2` \| `3` \| `4` \| `5` \| `6`
+> `optional` **columns**: `1` \| `2` \| `3` \| `4` \| `6` \| `5`
 
 Defined in: [packages/ui/src/crud/filters/chip-filter.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/chip-filter.tsx#L28)
 
@@ -46,7 +46,7 @@ Server filter key (e.g. `"holidayType.equals"`).
 
 ### gap?
 
-> `optional` **gap**: `"xs"` \| `"sm"` \| `"lg"` \| `"none"` \| `"md"`
+> `optional` **gap**: `"none"` \| `"xs"` \| `"sm"` \| `"lg"` \| `"md"`
 
 Defined in: [packages/ui/src/crud/filters/chip-filter.tsx:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/chip-filter.tsx#L30)
 

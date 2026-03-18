@@ -8,7 +8,7 @@
 
 > **TimezoneField**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/form/timezone-field.tsx:35](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/timezone-field.tsx#L35)
+Defined in: [packages/ui/src/fields/form/timezone-field.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/timezone-field.tsx#L23)
 
 Timezone selector field with region grouping and localized names.
 Supports search by IANA ID, offset label, and localized name.

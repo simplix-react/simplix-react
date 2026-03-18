@@ -82,7 +82,7 @@ Custom labels for true/false values when using `"text"` mode.
 
 ### layout?
 
-> `optional` **layout**: `"hidden"` \| `"inline"` \| `"left"` \| `"top"`
+> `optional` **layout**: `"inline"` \| `"left"` \| `"top"` \| `"hidden"`
 
 Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L5)
 

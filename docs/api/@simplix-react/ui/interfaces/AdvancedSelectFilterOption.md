@@ -6,7 +6,7 @@
 
 # Interface: AdvancedSelectFilterOption
 
-Defined in: [packages/ui/src/crud/filters/advanced-select-filter.tsx:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/advanced-select-filter.tsx#L29)
+Defined in: [packages/ui/src/crud/filters/advanced-select-filter.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/advanced-select-filter.tsx#L13)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/crud/filters/advanced-select-filter.tsx:29](https:/
 
 > `optional` **icon**: `ComponentType`\<\{ `className?`: `string`; \}\>
 
-Defined in: [packages/ui/src/crud/filters/advanced-select-filter.tsx:32](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/advanced-select-filter.tsx#L32)
+Defined in: [packages/ui/src/crud/filters/advanced-select-filter.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/advanced-select-filter.tsx#L16)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [packages/ui/src/crud/filters/advanced-select-filter.tsx:32](https:/
 
 > **label**: `string`
 
-Defined in: [packages/ui/src/crud/filters/advanced-select-filter.tsx:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/advanced-select-filter.tsx#L30)
+Defined in: [packages/ui/src/crud/filters/advanced-select-filter.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/advanced-select-filter.tsx#L14)
 
 ***
 
@@ -30,4 +30,4 @@ Defined in: [packages/ui/src/crud/filters/advanced-select-filter.tsx:30](https:/
 
 > **value**: `string`
 
-Defined in: [packages/ui/src/crud/filters/advanced-select-filter.tsx:31](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/advanced-select-filter.tsx#L31)
+Defined in: [packages/ui/src/crud/filters/advanced-select-filter.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/advanced-select-filter.tsx#L15)

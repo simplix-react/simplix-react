@@ -8,7 +8,7 @@
 
 > **MultiSelectField**\<`T`\>(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:44](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/multi-select-field.tsx#L44)
+Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:39](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/multi-select-field.tsx#L39)
 
 Multi-select dropdown field with badge chips and search filtering.
 

@@ -20,7 +20,7 @@ Defined in: [packages/ui/src/base/display/boolean-badge.tsx:10](https://github.c
 
 ### falseVariant?
 
-> `optional` **falseVariant**: `"default"` \| `"destructive"` \| `"outline"` \| `"secondary"` \| `"success"` \| `"warning"` \| `"slate"` \| `"red"` \| `"orange"` \| `"amber"` \| `"yellow"` \| `"lime"` \| `"green"` \| `"emerald"` \| `"teal"` \| `"cyan"` \| `"sky"` \| `"blue"` \| `"indigo"` \| `"violet"` \| `"purple"` \| `"fuchsia"` \| `"pink"` \| `"rose"` \| `null`
+> `optional` **falseVariant**: `"default"` \| `"blue"` \| `"cyan"` \| `"fuchsia"` \| `"green"` \| `"indigo"` \| `"lime"` \| `"orange"` \| `"pink"` \| `"purple"` \| `"red"` \| `"teal"` \| `"violet"` \| `"yellow"` \| `"destructive"` \| `"outline"` \| `"secondary"` \| `"success"` \| `"warning"` \| `"slate"` \| `"amber"` \| `"emerald"` \| `"sky"` \| `"rose"` \| `null`
 
 Defined in: [packages/ui/src/base/display/boolean-badge.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/boolean-badge.tsx#L9)
 
@@ -28,7 +28,7 @@ Defined in: [packages/ui/src/base/display/boolean-badge.tsx:9](https://github.co
 
 ### trueVariant?
 
-> `optional` **trueVariant**: `"default"` \| `"destructive"` \| `"outline"` \| `"secondary"` \| `"success"` \| `"warning"` \| `"slate"` \| `"red"` \| `"orange"` \| `"amber"` \| `"yellow"` \| `"lime"` \| `"green"` \| `"emerald"` \| `"teal"` \| `"cyan"` \| `"sky"` \| `"blue"` \| `"indigo"` \| `"violet"` \| `"purple"` \| `"fuchsia"` \| `"pink"` \| `"rose"` \| `null`
+> `optional` **trueVariant**: `"default"` \| `"blue"` \| `"cyan"` \| `"fuchsia"` \| `"green"` \| `"indigo"` \| `"lime"` \| `"orange"` \| `"pink"` \| `"purple"` \| `"red"` \| `"teal"` \| `"violet"` \| `"yellow"` \| `"destructive"` \| `"outline"` \| `"secondary"` \| `"success"` \| `"warning"` \| `"slate"` \| `"amber"` \| `"emerald"` \| `"sky"` \| `"rose"` \| `null`
 
 Defined in: [packages/ui/src/base/display/boolean-badge.tsx:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/boolean-badge.tsx#L8)
 

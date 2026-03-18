@@ -6,7 +6,7 @@
 
 # Interface: FacetedFilterProps
 
-Defined in: [packages/ui/src/crud/filters/faceted-filter.tsx:35](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/faceted-filter.tsx#L35)
+Defined in: [packages/ui/src/crud/filters/faceted-filter.tsx:25](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/faceted-filter.tsx#L25)
 
 Props for the [FacetedFilter](../functions/FacetedFilter.md) component.
 
@@ -16,7 +16,7 @@ Props for the [FacetedFilter](../functions/FacetedFilter.md) component.
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/filters/faceted-filter.tsx:48](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/faceted-filter.tsx#L48)
+Defined in: [packages/ui/src/crud/filters/faceted-filter.tsx:38](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/faceted-filter.tsx#L38)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [packages/ui/src/crud/filters/faceted-filter.tsx:48](https://github.
 
 > **label**: `string`
 
-Defined in: [packages/ui/src/crud/filters/faceted-filter.tsx:37](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/faceted-filter.tsx#L37)
+Defined in: [packages/ui/src/crud/filters/faceted-filter.tsx:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/faceted-filter.tsx#L27)
 
 Button label (e.g. `"Status"`, `"Category"`).
 
@@ -34,7 +34,7 @@ Button label (e.g. `"Status"`, `"Category"`).
 
 > `optional` **maxDisplayCount**: `number`
 
-Defined in: [packages/ui/src/crud/filters/faceted-filter.tsx:47](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/faceted-filter.tsx#L47)
+Defined in: [packages/ui/src/crud/filters/faceted-filter.tsx:37](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/faceted-filter.tsx#L37)
 
 Max badges to show before collapsing to count. Defaults to `5`.
 
@@ -44,7 +44,7 @@ Max badges to show before collapsing to count. Defaults to `5`.
 
 > `optional` **multiSelect**: `boolean`
 
-Defined in: [packages/ui/src/crud/filters/faceted-filter.tsx:45](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/faceted-filter.tsx#L45)
+Defined in: [packages/ui/src/crud/filters/faceted-filter.tsx:35](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/faceted-filter.tsx#L35)
 
 Enable multi-select mode. Defaults to `true`.
 
@@ -54,7 +54,7 @@ Enable multi-select mode. Defaults to `true`.
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/crud/filters/faceted-filter.tsx:41](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/faceted-filter.tsx#L41)
+Defined in: [packages/ui/src/crud/filters/faceted-filter.tsx:31](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/faceted-filter.tsx#L31)
 
 Called when selection changes.
 
@@ -74,7 +74,7 @@ Called when selection changes.
 
 > **options**: [`FacetedFilterOption`](FacetedFilterOption.md)[]
 
-Defined in: [packages/ui/src/crud/filters/faceted-filter.tsx:43](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/faceted-filter.tsx#L43)
+Defined in: [packages/ui/src/crud/filters/faceted-filter.tsx:33](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/faceted-filter.tsx#L33)
 
 Available filter options.
 
@@ -84,6 +84,6 @@ Available filter options.
 
 > **value**: `string` \| `string`[]
 
-Defined in: [packages/ui/src/crud/filters/faceted-filter.tsx:39](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/faceted-filter.tsx#L39)
+Defined in: [packages/ui/src/crud/filters/faceted-filter.tsx:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/faceted-filter.tsx#L29)
 
 Currently selected value(s). String for single-select, string array for multi-select.

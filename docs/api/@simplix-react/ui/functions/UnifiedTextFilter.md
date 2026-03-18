@@ -8,7 +8,7 @@
 
 > **UnifiedTextFilter**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:36](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L36)
+Defined in: [packages/ui/src/crud/filters/unified-text-filter.tsx:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/unified-text-filter.tsx#L30)
 
 ## Parameters
 

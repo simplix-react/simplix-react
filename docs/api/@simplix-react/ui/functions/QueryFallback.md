@@ -8,16 +8,13 @@
 
 > **QueryFallback**(`__namedParameters`): `ReactNode`
 
-Defined in: [packages/ui/src/crud/shared/query-fallback.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/query-fallback.tsx#L22)
+Defined in: [packages/ui/src/crud/shared/query-fallback.tsx:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/query-fallback.tsx#L29)
 
 Fallback component for query loading and not-found states.
 
-Use as an early-return guard in pages that fetch a single entity:
-
-```tsx
-const { data, isLoading } = useGet(id);
-if (isLoading || !data) return <QueryFallback isLoading={isLoading} notFoundMessage="Pet not found." />;
-```
+When `onNotFound` is provided, displays a dialog informing the user that
+the data was not found. Clicking confirm triggers `onNotFound` (typically
+closing the detail panel and returning to the list).
 
 ## Parameters
 
@@ -28,3 +25,10 @@ if (isLoading || !data) return <QueryFallback isLoading={isLoading} notFoundMess
 ## Returns
 
 `ReactNode`
+
+## Example
+
+```tsx
+const { data, isLoading } = useGet(id);
+if (isLoading || !data) return <QueryFallback isLoading={isLoading} notFoundMessage="Pet not found." onNotFound={onClose} />;
+```

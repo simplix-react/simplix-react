@@ -8,7 +8,7 @@
 
 > **MapPinContainerProps** = `object`
 
-Defined in: [packages/ui/src/base/map/map.tsx:600](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/map/map.tsx#L600)
+Defined in: [packages/ui/src/base/map/map.tsx:619](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/map/map.tsx#L619)
 
 Props for the [MapPinContainer](../functions/MapPinContainer.md) component.
 
@@ -18,7 +18,7 @@ Props for the [MapPinContainer](../functions/MapPinContainer.md) component.
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/base/map/map.tsx:601](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/map/map.tsx#L601)
+Defined in: [packages/ui/src/base/map/map.tsx:620](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/map/map.tsx#L620)
 
 ***
 
@@ -26,4 +26,4 @@ Defined in: [packages/ui/src/base/map/map.tsx:601](https://github.com/simplix-re
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/base/map/map.tsx:602](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/map/map.tsx#L602)
+Defined in: [packages/ui/src/base/map/map.tsx:621](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/map/map.tsx#L621)

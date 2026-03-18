@@ -6,7 +6,7 @@
 
 # Interface: ComboboxFieldProps\<T\>
 
-Defined in: [packages/ui/src/fields/form/combobox-field.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L16)
+Defined in: [packages/ui/src/fields/form/combobox-field.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L11)
 
 Props for the [ComboboxField](../functions/ComboboxField.md) form component.
 
@@ -62,7 +62,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:29](https://github.com/simplix
 
 > `optional` **emptyMessage**: `string`
 
-Defined in: [packages/ui/src/fields/form/combobox-field.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L24)
+Defined in: [packages/ui/src/fields/form/combobox-field.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L19)
 
 ***
 
@@ -104,7 +104,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:24](https://github.com/simplix
 
 ### layout?
 
-> `optional` **layout**: `"hidden"` \| `"inline"` \| `"left"` \| `"top"`
+> `optional` **layout**: `"inline"` \| `"left"` \| `"top"` \| `"hidden"`
 
 Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L5)
 
@@ -118,7 +118,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-
 
 > `optional` **loading**: `boolean`
 
-Defined in: [packages/ui/src/fields/form/combobox-field.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L22)
+Defined in: [packages/ui/src/fields/form/combobox-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L17)
 
 ***
 
@@ -126,7 +126,7 @@ Defined in: [packages/ui/src/fields/form/combobox-field.tsx:22](https://github.c
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/fields/form/combobox-field.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L19)
+Defined in: [packages/ui/src/fields/form/combobox-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L14)
 
 #### Parameters
 
@@ -144,7 +144,7 @@ Defined in: [packages/ui/src/fields/form/combobox-field.tsx:19](https://github.c
 
 > `optional` **onSearch**: (`query`) => `void`
 
-Defined in: [packages/ui/src/fields/form/combobox-field.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L21)
+Defined in: [packages/ui/src/fields/form/combobox-field.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L16)
 
 #### Parameters
 
@@ -162,7 +162,7 @@ Defined in: [packages/ui/src/fields/form/combobox-field.tsx:21](https://github.c
 
 > **options**: `object`[]
 
-Defined in: [packages/ui/src/fields/form/combobox-field.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L20)
+Defined in: [packages/ui/src/fields/form/combobox-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L15)
 
 #### icon?
 
@@ -182,7 +182,7 @@ Defined in: [packages/ui/src/fields/form/combobox-field.tsx:20](https://github.c
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/fields/form/combobox-field.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L23)
+Defined in: [packages/ui/src/fields/form/combobox-field.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L18)
 
 ***
 
@@ -214,7 +214,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-
 
 > **value**: `T` \| `null`
 
-Defined in: [packages/ui/src/fields/form/combobox-field.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L18)
+Defined in: [packages/ui/src/fields/form/combobox-field.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L13)
 
 ***
 
