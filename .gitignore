@@ -20,3 +20,4 @@ storybook-static/
 **/src/**/*.d.ts.map
 !packages/cli/src/types/hbs.d.ts
 *.iml
+coverage/

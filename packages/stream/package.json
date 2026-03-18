@@ -29,7 +29,9 @@
   },
   "devDependencies": {
     "@simplix-react/config-typescript": "workspace:*",
+    "@testing-library/react": "catalog:",
     "@types/react": "catalog:",
+    "jsdom": "catalog:",
     "react": "catalog:",
     "tsup": "catalog:",
     "typescript": "catalog:",

@@ -1,5 +1,8 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, mkdirSync } from "node:fs";
 import { defineConfig } from "vitest/config";
+
+// Ensure coverage temp directory exists (workaround for vitest v8 race condition)
+try { mkdirSync("./coverage/.tmp", { recursive: true }); } catch {}
 
 export default defineConfig({
   plugins: [
@@ -27,5 +30,20 @@ export default defineConfig({
       },
       "extensions/simplix-boot/packages/*",
     ],
+    coverage: {
+      provider: "v8",
+      reporter: ["text"],
+      reportsDirectory: "./coverage",
+      include: [
+        "packages/*/src/**/*.{ts,tsx}",
+        "extensions/simplix-boot/packages/*/src/**/*.{ts,tsx}",
+      ],
+      exclude: [
+        "**/__tests__/**",
+        "**/index.ts",
+        "**/*.d.ts",
+        "**/types.ts",
+      ],
+    },
   },
 });

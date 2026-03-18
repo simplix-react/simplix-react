@@ -5,12 +5,12 @@
   "description": "Package-first React framework that auto-generates reusable domain packages from OpenAPI specs",
   "type": "module",
   "scripts": {
-    "build": "turbo run build",
+    "build": "turbo run build && vitest run",
     "build:storybook": "turbo run build-storybook",
     "dev": "turbo run dev",
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",
-    "test": "vitest run --reporter=verbose",
+    "test": "vitest run --reporter=verbose --coverage",
     "clean": "turbo run clean",
     "storybook": "pnpm --filter @simplix-react/storybook storybook",
     "docs:api": "typedoc",
@@ -21,6 +21,7 @@
   "devDependencies": {
     "@changesets/changelog-github": "catalog:",
     "@changesets/cli": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
     "oxlint": "catalog:",
     "turbo": "catalog:",
     "typedoc": "catalog:",
