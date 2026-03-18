@@ -128,3 +128,27 @@ export const Disabled: Story = {
     disabled: true,
   },
 };
+
+const scheduleOptions = [
+  { label: "24/7", value: "always" },
+  { label: "Business Hours", value: "business" },
+  { label: "Night Shift", value: "night" },
+];
+
+export const Compact: StoryObj = {
+  render: () => {
+    const [value, setValue] = React.useState("business");
+    return (
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <span style={{ fontSize: 14, color: "#6b7280" }}>Schedule:</span>
+        <FormFields.SelectField
+          compact
+          value={value}
+          onChange={setValue}
+          options={scheduleOptions}
+          placeholder="Select..."
+        />
+      </div>
+    );
+  },
+};
