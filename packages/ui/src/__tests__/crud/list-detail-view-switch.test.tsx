@@ -26,6 +26,7 @@ function createState(
 function createFade(displayedId: string | null = null): UseFadeTransitionResult {
   return {
     displayedId,
+    fading: false,
     style: { opacity: 1, transition: "opacity 200ms" },
   };
 }

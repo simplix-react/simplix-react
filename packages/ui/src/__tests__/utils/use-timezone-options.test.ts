@@ -41,7 +41,6 @@ describe("getTimezoneList", () => {
 
   it("returns fallback when Intl.supportedValuesOf throws", () => {
     const original = Intl.supportedValuesOf;
-    // @ts-expect-error -- temporarily override for test
     Intl.supportedValuesOf = () => { throw new Error("not supported"); };
     try {
       const list = getTimezoneList();

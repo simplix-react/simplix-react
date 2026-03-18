@@ -58,6 +58,7 @@ const siblings: TreeNode[] = [
 ];
 
 const defaultConfig = {
+  orderField: "id" as const,
   idField: "id" as const,
   onReorder: vi.fn(),
 };

@@ -237,7 +237,7 @@ describe("CrudList.Table", () => {
       <CrudList>
         <CrudList.Table
           data={testData}
-          sort={{ field: null, direction: "asc" }}
+          sort={null}
           onSortChange={onSortChange}
         >
           <CrudList.Column<TestItem> field="name" header="Name" sortable />

@@ -18,7 +18,7 @@ describe("useCrudNavigation", () => {
   it("parses detail mode with id", () => {
     const onNavigate = vi.fn();
     const { result } = renderHook(() =>
-      useCrudNavigation({ id: "42", mode: "detail" }, onNavigate),
+      useCrudNavigation({ id: "42" }, onNavigate),
     );
 
     expect(result.current.view).toBe("detail");
@@ -48,7 +48,7 @@ describe("useCrudNavigation", () => {
   it("showList navigates to empty search (list view)", () => {
     const onNavigate = vi.fn();
     const { result } = renderHook(() =>
-      useCrudNavigation({ id: "42", mode: "detail" }, onNavigate),
+      useCrudNavigation({ id: "42" }, onNavigate),
     );
 
     act(() => result.current.showList());

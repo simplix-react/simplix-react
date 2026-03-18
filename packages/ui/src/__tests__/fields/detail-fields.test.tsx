@@ -206,7 +206,7 @@ describe("DetailLinkField", () => {
 describe("DetailBadgeField", () => {
   it("renders badge with value", () => {
     render(
-      <DetailBadgeField
+      <DetailBadgeField<"active" | "inactive">
         label="Status"
         value="active"
         variants={{ active: "success", inactive: "secondary" }}

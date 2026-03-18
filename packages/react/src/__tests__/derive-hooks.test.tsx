@@ -124,7 +124,8 @@ describe("deriveEntityHooks", () => {
   describe("hook structure", () => {
     it("returns entity hooks for each entity in the contract", () => {
       const contract = createMockContract();
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       expect(hooks).toHaveProperty("task");
       expect(hooks.task).toHaveProperty("useList");
@@ -169,7 +170,8 @@ describe("deriveEntityHooks", () => {
         queryKeys: createMockQueryKeys(),
       };
 
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       expect(hooks).toHaveProperty("archiveTask");
       expect(hooks.archiveTask).toHaveProperty("useMutation");
@@ -182,7 +184,8 @@ describe("deriveEntityHooks", () => {
     it("fetches a list of entities", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(() => hooks.task.useList(), {
         wrapper: createWrapper(queryClient),
@@ -200,7 +203,8 @@ describe("deriveEntityHooks", () => {
     it("passes list params (filters, sort, pagination)", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const listParams = {
         filters: { status: "open" },
@@ -217,7 +221,8 @@ describe("deriveEntityHooks", () => {
     it("passes parentId for child entities", async () => {
       const client = createMockClient();
       const contract = createMockContractWithParent(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       renderHook(() => hooks.task.useList("parent-1"), {
         wrapper: createWrapper(queryClient),
@@ -231,7 +236,8 @@ describe("deriveEntityHooks", () => {
     it("passes parentId with list params for child entities", async () => {
       const client = createMockClient();
       const contract = createMockContractWithParent(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const listParams = { filters: { status: "open" } };
 
@@ -247,7 +253,8 @@ describe("deriveEntityHooks", () => {
     it("is disabled when parent entity has no parentId", async () => {
       const client = createMockClient();
       const contract = createMockContractWithParent(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(() => hooks.task.useList(undefined as unknown as string), {
         wrapper: createWrapper(queryClient),
@@ -261,7 +268,8 @@ describe("deriveEntityHooks", () => {
     it("merges custom query options", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(
         () => hooks.task.useList({ enabled: false }),
@@ -279,7 +287,8 @@ describe("deriveEntityHooks", () => {
     it("fetches a single entity by ID", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(() => hooks.task.useGet("1"), {
         wrapper: createWrapper(queryClient),
@@ -294,7 +303,8 @@ describe("deriveEntityHooks", () => {
     it("is disabled when id is empty string", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(() => hooks.task.useGet(""), {
         wrapper: createWrapper(queryClient),
@@ -307,7 +317,8 @@ describe("deriveEntityHooks", () => {
     it("merges custom query options", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(
         () => hooks.task.useGet("1", { enabled: false }),
@@ -323,7 +334,8 @@ describe("deriveEntityHooks", () => {
       const compositeId = { tenantId: "t1", taskId: "1" };
       client.task.get.mockResolvedValue({ tenantId: "t1", taskId: "1", title: "Task 1", status: "open" });
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(() => hooks.task.useGet(compositeId), {
         wrapper: createWrapper(queryClient),
@@ -341,7 +353,8 @@ describe("deriveEntityHooks", () => {
     it("creates an entity and invalidates cache", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
       const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
 
       const { result } = renderHook(() => hooks.task.useCreate(), {
@@ -363,7 +376,8 @@ describe("deriveEntityHooks", () => {
     it("passes parentId for child entities", async () => {
       const client = createMockClient();
       const contract = createMockContractWithParent(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(() => hooks.task.useCreate("parent-1"), {
         wrapper: createWrapper(queryClient),
@@ -381,7 +395,8 @@ describe("deriveEntityHooks", () => {
     it("calls user-provided onSuccess callback", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
       const onSuccess = vi.fn();
 
       const { result } = renderHook(
@@ -405,7 +420,8 @@ describe("deriveEntityHooks", () => {
     it("updates an entity and invalidates cache on settled", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
       const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
 
       const { result } = renderHook(() => hooks.task.useUpdate(), {
@@ -427,7 +443,8 @@ describe("deriveEntityHooks", () => {
     it("calls user-provided onSuccess callback", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
       const onSuccess = vi.fn();
 
       const { result } = renderHook(
@@ -451,7 +468,8 @@ describe("deriveEntityHooks", () => {
         () => new Promise((resolve) => setTimeout(() => resolve({ id: "1", title: "Server Updated", status: "done" }), 50)),
       );
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       // Pre-populate cache with list data
       queryClient.setQueryData(["test", "task", "list", {}], [
@@ -477,7 +495,8 @@ describe("deriveEntityHooks", () => {
       const client = createMockClient();
       client.task.update.mockRejectedValue(new Error("Server error"));
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const originalData = [
         { id: "1", title: "Task 1", status: "open" },
@@ -508,7 +527,8 @@ describe("deriveEntityHooks", () => {
       const compositeId = { tenantId: "t1", taskId: "1" };
       client.task.update.mockResolvedValue({ tenantId: "t1", taskId: "1", title: "Updated", status: "done" });
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(() => hooks.task.useUpdate(), {
         wrapper: createWrapper(queryClient),
@@ -530,7 +550,8 @@ describe("deriveEntityHooks", () => {
         () => new Promise((resolve) => setTimeout(() => resolve({ tenantId: "t1", taskId: "1", title: "Server Updated", status: "done" }), 50)),
       );
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       queryClient.setQueryData(["test", "task", "list", {}], [
         { tenantId: "t1", taskId: "1", title: "Task 1", status: "open" },
@@ -558,7 +579,8 @@ describe("deriveEntityHooks", () => {
     it("deletes an entity and invalidates cache", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
       const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
 
       const { result } = renderHook(() => hooks.task.useDelete(), {
@@ -580,7 +602,8 @@ describe("deriveEntityHooks", () => {
     it("calls user-provided onSuccess callback", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
       const onSuccess = vi.fn();
 
       const { result } = renderHook(
@@ -601,7 +624,8 @@ describe("deriveEntityHooks", () => {
       const client = createMockClient();
       const compositeId = { tenantId: "t1", taskId: "1" };
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(() => hooks.task.useDelete(), {
         wrapper: createWrapper(queryClient),
@@ -627,7 +651,8 @@ describe("deriveEntityHooks", () => {
         meta: { hasNextPage: true, nextCursor: "cursor-1" },
       });
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(
         () => hooks.task.useInfiniteList(),
@@ -647,7 +672,8 @@ describe("deriveEntityHooks", () => {
         meta: { hasNextPage: true, nextCursor: "cursor-1" },
       });
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(
         () => hooks.task.useInfiniteList(),
@@ -665,7 +691,8 @@ describe("deriveEntityHooks", () => {
         meta: { hasNextPage: false },
       });
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(
         () => hooks.task.useInfiniteList(),
@@ -683,7 +710,8 @@ describe("deriveEntityHooks", () => {
         meta: { hasNextPage: false },
       });
       const contract = createMockContractWithParent(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       renderHook(
         () => hooks.task.useInfiniteList("parent-1"),
@@ -703,7 +731,8 @@ describe("deriveEntityHooks", () => {
     it("is disabled when parent entity has no parentId", async () => {
       const client = createMockClient();
       const contract = createMockContractWithParent(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(
         () => hooks.task.useInfiniteList(undefined),
@@ -721,7 +750,8 @@ describe("deriveEntityHooks", () => {
         meta: { hasNextPage: false },
       });
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       renderHook(
         () => hooks.task.useInfiniteList(undefined, { limit: 50 }),
@@ -744,7 +774,8 @@ describe("deriveEntityHooks", () => {
         meta: { hasNextPage: false },
       });
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const params = {
         filters: { status: "open" },
@@ -773,7 +804,8 @@ describe("deriveEntityHooks", () => {
     it("uses correct query keys for useList", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       renderHook(() => hooks.task.useList(), {
         wrapper: createWrapper(queryClient),
@@ -791,7 +823,8 @@ describe("deriveEntityHooks", () => {
     it("uses correct query keys for useGet", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       renderHook(() => hooks.task.useGet("abc"), {
         wrapper: createWrapper(queryClient),
@@ -808,7 +841,8 @@ describe("deriveEntityHooks", () => {
     it("includes filter params in list query key", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const listParams = { filters: { status: "open" } };
 
@@ -837,7 +871,8 @@ describe("deriveEntityHooks", () => {
     it("invalidates list cache after create mutation", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       // Pre-populate list cache
       queryClient.setQueryData(["test", "task", "list", {}], [
@@ -864,7 +899,8 @@ describe("deriveEntityHooks", () => {
     it("invalidates all entity queries after delete mutation", async () => {
       const client = createMockClient();
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       // Pre-populate both list and detail cache
       queryClient.setQueryData(["test", "task", "list", {}], [
@@ -903,7 +939,8 @@ describe("deriveEntityHooks", () => {
       const client = createMockClient();
       client.task.list.mockRejectedValue(new Error("Network error"));
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(() => hooks.task.useList(), {
         wrapper: createWrapper(queryClient),
@@ -917,7 +954,8 @@ describe("deriveEntityHooks", () => {
       const client = createMockClient();
       client.task.get.mockRejectedValue(new Error("Not found"));
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(() => hooks.task.useGet("999"), {
         wrapper: createWrapper(queryClient),
@@ -931,7 +969,8 @@ describe("deriveEntityHooks", () => {
       const client = createMockClient();
       client.task.create.mockRejectedValue(new Error("Validation failed"));
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(() => hooks.task.useCreate(), {
         wrapper: createWrapper(queryClient),
@@ -949,7 +988,8 @@ describe("deriveEntityHooks", () => {
       const client = createMockClient();
       client.task.update.mockRejectedValue(new Error("Conflict"));
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(() => hooks.task.useUpdate(), {
         wrapper: createWrapper(queryClient),
@@ -967,7 +1007,8 @@ describe("deriveEntityHooks", () => {
       const client = createMockClient();
       client.task.delete.mockRejectedValue(new Error("Forbidden"));
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(() => hooks.task.useDelete(), {
         wrapper: createWrapper(queryClient),
@@ -1019,7 +1060,8 @@ describe("deriveEntityHooks", () => {
         queryKeys: createMockQueryKeys(),
       };
 
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(() => hooks.archiveTask.useMutation(), {
         wrapper: createWrapper(queryClient),
@@ -1075,7 +1117,8 @@ describe("deriveEntityHooks", () => {
         queryKeys: mockQueryKeys,
       };
 
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(() => hooks.archiveTask.useMutation(), {
         wrapper: createWrapper(queryClient),
@@ -1128,7 +1171,8 @@ describe("deriveEntityHooks", () => {
         queryKeys: createMockQueryKeys(),
       };
 
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(
         () => hooks.archiveTask.useMutation({ onSuccess }),
@@ -1179,7 +1223,8 @@ describe("deriveEntityHooks", () => {
         queryKeys: createMockQueryKeys(),
       };
 
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(() => hooks.archiveTask.useMutation(), {
         wrapper: createWrapper(queryClient),
@@ -1207,7 +1252,8 @@ describe("deriveEntityHooks", () => {
         meta: { total: 2, page: 1 },
       });
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(() => hooks.task.useList(), {
         wrapper: createWrapper(queryClient),
@@ -1227,7 +1273,8 @@ describe("deriveEntityHooks", () => {
         { id: "1", title: "Task 1", status: "open" },
       ]);
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(() => hooks.task.useList(), {
         wrapper: createWrapper(queryClient),
@@ -1245,7 +1292,8 @@ describe("deriveEntityHooks", () => {
       // An object without a `data` array property
       client.task.list.mockResolvedValue({ items: [{ id: "1" }] });
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(() => hooks.task.useList(), {
         wrapper: createWrapper(queryClient),
@@ -1290,7 +1338,8 @@ describe("deriveEntityHooks", () => {
         queryKeys: mockQueryKeys,
       };
 
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const treeParams = { rootId: "root-1" };
       const { result } = renderHook(() => hooks.task.useTree(treeParams), {
@@ -1333,7 +1382,8 @@ describe("deriveEntityHooks", () => {
         queryKeys: mockQueryKeys,
       };
 
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(() => hooks.task.useTree(), {
         wrapper: createWrapper(queryClient),
@@ -1387,7 +1437,8 @@ describe("deriveEntityHooks", () => {
 
     it("derives a generic query hook for custom GET operations", async () => {
       const { contract, searchFn } = createContractWithCustomOps();
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       expect(hooks.task).toHaveProperty("useSearch");
 
@@ -1405,7 +1456,8 @@ describe("deriveEntityHooks", () => {
 
     it("derives a generic mutation hook for custom non-GET operations", async () => {
       const { contract, archiveFn } = createContractWithCustomOps();
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       expect(hooks.task).toHaveProperty("useArchive");
 
@@ -1425,7 +1477,8 @@ describe("deriveEntityHooks", () => {
 
     it("generic mutation invalidates all entity queries by default", async () => {
       const { contract } = createContractWithCustomOps();
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
       const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
 
       const { result } = renderHook(() => hooks.task.useArchive(), {
@@ -1477,7 +1530,8 @@ describe("deriveEntityHooks", () => {
         queryKeys: mockQueryKeys,
       };
 
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
       const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
 
       const { result } = renderHook(() => hooks.task.useArchive(), {
@@ -1497,7 +1551,8 @@ describe("deriveEntityHooks", () => {
 
     it("generic mutation calls user-provided onSuccess callback", async () => {
       const { contract } = createContractWithCustomOps();
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
       const onSuccess = vi.fn();
 
       const { result } = renderHook(
@@ -1531,7 +1586,8 @@ describe("deriveEntityHooks", () => {
           meta: { hasNextPage: false },
         });
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(
         () => hooks.task.useInfiniteList(),
@@ -1571,7 +1627,8 @@ describe("deriveEntityHooks", () => {
           meta: { hasNextPage: false },
         });
       const contract = createMockContract(client);
-      const hooks = deriveEntityHooks(contract);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hooks: any = deriveEntityHooks(contract as any);
 
       const { result } = renderHook(
         () => hooks.task.useInfiniteList(),

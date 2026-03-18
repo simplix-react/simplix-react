@@ -122,6 +122,7 @@ vi.mock("../../base/map/map-provider", () => ({
 
 import React from "react";
 import { Map, MapMarker, MapControls } from "../../base/map/map";
+import type { MapRef } from "../../base/map/map";
 
 // ── Map theme change ──
 
@@ -488,7 +489,7 @@ describe("Map ref forwarding", () => {
   });
 
   it("forwards ref as object", () => {
-    const ref = React.createRef<unknown>();
+    const ref = React.createRef<MapRef>();
     render(<Map ref={ref} />);
     expect(ref.current).toBeTruthy();
   });

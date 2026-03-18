@@ -6,7 +6,7 @@ afterEach(cleanup);
 
 import { CrudErrorBoundary } from "../../crud/shared/error-boundary";
 
-function ThrowError({ message }: { message: string }) {
+function ThrowError({ message }: { message: string }): never {
   throw new Error(message);
 }
 

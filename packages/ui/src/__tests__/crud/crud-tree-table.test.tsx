@@ -116,7 +116,7 @@ describe("CrudTree.Table", () => {
       <CrudTree>
         <CrudTree.Table
           data={treeData}
-          sort={{ field: null, direction: "asc" }}
+          sort={null}
           onSortChange={onSortChange}
         >
           <CrudTree.Column<TreeNode> field="name" header="Name" sortable />

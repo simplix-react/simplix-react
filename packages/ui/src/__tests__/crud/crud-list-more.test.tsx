@@ -278,7 +278,7 @@ describe("CrudList.Table (more coverage)", () => {
       <CrudList>
         <CrudList.Table
           data={testData}
-          sort={{ field: null, direction: "asc" }}
+          sort={null}
           onSortChange={vi.fn()}
         >
           <CrudList.Column<TestItem> field="name" header="Name" />

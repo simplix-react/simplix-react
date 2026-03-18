@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
-import type { ComponentType } from "react";
 import { cleanup, render, renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
+import type { UIComponents } from "../../provider/types";
 import { UIProvider, useUIComponents } from "../../provider/ui-provider";
 
 afterEach(cleanup);
@@ -75,7 +75,7 @@ describe("useUIComponents", () => {
 
 describe("UIProvider", () => {
   it("overrides a base component", () => {
-    const CustomButton: ComponentType<Record<string, unknown>> = () => null;
+    const CustomButton: UIComponents["Button"] = () => null;
 
     const { result } = renderHook(() => useUIComponents(), {
       wrapper: ({ children }) => (
@@ -92,11 +92,11 @@ describe("UIProvider", () => {
   });
 
   it("deep merges compound component overrides", () => {
-    const CustomSelectTrigger: ComponentType<Record<string, unknown>> = () => null;
+    const CustomSelectTrigger: UIComponents["Select"]["Trigger"] = () => null;
 
     const { result } = renderHook(() => useUIComponents(), {
       wrapper: ({ children }) => (
-        <UIProvider overrides={{ Select: { Trigger: CustomSelectTrigger } as unknown as Record<string, unknown> }}>
+        <UIProvider overrides={{ Select: { Trigger: CustomSelectTrigger } as Partial<UIComponents["Select"]> as UIComponents["Select"] }}>
           {children}
         </UIProvider>
       ),
@@ -112,8 +112,8 @@ describe("UIProvider", () => {
   });
 
   it("supports nested UIProviders (inner wins)", () => {
-    const OuterButton: ComponentType<Record<string, unknown>> = () => null;
-    const InnerButton: ComponentType<Record<string, unknown>> = () => null;
+    const OuterButton: UIComponents["Button"] = () => null;
+    const InnerButton: UIComponents["Button"] = () => null;
 
     const { result } = renderHook(() => useUIComponents(), {
       wrapper: ({ children }) => (
@@ -129,8 +129,8 @@ describe("UIProvider", () => {
   });
 
   it("nested UIProvider inherits parent overrides", () => {
-    const CustomInput: ComponentType<Record<string, unknown>> = () => null;
-    const CustomButton: ComponentType<Record<string, unknown>> = () => null;
+    const CustomInput: UIComponents["Input"] = () => null;
+    const CustomButton: UIComponents["Button"] = () => null;
 
     const { result } = renderHook(() => useUIComponents(), {
       wrapper: ({ children }) => (

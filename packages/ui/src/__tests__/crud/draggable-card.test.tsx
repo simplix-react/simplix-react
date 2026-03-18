@@ -37,7 +37,7 @@ interface TestItem {
 describe("DraggableCard", () => {
   const item: TestItem = { id: "1", name: "Alice" };
   const config = {
-    orderField: "displayOrder" as string,
+    orderField: "id" as const,
     idField: "id" as keyof TestItem & string,
     onReorder: vi.fn(),
   };

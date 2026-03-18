@@ -76,7 +76,7 @@ describe("CrudList.Table (extended coverage)", () => {
     render(
       <CrudList>
         <CrudList.Table data={testData}>
-          <CrudList.Column<TestItem> field="created" header="Created" display="date" />
+          <CrudList.Column<TestItem> field="created" header="Created" format="date" />
         </CrudList.Table>
       </CrudList>,
     );
@@ -88,7 +88,7 @@ describe("CrudList.Table (extended coverage)", () => {
     render(
       <CrudList>
         <CrudList.Table data={data}>
-          <CrudList.Column field="ts" header="Timestamp" display="datetime" />
+          <CrudList.Column field="ts" header="Timestamp" format="datetime" />
         </CrudList.Table>
       </CrudList>,
     );
@@ -100,7 +100,7 @@ describe("CrudList.Table (extended coverage)", () => {
     render(
       <CrudList>
         <CrudList.Table data={data}>
-          <CrudList.Column field="ts" header="Time" display="relative" />
+          <CrudList.Column field="ts" header="Time" format="relative" />
         </CrudList.Table>
       </CrudList>,
     );
@@ -111,7 +111,7 @@ describe("CrudList.Table (extended coverage)", () => {
     render(
       <CrudList>
         <CrudList.Table data={testData}>
-          <CrudList.Column<TestItem> field="score" header="Score" display="number" />
+          <CrudList.Column<TestItem> field="score" header="Score" />
         </CrudList.Table>
       </CrudList>,
     );
