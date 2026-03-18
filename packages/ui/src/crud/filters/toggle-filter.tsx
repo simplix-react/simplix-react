@@ -1,7 +1,7 @@
 import { useTranslation } from "@simplix-react/i18n/react";
 import { cn } from "../../utils/cn";
-import { Badge } from "../../base/display/badge";
 import { Separator } from "../../base/display/separator";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import { ToggleLeftIcon, XIcon } from "../shared/icons";
 
 export interface ToggleFilterProps {
@@ -17,6 +17,7 @@ export function ToggleFilter({
   onChange,
   className,
 }: ToggleFilterProps) {
+  const { Badge } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const isActive = value !== undefined;
 

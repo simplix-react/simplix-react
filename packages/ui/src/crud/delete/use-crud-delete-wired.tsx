@@ -1,6 +1,6 @@
 import { type ReactElement, useCallback } from "react";
 
-import { useUIComponents } from "../../provider/ui-provider";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import type { CrudMutation } from "../form/use-crud-form-submit";
 
 import { type DeleteTarget, useCrudDeleteList } from "./use-crud-delete";
@@ -62,7 +62,7 @@ export function useCrudDeleteWired(
     });
   }, [del.target, del.cancel, deleteMutation, onDeleted]);
 
-  const { CrudDelete } = useUIComponents();
+  const { CrudDelete } = useFlatUIComponents();
 
   const deleteDialog: ReactElement | null = del.target ? (
     <CrudDelete

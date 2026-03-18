@@ -1,8 +1,8 @@
 import { useTranslation } from "@simplix-react/i18n/react";
 import type { ReactNode } from "react";
 
-import { Badge } from "../../base/display/badge";
-import { Button, type ButtonProps } from "../../base/controls/button";
+import type { ButtonProps } from "../../base/controls/button";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 
 /**
  * Props for the {@link SaveButton} component.
@@ -65,6 +65,7 @@ export function SaveButton({
   children,
   ...rest
 }: SaveButtonProps) {
+  const { Badge, Button } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const clientErrorCount = validationCount ?? 0;
   const serverErrorCount = Object.keys(fieldErrors ?? {}).length;

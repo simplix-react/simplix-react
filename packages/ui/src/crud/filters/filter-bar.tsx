@@ -1,35 +1,10 @@
 import { type ComponentType, type ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslation } from "@simplix-react/i18n/react";
 
-import { Badge } from "../../base/display/badge";
-import { Button } from "../../base/controls/button";
-import { Calendar, type DateRange } from "../../base/controls/calendar";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "../../base/inputs/command";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "../../base/navigation/dropdown-menu";
-import { Input } from "../../base/inputs/input";
-import { Label } from "../../base/controls/label";
-import { Popover, PopoverContent, PopoverTrigger } from "../../base/overlay/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from "../../base/inputs/select";
-import { Switch } from "../../base/inputs/switch";
+import type { DateRange } from "../../base/controls/calendar";
 import { Flex } from "../../primitives/flex";
 import { Stack } from "../../primitives/stack";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
 import { formatDateRange } from "../../utils/format-date";
 import { useCrudListColumns } from "../shared/column-context";
@@ -109,6 +84,7 @@ export interface FilterBarProps {
 // ── FilterBar Component ──
 
 export function FilterBar({ filters, state, leading, maxBadges, className }: FilterBarProps) {
+  const { Badge, Button, Popover, PopoverTrigger, PopoverContent, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuCheckboxItem } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const locale = useLocale();
   const columnCtx = useCrudListColumns();
@@ -427,6 +403,7 @@ function OperatorIcon({
   currentOp: SearchOperator;
   onOperatorChange?: (op: SearchOperator) => void;
 }) {
+  const { Select, SelectTrigger, SelectContent, SelectItem } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const meta = operatorConfig[currentOp];
 
@@ -467,6 +444,7 @@ function TextFormField({
   onOperatorChange: (def: TextFilterDef, op: SearchOperator) => void;
   className?: string;
 }) {
+  const { Input, Label } = useFlatUIComponents();
   const currentOp = operators[def.field] ?? def.defaultOperator;
   const key = makeFilterKey(def.field, currentOp);
   const value = (state.values[key] as string) ?? "";
@@ -510,6 +488,7 @@ function NumberFormField({
   onOperatorChange: (def: NumberFilterDef, op: SearchOperator) => void;
   className?: string;
 }) {
+  const { Input, Label } = useFlatUIComponents();
   const currentOp = operators[def.field] ?? def.defaultOperator;
   const key = makeFilterKey(def.field, currentOp);
   const rawValue = state.values[key];
@@ -576,6 +555,7 @@ function FacetedFormField({
   state: CrudListFilters;
   className?: string;
 }) {
+  const { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem, Label } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const key = makeFilterKey(def.field, SearchOperator.IN);
   const rawValue = state.values[key];
@@ -652,6 +632,7 @@ function ToggleFormField({
   state: CrudListFilters;
   className?: string;
 }) {
+  const { Label, Switch } = useFlatUIComponents();
   const key = makeFilterKey(def.field, SearchOperator.EQUALS);
   const rawValue = state.values[key];
   const checked = typeof rawValue === "boolean" ? rawValue : false;
@@ -682,6 +663,7 @@ function DateRangeFormField({
   state: CrudListFilters;
   className?: string;
 }) {
+  const { Calendar, Label } = useFlatUIComponents();
   const locale = useLocale();
   const gteKey = makeFilterKey(def.field, SearchOperator.GREATER_THAN_OR_EQUAL);
   const lteKey = makeFilterKey(def.field, SearchOperator.LESS_THAN_OR_EQUAL);

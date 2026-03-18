@@ -1,12 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 
 import type { CommonFieldProps } from "../../crud/shared/types";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "../../base/overlay/popover";
-import { useUIComponents } from "../../provider/ui-provider";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
 import { FieldWrapper } from "../shared/field-wrapper";
 
@@ -56,7 +51,7 @@ export function MultiSelectField<T extends string = string>({
   className,
   ...variantProps
 }: MultiSelectFieldProps<T>) {
-  const { Badge, Input } = useUIComponents();
+  const { Badge, Input, Popover, PopoverContent, PopoverTrigger } = useFlatUIComponents();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);

@@ -1,7 +1,7 @@
 import type { DraggableAttributes, DraggableSyntheticListeners } from "@dnd-kit/core";
 
-import { Button } from "../../base";
 import { cn } from "../../utils/cn";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 
 interface DragHandleCellProps {
   disabled?: boolean;
@@ -79,6 +79,7 @@ interface DragHandleHeaderProps {
 }
 
 export function DragHandleHeader({ isDragEnabled, onActivate }: DragHandleHeaderProps) {
+  const { Button } = useFlatUIComponents();
   return (
     <Button
       type="button"

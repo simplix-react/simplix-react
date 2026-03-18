@@ -2,7 +2,7 @@ import { type VariantProps, cva } from "class-variance-authority";
 import { type ReactNode, useId } from "react";
 
 import { type FieldVariant, useFieldVariant } from "../../crud/shared/types";
-import { useUIComponents } from "../../provider/ui-provider";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn, toTestId } from "../../utils/cn";
 import { FieldMessage } from "./field-message";
 
@@ -63,7 +63,7 @@ export function FieldWrapper({
   ...variantOverride
 }: FieldWrapperProps) {
   const { layout, size } = useFieldVariant(variantOverride);
-  const { Label } = useUIComponents();
+  const { Label } = useFlatUIComponents();
   const id = useId();
 
   const isHidden = layout === "hidden";

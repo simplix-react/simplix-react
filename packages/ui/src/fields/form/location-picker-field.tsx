@@ -3,17 +3,9 @@ import { useTranslation } from "@simplix-react/i18n/react";
 
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { MapPinIcon, MagnifyingGlassIcon, LocateIcon, SunIcon, MoonIcon, XIcon } from "../../crud/shared/icons";
-import { useUIComponents } from "../../provider/ui-provider";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
 import { Map, MapMarker } from "../../base/map/map";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../../base/overlay/dialog";
 import { FieldWrapper } from "../shared/field-wrapper";
 
 /** Props for the {@link LocationPickerField} component. */
@@ -79,7 +71,7 @@ export function LocationPickerField({
   className,
   ...variantProps
 }: LocationPickerFieldProps) {
-  const { Input } = useUIComponents();
+  const { Input } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const [open, setOpen] = useState(false);
   const [online, setOnline] = useState(
@@ -259,7 +251,7 @@ function LocationPickerDialog({
   markerIcon,
   fallbackTileUrl,
 }: LocationPickerDialogProps) {
-  const { Button } = useUIComponents();
+  const { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const center = safeCenter(latitude, longitude);
 
@@ -440,7 +432,7 @@ function LocationPickerDialog({
 // ── Geocoding search ──
 
 function GeoSearch({ onSelect }: { onSelect: (lat: number, lng: number) => void }) {
-  const { Input } = useUIComponents();
+  const { Input } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<NominatimResult[]>([]);

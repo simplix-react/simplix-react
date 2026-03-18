@@ -1,5 +1,5 @@
 import type { CommonFieldProps } from "../../crud/shared/types";
-import { useUIComponents } from "../../provider/ui-provider";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
 import { FieldWrapper } from "../shared/field-wrapper";
 
@@ -42,7 +42,7 @@ export function NumberField({
   className,
   ...variantProps
 }: NumberFieldProps) {
-  const { Input } = useUIComponents();
+  const { Input } = useFlatUIComponents();
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const raw = e.target.value;

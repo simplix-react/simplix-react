@@ -4,12 +4,11 @@ import {
   useCallback,
 } from "react";
 
-import { Button } from "../../base/controls/button";
 import { Flex } from "../../primitives/flex";
 import { Grid } from "../../primitives/grid";
 import { Stack } from "../../primitives/stack";
 import { cn } from "../../utils/cn";
-import { useUIComponents } from "../../provider/ui-provider";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import { XIcon } from "../shared/icons";
 import type { SectionShellProps } from "../shared/section-shell";
 import { type FieldVariant, FieldVariantContext } from "../shared/types";
@@ -64,6 +63,7 @@ function FormRoot({
   className,
   children,
 }: CrudFormProps) {
+  const { Button } = useFlatUIComponents();
   useBeforeUnload(!!warnOnUnsavedChanges);
 
   const handleSubmit = useCallback(
@@ -141,7 +141,7 @@ function FormSection({
   layout = "single-column",
   ...props
 }: CrudFormSectionProps) {
-  const { SectionShell } = useUIComponents();
+  const { SectionShell } = useFlatUIComponents();
   const columns = layoutClasses[layout];
 
   return (

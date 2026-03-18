@@ -4,17 +4,9 @@ import { CSS } from "@dnd-kit/utilities";
 import { useTranslation } from "@simplix-react/i18n/react";
 import { useCallback, useState } from "react";
 
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../../base";
 import { Stack } from "../../primitives";
 import { cn } from "../../utils/cn";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import type { TreeReorderConfig } from "./tree-types";
 
 // ── Grip icon ──
@@ -92,6 +84,7 @@ export function TreeReorderDialog<T>({
   title,
   description,
 }: TreeReorderDialogProps<T>) {
+  const { Button, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const idField = config.idField ?? ("id" as keyof T & string);
 

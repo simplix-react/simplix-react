@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
 
-import { Button } from "../base/controls/button";
+import { XIcon } from "../crud/shared/icons";
+import { useFlatUIComponents } from "../provider/ui-provider";
 import { Flex } from "../primitives/flex";
 import { Heading } from "../primitives/heading";
 import { Stack } from "../primitives/stack";
-import { XIcon } from "../crud/shared/icons";
 
 export interface PanelHeaderProps {
   title: string;
@@ -14,6 +14,8 @@ export interface PanelHeaderProps {
 }
 
 export function PanelHeader({ title, description, onClose, children }: PanelHeaderProps) {
+  const { Button } = useFlatUIComponents();
+
   return (
     <Flex align="center" gap="sm" className="border-b px-0 py-4 shrink-0">
       <Stack gap="none" className="flex-1 min-w-0">

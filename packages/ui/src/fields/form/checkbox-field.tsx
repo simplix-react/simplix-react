@@ -2,7 +2,7 @@ import type { ComponentProps } from "react";
 
 import type { CommonFieldProps } from "../../crud/shared/types";
 import type { Checkbox as CheckboxBase } from "../../base/inputs/checkbox";
-import { useUIComponents } from "../../provider/ui-provider";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import { FieldWrapper } from "../shared/field-wrapper";
 
 /** Props for the {@link CheckboxField} form component. */
@@ -37,7 +37,7 @@ export function CheckboxField({
   layout = "left",
   ...variantProps
 }: CheckboxFieldProps) {
-  const { Checkbox } = useUIComponents();
+  const { Checkbox } = useFlatUIComponents();
 
   return (
     <FieldWrapper

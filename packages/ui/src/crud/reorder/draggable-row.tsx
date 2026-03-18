@@ -3,8 +3,8 @@ import { CSS } from "@dnd-kit/utilities";
 import { flexRender } from "@tanstack/react-table";
 import type { Row } from "@tanstack/react-table";
 
-import { TableCell, TableRow } from "../../base";
 import { cn } from "../../utils/cn";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import type { ReorderConfig } from "../shared";
 import { DragHandleCell } from "./drag-handle";
 
@@ -27,6 +27,7 @@ export function DraggableRow<T>({
   reorderConfig,
   onRowClick,
 }: DraggableRowProps<T>) {
+  const { TableCell, TableRow } = useFlatUIComponents();
   const canDrag = isDragEnabled && (reorderConfig.canDrag?.(row.original) ?? true);
 
   const {

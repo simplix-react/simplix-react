@@ -4,18 +4,8 @@ import { useTranslation } from "@simplix-react/i18n/react";
 import { cn } from "../../utils/cn";
 import { CheckIcon, XIcon } from "../shared/icons";
 import { Flex } from "../../primitives/flex";
-import { Badge } from "../../base/display/badge";
 import { Separator } from "../../base/display/separator";
-import { Popover, PopoverContent, PopoverTrigger } from "../../base/overlay/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-} from "../../base/inputs/command";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 
 /**
  * A single option in a {@link FacetedFilter}.
@@ -76,6 +66,7 @@ export function FacetedFilter({
   maxDisplayCount = 5,
   className,
 }: FacetedFilterProps) {
+  const { Badge, Popover, PopoverTrigger, PopoverContent, Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandSeparator } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const selectedValues = useMemo(
     () => new Set(Array.isArray(value) ? value : value ? [value] : []),

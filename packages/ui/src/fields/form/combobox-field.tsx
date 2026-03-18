@@ -2,12 +2,7 @@ import { useTranslation } from "@simplix-react/i18n/react";
 import { useCallback, useMemo, useState } from "react";
 
 import type { CommonFieldProps } from "../../crud/shared/types";
-import {
-  Input,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "../../base";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import { Stack } from "../../primitives";
 import { cn } from "../../utils/cn";
 import { FieldWrapper } from "../shared/field-wrapper";
@@ -57,6 +52,7 @@ export function ComboboxField<T extends string = string>({
   className,
   ...variantProps
 }: ComboboxFieldProps<T>) {
+  const { Input, Popover, PopoverTrigger, PopoverContent } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");

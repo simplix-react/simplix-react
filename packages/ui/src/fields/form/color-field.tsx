@@ -1,7 +1,7 @@
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { ColorPicker } from "../../base/inputs";
 import type { PresetColor } from "../../base/inputs";
-import { useUIComponents } from "../../provider/ui-provider";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
 import { FieldWrapper } from "../shared/field-wrapper";
 
@@ -45,7 +45,7 @@ export function ColorField({
   className,
   ...variantProps
 }: ColorFieldProps) {
-  const { Input } = useUIComponents();
+  const { Input } = useFlatUIComponents();
 
   return (
     <FieldWrapper

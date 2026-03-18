@@ -3,10 +3,9 @@ import { useTranslation } from "@simplix-react/i18n/react";
 import { cn } from "../../utils/cn";
 import { formatDateRange } from "../../utils/format-date";
 import { CalendarDotsIcon, XIcon } from "../shared/icons";
-import { Badge } from "../../base/display/badge";
+import type { DateRange } from "../../base/controls/calendar";
 import { Separator } from "../../base/display/separator";
-import { Popover, PopoverContent, PopoverTrigger } from "../../base/overlay/popover";
-import { Calendar, type DateRange } from "../../base/controls/calendar";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 
 /**
  * Props for the {@link DateRangeFilter} component.
@@ -47,6 +46,7 @@ export function DateRangeFilter({
   onChange,
   className,
 }: DateRangeFilterProps) {
+  const { Badge, Calendar, Popover, PopoverTrigger, PopoverContent } = useFlatUIComponents();
   const { t, locale: i18nLocale } = useTranslation("simplix/ui");
   const [open, setOpen] = useState(false);
 

@@ -1,5 +1,5 @@
 import type { CommonFieldProps } from "../../crud/shared/types";
-import { useUIComponents } from "../../provider/ui-provider";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
 import { FieldWrapper } from "../shared/field-wrapper";
 
@@ -51,7 +51,7 @@ export function RadioGroupField<T extends string = string>({
   className,
   ...variantProps
 }: RadioGroupFieldProps<T>) {
-  const { RadioGroup } = useUIComponents();
+  const { RadioGroup, RadioGroupItem } = useFlatUIComponents();
 
   return (
     <FieldWrapper
@@ -64,7 +64,7 @@ export function RadioGroupField<T extends string = string>({
       className={className}
       {...variantProps}
     >
-      <RadioGroup.Root
+      <RadioGroup
         value={value}
         onValueChange={(v) => onChange(v as T)}
         disabled={disabled}
@@ -76,7 +76,7 @@ export function RadioGroupField<T extends string = string>({
             key={opt.value}
             className="flex items-center gap-2 cursor-pointer"
           >
-            <RadioGroup.Item value={opt.value} />
+            <RadioGroupItem value={opt.value} />
             <span className="text-sm">
               {opt.label}
               {opt.description && (
@@ -87,7 +87,7 @@ export function RadioGroupField<T extends string = string>({
             </span>
           </label>
         ))}
-      </RadioGroup.Root>
+      </RadioGroup>
     </FieldWrapper>
   );
 }

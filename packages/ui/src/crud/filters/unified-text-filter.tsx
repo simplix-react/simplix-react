@@ -1,14 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "@simplix-react/i18n/react";
 
-import { Input } from "../../base/inputs/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../../base/navigation/dropdown-menu";
 import { Flex } from "../../primitives/flex";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
 import { CaretDownIcon, XIcon } from "../shared/icons";
 import { operatorConfig } from "./filter-icons";
@@ -44,6 +38,7 @@ export function UnifiedTextFilter({
   width,
   className,
 }: UnifiedTextFilterProps) {
+  const { Input, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const [inputValue, setInputValue] = useState(value);
   const isUserInteracting = useRef(false);

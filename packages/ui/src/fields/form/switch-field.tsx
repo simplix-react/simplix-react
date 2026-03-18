@@ -2,7 +2,7 @@ import type { ComponentProps } from "react";
 
 import type { CommonFieldProps } from "../../crud/shared/types";
 import type { Switch as SwitchBase } from "../../base/inputs/switch";
-import { useUIComponents } from "../../provider/ui-provider";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import { FieldWrapper } from "../shared/field-wrapper";
 
 /** Props for the {@link SwitchField} form component. */
@@ -37,7 +37,7 @@ export function SwitchField({
   layout = "left",
   ...variantProps
 }: SwitchFieldProps) {
-  const { Switch } = useUIComponents();
+  const { Switch } = useFlatUIComponents();
 
   return (
     <FieldWrapper

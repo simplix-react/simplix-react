@@ -4,16 +4,9 @@ import { cn } from "../../utils/cn";
 import { formatDateMedium, formatDateRange } from "../../utils/format-date";
 import { CalendarDotIcon, CalendarDotsIcon, XIcon, CaretDownIcon } from "../shared/icons";
 import { Flex } from "../../primitives/flex";
-import { Badge } from "../../base/display/badge";
+import type { DateRange } from "../../base/controls/calendar";
 import { Separator } from "../../base/display/separator";
-import { Popover, PopoverContent, PopoverTrigger } from "../../base/overlay/popover";
-import { Calendar, type DateRange } from "../../base/controls/calendar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../../base/navigation/dropdown-menu";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import type { SearchOperator } from "./filter-types";
 import { dateOperatorConfig } from "./filter-types";
 import { operatorConfig } from "./filter-icons";
@@ -39,6 +32,7 @@ export function DateFilter({
   operators,
   className,
 }: DateFilterProps) {
+  const { Badge, Calendar, Popover, PopoverTrigger, PopoverContent, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } = useFlatUIComponents();
   const { t, locale: i18nLocale } = useTranslation("simplix/ui");
   const [open, setOpen] = useState(false);
   const isRange = dateOperatorConfig[operator]?.requiresRange ?? false;

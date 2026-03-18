@@ -1,7 +1,7 @@
 import { useTranslation } from "@simplix-react/i18n/react";
 
 import { cn } from "../../utils/cn";
-import { Button } from "../../base/controls/button";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import { MagnifyingGlassIcon, XIcon } from "../shared/icons";
 
 export interface FilterActionsProps {
@@ -23,6 +23,7 @@ export function FilterActions({
   applyLabel,
   className,
 }: FilterActionsProps) {
+  const { Button } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   return (
     <div className={cn("!grow-0 inline-flex items-center", className)}>

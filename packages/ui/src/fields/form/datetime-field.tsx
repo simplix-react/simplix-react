@@ -3,7 +3,7 @@ import { useTranslation } from "@simplix-react/i18n/react";
 
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { DatePicker } from "../../base/inputs/date-picker";
-import { useUIComponents } from "../../provider/ui-provider";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import type { DateLike } from "../../utils/parse-date";
 import { parseDate } from "../../utils/parse-date";
 import { FieldWrapper } from "../shared/field-wrapper";
@@ -61,7 +61,7 @@ export function DateTimeField({
   className,
   ...variantProps
 }: DateTimeFieldProps) {
-  const { Input } = useUIComponents();
+  const { Input } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const parsed = useMemo(() => parseDate(value), [value]);
 

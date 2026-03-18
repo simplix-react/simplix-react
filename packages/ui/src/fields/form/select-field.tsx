@@ -1,5 +1,5 @@
 import type { CommonFieldProps } from "../../crud/shared/types";
-import { useUIComponents } from "../../provider/ui-provider";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import { FieldWrapper } from "../shared/field-wrapper";
 
 /** Props for the {@link SelectField} form component. */
@@ -56,24 +56,24 @@ export function SelectField<T extends string = string>({
   className,
   ...variantProps
 }: SelectFieldProps<T>) {
-  const { Select } = useUIComponents();
+  const { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } = useFlatUIComponents();
 
   const selectElement = (
-    <Select.Root
+    <Select
       value={value}
       onValueChange={(v) => onChange(v as T)}
       disabled={disabled}
     >
-      <Select.Trigger
+      <SelectTrigger
         aria-invalid={!!error}
         aria-label={compact ? label ?? placeholder : variantProps.layout === "hidden" ? label : undefined}
         className={compact ? "h-8 text-sm" : undefined}
       >
-        <Select.Value placeholder={placeholder} />
-      </Select.Trigger>
-      <Select.Content>
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent>
         {options.map((opt) => (
-          <Select.Item
+          <SelectItem
             key={opt.value}
             value={opt.value}
             disabled={opt.disabled}
@@ -86,10 +86,10 @@ export function SelectField<T extends string = string>({
             ) : (
               opt.label
             )}
-          </Select.Item>
+          </SelectItem>
         ))}
-      </Select.Content>
-    </Select.Root>
+      </SelectContent>
+    </Select>
   );
 
   if (compact) {

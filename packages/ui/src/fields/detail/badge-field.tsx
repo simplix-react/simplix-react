@@ -1,5 +1,5 @@
 import type { CommonDetailFieldProps } from "../../crud/shared/types";
-import { useUIComponents } from "../../provider";
+import { useFlatUIComponents } from "../../provider";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
 
 export type BadgeVariant = NonNullable<
@@ -44,7 +44,7 @@ export function DetailBadgeField<T extends string = string>({
   size,
   className,
 }: DetailBadgeFieldProps<T>) {
-  const { Badge } = useUIComponents();
+  const { Badge } = useFlatUIComponents();
   const hasValue = value != null && value !== "";
 
   return (

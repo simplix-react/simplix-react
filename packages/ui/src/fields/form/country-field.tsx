@@ -1,21 +1,9 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "@simplix-react/i18n/react";
 
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "../../base/overlay/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "../../base/inputs/command";
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { MapPinIcon } from "../../crud/shared/icons";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import { Flex } from "../../primitives/flex";
 import { cn } from "../../utils/cn";
 import { countryFromTimezone } from "../../utils/timezone-country-map";
@@ -46,6 +34,7 @@ export function CountryField({
   className,
   ...variantProps
 }: CountryFieldProps) {
+  const { Popover, PopoverTrigger, PopoverContent, Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const options = useCountryOptions();
   const [open, setOpen] = useState(false);

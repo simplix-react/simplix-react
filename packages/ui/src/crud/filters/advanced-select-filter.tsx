@@ -4,24 +4,8 @@ import { useTranslation } from "@simplix-react/i18n/react";
 import { cn } from "../../utils/cn";
 import { CheckIcon, CaretDownIcon, XIcon } from "../shared/icons";
 import { Flex } from "../../primitives/flex";
-import { Badge } from "../../base/display/badge";
 import { Separator } from "../../base/display/separator";
-import { Popover, PopoverContent, PopoverTrigger } from "../../base/overlay/popover";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../../base/navigation/dropdown-menu";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-} from "../../base/inputs/command";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import type { SearchOperator } from "./filter-types";
 import { selectOperatorConfig } from "./filter-types";
 import { operatorConfig } from "./filter-icons";
@@ -56,6 +40,7 @@ export function AdvancedSelectFilter({
   maxDisplayCount = 5,
   className,
 }: AdvancedSelectFilterProps) {
+  const { Badge, Popover, PopoverTrigger, PopoverContent, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandSeparator } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const allowMultiple = selectOperatorConfig[operator]?.allowMultiple ?? false;
   const currentOp = operatorConfig[operator];

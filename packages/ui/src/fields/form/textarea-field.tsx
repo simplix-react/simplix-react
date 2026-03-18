@@ -1,5 +1,5 @@
 import type { CommonFieldProps } from "../../crud/shared/types";
-import { useUIComponents } from "../../provider/ui-provider";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
 import { FieldWrapper } from "../shared/field-wrapper";
 
@@ -50,7 +50,7 @@ export function TextareaField({
   className,
   ...variantProps
 }: TextareaFieldProps) {
-  const { Textarea } = useUIComponents();
+  const { Textarea } = useFlatUIComponents();
 
   return (
     <FieldWrapper

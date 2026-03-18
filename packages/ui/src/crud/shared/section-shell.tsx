@@ -1,10 +1,10 @@
 import * as CollapsiblePrimitive from "@radix-ui/react-collapsible";
 import { type ReactNode, useState } from "react";
 
-import { Button } from "../../base";
 import { Flex } from "../../primitives";
 import { Stack } from "../../primitives";
 import { cn } from "../../utils/cn";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import { CaretDownIcon } from "./icons";
 
 // variant="card" (default)
@@ -89,6 +89,7 @@ export function SectionShell({
   className,
   children,
 }: SectionShellProps) {
+  const { Button } = useFlatUIComponents();
   const [open, setOpen] = useState(defaultOpen);
 
   const TitleTag = sectionTitle ? "h4" : "h3";

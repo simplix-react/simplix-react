@@ -1,17 +1,9 @@
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "@simplix-react/i18n/react";
 
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "../../base/inputs/command";
-import { Label } from "../../base/controls/label";
 import { Flex } from "../../primitives/flex";
 import { Stack } from "../../primitives/stack";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
 import { type TimezoneOption, useTimezoneOptions } from "../../utils/use-timezone-options";
 import { CheckIcon } from "../shared/icons";
@@ -31,6 +23,7 @@ export function TimezoneFormField({
   state: CrudListFilters;
   className?: string;
 }) {
+  const { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem, Label } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const { groups } = useTimezoneOptions();
   const key = makeFilterKey(field, SearchOperator.IN);

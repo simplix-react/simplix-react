@@ -1,5 +1,5 @@
 import type { CommonDetailFieldProps } from "../../crud/shared/types";
-import { useUIComponents } from "../../provider";
+import { useFlatUIComponents } from "../../provider";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
 
 /** Display mode for the {@link DetailListField} component. */
@@ -35,7 +35,7 @@ export function DetailListField({
   size,
   className,
 }: DetailListFieldProps) {
-  const { Badge } = useUIComponents();
+  const { Badge } = useFlatUIComponents();
 
   if (value == null || value.length === 0) {
     return (

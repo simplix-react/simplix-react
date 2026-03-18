@@ -10,29 +10,11 @@ import {
 import {createElement, type ReactNode, useCallback, useEffect, useMemo, useRef, useState,} from "react";
 
 import {
-  Badge,
   type BadgeVariants,
   BooleanBadge,
-  Button,
-  Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Skeleton,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
   type TableProps,
-  TableRow,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
 } from "../../base";
+import {useFlatUIComponents} from "../../provider/ui-provider";
 import {Flex, Stack} from "../../primitives";
 import {cn} from "../../utils/cn";
 import {formatDateMedium, formatDateTime, formatRelativeTime} from "../../utils/format-date";
@@ -161,6 +143,7 @@ export interface ListSearchProps {
 
 function ListSearch({ value, onChange, placeholder, className }: ListSearchProps) {
   const { t } = useTranslation("simplix/ui");
+  const { Input } = useFlatUIComponents();
   return (
     <Input
       type="search"
@@ -355,6 +338,7 @@ function getActionColumnWidth(actions: RowActionDef<unknown>[], variant: ActionV
 
 function RowActionCell<T>({ row, actions, variant }: { row: T; actions: RowActionDef<T>[]; variant: ActionVariant }) {
   const { t } = useTranslation("simplix/ui");
+  const { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } = useFlatUIComponents();
   const visible = actions.filter((a) => !a.when || a.when(row));
   if (visible.length === 0) return null;
 
@@ -482,6 +466,7 @@ function ReorderableTable<T>({
   className,
 }: ReorderableTableProps<T>) {
   const { t } = useTranslation("simplix/ui");
+  const { Table, TableHeader, TableRow, TableHead, TableBody, TableCell, Skeleton } = useFlatUIComponents();
   const emptyMessages: Record<EmptyReason, string> = {
     "no-data": t("list.noData"),
     "no-filter": t("list.noFilter"),
@@ -661,6 +646,7 @@ function ReorderableCardList<T>({
   cardContent,
 }: ReorderableCardListProps<T>) {
   const { t } = useTranslation("simplix/ui");
+  const { Skeleton } = useFlatUIComponents();
   const emptyMessages: Record<EmptyReason, string> = {
     "no-data": t("list.noData"),
     "no-filter": t("list.noFilter"),
@@ -782,6 +768,7 @@ function ListTable<T>({
   children,
 }: ListTableProps<T>) {
   const { t, locale } = useTranslation("simplix/ui");
+  const { Badge, Skeleton, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } = useFlatUIComponents();
   const emptyMessages: Record<EmptyReason, string> = {
     "no-data": t("list.noData"),
     "no-filter": t("list.noFilter"),
@@ -1220,6 +1207,7 @@ function ListPagination({
   className,
 }: ListPaginationProps) {
   const { t } = useTranslation("simplix/ui");
+  const { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } = useFlatUIComponents();
   const containerRef = useRef<HTMLDivElement>(null);
   const containerWidth = useContainerWidth(containerRef);
   const isCompact = containerWidth > 0 && containerWidth < compactBreakpoint;

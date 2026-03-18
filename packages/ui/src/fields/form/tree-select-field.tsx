@@ -4,12 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { CommonFieldProps } from "../../crud/shared/types";
 import type { TreeConfig } from "../../crud/tree/tree-types";
 import { filterTreeWithAncestors, getDescendantIds } from "../../crud/tree/tree-utils";
-import {
-  Input,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "../../base";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import { Stack } from "../../primitives";
 import { cn } from "../../utils/cn";
 import { FieldWrapper } from "../shared/field-wrapper";
@@ -185,6 +180,7 @@ export function TreeSelectField<T>({
   className,
   ...variantProps
 }: TreeSelectFieldProps<T>) {
+  const { Input, Popover, PopoverTrigger, PopoverContent } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");

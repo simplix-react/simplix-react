@@ -17,24 +17,9 @@ import {
 } from "react";
 
 import {
-  Button,
-  Input,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-  Skeleton,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
   type TableProps,
-  TableRow,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
 } from "../../base";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import { Flex, Stack } from "../../primitives";
 import { cn } from "../../utils/cn";
 import type { ColumnInfo, EmptyReason, SortState } from "../shared";
@@ -178,6 +163,7 @@ export interface TreeSearchProps {
 
 function TreeSearch({ value, onChange, placeholder, className }: TreeSearchProps) {
   const { t } = useTranslation("simplix/ui");
+  const { Input } = useFlatUIComponents();
   const ctx = useCrudTreeContext();
   const controlled = value !== undefined;
   return (
@@ -205,6 +191,7 @@ function TreeSearch({ value, onChange, placeholder, className }: TreeSearchProps
 
 function TreeExpandToggle({ className }: { className?: string }) {
   const { t } = useTranslation("simplix/ui");
+  const { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } = useFlatUIComponents();
   const ctx = useCrudTreeContext();
   const expansion = ctx?.expansion;
 
@@ -279,6 +266,7 @@ function getActionColumnWidth(actions: RowActionDef<unknown>[], variant: ActionV
 
 function RowActionCell<T>({ row, actions, variant }: { row: T; actions: RowActionDef<T>[]; variant: ActionVariant }) {
   const { t } = useTranslation("simplix/ui");
+  const { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } = useFlatUIComponents();
   const visible = actions.filter((a) => !a.when || a.when(row));
   if (visible.length === 0) return null;
 
@@ -405,6 +393,7 @@ function TreeTable<T>({
   children,
 }: TreeTableProps<T>) {
   useTranslation("simplix/ui");
+  const { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Skeleton } = useFlatUIComponents();
   const treeCtx = useCrudTreeContext();
 
   const config: TreeConfig<T> = useMemo(
@@ -675,6 +664,7 @@ export interface TreeHeaderActionsProps {
 
 function TreeHeaderActions({ searchPlaceholder, className }: TreeHeaderActionsProps) {
   const { t } = useTranslation("simplix/ui");
+  const { Button, Input, Popover, PopoverContent, PopoverTrigger, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } = useFlatUIComponents();
   const ctx = useCrudTreeContext();
   const expansion = ctx?.expansion;
   const [searchOpen, setSearchOpen] = useState(false);

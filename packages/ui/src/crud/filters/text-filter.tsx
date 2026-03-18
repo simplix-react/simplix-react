@@ -1,8 +1,8 @@
 import { useCallback } from "react";
 import { useTranslation } from "@simplix-react/i18n/react";
 
-import { Input } from "../../base/inputs/input";
 import { Flex } from "../../primitives/flex";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
 import { MagnifyingGlassIcon, XIcon } from "../shared/icons";
 
@@ -33,6 +33,7 @@ export interface TextFilterProps {
  * @param props - {@link TextFilterProps}
  */
 export function TextFilter({ label, value, onChange, placeholder, className }: TextFilterProps) {
+  const { Input } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const handleClear = useCallback(() => onChange(""), [onChange]);
 

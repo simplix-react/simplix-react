@@ -1,18 +1,9 @@
 import { useTranslation } from "@simplix-react/i18n/react";
 import { useCallback, useMemo, useState } from "react";
 
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  Input,
-} from "../../base";
 import { Stack } from "../../primitives";
 import { cn } from "../../utils/cn";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import type { TreeMoveConfig } from "./tree-types";
 import { filterTreeWithAncestors, getDescendantIds } from "./tree-utils";
 
@@ -174,6 +165,7 @@ export function TreeMoveDialog<T>({
   description,
   rootLabel,
 }: TreeMoveDialogProps<T>) {
+  const { Button, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, Input } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const idField = config.idField ?? ("id" as keyof T & string);
 

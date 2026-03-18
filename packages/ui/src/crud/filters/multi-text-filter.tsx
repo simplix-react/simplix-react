@@ -1,14 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "@simplix-react/i18n/react";
 
-import { Input } from "../../base/inputs/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../../base/navigation/dropdown-menu";
 import { Flex } from "../../primitives/flex";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
 import { CaretDownIcon, MagnifyingGlassIcon, XIcon } from "../shared/icons";
 
@@ -33,6 +27,7 @@ export function MultiTextFilter({
   onFieldSwitch,
   className,
 }: MultiTextFilterProps) {
+  const { Input, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   // Auto-detect initial active field from non-empty values
   const initialField = useMemo(() => {

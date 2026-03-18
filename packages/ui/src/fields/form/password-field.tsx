@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import type { CommonFieldProps } from "../../crud/shared/types";
-import { useUIComponents } from "../../provider/ui-provider";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
 import { FieldWrapper } from "../shared/field-wrapper";
 
@@ -40,7 +40,7 @@ export function PasswordField({
   className,
   ...variantProps
 }: PasswordFieldProps) {
-  const { Input } = useUIComponents();
+  const { Input } = useFlatUIComponents();
   const [visible, setVisible] = useState(false);
 
   return (

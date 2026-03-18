@@ -1,11 +1,10 @@
 import { useTranslation } from "@simplix-react/i18n/react";
 import type { ReactNode } from "react";
 
-import { Button } from "../../base/controls/button";
 import { Flex } from "../../primitives/flex";
 import { Stack } from "../../primitives/stack";
 import { cn } from "../../utils/cn";
-import { useUIComponents } from "../../provider/ui-provider";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import { ArrowLeftIcon, XIcon, TrashIcon } from "../shared/icons";
 import type { SectionShellProps } from "../shared/section-shell";
 import { type FieldVariant, FieldVariantContext } from "../shared/types";
@@ -93,6 +92,7 @@ export interface CrudDetailProps {
 }
 
 function DetailRoot({ isLoading, onClose, header, footer, variant = "default", auditData, fieldVariant, className, children }: CrudDetailProps) {
+  const { Button } = useFlatUIComponents();
   const isDialog = variant === "dialog";
   const px = isDialog ? "px-5" : "px-2";
 
@@ -186,7 +186,7 @@ function DetailRoot({ isLoading, onClose, header, footer, variant = "default", a
 export type CrudDetailSectionProps = SectionShellProps;
 
 function DetailSection(props: CrudDetailSectionProps) {
-  const { SectionShell } = useUIComponents();
+  const { SectionShell } = useFlatUIComponents();
   return (
     <SectionShell {...props}>
       <Stack gap="sm">
@@ -248,6 +248,7 @@ export interface CrudDetailDefaultActionsProps {
 }
 
 function DetailDefaultActions({ onClose, onBack, onDelete, onEdit, isPending, closeLabel, backLabel, editLabel, className }: CrudDetailDefaultActionsProps) {
+  const { Button } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const hasLeft = onBack || onClose;
   return (

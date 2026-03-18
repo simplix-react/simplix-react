@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 
 import { useTranslation } from "@simplix-react/i18n/react";
-import { Badge } from "../../base/display/badge";
 import { Card, Flex, Text } from "../../primitives";
+import { useFlatUIComponents } from "../../provider/ui-provider";
 import { EmptyState } from "../shared/empty-state";
 import { CrudList } from "../list/crud-list";
 import type { RowActionDef } from "../list/crud-list";
@@ -71,6 +71,7 @@ export interface AssignmentChipProps {
 // ── Components ──
 
 function AssignmentPanelRoot({ title, count, action, children }: AssignmentPanelProps) {
+  const { Badge } = useFlatUIComponents();
   return (
     <Card padding="none" className="overflow-hidden [&_div.rounded-lg.border]:border-0 [&_div.rounded-lg.border]:rounded-none">
       <Flex justify="between" align="center" className="border-b bg-muted/50 px-4 py-2">
