@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { bearerScheme } from "../schemes/bearer-scheme.js";
 import { memoryStore } from "../stores/memory-store.js";
 import { AuthError } from "../errors.js";
@@ -237,6 +237,139 @@ describe("bearerScheme", () => {
       expect(store.get("access_token")).toBeNull();
       expect(store.get("refresh_token")).toBeNull();
       expect(store.get("expires_at")).toBeNull();
+    });
+  });
+
+  describe("autoSchedule", () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it("starts auto-refresh scheduler when autoSchedule is true", () => {
+      store.set("access_token", "token");
+      store.set("expires_at", String(Date.now() + 120_000));
+
+      const refreshFn = vi.fn().mockResolvedValue({
+        accessToken: "new-token",
+        expiresIn: 3600,
+      });
+
+      const scheme = bearerScheme({
+        store,
+        token: () => store.get("access_token"),
+        refresh: {
+          refreshFn,
+          autoSchedule: true,
+          refreshBeforeExpiry: 60,
+          minIntervalSeconds: 10,
+        },
+      });
+
+      // Scheduler should be created and running; advance timer to trigger refresh
+      vi.advanceTimersByTime(61_000);
+
+      expect(refreshFn).toHaveBeenCalled();
+
+      // Clean up scheduler
+      scheme.clear();
+    });
+
+    it("calls onScheduledRefreshFailed when background refresh fails", async () => {
+      store.set("access_token", "token");
+      store.set("expires_at", String(Date.now() + 30_000));
+
+      const onScheduledRefreshFailed = vi.fn();
+      const refreshFn = vi.fn().mockRejectedValue(new Error("fail"));
+
+      const scheme = bearerScheme({
+        store,
+        token: () => store.get("access_token"),
+        refresh: {
+          refreshFn,
+          autoSchedule: true,
+          refreshBeforeExpiry: 60,
+          onScheduledRefreshFailed,
+        },
+      });
+
+      // Advance so the scheduled refresh fires
+      await vi.advanceTimersByTimeAsync(31_000);
+
+      expect(refreshFn).toHaveBeenCalled();
+      expect(onScheduledRefreshFailed).toHaveBeenCalled();
+
+      scheme.clear();
+    });
+
+    it("stops scheduler on clear", () => {
+      store.set("access_token", "token");
+      store.set("expires_at", String(Date.now() + 120_000));
+
+      const refreshFn = vi.fn().mockResolvedValue({
+        accessToken: "new",
+        expiresIn: 3600,
+      });
+
+      const scheme = bearerScheme({
+        store,
+        token: () => store.get("access_token"),
+        refresh: {
+          refreshFn,
+          autoSchedule: true,
+          refreshBeforeExpiry: 60,
+        },
+      });
+
+      scheme.clear();
+
+      // After clear, scheduler should be stopped; advancing time should not trigger refresh
+      vi.advanceTimersByTime(200_000);
+      expect(refreshFn).not.toHaveBeenCalled();
+    });
+
+    it("reschedules auto-refresh after manual refresh call", async () => {
+      store.set("access_token", "token");
+      store.set("expires_at", String(Date.now() + 120_000));
+
+      const refreshFn = vi.fn().mockResolvedValue({
+        accessToken: "refreshed",
+        expiresIn: 3600,
+      });
+
+      const scheme = bearerScheme({
+        store,
+        token: () => store.get("access_token"),
+        refresh: {
+          refreshFn,
+          autoSchedule: true,
+          refreshBeforeExpiry: 60,
+        },
+      });
+
+      // Manual refresh should call refreshFn and reschedule
+      await scheme.refresh!();
+
+      expect(refreshFn).toHaveBeenCalledOnce();
+      expect(store.get("access_token")).toBe("refreshed");
+
+      // The scheduler should have been restarted (getExpiresAt callback is wired to store)
+      // Advance time to verify the scheduler picks up the new expiry
+      refreshFn.mockClear();
+      refreshFn.mockResolvedValue({
+        accessToken: "auto-refreshed",
+        expiresIn: 3600,
+      });
+
+      // expiresIn=3600 => expiresAt is ~3600s from now, refreshBeforeExpiry=60s => fires at ~3540s
+      await vi.advanceTimersByTimeAsync(3541_000);
+
+      expect(refreshFn).toHaveBeenCalled();
+
+      scheme.clear();
     });
   });
 });

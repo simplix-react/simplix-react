@@ -158,6 +158,258 @@ describe("validateI18nRules", () => {
     expect(result.errors).toHaveLength(0);
     expect(result.passes.length).toBeGreaterThan(0);
   });
+
+  it("auto-fixes missing keys with --fix", async () => {
+    const localesDir = join(tempDir, "src", "locales", "common");
+    await mkdir(localesDir, { recursive: true });
+    await writeFile(
+      join(localesDir, "en.json"),
+      JSON.stringify({ title: "Hello", subtitle: "World" }),
+    );
+    await writeFile(
+      join(localesDir, "ko.json"),
+      JSON.stringify({ title: "안녕" }),
+    );
+
+    const result = createResult(tempDir);
+    await validateI18nRules(tempDir, result, { fix: true });
+
+    expect(result.errors).toHaveLength(0);
+    expect(result.passes.some((p) => p.includes("Auto-fixed") && p.includes("subtitle"))).toBe(true);
+
+    // Verify the file was actually written
+    const { readFile: rf } = await import("node:fs/promises");
+    const fixed = JSON.parse(await rf(join(localesDir, "ko.json"), "utf-8"));
+    expect(fixed.subtitle).toBe("World");
+  });
+
+  it("auto-fixes extra keys with --fix", async () => {
+    const localesDir = join(tempDir, "src", "locales", "common");
+    await mkdir(localesDir, { recursive: true });
+    await writeFile(
+      join(localesDir, "en.json"),
+      JSON.stringify({ title: "Hello" }),
+    );
+    await writeFile(
+      join(localesDir, "ko.json"),
+      JSON.stringify({ title: "안녕", orphan: "남은것" }),
+    );
+
+    const result = createResult(tempDir);
+    await validateI18nRules(tempDir, result, { fix: true });
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.passes.some((p) => p.includes("Auto-fixed") && p.includes("orphan"))).toBe(true);
+
+    const { readFile: rf } = await import("node:fs/promises");
+    const fixed = JSON.parse(await rf(join(localesDir, "ko.json"), "utf-8"));
+    expect(fixed.orphan).toBeUndefined();
+  });
+
+  it("detects empty string values", async () => {
+    const localesDir = join(tempDir, "src", "locales", "common");
+    await mkdir(localesDir, { recursive: true });
+    await writeFile(
+      join(localesDir, "en.json"),
+      JSON.stringify({ title: "Hello" }),
+    );
+    await writeFile(
+      join(localesDir, "ko.json"),
+      JSON.stringify({ title: "" }),
+    );
+
+    const result = createResult(tempDir);
+    await validateI18nRules(tempDir, result);
+
+    expect(result.warnings.some((w) => w.includes("Empty value") && w.includes("title"))).toBe(true);
+  });
+
+  it("handles nested keys correctly", async () => {
+    const localesDir = join(tempDir, "src", "locales", "common");
+    await mkdir(localesDir, { recursive: true });
+    await writeFile(
+      join(localesDir, "en.json"),
+      JSON.stringify({ form: { label: { name: "Name", email: "Email" } } }),
+    );
+    await writeFile(
+      join(localesDir, "ko.json"),
+      JSON.stringify({ form: { label: { name: "이름" } } }),
+    );
+
+    const result = createResult(tempDir);
+    await validateI18nRules(tempDir, result);
+
+    expect(result.errors.some((e) => e.includes("form.label.email") && e.includes("ko"))).toBe(true);
+  });
+
+  it("auto-fixes nested missing keys with --fix", async () => {
+    const localesDir = join(tempDir, "src", "locales", "common");
+    await mkdir(localesDir, { recursive: true });
+    await writeFile(
+      join(localesDir, "en.json"),
+      JSON.stringify({ form: { label: { name: "Name", email: "Email" } } }),
+    );
+    await writeFile(
+      join(localesDir, "ko.json"),
+      JSON.stringify({ form: { label: { name: "이름" } } }),
+    );
+
+    const result = createResult(tempDir);
+    await validateI18nRules(tempDir, result, { fix: true });
+
+    expect(result.errors).toHaveLength(0);
+
+    const { readFile: rf } = await import("node:fs/promises");
+    const fixed = JSON.parse(await rf(join(localesDir, "ko.json"), "utf-8"));
+    expect(fixed.form.label.email).toBe("Email");
+  });
+
+  it("auto-fixes nested extra keys with --fix and cleans empty parents", async () => {
+    const localesDir = join(tempDir, "src", "locales", "common");
+    await mkdir(localesDir, { recursive: true });
+    await writeFile(
+      join(localesDir, "en.json"),
+      JSON.stringify({ title: "Hello" }),
+    );
+    await writeFile(
+      join(localesDir, "ko.json"),
+      JSON.stringify({ title: "안녕", nested: { deep: { orphan: "remove me" } } }),
+    );
+
+    const result = createResult(tempDir);
+    await validateI18nRules(tempDir, result, { fix: true });
+
+    const { readFile: rf } = await import("node:fs/promises");
+    const fixed = JSON.parse(await rf(join(localesDir, "ko.json"), "utf-8"));
+    expect(fixed.nested).toBeUndefined();
+  });
+
+  it("handles array values in locale files", async () => {
+    const localesDir = join(tempDir, "src", "locales", "common");
+    await mkdir(localesDir, { recursive: true });
+    await writeFile(
+      join(localesDir, "en.json"),
+      JSON.stringify({ items: ["one", "two"], title: "Hello" }),
+    );
+    await writeFile(
+      join(localesDir, "ko.json"),
+      JSON.stringify({ items: ["하나", "둘"], title: "안녕" }),
+    );
+
+    const result = createResult(tempDir);
+    await validateI18nRules(tempDir, result);
+
+    expect(result.errors).toHaveLength(0);
+  });
+
+  it("returns early when locales directory does not exist", async () => {
+    const result = createResult(tempDir);
+    await validateI18nRules(tempDir, result);
+
+    expect(result.errors).toHaveLength(0);
+    expect(result.passes).toHaveLength(0);
+  });
+
+  it("skips group with only one locale file", async () => {
+    const localesDir = join(tempDir, "src", "locales", "single");
+    await mkdir(localesDir, { recursive: true });
+    await writeFile(
+      join(localesDir, "en.json"),
+      JSON.stringify({ title: "Hello" }),
+    );
+
+    const result = createResult(tempDir);
+    await validateI18nRules(tempDir, result);
+
+    // Only one locale, so consistency check is skipped for that group
+    expect(result.errors).toHaveLength(0);
+  });
+
+  it("discovers locale files in nested subdirectories", async () => {
+    const dir1 = join(tempDir, "src", "locales", "common");
+    const dir2 = join(tempDir, "src", "locales", "errors");
+    await mkdir(dir1, { recursive: true });
+    await mkdir(dir2, { recursive: true });
+
+    await writeFile(join(dir1, "en.json"), JSON.stringify({ title: "Hello" }));
+    await writeFile(join(dir1, "ko.json"), JSON.stringify({ title: "안녕" }));
+    await writeFile(join(dir2, "en.json"), JSON.stringify({ error: "Fail" }));
+    await writeFile(join(dir2, "ko.json"), JSON.stringify({ error: "실패" }));
+
+    const result = createResult(tempDir);
+    await validateI18nRules(tempDir, result);
+
+    expect(result.errors).toHaveLength(0);
+    // Two groups checked
+    expect(result.passes.filter((p) => p.includes("locale consistency checked"))).toHaveLength(2);
+  });
+
+  it("uses en as reference locale when available", async () => {
+    const localesDir = join(tempDir, "src", "locales", "common");
+    await mkdir(localesDir, { recursive: true });
+    await writeFile(
+      join(localesDir, "en.json"),
+      JSON.stringify({ title: "Hello", desc: "World" }),
+    );
+    await writeFile(
+      join(localesDir, "ja.json"),
+      JSON.stringify({ title: "こんにちは" }),
+    );
+
+    const result = createResult(tempDir);
+    await validateI18nRules(tempDir, result);
+
+    // en is reference, ja is missing "desc"
+    expect(result.errors.some((e) => e.includes("desc") && e.includes("ja"))).toBe(true);
+  });
+
+  it("auto-fixes missing deeply nested key where intermediate object does not exist", async () => {
+    const localesDir = join(tempDir, "src", "locales", "common");
+    await mkdir(localesDir, { recursive: true });
+    // en has deep nesting
+    await writeFile(
+      join(localesDir, "en.json"),
+      JSON.stringify({ section: { form: { label: "Name" } } }),
+    );
+    // ko is missing the entire "section" branch
+    await writeFile(
+      join(localesDir, "ko.json"),
+      JSON.stringify({}),
+    );
+
+    const result = createResult(tempDir);
+    await validateI18nRules(tempDir, result, { fix: true });
+
+    expect(result.errors).toHaveLength(0);
+    expect(result.passes.some((p) => p.includes("Auto-fixed") && p.includes("section.form.label"))).toBe(true);
+
+    const { readFile: rf } = await import("node:fs/promises");
+    const fixed = JSON.parse(await rf(join(localesDir, "ko.json"), "utf-8"));
+    expect(fixed.section.form.label).toBe("Name");
+  });
+
+  it("auto-fixes extra nested key while preserving sibling keys (break path)", async () => {
+    const localesDir = join(tempDir, "src", "locales", "common");
+    await mkdir(localesDir, { recursive: true });
+    await writeFile(
+      join(localesDir, "en.json"),
+      JSON.stringify({ group: { keep: "Keep this" } }),
+    );
+    // ko has an extra key inside "group" alongside the valid key
+    await writeFile(
+      join(localesDir, "ko.json"),
+      JSON.stringify({ group: { keep: "유지", extra: "삭제" } }),
+    );
+
+    const result = createResult(tempDir);
+    await validateI18nRules(tempDir, result, { fix: true });
+
+    const { readFile: rf } = await import("node:fs/promises");
+    const fixed = JSON.parse(await rf(join(localesDir, "ko.json"), "utf-8"));
+    // "group" should still exist because "keep" is still in it
+    expect(fixed.group.keep).toBe("유지");
+    expect(fixed.group.extra).toBeUndefined();
+  });
 });
 
 describe("validateFsdRules", () => {

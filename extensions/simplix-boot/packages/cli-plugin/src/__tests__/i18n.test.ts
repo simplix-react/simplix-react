@@ -133,6 +133,76 @@ describe("transformToLocaleData", () => {
     const result = transformToLocaleData(serverData, entityKeyMap, ["en"]);
     expect(result.size).toBe(0);
   });
+
+  it("skips enum values without translation for the requested locale", () => {
+    const serverData = {
+      entities: {},
+      enums: {
+        Status: {
+          values: {
+            ACTIVE: { translations: { en: "Active" } },
+            INACTIVE: { translations: { ko: "비활성" } },
+          },
+        },
+      },
+    };
+    const entityKeyMap = new Map<string, string>();
+
+    const result = transformToLocaleData(serverData, entityKeyMap, ["en"]);
+
+    expect(result.get("en")).toEqual({
+      enums: {
+        Status: { ACTIVE: "Active" },
+      },
+    });
+  });
+
+  it("skips entire enum when no values have translations for the locale", () => {
+    const serverData = {
+      entities: {},
+      enums: {
+        Status: {
+          values: {
+            ACTIVE: { translations: { ko: "활성" } },
+            INACTIVE: { translations: { ko: "비활성" } },
+          },
+        },
+      },
+    };
+    const entityKeyMap = new Map<string, string>();
+
+    const result = transformToLocaleData(serverData, entityKeyMap, ["en"]);
+
+    // No enums should be present for "en" locale since no translations match
+    expect(result.size).toBe(0);
+  });
+
+  it("skips enums key when all enum entries have no matching translations", () => {
+    const serverData = {
+      entities: {
+        Pet: {
+          fields: {
+            name: { translations: { en: "Name" } },
+          },
+        },
+      },
+      enums: {
+        Status: {
+          values: {
+            ACTIVE: { translations: { ko: "활성" } },
+          },
+        },
+      },
+    };
+    const entityKeyMap = new Map([["Pet", "pet"]]);
+
+    const result = transformToLocaleData(serverData, entityKeyMap, ["en"]);
+
+    // Should have entity data but no enums key
+    const localeData = result.get("en")!;
+    expect(localeData.pet).toEqual({ fields: { name: "Name" } });
+    expect(localeData["enums"]).toBeUndefined();
+  });
 });
 
 describe("overlayLocaleJson", () => {
@@ -235,5 +305,17 @@ describe("downloadI18nMessages", () => {
     const result = await downloadI18nMessages("http://localhost:8080", "/api/v1/dev/i18n/messages");
     expect(result).toBeUndefined();
     expect(warnSpy).toHaveBeenCalled();
+  });
+
+  it("returns undefined on non-Error rejection (e.g. string throw)", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockRejectedValue("timeout"),
+    );
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const result = await downloadI18nMessages("http://localhost:8080", "/api/v1/dev/i18n/messages");
+    expect(result).toBeUndefined();
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("timeout"));
   });
 });

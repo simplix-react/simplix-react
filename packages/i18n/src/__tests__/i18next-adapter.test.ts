@@ -210,6 +210,16 @@ describe("I18nextAdapter", () => {
       });
       expect(result).toContain("1,234.00");
     });
+
+    it("formats a number with unit style", async () => {
+      await adapter.initialize();
+      const result = adapter.formatNumber(100, {
+        style: "unit",
+        unit: "kilometer",
+      });
+      expect(result).toBeTruthy();
+      expect(typeof result).toBe("string");
+    });
   });
 
   describe("formatCurrency", () => {
@@ -286,6 +296,18 @@ describe("I18nextAdapter", () => {
         timeStyle: "short",
       });
       expect(result).toBeTruthy();
+    });
+
+    it("formats with hour12 option", async () => {
+      await adapter.initialize();
+      const date = new Date(2025, 0, 15, 14, 30, 0);
+      const result = adapter.formatDateTime(date, {
+        dateStyle: "short",
+        timeStyle: "short",
+        hour12: true,
+      });
+      expect(result).toBeTruthy();
+      expect(typeof result).toBe("string");
     });
   });
 

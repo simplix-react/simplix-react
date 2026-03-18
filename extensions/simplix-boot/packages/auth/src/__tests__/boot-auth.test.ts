@@ -1,5 +1,12 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
+const mockAuthFetchFn = vi.fn().mockResolvedValue({
+  type: "SUCCESS",
+  message: "OK",
+  body: { userId: "u1" },
+  timestamp: "2024-01-01T00:00:00Z",
+});
+
 vi.mock("@simplix-react/contract", () => ({
   createFetch: vi.fn(() => vi.fn()),
 }));
@@ -10,12 +17,7 @@ vi.mock("@simplix-react/auth", () => {
   };
   return {
     createAuth: vi.fn(() => ({
-      fetchFn: vi.fn().mockResolvedValue({
-        type: "SUCCESS",
-        message: "OK",
-        body: { userId: "u1" },
-        timestamp: "2024-01-01T00:00:00Z",
-      }),
+      fetchFn: mockAuthFetchFn,
       clear: vi.fn(),
     })),
     createAuthFetch: vi.fn((_config: unknown, baseFetch: unknown) => baseFetch),
@@ -37,6 +39,7 @@ vi.mock("@simplix-react/auth", () => {
 });
 
 import { createBootAuth } from "../boot-auth.js";
+import { createFetch } from "@simplix-react/contract";
 import {
   createAuth,
   createCrossTabSync,
@@ -150,5 +153,181 @@ describe("createBootAuth", () => {
     expect(typeof result.authClient.refreshFn).toBe("function");
     expect(typeof result.authClient.revokeFn).toBe("function");
     expect(typeof result.authClient.userInfoFn).toBe("function");
+  });
+
+  it("authClient.refreshFn calls baseFetch with refresh endpoint and returns token pair", async () => {
+    const mockBaseFetch = vi.fn().mockResolvedValue({
+      accessToken: "new-at",
+      refreshToken: "new-rt",
+      accessTokenExpiry: "2025-06-01T00:00:00Z",
+      refreshTokenExpiry: "2025-06-08T00:00:00Z",
+    });
+    const result = createBootAuth({ fetchFn: mockBaseFetch });
+    const tokens = await result.authClient.refreshFn();
+
+    expect(mockBaseFetch).toHaveBeenCalledWith(
+      "/api/v1/auth/token/refresh",
+      expect.objectContaining({
+        method: "GET",
+        headers: { "X-Refresh-Token": "mock-refresh-token" },
+      }),
+    );
+    expect(tokens).toEqual({
+      accessToken: "new-at",
+      refreshToken: "new-rt",
+      expiresAt: "2025-06-01T00:00:00Z",
+      refreshTokenExpiresAt: "2025-06-08T00:00:00Z",
+    });
+  });
+
+  it("authClient.refreshFn throws when no refresh token is available", async () => {
+    const customStore = {
+      get: vi.fn(() => null),
+      set: vi.fn(),
+      remove: vi.fn(),
+      clear: vi.fn(),
+    };
+    const result = createBootAuth({ store: customStore });
+
+    await expect(result.authClient.refreshFn()).rejects.toThrow(
+      "No refresh token available",
+    );
+  });
+
+  it("authClient.revokeFn calls auth.fetchFn with revoke endpoint", async () => {
+    const result = createBootAuth();
+    await result.authClient.revokeFn();
+
+    expect(mockAuthFetchFn).toHaveBeenCalledWith(
+      "/api/v1/auth/token/revoke",
+      expect.objectContaining({
+        method: "POST",
+        headers: { "X-Refresh-Token": "mock-refresh-token" },
+      }),
+    );
+  });
+
+  it("authClient.loginFn sends Basic auth header and returns token pair", async () => {
+    const mockBaseFetch = vi.fn().mockResolvedValue({
+      accessToken: "at-123",
+      refreshToken: "rt-456",
+      accessTokenExpiry: "2025-01-01T00:00:00Z",
+      refreshTokenExpiry: "2025-01-08T00:00:00Z",
+    });
+    const result = createBootAuth({ fetchFn: mockBaseFetch });
+    const tokens = await result.authClient.loginFn("admin", "password123");
+
+    expect(mockBaseFetch).toHaveBeenCalledWith(
+      "/api/v1/auth/token/issue",
+      expect.objectContaining({
+        method: "GET",
+        headers: {
+          Authorization: `Basic ${btoa("admin:password123")}`,
+        },
+      }),
+    );
+    expect(tokens).toEqual({
+      accessToken: "at-123",
+      refreshToken: "rt-456",
+      expiresAt: "2025-01-01T00:00:00Z",
+      refreshTokenExpiresAt: "2025-01-08T00:00:00Z",
+    });
+  });
+
+  it("authClient.userInfoFn unwraps envelope and returns user data", async () => {
+    const result = createBootAuth();
+    const userInfo = await result.authClient.userInfoFn();
+    expect(userInfo).toEqual({ userId: "u1" });
+  });
+
+  it("cross-tab sync onExternalLogout calls auth.clear", () => {
+    createBootAuth();
+
+    const crossTabCall = vi.mocked(createCrossTabSync).mock.calls[0][0];
+    const mockAuth = vi.mocked(createAuth).mock.results[0].value;
+
+    crossTabCall.onExternalLogout();
+    expect(mockAuth.clear).toHaveBeenCalled();
+  });
+
+  it("creates rawAuthFetch via createAuthFetch when rawFetchOptions provided", () => {
+    const result = createBootAuth({
+      rawFetchOptions: { baseUrl: "https://other-api.example.com" },
+    });
+    expect(result.rawAuthFetch).toBeDefined();
+  });
+
+  it("rawAuthFetch defaults to baseFetch when rawFetchOptions not provided", () => {
+    const result = createBootAuth();
+    expect(result.rawAuthFetch).toBe(result.baseFetch);
+  });
+
+  it("uses custom basePath for auth endpoints", async () => {
+    const mockBaseFetch = vi.fn().mockResolvedValue({
+      accessToken: "at",
+      refreshToken: "rt",
+      accessTokenExpiry: "2025-01-01T00:00:00Z",
+      refreshTokenExpiry: "2025-01-08T00:00:00Z",
+    });
+    const result = createBootAuth({
+      fetchFn: mockBaseFetch,
+      basePath: "/custom/api",
+    });
+
+    await result.authClient.loginFn("user", "pass");
+    expect(mockBaseFetch).toHaveBeenCalledWith(
+      "/custom/api/auth/token/issue",
+      expect.any(Object),
+    );
+  });
+
+  it("bearerScheme token callback returns access_token from store", () => {
+    createBootAuth();
+
+    const schemeArgs = vi.mocked(bearerScheme).mock.calls[0][0];
+    const token = typeof schemeArgs.token === "function" ? schemeArgs.token() : schemeArgs.token;
+    expect(token).toBe("mock-access-token");
+  });
+
+  it("bearerScheme onScheduledRefreshFailed invokes onRefreshFailure", () => {
+    const onRefreshFailure = vi.fn();
+    createBootAuth({ onRefreshFailure });
+
+    const schemeArgs = vi.mocked(bearerScheme).mock.calls[0][0];
+    const mockScheme = vi.mocked(bearerScheme).mock.results[0].value;
+    schemeArgs.refresh!.onScheduledRefreshFailed!();
+
+    expect(mockScheme.clear).toHaveBeenCalled();
+    expect(onRefreshFailure).toHaveBeenCalledWith(expect.any(Error));
+  });
+
+  it("onRefreshFailure clears scheme and calls user callback", () => {
+    const onRefreshFailure = vi.fn();
+    createBootAuth({ onRefreshFailure });
+
+    // Get the wrapped onRefreshFailure from createAuth call
+    const authArgs = vi.mocked(createAuth).mock.calls[0][0];
+    const mockScheme = vi.mocked(bearerScheme).mock.results[0].value;
+
+    authArgs.onRefreshFailure!(new Error("refresh failed"));
+
+    expect(mockScheme.clear).toHaveBeenCalled();
+    expect(onRefreshFailure).toHaveBeenCalledWith(expect.objectContaining({
+      message: "refresh failed",
+    }));
+  });
+
+  it("rawFetchOptions getToken callback returns access_token from store", () => {
+    vi.mocked(createFetch).mockClear();
+    createBootAuth({
+      rawFetchOptions: { baseUrl: "https://example.com" },
+    });
+
+    // createFetch is called twice: once by createBootHttpFetch (baseFetch), once by rawFetchOptions
+    // The rawFetchOptions call is the last one
+    const calls = vi.mocked(createFetch).mock.calls;
+    const rawFetchCall = calls[calls.length - 1][0];
+    const token = rawFetchCall!.getToken!();
+    expect(token).toBe("mock-access-token");
   });
 });

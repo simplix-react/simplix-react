@@ -178,6 +178,28 @@ describe("simplixBootNaming", () => {
       expect(result).toEqual({ role: "update", hookName: "updatePet" });
     });
 
+    it("resolves PUT /{id}/zones as custom updateZones action", () => {
+      const result = simplixBootNaming.resolveOperation({
+        ...baseContext,
+        entityName: "floor",
+        method: "put",
+        path: "/api/v1/floor/{id}/zones",
+        pathParams: ["id"],
+      });
+      expect(result).toEqual({ role: "updateZones", hookName: "updateZonesFloor" });
+    });
+
+    it("resolves PUT /{id}/placements as custom updatePlacements action", () => {
+      const result = simplixBootNaming.resolveOperation({
+        ...baseContext,
+        entityName: "floor",
+        method: "put",
+        path: "/api/v1/floor/{id}/placements",
+        pathParams: ["id"],
+      });
+      expect(result).toEqual({ role: "updatePlacements", hookName: "updatePlacementsFloor" });
+    });
+
     // --- DELETE patterns ---
 
     it("resolves DELETE /{id} as delete", () => {
@@ -198,6 +220,17 @@ describe("simplixBootNaming", () => {
         pathParams: [],
       });
       expect(result).toEqual({ role: "batchDelete", hookName: "batchDeletePets" });
+    });
+
+    it("resolves DELETE sub-resource /entity/{id}/groups/{groupId}", () => {
+      const result = simplixBootNaming.resolveOperation({
+        ...baseContext,
+        entityName: "user",
+        method: "delete",
+        path: "/api/v1/user/{id}/groups/{groupId}",
+        pathParams: ["id", "groupId"],
+      });
+      expect(result).toEqual({ role: "deleteGroups", hookName: "deleteGroupsUser" });
     });
 
     // --- PATCH patterns ---

@@ -304,4 +304,30 @@ describe("useUpdateForm (runtime)", () => {
     // Form should be created with empty defaults
     expect(result.current.form).toBeDefined();
   });
+
+  it("resets form when dataUpdatedAt changes (entity refetch)", () => {
+    const initialTimestamp = 1000;
+    const entity = { id: "1", title: "Original", status: "open" };
+    const hooks = createMockEntityHooks({ entity, dataUpdatedAt: initialTimestamp });
+    const useUpdateForm = createUseUpdateForm(hooks);
+
+    const { result, rerender } = renderHook(() => useUpdateForm("1"), {
+      wrapper: createWrapper(queryClient),
+    });
+
+    expect(result.current.form.getFieldValue("title")).toBe("Original");
+
+    // Simulate entity refetch: new dataUpdatedAt, new entity data
+    const updatedEntity = { id: "1", title: "Refetched", status: "closed" };
+    (hooks.useGet as ReturnType<typeof vi.fn>).mockReturnValue({
+      data: updatedEntity,
+      isLoading: false,
+      dataUpdatedAt: 2000,
+    });
+
+    rerender();
+
+    expect(result.current.form.getFieldValue("title")).toBe("Refetched");
+    expect(result.current.form.getFieldValue("status")).toBe("closed");
+  });
 });

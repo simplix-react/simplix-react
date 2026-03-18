@@ -89,6 +89,19 @@ describe("createBootAccessPolicy", () => {
     expect(typeof calledWith.isSuperAdmin).toBe("function");
   });
 
+  it("default isSuperAdmin returns true when user.isSuperAdmin is true", () => {
+    const mockFetch = vi.fn();
+
+    createBootAccessPolicy({ fetchFn: mockFetch });
+
+    const calledWith = vi.mocked(createAccessPolicy).mock.calls[0][0];
+    const isSuperAdmin = calledWith.isSuperAdmin!;
+
+    expect(isSuperAdmin({ userId: "1", username: "admin", roles: [], isSuperAdmin: true })).toBe(true);
+    expect(isSuperAdmin({ userId: "2", username: "user", roles: [], isSuperAdmin: false })).toBe(false);
+    expect(isSuperAdmin({ userId: "3", username: "user", roles: [] } as never)).toBe(false);
+  });
+
   it("passes persist config", () => {
     const mockFetch = vi.fn();
     const persist = { storage: {} as Storage };

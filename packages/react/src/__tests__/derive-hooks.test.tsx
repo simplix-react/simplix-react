@@ -1193,4 +1193,407 @@ describe("deriveEntityHooks", () => {
       expect(result.current.error?.message).toBe("Operation failed");
     });
   });
+
+  // ── useList paginated response unwrapping ──
+
+  describe("useList paginated response", () => {
+    it("unwraps paginated { data: T[] } response to T[]", async () => {
+      const client = createMockClient();
+      client.task.list.mockResolvedValue({
+        data: [
+          { id: "1", title: "Task 1", status: "open" },
+          { id: "2", title: "Task 2", status: "done" },
+        ],
+        meta: { total: 2, page: 1 },
+      });
+      const contract = createMockContract(client);
+      const hooks = deriveEntityHooks(contract);
+
+      const { result } = renderHook(() => hooks.task.useList(), {
+        wrapper: createWrapper(queryClient),
+      });
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+      expect(result.current.data).toEqual([
+        { id: "1", title: "Task 1", status: "open" },
+        { id: "2", title: "Task 2", status: "done" },
+      ]);
+    });
+
+    it("returns raw array when response is already an array", async () => {
+      const client = createMockClient();
+      client.task.list.mockResolvedValue([
+        { id: "1", title: "Task 1", status: "open" },
+      ]);
+      const contract = createMockContract(client);
+      const hooks = deriveEntityHooks(contract);
+
+      const { result } = renderHook(() => hooks.task.useList(), {
+        wrapper: createWrapper(queryClient),
+      });
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+      expect(result.current.data).toEqual([
+        { id: "1", title: "Task 1", status: "open" },
+      ]);
+    });
+
+    it("returns object as-is when no data property exists", async () => {
+      const client = createMockClient();
+      // An object without a `data` array property
+      client.task.list.mockResolvedValue({ items: [{ id: "1" }] });
+      const contract = createMockContract(client);
+      const hooks = deriveEntityHooks(contract);
+
+      const { result } = renderHook(() => hooks.task.useList(), {
+        wrapper: createWrapper(queryClient),
+      });
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+      expect(result.current.data).toEqual({ items: [{ id: "1" }] });
+    });
+  });
+
+  // ── useTree ──
+
+  describe("useTree", () => {
+    it("fetches tree data with params", async () => {
+      const treeFn = vi.fn().mockResolvedValue([
+        { id: "1", title: "Root", children: [{ id: "2", title: "Child" }] },
+      ]);
+      const client = createMockClient();
+      (client.task as Record<string, unknown>).tree = treeFn;
+
+      const mockQueryKeys = createMockQueryKeys();
+      const contract = {
+        config: {
+          domain: "test",
+          basePath: "/api",
+          entities: {
+            task: {
+              schema: taskSchema,
+              operations: {
+                tree: { method: "GET" as const, path: "/tasks/tree" },
+                list: { method: "GET" as const, path: "/tasks" },
+                get: { method: "GET" as const, path: "/tasks/:id" },
+                create: { method: "POST" as const, path: "/tasks", input: createTaskDto },
+                update: { method: "PATCH" as const, path: "/tasks/:id", input: updateTaskDto },
+                delete: { method: "DELETE" as const, path: "/tasks/:id" },
+              },
+            },
+          },
+        },
+        client,
+        queryKeys: mockQueryKeys,
+      };
+
+      const hooks = deriveEntityHooks(contract);
+
+      const treeParams = { rootId: "root-1" };
+      const { result } = renderHook(() => hooks.task.useTree(treeParams), {
+        wrapper: createWrapper(queryClient),
+      });
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+      expect(treeFn).toHaveBeenCalledWith(treeParams);
+      expect(result.current.data).toEqual([
+        { id: "1", title: "Root", children: [{ id: "2", title: "Child" }] },
+      ]);
+    });
+
+    it("fetches tree data without params", async () => {
+      const treeFn = vi.fn().mockResolvedValue([{ id: "1", title: "Root" }]);
+      const client = createMockClient();
+      (client.task as Record<string, unknown>).tree = treeFn;
+
+      const mockQueryKeys = createMockQueryKeys();
+      const contract = {
+        config: {
+          domain: "test",
+          basePath: "/api",
+          entities: {
+            task: {
+              schema: taskSchema,
+              operations: {
+                tree: { method: "GET" as const, path: "/tasks/tree" },
+                list: { method: "GET" as const, path: "/tasks" },
+                get: { method: "GET" as const, path: "/tasks/:id" },
+                create: { method: "POST" as const, path: "/tasks", input: createTaskDto },
+                update: { method: "PATCH" as const, path: "/tasks/:id", input: updateTaskDto },
+                delete: { method: "DELETE" as const, path: "/tasks/:id" },
+              },
+            },
+          },
+        },
+        client,
+        queryKeys: mockQueryKeys,
+      };
+
+      const hooks = deriveEntityHooks(contract);
+
+      const { result } = renderHook(() => hooks.task.useTree(), {
+        wrapper: createWrapper(queryClient),
+      });
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+      expect(treeFn).toHaveBeenCalledWith(undefined);
+    });
+  });
+
+  // ── Custom Entity Operations (Generic Query / Mutation) ──
+
+  describe("custom entity operations", () => {
+    function createContractWithCustomOps() {
+      const searchFn = vi.fn().mockResolvedValue([{ id: "1", title: "Found" }]);
+      const archiveFn = vi.fn().mockResolvedValue({ success: true });
+
+      const client = {
+        ...createMockClient(),
+      };
+      (client.task as Record<string, unknown>).search = searchFn;
+      (client.task as Record<string, unknown>).archive = archiveFn;
+
+      const mockQueryKeys = createMockQueryKeys();
+      const contract = {
+        config: {
+          domain: "test",
+          basePath: "/api",
+          entities: {
+            task: {
+              schema: taskSchema,
+              operations: {
+                list: { method: "GET" as const, path: "/tasks" },
+                get: { method: "GET" as const, path: "/tasks/:id" },
+                create: { method: "POST" as const, path: "/tasks", input: createTaskDto },
+                update: { method: "PATCH" as const, path: "/tasks/:id", input: updateTaskDto },
+                delete: { method: "DELETE" as const, path: "/tasks/:id" },
+                search: { method: "GET" as const, path: "/tasks/search" },
+                archive: { method: "POST" as const, path: "/tasks/:id/archive" },
+              },
+            },
+          },
+        },
+        client,
+        queryKeys: mockQueryKeys,
+      };
+
+      return { contract, searchFn, archiveFn, mockQueryKeys };
+    }
+
+    it("derives a generic query hook for custom GET operations", async () => {
+      const { contract, searchFn } = createContractWithCustomOps();
+      const hooks = deriveEntityHooks(contract);
+
+      expect(hooks.task).toHaveProperty("useSearch");
+
+      const searchParams = { q: "keyword" };
+      const { result } = renderHook(
+        () => hooks.task.useSearch(searchParams),
+        { wrapper: createWrapper(queryClient) },
+      );
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+      expect(searchFn).toHaveBeenCalledWith(searchParams);
+      expect(result.current.data).toEqual([{ id: "1", title: "Found" }]);
+    });
+
+    it("derives a generic mutation hook for custom non-GET operations", async () => {
+      const { contract, archiveFn } = createContractWithCustomOps();
+      const hooks = deriveEntityHooks(contract);
+
+      expect(hooks.task).toHaveProperty("useArchive");
+
+      const { result } = renderHook(() => hooks.task.useArchive(), {
+        wrapper: createWrapper(queryClient),
+      });
+
+      await act(async () => {
+        result.current.mutate({ id: "task-1" });
+      });
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+      expect(archiveFn).toHaveBeenCalledWith({ id: "task-1" }, expect.anything());
+      expect(result.current.data).toEqual({ success: true });
+    });
+
+    it("generic mutation invalidates all entity queries by default", async () => {
+      const { contract } = createContractWithCustomOps();
+      const hooks = deriveEntityHooks(contract);
+      const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
+
+      const { result } = renderHook(() => hooks.task.useArchive(), {
+        wrapper: createWrapper(queryClient),
+      });
+
+      await act(async () => {
+        result.current.mutate({ id: "task-1" });
+      });
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+      expect(invalidateSpy).toHaveBeenCalledWith({
+        queryKey: ["test", "task"],
+      });
+    });
+
+    it("generic mutation uses custom invalidates function when provided", async () => {
+      const archiveFn = vi.fn().mockResolvedValue({ success: true });
+      const client = createMockClient();
+      (client.task as Record<string, unknown>).archive = archiveFn;
+
+      const mockQueryKeys = createMockQueryKeys();
+      const contract = {
+        config: {
+          domain: "test",
+          basePath: "/api",
+          entities: {
+            task: {
+              schema: taskSchema,
+              operations: {
+                list: { method: "GET" as const, path: "/tasks" },
+                get: { method: "GET" as const, path: "/tasks/:id" },
+                create: { method: "POST" as const, path: "/tasks", input: createTaskDto },
+                update: { method: "PATCH" as const, path: "/tasks/:id", input: updateTaskDto },
+                delete: { method: "DELETE" as const, path: "/tasks/:id" },
+                archive: {
+                  method: "POST" as const,
+                  path: "/tasks/:id/archive",
+                  invalidates: (queryKeys: Record<string, QueryKeyFactory>) => [
+                    queryKeys.archive.lists(),
+                  ],
+                },
+              },
+            },
+          },
+        },
+        client,
+        queryKeys: mockQueryKeys,
+      };
+
+      const hooks = deriveEntityHooks(contract);
+      const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
+
+      const { result } = renderHook(() => hooks.task.useArchive(), {
+        wrapper: createWrapper(queryClient),
+      });
+
+      await act(async () => {
+        result.current.mutate({ id: "task-1" });
+      });
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+      expect(invalidateSpy).toHaveBeenCalledWith({
+        queryKey: ["test", "task", "list"],
+      });
+    });
+
+    it("generic mutation calls user-provided onSuccess callback", async () => {
+      const { contract } = createContractWithCustomOps();
+      const hooks = deriveEntityHooks(contract);
+      const onSuccess = vi.fn();
+
+      const { result } = renderHook(
+        () => hooks.task.useArchive({ onSuccess }),
+        { wrapper: createWrapper(queryClient) },
+      );
+
+      await act(async () => {
+        result.current.mutate({ id: "task-1" });
+      });
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+      expect(onSuccess).toHaveBeenCalled();
+    });
+  });
+
+  // ── useInfiniteList advanced pagination ──
+
+  describe("useInfiniteList pagination", () => {
+    it("uses offset-based pagination increment when no cursor", async () => {
+      const client = createMockClient();
+      // First page: has next page, no cursor (offset-based)
+      client.task.list
+        .mockResolvedValueOnce({
+          data: [{ id: "1", title: "Task 1", status: "open" }],
+          meta: { hasNextPage: true },
+        })
+        .mockResolvedValueOnce({
+          data: [{ id: "2", title: "Task 2", status: "done" }],
+          meta: { hasNextPage: false },
+        });
+      const contract = createMockContract(client);
+      const hooks = deriveEntityHooks(contract);
+
+      const { result } = renderHook(
+        () => hooks.task.useInfiniteList(),
+        { wrapper: createWrapper(queryClient) },
+      );
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+      // Should have next page (offset-based, lastPageParam=1 -> nextPageParam=2)
+      expect(result.current.hasNextPage).toBe(true);
+
+      // Fetch next page
+      await act(async () => {
+        result.current.fetchNextPage();
+      });
+
+      await waitFor(() => expect(result.current.data?.pages).toHaveLength(2));
+
+      // Second call should use page 2 with offset pagination
+      expect(client.task.list).toHaveBeenCalledTimes(2);
+      expect(client.task.list).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          pagination: expect.objectContaining({ type: "offset", page: 2, limit: 20 }),
+        }),
+      );
+    });
+
+    it("uses cursor-based pagination when pageParam is a string", async () => {
+      const client = createMockClient();
+      client.task.list
+        .mockResolvedValueOnce({
+          data: [{ id: "1", title: "Task 1", status: "open" }],
+          meta: { hasNextPage: true, nextCursor: "cursor-abc" },
+        })
+        .mockResolvedValueOnce({
+          data: [{ id: "2", title: "Task 2", status: "done" }],
+          meta: { hasNextPage: false },
+        });
+      const contract = createMockContract(client);
+      const hooks = deriveEntityHooks(contract);
+
+      const { result } = renderHook(
+        () => hooks.task.useInfiniteList(),
+        { wrapper: createWrapper(queryClient) },
+      );
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+      expect(result.current.hasNextPage).toBe(true);
+
+      // Fetch next page using cursor
+      await act(async () => {
+        result.current.fetchNextPage();
+      });
+
+      await waitFor(() => expect(result.current.data?.pages).toHaveLength(2));
+
+      // Second call should use cursor-based pagination
+      expect(client.task.list).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          pagination: expect.objectContaining({ type: "cursor", cursor: "cursor-abc" }),
+        }),
+      );
+    });
+  });
 });
