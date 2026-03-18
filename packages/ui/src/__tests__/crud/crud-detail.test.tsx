@@ -12,16 +12,22 @@ vi.mock("@simplix-react/i18n/react", () => ({
   }),
 }));
 
-vi.mock("../../provider/ui-provider", () => ({
-  useUIComponents: () => ({
-    SectionShell: ({ title, children }: { title?: React.ReactNode; children?: React.ReactNode }) => (
-      <section>
-        {title && <h3>{title}</h3>}
-        {children}
-      </section>
-    ),
-  }),
-}));
+vi.mock("../../provider/ui-provider", () => {
+  const mockSectionShell = ({ title, children }: { title?: React.ReactNode; children?: React.ReactNode }) => (
+    <section>
+      {title && <h3>{title}</h3>}
+      {children}
+    </section>
+  );
+  const mockComponents = {
+    Button: (props: Record<string, unknown>) => <button {...props} />,
+    SectionShell: mockSectionShell,
+  };
+  return {
+    useUIComponents: () => mockComponents,
+    useFlatUIComponents: () => mockComponents,
+  };
+});
 
 import React from "react";
 import { CrudDetail } from "../../crud/detail/crud-detail";

@@ -12,9 +12,9 @@ vi.mock("@simplix-react/i18n/react", () => ({
   }),
 }));
 
-// Mock useUIComponents to return a CrudDelete that renders based on props
-vi.mock("../../provider/ui-provider", () => ({
-  useUIComponents: () => ({
+// Mock useUIComponents/useFlatUIComponents to return a CrudDelete
+vi.mock("../../provider/ui-provider", () => {
+  const mockComponents = {
     CrudDelete: ({ open, onOpenChange, onConfirm, title, description, loading, cancelLabel, deleteLabel, deletingLabel }: {
       open: boolean;
       onOpenChange: (o: boolean) => void;
@@ -37,8 +37,12 @@ vi.mock("../../provider/ui-provider", () => ({
         </button>
       </div>
     ) : null,
-  }),
-}));
+  };
+  return {
+    useUIComponents: () => mockComponents,
+    useFlatUIComponents: () => mockComponents,
+  };
+});
 
 import { renderHook, act } from "@testing-library/react";
 import { useCrudDeleteWired } from "../../crud/delete/use-crud-delete-wired";
