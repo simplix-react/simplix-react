@@ -266,7 +266,7 @@ export type {
 } from "./base";
 
 // Provider
-export { UIComponentContext, UIProvider, useUIComponents } from "./provider";
+export { createOverrides, UIComponentContext, UIProvider, useFlatUIComponents, useUIComponents, withOverride } from "./provider";
 export type {
   CommandComponents,
   DialogComponents,
