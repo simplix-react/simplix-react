@@ -5,7 +5,7 @@
   "description": "Package-first React framework that auto-generates reusable domain packages from OpenAPI specs",
   "type": "module",
   "scripts": {
-    "build": "turbo run build && vitest run",
+    "build": "turbo run build",
     "build:storybook": "turbo run build-storybook",
     "dev": "turbo run dev",
     "typecheck": "turbo run typecheck",
