@@ -6,17 +6,18 @@
   "type": "module",
   "scripts": {
     "build": "turbo run build",
-    "build:storybook": "turbo run build-storybook",
-    "dev": "turbo run dev",
+    "dev": "echo \"Use: pnpm dev:storybook or turbo run dev --filter=<package>\"",
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",
     "test": "vitest run --reporter=verbose --coverage",
     "clean": "turbo run clean",
-    "storybook": "pnpm --filter @simplix-react/storybook storybook",
     "docs:api": "typedoc",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "turbo run build && changeset publish"
+    "release": "turbo run build && changeset publish",
+    "storybook": "pnpm --filter @simplix-react/storybook storybook",
+    "dev:storybook": "turbo run dev storybook --filter=@simplix-react/ui --filter=@simplix-react/storybook --concurrency=3",
+    "build:storybook": "turbo run build-storybook"
   },
   "devDependencies": {
     "@changesets/changelog-github": "catalog:",
