@@ -54,6 +54,18 @@
     "clearDateRange": "Clear date range",
     "clearDate": "Clear date"
   },
+  "timeRange": {
+    "previous": "Previous",
+    "next": "Next",
+    "now": "Now",
+    "units": {
+      "m": "m",
+      "h": "h",
+      "d": "d",
+      "w": "w",
+      "mo": "mo"
+    }
+  },
   "field": {
     "selectCountry": "Select country",
     "searchCountry": "Search country...",

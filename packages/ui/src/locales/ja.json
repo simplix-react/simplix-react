@@ -54,6 +54,18 @@
     "clearDateRange": "日付範囲をクリア",
     "clearDate": "日付をクリア"
   },
+  "timeRange": {
+    "previous": "前へ",
+    "next": "次へ",
+    "now": "現在",
+    "units": {
+      "m": "分",
+      "h": "時間",
+      "d": "日",
+      "w": "週",
+      "mo": "ヶ月"
+    }
+  },
   "field": {
     "selectCountry": "国を選択",
     "searchCountry": "国を検索...",
