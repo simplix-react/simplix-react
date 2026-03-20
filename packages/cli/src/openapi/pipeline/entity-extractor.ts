@@ -642,9 +642,13 @@ function extractEntitySchemaFromOps(
     }
   }
 
-  const getList = ops.find(
+  // Prefer /search endpoint for getList (paginated list), then fall back to any parameterless GET
+  const getListCandidates = ops.filter(
     (op) => op.method === "GET" && !hasPathParam(op.path),
   );
+  const getList =
+    getListCandidates.find((op) => op.path.endsWith("/search")) ??
+    getListCandidates[0];
   if (getList) {
     const schema = extractResponseSchema(spec, getList.path, "get");
     if (schema) {

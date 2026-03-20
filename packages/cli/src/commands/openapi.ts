@@ -15,6 +15,7 @@ import { resolveRefs } from "../openapi/pipeline/schema-resolver.js";
 import { extractEntities, enrichWithResponseInfo } from "../openapi/pipeline/entity-extractor.js";
 import { computeDiff, formatDiff } from "../openapi/adaptation/diff-engine.js";
 import { groupEntitiesByDomain } from "../openapi/pipeline/domain-splitter.js";
+import { getSpecProfile } from "../openapi/plugin-registry.js";
 import { generateMockFiles } from "../openapi/generation/mock-generator.js";
 import { generateHookFiles } from "../openapi/generation/hook-generator.js";
 import { generateHttpFile, generateHttpEnvJson } from "../openapi/generation/http-file-gen.js";
@@ -89,6 +90,23 @@ export const openapiCommand = new Command("openapi")
 
     // 2. Load project config
     const config = await loadConfig(rootDir);
+
+    // Verify required spec profiles are available (plugins loaded)
+    if (config.openapi) {
+      for (const specEntry of config.openapi) {
+        if (specEntry.profile) {
+          const profile = getSpecProfile(specEntry.profile);
+          if (!profile) {
+            log.error(
+              `Spec profile "${specEntry.profile}" is declared in simplix.config but its plugin is not loaded.\n` +
+              `  Ensure the plugin package is installed and accessible.\n` +
+              `  Without this plugin, code generation will produce incorrect results.`,
+            );
+            process.exit(1);
+          }
+        }
+      }
+    }
 
     // 3. Parse OpenAPI spec
     const spinner = ora("Loading OpenAPI spec...").start();

@@ -69,33 +69,57 @@ function findActionSuffix(segments: string[], entityName: string): string | unde
  */
 function findGetSubpath(segments: string[], entityName: string): string | undefined {
   const entityKebab = entityName.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
+  const entityParts = entityKebab.split("-");
 
-  let entityIdx = -1;
-  // Exact match first
-  for (let i = 0; i < segments.length; i++) {
-    if (segments[i] === entityKebab) {
-      entityIdx = i;
-      break;
+  // Find where the entity's path segments end.
+  // Entity "syncTransactionLog" → kebab "sync-transaction-log" → parts ["sync","transaction","log"]
+  // Path may spread entity across multiple segments: /sync/transaction-log/...
+  // Strategy: find the last segment that belongs to the entity name, then extract action parts after it.
+
+  // Build all possible contiguous kebab sequences from path segments
+  // and find the longest match that covers the entity parts
+  let entityEndIdx = -1;
+
+  // Try matching entity parts against consecutive path segments (joining with "-")
+  for (let start = 0; start < segments.length; start++) {
+    if (segments[start].startsWith("{")) continue;
+    let combined = "";
+    for (let end = start; end < segments.length; end++) {
+      if (segments[end].startsWith("{")) break;
+      combined = combined ? combined + "-" + segments[end] : segments[end];
+      if (combined === entityKebab) {
+        entityEndIdx = end;
+        break;
+      }
     }
+    if (entityEndIdx >= 0) break;
   }
 
   // Prefix fallback: when entity name from tag has a qualifier suffix
-  // (e.g., tag "pacs.policy.PolicyOverview" → "policy-overview")
-  // but path uses only the base resource name (e.g., "/policy/summary")
-  if (entityIdx < 0) {
+  if (entityEndIdx < 0) {
     const prefixes = buildEntityPrefixes(entityKebab);
-    for (let i = 0; i < segments.length; i++) {
-      if (prefixes.has(segments[i])) {
-        entityIdx = i;
+    for (let i = segments.length - 1; i >= 0; i--) {
+      if (!segments[i].startsWith("{") && prefixes.has(segments[i])) {
+        entityEndIdx = i;
         break;
       }
     }
   }
 
-  if (entityIdx < 0) return undefined;
+  // Single segment exact match
+  if (entityEndIdx < 0) {
+    for (let i = 0; i < segments.length; i++) {
+      if (segments[i] === entityKebab) {
+        entityEndIdx = i;
+        break;
+      }
+    }
+  }
+
+  if (entityEndIdx < 0) return undefined;
 
   const actionParts: string[] = [];
-  for (let i = entityIdx + 1; i < segments.length; i++) {
+  for (let i = entityEndIdx + 1; i < segments.length; i++) {
     const seg = segments[i];
     if (!seg.startsWith("{")) {
       actionParts.push(toCamelCase(seg));
@@ -159,14 +183,15 @@ export const simplixBootNaming: OpenApiNamingStrategy = {
         }
         return { role: "tree", hookName: `get${pascal}Tree` };
       }
-      if (hasPathParam && !pathAfterParam) {
-        return { role: "get", hookName: `get${pascal}` };
-      }
       // Custom GET sub-path: /entity/summary, /entity/controller/{id}/timeline
+      // Check BEFORE simple get to avoid collision between GET /{id} and GET /sub-path/{param}
       const getAction = findGetSubpath(pathSegments, entity);
       if (getAction) {
         const actionPascal = getAction.charAt(0).toUpperCase() + getAction.slice(1);
         return { role: getAction, hookName: `get${pascal}${actionPascal}` };
+      }
+      if (hasPathParam && !pathAfterParam) {
+        return { role: "get", hookName: `get${pascal}` };
       }
       // GET /entity (base path, no sub-path, no path param) → getAll
       // Distinct from GET /entity/search which is the paginated "list" role
@@ -194,7 +219,8 @@ export const simplixBootNaming: OpenApiNamingStrategy = {
       // PUT with suffix after entity or param → custom action
       // e.g. /floor/{id}/zones, /floor/{id}/placements
       const entitySegment = entity.toLowerCase();
-      const isEntityOrParam = lastSegment === entitySegment || lastSegment.startsWith("{");
+      const lastSegmentNormalized = toCamelCase(lastSegment).toLowerCase();
+      const isEntityOrParam = lastSegment === entitySegment || lastSegmentNormalized === entitySegment || lastSegment.startsWith("{");
       if (!isEntityOrParam) {
         const actionSuffix = toCamelCase(lastSegment);
         const actionPascal = actionSuffix.charAt(0).toUpperCase() + actionSuffix.slice(1);
@@ -234,7 +260,8 @@ export const simplixBootNaming: OpenApiNamingStrategy = {
       // PATCH with suffix after entity or param → custom action
       // e.g. /floor/order, /floor/{id}/password
       const entitySegment = entity.toLowerCase();
-      const isEntityOrParam = lastSegment === entitySegment || lastSegment.startsWith("{");
+      const lastSegmentNormalized = toCamelCase(lastSegment).toLowerCase();
+      const isEntityOrParam = lastSegment === entitySegment || lastSegmentNormalized === entitySegment || lastSegment.startsWith("{");
       if (!isEntityOrParam) {
         const actionSuffix = toCamelCase(lastSegment);
         return {
