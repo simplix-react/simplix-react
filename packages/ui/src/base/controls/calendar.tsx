@@ -359,9 +359,9 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
 
         {/* Day grid modes: single, range, week */}
         {!isMonthMode && (
-          <div className="flex gap-4">
+          <div className="flex gap-3">
             {months.map(({ year, month, days }) => (
-              <div key={`${year}-${month}`} className="flex-1 min-w-0">
+              <div key={`${year}-${month}`} className={cn("flex-1 min-w-0", numberOfMonths > 1 && "rounded-md border border-input p-2")}>
                 {/* Day-of-week headers */}
                 <header className="grid grid-cols-7 gap-0">
                   {weekdayNames.map((day, i) => (

@@ -59,5 +59,5 @@ export type { SearchPopoverProps, SearchPopoverGroup } from "./search-popover";
 export { Textarea } from "./textarea";
 export type { TextareaProps } from "./textarea";
 
-export { TimeRangeSelector } from "./time-range-selector";
-export type { TimeRangeSelectorProps, TimeRangeValue, WindowPreset } from "./time-range-selector";
+export { TimeRangeSelector, HEATMAP_THEMES } from "./time-range-selector";
+export type { TimeRangeSelectorProps, TimeRangeValue, WindowPreset, HeatmapColorTheme, HeatmapPalette } from "./time-range-selector";

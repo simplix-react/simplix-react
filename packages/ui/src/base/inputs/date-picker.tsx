@@ -1,13 +1,13 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "@simplix-react/i18n/react";
 
-import { Calendar } from "../controls/calendar";
+import { Calendar } from "../controls";
 import { CalendarDotIcon, XIcon } from "../../crud/shared/icons";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "../overlay/popover";
+} from "../overlay";
 import {
   Select,
   SelectContent,

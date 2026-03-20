@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import ReactApexChart from "react-apexcharts";
-import { useTranslation } from "@simplix-react/i18n/react";
+import {useTranslation} from "@simplix-react/i18n/react";
 
-import { cn } from "../../utils/cn";
-import { hideGridRect, toHex6, useChartTheme } from "../charts/apexcharts/use-chart-theme";
-import { Popover, PopoverContent, PopoverTrigger } from "../overlay/popover";
-import { DatePicker } from "./date-picker";
+import {cn} from "../../utils/cn";
+import {hideGridRect, toHex6, useChartTheme} from "../charts/apexcharts/use-chart-theme";
+import {Popover, PopoverContent, PopoverTrigger} from "../overlay";
+import {DatePicker} from "./date-picker";
 
 // ── Types ──
 
@@ -33,6 +33,51 @@ export interface TimeRangeValue extends TimeRange {
   bucketMinutes: number;
 }
 
+/** Heatmap color theme key. */
+export type HeatmapColorTheme = "slate" | "blue" | "emerald" | "violet" | "amber" | "rose";
+
+/** A pair of light/dark palettes for heatmap rendering. */
+export interface HeatmapPalette {
+  light: string[];
+  dark: string[];
+  /** Accent color for selection markers, contrasting with the heatmap palette. */
+  accent: { light: string; dark: string };
+}
+
+/** Built-in heatmap color themes. All use muted/desaturated tones to avoid conflicting with alert colors. */
+export const HEATMAP_THEMES: Record<HeatmapColorTheme, HeatmapPalette> = {
+  slate: {
+    light: ["#f1f5f9", "#cbd5e1", "#94a3b8", "#64748b", "#475569", "#1e293b"],
+    dark:  ["#1e293b", "#334155", "#475569", "#64748b", "#94a3b8", "#e2e8f0"],
+    accent: { light: "#3b82f6", dark: "#60a5fa" },
+  },
+  blue: {
+    light: ["#f0f7ff", "#c7ddf5", "#8fbce6", "#5a9bd5", "#3578b8", "#1a4e80"],
+    dark:  ["#0f1e2e", "#1a3350", "#265078", "#3578b8", "#5a9bd5", "#a8cce8"],
+    accent: { light: "#e85d04", dark: "#fb923c" },
+  },
+  emerald: {
+    light: ["#f0fdf6", "#bbf0d4", "#6dd8a6", "#34b578", "#1f8c5a", "#0f5736"],
+    dark:  ["#0a1f14", "#0f3524", "#1a5038", "#2b7a56", "#47b07a", "#94dbb5"],
+    accent: { light: "#6366f1", dark: "#a5b4fc" },
+  },
+  violet: {
+    light: ["#f5f3ff", "#d4ccf0", "#a896df", "#7e6bc7", "#5b44a8", "#3a2570"],
+    dark:  ["#1a1030", "#2a1a50", "#3d2b78", "#5b44a8", "#7e6bc7", "#b8a8e0"],
+    accent: { light: "#0891b2", dark: "#22d3ee" },
+  },
+  amber: {
+    light: ["#fefcf0", "#f5e8b8", "#e6ca6e", "#c9a63a", "#a07e20", "#604a0a"],
+    dark:  ["#1c1608", "#3a2e10", "#5e4c1e", "#8a7030", "#c9a63a", "#e6d48a"],
+    accent: { light: "#7c3aed", dark: "#a78bfa" },
+  },
+  rose: {
+    light: ["#fff5f7", "#f5ccd4", "#e6899a", "#d05570", "#a83050", "#701a32"],
+    dark:  ["#1e0a10", "#3a1420", "#5e2838", "#a83050", "#d05570", "#e6a0b0"],
+    accent: { light: "#0d9488", dark: "#5eead4" },
+  },
+};
+
 /** Props for the {@link TimeRangeSelector} component. */
 export interface TimeRangeSelectorProps {
   /** Current selected range */
@@ -49,6 +94,8 @@ export interface TimeRangeSelectorProps {
   colorSteps?: number[];
   /** Bucket size (in minutes) that colorSteps are calibrated for. @defaultValue 60 */
   colorStepBaseMinutes?: number;
+  /** Heatmap color theme. @defaultValue "slate" */
+  colorTheme?: HeatmapColorTheme;
   /** Available window presets. Defaults provided if omitted. */
   presets?: WindowPreset[];
   /** Initial window preset key. @defaultValue "1d" */
@@ -150,6 +197,7 @@ export function TimeRangeSelector({
   maxCount,
   colorSteps: colorStepsProp,
   colorStepBaseMinutes = 60,
+  colorTheme = "slate",
   presets: presetsProp,
   defaultWindow = "1d",
   minDate,
@@ -188,6 +236,12 @@ export function TimeRangeSelector({
     }
     return getBucketCount(activePreset);
   }, [viewFrom, viewTo, activePreset]);
+
+  // Accent color for selection markers
+  const accentColor = useMemo(() => {
+    const palette = HEATMAP_THEMES[colorTheme] ?? HEATMAP_THEMES.slate;
+    return isDark ? palette.accent.dark : palette.accent.light;
+  }, [colorTheme, isDark]);
 
   // Counts data
   const [counts, setCounts] = useState<number[]>([]);
@@ -269,8 +323,7 @@ export function TimeRangeSelector({
   const handleNavigate = useCallback(
     (direction: -1 | 1) => {
       const shiftMs = activePreset.windowMinutes * 60 * 1000;
-      const newMs = viewFrom.getTime() + direction * shiftMs;
-      let ms = newMs;
+      let ms = viewFrom.getTime() + direction * shiftMs;
       if (maxDate && ms + shiftMs > maxDate.getTime()) ms = maxDate.getTime() - shiftMs;
       if (minDate && ms < minDate.getTime()) ms = minDate.getTime();
       const newFrom = snapToFloor(new Date(ms), activePreset.bucketMinutes);
@@ -303,38 +356,135 @@ export function TimeRangeSelector({
     [presets, onChange],
   );
 
+  // ── Selection highlight ──
+
+  const selectionOverlay = useMemo(() => {
+    const viewFromMs = viewFrom.getTime();
+    const viewToMs = viewTo.getTime();
+    const windowMs = viewToMs - viewFromMs;
+    if (windowMs <= 0) return null;
+
+    // Check if selection falls within view
+    if (value.from.getTime() >= viewToMs || value.to.getTime() <= viewFromMs) return null;
+
+    const left = Math.max(0, (value.from.getTime() - viewFromMs) / windowMs);
+    const right = Math.min(1, (value.to.getTime() - viewFromMs) / windowMs);
+
+    // If selection covers entire view, no overlay needed
+    if (left <= 0.001 && right >= 0.999) return null;
+
+    return { left, right };
+  }, [value, viewFrom, viewTo]);
+
   // ── Drag Selection ──
 
   const dragContainerRef = useRef<HTMLDivElement>(null);
-  const [dragState, setDragState] = useState<{ startX: number; currentX: number } | null>(null);
+  /** Drag mode: "create" = new selection, "resize-left"/"resize-right" = move one marker edge */
+  const [dragState, setDragState] = useState<{
+    mode: "create" | "resize-left" | "resize-right";
+    startX: number;
+    currentX: number;
+    /** Anchor edge position (the fixed edge during resize) */
+    anchor?: number;
+  } | null>(null);
   const [hoverIdx, setHoverIdx] = useState<number | null>(null);
+
+  /** Threshold (in fraction 0–1) for detecting marker proximity */
+  const MARKER_HIT = 0.015;
+
+  /** Convert a clientX to a 0–1 fraction within the drag container, clamped. */
+  const clientXToFraction = useCallback((clientX: number): number => {
+    const rect = dragContainerRef.current?.getBoundingClientRect();
+    if (!rect) return 0;
+    return Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+  }, []);
+
+  // Document-level drag handlers (registered on drag start, cleaned up on drag end)
+  const docMoveRef = useRef<((e: MouseEvent) => void) | null>(null);
+  const docUpRef = useRef<((e: MouseEvent) => void) | null>(null);
+
+  const cleanupDocListeners = useCallback(() => {
+    if (docMoveRef.current) { document.removeEventListener("mousemove", docMoveRef.current); docMoveRef.current = null; }
+    if (docUpRef.current) { document.removeEventListener("mouseup", docUpRef.current); docUpRef.current = null; }
+  }, []);
 
   const handleDragStart = useCallback((e: React.MouseEvent) => {
     const rect = dragContainerRef.current?.getBoundingClientRect();
     if (!rect) return;
     const x = (e.clientX - rect.left) / rect.width;
-    setDragState({ startX: x, currentX: x });
-  }, []);
+
+    let mode: "create" | "resize-left" | "resize-right" = "create";
+    let anchor: number | undefined;
+
+    // Check if click is near an existing selection marker
+    if (selectionOverlay) {
+      if (Math.abs(x - selectionOverlay.left) < MARKER_HIT) {
+        mode = "resize-left";
+        anchor = selectionOverlay.right;
+      } else if (Math.abs(x - selectionOverlay.right) < MARKER_HIT) {
+        mode = "resize-right";
+        anchor = selectionOverlay.left;
+      }
+    }
+
+    setDragState({ mode, startX: x, currentX: x, anchor });
+
+    // Register document-level listeners so drag continues outside the component
+    cleanupDocListeners();
+    docMoveRef.current = (ev: MouseEvent) => {
+      const frac = clientXToFraction(ev.clientX);
+      setDragState((prev) => prev ? { ...prev, currentX: frac } : null);
+      setHoverIdx(null);
+    };
+    docUpRef.current = () => {
+      cleanupDocListeners();
+      dragEndRef.current();
+    };
+    document.addEventListener("mousemove", docMoveRef.current);
+    document.addEventListener("mouseup", docUpRef.current);
+  }, [selectionOverlay, clientXToFraction, cleanupDocListeners]);
 
   const handleDragMove = useCallback((e: React.MouseEvent) => {
-    const rect = dragContainerRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const x = clientXToFraction(e.clientX);
     if (dragState) {
-      setDragState((prev) => prev ? { ...prev, currentX: x } : null);
-      setHoverIdx(null);
-    } else {
-      setHoverIdx(Math.min(bucketCount - 1, Math.floor(x * bucketCount)));
+      // Handled by document listener
+      return;
     }
-  }, [dragState, bucketCount]);
+    // Cursor style: show resize cursor near markers
+    if (selectionOverlay && (Math.abs(x - selectionOverlay.left) < MARKER_HIT || Math.abs(x - selectionOverlay.right) < MARKER_HIT)) {
+      if (dragContainerRef.current) dragContainerRef.current.style.cursor = "col-resize";
+    } else {
+      if (dragContainerRef.current) dragContainerRef.current.style.cursor = "crosshair";
+    }
+    setHoverIdx(Math.min(bucketCount - 1, Math.floor(x * bucketCount)));
+  }, [dragState, bucketCount, selectionOverlay, clientXToFraction]);
+
+  const dragEndRef = useRef<() => void>(() => {});
 
   const handleDragEnd = useCallback(() => {
     if (!dragState) return;
+    const bucketMs = activePreset.bucketMinutes * 60 * 1000;
+
+    if (dragState.mode === "resize-left" || dragState.mode === "resize-right") {
+      // Resize: anchor is the fixed edge, currentX is the moved edge
+      const a = dragState.anchor!;
+      const b = dragState.currentX;
+      const left = Math.min(a, b);
+      const right = Math.max(a, b);
+      const fromBucket = Math.floor(left * bucketCount);
+      const toBucket = Math.min(bucketCount, Math.ceil(right * bucketCount));
+      if (toBucket - fromBucket < 1) { setDragState(null); return; }
+      const selFrom = new Date(viewFrom.getTime() + fromBucket * bucketMs);
+      const selTo = new Date(viewFrom.getTime() + toBucket * bucketMs);
+      setDragState(null);
+      onChange({ from: selFrom, to: selTo, bucketMinutes: activePreset.bucketMinutes });
+      return;
+    }
+
+    // Create mode
     const left = Math.min(dragState.startX, dragState.currentX);
     const right = Math.max(dragState.startX, dragState.currentX);
     setDragState(null);
-
-    const bucketMs = activePreset.bucketMinutes * 60 * 1000;
 
     if (right - left < 0.03) {
       // Click — select single bucket
@@ -354,6 +504,12 @@ export function TimeRangeSelector({
     const selTo = new Date(viewFrom.getTime() + toBucket * bucketMs);
     onChange({ from: selFrom, to: selTo, bucketMinutes: activePreset.bucketMinutes });
   }, [dragState, viewFrom, activePreset, bucketCount, onChange]);
+
+  // Keep ref in sync so document mouseup can call latest handleDragEnd
+  dragEndRef.current = handleDragEnd;
+
+  // Cleanup document listeners on unmount
+  useEffect(() => cleanupDocListeners, [cleanupDocListeners]);
 
   // ── Chart Data ──
 
@@ -392,9 +548,8 @@ export function TimeRangeSelector({
       return result.length > 0 ? result : [Math.ceil(effectiveMax / 2)];
     })();
     // palette: [0-color, step1, step2, ..., max-color] — need steps.length + 2 colors
-    const basePalette = isDark
-      ? ["#1a2e44", "#1e3a5f", "#2563eb", "#3b82f6", "#f59e0b", "#ef4444"]
-      : ["#f0f4f8", "#bfdbfe", "#3b82f6", "#60a5fa", "#f59e0b", "#ef4444"];
+    const palette = HEATMAP_THEMES[colorTheme] ?? HEATMAP_THEMES.slate;
+    const basePalette = isDark ? palette.dark : palette.light;
 
     const options: ApexCharts.ApexOptions = {
       chart: {
@@ -462,25 +617,6 @@ export function TimeRangeSelector({
   const handleReset = useCallback(() => {
     onChange({ from: viewFrom, to: viewTo, bucketMinutes: activePreset.bucketMinutes });
   }, [viewFrom, viewTo, activePreset, onChange]);
-
-  // ── Selection highlight ──
-
-  const selectionOverlay = useMemo(() => {
-    const windowMs = activePreset.windowMinutes * 60 * 1000;
-    const viewFromMs = viewFrom.getTime();
-    const viewToMs = viewFromMs + windowMs;
-
-    // Check if selection falls within view
-    if (value.from.getTime() >= viewToMs || value.to.getTime() <= viewFromMs) return null;
-
-    const left = Math.max(0, (value.from.getTime() - viewFromMs) / windowMs);
-    const right = Math.min(1, (value.to.getTime() - viewFromMs) / windowMs);
-
-    // If selection covers entire view, no overlay needed
-    if (left <= 0.001 && right >= 0.999) return null;
-
-    return { left, right };
-  }, [value, viewFrom, activePreset]);
 
   // ── Render ──
 
@@ -577,11 +713,11 @@ export function TimeRangeSelector({
         {/* Heatmap with drag overlay */}
         <div
           ref={dragContainerRef}
-          className={cn("relative flex-1 min-w-0 overflow-visible transition-opacity [&_.apexcharts-canvas]:outline-none [&_.apexcharts-svg]:outline-none [&_.apexcharts-canvas]:overflow-visible [&_svg]:overflow-visible select-none cursor-col-resize before:content-[''] before:absolute before:-top-4 before:-bottom-4 before:left-0 before:right-0", isLoading && "opacity-50")}
+          className={cn("relative flex-1 min-w-0 overflow-visible transition-opacity [&_.apexcharts-canvas]:outline-none [&_.apexcharts-svg]:outline-none [&_.apexcharts-canvas]:overflow-visible [&_svg]:overflow-visible select-none cursor-col-resize before:content-[''] before:absolute before:-top-1 before:-bottom-1 before:left-0 before:right-0", isLoading && "opacity-50")}
           onMouseDown={handleDragStart}
           onMouseMove={handleDragMove}
           onMouseUp={handleDragEnd}
-          onMouseLeave={() => { if (!dragState) setHoverIdx(null); handleDragEnd(); }}
+          onMouseLeave={() => { if (!dragState) setHoverIdx(null); }}
         >
           <ReactApexChart
             key={`${isDark ? "d" : "l"}-${activePreset.key}-${viewFrom.getTime()}`}
@@ -590,43 +726,52 @@ export function TimeRangeSelector({
             series={chartSeries}
             height={20}
           />
-          {/* Selected range highlight — dim unselected areas, aligned to heatmap cells */}
+          {/* Selected range — transparent box with accent border + dismiss button */}
           {selectionOverlay && !dragState && (
-            <>
-              {selectionOverlay.left > 0.001 && (
-                <div
-                  className="absolute bg-background/60 pointer-events-none"
-                  style={{ left: 0, top: 0, bottom: 0, width: `${selectionOverlay.left * 100}%` }}
-                />
-              )}
-              {selectionOverlay.right < 0.999 && (
-                <div
-                  className="absolute bg-background/60 pointer-events-none"
-                  style={{ left: `${selectionOverlay.right * 100}%`, top: 0, bottom: 0, width: `${(1 - selectionOverlay.right) * 100}%` }}
-                />
-              )}
-              <div
-                className="absolute border-x-2 border-primary/50 pointer-events-none"
-                style={{ left: `${selectionOverlay.left * 100}%`, top: 0, bottom: 0, width: `${(selectionOverlay.right - selectionOverlay.left) * 100}%` }}
-              />
-            </>
+            <div
+              className="group/sel absolute rounded-[3px]"
+              style={{
+                left: `calc(${selectionOverlay.left * 100}% - 3px)`,
+                top: -2,
+                bottom: -2,
+                width: `calc(${(selectionOverlay.right - selectionOverlay.left) * 100}% + 6px)`,
+                border: `2px solid ${accentColor}`,
+              }}
+            >
+              <button
+                type="button"
+                className="absolute top-0 bottom-0 right-0 hidden group-hover/sel:flex items-center justify-center w-2.5 rounded-none z-10"
+                style={{ backgroundColor: accentColor, color: "#fff" }}
+                onMouseDown={(e) => e.stopPropagation()}
+                onClick={(e) => { e.stopPropagation(); handleReset(); }}
+                aria-label="Clear selection"
+              >
+                <svg width="8" height="8" viewBox="0 0 8 8" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                  <path d="M2 2l4 4M6 2l-4 4" />
+                </svg>
+              </button>
+            </div>
           )}
-          {/* Drag selection overlay — snapped to bucket boundaries */}
+          {/* Drag selection overlay — markers follow mouse, dimmed area snaps to bucket */}
           {dragState && Math.abs(dragState.currentX - dragState.startX) > 0.02 && (() => {
-            const left = Math.min(dragState.startX, dragState.currentX);
-            const right = Math.max(dragState.startX, dragState.currentX);
-            const snappedLeft = Math.floor(left * bucketCount) / bucketCount;
-            const snappedRight = Math.ceil(right * bucketCount) / bucketCount;
+            const isResize = dragState.mode === "resize-left" || dragState.mode === "resize-right";
+            // Raw positions (follow mouse)
+            const rawLeft = isResize ? Math.min(dragState.anchor!, dragState.currentX) : Math.min(dragState.startX, dragState.currentX);
+            const rawRight = isResize ? Math.max(dragState.anchor!, dragState.currentX) : Math.max(dragState.startX, dragState.currentX);
             return (
-              <div
-                className="absolute border-2 border-primary/60 bg-primary/10 rounded-sm pointer-events-none"
-                style={{
-                  left: `${snappedLeft * 100}%`,
-                  top: 0,
-                  bottom: 0,
-                  width: `${(snappedRight - snappedLeft) * 100}%`,
-                }}
-              />
+              <>
+                {/* Selection box — follows mouse */}
+                <div
+                  className="absolute rounded-[3px] pointer-events-none"
+                  style={{
+                    left: `calc(${rawLeft * 100}% - 3px)`,
+                    top: -2,
+                    bottom: -2,
+                    width: `calc(${(rawRight - rawLeft) * 100}% + 6px)`,
+                    border: `2px solid ${accentColor}`,
+                  }}
+                />
+              </>
             );
           })()}
           {/* Current time indicator — inverted triangle + vertical line */}
@@ -691,26 +836,26 @@ export function TimeRangeSelector({
               />
             ));
           })()}
-          {/* Hover tooltip — positioned above hovered cell */}
+          {/* Hover tooltip — positioned below hovered cell */}
           {hoverIdx != null && !dragState && (
             <div
               className="absolute pointer-events-none z-50"
               style={{
                 left: `${((hoverIdx + 0.5) / bucketCount) * 100}%`,
-                top: -2,
-                transform: "translate(-50%, -100%)",
+                bottom: -2,
+                transform: "translate(-50%, 100%)",
               }}
             >
               <div className="flex flex-col items-center">
-              <div className="rounded-md bg-foreground px-2 py-0.5 text-xs text-background shadow-md whitespace-nowrap">
-                {formatBucketLabel(new Date(viewFrom.getTime() + hoverIdx * activePreset.bucketMinutes * 60 * 1000), activePreset.bucketMinutes, locale)}
-                {" — "}
-                <span className="font-semibold">{counts[hoverIdx] ?? 0}</span>
+                <svg width="10" height="5" className="-mb-[1px] text-foreground" style={{ filter: "drop-shadow(0 -1px 1px rgb(0 0 0 / 0.1))" }}>
+                  <polygon points="0,5 10,5 5,0" fill="currentColor" />
+                </svg>
+                <div className="rounded-md bg-foreground px-2 py-0.5 text-xs text-background shadow-md whitespace-nowrap">
+                  {formatBucketLabel(new Date(viewFrom.getTime() + hoverIdx * activePreset.bucketMinutes * 60 * 1000), activePreset.bucketMinutes, locale)}
+                  {" — "}
+                  <span className="font-semibold">{counts[hoverIdx] ?? 0}</span>
+                </div>
               </div>
-              <svg width="10" height="5" className="-mt-[1px] text-foreground" style={{ filter: "drop-shadow(0 1px 1px rgb(0 0 0 / 0.1))" }}>
-                <polygon points="0,0 10,0 5,5" fill="currentColor" />
-              </svg>
-            </div>
             </div>
           )}
         </div>

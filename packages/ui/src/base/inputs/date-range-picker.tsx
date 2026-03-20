@@ -2,12 +2,19 @@ import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "@simplix-react/i18n/react";
 
 import { Calendar, type DateRange } from "../controls/calendar";
-import { CalendarDotsIcon, XIcon, CaretDownIcon } from "../../crud/shared/icons";
+import { CalendarDotsIcon, XIcon } from "../../crud/shared/icons";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "../overlay/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./select";
 import { cn } from "../../utils/cn";
 import {
   endOfDay,
@@ -42,24 +49,18 @@ function MonthYearSelect({
   className?: string;
 }) {
   return (
-    <div className={cn("relative inline-flex", className)}>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className={cn(
-          "h-8 appearance-none rounded-md border border-input bg-background px-2 pr-6 text-sm font-medium",
-          "hover:bg-accent hover:text-accent-foreground",
-          "focus:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-        )}
-      >
+    <Select value={value} onValueChange={onChange}>
+      <SelectTrigger className={cn("h-8 gap-1 text-sm font-medium", className)}>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
         {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
+          <SelectItem key={opt.value} value={opt.value}>
             {opt.label}
-          </option>
+          </SelectItem>
         ))}
-      </select>
-      <CaretDownIcon className="pointer-events-none absolute right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 opacity-50" />
-    </div>
+      </SelectContent>
+    </Select>
   );
 }
 
@@ -114,7 +115,6 @@ export function DateRangePicker({
 
   const [open, setOpen] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
-  const [customDays, setCustomDays] = useState("");
 
   const today = useMemo(() => new Date(), []);
 
@@ -136,18 +136,28 @@ export function DateRangePicker({
     [monthNames],
   );
 
-  // Preset date ranges
-  const presets = useMemo(
+  // Preset date ranges grouped by unit (day / week / month+year)
+  const presetGroups = useMemo(
     () => [
-      { label: t("date.today"), from: startOfDay(today), to: endOfDay(today) },
-      { label: t("date.yesterday"), from: startOfDay(subDays(today, 1)), to: endOfDay(subDays(today, 1)) },
-      { label: t("date.thisWeek"), from: startOfWeek(today), to: endOfWeek(today) },
-      { label: t("date.lastWeek"), from: startOfWeek(subDays(startOfWeek(today), 1)), to: endOfWeek(subDays(startOfWeek(today), 1)) },
-      { label: t("date.last7Days"), from: startOfDay(subDays(today, 6)), to: endOfDay(today) },
-      { label: t("date.thisMonth"), from: startOfMonth(today), to: endOfMonth(today) },
-      { label: t("date.lastMonth"), from: startOfMonth(subDays(startOfMonth(today), 1)), to: endOfMonth(subDays(startOfMonth(today), 1)) },
-      { label: t("date.thisYear"), from: startOfYear(today), to: endOfYear(today) },
-      { label: t("date.lastYear"), from: startOfYear(subDays(startOfYear(today), 1)), to: endOfYear(subDays(startOfYear(today), 1)) },
+      [
+        { label: t("date.today"), from: startOfDay(today), to: endOfDay(today) },
+        { label: t("date.yesterday"), from: startOfDay(subDays(today, 1)), to: endOfDay(subDays(today, 1)) },
+        { label: t("date.last3Days"), from: startOfDay(subDays(today, 2)), to: endOfDay(today) },
+        { label: t("date.last7Days"), from: startOfDay(subDays(today, 6)), to: endOfDay(today) },
+        { label: t("date.last15Days"), from: startOfDay(subDays(today, 14)), to: endOfDay(today) },
+      ],
+      [
+        { label: t("date.thisWeek"), from: startOfWeek(today), to: endOfWeek(today) },
+        { label: t("date.lastWeek"), from: startOfWeek(subDays(startOfWeek(today), 1)), to: endOfWeek(subDays(startOfWeek(today), 1)) },
+      ],
+      [
+        { label: t("date.thisMonth"), from: startOfMonth(today), to: endOfMonth(today) },
+        { label: t("date.lastMonth"), from: startOfMonth(subDays(startOfMonth(today), 1)), to: endOfMonth(subDays(startOfMonth(today), 1)) },
+      ],
+      [
+        { label: t("date.thisYear"), from: startOfYear(today), to: endOfYear(today) },
+        { label: t("date.lastYear"), from: startOfYear(subDays(startOfYear(today), 1)), to: endOfYear(subDays(startOfYear(today), 1)) },
+      ],
     ],
     [t, today],
   );
@@ -160,16 +170,6 @@ export function DateRangePicker({
     },
     [onChange],
   );
-
-  const handleCustomDays = useCallback(() => {
-    const num = parseInt(customDays);
-    if (isNaN(num) || num <= 0) return;
-    const from = startOfDay(subDays(today, num - 1));
-    const to = endOfDay(today);
-    onChange({ from, to });
-    setSelectedPreset(`${t("date.recent")} ${num} ${t("date.days")}`);
-    setViewMonth(from);
-  }, [customDays, onChange, t, today]);
 
   const handleRangeSelect = useCallback(
     (range: DateRange) => {
@@ -189,7 +189,6 @@ export function DateRangePicker({
       onChange({ from: undefined, to: undefined });
     }
     setSelectedPreset(null);
-    setCustomDays("");
     setViewMonth(today);
   }, [onChange, onReset, today]);
 
@@ -276,37 +275,33 @@ export function DateRangePicker({
         <div className="flex">
           {/* Presets panel (desktop only, dual month) */}
           {numberOfMonths === 2 && (
-            <div className="hidden md:flex flex-col border-r p-3 w-44">
-              <h4 className="text-xs font-medium mb-2">{t("date.presets")}</h4>
-              <div className="grid grid-cols-2 gap-1">
-                {presets.map((preset) => (
-                  <button
-                    key={preset.label}
-                    type="button"
-                    className={cn(
-                      "rounded-md px-2 py-1 text-xs text-start hover:bg-primary/90 hover:text-primary-foreground",
-                      selectedPreset === preset.label && "bg-primary text-primary-foreground",
-                    )}
-                    onClick={() => handlePresetSelect(preset)}
-                  >
-                    {preset.label}
-                  </button>
-                ))}
+            <div className="hidden md:flex flex-col border-r w-44">
+              <div className="px-3 pt-3 pb-2">
+                <h4 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{t("date.presets")}</h4>
               </div>
-              {/* Recent N days */}
-              <div className="mt-3 flex items-center gap-1 rounded-md bg-muted/30 p-2">
-                <span className="text-xs">{t("date.recent")}</span>
-                <input
-                  type="number"
-                  value={customDays}
-                  onChange={(e) => setCustomDays(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === "Enter") handleCustomDays(); }}
-                  placeholder="7"
-                  className="w-14 h-6 rounded border px-1 text-center text-xs"
-                  min="1"
-                  max="365"
-                />
-                <span className="text-xs">{t("date.days")}</span>
+              <div className="flex flex-col px-1.5 pb-2 overflow-y-auto min-h-0 flex-1">
+                {presetGroups.map((group, gi) => (
+                  <div key={gi}>
+                    {gi > 0 && <div className="border-t mx-1.5 my-1" />}
+                    <div className="grid grid-cols-2 gap-0.5">
+                      {group.map((preset) => (
+                        <button
+                          key={preset.label}
+                          type="button"
+                          className={cn(
+                            "rounded-md px-2 py-1 text-xs text-start transition-colors shrink-0",
+                            selectedPreset === preset.label
+                              ? "bg-primary text-primary-foreground font-medium"
+                              : "text-foreground hover:bg-accent",
+                          )}
+                          onClick={() => handlePresetSelect(preset)}
+                        >
+                          {preset.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
