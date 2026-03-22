@@ -5,7 +5,7 @@ import type { FieldVariant } from "../../crud/shared/types";
 import { useFieldVariant } from "../../crud/shared/types";
 import { cn, toTestId } from "../../utils/cn";
 
-const detailFieldWrapperVariants = cva("", {
+const detailFieldWrapperVariants = cva("py-1", {
   variants: {
     layout: {
       top: "flex flex-col gap-1",
@@ -19,7 +19,7 @@ const detailFieldWrapperVariants = cva("", {
       lg: "[&_.field-label]:text-base [&_.field-value]:text-base",
     },
   },
-  defaultVariants: { layout: "top", size: "md" },
+  defaultVariants: { layout: "top", size: "sm" },
 });
 
 /** Variant props extracted from {@link detailFieldWrapperVariants}. */
@@ -71,7 +71,7 @@ export function DetailFieldWrapper({
           {displayLabel}
         </span>
       )}
-      <span className="field-value">{children}</span>
+      <span className="field-value text-foreground">{children}</span>
     </span>
   );
 }

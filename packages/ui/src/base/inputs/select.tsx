@@ -87,6 +87,10 @@ export const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(
 SelectContent.displayName = "SelectContent";
 
 // Item
+// TODO: SelectItem tag right-alignment — Radix ItemText renders as inline span,
+// preventing flex-based right-alignment of tag content inside children.
+// Options: (1) Add `trailing` prop to SelectItem rendered outside ItemText,
+// (2) Use Radix's SelectItemText portal behavior to separate trigger vs dropdown rendering.
 export type SelectItemProps = ComponentPropsWithRef<
   typeof SelectPrimitive.Item
 >;

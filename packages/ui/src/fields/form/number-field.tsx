@@ -13,6 +13,8 @@ export interface NumberFieldProps extends CommonFieldProps {
   max?: number;
   step?: number;
   placeholder?: string;
+  /** Unit suffix displayed inside the input (e.g. "sec", "px", "kg"). */
+  suffix?: string;
   /** Additional props forwarded to the underlying input element. */
   inputProps?: React.ComponentProps<"input">;
 }
@@ -32,6 +34,7 @@ export function NumberField({
   max,
   step,
   placeholder,
+  suffix,
   inputProps,
   label,
   labelKey,
@@ -56,6 +59,28 @@ export function NumberField({
     }
   }
 
+  const input = (
+    <Input
+      type="number"
+      value={value === null ? "" : String(value)}
+      onChange={handleChange}
+      min={min}
+      max={max}
+      step={step}
+      placeholder={placeholder}
+      disabled={disabled}
+      required={required}
+      aria-invalid={!!error}
+      aria-label={variantProps.layout === "hidden" ? label : undefined}
+      {...inputProps}
+      className={cn(
+        error && "border-destructive",
+        suffix && "pr-10 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
+        inputProps?.className,
+      )}
+    />
+  );
+
   return (
     <FieldWrapper
       label={label}
@@ -67,21 +92,16 @@ export function NumberField({
       className={className}
       {...variantProps}
     >
-      <Input
-        type="number"
-        value={value === null ? "" : String(value)}
-        onChange={handleChange}
-        min={min}
-        max={max}
-        step={step}
-        placeholder={placeholder}
-        disabled={disabled}
-        required={required}
-        aria-invalid={!!error}
-        aria-label={variantProps.layout === "hidden" ? label : undefined}
-        {...inputProps}
-        className={cn(error && "border-destructive", inputProps?.className)}
-      />
+      {suffix ? (
+        <div className="relative">
+          {input}
+          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+            {suffix}
+          </span>
+        </div>
+      ) : (
+        input
+      )}
     </FieldWrapper>
   );
 }

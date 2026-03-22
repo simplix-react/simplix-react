@@ -6,7 +6,7 @@ import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn, toTestId } from "../../utils/cn";
 import { FieldMessage } from "./field-message";
 
-const fieldWrapperVariants = cva("", {
+const fieldWrapperVariants = cva("py-1", {
   variants: {
     layout: {
       top: "flex flex-col gap-1",
