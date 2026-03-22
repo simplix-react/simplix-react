@@ -346,6 +346,7 @@ export type {
 
 export { CrudForm, SaveButton, useAutosave, useBeforeUnload, useCrudFormSubmit, useIsDirty, useUnsavedChanges, Wizard } from "./crud/form";
 export { adaptOrvalCreate, adaptOrvalDelete, adaptOrvalOrder, adaptOrvalUpdate, useInvalidateEntity } from "./crud/form";
+export { groupValidationErrors } from "./crud/form/group-validation-errors";
 export type {
   AutosaveStatus,
   CrudFormActionsProps,
@@ -550,6 +551,9 @@ export type { UseMapPageDataOptions, UseMapPageDataReturn } from "./map/use-map-
 // Geo utilities
 export { isValidCoord, computeBounds, fitMapToBounds, DEFAULT_MAP_FIT_OPTIONS, toRad, haversineDistance, destinationPoint, geoCircle, computeBoundingCircle } from "./utils/geo";
 export type { Bounds, GeoPoint, HasCoords, MapFitOptions, WithValidCoords } from "./utils/geo";
+
+// Hooks
+export { usePulseOnUpdate } from "./hooks/use-pulse-on-update";
 
 // Utilities
 export { cn, toTestId } from "./utils/cn";
