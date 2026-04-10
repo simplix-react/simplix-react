@@ -17,6 +17,8 @@ export interface ComboboxFieldProps<T extends string = string>
   loading?: boolean;
   placeholder?: string;
   emptyMessage?: string;
+  /** When true, options are rendered as-is from the server — local filtering is skipped. */
+  serverSearch?: boolean;
 }
 
 /**
@@ -43,6 +45,7 @@ export function ComboboxField<T extends string = string>({
   loading = false,
   placeholder,
   emptyMessage,
+  serverSearch,
   label,
   labelKey,
   error,
@@ -67,10 +70,11 @@ export function ComboboxField<T extends string = string>({
   );
 
   const filtered = useMemo(() => {
+    if (serverSearch) return options;
     if (!query) return options;
     const lower = query.toLowerCase();
     return options.filter((o) => o.label.toLowerCase().includes(lower));
-  }, [options, query]);
+  }, [options, query, serverSearch]);
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,6 +94,7 @@ export function ComboboxField<T extends string = string>({
   function handleClear() {
     onChange(null);
     setQuery("");
+    if (serverSearch) onSearch?.("");
   }
 
   return (

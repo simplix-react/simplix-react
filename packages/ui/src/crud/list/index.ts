@@ -23,6 +23,9 @@ export type { OrvalListHookLike, AdaptOrvalListOptions } from "./adapt-orval-lis
 export { useOrvalOptions } from "./use-orval-options";
 export type { OrvalOptionsHookLike, UseOrvalOptionsConfig, UseOrvalOptionsResult } from "./use-orval-options";
 
+export { useServerSearchOptions } from "./use-server-search-options";
+export type { UseServerSearchOptionsConfig, UseServerSearchOptionsReturn } from "./use-server-search-options";
+
 export { useCrudList } from "./use-crud-list";
 export type {
   CrudListFilters,

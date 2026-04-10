@@ -313,7 +313,7 @@ export type {
 } from "./crud/shared";
 
 // CRUD layout components
-export { adaptOrvalList, CardList, CrudList, useCrudList, useKeyboardNav, useMediaQuery, useOrvalOptions } from "./crud/list";
+export { adaptOrvalList, CardList, CrudList, useCrudList, useKeyboardNav, useMediaQuery, useOrvalOptions, useServerSearchOptions } from "./crud/list";
 export type {
   ActionType,
   ActionVariant,
@@ -342,6 +342,8 @@ export type {
   UseOrvalOptionsConfig,
   UseOrvalOptionsResult,
   UseCrudListResult,
+  UseServerSearchOptionsConfig,
+  UseServerSearchOptionsReturn,
 } from "./crud/list";
 
 export { CrudForm, SaveButton, useAutosave, useBeforeUnload, useCrudFormSubmit, useIsDirty, useUnsavedChanges, Wizard } from "./crud/form";
