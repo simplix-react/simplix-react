@@ -51,7 +51,7 @@ export function MultiSelectField<T extends string = string>({
   className,
   ...variantProps
 }: MultiSelectFieldProps<T>) {
-  const { Badge, Input, Popover, PopoverContent, PopoverTrigger } = useFlatUIComponents();
+  const { Badge, Popover, PopoverContent, PopoverTrigger } = useFlatUIComponents();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -95,8 +95,8 @@ export function MultiSelectField<T extends string = string>({
         <PopoverTrigger asChild>
           <span
             className={cn(
-              "relative flex min-h-8 w-full flex-wrap items-center gap-1 rounded-md border border-input bg-background px-3 py-1 text-sm",
-              "focus-within:border-foreground",
+              "flex h-8 w-full items-center gap-1 overflow-hidden rounded-md border border-input bg-background px-3 text-sm",
+              "focus-within:outline-none focus-within:border-foreground",
               disabled && "cursor-not-allowed opacity-50",
               error && "border-destructive focus-within:border-destructive",
             )}
@@ -110,7 +110,7 @@ export function MultiSelectField<T extends string = string>({
               <Badge
                 key={opt.value}
                 variant="secondary"
-                className="gap-1 pr-1"
+                className="shrink-0 gap-0.5 pr-0.5 text-[11px] py-0 h-5"
               >
                 {opt.label}
                 {!disabled && (
@@ -142,14 +142,14 @@ export function MultiSelectField<T extends string = string>({
                 )}
               </Badge>
             ))}
-            <Input
+            <input
               ref={inputRef}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onFocus={() => setOpen(true)}
               placeholder={value.length === 0 ? placeholder : ""}
               disabled={disabled}
-              className="h-auto min-w-[60px] flex-1 border-0 p-0 shadow-none"
+              className="min-w-[60px] flex-1 bg-transparent outline-none text-sm placeholder:text-muted-foreground disabled:cursor-not-allowed"
             />
           </span>
         </PopoverTrigger>
