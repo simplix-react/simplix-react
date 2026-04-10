@@ -32,6 +32,8 @@ export interface FieldWrapperProps extends Partial<FieldVariant> {
   label?: string;
   /** i18n key for label resolution. */
   labelKey?: string;
+  /** Content rendered at the right side of the label area (e.g., LanguageSelector). */
+  labelExtra?: ReactNode;
   /** Error message displayed below the field (highest priority). */
   error?: string;
   /** Warning message displayed below the field (shown when no error). */
@@ -68,10 +70,25 @@ export function FieldWrapper({
 
   const isHidden = layout === "hidden";
   const testId = label ? `form-field-${toTestId(label)}` : undefined;
+  const { labelExtra, disabled, labelKey, ...restVariant } = variantOverride;
 
   // Determine which status message to show (error takes priority over warning)
   const statusMessage = error ?? warning;
   const statusVariant = error ? "error" : warning ? "warning" : undefined;
+
+  const labelElement = label && !isHidden ? (
+    <div className="flex items-center justify-between min-h-6">
+      <Label htmlFor={id}>
+        {label}
+        {required && (
+          <span className="text-destructive ml-0.5" aria-hidden="true">
+            *
+          </span>
+        )}
+      </Label>
+      {labelExtra}
+    </div>
+  ) : null;
 
   return (
     <fieldset
@@ -79,20 +96,11 @@ export function FieldWrapper({
         fieldWrapperVariants({ layout, size }),
         className,
       )}
-      disabled={variantOverride.disabled ?? undefined}
+      disabled={disabled ?? undefined}
       data-testid={testId}
       aria-label={isHidden && label ? label : undefined}
     >
-      {label && !isHidden && (
-        <Label htmlFor={id}>
-          {label}
-          {required && (
-            <span className="text-destructive ml-0.5" aria-hidden="true">
-              *
-            </span>
-          )}
-        </Label>
-      )}
+      {labelElement}
 
       {isHidden && label ? (
         <span className="sr-only" id={`${id}-label`}>

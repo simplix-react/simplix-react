@@ -2,6 +2,7 @@ import type { CommonFieldProps } from "../../crud/shared/types";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
 import { FieldWrapper } from "../shared/field-wrapper";
+import { resizeClasses } from "../shared/textarea-utils";
 
 /** Props for the {@link TextareaField} form component. */
 export interface TextareaFieldProps extends CommonFieldProps {
@@ -18,12 +19,6 @@ export interface TextareaFieldProps extends CommonFieldProps {
   /** Additional props forwarded to the underlying textarea element. */
   textareaProps?: React.ComponentProps<"textarea">;
 }
-
-const resizeClasses = {
-  none: "resize-none",
-  vertical: "resize-y",
-  both: "resize",
-} as const;
 
 /**
  * Multi-line text input field with label, error, and description support.
