@@ -1,14 +1,19 @@
 import { useCallback, useRef, useState } from "react";
 
 {{#if hasUpdate}}
-import { QueryFallback, ArrowLeftIcon, Button, CrudForm, FormFields, Heading, SaveButton, {{#if hasTree}}TreeSelectField, {{/if}}useCrudFormSubmit, useIsDirty, adaptOrvalCreate{{#if hookUpdate}}, adaptOrvalUpdate{{/if}}{{#if hasDateFields}}, parseDate{{/if}}{{#if hookCreate}}, useInvalidateEntity{{/if}} } from "@simplix-react/ui";
+import { QueryFallback, ArrowLeftIcon, Button, CrudForm, FormFields, Heading, SaveButton, {{#if hasTree}}TreeSelectField, {{/if}}useCrudFormSubmit, useIsDirty, adaptOrvalCreate{{#if hookUpdate}}, adaptOrvalUpdate{{/if}}{{#if hasDateFields}}, parseDate{{/if}}{{#if hookCreate}}, useInvalidateEntity{{/if}}{{#if hasI18nFields}}, prepareI18nSubmitData{{/if}} } from "@simplix-react/ui";
 {{else}}
-import { ArrowLeftIcon, Button, CrudForm, FormFields, Heading, SaveButton, {{#if hasTree}}TreeSelectField, {{/if}}useCrudFormSubmit, useIsDirty, adaptOrvalCreate{{#if hasDateFields}}, parseDate{{/if}}{{#if hookCreate}}, useInvalidateEntity{{/if}} } from "@simplix-react/ui";
+import { ArrowLeftIcon, Button, CrudForm, FormFields, Heading, SaveButton, {{#if hasTree}}TreeSelectField, {{/if}}useCrudFormSubmit, useIsDirty, adaptOrvalCreate{{#if hasDateFields}}, parseDate{{/if}}{{#if hookCreate}}, useInvalidateEntity{{/if}}{{#if hasI18nFields}}, prepareI18nSubmitData{{/if}} } from "@simplix-react/ui";
 {{/if}}
 {{#if hasUpdate}}
 import type { EntityId } from "@simplix-react/contract";
 {{/if}}
 import { useEntityTranslation, useTranslation } from "@simplix-react/i18n/react";
+{{#if hasI18nFields}}
+import { DEFAULT_LOCALES } from "@simplix-react/i18n";
+
+const I18N_LANGUAGES = DEFAULT_LOCALES.filter((l) => [{{#each i18nLocales}}"{{this}}"{{#unless @last}}, {{/unless}}{{/each}}].includes(l.code));
+{{/if}}
 {{#if packageName}}
 import { {{#if hasUpdate}}{{#if hookGetForEdit}}{{hookGetForEdit}}, {{else}}{{#if hookGet}}{{hookGet}}, {{/if}}{{/if}}{{/if}}{{#if hookCreate}}{{hookCreate}}{{/if}}{{#if hookUpdate}}{{#if hookCreate}}, {{/if}}{{hookUpdate}}{{/if}}{{#if hasTree}}{{#if hookTree}}, {{hookTree}}{{/if}}{{/if}} } from "{{packageName}}";
 {{/if}}
@@ -141,7 +146,11 @@ function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}I
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
 {{/unless}}
   const { fieldLabel, enumLabel } = useEntityTranslation("{{entity}}");
+{{#if hasI18nFields}}
+  const { t, locale } = useTranslation("{{moduleNamespace}}/widgets");
+{{else}}
   const { t } = useTranslation("{{moduleNamespace}}/widgets");
+{{/if}}
   const [values, setValues] = useState<Partial<{{EntityPascal}}FormValues>>({
 {{#each fields}}
 {{#if (eq this.name ../treeParentIdField)}}
@@ -171,12 +180,29 @@ function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}I
 {{/if}}
 {{/if}}
 
+{{#if hasI18nFields}}
+  const handleSubmit = useCallback(
+    () => {
+      const data = prepareI18nSubmitData<{{EntityPascal}}FormValues>(values as Record<string, unknown>, {
+        i18nFields: {
+{{#each i18nFieldPairs}}
+          {{this.i18nFieldName}}: "{{this.plainFieldName}}",
+{{/each}}
+        },
+        defaultLang: locale || "ko",
+      });
+      onSubmit(data);
+    },
+    [onSubmit, values, locale],
+  );
+{{else}}
   const handleSubmit = useCallback(
     () => {
       onSubmit(values as {{EntityPascal}}FormValues);
     },
     [onSubmit, values],
   );
+{{/if}}
 
 {{#if hasUpdate}}
 {{#if displayNameField}}
@@ -205,6 +231,7 @@ function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}I
       <CrudForm.Section title={t("{{entity}}.sectionTitle")} variant="flat">
 {{#each fields}}
 {{#unless this.isSystemField}}
+{{#unless this.isI18nPair}}
 {{#if (eq this.name ../treeParentIdField)}}
         <TreeSelectField<{{../EntityPascal}}>
           label={fieldLabel("{{this.name}}")}
@@ -218,6 +245,22 @@ function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}I
 {{#if ../hasUpdate}}
           disabledItemId={ {{~../entity~}}Id ? String({{~../entity~}}Id) : undefined}
 {{/if}}
+        />
+{{else if (eq this.formComponent "I18nTextField")}}
+        <FormFields.I18nTextField
+          label={fieldLabel("{{#if this.baseFieldName}}{{this.baseFieldName}}{{else}}{{this.name}}{{/if}}")}
+          value={values.{{this.name}}!}
+          onChange={(v) => updateField("{{this.name}}", v)}
+          languages={I18N_LANGUAGES}
+          error={fieldErrors?.["{{this.name}}"]}
+        />
+{{else if (eq this.formComponent "I18nTextareaField")}}
+        <FormFields.I18nTextareaField
+          label={fieldLabel("{{#if this.baseFieldName}}{{this.baseFieldName}}{{else}}{{this.name}}{{/if}}")}
+          value={values.{{this.name}}!}
+          onChange={(v) => updateField("{{this.name}}", v)}
+          languages={I18N_LANGUAGES}
+          error={fieldErrors?.["{{this.name}}"]}
         />
 {{else if (eq this.formComponent "TextField")}}
         <FormFields.TextField
@@ -273,7 +316,8 @@ function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}I
           ]}
         />
 {{/if}}
-{{/unless}}
+{{/unless}}  {{!-- isI18nPair --}}
+{{/unless}}  {{!-- isSystemField --}}
 {{/each}}
       </CrudForm.Section>
     </CrudForm>

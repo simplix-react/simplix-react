@@ -44,3 +44,5 @@ export type {
   UseUnsavedChangesOptions,
   UseUnsavedChangesReturn,
 } from "./use-unsaved-changes";
+
+export { prepareI18nSubmitData } from "./prepare-i18n-submit-data";

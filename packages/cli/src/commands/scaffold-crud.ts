@@ -39,12 +39,14 @@ export interface FieldInfo {
   isForeignKey: boolean;
   fkEntityField: string | null;
   isSystemField: boolean;
+  isI18nPair: boolean;
+  baseFieldName: string | null;
 }
 
 /** Fields that exist in the data model but should not be displayed or edited by users. */
 const SYSTEM_FIELDS = ["id", "displayOrder", "sortOrder"];
 
-export function parseZodType(zodExpr: string): Omit<FieldInfo, "name" | "label" | "capitalizedName" | "defaultValue" | "isForeignKey" | "fkEntityField" | "isSystemField"> {
+export function parseZodType(zodExpr: string): Omit<FieldInfo, "name" | "label" | "capitalizedName" | "defaultValue" | "isForeignKey" | "fkEntityField" | "isSystemField" | "isI18nPair" | "baseFieldName"> {
   const trimmed = zodExpr.trim();
 
   // z.enum([...]) / zod.enum([...])
@@ -145,6 +147,17 @@ export function parseZodType(zodExpr: string): Omit<FieldInfo, "name" | "label" 
     };
   }
 
+  // z.record(z.string(), z.string()) — i18n map field
+  if (/(?:z|zod)\.record\(\s*(?:z|zod)\.string\(\)\s*,\s*(?:z|zod)\.string\(\)\s*\)/.test(trimmed)) {
+    return {
+      tsType: "Record<string, string>",
+      formComponent: "I18nTextField",
+      inputType: "text",
+      component: "I18nText",
+      options: [],
+    };
+  }
+
   // Default fallback
   return {
     tsType: "string",
@@ -159,7 +172,30 @@ export function getDefaultValue(tsType: string): string {
   if (tsType === "number") return "0";
   if (tsType === "boolean") return "false";
   if (tsType === "Date") return "new Date()";
+  if (tsType === "Record<string, string>") return "{}";
   return '""';
+}
+
+/**
+ * Detect i18n field pairs in a list of FieldInfo entries.
+ * Mutates fields in place: marks plain fields with isI18nPair=true,
+ * sets baseFieldName on i18n fields, and inherits textarea component.
+ */
+function detectI18nFieldPairs(fields: FieldInfo[]): void {
+  for (const field of fields) {
+    if (field.name.endsWith("I18n") && field.tsType === "Record<string, string>") {
+      const baseName = field.name.slice(0, -4);
+      const plainField = fields.find((f) => f.name === baseName);
+      if (plainField) {
+        plainField.isI18nPair = true;
+        field.baseFieldName = baseName;
+        if (plainField.formComponent === "TextareaField") {
+          field.formComponent = "I18nTextareaField";
+          field.component = "I18nTextarea";
+        }
+      }
+    }
+  }
 }
 
 /**
@@ -167,9 +203,30 @@ export function getDefaultValue(tsType: string): string {
  * Zod schema parsing fails (e.g., read-only entities with no Body schema).
  */
 export function entityFieldsToFieldInfo(fields: EntityField[]): FieldInfo[] {
-  return fields
-    .filter((f) => f.type !== "object" && f.type !== "array")
+  const result = fields
+    .filter((f) => (f.type !== "object" && f.type !== "array") || (f.type === "object" && f.name.endsWith("I18n")))
     .map((f) => {
+      // i18n map fields: object type with I18n suffix
+      if (f.type === "object" && f.name.endsWith("I18n")) {
+        const capitalizedName = f.name.charAt(0).toUpperCase() + f.name.slice(1);
+        return {
+          name: f.name,
+          capitalizedName,
+          label: capitalizedName.replace(/([A-Z])/g, " $1").trim(),
+          tsType: "Record<string, string>",
+          formComponent: "I18nTextField",
+          inputType: "text",
+          component: "I18nText",
+          options: [],
+          defaultValue: getDefaultValue("Record<string, string>"),
+          isForeignKey: false,
+          fkEntityField: null,
+          isSystemField: false,
+          isI18nPair: false,
+          baseFieldName: fields.some((pf) => pf.name === f.name.slice(0, -4)) ? f.name.slice(0, -4) : null,
+        };
+      }
+
       let tsType = "string";
       let formComponent = "TextField";
       let inputType = "text";
@@ -216,8 +273,14 @@ export function entityFieldsToFieldInfo(fields: EntityField[]): FieldInfo[] {
         isForeignKey,
         fkEntityField,
         isSystemField: SYSTEM_FIELDS.includes(f.name),
+        isI18nPair: false,
+        baseFieldName: null,
       };
     });
+
+  detectI18nFieldPairs(result);
+
+  return result;
 }
 
 export function parseSchemaFields(content: string, entityName: string): FieldInfo[] {
@@ -335,8 +398,12 @@ function parseZodObjectBody(content: string, match: RegExpExecArray): FieldInfo[
       isForeignKey,
       fkEntityField,
       isSystemField: SYSTEM_FIELDS.includes(name),
+      isI18nPair: false,
+      baseFieldName: null,
     });
   }
+
+  detectI18nFieldPairs(fields);
 
   return fields;
 }
@@ -1294,6 +1361,8 @@ const PLACEHOLDER_FIELDS: FieldInfo[] = [
     isForeignKey: false,
     fkEntityField: null,
     isSystemField: true,
+    isI18nPair: false,
+    baseFieldName: null,
   },
   {
     name: "name",
@@ -1308,6 +1377,8 @@ const PLACEHOLDER_FIELDS: FieldInfo[] = [
     isForeignKey: false,
     fkEntityField: null,
     isSystemField: false,
+    isI18nPair: false,
+    baseFieldName: null,
   },
 ];
 
@@ -1635,7 +1706,17 @@ export const scaffoldCrudCommand = new Command("scaffold")
       const moduleNamespace = moduleDir ? await resolveModuleNamespace(moduleDir) : entity;
       const hasListDetail = (hasTree || ctx.hasList) && ctx.hasDetail;
       const moduleName = moduleDir ? basename(moduleDir) : entity;
-      const fullCtx = { ...ctx, moduleNamespace, moduleName, entityIcon: "FileTextIcon", hasListDetail };
+      // Detect i18n field presence and build pairs array for template
+      const i18nFieldPairs: { i18nFieldName: string; plainFieldName: string }[] = [];
+      for (const f of fields) {
+        if (f.baseFieldName !== null) {
+          i18nFieldPairs.push({ i18nFieldName: f.name, plainFieldName: f.baseFieldName });
+        }
+      }
+      const hasI18nFields = i18nFieldPairs.length > 0;
+      const projectConfig = await loadConfig(rootDir);
+      const i18nLocales = projectConfig.i18n?.locales ?? ["en", "ko", "ja"];
+      const fullCtx = { ...ctx, moduleNamespace, moduleName, entityIcon: "FileTextIcon", hasListDetail, hasI18nFields, i18nFieldPairs, i18nLocales };
 
       const files: Record<string, string> = {};
       if (hasTree) {
@@ -1675,9 +1756,8 @@ export const scaffoldCrudCommand = new Command("scaffold")
         // Auto-update widgets/index.ts with entity exports
         await updateWidgetsIndex(moduleDir, entityKebab, fullCtx);
 
-        // Pages generation
-        const config = await loadConfig(rootDir);
-        const locales = config.i18n?.locales ?? ["en", "ko", "ja"];
+        // Pages generation (reuse i18nLocales loaded above)
+        const locales = i18nLocales;
 
         const pageFiles = await generatePages(moduleDir, entityKebab, fullCtx);
         if (pageFiles.length > 0) {

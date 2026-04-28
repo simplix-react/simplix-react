@@ -116,7 +116,11 @@ interface {{EntityPascal}}ListProps {
 }
 
 export function {{EntityPascal}}List({ list: externalList, activeRowId, actions, actionVariant, onRowClick }: {{EntityPascal}}ListProps) {
+{{#if hasI18nFields}}
+  const { t, locale } = useTranslation("{{moduleName}}/widgets");
+{{else}}
   const { t } = useTranslation("{{moduleName}}/widgets");
+{{/if}}
 {{#if hasEnumFields}}
   const { fieldLabel, enumLabel } = useEntityTranslation("{{entity}}");
 {{else}}
@@ -168,7 +172,16 @@ export function {{EntityPascal}}List({ list: externalList, activeRowId, actions,
           <Stack gap="xs">
 {{#each fields}}
 {{#unless @first}}
-{{#if (eq this.component "Select")}}
+{{#unless this.isI18nPair}}
+{{#if (eq this.component "I18nText")}}
+            <DetailFieldWrapper label={fieldLabel("{{#if this.baseFieldName}}{{this.baseFieldName}}{{else}}{{this.name}}{{/if}}")} layout="inline" size="sm">
+              {(row.{{this.name}} as unknown as Record<string, string> | undefined)?.[locale] ?? ""}
+            </DetailFieldWrapper>
+{{else if (eq this.component "I18nTextarea")}}
+            <DetailFieldWrapper label={fieldLabel("{{#if this.baseFieldName}}{{this.baseFieldName}}{{else}}{{this.name}}{{/if}}")} layout="inline" size="sm">
+              {(row.{{this.name}} as unknown as Record<string, string> | undefined)?.[locale] ?? ""}
+            </DetailFieldWrapper>
+{{else if (eq this.component "Select")}}
             <DetailFieldWrapper label={fieldLabel("{{this.name}}")} layout="inline" size="sm">
               <Badge>{enumLabel("{{../entity}}{{this.capitalizedName}}", String(row.{{this.name}}))}</Badge>
             </DetailFieldWrapper>
@@ -185,13 +198,35 @@ export function {{EntityPascal}}List({ list: externalList, activeRowId, actions,
               {row.{{this.name~}} }
             </DetailFieldWrapper>
 {{/if}}
-{{/unless}}
+{{/unless}}  {{!-- isI18nPair --}}
+{{/unless}}  {{!-- @first --}}
 {{/each}}
           </Stack>
         )}
       >
 {{#each fields}}
-{{#if (eq this.component "Select")}}
+{{#unless this.isI18nPair}}
+{{#if (eq this.component "I18nText")}}
+        <CrudList.Column<{{../EntityPascal}}>
+          field="{{this.name}}"
+          header={fieldLabel("{{#if this.baseFieldName}}{{this.baseFieldName}}{{else}}{{this.name}}{{/if}}")}
+          sortable
+          render={(value) => {
+            const map = value as unknown as Record<string, string> | undefined;
+            return map?.[locale] ?? map?.[Object.keys(map ?? {})[0]] ?? "";
+          }}
+        />
+{{else if (eq this.component "I18nTextarea")}}
+        <CrudList.Column<{{../EntityPascal}}>
+          field="{{this.name}}"
+          header={fieldLabel("{{#if this.baseFieldName}}{{this.baseFieldName}}{{else}}{{this.name}}{{/if}}")}
+          sortable
+          render={(value) => {
+            const map = value as unknown as Record<string, string> | undefined;
+            return map?.[locale] ?? map?.[Object.keys(map ?? {})[0]] ?? "";
+          }}
+        />
+{{else if (eq this.component "Select")}}
         <CrudList.Column<{{../EntityPascal}}>
           field="{{this.name}}"
           header={fieldLabel("{{this.name}}")}
@@ -206,6 +241,7 @@ export function {{EntityPascal}}List({ list: externalList, activeRowId, actions,
           sortable
         />
 {{/if}}
+{{/unless}}  {{!-- isI18nPair --}}
 {{/each}}
       </CrudList.Table>
 

@@ -18,7 +18,11 @@ interface {{EntityPascal}}DetailProps {
 }
 
 export function {{EntityPascal}}Detail({ {{entity}}Id, onClose, onBack{{#if hasUpdate}}, onEdit{{/if}}{{#if hasDelete}}, onDeleted{{/if}} }: {{EntityPascal}}DetailProps) {
+{{#if hasI18nFields}}
+  const { t, locale } = useTranslation("{{moduleNamespace}}/widgets");
+{{else}}
   const { t } = useTranslation("{{moduleNamespace}}/widgets");
+{{/if}}
 {{#if hookGet}}
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, isLoading } = {{hookGet}}({{entity}}Id as any) as any;
@@ -73,7 +77,20 @@ export function {{EntityPascal}}Detail({ {{entity}}Id, onClose, onBack{{#if hasU
         <CrudDetail.Section title={t("{{entity}}.sectionTitle")} variant="flat">
 {{#each fields}}
 {{#unless this.isSystemField}}
-{{#if (eq this.component "Date")}}
+{{#unless this.isI18nPair}}
+{{#if (eq this.component "I18nText")}}
+          <DetailFields.DetailTextField
+            label={fieldLabel("{{#if this.baseFieldName}}{{this.baseFieldName}}{{else}}{{this.name}}{{/if}}")}
+            value={(() => { const m = displayData.{{this.name}} as unknown as Record<string, string> | undefined; return m?.[locale] ?? m?.[Object.keys(m ?? {})[0]] ?? ""; })()}
+            layout="inline"
+          />
+{{else if (eq this.component "I18nTextarea")}}
+          <DetailFields.DetailTextField
+            label={fieldLabel("{{#if this.baseFieldName}}{{this.baseFieldName}}{{else}}{{this.name}}{{/if}}")}
+            value={(() => { const m = displayData.{{this.name}} as unknown as Record<string, string> | undefined; return m?.[locale] ?? m?.[Object.keys(m ?? {})[0]] ?? ""; })()}
+            layout="inline"
+          />
+{{else if (eq this.component "Date")}}
           <DetailFields.DetailDateField
             label={fieldLabel("{{this.name}}")}
             value={displayData.{{this.name~}} }
@@ -112,7 +129,8 @@ export function {{EntityPascal}}Detail({ {{entity}}Id, onClose, onBack{{#if hasU
             layout="inline"
           />
 {{/if}}
-{{/unless}}
+{{/unless}}  {{!-- isI18nPair --}}
+{{/unless}}  {{!-- isSystemField --}}
 {{/each}}
         </CrudDetail.Section>
       </CrudDetail>
