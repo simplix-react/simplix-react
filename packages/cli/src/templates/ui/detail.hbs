@@ -57,7 +57,7 @@ export function {{EntityPascal}}Detail({ {{entity}}Id, onClose, onBack{{#if hasU
 
   return (
     <>
-      <CrudDetail isLoading={isLoading} header={header} onClose={onClose} auditData={{ldb}} id: displayData.id, createdAt: displayData.createdAt, updatedAt: displayData.updatedAt {{rdb}} footer={
+      <CrudDetail isLoading={isLoading} header={header} onClose={onClose} auditData={{ldb}} id: displayData.{{rowIdField}}, createdAt: displayData.createdAt, updatedAt: displayData.updatedAt {{rdb}} footer={
         <CrudDetail.DefaultActions
           onClose={onClose}
           onBack={onBack}
