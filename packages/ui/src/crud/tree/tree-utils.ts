@@ -153,7 +153,7 @@ export function getSiblings<T>(
   parentId: string | null,
   config: TreeConfig<T>,
 ): T[] {
-  if (parentId === null) return data;
+  if (parentId === null || parentId === undefined) return data;
 
   function find(items: T[]): T[] | null {
     for (const item of items) {
