@@ -118,6 +118,7 @@
     "moveDescription": "\"{{name}}\"の新しい親を選択してください",
     "reorderTitle": "順序変更",
     "reorderDescription": "ドラッグして順序を変更してください",
+    "reorderEmpty": "並び替える項目がありません",
     "searchPlaceholder": "検索...",
     "confirm": "確認",
     "move": "移動",

@@ -118,6 +118,7 @@
     "moveDescription": "Select new parent for \"{{name}}\"",
     "reorderTitle": "Reorder",
     "reorderDescription": "Drag to reorder items",
+    "reorderEmpty": "No items to reorder",
     "searchPlaceholder": "Search...",
     "confirm": "Confirm",
     "move": "Move",

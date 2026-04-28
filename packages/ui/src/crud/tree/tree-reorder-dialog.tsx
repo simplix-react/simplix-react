@@ -142,25 +142,29 @@ export function TreeReorderDialog<T>({
           <DialogDescription>{description ?? t("tree.reorderDescription")}</DialogDescription>
         </DialogHeader>
         <div className="max-h-72 overflow-y-auto py-2">
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext items={sortableIds} strategy={verticalListSortingStrategy}>
-              <Stack gap="xs">
-                {items.map((item) => (
-                  <SortableItem
-                    key={item.id}
-                    id={item.id}
-                    label={getDisplayName(item.data)}
-                  />
-                ))}
-              </Stack>
-            </SortableContext>
-          </DndContext>
+          {items.length <= 1 ? (
+            <p className="py-6 text-center text-sm text-muted-foreground">{t("tree.reorderEmpty")}</p>
+          ) : (
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={sortableIds} strategy={verticalListSortingStrategy}>
+                <Stack gap="xs">
+                  {items.map((item) => (
+                    <SortableItem
+                      key={item.id}
+                      id={item.id}
+                      label={getDisplayName(item.data)}
+                    />
+                  ))}
+                </Stack>
+              </SortableContext>
+            </DndContext>
+          )}
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            {t("common.cancel")}
+            {items.length <= 1 ? t("common.close") : t("common.cancel")}
           </Button>
-          <Button onClick={handleConfirm}>{t("tree.confirm")}</Button>
+          {items.length > 1 && <Button onClick={handleConfirm}>{t("tree.confirm")}</Button>}
         </DialogFooter>
       </DialogContent>
     </Dialog>
