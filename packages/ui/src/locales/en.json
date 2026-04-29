@@ -154,5 +154,84 @@
     "reset": "Reset",
     "year": "Year",
     "month": "Month"
+  },
+  "plateEditor": {
+    "toolbar": {
+      "bold": "Bold",
+      "italic": "Italic",
+      "underline": "Underline",
+      "strikethrough": "Strikethrough",
+      "code": "Inline Code",
+      "heading1": "Heading 1",
+      "heading2": "Heading 2",
+      "heading3": "Heading 3",
+      "paragraph": "Paragraph",
+      "bulletList": "Bullet List",
+      "numberedList": "Numbered List",
+      "blockquote": "Quote",
+      "link": "Link",
+      "image": "Image",
+      "codeBlock": "Code Block",
+      "table": "Table",
+      "mention": "Mention",
+      "turnInto": "Turn into",
+      "fontSize": "Font Size",
+      "fontSizeIncrease": "Increase Font Size",
+      "fontSizeDecrease": "Decrease Font Size",
+      "subscript": "Subscript",
+      "superscript": "Superscript",
+      "fontColor": "Font Color",
+      "backgroundColor": "Background Color",
+      "align": "Align",
+      "alignLeft": "Align Left",
+      "alignCenter": "Align Center",
+      "alignRight": "Align Right",
+      "alignJustify": "Justify"
+    },
+    "link": {
+      "placeholder": "Enter URL",
+      "insert": "Insert Link",
+      "edit": "Edit",
+      "unlink": "Unlink"
+    },
+    "image": {
+      "upload": "Upload Image",
+      "uploading": "Uploading...",
+      "sizeLimitError": "Image size exceeds {{size}}MB limit",
+      "formatError": "Unsupported image format"
+    },
+    "table": {
+      "menu": "Table Menu",
+      "table": "Table",
+      "cell": "Cell",
+      "row": "Row",
+      "column": "Column",
+      "insertTable": "Insert Table",
+      "insertRow": "Insert Row",
+      "insertRowAbove": "Insert Row Above",
+      "insertRowBelow": "Insert Row Below",
+      "insertColumn": "Insert Column",
+      "insertColumnLeft": "Insert Column Left",
+      "insertColumnRight": "Insert Column Right",
+      "deleteRow": "Delete Row",
+      "deleteColumn": "Delete Column",
+      "deleteTable": "Delete Table",
+      "mergeCells": "Merge Cells",
+      "splitCell": "Split Cell"
+    },
+    "mention": {
+      "noResults": "No results found",
+      "placeholder": "Search names..."
+    },
+    "colorPicker": {
+      "custom": "Custom Color",
+      "clear": "Clear Color"
+    },
+    "placeholder": {
+      "default": "Type something...",
+      "heading1": "Heading 1",
+      "heading2": "Heading 2",
+      "heading3": "Heading 3"
+    }
   }
 }
