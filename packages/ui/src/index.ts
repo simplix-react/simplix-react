@@ -507,6 +507,8 @@ export { ArrowLeftIcon } from "./crud/shared/icons";
 // Field components
 export { DetailFields, DetailFieldWrapper, FieldMessage, FieldWrapper, FormFields } from "./fields";
 export type { DetailFieldWrapperProps, FieldMessageProps, FieldWrapperProps } from "./fields";
+export { I18nText } from "./fields/detail/i18n-text-field";
+export type { I18nTextProps } from "./fields/detail/i18n-text-field";
 
 // Router adapters
 export { CrudProvider, createReactRouterAdapter, RouterContext, useRouter } from "./adapters";

@@ -36,3 +36,6 @@ export type { DetailTextFieldProps } from "./text-field";
 
 export { DetailTimezoneField } from "./timezone-field";
 export type { DetailTimezoneFieldProps } from "./timezone-field";
+
+export { I18nText, DetailI18nTextField, DetailI18nTextareaField } from "./i18n-text-field";
+export type { I18nTextProps, DetailI18nTextFieldProps, DetailI18nTextareaFieldProps } from "./i18n-text-field";
