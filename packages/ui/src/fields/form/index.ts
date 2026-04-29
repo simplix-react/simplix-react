@@ -63,3 +63,9 @@ export type { I18nTextFieldProps, I18nValue } from "./i18n-text-field";
 
 export { I18nTextareaField } from "./i18n-textarea-field";
 export type { I18nTextareaFieldProps } from "./i18n-textarea-field";
+
+export { PlateEditorField } from "./plate-editor-field";
+export type { PlateEditorFieldProps, PlateEditorVariant } from "./plate-editor-field";
+
+export { PlateEditorI18nField } from "./plate-editor-i18n-field";
+export type { PlateEditorI18nFieldProps } from "./plate-editor-i18n-field";
