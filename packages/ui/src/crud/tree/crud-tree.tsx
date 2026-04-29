@@ -365,6 +365,8 @@ export interface TreeTableProps<T> {
   actionVariant?: ActionVariant;
   headerActions?: ReactNode;
   searchFields?: (keyof T & string)[];
+  /** Callback-based search predicate. OR-combined with searchFields. */
+  searchPredicate?: (row: T, query: string) => boolean;
   variant?: TableProps["variant"];
   size?: TableProps["size"];
   density?: TableProps["density"];
@@ -385,6 +387,7 @@ function TreeTable<T>({
   actionVariant = "icon",
   headerActions,
   searchFields,
+  searchPredicate,
   variant,
   size,
   density,
@@ -415,18 +418,22 @@ function TreeTable<T>({
   const search = treeCtx?.search ?? "";
 
   const displayData = useMemo(() => {
-    if (!search.trim() || !searchFields?.length) return data;
+    if (!search.trim() || (!searchFields?.length && !searchPredicate)) return data;
     const lower = search.toLowerCase();
     return filterTreeWithAncestors(data, (item) => {
       const row = item as Record<string, unknown>;
-      return searchFields.some((f) => String(row[f] ?? "").toLowerCase().includes(lower));
+      const fieldHit = searchFields?.length
+        ? searchFields.some((f) => String(row[f] ?? "").toLowerCase().includes(lower))
+        : false;
+      const customHit = searchPredicate?.(item, lower) ?? false;
+      return fieldHit || customHit;
     }, config);
-  }, [data, search, searchFields, config]);
+  }, [data, search, searchFields, searchPredicate, config]);
 
   const searchExpandedIds = useMemo(() => {
-    if (!search.trim() || !searchFields?.length) return null;
+    if (!search.trim() || (!searchFields?.length && !searchPredicate)) return null;
     return new Set(getAllNodeIds(displayData, config));
-  }, [displayData, search, searchFields, config]);
+  }, [displayData, search, searchFields, searchPredicate, config]);
 
   const effectiveExpandedIds = searchExpandedIds ?? expandedIds;
 
