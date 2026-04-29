@@ -79,3 +79,17 @@ catalog:
   storybook-addon-pseudo-states: ^10.2.19
   '@tailwindcss/vite': ^4.2.1
   tailwindcss: ^4.2.1
+  platejs: ^53.0.0
+  '@platejs/basic-nodes': ^53.0.0
+  '@platejs/basic-styles': ^53.0.0
+  '@platejs/caption': ^53.0.0
+  '@platejs/code-block': ^53.0.0
+  '@platejs/floating': ^53.0.0
+  '@platejs/indent': ^53.0.0
+  '@platejs/link': ^53.0.0
+  '@platejs/list-classic': ^53.0.0
+  '@platejs/media': ^53.0.0
+  '@platejs/mention': ^53.0.0
+  '@platejs/table': ^53.0.0
+  lowlight: ^3.3.0
+  lucide-react: ^1.12.0

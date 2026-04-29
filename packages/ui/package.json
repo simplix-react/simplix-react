@@ -6,12 +6,17 @@
   "sideEffects": [
     "./dist/styles.css",
     "./dist/index.js",
+    "./dist/plate-editor.js",
     "./src/locales/*"
   ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./plate-editor": {
+      "types": "./dist/plate-editor.d.ts",
+      "import": "./dist/plate-editor.js"
     },
     "./styles.css": "./dist/styles.css"
   },
@@ -74,7 +79,21 @@
     "pmtiles": "catalog:",
     "protomaps-themes-base": "catalog:",
     "react-apexcharts": "catalog:",
-    "tailwind-merge": "catalog:"
+    "tailwind-merge": "catalog:",
+    "platejs": "catalog:",
+    "@platejs/basic-nodes": "catalog:",
+    "@platejs/basic-styles": "catalog:",
+    "@platejs/caption": "catalog:",
+    "@platejs/code-block": "catalog:",
+    "@platejs/floating": "catalog:",
+    "@platejs/indent": "catalog:",
+    "@platejs/link": "catalog:",
+    "@platejs/list-classic": "catalog:",
+    "@platejs/media": "catalog:",
+    "@platejs/mention": "catalog:",
+    "@platejs/table": "catalog:",
+    "lowlight": "catalog:",
+    "lucide-react": "catalog:"
   },
   "devDependencies": {
     "@simplix-react/api": "workspace:*",
