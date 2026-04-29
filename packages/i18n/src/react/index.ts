@@ -12,3 +12,4 @@ export type {
   LocaleOption,
   UseLocalePickerReturn,
 } from "./use-locale-picker.js";
+export { useLocalizedText } from "./use-localized-text.js";
