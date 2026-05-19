@@ -34,6 +34,9 @@ export type { DetailNumberFieldProps } from "./number-field";
 export { DetailTextField } from "./text-field";
 export type { DetailTextFieldProps } from "./text-field";
 
+export { DetailTextareaField } from "./textarea-field";
+export type { DetailTextareaFieldProps } from "./textarea-field";
+
 export { DetailTimezoneField } from "./timezone-field";
 export type { DetailTimezoneFieldProps } from "./timezone-field";
 
