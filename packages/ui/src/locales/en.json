@@ -113,7 +113,7 @@
   "tree": {
     "expandAll": "Expand All",
     "collapseAll": "Collapse All",
-    "rootNode": "Root (No Parent)",
+    "rootNode": "Root",
     "moveTitle": "Move Location",
     "moveDescription": "Select new parent for \"{{name}}\"",
     "reorderTitle": "Reorder",

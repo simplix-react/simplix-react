@@ -113,7 +113,7 @@
   "tree": {
     "expandAll": "すべて展開",
     "collapseAll": "すべて折りたたむ",
-    "rootNode": "ルート (親なし)",
+    "rootNode": "ルート",
     "moveTitle": "位置移動",
     "moveDescription": "\"{{name}}\"の新しい親を選択してください",
     "reorderTitle": "順序変更",
