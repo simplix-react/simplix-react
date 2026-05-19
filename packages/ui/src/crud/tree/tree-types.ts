@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 /**
  * Internal metadata injected into flattened tree rows for rendering.
  *
@@ -57,7 +59,7 @@ export interface TreeMoveConfig<T> {
   /** Field name for parent ID. */
   parentIdField?: keyof T & string;
   /** Extract a display name from a node for the move dialog. */
-  getDisplayName: (item: T) => string;
+  getDisplayName: (item: T) => string | ReactNode;
   /** Called when the user confirms the move. `null` parent means root level. */
   onMove: (itemId: string, newParentId: string | null) => void | Promise<void>;
 }

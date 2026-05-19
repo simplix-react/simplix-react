@@ -1,5 +1,5 @@
 import { useTranslation } from "@simplix-react/i18n/react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 
 import type { CommonFieldProps } from "../../crud/shared/types";
 import type { TreeConfig } from "../../crud/tree/tree-types";
@@ -63,7 +63,7 @@ interface TreeSelectItemProps<T> {
   depth: number;
   idField: string;
   childrenField: string;
-  getDisplayName: (item: T) => string;
+  getDisplayName: (item: T) => string | ReactNode;
   disabledIds: Set<string>;
   selectedId: string | null;
   expandedIds: Set<string>;
@@ -157,7 +157,7 @@ export interface TreeSelectFieldProps<T> extends CommonFieldProps {
   treeData: T[];
   isLoading?: boolean;
   config?: Pick<TreeConfig<T>, "idField" | "childrenField">;
-  getDisplayName?: (item: T) => string;
+  getDisplayName?: (item: T) => string | ReactNode;
   disabledItemId?: string;
   placeholder?: string;
 }
@@ -207,7 +207,7 @@ export function TreeSelectField<T>({
 
   const selectedLabel = useMemo(() => {
     if (!value) return "";
-    function find(items: T[]): string | null {
+    function find(items: T[]): ReactNode | null {
       for (const item of items) {
         if (String((item as Record<string, unknown>)[idField]) === value) {
           return getDisplayName(item);
@@ -228,7 +228,7 @@ export function TreeSelectField<T>({
     const lower = search.toLowerCase();
     return filterTreeWithAncestors(
       treeData,
-      (item) => getDisplayName(item).toLowerCase().includes(lower),
+      (item) => String(getDisplayName(item) ?? "").toLowerCase().includes(lower),
       { idField: idField as keyof T & string, childrenField: childrenField as keyof T & string },
     );
   }, [treeData, search, getDisplayName, idField, childrenField]);

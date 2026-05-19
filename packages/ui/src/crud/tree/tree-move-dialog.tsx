@@ -1,5 +1,5 @@
 import { useTranslation } from "@simplix-react/i18n/react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, type ReactNode } from "react";
 
 import { Stack } from "../../primitives";
 import { cn } from "../../utils/cn";
@@ -198,7 +198,7 @@ export function TreeMoveDialog<T>({
   );
 
   const itemName = useMemo(() => {
-    function find(items: T[]): string | null {
+    function find(items: T[]): ReactNode | null {
       for (const item of items) {
         if (String((item as Record<string, unknown>)[idField]) === currentItemId) {
           return config.getDisplayName(item);
@@ -219,7 +219,7 @@ export function TreeMoveDialog<T>({
     const lower = search.toLowerCase();
     return filterTreeWithAncestors(
       treeData,
-      (item) => config.getDisplayName(item).toLowerCase().includes(lower),
+      (item) => String(config.getDisplayName(item) ?? "").toLowerCase().includes(lower),
       { idField: idField as keyof T & string, childrenField: "children" as keyof T & string },
     );
   }, [treeData, search, config, idField]);
@@ -250,7 +250,7 @@ export function TreeMoveDialog<T>({
         <DialogHeader>
           <DialogTitle>{title ?? t("tree.moveTitle")}</DialogTitle>
           <DialogDescription>
-            {description ?? t("tree.moveDescription", { name: itemName })}
+            {description ?? t("tree.moveDescription", { name: String(itemName ?? "") })}
           </DialogDescription>
         </DialogHeader>
         <Stack gap="sm">

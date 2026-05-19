@@ -2,7 +2,7 @@ import { closestCenter, DndContext, type DragEndEvent, MouseSensor, TouchSensor,
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useTranslation } from "@simplix-react/i18n/react";
-import { useCallback, useState } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 
 import { Stack } from "../../primitives";
 import { cn } from "../../utils/cn";
@@ -28,7 +28,7 @@ function GripIcon() {
 
 interface SortableItemProps {
   id: string;
-  label: string;
+  label: string | ReactNode;
 }
 
 function SortableItem({ id, label }: SortableItemProps) {
@@ -69,7 +69,7 @@ export interface TreeReorderDialogProps<T> {
   parentId: string | null;
   siblings: T[];
   config: TreeReorderConfig<T>;
-  getDisplayName: (item: T) => string;
+  getDisplayName: (item: T) => string | ReactNode;
   title?: string;
   description?: string;
 }
