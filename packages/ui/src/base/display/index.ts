@@ -4,6 +4,13 @@ export type { BadgeProps, BadgeVariants } from "./badge";
 export { BooleanBadge } from "./boolean-badge";
 export type { BooleanBadgeProps } from "./boolean-badge";
 
+export { DynamicColorIcon, DynamicColorIconPresets } from "./dynamic-color-icon";
+export type {
+  DynamicColorIconProps,
+  DynamicColorIconPreset,
+  IconLibrary,
+} from "./dynamic-color-icon";
+
 export { Separator } from "./separator";
 export type { SeparatorProps } from "./separator";
 

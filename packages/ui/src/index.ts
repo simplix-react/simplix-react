@@ -394,6 +394,26 @@ export type {
 export { TreeSelectField } from "./fields/form/tree-select-field";
 export type { TreeSelectFieldProps } from "./fields/form/tree-select-field";
 
+// Icon picker primitive
+export { IconPicker, Icon } from "./base/inputs/icon-picker";
+export type {
+  IconPickerProps,
+  IconProps,
+  IconName,
+  IconData,
+} from "./base/inputs/icon-picker";
+
+// Dynamic color icon (display)
+export {
+  DynamicColorIcon,
+  DynamicColorIconPresets,
+} from "./base/display/dynamic-color-icon";
+export type {
+  DynamicColorIconProps,
+  DynamicColorIconPreset,
+  IconLibrary,
+} from "./base/display/dynamic-color-icon";
+
 export { CrudDetail, usePreviousData } from "./crud/detail";
 export type {
   AuditData,

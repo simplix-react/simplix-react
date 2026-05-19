@@ -26,6 +26,9 @@ export {
 export { Input } from "./input";
 export type { InputProps } from "./input";
 
+export { IconPicker, Icon } from "./icon-picker";
+export type { IconPickerProps, IconProps, IconName, IconData } from "./icon-picker";
+
 export { NumberInput } from "./number-input";
 export type { NumberInputProps } from "./number-input";
 
