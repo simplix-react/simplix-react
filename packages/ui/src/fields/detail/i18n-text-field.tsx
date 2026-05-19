@@ -7,12 +7,14 @@ import { DetailTextField } from "./text-field";
 export interface I18nTextProps {
   value: Record<string, string> | null | undefined;
   fallback?: string;
+  emptyAlign?: "left" | "center";
 }
 
-export function I18nText({ value, fallback = "—" }: I18nTextProps) {
+export function I18nText({ value, fallback = "", emptyAlign = "left" }: I18nTextProps) {
   const localized = useLocalizedText();
   const text = localized(value);
-  return <>{text || fallback}</>;
+  if (text) return <>{text}</>;
+  return <span style={{ display: "inline-block", width: "100%", textAlign: emptyAlign }}>{fallback}</span>;
 }
 
 export interface DetailI18nTextFieldProps extends CommonDetailFieldProps {
@@ -32,7 +34,7 @@ export interface DetailI18nTextareaFieldProps extends CommonDetailFieldProps {
   fallback?: string;
 }
 
-export function DetailI18nTextareaField({ value, fallback = "—", label, labelKey, layout, size, className }: DetailI18nTextareaFieldProps) {
+export function DetailI18nTextareaField({ value, fallback = "", label, labelKey, layout, size, className }: DetailI18nTextareaFieldProps) {
   const localized = useLocalizedText();
   const resolved = localized(value);
   const display = resolved || fallback;

@@ -8,7 +8,7 @@ import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
 export interface DetailTextFieldProps extends CommonDetailFieldProps {
   /** Text value to display. */
   value: string | null | undefined;
-  /** Fallback text when value is null, undefined, or empty string. Defaults to em-dash. */
+  /** Fallback text when value is null, undefined, or empty string. Defaults to empty string. */
   fallback?: string;
   /** Whether to show a copy-to-clipboard button. */
   copyable?: boolean;
@@ -24,7 +24,7 @@ export interface DetailTextFieldProps extends CommonDetailFieldProps {
  */
 export function DetailTextField({
   value,
-  fallback = "\u2014",
+  fallback = "",
   copyable,
   label,
   labelKey,

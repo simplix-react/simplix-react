@@ -614,14 +614,14 @@ describe("StaticField", () => {
     expect(screen.getByText("123 Main St")).toBeDefined();
   });
 
-  it("shows em-dash fallback when value is null", () => {
+  it("renders empty by default when value is null", () => {
     render(<StaticField label="Address" value={null} />);
-    expect(screen.getByText("\u2014")).toBeDefined();
+    expect(screen.queryByText("\u2014")).toBeNull();
   });
 
-  it("shows em-dash fallback when value is undefined", () => {
+  it("renders empty by default when value is undefined", () => {
     render(<StaticField label="Address" />);
-    expect(screen.getByText("\u2014")).toBeDefined();
+    expect(screen.queryByText("\u2014")).toBeNull();
   });
 
   it("shows custom fallback", () => {

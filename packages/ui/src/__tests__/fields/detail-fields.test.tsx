@@ -23,14 +23,14 @@ describe("DetailTextField", () => {
     expect(screen.getByText("test@example.com")).toBeDefined();
   });
 
-  it("shows fallback when value is null", () => {
+  it("renders empty by default when value is null", () => {
     render(<DetailTextField label="Email" value={null} />);
-    expect(screen.getByText("\u2014")).toBeDefined();
+    expect(screen.queryByText("\u2014")).toBeNull();
   });
 
-  it("shows fallback when value is undefined", () => {
+  it("renders empty by default when value is undefined", () => {
     render(<DetailTextField label="Email" value={undefined} />);
-    expect(screen.getByText("\u2014")).toBeDefined();
+    expect(screen.queryByText("\u2014")).toBeNull();
   });
 
   it("shows custom fallback", () => {

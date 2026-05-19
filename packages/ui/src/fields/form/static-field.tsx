@@ -7,7 +7,7 @@ import { FieldWrapper } from "../shared/field-wrapper";
 export interface StaticFieldProps extends CommonFieldProps {
   /** Text or numeric value to display. */
   value?: string | number | null;
-  /** Fallback text when value is null/undefined. Defaults to em-dash. */
+  /** Fallback text when value is null/undefined. Defaults to empty string. */
   fallback?: string;
   /** Custom content to render instead of value text. */
   children?: ReactNode;
@@ -28,7 +28,7 @@ export interface StaticFieldProps extends CommonFieldProps {
  */
 export function StaticField({
   value,
-  fallback = "\u2014",
+  fallback = "",
   children,
   label,
   labelKey,

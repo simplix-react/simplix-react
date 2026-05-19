@@ -313,9 +313,9 @@ describe("DetailDateField (extended)", () => {
 // ── DetailTextField (additional coverage) ──
 
 describe("DetailTextField (extended)", () => {
-  it("shows fallback for empty string", () => {
+  it("renders empty by default for empty string value", () => {
     render(<DetailTextField label="Name" value="" />);
-    expect(screen.getByText("\u2014")).toBeDefined();
+    expect(screen.queryByText("\u2014")).toBeNull();
   });
 
   it("does not show copy button for empty string value", () => {
