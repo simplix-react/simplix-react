@@ -26,12 +26,20 @@ function createMockAdapter(locale: string): II18nAdapter {
       listeners.add(handler);
       return () => { listeners.delete(handler); };
     },
+    formatDate: () => "",
+    formatTime: () => "",
+    formatDateTime: () => "",
+    formatRelativeTime: () => "",
+    formatNumber: () => "",
+    formatCurrency: () => "",
+    loadTranslations: () => {},
+    getLoadState: () => "loaded" as const,
   };
 }
 
 function makeWrapper(locale: string) {
   return ({ children }: { children: ReactNode }) =>
-    createElement(I18nProvider, { adapter: createMockAdapter(locale) }, children);
+    createElement(I18nProvider, { adapter: createMockAdapter(locale), children });
 }
 
 describe("useLocalizedText", () => {
