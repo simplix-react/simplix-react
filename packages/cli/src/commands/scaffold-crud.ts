@@ -1496,6 +1496,8 @@ export const scaffoldCrudCommand = new Command("scaffold")
       const fieldNameList = fields.map((f) => f.name).join(", ");
       const hasEnumFields = fields.some((f) => f.component === "Select");
       const hasDateFields = fields.some((f) => f.component === "Date");
+      const hasBooleanFields = fields.some((f) => f.component === "Boolean");
+      const hasTextareaFields = fields.some((f) => f.component === "Textarea");
 
       // Detect path param names for update/delete mutations (Orval-specific)
       const updatePathParam = crudConfig?.update
@@ -1693,6 +1695,8 @@ export const scaffoldCrudCommand = new Command("scaffold")
         treeDisplayFields,
         hasEnumFields,
         hasDateFields,
+        hasBooleanFields,
+        hasTextareaFields,
         filters: nonTextFilters,
         hasFilters: filterFields.length > 0,
         filterBarDefs,

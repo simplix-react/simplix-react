@@ -211,20 +211,14 @@ export function {{EntityPascal}}List({ list: externalList, activeRowId, actions,
           field="{{this.name}}"
           header={fieldLabel("{{#if this.baseFieldName}}{{this.baseFieldName}}{{else}}{{this.name}}{{/if}}")}
           sortable
-          render={(value) => {
-            const map = value as unknown as Record<string, string> | undefined;
-            return map?.[locale] ?? map?.[Object.keys(map ?? {})[0]] ?? "";
-          }}
+          render={(value) => <I18nText value={value as unknown as Record<string, string> | undefined} />}
         />
 {{else if (eq this.component "I18nTextarea")}}
         <CrudList.Column<{{../EntityPascal}}>
           field="{{this.name}}"
           header={fieldLabel("{{#if this.baseFieldName}}{{this.baseFieldName}}{{else}}{{this.name}}{{/if}}")}
           sortable
-          render={(value) => {
-            const map = value as unknown as Record<string, string> | undefined;
-            return map?.[locale] ?? map?.[Object.keys(map ?? {})[0]] ?? "";
-          }}
+          render={(value) => <I18nText value={value as unknown as Record<string, string> | undefined} />}
         />
 {{else if (eq this.component "Select")}}
         <CrudList.Column<{{../EntityPascal}}>

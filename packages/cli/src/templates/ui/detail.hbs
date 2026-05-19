@@ -1,4 +1,4 @@
-import { QueryFallback, {{#if hasDelete}}CrudDelete, useCrudDeleteDetail, adaptOrvalDelete, {{/if}}CrudDetail, DetailFields, Heading, usePreviousData{{#if hookDelete}}, useInvalidateEntity{{/if}} } from "@simplix-react/ui";
+import { QueryFallback, {{#if hasDelete}}CrudDelete, useCrudDeleteDetail, adaptOrvalDelete, {{/if}}CrudDetail, DetailFields, {{#if hasBooleanFields}}DetailFieldWrapper, BooleanBadge, {{/if}}Heading, usePreviousData{{#if hookDelete}}, useInvalidateEntity{{/if}} } from "@simplix-react/ui";
 import type { EntityId } from "@simplix-react/contract";
 import { useEntityTranslation, useTranslation } from "@simplix-react/i18n/react";
 {{#if packageName}}
@@ -19,7 +19,7 @@ interface {{EntityPascal}}DetailProps {
 
 export function {{EntityPascal}}Detail({ {{entity}}Id, onClose, onBack{{#if hasUpdate}}, onEdit{{/if}}{{#if hasDelete}}, onDeleted{{/if}} }: {{EntityPascal}}DetailProps) {
 {{#if hasI18nFields}}
-  const { t, locale } = useTranslation("{{moduleNamespace}}/widgets");
+  const { t } = useTranslation("{{moduleNamespace}}/widgets");
 {{else}}
   const { t } = useTranslation("{{moduleNamespace}}/widgets");
 {{/if}}
@@ -79,16 +79,22 @@ export function {{EntityPascal}}Detail({ {{entity}}Id, onClose, onBack{{#if hasU
 {{#unless this.isSystemField}}
 {{#unless this.isI18nPair}}
 {{#if (eq this.component "I18nText")}}
-          <DetailFields.DetailTextField
+          <DetailFields.DetailI18nTextField
             label={fieldLabel("{{#if this.baseFieldName}}{{this.baseFieldName}}{{else}}{{this.name}}{{/if}}")}
-            value={(() => { const m = displayData.{{this.name}} as unknown as Record<string, string> | undefined; return m?.[locale] ?? m?.[Object.keys(m ?? {})[0]] ?? ""; })()}
+            value={displayData.{{this.name}} as unknown as Record<string, string> | undefined}
             layout="inline"
           />
 {{else if (eq this.component "I18nTextarea")}}
-          <DetailFields.DetailTextField
+          <DetailFields.DetailI18nTextareaField
             label={fieldLabel("{{#if this.baseFieldName}}{{this.baseFieldName}}{{else}}{{this.name}}{{/if}}")}
-            value={(() => { const m = displayData.{{this.name}} as unknown as Record<string, string> | undefined; return m?.[locale] ?? m?.[Object.keys(m ?? {})[0]] ?? ""; })()}
-            layout="inline"
+            value={displayData.{{this.name}} as unknown as Record<string, string> | undefined}
+            layout="top"
+          />
+{{else if (eq this.component "Textarea")}}
+          <DetailFields.DetailTextareaField
+            label={fieldLabel("{{this.name}}")}
+            value={displayData.{{this.name}} as string | null | undefined}
+            layout="top"
           />
 {{else if (eq this.component "Date")}}
           <DetailFields.DetailDateField
@@ -103,11 +109,9 @@ export function {{EntityPascal}}Detail({ {{entity}}Id, onClose, onBack{{#if hasU
             layout="inline"
           />
 {{else if (eq this.component "Boolean")}}
-          <DetailFields.DetailTextField
-            label={fieldLabel("{{this.name}}")}
-            value={displayData.{{this.name}} ? t("{{../entity}}.yes") : t("{{../entity}}.no")}
-            layout="inline"
-          />
+          <DetailFieldWrapper label={fieldLabel("{{this.name}}")} layout="inline">
+            <BooleanBadge value={!!displayData.{{this.name~}} } />
+          </DetailFieldWrapper>
 {{else if (eq this.component "Select")}}
           <DetailFields.DetailBadgeField
             label={fieldLabel("{{this.name}}")}

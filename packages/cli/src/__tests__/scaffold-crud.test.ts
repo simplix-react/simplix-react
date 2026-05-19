@@ -351,7 +351,7 @@ describe("listTemplate", () => {
 describe("formTemplate", () => {
   it("renders with correct imports", () => {
     const result = renderTemplate(formTemplate, baseCtx);
-    expect(result).toContain('import { useCallback, useRef, useState } from "react"');
+    expect(result).toContain('import { useCallback, useRef, useState, type FormEvent } from "react"');
     expect(result).toContain('SaveButton, useCrudFormSubmit, useIsDirty');
     expect(result).toContain('import { useEntityTranslation, useTranslation } from "@simplix-react/i18n/react"');
   });
