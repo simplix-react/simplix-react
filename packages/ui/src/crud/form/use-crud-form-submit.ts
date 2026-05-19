@@ -4,6 +4,7 @@ import {
   getValidationErrors,
   type ValidationFieldError,
 } from "@simplix-react/api";
+import { applyI18nFallback } from "./i18n-submit-helper";
 
 /** Minimal mutation shape used by {@link useCrudFormSubmit}. */
 export interface CrudMutation<TInput> {
@@ -23,6 +24,16 @@ export interface UseCrudFormSubmitOptions<T, TId = unknown> {
   create: CrudMutation<T>;
   /** Update mutation hook result. Required for edit mode. */
   update?: CrudMutation<{ id: TId; dto: T }>;
+  /**
+   * Map of i18n field name → plain field name. Before submit, each plain
+   * field is populated from `applyI18nFallback(values[i18nField], locales)`.
+   */
+  i18nFields?: Record<string, string>;
+  /**
+   * Locale config order for fallback (typically `useLocalePicker().locales`).
+   * Required when `i18nFields` is provided.
+   */
+  locales?: ReadonlyArray<{ value: string }>;
   /** Called after a successful create or update. */
   onSuccess?: () => void;
 }
@@ -71,7 +82,7 @@ export interface UseCrudFormSubmitResult<T> {
 export function useCrudFormSubmit<T, TId = unknown>(
   options: UseCrudFormSubmitOptions<T, TId>,
 ): UseCrudFormSubmitResult<T> {
-  const { entityId, create, update, onSuccess } = options;
+  const { entityId, create, update, onSuccess, i18nFields, locales } = options;
   const isEdit = entityId != null && entityId !== "";
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
@@ -79,10 +90,20 @@ export function useCrudFormSubmit<T, TId = unknown>(
     (values: T) => {
       setFieldErrors({});
 
+      let prepared: T = values;
+      if (i18nFields && locales) {
+        const next: Record<string, unknown> = { ...(values as Record<string, unknown>) };
+        for (const [i18nField, plainField] of Object.entries(i18nFields)) {
+          const i18nValue = next[i18nField] as Record<string, string> | null | undefined;
+          next[plainField] = applyI18nFallback(i18nValue, locales);
+        }
+        prepared = next as T;
+      }
+
       const doMutate =
         isEdit && update
-          ? () => update.mutateAsync({ id: entityId, dto: values })
-          : () => create.mutateAsync(values);
+          ? () => update.mutateAsync({ id: entityId, dto: prepared })
+          : () => create.mutateAsync(prepared);
 
       doMutate()
         .then(() => onSuccess?.())
@@ -93,7 +114,7 @@ export function useCrudFormSubmit<T, TId = unknown>(
           }
         });
     },
-    [isEdit, entityId, create, update, onSuccess],
+    [isEdit, entityId, create, update, onSuccess, i18nFields, locales],
   );
 
   const isPending = isEdit ? (update?.isPending ?? false) : create.isPending;

@@ -255,4 +255,91 @@ describe("useCrudFormSubmit", () => {
       expect(result.current.fieldErrors).toEqual({});
     });
   });
+
+  describe("i18nFields option (locale-order fallback)", () => {
+    const LOCALES_EN_FIRST = [{ value: "en" }, { value: "ko" }];
+
+    it("populates plain field from i18n map on create (en-first)", () => {
+      const create = createMutation<{ menuName: string; menuNameI18n: Record<string, string> }>();
+      const { result } = renderHook(() =>
+        useCrudFormSubmit({
+          create,
+          i18nFields: { menuNameI18n: "menuName" },
+          locales: LOCALES_EN_FIRST,
+        }),
+      );
+
+      act(() =>
+        result.current.handleSubmit({
+          menuName: "",
+          menuNameI18n: { en: "Home", ko: "홈" },
+        }),
+      );
+
+      expect(create.mutateAsync).toHaveBeenCalledWith({
+        menuName: "Home",
+        menuNameI18n: { en: "Home", ko: "홈" },
+      });
+    });
+
+    it("populates plain field from i18n map on update (en-first)", () => {
+      const create = createMutation<{ menuName: string; menuNameI18n: Record<string, string> }>();
+      const update = createMutation<{ id: string; dto: { menuName: string; menuNameI18n: Record<string, string> } }>();
+      const { result } = renderHook(() =>
+        useCrudFormSubmit({
+          entityId: "abc",
+          create,
+          update,
+          i18nFields: { menuNameI18n: "menuName" },
+          locales: LOCALES_EN_FIRST,
+        }),
+      );
+
+      act(() =>
+        result.current.handleSubmit({
+          menuName: "",
+          menuNameI18n: { en: "Home", ko: "홈" },
+        }),
+      );
+
+      expect(update.mutateAsync).toHaveBeenCalledWith({
+        id: "abc",
+        dto: { menuName: "Home", menuNameI18n: { en: "Home", ko: "홈" } },
+      });
+    });
+
+    it("respects locale config order (ko-first prefers ko over en)", () => {
+      const create = createMutation<{ menuName: string; menuNameI18n: Record<string, string> }>();
+      const { result } = renderHook(() =>
+        useCrudFormSubmit({
+          create,
+          i18nFields: { menuNameI18n: "menuName" },
+          locales: [{ value: "ko" }, { value: "en" }],
+        }),
+      );
+
+      act(() =>
+        result.current.handleSubmit({
+          menuName: "",
+          menuNameI18n: { en: "Home", ko: "홈" },
+        }),
+      );
+
+      expect(create.mutateAsync).toHaveBeenCalledWith({
+        menuName: "홈",
+        menuNameI18n: { en: "Home", ko: "홈" },
+      });
+    });
+
+    it("passes values through unchanged when i18nFields is omitted", () => {
+      const create = createMutation<{ menuName: string }>();
+      const { result } = renderHook(() =>
+        useCrudFormSubmit({ create }),
+      );
+
+      act(() => result.current.handleSubmit({ menuName: "Home" }));
+
+      expect(create.mutateAsync).toHaveBeenCalledWith({ menuName: "Home" });
+    });
+  });
 });
