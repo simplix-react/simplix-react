@@ -23,6 +23,7 @@ import {
   FixedToolbar,
   ToolbarGroup,
   ToolbarSeparator,
+  ToolbarButton,
 } from './components/toolbar'
 import { MarkToolbarButton } from './components/mark-toolbar-button'
 import { TurnIntoToolbarButton } from './components/turn-into-toolbar-button'
@@ -229,13 +230,12 @@ export function PlateEditorAdvanced({
             {/* Link, Code block, Table */}
             <ToolbarGroup>
               <LinkToolbarButton tooltip={t('plateEditor.toolbar.link')} />
-              <MarkToolbarButton
-                nodeType={KEYS.codeBlock}
+              <ToolbarButton
                 tooltip={`${t('plateEditor.toolbar.codeBlock')} (Cmd+Alt+8)`}
                 onClick={() => editor.tf.toggleBlock(KEYS.codeBlock)}
               >
                 <FileCode className="h-4 w-4" />
-              </MarkToolbarButton>
+              </ToolbarButton>
               <TableDropdownMenu />
             </ToolbarGroup>
           </FixedToolbar>
