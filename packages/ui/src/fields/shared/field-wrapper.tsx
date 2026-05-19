@@ -44,6 +44,15 @@ export interface FieldWrapperProps extends Partial<FieldVariant> {
   required?: boolean;
   /** Whether the field is disabled. */
   disabled?: boolean;
+  /**
+   * Control rendered on the leading (left in LTR) side of the input, on the same row.
+   * Use for IconPicker, ColorPicker, or similar adornments.
+   */
+  prefixControl?: ReactNode;
+  /**
+   * Control rendered on the trailing (right in LTR) side of the input, on the same row.
+   */
+  suffixControl?: ReactNode;
   className?: string;
   children: ReactNode;
 }
@@ -60,6 +69,8 @@ export function FieldWrapper({
   warning,
   description,
   required,
+  prefixControl,
+  suffixControl,
   className,
   children,
   ...variantOverride
@@ -71,6 +82,16 @@ export function FieldWrapper({
   const isHidden = layout === "hidden";
   const testId = label ? `form-field-${toTestId(label)}` : undefined;
   const { labelExtra, disabled, labelKey, ...restVariant } = variantOverride;
+
+  const inputRow = (prefixControl || suffixControl) ? (
+    <div className="flex items-center gap-2">
+      {prefixControl}
+      <div className="flex-1 min-w-0">{children}</div>
+      {suffixControl}
+    </div>
+  ) : (
+    children
+  );
 
   // Determine which status message to show (error takes priority over warning)
   const statusMessage = error ?? warning;
@@ -111,7 +132,7 @@ export function FieldWrapper({
       {/* Content area - spans full width in left layout for description/error */}
       {layout === "left" ? (
         <>
-          {children}
+          {inputRow}
           {/* Description and status message occupy the second column */}
           {description && (
             <>
@@ -128,7 +149,7 @@ export function FieldWrapper({
         </>
       ) : (
         <>
-          {children}
+          {inputRow}
           {description && (
             <FieldMessage variant="description">{description}</FieldMessage>
           )}

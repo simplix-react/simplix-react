@@ -22,6 +22,9 @@ export type { DateTimeFieldProps } from "./datetime-field";
 export { Field } from "./field";
 export type { FormFieldProps } from "./field";
 
+export { IconField } from "./icon-field";
+export type { IconFieldProps } from "./icon-field";
+
 export { MultiSelectField } from "./multi-select-field";
 export type { MultiSelectFieldProps } from "./multi-select-field";
 

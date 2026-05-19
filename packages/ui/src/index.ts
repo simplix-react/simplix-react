@@ -394,6 +394,10 @@ export type {
 export { TreeSelectField } from "./fields/form/tree-select-field";
 export type { TreeSelectFieldProps } from "./fields/form/tree-select-field";
 
+// Icon field
+export { IconField } from "./fields/form/icon-field";
+export type { IconFieldProps } from "./fields/form/icon-field";
+
 // Icon picker primitive
 export { IconPicker, Icon } from "./base/inputs/icon-picker";
 export type {
