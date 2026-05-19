@@ -4,6 +4,7 @@ import type { CommonFieldProps } from "../../crud/shared/types";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
 import { FieldWrapper } from "../shared/field-wrapper";
+import { getFilledLanguages } from "../shared/filled-languages";
 import { LanguageSelector } from "../shared/language-selector";
 import { resizeClasses } from "../shared/textarea-utils";
 import type { I18nValue } from "./i18n-text-field";
@@ -51,9 +52,7 @@ export function I18nTextareaField({
   const currentLang = selectedLanguage ?? internalLang;
   const handleLangChange = onLanguageChange ?? setInternalLang;
 
-  const filledLanguages = Object.entries(value ?? {})
-    .filter(([, v]) => v?.trim())
-    .map(([k]) => k);
+  const filledLanguages = getFilledLanguages(value);
 
   // Per-locale placeholder: undefined when key absent (no placeholder shown for that locale).
   const currentPlaceholder =

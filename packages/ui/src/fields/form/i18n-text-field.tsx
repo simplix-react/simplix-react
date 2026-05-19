@@ -1,10 +1,13 @@
 import type { LocaleCode, LocaleConfig } from "@simplix-react/i18n";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
 import { FieldWrapper } from "../shared/field-wrapper";
+import { getFilledLanguages } from "../shared/filled-languages";
 import { LanguageSelector } from "../shared/language-selector";
+import { InlineIconPickerTrigger } from "../shared/inline-icon-picker-trigger";
+import { ColorPicker } from "../../base/inputs/color-picker";
 
 export type I18nValue = Record<LocaleCode, string>;
 
@@ -18,6 +21,21 @@ export interface I18nTextFieldProps extends CommonFieldProps {
   maxLength?: number;
   type?: "text" | "email" | "url" | "tel";
   inputProps?: React.ComponentProps<"input">;
+  /**
+   * Control rendered on the leading side of the input (same row).
+   * Takes precedence over {@link I18nTextFieldProps.iconValue}.
+   */
+  prefixControl?: ReactNode;
+  /** Control rendered on the trailing side of the input (same row). */
+  suffixControl?: ReactNode;
+  /** Convenience: current icon name. When provided, an IconPicker is rendered as prefixControl. */
+  iconValue?: string;
+  /** Convenience: called when the icon changes. */
+  onIconChange?: (value: string) => void;
+  /** Convenience: current color (hex). When provided, a ColorPicker is rendered as suffixControl. */
+  colorValue?: string;
+  /** Convenience: called when the color changes. */
+  onColorChange?: (value: string) => void;
 }
 
 export function I18nTextField({
@@ -30,6 +48,12 @@ export function I18nTextField({
   maxLength,
   type = "text",
   inputProps,
+  prefixControl,
+  suffixControl,
+  iconValue,
+  onIconChange,
+  colorValue,
+  onColorChange,
   label,
   labelKey,
   error,
@@ -49,9 +73,7 @@ export function I18nTextField({
   const currentLang = selectedLanguage ?? internalLang;
   const handleLangChange = onLanguageChange ?? setInternalLang;
 
-  const filledLanguages = Object.entries(value ?? {})
-    .filter(([, v]) => v?.trim())
-    .map(([k]) => k);
+  const filledLanguages = getFilledLanguages(value);
 
   // Per-locale placeholder: undefined when key absent (no placeholder shown for that locale).
   const currentPlaceholder =
@@ -67,6 +89,13 @@ export function I18nTextField({
     />
   ) : undefined;
 
+  const resolvedPrefix = prefixControl ?? (onIconChange ? (
+    <InlineIconPickerTrigger value={iconValue} onChange={onIconChange} disabled={disabled} />
+  ) : undefined);
+  const resolvedSuffix = suffixControl ?? (onColorChange ? (
+    <ColorPicker value={colorValue ?? ""} onChange={onColorChange} disabled={disabled} />
+  ) : undefined);
+
   return (
     <FieldWrapper
       label={label}
@@ -77,6 +106,8 @@ export function I18nTextField({
       description={description}
       required={required}
       disabled={disabled}
+      prefixControl={resolvedPrefix}
+      suffixControl={resolvedSuffix}
       className={className}
       {...variantProps}
     >
