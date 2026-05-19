@@ -1,0 +1,23 @@
+{
+  "triggerPlaceholder": "색상 선택",
+  "custom": "직접 선택",
+  "clear": "지우기",
+  "presetColors": {
+    "red": "빨강",
+    "orange": "주황",
+    "amber": "황색",
+    "yellow": "노랑",
+    "lime": "라임",
+    "green": "초록",
+    "teal": "청록",
+    "cyan": "시안",
+    "blue": "파랑",
+    "indigo": "남색",
+    "violet": "보라",
+    "purple": "자주",
+    "pink": "분홍",
+    "rose": "장미",
+    "slate": "슬레이트",
+    "stone": "스톤"
+  }
+}

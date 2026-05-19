@@ -1,0 +1,23 @@
+{
+  "triggerPlaceholder": "Select color",
+  "custom": "Custom",
+  "clear": "Clear",
+  "presetColors": {
+    "red": "Red",
+    "orange": "Orange",
+    "amber": "Amber",
+    "yellow": "Yellow",
+    "lime": "Lime",
+    "green": "Green",
+    "teal": "Teal",
+    "cyan": "Cyan",
+    "blue": "Blue",
+    "indigo": "Indigo",
+    "violet": "Violet",
+    "purple": "Purple",
+    "pink": "Pink",
+    "rose": "Rose",
+    "slate": "Slate",
+    "stone": "Stone"
+  }
+}

@@ -19,14 +19,14 @@ describe("ColorPicker", () => {
     expect(trigger.style.backgroundColor).toBe("transparent");
   });
 
-  it("shows + when no value", () => {
-    render(<ColorPicker value="" onChange={vi.fn()} />);
-    expect(screen.getByText("+")).toBeDefined();
+  it("shows + icon when no value", () => {
+    const { container } = render(<ColorPicker value="" onChange={vi.fn()} />);
+    expect(container.querySelector(".lucide-plus")).not.toBeNull();
   });
 
-  it("does not show + when value is set", () => {
-    render(<ColorPicker value="#ff0000" onChange={vi.fn()} />);
-    expect(screen.queryByText("+")).toBeNull();
+  it("does not show + icon when value is set", () => {
+    const { container } = render(<ColorPicker value="#ff0000" onChange={vi.fn()} />);
+    expect(container.querySelector(".lucide-plus")).toBeNull();
   });
 
   it("applies dashed border when no value", () => {

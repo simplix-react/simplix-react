@@ -1,0 +1,23 @@
+{
+  "triggerPlaceholder": "色を選択",
+  "custom": "カスタム",
+  "clear": "クリア",
+  "presetColors": {
+    "red": "レッド",
+    "orange": "オレンジ",
+    "amber": "アンバー",
+    "yellow": "イエロー",
+    "lime": "ライム",
+    "green": "グリーン",
+    "teal": "ティール",
+    "cyan": "シアン",
+    "blue": "ブルー",
+    "indigo": "インディゴ",
+    "violet": "バイオレット",
+    "purple": "パープル",
+    "pink": "ピンク",
+    "rose": "ローズ",
+    "slate": "スレート",
+    "stone": "ストーン"
+  }
+}
