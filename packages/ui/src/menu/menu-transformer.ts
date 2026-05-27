@@ -38,6 +38,8 @@ export function transformMenuNodes(
         permissionCode: node.permissionCode,
         hasChildren: children.length > 0,
         children: children.length > 0 ? children : undefined,
+        targetType: node.targetType,
+        targetId: node.targetId,
       };
     });
 }

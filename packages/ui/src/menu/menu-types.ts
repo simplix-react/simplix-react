@@ -25,6 +25,8 @@ export interface MenuNode {
   permissionCode?: string;
   enabled: boolean;
   children: MenuNode[];
+  targetType?: string;
+  targetId?: string;
 }
 
 // Permission filter callback
@@ -40,6 +42,8 @@ export interface NavigationItem {
   permissionCode?: string;
   hasChildren: boolean;
   children?: NavigationItem[];
+  targetType?: string;
+  targetId?: string;
 }
 
 // Depth-0 menu group container
