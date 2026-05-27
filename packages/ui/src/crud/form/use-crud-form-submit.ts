@@ -36,6 +36,42 @@ export interface UseCrudFormSubmitOptions<T, TId = unknown> {
   locales?: ReadonlyArray<{ value: string }>;
   /** Called after a successful create or update. */
   onSuccess?: () => void;
+  /**
+   * Optional client-side validator. Runs on submit BEFORE the server
+   * mutation. Receives the raw form values (pre-i18n-fallback) and must
+   * return either `null` / `{}` to pass, or `Record<field, message>` to
+   * block the submit.
+   *
+   * When the validator returns errors:
+   *   - `fieldErrors` is set to the returned errors
+   *   - the create/update mutation is NOT called
+   *   - the form stays on screen
+   *
+   * Client and server errors are temporally mutually exclusive: a failing
+   * validator prevents the network call, so server errors cannot coexist
+   * with client errors in the same submit attempt. A subsequent submit
+   * either replaces the errors with new client errors, new server errors,
+   * or clears them on success.
+   *
+   * Wrap inline validator functions with `useCallback` / `useMemo` to keep
+   * `handleSubmit` identity stable across renders.
+   *
+   * @example Zod (use `zodToFieldErrors` from `@simplix-react/form`):
+   * ```ts
+   * import { zodToFieldErrors } from "@simplix-react/form";
+   * import { createUserSchema } from "@my-app/domain-user";
+   *
+   * validator: (v) => zodToFieldErrors(createUserSchema, v)
+   * ```
+   *
+   * @example Custom rules:
+   * ```ts
+   * validator: (v) => v.email?.includes("@")
+   *   ? null
+   *   : { email: "Invalid email" }
+   * ```
+   */
+  validator?: (values: T) => Record<string, string> | null;
 }
 
 /** Return type of {@link useCrudFormSubmit}. */
@@ -78,17 +114,41 @@ export interface UseCrudFormSubmitResult<T> {
  *   error={fieldErrors["name"]}
  * />
  * ```
+ *
+ * @example With client-side validation (Zod):
+ * ```tsx
+ * import { zodToFieldErrors } from "@simplix-react/form";
+ * import { createUserSchema, updateUserSchema } from "@my-app/domain-user";
+ *
+ * const { isEdit, handleSubmit, fieldErrors } = useCrudFormSubmit<FormValues>({
+ *   entityId,
+ *   create: adaptOrvalCreate(_create),
+ *   update: adaptOrvalUpdate(_update, "userId"),
+ *   validator: (v) => zodToFieldErrors(isEdit ? updateUserSchema : createUserSchema, v),
+ *   onSuccess,
+ * });
+ * ```
  */
 export function useCrudFormSubmit<T, TId = unknown>(
   options: UseCrudFormSubmitOptions<T, TId>,
 ): UseCrudFormSubmitResult<T> {
-  const { entityId, create, update, onSuccess, i18nFields, locales } = options;
+  const { entityId, create, update, onSuccess, i18nFields, locales, validator } = options;
   const isEdit = entityId != null && entityId !== "";
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const handleSubmit = useCallback(
     (values: T) => {
       setFieldErrors({});
+
+      // ── client-side validation gate ──
+      // Validator receives the raw form values (pre-i18n-fallback) so the
+      // user's input is checked exactly as typed. On failure, skip the
+      // server mutation entirely.
+      const clientErrs = validator?.(values);
+      if (clientErrs && Object.keys(clientErrs).length > 0) {
+        setFieldErrors(clientErrs);
+        return;
+      }
 
       let prepared: T = values;
       if (i18nFields && locales) {
@@ -114,7 +174,7 @@ export function useCrudFormSubmit<T, TId = unknown>(
           }
         });
     },
-    [isEdit, entityId, create, update, onSuccess, i18nFields, locales],
+    [isEdit, entityId, create, update, onSuccess, i18nFields, locales, validator],
   );
 
   const isPending = isEdit ? (update?.isPending ?? false) : create.isPending;

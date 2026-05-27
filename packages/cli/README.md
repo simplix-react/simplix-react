@@ -503,6 +503,89 @@ simplix scaffold <entity> [options]
 simplix scaffold product --module store
 ```
 
+### Extending a scaffolded form
+
+The generated form template stays minimal on purpose. Each `FormFields.*`
+component already accepts the props below directly — extend the generated
+file by adding them on the relevant fields. The `useCrudFormSubmit` hook
+accepts an optional `validator` for client-side checks.
+
+#### Client-side validation
+
+Wire any sync validator on the `useCrudFormSubmit({ validator })` option.
+A failing validator blocks the submit and the server mutation is not
+called. Client and server errors are temporally mutually exclusive, so
+`fieldErrors` always reflects exactly one source per attempt.
+
+```tsx
+// Zod-driven (recommended when schemas-ts.hbs is present):
+import { zodToFieldErrors } from "@simplix-react/form";
+import { createProductSchema, updateProductSchema } from "@my-app/domain-product";
+
+const { handleSubmit, fieldErrors } = useCrudFormSubmit<ProductFormValues>({
+  entityId,
+  create: adaptOrvalCreate(_create, { onSettled: invalidate }),
+  update: adaptOrvalUpdate(_update, "productId", { onSettled: invalidate }),
+  validator: (v) => zodToFieldErrors(isEdit ? updateProductSchema : createProductSchema, v),
+  onSuccess,
+});
+
+// Imperative rules (no Zod):
+validator: (v) => v.name?.trim() ? null : { name: "Name is required" }
+```
+
+#### maxLength
+
+`FormFields.TextField` / `TextareaField` / `I18nTextField` / `I18nTextareaField`
+accept a literal `maxLength`:
+
+```tsx
+<FormFields.TextField
+  label={fieldLabel("name")}
+  value={values.name}
+  onChange={(v) => updateField("name", v)}
+  error={fieldErrors?.["name"]}
+  maxLength={50}
+/>
+```
+
+#### placeholder
+
+Every input component accepts a `placeholder`. Prefer i18n keys for any
+user-visible text:
+
+```tsx
+<FormFields.TextField
+  label={fieldLabel("name")}
+  placeholder={t("product.placeholders.name")}
+  /* ... */
+/>
+```
+
+`I18nTextField` / `I18nTextareaField` also accept a per-locale object
+(`{ en: "...", ko: "..." }`) when each locale needs its own placeholder.
+
+#### min / max (NumberField)
+
+```tsx
+<FormFields.NumberField
+  label={fieldLabel("priority")}
+  value={values.priority}
+  onChange={(v) => updateField("priority", v ?? 0)}
+  error={fieldErrors?.["priority"]}
+  min={0}
+  max={100}
+/>
+```
+
+#### Keeping label translations in sync
+
+Entity field labels resolve through `useEntityTranslation(entity).fieldLabel("...")`
+backed by the domain package's `locales/{lang}.json` under `{entity}.fields.*`.
+Placeholders, hints, and section titles can live in the same JSON tree
+(`{entity}.placeholders.*`, `{entity}.form.sections.*`, etc.) and be read with
+`useTranslation("{moduleNamespace}/widgets").t("...")`.
+
 ## Configuration
 
 The CLI reads an optional `simplix.config.ts` file from the project root. If the file does not exist, default values are used.

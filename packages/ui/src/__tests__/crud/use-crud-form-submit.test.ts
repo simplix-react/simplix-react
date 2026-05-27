@@ -342,4 +342,172 @@ describe("useCrudFormSubmit", () => {
       expect(create.mutateAsync).toHaveBeenCalledWith({ menuName: "Home" });
     });
   });
+
+  describe("client-side validator option", () => {
+    // T1 — validator unset: existing behavior, mutate is called
+    it("calls mutate when validator is unset", () => {
+      const create = createMutation<{ name: string }>();
+      const { result } = renderHook(() =>
+        useCrudFormSubmit({ create }),
+      );
+
+      act(() => result.current.handleSubmit({ name: "Alice" }));
+
+      expect(create.mutateAsync).toHaveBeenCalledWith({ name: "Alice" });
+    });
+
+    // T2 — validator returns null: pass-through
+    it("calls mutate when validator returns null", () => {
+      const create = createMutation<{ name: string }>();
+      const validator = vi.fn().mockReturnValue(null);
+      const { result } = renderHook(() =>
+        useCrudFormSubmit({ create, validator }),
+      );
+
+      act(() => result.current.handleSubmit({ name: "Alice" }));
+
+      expect(validator).toHaveBeenCalledWith({ name: "Alice" });
+      expect(create.mutateAsync).toHaveBeenCalled();
+      expect(result.current.fieldErrors).toEqual({});
+    });
+
+    // T3 — validator returns empty object: pass-through (size 0)
+    it("calls mutate when validator returns an empty object", () => {
+      const create = createMutation<{ name: string }>();
+      const validator = vi.fn().mockReturnValue({});
+      const { result } = renderHook(() =>
+        useCrudFormSubmit({ create, validator }),
+      );
+
+      act(() => result.current.handleSubmit({ name: "Alice" }));
+
+      expect(create.mutateAsync).toHaveBeenCalled();
+      expect(result.current.fieldErrors).toEqual({});
+    });
+
+    // T4 — validator returns errors: sets fieldErrors, mutate NOT called
+    it("sets fieldErrors and skips mutate when validator returns errors", async () => {
+      const create = createMutation<{ name: string }>();
+      const update = createMutation<{ id: string; dto: { name: string } }>();
+      const validator = vi.fn().mockReturnValue({ name: "필수" });
+      const { result } = renderHook(() =>
+        useCrudFormSubmit({ entityId: "123", create, update, validator }),
+      );
+
+      act(() => result.current.handleSubmit({ name: "" }));
+
+      await waitFor(() => {
+        expect(result.current.fieldErrors).toEqual({ name: "필수" });
+      });
+      expect(create.mutateAsync).not.toHaveBeenCalled();
+      expect(update.mutateAsync).not.toHaveBeenCalled();
+    });
+
+    // T5 — client fail → new client fail: errors are replaced
+    it("replaces fieldErrors with new client errors on consecutive client failures", async () => {
+      const create = createMutation<{ name: string }>();
+      let next: Record<string, string> | null = { name: "first" };
+      const validator = vi.fn(() => next);
+      const { result } = renderHook(() =>
+        useCrudFormSubmit({ create, validator }),
+      );
+
+      act(() => result.current.handleSubmit({ name: "" }));
+      await waitFor(() => {
+        expect(result.current.fieldErrors).toEqual({ name: "first" });
+      });
+
+      next = { name: "second" };
+      act(() => result.current.handleSubmit({ name: "" }));
+      await waitFor(() => {
+        expect(result.current.fieldErrors).toEqual({ name: "second" });
+      });
+      expect(create.mutateAsync).not.toHaveBeenCalled();
+    });
+
+    // T6 — client pass → server fail: fieldErrors set from server response
+    it("sets fieldErrors from server when client passes but server fails", async () => {
+      const serverError = {
+        status: 400,
+        errorDetail: [{ field: "name", message: "already taken" }],
+      };
+      const create = createMutation<{ name: string }>(false, {
+        rejectWith: serverError,
+      });
+      const validator = vi.fn().mockReturnValue(null);
+      const { result } = renderHook(() =>
+        useCrudFormSubmit({ create, validator }),
+      );
+
+      act(() => result.current.handleSubmit({ name: "Alice" }));
+
+      await waitFor(() => {
+        expect(result.current.fieldErrors).toEqual({ name: "already taken" });
+      });
+      expect(create.mutateAsync).toHaveBeenCalled();
+    });
+
+    // T7 — server fail visible → next submit with client fail: errors replace server→client
+    it("replaces visible server errors with client errors on next submit failure", async () => {
+      const serverError = {
+        status: 400,
+        errorDetail: [{ field: "name", message: "server rejects" }],
+      };
+      const create = createMutation<{ name: string }>(false, {
+        rejectWith: serverError,
+      });
+      let clientErrs: Record<string, string> | null = null;
+      const validator = vi.fn(() => clientErrs);
+      const { result } = renderHook(() =>
+        useCrudFormSubmit({ create, validator }),
+      );
+
+      // First submit: client passes, server fails
+      act(() => result.current.handleSubmit({ name: "Alice" }));
+      await waitFor(() => {
+        expect(result.current.fieldErrors).toEqual({ name: "server rejects" });
+      });
+
+      // Second submit: client fails this time
+      clientErrs = { name: "client rejects" };
+      act(() => result.current.handleSubmit({ name: "" }));
+      await waitFor(() => {
+        expect(result.current.fieldErrors).toEqual({ name: "client rejects" });
+      });
+    });
+
+    // T8 — validator receives the raw values BEFORE i18n fallback
+    it("passes pre-i18n-fallback values to the validator", () => {
+      const create = createMutation<{ menuName: string; menuNameI18n: Record<string, string> }>();
+      const validator = vi.fn().mockReturnValue(null);
+      const { result } = renderHook(() =>
+        useCrudFormSubmit({
+          create,
+          i18nFields: { menuNameI18n: "menuName" },
+          locales: [{ value: "en" }, { value: "ko" }],
+          validator,
+        }),
+      );
+
+      act(() =>
+        result.current.handleSubmit({
+          // Raw user input: menuName is still empty before fallback.
+          menuName: "",
+          menuNameI18n: { en: "Home", ko: "홈" },
+        }),
+      );
+
+      // Validator must see the raw empty menuName, not the fallback-populated "Home".
+      expect(validator).toHaveBeenCalledWith({
+        menuName: "",
+        menuNameI18n: { en: "Home", ko: "홈" },
+      });
+
+      // mutate, however, still receives the fallback-populated values.
+      expect(create.mutateAsync).toHaveBeenCalledWith({
+        menuName: "Home",
+        menuNameI18n: { en: "Home", ko: "홈" },
+      });
+    });
+  });
 });

@@ -528,7 +528,38 @@ const { isEdit, handleSubmit, isPending } = useCrudFormSubmit<FormValues>({
 });
 ```
 
-Returns: `{ isEdit, handleSubmit, isPending }`
+Returns: `{ isEdit, handleSubmit, isPending, fieldErrors }`
+
+##### Client-side validation (optional)
+
+Pass a `validator` to run a sync check on the raw form values **before** the
+server mutation. Returning a non-empty `Record<field, message>` stops the
+submit and exposes the errors via `fieldErrors`; the create/update mutation
+is **not** called. Returning `null` (or `{}`) passes through to the server.
+
+Client and server errors are temporally mutually exclusive on the same
+submit, so `fieldErrors` always reflects exactly one source per attempt
+(client → server → success replaces).
+
+```tsx
+// Zod (use `zodToFieldErrors` from @simplix-react/form):
+import { zodToFieldErrors } from "@simplix-react/form";
+import { createUserSchema, updateUserSchema } from "@my-app/domain-user";
+
+const { handleSubmit, fieldErrors } = useCrudFormSubmit<FormValues>({
+  entityId,
+  create: adaptOrvalCreate(_create),
+  update: adaptOrvalUpdate(_update, "userId"),
+  validator: (v) => zodToFieldErrors(isEdit ? updateUserSchema : createUserSchema, v),
+  onSuccess,
+});
+
+// Custom imperative rules:
+validator: (v) => v.email?.includes("@") ? null : { email: "Invalid email" }
+```
+
+Wrap inline validator functions with `useCallback` / `useMemo` to keep
+`handleSubmit` identity stable across renders.
 
 #### useCrudDeleteList
 
