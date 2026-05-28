@@ -83,7 +83,7 @@ export function createBootAuth(options: BootAuthOptions = {}): BootAuthResult {
     const raw = await baseFetch<SpringTokenResponse>(
       `${basePath}/auth/token/refresh`,
       {
-        method: "GET",
+        method: "POST",
         headers: { "X-Refresh-Token": refreshToken },
       },
     );
@@ -159,7 +159,7 @@ export function createBootAuth(options: BootAuthOptions = {}): BootAuthResult {
       const raw = await baseFetch<SpringTokenResponse>(
         `${basePath}/auth/token/issue`,
         {
-          method: "GET",
+          method: "POST",
           headers: {
             Authorization: `Basic ${btoa(`${username}:${password}`)}`,
           },
