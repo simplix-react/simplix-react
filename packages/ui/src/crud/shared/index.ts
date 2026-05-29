@@ -3,7 +3,7 @@ export {
   useFieldVariant,
 } from "./types";
 export { CrudListColumnContext, useCrudListColumns } from "./column-context";
-export type { ColumnInfo, CrudListColumnContextValue } from "./column-context";
+export type { ColumnInfo, CrudListColumnContextValue, CrudListViewMode } from "./column-context";
 export type {
   CommonDetailFieldProps,
   CommonFieldProps,

@@ -20,6 +20,7 @@ import {cn} from "../../utils/cn";
 import {formatDateMedium, formatDateTime, formatRelativeTime} from "../../utils/format-date";
 import type {ColumnInfo, EmptyReason, SortState} from "../shared";
 import {CrudListColumnContext, useCrudListColumns} from "../shared";
+import type {CrudListViewMode} from "../shared";
 import {EmptyState} from "../shared/empty-state";
 import {AlertTriangleIcon, ArrowUpDownIcon, EyeIcon, FolderTreeIcon, FunnelIcon, MagnifyingGlassIcon, MapPinIcon, PencilIcon, PlusIcon, TrashIcon, UnlinkIcon} from "../shared/icons";
 import {
@@ -91,10 +92,16 @@ function ListRoot({ className, children }: ListProps) {
   const [columns, setColumns] = useState<ColumnInfo[]>([]);
   const [hiddenColumns, setHiddenColumns] = useState<Set<string>>(new Set());
   const [isCardMode, setIsCardMode] = useState(false);
+  const [viewMode, setViewMode] = useState<CrudListViewMode>("list");
+  const [canGridView, setCanGridView] = useState(false);
+  const [responsiveCardMode, setResponsiveCardMode] = useState(false);
 
   const columnCtx = useMemo(
-    () => ({ columns, setColumns, hiddenColumns, setHiddenColumns, isCardMode, setIsCardMode }),
-    [columns, hiddenColumns, isCardMode],
+    () => ({
+      columns, setColumns, hiddenColumns, setHiddenColumns, isCardMode, setIsCardMode,
+      viewMode, setViewMode, canGridView, setCanGridView, responsiveCardMode, setResponsiveCardMode,
+    }),
+    [columns, hiddenColumns, isCardMode, viewMode, canGridView, responsiveCardMode],
   );
 
   return (
@@ -272,6 +279,12 @@ export interface ListTableProps<T> {
   rowId?: (row: T) => string;
   /** Container width threshold (px) below which card mode activates. Disabled when omitted. */
   cardBreakpoint?: number;
+  /**
+   * Declares grid as a user-selectable view (requires `cardTitle`/`cardContent`).
+   * When set, the FilterBar auto-shows a list/grid toggle. Independent of the
+   * responsive `cardBreakpoint` fallback.
+   */
+  gridView?: boolean;
   /** Render prop for the card title area. Displayed with a bottom border, inline with action buttons. */
   cardTitle?: (props: { row: T; index: number }) => ReactNode;
   /** Render prop for the card content area below the title. */
@@ -751,6 +764,7 @@ function ListTable<T>({
   onSelectAll,
   rowId,
   cardBreakpoint,
+  gridView,
   cardTitle,
   cardContent,
   variant,
@@ -778,19 +792,31 @@ function ListTable<T>({
   const containerRef = useRef<HTMLDivElement>(null);
   const containerWidth = useContainerWidth(containerRef);
   const hasCard = !!(cardTitle || cardContent);
-  const isCardMode = !!(
+
+  const columnCtx = useCrudListColumns();
+
+  const responsiveCardMode = !!(
     cardBreakpoint &&
     hasCard &&
     containerWidth > 0 &&
     containerWidth < cardBreakpoint
   );
+  const manualGrid = !!(gridView && hasCard && columnCtx?.viewMode === "grid");
+  const isCardMode = manualGrid || responsiveCardMode;
 
-  const columnCtx = useCrudListColumns();
+  // Declare grid as a selectable view so the FilterBar can auto-show the toggle.
+  useEffect(() => {
+    columnCtx?.setCanGridView(!!gridView && hasCard);
+  }, [gridView, hasCard, columnCtx?.setCanGridView]);
 
-  // Sync card mode to context so FilterBar can hide column toggle
+  // Sync card-mode flags to context: effective mode hides the column toggle,
+  // responsive-forced mode hides the view toggle.
   useEffect(() => {
     columnCtx?.setIsCardMode(isCardMode);
   }, [isCardMode, columnCtx?.setIsCardMode]);
+  useEffect(() => {
+    columnCtx?.setResponsiveCardMode(responsiveCardMode);
+  }, [responsiveCardMode, columnCtx?.setResponsiveCardMode]);
   const columnDefs = useMemo(() => extractColumnDefs<T>(children), [children]);
 
   // Register columns to context for FilterBar's Columns dropdown
@@ -868,7 +894,10 @@ function ListTable<T>({
               <button
                 type="button"
                 onClick={() => handleSortChange(colDef.field!)}
-                className="inline-flex items-center font-medium hover:text-foreground"
+                className={cn(
+                  "inline-flex items-center font-semibold hover:text-foreground",
+                  isSorted && "text-primary",
+                )}
               >
                 {colDef.header ?? ""}
                 <SortIcon direction={dir} />
@@ -1128,8 +1157,8 @@ function ListTable<T>({
                         <TableRow
                           key={row.id}
                           className={cn(
-                            selectedIndices?.has(row.index) && "bg-muted/30",
-                            isActive && "bg-muted/50",
+                            selectedIndices?.has(row.index) && "bg-muted",
+                            isActive && "bg-muted",
                             onRowClick && "cursor-pointer",
                             rowClassName?.(row.original),
                           )}
@@ -1218,7 +1247,7 @@ function ListPagination({
         value={String(pageSize)}
         onValueChange={(v) => onPageSizeChange(Number(v))}
       >
-        <SelectTrigger className="h-6 w-[54px] text-xs" aria-label="Page size">
+        <SelectTrigger className="h-8 w-[64px] rounded-sm border-border bg-card text-xs font-medium text-secondary-foreground" aria-label="Page size">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -1232,12 +1261,15 @@ function ListPagination({
     </Flex>
   );
 
+  const navCell =
+    "inline-flex h-8 items-center justify-center rounded-sm border border-border bg-card text-xs font-medium text-secondary-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-50";
+
   const prevButton = (
     <button
       type="button"
       disabled={page <= 1}
       onClick={() => onPageChange(page - 1)}
-      className="inline-flex h-6 w-6 items-center justify-center rounded border text-xs disabled:opacity-50"
+      className={cn(navCell, "w-8")}
       aria-label="Previous page"
     >
       <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -1251,7 +1283,7 @@ function ListPagination({
       type="button"
       disabled={page >= totalPages}
       onClick={() => onPageChange(page + 1)}
-      className="inline-flex h-6 w-6 items-center justify-center rounded border text-xs disabled:opacity-50"
+      className={cn(navCell, "w-8")}
       aria-label="Next page"
     >
       <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -1263,7 +1295,7 @@ function ListPagination({
   const pageNumbers = isCompact ? null : getPageNumbers(page, totalPages);
 
   return (
-    <div ref={containerRef} className={cn("flex w-full items-center justify-end", className)}>
+    <div ref={containerRef} className={cn("flex w-full items-center justify-end gap-2 border-t bg-muted/60 px-3.5 py-2.5", className)}>
       <Flex gap="sm" align="center">
         {pageSizeSelector}
         <Flex gap="xs" align="center">
@@ -1273,7 +1305,7 @@ function ListPagination({
         ) : (
           pageNumbers!.map((p, i) =>
             p === "ellipsis" ? (
-              <span key={`ellipsis-${i}`} className="inline-flex h-6 w-6 items-center justify-center text-xs text-muted-foreground">
+              <span key={`ellipsis-${i}`} className="inline-flex h-8 min-w-[26px] items-center justify-center text-xs text-muted-foreground">
                 &hellip;
               </span>
             ) : (
@@ -1282,10 +1314,10 @@ function ListPagination({
                 type="button"
                 onClick={() => onPageChange(p)}
                 className={cn(
-                  "inline-flex h-6 w-6 items-center justify-center rounded text-xs font-medium",
-                  p === page
-                    ? "bg-primary text-primary-foreground"
-                    : "hover:bg-accent hover:text-accent-foreground",
+                  navCell,
+                  "min-w-[26px] px-2",
+                  p === page &&
+                    "border-primary bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
                 )}
                 aria-label={`Page ${p}`}
                 aria-current={p === page ? "page" : undefined}

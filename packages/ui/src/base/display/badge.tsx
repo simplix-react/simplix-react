@@ -67,7 +67,7 @@ const badgeVariants = cva(
           "border-transparent bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-100",
       },
     },
-    defaultVariants: { variant: "default", rounded: "full", size: "default" },
+    defaultVariants: { variant: "default", rounded: "sm", size: "default" },
   },
 );
 

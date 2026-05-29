@@ -8,7 +8,7 @@ import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
 import { formatDateRange } from "../../utils/format-date";
 import { useCrudListColumns } from "../shared/column-context";
-import { CheckIcon, ColumnsIcon, FunnelIcon, XIcon } from "../shared/icons";
+import { CheckIcon, ColumnsIcon, EyeIcon, FunnelIcon, LayoutGridIcon, RowsIcon, XIcon } from "../shared/icons";
 import { CountryFormField } from "./country-form-field";
 import { FieldClearButton } from "./field-clear-button";
 import { operatorConfig } from "./filter-icons";
@@ -78,12 +78,19 @@ export interface FilterBarProps {
   leading?: ReactNode;
   /** Max number of visible filter badges before collapsing into "+N". */
   maxBadges?: number;
+  /**
+   * When provided, renders a preview button in the leading group that invokes
+   * this handler on click. Omit to hide the button.
+   */
+  onPreview?: () => void;
+  /** Label for the preview button. Defaults to the `list.preview` translation. */
+  previewLabel?: string;
   className?: string;
 }
 
 // ── FilterBar Component ──
 
-export function FilterBar({ filters, state, leading, maxBadges, className }: FilterBarProps) {
+export function FilterBar({ filters, state, leading, maxBadges, onPreview, previewLabel, className }: FilterBarProps) {
   const { Badge, Button, Popover, PopoverTrigger, PopoverContent, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuCheckboxItem } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const locale = useLocale();
@@ -251,15 +258,60 @@ export function FilterBar({ filters, state, leading, maxBadges, className }: Fil
   const visibleDefs = maxBadges != null ? activeDefs.slice(0, maxBadges) : activeDefs;
   const hiddenCount = activeDefs.length - visibleDefs.length;
 
+  const showViewToggle = !!columnCtx?.canGridView && !columnCtx?.responsiveCardMode;
+  const hasLeadingGroup = !!leading || showViewToggle || !!onPreview;
+
   return (
     <Flex
       gap="xs"
       align="center"
       wrap
-      justify={leading ? "between" : "end"}
+      justify={hasLeadingGroup ? "between" : "end"}
       className={cn("w-full", className)}
     >
-      {leading}
+      {hasLeadingGroup && (
+        <Flex gap="xs" align="center" wrap>
+          {leading}
+          {showViewToggle && (
+            <div
+              role="group"
+              aria-label={t("filter.label")}
+              className="inline-flex h-8 items-center rounded-sm border border-border-strong bg-card p-[3px]"
+            >
+              {([
+                { mode: "list", Icon: RowsIcon, label: t("list.viewList") },
+                { mode: "grid", Icon: LayoutGridIcon, label: t("list.viewGrid") },
+              ] as const).map(({ mode, Icon, label }) => {
+                const active = (columnCtx?.viewMode ?? "list") === mode;
+                return (
+                  <button
+                    key={mode}
+                    type="button"
+                    aria-pressed={active}
+                    aria-label={label}
+                    title={label}
+                    onClick={() => columnCtx?.setViewMode(mode)}
+                    className={cn(
+                      "inline-grid h-full w-7 place-items-center rounded-sm transition-colors",
+                      active
+                        ? "bg-primary-soft text-primary"
+                        : "text-secondary-foreground hover:bg-muted hover:text-foreground",
+                    )}
+                  >
+                    <Icon className="h-3.5 w-3.5" />
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          {onPreview && (
+            <Button variant="outline" size="sm" className="gap-1.5 font-semibold" onClick={onPreview}>
+              <EyeIcon className="h-3.5 w-3.5" />
+              {previewLabel ?? t("list.preview")}
+            </Button>
+          )}
+        </Flex>
+      )}
       <Flex gap="xs" align="center" wrap>
       {visibleDefs.map((def) => {
         const BadgeIcon = getBadgeIcon(def);
@@ -267,7 +319,7 @@ export function FilterBar({ filters, state, leading, maxBadges, className }: Fil
           <Badge
             key={def.field}
             variant="secondary"
-            className="h-7 max-w-[12rem] gap-1 pl-2 pr-1 text-xs font-normal"
+            className="h-8 max-w-[12rem] gap-1 rounded-sm border-border-strong pl-2 pr-1 text-xs font-normal"
           >
             <span className="shrink-0 text-muted-foreground">{def.label}:</span>
             {BadgeIcon && <BadgeIcon className="h-3 w-3 shrink-0 text-muted-foreground" />}
@@ -284,17 +336,24 @@ export function FilterBar({ filters, state, leading, maxBadges, className }: Fil
         );
       })}
       {hiddenCount > 0 && (
-        <Badge variant="secondary" className="h-7 px-2 text-xs font-normal">
+        <Badge variant="secondary" className="h-8 rounded-sm border-border-strong px-2 text-xs font-normal">
           +{hiddenCount}
         </Badge>
       )}
       <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="xs" className="gap-1.5">
+            <Button
+              variant="outline"
+              size="sm"
+              className={cn(
+                "gap-1.5 rounded-sm font-semibold",
+                hasActiveFilters && "border-primary-soft-2 bg-primary-soft text-primary hover:bg-primary-soft hover:text-primary",
+              )}
+            >
               <FunnelIcon className="h-3 w-3" />
               {t("filter.label")}
               {hasActiveFilters && (
-                <Badge variant="secondary" className="ml-0.5 h-4 min-w-[1rem] justify-center px-1 text-[10px] font-normal leading-none">
+                <Badge className="ml-0.5 h-4 min-w-[1rem] justify-center rounded-full bg-primary px-1 text-[10px] font-bold leading-none text-primary-foreground">
                   {activeDefs.length}
                 </Badge>
               )}
@@ -333,7 +392,7 @@ export function FilterBar({ filters, state, leading, maxBadges, className }: Fil
         {columnCtx && columnCtx.columns.length > 0 && !columnCtx.isCardMode && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="xs" className="h-7 w-7 p-0" aria-label="Toggle columns">
+              <Button variant="outline" size="sm" className="h-8 w-8 rounded-sm p-0" aria-label="Toggle columns">
                 <ColumnsIcon className="h-3.5 w-3.5" />
               </Button>
             </DropdownMenuTrigger>

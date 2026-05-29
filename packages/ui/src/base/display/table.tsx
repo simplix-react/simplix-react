@@ -46,7 +46,7 @@ const headHMap = { sm: "h-8", md: "h-10", lg: "h-12" } as const;
 const cellPxMap = { sm: "px-2", md: "px-3", lg: "px-4" } as const;
 const cellPyMap = { sm: "py-1.5", md: "py-2.5", lg: "py-4" } as const;
 
-const densityCellPyMap = { compact: "py-1", default: "py-2", comfortable: "py-3" } as const;
+const densityCellPyMap = { compact: "py-1.5", default: "py-2.5", comfortable: "py-3" } as const;
 const densityHeadHMap = { compact: "h-8", default: "h-9", comfortable: "h-11" } as const;
 
 // ---------------------------------------------------------------------------
@@ -77,7 +77,7 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
           ref={ref}
           data-slot="table"
           className={cn(
-            "w-full caption-bottom text-sm",
+            "w-full caption-bottom text-base",
             variant === "bordered" && "border-separate border-spacing-0",
             className,
           )}
@@ -103,7 +103,10 @@ export const TableHeader = forwardRef<HTMLTableSectionElement, TableHeaderProps>
     <thead
       ref={ref}
       data-slot="table-header"
-      className={cn("border-t border-border bg-muted/50 [&_tr]:border-b", className)}
+      className={cn(
+        "border-t border-border bg-muted [&_tr]:border-b [&_tr]:border-border-strong",
+        className,
+      )}
       {...rest}
     />
   ),
@@ -167,7 +170,7 @@ export const TableRow = forwardRef<HTMLTableRowElement, TableRowProps>(
         data-slot="table-row"
         className={cn(
           "border-b border-border transition-colors",
-          variant === "default" && "hover:bg-muted/50",
+          variant === "default" && "hover:bg-muted",
           variant === "striped" && "even:bg-muted/50",
           variant === "bordered" && "hover:bg-muted/50",
           className,
@@ -194,7 +197,7 @@ export const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
         ref={ref}
         data-slot="table-head"
         className={cn(
-          "text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
+          "text-left align-middle text-base font-bold tracking-[0.01em] text-secondary-foreground [&:has([role=checkbox])]:pr-0",
           headPxMap[size],
           density ? densityHeadHMap[density] : headHMap[size],
           variant === "bordered" && "border border-border",
