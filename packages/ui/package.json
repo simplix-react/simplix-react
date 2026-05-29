@@ -5,6 +5,7 @@
   "type": "module",
   "sideEffects": [
     "./dist/styles.css",
+    "./dist/theme.css",
     "./dist/index.js",
     "./dist/plate-editor.js",
     "./src/locales/*"
@@ -18,7 +19,8 @@
       "types": "./dist/plate-editor.d.ts",
       "import": "./dist/plate-editor.js"
     },
-    "./styles.css": "./dist/styles.css"
+    "./styles.css": "./dist/styles.css",
+    "./theme.css": "./dist/theme.css"
   },
   "files": [
     "dist"

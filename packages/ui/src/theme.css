@@ -1,0 +1,328 @@
+/* ====================================================================
+ * @simplix-react/ui — Official theme tokens
+ *
+ * Opt-in design tokens consumed by @simplix-react/ui components, which
+ * reference these via var(--*) only (the component CSS ships no values).
+ * Import after `@import "tailwindcss"` to enable the token-backed
+ * utilities:
+ *
+ *   @import "tailwindcss";
+ *   @import "@simplix-react/ui/styles.css";
+ *   @import "@simplix-react/ui/theme.css";
+ *
+ * Apps may override any token by redefining it after this import.
+ * ==================================================================== */
+
+:root,
+[data-theme="light"] {
+    /* ── surfaces ── */
+    --background: #F2F3F5;
+    --card: #FFFFFF;
+    --surface-2: #F4F6F8;
+    --surface-3: #EBEEF2;
+
+    /* ── text ── */
+    --foreground: #15171C;
+    --secondary-foreground: #2D3038;
+    --muted-foreground: #5C6370;
+    --muted-2: #8990A0;
+
+    /* ── borders (shadcn: --border / --border-strong) ── */
+    --border: #ECEEF1;
+    --border-strong: #DDE0E6;
+
+    /* ── primary ── */
+    --primary: #246BFD;
+    --primary-foreground: #FFFFFF;
+    --primary-hover: #0E54E0;
+    --primary-soft: #E4EDFF;
+    --primary-soft-2: #D6E2FF;
+
+    /* ── status ── */
+    --success: #149E5C;
+    --success-soft: #E2F5EB;
+    --warning: #C97A00;
+    --warn-soft: #FFF3DE;
+    --destructive: #D4351F;
+    --danger-soft: #FDECE8;
+
+    /* ── accent (admin-auth permission UI) ── */
+    --purple: #7C3AED;
+    --purple-soft: #FAF5FF;
+    --purple-soft-2: #EDE9FE;
+
+    /* ── sidebar (shadcn: --sidebar / --sidebar-foreground / --sidebar-accent) ── */
+    --sidebar: #F7F8FA;
+    --sidebar-foreground: #2D3038;
+    --sidebar-accent: #FFFFFF;
+
+    /* ── brand / chrome mnemonic (no shadcn peer) ── */
+    --brand-bg: #246BFD;
+    --brand-fg: #FFFFFF;
+    --hatch-stroke: #15171C;
+    --hover-bg: rgba(15, 42, 85, 0.05);
+    --hover-bg-strong: rgba(15, 42, 85, 0.08);
+    --scroll-thumb: rgba(15, 23, 28, 0.20);
+    --scroll-thumb-hover: rgba(15, 23, 28, 0.36);
+
+    /* ── shadows ── */
+    --shadow-card: 0 1px 2px rgba(15, 42, 85, 0.04), 0 0 0 1px rgba(15, 42, 85, 0.04);
+    --shadow-pop: 0 12px 28px rgba(15, 42, 85, 0.12), 0 2px 6px rgba(15, 42, 85, 0.04);
+    --shadow-1: 0 1px 2px rgba(15, 42, 85, 0.04), 0 0 0 1px rgba(15, 42, 85, 0.04);
+    --shadow-2: 0 4px 12px rgba(15, 42, 85, 0.08), 0 2px 4px rgba(15, 42, 85, 0.04);
+    --shadow-3: 0 12px 28px rgba(15, 42, 85, 0.12), 0 2px 6px rgba(15, 42, 85, 0.04);
+
+    /* radius scale + font families: single-sourced in the @theme block below
+       (so Tailwind rounded-* / font-sans utilities are generated). */
+
+    /* ── chart / info (HEAD oklch palette — variant themes + shared-ui) ── */
+    --info: oklch(0.55 0.2 250);
+    --chart-1: oklch(0.646 0.222 41.116);
+    --chart-2: oklch(0.6 0.118 184.704);
+    --chart-3: oklch(0.398 0.07 227.392);
+    --chart-4: oklch(0.828 0.189 84.429);
+    --chart-5: oklch(0.769 0.188 70.08);
+
+    /* ── typography scale (KRDS-aligned — Pretendard GOV, Body Medium 17px base) ── */
+    --text-xs: 13px;     /* KRDS Body XSmall — meta, micro-labels */
+    --text-sm: 13px;     /* KRDS Body XSmall — preview titles, captions */
+    --text-base: 15px;   /* KRDS Body Small — field labels, dense table cells */
+    --text-md: 17px;     /* KRDS Body Medium — inputs, buttons (base) */
+    --text-lg: 19px;     /* KRDS Heading Small / Body Large — section card head h3 */
+    --text-xl: 24px;     /* KRDS Heading Medium — search-result title */
+    --text-2xl: 32px;    /* KRDS Heading Large — page h1 */
+
+    --fw-regular: 400;
+    --fw-medium: 500;
+    --fw-semibold: 600;
+    --fw-bold: 700;
+
+    /* ── spacing scale ── */
+    --sp-1: 4px;
+    --sp-2: 8px;
+    --sp-3: 12px;
+    --sp-4: 16px;
+    --sp-5: 20px;
+    --sp-6: 24px;
+    --sp-7: 32px;
+
+    /* ── vertical rhythm (chrome / structural heights — KRDS-aligned for 17px base) ── */
+    --h-topnav: 56px;
+    --h-tab: 48px;               /* KRDS touch-target friendly */
+    --h-section-head: 44px;      /* min-height — body grows past it */
+    --h-input: 44px;            /* padding 10 + 17*1.4 + 10 ≈ 44, KRDS touch target */
+    --h-btn: 44px;              /* padding 10 + 17 + 10 + border, KRDS touch target */
+    --h-btn-sm: 32px;           /* padding 6 + 15 + 6 + border (Body Small) */
+    --h-icon-btn: 40px;
+
+    color-scheme: light;
+}
+
+[data-theme="dark"] {
+    /* ── surfaces ── */
+    --background: #0B0D11;
+    --card: #14171D;
+    --surface-2: #1B1F27;
+    --surface-3: #232A36;
+
+    /* ── text ── */
+    --foreground: #E8EAEE;
+    --secondary-foreground: #C9CDD4;
+    --muted-foreground: #8E96A4;
+    --muted-2: #6A7180;
+
+    /* ── borders ── */
+    --border: #242935;
+    --border-strong: #2F3540;
+
+    /* ── primary ── */
+    --primary: #6195FF;
+    --primary-foreground: #FFFFFF;
+    --primary-hover: #80A8FF;
+    --primary-soft: rgba(97, 149, 255, 0.14);
+    --primary-soft-2: rgba(97, 149, 255, 0.28);
+
+    /* ── status ── */
+    --success: #2AB76C;
+    --success-soft: #143628;
+    --warning: #DBA042;
+    --warn-soft: #3A2B0F;
+    --destructive: #F26E5C;
+    --danger-soft: #3A1A14;
+
+    /* ── accent ── */
+    --purple: #A78BFA;
+    --purple-soft: #4C1D95;
+    --purple-soft-2: #3B0764;
+
+    /* ── sidebar ── */
+    --sidebar: #14171D;
+    --sidebar-foreground: #C9CDD4;
+    --sidebar-accent: #1F242E;
+
+    /* ── brand / chrome mnemonic ── */
+    --brand-bg: #6195FF;
+    --brand-fg: #0B0D11;
+    --hatch-stroke: #FFFFFF;
+    --hover-bg: rgba(255, 255, 255, 0.05);
+    --hover-bg-strong: rgba(255, 255, 255, 0.09);
+    --scroll-thumb: rgba(255, 255, 255, 0.16);
+    --scroll-thumb-hover: rgba(255, 255, 255, 0.30);
+
+    /* ── shadows ── */
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.32), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    --shadow-pop: 0 12px 28px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.20);
+    --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.32), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.40), 0 2px 4px rgba(0, 0, 0, 0.30);
+    --shadow-3: 0 12px 28px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.20);
+
+    /* ── chart / info (HEAD oklch palette — dark) ── */
+    --info: oklch(0.72 0.17 250);
+    --chart-1: oklch(0.488 0.243 264.376);
+    --chart-2: oklch(0.696 0.17 162.48);
+    --chart-3: oklch(0.769 0.188 70.08);
+    --chart-4: oklch(0.627 0.265 303.9);
+    --chart-5: oklch(0.645 0.246 16.439);
+
+    color-scheme: dark;
+}
+
+/* ====================================================================
+ * Registration + alias layer (restored)
+ *
+ * The runtime token names above follow the shadcn-aligned scheme. The
+ * codebase + module CSS also consume the canonical mnemonic names
+ * (design-source/tokens.css canon: --bg/--fg/--surface/--hairline/...)
+ * and the shadcn background/foreground pairs. This block aliases those
+ * to the tokens defined above, then registers every utility via @theme.
+ *
+ * Aliases reference themed vars, so a single :root block adapts to
+ * light/dark automatically. Color-variant themes (blue/green/...) are
+ * imported after this file and override at equal specificity.
+ * ==================================================================== */
+
+:root {
+  /* canon mnemonic -> shadcn tokens */
+  --bg: var(--background);
+  --surface: var(--card);
+  --fg: var(--foreground);
+  --fg-soft: var(--secondary-foreground);
+  --hairline: var(--border);
+  --hairline-2: var(--border-strong);
+  --primary-strong: var(--primary-hover);
+  --warn: var(--warning);
+  --danger: var(--destructive);
+
+  /* shadcn background/foreground pairs (canon aliasing) */
+  --card-foreground: var(--foreground);
+  --popover: var(--card);
+  --popover-foreground: var(--foreground);
+  --secondary: var(--surface-2);
+  --muted: var(--surface-2);
+  --accent: var(--surface-2);
+  --accent-foreground: var(--foreground);
+  --destructive-foreground: #FFFFFF;
+  --input: var(--border);
+  --ring: var(--primary);
+
+  /* sidebar extras */
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--primary);
+
+  /* radius scale aliases for module CSS var(--r-*) consumers */
+  --r-xs: var(--radius-xs);
+  --r-sm: var(--radius-sm);
+  --r-md: var(--radius-md);
+  --r-lg: var(--radius-lg);
+  --r-xl: var(--radius-xl);
+}
+
+/* radius + fonts: single source. Non-inline @theme so the vars are also
+   emitted to :root (var(--radius-*) / var(--font-title) consumers). */
+@theme {
+  --radius: 3px;
+  --radius-xs: 2px;
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+  --radius-xl: 5px;
+
+  --font-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
+    "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "D2Coding", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-title: 'seravek-web', 'Noto Sans KR', 'Noto Sans JP', sans-serif;
+}
+
+/* Color utilities. inline -> utilities reference the runtime var directly,
+   so color-variant theme overrides apply. */
+@theme inline {
+  /* shadcn core */
+  /* `bg-background` is the surface form controls / base components sit on. In
+     this app the page frame is grey (--bg → --background) but content lives on
+     the white card, so map the utility to --card. Layouts keep grey via bg-bg
+     (--color-bg → --bg). */
+  --color-background: var(--card);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* canon mnemonic + brand + project extras */
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-fg: var(--fg);
+  --color-fg-soft: var(--fg-soft);
+  --color-muted-2: var(--muted-2);
+  --color-hairline: var(--hairline);
+  --color-hairline-2: var(--hairline-2);
+  --color-border-strong: var(--border-strong);
+  --color-primary-strong: var(--primary-strong);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-soft-2: var(--primary-soft-2);
+  --color-brand-bg: var(--brand-bg);
+  --color-brand-fg: var(--brand-fg);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-purple: var(--purple);
+  --color-purple-soft: var(--purple-soft);
+  --color-purple-soft-2: var(--purple-soft-2);
+}

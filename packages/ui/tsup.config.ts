@@ -15,5 +15,5 @@ export default defineConfig((options) => ({
     /^maplibre/, /^pmtiles/, /^protomaps/, /^apexcharts/,
     /^@?platejs/, /^lowlight/, /^lucide-react/,
   ],
-  onSuccess: "cp src/styles.css dist/styles.css",
+  onSuccess: "cp src/styles.css dist/styles.css && cp src/theme.css dist/theme.css",
 }));

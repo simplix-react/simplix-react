@@ -28,6 +28,24 @@ function App() {
 }
 ```
 
+## Styles & Theme
+
+Component CSS ships values only as `var(--*)` references. Import the
+stylesheet plus the official token theme from your app's CSS entry:
+
+```css
+@import "tailwindcss";
+@import "@simplix-react/ui/styles.css";   /* component styles */
+@import "@simplix-react/ui/theme.css";    /* official design tokens (opt-in) */
+
+@source "../node_modules/@simplix-react/ui/dist/**/*.js";
+```
+
+`theme.css` defines the design tokens (light/dark, color variants, radius,
+typography) consumed by the components. Apps may override any token by
+redefining it after the import. Projects scaffolded via `simplix init`
+wire this up automatically.
+
 ## App Architecture (FSD)
 
 simplix-react apps follow **Feature-Sliced Design (FSD)** — UI code lives in **modules**, not in domain packages:
