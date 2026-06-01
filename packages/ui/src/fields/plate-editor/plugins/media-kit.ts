@@ -16,11 +16,11 @@ export type ImageUploadHandler = (file: File) => Promise<string>
 /**
  * Create media kit with custom upload handler
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createMediaKit = (options?: {
   uploadHandler?: ImageUploadHandler
   maxImageSize?: number
   acceptedFormats?: string[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 }): any[] => {
   const {
     uploadHandler,

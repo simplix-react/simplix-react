@@ -594,10 +594,10 @@ function MapMarker({
     marker.setDraggable(draggable);
   }
 
+  const defaults = useMapDefaults();
+
   const el = marker.getElement();
   if (!el) return null;
-
-  const defaults = useMapDefaults();
 
   return createPortal(
     <div className="relative cursor-pointer">

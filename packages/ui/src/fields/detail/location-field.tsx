@@ -64,8 +64,6 @@ export function DetailLocationField({
   const hasLocation =
     isValidLatLng(latitude, longitude) && !(latitude === 0 && longitude === 0);
 
-  if (!hasLocation && hideWhenEmpty) return null;
-
   const dialogMapRef = useRef<maplibregl.Map | null>(null);
 
   const [mapTheme, setMapTheme] = useState<"light" | "dark">(() =>
@@ -87,6 +85,8 @@ export function DetailLocationField({
     }
     setOpen(v);
   }, []);
+
+  if (!hasLocation && hideWhenEmpty) return null;
 
   return (
     <DetailFieldWrapper

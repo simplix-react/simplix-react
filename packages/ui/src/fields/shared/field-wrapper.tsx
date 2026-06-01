@@ -81,7 +81,7 @@ export function FieldWrapper({
 
   const isHidden = layout === "hidden";
   const testId = label ? `form-field-${toTestId(label)}` : undefined;
-  const { labelExtra, disabled, labelKey, ...restVariant } = variantOverride;
+  const { labelExtra, disabled } = variantOverride;
 
   const inputRow = (prefixControl || suffixControl) ? (
     <div className="flex items-center gap-2">

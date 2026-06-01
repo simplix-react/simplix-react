@@ -296,8 +296,6 @@ export function TimeRangeSelector({
         // 1mo → 1st of current month to 1st of next month (actual month length)
         newFrom = new Date(now.getFullYear(), now.getMonth(), 1);
         newTo = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-        const actualWindowMs = newTo.getTime() - newFrom.getTime();
-        const daysInMonth = actualWindowMs / (24 * 60 * 60 * 1000);
         setViewFrom(newFrom);
         onChange({ from: newFrom, to: newTo, bucketMinutes: 1440 });
         return;

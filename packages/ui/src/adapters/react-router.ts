@@ -25,10 +25,14 @@ export interface ReactRouterHooks {
 export function createReactRouterAdapter(hooks: ReactRouterHooks): RouterAdapter {
   const { useNavigate, useSearchParams, useLocation } = hooks;
 
-  // Capture current hook references per call-site
+  // Capture current hook references per call-site.
+  // This factory is itself called during render (it forwards React Router
+  // hooks), so the hook calls are valid even though the name isn't `use*`.
+  /* eslint-disable react-hooks/rules-of-hooks */
   const nav = useNavigate();
   const [searchParams, setSearchParamsRR] = useSearchParams();
   const location = useLocation();
+  /* eslint-enable react-hooks/rules-of-hooks */
 
   return {
     navigate: (to, options) => nav(to, options),

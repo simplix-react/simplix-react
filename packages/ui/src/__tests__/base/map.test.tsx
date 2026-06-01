@@ -71,6 +71,7 @@ vi.mock("maplibre-gl", () => {
   // Use regular function so `new` works correctly
   function MockMap(this: Record<string, unknown>) {
     const instance = createMockMapInstance();
+    // eslint-disable-next-line react/no-this-in-sfc -- constructor mock invoked with `new`
     Object.assign(this, instance);
   }
 

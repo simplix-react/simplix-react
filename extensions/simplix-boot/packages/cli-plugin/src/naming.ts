@@ -69,7 +69,6 @@ function findActionSuffix(segments: string[], entityName: string): string | unde
  */
 function findGetSubpath(segments: string[], entityName: string): string | undefined {
   const entityKebab = entityName.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
-  const entityParts = entityKebab.split("-");
 
   // Find where the entity's path segments end.
   // Entity "syncTransactionLog" → kebab "sync-transaction-log" → parts ["sync","transaction","log"]

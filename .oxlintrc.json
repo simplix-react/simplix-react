@@ -3,14 +3,16 @@
   "categories": {
     "correctness": "warn"
   },
-  "plugins": ["typescript"],
+  "plugins": ["typescript", "react"],
   "rules": {
     "no-undef": "off",
     "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/no-unused-vars": [
       "warn",
       { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }
-    ]
+    ],
+    "react-hooks/rules-of-hooks": "warn",
+    "react-hooks/exhaustive-deps": "off"
   },
   "ignorePatterns": ["dist", "node_modules", "*.config.*"]
 }

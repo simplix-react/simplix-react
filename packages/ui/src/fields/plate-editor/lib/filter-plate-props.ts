@@ -9,17 +9,17 @@
 export function filterPlateProps(props: Record<string, any>) {
   const {
     // Plate.js internal props to filter out
-    setOption,
-    setOptions,
-    getOption,
-    getOptions,
-    element,
-    editor,
+    setOption: _setOption,
+    setOptions: _setOptions,
+    getOption: _getOption,
+    getOptions: _getOptions,
+    element: _element,
+    editor: _editor,
     nodeProps,
-    attributes,
+    attributes: _attributes,
     // Additional internal props that may be passed
-    api,
-    tf,
+    api: _api,
+    tf: _tf,
     ...domProps
   } = props
 

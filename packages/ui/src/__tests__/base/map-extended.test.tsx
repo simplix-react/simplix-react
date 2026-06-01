@@ -80,6 +80,7 @@ const MockMarkerInstance = {
 vi.mock("maplibre-gl", () => {
   function MockMap(this: Record<string, unknown>) {
     const instance = createMockMapInstance();
+    // eslint-disable-next-line react/no-this-in-sfc -- constructor mock invoked with `new`
     Object.assign(this, instance);
   }
 
@@ -104,6 +105,7 @@ vi.mock("maplibre-gl", () => {
 
 vi.mock("pmtiles", () => {
   function MockProtocol(this: Record<string, unknown>) {
+    // eslint-disable-next-line react/no-this-in-sfc -- constructor mock invoked with `new`
     this.tile = vi.fn();
   }
   return { Protocol: MockProtocol };
