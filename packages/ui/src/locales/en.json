@@ -236,5 +236,101 @@
       "heading2": "Heading 2",
       "heading3": "Heading 3"
     }
+  },
+  "file": {
+    "dropzone": {
+      "title": "Drag files here or click to select",
+      "cta": "Browse",
+      "maxFiles": "Up to {{max}} files",
+      "count": "({{current}}/{{max}})",
+      "maxSize": "Max {{size}} per file",
+      "extensions": "Allowed types",
+      "extensionsTitle": "Accepted formats",
+      "extensionsAll": "All types allowed"
+    },
+    "section": {
+      "files": "Files",
+      "images": "Images"
+    },
+    "action": {
+      "download": "Download",
+      "edit": "Edit description",
+      "delete": "Delete",
+      "preview": "Preview",
+      "retry": "Retry upload",
+      "cancel": "Cancel"
+    },
+    "handle": {
+      "reorder": "Reorder",
+      "reorderDisabled": "Failed or uploading items cannot be moved"
+    },
+    "representative": {
+      "set": "Set as representative",
+      "unset": "Unset representative",
+      "label": "Representative image"
+    },
+    "description": {
+      "title": "Edit description",
+      "label": "Description",
+      "placeholder": "Enter a description",
+      "save": "Save",
+      "cancel": "Cancel",
+      "close": "Close"
+    },
+    "viewer": {
+      "title": "Image preview",
+      "size": "Size",
+      "dimension": "Dimensions",
+      "close": "Close",
+      "download": "Download"
+    },
+    "remove": {
+      "title": "Delete file",
+      "message": "Delete this file? This cannot be undone.",
+      "confirm": "Delete",
+      "cancel": "Cancel",
+      "deleting": "Deleting..."
+    },
+    "validation": {
+      "title": "Files that cannot be uploaded",
+      "close": "OK",
+      "maxAttachments": "Up to {{max}} attachment(s) allowed.",
+      "maxFileSize": "File exceeds the {{size}} size limit.",
+      "extensionNotAllowed": "The \".{{ext}}\" extension is not allowed.",
+      "mimeNotAllowed": "The \"{{mime}}\" type is not allowed."
+    },
+    "uploadFailed": "Upload failed",
+    "unknownFile": "Unknown file",
+    "crop": {
+      "title": "Image Crop",
+      "altText": "Image to crop",
+      "areaLabel": "Crop area",
+      "aspectLabel": "Aspect ratio",
+      "ratioFree": "Free",
+      "ratioOriginal": "Original",
+      "save": "Save",
+      "cancel": "Cancel",
+      "close": "Close"
+    },
+    "nav": {
+      "prev": "Previous image",
+      "next": "Next image",
+      "dotLabel": "{{index}} / {{total}}",
+      "badgeInfo": "File info",
+      "metaName": "Name",
+      "metaSize": "Size",
+      "metaDimension": "Dimensions"
+    },
+    "stage": {
+      "emptyTitle": "No images uploaded",
+      "emptyDesc": "Add images to get started",
+      "dropTitle": "Drag or click to select an image",
+      "dropCta": "Select image",
+      "extensions": "Allowed formats",
+      "extensionsTitle": "Accepted formats"
+    },
+    "thumb": {
+      "uploadFailed": "Upload failed"
+    }
   }
 }

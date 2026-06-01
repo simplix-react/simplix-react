@@ -72,3 +72,9 @@ export type { PlateEditorFieldProps, PlateEditorVariant } from "./plate-editor-f
 
 export { PlateEditorI18nField } from "./plate-editor-i18n-field";
 export type { PlateEditorI18nFieldProps } from "./plate-editor-i18n-field";
+
+export { FileField } from "./file-field";
+export type { FileFieldProps } from "./file-field";
+
+export { ImageField } from "./image-field";
+export type { ImageFieldProps } from "./image-field";
