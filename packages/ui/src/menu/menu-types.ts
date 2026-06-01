@@ -93,3 +93,17 @@ export interface MenuContextValue {
   isLoading: boolean;
   error: Error | null;
 }
+
+// Route matcher injected by the host router (router-agnostic).
+// `fuzzy` = match the current location as a descendant of `to` (ancestor route).
+export type RouteMatcher = (
+  to: string,
+  opts?: { fuzzy?: boolean },
+) => boolean;
+
+// Options for useActiveMenuItem
+export interface UseActiveMenuItemOptions {
+  // Restrict to a root menu group by its menuCode (mapped to NavigationGroup.groupCode).
+  // Omit to search all groups.
+  menuCode?: string;
+}

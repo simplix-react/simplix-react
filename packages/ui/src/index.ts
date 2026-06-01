@@ -611,7 +611,13 @@ export { useTimezoneOptions } from "./utils/use-timezone-options";
 export type { TimezoneOption } from "./utils/use-timezone-options";
 
 // Menu
-export { MenuProvider, useMenu } from "./menu";
+export {
+  MenuProvider,
+  useMenu,
+  useActiveMenuItem,
+  RouteMatcherContext,
+  RouteMatcherProvider,
+} from "./menu";
 export type {
   FixedMenuGroup,
   FixedMenuItem,
@@ -623,4 +629,7 @@ export type {
   MenuProviderProps,
   NavigationGroup,
   NavigationItem,
+  RouteMatcher,
+  RouteMatcherProviderProps,
+  UseActiveMenuItemOptions,
 } from "./menu";
