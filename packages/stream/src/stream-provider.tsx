@@ -55,6 +55,14 @@ const DEFAULT_EVENT_NAMES: Required<StreamEventNames> = {
 
 const DEFAULT_HEARTBEAT_TIMEOUT_MS = 10_000;
 
+// Cap consecutive reconnect attempts to prevent runaway storms when the
+// backend keeps rejecting (e.g. 401). After the cap, the watchdog is also
+// stopped; the user must reload to retry. With the backoff schedule
+// (1, 2, 4, 8, 10, 10, ... seconds, capped at 10s), 20 attempts cover
+// roughly 3 minutes of recovery window — long enough for a backend
+// restart or transient network glitch to self-heal.
+const DEFAULT_MAX_CONSECUTIVE_RETRIES = 20;
+
 // ── Context ──
 
 const StreamContext = createContext<StreamContextValue | null>(null);
@@ -86,6 +94,20 @@ interface StreamProviderProps {
   eventNames?: StreamEventNames;
   /** Heartbeat watchdog timeout in ms. Default: 10000 */
   heartbeatTimeoutMs?: number;
+  /**
+   * When true, the provider mounts the context but skips the SSE connection.
+   * Use to gate connection on auth readiness — keep `true` while auth is
+   * rehydrating and flip to `false` once authentication is verified, so the
+   * EventSource never fires with a stale/expired session cookie.
+   */
+  disabled?: boolean;
+  /**
+   * Cap on consecutive failed reconnect attempts before the provider gives
+   * up and stops the heartbeat watchdog. The user must reload (or the
+   * provider must remount) to retry. Default: 20 (~3 minutes with the
+   * built-in exponential backoff).
+   */
+  maxConsecutiveRetries?: number;
 }
 
 export function StreamProvider({
@@ -96,6 +118,8 @@ export function StreamProvider({
   subscriptionSync: syncProp,
   eventNames: eventNamesProp,
   heartbeatTimeoutMs = DEFAULT_HEARTBEAT_TIMEOUT_MS,
+  disabled = false,
+  maxConsecutiveRetries = DEFAULT_MAX_CONSECUTIVE_RETRIES,
 }: StreamProviderProps) {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("connecting");
@@ -245,6 +269,15 @@ export function StreamProvider({
   // Real EventSource connection
   useEffect(() => {
     if (mock?.enabled) return;
+    // Skip connecting until the consumer signals that auth is ready.
+    // Without this gate, EventSource fires immediately with a possibly-
+    // expired session cookie, hits 401, and starts a reconnect storm.
+    if (disabled) {
+      setConnectionStatus("disconnected");
+      return;
+    }
+    // Reset retry state on (re-)enable so a fresh enable starts clean.
+    retryCountRef.current = 0;
 
     let heartbeatThrottleTimer: ReturnType<typeof setTimeout> | null = null;
     function touchHeartbeat() {
@@ -274,12 +307,32 @@ export function StreamProvider({
     }
 
     function reconnect() {
+      // Idempotent: es.onerror and the heartbeat watchdog can both fire
+      // concurrently. Without this guard, two setTimeouts would each spawn
+      // an EventSource, doubling on every cycle.
+      if (retryTimerRef.current) return;
+
       cleanupEventSource();
       if (heartbeatThrottleTimer) {
         clearTimeout(heartbeatThrottleTimer);
         heartbeatThrottleTimer = null;
       }
       setConnectionStatus("disconnected");
+
+      // Hard stop on persistent failure (e.g. backend returns 401 every time).
+      // Stop the watchdog too so it can't keep forcing reconnects.
+      if (retryCountRef.current >= maxConsecutiveRetries) {
+        appendStreamLog({
+          timestamp: Date.now(),
+          type: "error",
+          summary: `Max retries (${maxConsecutiveRetries}) reached; stopped reconnecting`,
+        });
+        if (heartbeatWatchdogRef.current) {
+          clearInterval(heartbeatWatchdogRef.current);
+          heartbeatWatchdogRef.current = null;
+        }
+        return;
+      }
 
       // Exponential backoff: 1s → 2s → 4s → 8s → 10s (cap)
       // ±25% jitter to avoid thundering herd on mass reconnect
@@ -288,7 +341,10 @@ export function StreamProvider({
       const delay = Math.max(0, baseDelay + jitter);
 
       retryCountRef.current += 1;
-      retryTimerRef.current = setTimeout(connect, delay);
+      retryTimerRef.current = setTimeout(() => {
+        retryTimerRef.current = null;
+        connect();
+      }, delay);
     }
 
     function connect() {
@@ -419,7 +475,7 @@ export function StreamProvider({
       }
       cleanupEventSource();
     };
-  }, [url, mock, dispatch, heartbeatTimeoutMs]);
+  }, [url, mock, dispatch, heartbeatTimeoutMs, disabled]);
 
   const value: StreamContextValue = {
     sessionId,
