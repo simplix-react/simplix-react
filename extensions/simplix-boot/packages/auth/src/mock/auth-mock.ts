@@ -47,7 +47,7 @@ export function createAuthMock(options: AuthMockOptions): MockDomainConfig {
   const { basePath = "/api/v1", users } = options;
 
   const handlers = [
-    http.get(`${basePath}/auth/token/issue`, async ({ request }) => {
+    http.post(`${basePath}/auth/token/issue`, async ({ request }) => {
       const auth = request.headers.get("Authorization");
       if (!auth || !auth.startsWith("Basic ")) {
         return HttpResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -61,7 +61,7 @@ export function createAuthMock(options: AuthMockOptions): MockDomainConfig {
       return HttpResponse.json({ message: "Invalid credentials" }, { status: 401 });
     }),
 
-    http.get(`${basePath}/auth/token/refresh`, ({ request }) => {
+    http.post(`${basePath}/auth/token/refresh`, ({ request }) => {
       const username = extractUsername(request) ?? "admin";
       return HttpResponse.json(makeTokenResponse(username));
     }),

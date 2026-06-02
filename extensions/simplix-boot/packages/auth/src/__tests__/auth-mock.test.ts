@@ -94,6 +94,7 @@ describe("createAuthMock handlers", () => {
   describe("token/issue", () => {
     it("returns token for valid credentials", async () => {
       const res = await fetch(`${BASE}/api/v1/auth/token/issue`, {
+        method: "POST",
         headers: { Authorization: `Basic ${btoa("admin:admin123")}` },
       });
       expect(res.status).toBe(200);
@@ -105,12 +106,15 @@ describe("createAuthMock handlers", () => {
     });
 
     it("returns 401 for missing Authorization header", async () => {
-      const res = await fetch(`${BASE}/api/v1/auth/token/issue`);
+      const res = await fetch(`${BASE}/api/v1/auth/token/issue`, {
+        method: "POST",
+      });
       expect(res.status).toBe(401);
     });
 
     it("returns 401 for wrong password", async () => {
       const res = await fetch(`${BASE}/api/v1/auth/token/issue`, {
+        method: "POST",
         headers: { Authorization: `Basic ${btoa("admin:wrong")}` },
       });
       expect(res.status).toBe(401);
@@ -118,6 +122,7 @@ describe("createAuthMock handlers", () => {
 
     it("returns 401 for unknown user", async () => {
       const res = await fetch(`${BASE}/api/v1/auth/token/issue`, {
+        method: "POST",
         headers: { Authorization: `Basic ${btoa("nobody:pass")}` },
       });
       expect(res.status).toBe(401);
@@ -127,6 +132,7 @@ describe("createAuthMock handlers", () => {
   describe("token/refresh", () => {
     it("returns new tokens", async () => {
       const res = await fetch(`${BASE}/api/v1/auth/token/refresh`, {
+        method: "POST",
         headers: { Authorization: "Bearer mock-access-admin-12345" },
       });
       expect(res.status).toBe(200);
@@ -135,7 +141,9 @@ describe("createAuthMock handlers", () => {
     });
 
     it("defaults to admin username when no bearer token", async () => {
-      const res = await fetch(`${BASE}/api/v1/auth/token/refresh`);
+      const res = await fetch(`${BASE}/api/v1/auth/token/refresh`, {
+        method: "POST",
+      });
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.accessToken).toContain("mock-access-admin");

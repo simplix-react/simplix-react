@@ -168,7 +168,7 @@ describe("createBootAuth", () => {
     expect(mockBaseFetch).toHaveBeenCalledWith(
       "/api/v1/auth/token/refresh",
       expect.objectContaining({
-        method: "GET",
+        method: "POST",
         headers: { "X-Refresh-Token": "mock-refresh-token" },
       }),
     );
@@ -220,7 +220,7 @@ describe("createBootAuth", () => {
     expect(mockBaseFetch).toHaveBeenCalledWith(
       "/api/v1/auth/token/issue",
       expect.objectContaining({
-        method: "GET",
+        method: "POST",
         headers: {
           Authorization: `Basic ${btoa("admin:password123")}`,
         },
