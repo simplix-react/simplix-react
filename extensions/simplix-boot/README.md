@@ -10,6 +10,7 @@ Extension for SimpliX, a Spring Boot-based backend framework by SimpleCORE Inc. 
 | --- | --- |
 | [@simplix-react-ext/simplix-boot-access](./packages/access/) | Spring Security authorization adapter for `@simplix-react/access` |
 | [@simplix-react-ext/simplix-boot-auth](./packages/auth/) | Spring Security authentication contract (token, user profile, permissions) |
+| [@simplix-react-ext/simplix-boot-stream](./packages/stream/) | SimpliX Boot SSE streaming (EventSource management, subscriptions, staleness detection) |
 
 ## How It Works
 
