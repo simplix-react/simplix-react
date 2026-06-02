@@ -1,5 +1,6 @@
-import { normalizePermissionMap, normalizeRoles } from "@simplix-react/access";
+import { normalizePermissionMap } from "@simplix-react/access";
 
+import { normalizeRoles } from "./role-utils.js";
 import type { SpringConvertResult, SpringPermissionsResponse } from "./types.js";
 
 /**

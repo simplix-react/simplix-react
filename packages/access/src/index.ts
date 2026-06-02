@@ -35,8 +35,6 @@ export {
 } from "./helpers/normalize-rules.js";
 export {
   normalizeRole,
-  normalizeRoles,
   hasRole,
   hasAnyRole,
 } from "./helpers/role-utils.js";
-export type { RoleInput } from "./helpers/role-utils.js";

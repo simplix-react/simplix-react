@@ -8,7 +8,7 @@
 
 > **normalizeRole**(`role`): `string`
 
-Defined in: [packages/access/src/helpers/role-utils.ts:50](https://github.com/simplix-react/simplix-react/blob/main/packages/access/src/helpers/role-utils.ts#L50)
+Defined in: [packages/access/src/helpers/role-utils.ts:17](https://github.com/simplix-react/simplix-react/blob/main/packages/access/src/helpers/role-utils.ts#L17)
 
 Ensures a role string has the `ROLE_` prefix.
 
