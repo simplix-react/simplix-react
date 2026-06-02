@@ -48,6 +48,12 @@ export interface InitOptions {
 const simplixConfigTs = `import { defineConfig } from "@simplix-react/cli";
 
 export default defineConfig({
+  // ── Plugins ────────────────────────────────────────────────
+  // CLI extension plugins to load. They register the spec profiles and
+  // response adapters used during code generation. Remove or replace this
+  // entry if you target a different backend.
+  plugins: ["@simplix-react-ext/simplix-boot-cli-plugin"],
+
   // ── API ────────────────────────────────────────────────────
   api: {
     /** API base path — used for basePath in code generation */

@@ -44,7 +44,7 @@ export default defineConfig({
 
 > `optional` **api**: `object`
 
-Defined in: [config/types.ts:61](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L61)
+Defined in: [config/types.ts:76](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L76)
 
 API settings — used for basePath in code generation
 
@@ -60,7 +60,7 @@ API base path (default: "/api")
 
 > `optional` **codegen**: `object`
 
-Defined in: [config/types.ts:81](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L81)
+Defined in: [config/types.ts:96](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L96)
 
 Code generation options
 
@@ -76,7 +76,7 @@ Prepend auto-generated header comment to generated files (default: true)
 
 > `optional` **http**: `object`
 
-Defined in: [config/types.ts:76](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L76)
+Defined in: [config/types.ts:91](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L91)
 
 .http file environment settings
 
@@ -90,7 +90,7 @@ Defined in: [config/types.ts:76](https://github.com/simplix-react/simplix-react/
 
 > `optional` **i18n**: `object`
 
-Defined in: [config/types.ts:87](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L87)
+Defined in: [config/types.ts:102](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L102)
 
 Internationalization settings
 
@@ -112,7 +112,7 @@ Supported locale codes (default: ["en", "ko", "ja"])
 
 > `optional` **openapi**: [`OpenAPISpecConfig`](OpenAPISpecConfig.md)[]
 
-Defined in: [config/types.ts:95](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L95)
+Defined in: [config/types.ts:110](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L110)
 
 OpenAPI code generation — array of per-spec configurations
 
@@ -122,7 +122,7 @@ OpenAPI code generation — array of per-spec configurations
 
 > `optional` **packages**: `object`
 
-Defined in: [config/types.ts:70](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L70)
+Defined in: [config/types.ts:85](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L85)
 
 Package naming options
 
@@ -134,10 +134,31 @@ Short prefix for generated package names (default: derived from root package.jso
 
 ***
 
+### plugins?
+
+> `optional` **plugins**: `string`[]
+
+Defined in: [config/types.ts:73](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L73)
+
+CLI extension plugin modules to load before running any command.
+
+#### Remarks
+
+Each entry is a package specifier (e.g. `"@simplix-react-ext/simplix-boot-cli-plugin"`).
+Plugins register spec profiles and response adapters needed for correct
+code generation. The core CLI is backend-agnostic and does not know about
+any specific extension — the target backend is declared here.
+
+If a [profile](OpenAPISpecConfig.md#profile) is referenced but its
+plugin is not listed (or cannot be resolved), the `openapi` command warns
+and exits rather than silently generating incorrect code.
+
+***
+
 ### queryBuilder?
 
 > `optional` **queryBuilder**: `unknown`
 
-Defined in: [config/types.ts:67](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L67)
+Defined in: [config/types.ts:82](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L82)
 
 Global QueryBuilder — applied to all domains

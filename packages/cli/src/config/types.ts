@@ -57,6 +57,21 @@ export interface SimplixHttpEnvironment {
  * @see {@link defineConfig} — identity wrapper for type-safe autocompletion
  */
 export interface SimplixConfig {
+  /**
+   * CLI extension plugin modules to load before running any command.
+   *
+   * @remarks
+   * Each entry is a package specifier (e.g. `"@simplix-react-ext/simplix-boot-cli-plugin"`).
+   * Plugins register spec profiles and response adapters needed for correct
+   * code generation. The core CLI is backend-agnostic and does not know about
+   * any specific extension — the target backend is declared here.
+   *
+   * If a {@link OpenAPISpecConfig.profile | profile} is referenced but its
+   * plugin is not listed (or cannot be resolved), the `openapi` command warns
+   * and exits rather than silently generating incorrect code.
+   */
+  plugins?: string[];
+
   /** API settings — used for basePath in code generation */
   api?: {
     /** API base path (default: "/api") */

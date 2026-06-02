@@ -12,23 +12,23 @@ import { openapiCommand } from "./commands/openapi.js";
 import { scaffoldCrudCommand } from "./commands/scaffold-crud.js";
 import { frameworkVersion } from "./versions.js";
 import { findProjectRoot, pathExists } from "./utils/fs.js";
+import { loadConfig } from "./config/config-loader.js";
 
 // ── Load extension plugins ──
 // Plugins register spec profiles and schema adapters needed for correct code generation.
-// If a profile is declared in simplix.config but its plugin cannot be loaded, the openapi
-// command will warn and exit rather than silently generating incorrect code.
+// The core CLI is backend-agnostic: which plugins to load is declared by the project
+// via the `plugins` field in simplix.config.ts — no extension name is hardcoded here.
+// If a profile is declared but its plugin cannot be resolved, the openapi command warns
+// and exits rather than silently generating incorrect code.
 
-const PLUGIN_MODULE = "@simplix-react-ext/simplix-boot-cli-plugin";
-
-async function loadPlugin(): Promise<boolean> {
+async function loadPluginModule(root: string, moduleId: string): Promise<boolean> {
   // Resolve from the consumer project root (not from CLI package location).
   // pnpm link: packages live in the .pnpm store and are only resolvable
   // from the project that declares the dependency.
-  const root = await findProjectRoot(process.cwd()).catch(() => process.cwd());
   const projectRequire = createRequire(join(root, "package.json"));
 
   // Try resolving the main entry, then fall back to dist/index.js
-  for (const target of [PLUGIN_MODULE, `${PLUGIN_MODULE}/dist/index.js`]) {
+  for (const target of [moduleId, `${moduleId}/dist/index.js`]) {
     try {
       const pluginPath = projectRequire.resolve(target);
       await import(pathToFileURL(pluginPath).href);
@@ -40,7 +40,7 @@ async function loadPlugin(): Promise<boolean> {
 
   // Fallback: direct path lookup
   try {
-    const pluginEntry = join(root, "node_modules", ...PLUGIN_MODULE.split("/"), "dist/index.js");
+    const pluginEntry = join(root, "node_modules", ...moduleId.split("/"), "dist/index.js");
     if (await pathExists(pluginEntry)) {
       await import(pathToFileURL(pluginEntry).href);
       return true;
@@ -52,7 +52,15 @@ async function loadPlugin(): Promise<boolean> {
   return false;
 }
 
-await loadPlugin();
+async function loadConfiguredPlugins(): Promise<void> {
+  const root = await findProjectRoot(process.cwd()).catch(() => process.cwd());
+  const config = await loadConfig(root);
+  for (const moduleId of config.plugins ?? []) {
+    await loadPluginModule(root, moduleId);
+  }
+}
+
+await loadConfiguredPlugins();
 
 const program = new Command();
 
