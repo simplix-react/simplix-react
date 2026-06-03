@@ -42,15 +42,20 @@ export interface SimplixHttpEnvironment {
  * import { defineConfig } from "@simplix-react/cli";
  *
  * export default defineConfig({
+ *   plugins: ["@simplix-react-ext/simplix-boot-cli-plugin"],
  *   api: { baseUrl: "/api/v1" },
  *   packages: { prefix: "acme" },
  *   codegen: { header: true },
- *   openapi: {
- *     domains: {
- *       project: ["Projects", "Tasks"],
- *       auth: ["Auth", "Users"],
+ *   openapi: [
+ *     {
+ *       spec: "openapi.json",
+ *       profile: "simplix-boot",
+ *       domains: {
+ *         project: ["Projects", "Tasks"],
+ *         auth: ["Auth", "Users"],
+ *       },
  *     },
- *   },
+ *   ],
  * });
  * ```
  *

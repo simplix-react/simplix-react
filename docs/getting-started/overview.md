@@ -8,7 +8,7 @@ simplix-react is a **package-first React framework** that auto-generates reusabl
 
 The central idea behind simplix-react is that your API contract is the **single source of truth**. You define your entities and operations once using Zod schemas, and the framework derives everything else:
 
-```
+```text
 Contract (Zod schemas)
     |
     +---> Client (type-safe HTTP client)

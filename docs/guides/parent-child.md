@@ -70,7 +70,7 @@ const taskEntity = {
 
 The `parent` configuration produces the URL pattern:
 
-```
+```text
 basePath + parent.path + /:param + path
 /api/v1  + /projects   + /:projectId + /tasks
 → /api/v1/projects/:projectId/tasks

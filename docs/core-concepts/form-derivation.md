@@ -12,7 +12,7 @@ Form derivation sits at the top of the derivation chain: contracts produce clien
 
 ### The Derivation Chain
 
-```
+```text
 defineApi()              → contract (schemas, paths)
     |
 deriveEntityHooks()      → React Query hooks (useList, useGet, useCreate, useUpdate, ...)

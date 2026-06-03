@@ -1,63 +1,65 @@
-# `@simplix-react/ui` 디자인 커스터마이징 가이드
+# `@simplix-react/ui` Design Customization Guide
 
-이 문서는 `@simplix-react/ui`를 컨슈머 프로젝트에서 사용하면서 **디자인을 어떻게 변경할 수 있는지**를 정리합니다. 변경 범위에 따라 복사할 파일과 방법이 다릅니다.
+> **Prerequisites:** Complete the initial styling setup described in [`consumer-styling-setup.md`](./consumer-styling-setup.md) — you should already have Tailwind wired up, the `@source` globs configured, and `@simplix-react/ui/styles.css` imported before following this guide.
 
-관련 문서: [`consumer-styling-setup.md`](./consumer-styling-setup.md) — 최초 셋업 및 디자인 토큰 레퍼런스
+This guide explains **how you can change the design** when using `@simplix-react/ui` in your consumer project. The files you copy and the approach you take depend on the scope of your change.
 
----
-
-## 목차
-
-- [디자인 변경 — 어떤 파일을 복사해서 수정?](#디자인-변경--어떤-파일을-복사해서-수정)
-  - [1. 색·폰트·radius만 바꾸고 싶다 (90% 케이스)](#1-색폰트radius만-바꾸고-싶다-90-케이스)
-  - [2. 컬러 팔레트를 여러 개 두고 토글하고 싶다](#2-컬러-팔레트를-여러-개-두고-토글하고-싶다)
-  - [3. 특정 컴포넌트 1개만 다르게 보이고 싶다](#3-특정-컴포넌트-1개만-다르게-보이고-싶다-예-button만-기업-스타일로)
-  - [4. 특정 인스턴스 1곳만 살짝 다르게](#4-특정-인스턴스-1곳만-살짝-다르게)
-  - [5. 테이블 스크롤바를 내 스타일로 바꾸고 싶다](#5-테이블-스크롤바를-내-스타일로-바꾸고-싶다)
-  - [6. 컴포넌트 구조 자체를 바꾸고 싶다](#6-컴포넌트-구조-자체를-바꾸고-싶다-레이아웃동작-변경)
-- [요약 결정 트리](#요약-결정-트리)
-- [default.css에 포함된 것들](#defaultcss에-포함된-것들)
-  - [Radius 정의](#radius-정의)
-  - [default.css 전체 구성](#defaultcss-전체-구성)
-- [테마 적용 단계별 가이드](#테마-적용-단계별-가이드)
-  - [시나리오 A: 브랜드 컬러 하나로 통일 (가장 흔함)](#시나리오-a-브랜드-컬러-하나로-통일-가장-흔함)
-  - [시나리오 B: 사용자가 테마를 골라 쓰는 멀티 테마](#시나리오-b-사용자가-테마를-골라-쓰는-멀티-테마)
-  - [시나리오 C: 시스템 다크모드 자동 감지](#시나리오-c-시스템-다크모드-자동-감지)
-  - [핵심 정리](#핵심-정리)
-- [테마 셀렉트 동작 원리 (Storybook 예시 분석)](#테마-셀렉트-동작-원리-storybook-예시-분석)
-  - [작동 원리 한 줄](#작동-원리-한-줄)
-  - [Storybook의 구조 (3개 부분)](#storybook의-구조-3개-부분)
-  - [동작 흐름](#동작-흐름)
-  - [메커니즘 매핑](#메커니즘-매핑)
+Related document: [`consumer-styling-setup.md`](./consumer-styling-setup.md) — initial setup and design token reference.
 
 ---
 
-## 디자인 변경 — 어떤 파일을 복사해서 수정?
+## Table of Contents
 
-### 1. 색·폰트·radius만 바꾸고 싶다 (90% 케이스)
+- [Changing the design — which file do you copy and edit?](#changing-the-design--which-file-do-you-copy-and-edit)
+  - [1. You only want to change colors, fonts, and radius (90% of cases)](#1-you-only-want-to-change-colors-fonts-and-radius-90-of-cases)
+  - [2. You want several color palettes and toggle between them](#2-you-want-several-color-palettes-and-toggle-between-them)
+  - [3. You want just one specific component to look different](#3-you-want-just-one-specific-component-to-look-different-eg-only-button-in-a-corporate-style)
+  - [4. You want just one specific instance to look slightly different](#4-you-want-just-one-specific-instance-to-look-slightly-different)
+  - [5. You want to restyle the table scrollbar](#5-you-want-to-restyle-the-table-scrollbar)
+  - [6. You want to change the component structure itself](#6-you-want-to-change-the-component-structure-itself-layout--behavior)
+- [Decision tree summary](#decision-tree-summary)
+- [What is included in default.css](#what-is-included-in-defaultcss)
+  - [Radius definitions](#radius-definitions)
+  - [Full structure of default.css](#full-structure-of-defaultcss)
+- [Step-by-step theming guide](#step-by-step-theming-guide)
+  - [Scenario A: Unify everything under one brand color (most common)](#scenario-a-unify-everything-under-one-brand-color-most-common)
+  - [Scenario B: A multi-theme app where users pick a theme](#scenario-b-a-multi-theme-app-where-users-pick-a-theme)
+  - [Scenario C: Auto-detect the system dark mode](#scenario-c-auto-detect-the-system-dark-mode)
+  - [Key takeaways](#key-takeaways)
+- [How the theme select works (Storybook example walkthrough)](#how-the-theme-select-works-storybook-example-walkthrough)
+  - [The mechanism in one line](#the-mechanism-in-one-line)
+  - [The structure in Storybook (three parts)](#the-structure-in-storybook-three-parts)
+  - [The flow](#the-flow)
+  - [Mechanism mapping](#mechanism-mapping)
 
-**복사**: `apps/storybook/src/themes/default.css` → 컨슈머의 `src/index.css` (또는 별도 `src/theme.css`)
+---
 
-**수정**:
-- `:root { --primary, --background, --foreground, ... }` 값만 바꾸기
-- 폰트 바꾸려면 `@theme inline { --font-sans, --font-display, --font-mono }`
-- 둥글기는 `--radius` 한 값만 바꾸면 `--radius-sm/md/lg/xl` 자동 파생
-- 다크모드 변형은 `.dark { ... }` 블록도 같이
+## Changing the design — which file do you copy and edit?
 
-이 한 파일만 고치면 **모든 Button, Input, Card, Badge 등이 자동 반영**됩니다 (컴포넌트 코드 안 건드림).
+### 1. You only want to change colors, fonts, and radius (90% of cases)
 
-### 2. 컬러 팔레트를 여러 개 두고 토글하고 싶다
+**Copy**: `apps/storybook/src/themes/default.css` → your consumer's `src/index.css` (or a separate `src/theme.css`).
 
-**복사**: `apps/storybook/src/themes/blue.css` (또는 green/rose/orange/violet 중 가까운 것)
+**Edit**:
+- Change only the values in `:root { --primary, --background, --foreground, ... }`.
+- To change fonts, edit `@theme inline { --font-sans, --font-display, --font-mono }`.
+- For corner rounding, change only the single `--radius` value — `--radius-sm/md/lg/xl` are automatically derived.
+- For dark mode variants, edit the `.dark { ... }` block as well.
 
-**수정**:
-- 셀렉터 이름 바꾸기: `[data-color-theme='blue']` → `[data-color-theme='mybrand']`
-- 토큰 값 교체
-- 컨슈머 앱에서 `<html data-color-theme="mybrand">` 토글
+Once you fix this one file, **every Button, Input, Card, Badge, and so on is updated automatically** (you never touch the component code).
 
-### 3. 특정 컴포넌트 1개만 다르게 보이고 싶다 (예: Button만 기업 스타일로)
+### 2. You want several color palettes and toggle between them
 
-**복사 안 함**. UIProvider 오버라이드 사용:
+**Copy**: `apps/storybook/src/themes/blue.css` (or whichever of green/rose/orange/violet is closest to what you want).
+
+**Edit**:
+- Rename the selector: `[data-color-theme='blue']` → `[data-color-theme='mybrand']`.
+- Replace the token values.
+- Toggle `<html data-color-theme="mybrand">` in your consumer app.
+
+### 3. You want just one specific component to look different (e.g., only Button in a corporate style)
+
+**Nothing to copy**. Use a UIProvider override:
 
 ```tsx
 import { UIProvider } from "@simplix-react/ui";
@@ -68,64 +70,66 @@ import { MyButton } from "./my-button";
 </UIProvider>
 ```
 
-오버라이드 가능 항목: `Input`, `Textarea`, `Label`, `Switch`, `Checkbox`, `Badge`, `Calendar`, `Select`, `RadioGroup` (`packages/ui/README.md:797`)
+Overridable items: `Input`, `Textarea`, `Label`, `Switch`, `Checkbox`, `Badge`, `Calendar`, `Select`, `RadioGroup` (`packages/ui/README.md:797`).
 
-`Button`처럼 위 리스트에 없는 컴포넌트는 **오버라이드가 불가능하므로 4번 방식으로** 가야 합니다.
+Components not in the list above — such as `Button` — **cannot be overridden, so you must use approach 4 instead.**
 
-### 4. 특정 인스턴스 1곳만 살짝 다르게
+### 4. You want just one specific instance to look slightly different
 
-**아무것도 복사 안 함**. `className` prop으로 덮기:
+**Copy nothing**. Override with the `className` prop:
 
 ```tsx
-<Button className="bg-emerald-600 hover:bg-emerald-700">저장</Button>
+<Button className="bg-emerald-600 hover:bg-emerald-700">Save</Button>
 ```
 
-`cn()` 유틸이 `tailwind-merge`로 충돌 클래스를 자동 정리.
+The `cn()` utility uses `tailwind-merge` to resolve conflicting classes automatically.
 
-### 5. 테이블 스크롤바를 내 스타일로 바꾸고 싶다
+### 5. You want to restyle the table scrollbar
 
-**복사**: `packages/ui/src/styles.css` (30줄) → 컨슈머 프로젝트로
+**Copy**: `packages/ui/src/styles.css` (30 lines) → into your consumer project.
 
-**수정 후**:
-- `import "@simplix-react/ui/styles.css"` 줄 **삭제**
-- 대신 컨슈머 버전을 import
+**After editing**:
+- **Remove** the `import "@simplix-react/ui/styles.css"` line.
+- Import your consumer version instead.
 
-### 6. 컴포넌트 구조 자체를 바꾸고 싶다 (레이아웃·동작 변경)
+### 6. You want to change the component structure itself (layout / behavior)
 
-**복사 안 함**. 두 방법:
-- (a) UIProvider 오버라이드로 통째로 교체 (오버라이드 가능 컴포넌트만)
-- (b) 그 컴포넌트는 simplix를 안 쓰고 직접 작성
+**Copy nothing**. Two approaches:
+- (a) Replace the component wholesale with a UIProvider override (overridable components only).
+- (b) Do not use the simplix component for that case and write your own instead.
 
-소스를 fork하는 건 비추 — 이 패키지는 자주 업데이트되고 fork는 머지 비용이 큽니다.
+Forking the source is discouraged — this package is updated frequently, and forks carry a high merge cost.
 
 ---
 
-## 요약 결정 트리
+## Decision tree summary
 
-| 원하는 것 | 복사할 파일 | 수정 위치 |
+| What you want | File to copy | Where to edit |
 |---|---|---|
-| 전체 톤·컬러·폰트 | `apps/storybook/src/themes/default.css` | 토큰 값 |
-| 멀티 컬러 테마 | `apps/storybook/src/themes/blue.css` | 셀렉터 + 토큰 |
-| 한 컴포넌트 통째 교체 | (복사 X) | `<UIProvider overrides={{ ... }}>` |
-| 인스턴스 한 곳 | (복사 X) | `className` prop |
-| 테이블 스크롤바 | `packages/ui/src/styles.css` | 컨슈머에 복사 후 import 교체 |
+| Overall tone, color, font | `apps/storybook/src/themes/default.css` | Token values |
+| Multiple color themes | `apps/storybook/src/themes/blue.css` | Selector + tokens |
+| Replace one component wholesale | (no copy) | `<UIProvider overrides={{ ... }}>` |
+| A single instance | (no copy) | `className` prop |
+| Table scrollbar | `packages/ui/src/styles.css` | Copy into consumer, then swap the import |
 
-대부분의 경우는 **1번 (default.css 복사·수정)만으로 끝납니다.**
+In most cases you are done with **approach 1 alone (copy and edit default.css).**
 
 ---
 
-## default.css에 포함된 것들
+## What is included in default.css
 
-`apps/storybook/src/themes/default.css` 한 파일에 **디자인 시스템 전부 (115줄)**가 들어있습니다.
+The single file `apps/storybook/src/themes/default.css` contains **the entire design system (115 lines)**.
 
-### Radius 정의
+### Radius definitions
 
-**`:root` 안 (3번 라인)**:
+**Inside `:root` (line 3)**:
+
 ```css
 --radius: 0.625rem;
 ```
 
-**`@theme inline` 안 (76-79번 라인) — 자동 파생**:
+**Inside `@theme inline` (lines 76-79) — automatically derived**:
+
 ```css
 --radius-sm: calc(var(--radius) - 4px);   /* 6px */
 --radius-md: calc(var(--radius) - 2px);   /* 8px */
@@ -133,31 +137,31 @@ import { MyButton } from "./my-button";
 --radius-xl: calc(var(--radius) + 4px);   /* 14px */
 ```
 
-즉 **`--radius` 한 값만 바꾸면** `rounded-sm/md/lg/xl` 유틸리티가 전부 비례해서 따라옵니다. 4개를 따로 정의할 필요 없음.
+In other words, **when you change only the single `--radius` value**, the `rounded-sm/md/lg/xl` utilities all scale proportionally to follow it. You do not need to define the four values separately.
 
-### default.css 전체 구성
+### Full structure of default.css
 
-| 카테고리 | 정의 위치 |
+| Category | Where it is defined |
 |---|---|
-| 색상 토큰 페어 (background, primary, muted, destructive, border 등 전체) | `:root` (4-24번 라인) |
-| 차트 컬러 `--chart-1` ~ `--chart-5` | `:root` (25-29번 라인) |
-| 사이드바 토큰 8종 | `:root` (31-38번 라인) |
-| 다크모드 오버라이드 (모든 색 + 차트) | `.dark { ... }` (41-68번 라인) |
-| **`--radius` 베이스 + sm/md/lg/xl 파생** | `:root` + `@theme inline` |
-| 폰트 패밀리 4종 (`--font-sans`, `--font-display`, `--font-title`, `--font-mono`) | `@theme inline` (71-74번 라인) |
-| Tailwind `--color-*` 별칭 매핑 (전체) | `@theme inline` (80-113번 라인) |
+| Color token pairs (background, primary, muted, destructive, border, and so on — all of them) | `:root` (lines 4-24) |
+| Chart colors `--chart-1` ~ `--chart-5` | `:root` (lines 25-29) |
+| Eight sidebar tokens | `:root` (lines 31-38) |
+| Dark mode overrides (all colors + charts) | `.dark { ... }` (lines 41-68) |
+| **`--radius` base + sm/md/lg/xl derived values** | `:root` + `@theme inline` |
+| Four font families (`--font-sans`, `--font-display`, `--font-title`, `--font-mono`) | `@theme inline` (lines 71-74) |
+| Tailwind `--color-*` alias mappings (all of them) | `@theme inline` (lines 80-113) |
 
-이 파일 **115줄에 디자인 시스템 전부**가 들어있어서, 그대로 복사해서 값만 고치면 됩니다.
+Because this **115-line file holds the entire design system**, you just copy it as-is and edit the values.
 
 ---
 
-## 테마 적용 단계별 가이드
+## Step-by-step theming guide
 
-컨슈머 프로젝트에서 simplix-react 컴포넌트에 테마를 입히는 전체 흐름입니다.
+This is the full flow for applying a theme to simplix-react components in your consumer project.
 
-### 시나리오 A: 브랜드 컬러 하나로 통일 (가장 흔함)
+### Scenario A: Unify everything under one brand color (most common)
 
-#### Step 1. 테마 파일 복사
+#### Step 1. Copy the theme file
 
 ```bash
 mkdir -p src/styles
@@ -165,31 +169,31 @@ cp /path/to/simplix-react/apps/storybook/src/themes/default.css \
    src/styles/theme.css
 ```
 
-#### Step 2. 토큰 값 수정 (`src/styles/theme.css`)
+#### Step 2. Edit the token values (`src/styles/theme.css`)
 
 ```css
 :root {
-  --radius: 0.5rem;                          /* 모서리 둥글기 */
-  --primary: oklch(0.55 0.22 240);           /* 브랜드 파랑 */
-  --primary-foreground: oklch(0.98 0 0);     /* primary 위의 글자색 */
-  --ring: oklch(0.55 0.22 240);              /* focus 링도 같이 */
-  /* 나머지는 그대로 두면 됨 */
+  --radius: 0.5rem;                          /* corner rounding */
+  --primary: oklch(0.55 0.22 240);           /* brand blue */
+  --primary-foreground: oklch(0.98 0 0);     /* text color on top of primary */
+  --ring: oklch(0.55 0.22 240);              /* focus ring follows along too */
+  /* leave the rest as-is */
 }
 
 .dark {
-  --primary: oklch(0.65 0.20 240);           /* 다크모드용 살짝 밝게 */
+  --primary: oklch(0.65 0.20 240);           /* slightly lighter for dark mode */
   /* ... */
 }
 ```
 
-#### Step 3. entry CSS에서 import (`src/index.css`)
+#### Step 3. Import it from the entry CSS (`src/index.css`)
 
 ```css
 @import "tailwindcss";
 @source "../node_modules/@simplix-react/ui/dist/**/*.js";
 @source "./**/*.tsx";
 
-@import "./styles/theme.css";    /* ← 이 한 줄 */
+@import "./styles/theme.css";    /* <- this one line */
 
 @layer base {
   * { @apply border-border outline-ring/50; }
@@ -205,13 +209,13 @@ import "@simplix-react/ui";
 import "@simplix-react/ui/styles.css";
 ```
 
-**끝.** Button, Input, Card 등 모든 컴포넌트가 자동으로 브랜드 컬러 반영. attribute 토글도 필요 없음.
+**Done.** Every component — Button, Input, Card, and so on — automatically reflects the brand color. No attribute toggling required.
 
 ---
 
-### 시나리오 B: 사용자가 테마를 골라 쓰는 멀티 테마
+### Scenario B: A multi-theme app where users pick a theme
 
-#### Step 1. 테마 파일들 복사
+#### Step 1. Copy the theme files
 
 ```bash
 mkdir -p src/styles/themes
@@ -221,20 +225,20 @@ cp /path/to/simplix-react/apps/storybook/src/themes/green.css   src/styles/theme
 cp /path/to/simplix-react/apps/storybook/src/themes/rose.css    src/styles/themes/
 ```
 
-#### Step 2. 전부 import (`src/index.css`)
+#### Step 2. Import them all (`src/index.css`)
 
 ```css
 @import "tailwindcss";
 @source "../node_modules/@simplix-react/ui/dist/**/*.js";
 @source "./**/*.tsx";
 
-@import "./styles/themes/default.css";    /* :root — 항상 활성 (베이스) */
-@import "./styles/themes/blue.css";       /* [data-color-theme='blue'] — 대기 */
-@import "./styles/themes/green.css";      /* [data-color-theme='green'] — 대기 */
-@import "./styles/themes/rose.css";       /* [data-color-theme='rose'] — 대기 */
+@import "./styles/themes/default.css";    /* :root — always active (base) */
+@import "./styles/themes/blue.css";       /* [data-color-theme='blue'] — on standby */
+@import "./styles/themes/green.css";      /* [data-color-theme='green'] — on standby */
+@import "./styles/themes/rose.css";       /* [data-color-theme='rose'] — on standby */
 ```
 
-#### Step 3. 테마 토글 훅 (`src/hooks/use-theme.ts`)
+#### Step 3. The theme toggle hook (`src/hooks/use-theme.ts`)
 
 ```ts
 import { useEffect, useState } from "react";
@@ -262,7 +266,7 @@ export function useTheme() {
 }
 ```
 
-#### Step 4. 셀렉트 UI (`src/components/theme-switcher.tsx`)
+#### Step 4. The select UI (`src/components/theme-switcher.tsx`)
 
 ```tsx
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@simplix-react/ui";
@@ -286,24 +290,24 @@ export function ThemeSwitcher() {
       </Select>
 
       <button onClick={() => setMode(mode === "light" ? "dark" : "light")}>
-        {mode === "light" ? "🌙" : "☀️"}
+        {mode === "light" ? "Dark" : "Light"}
       </button>
     </div>
   );
 }
 ```
 
-#### Step 5. 어디든 배치
+#### Step 5. Place it anywhere
 
 ```tsx
 function App() {
   return (
     <UIProvider>
       <header>
-        <ThemeSwitcher />     {/* 사용자가 여기서 선택 */}
+        <ThemeSwitcher />     {/* the user selects here */}
       </header>
       <main>
-        {/* 모든 컴포넌트가 선택된 테마/모드 따라 색 전환 */}
+        {/* every component switches colors according to the selected theme/mode */}
       </main>
     </UIProvider>
   );
@@ -312,9 +316,9 @@ function App() {
 
 ---
 
-### 시나리오 C: 시스템 다크모드 자동 감지
+### Scenario C: Auto-detect the system dark mode
 
-`useTheme` 훅에서 OS 설정 따라가게:
+Make the `useTheme` hook follow the OS setting:
 
 ```ts
 useEffect(() => {
@@ -330,33 +334,33 @@ useEffect(() => {
 
 ---
 
-### 핵심 정리
+### Key takeaways
 
-| 원하는 것 | 필요한 작업 |
+| What you want | What you need to do |
 |---|---|
-| 단일 브랜드 컬러 | `:root` 토큰만 덮어쓰기 → 자동 |
-| 멀티 테마 셀렉트 | import + `data-color-theme` 토글 |
-| 다크/라이트 토글 | `<html>` 에 `.dark` 클래스 토글 |
-| 사용자 선택 저장 | `localStorage` + `useEffect` |
-| 부분 트리만 다른 테마 | 그 wrapper에 `data-color-theme` 부착 |
+| A single brand color | Override only the `:root` tokens → automatic |
+| A multi-theme select | Import + toggle `data-color-theme` |
+| Dark/light toggle | Toggle the `.dark` class on `<html>` |
+| Persist the user's choice | `localStorage` + `useEffect` |
+| A different theme for only part of the tree | Attach `data-color-theme` to that wrapper |
 
-**모든 시나리오에서 simplix-react 컴포넌트 코드는 절대 안 건드립니다.** CSS 변수 한 번 셋업하면 그 이후엔 attribute 토글만으로 끝.
+**In every scenario you never touch the simplix-react component code.** Once you set up the CSS variables, everything afterward is done purely by toggling attributes.
 
 ---
 
-## 테마 셀렉트 동작 원리 (Storybook 예시 분석)
+## How the theme select works (Storybook example walkthrough)
 
-Storybook의 테마 셀렉트 UI가 어떻게 작동하는지 — 일반 React 앱에서도 동일한 패턴을 쓸 수 있습니다. 참고 파일: `apps/storybook/.storybook/preview.tsx`
+The following is background on how the theme select UI in Storybook works — you can use the exact same pattern in a regular React app too. This is included to show the underlying mechanism, not as a required setup step. Reference file: `apps/storybook/.storybook/preview.tsx`.
 
-### 작동 원리 한 줄
+### The mechanism in one line
 
-state → DOM attribute → CSS 캐스케이드 → 토큰 → Tailwind → 화면
+state → DOM attribute → CSS cascade → tokens → Tailwind → screen.
 
-React state가 바뀌면 DOM attribute가 바뀌고, 그 뒤는 **순수 CSS 메커니즘**으로 동작합니다. 컴포넌트는 자기가 무슨 색인지 알지도 못하고 그냥 `bg-primary`만 적어둡니다.
+When React state changes, the DOM attribute changes, and everything after that runs on **pure CSS mechanisms**. A component does not even know what color it is — it simply declares `bg-primary`.
 
-### Storybook의 구조 (3개 부분)
+### The structure in Storybook (three parts)
 
-#### ① 셀렉트 메뉴 정의 (47-63번 라인)
+#### (1) The select menu definition (lines 47-63)
 
 ```ts
 globalTypes: {
@@ -379,9 +383,9 @@ globalTypes: {
 }
 ```
 
-`value`가 곧 `data-color-theme` 값이 될 문자열.
+The `value` is the string that becomes the `data-color-theme` value.
 
-#### ② 초기값 (90-94번 라인)
+#### (2) The initial values (lines 90-94)
 
 ```ts
 initialGlobals: {
@@ -391,7 +395,7 @@ initialGlobals: {
 }
 ```
 
-#### ③ 데코레이터 — 매 렌더마다 attribute를 다시 그림 (96-118번 라인)
+#### (3) The decorator — redraws the attribute on every render (lines 96-118)
 
 ```tsx
 decorators: [
@@ -411,20 +415,24 @@ decorators: [
 ]
 ```
 
-### 동작 흐름
+### The flow
 
-1. 사용자가 툴바에서 "Blue" 선택
-2. Storybook이 `context.globals.colorTheme = "blue"` 로 업데이트하고 데코레이터를 **재실행**
-3. 데코레이터가 `<div data-color-theme="blue">`로 다시 렌더
-4. 브라우저가 CSS 캐스케이드 재평가 → `[data-color-theme='blue']` 셀렉터가 매칭됨 → `--primary` 등 토큰이 파랑 값으로 교체
-5. `bg-primary`, `text-primary` 등 `var(--primary)`를 읽는 모든 Tailwind 유틸리티가 즉시 새 색 표시
+1. The user selects "Blue" from the toolbar.
+2. Storybook updates `context.globals.colorTheme = "blue"` and **re-runs** the decorator.
+3. The decorator re-renders as `<div data-color-theme="blue">`.
+4. The browser re-evaluates the CSS cascade → the `[data-color-theme='blue']` selector matches → tokens such as `--primary` are replaced with the blue values.
+5. Every Tailwind utility that reads `var(--primary)` — `bg-primary`, `text-primary`, and so on — immediately shows the new color.
 
-### 메커니즘 매핑
+### Mechanism mapping
 
-| Storybook 부분 | 역할 | 일반 React 등가물 |
+| Storybook part | Role | Equivalent in a regular React app |
 |---|---|---|
-| `globalTypes.colorTheme.items` | 셀렉트 메뉴의 옵션 목록 | `<SelectItem>` 들 |
-| `context.globals.colorTheme` | 현재 선택된 값 (state) | `useState<Theme>()` |
-| `<div data-color-theme={...}>` | 값을 DOM attribute로 바인딩 | `useEffect`로 `documentElement.dataset.colorTheme` 설정 |
-| CSS의 `[data-color-theme='blue']` 셀렉터 | attribute가 매칭되면 발동 | 동일 |
-| Tailwind `var(--primary)` | 토큰 값 변화에 자동 반응 | 동일 |
+| `globalTypes.colorTheme.items` | The list of options in the select menu | The `<SelectItem>` entries |
+| `context.globals.colorTheme` | The currently selected value (state) | `useState<Theme>()` |
+| `<div data-color-theme={...}>` | Binds the value to a DOM attribute | Set `documentElement.dataset.colorTheme` via `useEffect` |
+| The CSS selector `[data-color-theme='blue']` | Fires when the attribute matches | Same |
+| Tailwind `var(--primary)` | Reacts automatically to token value changes | Same |
+
+---
+
+> **Next step:** See [`consumer-styling-setup.md`](./consumer-styling-setup.md) for the initial styling setup and the full design token reference, and [`ui-components.md`](./ui-components.md) for the catalog of available UI components you are theming.

@@ -10,7 +10,7 @@ The core insight is that simplix-react's core packages define _what_ needs to ha
 
 Extensions follow a provider pattern: core packages define abstract interfaces, and extensions supply concrete implementations.
 
-```
+```text
 Core Packages (environment-agnostic)          Extensions (environment-specific)
 
 @simplix-react/auth                           @simplix-react-ext/simplix-boot-auth
@@ -30,7 +30,7 @@ Your application code depends on core interfaces. At configuration time, you wir
 
 Extension packages follow the `@simplix-react-ext/` scope prefix:
 
-```
+```text
 @simplix-react-ext/<extension>-<sub-package>
 ```
 
@@ -45,7 +45,7 @@ For example, the simplix-boot extension produces:
 
 Extensions live under `extensions/` in the monorepo root. Each extension is a standalone pnpm workspace with its own sub-packages:
 
-```
+```text
 simplix-react/
   packages/                         # Core packages (universal)
     auth/                           #   Abstract auth interfaces
@@ -90,22 +90,23 @@ Extension packages declare core packages as `peerDependencies` rather than direc
 
 The consuming application installs both the core package and the extension. The extension resolves the core package from the consumer's `node_modules`, guaranteeing a single shared instance.
 
-### CLI Dynamic Plugin Loading
+### CLI Plugin Loading
 
-The CLI uses a dynamic import pattern to discover extension plugins at runtime without requiring a hard dependency:
+The CLI is backend-agnostic and hardcodes no extension. Each project declares which extension plugins to load through the `plugins` field of `simplix.config.ts`:
 
 ```ts
-// packages/cli/src/bin.ts
-try {
-  await import("@simplix-react-ext/simplix-boot-cli-plugin");
-} catch {
-  // Plugin not installed --- boot profile won't be available
-}
+// simplix.config.ts
+import { defineConfig } from "@simplix-react/cli";
+
+export default defineConfig({
+  plugins: ["@simplix-react-ext/simplix-boot-cli-plugin"],
+  // ...
+});
 ```
 
-When the import succeeds, the plugin's top-level code calls `registerPlugin()` and `registerSchemaAdapter()` from `@simplix-react/cli`, registering its spec profile and schema adapter into the CLI's global registry. When the import fails (package not installed), the CLI continues without the plugin --- no error, no degradation for non-Boot users.
+At startup, the CLI reads `config.plugins` and dynamically imports each declared module. A plugin's entry point calls `registerPlugin()` and `registerSchemaAdapter()` from `@simplix-react/cli`, registering its spec profile and schema adapter into the CLI's global registry. If an `openapi` spec references a `profile` whose plugin is not listed (or cannot be resolved), the `openapi` command reports an error and exits rather than generating incorrect code.
 
-This pattern allows any extension to add CLI capabilities by publishing a package whose entry point calls the CLI's registration functions. The CLI does not need to know about extensions at compile time.
+This keeps the CLI free of any compile-time knowledge of extensions: any extension can add CLI capabilities by publishing a plugin package, and consuming projects opt in by listing it in `plugins`.
 
 ## Available Extensions
 
@@ -132,7 +133,7 @@ To create an extension for a new backend environment:
 
 3. **Implement sub-packages** that provide concrete implementations of core interfaces. Each sub-package declares the relevant core package as a `peerDependency`.
 
-4. **For CLI integration**, create a CLI plugin package whose entry point calls `registerPlugin()` and `registerSchemaAdapter()`. The CLI will load it via dynamic import if installed.
+4. **For CLI integration**, create a CLI plugin package whose entry point calls `registerPlugin()` and `registerSchemaAdapter()`. Consuming projects load it by adding its package name to the `plugins` array in their `simplix.config.ts`.
 
 5. **Follow the naming convention**: `@simplix-react-ext/<extension-name>-<sub-package>`.
 
@@ -156,9 +157,9 @@ Core packages must remain environment-agnostic to serve all users. Embedding Spr
 
 Peer dependencies prevent version duplication. If an extension bundled its own copy of `@simplix-react/auth`, the application would have two separate auth instances --- one from the app and one from the extension --- leading to split state and subtle bugs. Peer dependencies guarantee a single shared instance.
 
-### Why Dynamic Plugin Loading?
+### Why Config-Driven Plugin Loading?
 
-A static import would make the CLI depend on every extension at build time. Dynamic imports with `try/catch` allow the CLI to discover plugins at runtime based on what the user has installed, keeping the CLI's dependency footprint minimal.
+A static import would make the CLI depend on every extension at build time. Instead, each project declares the plugins it needs in `simplix.config.ts`, and the CLI dynamically imports them at startup. This keeps the CLI backend-agnostic --- no hardcoded extension names --- with a minimal dependency footprint, while still failing loudly when a referenced spec profile's plugin is missing.
 
 ## Related
 

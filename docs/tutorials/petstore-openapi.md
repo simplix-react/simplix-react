@@ -8,10 +8,10 @@
 
 - Node.js 18 or later
 - pnpm 9 or later
-- `@simplix-react/cli` installed globally or via npx
+- `@simplix-react/cli` installed globally or run via `pnpm dlx`
 
 ```bash
-npm install -g @simplix-react/cli
+pnpm add -g @simplix-react/cli
 ```
 
 ---
@@ -27,7 +27,7 @@ cd sample-petstore
 
 This generates the following structure:
 
-```
+```text
 sample-petstore/
   apps/
     sample-petstore-demo/     # Vite + React demo application
@@ -48,13 +48,9 @@ Key file — `simplix.config.ts`:
 import { defineConfig } from "@simplix-react/cli";
 
 export default defineConfig({
+  plugins: ["@simplix-react-ext/simplix-boot-cli-plugin"],
   api: {
     baseUrl: "/api",
-  },
-  mock: {
-    defaultLimit: 50,
-    maxLimit: 100,
-    dataDir: "idb://sample-petstore-mock",
   },
   codegen: {
     header: true,
@@ -98,7 +94,7 @@ node -e "
 
 Expected output:
 
-```
+```text
 Title: Swagger Petstore - OpenAPI 3.0
 Tags: pet, store, user
 ```
@@ -109,13 +105,15 @@ These three tags correspond to the three domains you will generate.
 
 ## Step 3: Configure Domain Splitting
 
-Edit `simplix.config.ts` to add the `openapi.domains` section. Each key is a
-domain name, and the value is an array of OpenAPI tag patterns to include:
+Edit `simplix.config.ts` to add an `openapi` entry. `openapi` is an array of
+per-spec configs; in each entry's `domains` map, the key is a domain name and
+the value is an array of OpenAPI tag patterns to include:
 
 ```ts
 import { defineConfig } from "@simplix-react/cli";
 
 export default defineConfig({
+  plugins: ["@simplix-react-ext/simplix-boot-cli-plugin"],
   api: {
     baseUrl: "/api",
   },
@@ -124,25 +122,23 @@ export default defineConfig({
       development: { baseUrl: "http://localhost:3000" },
     },
   },
-  mock: {
-    defaultLimit: 50,
-    maxLimit: 100,
-    dataDir: "idb://sample-petstore-mock",
-  },
   codegen: {
     header: true,
   },
-  openapi: {
-    domains: {
-      pet: ["pet"],
-      store: ["store"],
-      user: ["user"],
+  openapi: [
+    {
+      spec: "petstore.json",
+      domains: {
+        pet: ["pet"],
+        store: ["store"],
+        user: ["user"],
+      },
     },
-  },
+  ],
 });
 ```
 
-The `openapi.domains` mapping tells the CLI to split OpenAPI operations
+The `openapi[].domains` mapping tells the CLI to split OpenAPI operations
 by their tag into separate domain packages.
 
 ---
@@ -157,7 +153,7 @@ simplix openapi petstore.json -y
 
 Expected output:
 
-```
+```text
 ✔ Loaded: Swagger Petstore - OpenAPI 3.0 v1.0.x
 i Multi-domain mode: pet(1), store(2), user(1)
 ✔ Created domain package: @sample-petstore/sample-petstore-domain-pet
@@ -167,7 +163,7 @@ i Multi-domain mode: pet(1), store(2), user(1)
 
 Three new packages are created under `packages/`:
 
-```
+```text
 packages/
   sample-petstore-domain-pet/
     package.json
@@ -234,7 +230,7 @@ pnpm build
 
 Expected output:
 
-```
+```text
  Tasks:    4 successful, 4 total
 ```
 
@@ -404,13 +400,8 @@ simplix openapi petstore.json -y
 The CLI compares the new spec against a `.openapi-snapshot.json` saved in each
 domain package. It shows a diff of changes and regenerates only the
 `src/generated/` and `src/mock/generated/` directories. User-owned files
-(`src/index.ts`, `src/mock/seed.ts`, `package.json`) are preserved.
-
-Use `--dry-run` to preview changes without writing:
-
-```bash
-simplix openapi petstore.json --dry-run
-```
+(`src/index.ts`, `src/mock/seed.ts`, `package.json`) are preserved. Pass
+`-f, --force` to regenerate even when no changes are detected.
 
 ---
 
@@ -430,7 +421,7 @@ simplix add-module user -y
 
 Expected output:
 
-```
+```text
 ✔ Module created: @sample-petstore/sample-petstore-store
   → Location: modules/sample-petstore-store/
   → FSD layers: features/ widgets/ shared/
@@ -444,7 +435,7 @@ Expected output:
 
 Two new modules are created under `modules/`:
 
-```
+```text
 modules/
   sample-petstore-store/
     package.json
@@ -494,7 +485,7 @@ export const storeManifest: ModuleManifest = {
 Modules consume domain packages to build features. The `store` module will
 use both the `pet` and `store` domain packages:
 
-```
+```text
 packages/ (domain layer)          modules/ (FSD layer)
 ├── domain-pet/   ─────────┐
 │     contract, hooks,      ├──→  sample-petstore-store/
@@ -547,7 +538,7 @@ In this tutorial, you:
 
 ### Generated Pipeline
 
-```
+```text
 OpenAPI Spec
     |
     v

@@ -52,7 +52,7 @@ const policy = createAccessPolicy({
 
 The policy starts empty --- no user, no roles, no rules. Its lifecycle is:
 
-```
+```text
 empty → update(authData) → adapter.extract(authData) → applyRules → active
                                                                        |
                                                             subscribe/notify
@@ -88,7 +88,7 @@ interface AccessAdapter<TActions, TSubjects> {
 
 The `extract` method receives raw auth data and returns rules, user info, and roles. Three built-in adapters cover the most common scenarios:
 
-```
+```text
 AccessAdapter (interface)
     |
     +--- createJwtAdapter()     → Decodes JWT payload, extracts permissions
@@ -131,11 +131,10 @@ Roles are normalized to handle the common `ROLE_` prefix convention used by Spri
 | Helper | Behavior |
 | --- | --- |
 | `normalizeRole(role)` | Ensures `ROLE_` prefix: `"ADMIN"` becomes `"ROLE_ADMIN"` |
-| `normalizeRoles(roles)` | Normalizes mixed arrays of strings and role objects |
 | `hasRole(roles, role)` | Prefix-insensitive comparison |
 | `hasAnyRole(roles, targetRoles)` | Returns `true` if any target role matches |
 
-The `RoleInput` type accepts both plain strings and Spring Security role objects (`{ roleCode, roleName, name }`), making it compatible with various backend role representations.
+> ℹ **Backend-specific role objects:** `normalizeRoles(roles)` and the `RoleInput` type — which normalize mixed arrays of plain strings and Spring Security role objects (`{ roleCode, roleName, name }`) — live in the `@simplix-react-ext/simplix-boot-access` extension, not core `@simplix-react/access`. That object shape is specific to the SimpliX (Spring Security) backend, so it belongs with the backend adapter rather than the backend-agnostic core.
 
 ### Super-Admin Bypass
 
@@ -157,7 +156,7 @@ On application startup, `rehydrate()` restores the persisted state, allowing the
 
 The policy implements a `subscribe`/`getSnapshot` pattern compatible with React's `useSyncExternalStore`. The snapshot reference (`AccessSnapshot`) is only updated when state actually changes, preventing infinite re-render loops.
 
-```
+```text
 policy.subscribe(listener) → listener called on every state change
 policy.getSnapshot()        → returns cached AccessSnapshot (reference-stable)
 ```

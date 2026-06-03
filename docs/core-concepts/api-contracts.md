@@ -14,13 +14,13 @@ A contract is built from two fundamental building blocks: **EntityDefinition** a
 
 ### EntityDefinition
 
-An `EntityDefinition` describes a CRUD-capable resource. It contains:
+An `EntityDefinition` describes a CRUD-capable entity. It contains:
 
 - **path** --- the URL segment (e.g. `"/tasks"`)
 - **schema** --- a Zod schema defining the entity's response shape
 - **createSchema** --- a Zod schema defining the creation payload
 - **updateSchema** --- a Zod schema defining the update payload
-- **parent** (optional) --- describes a parent resource for nested URL construction
+- **parent** (optional) --- describes a parent entity for nested URL construction
 - **queries** (optional) --- named query scopes for filtering by parent relationships
 - **filterSchema** (optional) --- a Zod schema for validating list filter parameters
 
@@ -96,7 +96,7 @@ Each contract is scoped to a `domain` (e.g. `"project"`, `"billing"`, `"auth"`).
 
 ### Why EntityDefinition and OperationDefinition Are Separate
 
-Entities and operations serve fundamentally different purposes. Entities describe resources with predictable CRUD lifecycles; operations describe arbitrary actions. Keeping them separate allows the framework to generate complete CRUD scaffolding for entities while providing a flexible escape hatch for everything else.
+Entities and operations serve fundamentally different purposes. Entities describe data with predictable CRUD lifecycles; operations describe arbitrary actions. Keeping them separate allows the framework to generate complete CRUD scaffolding for entities while providing a flexible escape hatch for everything else.
 
 ### Why Contracts Include No Runtime Behavior
 

@@ -14,7 +14,7 @@ The strategy is deliberately conservative: mutations invalidate broadly rather t
 
 Every query key in simplix-react follows a hierarchical structure rooted in the contract's `domain` and the entity name:
 
-```
+```text
 [domain, entityName]                          // all (root)
 [domain, entityName, "list"]                  // all lists
 [domain, entityName, "list", { ...params }]   // specific list with filters

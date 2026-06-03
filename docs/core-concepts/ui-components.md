@@ -12,7 +12,7 @@ The core insight is that most business applications consist of CRUD screens that
 
 The library is organized into four layers, from lowest to highest abstraction:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │  CRUD layer   (CrudList, CrudForm, CrudDetail, CrudTree) │
 ├─────────────────────────────────────────────────────────┤

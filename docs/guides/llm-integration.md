@@ -120,7 +120,7 @@ Package map:
 - @simplix-react/contract — defineApi, EntityDefinition, OperationDefinition
 - @simplix-react/react — deriveEntityHooks
 - @simplix-react/mock — deriveMockHandlers, setupMockWorker
-- @simplix-react/i18n — deriveI18n, I18nextAdapter
+- @simplix-react/i18n — createI18nConfig, I18nextAdapter
 - @simplix-react/cli — project scaffolding
 
 Full docs: https://raw.githubusercontent.com/simplix-react/simplix-react/main/docs/llms.txt
@@ -207,7 +207,7 @@ This project uses simplix-react, a contract-driven React framework.
 - @simplix-react/contract — defineApi, EntityDefinition, OperationDefinition
 - @simplix-react/react — deriveEntityHooks
 - @simplix-react/mock — deriveMockHandlers, setupMockWorker
-- @simplix-react/i18n — deriveI18n, I18nextAdapter
+- @simplix-react/i18n — createI18nConfig, I18nextAdapter
 - @simplix-react/testing — test utilities
 - @simplix-react/cli — project scaffolding
 

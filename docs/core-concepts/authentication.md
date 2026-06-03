@@ -10,7 +10,7 @@ The core insight is that authentication is orthogonal to your API contract. Your
 
 The auth package follows the Strategy pattern. Each authentication method is encapsulated in an `AuthScheme` --- an object that knows how to produce HTTP headers, refresh credentials, and report its authentication state.
 
-```
+```text
 AuthScheme (interface)
     |
     +--- bearerScheme()    → Authorization: Bearer <token>
@@ -28,7 +28,7 @@ Multiple schemes can be composed. When composed, their headers are merged and re
 
 The `createAuthFetch` function wraps a base `FetchFn` with authentication logic:
 
-```
+```text
 Request → scheme.getHeaders() → merge → baseFetchFn()
                                             |
                                         ApiError(401)?
@@ -54,7 +54,7 @@ On every request, the wrapper:
 
 When multiple requests fail with 401 simultaneously, the `RefreshManager` ensures only one refresh operation executes. Subsequent callers await the same in-flight promise. This prevents the thundering herd problem where dozens of concurrent refresh requests overwhelm the auth server.
 
-```
+```text
 Request A (401) ──→ RefreshManager.refresh() ──→ refresh endpoint
 Request B (401) ──→ RefreshManager.refresh() ──→ (awaits same promise)
 Request C (401) ──→ RefreshManager.refresh() ──→ (awaits same promise)

@@ -40,6 +40,6 @@ Practical how-to guides for accomplishing specific tasks with simplix-react. Eac
 
 | Document | Description |
 | --- | --- |
-| [CLI Usage](./cli-usage.md) | Use the `simplix` CLI to scaffold projects (`init`), add domains and modules (`add`), import OpenAPI specs (`openapi`), validate project structure (`validate`), and generate i18n types |
+| [CLI Usage](./cli-usage.md) | Use the `simplix` CLI to scaffold projects (`init`), add domains and modules (`add-domain`, `add-module`), import OpenAPI specs (`openapi`), validate project structure (`validate`), and generate i18n types |
 | [Extensions](./extensions.md) | Set up Spring Boot authentication, authorization, and CLI code generation using `@simplix-react-ext/simplix-boot-*` extension packages with Boot-specific adapters and naming conventions |
 | [LLM Integration](./llm-integration.md) | Provide context for LLM coding agents (Claude Code, Cursor, Copilot) using `llms.txt`, Claude Code skills, and CLAUDE.md references so agents can accurately generate simplix-react code |

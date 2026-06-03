@@ -53,7 +53,7 @@ simplix init my-project --no-demo --no-i18n
 
 Generated structure:
 
-```
+```text
 my-project/
   package.json
   pnpm-workspace.yaml
@@ -111,7 +111,7 @@ simplix add-domain inventory --entities product,category -y
 
 Generated structure:
 
-```
+```text
 packages/my-project-domain-inventory/
   package.json
   tsup.config.ts
@@ -169,7 +169,7 @@ simplix add-module editor
 
 Generated structure:
 
-```
+```text
 modules/my-project-editor/
   package.json
   tsup.config.ts
@@ -218,7 +218,7 @@ simplix validate --fix
 
 Example output:
 
-```
+```text
 simplix validate
 
   packages/my-project-core
@@ -295,36 +295,32 @@ simplix openapi https://api.example.com/openapi.json --domain pets
 | `-d, --domain <name>` | Domain name (defaults to spec's `info.title`) |
 | `-e, --entities <names>` | Filter to specific entities (comma-separated) |
 | `-o, --output <dir>` | Output directory (defaults to `packages/`) |
-| `--dry-run` | Preview files without writing |
 | `-f, --force` | Regenerate even if no changes detected |
 | `--no-http` | Skip `.http` file generation |
-| `--no-mock` | Skip mock layer generation |
-| `--no-header` | Skip auto-generated header comments |
 | `-y, --yes` | Auto-confirm without prompts |
 
-On subsequent runs, the command detects changes against a `.openapi-snapshot.json` file and only regenerates the `src/generated/` directory. User-owned files (`src/index.ts`, `src/mock/index.ts`, `package.json`) are preserved.
-
-Preview changes before regenerating:
-
-```bash
-simplix openapi ./specs/petstore.yaml --dry-run
-```
+On subsequent runs, the command detects changes against a `.openapi-snapshot.json` file and only regenerates the `src/generated/` directory. User-owned files (`src/index.ts`, `src/mock/index.ts`, `package.json`) are preserved. Use `-f, --force` to regenerate even when no changes are detected.
 
 #### Multi-Domain Mode
 
-When your OpenAPI spec contains operations tagged for different domains, you can split the output into multiple packages automatically. Add `openapi.domains` to your `simplix.config.ts`:
+When your OpenAPI spec contains operations tagged for different domains, you can split the output into multiple packages automatically. Add an `openapi` entry with `domains` to your `simplix.config.ts`. `openapi` is an array of per-spec configurations:
 
 ```ts
 // simplix.config.ts
-export default {
-  openapi: {
-    domains: {
-      pet: ["pet"],
-      store: ["store"],
-      user: ["user"],
+import { defineConfig } from "@simplix-react/cli";
+
+export default defineConfig({
+  openapi: [
+    {
+      spec: "./specs/petstore.yaml",
+      domains: {
+        pet: ["pet"],
+        store: ["store"],
+        user: ["user"],
+      },
     },
-  },
-} satisfies SimplixConfig;
+  ],
+});
 ```
 
 Each key is a domain name and each value is an array of tag patterns. Patterns can be exact strings or regular expressions wrapped in `/`:
@@ -356,9 +352,10 @@ Create `simplix.config.ts` at the project root to customize CLI behavior:
 
 ```ts
 // simplix.config.ts
-import type { SimplixConfig } from "@simplix-react/cli";
+import { defineConfig } from "@simplix-react/cli";
 
-const config: SimplixConfig = {
+export default defineConfig({
+  plugins: ["@simplix-react-ext/simplix-boot-cli-plugin"],
   packages: {
     prefix: "myapp",
   },
@@ -369,32 +366,31 @@ const config: SimplixConfig = {
       production: { baseUrl: "https://api.example.com" },
     },
   },
-  mock: {
-    defaultLimit: 20,
-    maxLimit: 100,
-  },
   codegen: {
     header: true,
   },
-  openapi: {
-    domains: {
-      iam: ["IAM", "/^Auth.*/"],
-      billing: ["Billing"],
+  openapi: [
+    {
+      spec: "./specs/api.json",
+      profile: "simplix-boot",
+      domains: {
+        iam: ["IAM", "/^Auth.*/"],
+        billing: ["Billing"],
+      },
     },
-  },
-};
-
-export default config;
+  ],
+});
 ```
 
 | Field | Description |
 | --- | --- |
+| `plugins` | CLI extension plugin module IDs to load (e.g. `@simplix-react-ext/simplix-boot-cli-plugin`); required when an `openapi` entry references a `profile` |
 | `packages.prefix` | Short prefix for generated package names |
 | `http.environments` | Named environments for `.http` file generation |
-| `mock.defaultLimit` | Default pagination limit for mock handlers |
-| `mock.maxLimit` | Maximum allowed pagination limit |
 | `codegen.header` | Prepend auto-generated header comment to generated files |
-| `openapi.domains` | Tag-based domain splitting: domain name → tag patterns (exact or `/regex/`) |
+| `openapi[].spec` | OpenAPI spec file path (relative to project root) or URL |
+| `openapi[].profile` | Spec profile preset name registered by a plugin (e.g. `simplix-boot`) |
+| `openapi[].domains` | Tag-based domain splitting: domain name → tag patterns (exact or `/regex/`) |
 
 ### CI Integration
 

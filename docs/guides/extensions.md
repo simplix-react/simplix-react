@@ -13,7 +13,7 @@
 pnpm add @simplix-react-ext/simplix-boot-auth @simplix-react-ext/simplix-boot-access
 ```
 
-For CLI code generation support:
+For CLI code generation support (then declare it in `simplix.config.ts` under `plugins` --- see [Using the CLI Plugin](#using-the-cli-plugin)):
 
 ```bash
 pnpm add -D @simplix-react-ext/simplix-boot-cli-plugin
@@ -248,7 +248,17 @@ hasBackofficeAccess(rules, false, "MY_PANEL"); // checks for custom resource
 
 ### Using the CLI Plugin
 
-When `@simplix-react-ext/simplix-boot-cli-plugin` is installed, the CLI automatically loads it and registers a `simplix-boot` spec profile.
+After installing `@simplix-react-ext/simplix-boot-cli-plugin`, declare it in the `plugins` field of `simplix.config.ts` so the CLI loads it and registers the `simplix-boot` spec profile:
+
+```ts
+// simplix.config.ts
+import { defineConfig } from "@simplix-react/cli";
+
+export default defineConfig({
+  plugins: ["@simplix-react-ext/simplix-boot-cli-plugin"],
+  // ...
+});
+```
 
 #### Spec Profile Registration
 
@@ -258,10 +268,26 @@ The plugin registers:
 - **Response adapter** (`boot`): Configures Boot envelope handling for generated code, including `bootResponseAdapter` for error conversion and `wrapEnvelope` for mock responses.
 - **Schema adapter** (`bootSchemaAdapter`): Unwraps Boot envelope schemas (strips `type`, `message`, `timestamp`, `errorCode`, `errorDetail` wrappers) so generated types reflect the actual `body` payload, not the envelope.
 
-Use the `simplix-boot` profile when generating domain packages from a Boot API spec:
+Reference the `simplix-boot` profile per spec in the `openapi` config, then run code generation:
+
+```ts
+// simplix.config.ts
+export default defineConfig({
+  plugins: ["@simplix-react-ext/simplix-boot-cli-plugin"],
+  openapi: [
+    {
+      spec: "my-api-spec.json",
+      profile: "simplix-boot",
+      domains: {
+        // domainName: [tagPatterns]
+      },
+    },
+  ],
+});
+```
 
 ```bash
-simplix openapi my-api-spec.json --profile simplix-boot
+simplix openapi my-api-spec.json
 ```
 
 #### Boot Envelope Format

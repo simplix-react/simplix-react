@@ -42,9 +42,9 @@ export function defineApi(config, options?) {
 }
 ```
 
-### Stage 2: deriveClient (HTTP Client Generation)
+### Stage 2: deriveClient (HTTP Client Derivation)
 
-`deriveClient()` iterates over all entities and operations in the config. For each entity, it generates an object with five CRUD methods: `list`, `get`, `create`, `update`, and `delete`. For each operation, it generates a callable function that maps positional arguments to path parameters.
+`deriveClient()` iterates over all entities and operations in the config. For each entity, it derives an object with five CRUD methods: `list`, `get`, `create`, `update`, and `delete`. For each operation, it derives a callable function that maps positional arguments to path parameters.
 
 Key behaviors:
 
@@ -65,7 +65,7 @@ api.client.task.delete(id)                 // DELETE /:id
 api.client.assignTask(taskId, { userId })  // POST /tasks/:taskId/assign
 ```
 
-### Stage 3: deriveQueryKeys (Query Key Factory Generation)
+### Stage 3: deriveQueryKeys (Query Key Factory Derivation)
 
 `deriveQueryKeys()` iterates over all entity names and creates a `QueryKeyFactory` for each. The factory follows the TanStack Query key factory pattern with a hierarchical structure:
 
@@ -79,11 +79,11 @@ queryKeys.task.detail(id)       // ["project", "task", "detail", id]
 
 The hierarchy enables granular cache invalidation: invalidating `queryKeys.task.all` clears everything, while invalidating `queryKeys.task.lists()` only clears list queries without touching detail queries.
 
-### Stage 4: deriveEntityHooks (React Query Hook Generation)
+### Stage 4: deriveEntityHooks (React Query Hook Derivation)
 
-`deriveEntityHooks()` from `@simplix-react/react` takes the full contract object (config + client + queryKeys) and generates React Query hooks for each entity and operation.
+`deriveEntityHooks()` from `@simplix-react/react` takes the full contract object (config + client + queryKeys) and derives React Query hooks for each entity and operation.
 
-For entities, six hooks are generated:
+For entities, six hooks are derived:
 
 | Hook | TanStack Primitive | Purpose |
 | --- | --- | --- |
@@ -94,15 +94,15 @@ For entities, six hooks are generated:
 | `useDelete` | `useMutation` | Delete an entity, auto-invalidates `keys.all` on success |
 | `useInfiniteList` | `useInfiniteQuery` | Infinite scroll with cursor or offset pagination |
 
-For operations, a single `useMutation` hook is generated with automatic cache invalidation driven by the operation's `invalidates` configuration.
+For operations, a single `useMutation` hook is derived with automatic cache invalidation driven by the operation's `invalidates` configuration.
 
 All hooks support full TanStack Query options passthrough --- callers can provide any option except `queryKey`/`queryFn` (for queries) or `mutationFn` (for mutations), which are managed by the derivation layer.
 
-### Stage 5: deriveMockHandlers (MSW Handler Generation)
+### Stage 5: deriveMockHandlers (MSW Handler Derivation)
 
-`deriveMockHandlers()` from `@simplix-react/mock` reads the contract config and generates MSW `http.*` handlers for each entity's CRUD operations. Each handler reads from and writes to an in-memory Map store.
+`deriveMockHandlers()` from `@simplix-react/mock` reads the contract config and derives MSW `http.*` handlers for each entity's CRUD operations. Each handler reads from and writes to an in-memory Map store.
 
-For each entity, five handlers are generated:
+For each entity, five handlers are derived:
 
 - `http.get(listPath)` --- supports filtering, sorting, and pagination via query params
 - `http.get(detailPath)` --- supports `belongsTo` relation loading via joins

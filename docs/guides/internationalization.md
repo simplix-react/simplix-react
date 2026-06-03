@@ -18,7 +18,7 @@ pnpm add @simplix-react/i18n
 
 Organize translations by namespace and locale. Each namespace gets its own directory with one JSON file per locale:
 
-```
+```text
 src/
   locales/
     common/
@@ -224,7 +224,7 @@ Two lines do all the work:
 
 After this setup, all requests through `getMutator()` automatically include the `Accept-Language` header matching the app's language. For example, if the user selects English:
 
-```
+```http
 POST /api/v1/pets HTTP/1.1
 Accept-Language: en
 ```

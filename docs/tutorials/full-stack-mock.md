@@ -23,7 +23,7 @@ pnpm add -D @types/react @types/react-dom
 Initialize the MSW service worker in your public directory:
 
 ```bash
-pnpx msw init public/ --save
+pnpm dlx msw init public/ --save
 ```
 
 Verify the `mockServiceWorker.js` file was created:
@@ -504,7 +504,7 @@ VITE_USE_MOCK=false
 
 The transition path:
 
-```
+```text
 Contract (shared)
     |
     +-- Mock: In-Memory Store + MSW (development)
