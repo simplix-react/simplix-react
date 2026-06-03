@@ -10,7 +10,9 @@ Extension for SimpliX, a Spring Boot-based backend framework by SimpleCORE Inc. 
 | --- | --- |
 | [@simplix-react-ext/simplix-boot-access](./packages/access/) | Spring Security authorization adapter for `@simplix-react/access` |
 | [@simplix-react-ext/simplix-boot-auth](./packages/auth/) | Spring Security authentication contract (token, user profile, permissions) |
+| [@simplix-react-ext/simplix-boot-cli-plugin](./packages/cli-plugin/) | CLI spec profile: Boot naming strategy, response adapter (envelope), schema adapter, i18n downloader |
 | [@simplix-react-ext/simplix-boot-stream](./packages/stream/) | SimpliX Boot SSE streaming (EventSource management, subscriptions, staleness detection) |
+| [@simplix-react-ext/simplix-boot-utils](./packages/utils/) | Boot-specific utilities (`resolveBootEnum`, `transformSearchableFilters`) |
 
 ## How It Works
 
@@ -29,13 +31,14 @@ GET  /user/me/permissions -> @simplix-react-ext/simplix-boot-access --> AccessAd
 ### Authentication
 
 ```ts
-import { createAuthApi } from "@simplix-react-ext/simplix-boot-auth";
+import { createBootAuth } from "@simplix-react-ext/simplix-boot-auth";
 
-// Default basePath: "/api/v1"
-const authApi = createAuthApi();
-
-// Custom basePath
-const authApi = createAuthApi({ basePath: "/api/v2" });
+// High-level factory: Bearer auth with automatic refresh, cross-tab sync,
+// and Boot envelope handling. Default basePath: "/api/v1".
+const { auth, authClient, getToken } = createBootAuth({
+  basePath: "/api/v1",
+  storePrefix: "myapp:",
+});
 ```
 
 For mock setup:
@@ -43,8 +46,8 @@ For mock setup:
 ```ts
 import { createAuthMock } from "@simplix-react-ext/simplix-boot-auth/mock";
 
+// Default basePath: "/api/v1"
 const authMock = createAuthMock({
-  authApi,
   users: {
     admin: {
       user: { userId: "1", username: "admin", displayName: "Admin", email: "admin@example.com", roles: [], isSuperAdmin: true },

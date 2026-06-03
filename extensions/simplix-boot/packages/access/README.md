@@ -56,6 +56,17 @@ const result = convertSpringPermissionsToCasl({
 
 When `isSuperAdmin` is `true` (or `"true"`), a `{ action: "manage", subject: "all" }` rule is prepended automatically.
 
+### Normalize Roles
+
+Spring Security may return roles as plain strings or as objects. `normalizeRoles()` flattens a mixed array into plain role-code strings:
+
+```ts
+import { normalizeRoles } from "@simplix-react-ext/simplix-boot-access";
+
+normalizeRoles(["ROLE_USER", { roleCode: "ROLE_ADMIN", roleName: "Admin" }]);
+// → ["ROLE_USER", "ROLE_ADMIN"]
+```
+
 ### Check Backoffice Access
 
 A utility to check if the current user has backoffice access:
@@ -121,6 +132,18 @@ Converts a `SpringPermissionsResponse` into CASL rules.
 | `roles` | `string[]` | Normalized role strings |
 | `isSuperAdmin` | `boolean` | Whether the user is a super admin |
 
+### `normalizeRoles(roles)`
+
+Normalizes a mixed array of role strings and Spring Security role objects into plain role-code strings.
+
+**Parameters:**
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `roles` | `RoleInput[]` | Array of role strings or role objects |
+
+For each entry, a string is kept as-is and an object resolves to `roleCode ?? roleName ?? name`. Entries that resolve to an empty value are filtered out. Returns `string[]`.
+
 ### `hasBackofficeAccess(rules, isSuperAdmin?, resource?)`
 
 Checks whether the given rules grant backoffice access.
@@ -159,6 +182,12 @@ interface SpringConvertResult {
   roles: string[];
   isSuperAdmin: boolean;
 }
+```
+
+#### `RoleInput`
+
+```ts
+type RoleInput = string | { roleCode?: string; roleName?: string; name?: string };
 ```
 
 ## Error Handling
