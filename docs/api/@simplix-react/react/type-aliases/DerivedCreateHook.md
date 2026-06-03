@@ -8,7 +8,7 @@
 
 > **DerivedCreateHook**\<`TInput`, `TOutput`\> = (`parentId?`, `options?`) => `UseMutationResult`\<`TOutput`, `Error`, `TInput`\>
 
-Defined in: [types.ts:84](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L84)
+Defined in: [types.ts:94](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L94)
 
 Represents a derived create mutation hook.
 

@@ -8,7 +8,7 @@
 
 > **DerivedListHook**\<`TData`\> = (`parentIdOrParams?`, `paramsOrOptions?`, `options?`) => `UseQueryResult`\<`TData`[]\>
 
-Defined in: [types.ts:36](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L36)
+Defined in: [types.ts:46](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L46)
 
 Represents a derived list query hook with overloaded call signatures.
 

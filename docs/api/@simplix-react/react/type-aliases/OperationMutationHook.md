@@ -8,7 +8,7 @@
 
 > **OperationMutationHook**\<`TInput`, `TOutput`\> = (`options?`) => `UseMutationResult`\<`TOutput`, `Error`, `TInput`\>
 
-Defined in: [types.ts:219](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L219)
+Defined in: [types.ts:284](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L284)
 
 Represents a derived mutation hook for a custom operation.
 

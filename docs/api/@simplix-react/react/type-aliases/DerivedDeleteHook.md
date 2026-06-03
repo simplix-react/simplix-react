@@ -8,7 +8,7 @@
 
 > **DerivedDeleteHook** = (`options?`) => `UseMutationResult`\<`void`, `Error`, `EntityId`\>
 
-Defined in: [types.ts:137](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L137)
+Defined in: [types.ts:147](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L147)
 
 Represents a derived delete mutation hook.
 

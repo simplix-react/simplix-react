@@ -6,9 +6,9 @@
 
 # Function: customizeApi()
 
-> **customizeApi**\<`TEntities`, `TOperations`\>(`base`, `patch`, `options?`): `object`
+> **customizeApi**\<`TEntities`, `TOperations`\>(`base`, `patch`, `options?`): [`ApiContract`](../interfaces/ApiContract.md)\<`TEntities`, `TOperations`\>
 
-Defined in: [packages/contract/src/customize-api.ts:66](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/customize-api.ts#L66)
+Defined in: [packages/contract/src/customize-api.ts:67](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/customize-api.ts#L67)
 
 Creates a patched copy of an API contract by adding, replacing, or removing
 entity operations.
@@ -54,21 +54,9 @@ Custom fetch function; defaults to the built-in [defaultFetch](../variables/defa
 
 ## Returns
 
-`object`
+[`ApiContract`](../interfaces/ApiContract.md)\<`TEntities`, `TOperations`\>
 
 A new contract object with `config`, `client`, and `queryKeys`.
-
-### client
-
-> **client**: `Record`\<`string`, `unknown`\>
-
-### config
-
-> **config**: [`ApiContractConfig`](../interfaces/ApiContractConfig.md)\<`TEntities`, `TOperations`\> = `patchedConfig`
-
-### queryKeys
-
-> **queryKeys**: \{ \[K in string \| number \| symbol\]: QueryKeyFactory \}
 
 ## Example
 

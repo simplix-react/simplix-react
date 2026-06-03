@@ -350,11 +350,16 @@ try {
 - [AnyOperationDef](type-aliases/AnyOperationDef.md)
 - [CrudRole](type-aliases/CrudRole.md)
 - [EntityClient](type-aliases/EntityClient.md)
+- [EntityClientFn](type-aliases/EntityClientFn.md)
 - [EntityId](type-aliases/EntityId.md)
 - [FetchFn](type-aliases/FetchFn.md)
 - [HttpMethod](type-aliases/HttpMethod.md)
+- [InferEntityData](type-aliases/InferEntityData.md)
+- [InferOpInput](type-aliases/InferOpInput.md)
+- [InferOpOutputData](type-aliases/InferOpOutputData.md)
 - [InferOutputData](type-aliases/InferOutputData.md)
 - [PaginationParam](type-aliases/PaginationParam.md)
+- [ResolveRole](type-aliases/ResolveRole.md)
 
 ## Variables
 

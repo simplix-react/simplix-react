@@ -6,7 +6,7 @@
 
 # Interface: TransformedRequest
 
-Defined in: [packages/contract/src/types.ts:129](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L129)
+Defined in: [packages/contract/src/types.ts:191](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L191)
 
 Describes how to override the default HTTP request built by the client.
 
@@ -40,7 +40,7 @@ transformRequest: (input, url) => ({
 
 > `optional` **body**: `BodyInit` \| `null`
 
-Defined in: [packages/contract/src/types.ts:133](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L133)
+Defined in: [packages/contract/src/types.ts:195](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L195)
 
 Override request body. `null` = explicitly no body, `undefined` = default behavior.
 
@@ -50,7 +50,7 @@ Override request body. `null` = explicitly no body, `undefined` = default behavi
 
 > `optional` **headers**: `Record`\<`string`, `string`\>
 
-Defined in: [packages/contract/src/types.ts:131](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L131)
+Defined in: [packages/contract/src/types.ts:193](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L193)
 
 Override or add request headers. Merged OVER auth scheme headers.
 
@@ -60,6 +60,6 @@ Override or add request headers. Merged OVER auth scheme headers.
 
 > `optional` **url**: `string`
 
-Defined in: [packages/contract/src/types.ts:135](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L135)
+Defined in: [packages/contract/src/types.ts:197](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L197)
 
 Override or replace the URL (e.g., add query params).

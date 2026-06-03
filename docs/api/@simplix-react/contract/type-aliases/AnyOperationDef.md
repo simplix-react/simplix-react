@@ -8,6 +8,6 @@
 
 > **AnyOperationDef** = [`OperationDefinition`](../interfaces/OperationDefinition.md)\<`z.ZodTypeAny`, `z.ZodTypeAny`\>
 
-Defined in: [packages/contract/src/types.ts:627](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L627)
+Defined in: [packages/contract/src/types.ts:691](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L691)
 
 Shorthand for an operation definition with any Zod schema types.

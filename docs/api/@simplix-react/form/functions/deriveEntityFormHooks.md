@@ -35,7 +35,7 @@ The API contract produced by `defineApi()` from `@simplix-react/contract`
 
 ### hooks
 
-\{ \[K in string \| number \| symbol\]: EntityHooks\<TEntities\[K\]\["schema"\]\> \}
+\{ \[K in string \| number \| symbol\]: EntityHooks\<TEntities\[K\]\["schema"\], TEntities\[K\]\["operations"\]\> \}
 
 The React Query hooks produced by `deriveEntityHooks()` from `@simplix-react/react`
 

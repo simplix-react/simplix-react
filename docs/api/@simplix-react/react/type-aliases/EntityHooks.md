@@ -4,28 +4,34 @@
 
 [Documentation](../../../README.md) / [@simplix-react/react](../README.md) / EntityHooks
 
-# Type Alias: EntityHooks\<_TSchema\>
+# Type Alias: EntityHooks\<TSchema, TOperations\>
 
-> **EntityHooks**\<`_TSchema`\> = `Record`\<`string`, (...`args`) => `unknown`\>
+> **EntityHooks**\<`TSchema`, `TOperations`\> = `` { [K in keyof TOperations & string as `use${Capitalize<K>}`]: EntityHookFor<ResolveRole<K, TOperations[K]>, TOperations[K], TSchema> } `` & `EntityHasListRole`\<`TOperations`\> *extends* `true` ? `object` : `Record`\<`never`, `never`\>
 
-Defined in: [types.ts:204](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L204)
+Defined in: [types.ts:260](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L260)
 
-Represents the complete set of React Query hooks derived from an entity definition.
+The complete set of React Query hooks derived from an entity definition.
 
-Each entity in the contract produces an object conforming to this interface.
-Hook names are derived from operation names with a `use` prefix and PascalCase.
-CRUD role operations produce specialized hooks; custom operations produce
-generic query/mutation hooks based on their HTTP method.
+Each entity in the contract produces an object conforming to this type. Hook
+names are derived from operation keys with a `use` prefix and PascalCase
+(`list` → `useList`, custom `archive` → `useArchive`). CRUD-role operations
+produce specialized, fully-typed hooks; custom operations produce generic
+query (GET) or mutation hooks. A `list`-role operation additionally yields a
+`useInfiniteList` hook.
 
 ## Type Parameters
 
-### _TSchema
+### TSchema
 
-`_TSchema` *extends* `z.ZodTypeAny` = `z.ZodTypeAny`
-
-## Type Param
+`TSchema` *extends* `z.ZodTypeAny` = `z.ZodTypeAny`
 
 The Zod schema defining the entity shape
+
+### TOperations
+
+`TOperations` *extends* `Record`\<`string`, `EntityOperationDef`\> = `Record`\<`string`, `EntityOperationDef`\>
+
+The entity's operations map (drives hook names and types)
 
 ## Example
 
@@ -34,17 +40,10 @@ import { deriveEntityHooks } from "@simplix-react/react";
 
 const hooks = deriveEntityHooks(inventoryContract);
 
-// CRUD hooks (from operations with CRUD roles)
-const { data } = hooks.product.useList();
-const { data: single } = hooks.product.useGet(id);
-const create = hooks.product.useCreate();
-const update = hooks.product.useUpdate();
-const remove = hooks.product.useDelete();
-const infinite = hooks.product.useInfiniteList();
-
-// Custom operation hooks
-const archive = hooks.product.useArchive();
-const { data: results } = hooks.product.useSearch({ q: "keyword" });
+const { data } = hooks.product.useList();          // UseQueryResult<Product[]>
+const { data: single } = hooks.product.useGet(id); // UseQueryResult<Product>
+const create = hooks.product.useCreate();          // UseMutationResult<Product, Error, CreateInput>
+const archive = hooks.product.useArchive();        // custom operation hook
 ```
 
 ## See

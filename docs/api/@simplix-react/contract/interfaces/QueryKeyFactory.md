@@ -6,7 +6,7 @@
 
 # Interface: QueryKeyFactory
 
-Defined in: [packages/contract/src/types.ts:496](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L496)
+Defined in: [packages/contract/src/types.ts:558](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L558)
 
 Provides structured query key generators for a single entity, following the
 query key factory pattern recommended by TanStack Query.
@@ -40,7 +40,7 @@ api.queryKeys.product.tree({ rootId: "x" });   // ["inventory", "product", "tree
 
 > **all**: readonly `unknown`[]
 
-Defined in: [packages/contract/src/types.ts:498](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L498)
+Defined in: [packages/contract/src/types.ts:560](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L560)
 
 Root key matching all queries for this entity: `[domain, entity]`.
 
@@ -50,7 +50,7 @@ Root key matching all queries for this entity: `[domain, entity]`.
 
 > **detail**: (`id`) => readonly `unknown`[]
 
-Defined in: [packages/contract/src/types.ts:506](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L506)
+Defined in: [packages/contract/src/types.ts:568](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L568)
 
 Returns key matching a specific detail query by ID.
 
@@ -70,7 +70,7 @@ readonly `unknown`[]
 
 > **details**: () => readonly `unknown`[]
 
-Defined in: [packages/contract/src/types.ts:504](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L504)
+Defined in: [packages/contract/src/types.ts:566](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L566)
 
 Returns key matching all detail queries: `[domain, entity, "detail"]`.
 
@@ -84,7 +84,7 @@ readonly `unknown`[]
 
 > **list**: (`params`) => readonly `unknown`[]
 
-Defined in: [packages/contract/src/types.ts:502](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L502)
+Defined in: [packages/contract/src/types.ts:564](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L564)
 
 Returns key matching a specific list query with parameters.
 
@@ -104,7 +104,7 @@ readonly `unknown`[]
 
 > **lists**: () => readonly `unknown`[]
 
-Defined in: [packages/contract/src/types.ts:500](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L500)
+Defined in: [packages/contract/src/types.ts:562](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L562)
 
 Returns key matching all list queries: `[domain, entity, "list"]`.
 
@@ -118,7 +118,7 @@ readonly `unknown`[]
 
 > **tree**: (`params?`) => readonly `unknown`[]
 
-Defined in: [packages/contract/src/types.ts:510](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L510)
+Defined in: [packages/contract/src/types.ts:572](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L572)
 
 Returns key matching a specific tree query with parameters.
 
@@ -138,7 +138,7 @@ readonly `unknown`[]
 
 > **trees**: () => readonly `unknown`[]
 
-Defined in: [packages/contract/src/types.ts:508](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L508)
+Defined in: [packages/contract/src/types.ts:570](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L570)
 
 Returns key matching all tree queries: `[domain, entity, "tree"]`.
 

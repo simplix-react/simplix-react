@@ -6,7 +6,7 @@
 
 # Type Alias: DerivedEntityHooksResult\<TEntities, TOperations\>
 
-> **DerivedEntityHooksResult**\<`TEntities`, `TOperations`\> = `{ [K in keyof TEntities]: EntityHooks<TEntities[K]["schema"]> }` & `{ [K in keyof TOperations]: TOperations[K] extends OperationDefinition<infer TInput, infer TOutput> ? OperationHooks<TInput, TOutput> : never }`
+> **DerivedEntityHooksResult**\<`TEntities`, `TOperations`\> = `{ [K in keyof TEntities]: EntityHooks<TEntities[K]["schema"], TEntities[K]["operations"]> }` & `{ [K in keyof TOperations]: TOperations[K] extends OperationDefinition<infer TInput, infer TOutput> ? OperationHooks<TInput, TOutput> : never }`
 
 Defined in: [derive-hooks.ts:560](https://github.com/simplix-react/simplix-react/blob/main/derive-hooks.ts#L560)
 

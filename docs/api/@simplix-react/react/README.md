@@ -255,7 +255,10 @@ Next Step → `@simplix-react/mock`
 - [DerivedGetHook](type-aliases/DerivedGetHook.md)
 - [DerivedInfiniteListHook](type-aliases/DerivedInfiniteListHook.md)
 - [DerivedListHook](type-aliases/DerivedListHook.md)
+- [DerivedQueryHook](type-aliases/DerivedQueryHook.md)
+- [DerivedTreeHook](type-aliases/DerivedTreeHook.md)
 - [DerivedUpdateHook](type-aliases/DerivedUpdateHook.md)
+- [EntityHookFor](type-aliases/EntityHookFor.md)
 - [EntityHooks](type-aliases/EntityHooks.md)
 - [OperationMutationHook](type-aliases/OperationMutationHook.md)
 

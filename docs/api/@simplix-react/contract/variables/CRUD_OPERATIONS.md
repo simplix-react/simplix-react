@@ -8,7 +8,7 @@
 
 > `const` **CRUD\_OPERATIONS**: `object`
 
-Defined in: [packages/contract/src/types.ts:334](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L334)
+Defined in: [packages/contract/src/types.ts:396](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L396)
 
 Standard CRUD operation method defaults. Spread and customize per entity.
 

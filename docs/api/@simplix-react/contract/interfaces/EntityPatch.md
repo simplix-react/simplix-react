@@ -6,7 +6,7 @@
 
 # Interface: EntityPatch
 
-Defined in: [packages/contract/src/customize-api.ts:17](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/customize-api.ts#L17)
+Defined in: [packages/contract/src/customize-api.ts:18](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/customize-api.ts#L18)
 
 Patch descriptor for a single entity's operations.
 
@@ -19,4 +19,4 @@ Patch descriptor for a single entity's operations.
 
 > `optional` **operations**: `Record`\<`string`, [`EntityOperationDef`](EntityOperationDef.md)\<`ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>, `unknown`\> \| `null`\>
 
-Defined in: [packages/contract/src/customize-api.ts:18](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/customize-api.ts#L18)
+Defined in: [packages/contract/src/customize-api.ts:19](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/customize-api.ts#L19)

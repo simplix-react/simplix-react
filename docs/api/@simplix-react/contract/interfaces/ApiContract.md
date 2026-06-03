@@ -6,7 +6,7 @@
 
 # Interface: ApiContract\<TEntities, TOperations\>
 
-Defined in: [packages/contract/src/types.ts:580](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L580)
+Defined in: [packages/contract/src/types.ts:644](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L644)
 
 Represents the fully constructed API contract returned by [defineApi](../functions/defineApi.md).
 
@@ -40,7 +40,7 @@ Map of operation names to their definitions.
 
 > **client**: \{ \[K in string \| number \| symbol\]: EntityClient\<TEntities\[K\]\["schema"\], TEntities\[K\]\["operations"\]\> \} & \{ \[K in string \| number \| symbol\]: TOperations\[K\] extends OperationDefinition\<\_TInput, TOutput\> ? (args: unknown\[\]) =\> Promise\<output\<TOutput\>\> : never \}
 
-Defined in: [packages/contract/src/types.ts:587](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L587)
+Defined in: [packages/contract/src/types.ts:651](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L651)
 
 Type-safe HTTP client with methods for each entity and operation.
 
@@ -50,7 +50,7 @@ Type-safe HTTP client with methods for each entity and operation.
 
 > **config**: [`ApiContractConfig`](ApiContractConfig.md)\<`TEntities`, `TOperations`\>
 
-Defined in: [packages/contract/src/types.ts:585](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L585)
+Defined in: [packages/contract/src/types.ts:649](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L649)
 
 The original contract configuration.
 
@@ -60,6 +60,6 @@ The original contract configuration.
 
 > **queryKeys**: \{ \[K in string \| number \| symbol\]: QueryKeyFactory \}
 
-Defined in: [packages/contract/src/types.ts:601](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L601)
+Defined in: [packages/contract/src/types.ts:665](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L665)
 
 Query key factories for cache management, one per entity.

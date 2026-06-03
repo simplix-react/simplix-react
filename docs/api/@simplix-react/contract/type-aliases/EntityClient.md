@@ -4,11 +4,11 @@
 
 [Documentation](../../../README.md) / [@simplix-react/contract](../README.md) / EntityClient
 
-# Type Alias: EntityClient\<_TSchema, TOperations\>
+# Type Alias: EntityClient\<TSchema, TOperations\>
 
-> **EntityClient**\<`_TSchema`, `TOperations`\> = `{ [K in keyof TOperations]: (args: unknown[]) => Promise<InferOutputData<TOperations[K]["output"]>> }`
+> **EntityClient**\<`TSchema`, `TOperations`\> = `{ [K in keyof TOperations & string]: EntityClientFn<ResolveRole<K, TOperations[K]>, TOperations[K], TSchema> }`
 
-Defined in: [packages/contract/src/types.ts:542](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L542)
+Defined in: [packages/contract/src/types.ts:604](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L604)
 
 Provides a type-safe client for a single entity, derived from its
 [EntityDefinition](../interfaces/EntityDefinition.md) operations.
@@ -18,19 +18,17 @@ Function signatures vary by CRUD role and HTTP method.
 
 ## Type Parameters
 
-### _TSchema
+### TSchema
 
-`_TSchema` *extends* `z.ZodType`
+`TSchema` *extends* `z.ZodType`
+
+Zod schema for the entity's response shape.
 
 ### TOperations
 
 `TOperations` *extends* `Record`\<`string`, [`EntityOperationDef`](../interfaces/EntityOperationDef.md)\>
 
 Map of operation names to their definitions.
-
-## Type Param
-
-Zod schema for the entity's response shape.
 
 ## Example
 

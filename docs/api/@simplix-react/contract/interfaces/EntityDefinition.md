@@ -6,7 +6,7 @@
 
 # Interface: EntityDefinition\<TSchema, TOperations\>
 
-Defined in: [packages/contract/src/types.ts:302](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L302)
+Defined in: [packages/contract/src/types.ts:364](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L364)
 
 Defines an API entity with a flexible operations map.
 
@@ -59,7 +59,7 @@ Map of operation names to their definitions.
 
 > `optional` **filterSchema**: `ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\>
 
-Defined in: [packages/contract/src/types.ts:317](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L317)
+Defined in: [packages/contract/src/types.ts:379](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L379)
 
 Optional Zod schema for validating list filter parameters.
 
@@ -69,7 +69,7 @@ Optional Zod schema for validating list filter parameters.
 
 > `optional` **identity**: `string`[]
 
-Defined in: [packages/contract/src/types.ts:309](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L309)
+Defined in: [packages/contract/src/types.ts:371](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L371)
 
 Identity field names for cache key management. Defaults to `["id"]`.
 
@@ -79,7 +79,7 @@ Identity field names for cache key management. Defaults to `["id"]`.
 
 > **operations**: `TOperations`
 
-Defined in: [packages/contract/src/types.ts:311](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L311)
+Defined in: [packages/contract/src/types.ts:373](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L373)
 
 Map of operation names to their definitions.
 
@@ -89,7 +89,7 @@ Map of operation names to their definitions.
 
 > `optional` **parent**: [`EntityParent`](EntityParent.md)
 
-Defined in: [packages/contract/src/types.ts:313](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L313)
+Defined in: [packages/contract/src/types.ts:375](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L375)
 
 Optional parent resource for nested URL construction.
 
@@ -99,7 +99,7 @@ Optional parent resource for nested URL construction.
 
 > `optional` **queries**: `Record`\<`string`, [`EntityQuery`](EntityQuery.md)\>
 
-Defined in: [packages/contract/src/types.ts:315](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L315)
+Defined in: [packages/contract/src/types.ts:377](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L377)
 
 Named query scopes for filtering entities by parent relationships.
 
@@ -109,6 +109,6 @@ Named query scopes for filtering entities by parent relationships.
 
 > **schema**: `TSchema`
 
-Defined in: [packages/contract/src/types.ts:307](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L307)
+Defined in: [packages/contract/src/types.ts:369](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L369)
 
 Zod schema describing the full entity shape returned by the API.

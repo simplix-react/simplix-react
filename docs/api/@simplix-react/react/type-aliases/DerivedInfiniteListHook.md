@@ -6,9 +6,9 @@
 
 # Type Alias: DerivedInfiniteListHook()\<TData\>
 
-> **DerivedInfiniteListHook**\<`TData`\> = (`parentId?`, `params?`, `options?`) => `UseInfiniteQueryResult`\<\{ `data`: `TData`[]; `meta`: `PageInfo`; \}, `Error`\>
+> **DerivedInfiniteListHook**\<`TData`\> = (`parentId?`, `params?`, `options?`) => `UseInfiniteQueryResult`\<`InfiniteData`\<\{ `data`: `TData`[]; `meta`: `PageInfo`; \}\>, `Error`\>
 
-Defined in: [types.ts:164](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L164)
+Defined in: [types.ts:174](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L174)
 
 Represents a derived infinite list query hook for cursor-based or offset-based pagination.
 
@@ -38,7 +38,7 @@ The entity type returned in each page
 
 ## Returns
 
-`UseInfiniteQueryResult`\<\{ `data`: `TData`[]; `meta`: `PageInfo`; \}, `Error`\>
+`UseInfiniteQueryResult`\<`InfiniteData`\<\{ `data`: `TData`[]; `meta`: `PageInfo`; \}\>, `Error`\>
 
 ## Example
 

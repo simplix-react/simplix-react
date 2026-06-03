@@ -6,9 +6,9 @@
 
 # Function: deriveClient()
 
-> **deriveClient**\<`TEntities`, `TOperations`\>(`config`, `fetchFn?`): `Record`\<`string`, `unknown`\>
+> **deriveClient**\<`TEntities`, `TOperations`\>(`config`, `fetchFn?`): \{ \[K in string \| number \| symbol\]: EntityClient\<TEntities\[K\]\["schema"\], TEntities\[K\]\["operations"\]\> \} & \{ \[K in string \| number \| symbol\]: TOperations\[K\] extends OperationDefinition\<\_TInput, TOutput\> ? (args: unknown\[\]) =\> Promise\<output\<TOutput\>\> : never \}
 
-Defined in: [packages/contract/src/derive/client.ts:40](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/derive/client.ts#L40)
+Defined in: [packages/contract/src/derive/client.ts:41](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/derive/client.ts#L41)
 
 Derives a type-safe HTTP client from an [ApiContractConfig](../interfaces/ApiContractConfig.md).
 
@@ -49,7 +49,7 @@ Custom fetch function; defaults to [defaultFetch](../variables/defaultFetch.md).
 
 ## Returns
 
-`Record`\<`string`, `unknown`\>
+\{ \[K in string \| number \| symbol\]: EntityClient\<TEntities\[K\]\["schema"\], TEntities\[K\]\["operations"\]\> \} & \{ \[K in string \| number \| symbol\]: TOperations\[K\] extends OperationDefinition\<\_TInput, TOutput\> ? (args: unknown\[\]) =\> Promise\<output\<TOutput\>\> : never \}
 
 A client object with typed methods for each entity and operation.
 

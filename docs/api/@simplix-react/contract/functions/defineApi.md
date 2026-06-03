@@ -6,9 +6,9 @@
 
 # Function: defineApi()
 
-> **defineApi**\<`TEntities`, `TOperations`\>(`config`, `options?`): `object`
+> **defineApi**\<`TEntities`, `TOperations`\>(`config`, `options?`): [`ApiContract`](../interfaces/ApiContract.md)\<`TEntities`, `TOperations`\>
 
-Defined in: [packages/contract/src/define-api.ts:62](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/define-api.ts#L62)
+Defined in: [packages/contract/src/define-api.ts:63](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/define-api.ts#L63)
 
 Creates a fully-typed API contract from an [ApiContractConfig](../interfaces/ApiContractConfig.md).
 
@@ -51,21 +51,9 @@ Custom fetch function replacing the built-in [defaultFetch](../variables/default
 
 ## Returns
 
-`object`
+[`ApiContract`](../interfaces/ApiContract.md)\<`TEntities`, `TOperations`\>
 
 An [ApiContract](../interfaces/ApiContract.md) containing `config`, `client`, and `queryKeys`.
-
-### client
-
-> **client**: `Record`\<`string`, `unknown`\>
-
-### config
-
-> **config**: [`ApiContractConfig`](../interfaces/ApiContractConfig.md)\<`TEntities`, `TOperations`\>
-
-### queryKeys
-
-> **queryKeys**: \{ \[K in string \| number \| symbol\]: QueryKeyFactory \}
 
 ## Example
 

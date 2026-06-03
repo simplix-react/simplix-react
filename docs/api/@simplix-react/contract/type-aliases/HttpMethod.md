@@ -8,6 +8,6 @@
 
 > **HttpMethod** = `"GET"` \| `"POST"` \| `"PUT"` \| `"PATCH"` \| `"DELETE"`
 
-Defined in: [packages/contract/src/types.ts:347](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L347)
+Defined in: [packages/contract/src/types.ts:409](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L409)
 
 Supported HTTP methods for API operations.

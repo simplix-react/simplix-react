@@ -6,7 +6,7 @@
 
 # Interface: OperationDefinition\<TInput, TOutput\>
 
-Defined in: [packages/contract/src/types.ts:374](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L374)
+Defined in: [packages/contract/src/types.ts:436](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L436)
 
 Defines a custom (non-CRUD) API operation with typed input and output.
 
@@ -52,7 +52,7 @@ Zod schema for the response payload.
 
 > `optional` **contentType**: `"json"` \| `"multipart"`
 
-Defined in: [packages/contract/src/types.ts:387](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L387)
+Defined in: [packages/contract/src/types.ts:449](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L449)
 
 Content type for the request body. Defaults to `"json"`.
 
@@ -62,7 +62,7 @@ Content type for the request body. Defaults to `"json"`.
 
 > **input**: `TInput`
 
-Defined in: [packages/contract/src/types.ts:383](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L383)
+Defined in: [packages/contract/src/types.ts:445](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L445)
 
 Zod schema validating the request payload.
 
@@ -70,9 +70,9 @@ Zod schema validating the request payload.
 
 ### invalidates()?
 
-> `optional` **invalidates**: (`queryKeys`, `params`) => readonly `unknown`[][]
+> `optional` **invalidates**: (`queryKeys`, `params`) => readonly readonly `unknown`[][]
 
-Defined in: [packages/contract/src/types.ts:394](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L394)
+Defined in: [packages/contract/src/types.ts:456](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L456)
 
 Returns query key arrays that should be invalidated after this operation succeeds.
 Enables automatic cache invalidation in `@simplix-react/react`.
@@ -89,7 +89,7 @@ Enables automatic cache invalidation in `@simplix-react/react`.
 
 #### Returns
 
-readonly `unknown`[][]
+readonly readonly `unknown`[][]
 
 ***
 
@@ -97,7 +97,7 @@ readonly `unknown`[][]
 
 > **method**: [`HttpMethod`](../type-aliases/HttpMethod.md)
 
-Defined in: [packages/contract/src/types.ts:379](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L379)
+Defined in: [packages/contract/src/types.ts:441](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L441)
 
 HTTP method for this operation.
 
@@ -107,7 +107,7 @@ HTTP method for this operation.
 
 > **output**: `TOutput`
 
-Defined in: [packages/contract/src/types.ts:385](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L385)
+Defined in: [packages/contract/src/types.ts:447](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L447)
 
 Zod schema validating the response payload.
 
@@ -117,7 +117,7 @@ Zod schema validating the response payload.
 
 > **path**: `string`
 
-Defined in: [packages/contract/src/types.ts:381](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L381)
+Defined in: [packages/contract/src/types.ts:443](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L443)
 
 URL path with optional `:paramName` placeholders (e.g. `"/tasks/:taskId/assign"`).
 
@@ -127,7 +127,7 @@ URL path with optional `:paramName` placeholders (e.g. `"/tasks/:taskId/assign"`
 
 > `optional` **responseType**: `"json"` \| `"blob"`
 
-Defined in: [packages/contract/src/types.ts:389](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L389)
+Defined in: [packages/contract/src/types.ts:451](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L451)
 
 Expected response format. Defaults to `"json"`.
 
@@ -137,7 +137,7 @@ Expected response format. Defaults to `"json"`.
 
 > `optional` **transformRequest**: (`input`, `url`) => [`TransformedRequest`](TransformedRequest.md)
 
-Defined in: [packages/contract/src/types.ts:402](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L402)
+Defined in: [packages/contract/src/types.ts:464](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L464)
 
 Transforms the input into a custom HTTP request.
 When provided, replaces the default JSON body serialization.
@@ -162,7 +162,7 @@ When provided, replaces the default JSON body serialization.
 
 > `optional` **transformResponse**: (`raw`) => `unknown`
 
-Defined in: [packages/contract/src/types.ts:407](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L407)
+Defined in: [packages/contract/src/types.ts:469](https://github.com/simplix-react/simplix-react/blob/main/packages/contract/src/types.ts#L469)
 
 Transforms the raw API response before returning to the caller.
 Useful for mapping server field names to client-side conventions.
