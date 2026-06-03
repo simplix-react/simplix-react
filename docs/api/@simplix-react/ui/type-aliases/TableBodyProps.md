@@ -8,4 +8,4 @@
 
 > **TableBodyProps** = `ComponentPropsWithRef`\<`"tbody"`\>
 
-Defined in: [packages/ui/src/base/display/table.tsx:118](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/table.tsx#L118)
+Defined in: [packages/ui/src/base/display/table.tsx:121](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/table.tsx#L121)

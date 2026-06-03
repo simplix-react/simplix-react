@@ -8,7 +8,7 @@
 
 > **NumberField**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/form/number-field.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/number-field.tsx#L28)
+Defined in: [packages/ui/src/fields/form/number-field.tsx:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/number-field.tsx#L30)
 
 Numeric input field with null handling for empty values.
 

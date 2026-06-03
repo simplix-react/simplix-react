@@ -80,7 +80,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:25](https://github.com/simplix
 
 Defined in: [packages/ui/src/fields/form/static-field.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/static-field.tsx#L11)
 
-Fallback text when value is null/undefined. Defaults to em-dash.
+Fallback text when value is null/undefined. Defaults to empty string.
 
 ***
 

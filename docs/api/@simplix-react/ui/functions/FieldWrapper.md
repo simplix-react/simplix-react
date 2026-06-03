@@ -8,7 +8,7 @@
 
 > **FieldWrapper**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/shared/field-wrapper.tsx:55](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/field-wrapper.tsx#L55)
+Defined in: [packages/ui/src/fields/shared/field-wrapper.tsx:66](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/field-wrapper.tsx#L66)
 
 Wraps a form input with label, description, and error/warning display.
 Handles label positioning, accessibility attributes, and field variants.

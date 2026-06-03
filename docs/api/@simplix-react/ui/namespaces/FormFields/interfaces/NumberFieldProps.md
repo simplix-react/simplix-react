@@ -68,7 +68,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:25](https://github.com/simplix
 
 > `optional` **inputProps**: `DetailedHTMLProps`\<`InputHTMLAttributes`\<`HTMLInputElement`\>, `HTMLInputElement`\>
 
-Defined in: [packages/ui/src/fields/form/number-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/number-field.tsx#L17)
+Defined in: [packages/ui/src/fields/form/number-field.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/number-field.tsx#L19)
 
 Additional props forwarded to the underlying input element.
 
@@ -183,6 +183,16 @@ Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-
 > `optional` **step**: `number`
 
 Defined in: [packages/ui/src/fields/form/number-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/number-field.tsx#L14)
+
+***
+
+### suffix?
+
+> `optional` **suffix**: `string`
+
+Defined in: [packages/ui/src/fields/form/number-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/number-field.tsx#L17)
+
+Unit suffix displayed inside the input (e.g. "sec", "px", "kg").
 
 ***
 

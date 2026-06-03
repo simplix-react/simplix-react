@@ -17,6 +17,7 @@ Shared props for all form field components.
 ## Extended by
 
 - [`TreeSelectFieldProps`](TreeSelectFieldProps.md)
+- [`IconFieldProps`](IconFieldProps.md)
 - [`CheckboxFieldProps`](../namespaces/FormFields/interfaces/CheckboxFieldProps.md)
 - [`ColorFieldProps`](../namespaces/FormFields/interfaces/ColorFieldProps.md)
 - [`ComboboxFieldProps`](../namespaces/FormFields/interfaces/ComboboxFieldProps.md)
@@ -37,6 +38,12 @@ Shared props for all form field components.
 - [`TextareaFieldProps`](../namespaces/FormFields/interfaces/TextareaFieldProps.md)
 - [`LocationPickerFieldProps`](../namespaces/FormFields/interfaces/LocationPickerFieldProps.md)
 - [`TimezoneFieldProps`](../namespaces/FormFields/interfaces/TimezoneFieldProps.md)
+- [`I18nTextFieldProps`](../namespaces/FormFields/interfaces/I18nTextFieldProps.md)
+- [`I18nTextareaFieldProps`](../namespaces/FormFields/interfaces/I18nTextareaFieldProps.md)
+- [`PlateEditorFieldProps`](../namespaces/FormFields/interfaces/PlateEditorFieldProps.md)
+- [`PlateEditorI18nFieldProps`](../namespaces/FormFields/interfaces/PlateEditorI18nFieldProps.md)
+- [`FileFieldProps`](../namespaces/FormFields/interfaces/FileFieldProps.md)
+- [`ImageFieldProps`](../namespaces/FormFields/interfaces/ImageFieldProps.md)
 
 ## Properties
 

@@ -34,7 +34,7 @@ Defined in: [packages/ui/src/fields/shared/field-message.tsx:20](https://github.
 
 ### variant?
 
-> `optional` **variant**: `"description"` \| `"warning"` \| `"error"` \| `"info"` \| `null`
+> `optional` **variant**: `"description"` \| `"warning"` \| `"info"` \| `"error"` \| `null`
 
 Defined in: [packages/ui/src/fields/shared/field-message.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/field-message.tsx#L7)
 

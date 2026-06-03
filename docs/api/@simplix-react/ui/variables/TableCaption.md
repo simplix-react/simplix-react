@@ -8,4 +8,4 @@
 
 > `const` **TableCaption**: `ForwardRefExoticComponent`\<`Omit`\<`DetailedHTMLProps`\<`HTMLAttributes`\<`HTMLElement`\>, `HTMLElement`\>, `"ref"`\> & `RefAttributes`\<`HTMLTableCaptionElement`\>\>
 
-Defined in: [packages/ui/src/base/display/table.tsx:245](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/table.tsx#L245)
+Defined in: [packages/ui/src/base/display/table.tsx:248](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/table.tsx#L248)

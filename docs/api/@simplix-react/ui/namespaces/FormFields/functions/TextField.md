@@ -8,9 +8,13 @@
 
 > **TextField**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/form/text-field.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/text-field.tsx#L28)
+Defined in: [packages/ui/src/fields/form/text-field.tsx:51](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/text-field.tsx#L51)
 
 Text input field with label, error, and description support.
+
+Supports leading/trailing adornments via [TextFieldProps.prefixControl](../interfaces/TextFieldProps.md#prefixcontrol) /
+[TextFieldProps.suffixControl](../interfaces/TextFieldProps.md#suffixcontrol). Convenience props [TextFieldProps.iconValue](../interfaces/TextFieldProps.md#iconvalue) /
+[TextFieldProps.colorValue](../interfaces/TextFieldProps.md#colorvalue) auto-render the standard pickers.
 
 ## Parameters
 
@@ -25,5 +29,5 @@ Text input field with label, error, and description support.
 ## Example
 
 ```tsx
-<TextField label="Email" value={email} onChange={setEmail} type="email" required />
+<TextField label="Name" value={v} onChange={setV} iconValue={icon} onIconChange={setIcon} />
 ```

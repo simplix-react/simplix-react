@@ -243,3 +243,4 @@ Next Step → `@simplix-react/mock`
 - [deriveEntityFormHooks](functions/deriveEntityFormHooks.md)
 - [extractDirtyFields](functions/extractDirtyFields.md)
 - [mapServerErrorsToForm](functions/mapServerErrorsToForm.md)
+- [zodToFieldErrors](functions/zodToFieldErrors.md)

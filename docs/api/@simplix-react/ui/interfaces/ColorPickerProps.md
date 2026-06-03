@@ -6,7 +6,7 @@
 
 # Interface: ColorPickerProps
 
-Defined in: [packages/ui/src/base/inputs/color-picker.tsx:37](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/color-picker.tsx#L37)
+Defined in: [packages/ui/src/base/inputs/color-picker.tsx:52](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/color-picker.tsx#L52)
 
 Props for the [ColorPicker](../functions/ColorPicker.md) component.
 
@@ -16,7 +16,7 @@ Props for the [ColorPicker](../functions/ColorPicker.md) component.
 
 > `optional` **aria-label**: `string`
 
-Defined in: [packages/ui/src/base/inputs/color-picker.tsx:51](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/color-picker.tsx#L51)
+Defined in: [packages/ui/src/base/inputs/color-picker.tsx:66](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/color-picker.tsx#L66)
 
 Accessible label for the trigger button.
 
@@ -26,7 +26,7 @@ Accessible label for the trigger button.
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/base/inputs/color-picker.tsx:53](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/color-picker.tsx#L53)
+Defined in: [packages/ui/src/base/inputs/color-picker.tsx:68](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/color-picker.tsx#L68)
 
 Additional class names for the trigger button.
 
@@ -36,7 +36,7 @@ Additional class names for the trigger button.
 
 > `optional` **clearable**: `boolean`
 
-Defined in: [packages/ui/src/base/inputs/color-picker.tsx:47](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/color-picker.tsx#L47)
+Defined in: [packages/ui/src/base/inputs/color-picker.tsx:62](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/color-picker.tsx#L62)
 
 Allow clearing the selected color.
 
@@ -52,9 +52,21 @@ true
 
 > `optional` **disabled**: `boolean`
 
-Defined in: [packages/ui/src/base/inputs/color-picker.tsx:49](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/color-picker.tsx#L49)
+Defined in: [packages/ui/src/base/inputs/color-picker.tsx:64](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/color-picker.tsx#L64)
 
 Disable the picker.
+
+***
+
+### lang?
+
+> `optional` **lang**: `string`
+
+Defined in: [packages/ui/src/base/inputs/color-picker.tsx:76](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/color-picker.tsx#L76)
+
+BCP-47 language code for picker UI text (e.g. `"ko"`, `"en"`, `"ja"`).
+When omitted, follows the active i18n locale from useLocale (re-renders
+on locale change). Bundled languages: ko/en/ja — unknown codes fall back to English.
 
 ***
 
@@ -62,7 +74,7 @@ Disable the picker.
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/base/inputs/color-picker.tsx:41](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/color-picker.tsx#L41)
+Defined in: [packages/ui/src/base/inputs/color-picker.tsx:56](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/color-picker.tsx#L56)
 
 Called when the value changes.
 
@@ -82,7 +94,7 @@ Called when the value changes.
 
 > `optional` **presetColors**: [`PresetColor`](PresetColor.md)[]
 
-Defined in: [packages/ui/src/base/inputs/color-picker.tsx:43](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/color-picker.tsx#L43)
+Defined in: [packages/ui/src/base/inputs/color-picker.tsx:58](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/color-picker.tsx#L58)
 
 Preset color palette. Defaults to 16 common colors.
 
@@ -92,7 +104,7 @@ Preset color palette. Defaults to 16 common colors.
 
 > `optional` **renderClear**: (`onClear`) => `ReactNode`
 
-Defined in: [packages/ui/src/base/inputs/color-picker.tsx:55](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/color-picker.tsx#L55)
+Defined in: [packages/ui/src/base/inputs/color-picker.tsx:70](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/color-picker.tsx#L70)
 
 Render a custom clear button. Falls back to a built-in ghost button.
 
@@ -112,7 +124,7 @@ Render a custom clear button. Falls back to a built-in ghost button.
 
 > `optional` **showCustomPicker**: `boolean`
 
-Defined in: [packages/ui/src/base/inputs/color-picker.tsx:45](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/color-picker.tsx#L45)
+Defined in: [packages/ui/src/base/inputs/color-picker.tsx:60](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/color-picker.tsx#L60)
 
 Show the native color picker for custom colors.
 
@@ -128,6 +140,6 @@ true
 
 > **value**: `string`
 
-Defined in: [packages/ui/src/base/inputs/color-picker.tsx:39](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/color-picker.tsx#L39)
+Defined in: [packages/ui/src/base/inputs/color-picker.tsx:54](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/color-picker.tsx#L54)
 
 Current hex color value (e.g. `"#ff0000"`).

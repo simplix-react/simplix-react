@@ -8,7 +8,7 @@
 
 > **DateRangePicker**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/base/inputs/date-range-picker.tsx:98](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-range-picker.tsx#L98)
+Defined in: [packages/ui/src/base/inputs/date-range-picker.tsx:99](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-range-picker.tsx#L99)
 
 Standalone date range picker with a popover calendar, preset ranges, and month/year dropdowns.
 

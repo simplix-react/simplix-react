@@ -6,7 +6,7 @@
 
 # Interface: OpenAPISpecConfig
 
-Defined in: [config/types.ts:99](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L99)
+Defined in: [config/types.ts:119](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L119)
 
 Per-spec OpenAPI configuration
 
@@ -16,7 +16,7 @@ Per-spec OpenAPI configuration
 
 > `optional` **crud**: `Partial`\<`Record`\<`CrudRole`, [`CrudEndpointPattern`](CrudEndpointPattern.md)\>\>
 
-Defined in: [config/types.ts:111](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L111)
+Defined in: [config/types.ts:131](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L131)
 
 CRUD role detection patterns. When omitted, no CRUD roles are assigned.
 
@@ -26,7 +26,7 @@ CRUD role detection patterns. When omitted, no CRUD roles are assigned.
 
 > **domains**: `Record`\<`string`, `string`[]\>
 
-Defined in: [config/types.ts:109](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L109)
+Defined in: [config/types.ts:129](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L129)
 
 Tag-based domain splitting: domainName → tagPatterns (exact string or /regex/)
 
@@ -36,7 +36,7 @@ Tag-based domain splitting: domainName → tagPatterns (exact string or /regex/)
 
 > `optional` **naming**: [`OpenApiNamingStrategy`](OpenApiNamingStrategy.md)
 
-Defined in: [config/types.ts:105](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L105)
+Defined in: [config/types.ts:125](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L125)
 
 NamingStrategy — overrides profile's naming if both are set
 
@@ -46,7 +46,7 @@ NamingStrategy — overrides profile's naming if both are set
 
 > `optional` **profile**: `string`
 
-Defined in: [config/types.ts:103](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L103)
+Defined in: [config/types.ts:123](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L123)
 
 Spec Profile preset name (bundles naming + responseAdapter)
 
@@ -56,7 +56,7 @@ Spec Profile preset name (bundles naming + responseAdapter)
 
 > `optional` **responseAdapter**: [`ResponseAdapterConfig`](../type-aliases/ResponseAdapterConfig.md)
 
-Defined in: [config/types.ts:107](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L107)
+Defined in: [config/types.ts:127](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L127)
 
 ResponseAdapter — overrides profile's responseAdapter if both are set
 
@@ -66,6 +66,6 @@ ResponseAdapter — overrides profile's responseAdapter if both are set
 
 > **spec**: `string`
 
-Defined in: [config/types.ts:101](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L101)
+Defined in: [config/types.ts:121](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L121)
 
 OpenAPI spec file path (relative to project root) or URL

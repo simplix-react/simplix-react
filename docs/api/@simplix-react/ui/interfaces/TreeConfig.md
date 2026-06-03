@@ -6,7 +6,7 @@
 
 # Interface: TreeConfig\<T\>
 
-Defined in: [packages/ui/src/crud/tree/tree-types.ts:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L24)
+Defined in: [packages/ui/src/crud/tree/tree-types.ts:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L26)
 
 Configuration for tree data structure mapping.
 
@@ -24,7 +24,7 @@ Tree node data type.
 
 > `optional` **childrenField**: keyof `T` & `string`
 
-Defined in: [packages/ui/src/crud/tree/tree-types.ts:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L30)
+Defined in: [packages/ui/src/crud/tree/tree-types.ts:32](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L32)
 
 Field name for nested children array. Defaults to `"children"`.
 
@@ -34,7 +34,7 @@ Field name for nested children array. Defaults to `"children"`.
 
 > `optional` **idField**: keyof `T` & `string`
 
-Defined in: [packages/ui/src/crud/tree/tree-types.ts:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L26)
+Defined in: [packages/ui/src/crud/tree/tree-types.ts:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L28)
 
 Field name for node ID. Defaults to `"id"`.
 
@@ -44,7 +44,7 @@ Field name for node ID. Defaults to `"id"`.
 
 > `optional` **initialExpandedDepth**: `number`
 
-Defined in: [packages/ui/src/crud/tree/tree-types.ts:32](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L32)
+Defined in: [packages/ui/src/crud/tree/tree-types.ts:34](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L34)
 
 Number of levels to expand initially. Defaults to `1`.
 
@@ -54,6 +54,6 @@ Number of levels to expand initially. Defaults to `1`.
 
 > `optional` **parentIdField**: keyof `T` & `string`
 
-Defined in: [packages/ui/src/crud/tree/tree-types.ts:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L28)
+Defined in: [packages/ui/src/crud/tree/tree-types.ts:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L30)
 
 Field name for parent ID (flat-list mode).

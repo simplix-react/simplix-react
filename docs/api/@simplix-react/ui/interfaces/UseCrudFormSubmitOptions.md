@@ -6,7 +6,7 @@
 
 # Interface: UseCrudFormSubmitOptions\<T, TId\>
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L19)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L20)
 
 Options for the [useCrudFormSubmit](../functions/useCrudFormSubmit.md) hook.
 
@@ -26,7 +26,7 @@ Options for the [useCrudFormSubmit](../functions/useCrudFormSubmit.md) hook.
 
 > **create**: [`CrudMutation`](CrudMutation.md)\<`T`\>
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L23)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L24)
 
 Create mutation hook result.
 
@@ -36,9 +36,31 @@ Create mutation hook result.
 
 > `optional` **entityId**: `TId`
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L21)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L22)
 
 Entity ID for edit mode. When nullish, create mode is used.
+
+***
+
+### i18nFields?
+
+> `optional` **i18nFields**: `Record`\<`string`, `string`\>
+
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:31](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L31)
+
+Map of i18n field name → plain field name. Before submit, each plain
+field is populated from `applyI18nFallback(values[i18nField], locales)`.
+
+***
+
+### locales?
+
+> `optional` **locales**: readonly `object`[]
+
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:36](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L36)
+
+Locale config order for fallback (typically `useLocalePicker().locales`).
+Required when `i18nFields` is provided.
 
 ***
 
@@ -46,7 +68,7 @@ Entity ID for edit mode. When nullish, create mode is used.
 
 > `optional` **onSuccess**: () => `void`
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L27)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:38](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L38)
 
 Called after a successful create or update.
 
@@ -60,6 +82,58 @@ Called after a successful create or update.
 
 > `optional` **update**: [`CrudMutation`](CrudMutation.md)\<\{ `dto`: `T`; `id`: `TId`; \}\>
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:25](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L25)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L26)
 
 Update mutation hook result. Required for edit mode.
+
+***
+
+### validator()?
+
+> `optional` **validator**: (`values`) => `Record`\<`string`, `string`\> \| `null`
+
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:74](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L74)
+
+Optional client-side validator. Runs on submit BEFORE the server
+mutation. Receives the raw form values (pre-i18n-fallback) and must
+return either `null` / `{}` to pass, or `Record<field, message>` to
+block the submit.
+
+When the validator returns errors:
+  - `fieldErrors` is set to the returned errors
+  - the create/update mutation is NOT called
+  - the form stays on screen
+
+Client and server errors are temporally mutually exclusive: a failing
+validator prevents the network call, so server errors cannot coexist
+with client errors in the same submit attempt. A subsequent submit
+either replaces the errors with new client errors, new server errors,
+or clears them on success.
+
+Wrap inline validator functions with `useCallback` / `useMemo` to keep
+`handleSubmit` identity stable across renders.
+
+#### Parameters
+
+##### values
+
+`T`
+
+#### Returns
+
+`Record`\<`string`, `string`\> \| `null`
+
+#### Examples
+
+```ts
+import { zodToFieldErrors } from "@simplix-react/form";
+import { createUserSchema } from "@my-app/domain-user";
+
+validator: (v) => zodToFieldErrors(createUserSchema, v)
+```
+
+```ts
+validator: (v) => v.email?.includes("@")
+  ? null
+  : { email: "Invalid email" }
+```

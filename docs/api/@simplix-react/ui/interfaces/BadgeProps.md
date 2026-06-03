@@ -6,7 +6,7 @@
 
 # Interface: BadgeProps
 
-Defined in: [packages/ui/src/base/display/badge.tsx:72](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L72)
+Defined in: [packages/ui/src/base/display/badge.tsx:76](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L76)
 
 ## Extends
 
@@ -3539,6 +3539,18 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 ***
 
+### size?
+
+> `optional` **size**: `"default"` \| `"sm"` \| `null`
+
+Defined in: [packages/ui/src/base/display/badge.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L17)
+
+#### Inherited from
+
+`BadgeVariants.size`
+
+***
+
 ### slot?
 
 > `optional` **slot**: `string`
@@ -3663,7 +3675,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **variant**: `"default"` \| `"blue"` \| `"cyan"` \| `"fuchsia"` \| `"green"` \| `"indigo"` \| `"lime"` \| `"orange"` \| `"pink"` \| `"purple"` \| `"red"` \| `"teal"` \| `"violet"` \| `"yellow"` \| `"destructive"` \| `"outline"` \| `"secondary"` \| `"success"` \| `"warning"` \| `"slate"` \| `"amber"` \| `"emerald"` \| `"sky"` \| `"rose"` \| `null`
 
-Defined in: [packages/ui/src/base/display/badge.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L17)
+Defined in: [packages/ui/src/base/display/badge.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L21)
 
 #### Inherited from
 

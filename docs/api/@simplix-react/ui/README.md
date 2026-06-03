@@ -34,6 +34,24 @@ function App() {
 }
 ```
 
+## Styles & Theme
+
+Component CSS ships values only as `var(--*)` references. Import the
+stylesheet plus the official token theme from your app's CSS entry:
+
+```css
+@import "tailwindcss";
+@import "@simplix-react/ui/styles.css";   /* component styles */
+@import "@simplix-react/ui/theme.css";    /* official design tokens (opt-in) */
+
+@source "../node_modules/@simplix-react/ui/dist/**/*.js";
+```
+
+`theme.css` defines the design tokens (light/dark, color variants, radius,
+typography) consumed by the components. Apps may override any token by
+redefining it after the import. Projects scaffolded via `simplix init`
+wire this up automatically.
+
 ## App Architecture (FSD)
 
 simplix-react apps follow **Feature-Sliced Design (FSD)** — UI code lives in **modules**, not in domain packages:
@@ -533,7 +551,38 @@ const { isEdit, handleSubmit, isPending } = useCrudFormSubmit<FormValues>({
 });
 ```
 
-Returns: `{ isEdit, handleSubmit, isPending }`
+Returns: `{ isEdit, handleSubmit, isPending, fieldErrors }`
+
+##### Client-side validation (optional)
+
+Pass a `validator` to run a sync check on the raw form values **before** the
+server mutation. Returning a non-empty `Record<field, message>` stops the
+submit and exposes the errors via `fieldErrors`; the create/update mutation
+is **not** called. Returning `null` (or `{}`) passes through to the server.
+
+Client and server errors are temporally mutually exclusive on the same
+submit, so `fieldErrors` always reflects exactly one source per attempt
+(client → server → success replaces).
+
+```tsx
+// Zod (use `zodToFieldErrors` from @simplix-react/form):
+import { zodToFieldErrors } from "@simplix-react/form";
+import { createUserSchema, updateUserSchema } from "@my-app/domain-user";
+
+const { handleSubmit, fieldErrors } = useCrudFormSubmit<FormValues>({
+  entityId,
+  create: adaptOrvalCreate(_create),
+  update: adaptOrvalUpdate(_update, "userId"),
+  validator: (v) => zodToFieldErrors(isEdit ? updateUserSchema : createUserSchema, v),
+  onSuccess,
+});
+
+// Custom imperative rules:
+validator: (v) => v.email?.includes("@") ? null : { email: "Invalid email" }
+```
+
+Wrap inline validator functions with `useCallback` / `useMemo` to keep
+`handleSubmit` identity stable across renders.
 
 #### useCrudDeleteList
 
@@ -881,6 +930,7 @@ See root LICENSE file.
 - [DialogComponents](interfaces/DialogComponents.md)
 - [DonutChartProps](interfaces/DonutChartProps.md)
 - [DropdownMenuComponents](interfaces/DropdownMenuComponents.md)
+- [DynamicColorIconProps](interfaces/DynamicColorIconProps.md)
 - [EditorFooterProps](interfaces/EditorFooterProps.md)
 - [EmptyStateProps](interfaces/EmptyStateProps.md)
 - [ErrorBoundaryState](interfaces/ErrorBoundaryState.md)
@@ -894,12 +944,19 @@ See root LICENSE file.
 - [FilterBarProps](interfaces/FilterBarProps.md)
 - [FilterDateRange](interfaces/FilterDateRange.md)
 - [FilterState](interfaces/FilterState.md)
+- [FixedMenuGroup](interfaces/FixedMenuGroup.md)
+- [FixedMenuItem](interfaces/FixedMenuItem.md)
 - [GridProps](interfaces/GridProps.md)
 - [HasCoords](interfaces/HasCoords.md)
 - [HeadingProps](interfaces/HeadingProps.md)
 - [HeatmapCell](interfaces/HeatmapCell.md)
 - [HeatmapChartProps](interfaces/HeatmapChartProps.md)
+- [HeatmapPalette](interfaces/HeatmapPalette.md)
 - [HeatmapSeries](interfaces/HeatmapSeries.md)
+- [I18nTextProps](interfaces/I18nTextProps.md)
+- [IconFieldProps](interfaces/IconFieldProps.md)
+- [IconPickerProps](interfaces/IconPickerProps.md)
+- [IconProps](interfaces/IconProps.md)
 - [LineChartProps](interfaces/LineChartProps.md)
 - [ListBulkActionProps](interfaces/ListBulkActionProps.md)
 - [ListBulkActionsProps](interfaces/ListBulkActionsProps.md)
@@ -922,8 +979,14 @@ See root LICENSE file.
 - [MapNavigatorProps](interfaces/MapNavigatorProps.md)
 - [MapProviderContextValue](interfaces/MapProviderContextValue.md)
 - [MapProviderProps](interfaces/MapProviderProps.md)
+- [MenuContextValue](interfaces/MenuContextValue.md)
+- [MenuGroupConfig](interfaces/MenuGroupConfig.md)
+- [MenuNode](interfaces/MenuNode.md)
+- [MenuProviderProps](interfaces/MenuProviderProps.md)
 - [MultiTextFilterField](interfaces/MultiTextFilterField.md)
 - [MultiTextFilterProps](interfaces/MultiTextFilterProps.md)
+- [NavigationGroup](interfaces/NavigationGroup.md)
+- [NavigationItem](interfaces/NavigationItem.md)
 - [NumberFilterDef](interfaces/NumberFilterDef.md)
 - [NumberFilterProps](interfaces/NumberFilterProps.md)
 - [NumberInputProps](interfaces/NumberInputProps.md)
@@ -940,6 +1003,7 @@ See root LICENSE file.
 - [RadioGroupComponents](interfaces/RadioGroupComponents.md)
 - [ReactRouterHooks](interfaces/ReactRouterHooks.md)
 - [ReorderConfig](interfaces/ReorderConfig.md)
+- [RouteMatcherProviderProps](interfaces/RouteMatcherProviderProps.md)
 - [RouterAdapter](interfaces/RouterAdapter.md)
 - [RowActionDef](interfaces/RowActionDef.md)
 - [SaveButtonProps](interfaces/SaveButtonProps.md)
@@ -960,8 +1024,11 @@ See root LICENSE file.
 - [TextFilterDef](interfaces/TextFilterDef.md)
 - [TextFilterProps](interfaces/TextFilterProps.md)
 - [TextProps](interfaces/TextProps.md)
+- [TimeRangeSelectorProps](interfaces/TimeRangeSelectorProps.md)
+- [TimeRangeValue](interfaces/TimeRangeValue.md)
 - [TimezoneFilterDef](interfaces/TimezoneFilterDef.md)
 - [TimezoneOption](interfaces/TimezoneOption.md)
+- [Toast](interfaces/Toast.md)
 - [ToggleFilterDef](interfaces/ToggleFilterDef.md)
 - [ToggleFilterProps](interfaces/ToggleFilterProps.md)
 - [TooltipComponents](interfaces/TooltipComponents.md)
@@ -982,6 +1049,7 @@ See root LICENSE file.
 - [UIProviderProps](interfaces/UIProviderProps.md)
 - [UnifiedTextFilterField](interfaces/UnifiedTextFilterField.md)
 - [UnifiedTextFilterProps](interfaces/UnifiedTextFilterProps.md)
+- [UseActiveMenuItemOptions](interfaces/UseActiveMenuItemOptions.md)
 - [UseAutosaveOptions](interfaces/UseAutosaveOptions.md)
 - [UseAutosaveReturn](interfaces/UseAutosaveReturn.md)
 - [UseCrudDeleteDetailResult](interfaces/UseCrudDeleteDetailResult.md)
@@ -1005,12 +1073,15 @@ See root LICENSE file.
 - [UseMapPageDataReturn](interfaces/UseMapPageDataReturn.md)
 - [UseOrvalOptionsConfig](interfaces/UseOrvalOptionsConfig.md)
 - [UseOrvalOptionsResult](interfaces/UseOrvalOptionsResult.md)
+- [UseServerSearchOptionsConfig](interfaces/UseServerSearchOptionsConfig.md)
+- [UseServerSearchOptionsReturn](interfaces/UseServerSearchOptionsReturn.md)
 - [UseTreeExpansionOptions](interfaces/UseTreeExpansionOptions.md)
 - [UseTreeExpansionResult](interfaces/UseTreeExpansionResult.md)
 - [UseUnsavedChangesOptions](interfaces/UseUnsavedChangesOptions.md)
 - [UseUnsavedChangesReturn](interfaces/UseUnsavedChangesReturn.md)
 - [UseUrlSyncOptions](interfaces/UseUrlSyncOptions.md)
 - [UseVirtualListOptions](interfaces/UseVirtualListOptions.md)
+- [WindowPreset](interfaces/WindowPreset.md)
 - [WizardProps](interfaces/WizardProps.md)
 - [WizardStepProps](interfaces/WizardStepProps.md)
 
@@ -1044,6 +1115,7 @@ See root LICENSE file.
 - [DropdownMenuSeparatorProps](type-aliases/DropdownMenuSeparatorProps.md)
 - [DropdownMenuSubContentProps](type-aliases/DropdownMenuSubContentProps.md)
 - [DropdownMenuSubTriggerProps](type-aliases/DropdownMenuSubTriggerProps.md)
+- [DynamicColorIconPreset](type-aliases/DynamicColorIconPreset.md)
 - [EmptyReason](type-aliases/EmptyReason.md)
 - [FilterDef](type-aliases/FilterDef.md)
 - [FlexProps](type-aliases/FlexProps.md)
@@ -1051,8 +1123,13 @@ See root LICENSE file.
 - [GridVariants](type-aliases/GridVariants.md)
 - [HeadingTag](type-aliases/HeadingTag.md)
 - [HeadingVariants](type-aliases/HeadingVariants.md)
+- [HeatmapColorTheme](type-aliases/HeatmapColorTheme.md)
+- [IconData](type-aliases/IconData.md)
+- [IconLibrary](type-aliases/IconLibrary.md)
+- [IconName](type-aliases/IconName.md)
 - [InputProps](type-aliases/InputProps.md)
 - [LabelProps](type-aliases/LabelProps.md)
+- [LinkTarget](type-aliases/LinkTarget.md)
 - [ListDetailProps](type-aliases/ListDetailProps.md)
 - [ListDetailVariant](type-aliases/ListDetailVariant.md)
 - [MapContextValue](type-aliases/MapContextValue.md)
@@ -1064,6 +1141,7 @@ See root LICENSE file.
 - [MapRef](type-aliases/MapRef.md)
 - [MapStyleOption](type-aliases/MapStyleOption.md)
 - [MapTheme](type-aliases/MapTheme.md)
+- [MenuPermissionFilter](type-aliases/MenuPermissionFilter.md)
 - [NavigationMenuContentProps](type-aliases/NavigationMenuContentProps.md)
 - [NavigationMenuIndicatorProps](type-aliases/NavigationMenuIndicatorProps.md)
 - [NavigationMenuItemProps](type-aliases/NavigationMenuItemProps.md)
@@ -1077,6 +1155,7 @@ See root LICENSE file.
 - [PopoverContentProps](type-aliases/PopoverContentProps.md)
 - [RadioGroupItemProps](type-aliases/RadioGroupItemProps.md)
 - [RadioGroupProps](type-aliases/RadioGroupProps.md)
+- [RouteMatcher](type-aliases/RouteMatcher.md)
 - [SelectContentProps](type-aliases/SelectContentProps.md)
 - [SelectItemProps](type-aliases/SelectItemProps.md)
 - [SelectLabelProps](type-aliases/SelectLabelProps.md)
@@ -1156,12 +1235,16 @@ See root LICENSE file.
 - [DropdownMenuSubContent](variables/DropdownMenuSubContent.md)
 - [DropdownMenuSubTrigger](variables/DropdownMenuSubTrigger.md)
 - [DropdownMenuTrigger](variables/DropdownMenuTrigger.md)
+- [DynamicColorIconPresets](variables/DynamicColorIconPresets.md)
 - [FieldVariantContext](variables/FieldVariantContext.md)
 - [Flex](variables/Flex.md)
 - [Grid](variables/Grid.md)
 - [gridVariants](variables/gridVariants.md)
 - [Heading](variables/Heading.md)
 - [headingVariants](variables/headingVariants.md)
+- [HEATMAP\_THEMES](variables/HEATMAP_THEMES.md)
+- [Icon](variables/Icon.md)
+- [IconPicker](variables/IconPicker.md)
 - [Input](variables/Input.md)
 - [Label](variables/Label.md)
 - [ListDetail](variables/ListDetail.md)
@@ -1183,6 +1266,7 @@ See root LICENSE file.
 - [PopoverTrigger](variables/PopoverTrigger.md)
 - [RadioGroup](variables/RadioGroup.md)
 - [RadioGroupItem](variables/RadioGroupItem.md)
+- [RouteMatcherContext](variables/RouteMatcherContext.md)
 - [RouterContext](variables/RouterContext.md)
 - [Section](variables/Section.md)
 - [Select](variables/Select.md)
@@ -1235,6 +1319,7 @@ See root LICENSE file.
 - [adaptOrvalOrder](functions/adaptOrvalOrder.md)
 - [adaptOrvalUpdate](functions/adaptOrvalUpdate.md)
 - [addDays](functions/addDays.md)
+- [addToast](functions/addToast.md)
 - [AdvancedSelectFilter](functions/AdvancedSelectFilter.md)
 - [AdvancedTextFilter](functions/AdvancedTextFilter.md)
 - [ArrowLeftIcon](functions/ArrowLeftIcon.md)
@@ -1262,6 +1347,7 @@ See root LICENSE file.
 - [DetailFieldWrapper](functions/DetailFieldWrapper.md)
 - [DialogFooter](functions/DialogFooter.md)
 - [DialogHeader](functions/DialogHeader.md)
+- [DynamicColorIcon](functions/DynamicColorIcon.md)
 - [EditorFooter](functions/EditorFooter.md)
 - [EmptyState](functions/EmptyState.md)
 - [endOfDay](functions/endOfDay.md)
@@ -1282,7 +1368,10 @@ See root LICENSE file.
 - [geoCircle](functions/geoCircle.md)
 - [getFilterLayout](functions/getFilterLayout.md)
 - [getSiblings](functions/getSiblings.md)
+- [groupValidationErrors](functions/groupValidationErrors.md)
 - [haversineDistance](functions/haversineDistance.md)
+- [I18nText](functions/I18nText.md)
+- [IconField](functions/IconField.md)
 - [insertFilterSeparators](functions/insertFilterSeparators.md)
 - [isSameDay](functions/isSameDay.md)
 - [isSameMonth](functions/isSameMonth.md)
@@ -1298,6 +1387,7 @@ See root LICENSE file.
 - [MapNavigator](functions/MapNavigator.md)
 - [MapPinContainer](functions/MapPinContainer.md)
 - [MapProvider](functions/MapProvider.md)
+- [MenuProvider](functions/MenuProvider.md)
 - [MultiTextFilter](functions/MultiTextFilter.md)
 - [NavigationMenu](functions/NavigationMenu.md)
 - [NumberFilter](functions/NumberFilter.md)
@@ -1307,6 +1397,8 @@ See root LICENSE file.
 - [parseDate](functions/parseDate.md)
 - [parseFilterKey](functions/parseFilterKey.md)
 - [QueryFallback](functions/QueryFallback.md)
+- [removeToast](functions/removeToast.md)
+- [RouteMatcherProvider](functions/RouteMatcherProvider.md)
 - [sanitizeHtml](functions/sanitizeHtml.md)
 - [SaveButton](functions/SaveButton.md)
 - [SearchPopover](functions/SearchPopover.md)
@@ -1322,6 +1414,8 @@ See root LICENSE file.
 - [StatCard](functions/StatCard.md)
 - [subDays](functions/subDays.md)
 - [TextFilter](functions/TextFilter.md)
+- [TimeRangeSelector](functions/TimeRangeSelector.md)
+- [ToastContainer](functions/ToastContainer.md)
 - [ToggleFilter](functions/ToggleFilter.md)
 - [TooltipProvider](functions/TooltipProvider.md)
 - [toRad](functions/toRad.md)
@@ -1331,6 +1425,7 @@ See root LICENSE file.
 - [TreeSelectField](functions/TreeSelectField.md)
 - [UIProvider](functions/UIProvider.md)
 - [UnifiedTextFilter](functions/UnifiedTextFilter.md)
+- [useActiveMenuItem](functions/useActiveMenuItem.md)
 - [useAutosave](functions/useAutosave.md)
 - [useBeforeUnload](functions/useBeforeUnload.md)
 - [useChartAdapter](functions/useChartAdapter.md)
@@ -1354,12 +1449,16 @@ See root LICENSE file.
 - [useMapNavigator](functions/useMapNavigator.md)
 - [useMapPageData](functions/useMapPageData.md)
 - [useMediaQuery](functions/useMediaQuery.md)
+- [useMenu](functions/useMenu.md)
 - [useOrvalOptions](functions/useOrvalOptions.md)
 - [usePageHeader](functions/usePageHeader.md)
 - [usePageHeaderState](functions/usePageHeaderState.md)
 - [usePreviousData](functions/usePreviousData.md)
+- [usePulseOnUpdate](functions/usePulseOnUpdate.md)
 - [useRouter](functions/useRouter.md)
+- [useServerSearchOptions](functions/useServerSearchOptions.md)
 - [useTimezoneOptions](functions/useTimezoneOptions.md)
+- [useToastStore](functions/useToastStore.md)
 - [useTreeExpansion](functions/useTreeExpansion.md)
 - [useUIComponents](functions/useUIComponents.md)
 - [useUnsavedChanges](functions/useUnsavedChanges.md)

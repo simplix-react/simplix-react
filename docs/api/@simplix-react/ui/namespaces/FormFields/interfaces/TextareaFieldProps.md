@@ -6,7 +6,7 @@
 
 # Interface: TextareaFieldProps
 
-Defined in: [packages/ui/src/fields/form/textarea-field.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/textarea-field.tsx#L7)
+Defined in: [packages/ui/src/fields/form/textarea-field.tsx:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/textarea-field.tsx#L8)
 
 Props for the [TextareaField](../functions/TextareaField.md) form component.
 
@@ -104,7 +104,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-
 
 > `optional` **maxLength**: `number`
 
-Defined in: [packages/ui/src/fields/form/textarea-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/textarea-field.tsx#L15)
+Defined in: [packages/ui/src/fields/form/textarea-field.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/textarea-field.tsx#L16)
 
 ***
 
@@ -112,7 +112,7 @@ Defined in: [packages/ui/src/fields/form/textarea-field.tsx:15](https://github.c
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/fields/form/textarea-field.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/textarea-field.tsx#L11)
+Defined in: [packages/ui/src/fields/form/textarea-field.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/textarea-field.tsx#L12)
 
 Called when the value changes.
 
@@ -132,7 +132,7 @@ Called when the value changes.
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/fields/form/textarea-field.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/textarea-field.tsx#L12)
+Defined in: [packages/ui/src/fields/form/textarea-field.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/textarea-field.tsx#L13)
 
 ***
 
@@ -152,7 +152,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:28](https://github.com/simplix
 
 > `optional` **resize**: `"none"` \| `"both"` \| `"vertical"`
 
-Defined in: [packages/ui/src/fields/form/textarea-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/textarea-field.tsx#L17)
+Defined in: [packages/ui/src/fields/form/textarea-field.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/textarea-field.tsx#L18)
 
 Resize behavior. Defaults to `"vertical"`.
 
@@ -162,7 +162,7 @@ Resize behavior. Defaults to `"vertical"`.
 
 > `optional` **rows**: `number`
 
-Defined in: [packages/ui/src/fields/form/textarea-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/textarea-field.tsx#L14)
+Defined in: [packages/ui/src/fields/form/textarea-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/textarea-field.tsx#L15)
 
 Number of visible text rows.
 
@@ -184,7 +184,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-
 
 > `optional` **textareaProps**: `DetailedHTMLProps`\<`TextareaHTMLAttributes`\<`HTMLTextAreaElement`\>, `HTMLTextAreaElement`\>
 
-Defined in: [packages/ui/src/fields/form/textarea-field.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/textarea-field.tsx#L19)
+Defined in: [packages/ui/src/fields/form/textarea-field.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/textarea-field.tsx#L20)
 
 Additional props forwarded to the underlying textarea element.
 
@@ -194,7 +194,7 @@ Additional props forwarded to the underlying textarea element.
 
 > **value**: `string`
 
-Defined in: [packages/ui/src/fields/form/textarea-field.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/textarea-field.tsx#L9)
+Defined in: [packages/ui/src/fields/form/textarea-field.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/textarea-field.tsx#L10)
 
 Current textarea value.
 

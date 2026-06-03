@@ -6,7 +6,7 @@
 
 # Interface: SimplixConfig
 
-Defined in: [config/types.ts:59](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L59)
+Defined in: [config/types.ts:64](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L64)
 
 Project-level configuration loaded from `simplix.config.ts` at the project root.
 
@@ -22,15 +22,20 @@ are applied when omitted.
 import { defineConfig } from "@simplix-react/cli";
 
 export default defineConfig({
+  plugins: ["@simplix-react-ext/simplix-boot-cli-plugin"],
   api: { baseUrl: "/api/v1" },
   packages: { prefix: "acme" },
   codegen: { header: true },
-  openapi: {
-    domains: {
-      project: ["Projects", "Tasks"],
-      auth: ["Auth", "Users"],
+  openapi: [
+    {
+      spec: "openapi.json",
+      profile: "simplix-boot",
+      domains: {
+        project: ["Projects", "Tasks"],
+        auth: ["Auth", "Users"],
+      },
     },
-  },
+  ],
 });
 ```
 
@@ -44,7 +49,7 @@ export default defineConfig({
 
 > `optional` **api**: `object`
 
-Defined in: [config/types.ts:76](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L76)
+Defined in: [config/types.ts:81](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L81)
 
 API settings — used for basePath in code generation
 
@@ -60,7 +65,7 @@ API base path (default: "/api")
 
 > `optional` **codegen**: `object`
 
-Defined in: [config/types.ts:96](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L96)
+Defined in: [config/types.ts:101](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L101)
 
 Code generation options
 
@@ -76,7 +81,7 @@ Prepend auto-generated header comment to generated files (default: true)
 
 > `optional` **http**: `object`
 
-Defined in: [config/types.ts:91](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L91)
+Defined in: [config/types.ts:96](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L96)
 
 .http file environment settings
 
@@ -90,7 +95,7 @@ Defined in: [config/types.ts:91](https://github.com/simplix-react/simplix-react/
 
 > `optional` **i18n**: `object`
 
-Defined in: [config/types.ts:102](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L102)
+Defined in: [config/types.ts:107](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L107)
 
 Internationalization settings
 
@@ -112,7 +117,7 @@ Supported locale codes (default: ["en", "ko", "ja"])
 
 > `optional` **openapi**: [`OpenAPISpecConfig`](OpenAPISpecConfig.md)[]
 
-Defined in: [config/types.ts:110](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L110)
+Defined in: [config/types.ts:115](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L115)
 
 OpenAPI code generation — array of per-spec configurations
 
@@ -122,7 +127,7 @@ OpenAPI code generation — array of per-spec configurations
 
 > `optional` **packages**: `object`
 
-Defined in: [config/types.ts:85](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L85)
+Defined in: [config/types.ts:90](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L90)
 
 Package naming options
 
@@ -138,7 +143,7 @@ Short prefix for generated package names (default: derived from root package.jso
 
 > `optional` **plugins**: `string`[]
 
-Defined in: [config/types.ts:73](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L73)
+Defined in: [config/types.ts:78](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L78)
 
 CLI extension plugin modules to load before running any command.
 
@@ -159,6 +164,6 @@ and exits rather than silently generating incorrect code.
 
 > `optional` **queryBuilder**: `unknown`
 
-Defined in: [config/types.ts:82](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L82)
+Defined in: [config/types.ts:87](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L87)
 
 Global QueryBuilder — applied to all domains

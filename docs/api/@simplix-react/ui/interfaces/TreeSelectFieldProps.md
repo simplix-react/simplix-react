@@ -88,7 +88,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:25](https://github.com/simplix
 
 ### getDisplayName()?
 
-> `optional` **getDisplayName**: (`item`) => `string`
+> `optional` **getDisplayName**: (`item`) => `ReactNode`
 
 Defined in: [packages/ui/src/fields/form/tree-select-field.tsx:160](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-select-field.tsx#L160)
 
@@ -100,7 +100,7 @@ Defined in: [packages/ui/src/fields/form/tree-select-field.tsx:160](https://gith
 
 #### Returns
 
-`string`
+`ReactNode`
 
 ***
 

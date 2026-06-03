@@ -8,7 +8,7 @@
 
 > **useCrudFormSubmit**\<`T`, `TId`\>(`options`): [`UseCrudFormSubmitResult`](../interfaces/UseCrudFormSubmitResult.md)\<`T`\>
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:71](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L71)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:132](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L132)
 
 Handles create/update mutation dispatch for CRUD forms.
 Determines whether to create or update based on `entityId` presence.
@@ -42,7 +42,7 @@ Validation errors are suppressed from the global error dialog
 (requires `MutationCache.onError` to skip `category === "validation"`).
 Non-validation errors still propagate to the global dialog.
 
-## Example
+## Examples
 
 ```tsx
 const { isEdit, handleSubmit, fieldErrors } = useCrudFormSubmit<FormValues>({
@@ -58,4 +58,17 @@ const { isEdit, handleSubmit, fieldErrors } = useCrudFormSubmit<FormValues>({
   onChange={setName}
   error={fieldErrors["name"]}
 />
+```
+
+```tsx
+import { zodToFieldErrors } from "@simplix-react/form";
+import { createUserSchema, updateUserSchema } from "@my-app/domain-user";
+
+const { isEdit, handleSubmit, fieldErrors } = useCrudFormSubmit<FormValues>({
+  entityId,
+  create: adaptOrvalCreate(_create),
+  update: adaptOrvalUpdate(_update, "userId"),
+  validator: (v) => zodToFieldErrors(isEdit ? updateUserSchema : createUserSchema, v),
+  onSuccess,
+});
 ```

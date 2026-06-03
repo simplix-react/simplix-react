@@ -6,7 +6,7 @@
 
 # Interface: RowActionDef\<T\>
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:248](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L248)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:255](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L255)
 
 ## Type Parameters
 
@@ -20,7 +20,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:248](https://github.com/sim
 
 > `optional` **disabled**: (`row`) => `boolean`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:254](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L254)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:261](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L261)
 
 #### Parameters
 
@@ -38,7 +38,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:254](https://github.com/sim
 
 > `optional` **icon**: `ReactNode` \| (`row`) => `ReactNode`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:252](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L252)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:259](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L259)
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:252](https://github.com/sim
 
 > `optional` **label**: `string`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:251](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L251)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:258](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L258)
 
 ***
 
@@ -54,7 +54,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:251](https://github.com/sim
 
 > **onClick**: (`row`) => `void`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:250](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L250)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:257](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L257)
 
 #### Parameters
 
@@ -72,7 +72,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:250](https://github.com/sim
 
 > **type**: [`ActionType`](../type-aliases/ActionType.md)
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:249](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L249)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:256](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L256)
 
 ***
 
@@ -80,7 +80,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:249](https://github.com/sim
 
 > `optional` **when**: (`row`) => `boolean`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:253](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L253)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:260](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L260)
 
 #### Parameters
 

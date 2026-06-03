@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:74](https://github.com/
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:81](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L81)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:88](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L88)
 
 ***
 
@@ -43,6 +43,31 @@ Content rendered on the left side of the filter bar.
 Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:80](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L80)
 
 Max number of visible filter badges before collapsing into "+N".
+
+***
+
+### onPreview()?
+
+> `optional` **onPreview**: () => `void`
+
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:85](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L85)
+
+When provided, renders a preview button in the leading group that invokes
+this handler on click. Omit to hide the button.
+
+#### Returns
+
+`void`
+
+***
+
+### previewLabel?
+
+> `optional` **previewLabel**: `string`
+
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:87](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L87)
+
+Label for the preview button. Defaults to the `list.preview` translation.
 
 ***
 

@@ -6,7 +6,7 @@
 
 # Interface: TreeReorderConfig\<T\>
 
-Defined in: [packages/ui/src/crud/tree/tree-types.ts:40](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L40)
+Defined in: [packages/ui/src/crud/tree/tree-types.ts:42](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L42)
 
 Configuration for drag-and-drop reordering within a tree level.
 
@@ -24,7 +24,7 @@ Tree node data type.
 
 > `optional` **idField**: keyof `T` & `string`
 
-Defined in: [packages/ui/src/crud/tree/tree-types.ts:44](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L44)
+Defined in: [packages/ui/src/crud/tree/tree-types.ts:46](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L46)
 
 Field name for node ID. Defaults to `"id"`.
 
@@ -34,7 +34,7 @@ Field name for node ID. Defaults to `"id"`.
 
 > **onReorder**: (`parentId`, `items`) => `void` \| `Promise`\<`void`\>
 
-Defined in: [packages/ui/src/crud/tree/tree-types.ts:46](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L46)
+Defined in: [packages/ui/src/crud/tree/tree-types.ts:48](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L48)
 
 Called after reorder with the parent ID and reordered sibling items.
 
@@ -58,6 +58,6 @@ Called after reorder with the parent ID and reordered sibling items.
 
 > **orderField**: keyof `T` & `string`
 
-Defined in: [packages/ui/src/crud/tree/tree-types.ts:42](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L42)
+Defined in: [packages/ui/src/crud/tree/tree-types.ts:44](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L44)
 
 Field name for sort order (e.g. `"displayOrder"`).

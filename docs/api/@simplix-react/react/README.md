@@ -262,3 +262,4 @@ Next Step → `@simplix-react/mock`
 ## Functions
 
 - [deriveEntityHooks](functions/deriveEntityHooks.md)
+- [useBatchDetails](functions/useBatchDetails.md)

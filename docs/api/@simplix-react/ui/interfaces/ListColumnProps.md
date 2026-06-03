@@ -6,7 +6,7 @@
 
 # Interface: ListColumnProps\<T\>
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:201](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L201)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:208](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L208)
 
 Declarative column definition for List.Table. Not rendered directly.
 
@@ -22,7 +22,7 @@ Declarative column definition for List.Table. Not rendered directly.
 
 > `optional` **children**: (`props`) => `ReactNode`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:209](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L209)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:216](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L216)
 
 #### Parameters
 
@@ -46,7 +46,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:209](https://github.com/sim
 
 > `optional` **display**: `"boolean"` \| `"badge"`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:206](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L206)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:213](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L213)
 
 ***
 
@@ -54,7 +54,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:206](https://github.com/sim
 
 > `optional` **field**: keyof `T` & `string`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:202](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L202)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:209](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L209)
 
 ***
 
@@ -62,7 +62,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:202](https://github.com/sim
 
 > `optional` **format**: `"date"` \| `"relative"` \| `"datetime"`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:207](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L207)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:214](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L214)
 
 ***
 
@@ -70,7 +70,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:207](https://github.com/sim
 
 > `optional` **header**: `string`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:203](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L203)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:210](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L210)
 
 ***
 
@@ -78,7 +78,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:203](https://github.com/sim
 
 > `optional` **sortable**: `boolean`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:204](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L204)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:211](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L211)
 
 ***
 
@@ -86,7 +86,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:204](https://github.com/sim
 
 > `optional` **variants**: `Record`\<`string`, `"default"` \| `"blue"` \| `"cyan"` \| `"fuchsia"` \| `"green"` \| `"indigo"` \| `"lime"` \| `"orange"` \| `"pink"` \| `"purple"` \| `"red"` \| `"teal"` \| `"violet"` \| `"yellow"` \| `"destructive"` \| `"outline"` \| `"secondary"` \| `"success"` \| `"warning"` \| `"slate"` \| `"amber"` \| `"emerald"` \| `"sky"` \| `"rose"` \| `null` \| `undefined`\>
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:208](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L208)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:215](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L215)
 
 ***
 
@@ -94,4 +94,4 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:208](https://github.com/sim
 
 > `optional` **width**: `number`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:205](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L205)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:212](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L212)

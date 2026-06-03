@@ -198,6 +198,16 @@ Defined in: [packages/ui/src/crud/shared/types.ts:28](https://github.com/simplix
 
 ***
 
+### serverSearch?
+
+> `optional` **serverSearch**: `boolean`
+
+Defined in: [packages/ui/src/fields/form/combobox-field.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L21)
+
+When true, options are rendered as-is from the server — local filtering is skipped.
+
+***
+
 ### size?
 
 > `optional` **size**: `"sm"` \| `"lg"` \| `"md"`

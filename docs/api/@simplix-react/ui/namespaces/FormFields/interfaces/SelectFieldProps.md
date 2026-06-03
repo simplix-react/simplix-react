@@ -156,6 +156,10 @@ Available options with label/value pairs.
 
 > **label**: `string`
 
+#### tag?
+
+> `optional` **tag**: `string`
+
 #### value
 
 > **value**: `T`

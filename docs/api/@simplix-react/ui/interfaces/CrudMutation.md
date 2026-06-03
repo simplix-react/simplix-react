@@ -6,7 +6,7 @@
 
 # Interface: CrudMutation\<TInput\>
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L9)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L10)
 
 Minimal mutation shape used by [useCrudFormSubmit](../functions/useCrudFormSubmit.md).
 
@@ -22,7 +22,7 @@ Minimal mutation shape used by [useCrudFormSubmit](../functions/useCrudFormSubmi
 
 > **isPending**: `boolean`
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L15)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L16)
 
 Whether the mutation is currently in flight.
 
@@ -32,7 +32,7 @@ Whether the mutation is currently in flight.
 
 > **mutate**: (`input`, `options?`) => `void`
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L11)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L12)
 
 Trigger the mutation with the given input.
 
@@ -58,7 +58,7 @@ Trigger the mutation with the given input.
 
 > **mutateAsync**: (`input`) => `Promise`\<`unknown`\>
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L13)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L14)
 
 Promise-based mutation trigger for error handling.
 

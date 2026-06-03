@@ -6,7 +6,7 @@
 
 # Interface: TreeMoveConfig\<T\>
 
-Defined in: [packages/ui/src/crud/tree/tree-types.ts:54](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L54)
+Defined in: [packages/ui/src/crud/tree/tree-types.ts:56](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L56)
 
 Configuration for moving a node to a different parent in the tree.
 
@@ -22,9 +22,9 @@ Tree node data type.
 
 ### getDisplayName()
 
-> **getDisplayName**: (`item`) => `string`
+> **getDisplayName**: (`item`) => `ReactNode`
 
-Defined in: [packages/ui/src/crud/tree/tree-types.ts:60](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L60)
+Defined in: [packages/ui/src/crud/tree/tree-types.ts:62](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L62)
 
 Extract a display name from a node for the move dialog.
 
@@ -36,7 +36,7 @@ Extract a display name from a node for the move dialog.
 
 #### Returns
 
-`string`
+`ReactNode`
 
 ***
 
@@ -44,7 +44,7 @@ Extract a display name from a node for the move dialog.
 
 > `optional` **idField**: keyof `T` & `string`
 
-Defined in: [packages/ui/src/crud/tree/tree-types.ts:56](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L56)
+Defined in: [packages/ui/src/crud/tree/tree-types.ts:58](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L58)
 
 Field name for node ID. Defaults to `"id"`.
 
@@ -54,7 +54,7 @@ Field name for node ID. Defaults to `"id"`.
 
 > **onMove**: (`itemId`, `newParentId`) => `void` \| `Promise`\<`void`\>
 
-Defined in: [packages/ui/src/crud/tree/tree-types.ts:62](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L62)
+Defined in: [packages/ui/src/crud/tree/tree-types.ts:64](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L64)
 
 Called when the user confirms the move. `null` parent means root level.
 
@@ -78,6 +78,6 @@ Called when the user confirms the move. `null` parent means root level.
 
 > `optional` **parentIdField**: keyof `T` & `string`
 
-Defined in: [packages/ui/src/crud/tree/tree-types.ts:58](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L58)
+Defined in: [packages/ui/src/crud/tree/tree-types.ts:60](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-types.ts#L60)
 
 Field name for parent ID.

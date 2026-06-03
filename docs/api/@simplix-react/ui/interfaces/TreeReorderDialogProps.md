@@ -34,7 +34,7 @@ Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:74](https://githu
 
 ### getDisplayName()
 
-> **getDisplayName**: (`item`) => `string`
+> **getDisplayName**: (`item`) => `ReactNode`
 
 Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:72](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-reorder-dialog.tsx#L72)
 
@@ -46,7 +46,7 @@ Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:72](https://githu
 
 #### Returns
 
-`string`
+`ReactNode`
 
 ***
 
