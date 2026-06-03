@@ -21,3 +21,4 @@ storybook-static/
 !packages/cli/src/types/hbs.d.ts
 *.iml
 coverage/
+/.skill-check/
