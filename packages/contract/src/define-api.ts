@@ -1,4 +1,5 @@
 import type {
+  ApiContract,
   ApiContractConfig,
   EntityDefinition,
   FetchFn,
@@ -68,7 +69,7 @@ export function defineApi<
 >(
   config: ApiContractConfig<TEntities, TOperations>,
   options?: { fetchFn?: FetchFn },
-) {
+): ApiContract<TEntities, TOperations> {
   return {
     config,
     client: deriveClient(config, options?.fetchFn),

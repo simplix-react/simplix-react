@@ -4,6 +4,7 @@ export { useBatchDetails } from "./use-batch-details.js";
 
 export type {
   EntityHooks,
+  EntityHookFor,
   OperationHooks,
   DerivedListHook,
   DerivedGetHook,
@@ -11,5 +12,7 @@ export type {
   DerivedUpdateHook,
   DerivedDeleteHook,
   DerivedInfiniteListHook,
+  DerivedTreeHook,
+  DerivedQueryHook,
   OperationMutationHook,
 } from "./types.js";

@@ -39,7 +39,7 @@ export function deriveEntityFormHooks<
     config: ApiContractConfig<TEntities, any>;
   },
   hooks: {
-    [K in keyof TEntities]: EntityHooks<TEntities[K]["schema"]>;
+    [K in keyof TEntities]: EntityHooks<TEntities[K]["schema"], TEntities[K]["operations"]>;
   },
 ): DerivedEntityFormHooksResult<TEntities> {
   const { config } = contract;

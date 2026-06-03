@@ -1,4 +1,5 @@
 import type {
+  ApiContract,
   ApiContractConfig,
   EntityDefinition,
   EntityOperationDef,
@@ -43,7 +44,7 @@ export function deriveClient<
 >(
   config: ApiContractConfig<TEntities, TOperations>,
   fetchFn?: FetchFn,
-) {
+): ApiContract<TEntities, TOperations>["client"] {
   const resolvedFetch: FetchFn = fetchFn
     ?? (<T>(path: string, options?: RequestInit) => getDefaultFetch()<T>(path, options));
   const { basePath, entities, operations, queryBuilder } = config;
@@ -59,7 +60,9 @@ export function deriveClient<
     }
   }
 
-  return result;
+  // The dynamic build above is intentionally untyped; the role-aware client
+  // shape is recovered here. Runtime behavior matches the typed contract.
+  return result as ApiContract<TEntities, TOperations>["client"];
 }
 
 function createEntityClient(

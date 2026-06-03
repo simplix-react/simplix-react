@@ -1,9 +1,13 @@
 import type { z } from "zod";
 import type { AnyFormApi } from "@tanstack/react-form";
-import type { EntityHooks } from "@simplix-react/react";
 
-/** Shorthand for entity hooks with any Zod schema type. */
-export type AnyEntityHooks = EntityHooks<z.ZodTypeAny>;
+/**
+ * Loose shape for the derived entity hooks consumed internally by the form
+ * factories. The precise per-hook types live in `@simplix-react/react`'s
+ * `EntityHooks`; the form plumbing calls hooks generically, so it intentionally
+ * treats them as a record of callables.
+ */
+export type AnyEntityHooks = Record<string, (...args: unknown[]) => unknown>;
 
 /**
  * Options for the `useCreateForm` hook.

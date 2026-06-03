@@ -1,5 +1,5 @@
 import type { z } from "zod";
-import type { QueryBuilder } from "./helpers/query-types.js";
+import type { ListParams, QueryBuilder } from "./helpers/query-types.js";
 
 // ── WiredSchema ──
 
@@ -97,6 +97,68 @@ export type InferOutputData<T> =
     : T extends z.ZodType
       ? z.infer<T>
       : unknown;
+
+// ── Role & Inference Helpers ──
+
+/** Standard operation key names that resolve to a CRUD role by convention. */
+type CrudOperationName = "list" | "get" | "create" | "update" | "delete" | "tree";
+
+/**
+ * Resolves the effective CRUD role of an operation at the type level, mirroring
+ * the runtime `resolveRole`: an explicit `role` wins, otherwise the operation
+ * key is matched against the standard CRUD names, otherwise `"custom"`.
+ *
+ * @typeParam K - The operation key name.
+ * @typeParam Op - The operation definition.
+ */
+export type ResolveRole<K extends string, Op> = Op extends {
+  role: infer R extends CrudRole;
+}
+  ? R
+  : K extends CrudOperationName
+    ? K
+    : "custom";
+
+/** Infers the entity data type from its Zod schema (`unknown` when not a schema). */
+export type InferEntityData<TSchema> = TSchema extends z.ZodType
+  ? z.infer<TSchema>
+  : unknown;
+
+/** Infers an operation's input DTO type from its `input` schema (`unknown` when absent). */
+export type InferOpInput<Op> = Op extends { input: infer I extends z.ZodType }
+  ? z.infer<I>
+  : unknown;
+
+/**
+ * Infers an operation's output data: its `output` schema when present, otherwise
+ * the entity's own schema (matching the runtime fallback in `deriveClient`).
+ */
+export type InferOpOutputData<Op, TSchema> = Op extends { output: infer O }
+  ? unknown extends O
+    ? InferEntityData<TSchema>
+    : InferOutputData<O>
+  : InferEntityData<TSchema>;
+
+/**
+ * Client method type for one entity operation, shaped by its resolved CRUD role.
+ *
+ * @typeParam Role - The resolved {@link ResolveRole | CRUD role}.
+ * @typeParam Op - The operation definition.
+ * @typeParam TSchema - The entity's Zod schema.
+ */
+export type EntityClientFn<Role, Op, TSchema> = Role extends "list"
+  ? (parentIdOrParams?: string | ListParams, params?: ListParams) => Promise<InferEntityData<TSchema>[]>
+  : Role extends "get"
+    ? (id: EntityId) => Promise<InferEntityData<TSchema>>
+    : Role extends "create"
+      ? (parentIdOrDto: string | InferOpInput<Op>, dto?: InferOpInput<Op>) => Promise<InferEntityData<TSchema>>
+      : Role extends "update"
+        ? (id: EntityId, dto: InferOpInput<Op>) => Promise<InferEntityData<TSchema>>
+        : Role extends "delete"
+          ? (id: EntityId) => Promise<void>
+          : Role extends "tree"
+            ? (params?: Record<string, unknown>) => Promise<InferEntityData<TSchema>>
+            : (...args: unknown[]) => Promise<InferOpOutputData<Op, TSchema>>;
 
 // ── Transform Types ──
 
@@ -235,7 +297,7 @@ export interface EntityOperationDef<
   invalidates?: (
     queryKeys: Record<string, QueryKeyFactory>,
     params: Record<string, string>,
-  ) => readonly unknown[][];
+  ) => readonly (readonly unknown[])[];
   /** Content type for the request body. Defaults to `"json"`. */
   contentType?: "json" | "multipart";
   /** Expected response format. Defaults to `"json"`. */
@@ -394,7 +456,7 @@ export interface OperationDefinition<
   invalidates?: (
     queryKeys: Record<string, QueryKeyFactory>,
     params: Record<string, string>,
-  ) => readonly unknown[][];
+  ) => readonly (readonly unknown[])[];
   /**
    * Transforms the input into a custom HTTP request.
    * When provided, replaces the default JSON body serialization.
@@ -540,12 +602,14 @@ export interface QueryKeyFactory {
  * @see {@link deriveClient} for the factory function.
  */
 export type EntityClient<
-  _TSchema extends z.ZodType,
+  TSchema extends z.ZodType,
   TOperations extends Record<string, EntityOperationDef>,
 > = {
-  [K in keyof TOperations]: (
-    ...args: unknown[]
-  ) => Promise<InferOutputData<TOperations[K]["output"]>>;
+  [K in keyof TOperations & string]: EntityClientFn<
+    ResolveRole<K, TOperations[K]>,
+    TOperations[K],
+    TSchema
+  >;
 };
 
 /**

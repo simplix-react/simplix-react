@@ -1,11 +1,21 @@
 import type {
+  InfiniteData,
   UseQueryOptions,
   UseQueryResult,
   UseInfiniteQueryResult,
   UseMutationOptions,
   UseMutationResult,
 } from "@tanstack/react-query";
-import type { EntityId, ListParams, PageInfo } from "@simplix-react/contract";
+import type {
+  EntityId,
+  EntityOperationDef,
+  InferEntityData,
+  InferOpInput,
+  InferOpOutputData,
+  ListParams,
+  PageInfo,
+  ResolveRole,
+} from "@simplix-react/contract";
 import type { z } from "zod";
 
 /**
@@ -166,19 +176,72 @@ export type DerivedInfiniteListHook<TData> = (
   params?: Omit<ListParams, "pagination"> & { limit?: number },
   options?: Record<string, unknown>,
 ) => UseInfiniteQueryResult<
-  { data: TData[]; meta: PageInfo },
+  InfiniteData<{ data: TData[]; meta: PageInfo }>,
   Error
 >;
 
 /**
- * Represents the complete set of React Query hooks derived from an entity definition.
+ * Represents a derived tree query hook produced for a `tree`-role operation.
  *
- * Each entity in the contract produces an object conforming to this interface.
- * Hook names are derived from operation names with a `use` prefix and PascalCase.
- * CRUD role operations produce specialized hooks; custom operations produce
- * generic query/mutation hooks based on their HTTP method.
+ * @typeParam TData - The tree response type
+ */
+export type DerivedTreeHook<TData> = (
+  params?: Record<string, unknown>,
+  options?: Omit<UseQueryOptions<TData, Error>, "queryKey" | "queryFn">,
+) => UseQueryResult<TData>;
+
+/**
+ * Represents a derived query hook produced for a custom GET operation.
+ *
+ * @typeParam TData - The operation's response type
+ */
+export type DerivedQueryHook<TData> = (
+  params?: Record<string, unknown>,
+  options?: Omit<UseQueryOptions<TData, Error>, "queryKey" | "queryFn">,
+) => UseQueryResult<TData>;
+
+/**
+ * Maps a single entity operation to its derived hook type, by resolved CRUD role.
+ *
+ * @typeParam Role - The resolved CRUD role (see `ResolveRole`)
+ * @typeParam Op - The operation definition
+ * @typeParam TSchema - The entity's Zod schema
+ */
+export type EntityHookFor<Role, Op, TSchema extends z.ZodTypeAny> = Role extends "list"
+  ? DerivedListHook<InferEntityData<TSchema>>
+  : Role extends "get"
+    ? DerivedGetHook<InferEntityData<TSchema>>
+    : Role extends "create"
+      ? DerivedCreateHook<InferOpInput<Op>, InferEntityData<TSchema>>
+      : Role extends "update"
+        ? DerivedUpdateHook<InferOpInput<Op>, InferEntityData<TSchema>>
+        : Role extends "delete"
+          ? DerivedDeleteHook
+          : Role extends "tree"
+            ? DerivedTreeHook<InferEntityData<TSchema>>
+            : Op extends { method: "GET" }
+              ? DerivedQueryHook<InferOpOutputData<Op, TSchema>>
+              : OperationMutationHook<InferOpInput<Op>, InferOpOutputData<Op, TSchema>>;
+
+/** Resolves to `true` when any operation in the map has a `list` role. */
+type EntityHasListRole<TOperations> = true extends {
+  [K in keyof TOperations & string]: ResolveRole<K, TOperations[K]> extends "list" ? true : false;
+}[keyof TOperations & string]
+  ? true
+  : false;
+
+/**
+ * The complete set of React Query hooks derived from an entity definition.
+ *
+ * Each entity in the contract produces an object conforming to this type. Hook
+ * names are derived from operation keys with a `use` prefix and PascalCase
+ * (`list` → `useList`, custom `archive` → `useArchive`). CRUD-role operations
+ * produce specialized, fully-typed hooks; custom operations produce generic
+ * query (GET) or mutation hooks. A `list`-role operation additionally yields a
+ * `useInfiniteList` hook.
  *
  * @typeParam TSchema - The Zod schema defining the entity shape
+ * @typeParam TOperations - The entity's operations map (drives hook names and types)
  *
  * @example
  * ```ts
@@ -186,24 +249,26 @@ export type DerivedInfiniteListHook<TData> = (
  *
  * const hooks = deriveEntityHooks(inventoryContract);
  *
- * // CRUD hooks (from operations with CRUD roles)
- * const { data } = hooks.product.useList();
- * const { data: single } = hooks.product.useGet(id);
- * const create = hooks.product.useCreate();
- * const update = hooks.product.useUpdate();
- * const remove = hooks.product.useDelete();
- * const infinite = hooks.product.useInfiniteList();
- *
- * // Custom operation hooks
- * const archive = hooks.product.useArchive();
- * const { data: results } = hooks.product.useSearch({ q: "keyword" });
+ * const { data } = hooks.product.useList();          // UseQueryResult<Product[]>
+ * const { data: single } = hooks.product.useGet(id); // UseQueryResult<Product>
+ * const create = hooks.product.useCreate();          // UseMutationResult<Product, Error, CreateInput>
+ * const archive = hooks.product.useArchive();        // custom operation hook
  * ```
  *
  * @see {@link deriveEntityHooks} for generating these hooks from a contract.
  */
 export type EntityHooks<
-  _TSchema extends z.ZodTypeAny = z.ZodTypeAny,
-> = Record<string, (...args: unknown[]) => unknown>;
+  TSchema extends z.ZodTypeAny = z.ZodTypeAny,
+  TOperations extends Record<string, EntityOperationDef> = Record<string, EntityOperationDef>,
+> = {
+  [K in keyof TOperations & string as `use${Capitalize<K>}`]: EntityHookFor<
+    ResolveRole<K, TOperations[K]>,
+    TOperations[K],
+    TSchema
+  >;
+} & (EntityHasListRole<TOperations> extends true
+  ? { useInfiniteList: DerivedInfiniteListHook<InferEntityData<TSchema>> }
+  : Record<never, never>);
 
 /**
  * Represents a derived mutation hook for a custom operation.

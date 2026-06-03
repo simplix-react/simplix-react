@@ -561,7 +561,7 @@ export type DerivedEntityHooksResult<
   TEntities extends Record<string, AnyEntityDef>,
   TOperations extends Record<string, AnyOperationDef>,
 > = {
-  [K in keyof TEntities]: EntityHooks<TEntities[K]["schema"]>;
+  [K in keyof TEntities]: EntityHooks<TEntities[K]["schema"], TEntities[K]["operations"]>;
 } & {
   [K in keyof TOperations]: TOperations[K] extends OperationDefinition<
     infer TInput,

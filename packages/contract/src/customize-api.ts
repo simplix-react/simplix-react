@@ -1,4 +1,5 @@
 import type {
+  ApiContract,
   ApiContractConfig,
   EntityDefinition,
   EntityOperationDef,
@@ -70,7 +71,7 @@ export function customizeApi<
   base: { config: ApiContractConfig<TEntities, TOperations> },
   patch: ApiPatch,
   options?: { fetchFn?: FetchFn },
-) {
+): ApiContract<TEntities, TOperations> {
   const patchedEntities = { ...base.config.entities } as Record<string, EntityDefinition>;
 
   if (patch.entities) {

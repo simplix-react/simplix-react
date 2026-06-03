@@ -33,11 +33,16 @@ export type {
   ApiContractConfig,
   QueryKeyFactory,
   EntityClient,
+  EntityClientFn,
   ApiContract,
   EntityId,
   FetchFn,
   AnyEntityDef,
   AnyOperationDef,
+  ResolveRole,
+  InferEntityData,
+  InferOpInput,
+  InferOpOutputData,
 } from "./types.js";
 
 export { wired, isWiredSchema, CRUD_OPERATIONS } from "./types.js";
