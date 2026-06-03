@@ -1,8 +1,9 @@
 name: simplix-react
-description: Package-first React framework that auto-generates reusable domain packages from OpenAPI specs
-version: 1.0.0
+description: Package-first React framework that derives a type-safe client, React Query hooks, TanStack Form hooks, and MSW mocks from one Zod/OpenAPI contract per domain. Enforces framework-first derivation, package/module (FSD) separation, and CLI + OpenAPI scaffolding over hand-rolled code.
+version: 1.1.0
 entry: simplix-react/SKILL.md
 references:
+  - simplix-react/references/cli-workflow.md
   - simplix-react/references/api-patterns.md
   - simplix-react/references/recipes.md
   - simplix-react/references/configuration.md
