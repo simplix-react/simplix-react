@@ -36,6 +36,7 @@ export function DescriptionEditDialog({
     DialogContent,
     DialogHeader,
     DialogTitle,
+    DialogDescription,
     DialogFooter,
     Button,
   } = useFlatUIComponents()
@@ -80,6 +81,9 @@ export function DescriptionEditDialog({
               <X size={16} aria-hidden="true" />
             </Button>
           </div>
+          <DialogDescription className="sr-only">
+            {t('file.description.placeholder')}
+          </DialogDescription>
         </DialogHeader>
 
         {/* py only — no horizontal padding so the i18n input is flush with header/footer (issue 2) */}
