@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from '@simplix-react/i18n/react'
-import { formatBytes } from './lib/format-bytes'
+import { formatBytes } from '../../utils/format-bytes'
 import {
   DEFAULT_MAX_FILES,
   DEFAULT_MAX_FILE_SIZE,

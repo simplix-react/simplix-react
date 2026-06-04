@@ -13,7 +13,7 @@ import { FileActionButton } from '../file-attachment/components/file-action-butt
 import { FileThumbnail } from '../file-attachment/atoms/file-thumbnail'
 import { FileDropzone } from '../file-attachment/atoms/file-dropzone'
 import { FileListItem } from '../file-attachment/components/file-list-item'
-import { formatBytes } from '../file-attachment/lib/format-bytes'
+import { formatBytes } from '../../utils/format-bytes'
 import { DEFAULT_MAX_FILE_SIZE } from '../file-attachment/types'
 import { Carousel } from '../image-attachment/components/carousel'
 import { ThumbStrip } from '../image-attachment/components/thumb-strip'

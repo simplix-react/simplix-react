@@ -11,7 +11,7 @@ import {
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { useTranslation } from '@simplix-react/i18n/react'
-import { formatBytes } from '../lib/format-bytes'
+import { formatBytes } from '../../../utils/format-bytes'
 import { cn } from '../../../utils/cn'
 import { FileListItem } from './file-list-item'
 import { FileTypeIcon } from '../atoms/file-type-icon'

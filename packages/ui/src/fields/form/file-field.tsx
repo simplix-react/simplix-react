@@ -11,7 +11,7 @@ import { DeleteConfirmDialog } from '../file-attachment/components/delete-confir
 import { ImageViewerModal } from '../file-attachment/components/image-viewer-modal'
 import { DescriptionEditDialog } from '../file-attachment/components/description-edit-dialog'
 import { DEFAULT_MAX_FILES, DEFAULT_MAX_FILE_SIZE } from '../file-attachment/types'
-import { formatBytes } from '../file-attachment/lib/format-bytes'
+import { formatBytes } from '../../utils/format-bytes'
 import type { FileAttachmentItem } from '../file-attachment/types'
 import type { FileFieldProps } from '../file-attachment/types'
 
