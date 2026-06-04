@@ -16,6 +16,10 @@ export type {
 export { useFileAttachment } from './use-file-attachment'
 export type { UseFileAttachmentOptions } from './use-file-attachment'
 
+// API factory (builds a FileFieldApi against the common attachment endpoints)
+export { createFileFieldApi } from './create-file-field-api'
+export type { CreateFileFieldApiOptions, AttachmentHttpClient } from './create-file-field-api'
+
 // Atoms
 export { FileDropzone } from './atoms/file-dropzone'
 export type { FileDropzoneProps } from './atoms/file-dropzone'

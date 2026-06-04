@@ -633,3 +633,10 @@ export type {
   RouteMatcherProviderProps,
   UseActiveMenuItemOptions,
 } from "./menu";
+
+// File attachment API factory (builds a FileFieldApi for the common endpoints)
+export { createFileFieldApi } from "./fields/file-attachment";
+export type {
+  CreateFileFieldApiOptions,
+  AttachmentHttpClient,
+} from "./fields/file-attachment";
