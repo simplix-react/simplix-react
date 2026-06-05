@@ -11,6 +11,8 @@
     "locate": "Locate",
     "yes": "Yes",
     "no": "No",
+    "on": "On",
+    "off": "Off",
     "loading": "Loading...",
     "notFound": "Not found.",
     "notFoundTitle": "Data Not Found",

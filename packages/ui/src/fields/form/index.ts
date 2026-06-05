@@ -28,6 +28,14 @@ export type { IconFieldProps } from "./icon-field";
 export { MultiSelectField } from "./multi-select-field";
 export type { MultiSelectFieldProps } from "./multi-select-field";
 
+export { GroupedToggleField } from "./grouped-toggle-field";
+export type {
+  GroupedToggleFieldProps,
+  GroupedToggleGroup,
+  GroupedToggleOption,
+  GroupedToggleOtherInfo,
+} from "./grouped-toggle-field";
+
 export { NumberField } from "./number-field";
 export type { NumberFieldProps } from "./number-field";
 
