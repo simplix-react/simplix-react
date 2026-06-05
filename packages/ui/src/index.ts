@@ -398,6 +398,15 @@ export type { TreeSelectFieldProps } from "./fields/form/tree-select-field";
 export { IconField } from "./fields/form/icon-field";
 export type { IconFieldProps } from "./fields/form/icon-field";
 
+// Grouped toggle field
+export { GroupedToggleField } from "./fields/form";
+export type {
+  GroupedToggleFieldProps,
+  GroupedToggleGroup,
+  GroupedToggleOption,
+  GroupedToggleOtherInfo,
+} from "./fields/form";
+
 // Icon picker primitive
 export { IconPicker, Icon } from "./base/inputs/icon-picker";
 export type {
@@ -427,6 +436,14 @@ export type {
   CrudDetailProps,
   CrudDetailSectionProps,
   CrudDetailVariant,
+} from "./crud/detail";
+
+// Detail profile
+export { DetailProfile } from "./crud/detail";
+export type {
+  DetailProfileFeatsProps,
+  DetailProfileMetaProps,
+  DetailProfileProps,
 } from "./crud/detail";
 
 // Filters
@@ -524,6 +541,18 @@ export type { ConfirmDialogProps } from "./crud/shared";
 // Query fallback
 export { QueryFallback } from "./crud/shared";
 export type { QueryFallbackProps } from "./crud/shared";
+
+// Table card frame
+export { TableCardFrame, TableCardFrameContext, useTableCardFrame } from "./crud/shared";
+export type { TableCardFrameProps, TableCardFrameValue } from "./crud/shared";
+
+// Feature card
+export { FeatureCard } from "./crud/shared";
+export type { FeatureCardProps } from "./crud/shared";
+
+// Modal sidebar
+export { ModalSidebar } from "./crud/modal";
+export type { ModalSidebarBlockProps, ModalSidebarProps, ModalSidebarRowProps } from "./crud/modal";
 
 // Icons (selective re-export for consumer use)
 export { ArrowLeftIcon } from "./crud/shared/icons";

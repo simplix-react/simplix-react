@@ -31,3 +31,6 @@ export type { EmptyStateProps } from "./empty-state";
 
 export { TableCardFrame, TableCardFrameContext, useTableCardFrame } from "./table-card-frame";
 export type { TableCardFrameProps, TableCardFrameValue } from "./table-card-frame";
+
+export { FeatureCard } from "./feature-card";
+export type { FeatureCardProps } from "./feature-card";
