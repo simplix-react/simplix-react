@@ -79,7 +79,8 @@ describe("FilterBar", () => {
   it("renders the filter button", () => {
     const state = createMockState();
     render(<FilterBar filters={[textFilter]} state={state} />);
-    expect(screen.getByText("filter.label")).toBeTruthy();
+    // The filter trigger is an icon-only button identified by its aria-label.
+    expect(screen.getByRole("button", { name: "filter.label" })).toBeTruthy();
   });
 
   it("renders leading content", () => {

@@ -22,9 +22,15 @@ describe("Badge", () => {
     expect(badge.className).toContain("text-primary-foreground");
   });
 
-  it("applies default rounded='full'", () => {
+  it("applies default rounded='sm'", () => {
     render(<Badge>Round</Badge>);
     const badge = screen.getByText("Round");
+    expect(badge.className).toContain("rounded-sm");
+  });
+
+  it("applies rounded='full'", () => {
+    render(<Badge rounded="full">Full</Badge>);
+    const badge = screen.getByText("Full");
     expect(badge.className).toContain("rounded-full");
   });
 

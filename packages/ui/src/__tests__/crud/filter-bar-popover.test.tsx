@@ -123,7 +123,8 @@ describe("FilterBar popover form fields", () => {
   };
 
   function openPopover() {
-    const filterBtn = screen.getByText("filter.label").closest("button");
+    // The filter trigger is an icon-only button identified by its aria-label.
+    const filterBtn = screen.getByRole("button", { name: "filter.label" });
     if (filterBtn) fireEvent.click(filterBtn);
   }
 

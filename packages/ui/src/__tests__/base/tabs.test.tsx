@@ -81,6 +81,22 @@ describe("TabsList", () => {
     expect(list.className).toContain("mt-3");
   });
 
+  it("applies bookmark variant", () => {
+    const { container } = render(
+      <Tabs defaultValue="a">
+        <TabsList variant="bookmark">
+          <TabsTrigger value="a">A</TabsTrigger>
+        </TabsList>
+        <TabsContent value="a">Content</TabsContent>
+      </Tabs>,
+    );
+    const list = container.querySelector("[role='tablist']") as HTMLElement;
+    expect(list.className).toContain("border-b-2");
+    expect(list.className).toContain("items-end");
+    // bookmark list drops the segmented-track background
+    expect(list.className).not.toContain("bg-muted");
+  });
+
   it("merges custom className", () => {
     const { container } = render(
       <Tabs defaultValue="a">
@@ -150,6 +166,23 @@ describe("TabsTrigger", () => {
     );
     const tab = screen.getByRole("tab");
     expect(tab.className).toContain("my-trigger");
+  });
+
+  it("adapts styling to the bookmark list variant via context", () => {
+    render(
+      <Tabs defaultValue="a">
+        <TabsList variant="bookmark">
+          <TabsTrigger value="a">A</TabsTrigger>
+        </TabsList>
+        <TabsContent value="a">Content</TabsContent>
+      </Tabs>,
+    );
+    const tab = screen.getByRole("tab");
+    // folder-shaped trigger: top-rounded, no bottom border
+    expect(tab.className).toContain("rounded-t-lg");
+    expect(tab.className).toContain("border-b-0");
+    // segmented-control trigger classes are not applied in bookmark mode
+    expect(tab.className).not.toContain("rounded-md");
   });
 
   it("forwards ref", () => {
@@ -245,4 +278,5 @@ describe("TabsContent", () => {
     );
     expect(ref.current).toBeInstanceOf(HTMLDivElement);
   });
+
 });

@@ -1,8 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { useState, useMemo, useCallback } from "react";
 import {
+  CrudListColumnContext,
   FilterBar,
   SearchOperator,
+  type CrudListColumnContextValue,
   type CrudListFilters,
   type FilterDef,
 } from "@simplix-react/ui";
@@ -205,11 +207,34 @@ export const WithActiveFilters: StoryObj = {
       "name.contains": "Alice",
       "status.in": ["active", "pending"],
     });
+    // Provide column context so the columns toggle renders, grouped with the
+    // filter trigger in one segmented control (like the list/grid view toggle).
+    const [hiddenColumns, setHiddenColumns] = useState<Set<string>>(new Set());
+    const columnCtx = useMemo<CrudListColumnContextValue>(
+      () => ({
+        columns: [
+          { field: "name", label: "Name" },
+          { field: "status", label: "Status" },
+          { field: "email", label: "Email" },
+        ],
+        setColumns: () => {},
+        hiddenColumns,
+        setHiddenColumns,
+        isCardMode: false,
+        setIsCardMode: () => {},
+        viewMode: "list",
+        setViewMode: () => {},
+        canGridView: false,
+        setCanGridView: () => {},
+        responsiveCardMode: false,
+        setResponsiveCardMode: () => {},
+      }),
+      [hiddenColumns],
+    );
     return (
-      <FilterBar
-        filters={textAndFacetedFilters}
-        state={state}
-      />
+      <CrudListColumnContext.Provider value={columnCtx}>
+        <FilterBar count={42} filters={textAndFacetedFilters} state={state} />
+      </CrudListColumnContext.Provider>
     );
   },
 };

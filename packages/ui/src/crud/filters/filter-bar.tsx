@@ -85,12 +85,14 @@ export interface FilterBarProps {
   onPreview?: () => void;
   /** Label for the preview button. Defaults to the `list.preview` translation. */
   previewLabel?: string;
+  /** When provided, renders a standard total-count badge at the start of the leading group. */
+  count?: number;
   className?: string;
 }
 
 // ── FilterBar Component ──
 
-export function FilterBar({ filters, state, leading, maxBadges, onPreview, previewLabel, className }: FilterBarProps) {
+export function FilterBar({ filters, state, leading, maxBadges, onPreview, previewLabel, count, className }: FilterBarProps) {
   const { Badge, Button, Popover, PopoverTrigger, PopoverContent, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuCheckboxItem } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const locale = useLocale();
@@ -258,8 +260,10 @@ export function FilterBar({ filters, state, leading, maxBadges, onPreview, previ
   const visibleDefs = maxBadges != null ? activeDefs.slice(0, maxBadges) : activeDefs;
   const hiddenCount = activeDefs.length - visibleDefs.length;
 
+  const showCount = count != null;
   const showViewToggle = !!columnCtx?.canGridView && !columnCtx?.responsiveCardMode;
-  const hasLeadingGroup = !!leading || showViewToggle || !!onPreview;
+  const showColumnsToggle = !!columnCtx && columnCtx.columns.length > 0 && !columnCtx.isCardMode;
+  const hasLeadingGroup = showCount || !!leading || showViewToggle || !!onPreview;
 
   return (
     <Flex
@@ -271,12 +275,18 @@ export function FilterBar({ filters, state, leading, maxBadges, onPreview, previ
     >
       {hasLeadingGroup && (
         <Flex gap="xs" align="center" wrap>
+          {showCount && (
+            <span className="box-border inline-flex h-8 items-center gap-1.5 rounded-md border border-input bg-card px-2.5 text-sm text-muted-foreground [&_svg]:size-3.5">
+              <RowsIcon />
+              {t("list.totalCount", { count: count! })}
+            </span>
+          )}
           {leading}
           {showViewToggle && (
             <div
               role="group"
               aria-label={t("filter.label")}
-              className="inline-flex h-8 items-center rounded-sm border border-border-strong bg-card p-[3px]"
+              className="box-border inline-flex h-8 items-center rounded-md border border-input bg-card p-0.5"
             >
               {([
                 { mode: "list", Icon: RowsIcon, label: t("list.viewList") },
@@ -292,10 +302,10 @@ export function FilterBar({ filters, state, leading, maxBadges, onPreview, previ
                     title={label}
                     onClick={() => columnCtx?.setViewMode(mode)}
                     className={cn(
-                      "inline-grid h-full w-7 place-items-center rounded-sm transition-colors",
+                      "inline-grid h-full w-7 place-items-center rounded transition-colors",
                       active
-                        ? "bg-primary-soft text-primary"
-                        : "text-secondary-foreground hover:bg-muted hover:text-foreground",
+                        ? "bg-muted text-foreground"
+                        : "text-muted-foreground hover:text-foreground",
                     )}
                   >
                     <Icon className="h-3.5 w-3.5" />
@@ -319,7 +329,7 @@ export function FilterBar({ filters, state, leading, maxBadges, onPreview, previ
           <Badge
             key={def.field}
             variant="secondary"
-            className="h-8 max-w-[12rem] gap-1 rounded-sm border-border-strong pl-2 pr-1 text-xs font-normal"
+            className="h-8 max-w-[12rem] gap-1 rounded-md border-input pl-2 pr-1 text-xs font-normal"
           >
             <span className="shrink-0 text-muted-foreground">{def.label}:</span>
             {BadgeIcon && <BadgeIcon className="h-3 w-3 shrink-0 text-muted-foreground" />}
@@ -336,28 +346,31 @@ export function FilterBar({ filters, state, leading, maxBadges, onPreview, previ
         );
       })}
       {hiddenCount > 0 && (
-        <Badge variant="secondary" className="h-8 rounded-sm border-border-strong px-2 text-xs font-normal">
+        <Badge variant="secondary" className="h-8 rounded-md border-input px-2 text-xs font-normal">
           +{hiddenCount}
         </Badge>
       )}
-      <Popover open={open} onOpenChange={setOpen}>
+      {/* Segmented group: filter trigger + columns toggle, styled like the view toggle. */}
+      <div className="box-border inline-flex h-8 items-center gap-0.5 rounded-md border border-input bg-card p-0.5">
+        <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              size="sm"
+            <button
+              type="button"
+              aria-label={t("filter.label")}
+              title={t("filter.label")}
               className={cn(
-                "gap-1.5 rounded-sm font-semibold",
-                hasActiveFilters && "border-primary-soft-2 bg-primary-soft text-primary hover:bg-primary-soft hover:text-primary",
+                "inline-flex h-full items-center gap-1.5 rounded px-2 text-sm transition-colors hover:bg-muted [&_svg]:size-3.5",
+                hasActiveFilters ? "text-primary" : "text-muted-foreground hover:text-foreground",
               )}
             >
-              <FunnelIcon className="h-3 w-3" />
-              {t("filter.label")}
+              <FunnelIcon className="h-3.5 w-3.5" />
+              <span>{t("filter.label")}</span>
               {hasActiveFilters && (
-                <Badge className="ml-0.5 h-4 min-w-[1rem] justify-center rounded-full bg-primary px-1 text-[10px] font-bold leading-none text-primary-foreground">
+                <Badge className="h-4 min-w-[1rem] justify-center rounded-full bg-primary px-1 text-[10px] font-bold leading-none text-primary-foreground">
                   {activeDefs.length}
                 </Badge>
               )}
-            </Button>
+            </button>
           </PopoverTrigger>
           <PopoverContent
             className="flex max-h-[min(70vh,var(--radix-popover-content-available-height,70vh))] w-[320px] flex-col p-0"
@@ -365,7 +378,7 @@ export function FilterBar({ filters, state, leading, maxBadges, onPreview, previ
             collisionPadding={16}
           >
             <Flex align="center" justify="between" className="border-b px-4 py-2.5">
-              <span className="text-sm font-medium">{t("filter.label")}</span>
+              <span className="text-sm font-bold">{t("filter.label")}</span>
               <Flex gap="xs" align="center">
                 <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={clearAll} disabled={!hasActiveFilters && !state.isPending}>
                   {t("common.clear")}
@@ -389,12 +402,17 @@ export function FilterBar({ filters, state, leading, maxBadges, onPreview, previ
             </Stack>
           </PopoverContent>
         </Popover>
-        {columnCtx && columnCtx.columns.length > 0 && !columnCtx.isCardMode && (
+        {showColumnsToggle && <span aria-hidden className="mx-0.5 h-4 w-px bg-border" />}
+        {showColumnsToggle && columnCtx && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="h-8 w-8 rounded-sm p-0" aria-label="Toggle columns">
+              <button
+                type="button"
+                aria-label="Toggle columns"
+                className="inline-grid h-full w-7 place-items-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground [&_svg]:size-3.5"
+              >
                 <ColumnsIcon className="h-3.5 w-3.5" />
-              </Button>
+              </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               {columnCtx.columns.map((col) => (
@@ -414,6 +432,7 @@ export function FilterBar({ filters, state, leading, maxBadges, onPreview, previ
             </DropdownMenuContent>
           </DropdownMenu>
         )}
+      </div>
       </Flex>
     </Flex>
   );
@@ -511,7 +530,7 @@ function TextFormField({
   return (
     <Stack gap="xs" className={className}>
       <Flex align="center" justify="between">
-        <Label className="text-xs font-medium text-muted-foreground">{def.label}</Label>
+        <Label className="text-sm font-medium text-secondary-foreground">{def.label}</Label>
         {value && <FieldClearButton onClick={() => state.setValue(key, undefined)} label={def.label} />}
       </Flex>
       <Flex gap="xs" align="center">
@@ -582,7 +601,7 @@ function NumberFormField({
   return (
     <Stack gap="xs" className={className}>
       <Flex align="center" justify="between">
-        <Label className="text-xs font-medium text-muted-foreground">{def.label}</Label>
+        <Label className="text-sm font-medium text-secondary-foreground">{def.label}</Label>
         {rawValue != null && <FieldClearButton onClick={handleClear} label={def.label} />}
       </Flex>
       <Flex gap="xs" align="center">
@@ -639,7 +658,7 @@ function FacetedFormField({
   return (
     <Stack gap="xs" className={className}>
       <Flex align="center" justify="between">
-        <Label className="text-xs font-medium text-muted-foreground">{def.label}</Label>
+        <Label className="text-sm font-medium text-secondary-foreground">{def.label}</Label>
         {selectedValues.size > 0 && <FieldClearButton onClick={() => state.setValue(key, undefined)} label={def.label} />}
       </Flex>
       {def.options.length > 0 ? (
@@ -699,7 +718,7 @@ function ToggleFormField({
 
   return (
     <Flex align="center" justify="between" className={cn("py-1", className)}>
-      <Label className="text-xs font-medium text-muted-foreground">{def.label}</Label>
+      <Label className="text-sm font-medium text-secondary-foreground">{def.label}</Label>
       <Flex align="center" gap="xs">
         {isActive && <FieldClearButton onClick={() => state.setValue(key, undefined)} label={def.label} />}
         <Switch
@@ -751,7 +770,7 @@ function DateRangeFormField({
   return (
     <Stack gap="xs" className={className}>
       <Flex align="center" justify="between">
-        <Label className="text-xs font-medium text-muted-foreground">{def.label}</Label>
+        <Label className="text-sm font-medium text-secondary-foreground">{def.label}</Label>
         {hasValue && (
           <Flex gap="xs" align="center">
             <span className="text-xs text-foreground">{rangeText}</span>
