@@ -225,3 +225,45 @@ export const CustomCellRenderer: StoryObj = {
     </CrudList>
   ),
 };
+
+// Larger dataset so the scroll region / sticky header is exercised.
+const manyPets: Pet[] = Array.from({ length: 40 }, (_, i) => ({
+  id: i + 1,
+  name: `Pet ${i + 1}`,
+  status: ["available", "pending", "sold"][i % 3],
+  category: ["Dog", "Cat", "Fish"][i % 3],
+}));
+
+/**
+ * TableCard wraps Table + Pagination in one bordered card: small muted headers,
+ * a sticky header while the body scrolls (`maxHeight`), and the pager docked as
+ * the card footer — matching the CMS list design.
+ */
+export const TableCard: StoryObj = {
+  render: () => {
+    const [page, setPage] = useState(1);
+    const pageSize = 20;
+    const totalPages = Math.ceil(manyPets.length / pageSize);
+    const pageData = manyPets.slice((page - 1) * pageSize, page * pageSize);
+
+    return (
+      <CrudList>
+        <CrudList.TableCard maxHeight={340}>
+          <CrudList.Table<Pet> data={pageData}>
+            <CrudList.Column<Pet> field="id" header="ID" width={60} />
+            <CrudList.Column<Pet> field="name" header="Name" sortable />
+            <CrudList.Column<Pet> field="status" header="Status" display="badge" variants={{ available: "default", pending: "secondary", sold: "outline" }} />
+            <CrudList.Column<Pet> field="category" header="Category" />
+          </CrudList.Table>
+          <CrudList.Pagination
+            page={page}
+            pageSize={pageSize}
+            total={manyPets.length}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+        </CrudList.TableCard>
+      </CrudList>
+    );
+  },
+};

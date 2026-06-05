@@ -22,6 +22,7 @@ import type {ColumnInfo, EmptyReason, SortState} from "../shared";
 import {CrudListColumnContext, useCrudListColumns} from "../shared";
 import type {CrudListViewMode} from "../shared";
 import {EmptyState} from "../shared/empty-state";
+import {TableCardFrame, useTableCardFrame} from "../shared/table-card-frame";
 import {AlertTriangleIcon, ArrowUpDownIcon, EyeIcon, FolderTreeIcon, FunnelIcon, MagnifyingGlassIcon, MapPinIcon, PencilIcon, PlusIcon, TrashIcon, UnlinkIcon} from "../shared/icons";
 import {
   AdvancedSelectFilter,
@@ -46,6 +47,13 @@ import { DragHandleHeader } from "../reorder/drag-handle";
 import { DraggableRow } from "../reorder/draggable-row";
 import { DraggableCard } from "../reorder/draggable-card";
 import {useContainerWidth} from "./use-container-width";
+
+// ── Table Card frame context ──
+//
+// Set by CrudList.TableCard (via the shared TableCardFrame) so List.Table and
+// List.Pagination know they render inside one bordered card: the table becomes
+// the scroll region with a sticky header, and the pager becomes the card footer.
+// The frame primitive is shared with CrudTree.TableCard — see ../shared/table-card-frame.
 
 // ── Empty Reason Card ──
 
@@ -138,6 +146,38 @@ function ListToolbar({ className, children }: ListToolbarProps) {
   );
 }
 
+// ── List.TableCard ──
+
+/** Props for the List.TableCard wrapper. */
+export interface ListTableCardProps {
+  /** Bounds the table body height so it scrolls while the header sticks. Works in any layout. */
+  maxHeight?: number | string;
+  /** Fills a height-bounded flex parent instead of using `maxHeight` (e.g. list-detail pane). */
+  fill?: boolean;
+  className?: string;
+  children?: ReactNode;
+}
+
+/**
+ * Wraps `List.Table` + `List.Pagination` in one bordered card: the table is a
+ * scroll region with a sticky header and the pager docks as the footer.
+ * Opt-in — without it, Table and Pagination render as before.
+ *
+ * ```tsx
+ * <CrudList.TableCard maxHeight={520}>
+ *   <CrudList.Table ... />
+ *   <CrudList.Pagination ... />
+ * </CrudList.TableCard>
+ * ```
+ */
+function ListTableCard({ maxHeight, fill, className, children }: ListTableCardProps) {
+  return (
+    <TableCardFrame maxHeight={maxHeight} fill={fill} className={className}>
+      {children}
+    </TableCardFrame>
+  );
+}
+
 // ── List.Search ──
 
 /** Props for the List.Search sub-component. */
@@ -167,37 +207,22 @@ function ListSearch({ value, onChange, placeholder, className }: ListSearchProps
 // ── Sort Icon SVG ──
 
 function SortIcon({ direction }: { direction: "asc" | "desc" | null }) {
-  if (!direction) {
-    return (
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 16 16"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className="ml-1 inline-block opacity-30"
-        aria-hidden="true"
-      >
-        <path d="M8 4L11 7H5L8 4Z" fill="currentColor" />
-        <path d="M8 12L5 9H11L8 12Z" fill="currentColor" />
-      </svg>
-    );
-  }
+  // Single chevron: faint (sortable hint) when inactive, solid up/down when sorted.
   return (
     <svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
       fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       xmlns="http://www.w3.org/2000/svg"
-      className="ml-1 inline-block"
+      className={cn("ml-1 inline-block", direction ? "opacity-100" : "opacity-30")}
       aria-hidden="true"
     >
-      {direction === "asc" ? (
-        <path d="M8 4L11 8H5L8 4Z" fill="currentColor" />
-      ) : (
-        <path d="M8 12L5 8H11L8 12Z" fill="currentColor" />
-      )}
+      {direction === "asc" ? <path d="m18 15-6-6-6 6" /> : <path d="m6 9 6 6 6-6" />}
     </svg>
   );
 }
@@ -456,6 +481,9 @@ interface ReorderableTableProps<T> {
   size?: TableProps["size"];
   density?: TableProps["density"];
   rounded?: TableProps["rounded"];
+  maxHeight?: TableProps["maxHeight"];
+  fill?: TableProps["fill"];
+  stickyHeader?: boolean;
   className?: string;
 }
 
@@ -476,6 +504,9 @@ function ReorderableTable<T>({
   size,
   density,
   rounded,
+  maxHeight,
+  fill,
+  stickyHeader,
   className,
 }: ReorderableTableProps<T>) {
   const { t } = useTranslation("simplix/ui");
@@ -540,7 +571,7 @@ function ReorderableTable<T>({
 
   if (isLoading && data.length === 0) {
     return (
-      <Table variant={variant} size={size} density={density} rounded={rounded} className={cn("table-auto", className)}>
+      <Table variant={variant} size={size} density={density} rounded={rounded} maxHeight={maxHeight} fill={fill} stickyHeader={stickyHeader} className={cn("table-auto", className)}>
         {tableHeader}
         <TableBody>
           {Array.from({ length: 5 }, (_, i) => (
@@ -579,7 +610,7 @@ function ReorderableTable<T>({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <Table variant={variant} size={size} density={density} rounded={rounded} className={cn("table-auto", className)}>
+      <Table variant={variant} size={size} density={density} rounded={rounded} maxHeight={maxHeight} fill={fill} stickyHeader={stickyHeader} className={cn("table-auto", className)}>
         {tableHeader}
         <SortableContext items={sortableIds} strategy={verticalListSortingStrategy}>
           <TableBody>
@@ -804,6 +835,11 @@ function ListTable<T>({
   const manualGrid = !!(gridView && hasCard && columnCtx?.viewMode === "grid");
   const isCardMode = manualGrid || responsiveCardMode;
 
+  // Inside a CrudList.TableCard the table is the scroll region with a sticky
+  // header; base Table owns the overflow so this wrapper must not also scroll.
+  const frame = useTableCardFrame();
+  const framed = !!frame?.framed && !isCardMode;
+
   // Declare grid as a selectable view so the FilterBar can auto-show the toggle.
   useEffect(() => {
     columnCtx?.setCanGridView(!!gridView && hasCard);
@@ -896,7 +932,7 @@ function ListTable<T>({
                 onClick={() => handleSortChange(colDef.field!)}
                 className={cn(
                   "inline-flex items-center font-semibold hover:text-foreground",
-                  isSorted && "text-primary",
+                  isSorted && "text-foreground",
                 )}
               >
                 {colDef.header ?? ""}
@@ -996,7 +1032,14 @@ function ListTable<T>({
   }
 
   return (
-    <div ref={containerRef} className={cn("w-full", !isCardMode && "overflow-x-auto")}>
+    <div
+      ref={containerRef}
+      className={cn(
+        "w-full",
+        !isCardMode && !framed && "overflow-x-auto",
+        framed && frame?.fill && "flex min-h-0 flex-1 flex-col",
+      )}
+    >
       {isCardMode ? (
         <div key="card" className="animate-in fade-in-0 duration-200">
           <Stack gap="sm">
@@ -1116,10 +1159,22 @@ function ListTable<T>({
               size={size}
               density={density}
               rounded={rounded}
+              maxHeight={framed ? frame?.maxHeight : undefined}
+              fill={framed ? frame?.fill : undefined}
+              stickyHeader={framed}
               className={className}
             />
           ) : (
-            <Table variant={variant} size={size} density={density} rounded={rounded} className={cn("table-auto", className)}>
+            <Table
+              variant={variant}
+              size={size}
+              density={density}
+              rounded={rounded}
+              maxHeight={framed ? frame?.maxHeight : undefined}
+              fill={framed ? frame?.fill : undefined}
+              stickyHeader={framed}
+              className={cn("table-auto", className)}
+            >
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id}>
@@ -1158,7 +1213,7 @@ function ListTable<T>({
                           key={row.id}
                           className={cn(
                             selectedIndices?.has(row.index) && "bg-muted",
-                            isActive && "bg-muted",
+                            isActive && "bg-muted/50",
                             onRowClick && "cursor-pointer",
                             rowClassName?.(row.original),
                           )}
@@ -1236,6 +1291,8 @@ function ListPagination({
   className,
 }: ListPaginationProps) {
   const { t } = useTranslation("simplix/ui");
+  // Inside a TableCard the pager docks as the card footer (card bg).
+  const framed = !!useTableCardFrame()?.framed;
   const { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } = useFlatUIComponents();
   const containerRef = useRef<HTMLDivElement>(null);
   const containerWidth = useContainerWidth(containerRef);
@@ -1295,7 +1352,7 @@ function ListPagination({
   const pageNumbers = isCompact ? null : getPageNumbers(page, totalPages);
 
   return (
-    <div ref={containerRef} className={cn("flex w-full items-center justify-end gap-2 border-t bg-muted/60 px-3.5 py-2.5", className)}>
+    <div ref={containerRef} className={cn("flex w-full items-center justify-end gap-2 border-t px-3.5 py-2.5", framed ? "bg-card" : "bg-muted/60", className)}>
       <Flex gap="sm" align="center">
         {pageSizeSelector}
         <Flex gap="xs" align="center">
@@ -1487,6 +1544,7 @@ export const CrudList = Object.assign(ListRoot, {
   FilterBar,
   // Core components
   Table: ListTable,
+  TableCard: ListTableCard,
   Column: ListColumn,
   Pagination: ListPagination,
   BulkActions: ListBulkActions,

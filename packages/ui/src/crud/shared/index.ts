@@ -28,3 +28,6 @@ export type { ConfirmDialogProps } from "./confirm-dialog";
 
 export { EmptyState } from "./empty-state";
 export type { EmptyStateProps } from "./empty-state";
+
+export { TableCardFrame, TableCardFrameContext, useTableCardFrame } from "./table-card-frame";
+export type { TableCardFrameProps, TableCardFrameValue } from "./table-card-frame";

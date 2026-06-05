@@ -239,6 +239,50 @@ describe("CrudTree.Table", () => {
   });
 });
 
+describe("CrudTree.TableCard", () => {
+  it("wraps the table in a bordered card frame", () => {
+    const { container } = render(
+      <CrudTree>
+        <CrudTree.TableCard maxHeight={340}>
+          <CrudTree.Table data={treeData}>
+            <CrudTree.Column<TreeNode> field="name" header="Name" />
+          </CrudTree.Table>
+        </CrudTree.TableCard>
+      </CrudTree>,
+    );
+    const card = container.querySelector(".rounded-lg.border.bg-card");
+    expect(card).toBeTruthy();
+    // Table still renders inside the card.
+    expect(screen.getByText("Category A")).toBeTruthy();
+  });
+
+  it("applies a sticky header when framed", () => {
+    const { container } = render(
+      <CrudTree>
+        <CrudTree.TableCard maxHeight={340}>
+          <CrudTree.Table data={treeData}>
+            <CrudTree.Column<TreeNode> field="name" header="Name" />
+          </CrudTree.Table>
+        </CrudTree.TableCard>
+      </CrudTree>,
+    );
+    const stickyHead = container.querySelector("thead th.sticky");
+    expect(stickyHead).toBeTruthy();
+  });
+
+  it("renders without a card frame when used standalone (no regression)", () => {
+    const { container } = render(
+      <CrudTree>
+        <CrudTree.Table data={treeData}>
+          <CrudTree.Column<TreeNode> field="name" header="Name" />
+        </CrudTree.Table>
+      </CrudTree>,
+    );
+    expect(container.querySelector(".rounded-lg.border.bg-card")).toBeNull();
+    expect(container.querySelector("thead th.sticky")).toBeNull();
+  });
+});
+
 describe("CrudTree.Empty", () => {
   it("renders default no-data message", () => {
     render(

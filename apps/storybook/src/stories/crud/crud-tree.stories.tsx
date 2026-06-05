@@ -114,3 +114,20 @@ export const WithRowClick: StoryObj = {
     </CrudTree>
   ),
 };
+
+export const TableCard: StoryObj = {
+  render: () => (
+    <CrudTree>
+      <CrudTree.TableCard maxHeight={340}>
+        <CrudTree.Table<Category>
+          data={mockTree}
+          tree={{ idField: "id", childrenField: "children", initialExpandedDepth: 2 }}
+          searchFields={["name"]}
+        >
+          <CrudTree.Column<Category> field="name" header="Name" />
+          <CrudTree.Column<Category> field="status" header="Status" />
+        </CrudTree.Table>
+      </CrudTree.TableCard>
+    </CrudTree>
+  ),
+};

@@ -23,6 +23,7 @@ import { useFlatUIComponents } from "../../provider/ui-provider";
 import { Flex, Stack } from "../../primitives";
 import { cn } from "../../utils/cn";
 import type { ColumnInfo, EmptyReason, SortState } from "../shared";
+import { TableCardFrame, useTableCardFrame } from "../shared/table-card-frame";
 import type { ActionType, ActionVariant, ListColumnProps, RowActionDef } from "../list/crud-list";
 import { ArrowUpDownIcon, ChevronsDownUpIcon, ChevronsUpDownIcon, EyeIcon, FolderTreeIcon, MagnifyingGlassIcon, MapPinIcon, PencilIcon, PlusIcon, TrashIcon, UnlinkIcon, XIcon } from "../shared/icons";
 import type { TreeConfig, TreeNodeMetadata } from "./tree-types";
@@ -399,6 +400,10 @@ function TreeTable<T>({
   const { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Skeleton } = useFlatUIComponents();
   const treeCtx = useCrudTreeContext();
 
+  // Inside a CrudTree.TableCard the table is the scroll region with a sticky header.
+  const frame = useTableCardFrame();
+  const framed = !!frame?.framed;
+
   const config: TreeConfig<T> = useMemo(
     () => ({
       idField: (treeConfig?.idField ?? "id") as keyof T & string,
@@ -605,8 +610,23 @@ function TreeTable<T>({
   });
 
   return (
-    <div className="w-full overflow-x-auto">
-      <Table variant={variant} size={size} density={density} rounded={rounded} className={cn("table-auto", className)}>
+    <div
+      className={cn(
+        "w-full",
+        !framed && "overflow-x-auto",
+        framed && frame?.fill && "flex min-h-0 flex-1 flex-col",
+      )}
+    >
+      <Table
+        variant={variant}
+        size={size}
+        density={density}
+        rounded={rounded}
+        maxHeight={framed ? frame?.maxHeight : undefined}
+        fill={framed ? frame?.fill : undefined}
+        stickyHeader={framed}
+        className={cn("table-auto", className)}
+      >
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
@@ -659,6 +679,37 @@ function TreeTable<T>({
         </TableBody>
       </Table>
     </div>
+  );
+}
+
+// ── TreeTableCard ──
+
+/** Props for the CrudTree.TableCard wrapper. */
+export interface TreeTableCardProps {
+  /** Bounds the table body height so it scrolls while the header sticks. Works in any layout. */
+  maxHeight?: number | string;
+  /** Fills a height-bounded flex parent instead of using `maxHeight` (e.g. list-detail pane). */
+  fill?: boolean;
+  className?: string;
+  children?: ReactNode;
+}
+
+/**
+ * Wraps `CrudTree.Table` in one bordered card: the table becomes a scroll region
+ * with a sticky header — matching the `CrudList.TableCard` design. Opt-in;
+ * without it `CrudTree.Table` renders unframed as before.
+ *
+ * ```tsx
+ * <CrudTree.TableCard maxHeight={340}>
+ *   <CrudTree.Table ...>...</CrudTree.Table>
+ * </CrudTree.TableCard>
+ * ```
+ */
+function TreeTableCard({ maxHeight, fill, className, children }: TreeTableCardProps) {
+  return (
+    <TableCardFrame maxHeight={maxHeight} fill={fill} className={className}>
+      {children}
+    </TableCardFrame>
   );
 }
 
@@ -806,6 +857,7 @@ export const CrudTree = Object.assign(TreeRoot, {
   ExpandToggle: TreeExpandToggle,
   HeaderActions: TreeHeaderActions,
   Table: TreeTable,
+  TableCard: TreeTableCard,
   Column: TreeColumn,
   Empty: TreeEmpty,
 });

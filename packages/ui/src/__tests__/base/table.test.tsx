@@ -219,7 +219,7 @@ describe("TableHeader", () => {
     );
     const thead = container.querySelector("thead");
     expect(thead!.className).toContain("border-t");
-    expect(thead!.className).toContain("bg-muted/50");
+    expect(thead!.className).toContain("bg-muted/40");
   });
 
   it("forwards ref", () => {
@@ -310,7 +310,7 @@ describe("TableRow", () => {
       </Table>,
     );
     const tr = container.querySelector("tr");
-    expect(tr!.className).toContain("hover:bg-muted/50");
+    expect(tr!.className).toContain("hover:bg-muted/40");
   });
 
   it("forwards ref", () => {
