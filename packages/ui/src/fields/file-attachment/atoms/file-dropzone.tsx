@@ -118,6 +118,7 @@ export function FileDropzone({
       role="button"
       tabIndex={disabled ? -1 : 0}
       aria-disabled={disabled}
+      aria-label={resolvedTitle}
       className={cn(
         // base (mobile): stacked column; @md (448px+): horizontal row (matches Grid breakpoints)
         'flex flex-col gap-3 rounded-md border-2 border-dashed border-input',
@@ -143,7 +144,7 @@ export function FileDropzone({
 
         {/* Text area */}
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <span className="text-sm font-semibold">{resolvedTitle}</span>
+          <span className="hidden text-sm font-semibold @md:block">{resolvedTitle}</span>
           {/* Constraint pills: lucide icon + label. Each pill is an atomic inline-flex unit and
               carries its separator dot as a TRAILING child, so a wrapped second line never starts
               with a dot (prevents the extensions pill from being indented on wrap).

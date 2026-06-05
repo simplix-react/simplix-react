@@ -73,9 +73,9 @@ export function StageDropzone({
         aria-hidden="true"
       />
 
-      <div className="flex flex-col items-center gap-[14px] text-center px-6 py-6 max-w-[540px] pointer-events-none">
+      <div className="flex flex-col items-center gap-2 @md:gap-[14px] text-center px-4 py-4 @md:px-6 @md:py-6 max-w-[540px] pointer-events-none">
         {/* Upload icon */}
-        <div className="w-[54px] h-[54px] rounded-lg bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] text-primary grid place-items-center shrink-0 shadow-sm">
+        <div className="w-10 h-10 @md:w-[54px] @md:h-[54px] rounded-lg bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] text-primary grid place-items-center shrink-0 shadow-sm">
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -83,7 +83,7 @@ export function StageDropzone({
             strokeWidth="1.6"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="w-[26px] h-[26px]"
+            className="w-5 h-5 @md:w-[26px] @md:h-[26px]"
             aria-hidden="true"
           >
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -92,8 +92,8 @@ export function StageDropzone({
           </svg>
         </div>
 
-        {/* Title */}
-        <div className="text-[15.5px] font-bold text-foreground tracking-[-0.01em] leading-[1.35]">
+        {/* Title — hidden when the dropzone stacks to the cramped/narrow stage (< @md), shown from @md */}
+        <div className="hidden text-[15.5px] font-bold text-foreground tracking-[-0.01em] leading-[1.35] @md:block">
           {t('file.stage.dropTitle')}
         </div>
 
