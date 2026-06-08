@@ -79,7 +79,7 @@ describe("DetailBooleanField", () => {
 
   it("shows fallback for null value", () => {
     render(<DetailBooleanField label="Active" value={null} />);
-    expect(screen.getByText("\u2014")).toBeDefined();
+    expect(screen.queryByText("\u2014")).toBeNull();
   });
 
   it("supports custom labels", () => {
@@ -121,7 +121,7 @@ describe("DetailNumberField", () => {
 
   it("shows fallback for null value", () => {
     render(<DetailNumberField label="Count" value={null} />);
-    expect(screen.getByText("\u2014")).toBeDefined();
+    expect(screen.queryByText("\u2014")).toBeNull();
   });
 
   it("shows custom fallback", () => {
@@ -246,12 +246,12 @@ describe("DetailListField", () => {
 
   it("shows fallback for null value", () => {
     render(<DetailListField label="Tags" value={null} />);
-    expect(screen.getByText("\u2014")).toBeDefined();
+    expect(screen.queryByText("\u2014")).toBeNull();
   });
 
   it("shows fallback for empty array", () => {
     render(<DetailListField label="Tags" value={[]} />);
-    expect(screen.getByText("\u2014")).toBeDefined();
+    expect(screen.queryByText("\u2014")).toBeNull();
   });
 
   it("renders comma mode", () => {
@@ -341,12 +341,12 @@ describe("DetailDateField", () => {
 
   it("shows fallback for null value", () => {
     render(<DetailDateField label="Updated" value={null} />);
-    expect(screen.getByText("\u2014")).toBeDefined();
+    expect(screen.queryByText("\u2014")).toBeNull();
   });
 
   it("shows fallback for invalid date string", () => {
     render(<DetailDateField label="Date" value="not-a-date" />);
-    expect(screen.getByText("\u2014")).toBeDefined();
+    expect(screen.queryByText("\u2014")).toBeNull();
   });
 
   it("renders from ISO string", () => {

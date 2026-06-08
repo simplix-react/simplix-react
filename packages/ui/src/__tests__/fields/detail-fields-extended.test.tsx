@@ -105,12 +105,12 @@ describe("DetailCountryField", () => {
 
   it("shows fallback when value is null", () => {
     render(<DetailCountryField label="Country" value={null} />);
-    expect(screen.getByText("\u2014")).toBeDefined();
+    expect(screen.queryByText("\u2014")).toBeNull();
   });
 
   it("shows fallback when value is empty string", () => {
     render(<DetailCountryField label="Country" value="" />);
-    expect(screen.getByText("\u2014")).toBeDefined();
+    expect(screen.queryByText("\u2014")).toBeNull();
   });
 
   it("shows custom fallback", () => {
@@ -154,7 +154,7 @@ describe("DetailLocationField", () => {
     render(
       <DetailLocationField label="Location" latitude={0} longitude={0} />,
     );
-    expect(screen.getByText("\u2014")).toBeDefined();
+    expect(screen.queryByText("\u2014")).toBeNull();
   });
 
   it("shows custom fallback", () => {
@@ -197,28 +197,28 @@ describe("DetailLocationField", () => {
     render(
       <DetailLocationField label="Location" latitude={-100} longitude={50} />,
     );
-    expect(screen.getByText("\u2014")).toBeDefined();
+    expect(screen.queryByText("\u2014")).toBeNull();
   });
 
   it("shows fallback for invalid longitude", () => {
     render(
       <DetailLocationField label="Location" latitude={50} longitude={200} />,
     );
-    expect(screen.getByText("\u2014")).toBeDefined();
+    expect(screen.queryByText("\u2014")).toBeNull();
   });
 
   it("shows fallback for NaN coordinates", () => {
     render(
       <DetailLocationField label="Location" latitude={NaN} longitude={NaN} />,
     );
-    expect(screen.getByText("\u2014")).toBeDefined();
+    expect(screen.queryByText("\u2014")).toBeNull();
   });
 
   it("shows fallback for Infinity coordinates", () => {
     render(
       <DetailLocationField label="Location" latitude={Infinity} longitude={0} />,
     );
-    expect(screen.getByText("\u2014")).toBeDefined();
+    expect(screen.queryByText("\u2014")).toBeNull();
   });
 
   it("renders map expand button for valid location", () => {
@@ -293,7 +293,7 @@ describe("DetailDateField (extended)", () => {
     render(
       <DetailDateField label="Date" value={new Date("invalid")} />,
     );
-    expect(screen.getByText("\u2014")).toBeDefined();
+    expect(screen.queryByText("\u2014")).toBeNull();
   });
 
   it("renders with layout=inline", () => {
@@ -386,17 +386,17 @@ describe("DetailTimezoneField", () => {
 
   it("shows fallback when value is null", () => {
     render(<DetailTimezoneField label="Timezone" value={null} />);
-    expect(screen.getByText("\u2014")).toBeDefined();
+    expect(screen.queryByText("\u2014")).toBeNull();
   });
 
   it("shows fallback when value is undefined", () => {
     render(<DetailTimezoneField label="Timezone" value={undefined} />);
-    expect(screen.getByText("\u2014")).toBeDefined();
+    expect(screen.queryByText("\u2014")).toBeNull();
   });
 
   it("shows fallback when value is empty string", () => {
     render(<DetailTimezoneField label="Timezone" value="" />);
-    expect(screen.getByText("\u2014")).toBeDefined();
+    expect(screen.queryByText("\u2014")).toBeNull();
   });
 
   it("shows custom fallback", () => {

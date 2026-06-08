@@ -37,7 +37,7 @@ export function DetailBadgeField<T extends string = string>({
   value,
   displayValue,
   variants,
-  fallback = "\u2014",
+  fallback = "",
   label,
   labelKey,
   layout,

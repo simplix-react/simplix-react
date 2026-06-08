@@ -25,7 +25,7 @@ export function DetailLinkField({
   value,
   href,
   external,
-  fallback = "\u2014",
+  fallback = "",
   label,
   labelKey,
   layout,

@@ -43,7 +43,7 @@ function formatDate(
 export function DetailDateField({
   value,
   format = "date",
-  fallback = "\u2014",
+  fallback = "",
   label,
   labelKey,
   layout,

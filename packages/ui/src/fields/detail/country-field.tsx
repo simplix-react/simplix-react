@@ -22,7 +22,7 @@ export interface DetailCountryFieldProps extends CommonDetailFieldProps {
  */
 export function DetailCountryField({
   value,
-  fallback = "\u2014",
+  fallback = "",
   label,
   labelKey,
   layout,

@@ -29,7 +29,7 @@ export function DetailBooleanField({
   value,
   mode = "text",
   labels = { true: "Yes", false: "No" },
-  fallback = "\u2014",
+  fallback = "",
   label,
   labelKey,
   layout,

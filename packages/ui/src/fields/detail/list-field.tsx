@@ -28,7 +28,7 @@ export interface DetailListFieldProps extends CommonDetailFieldProps {
 export function DetailListField({
   value,
   mode = "badges",
-  fallback = "\u2014",
+  fallback = "",
   label,
   labelKey,
   layout,

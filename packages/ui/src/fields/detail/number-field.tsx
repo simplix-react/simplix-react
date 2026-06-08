@@ -31,7 +31,7 @@ export function DetailNumberField({
   format = "decimal",
   locale,
   currency,
-  fallback = "\u2014",
+  fallback = "",
   label,
   labelKey,
   layout,

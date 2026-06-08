@@ -49,7 +49,7 @@ export function DetailLocationField({
   latitude,
   longitude,
   zoom = 13,
-  fallback = "\u2014",
+  fallback = "",
   hideWhenEmpty = false,
   markerIcon,
   fallbackTileUrl,

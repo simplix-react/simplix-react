@@ -22,7 +22,7 @@ export interface DetailTimezoneFieldProps extends CommonDetailFieldProps {
  */
 export function DetailTimezoneField({
   value,
-  fallback = "\u2014",
+  fallback = "",
   label,
   labelKey,
   layout,
