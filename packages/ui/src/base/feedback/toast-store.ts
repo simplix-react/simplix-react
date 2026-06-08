@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { generateLocalId } from "../../utils/local-id";
 
 export interface Toast {
   id: string;
@@ -25,7 +26,7 @@ function emit() {
 }
 
 function generateId(): string {
-  return `toast-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+  return `toast-${generateLocalId()}`;
 }
 
 export function addToast(toast: Omit<Toast, "id">) {
