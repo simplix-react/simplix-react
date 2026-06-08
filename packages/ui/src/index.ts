@@ -530,6 +530,10 @@ export { CrudErrorBoundary } from "./crud/shared";
 export type { CrudErrorBoundaryProps, ErrorBoundaryState } from "./crud/shared";
 export type { ColumnInfo } from "./crud/shared";
 
+// Column context
+export { CrudListColumnContext, useCrudListColumns } from "./crud/shared";
+export type { CrudListColumnContextValue, CrudListViewMode } from "./crud/shared";
+
 // Section shell
 export { SectionShell } from "./crud/shared";
 export type { SectionShellProps } from "./crud/shared";

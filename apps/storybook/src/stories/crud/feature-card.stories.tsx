@@ -17,7 +17,7 @@ const meta = {
 } satisfies Meta<typeof FeatureCard>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 
 // ── Icons (inline SVG — lucide-react is not a storybook dependency) ──
 
