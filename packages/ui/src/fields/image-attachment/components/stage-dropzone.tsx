@@ -1,6 +1,8 @@
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import { useTranslation } from '@simplix-react/i18n/react'
 import { cn } from '../../../utils/cn'
+import { PillDot } from '../../shared/pill-dot'
+import { useDropzoneDrag } from '../../shared/use-dropzone-drag'
 
 export interface StageDropzoneProps {
   onDrop: (file: File) => void
@@ -22,12 +24,15 @@ export function StageDropzone({
 }: StageDropzoneProps) {
   const { t } = useTranslation('simplix/ui')
   const inputRef = useRef<HTMLInputElement>(null)
-  const [dragOver, setDragOver] = useState(false)
 
   const handleFiles = (files: FileList | null) => {
     const f = files?.[0]
     if (f) onDrop(f)
   }
+
+  const { isDragOver, dragProps, resetInput } = useDropzoneDrag({
+    onFiles: handleFiles,
+  })
 
   const extensionsLabel =
     allowedExtensions && allowedExtensions.length > 0
@@ -39,7 +44,7 @@ export function StageDropzone({
       className={cn(
         'absolute inset-0 grid place-items-center cursor-pointer',
         'bg-muted transition-[background]',
-        dragOver ? 'bg-[color-mix(in_srgb,var(--primary)_10%,transparent)]' : '',
+        isDragOver ? 'bg-[color-mix(in_srgb,var(--primary)_10%,transparent)]' : '',
         'focus-visible:bg-[color-mix(in_srgb,var(--primary)_10%,transparent)]',
       )}
       role="button"
@@ -52,23 +57,14 @@ export function StageDropzone({
           inputRef.current?.click()
         }
       }}
-      onDragOver={(e) => {
-        e.preventDefault()
-        setDragOver(true)
-      }}
-      onDragLeave={() => setDragOver(false)}
-      onDrop={(e) => {
-        e.preventDefault()
-        setDragOver(false)
-        handleFiles(e.dataTransfer.files)
-      }}
+      {...dragProps}
     >
       {/* Dashed border affordance — same style as FileDropzone (border-2 border-dashed
           border-input rounded-md), inset from the stage edge. */}
       <span
         className={cn(
           'pointer-events-none absolute inset-3 rounded-md border-2 border-dashed transition-colors',
-          dragOver ? 'border-primary' : 'border-input',
+          isDragOver ? 'border-primary' : 'border-input',
         )}
         aria-hidden="true"
       />
@@ -125,12 +121,7 @@ export function StageDropzone({
               </span>
             ) : null}
 
-            {maxFiles != null && maxSizeLabel ? (
-              <span
-                className="inline-block h-[3px] w-[3px] shrink-0 rounded-full bg-border"
-                aria-hidden="true"
-              />
-            ) : null}
+            {maxFiles != null && maxSizeLabel ? <PillDot /> : null}
 
             {maxSizeLabel ? (
               <span className="inline-flex items-center gap-[5px]">
@@ -152,10 +143,7 @@ export function StageDropzone({
             ) : null}
 
             {(maxFiles != null || maxSizeLabel) && extensionsLabel ? (
-              <span
-                className="inline-block h-[3px] w-[3px] shrink-0 rounded-full bg-border"
-                aria-hidden="true"
-              />
+              <PillDot />
             ) : null}
 
             {extensionsLabel ? (
@@ -224,7 +212,7 @@ export function StageDropzone({
         hidden
         onChange={(e) => {
           handleFiles(e.target.files)
-          if (e.target) e.target.value = ''
+          resetInput(e.target)
         }}
       />
     </div>

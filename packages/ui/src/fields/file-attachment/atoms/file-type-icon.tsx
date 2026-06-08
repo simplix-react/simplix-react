@@ -1,4 +1,5 @@
 import { FileIcon, defaultStyles } from 'react-file-icon'
+import type { FileIconProps } from 'react-file-icon'
 import { cn } from '../../../utils/cn'
 
 export interface FileTypeIconProps {
@@ -59,8 +60,7 @@ export function FileTypeIcon({
   className,
 }: FileTypeIconProps) {
   const ext = resolveExtension(extension, mimeType, fileName)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const styles = (defaultStyles as Record<string, any>)[ext] ?? {}
+  const styles = (defaultStyles as Record<string, Partial<FileIconProps>>)[ext] ?? {}
 
   return (
     <div

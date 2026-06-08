@@ -10,7 +10,7 @@ import { FileSection } from '../file-attachment/components/file-section'
 import { DeleteConfirmDialog } from '../file-attachment/components/delete-confirm-dialog'
 import { ImageViewerModal } from '../file-attachment/components/image-viewer-modal'
 import { DescriptionEditDialog } from '../file-attachment/components/description-edit-dialog'
-import { DEFAULT_MAX_FILES, DEFAULT_MAX_FILE_SIZE } from '../file-attachment/types'
+import { DEFAULT_MAX_FILES, resolveMaxFileSize } from '../file-attachment/types'
 import { formatBytes } from '../../utils/format-bytes'
 import type { FileAttachmentItem } from '../file-attachment/types'
 import type { FileFieldProps } from '../file-attachment/types'
@@ -107,8 +107,7 @@ export function FileField({
   // Issue 8: hardcode 10개/10MB defaults when the host provides no config —
   // display (dropzone) and validation (hook) share the same DEFAULT_* source.
   const maxFiles = config?.maxAttachments ?? DEFAULT_MAX_FILES
-  const maxFileSize =
-    config?.maxFileSize && config.maxFileSize >= 1024 ? config.maxFileSize : DEFAULT_MAX_FILE_SIZE
+  const maxFileSize = resolveMaxFileSize(config)
   const maxSizeLabel = t('file.dropzone.maxSize', { size: formatBytes(maxFileSize) })
 
   async function handleConfirmDelete() {

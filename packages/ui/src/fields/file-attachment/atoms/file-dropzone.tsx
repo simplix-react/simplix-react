@@ -1,8 +1,10 @@
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import { Upload, Layers, HardDrive, FileCheck } from 'lucide-react'
 import { useTranslation } from '@simplix-react/i18n/react'
 import { cn } from '../../../utils/cn'
 import { useFlatUIComponents } from '../../../provider/ui-provider'
+import { PillDot } from '../../shared/pill-dot'
+import { useDropzoneDrag } from '../../shared/use-dropzone-drag'
 
 export interface FileDropzoneProps {
   multiple?: boolean
@@ -19,16 +21,6 @@ export interface FileDropzoneProps {
 
 interface ExtensionsPillProps {
   allowedExtensions?: string[]
-}
-
-/** Small dot separator between constraint pills (mirrors original .fa-cdot). */
-function PillDot() {
-  return (
-    <span
-      className="inline-block h-[3px] w-[3px] shrink-0 rounded-full bg-border"
-      aria-hidden="true"
-    />
-  )
 }
 
 function ExtensionsPill({ allowedExtensions }: ExtensionsPillProps) {
@@ -87,7 +79,6 @@ export function FileDropzone({
   const { t } = useTranslation('simplix/ui')
   const { Button } = useFlatUIComponents()
   const inputRef = useRef<HTMLInputElement>(null)
-  const [isDragOver, setIsDragOver] = useState(false)
 
   const resolvedTitle = title ?? t('file.dropzone.title')
   const resolvedCta = cta ?? t('file.dropzone.cta')
@@ -98,20 +89,10 @@ export function FileDropzone({
     if (arr.length > 0) onDrop(arr)
   }
 
-  function handleDragOver(e: React.DragEvent<HTMLDivElement>) {
-    e.preventDefault()
-    if (!disabled) setIsDragOver(true)
-  }
-
-  function handleDragLeave() {
-    setIsDragOver(false)
-  }
-
-  function handleDrop(e: React.DragEvent<HTMLDivElement>) {
-    e.preventDefault()
-    setIsDragOver(false)
-    handleFiles(e.dataTransfer.files)
-  }
+  const { isDragOver, dragProps, resetInput } = useDropzoneDrag({
+    onFiles: handleFiles,
+    disabled,
+  })
 
   return (
     <div
@@ -127,9 +108,7 @@ export function FileDropzone({
         isDragOver && !disabled && 'border-primary bg-primary/10',
         disabled && 'pointer-events-none opacity-50',
       )}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
+      {...dragProps}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') inputRef.current?.click()
       }}
@@ -197,7 +176,7 @@ export function FileDropzone({
         onChange={(e) => {
           handleFiles(e.target.files)
           // Reset so selecting the same file again still fires onChange (re-upload).
-          e.target.value = ''
+          resetInput(e.target)
         }}
         aria-hidden="true"
         tabIndex={-1}

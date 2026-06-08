@@ -14,7 +14,7 @@ import { FileThumbnail } from '../file-attachment/atoms/file-thumbnail'
 import { FileDropzone } from '../file-attachment/atoms/file-dropzone'
 import { FileListItem } from '../file-attachment/components/file-list-item'
 import { formatBytes } from '../../utils/format-bytes'
-import { DEFAULT_MAX_FILE_SIZE } from '../file-attachment/types'
+import { resolveMaxFileSize } from '../file-attachment/types'
 import { Carousel } from '../image-attachment/components/carousel'
 import { ThumbStrip } from '../image-attachment/components/thumb-strip'
 import { StageDropzone } from '../image-attachment/components/stage-dropzone'
@@ -300,8 +300,7 @@ export function ImageField({
   }
 
   const currentCount = items.length
-  const maxFileSize =
-    config?.maxFileSize && config.maxFileSize >= 1024 ? config.maxFileSize : DEFAULT_MAX_FILE_SIZE
+  const maxFileSize = resolveMaxFileSize(config)
   // Always-shown dropzone size label (issue #3) — defaults to 10MB when no config injected.
   const maxSizeLabel = t('file.dropzone.maxSize', { size: formatBytes(maxFileSize) })
   // Image-only field: default the displayed allowed extensions when the host injects none,

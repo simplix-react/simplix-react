@@ -100,6 +100,11 @@ export interface FileAttachmentItem {
 export const DEFAULT_MAX_FILES = 10
 export const DEFAULT_MAX_FILE_SIZE = 10 * 1024 * 1024
 
+/** Resolves the effective max file size, falling back to the default when unset or < 1024 (UD-8). */
+export function resolveMaxFileSize(config?: { maxFileSize?: number }): number {
+  return config?.maxFileSize && config.maxFileSize >= 1024 ? config.maxFileSize : DEFAULT_MAX_FILE_SIZE
+}
+
 /** Per-field capacity / MIME constraints. */
 export interface FileFieldConfig {
   maxAttachments?: number

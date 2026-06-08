@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from '@simplix-react/i18n/react'
 import { formatBytes } from '../../utils/format-bytes'
+import { generateLocalId } from '../../utils/local-id'
 import {
   DEFAULT_MAX_FILES,
-  DEFAULT_MAX_FILE_SIZE,
+  resolveMaxFileSize,
 } from './types'
 import type {
   AttachmentDescriptionUpdate,
@@ -18,10 +19,6 @@ import type {
 } from './types'
 
 // ── Pure helpers ───────────────────────────────────────────────────────────────
-
-function generateLocalId(): string {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
-}
 
 /**
  * Routes 401/403 errors to onAuthError; re-throws everything else (R2-5/R2-6).
@@ -54,10 +51,7 @@ function validateFile(
   config: FileFieldConfig,
   currentCount: number,
 ): ValidationErrorType | null {
-  const maxSize =
-    typeof config.maxFileSize === 'number' && config.maxFileSize >= 1024
-      ? config.maxFileSize
-      : DEFAULT_MAX_FILE_SIZE
+  const maxSize = resolveMaxFileSize(config)
   // Default to 10 when the host provides no count limit (issue 8: display + validation share the default).
   const maxAttachments =
     typeof config.maxAttachments === 'number' ? config.maxAttachments : DEFAULT_MAX_FILES
@@ -179,10 +173,7 @@ export function useFileAttachment(options: UseFileAttachmentOptions): UseFileAtt
         const currentCount = items.length + acceptedInBatch
         const err = validateFile(file, config, currentCount)
         if (err) {
-          const maxSize =
-            typeof config.maxFileSize === 'number' && config.maxFileSize >= 1024
-              ? config.maxFileSize
-              : DEFAULT_MAX_FILE_SIZE
+          const maxSize = resolveMaxFileSize(config)
           let message: string
           switch (err.type) {
             case 'maxAttachments':

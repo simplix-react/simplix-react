@@ -113,6 +113,7 @@ export function FileThumbnail({
         >
           <Star
             size={11}
+            // Star color: #FFC107 / fill always-on (display-only) (no token equivalent, hardcoded per plan §5.3/R4-7)
             style={{ color: '#FFC107', fill: '#FFC107', stroke: '#5C3A10' }}
           />
         </span>
