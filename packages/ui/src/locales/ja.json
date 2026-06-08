@@ -160,6 +160,85 @@
     "year": "年",
     "month": "月"
   },
+  "plateEditor": {
+    "toolbar": {
+      "bold": "太字",
+      "italic": "斜体",
+      "underline": "下線",
+      "strikethrough": "取り消し線",
+      "code": "インラインコード",
+      "heading1": "見出し1",
+      "heading2": "見出し2",
+      "heading3": "見出し3",
+      "paragraph": "本文",
+      "bulletList": "箇条書き",
+      "numberedList": "番号付きリスト",
+      "blockquote": "引用",
+      "link": "リンク",
+      "image": "画像",
+      "codeBlock": "コードブロック",
+      "table": "表",
+      "mention": "メンション",
+      "turnInto": "変換",
+      "fontSize": "フォントサイズ",
+      "fontSizeIncrease": "フォントサイズを大きく",
+      "fontSizeDecrease": "フォントサイズを小さく",
+      "subscript": "下付き文字",
+      "superscript": "上付き文字",
+      "fontColor": "文字色",
+      "backgroundColor": "背景色",
+      "align": "配置",
+      "alignLeft": "左揃え",
+      "alignCenter": "中央揃え",
+      "alignRight": "右揃え",
+      "alignJustify": "両端揃え"
+    },
+    "link": {
+      "placeholder": "URLを入力",
+      "insert": "リンクを挿入",
+      "edit": "編集",
+      "unlink": "リンク解除"
+    },
+    "image": {
+      "upload": "画像をアップロード",
+      "uploading": "アップロード中...",
+      "sizeLimitError": "画像サイズが{{size}}MBの制限を超えています",
+      "formatError": "サポートされていない画像形式です"
+    },
+    "table": {
+      "menu": "表メニュー",
+      "table": "表",
+      "cell": "セル",
+      "row": "行",
+      "column": "列",
+      "insertTable": "表を挿入",
+      "insertRow": "行を挿入",
+      "insertRowAbove": "上に行を挿入",
+      "insertRowBelow": "下に行を挿入",
+      "insertColumn": "列を挿入",
+      "insertColumnLeft": "左に列を挿入",
+      "insertColumnRight": "右に列を挿入",
+      "deleteRow": "行を削除",
+      "deleteColumn": "列を削除",
+      "deleteTable": "表を削除",
+      "mergeCells": "セルを結合",
+      "splitCell": "セルを分割"
+    },
+    "mention": {
+      "noResults": "結果が見つかりません",
+      "placeholder": "名前を検索..."
+    },
+    "colorPicker": {
+      "custom": "カスタムカラー",
+      "clear": "色をクリア"
+    },
+    "placeholder": {
+      "default": "入力してください...",
+      "heading1": "見出し1",
+      "heading2": "見出し2",
+      "heading3": "見出し3"
+    }
+  },
   "file": {
     "dropzone": {
       "title": "ファイルをドラッグまたはクリックして選択",
