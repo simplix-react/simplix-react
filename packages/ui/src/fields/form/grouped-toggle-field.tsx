@@ -3,6 +3,7 @@ import { DynamicIcon, type IconName } from "lucide-react/dynamic";
 import { useMemo, type ReactNode } from "react";
 
 import type { CommonFieldProps } from "../../crud/shared/types";
+import { Flex } from "../../primitives/flex";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
 import { FieldWrapper } from "../shared/field-wrapper";
@@ -234,8 +235,16 @@ export function GroupedToggleField<T extends string = string>({
               aria-label={group.label}
               className="rounded-lg border border-border bg-secondary/40 p-3"
             >
-              <div className="mb-2.5 flex items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+              <Flex
+                align="center"
+                justify="between"
+                gap="sm"
+                className="mb-2.5"
+              >
+                <Flex
+                  align="center"
+                  className="gap-1.5 text-sm font-medium text-foreground"
+                >
                   {group.icon && (
                     <DynamicIcon
                       name={group.icon}
@@ -244,7 +253,7 @@ export function GroupedToggleField<T extends string = string>({
                     />
                   )}
                   {group.label}
-                </div>
+                </Flex>
                 {showSelectAll && (
                   <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
                     <span>{selectAllLabel}</span>
@@ -257,8 +266,8 @@ export function GroupedToggleField<T extends string = string>({
                     />
                   </label>
                 )}
-              </div>
-              <div className="flex flex-wrap gap-1.5">
+              </Flex>
+              <Flex wrap className="gap-1.5">
                 {group.options.map((option) => (
                   <ToggleChip
                     key={option.value}
@@ -267,7 +276,7 @@ export function GroupedToggleField<T extends string = string>({
                     onToggle={() => toggleOption(group, option.value)}
                   />
                 ))}
-              </div>
+              </Flex>
             </div>
           );
         })}
