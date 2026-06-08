@@ -1,5 +1,5 @@
 
-import * as React from 'react'
+import { useEffect } from 'react'
 import {
   Bold,
   Italic,
@@ -84,14 +84,14 @@ export function PlateEditorAdvanced({
   })
 
   // Handle auto focus
-  React.useEffect(() => {
+  useEffect(() => {
     if (autoFocus && !readOnly && !disabled) {
       editor.tf.focus()
     }
   }, [editor, autoFocus, readOnly, disabled])
 
   // Sync value prop changes in readOnly mode
-  React.useEffect(() => {
+  useEffect(() => {
     if (readOnly && value) {
       editor.tf.setValue(value)
     }

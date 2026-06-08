@@ -6,6 +6,8 @@ import {
   TableCellHeaderPlugin,
 } from '@platejs/table/react'
 
+import type { AnyPlatePlugin } from 'platejs/react'
+
 import {
   TableElement,
   TableRowElement,
@@ -28,8 +30,7 @@ export interface TableKitOptions {
 /**
  * Create table kit with custom options
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const createTableKit = (options?: TableKitOptions): any[] => {
+export const createTableKit = (options?: TableKitOptions): AnyPlatePlugin[] => {
   const {
     initialTableWidth,
     minColumnWidth = 48,
@@ -58,5 +59,4 @@ export const createTableKit = (options?: TableKitOptions): any[] => {
  * - Minimum column width: 48px
  * - Row/column insert/delete operations
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const TableKit: any[] = createTableKit()
+export const TableKit: AnyPlatePlugin[] = createTableKit()

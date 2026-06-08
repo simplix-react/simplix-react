@@ -1,10 +1,20 @@
 
-import * as React from 'react'
+import {
+  type ButtonHTMLAttributes,
+  type ComponentPropsWithoutRef,
+  type ElementRef,
+  forwardRef,
+  type HTMLAttributes,
+  type ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import { cn } from '../../../utils/cn'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../base/overlay/tooltip'
 import { Separator } from '../../../base/display/separator'
 
-export interface ToolbarProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface ToolbarProps extends HTMLAttributes<HTMLDivElement> {
   /** Orientation of the toolbar */
   orientation?: 'horizontal' | 'vertical'
   /** Enable floating effect when sticky */
@@ -14,12 +24,12 @@ export interface ToolbarProps extends React.HTMLAttributes<HTMLDivElement> {
 /**
  * Fixed toolbar container with optional floating effect
  */
-export const FixedToolbar = React.forwardRef<HTMLDivElement, ToolbarProps>(
+export const FixedToolbar = forwardRef<HTMLDivElement, ToolbarProps>(
   ({ className, orientation = 'horizontal', floatingEffect = true, children, ...props }, ref) => {
-    const [isSticky, setIsSticky] = React.useState(false)
-    const sentinelRef = React.useRef<HTMLDivElement>(null)
+    const [isSticky, setIsSticky] = useState(false)
+    const sentinelRef = useRef<HTMLDivElement>(null)
 
-    React.useEffect(() => {
+    useEffect(() => {
       if (!floatingEffect) return
 
       const sentinel = sentinelRef.current
@@ -73,9 +83,9 @@ FixedToolbar.displayName = 'FixedToolbar'
 /**
  * Toolbar group for related buttons
  */
-export const ToolbarGroup = React.forwardRef<
+export const ToolbarGroup = forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
+  HTMLAttributes<HTMLDivElement>
 >(({ className, children, ...props }, ref) => {
   return (
     <div
@@ -93,9 +103,9 @@ ToolbarGroup.displayName = 'ToolbarGroup'
 /**
  * Toolbar separator
  */
-export const ToolbarSeparator = React.forwardRef<
-  React.ElementRef<typeof Separator>,
-  React.ComponentPropsWithoutRef<typeof Separator>
+export const ToolbarSeparator = forwardRef<
+  ElementRef<typeof Separator>,
+  ComponentPropsWithoutRef<typeof Separator>
 >(({ className, ...props }, ref) => {
   return (
     <Separator
@@ -108,19 +118,19 @@ export const ToolbarSeparator = React.forwardRef<
 })
 ToolbarSeparator.displayName = 'ToolbarSeparator'
 
-export interface ToolbarButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ToolbarButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   /** Whether the button is active/pressed */
   pressed?: boolean
   /** Tooltip text */
   tooltip?: string
   /** Icon to display */
-  icon?: React.ReactNode
+  icon?: ReactNode
 }
 
 /**
  * Basic toolbar button
  */
-export const ToolbarButton = React.forwardRef<HTMLButtonElement, ToolbarButtonProps>(
+export const ToolbarButton = forwardRef<HTMLButtonElement, ToolbarButtonProps>(
   ({ className, pressed, tooltip, icon, children, disabled, ...props }, ref) => {
     const button = (
       <button

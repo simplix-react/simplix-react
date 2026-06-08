@@ -75,11 +75,21 @@ export interface PlateEditorStandardProps extends PlateEditorBaseProps {
 export interface PlateEditorAdvancedProps extends PlateEditorBaseProps {}
 
 /**
+ * Default maximum image file size in bytes (5MB)
+ */
+export const DEFAULT_MAX_IMAGE_SIZE = 5 * 1024 * 1024
+
+/**
+ * Default accepted image formats
+ */
+export const DEFAULT_ACCEPTED_IMAGE_FORMATS = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+
+/**
  * Default image upload config
  */
 export const DEFAULT_IMAGE_CONFIG = {
-  maxSize: 5 * 1024 * 1024, // 5MB
-  acceptedFormats: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+  maxSize: DEFAULT_MAX_IMAGE_SIZE,
+  acceptedFormats: DEFAULT_ACCEPTED_IMAGE_FORMATS,
 }
 
 /**

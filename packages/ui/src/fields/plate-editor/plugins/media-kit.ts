@@ -5,8 +5,10 @@ import {
   PlaceholderPlugin,
 } from '@platejs/media/react'
 import { KEYS } from 'platejs'
+import type { AnyPlatePlugin } from 'platejs/react'
 
 import { ImageElement, PlaceholderElement } from '../components/image-node'
+import { DEFAULT_MAX_IMAGE_SIZE, DEFAULT_ACCEPTED_IMAGE_FORMATS } from '../types'
 
 /**
  * Image upload handler type
@@ -20,12 +22,11 @@ export const createMediaKit = (options?: {
   uploadHandler?: ImageUploadHandler
   maxImageSize?: number
   acceptedFormats?: string[]
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-}): any[] => {
+}): AnyPlatePlugin[] => {
   const {
     uploadHandler,
-    maxImageSize = 5 * 1024 * 1024, // 5MB default
-    acceptedFormats = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+    maxImageSize = DEFAULT_MAX_IMAGE_SIZE,
+    acceptedFormats = DEFAULT_ACCEPTED_IMAGE_FORMATS,
   } = options || {}
 
   return [
@@ -82,5 +83,4 @@ export const createMediaKit = (options?: {
  * Default media kit without upload handler
  * Images can only be embedded via URL
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const MediaKit: any[] = createMediaKit()
+export const MediaKit: AnyPlatePlugin[] = createMediaKit()

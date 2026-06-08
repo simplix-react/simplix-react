@@ -1,5 +1,5 @@
 
-import * as React from 'react'
+import { type ReactNode, useCallback, useState } from 'react'
 import {
   AlignLeft,
   AlignCenter,
@@ -21,7 +21,7 @@ import { ToolbarButton } from './toolbar'
 
 type AlignValue = 'left' | 'center' | 'right' | 'justify'
 
-const alignIcons: Record<AlignValue, React.ReactNode> = {
+const alignIcons: Record<AlignValue, ReactNode> = {
   left: <AlignLeft className="h-3.5 w-3.5" />,
   center: <AlignCenter className="h-3.5 w-3.5" />,
   right: <AlignRight className="h-3.5 w-3.5" />,
@@ -47,7 +47,7 @@ export interface AlignToolbarButtonProps {
 export function AlignToolbarButton({ tooltip }: AlignToolbarButtonProps) {
   const editor = useEditorRef()
   const { t } = useTranslation('simplix/ui')
-  const [open, setOpen] = React.useState(false)
+  const [open, setOpen] = useState(false)
 
   const currentAlign = useSelectionFragmentProp({
     defaultValue: 'left',
@@ -55,7 +55,7 @@ export function AlignToolbarButton({ tooltip }: AlignToolbarButtonProps) {
   }) as AlignValue
   const currentValue: AlignValue = alignValues.includes(currentAlign) ? currentAlign : 'left'
 
-  const handleSelect = React.useCallback(
+  const handleSelect = useCallback(
     (align: AlignValue) => {
       editor.tf.setNodes({ align } as Partial<TElement>)
       editor.tf.focus()

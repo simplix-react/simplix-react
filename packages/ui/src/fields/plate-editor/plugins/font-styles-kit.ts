@@ -1,5 +1,6 @@
 
 import { KEYS } from 'platejs'
+import type { AnyPlatePlugin } from 'platejs/react'
 import {
   FontBackgroundColorPlugin,
   FontColorPlugin,
@@ -11,8 +12,7 @@ import {
  * Font styles kit for text formatting
  * Includes: FontSize, FontColor, FontBackgroundColor, TextAlign
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const FontStylesKit: any[] = [
+export const FontStylesKit: AnyPlatePlugin[] = [
   // Font size - injects fontSize style to leaf nodes
   FontSizePlugin.configure({
     inject: {

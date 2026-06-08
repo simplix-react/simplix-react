@@ -1,5 +1,5 @@
 
-import * as React from 'react'
+import { forwardRef } from 'react'
 import { Link } from 'lucide-react'
 import { useEditorRef, useEditorSelector } from 'platejs/react'
 import { LinkPlugin, triggerFloatingLink } from '@platejs/link/react'
@@ -15,7 +15,7 @@ export interface LinkToolbarButtonProps {
 /**
  * Toolbar button for inserting/editing links
  */
-export const LinkToolbarButton = React.forwardRef<HTMLButtonElement, LinkToolbarButtonProps>(
+export const LinkToolbarButton = forwardRef<HTMLButtonElement, LinkToolbarButtonProps>(
   ({ tooltip, className }, ref) => {
     const editor = useEditorRef()
     const pressed = useEditorSelector(

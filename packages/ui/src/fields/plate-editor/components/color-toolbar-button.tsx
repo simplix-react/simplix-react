@@ -1,5 +1,5 @@
 
-import * as React from 'react'
+import { type ChangeEvent, type FormEvent, type ReactNode, useCallback, useState } from 'react'
 import { useEditorRef, useEditorSelector } from 'platejs/react'
 
 import { cn } from '../../../utils/cn'
@@ -21,7 +21,7 @@ export interface ColorToolbarButtonProps {
   /** Color palette to use */
   colors?: string[]
   /** Icon to display */
-  children: React.ReactNode
+  children: ReactNode
   /** Whether this is a background color picker */
   isBackground?: boolean
 }
@@ -38,8 +38,8 @@ export function ColorToolbarButton({
 }: ColorToolbarButtonProps) {
   const editor = useEditorRef()
   const { t } = useTranslation("simplix/ui")
-  const [open, setOpen] = React.useState(false)
-  const [customColor, setCustomColor] = React.useState('')
+  const [open, setOpen] = useState(false)
+  const [customColor, setCustomColor] = useState('')
 
   const currentColor = useEditorSelector(
     (editor) => editor.api.mark(nodeType) as string | undefined,
@@ -48,7 +48,7 @@ export function ColorToolbarButton({
 
   const colorPalette = colors || (isBackground ? HIGHLIGHT_COLORS : FONT_COLORS)
 
-  const handleSelect = React.useCallback(
+  const handleSelect = useCallback(
     (color: string) => {
       if (editor.selection) {
         if (color === 'transparent' || color === '') {
@@ -63,7 +63,7 @@ export function ColorToolbarButton({
     [editor, nodeType]
   )
 
-  const handleClear = React.useCallback(() => {
+  const handleClear = useCallback(() => {
     if (editor.selection) {
       editor.tf.removeMarks(nodeType)
       editor.tf.focus()
@@ -71,8 +71,8 @@ export function ColorToolbarButton({
     setOpen(false)
   }, [editor, nodeType])
 
-  const handleCustomColorSubmit = React.useCallback(
-    (e: React.FormEvent) => {
+  const handleCustomColorSubmit = useCallback(
+    (e: FormEvent) => {
       e.preventDefault()
       if (customColor && /^#[0-9A-Fa-f]{6}$/.test(customColor)) {
         handleSelect(customColor)
@@ -82,8 +82,8 @@ export function ColorToolbarButton({
     [customColor, handleSelect]
   )
 
-  const handleColorInputChange = React.useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleColorInputChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
       const color = e.target.value
       if (editor.selection) {
         editor.tf.addMarks({ [nodeType]: color })

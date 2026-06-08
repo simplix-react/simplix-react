@@ -1,5 +1,6 @@
 
 import { MentionPlugin, MentionInputPlugin } from '@platejs/mention/react'
+import type { AnyPlatePlugin } from 'platejs/react'
 
 import { MentionElement, MentionInputElement } from '../components/mention-node'
 import type { MentionItem } from '../types'
@@ -26,8 +27,7 @@ export interface MentionKitOptions {
  * Note: data and searchHandler are stored for future use when implementing
  * mention suggestions UI component
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const createMentionKit = (options?: MentionKitOptions): any[] => {
+export const createMentionKit = (options?: MentionKitOptions): AnyPlatePlugin[] => {
   const { trigger = '@' } = options || {}
 
   return [
@@ -45,5 +45,4 @@ export const createMentionKit = (options?: MentionKitOptions): any[] => {
  * Default mention kit without data
  * Mention suggestions will be empty
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const MentionKit: any[] = createMentionKit()
+export const MentionKit: AnyPlatePlugin[] = createMentionKit()

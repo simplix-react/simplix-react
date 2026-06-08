@@ -1,9 +1,9 @@
 
-import * as React from 'react'
+import { forwardRef, type HTMLAttributes } from 'react'
 import { PlateContent, type PlateContentProps } from 'platejs/react'
 import { cn } from '../../../utils/cn'
 
-export interface EditorContainerProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface EditorContainerProps extends HTMLAttributes<HTMLDivElement> {
   /** Default height of the editor (initial height) */
   defaultHeight?: number | string
   /** Minimum height of the editor */
@@ -19,7 +19,7 @@ export interface EditorContainerProps extends React.HTMLAttributes<HTMLDivElemen
 /**
  * Container for the plate editor content area with styling
  */
-export const EditorContainer = React.forwardRef<HTMLDivElement, EditorContainerProps>(
+export const EditorContainer = forwardRef<HTMLDivElement, EditorContainerProps>(
   ({ className, defaultHeight, minHeight = 150, maxHeight, resizable = true, disabled, children, ...props }, ref) => {
     return (
       <div
@@ -44,7 +44,7 @@ export const EditorContainer = React.forwardRef<HTMLDivElement, EditorContainerP
 )
 EditorContainer.displayName = 'EditorContainer'
 
-export interface EditorWrapperProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface EditorWrapperProps extends HTMLAttributes<HTMLDivElement> {
   /** Disabled state */
   disabled?: boolean
   /** Error state - shows destructive border */
@@ -56,7 +56,7 @@ export interface EditorWrapperProps extends React.HTMLAttributes<HTMLDivElement>
  * Note: overflow-x-hidden prevents horizontal expansion from long code blocks
  * Floating toolbars use position:fixed so they're not affected
  */
-export const EditorWrapper = React.forwardRef<HTMLDivElement, EditorWrapperProps>(
+export const EditorWrapper = forwardRef<HTMLDivElement, EditorWrapperProps>(
   ({ className, disabled, error, children, ...props }, ref) => {
     return (
       <div
@@ -86,7 +86,7 @@ export interface EditorProps extends PlateContentProps {
 /**
  * The actual editable content area
  */
-export const Editor = React.forwardRef<HTMLDivElement, EditorProps>(
+export const Editor = forwardRef<HTMLDivElement, EditorProps>(
   ({ className, disabled, readOnly, ...props }, ref) => {
     return (
       <PlateContent

@@ -1,5 +1,5 @@
 
-import * as React from 'react'
+import { forwardRef } from 'react'
 import { useEditorRef, useEditorSelector } from 'platejs/react'
 import { ToolbarButton, type ToolbarButtonProps } from './toolbar'
 
@@ -11,7 +11,7 @@ export interface MarkToolbarButtonProps extends Omit<ToolbarButtonProps, 'presse
 /**
  * Toolbar button for toggling text marks (bold, italic, etc.)
  */
-export const MarkToolbarButton = React.forwardRef<HTMLButtonElement, MarkToolbarButtonProps>(
+export const MarkToolbarButton = forwardRef<HTMLButtonElement, MarkToolbarButtonProps>(
   ({ nodeType, children, ...props }, ref) => {
     const editor = useEditorRef()
     const pressed = useEditorSelector(

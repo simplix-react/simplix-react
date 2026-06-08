@@ -1,5 +1,5 @@
 
-import * as React from 'react'
+import { forwardRef, type ReactNode } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { useEditorRef, useEditorSelector } from 'platejs/react'
 import { KEYS } from 'platejs'
@@ -15,7 +15,7 @@ import { ToolbarButton } from './toolbar'
 export interface TurnIntoOption {
   label: string
   value: string
-  icon?: React.ReactNode
+  icon?: ReactNode
 }
 
 export interface TurnIntoToolbarButtonProps {
@@ -36,7 +36,7 @@ const DEFAULT_OPTIONS: TurnIntoOption[] = [
 /**
  * Dropdown button for turning current block into different types
  */
-export const TurnIntoToolbarButton = React.forwardRef<
+export const TurnIntoToolbarButton = forwardRef<
   HTMLButtonElement,
   TurnIntoToolbarButtonProps
 >(({ options = DEFAULT_OPTIONS, className }, ref) => {

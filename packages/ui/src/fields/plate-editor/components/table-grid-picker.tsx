@@ -1,5 +1,5 @@
 
-import * as React from 'react'
+import { useState } from 'react'
 import { cn } from '../../../utils/cn'
 
 export interface TableGridPickerProps {
@@ -23,7 +23,7 @@ export function TableGridPicker({
   onSelect,
   formatLabel = (rows, cols) => `${cols} x ${rows}`,
 }: TableGridPickerProps) {
-  const [hoveredCell, setHoveredCell] = React.useState<{ row: number; col: number } | null>(null)
+  const [hoveredCell, setHoveredCell] = useState<{ row: number; col: number } | null>(null)
 
   const handleCellHover = (row: number, col: number) => {
     setHoveredCell({ row, col })

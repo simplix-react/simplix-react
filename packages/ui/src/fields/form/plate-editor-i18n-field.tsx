@@ -60,8 +60,7 @@ export function PlateEditorI18nField({
 
   useEffect(() => {
     // process is not typed in browser bundles — access via globalThis to avoid @types/node dependency
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const nodeEnv = (globalThis as any).process?.env?.NODE_ENV as string | undefined;
+    const nodeEnv = (globalThis as { process?: { env?: { NODE_ENV?: string } } }).process?.env?.NODE_ENV;
     if (nodeEnv !== "production" && selectedLanguage && !onLanguageChange) {
       console.warn("PlateEditorI18nField: selectedLanguage provided without onLanguageChange — unsupported binding mode");
     }

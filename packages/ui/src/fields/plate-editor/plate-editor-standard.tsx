@@ -1,5 +1,5 @@
 
-import * as React from 'react'
+import { type ChangeEvent, useEffect, useMemo, useRef } from 'react'
 import {
   Bold,
   Italic,
@@ -62,7 +62,7 @@ export function PlateEditorStandard({
   const { t } = useTranslation("simplix/ui")
 
   // Create media kit with upload handler
-  const mediaKit = React.useMemo(
+  const mediaKit = useMemo(
     () =>
       createMediaKit({
         uploadHandler: onImageUpload,
@@ -85,7 +85,7 @@ export function PlateEditorStandard({
   })
 
   // Handle auto focus
-  React.useEffect(() => {
+  useEffect(() => {
     if (autoFocus && !readOnly && !disabled) {
       editor.tf.focus()
     }
@@ -101,13 +101,13 @@ export function PlateEditorStandard({
   ]
 
   // Handle image upload via file input
-  const fileInputRef = React.useRef<HTMLInputElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleImageButtonClick = () => {
     fileInputRef.current?.click()
   }
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file || !onImageUpload) return
 

@@ -1,5 +1,5 @@
 
-import * as React from 'react'
+import { useEffect } from 'react'
 import {
   Bold,
   Italic,
@@ -63,7 +63,7 @@ export function PlateEditorBasic({
   })
 
   // Handle auto focus
-  React.useEffect(() => {
+  useEffect(() => {
     if (autoFocus && !readOnly && !disabled) {
       editor.tf.focus()
     }

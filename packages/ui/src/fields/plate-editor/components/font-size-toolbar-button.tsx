@@ -1,5 +1,5 @@
 
-import * as React from 'react'
+import { useCallback } from 'react'
 import { AArrowUp, AArrowDown } from 'lucide-react'
 import { useEditorRef, useEditorSelector } from 'platejs/react'
 import { KEYS } from 'platejs'
@@ -27,12 +27,12 @@ export function FontSizeToolbarButton({
   )
 
   // Get current size index in the FONT_SIZES array
-  const getCurrentSizeIndex = React.useCallback(() => {
+  const getCurrentSizeIndex = useCallback(() => {
     const index = FONT_SIZES.findIndex((s) => s.value === currentFontSize)
     return index >= 0 ? index : FONT_SIZES.findIndex((s) => s.value === '16px')
   }, [currentFontSize])
 
-  const handleIncrease = React.useCallback(() => {
+  const handleIncrease = useCallback(() => {
     const currentIndex = getCurrentSizeIndex()
     const nextIndex = Math.min(currentIndex + 1, FONT_SIZES.length - 1)
     if (editor.selection) {
@@ -41,7 +41,7 @@ export function FontSizeToolbarButton({
     }
   }, [editor, getCurrentSizeIndex])
 
-  const handleDecrease = React.useCallback(() => {
+  const handleDecrease = useCallback(() => {
     const currentIndex = getCurrentSizeIndex()
     const prevIndex = Math.max(currentIndex - 1, 0)
     if (editor.selection) {
