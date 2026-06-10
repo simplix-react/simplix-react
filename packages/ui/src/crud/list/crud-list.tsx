@@ -42,10 +42,7 @@ import {
 import { closestCenter, DndContext } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import type { ReorderConfig } from "../shared";
-import { useReorder } from "../reorder/use-reorder";
-import { DragHandleHeader } from "../reorder/drag-handle";
-import { DraggableRow } from "../reorder/draggable-row";
-import { DraggableCard } from "../reorder/draggable-card";
+import { useReorder, DragHandleHeader, DraggableRow, DraggableCard } from "../reorder";
 import {useContainerWidth} from "./use-container-width";
 
 // ── Table Card frame context ──
