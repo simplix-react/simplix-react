@@ -113,17 +113,22 @@ Table.displayName = "Table";
 export type TableHeaderProps = ComponentPropsWithRef<"thead">;
 
 export const TableHeader = forwardRef<HTMLTableSectionElement, TableHeaderProps>(
-  ({ className, ...rest }, ref) => (
-    <thead
-      ref={ref}
-      data-slot="table-header"
-      className={cn(
-        "border-t border-border bg-muted/40 [&_tr]:border-b [&_tr]:border-border-strong",
-        className,
-      )}
-      {...rest}
-    />
-  ),
+  ({ className, ...rest }, ref) => {
+    const { stickyHeader } = useTableContext();
+    return (
+      <thead
+        ref={ref}
+        data-slot="table-header"
+        className={cn(
+          // Framed card draws the top edge; thead border-t would double it.
+          !stickyHeader && "border-t border-border",
+          "bg-muted/40 [&_tr]:border-b [&_tr]:border-border-strong",
+          className,
+        )}
+        {...rest}
+      />
+    );
+  },
 );
 
 TableHeader.displayName = "TableHeader";
@@ -135,14 +140,22 @@ TableHeader.displayName = "TableHeader";
 export type TableBodyProps = ComponentPropsWithRef<"tbody">;
 
 export const TableBody = forwardRef<HTMLTableSectionElement, TableBodyProps>(
-  ({ className, ...rest }, ref) => (
-    <tbody
-      ref={ref}
-      data-slot="table-body"
-      className={cn("", className)}
-      {...rest}
-    />
-  ),
+  ({ className, ...rest }, ref) => {
+    const { stickyHeader } = useTableContext();
+    return (
+      <tbody
+        ref={ref}
+        data-slot="table-body"
+        className={cn(
+          // Framed: card bottom / pagination border-t is the closing line,
+          // so the last row's border-b would double it.
+          stickyHeader && "[&>tr:last-child]:border-b-0",
+          className,
+        )}
+        {...rest}
+      />
+    );
+  },
 );
 
 TableBody.displayName = "TableBody";

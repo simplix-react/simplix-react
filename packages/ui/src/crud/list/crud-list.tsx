@@ -60,11 +60,11 @@ const emptyReasonConfig = {
   "no-search": { icon: <MagnifyingGlassIcon />, iconClassName: "bg-muted text-muted-foreground", titleKey: "list.noSearchTitle", descKey: "list.noSearch" },
 } as const;
 
-function EmptyReasonCard({ reason }: { reason: Exclude<EmptyReason, "no-data"> }) {
+function EmptyReasonCard({ reason, bordered = true }: { reason: Exclude<EmptyReason, "no-data">; bordered?: boolean }) {
   const { t } = useTranslation("simplix/ui");
   const config = emptyReasonConfig[reason];
   return (
-    <div className="flex flex-col items-center justify-center rounded-lg border px-6 py-16 text-center">
+    <div className={cn("flex flex-col items-center justify-center px-6 py-16 text-center", bordered && "rounded-lg border")}>
       <div className={`mb-3 rounded-full p-4 [&_svg]:size-8 ${config.iconClassName}`}>
         {config.icon}
       </div>
@@ -1022,7 +1022,7 @@ function ListTable<T>({
     if (emptyReason !== "no-data") {
       return (
         <div ref={containerRef} className="w-full">
-          <EmptyReasonCard reason={emptyReason} />
+          <EmptyReasonCard reason={emptyReason} bordered={!framed} />
         </div>
       );
     }
