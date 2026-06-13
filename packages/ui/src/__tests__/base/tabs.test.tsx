@@ -91,7 +91,8 @@ describe("TabsList", () => {
       </Tabs>,
     );
     const list = container.querySelector("[role='tablist']") as HTMLElement;
-    expect(list.className).toContain("border-b-2");
+    // bottom line is an inset shadow (scroll-safe), not a border
+    expect(list.className).toContain("shadow-[inset_0_-2px_0_0_var(--border)]");
     expect(list.className).toContain("items-end");
     // bookmark list drops the segmented-track background
     expect(list.className).not.toContain("bg-muted");

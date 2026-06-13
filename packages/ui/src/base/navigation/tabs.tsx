@@ -20,6 +20,13 @@ export type TabsVariant = "default" | "full" | "bookmark";
  */
 const TabsVariantContext = createContext<TabsVariant>("default");
 
+/**
+ * Bottom-baseline track for the `bookmark` list variant. The line is an inset
+ * shadow (not a border) so the active tab's `bg-card` covers it without relying
+ * on overflow — the cutout survives `overflow-x-auto` horizontal scroll.
+ */
+const lineListBase = "flex items-end px-2 shadow-[inset_0_-2px_0_0_var(--border)]";
+
 // ── List ──
 
 export interface TabsListProps
@@ -28,7 +35,9 @@ export interface TabsListProps
    * Visual style variant. Triggers adapt automatically via context.
    * - `"default"` — inline segmented control, auto-width.
    * - `"full"` — spans full width with top margin; triggers auto-expand to equal widths.
-   * - `"bookmark"` — folder-style tabs sitting on a bottom border line.
+   * - `"bookmark"` — folder-style tabs sitting on a bottom line. The line is an
+   *   inset shadow (not a border) so the active tab's `bg-card` covers it without
+   *   relying on overflow — the cutout survives `overflow-x-auto` horizontal scroll.
    *
    * @default "default"
    */
@@ -42,7 +51,7 @@ export const TabsList = forwardRef<HTMLDivElement, TabsListProps>(
         ref={ref}
         className={cn(
           variant === "bookmark"
-            ? "flex items-end gap-0 border-b-2 border-border px-2"
+            ? cn(lineListBase, "gap-0")
             : cn(
                 "h-9 items-center justify-center rounded-lg border border-input bg-card p-1 text-muted-foreground",
                 variant === "full"
@@ -73,7 +82,7 @@ const triggerByVariant: Record<TabsVariant, string> = {
     "rounded-md px-3 py-1 hover:text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm data-[state=active]:hover:text-primary-foreground",
   full: "rounded-md px-3 py-1 hover:text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm data-[state=active]:hover:text-primary-foreground",
   bookmark:
-    "gap-2 rounded-t-lg border-2 border-transparent border-b-0 px-4 py-2.5 font-semibold text-muted-foreground hover:bg-accent hover:text-accent-foreground data-[state=active]:-mb-0.5 data-[state=active]:border-border data-[state=active]:bg-card data-[state=active]:font-bold data-[state=active]:text-foreground [&_svg]:size-4",
+    "gap-2 rounded-t-lg border border-transparent border-b-0 px-4 py-2.5 font-semibold text-muted-foreground hover:bg-accent hover:text-accent-foreground data-[state=active]:-mb-px data-[state=active]:border-border data-[state=active]:bg-card data-[state=active]:font-bold data-[state=active]:text-foreground [&_svg]:size-4",
 };
 
 export const TabsTrigger = forwardRef<HTMLButtonElement, TabsTriggerProps>(
