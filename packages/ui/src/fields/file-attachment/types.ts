@@ -70,6 +70,34 @@ export interface FileFieldApi {
   ) => Promise<string>
 }
 
+/**
+ * Source descriptor for the standard per-module attachment API.
+ *
+ * Lets a screen wire FileField/ImageField by passing only the module's
+ * attachment address; {@link createFileFieldApi} builds the FileFieldApi against
+ * the uniform endpoint shape `{basePath}/{id}/attachment/{group}/{op}`. The
+ * field accepts this via its `source` prop as an alternative to a hand-built
+ * `api` (which stays the escape hatch for non-conforming backends).
+ */
+export interface FileFieldSource {
+  /** Module attachment base, e.g. `"/api/v1/admin/banner"`. */
+  basePath: string
+  /** Attachment group/slot, e.g. `"banner"` (server allowlist-validated). */
+  group: string
+  /** Saved entity id (edit mode). Absent → pre-save `TEMP_<tempEntityId>`. */
+  entityId?: string
+  /** Stable id scoping pre-save temp uploads before the entity exists. */
+  tempEntityId?: string
+  /** Mutator strategy name registered by the host (default `"boot"`). */
+  strategy?: string
+  /**
+   * When true and a blob transport is registered, expose `fetchBlobUrl` so the
+   * field displays/downloads bytes via the authenticated download/thumbnail
+   * endpoints. Omit (default) to rely on the record's public `url`.
+   */
+  authenticatedBlob?: boolean
+}
+
 /** Upload lifecycle state for a single item in the hook's internal list. */
 export type AttachmentStatus = 'pending' | 'uploading' | 'completed' | 'error'
 

@@ -15,6 +15,7 @@ import { FileDropzone } from '../file-attachment/atoms/file-dropzone'
 import { FileListItem } from '../file-attachment/components/file-list-item'
 import { formatBytes } from '../../utils/format-bytes'
 import { resolveMaxFileSize } from '../file-attachment/types'
+import { useResolvedFileFieldConfig } from '../../config/file-policy-context'
 import { Carousel } from '../image-attachment/components/carousel'
 import { ThumbStrip } from '../image-attachment/components/thumb-strip'
 import { StageDropzone } from '../image-attachment/components/stage-dropzone'
@@ -63,7 +64,7 @@ export function ImageField({
   api,
   onAuthError,
   initialAttachments,
-  config,
+  config: configProp,
   languages,
   maxCount,
   label,
@@ -77,6 +78,8 @@ export function ImageField({
   ...variantProps
 }: ImageFieldProps) {
   const { t } = useTranslation('simplix/ui')
+  // Precedence Y: injected server policy wins per field, instance config fills gaps.
+  const config = useResolvedFileFieldConfig(configProp)
   const {
     Dialog,
     DialogContent,
