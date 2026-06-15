@@ -256,7 +256,7 @@ describe("generateOrvalSeedFile array heuristics", () => {
         { name: "tags", snakeName: "tags", type: "array", zodType: "z.array()", required: true, nullable: false },
       ],
     })]);
-    expect(result).toContain('{ id: 1, name: "tag-1" }');
+    expect(result).toContain('{ id: "1", name: "tag-1" }');
   });
 
   it("generates empty array for unknown array fields", () => {

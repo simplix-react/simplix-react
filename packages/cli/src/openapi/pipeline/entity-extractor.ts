@@ -347,7 +347,7 @@ function buildEntityFromOps(
   const parent = detectParentFromPath(basePath);
 
   // Extract schema
-  const schema = extractEntitySchemaFromOps(spec, group.ops);
+  const schema = extractEntitySchemaFromOps(spec, group.ops, basePath);
   const schemaOverride = buildSchemaOverride(schema);
   const fields = schemaToFields(schema);
 
@@ -629,10 +629,13 @@ function convertPath(path: string): string {
 function extractEntitySchemaFromOps(
   spec: OpenAPISpec,
   ops: RawOperation[],
+  basePath: string,
 ): SchemaObject {
-  // Priority: GET item → GET list → any 2xx response → empty
-  const getItem = ops.find(
-    (op) => op.method === "GET" && hasPathParam(op.path),
+  // Priority: GET item (detail) → GET list → any 2xx response → empty.
+  // `findItemOperation` selects the same item GET as `deriveModelType`, so the
+  // generated entity.fields (values) and entity.modelType (type) always agree.
+  const getItem = findItemOperation(ops, basePath, (op) =>
+    isItemDetailSchema(extractResponseSchema(spec, op.path, "get")),
   );
   if (getItem) {
     const schema = extractResponseSchema(spec, getItem.path, "get");
@@ -696,6 +699,70 @@ function isNonStandardSchema(schema: SchemaObject): boolean {
 
 function hasPathParam(path: string): boolean {
   return path.includes("{");
+}
+
+// --- Item-detail GET selection (shared by entity.fields and entity.modelType) ---
+
+/** True when a path ends with a single path-param segment (`/{id}` or `/:id`). */
+function endsWithPathParam(path: string): boolean {
+  return /\/(\{[^}]+\}|:[^/]+)$/.test(path);
+}
+
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/** True when `path` is exactly `basePath` plus one trailing path-param segment. */
+function isExactItemPath(path: string, basePath: string): boolean {
+  return new RegExp(`^${escapeRegExp(basePath)}/(\\{[^}]+\\}|:[^/]+)$`).test(path);
+}
+
+function isPageSchema(schema: SchemaObject): boolean {
+  const p = schema.properties;
+  return !!(p?.content && (p.totalElements || p.totalPages));
+}
+
+function isEnvelopeSchema(schema: SchemaObject): boolean {
+  const p = schema.properties;
+  return !!(p?.type && p.message && p.body && p.timestamp);
+}
+
+/**
+ * True when a 2xx response (after envelope unwrapping) is a single entity DTO —
+ * an object with properties that is neither a paginated `Page` nor an envelope.
+ */
+function isItemDetailSchema(schema: SchemaObject | undefined): boolean {
+  if (!schema) return false;
+  const inner = tryUnwrapSchema(schema) ?? schema;
+  return (
+    inner.type === "object" &&
+    !!inner.properties &&
+    Object.keys(inner.properties).length > 0 &&
+    !isPageSchema(inner) &&
+    !isEnvelopeSchema(inner)
+  );
+}
+
+/**
+ * Select the GET operation that returns the entity's item detail.
+ * Shared by `extractEntitySchemaFromOps` (values) and `deriveModelType` (type)
+ * to guarantee they resolve the same operation.
+ *
+ * Order: exact collection item (`basePath/{param}`) → any nested `…/{param}`
+ * → singleton (`basePath` itself). `isDetail` filters to single-DTO responses,
+ * so list/`/search`/`/tree/{id}` array endpoints are never chosen.
+ */
+function findItemOperation<T extends { path: string; method: HttpMethod }>(
+  ops: T[],
+  basePath: string,
+  isDetail: (op: T) => boolean,
+): T | undefined {
+  const candidates = ops.filter((op) => op.method === "GET" && isDetail(op));
+  return (
+    candidates.find((op) => isExactItemPath(op.path, basePath)) ??
+    candidates.find((op) => endsWithPathParam(op.path)) ??
+    candidates.find((op) => op.path === basePath)
+  );
 }
 
 function unwrapListSchema(schema: SchemaObject): SchemaObject | undefined {
@@ -841,12 +908,30 @@ function deduplicateEntities(entities: ExtractedEntity[]): ExtractedEntity[] {
       // Merge tags
       const tagSet = new Set([...existing.tags, ...entity.tags]);
       existing.tags = [...tagSet];
+      // Prefer real entity-detail fields. When the same name resolves from
+      // several groups (e.g. an action/parent-scoped group plus the true CRUD
+      // group), the kept group may carry an envelope/empty schema while a sibling
+      // carries the actual DTO. Adopt the real one so seed type and values agree.
+      if (isEnvelopeFieldSet(existing.fields) && !isEnvelopeFieldSet(entity.fields)) {
+        existing.fields = entity.fields;
+        existing.schemaOverride = entity.schemaOverride;
+      }
     } else {
       map.set(entity.name, entity);
     }
   }
 
   return [...map.values()];
+}
+
+/**
+ * True when a field set is the boot response envelope (type/message/body/...)
+ * or empty — i.e. not a real entity detail schema.
+ */
+function isEnvelopeFieldSet(fields: EntityField[]): boolean {
+  if (fields.length === 0) return true;
+  const names = new Set(fields.map((f) => f.name));
+  return names.has("type") && names.has("message") && names.has("body") && names.has("timestamp");
 }
 
 // --- Utility functions ---
@@ -1007,17 +1092,20 @@ function deriveModelType(
   _responseMap: Map<string, ResponseInfo>,
   requestBodyMap: Map<string, string>,
 ): string | undefined {
-  // 1. Find GET single-item response type (already envelope-stripped on op.responseEntityType)
-  for (const op of entity.operations) {
-    if (op.method !== "GET" || !op.responseEntityType) continue;
-    // GET /{id}: has path param, path ends with :param (no trailing action suffix)
-    const pathParts = op.path.split("/").filter(Boolean);
-    const lastPart = pathParts[pathParts.length - 1];
-    if (lastPart?.startsWith(":")) {
-      // This is the GET single-item operation
-      if (op.responseEntityType === entity.pascalName) return undefined;
-      return op.responseEntityType;
-    }
+  // 1. Find the item-detail GET response type. Uses the same `findItemOperation`
+  //    selector as `extractEntitySchemaFromOps`, so modelType (type) and
+  //    entity.fields (values) always describe the same operation's DTO.
+  //    `responseEntityType` is already envelope-stripped; `!isArrayResponse`
+  //    excludes list/`/tree/{id}` endpoints. Also covers singletons whose detail
+  //    is served at the collection path (no `/{id}`).
+  const itemOp = findItemOperation(
+    entity.operations,
+    entity.path,
+    (op) => !!op.responseEntityType && !op.isArrayResponse,
+  );
+  if (itemOp?.responseEntityType) {
+    if (itemOp.responseEntityType === entity.pascalName) return undefined;
+    return itemOp.responseEntityType;
   }
 
   // 2. Fallback: derive from request body refs by stripping DTO suffixes

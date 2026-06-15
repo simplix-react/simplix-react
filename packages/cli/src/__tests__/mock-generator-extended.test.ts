@@ -276,6 +276,10 @@ describe("generateMockFiles extended", () => {
 
   it("handles query param with dot in name (sanitized)", async () => {
     const entity = makeEntity({
+      fields: [
+        { name: "id", snakeName: "id", type: "string", zodType: "z.string()", required: true, nullable: false },
+        { name: "status", snakeName: "status", type: "string", zodType: "z.string()", required: false, nullable: false },
+      ],
       operations: [
         {
           name: "list",

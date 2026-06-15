@@ -1,4 +1,5 @@
 import { join } from "node:path";
+import { readdir } from "node:fs/promises";
 import { writeFileWithDir, pathExists } from "../../utils/fs.js";
 import { toPascalCase } from "../../utils/case.js";
 import { generateOrvalSeedFile } from "./seed-generator.js";
@@ -28,12 +29,19 @@ export async function generateMockFiles(
   entities: ExtractedEntity[],
   responseAdapter?: ResponseAdapterConfig,
 ): Promise<void> {
-  // 1. Generate seeds.ts if it doesn't exist
+  // 1. Generate seeds.ts if it doesn't exist.
+  //    Skip entities whose seed type (modelType ?? pascalName) is not an actual
+  //    generated model — these are list/action pseudo-entities with no entity DTO,
+  //    and a seed would import a non-existent type. When the model set can't be
+  //    read, keep all entities (preserves behavior for non-Orval/standard specs).
   const seedsPath = join(targetDir, "src/mock/seeds.ts");
-  const validEntities = entities.filter((e) => e.fields.length > 0);
+  const modelNames = await readGeneratedModelNames(targetDir);
+  const hasModel = (e: ExtractedEntity): boolean =>
+    modelNames.size === 0 || modelNames.has(e.modelType ?? e.pascalName);
+  const validEntities = entities.filter((e) => e.fields.length > 0 && hasModel(e));
 
   if (!(await pathExists(seedsPath)) && validEntities.length > 0) {
-    const seedContent = generateOrvalSeedFile(entities);
+    const seedContent = generateOrvalSeedFile(validEntities);
     if (seedContent) {
       await writeFileWithDir(seedsPath, seedContent);
     }
@@ -74,6 +82,24 @@ export async function generateMockFiles(
     );
     await writeFileWithDir(entryPath, entryContent);
   }
+}
+
+/**
+ * Read the export names of the generated Orval model barrel.
+ * Orval emits one file per model in camelCase (e.g. `bannerDetailDTO.ts`
+ * exporting `BannerDetailDTO`), so the export name is the basename with its
+ * first character upper-cased. Returns an empty set when the dir is absent.
+ */
+async function readGeneratedModelNames(targetDir: string): Promise<Set<string>> {
+  const modelDir = join(targetDir, "src/generated/model");
+  if (!(await pathExists(modelDir))) return new Set();
+  const names = new Set<string>();
+  for (const file of await readdir(modelDir)) {
+    if (!file.endsWith(".ts") || file.endsWith(".d.ts") || file === "index.ts") continue;
+    const base = file.slice(0, -3);
+    names.add(base.charAt(0).toUpperCase() + base.slice(1));
+  }
+  return names;
 }
 
 // ── Constants ────────────────────────────────────────────────
@@ -315,7 +341,7 @@ function generateHandlerEntry(
   let entry: string;
   switch (role) {
     case "list":
-      entry = generateListHandler(method, pattern, store, operation);
+      entry = generateListHandler(method, pattern, store, operation, entity);
       break;
     case "getAll":
       entry = `    http.${method}("${pattern}", () => HttpResponse.json(${store}.list())),`;
@@ -331,12 +357,12 @@ function generateHandlerEntry(
     case "update":
       entry = paramIsIdField
         ? generateUpdateHandler(method, pattern, store, typeName, pathParam, idField, isNumericId, isVoid)
-        : generateUpdateByFieldHandler(method, pattern, store, typeName, pathParam!, isVoid);
+        : generateUpdateByFieldHandler(method, pattern, store, typeName, pathParam!, idField, isVoid);
       break;
     case "delete":
       entry = paramIsIdField
         ? generateDeleteHandler(method, pattern, store, pathParam, isNumericId)
-        : generateDeleteByFieldHandler(method, pattern, store, pathParam!);
+        : generateDeleteByFieldHandler(method, pattern, store, pathParam!, idField);
       break;
     case "multiUpdate":
     case "batchUpdate":
@@ -390,8 +416,14 @@ function generateListHandler(
   pattern: string,
   store: string,
   operation: ExtractedOperation,
+  entity: ExtractedEntity,
 ): string {
-  const filterParams = operation.queryParams.filter((qp) => qp.type === "string");
+  // Only emit a query-param filter when it maps to a real entity field; a
+  // filter on a non-field (e.g. a pagination/scope param) would reference a
+  // property that does not exist on the DTO.
+  const filterParams = operation.queryParams.filter(
+    (qp) => qp.type === "string" && entity.fields.some((f) => f.name === sanitizeFieldName(qp.name)),
+  );
   const filterParam = filterParams.length > 0 ? filterParams[0] : undefined;
 
   const lines = [
@@ -567,13 +599,14 @@ function generateUpdateByFieldHandler(
   store: string,
   pascalName: string,
   pathParam: string,
+  idField: string,
   isVoid: boolean,
 ): string {
   if (isVoid) {
     const lines = [
       `    http.${method}("${pattern}", async ({ request, params }) => {`,
       `      const item = ${store}.filter((item) => String(item.${pathParam}) === String(params.${pathParam}))[0];`,
-      `      if (item) ${store}.update(item.id as string | number, await request.json() as ${pascalName});`,
+      `      if (item) ${store}.update(item.${idField} as string | number, await request.json() as ${pascalName});`,
       `      return new HttpResponse(null, { status: 204 });`,
       `    }),`,
     ];
@@ -583,7 +616,7 @@ function generateUpdateByFieldHandler(
     `    http.${method}("${pattern}", async ({ request, params }) => {`,
     `      const item = ${store}.filter((item) => String(item.${pathParam}) === String(params.${pathParam}))[0];`,
     `      if (!item) return HttpResponse.json(${store}.list()[0]);`,
-    `      return HttpResponse.json(${store}.update(item.id as string | number, await request.json() as ${pascalName}));`,
+    `      return HttpResponse.json(${store}.update(item.${idField} as string | number, await request.json() as ${pascalName}));`,
     `    }),`,
   ];
   return lines.join("\n");
@@ -612,11 +645,12 @@ function generateDeleteByFieldHandler(
   pattern: string,
   store: string,
   pathParam: string,
+  idField: string,
 ): string {
   const lines = [
     `    http.${method}("${pattern}", ({ params }) => {`,
     `      const item = ${store}.filter((item) => String(item.${pathParam}) === String(params.${pathParam}))[0];`,
-    `      if (item) ${store}.remove(item.id as string | number);`,
+    `      if (item) ${store}.remove(item.${idField} as string | number);`,
     `      return HttpResponse.json(null);`,
     `    }),`,
   ];
