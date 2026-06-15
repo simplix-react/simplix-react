@@ -17,6 +17,29 @@ interface I18nMessagesResponse {
   enums?: Record<string, I18nEnumMessages>;
 }
 
+/**
+ * Boot response envelope. The dev i18n endpoint is served through the standard
+ * Boot envelope (`{ type: "SUCCESS", body: ... }`), so the payload must be
+ * unwrapped before transformation.
+ */
+interface BootEnvelope<T> {
+  type?: string;
+  body?: T;
+}
+
+/**
+ * Unwrap the Boot response envelope to the i18n payload. Tolerates a raw
+ * (un-enveloped) body for servers that do not wrap this endpoint.
+ */
+function unwrapBootEnvelope(raw: unknown): I18nMessagesResponse | undefined {
+  if (!raw || typeof raw !== "object") return undefined;
+  const envelope = raw as BootEnvelope<I18nMessagesResponse>;
+  if ("type" in envelope && "body" in envelope) {
+    return envelope.body;
+  }
+  return raw as I18nMessagesResponse;
+}
+
 // --- Download ---
 
 export async function downloadI18nMessages(
@@ -37,7 +60,7 @@ export async function downloadI18nMessages(
       return undefined;
     }
 
-    return (await res.json()) as I18nMessagesResponse;
+    return unwrapBootEnvelope(await res.json());
   } catch (err) {
     console.warn(`i18n download failed: ${err instanceof Error ? err.message : String(err)} (${url})`);
     return undefined;
@@ -81,7 +104,7 @@ export function transformToLocaleData(
     const localeData: Record<string, unknown> = {};
 
     // Transform entity fields
-    for (const [pascalKey, entityMessages] of Object.entries(serverData.entities)) {
+    for (const [pascalKey, entityMessages] of Object.entries(serverData.entities ?? {})) {
       const entityName = entityKeyMap.get(pascalKey);
       if (!entityName) continue;
 
