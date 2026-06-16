@@ -96,6 +96,24 @@ export interface FileFieldSource {
    * endpoints. Omit (default) to rely on the record's public `url`.
    */
   authenticatedBlob?: boolean
+  /**
+   * Rewrites a record's display `url`/`thumbnailUrl` to a token-free public URL
+   * (e.g. public-site logo/favicon served without Bearer auth). Applied to
+   * upload / list / updateDescription results; return `undefined` to keep the
+   * record's existing url. MUTUALLY EXCLUSIVE with `authenticatedBlob` — when
+   * set, `fetchBlobUrl` is NOT exposed (public url takes precedence).
+   */
+  publicUrlBuilder?: (
+    group: string,
+    attachmentId: string,
+    opts?: { thumbnail?: boolean },
+  ) => string | undefined
+  /**
+   * Called after a successful mutating op (upload / delete / reorder /
+   * representative / updateDescription) — e.g. to invalidate host caches. NOT
+   * called for read ops (list / fetchBlobUrl).
+   */
+  onMutated?: () => void
 }
 
 /** Upload lifecycle state for a single item in the hook's internal list. */

@@ -22,17 +22,30 @@ const JSON_HEADERS = { 'Content-Type': 'application/json' }
  * (terminal progress, public `url`) otherwise.
  */
 export function createFileFieldApi(source: FileFieldSource): FileFieldApi {
-  const { basePath, group, entityId, tempEntityId, strategy = 'boot', authenticatedBlob } = source
+  const { basePath, group, entityId, tempEntityId, strategy = 'boot', authenticatedBlob, publicUrlBuilder, onMutated } = source
   const id = entityId ?? `TEMP_${tempEntityId}`
   const base = `${basePath}/${id}/attachment/${group}`
   const transport = getAttachmentTransport()
+
+  const mapRecord = (rec: AttachmentRecord): AttachmentRecord => {
+    if (!publicUrlBuilder || !rec.attachmentId) return rec
+    const url = publicUrlBuilder(group, rec.attachmentId)
+    const thumbnailUrl = publicUrlBuilder(group, rec.attachmentId, { thumbnail: true })
+    return {
+      ...rec,
+      ...(url !== undefined ? { url } : {}),
+      ...(thumbnailUrl !== undefined ? { thumbnailUrl } : {}),
+    }
+  }
 
   return {
     async upload(file, onProgress, signal) {
       const form = new FormData()
       form.append('file', file)
       if (transport.upload) {
-        return transport.upload<AttachmentRecord>(`${base}/upload`, form, { onProgress, signal })
+        const record = await transport.upload<AttachmentRecord>(`${base}/upload`, form, { onProgress, signal })
+        onMutated?.()
+        return mapRecord(record)
       }
       const record = await getMutator(strategy)<AttachmentRecord>(`${base}/upload`, {
         method: 'POST',
@@ -40,16 +53,18 @@ export function createFileFieldApi(source: FileFieldSource): FileFieldApi {
         signal,
       })
       onProgress?.(100)
-      return record
+      onMutated?.()
+      return mapRecord(record)
     },
     async list() {
       const records = await getMutator(strategy)<AttachmentRecord[]>(`${base}/list`, {
         method: 'GET',
       })
-      return Array.isArray(records) ? records : []
+      return Array.isArray(records) ? records.map(mapRecord) : []
     },
     async delete(attachmentId) {
       await getMutator(strategy)(`${base}/${attachmentId}`, { method: 'DELETE' })
+      onMutated?.()
     },
     async reorder(orders) {
       await getMutator(strategy)(`${base}/order`, {
@@ -57,21 +72,25 @@ export function createFileFieldApi(source: FileFieldSource): FileFieldApi {
         headers: JSON_HEADERS,
         body: JSON.stringify({ orders }),
       })
+      onMutated?.()
     },
     async setRepresentative(attachmentId, representative) {
       await getMutator(strategy)(
         `${base}/${attachmentId}/representative?representative=${representative}`,
         { method: 'PATCH' },
       )
+      onMutated?.()
     },
     async updateDescription(attachmentId, dto) {
-      return getMutator(strategy)<AttachmentRecord>(`${base}/${attachmentId}`, {
+      const record = await getMutator(strategy)<AttachmentRecord>(`${base}/${attachmentId}`, {
         method: 'PUT',
         headers: JSON_HEADERS,
         body: JSON.stringify(dto),
       })
+      onMutated?.()
+      return mapRecord(record)
     },
-    ...(authenticatedBlob && transport.fetchBlob
+    ...(authenticatedBlob && transport.fetchBlob && !publicUrlBuilder
       ? {
           async fetchBlobUrl(attachmentId: string, opts?: { thumbnail?: boolean; size?: number }) {
             const url = opts?.thumbnail
