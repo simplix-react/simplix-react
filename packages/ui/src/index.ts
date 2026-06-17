@@ -605,6 +605,22 @@ export type { PageHeaderState } from "./layout/page-header";
 export { PanelHeader } from "./layout/panel-header";
 export type { PanelHeaderProps } from "./layout/panel-header";
 
+// Status tone tokens + tone-driven display primitives (commonization)
+export { STATUS_TONES, STATUS_TONE_NAMES, statusToneClass, StatusBadge, StatusDot, AlertBanner, DetailList, DetailListRow, LabeledField } from "./base";
+export type {
+  StatusTone,
+  StatusToneToken,
+  IconComponent,
+  StatusBadgeProps,
+  StatusDotProps,
+  AlertBannerProps,
+  AlertTone,
+  AlertDensity,
+  DetailListProps,
+  DetailListRowProps,
+  LabeledFieldProps,
+} from "./base";
+
 // Map utilities
 export { useMapPageData } from "./map/use-map-page-data";
 export type { UseMapPageDataOptions, UseMapPageDataReturn } from "./map/use-map-page-data";

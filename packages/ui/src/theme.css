@@ -326,3 +326,34 @@
   --color-purple-soft: var(--purple-soft);
   --color-purple-soft-2: var(--purple-soft-2);
 }
+
+/* Status indicator animations.
+   `animate-status-flash` is the one-shot ring used by StatusDot animation="flash"
+   (re-triggered by remounting / a changing key on data updates).
+   `animate-live-flash` is a subtle background pulse for "live"/realtime affordances. */
+@theme {
+  --animate-status-flash: status-flash 0.9s ease-out;
+  --animate-live-flash: live-flash 1s ease-in-out;
+}
+
+@keyframes status-flash {
+  0% {
+    opacity: 0.75;
+    transform: scale(1);
+  }
+  80%,
+  100% {
+    opacity: 0;
+    transform: scale(2.2);
+  }
+}
+
+@keyframes live-flash {
+  0%,
+  100% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: color-mix(in oklab, var(--success) 18%, transparent);
+  }
+}

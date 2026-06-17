@@ -14,6 +14,15 @@ export type {
 export { Separator } from "./separator";
 export type { SeparatorProps } from "./separator";
 
+export { StatusBadge } from "./status-badge";
+export type { StatusBadgeProps } from "./status-badge";
+
+export { StatusDot } from "./status-dot";
+export type { StatusDotProps } from "./status-dot";
+
+export { DetailList, DetailListRow } from "./detail-list-row";
+export type { DetailListProps, DetailListRowProps } from "./detail-list-row";
+
 export { Skeleton } from "./skeleton";
 export type { SkeletonProps } from "./skeleton";
 
