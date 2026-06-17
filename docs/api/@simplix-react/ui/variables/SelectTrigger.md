@@ -6,6 +6,6 @@
 
 # Variable: SelectTrigger
 
-> `const` **SelectTrigger**: `ForwardRefExoticComponent`\<`Omit`\<`SelectTriggerProps` & `RefAttributes`\<`HTMLButtonElement`\>, `"ref"`\> & `RefAttributes`\<`HTMLButtonElement`\>\>
+> `const` **SelectTrigger**: `ForwardRefExoticComponent`\<`Omit`\<[`SelectTriggerProps`](../interfaces/SelectTriggerProps.md), `"ref"`\> & `RefAttributes`\<`HTMLButtonElement`\>\>
 
-Defined in: [packages/ui/src/base/inputs/select.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/select.tsx#L20)
+Defined in: [packages/ui/src/base/inputs/select.tsx:38](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/select.tsx#L38)

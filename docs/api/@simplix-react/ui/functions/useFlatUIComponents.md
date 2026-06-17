@@ -237,7 +237,7 @@ with the same names used in direct base imports (e.g. `Table`, `TableRow`).
 
 ### SelectTrigger
 
-> **SelectTrigger**: `ComponentType`\<`SelectTriggerProps` & `RefAttributes`\<`HTMLButtonElement`\>\> = `ui.Select.Trigger`
+> **SelectTrigger**: `ComponentType`\<[`SelectTriggerProps`](../interfaces/SelectTriggerProps.md)\> = `ui.Select.Trigger`
 
 ### SelectValue
 

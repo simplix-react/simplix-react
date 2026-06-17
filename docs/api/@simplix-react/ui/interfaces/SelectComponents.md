@@ -36,7 +36,7 @@ Defined in: [packages/ui/src/provider/types.ts:68](https://github.com/simplix-re
 
 ### Trigger
 
-> **Trigger**: `ComponentType`\<`SelectTriggerProps` & `RefAttributes`\<`HTMLButtonElement`\>\>
+> **Trigger**: `ComponentType`\<[`SelectTriggerProps`](SelectTriggerProps.md)\>
 
 Defined in: [packages/ui/src/provider/types.ts:69](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L69)
 
