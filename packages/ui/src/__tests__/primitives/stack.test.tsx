@@ -92,6 +92,43 @@ describe("Stack", () => {
     expect(screen.getByTestId("stack").className).toContain("flex-wrap");
   });
 
+  it("applies shrink={false} as shrink-0", () => {
+    render(<Stack data-testid="stack" shrink={false} />);
+    expect(screen.getByTestId("stack").className).toContain("shrink-0");
+  });
+
+  it("applies overflow variants", () => {
+    const overflows = {
+      visible: "overflow-visible",
+      hidden: "overflow-hidden",
+      auto: "overflow-auto",
+      scroll: "overflow-scroll",
+    } as const;
+
+    for (const [overflow, expected] of Object.entries(overflows)) {
+      const { unmount } = render(
+        <Stack
+          data-testid="stack"
+          overflow={overflow as keyof typeof overflows}
+        />,
+      );
+      expect(screen.getByTestId("stack").className).toContain(expected);
+      unmount();
+    }
+  });
+
+  it("applies overflow='auto' as overflow-auto", () => {
+    render(<Stack data-testid="stack" overflow="auto" />);
+    expect(screen.getByTestId("stack").className).toContain("overflow-auto");
+  });
+
+  it("applies minSize as min-w-0 and min-h-0", () => {
+    render(<Stack data-testid="stack" minSize={true} />);
+    const classes = screen.getByTestId("stack").className;
+    expect(classes).toContain("min-w-0");
+    expect(classes).toContain("min-h-0");
+  });
+
   it("merges custom className", () => {
     render(<Stack data-testid="stack" className="custom-class" />);
     const classes = screen.getByTestId("stack").className;

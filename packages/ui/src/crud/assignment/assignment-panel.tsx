@@ -64,6 +64,8 @@ export interface AssignmentChipProps {
   label: string;
   /** Optional icon before label. */
   icon?: ReactNode;
+  /** Optional trailing element rendered after the label (e.g. a count Badge). */
+  trailing?: ReactNode;
   /** Called when remove button is clicked. Omit to hide remove button. */
   onRemove?: () => void;
 }
@@ -139,11 +141,12 @@ function AssignmentChips<T>({
   );
 }
 
-function AssignmentChip({ label, icon, onRemove }: AssignmentChipProps) {
+function AssignmentChip({ label, icon, trailing, onRemove }: AssignmentChipProps) {
   return (
     <Flex align="center" gap="xs" className="h-8 rounded-md border bg-card px-3">
       {icon}
       <Text size="sm">{label}</Text>
+      {trailing}
       {onRemove && (
         <button
           type="button"

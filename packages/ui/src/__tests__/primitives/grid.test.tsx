@@ -71,6 +71,7 @@ describe("Grid", () => {
   it("applies gap variants", () => {
     const gaps = {
       none: "gap-0",
+      px: "gap-px",
       xs: "gap-1",
       sm: "gap-2",
       md: "gap-4",
@@ -91,6 +92,67 @@ describe("Grid", () => {
     render(<Grid data-testid="grid" columns={2} gap="lg">content</Grid>);
     const inner = screen.getByTestId("grid").firstElementChild!;
     expect(inner.className).toContain("gap-6");
+  });
+
+  it("applies gap='px' as gap-px", () => {
+    render(<Grid data-testid="grid" gap="px" />);
+    expect(screen.getByTestId("grid").className).toContain("gap-px");
+  });
+
+  it("applies template as inline grid-template-columns and skips columns class", () => {
+    render(
+      <Grid data-testid="grid" template="200px 1fr">
+        content
+      </Grid>,
+    );
+    const el = screen.getByTestId("grid") as HTMLDivElement;
+    expect(el.style.gridTemplateColumns).toBe("200px 1fr");
+    expect(el.className).toContain("grid");
+    // template path is flat: no @container wrapper and no columns enum class
+    expect(el.className).not.toContain("@container");
+    expect(el.className).not.toContain("grid-cols-1");
+  });
+
+  it("template path keeps the gap class", () => {
+    render(
+      <Grid data-testid="grid" template="repeat(2, 1fr)" gap="sm">
+        content
+      </Grid>,
+    );
+    const el = screen.getByTestId("grid");
+    expect(el.className).toContain("gap-2");
+  });
+
+  it("template overrides columns and responsive path", () => {
+    render(
+      <Grid
+        data-testid="grid"
+        columns={3}
+        template="repeat(auto-fill, minmax(12rem, 1fr))"
+      >
+        content
+      </Grid>,
+    );
+    const el = screen.getByTestId("grid") as HTMLDivElement;
+    expect(el.style.gridTemplateColumns).toBe(
+      "repeat(auto-fill, minmax(12rem, 1fr))",
+    );
+    expect(el.className).not.toContain("@container");
+  });
+
+  it("merges custom style with template", () => {
+    render(
+      <Grid
+        data-testid="grid"
+        template="1fr 1fr"
+        style={{ backgroundColor: "red" }}
+      >
+        content
+      </Grid>,
+    );
+    const el = screen.getByTestId("grid") as HTMLDivElement;
+    expect(el.style.gridTemplateColumns).toBe("1fr 1fr");
+    expect(el.style.backgroundColor).toBe("red");
   });
 
   it("merges custom className", () => {

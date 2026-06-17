@@ -34,6 +34,17 @@ const stackVariants = cva("flex", {
     fill: { true: "h-full" },
     flex: { true: "flex-1 min-h-0" },
     padded: { true: "pt-4 pb-8" },
+    // `shrink={false}` opts the stack out of flex-shrinking (applies `shrink-0`).
+    shrink: { false: "shrink-0" },
+    // Overflow behavior for the stack container.
+    overflow: {
+      visible: "overflow-visible",
+      hidden: "overflow-hidden",
+      auto: "overflow-auto",
+      scroll: "overflow-scroll",
+    },
+    // Allow shrinking below intrinsic content size — enables truncation/scroll inside flex parents.
+    minSize: { true: "min-w-0 min-h-0" },
   },
   defaultVariants: { direction: "column", gap: "md", align: "stretch" },
 });
@@ -78,7 +89,24 @@ export interface StackProps
  */
 const StackBase = forwardRef<HTMLDivElement, StackProps>(
   (
-    { className, direction, gap, align, justify, wrap, fill, flex, padded, fade, emptyContent, children, ...rest },
+    {
+      className,
+      direction,
+      gap,
+      align,
+      justify,
+      wrap,
+      fill,
+      flex,
+      padded,
+      shrink,
+      overflow,
+      minSize,
+      fade,
+      emptyContent,
+      children,
+      ...rest
+    },
     ref,
   ) => {
     const hasChildren = Children.toArray(children).filter(Boolean).length > 0;
@@ -91,7 +119,20 @@ const StackBase = forwardRef<HTMLDivElement, StackProps>(
     ) : children;
 
     const stackClass = cn(
-      stackVariants({ direction, gap, align, justify, wrap, fill: fade ? undefined : fill, flex: fade ? undefined : flex, padded }),
+      stackVariants({
+        direction,
+        gap,
+        align,
+        justify,
+        wrap,
+        fill: fade ? undefined : fill,
+        flex: fade ? undefined : flex,
+        padded,
+        shrink,
+        // Fade mode clips content via its own overflow-hidden wrapper; defer to it.
+        overflow: fade ? undefined : overflow,
+        minSize,
+      }),
       className,
     );
 

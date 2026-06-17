@@ -17,6 +17,7 @@ const gridVariants = cva("grid", {
     },
     gap: {
       none: "gap-0",
+      px: "gap-px",
       xs: "gap-1",
       sm: "gap-2",
       md: "gap-4",
@@ -42,6 +43,20 @@ export interface GridProps
    * @default true
    */
   responsive?: boolean;
+  /**
+   * Arbitrary `grid-template-columns` value applied as an inline style,
+   * covering cases the `columns` enum cannot express (e.g. `"repeat(auto-fill, minmax(12rem, 1fr))"`
+   * or `"200px 1fr"`). When provided, the `columns` class and responsive
+   * container-query behavior are skipped — `template` takes precedence.
+   *
+   * @example
+   * ```tsx
+   * <Grid template="repeat(auto-fill, minmax(12rem, 1fr))" gap="sm">
+   *   {items}
+   * </Grid>
+   * ```
+   */
+  template?: string;
 }
 
 /**
@@ -64,6 +79,7 @@ const responsiveColumnClasses: Record<number, string> = {
 
 const gapClassMap: Record<string, string> = {
   none: "gap-0",
+  px: "gap-px",
   xs: "gap-1",
   sm: "gap-2",
   md: "gap-4",
@@ -95,16 +111,33 @@ const gapClassMap: Record<string, string> = {
  * ```
  */
 const GridBase = forwardRef<HTMLDivElement, GridProps>(
-  ({ className, columns, gap, responsive = true, children, ...rest }, ref) => {
+  ({ className, columns, gap, responsive = true, template, children, style, ...rest }, ref) => {
     const cols = columns ?? 1;
     const isResponsive = responsive && cols > 1;
+
+    // An explicit grid-template-columns string overrides the columns enum and
+    // responsive container-query path; apply it as an inline style.
+    if (template) {
+      const gapClass = gapClassMap[(gap ?? "md") as string] ?? "gap-4";
+
+      return (
+        <div
+          ref={ref}
+          className={cn("grid", gapClass, className)}
+          style={{ gridTemplateColumns: template, ...style }}
+          {...rest}
+        >
+          {children}
+        </div>
+      );
+    }
 
     if (isResponsive) {
       const colClass = responsiveColumnClasses[cols] ?? `grid-cols-${cols}`;
       const gapClass = gapClassMap[(gap ?? "md") as string] ?? "gap-4";
 
       return (
-        <div ref={ref} className="@container" {...rest}>
+        <div ref={ref} className="@container" style={style} {...rest}>
           <div className={cn("grid", colClass, gapClass, className)}>
             {children}
           </div>
@@ -116,6 +149,7 @@ const GridBase = forwardRef<HTMLDivElement, GridProps>(
       <div
         ref={ref}
         className={cn(gridVariants({ columns, gap }), className)}
+        style={style}
         {...rest}
       >
         {children}
