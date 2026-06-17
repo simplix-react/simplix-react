@@ -30,9 +30,12 @@ This single install provides:
 | Package | Description |
 | --- | --- |
 | `@simplix-react/contract` | Zod-based type-safe API contract definitions |
+| `@simplix-react/api` | Orval mutator singleton for domain packages |
 | `@simplix-react/react` | React Query hooks derived from contracts |
 | `@simplix-react/form` | TanStack Form hooks derived from contracts |
+| `@simplix-react/ui` | CRUD scaffolding UI components and compound patterns |
 | `@simplix-react/auth` | Authentication middleware (Bearer, API Key, OAuth2) |
+| `@simplix-react/access` | CASL-based authorization and access control |
 | `@simplix-react/mock` | MSW handlers + in-memory stores |
 | `@simplix-react/i18n` | i18next-based internationalization |
 | `@simplix-react/cli` | Project scaffolding and validation CLI |

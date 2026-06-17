@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react/access",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Authorization and access control for @simplix-react with CASL integration",
   "type": "module",
   "sideEffects": false,

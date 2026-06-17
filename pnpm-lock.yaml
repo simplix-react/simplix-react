@@ -798,6 +798,12 @@ importers:
 
   packages/simplix-react:
     dependencies:
+      '@simplix-react/access':
+        specifier: workspace:*
+        version: link:../access
+      '@simplix-react/api':
+        specifier: workspace:*
+        version: link:../api
       '@simplix-react/auth':
         specifier: workspace:*
         version: link:../auth
@@ -822,6 +828,27 @@ importers:
       '@simplix-react/testing':
         specifier: workspace:*
         version: link:../testing
+      '@simplix-react/ui':
+        specifier: workspace:*
+        version: link:../ui
+
+  packages/simplix-react-ext:
+    dependencies:
+      '@simplix-react-ext/simplix-boot-access':
+        specifier: workspace:*
+        version: link:../../extensions/simplix-boot/packages/access
+      '@simplix-react-ext/simplix-boot-auth':
+        specifier: workspace:*
+        version: link:../../extensions/simplix-boot/packages/auth
+      '@simplix-react-ext/simplix-boot-cli-plugin':
+        specifier: workspace:*
+        version: link:../../extensions/simplix-boot/packages/cli-plugin
+      '@simplix-react-ext/simplix-boot-stream':
+        specifier: workspace:*
+        version: link:../../extensions/simplix-boot/packages/stream
+      '@simplix-react-ext/simplix-boot-utils':
+        specifier: workspace:*
+        version: link:../../extensions/simplix-boot/packages/utils
 
   packages/testing:
     devDependencies:

@@ -1,6 +1,6 @@
 {
   "name": "simplix-react",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Package-first React framework that auto-generates reusable domain packages from OpenAPI specs",
   "type": "module",
   "sideEffects": false,
@@ -9,9 +9,12 @@
   },
   "dependencies": {
     "@simplix-react/contract": "workspace:*",
+    "@simplix-react/api": "workspace:*",
     "@simplix-react/react": "workspace:*",
     "@simplix-react/form": "workspace:*",
+    "@simplix-react/ui": "workspace:*",
     "@simplix-react/auth": "workspace:*",
+    "@simplix-react/access": "workspace:*",
     "@simplix-react/mock": "workspace:*",
     "@simplix-react/i18n": "workspace:*",
     "@simplix-react/cli": "workspace:*",

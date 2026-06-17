@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react-ext/simplix-boot-auth",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Spring Security authentication for simplix-boot",
   "type": "module",
   "exports": {
