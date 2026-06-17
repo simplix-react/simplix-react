@@ -12,10 +12,12 @@
   ],
   "exports": {
     ".": {
+      "source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
     "./plate-editor": {
+      "source": "./src/fields/plate-editor/index.ts",
       "types": "./dist/plate-editor.d.ts",
       "import": "./dist/plate-editor.js"
     },
@@ -29,7 +31,7 @@
     "access": "public"
   },
   "scripts": {
-    "prebuild": "find src -name '*.d.ts' -o -name '*.d.ts.map' -o -name '*.js.map' | xargs rm -f",
+    "prebuild": "find src -name '*.d.ts' -o -name '*.d.ts.map' -o -name '*.js' -o -name '*.js.map' | xargs rm -f",
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
