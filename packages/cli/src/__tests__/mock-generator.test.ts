@@ -113,6 +113,10 @@ describe("generateMockFiles", () => {
 
   it("handles entity with list query params in handler", async () => {
     const entity = makeEntity({
+      fields: [
+        { name: "id", snakeName: "id", type: "string", zodType: "z.string()", required: true, nullable: false },
+        { name: "status", snakeName: "status", type: "string", zodType: "z.string()", required: false, nullable: false },
+      ],
       operations: [
         {
           name: "list",
@@ -129,7 +133,7 @@ describe("generateMockFiles", () => {
 
     const handlersPath = join(tempDir, "src/generated/mock/handlers.ts");
     const content = await readFile(handlersPath, "utf-8");
-    expect(content).toContain("status");
+    expect(content).toContain("item.status");
   });
 
   it("handles entity with numeric id field", async () => {

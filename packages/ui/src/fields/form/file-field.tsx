@@ -11,6 +11,7 @@ import { DeleteConfirmDialog } from '../file-attachment/components/delete-confir
 import { ImageViewerModal } from '../file-attachment/components/image-viewer-modal'
 import { DescriptionEditDialog } from '../file-attachment/components/description-edit-dialog'
 import { DEFAULT_MAX_FILES, resolveMaxFileSize } from '../file-attachment/types'
+import { useResolvedFileFieldConfig } from '../../config/file-policy-context'
 import { formatBytes } from '../../utils/format-bytes'
 import type { FileAttachmentItem } from '../file-attachment/types'
 import type { FileFieldProps } from '../file-attachment/types'
@@ -33,7 +34,7 @@ export function FileField({
   api,
   onAuthError,
   initialAttachments,
-  config,
+  config: configProp,
   languages,
   label,
   labelKey,
@@ -46,6 +47,8 @@ export function FileField({
   ...variantProps
 }: FileFieldProps) {
   const { t } = useTranslation('simplix/ui')
+  // Precedence Y: injected server policy wins per field, instance config fills gaps.
+  const config = useResolvedFileFieldConfig(configProp)
   const {
     Dialog,
     DialogContent,

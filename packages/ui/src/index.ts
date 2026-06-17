@@ -666,6 +666,11 @@ export {
   useActiveMenuItem,
   RouteMatcherContext,
   RouteMatcherProvider,
+  MenuLink,
+  isOnPath,
+  collectExpandKeys,
+  useMenuSelection,
+  useSidebar,
 } from "./menu";
 export type {
   FixedMenuGroup,
@@ -683,9 +688,17 @@ export type {
   UseActiveMenuItemOptions,
 } from "./menu";
 
-// File attachment API factory (builds a FileFieldApi for the common endpoints)
+// File attachment API factory (builds a FileFieldApi for the standard
+// per-module endpoints from a FileFieldSource address) + host transport
 export { createFileFieldApi } from "./fields/file-attachment";
-export type {
-  CreateFileFieldApiOptions,
-  AttachmentHttpClient,
+export type { FileFieldSource } from "./fields/file-attachment";
+export {
+  configureAttachmentTransport,
+  getAttachmentTransport,
 } from "./fields/file-attachment";
+export type { AttachmentTransport } from "./fields/file-attachment";
+
+// App-level config provider (host-injected queries; reserved `filePolicy` key
+// feeds FileField/ImageField defaults via precedence Y)
+export { createAppConfig, useFilePolicy } from "./config";
+export type { RemoteConfigQueryDef } from "./config";

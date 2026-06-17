@@ -173,9 +173,9 @@ function generateArrayValue(field: EntityField, index: number): string {
     return `["https://example.com/images/${index}.jpg"]`;
   }
 
-  // Tags or similar arrays of objects
+  // Tags or similar arrays of objects (id is a string in the generated DTOs)
   if (name.includes("tag")) {
-    return `[{ id: ${index}, name: "tag-${index}" }]`;
+    return `[{ id: "${index}", name: "tag-${index}" }]`;
   }
 
   return `[]`;

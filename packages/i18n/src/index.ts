@@ -54,3 +54,19 @@ export type { DomainTranslationConfig } from "./domain-translations.js";
 
 // Locale config
 export { DEFAULT_LOCALES, SUPPORTED_LOCALES } from "./utils/locale-config.js";
+
+// DateTime formatting utilities (locale/timezone-aware Intl wrappers)
+export {
+  formatDate,
+  formatTime,
+  formatDateTime,
+  formatRelative,
+  toBCP47Locale,
+  clearFormatterCaches,
+} from "./datetime.js";
+export type {
+  DateInput,
+  FormatDateOptions,
+  FormatTimeOptions,
+  FormatDateTimeOptions,
+} from "./datetime.js";

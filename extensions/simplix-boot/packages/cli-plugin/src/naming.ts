@@ -127,6 +127,21 @@ function findGetSubpath(segments: string[], entityName: string): string | undefi
 
   if (actionParts.length === 0) return undefined;
 
+  // When the entity match only covered a leading prefix of a compound entity
+  // (prefix fallback above), the trailing path segments may simply complete the
+  // entity name rather than name a custom action. e.g. entity "policyVersion"
+  // with path /policy/{policyId}/version — "version" completes the entity and is
+  // not an action. Detect this by checking the action segments against the
+  // entity's trailing parts; if they match, there is no sub-path action.
+  const entityParts = entityKebab.split("-");
+  if (actionParts.length < entityParts.length) {
+    const actionKebab = actionParts
+      .map(p => p.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase())
+      .join("-");
+    const entityTail = entityParts.slice(-actionParts.length).join("-");
+    if (actionKebab === entityTail) return undefined;
+  }
+
   return actionParts[0] + actionParts.slice(1)
     .map(p => p.charAt(0).toUpperCase() + p.slice(1))
     .join("");
@@ -187,6 +202,18 @@ export const simplixBootNaming: OpenApiNamingStrategy = {
       const getAction = findGetSubpath(pathSegments, entity);
       if (getAction) {
         const actionPascal = getAction.charAt(0).toUpperCase() + getAction.slice(1);
+        // Item-level sub-resource GET (path ends with a path param) must be
+        // distinct from its collection sibling (the same sub-path without the
+        // trailing param), which otherwise collapses to the same hook name.
+        // Disambiguate by the trailing param, mirroring the "...ById" convention.
+        if (lastSegment.startsWith("{")) {
+          const paramAction = toCamelCase(lastSegment.slice(1, -1));
+          const paramPascal = paramAction.charAt(0).toUpperCase() + paramAction.slice(1);
+          return {
+            role: `${getAction}By${paramPascal}`,
+            hookName: `get${pascal}${actionPascal}By${paramPascal}`,
+          };
+        }
         return { role: getAction, hookName: `get${pascal}${actionPascal}` };
       }
       if (hasPathParam && !pathAfterParam) {

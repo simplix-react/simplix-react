@@ -112,6 +112,62 @@ describe("simplixBootNaming", () => {
       expect(result).toEqual({ role: "getAll", hookName: "getAllPets" });
     });
 
+    // --- GET nested sub-resource where the compound entity name is split
+    //     across the path by a parent path param (e.g. policyVersion under
+    //     /policy/{policyId}/version). The trailing "version" completes the
+    //     entity name and must NOT be treated as a custom sub-path action. ---
+
+    it("resolves GET /policy/{policyId}/version/{versionId} as get for split compound entity policyVersion", () => {
+      const result = simplixBootNaming.resolveOperation({
+        ...baseContext,
+        entityName: "policyVersion",
+        method: "get",
+        path: "/api/v1/admin/policy/{policyId}/version/{versionId}",
+        pathParams: ["policyId", "versionId"],
+      });
+      expect(result).toEqual({ role: "get", hookName: "getPolicyVersion" });
+    });
+
+    it("resolves GET /policy/{policyId}/version as getAll for split compound entity policyVersion", () => {
+      const result = simplixBootNaming.resolveOperation({
+        ...baseContext,
+        entityName: "policyVersion",
+        method: "get",
+        path: "/api/v1/admin/policy/{policyId}/version",
+        pathParams: ["policyId"],
+      });
+      expect(result).toEqual({ role: "getAll", hookName: "getAllPolicyVersions" });
+    });
+
+    // --- GET sub-path action with item/collection siblings: the item variant
+    //     (trailing path param) must be distinct from the collection variant,
+    //     which otherwise collapses to the same hook name. ---
+
+    it("resolves GET /user/me/social-connections as collection sub-path action", () => {
+      const result = simplixBootNaming.resolveOperation({
+        ...baseContext,
+        entityName: "user",
+        method: "get",
+        path: "/api/v1/user/me/social-connections",
+        pathParams: [],
+      });
+      expect(result).toEqual({ role: "meSocialConnections", hookName: "getUserMeSocialConnections" });
+    });
+
+    it("resolves GET /user/me/social-connections/{provider} as distinct item sub-path action", () => {
+      const result = simplixBootNaming.resolveOperation({
+        ...baseContext,
+        entityName: "user",
+        method: "get",
+        path: "/api/v1/user/me/social-connections/{provider}",
+        pathParams: ["provider"],
+      });
+      expect(result).toEqual({
+        role: "meSocialConnectionsByProvider",
+        hookName: "getUserMeSocialConnectionsByProvider",
+      });
+    });
+
     // --- POST patterns ---
 
     it("resolves POST /create as create", () => {

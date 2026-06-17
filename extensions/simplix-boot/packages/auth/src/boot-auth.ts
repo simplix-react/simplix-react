@@ -50,6 +50,18 @@ export interface BootAuthResult {
   /** Auth-wrapped fetch WITH Boot envelope unwrapping (for Boot domain packages) */
   bootMutator: FetchFn;
   getToken: () => string | null;
+  /**
+   * XHR-based multipart upload with real progress, auth headers, 401
+   * refresh-retry, and Boot envelope unwrapping. Returns the unwrapped body.
+   * (fetch cannot report upload progress, so attachments use XHR here.)
+   */
+  uploadWithProgress: <T = unknown>(
+    url: string,
+    formData: FormData,
+    opts?: { onProgress?: (percent: number) => void; signal?: AbortSignal },
+  ) => Promise<T>;
+  /** Authenticated blob fetch (attachment download/thumbnail) with 401 refresh-retry. */
+  fetchAttachmentBlob: (url: string) => Promise<Blob>;
 }
 
 interface SpringTokenResponse {
@@ -195,5 +207,96 @@ export function createBootAuth(options: BootAuthOptions = {}): BootAuthResult {
     return unwrapEnvelope(envelope);
   }) as FetchFn;
 
-  return { auth, authClient, store, baseFetch, rawAuthFetch, bootMutator, getToken };
+  // Attachment transport: XHR (progress) / fetch (blob) sharing the bearer
+  // scheme's headers + 401 refresh-retry. baseUrl mirrors the Boot http fetch.
+  const attachmentBaseUrl = options.fetchOptions?.baseUrl ?? "";
+
+  async function withAuthRetry<T>(
+    run: (headers: Record<string, string>) => Promise<T>,
+  ): Promise<T> {
+    try {
+      return await run(await scheme.getHeaders());
+    } catch (error) {
+      const status = (error as { status?: number } | null)?.status;
+      if (status === 401 && scheme.refresh) {
+        await scheme.refresh();
+        return run(await scheme.getHeaders());
+      }
+      throw error;
+    }
+  }
+
+  function uploadWithProgress<T = unknown>(
+    url: string,
+    formData: FormData,
+    opts?: { onProgress?: (percent: number) => void; signal?: AbortSignal },
+  ): Promise<T> {
+    return withAuthRetry(
+      (headers) =>
+        new Promise<T>((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open("POST", attachmentBaseUrl + url);
+          for (const [key, value] of Object.entries(headers)) {
+            xhr.setRequestHeader(key, value);
+          }
+          xhr.upload.addEventListener("progress", (event) => {
+            if (event.lengthComputable && opts?.onProgress) {
+              opts.onProgress(Math.round((event.loaded / event.total) * 100));
+            }
+          });
+          xhr.addEventListener("load", () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              try {
+                resolve(unwrapEnvelope<T>(JSON.parse(xhr.responseText)));
+              } catch (parseError) {
+                reject(parseError);
+              }
+            } else {
+              const error = new Error(`HTTP ${xhr.status}`) as Error & { status: number };
+              error.status = xhr.status;
+              reject(error);
+            }
+          });
+          xhr.addEventListener("error", () =>
+            reject(new Error("Attachment upload network error")),
+          );
+          xhr.addEventListener("abort", () =>
+            reject(new DOMException("Aborted", "AbortError")),
+          );
+          if (opts?.signal) {
+            if (opts.signal.aborted) {
+              xhr.abort();
+              reject(new DOMException("Aborted", "AbortError"));
+              return;
+            }
+            opts.signal.addEventListener("abort", () => xhr.abort());
+          }
+          xhr.send(formData);
+        }),
+    );
+  }
+
+  function fetchAttachmentBlob(url: string): Promise<Blob> {
+    return withAuthRetry(async (headers) => {
+      const res = await fetch(attachmentBaseUrl + url, { headers });
+      if (!res.ok) {
+        const error = new Error(`HTTP ${res.status}`) as Error & { status: number };
+        error.status = res.status;
+        throw error;
+      }
+      return res.blob();
+    });
+  }
+
+  return {
+    auth,
+    authClient,
+    store,
+    baseFetch,
+    rawAuthFetch,
+    bootMutator,
+    getToken,
+    uploadWithProgress,
+    fetchAttachmentBlob,
+  };
 }
