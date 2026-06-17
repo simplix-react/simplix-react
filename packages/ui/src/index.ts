@@ -313,7 +313,7 @@ export type {
 } from "./crud/shared";
 
 // CRUD layout components
-export { adaptOrvalList, CardList, CrudList, useCrudList, useKeyboardNav, useMediaQuery, useOrvalOptions, useServerSearchOptions } from "./crud/list";
+export { adaptOrvalGet, adaptOrvalList, CardList, CrudList, useCrudList, useKeyboardNav, useMediaQuery, useOrvalOptions, useServerSearchOptions } from "./crud/list";
 export type {
   ActionType,
   ActionVariant,
@@ -335,6 +335,7 @@ export type {
   ListTableProps,
   ListTableSlots,
   ListToolbarProps,
+  OrvalGetResultLike,
   OrvalListHookLike,
   OrvalOptionsHookLike,
   RowActionDef,

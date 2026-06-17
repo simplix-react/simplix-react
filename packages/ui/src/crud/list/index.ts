@@ -21,6 +21,9 @@ export type {
 export { adaptOrvalList } from "./adapt-orval-list";
 export type { OrvalListHookLike, AdaptOrvalListOptions } from "./adapt-orval-list";
 
+export { adaptOrvalGet } from "./adapt-orval-get";
+export type { OrvalGetResultLike } from "./adapt-orval-get";
+
 export { useOrvalOptions } from "./use-orval-options";
 export type { OrvalOptionsHookLike, UseOrvalOptionsConfig, UseOrvalOptionsResult } from "./use-orval-options";
 
