@@ -49,11 +49,9 @@ import type {
 } from "../base";
 import type {
   CardProps,
-  ContainerProps,
   FlexProps,
   GridProps,
   HeadingProps,
-  SectionProps,
   StackProps,
   TextProps,
 } from "../primitives";
@@ -225,15 +223,13 @@ export interface UIComponents {
   Tabs: TabsComponents;
   Command: CommandComponents;
   Table: TableComponents;
-  // Primitives
-  Container: ComponentType<ContainerProps>;
+  // Primitives (Container/Section are not registered — 0 framework render sites)
   Stack: ComponentType<StackProps>;
   Flex: ComponentType<FlexProps>;
   Grid: ComponentType<GridProps>;
   Heading: ComponentType<HeadingProps>;
   Text: ComponentType<TextProps>;
   Card: ComponentType<CardProps>;
-  Section: ComponentType<SectionProps>;
   // CRUD components
   SectionShell: ComponentType<SectionShellProps>;
   QueryFallback: ComponentType<QueryFallbackProps>;

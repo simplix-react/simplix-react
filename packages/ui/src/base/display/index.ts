@@ -1,4 +1,4 @@
-export { Badge, badgeVariants } from "./badge";
+export { Badge, BadgeBase, badgeVariants } from "./badge";
 export type { BadgeProps, BadgeVariants } from "./badge";
 
 export { BooleanBadge } from "./boolean-badge";
@@ -23,7 +23,7 @@ export type { StatusDotProps } from "./status-dot";
 export { DetailList, DetailListRow } from "./detail-list-row";
 export type { DetailListProps, DetailListRowProps } from "./detail-list-row";
 
-export { Skeleton } from "./skeleton";
+export { Skeleton, SkeletonBase } from "./skeleton";
 export type { SkeletonProps } from "./skeleton";
 
 export {

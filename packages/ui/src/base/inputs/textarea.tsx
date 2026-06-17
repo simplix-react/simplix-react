@@ -1,10 +1,11 @@
 import { type ComponentPropsWithRef, forwardRef } from "react";
 
 import { cn } from "../../utils/cn";
+import { createSelfResolving } from "../../provider/self-resolving";
 
 export type TextareaProps = ComponentPropsWithRef<"textarea">;
 
-export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
+export const TextareaBase = forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, ...rest }, ref) => (
     <textarea
       ref={ref}
@@ -17,4 +18,6 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   ),
 );
 
-Textarea.displayName = "Textarea";
+TextareaBase.displayName = "Textarea";
+
+export const Textarea = createSelfResolving("Textarea", TextareaBase);

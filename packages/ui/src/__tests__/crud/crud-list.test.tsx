@@ -193,6 +193,38 @@ describe("CrudList.Table", () => {
     expect(screen.getByText("list.noData")).toBeTruthy();
   });
 
+  it("renders slots.empty instead of the default empty state", () => {
+    render(
+      <CrudList>
+        <CrudList.Table
+          data={[]}
+          emptyReason="no-data"
+          slots={{ empty: ({ reason }) => <div>custom-empty:{reason}</div> }}
+        >
+          <CrudList.Column<TestItem> field="name" header="Name" />
+        </CrudList.Table>
+      </CrudList>,
+    );
+    expect(screen.getByText("custom-empty:no-data")).toBeTruthy();
+    expect(screen.queryByText("list.noData")).toBeNull();
+  });
+
+  it("renders slots.rowActions for each row (no actions prop needed)", () => {
+    render(
+      <CrudList>
+        <CrudList.Table
+          data={testData}
+          slots={{ rowActions: ({ row }) => <button>act-{row.id}</button> }}
+        >
+          <CrudList.Column<TestItem> field="name" header="Name" />
+        </CrudList.Table>
+      </CrudList>,
+    );
+    expect(screen.getByText("act-1")).toBeTruthy();
+    expect(screen.getByText("act-2")).toBeTruthy();
+    expect(screen.getByText("act-3")).toBeTruthy();
+  });
+
   it("renders EmptyReasonCard for no-filter reason when empty", () => {
     render(
       <CrudList>

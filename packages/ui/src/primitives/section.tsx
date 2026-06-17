@@ -1,6 +1,5 @@
-import { type ComponentPropsWithRef, forwardRef, type ReactNode, useContext } from "react";
+import { type ComponentPropsWithRef, forwardRef, type ReactNode } from "react";
 
-import { UIComponentContext } from "../provider/ui-component-context";
 import { cn } from "../utils/cn";
 import { Stack } from "./stack";
 
@@ -37,7 +36,7 @@ export interface SectionProps
  * </Section>
  * ```
  */
-const SectionBase = forwardRef<HTMLElement, SectionProps>(
+export const Section = forwardRef<HTMLElement, SectionProps>(
   ({ className, title, description, children, ...rest }, ref) => (
     <section ref={ref} className={cn("space-y-4", className)} {...rest}>
       {(title || description) && (
@@ -53,16 +52,5 @@ const SectionBase = forwardRef<HTMLElement, SectionProps>(
       {children}
     </section>
   ),
-);
-SectionBase.displayName = "Section";
-
-export const Section = forwardRef<HTMLElement, SectionProps>(
-  (props, ref) => {
-    const ctx = useContext(UIComponentContext);
-    if (ctx.Section) {
-      return <ctx.Section {...props} />;
-    }
-    return <SectionBase ref={ref} {...props} />;
-  },
 );
 Section.displayName = "Section";

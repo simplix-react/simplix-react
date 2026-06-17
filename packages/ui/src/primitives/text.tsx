@@ -3,10 +3,9 @@ import {
   type ComponentPropsWithRef,
   type ElementType,
   forwardRef,
-  useContext,
 } from "react";
 
-import { UIComponentContext } from "../provider/ui-component-context";
+import { createSelfResolving } from "../provider/self-resolving";
 import { cn } from "../utils/cn";
 
 /** CVA variants for the Text component body typography scale. */
@@ -59,7 +58,7 @@ export interface TextProps
  * <Text font="display">Display font text</Text>
  * ```
  */
-const TextBase = forwardRef<HTMLParagraphElement, TextProps>(
+export const TextBase = forwardRef<HTMLParagraphElement, TextProps>(
   ({ className, size, tone, font, as, children, ...rest }, ref) => {
     const Tag = as ?? (font === "mono" ? "code" : "p");
     return (
@@ -75,15 +74,6 @@ const TextBase = forwardRef<HTMLParagraphElement, TextProps>(
 );
 TextBase.displayName = "Text";
 
-export const Text = forwardRef<HTMLParagraphElement, TextProps>(
-  (props, ref) => {
-    const ctx = useContext(UIComponentContext);
-    if (ctx.Text) {
-      return <ctx.Text {...props} />;
-    }
-    return <TextBase ref={ref} {...props} />;
-  },
-);
-Text.displayName = "Text";
+export const Text = createSelfResolving("Text", TextBase);
 
 export { textVariants };

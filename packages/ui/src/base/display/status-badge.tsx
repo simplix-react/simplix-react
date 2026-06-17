@@ -1,6 +1,7 @@
 import { type ComponentPropsWithRef, type ReactNode, forwardRef } from "react";
 
-import { STATUS_TONES, type IconComponent, type StatusTone } from "../status-tone";
+import { type IconComponent, type StatusTone } from "../status-tone";
+import { useStatusTones } from "../status-tone-context";
 import { StatusDot } from "./status-dot";
 import { cn } from "../../utils/cn";
 
@@ -59,7 +60,7 @@ export const StatusBadge = forwardRef<HTMLSpanElement, StatusBadgeProps>(
     },
     ref,
   ) => {
-    const token = STATUS_TONES[tone];
+    const token = useStatusTones()[tone];
     const appearanceClass =
       appearance === "filled"
         ? token.badge

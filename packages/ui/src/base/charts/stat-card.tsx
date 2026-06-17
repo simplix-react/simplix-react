@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { cn } from "../../utils/cn";
-import { STATUS_TONES, type StatusTone } from "../status-tone";
+import { type StatusTone } from "../status-tone";
+import { useStatusTones } from "../status-tone-context";
 
 export interface StatCardProps {
   /** Card title shown above the value. */
@@ -50,11 +51,12 @@ export function StatCard({
   className,
   children,
 }: StatCardProps) {
+  const tones = useStatusTones();
   return (
     <div
       className={cn(
         "rounded-lg border p-6 text-card-foreground shadow-sm",
-        highlighted && tone ? STATUS_TONES[tone].surface : "bg-card",
+        highlighted && tone ? tones[tone].surface : "bg-card",
         className,
       )}
     >
@@ -71,7 +73,7 @@ export function StatCard({
           <p
             className={cn(
               "mt-1 text-xs font-medium",
-              trend.value >= 0 ? STATUS_TONES.success.icon : STATUS_TONES.danger.icon,
+              trend.value >= 0 ? tones.success.icon : tones.danger.icon,
             )}
           >
             {trend.value >= 0 ? "+" : ""}{trend.value}%{trend.label ? ` ${trend.label}` : ""}

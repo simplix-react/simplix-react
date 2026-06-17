@@ -1,7 +1,7 @@
 import { type VariantProps, cva } from "class-variance-authority";
-import { type ComponentPropsWithRef, forwardRef, useContext } from "react";
+import { type ComponentPropsWithRef, forwardRef } from "react";
 
-import { UIComponentContext } from "../provider/ui-component-context";
+import { createSelfResolving } from "../provider/self-resolving";
 import { cn } from "../utils/cn";
 
 /** CVA variants for the Heading component typography scale. */
@@ -63,7 +63,7 @@ export interface HeadingProps
  * <Heading level={5} as="h2">Visually small but semantically h2</Heading>
  * ```
  */
-const HeadingBase = forwardRef<HTMLHeadingElement, HeadingProps>(
+export const HeadingBase = forwardRef<HTMLHeadingElement, HeadingProps>(
   ({ className, level = 1, tone, font, as, children, ...rest }, ref) => {
     const Tag = as ?? levelToTag[level as HeadingLevel];
     return (
@@ -79,15 +79,6 @@ const HeadingBase = forwardRef<HTMLHeadingElement, HeadingProps>(
 );
 HeadingBase.displayName = "Heading";
 
-export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(
-  (props, ref) => {
-    const ctx = useContext(UIComponentContext);
-    if (ctx.Heading) {
-      return <ctx.Heading {...props} />;
-    }
-    return <HeadingBase ref={ref} {...props} />;
-  },
-);
-Heading.displayName = "Heading";
+export const Heading = createSelfResolving("Heading", HeadingBase);
 
 export { headingVariants };

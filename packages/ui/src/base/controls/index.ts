@@ -1,10 +1,10 @@
-export { Button, buttonVariants } from "./button";
+export { Button, ButtonBase, buttonVariants } from "./button";
 export type { ButtonProps, ButtonVariants } from "./button";
 
-export { Calendar } from "./calendar";
+export { Calendar, CalendarBase } from "./calendar";
 export type { CalendarProps, DateRange } from "./calendar";
 
-export { Label } from "./label";
+export { Label, LabelBase } from "./label";
 export type { LabelProps } from "./label";
 
 export { LabeledField } from "./labeled-field";

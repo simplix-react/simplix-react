@@ -333,6 +333,7 @@ export type {
   ListProps,
   ListSearchProps,
   ListTableProps,
+  ListTableSlots,
   ListToolbarProps,
   OrvalListHookLike,
   OrvalOptionsHookLike,

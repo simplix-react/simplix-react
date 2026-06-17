@@ -1,4 +1,4 @@
-export { Checkbox } from "./checkbox";
+export { Checkbox, CheckboxBase } from "./checkbox";
 export type { CheckboxProps } from "./checkbox";
 
 export { ColorPicker } from "./color-picker";
@@ -23,7 +23,7 @@ export {
   CommandSeparator,
 } from "./command";
 
-export { Input } from "./input";
+export { Input, InputBase } from "./input";
 export type { InputProps } from "./input";
 
 export { IconPicker, Icon } from "./icon-picker";
@@ -53,13 +53,13 @@ export type {
   SelectTriggerProps,
 } from "./select";
 
-export { Switch, switchVariants } from "./switch";
+export { Switch, SwitchBase, switchVariants } from "./switch";
 export type { SwitchProps } from "./switch";
 
 export { SearchPopover } from "./search-popover";
 export type { SearchPopoverProps, SearchPopoverGroup } from "./search-popover";
 
-export { Textarea } from "./textarea";
+export { Textarea, TextareaBase } from "./textarea";
 export type { TextareaProps } from "./textarea";
 
 export { TimeRangeSelector, HEATMAP_THEMES } from "./time-range-selector";

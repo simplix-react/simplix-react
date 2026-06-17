@@ -2,7 +2,8 @@ import { type ComponentPropsWithRef, forwardRef, type ReactNode } from "react";
 
 import { cn } from "../../utils/cn";
 import { Flex } from "../../primitives";
-import { STATUS_TONES, type IconComponent, type StatusTone } from "../status-tone";
+import { type IconComponent, type StatusTone } from "../status-tone";
+import { useStatusTones } from "../status-tone-context";
 
 /**
  * Tone vocabulary for {@link AlertBanner}. Reuses the shared {@link StatusTone}
@@ -122,7 +123,7 @@ export const AlertBanner = forwardRef<HTMLDivElement, AlertBannerProps>(
     },
     ref,
   ) => {
-    const toneToken = STATUS_TONES[tone];
+    const toneToken = useStatusTones()[tone];
     const densityToken = DENSITY_TOKENS[density];
 
     // "hint" density is intrinsically borderless; otherwise honor `bordered`.

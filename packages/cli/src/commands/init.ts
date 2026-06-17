@@ -23,6 +23,7 @@ import {
   mainTsx,
   appIndexTsx,
   appProvidersTsx,
+  uiOverridesTsx,
   errorFallbacksTsx,
   pageLoadingFallbackTsx,
   appFeaturesIndexTs,
@@ -306,6 +307,8 @@ export const initCommand = new Command("init")
           ),
           [`apps/${ctx.projectName}-demo/src/app/providers/app-providers.tsx`]:
             renderTemplate(appProvidersTsx, appCtx),
+          [`apps/${ctx.projectName}-demo/src/app/providers/ui-overrides.ts`]:
+            renderTemplate(uiOverridesTsx, appCtx),
           [`apps/${ctx.projectName}-demo/src/app/providers/index.ts`]:
             'export { AppProviders } from "./app-providers.js";\n',
           // FSD layers

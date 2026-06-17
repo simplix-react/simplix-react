@@ -285,6 +285,17 @@ export interface RowActionDef<T> {
 
 // ── List.Table ──
 
+/**
+ * Per-instance render overrides for List.Table seams. Each slot replaces the
+ * default rendering for that seam; omitted slots keep the built-in behavior.
+ */
+export interface ListTableSlots<T> {
+  /** Replace the per-row action cluster. Receives the row. */
+  rowActions?: (ctx: { row: T }) => ReactNode;
+  /** Replace the empty / filtered / error state body. Receives the reason. */
+  empty?: (ctx: { reason: EmptyReason }) => ReactNode;
+}
+
 /** Props for the List.Table sub-component built on TanStack Table. */
 export interface ListTableProps<T> {
   data: T[];
@@ -325,6 +336,8 @@ export interface ListTableProps<T> {
   actionVariant?: ActionVariant;
   /** Override the auto-calculated action column width (px). */
   actionColumnWidth?: number;
+  /** Per-instance render overrides for the action cluster and empty state. */
+  slots?: ListTableSlots<T>;
   /** Drag-and-drop row reorder configuration. */
   reorder?: ReorderConfig<T>;
   /** When set, displays an empty-state message inside the table body. */
@@ -802,6 +815,7 @@ function ListTable<T>({
   actions,
   actionVariant = "icon",
   actionColumnWidth: actionColumnWidthOverride,
+  slots,
   reorder,
   emptyReason,
   emptyState,
@@ -967,14 +981,20 @@ function ListTable<T>({
       });
     }
 
-    if (actions && actions.length > 0) {
-      const colWidth = actionColumnWidthOverride ?? getActionColumnWidth(actions as RowActionDef<unknown>[], actionVariant);
+    const hasActions = !!(actions && actions.length > 0);
+    if (hasActions || slots?.rowActions) {
+      const colWidth =
+        actionColumnWidthOverride ??
+        (hasActions ? getActionColumnWidth(actions as RowActionDef<unknown>[], actionVariant) : 120);
       cols.push({
         id: "_actions",
         header: () => "",
-        cell: ({ row }) => (
-          <RowActionCell row={row.original} actions={actions} variant={actionVariant} />
-        ),
+        cell: ({ row }) =>
+          slots?.rowActions ? (
+            slots.rowActions({ row: row.original })
+          ) : (
+            <RowActionCell row={row.original} actions={actions!} variant={actionVariant} />
+          ),
         size: colWidth,
       });
     }
@@ -992,6 +1012,7 @@ function ListTable<T>({
     actions,
     actionVariant,
     actionColumnWidthOverride,
+    slots,
   ]);
 
   const columnVisibility: VisibilityState = useMemo(() => {
@@ -1012,6 +1033,13 @@ function ListTable<T>({
 
   // Empty states — replace the entire table/card area
   if (emptyReason && data.length === 0 && !isLoading) {
+    if (slots?.empty) {
+      return (
+        <div ref={containerRef} className="w-full">
+          {slots.empty({ reason: emptyReason })}
+        </div>
+      );
+    }
     if (emptyReason === "no-data" && emptyState) {
       return (
         <div ref={containerRef} className="w-full">
@@ -1108,9 +1136,11 @@ function ListTable<T>({
                         <Flex align="center" justify="between" className={cn("border-b px-2 py-1.5")}>
                           <div className="min-w-0 flex-1">{createElement(cardTitle, { row, index })}</div>
                           <Flex gap="xs" align="center" className="shrink-0 ml-2">
-                            {actions && actions.length > 0 && (
-                              <RowActionCell row={row} actions={actions} variant={actionVariant} />
-                            )}
+                            {slots?.rowActions
+                              ? slots.rowActions({ row })
+                              : actions && actions.length > 0 && (
+                                  <RowActionCell row={row} actions={actions} variant={actionVariant} />
+                                )}
                             {selectable && (
                               <input
                                 type="checkbox"

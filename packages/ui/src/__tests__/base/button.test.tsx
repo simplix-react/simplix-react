@@ -129,4 +129,17 @@ describe("Button", () => {
     fireEvent.click(screen.getByRole("button"));
     expect(onClick).not.toHaveBeenCalled();
   });
+
+  it("renders the child element with asChild, merging button classes", () => {
+    render(
+      <Button asChild variant="ghost">
+        <a href="/x">Go</a>
+      </Button>,
+    );
+    const link = screen.getByRole("link", { name: "Go" });
+    expect(link.tagName).toBe("A");
+    expect(link.getAttribute("href")).toBe("/x");
+    // Button variant styling is merged onto the anchor.
+    expect(link.className).toContain("inline-flex");
+  });
 });

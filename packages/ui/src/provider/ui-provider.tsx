@@ -1,135 +1,38 @@
 import { type ReactNode, useContext, useMemo } from "react";
 
-import {
-  Badge,
-  Button,
-  Calendar,
-  Checkbox,
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogOverlay,
-  DialogTitle,
-  DialogTrigger,
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-  Input,
-  Label,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-  RadioGroup,
-  RadioGroupItem,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-  Skeleton,
-  Switch,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-  Textarea,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../base";
-import { CrudDelete } from "../crud/delete";
-import { QueryFallback } from "../crud/shared";
-import { SectionShell } from "../crud/shared/section-shell";
-import { DetailFieldWrapper, FieldWrapper } from "../fields";
-import { Card, Container, Flex, Grid, Heading, Section, Stack, Text } from "../primitives";
+import { StatusToneContext, type StatusToneOverrides } from "../base/status-tone-context";
+import { baseComponents } from "./base-components";
 import type { UIComponents } from "./types";
 import { UIComponentContext } from "./ui-component-context";
 
-const defaultComponents: UIComponents = {
-  // Base
-  Input,
-  Textarea,
-  Label,
-  Switch,
-  Checkbox,
-  Badge,
-  Calendar,
-  Button,
-  Skeleton,
-  // Compound base
-  Select: { Root: Select, Trigger: SelectTrigger, Value: SelectValue, Content: SelectContent, Item: SelectItem },
-  RadioGroup: { Root: RadioGroup, Item: RadioGroupItem },
-  Dialog: { Root: Dialog, Trigger: DialogTrigger, Content: DialogContent, Header: DialogHeader, Footer: DialogFooter, Title: DialogTitle, Description: DialogDescription, Overlay: DialogOverlay, Close: DialogClose },
-  Sheet: { Root: Sheet, Trigger: SheetTrigger, Content: SheetContent, Header: SheetHeader, Footer: SheetFooter, Title: SheetTitle, Description: SheetDescription, Close: SheetClose },
-  Popover: { Root: Popover, Trigger: PopoverTrigger, Content: PopoverContent },
-  Tooltip: { Provider: TooltipProvider, Root: Tooltip, Trigger: TooltipTrigger, Content: TooltipContent },
-  DropdownMenu: { Root: DropdownMenu, Trigger: DropdownMenuTrigger, Content: DropdownMenuContent, Item: DropdownMenuItem, CheckboxItem: DropdownMenuCheckboxItem, RadioItem: DropdownMenuRadioItem, Label: DropdownMenuLabel, Separator: DropdownMenuSeparator, Group: DropdownMenuGroup, RadioGroup: DropdownMenuRadioGroup, Sub: DropdownMenuSub, SubTrigger: DropdownMenuSubTrigger, SubContent: DropdownMenuSubContent },
-  Tabs: { Root: Tabs, List: TabsList, Trigger: TabsTrigger, Content: TabsContent },
-  Command: { Root: Command, Input: CommandInput, List: CommandList, Empty: CommandEmpty, Group: CommandGroup, Item: CommandItem, Separator: CommandSeparator },
-  Table: { Root: Table, Header: TableHeader, Body: TableBody, Row: TableRow, Head: TableHead, Cell: TableCell },
-  // Primitives
-  Container,
-  Stack,
-  Flex,
-  Grid,
-  Heading,
-  Text,
-  Card,
-  Section,
-  // CRUD
-  SectionShell,
-  QueryFallback,
-  CrudDelete,
-  // Field wrappers
-  FieldWrapper,
-  DetailFieldWrapper,
-};
-
-/** Compound component keys that need deep merge. */
-const COMPOUND_KEYS = [
-  "Select", "RadioGroup", "Dialog", "Sheet", "Popover",
-  "Tooltip", "DropdownMenu", "Tabs", "Command", "Table",
-] as const;
+/**
+ * Detects a compound component group from the DEFAULT's shape.
+ *
+ * A compound group is a plain object whose values are components. A leaf is a
+ * single component — a function, or a `forwardRef`/`memo` exotic which is an
+ * object carrying a `$$typeof` symbol. We therefore treat as compound any
+ * non-null object that does NOT carry `$$typeof`. Detecting from the default
+ * (not the override) lets a partial compound override be a plain object while a
+ * leaf override stays a component, with no ambiguity.
+ */
+function isCompound(value: unknown): boolean {
+  return (
+    value != null &&
+    typeof value === "object" &&
+    !("$$typeof" in (value as object))
+  );
+}
 
 /** Props for the {@link UIProvider} component. */
 export interface UIProviderProps {
   /** Partial overrides for default base and primitive components. */
   overrides?: Partial<UIComponents>;
+  /**
+   * Per-tone, per-slot class overrides for the status/severity palette
+   * (success/warning/danger/…). Status tones are palette-literal, so this is
+   * the channel for globally retoning status colors without forking components.
+   */
+  statusTones?: StatusToneOverrides;
   children: ReactNode;
 }
 
@@ -139,22 +42,30 @@ export interface UIProviderProps {
  *
  * @example
  * ```tsx
- * <UIProvider overrides={{ Button: MyButton, SectionShell: MySectionShell }}>
+ * <UIProvider overrides={{ Button: MyButton }} statusTones={{ success: { badge: "bg-teal-100 text-teal-800" } }}>
  *   <App />
  * </UIProvider>
  * ```
  */
-export function UIProvider({ overrides, children }: UIProviderProps) {
+export function UIProvider({ overrides, statusTones, children }: UIProviderProps) {
   const parent = useContext(UIComponentContext);
+  const parentTones = useContext(StatusToneContext);
 
   const merged = useMemo(
     () => ({ ...parent, ...overrides }),
     [parent, overrides],
   );
 
+  const mergedTones = useMemo(
+    () => (statusTones ? { ...parentTones, ...statusTones } : parentTones),
+    [parentTones, statusTones],
+  );
+
   return (
     <UIComponentContext.Provider value={merged}>
-      {children}
+      <StatusToneContext.Provider value={mergedTones}>
+        {children}
+      </StatusToneContext.Provider>
     </UIComponentContext.Provider>
   );
 }
@@ -162,23 +73,24 @@ export function UIProvider({ overrides, children }: UIProviderProps) {
 /**
  * Returns the resolved set of UI base components, merging defaults with
  * any overrides provided by ancestor {@link UIProvider} instances.
+ *
+ * Leaf overrides replace the default outright; partial compound overrides are
+ * deep-merged so sibling sub-components are preserved.
  */
 export function useUIComponents(): UIComponents {
   const overrides = useContext(UIComponentContext);
 
   return useMemo(() => {
-    const result = { ...defaultComponents, ...overrides };
+    // Shallow merge resolves every leaf (override wins when present).
+    const result = { ...baseComponents, ...overrides } as UIComponents;
 
-    // Deep merge compound component groups
-    for (const key of COMPOUND_KEYS) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const defaults = (defaultComponents as any)[key];
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const override = (overrides as any)[key];
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (result as any)[key] = override
-        ? { ...defaults, ...override }
-        : defaults;
+    // Re-merge compound groups deeply so a partial override keeps its siblings.
+    for (const key of Object.keys(baseComponents) as (keyof UIComponents)[]) {
+      const base = baseComponents[key];
+      if (!isCompound(base)) continue;
+      const override = overrides[key];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- compound groups are merged by shape
+      (result as any)[key] = override ? { ...(base as any), ...(override as any) } : base;
     }
 
     return result;
@@ -285,14 +197,12 @@ export function useFlatUIComponents() {
     TableHead: ui.Table.Head,
     TableCell: ui.Table.Cell,
     // Primitives
-    Container: ui.Container,
     Stack: ui.Stack,
     Flex: ui.Flex,
     Grid: ui.Grid,
     Heading: ui.Heading,
     Text: ui.Text,
     Card: ui.Card,
-    Section: ui.Section,
     // CRUD building blocks
     SectionShell: ui.SectionShell,
     QueryFallback: ui.QueryFallback,
@@ -304,6 +214,10 @@ export function useFlatUIComponents() {
 
 /**
  * Creates a type-safe override map, optionally wrapping/extending defaults.
+ *
+ * The factory receives the raw `*Base` implementations, so
+ * `withOverride(defaults.Button, …)` wraps the non-resolving base and never
+ * re-enters the resolver.
  *
  * @example
  * ```tsx
@@ -318,5 +232,5 @@ export function useFlatUIComponents() {
 export function createOverrides(
   factory: (defaults: UIComponents) => Partial<UIComponents>,
 ): Partial<UIComponents> {
-  return factory(defaultComponents);
+  return factory(baseComponents);
 }

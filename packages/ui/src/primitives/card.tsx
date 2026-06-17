@@ -4,10 +4,9 @@ import {
   type ElementType,
   forwardRef,
   type ReactNode,
-  useContext,
 } from "react";
 
-import { UIComponentContext } from "../provider/ui-component-context";
+import { createSelfResolving } from "../provider/self-resolving";
 import { cn } from "../utils/cn";
 
 /** CVA variants for the Card component visual configuration. */
@@ -54,7 +53,7 @@ export interface CardProps
  * <Card padding="lg">Large padding card</Card>
  * ```
  */
-const CardBase = forwardRef<HTMLElement, CardProps>(
+export const CardBase = forwardRef<HTMLElement, CardProps>(
   ({ className, padding, interactive, as, children, ...rest }, ref) => {
     const Tag = as ?? (interactive ? "button" : "div");
     return (
@@ -74,15 +73,6 @@ const CardBase = forwardRef<HTMLElement, CardProps>(
 );
 CardBase.displayName = "Card";
 
-export const Card = forwardRef<HTMLElement, CardProps>(
-  (props, ref) => {
-    const ctx = useContext(UIComponentContext);
-    if (ctx.Card) {
-      return <ctx.Card {...props} />;
-    }
-    return <CardBase ref={ref} {...props} />;
-  },
-);
-Card.displayName = "Card";
+export const Card = createSelfResolving("Card", CardBase);
 
 export { cardVariants };

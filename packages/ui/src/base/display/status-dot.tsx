@@ -1,6 +1,7 @@
 import { type ComponentPropsWithRef, type ReactNode, forwardRef } from "react";
 
-import { STATUS_TONES, type StatusTone } from "../status-tone";
+import { type StatusTone } from "../status-tone";
+import { useStatusTones } from "../status-tone-context";
 import { cn } from "../../utils/cn";
 
 /** Dot size token → Tailwind `size-*` class for both the ring layer and the dot. */
@@ -57,9 +58,10 @@ export const StatusDot = forwardRef<HTMLSpanElement, StatusDotProps>(
     },
     ref,
   ) => {
+    const tones = useStatusTones();
     const sizeClass = DOT_SIZE[size];
     // Inactive indicators read as "off": force neutral hue, drop the ring.
-    const dotClass = active ? STATUS_TONES[tone].dot : STATUS_TONES.neutral.dot;
+    const dotClass = active ? tones[tone].dot : tones.neutral.dot;
     const showRing = active && animation !== "none";
 
     return (
@@ -81,7 +83,7 @@ export const StatusDot = forwardRef<HTMLSpanElement, StatusDotProps>(
             className={cn(
               "absolute inset-0 rounded-full opacity-75",
               sizeClass,
-              STATUS_TONES[tone].ring,
+              tones[tone].ring,
               animation === "ping" ? "animate-ping" : "animate-status-flash",
             )}
           />

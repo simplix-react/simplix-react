@@ -1,6 +1,8 @@
 import { QueryClient } from "@tanstack/query-core";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { UIProvider } from "@simplix-react/ui";
 import type { ReactNode } from "react";
+import { uiOverrides } from "./ui-overrides.js";
 {{#if enableI18n}}
 import { I18nProvider } from "@simplix-react/i18n/react";
 import { i18nAdapter } from "../i18n/index.js";
@@ -39,7 +41,9 @@ export function AppProviders({ children }: { children: ReactNode }) {
 {{/if}}
 {{/if}}
           <QueryClientProvider client={queryClient}>
-            {children}
+            <UIProvider overrides={uiOverrides}>
+              {children}
+            </UIProvider>
           </QueryClientProvider>
 {{#if enableAccess}}
         </AccessProvider>

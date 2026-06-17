@@ -2,6 +2,7 @@ import { type ComponentPropsWithRef, forwardRef, useMemo, useState } from "react
 import { useTranslation } from "@simplix-react/i18n/react";
 
 import { cn } from "../../utils/cn";
+import { createSelfResolving } from "../../provider/self-resolving";
 import {
   endOfWeek as endOfWeekFn,
   isSameDay,
@@ -172,7 +173,7 @@ function MonthGrid({
 
 // ── Main Calendar ──
 
-export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
+export const CalendarBase = forwardRef<HTMLDivElement, CalendarProps>(
   (
     {
       className,
@@ -449,4 +450,6 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
   },
 );
 
-Calendar.displayName = "Calendar";
+CalendarBase.displayName = "Calendar";
+
+export const Calendar = createSelfResolving("Calendar", CalendarBase);

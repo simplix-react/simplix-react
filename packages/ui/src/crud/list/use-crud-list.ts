@@ -114,6 +114,14 @@ export interface UseCrudListResult<T> {
  * In `"server"` mode, filter/sort/pagination params are forwarded to the list hook.
  * In `"client"` mode, all processing happens in-memory.
  *
+ * This is the **headless escape hatch** for the list view: it returns the full
+ * data/filter/sort/pagination/selection state so a consumer can render any
+ * markup they want and still drive it with the framework's list engine — total
+ * control without forking. This guarantee is **list-only**; the form and tree
+ * views have no single equivalent hook, so their ceiling for deep customization
+ * is per-instance slots / render-props (e.g. {@link ListTableSlots}), not a
+ * headless hook.
+ *
  * @typeParam T - Row data type.
  * @param useList - Data fetching hook (e.g. Orval-generated `useListPets`).
  * @param options - Configuration for state mode, defaults, and filter behavior.

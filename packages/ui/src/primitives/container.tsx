@@ -1,7 +1,6 @@
 import { type VariantProps, cva } from "class-variance-authority";
-import { type ComponentPropsWithRef, forwardRef, type ReactNode, useContext } from "react";
+import { type ComponentPropsWithRef, forwardRef, type ReactNode } from "react";
 
-import { UIComponentContext } from "../provider/ui-component-context";
 import { cn } from "../utils/cn";
 
 /** CVA variants for the Container component max-width configuration. */
@@ -39,7 +38,7 @@ export interface ContainerProps
  * </Container>
  * ```
  */
-const ContainerBase = forwardRef<HTMLDivElement, ContainerProps>(
+export const Container = forwardRef<HTMLDivElement, ContainerProps>(
   ({ className, size, children, ...rest }, ref) => (
     <div
       ref={ref}
@@ -49,17 +48,6 @@ const ContainerBase = forwardRef<HTMLDivElement, ContainerProps>(
       {children}
     </div>
   ),
-);
-ContainerBase.displayName = "Container";
-
-export const Container = forwardRef<HTMLDivElement, ContainerProps>(
-  (props, ref) => {
-    const ctx = useContext(UIComponentContext);
-    if (ctx.Container) {
-      return <ctx.Container {...props} />;
-    }
-    return <ContainerBase ref={ref} {...props} />;
-  },
 );
 Container.displayName = "Container";
 

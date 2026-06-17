@@ -2,10 +2,11 @@ import * as LabelPrimitive from "@radix-ui/react-label";
 import { type ComponentPropsWithRef, forwardRef } from "react";
 
 import { cn } from "../../utils/cn";
+import { createSelfResolving } from "../../provider/self-resolving";
 
 export type LabelProps = ComponentPropsWithRef<typeof LabelPrimitive.Root>;
 
-export const Label = forwardRef<HTMLLabelElement, LabelProps>(
+export const LabelBase = forwardRef<HTMLLabelElement, LabelProps>(
   ({ className, ...rest }, ref) => (
     <LabelPrimitive.Root
       ref={ref}
@@ -18,4 +19,6 @@ export const Label = forwardRef<HTMLLabelElement, LabelProps>(
   ),
 );
 
-Label.displayName = "Label";
+LabelBase.displayName = "Label";
+
+export const Label = createSelfResolving("Label", LabelBase);

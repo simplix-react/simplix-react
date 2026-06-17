@@ -1,0 +1,22 @@
+import { createOverrides } from "@simplix-react/ui";
+
+/**
+ * Global UI component overrides applied through `UIProvider`.
+ *
+ * Customize framework components here without forking. The factory receives the
+ * default `*Base` implementations, so wrapping them is recursion-safe.
+ *
+ * @example
+ * ```tsx
+ * import { withOverride } from "@simplix-react/ui";
+ *
+ * export const uiOverrides = createOverrides((d) => ({
+ *   Button: withOverride(d.Button, { className: "rounded-full" }),
+ *   Dialog: { Content: MyDialogContent },
+ * }));
+ * ```
+ *
+ * For look-only changes prefer theme tokens in `index.css`; for status colors
+ * use `UIProvider`'s `statusTones` prop; for a single element use `className`.
+ */
+export const uiOverrides = createOverrides(() => ({}));

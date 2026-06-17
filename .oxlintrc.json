@@ -12,7 +12,25 @@
       { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }
     ],
     "react-hooks/rules-of-hooks": "warn",
-    "react-hooks/exhaustive-deps": "off"
+    "react-hooks/exhaustive-deps": "off",
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          {
+            "group": ["**/primitives", "**/primitives/*", "**/base", "**/base/*", "**/base/**"],
+            "importNamePattern": "Base$",
+            "message": "Do not import *Base implementations directly. Import the self-resolving export (it honors UIProvider overrides) or use useFlatUIComponents(). *Base may only be referenced from provider/base-components.ts."
+          }
+        ]
+      }
+    ]
   },
+  "overrides": [
+    {
+      "files": ["packages/ui/src/provider/base-components.ts"],
+      "rules": { "no-restricted-imports": "off" }
+    }
+  ],
   "ignorePatterns": ["dist", "node_modules", "*.config.*"]
 }

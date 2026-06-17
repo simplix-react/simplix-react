@@ -6,6 +6,7 @@ export { default as indexCss } from "./app/index-css.hbs";
 export { default as mainTsx } from "./app/main-tsx.hbs";
 export { default as appIndexTsx } from "./app/app-index-tsx.hbs";
 export { default as appProvidersTsx } from "./app/app-providers-tsx.hbs";
+export { default as uiOverridesTsx } from "./app/ui-overrides-ts.hbs";
 export { default as errorFallbacksTsx } from "./app/error-fallbacks-tsx.hbs";
 export { default as pageLoadingFallbackTsx } from "./app/page-loading-fallback-tsx.hbs";
 export { default as appFeaturesIndexTs } from "./app/app-features-index-ts.hbs";

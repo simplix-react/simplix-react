@@ -1,10 +1,11 @@
 import { type ComponentPropsWithRef, forwardRef } from "react";
 
 import { cn } from "../../utils/cn";
+import { createSelfResolving } from "../../provider/self-resolving";
 
 export type InputProps = ComponentPropsWithRef<"input">;
 
-export const Input = forwardRef<HTMLInputElement, InputProps>(
+export const InputBase = forwardRef<HTMLInputElement, InputProps>(
   ({ className, type = "text", ...rest }, ref) => (
     <input
       ref={ref}
@@ -18,4 +19,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
   ),
 );
 
-Input.displayName = "Input";
+InputBase.displayName = "Input";
+
+export const Input = createSelfResolving("Input", InputBase);

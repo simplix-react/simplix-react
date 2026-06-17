@@ -13,6 +13,7 @@ export type {
   ListProps,
   ListSearchProps,
   ListTableProps,
+  ListTableSlots,
   ListToolbarProps,
   RowActionDef,
 } from "./crud-list";

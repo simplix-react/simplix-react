@@ -2,12 +2,13 @@ import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { type ComponentPropsWithRef, forwardRef } from "react";
 
 import { cn } from "../../utils/cn";
+import { createSelfResolving } from "../../provider/self-resolving";
 
 export type CheckboxProps = ComponentPropsWithRef<
   typeof CheckboxPrimitive.Root
 >;
 
-export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(
+export const CheckboxBase = forwardRef<HTMLButtonElement, CheckboxProps>(
   ({ className, ...rest }, ref) => (
     <CheckboxPrimitive.Root
       ref={ref}
@@ -37,4 +38,6 @@ export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(
   ),
 );
 
-Checkbox.displayName = "Checkbox";
+CheckboxBase.displayName = "Checkbox";
+
+export const Checkbox = createSelfResolving("Checkbox", CheckboxBase);

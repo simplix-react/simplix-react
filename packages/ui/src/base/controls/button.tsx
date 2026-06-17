@@ -1,7 +1,9 @@
+import { Slot } from "@radix-ui/react-slot";
 import { type VariantProps, cva } from "class-variance-authority";
 import { type ComponentPropsWithRef, type ReactNode, forwardRef } from "react";
 
 import { cn } from "../../utils/cn";
+import { createSelfResolving } from "../../provider/self-resolving";
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0",
@@ -46,6 +48,12 @@ export interface ButtonProps
   loading?: boolean;
   /** Text to show while loading. Replaces children if provided. */
   loadingText?: ReactNode;
+  /**
+   * Render the single child element instead of a `<button>`, merging the
+   * button styling and behavior onto it (e.g. wrap a router `<Link>`). The
+   * loading spinner is not composed in this mode.
+   */
+  asChild?: boolean;
 }
 
 const spinnerSizeMap: Record<string, string> = {
@@ -58,8 +66,20 @@ const spinnerSizeMap: Record<string, string> = {
   "icon-xs": "h-3 w-3",
 };
 
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, loading, loadingText, disabled, children, ...rest }, ref) => {
+export const ButtonBase = forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, loading, loadingText, disabled, asChild, children, ...rest }, ref) => {
+    const classes = cn(buttonVariants({ variant, size }), className);
+
+    // Composition mode: render the consumer's element with button styling.
+    // Slot accepts a single child, so the loading spinner is not composed here.
+    if (asChild) {
+      return (
+        <Slot ref={ref} className={classes} aria-busy={loading || undefined} {...rest}>
+          {children}
+        </Slot>
+      );
+    }
+
     const isIconOnly = typeof size === "string" && size.startsWith("icon");
     const spinnerSize = spinnerSizeMap[size ?? "default"] ?? "h-4 w-4";
 
@@ -73,7 +93,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button
         ref={ref}
-        className={cn(buttonVariants({ variant, size }), className)}
+        className={classes}
         disabled={loading || disabled}
         aria-busy={loading || undefined}
         {...rest}
@@ -93,6 +113,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   },
 );
 
-Button.displayName = "Button";
+ButtonBase.displayName = "Button";
+
+export const Button = createSelfResolving("Button", ButtonBase);
 
 export { buttonVariants };

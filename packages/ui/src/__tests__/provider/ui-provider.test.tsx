@@ -2,8 +2,10 @@
 import { cleanup, render, renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
+import { Button, StatusBadge } from "../../base";
+import { withOverride } from "../../provider/override-utils";
 import type { UIComponents } from "../../provider/types";
-import { UIProvider, useUIComponents } from "../../provider/ui-provider";
+import { createOverrides, UIProvider, useUIComponents } from "../../provider/ui-provider";
 
 afterEach(cleanup);
 
@@ -51,14 +53,12 @@ describe("useUIComponents", () => {
     const { result } = renderHook(() => useUIComponents());
     const components = result.current;
 
-    expect(components.Container).toBeDefined();
     expect(components.Stack).toBeDefined();
     expect(components.Flex).toBeDefined();
     expect(components.Grid).toBeDefined();
     expect(components.Heading).toBeDefined();
     expect(components.Text).toBeDefined();
     expect(components.Card).toBeDefined();
-    expect(components.Section).toBeDefined();
   });
 
   it("returns default CRUD components", () => {
@@ -164,5 +164,65 @@ describe("UIProvider", () => {
     expect(result.current.Button).toBeDefined();
     expect(result.current.Input).toBeDefined();
     expect(result.current.Select.Root).toBeDefined();
+  });
+});
+
+describe("self-resolving leaves", () => {
+  it("a statically-imported leaf honors a UIProvider override", () => {
+    const CustomButton: UIComponents["Button"] = (props) => (
+      <button data-testid="custom-button" {...props} />
+    );
+
+    const { getByTestId } = render(
+      <UIProvider overrides={{ Button: CustomButton }}>
+        <Button>click</Button>
+      </UIProvider>,
+    );
+
+    // The static `Button` export self-resolves to the provided override.
+    expect(getByTestId("custom-button").textContent).toBe("click");
+  });
+
+  it("renders the base implementation when no override is present", () => {
+    const { getByText } = render(<Button>plain</Button>);
+    expect(getByText("plain").tagName).toBe("BUTTON");
+  });
+
+  it("withOverride on a default base does not infinitely recurse", () => {
+    // createOverrides hands the *Base, so wrapping it can never re-enter the
+    // self-resolving wrapper. If it did, this render would stack-overflow.
+    const overrides = createOverrides((d) => ({
+      Button: withOverride(d.Button, { className: "wrapped-default" }),
+    }));
+
+    const { getByText } = render(
+      <UIProvider overrides={overrides}>
+        <Button>safe</Button>
+      </UIProvider>,
+    );
+
+    const el = getByText("safe");
+    expect(el.tagName).toBe("BUTTON");
+    expect(el.className).toContain("wrapped-default");
+  });
+});
+
+describe("statusTones channel", () => {
+  it("retones status colors globally via UIProvider", () => {
+    const { getByText } = render(
+      <UIProvider statusTones={{ success: { badge: "custom-success-badge" } }}>
+        <StatusBadge tone="success" appearance="filled" label="Active" />
+      </UIProvider>,
+    );
+    // Label renders in an inner span; the badge class sits on the outer span.
+    expect(getByText("Active").parentElement?.className).toContain("custom-success-badge");
+  });
+
+  it("falls back to the default palette when no override is set", () => {
+    const { getByText } = render(
+      <StatusBadge tone="success" appearance="filled" label="Active" />,
+    );
+    // Default success badge uses the emerald palette literal.
+    expect(getByText("Active").parentElement?.className).toContain("emerald");
   });
 });

@@ -1,4 +1,5 @@
 export * from "./status-tone";
+export * from "./status-tone-context";
 export * from "./charts";
 export * from "./controls";
 export * from "./display";

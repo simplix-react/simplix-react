@@ -34,7 +34,7 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
 import type { UIComponents } from "@simplix-react/ui";
 
-export const simplixUIComponents: UIComponents = {
+export const simplixUIComponents: Partial<UIComponents> = {
   Input,
   Textarea,
   Label,
@@ -93,7 +93,7 @@ export const initUiCommand = new Command("init-ui")
         'Import simplixUIComponents from "@/lib/simplix-ui" in your app root',
       );
       log.step(
-        "Wrap your app with <UIProvider components={simplixUIComponents}>",
+        "Wrap your app with <UIProvider overrides={simplixUIComponents}>",
       );
       log.info("");
     } catch (err) {

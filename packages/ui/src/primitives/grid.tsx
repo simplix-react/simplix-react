@@ -1,7 +1,7 @@
 import { type VariantProps, cva } from "class-variance-authority";
-import { type ComponentPropsWithRef, forwardRef, type ReactNode, useContext } from "react";
+import { type ComponentPropsWithRef, forwardRef, type ReactNode } from "react";
 
-import { UIComponentContext } from "../provider/ui-component-context";
+import { createSelfResolving } from "../provider/self-resolving";
 import { cn } from "../utils/cn";
 
 /** CVA variants for the Grid component column and gap configuration. */
@@ -110,7 +110,7 @@ const gapClassMap: Record<string, string> = {
  * </Grid>
  * ```
  */
-const GridBase = forwardRef<HTMLDivElement, GridProps>(
+export const GridBase = forwardRef<HTMLDivElement, GridProps>(
   ({ className, columns, gap, responsive = true, template, children, style, ...rest }, ref) => {
     const cols = columns ?? 1;
     const isResponsive = responsive && cols > 1;
@@ -159,15 +159,6 @@ const GridBase = forwardRef<HTMLDivElement, GridProps>(
 );
 GridBase.displayName = "Grid";
 
-export const Grid = forwardRef<HTMLDivElement, GridProps>(
-  (props, ref) => {
-    const ctx = useContext(UIComponentContext);
-    if (ctx.Grid) {
-      return <ctx.Grid {...props} />;
-    }
-    return <GridBase ref={ref} {...props} />;
-  },
-);
-Grid.displayName = "Grid";
+export const Grid = createSelfResolving("Grid", GridBase);
 
 export { gridVariants };

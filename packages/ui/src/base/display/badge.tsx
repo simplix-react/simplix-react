@@ -1,6 +1,8 @@
+import { Slot } from "@radix-ui/react-slot";
 import { type VariantProps, cva } from "class-variance-authority";
 import { type ComponentPropsWithRef, forwardRef } from "react";
 
+import { createSelfResolving } from "../../provider/self-resolving";
 import { cn } from "../../utils/cn";
 
 const badgeVariants = cva(
@@ -76,18 +78,29 @@ export type BadgeVariants = VariantProps<typeof badgeVariants>;
 
 export interface BadgeProps
   extends ComponentPropsWithRef<"span">,
-    BadgeVariants {}
+    BadgeVariants {
+  /**
+   * Render the single child element instead of a `<span>`, merging the badge
+   * styling onto it (e.g. wrap an `<a>`).
+   */
+  asChild?: boolean;
+}
 
-export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
-  ({ className, variant, rounded, size, ...rest }, ref) => (
-    <span
-      ref={ref}
-      className={cn(badgeVariants({ variant, rounded, size }), className)}
-      {...rest}
-    />
-  ),
+export const BadgeBase = forwardRef<HTMLSpanElement, BadgeProps>(
+  ({ className, variant, rounded, size, asChild, ...rest }, ref) => {
+    const Comp = asChild ? Slot : "span";
+    return (
+      <Comp
+        ref={ref}
+        className={cn(badgeVariants({ variant, rounded, size }), className)}
+        {...rest}
+      />
+    );
+  },
 );
 
-Badge.displayName = "Badge";
+BadgeBase.displayName = "Badge";
+
+export const Badge = createSelfResolving("Badge", BadgeBase);
 
 export { badgeVariants };

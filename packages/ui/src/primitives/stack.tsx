@@ -1,7 +1,7 @@
 import { type VariantProps, cva } from "class-variance-authority";
-import { Children, type ComponentPropsWithRef, forwardRef, type ReactNode, useContext } from "react";
+import { Children, type ComponentPropsWithRef, forwardRef, type ReactNode } from "react";
 
-import { UIComponentContext } from "../provider/ui-component-context";
+import { createSelfResolving } from "../provider/self-resolving";
 import { cn } from "../utils/cn";
 
 /** CVA variants for the Stack component layout configuration. */
@@ -87,7 +87,7 @@ export interface StackProps
  * </Stack>
  * ```
  */
-const StackBase = forwardRef<HTMLDivElement, StackProps>(
+export const StackBase = forwardRef<HTMLDivElement, StackProps>(
   (
     {
       className,
@@ -160,15 +160,6 @@ const StackBase = forwardRef<HTMLDivElement, StackProps>(
 );
 StackBase.displayName = "Stack";
 
-export const Stack = forwardRef<HTMLDivElement, StackProps>(
-  (props, ref) => {
-    const ctx = useContext(UIComponentContext);
-    if (ctx.Stack) {
-      return <ctx.Stack {...props} />;
-    }
-    return <StackBase ref={ref} {...props} />;
-  },
-);
-Stack.displayName = "Stack";
+export const Stack = createSelfResolving("Stack", StackBase);
 
 export { stackVariants };

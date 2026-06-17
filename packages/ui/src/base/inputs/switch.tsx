@@ -3,6 +3,7 @@ import { type ComponentPropsWithRef, forwardRef } from "react";
 import { type VariantProps, cva } from "class-variance-authority";
 
 import { cn } from "../../utils/cn";
+import { createSelfResolving } from "../../provider/self-resolving";
 
 export const switchVariants = cva(
   "peer inline-flex shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input",
@@ -37,7 +38,7 @@ const thumbVariants = cva(
 export type SwitchProps = ComponentPropsWithRef<typeof SwitchPrimitive.Root> &
   VariantProps<typeof switchVariants>;
 
-export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
+export const SwitchBase = forwardRef<HTMLButtonElement, SwitchProps>(
   ({ className, size, ...rest }, ref) => (
     <SwitchPrimitive.Root
       ref={ref}
@@ -49,4 +50,6 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
   ),
 );
 
-Switch.displayName = "Switch";
+SwitchBase.displayName = "Switch";
+
+export const Switch = createSelfResolving("Switch", SwitchBase);
