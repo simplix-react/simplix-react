@@ -42,7 +42,7 @@ stylesheet plus the official token theme from your app's CSS entry:
 ```
 
 `theme.css` defines the design tokens (light/dark, color variants, radius,
-typography) consumed by the components. Apps may override any token by
+typography, status indicator animations) consumed by the components. Apps may override any token by
 redefining it after the import. Projects scaffolded via `simplix init`
 wire this up automatically.
 
@@ -183,7 +183,7 @@ Semantic layout components built with CVA variants.
 | --- | --- | --- |
 | `Stack` | Vertical/horizontal flex layout | `direction`, `gap`, `align`, `justify`, `wrap` |
 | `Flex` | Horizontal flex (alias for `Stack direction="row"`) | Same as Stack |
-| `Grid` | CSS Grid layout | `columns` (1-6), `gap` |
+| `Grid` | CSS Grid layout | `columns` (1-6), `gap`, `template` (arbitrary `grid-template-columns`) |
 | `Container` | Centered max-width wrapper | `size` (sm/md/lg/xl/full) |
 | `Section` | Content section with title/description | `title`, `description` |
 | `Card` | Card container with border and shadow | `padding` (none/sm/md/lg), `interactive` |
@@ -220,6 +220,24 @@ Unstyled Radix UI primitives with Tailwind CSS styling. Used internally by field
 - `NavigationMenu` (Root, List, Item, Trigger, Content, Link, Viewport, Indicator)
 - `Separator`
 - `Skeleton`
+
+### Status & Display
+
+Tone-driven components sharing a single semantic color vocabulary. Each `StatusTone` (`success`, `warning`, `danger`, `info`, `neutral`, `pending`, `processing`) bundles every Tailwind class — badge, dot, ring, icon, surface — with its `dark:` variant, so adopting them keeps colors consistent across light/dark.
+
+- `StatusBadge` — compact status pill (tone + label, optional leading dot/icon, `filled`/`outline` appearance)
+- `StatusDot` — small indicator dot with an optional `ping`/`flash` ring animation
+- `AlertBanner` — tinted status banner with icon, title/subtitle (or free-form children), trailing slot, and `default`/`sm`/`hint` density
+- `DetailList` / `DetailListRow` — bordered key-value rows, optionally interactive (`onClick` upgrades a row to button semantics)
+- `LabeledField` — label + description row paired with an arbitrary trailing control
+- `SettingSwitch` — labeled toggle row built on `LabeledField` + `Switch`
+
+Tone tokens are exported directly for custom rendering: `STATUS_TONES`, `STATUS_TONE_NAMES`, `statusToneClass(tone, slot)`, plus the `StatusTone` / `StatusToneToken` / `IconComponent` types.
+
+```tsx
+<StatusBadge tone="success" label="Active" showDot />
+<AlertBanner tone="danger" icon={AlertTriangleIcon} title="Connection lost" subtitle="Reconnecting…" />
+```
 
 ### Form Field Components
 
