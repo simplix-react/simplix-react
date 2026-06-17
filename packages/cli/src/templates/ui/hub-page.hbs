@@ -10,6 +10,9 @@ interface {{EntityPascal}}ListPageProps {
 {{/if}}
 }
 
+/**
+ * Renders the {{entity}} landing page with a title, description, and an optional create action.
+ */
 export function {{EntityPascal}}ListPage({ {{#if hasCreate}}onCreate{{EntityPascal}}{{/if}} }: {{EntityPascal}}ListPageProps) {
   const { t } = useTranslation("{{moduleNamespace}}/widgets");
   return (

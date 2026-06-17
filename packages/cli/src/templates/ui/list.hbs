@@ -2,7 +2,7 @@
 import { useMemo } from "react";
 {{/unless}}
 
-import { {{#if hookList}}adaptOrvalList, {{/if}}{{#if hookOrder}}adaptOrvalOrder, {{/if}}Badge, CrudList, DetailFieldWrapper, {{#if hasEnumFields}}Flex, {{/if}}{{#if hasFilters}}SearchOperator, {{/if}}Stack, useCrudList{{#if hookOrder}}, useInvalidateEntity{{/if}} } from "@simplix-react/ui";
+import { {{#if hookList}}adaptOrvalList, {{/if}}{{#if hookOrder}}adaptOrvalOrder, {{/if}}Badge, CrudList, DetailFieldWrapper, {{#if hasEnumFields}}Flex, {{/if}}{{#if hasI18nFields}}I18nText, {{/if}}{{#if hasFilters}}SearchOperator, {{/if}}Stack, useCrudList{{#if hookOrder}}, useInvalidateEntity{{/if}} } from "@simplix-react/ui";
 import type { ActionVariant, RowActionDef } from "@simplix-react/ui";
 import { useEntityTranslation, useTranslation } from "@simplix-react/i18n/react";
 import { {{#if hasFilters}}ListIcon, {{/if}}{{entityIcon}} } from "lucide-react";
@@ -14,11 +14,16 @@ import { {{hookOrder}} } from "{{packageName}}";
 {{/if}}
 {{/if}}
 
+{{#if listRowType}}
+import type { {{listRowType}} } from "{{packageName}}";
+type {{EntityPascal}} = {{listRowType}};
+{{else}}
 interface {{EntityPascal}} {
 {{#each fields}}
   {{this.name}}: {{this.tsType}};
 {{/each}}
 }
+{{/if}}
 
 {{#unless hookList}}
 function useMockList(): { data: {{EntityPascal}}[] | undefined; isLoading: boolean; error: Error | null } {
@@ -27,6 +32,11 @@ function useMockList(): { data: {{EntityPascal}}[] | undefined; isLoading: boole
 }
 {{/unless}}
 
+/**
+ * Builds the {{entity}} list state — pagination, sorting, filtering, and selection — for the list widgets.
+ *
+ * @returns The CRUD list controller wired to the {{entity}} data source.
+ */
 export function use{{EntityPascal}}List() {
 {{#if hookList}}
   return useCrudList<{{EntityPascal}}>(
@@ -54,6 +64,9 @@ interface {{EntityPascal}}ListToolbarProps {
   list: ReturnType<typeof use{{EntityPascal}}List>;
 }
 
+/**
+ * Renders the {{entity}} list toolbar with search and filter controls bound to the list state.
+ */
 export function {{EntityPascal}}ListToolbar({ list }: {{EntityPascal}}ListToolbarProps) {
 {{#if hasFilters}}
   const { t } = useTranslation("simplix/ui");
@@ -62,6 +75,7 @@ export function {{EntityPascal}}ListToolbar({ list }: {{EntityPascal}}ListToolba
   return (
 {{#if hasFilters}}
       <CrudList.FilterBar
+        maxBadges={3}
         leading={
           <Badge variant="outline" className="gap-1.5 font-normal">
             <ListIcon className="size-3.5 text-muted-foreground" />
@@ -115,6 +129,9 @@ interface {{EntityPascal}}ListProps {
   onRowClick?: (row: {{EntityPascal}}) => void;
 }
 
+/**
+ * Renders a paginated, filterable table of {{entity}} records with sorting, selection, and row actions.
+ */
 export function {{EntityPascal}}List({ list: externalList, activeRowId, actions, actionVariant, onRowClick }: {{EntityPascal}}ListProps) {
 {{#if hasI18nFields}}
   const { t, locale } = useTranslation("{{moduleName}}/widgets");
@@ -166,13 +183,14 @@ export function {{EntityPascal}}List({ list: externalList, activeRowId, actions,
 {{/if}}
         cardBreakpoint={480}
         cardTitle={({ row }) => (
-          <span className="text-sm font-semibold">{row.{{fields.[0].name~}} }</span>
+          <span className="text-sm font-semibold">{{#if displayNameField}}{row.{{displayNameField~}} }{{else}}{row.{{fields.[0].name~}} }{{/if}}</span>
         )}
         cardContent={({ row }) => (
           <Stack gap="xs">
 {{#each fields}}
 {{#unless @first}}
 {{#unless this.isI18nPair}}
+{{#unless this.hideInList}}
 {{#if (eq this.component "I18nText")}}
             <DetailFieldWrapper label={fieldLabel("{{#if this.baseFieldName}}{{this.baseFieldName}}{{else}}{{this.name}}{{/if}}")} layout="inline" size="sm">
               {(row.{{this.name}} as unknown as Record<string, string> | undefined)?.[locale] ?? ""}
@@ -198,6 +216,7 @@ export function {{EntityPascal}}List({ list: externalList, activeRowId, actions,
               {row.{{this.name~}} }
             </DetailFieldWrapper>
 {{/if}}
+{{/unless}}  {{!-- hideInList --}}
 {{/unless}}  {{!-- isI18nPair --}}
 {{/unless}}  {{!-- @first --}}
 {{/each}}
@@ -206,6 +225,7 @@ export function {{EntityPascal}}List({ list: externalList, activeRowId, actions,
       >
 {{#each fields}}
 {{#unless this.isI18nPair}}
+{{#unless this.hideInList}}
 {{#if (eq this.component "I18nText")}}
         <CrudList.Column<{{../EntityPascal}}>
           field="{{this.name}}"
@@ -235,6 +255,7 @@ export function {{EntityPascal}}List({ list: externalList, activeRowId, actions,
           sortable
         />
 {{/if}}
+{{/unless}}  {{!-- hideInList --}}
 {{/unless}}  {{!-- isI18nPair --}}
 {{/each}}
       </CrudList.Table>

@@ -30,6 +30,9 @@ interface {{EntityPascal}}EditorProps {
 
 // -- Outer Guard --
 
+/**
+ * Renders a custom {{entity}} editor that loads the record, guards unsaved changes, and saves updates.
+ */
 export function {{EntityPascal}}Editor({
   {{entity}}Id,
   variant = "panel",
@@ -107,6 +110,7 @@ function EditorContent({ data, variant, onClose, onSuccess }: EditorContentProps
         />
       )}
 
+      {/* raw layout: scrollable editor body */}
       <div className="flex-1 overflow-y-auto">
         <Stack gap="md" padded className="px-5">
           {/* TODO: Add your editor content here */}

@@ -1,5 +1,8 @@
 // {{PascalName}} Module Manifest
 
+/**
+ * Describes a module's identity, version, navigation entry, and declared capabilities.
+ */
 export interface ModuleManifest {
   id: string;
   name: string;
@@ -13,6 +16,9 @@ export interface ModuleManifest {
   capabilities: string[];
 }
 
+/**
+ * Manifest for the {{PascalName}} module, consumed by the app shell to register navigation and capabilities.
+ */
 export const {{camelCase moduleName}}Manifest: ModuleManifest = {
   id: "{{moduleName}}",
   name: "{{PascalName}}",

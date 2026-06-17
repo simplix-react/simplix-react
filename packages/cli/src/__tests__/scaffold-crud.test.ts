@@ -346,6 +346,14 @@ describe("listTemplate", () => {
     expect(result).toContain("cardContent");
     expect(result).toContain("DetailFieldWrapper");
   });
+
+  it("imports the list-row DTO and aliases the row type when listRowType is set", () => {
+    const result = renderTemplate(listTemplate, { ...baseCtx, listRowType: "ProductListDTO" });
+    expect(result).toContain('import type { ProductListDTO } from "@myapp/myapp-domain-product"');
+    expect(result).toContain("type Product = ProductListDTO");
+    expect(result).not.toContain("id: number;");
+    expect(result).toContain("useCrudList<Product>");
+  });
 });
 
 describe("formTemplate", () => {

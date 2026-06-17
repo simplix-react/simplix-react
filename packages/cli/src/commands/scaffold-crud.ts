@@ -41,10 +41,86 @@ export interface FieldInfo {
   isSystemField: boolean;
   isI18nPair: boolean;
   baseFieldName: string | null;
+  /** Mandated list-column category, assigned by orderAndCategorizeFields. */
+  category?: ColumnCategory;
+  /** Whether the field should be hidden by default in scaffolded lists/trees. */
+  hideInList?: boolean;
 }
 
 /** Fields that exist in the data model but should not be displayed or edited by users. */
 const SYSTEM_FIELDS = ["id", "displayOrder", "sortOrder"];
+
+// ── Mandated list-column ordering (INV#18) ──
+
+/**
+ * Field-column categories in their mandated display order. Template chrome
+ * (drag/select/actions columns) is not represented here; this spans the
+ * identifier→audit field range only.
+ */
+const COLUMN_CATEGORY_ORDER = [
+  "identifier",
+  "relation",
+  "type",
+  "text",
+  "description",
+  "attribute",
+  "metric",
+  "schedule",
+  "audit",
+] as const;
+type ColumnCategory = (typeof COLUMN_CATEGORY_ORDER)[number];
+
+/** Categories hidden by default in scaffolded lists/trees. */
+const HIDDEN_CATEGORIES = new Set<ColumnCategory>(["identifier", "relation", "audit"]);
+
+// Audit timestamp/user field name patterns (e.g. createdAt, updatedBy, deletedOn).
+const AUDIT_NAME_RE = /^(created|updated|deleted|modified)(At|By|Date|Time|On)$/i;
+const AUDIT_USER_RE = /^(createdBy|updatedBy|deletedBy|modifiedBy|owner|author)$/i;
+// Generic schedule/timestamp field name pattern.
+const SCHEDULE_NAME_RE = /(At|Date|Time)$/;
+// Long-form free-text field name pattern.
+const DESCRIPTION_RE = /^(description|notes?|remark|comment|memo|summary|content)$/i;
+
+/**
+ * Classify a field into a single mandated column category. First match wins,
+ * so the ordering of the checks below is significant (e.g. audit/identifier
+ * rules must precede the generic date/string rules).
+ */
+export function categorizeField(f: FieldInfo): ColumnCategory {
+  const base = f.baseFieldName ?? f.name;
+  if (f.isSystemField || f.name === "id") return "identifier";
+  if (f.isForeignKey || f.fkEntityField) return "relation";
+  if (AUDIT_NAME_RE.test(base) || AUDIT_USER_RE.test(base)) return "audit";
+  if (f.component === "Select" || f.options.length > 0) return "type";
+  if (f.component === "Boolean" || f.tsType === "boolean") return "attribute";
+  if (f.component === "Number" || f.tsType === "number") return "metric";
+  if (f.component === "Date" || f.tsType === "Date" || SCHEDULE_NAME_RE.test(base)) return "schedule";
+  if (DESCRIPTION_RE.test(base)) return "description";
+  return "text";
+}
+
+/**
+ * Tag each field with its column category and default visibility, then return
+ * a stable sort by the mandated category order. The original field order is the
+ * tiebreaker within a category.
+ */
+export function orderAndCategorizeFields(fields: FieldInfo[]): FieldInfo[] {
+  return fields
+    .map((f, index) => {
+      const category = categorizeField(f);
+      return {
+        field: { ...f, category, hideInList: HIDDEN_CATEGORIES.has(category) },
+        category,
+        index,
+      };
+    })
+    .sort((a, b) => {
+      const rankDiff =
+        COLUMN_CATEGORY_ORDER.indexOf(a.category) - COLUMN_CATEGORY_ORDER.indexOf(b.category);
+      return rankDiff !== 0 ? rankDiff : a.index - b.index;
+    })
+    .map((entry) => entry.field);
+}
 
 export function parseZodType(zodExpr: string): Omit<FieldInfo, "name" | "label" | "capitalizedName" | "defaultValue" | "isForeignKey" | "fkEntityField" | "isSystemField" | "isI18nPair" | "baseFieldName"> {
   const trimmed = zodExpr.trim();
@@ -1468,6 +1544,11 @@ export const scaffoldCrudCommand = new Command("scaffold")
         fields = PLACEHOLDER_FIELDS;
       }
 
+      // Apply mandated list-column ordering + visibility (INV#18). Run before
+      // any downstream consumer of `fields` (tree display fields, ctx) so the
+      // category/hideInList tags are available everywhere.
+      fields = orderAndCategorizeFields(fields);
+
       const ops = await parseEntityOperations(rootDir, entity);
 
       // Resolve actual hook names from crud.config.ts
@@ -1636,12 +1717,14 @@ export const scaffoldCrudCommand = new Command("scaffold")
           .filter((f) => f.tsType === "string" && f.name !== rowIdField && f.name !== treeParentIdField)
           .map((f) => f.name);
 
-        // Display fields: fields for tree columns (exclude id, parentId, sortOrder)
-        // Put the display name field first for tree column ordering
+        // Display fields: fields for tree columns (exclude id, parentId, sortOrder
+        // and any field hidden by the mandated column ordering pass so that
+        // @first resolves to the first VISIBLE tree column)
         const filteredFields = fields.filter((f) =>
           f.name !== rowIdField &&
           f.name !== treeParentIdField &&
-          f.name !== treeSortOrderField,
+          f.name !== treeSortOrderField &&
+          !f.hideInList,
         );
         const displayNameIdx = filteredFields.findIndex((f) => f.name === treeDisplayNameField);
         if (displayNameIdx > 0) {
@@ -1655,6 +1738,21 @@ export const scaffoldCrudCommand = new Command("scaffold")
       const hasTreeMove = hasTree && !!hookUpdate && !!treeParentIdField;
       const updateMutationKey = updatePathParam ?? rowIdField;
 
+      // ── List/tree row DTO resolution (INV#30) ──
+      // The list row is the per-operation response DTO (e.g. CompanyListDTO),
+      // NOT the entity's detail modelType. Resolve from the snapshot by role and
+      // only emit a DTO import when we can both name the type AND import it.
+      const listOp =
+        extractedEntity?.operations?.find((o) => o.role === "list") ??
+        extractedEntity?.operations?.find((o) => o.role === "search");
+      const treeOp = extractedEntity?.operations?.find((o) => o.role === "tree");
+      const listRowType =
+        packageName && listOp?.responseEntityType ? listOp.responseEntityType : null;
+      const treeRowType =
+        packageName && (treeOp?.responseEntityType ?? listOp?.responseEntityType)
+          ? (treeOp?.responseEntityType ?? listOp?.responseEntityType)
+          : null;
+
       const entityPlural = `${entity}s`;
       const ctx = {
         EntityPascal,
@@ -1663,6 +1761,8 @@ export const scaffoldCrudCommand = new Command("scaffold")
         entityPlural,
         fields,
         packageName,
+        listRowType,
+        treeRowType,
         hookList,
         hookGet,
         hookGetForEdit,

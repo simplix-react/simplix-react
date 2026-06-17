@@ -17,6 +17,9 @@ interface {{EntityPascal}}DetailProps {
 {{/if}}
 }
 
+/**
+ * Renders the read-only detail view of a single {{entity}}, with edit and delete affordances.
+ */
 export function {{EntityPascal}}Detail({ {{entity}}Id, onClose, onBack{{#if hasUpdate}}, onEdit{{/if}}{{#if hasDelete}}, onDeleted{{/if}} }: {{EntityPascal}}DetailProps) {
 {{#if hasI18nFields}}
   const { t } = useTranslation("{{moduleNamespace}}/widgets");
@@ -143,8 +146,12 @@ export function {{EntityPascal}}Detail({ {{entity}}Id, onClose, onBack{{#if hasU
         open={del.open}
         onOpenChange={del.onOpenChange}
         onConfirm={() => deleteMutation.mutate({{entity}}Id, { onSuccess: onDeleted })}
-        title="Delete {{EntityPascal}}"
-        description="Are you sure you want to delete this {{entity}}? This action cannot be undone."
+        title={t("{{entity}}.delete{{EntityPascal}}Title")}
+{{#if displayNameField}}
+        description={t("{{entity}}.delete{{EntityPascal}}Desc", { name: String(displayData.{{displayNameField}} ?? "") })}
+{{else}}
+        description={t("{{entity}}.delete{{EntityPascal}}DescSimple")}
+{{/if}}
         loading={deleteMutation.isPending}
       />
 {{/if}}

@@ -19,6 +19,10 @@ import { {{#if hasUpdate}}{{#if hookGetForEdit}}{{hookGetForEdit}}, {{else}}{{#i
 {{/if}}
 
 {{#if hasTree}}
+{{#if treeRowType}}
+import type { {{treeRowType}} } from "{{packageName}}";
+type {{EntityPascal}} = {{treeRowType}} & { children: {{treeRowType}}[] };
+{{else}}
 interface {{EntityPascal}} {
 {{#each fields}}
 {{#if (eq this.name ../treeParentIdField)}}
@@ -29,8 +33,12 @@ interface {{EntityPascal}} {
 {{/each}}
   children: {{EntityPascal}}[];
 }
+{{/if}}
 
 {{/if}}
+/**
+ * Form value shape for creating or editing a {{entity}}, one property per editable field.
+ */
 export interface {{EntityPascal}}FormValues {
 {{#each fields}}
 {{#if (eq this.name ../treeParentIdField)}}
@@ -54,6 +62,9 @@ interface {{EntityPascal}}FormProps {
   onBack?: () => void;
 }
 
+/**
+ * Renders a create or edit form for a {{entity}}, loading existing data when an id is supplied.
+ */
 export function {{EntityPascal}}Form({ {{#if hasUpdate}}{{entity}}Id, {{/if}}{{#if hasTree}}defaultParentId, {{/if}}onClose, onSuccess, onCancel, onBack }: {{EntityPascal}}FormProps) {
 {{#if hasUpdate}}
   const isEdit = !!{{entity}}Id;

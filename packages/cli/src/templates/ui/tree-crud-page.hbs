@@ -11,6 +11,10 @@ import { {{#if hookDelete}}{{hookDelete}}, {{/if}}{{#if hookUpdate}}{{hookUpdate
 
 import { {{#if hasDetail}}{{EntityPascal}}Detail, {{/if}}{{#if hasForm}}{{EntityPascal}}Form, {{/if}}{{EntityPascal}}Tree, use{{EntityPascal}}Tree } from "../../widgets";
 
+{{#if treeRowType}}
+import type { {{treeRowType}} } from "{{packageName}}";
+type {{EntityPascal}} = {{treeRowType}} & { children: {{treeRowType}}[] };
+{{else}}
 interface {{EntityPascal}} {
 {{#each fields}}
 {{#if (eq this.name ../treeParentIdField)}}
@@ -21,6 +25,7 @@ interface {{EntityPascal}} {
 {{/each}}
   children: {{EntityPascal}}[];
 }
+{{/if}}
 
 interface {{EntityPascal}}CrudPageProps {
   variant?: "panel" | "dialog" | "page";
@@ -28,6 +33,9 @@ interface {{EntityPascal}}CrudPageProps {
   onNavigate: (search: CrudSearch) => void;
 }
 
+/**
+ * Renders the full {{entity}} tree CRUD page with detail, create, edit, move, and reorder flows.
+ */
 export function {{EntityPascal}}CrudPage({ variant = "panel", search, onNavigate }: {{EntityPascal}}CrudPageProps) {
   const tree = use{{EntityPascal}}Tree();
   const { t } = useTranslation("{{moduleNamespace}}/widgets");

@@ -4,6 +4,9 @@ import {
   getDefaultValue,
   entityFieldsToFieldInfo,
   parseSchemaFields,
+  categorizeField,
+  orderAndCategorizeFields,
+  type FieldInfo,
 } from "../commands/scaffold-crud.js";
 import { renderTemplate } from "../utils/template.js";
 import {
@@ -12,6 +15,7 @@ import {
   treeTemplate,
   treeCrudPageTemplate,
   pageIndexTemplate,
+  listTemplate,
 } from "../templates/ui/index.js";
 import type { EntityField } from "../openapi/types.js";
 
@@ -354,5 +358,131 @@ describe("treeTemplate", () => {
     expect(result).toContain("ProductTree");
     expect(result).toContain("useProductTree");
     expect(result).toContain("CrudTree");
+  });
+});
+
+// ── orderAndCategorizeFields (INV#18) ───────────────────────
+
+/** Build a minimal FieldInfo for ordering/categorization tests. */
+function makeField(partial: Partial<FieldInfo> & { name: string }): FieldInfo {
+  return {
+    capitalizedName: partial.name.charAt(0).toUpperCase() + partial.name.slice(1),
+    label: partial.name,
+    tsType: "string",
+    formComponent: "TextField",
+    inputType: "text",
+    component: "Text",
+    options: [],
+    defaultValue: '""',
+    isForeignKey: false,
+    fkEntityField: null,
+    isSystemField: false,
+    isI18nPair: false,
+    baseFieldName: null,
+    ...partial,
+  };
+}
+
+describe("orderAndCategorizeFields", () => {
+  it("categorizes fields by first-match rules", () => {
+    expect(
+      categorizeField(makeField({ name: "id", isSystemField: true })),
+    ).toBe("identifier");
+    expect(
+      categorizeField(makeField({ name: "categoryId", isForeignKey: true, fkEntityField: "category" })),
+    ).toBe("relation");
+    expect(
+      categorizeField(makeField({ name: "createdAt" })),
+    ).toBe("audit");
+    expect(
+      categorizeField(makeField({ name: "status", component: "Select", options: ["a", "b"] })),
+    ).toBe("type");
+    expect(
+      categorizeField(makeField({ name: "active", component: "Boolean", tsType: "boolean" })),
+    ).toBe("attribute");
+    expect(
+      categorizeField(makeField({ name: "price", component: "Number", tsType: "number" })),
+    ).toBe("metric");
+    expect(
+      categorizeField(makeField({ name: "startTime", component: "Date", tsType: "Date" })),
+    ).toBe("schedule");
+    expect(
+      categorizeField(makeField({ name: "description" })),
+    ).toBe("description");
+    expect(
+      categorizeField(makeField({ name: "name" })),
+    ).toBe("text");
+  });
+
+  it("orders fields by the mandated category order and tags hidden categories", () => {
+    const input: FieldInfo[] = [
+      makeField({ name: "createdAt" }),
+      makeField({ name: "name" }),
+      makeField({ name: "status", component: "Select", options: ["a", "b"] }),
+      makeField({ name: "price", component: "Number", tsType: "number" }),
+      makeField({ name: "id", isSystemField: true }),
+      makeField({ name: "categoryId", isForeignKey: true, fkEntityField: "category" }),
+      makeField({ name: "active", component: "Boolean", tsType: "boolean" }),
+      makeField({ name: "description" }),
+    ];
+    const ordered = orderAndCategorizeFields(input);
+
+    // Category sequence follows COLUMN_CATEGORY_ORDER
+    expect(ordered.map((f) => f.category)).toEqual([
+      "identifier", // id
+      "relation",   // categoryId
+      "type",       // status
+      "text",       // name
+      "description",// description
+      "attribute",  // active
+      "metric",     // price
+      "audit",      // createdAt
+    ]);
+
+    // Hidden categories tagged hideInList=true
+    const byName = new Map(ordered.map((f) => [f.name, f]));
+    expect(byName.get("id")?.hideInList).toBe(true);
+    expect(byName.get("categoryId")?.hideInList).toBe(true);
+    expect(byName.get("createdAt")?.hideInList).toBe(true);
+    // Visible categories remain false
+    expect(byName.get("name")?.hideInList).toBe(false);
+    expect(byName.get("status")?.hideInList).toBe(false);
+  });
+});
+
+describe("listTemplate column visibility (INV#18)", () => {
+  it("omits hidden columns while keeping visible ones", () => {
+    const ctx = {
+      ...baseCtx,
+      fields: [
+        {
+          name: "id",
+          capitalizedName: "Id",
+          label: "Id",
+          tsType: "number",
+          formComponent: "NumberField",
+          inputType: "number",
+          component: "Number",
+          options: [],
+          defaultValue: "0",
+          hideInList: true,
+        },
+        {
+          name: "name",
+          capitalizedName: "Name",
+          label: "Name",
+          tsType: "string",
+          formComponent: "TextField",
+          inputType: "text",
+          component: "Text",
+          options: [],
+          defaultValue: '""',
+          hideInList: false,
+        },
+      ],
+    };
+    const result = renderTemplate(listTemplate, ctx);
+    expect(result).not.toContain('field="id"');
+    expect(result).toContain('field="name"');
   });
 });

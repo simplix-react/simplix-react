@@ -16,6 +16,9 @@ interface {{EntityPascal}}CrudPageProps {
   onNavigate: (search: CrudSearch) => void;
 }
 
+/**
+ * Renders the full {{entity}} CRUD page, switching between list, detail, create, and edit views.
+ */
 export function {{EntityPascal}}CrudPage({ variant = "panel", search, onNavigate }: {{EntityPascal}}CrudPageProps) {
   const list = use{{EntityPascal}}List();
   const { t } = useTranslation("{{moduleNamespace}}/widgets");
