@@ -1301,7 +1301,7 @@ function ListPagination({
         value={String(pageSize)}
         onValueChange={(v) => onPageSizeChange(Number(v))}
       >
-        <SelectTrigger className="h-8 w-[64px] rounded-sm border-border bg-card text-xs font-medium text-secondary-foreground" aria-label="Page size">
+        <SelectTrigger className="h-8 w-[64px] rounded-md border-border bg-card text-xs font-medium text-secondary-foreground" aria-label="Page size">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -1316,7 +1316,7 @@ function ListPagination({
   );
 
   const navCell =
-    "inline-flex h-8 items-center justify-center rounded-sm border border-border bg-card text-xs font-medium text-secondary-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-50";
+    "inline-flex h-8 items-center justify-center rounded-md border border-border bg-card text-xs font-medium text-secondary-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-50";
 
   const prevButton = (
     <button

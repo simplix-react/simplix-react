@@ -22,6 +22,12 @@ describe("Button", () => {
     expect(button.className).toContain("text-primary-foreground");
   });
 
+  it("applies default rounded-md (less rounded than Badge)", () => {
+    render(<Button>Round</Button>);
+    const button = screen.getByRole("button");
+    expect(button.className).toContain("rounded-md");
+  });
+
   it("applies variant='destructive'", () => {
     render(<Button variant="destructive">Delete</Button>);
     const button = screen.getByRole("button");

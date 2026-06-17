@@ -9,6 +9,7 @@ const badgeVariants = cva(
     variants: {
       rounded: {
         full: "rounded-full",
+        xl: "rounded-xl",
         lg: "rounded-lg",
         md: "rounded-md",
         sm: "rounded-sm",
@@ -67,7 +68,7 @@ const badgeVariants = cva(
           "border-transparent bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-100",
       },
     },
-    defaultVariants: { variant: "default", rounded: "sm", size: "default" },
+    defaultVariants: { variant: "default", rounded: "xl", size: "default" },
   },
 );
 
