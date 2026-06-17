@@ -21,6 +21,7 @@ export const selectTriggerVariants = cva(
       size: {
         default: "h-8 px-3 py-1.5 text-sm",
         sm: "h-7 px-2 py-1 text-xs",
+        xs: "h-6 px-2 py-0.5 text-xs",
       },
     },
     defaultVariants: {
