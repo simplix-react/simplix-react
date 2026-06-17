@@ -12,16 +12,13 @@
     "test": "vitest run --reporter=verbose --coverage",
     "clean": "turbo run clean",
     "docs:api": "typedoc",
-    "changeset": "changeset",
-    "version-packages": "changeset version",
-    "release": "turbo run build && changeset publish",
+    "sync-version": "node scripts/sync-version.mjs",
+    "release": "pnpm sync-version && turbo run build && pnpm -r publish --access public",
     "storybook": "pnpm --filter @simplix-react/storybook storybook",
     "dev:storybook": "turbo run dev storybook --filter=@simplix-react/ui --filter=@simplix-react/storybook --concurrency=3",
     "build:storybook": "turbo run build-storybook"
   },
   "devDependencies": {
-    "@changesets/changelog-github": "catalog:",
-    "@changesets/cli": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "oxlint": "catalog:",
     "turbo": "catalog:",
