@@ -8,6 +8,6 @@
 
 > **StackVariants** = `VariantProps`\<*typeof* [`stackVariants`](../variables/stackVariants.md)\>
 
-Defined in: [packages/ui/src/primitives/stack.tsx:42](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/stack.tsx#L42)
+Defined in: [packages/ui/src/primitives/stack.tsx:53](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/stack.tsx#L53)
 
 Variant props extracted from [stackVariants](../variables/stackVariants.md).

@@ -6,7 +6,7 @@
 
 # Interface: TabsListProps
 
-Defined in: [packages/ui/src/base/navigation/tabs.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/tabs.tsx#L11)
+Defined in: [packages/ui/src/base/navigation/tabs.tsx:32](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/tabs.tsx#L32)
 
 ## Extends
 
@@ -242,7 +242,7 @@ aria-owns.
 
 ### aria-current?
 
-> `optional` **aria-current**: `boolean` \| `"date"` \| `"time"` \| `"true"` \| `"false"` \| `"page"` \| `"step"` \| `"location"`
+> `optional` **aria-current**: `boolean` \| `"date"` \| `"true"` \| `"false"` \| `"time"` \| `"page"` \| `"step"` \| `"location"`
 
 Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react/index.d.ts:2542](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.14/node_modules/@types/react/index.d.ts#L2542)
 
@@ -413,7 +413,7 @@ in ARIA 1.1
 
 ### aria-haspopup?
 
-> `optional` **aria-haspopup**: `boolean` \| `"tree"` \| `"dialog"` \| `"menu"` \| `"grid"` \| `"true"` \| `"false"` \| `"listbox"`
+> `optional` **aria-haspopup**: `boolean` \| `"tree"` \| `"true"` \| `"false"` \| `"dialog"` \| `"menu"` \| `"grid"` \| `"listbox"`
 
 Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react/index.d.ts:2586](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.14/node_modules/@types/react/index.d.ts#L2586)
 
@@ -3673,13 +3673,16 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 ### variant?
 
-> `optional` **variant**: `"default"` \| `"full"`
+> `optional` **variant**: `TabsVariant`
 
-Defined in: [packages/ui/src/base/navigation/tabs.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/tabs.tsx#L20)
+Defined in: [packages/ui/src/base/navigation/tabs.tsx:44](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/tabs.tsx#L44)
 
-Visual style variant.
-- `"default"` — inline, auto-width.
+Visual style variant. Triggers adapt automatically via context.
+- `"default"` — inline segmented control, auto-width.
 - `"full"` — spans full width with top margin; triggers auto-expand to equal widths.
+- `"bookmark"` — folder-style tabs sitting on a bottom line. The line is an
+  inset shadow (not a border) so the active tab's `bg-card` covers it without
+  relying on overflow — the cutout survives `overflow-x-auto` horizontal scroll.
 
 #### Default
 

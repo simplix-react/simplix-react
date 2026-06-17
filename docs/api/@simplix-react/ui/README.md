@@ -48,7 +48,7 @@ stylesheet plus the official token theme from your app's CSS entry:
 ```
 
 `theme.css` defines the design tokens (light/dark, color variants, radius,
-typography) consumed by the components. Apps may override any token by
+typography, status indicator animations) consumed by the components. Apps may override any token by
 redefining it after the import. Projects scaffolded via `simplix init`
 wire this up automatically.
 
@@ -189,7 +189,7 @@ Semantic layout components built with CVA variants.
 | --- | --- | --- |
 | `Stack` | Vertical/horizontal flex layout | `direction`, `gap`, `align`, `justify`, `wrap` |
 | `Flex` | Horizontal flex (alias for `Stack direction="row"`) | Same as Stack |
-| `Grid` | CSS Grid layout | `columns` (1-6), `gap` |
+| `Grid` | CSS Grid layout | `columns` (1-6), `gap`, `template` (arbitrary `grid-template-columns`) |
 | `Container` | Centered max-width wrapper | `size` (sm/md/lg/xl/full) |
 | `Section` | Content section with title/description | `title`, `description` |
 | `Card` | Card container with border and shadow | `padding` (none/sm/md/lg), `interactive` |
@@ -226,6 +226,24 @@ Unstyled Radix UI primitives with Tailwind CSS styling. Used internally by field
 - `NavigationMenu` (Root, List, Item, Trigger, Content, Link, Viewport, Indicator)
 - `Separator`
 - `Skeleton`
+
+### Status & Display
+
+Tone-driven components sharing a single semantic color vocabulary. Each `StatusTone` (`success`, `warning`, `danger`, `info`, `neutral`, `pending`, `processing`) bundles every Tailwind class — badge, dot, ring, icon, surface — with its `dark:` variant, so adopting them keeps colors consistent across light/dark.
+
+- `StatusBadge` — compact status pill (tone + label, optional leading dot/icon, `filled`/`outline` appearance)
+- `StatusDot` — small indicator dot with an optional `ping`/`flash` ring animation
+- `AlertBanner` — tinted status banner with icon, title/subtitle (or free-form children), trailing slot, and `default`/`sm`/`hint` density
+- `DetailList` / `DetailListRow` — bordered key-value rows, optionally interactive (`onClick` upgrades a row to button semantics)
+- `LabeledField` — label + description row paired with an arbitrary trailing control
+- `SettingSwitch` — labeled toggle row built on `LabeledField` + `Switch`
+
+Tone tokens are exported directly for custom rendering: `STATUS_TONES`, `STATUS_TONE_NAMES`, `statusToneClass(tone, slot)`, plus the `StatusTone` / `StatusToneToken` / `IconComponent` types.
+
+```tsx
+<StatusBadge tone="success" label="Active" showDot />
+<AlertBanner tone="danger" icon={AlertTriangleIcon} title="Connection lost" subtitle="Reconnecting…" />
+```
 
 ### Form Field Components
 
@@ -874,8 +892,10 @@ See root LICENSE file.
 - [AdvancedSelectFilterOption](interfaces/AdvancedSelectFilterOption.md)
 - [AdvancedSelectFilterProps](interfaces/AdvancedSelectFilterProps.md)
 - [AdvancedTextFilterProps](interfaces/AdvancedTextFilterProps.md)
+- [AlertBannerProps](interfaces/AlertBannerProps.md)
 - [AreaChartProps](interfaces/AreaChartProps.md)
 - [AssignmentChipProps](interfaces/AssignmentChipProps.md)
+- [AttachmentHttpClient](interfaces/AttachmentHttpClient.md)
 - [AuditData](interfaces/AuditData.md)
 - [BadgeProps](interfaces/BadgeProps.md)
 - [BarChartProps](interfaces/BarChartProps.md)
@@ -901,6 +921,7 @@ See root LICENSE file.
 - [ContainerProps](interfaces/ContainerProps.md)
 - [CountryFilterDef](interfaces/CountryFilterDef.md)
 - [CountryOption](interfaces/CountryOption.md)
+- [CreateFileFieldApiOptions](interfaces/CreateFileFieldApiOptions.md)
 - [CrudDeleteProps](interfaces/CrudDeleteProps.md)
 - [CrudDeleteWiredLabels](interfaces/CrudDeleteWiredLabels.md)
 - [CrudDetailActionsProps](interfaces/CrudDetailActionsProps.md)
@@ -911,6 +932,7 @@ See root LICENSE file.
 - [CrudFormActionsProps](interfaces/CrudFormActionsProps.md)
 - [CrudFormProps](interfaces/CrudFormProps.md)
 - [CrudFormSectionProps](interfaces/CrudFormSectionProps.md)
+- [CrudListColumnContextValue](interfaces/CrudListColumnContextValue.md)
 - [CrudListFilters](interfaces/CrudListFilters.md)
 - [CrudListPagination](interfaces/CrudListPagination.md)
 - [CrudListSelection](interfaces/CrudListSelection.md)
@@ -927,6 +949,11 @@ See root LICENSE file.
 - [DateRangePickerProps](interfaces/DateRangePickerProps.md)
 - [DeleteTarget](interfaces/DeleteTarget.md)
 - [DetailFieldWrapperProps](interfaces/DetailFieldWrapperProps.md)
+- [DetailListProps](interfaces/DetailListProps.md)
+- [DetailListRowProps](interfaces/DetailListRowProps.md)
+- [DetailProfileFeatsProps](interfaces/DetailProfileFeatsProps.md)
+- [DetailProfileMetaProps](interfaces/DetailProfileMetaProps.md)
+- [DetailProfileProps](interfaces/DetailProfileProps.md)
 - [DialogComponents](interfaces/DialogComponents.md)
 - [DonutChartProps](interfaces/DonutChartProps.md)
 - [DropdownMenuComponents](interfaces/DropdownMenuComponents.md)
@@ -937,6 +964,7 @@ See root LICENSE file.
 - [FacetedFilterDef](interfaces/FacetedFilterDef.md)
 - [FacetedFilterOption](interfaces/FacetedFilterOption.md)
 - [FacetedFilterProps](interfaces/FacetedFilterProps.md)
+- [FeatureCardProps](interfaces/FeatureCardProps.md)
 - [FieldMessageProps](interfaces/FieldMessageProps.md)
 - [FieldVariant](interfaces/FieldVariant.md)
 - [FieldWrapperProps](interfaces/FieldWrapperProps.md)
@@ -947,6 +975,10 @@ See root LICENSE file.
 - [FixedMenuGroup](interfaces/FixedMenuGroup.md)
 - [FixedMenuItem](interfaces/FixedMenuItem.md)
 - [GridProps](interfaces/GridProps.md)
+- [GroupedToggleFieldProps](interfaces/GroupedToggleFieldProps.md)
+- [GroupedToggleGroup](interfaces/GroupedToggleGroup.md)
+- [GroupedToggleOption](interfaces/GroupedToggleOption.md)
+- [GroupedToggleOtherInfo](interfaces/GroupedToggleOtherInfo.md)
 - [HasCoords](interfaces/HasCoords.md)
 - [HeadingProps](interfaces/HeadingProps.md)
 - [HeatmapCell](interfaces/HeatmapCell.md)
@@ -957,6 +989,7 @@ See root LICENSE file.
 - [IconFieldProps](interfaces/IconFieldProps.md)
 - [IconPickerProps](interfaces/IconPickerProps.md)
 - [IconProps](interfaces/IconProps.md)
+- [LabeledFieldProps](interfaces/LabeledFieldProps.md)
 - [LineChartProps](interfaces/LineChartProps.md)
 - [ListBulkActionProps](interfaces/ListBulkActionProps.md)
 - [ListBulkActionsProps](interfaces/ListBulkActionsProps.md)
@@ -983,6 +1016,9 @@ See root LICENSE file.
 - [MenuGroupConfig](interfaces/MenuGroupConfig.md)
 - [MenuNode](interfaces/MenuNode.md)
 - [MenuProviderProps](interfaces/MenuProviderProps.md)
+- [ModalSidebarBlockProps](interfaces/ModalSidebarBlockProps.md)
+- [ModalSidebarProps](interfaces/ModalSidebarProps.md)
+- [ModalSidebarRowProps](interfaces/ModalSidebarRowProps.md)
 - [MultiTextFilterField](interfaces/MultiTextFilterField.md)
 - [MultiTextFilterProps](interfaces/MultiTextFilterProps.md)
 - [NavigationGroup](interfaces/NavigationGroup.md)
@@ -1017,6 +1053,11 @@ See root LICENSE file.
 - [SortState](interfaces/SortState.md)
 - [StackProps](interfaces/StackProps.md)
 - [StatCardProps](interfaces/StatCardProps.md)
+- [StatusBadgeProps](interfaces/StatusBadgeProps.md)
+- [StatusDotProps](interfaces/StatusDotProps.md)
+- [StatusToneToken](interfaces/StatusToneToken.md)
+- [TableCardFrameProps](interfaces/TableCardFrameProps.md)
+- [TableCardFrameValue](interfaces/TableCardFrameValue.md)
 - [TableComponents](interfaces/TableComponents.md)
 - [TabsComponents](interfaces/TabsComponents.md)
 - [TabsContentProps](interfaces/TabsContentProps.md)
@@ -1089,6 +1130,8 @@ See root LICENSE file.
 
 - [ActionType](type-aliases/ActionType.md)
 - [ActionVariant](type-aliases/ActionVariant.md)
+- [AlertDensity](type-aliases/AlertDensity.md)
+- [AlertTone](type-aliases/AlertTone.md)
 - [AutosaveStatus](type-aliases/AutosaveStatus.md)
 - [BadgeVariants](type-aliases/BadgeVariants.md)
 - [ButtonVariants](type-aliases/ButtonVariants.md)
@@ -1098,6 +1141,7 @@ See root LICENSE file.
 - [ContainerVariants](type-aliases/ContainerVariants.md)
 - [CrudDetailSectionProps](type-aliases/CrudDetailSectionProps.md)
 - [CrudDetailVariant](type-aliases/CrudDetailVariant.md)
+- [CrudListViewMode](type-aliases/CrudListViewMode.md)
 - [CrudView](type-aliases/CrudView.md)
 - [DateLike](type-aliases/DateLike.md)
 - [DetailView](type-aliases/DetailView.md)
@@ -1124,6 +1168,7 @@ See root LICENSE file.
 - [HeadingTag](type-aliases/HeadingTag.md)
 - [HeadingVariants](type-aliases/HeadingVariants.md)
 - [HeatmapColorTheme](type-aliases/HeatmapColorTheme.md)
+- [IconComponent](type-aliases/IconComponent.md)
 - [IconData](type-aliases/IconData.md)
 - [IconLibrary](type-aliases/IconLibrary.md)
 - [IconName](type-aliases/IconName.md)
@@ -1169,6 +1214,7 @@ See root LICENSE file.
 - [SheetTitleProps](type-aliases/SheetTitleProps.md)
 - [SkeletonProps](type-aliases/SkeletonProps.md)
 - [StackVariants](type-aliases/StackVariants.md)
+- [StatusTone](type-aliases/StatusTone.md)
 - [SwitchProps](type-aliases/SwitchProps.md)
 - [TableBodyProps](type-aliases/TableBodyProps.md)
 - [TableCaptionProps](type-aliases/TableCaptionProps.md)
@@ -1188,6 +1234,7 @@ See root LICENSE file.
 
 ## Variables
 
+- [AlertBanner](variables/AlertBanner.md)
 - [apexChartsAdapter](variables/apexChartsAdapter.md)
 - [AssignmentPanel](variables/AssignmentPanel.md)
 - [Badge](variables/Badge.md)
@@ -1210,9 +1257,13 @@ See root LICENSE file.
 - [CrudDetail](variables/CrudDetail.md)
 - [CrudForm](variables/CrudForm.md)
 - [CrudList](variables/CrudList.md)
+- [CrudListColumnContext](variables/CrudListColumnContext.md)
 - [CrudTree](variables/CrudTree.md)
 - [dateOperatorConfig](variables/dateOperatorConfig.md)
 - [DEFAULT\_MAP\_FIT\_OPTIONS](variables/DEFAULT_MAP_FIT_OPTIONS.md)
+- [DetailList](variables/DetailList.md)
+- [DetailListRow](variables/DetailListRow.md)
+- [DetailProfile](variables/DetailProfile.md)
 - [Dialog](variables/Dialog.md)
 - [DialogClose](variables/DialogClose.md)
 - [DialogContent](variables/DialogContent.md)
@@ -1249,6 +1300,7 @@ See root LICENSE file.
 - [Label](variables/Label.md)
 - [ListDetail](variables/ListDetail.md)
 - [Map](variables/Map.md)
+- [ModalSidebar](variables/ModalSidebar.md)
 - [NavigationMenuContent](variables/NavigationMenuContent.md)
 - [NavigationMenuIndicator](variables/NavigationMenuIndicator.md)
 - [NavigationMenuItem](variables/NavigationMenuItem.md)
@@ -1287,11 +1339,16 @@ See root LICENSE file.
 - [SheetTrigger](variables/SheetTrigger.md)
 - [Stack](variables/Stack.md)
 - [stackVariants](variables/stackVariants.md)
+- [STATUS\_TONE\_NAMES](variables/STATUS_TONE_NAMES.md)
+- [STATUS\_TONES](variables/STATUS_TONES.md)
+- [StatusBadge](variables/StatusBadge.md)
+- [StatusDot](variables/StatusDot.md)
 - [Switch](variables/Switch.md)
 - [switchVariants](variables/switchVariants.md)
 - [Table](variables/Table.md)
 - [TableBody](variables/TableBody.md)
 - [TableCaption](variables/TableCaption.md)
+- [TableCardFrameContext](variables/TableCardFrameContext.md)
 - [TableCell](variables/TableCell.md)
 - [TableFooter](variables/TableFooter.md)
 - [TableHead](variables/TableHead.md)
@@ -1334,6 +1391,7 @@ See root LICENSE file.
 - [computeBounds](functions/computeBounds.md)
 - [ConfirmDialog](functions/ConfirmDialog.md)
 - [countryFromTimezone](functions/countryFromTimezone.md)
+- [createFileFieldApi](functions/createFileFieldApi.md)
 - [createOverrides](functions/createOverrides.md)
 - [createReactRouterAdapter](functions/createReactRouterAdapter.md)
 - [CrudDelete](functions/CrudDelete.md)
@@ -1355,6 +1413,7 @@ See root LICENSE file.
 - [endOfWeek](functions/endOfWeek.md)
 - [endOfYear](functions/endOfYear.md)
 - [FacetedFilter](functions/FacetedFilter.md)
+- [FeatureCard](functions/FeatureCard.md)
 - [FieldMessage](functions/FieldMessage.md)
 - [FieldWrapper](functions/FieldWrapper.md)
 - [FilterActions](functions/FilterActions.md)
@@ -1368,6 +1427,7 @@ See root LICENSE file.
 - [geoCircle](functions/geoCircle.md)
 - [getFilterLayout](functions/getFilterLayout.md)
 - [getSiblings](functions/getSiblings.md)
+- [GroupedToggleField](functions/GroupedToggleField.md)
 - [groupValidationErrors](functions/groupValidationErrors.md)
 - [haversineDistance](functions/haversineDistance.md)
 - [I18nText](functions/I18nText.md)
@@ -1377,6 +1437,7 @@ See root LICENSE file.
 - [isSameMonth](functions/isSameMonth.md)
 - [isSameWeek](functions/isSameWeek.md)
 - [isValidCoord](functions/isValidCoord.md)
+- [LabeledField](functions/LabeledField.md)
 - [ListDetailRoot](functions/ListDetailRoot.md)
 - [ListDetailViewSwitch](functions/ListDetailViewSwitch.md)
 - [makeFilterKey](functions/makeFilterKey.md)
@@ -1412,7 +1473,9 @@ See root LICENSE file.
 - [startOfWeek](functions/startOfWeek.md)
 - [startOfYear](functions/startOfYear.md)
 - [StatCard](functions/StatCard.md)
+- [statusToneClass](functions/statusToneClass.md)
 - [subDays](functions/subDays.md)
+- [TableCardFrame](functions/TableCardFrame.md)
 - [TextFilter](functions/TextFilter.md)
 - [TimeRangeSelector](functions/TimeRangeSelector.md)
 - [ToastContainer](functions/ToastContainer.md)
@@ -1435,6 +1498,7 @@ See root LICENSE file.
 - [useCrudDeleteWired](functions/useCrudDeleteWired.md)
 - [useCrudFormSubmit](functions/useCrudFormSubmit.md)
 - [useCrudList](functions/useCrudList.md)
+- [useCrudListColumns](functions/useCrudListColumns.md)
 - [useCrudNavigation](functions/useCrudNavigation.md)
 - [useCrudPageState](functions/useCrudPageState.md)
 - [useFadeTransition](functions/useFadeTransition.md)
@@ -1457,6 +1521,7 @@ See root LICENSE file.
 - [usePulseOnUpdate](functions/usePulseOnUpdate.md)
 - [useRouter](functions/useRouter.md)
 - [useServerSearchOptions](functions/useServerSearchOptions.md)
+- [useTableCardFrame](functions/useTableCardFrame.md)
 - [useTimezoneOptions](functions/useTimezoneOptions.md)
 - [useToastStore](functions/useToastStore.md)
 - [useTreeExpansion](functions/useTreeExpansion.md)

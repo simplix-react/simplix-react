@@ -16,7 +16,7 @@ CVA variants for the Stack component layout configuration.
 
 ### props?
 
-ConfigVariants\<\{ direction: \{ column: string; row: string; \}; gap: \{ none: string; xs: string; sm: string; md: string; lg: string; xl: string; \}; align: \{ start: string; center: string; end: string; stretch: string; baseline: string; \}; ... 4 more ...; padded: \{ ...; \}; \}\> & ClassProp
+ConfigVariants\<\{ direction: \{ column: string; row: string; \}; gap: \{ none: string; xs: string; sm: string; md: string; lg: string; xl: string; \}; align: \{ start: string; center: string; end: string; stretch: string; baseline: string; \}; ... 7 more ...; minSize: \{ ...; \}; \}\> & ClassProp
 
 ## Returns
 

@@ -6,7 +6,7 @@
 
 # Interface: Toast
 
-Defined in: [packages/ui/src/base/feedback/toast-store.ts:3](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/toast-store.ts#L3)
+Defined in: [packages/ui/src/base/feedback/toast-store.ts:4](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/toast-store.ts#L4)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/base/feedback/toast-store.ts:3](https://github.com/
 
 > `optional` **action**: `object`
 
-Defined in: [packages/ui/src/base/feedback/toast-store.ts:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/toast-store.ts#L7)
+Defined in: [packages/ui/src/base/feedback/toast-store.ts:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/toast-store.ts#L8)
 
 #### href
 
@@ -30,7 +30,7 @@ Defined in: [packages/ui/src/base/feedback/toast-store.ts:7](https://github.com/
 
 > **id**: `string`
 
-Defined in: [packages/ui/src/base/feedback/toast-store.ts:4](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/toast-store.ts#L4)
+Defined in: [packages/ui/src/base/feedback/toast-store.ts:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/toast-store.ts#L5)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [packages/ui/src/base/feedback/toast-store.ts:4](https://github.com/
 
 > **message**: `string`
 
-Defined in: [packages/ui/src/base/feedback/toast-store.ts:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/toast-store.ts#L6)
+Defined in: [packages/ui/src/base/feedback/toast-store.ts:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/toast-store.ts#L7)
 
 ***
 
@@ -46,4 +46,4 @@ Defined in: [packages/ui/src/base/feedback/toast-store.ts:6](https://github.com/
 
 > **type**: `"success"` \| `"warning"` \| `"info"` \| `"error"`
 
-Defined in: [packages/ui/src/base/feedback/toast-store.ts:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/toast-store.ts#L5)
+Defined in: [packages/ui/src/base/feedback/toast-store.ts:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/toast-store.ts#L6)

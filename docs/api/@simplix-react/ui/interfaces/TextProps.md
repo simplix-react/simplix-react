@@ -244,7 +244,7 @@ aria-owns.
 
 ### aria-current?
 
-> `optional` **aria-current**: `boolean` \| `"date"` \| `"time"` \| `"true"` \| `"false"` \| `"page"` \| `"step"` \| `"location"`
+> `optional` **aria-current**: `boolean` \| `"date"` \| `"true"` \| `"false"` \| `"time"` \| `"page"` \| `"step"` \| `"location"`
 
 Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react/index.d.ts:2542](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.14/node_modules/@types/react/index.d.ts#L2542)
 
@@ -415,7 +415,7 @@ in ARIA 1.1
 
 ### aria-haspopup?
 
-> `optional` **aria-haspopup**: `boolean` \| `"tree"` \| `"dialog"` \| `"menu"` \| `"grid"` \| `"true"` \| `"false"` \| `"listbox"`
+> `optional` **aria-haspopup**: `boolean` \| `"tree"` \| `"true"` \| `"false"` \| `"dialog"` \| `"menu"` \| `"grid"` \| `"listbox"`
 
 Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react/index.d.ts:2586](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.14/node_modules/@types/react/index.d.ts#L2586)
 

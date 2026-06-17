@@ -8,6 +8,6 @@
 
 > **GridVariants** = `VariantProps`\<*typeof* [`gridVariants`](../variables/gridVariants.md)\>
 
-Defined in: [packages/ui/src/primitives/grid.tsx:31](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/grid.tsx#L31)
+Defined in: [packages/ui/src/primitives/grid.tsx:32](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/grid.tsx#L32)
 
 Variant props extracted from [gridVariants](../variables/gridVariants.md).

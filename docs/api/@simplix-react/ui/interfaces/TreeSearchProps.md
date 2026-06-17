@@ -6,7 +6,7 @@
 
 # Interface: TreeSearchProps
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:157](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L157)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:158](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L158)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:157](https://github.com/sim
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:161](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L161)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:162](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L162)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:161](https://github.com/sim
 
 > `optional` **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:159](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L159)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:160](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L160)
 
 #### Parameters
 
@@ -40,7 +40,7 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:159](https://github.com/sim
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:160](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L160)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:161](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L161)
 
 ***
 
@@ -48,4 +48,4 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:160](https://github.com/sim
 
 > `optional` **value**: `string`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:158](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L158)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:159](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L159)

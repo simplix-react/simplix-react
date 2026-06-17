@@ -14,7 +14,17 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:74](https://github.com/
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:88](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L88)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:90](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L90)
+
+***
+
+### count?
+
+> `optional` **count**: `number`
+
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:89](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L89)
+
+When provided, renders a standard total-count badge at the start of the leading group.
 
 ***
 

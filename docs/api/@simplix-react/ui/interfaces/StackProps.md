@@ -6,7 +6,7 @@
 
 # Interface: StackProps
 
-Defined in: [packages/ui/src/primitives/stack.tsx:45](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/stack.tsx#L45)
+Defined in: [packages/ui/src/primitives/stack.tsx:56](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/stack.tsx#L56)
 
 Props for the [Stack](../variables/Stack.md) layout component.
 
@@ -256,7 +256,7 @@ aria-owns.
 
 ### aria-current?
 
-> `optional` **aria-current**: `boolean` \| `"date"` \| `"time"` \| `"true"` \| `"false"` \| `"page"` \| `"step"` \| `"location"`
+> `optional` **aria-current**: `boolean` \| `"date"` \| `"true"` \| `"false"` \| `"time"` \| `"page"` \| `"step"` \| `"location"`
 
 Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react/index.d.ts:2542](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.14/node_modules/@types/react/index.d.ts#L2542)
 
@@ -427,7 +427,7 @@ in ARIA 1.1
 
 ### aria-haspopup?
 
-> `optional` **aria-haspopup**: `boolean` \| `"tree"` \| `"dialog"` \| `"menu"` \| `"grid"` \| `"true"` \| `"false"` \| `"listbox"`
+> `optional` **aria-haspopup**: `boolean` \| `"tree"` \| `"true"` \| `"false"` \| `"dialog"` \| `"menu"` \| `"grid"` \| `"listbox"`
 
 Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react/index.d.ts:2586](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.14/node_modules/@types/react/index.d.ts#L2586)
 
@@ -981,7 +981,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/primitives/stack.tsx:48](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/stack.tsx#L48)
+Defined in: [packages/ui/src/primitives/stack.tsx:59](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/stack.tsx#L59)
 
 #### Overrides
 
@@ -1129,7 +1129,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **emptyContent**: `ReactNode`
 
-Defined in: [packages/ui/src/primitives/stack.tsx:52](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/stack.tsx#L52)
+Defined in: [packages/ui/src/primitives/stack.tsx:63](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/stack.tsx#L63)
 
 Placeholder rendered centered when children are empty. Only shown when no valid children exist.
 
@@ -1167,7 +1167,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **fade**: `boolean`
 
-Defined in: [packages/ui/src/primitives/stack.tsx:50](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/stack.tsx#L50)
+Defined in: [packages/ui/src/primitives/stack.tsx:61](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/stack.tsx#L61)
 
 Show bottom gradient fade overlay. Wraps content in a clipped container with a gradient from card background.
 
@@ -1390,6 +1390,18 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 #### Inherited from
 
 [`CardProps`](CardProps.md).[`lang`](CardProps.md#lang)
+
+***
+
+### minSize?
+
+> `optional` **minSize**: `boolean` \| `null`
+
+Defined in: [packages/ui/src/primitives/stack.tsx:47](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/stack.tsx#L47)
+
+#### Inherited from
+
+`StackVariants.minSize`
 
 ***
 
@@ -3429,6 +3441,18 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 ***
 
+### overflow?
+
+> `optional` **overflow**: `"auto"` \| `"hidden"` \| `"visible"` \| `"scroll"` \| `null`
+
+Defined in: [packages/ui/src/primitives/stack.tsx:40](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/stack.tsx#L40)
+
+#### Inherited from
+
+`StackVariants.overflow`
+
+***
+
 ### padded?
 
 > `optional` **padded**: `boolean` \| `null`
@@ -3618,6 +3642,18 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 #### Inherited from
 
 [`CardProps`](CardProps.md).[`security`](CardProps.md#security)
+
+***
+
+### shrink?
+
+> `optional` **shrink**: `boolean` \| `null`
+
+Defined in: [packages/ui/src/primitives/stack.tsx:38](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/stack.tsx#L38)
+
+#### Inherited from
+
+`StackVariants.shrink`
 
 ***
 

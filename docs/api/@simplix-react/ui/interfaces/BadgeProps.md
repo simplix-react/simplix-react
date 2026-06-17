@@ -6,7 +6,7 @@
 
 # Interface: BadgeProps
 
-Defined in: [packages/ui/src/base/display/badge.tsx:76](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L76)
+Defined in: [packages/ui/src/base/display/badge.tsx:77](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L77)
 
 ## Extends
 
@@ -242,7 +242,7 @@ aria-owns.
 
 ### aria-current?
 
-> `optional` **aria-current**: `boolean` \| `"date"` \| `"time"` \| `"true"` \| `"false"` \| `"page"` \| `"step"` \| `"location"`
+> `optional` **aria-current**: `boolean` \| `"date"` \| `"true"` \| `"false"` \| `"time"` \| `"page"` \| `"step"` \| `"location"`
 
 Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react/index.d.ts:2542](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.14/node_modules/@types/react/index.d.ts#L2542)
 
@@ -413,7 +413,7 @@ in ARIA 1.1
 
 ### aria-haspopup?
 
-> `optional` **aria-haspopup**: `boolean` \| `"tree"` \| `"dialog"` \| `"menu"` \| `"grid"` \| `"true"` \| `"false"` \| `"listbox"`
+> `optional` **aria-haspopup**: `boolean` \| `"tree"` \| `"true"` \| `"false"` \| `"dialog"` \| `"menu"` \| `"grid"` \| `"listbox"`
 
 Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react/index.d.ts:2586](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.14/node_modules/@types/react/index.d.ts#L2586)
 
@@ -3517,7 +3517,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 ### rounded?
 
-> `optional` **rounded**: `"none"` \| `"sm"` \| `"lg"` \| `"full"` \| `"md"` \| `null`
+> `optional` **rounded**: `"none"` \| `"sm"` \| `"lg"` \| `"full"` \| `"md"` \| `"xl"` \| `null`
 
 Defined in: [packages/ui/src/base/display/badge.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L10)
 
@@ -3543,7 +3543,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **size**: `"default"` \| `"sm"` \| `null`
 
-Defined in: [packages/ui/src/base/display/badge.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L17)
+Defined in: [packages/ui/src/base/display/badge.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L18)
 
 #### Inherited from
 
@@ -3673,9 +3673,9 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 ### variant?
 
-> `optional` **variant**: `"default"` \| `"blue"` \| `"cyan"` \| `"fuchsia"` \| `"green"` \| `"indigo"` \| `"lime"` \| `"orange"` \| `"pink"` \| `"purple"` \| `"red"` \| `"teal"` \| `"violet"` \| `"yellow"` \| `"destructive"` \| `"outline"` \| `"secondary"` \| `"success"` \| `"warning"` \| `"slate"` \| `"amber"` \| `"emerald"` \| `"sky"` \| `"rose"` \| `null`
+> `optional` **variant**: `"default"` \| `"success"` \| `"warning"` \| `"outline"` \| `"blue"` \| `"cyan"` \| `"fuchsia"` \| `"green"` \| `"indigo"` \| `"lime"` \| `"orange"` \| `"pink"` \| `"purple"` \| `"red"` \| `"teal"` \| `"violet"` \| `"yellow"` \| `"destructive"` \| `"secondary"` \| `"slate"` \| `"amber"` \| `"emerald"` \| `"sky"` \| `"rose"` \| `null`
 
-Defined in: [packages/ui/src/base/display/badge.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L21)
+Defined in: [packages/ui/src/base/display/badge.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L22)
 
 #### Inherited from
 

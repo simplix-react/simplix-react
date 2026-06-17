@@ -18,6 +18,7 @@ Shared props for all form field components.
 
 - [`TreeSelectFieldProps`](TreeSelectFieldProps.md)
 - [`IconFieldProps`](IconFieldProps.md)
+- [`GroupedToggleFieldProps`](GroupedToggleFieldProps.md)
 - [`CheckboxFieldProps`](../namespaces/FormFields/interfaces/CheckboxFieldProps.md)
 - [`ColorFieldProps`](../namespaces/FormFields/interfaces/ColorFieldProps.md)
 - [`ComboboxFieldProps`](../namespaces/FormFields/interfaces/ComboboxFieldProps.md)

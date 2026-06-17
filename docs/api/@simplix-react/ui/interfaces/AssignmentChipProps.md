@@ -36,10 +36,20 @@ Display label.
 
 > `optional` **onRemove**: () => `void`
 
-Defined in: [packages/ui/src/crud/assignment/assignment-panel.tsx:68](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/assignment/assignment-panel.tsx#L68)
+Defined in: [packages/ui/src/crud/assignment/assignment-panel.tsx:70](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/assignment/assignment-panel.tsx#L70)
 
 Called when remove button is clicked. Omit to hide remove button.
 
 #### Returns
 
 `void`
+
+***
+
+### trailing?
+
+> `optional` **trailing**: `ReactNode`
+
+Defined in: [packages/ui/src/crud/assignment/assignment-panel.tsx:68](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/assignment/assignment-panel.tsx#L68)
+
+Optional trailing element rendered after the label (e.g. a count Badge).

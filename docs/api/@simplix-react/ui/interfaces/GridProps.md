@@ -6,7 +6,7 @@
 
 # Interface: GridProps
 
-Defined in: [packages/ui/src/primitives/grid.tsx:34](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/grid.tsx#L34)
+Defined in: [packages/ui/src/primitives/grid.tsx:35](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/grid.tsx#L35)
 
 Props for the [Grid](../variables/Grid.md) layout component.
 
@@ -244,7 +244,7 @@ aria-owns.
 
 ### aria-current?
 
-> `optional` **aria-current**: `boolean` \| `"date"` \| `"time"` \| `"true"` \| `"false"` \| `"page"` \| `"step"` \| `"location"`
+> `optional` **aria-current**: `boolean` \| `"date"` \| `"true"` \| `"false"` \| `"time"` \| `"page"` \| `"step"` \| `"location"`
 
 Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react/index.d.ts:2542](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.14/node_modules/@types/react/index.d.ts#L2542)
 
@@ -415,7 +415,7 @@ in ARIA 1.1
 
 ### aria-haspopup?
 
-> `optional` **aria-haspopup**: `boolean` \| `"tree"` \| `"dialog"` \| `"menu"` \| `"grid"` \| `"true"` \| `"false"` \| `"listbox"`
+> `optional` **aria-haspopup**: `boolean` \| `"tree"` \| `"true"` \| `"false"` \| `"dialog"` \| `"menu"` \| `"grid"` \| `"listbox"`
 
 Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react/index.d.ts:2586](https://github.com/simplix-react/simplix-react/blob/main/node_modules/.pnpm/@types+react@19.2.14/node_modules/@types/react/index.d.ts#L2586)
 
@@ -969,7 +969,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/primitives/grid.tsx:37](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/grid.tsx#L37)
+Defined in: [packages/ui/src/primitives/grid.tsx:38](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/grid.tsx#L38)
 
 #### Overrides
 
@@ -1155,7 +1155,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 ### gap?
 
-> `optional` **gap**: `"none"` \| `"xs"` \| `"sm"` \| `"lg"` \| `"md"` \| `"xl"` \| `null`
+> `optional` **gap**: `"none"` \| `"xs"` \| `"sm"` \| `"lg"` \| `"md"` \| `"xl"` \| `"px"` \| `null`
 
 Defined in: [packages/ui/src/primitives/grid.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/grid.tsx#L18)
 
@@ -3509,7 +3509,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **responsive**: `boolean`
 
-Defined in: [packages/ui/src/primitives/grid.tsx:44](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/grid.tsx#L44)
+Defined in: [packages/ui/src/primitives/grid.tsx:45](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/grid.tsx#L45)
 
 When true, columns responsively decrease based on container width
 using CSS container queries. Requires Tailwind CSS v4+.
@@ -3639,6 +3639,27 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 #### Inherited from
 
 [`CardProps`](CardProps.md).[`tabIndex`](CardProps.md#tabindex)
+
+***
+
+### template?
+
+> `optional` **template**: `string`
+
+Defined in: [packages/ui/src/primitives/grid.tsx:59](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/grid.tsx#L59)
+
+Arbitrary `grid-template-columns` value applied as an inline style,
+covering cases the `columns` enum cannot express (e.g. `"repeat(auto-fill, minmax(12rem, 1fr))"`
+or `"200px 1fr"`). When provided, the `columns` class and responsive
+container-query behavior are skipped — `template` takes precedence.
+
+#### Example
+
+```tsx
+<Grid template="repeat(auto-fill, minmax(12rem, 1fr))" gap="sm">
+  {items}
+</Grid>
+```
 
 ***
 

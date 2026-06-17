@@ -16,7 +16,7 @@ CVA variants for the Grid component column and gap configuration.
 
 ### props?
 
-ConfigVariants\<\{ columns: \{ 1: string; 2: string; 3: string; 4: string; 5: string; 6: string; \}; gap: \{ none: string; xs: string; sm: string; md: string; lg: string; xl: string; \}; \}\> & ClassProp
+ConfigVariants\<\{ columns: \{ 1: string; 2: string; 3: string; 4: string; 5: string; 6: string; \}; gap: \{ none: string; px: string; xs: string; sm: string; md: string; lg: string; xl: string; \}; \}\> & ClassProp
 
 ## Returns
 

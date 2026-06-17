@@ -8,7 +8,7 @@
 
 > `const` **CrudList**: (`__namedParameters`) => `Element` & `object`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:1471](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1471)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:1525](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1525)
 
 Compound component for building CRUD list views with toolbar, table,
 pagination, selection, and bulk actions.
@@ -336,6 +336,31 @@ Faceted filter with searchable command popover and badge display.
 ##### \_\_namedParameters
 
 [`ListTableProps`](../interfaces/ListTableProps.md)\<`T`\>
+
+#### Returns
+
+`Element`
+
+### TableCard()
+
+> **TableCard**: (`__namedParameters`) => `Element` = `ListTableCard`
+
+Wraps `List.Table` + `List.Pagination` in one bordered card: the table is a
+scroll region with a sticky header and the pager docks as the footer.
+Opt-in — without it, Table and Pagination render as before.
+
+```tsx
+<CrudList.TableCard maxHeight={520}>
+  <CrudList.Table ... />
+  <CrudList.Pagination ... />
+</CrudList.TableCard>
+```
+
+#### Parameters
+
+##### \_\_namedParameters
+
+`ListTableCardProps`
 
 #### Returns
 

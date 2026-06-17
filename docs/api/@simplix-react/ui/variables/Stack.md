@@ -8,4 +8,4 @@
 
 > `const` **Stack**: `ForwardRefExoticComponent`\<`Omit`\<[`StackProps`](../interfaces/StackProps.md), `"ref"`\> & `RefAttributes`\<`HTMLDivElement`\>\>
 
-Defined in: [packages/ui/src/primitives/stack.tsx:122](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/stack.tsx#L122)
+Defined in: [packages/ui/src/primitives/stack.tsx:163](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/stack.tsx#L163)

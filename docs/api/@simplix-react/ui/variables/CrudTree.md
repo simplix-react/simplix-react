@@ -8,7 +8,7 @@
 
 > `const` **CrudTree**: (`__namedParameters`) => `Element` & `object`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:803](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L803)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:854](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L854)
 
 Compound component for building hierarchical tree views with
 expand/collapse, search filtering, sorting, and row actions.
@@ -123,6 +123,30 @@ Table, Column, Empty.
 ##### \_\_namedParameters
 
 [`TreeTableProps`](../interfaces/TreeTableProps.md)\<`T`\>
+
+#### Returns
+
+`Element`
+
+### TableCard()
+
+> **TableCard**: (`__namedParameters`) => `Element` = `TreeTableCard`
+
+Wraps `CrudTree.Table` in one bordered card: the table becomes a scroll region
+with a sticky header — matching the `CrudList.TableCard` design. Opt-in;
+without it `CrudTree.Table` renders unframed as before.
+
+```tsx
+<CrudTree.TableCard maxHeight={340}>
+  <CrudTree.Table ...>...</CrudTree.Table>
+</CrudTree.TableCard>
+```
+
+#### Parameters
+
+##### \_\_namedParameters
+
+`TreeTableCardProps`
 
 #### Returns
 
