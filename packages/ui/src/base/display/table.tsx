@@ -254,7 +254,9 @@ export const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(
         ref={ref}
         data-slot="table-cell"
         className={cn(
-          "align-middle [&:has([role=checkbox])]:pr-0",
+          // Data cells default to text-sm (the header row is text-xs); keeps record
+          // typography consistent so bare cells don't inherit the table root's text-base.
+          "align-middle text-sm [&:has([role=checkbox])]:pr-0",
           cellPxMap[size],
           density ? densityCellPyMap[density] : cellPyMap[size],
           variant === "bordered" && "border border-border",
