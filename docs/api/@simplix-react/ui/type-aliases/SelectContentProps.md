@@ -8,4 +8,4 @@
 
 > **SelectContentProps** = `ComponentPropsWithRef`\<*typeof* `SelectPrimitive.Content`\>
 
-Defined in: [packages/ui/src/base/inputs/select.tsx:70](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/select.tsx#L70)
+Defined in: [packages/ui/src/base/inputs/select.tsx:71](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/select.tsx#L71)

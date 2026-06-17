@@ -8,4 +8,4 @@
 
 > `const` **SelectContent**: `ForwardRefExoticComponent`\<`Omit`\<`SelectContentProps` & `RefAttributes`\<`HTMLDivElement`\>, `"ref"`\> & `RefAttributes`\<`HTMLDivElement`\>\>
 
-Defined in: [packages/ui/src/base/inputs/select.tsx:74](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/select.tsx#L74)
+Defined in: [packages/ui/src/base/inputs/select.tsx:75](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/select.tsx#L75)
