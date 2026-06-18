@@ -224,10 +224,10 @@ function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}I
         ) : onCancel ? (
           <Button type="button" size="sm" variant="outline" onClick={onCancel} disabled={isPending}>{t("common.cancel")}</Button>
         ) : null}
-        <SaveButton type="submit" isDirty={ {{~#if hasUpdate~}} isEdit ? isDirty : undefined {{~else~}} undefined {{~/if~}} } isSaving={isPending}>{t("{{entity}}.save{{EntityPascal}}")}</SaveButton>
+        <SaveButton type="submit" isDirty={ {{~#if hasUpdate~}} isEdit ? isDirty : undefined {{~else~}} undefined {{~/if~}} } isSaving={isPending} fieldErrors={fieldErrors}>{t("{{entity}}.save{{EntityPascal}}")}</SaveButton>
       </CrudForm.Actions>
     }>
-      <CrudForm.Section title={t("{{entity}}.sectionTitle")} variant="flat">
+      <CrudForm.Section title={t("{{entity}}.sectionTitle")} variant="card">
 {{#each fields}}
 {{#unless this.isSystemField}}
 {{#unless this.isI18nPair}}

@@ -608,7 +608,7 @@ export { PanelHeader } from "./layout/panel-header";
 export type { PanelHeaderProps } from "./layout/panel-header";
 
 // Status tone tokens + tone-driven display primitives (commonization)
-export { STATUS_TONES, STATUS_TONE_NAMES, statusToneClass, StatusBadge, StatusDot, AlertBanner, DetailList, DetailListRow, LabeledField } from "./base";
+export { STATUS_TONES, STATUS_TONE_NAMES, statusToneClass, StatusBadge, StatusDot, AlertBanner, DetailList, DetailListRow, LabeledField, EmptyValue, ColorDot } from "./base";
 export type {
   StatusTone,
   StatusToneToken,

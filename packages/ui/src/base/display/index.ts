@@ -4,6 +4,12 @@ export type { BadgeProps, BadgeVariants } from "./badge";
 export { BooleanBadge } from "./boolean-badge";
 export type { BooleanBadgeProps } from "./boolean-badge";
 
+export { EmptyValue } from "./empty-value";
+export type { EmptyValueProps } from "./empty-value";
+
+export { ColorDot } from "./color-dot";
+export type { ColorDotProps } from "./color-dot";
+
 export { DynamicColorIcon, DynamicColorIconPresets } from "./dynamic-color-icon";
 export type {
   DynamicColorIconProps,
