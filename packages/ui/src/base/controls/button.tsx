@@ -1,5 +1,6 @@
 import { Slot } from "@radix-ui/react-slot";
 import { type VariantProps, cva } from "class-variance-authority";
+import { ChevronDown } from "lucide-react";
 import { type ComponentPropsWithRef, type ReactNode, forwardRef } from "react";
 
 import { cn } from "../../utils/cn";
@@ -49,6 +50,12 @@ export interface ButtonProps
   /** Text to show while loading. Replaces children if provided. */
   loadingText?: ReactNode;
   /**
+   * Append a trailing chevron-down caret so the button reads as a menu/dropdown
+   * trigger. Use on a `DropdownMenuTrigger` button. Suppressed while loading and
+   * in `asChild` mode.
+   */
+  dropdown?: boolean;
+  /**
    * Render the single child element instead of a `<button>`, merging the
    * button styling and behavior onto it (e.g. wrap a router `<Link>`). The
    * loading spinner is not composed in this mode.
@@ -67,7 +74,7 @@ const spinnerSizeMap: Record<string, string> = {
 };
 
 export const ButtonBase = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, loading, loadingText, disabled, asChild, children, ...rest }, ref) => {
+  ({ className, variant, size, loading, loadingText, dropdown, disabled, asChild, children, ...rest }, ref) => {
     const classes = cn(buttonVariants({ variant, size }), className);
 
     // Composition mode: render the consumer's element with button styling.
@@ -105,6 +112,13 @@ export const ButtonBase = forwardRef<HTMLButtonElement, ButtonProps>(
               {loadingText ?? children}
             </>
           )
+        ) : dropdown ? (
+          <>
+            {children}
+            <span className="-mr-2 -ml-0.5 flex items-center self-stretch border-l border-current/30 pl-1">
+              <ChevronDown className="size-3.5 opacity-70" aria-hidden="true" />
+            </span>
+          </>
         ) : (
           children
         )}

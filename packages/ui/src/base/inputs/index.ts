@@ -35,6 +35,9 @@ export type { NumberInputProps } from "./number-input";
 export { RadioGroup, RadioGroupItem } from "./radio-group";
 export type { RadioGroupItemProps, RadioGroupProps } from "./radio-group";
 
+export { FieldChevron } from "./field-chevron";
+export type { FieldChevronProps } from "./field-chevron";
+
 export {
   Select,
   SelectContent,

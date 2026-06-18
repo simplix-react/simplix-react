@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 
 import type { CommonFieldProps } from "../../crud/shared/types";
+import { FieldChevron } from "../../base/inputs/field-chevron";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
 import { FieldWrapper } from "../shared/field-wrapper";
@@ -91,11 +92,11 @@ export function MultiSelectField<T extends string = string>({
       className={className}
       {...variantProps}
     >
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover open={open} onOpenChange={(v) => { if (disabled) return; setOpen(v); }}>
         <PopoverTrigger asChild>
           <span
             className={cn(
-              "flex h-8 w-full items-center gap-1 overflow-hidden rounded-md border border-input bg-background px-3 text-sm",
+              "flex h-8 w-full items-center gap-1 rounded-md border border-input bg-background px-3 text-sm",
               "focus-within:outline-none focus-within:border-foreground",
               disabled && "cursor-not-allowed opacity-50",
               error && "border-destructive focus-within:border-destructive",
@@ -106,6 +107,7 @@ export function MultiSelectField<T extends string = string>({
               variantProps.layout === "hidden" ? label : undefined
             }
           >
+            <span className="flex flex-1 items-center gap-1 overflow-hidden">
             {selectedLabels.map((opt) => (
               <Badge
                 key={opt.value}
@@ -151,6 +153,8 @@ export function MultiSelectField<T extends string = string>({
               disabled={disabled}
               className="min-w-[60px] flex-1 bg-transparent outline-none text-sm placeholder:text-muted-foreground disabled:cursor-not-allowed"
             />
+            </span>
+            <FieldChevron />
           </span>
         </PopoverTrigger>
         <PopoverContent

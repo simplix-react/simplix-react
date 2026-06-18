@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react
 import type { CommonFieldProps } from "../../crud/shared/types";
 import type { TreeConfig } from "../../crud/tree/tree-types";
 import { filterTreeWithAncestors, getDescendantIds } from "../../crud/tree/tree-utils";
+import { FieldChevron } from "../../base/inputs/field-chevron";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { Stack } from "../../primitives";
 import { cn } from "../../utils/cn";
@@ -284,17 +285,17 @@ export function TreeSelectField<T>({
       className={className}
       {...variantProps}
     >
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover open={open} onOpenChange={(v) => { if (disabled) return; setOpen(v); }}>
         <PopoverTrigger asChild>
           <span
             className={cn(
-              "relative flex h-8 w-full items-center rounded-md border border-input bg-background px-3 text-sm",
+              "flex h-8 w-full items-center gap-1 rounded-md border border-input bg-background px-3 text-sm",
               "focus-within:border-foreground",
               disabled && "cursor-not-allowed opacity-50",
               error && "border-destructive focus-within:border-destructive",
             )}
           >
-            <span className={cn("truncate", !value && "text-muted-foreground")}>
+            <span className={cn("flex-1 truncate", !value && "text-muted-foreground")}>
               {value ? selectedLabel : (placeholder ?? t("tree.searchPlaceholder"))}
             </span>
             {value && !disabled && (
@@ -304,12 +305,13 @@ export function TreeSelectField<T>({
                   e.stopPropagation();
                   handleClear();
                 }}
-                className="absolute right-2 flex h-5 w-5 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
+                className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
                 aria-label="Clear selection"
               >
                 <ClearIcon />
               </button>
             )}
+            <FieldChevron />
           </span>
         </PopoverTrigger>
         <PopoverContent

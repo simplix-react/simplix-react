@@ -2,6 +2,7 @@ import { useTranslation } from "@simplix-react/i18n/react";
 import { useCallback, useMemo, useState } from "react";
 
 import type { CommonFieldProps } from "../../crud/shared/types";
+import { FieldChevron } from "../../base/inputs/field-chevron";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { Stack } from "../../primitives";
 import { cn } from "../../utils/cn";
@@ -112,13 +113,13 @@ export function ComboboxField<T extends string = string>({
         <PopoverTrigger asChild>
           <span
             className={cn(
-              "relative flex h-8 w-full items-center rounded-md border border-input bg-background px-3 text-sm",
+              "flex h-8 w-full items-center gap-1 rounded-md border border-input bg-background px-3 text-sm",
               "focus-within:border-foreground",
               disabled && "cursor-not-allowed opacity-50",
               error && "border-destructive focus-within:border-destructive",
             )}
           >
-            <span className={cn("flex items-center gap-1.5 truncate", !value && "text-muted-foreground")}>
+            <span className={cn("flex flex-1 items-center gap-1.5 truncate", !value && "text-muted-foreground")}>
               {selectedOption?.icon}
               {value ? selectedOption?.label ?? "" : selectPlaceholder}
             </span>
@@ -129,7 +130,7 @@ export function ComboboxField<T extends string = string>({
                   e.stopPropagation();
                   handleClear();
                 }}
-                className="absolute right-2 flex h-5 w-5 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
+                className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
                 aria-label="Clear selection"
               >
                 <svg
@@ -149,6 +150,7 @@ export function ComboboxField<T extends string = string>({
                 </svg>
               </button>
             )}
+            <FieldChevron />
           </span>
         </PopoverTrigger>
         <PopoverContent
