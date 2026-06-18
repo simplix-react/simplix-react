@@ -1,7 +1,7 @@
 import { Command } from "commander";
 import prompts from "prompts";
 import ora from "ora";
-import { join, relative, resolve } from "node:path";
+import { join, relative, resolve, dirname } from "node:path";
 import { rm, readFile, readdir } from "node:fs/promises";
 import { writeFileWithDir, pathExists, readJsonFile, findProjectRoot } from "../utils/fs.js";
 import { log } from "../utils/logger.js";
@@ -39,6 +39,22 @@ import type { ExtractedEntity, ExtractedOperation, DomainGroup, OpenAPISnapshot,
 import { domainIndexTs } from "../templates/domain/index.js";
 
 const SNAPSHOT_FILE = ".openapi-snapshot.json";
+
+/**
+ * True when `dep` is already importable from `fromDir` through an installed
+ * (or hoisted / workspace-symlinked) node_modules entry. Lets profile-dependency
+ * injection skip a granular package that a meta-package already provides, so it
+ * never re-adds a dependency the project intentionally consumes transitively.
+ */
+export async function isDependencyInstalled(dep: string, fromDir: string): Promise<boolean> {
+  let dir = resolve(fromDir);
+  for (;;) {
+    if (await pathExists(join(dir, "node_modules", dep, "package.json"))) return true;
+    const parent = dirname(dir);
+    if (parent === dir) return false;
+    dir = parent;
+  }
+}
 
 interface OpenAPIFlags {
   domain?: string;
@@ -237,6 +253,15 @@ async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
 
   // 1. Domain package must exist (created by `simplix add-domain`)
   if (!(await pathExists(targetDir))) {
+    // A no-`-d` run groups operations not mapped to any configured domain into a
+    // spec-title fallback domain. That fallback has no package to generate, so
+    // skip it with a notice instead of failing the whole run (exit code 1).
+    if (!(domainName in specConfig.domains)) {
+      log.info(
+        `Skipping ${entities.length} operation(s) not mapped to a configured domain ("${domainName}").`,
+      );
+      return;
+    }
     log.error(`Domain package "${dirName}" not found.`);
     log.step(`Run first: simplix add-domain ${domainName}`);
     process.exit(1);
@@ -376,7 +401,10 @@ async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
       if (pkgJson) {
         let changed = false;
         for (const [dep, ver] of Object.entries(resolvedSpecConfig.dependencies)) {
-          if (!pkgJson.dependencies?.[dep]) {
+          if (
+            !pkgJson.dependencies?.[dep] &&
+            !(await isDependencyInstalled(dep, targetDir))
+          ) {
             pkgJson.dependencies ??= {};
             pkgJson.dependencies[dep] = ver;
             changed = true;

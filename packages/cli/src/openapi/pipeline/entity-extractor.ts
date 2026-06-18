@@ -1119,7 +1119,18 @@ function deriveModelType(
     }
   }
 
-  if (baseNames.size === 0) return undefined;
+  if (baseNames.size === 0) {
+    // 3. List/search-only entity (no item-detail GET, often an inline no-$ref
+    //    search body): derive the model from the list/array response element
+    //    type (e.g. "SyncQueueListDTO") so it matches the Orval-generated DTO
+    //    and a mock store/handlers are emitted instead of silently dropped.
+    const listOp = entity.operations.find(
+      (op) => !!op.responseEntityType && op.isArrayResponse,
+    );
+    return listOp && listOp.responseEntityType !== entity.pascalName
+      ? listOp.responseEntityType
+      : undefined;
+  }
   if (baseNames.has(entity.pascalName)) return undefined;
   return [...baseNames][0];
 }

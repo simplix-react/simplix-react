@@ -77,6 +77,44 @@ describe("generateMockFiles", () => {
     expect(content).toBe("// custom content\n");
   });
 
+  it("regenerates mock/index.ts handler wiring when it has no custom overrides", async () => {
+    const entity = makeEntity();
+    await generateMockFiles(tempDir, "test", [entity]);
+    const entryPath = join(tempDir, "src/mock/index.ts");
+
+    // Simulate a stale handler name (e.g. after a handler rename) while the
+    // override region stays empty — this must be reconciled on the next run.
+    const stale = (await readFile(entryPath, "utf-8")).replace(
+      /createUserHandlers/g,
+      "createUserStaleHandlers",
+    );
+    await writeFile(entryPath, stale);
+
+    await generateMockFiles(tempDir, "test", [entity]);
+
+    const content = await readFile(entryPath, "utf-8");
+    expect(content).toContain("createUserHandlers");
+    expect(content).not.toContain("createUserStaleHandlers");
+  });
+
+  it("preserves mock/index.ts when it has custom handler overrides", async () => {
+    const entity = makeEntity();
+    await generateMockFiles(tempDir, "test", [entity]);
+    const entryPath = join(tempDir, "src/mock/index.ts");
+
+    // Developer adds a custom override inside the marked override region.
+    const customized = (await readFile(entryPath, "utf-8")).replace(
+      "// Add custom handler overrides here (placed before generated handlers)",
+      '// Add custom handler overrides here (placed before generated handlers)\n      http.get("/custom", () => undefined),',
+    );
+    await writeFile(entryPath, customized);
+
+    await generateMockFiles(tempDir, "test", [entity]);
+
+    const content = await readFile(entryPath, "utf-8");
+    expect(content).toContain('http.get("/custom"');
+  });
+
   it("skips seed generation if seeds.ts exists", async () => {
     const entity = makeEntity();
 

@@ -293,6 +293,86 @@ describe("enrichWithResponseInfo", () => {
     expect(entities[0].modelType).toBe("UserAccount");
   });
 
+  it("derives modelType from list/array element when no item GET and inline search body (list/search-only entity)", () => {
+    const rawSpec: OpenAPISpec = {
+      openapi: "3.0.0",
+      info: { title: "Test", version: "1.0" },
+      paths: {
+        "/queues": {
+          get: {
+            operationId: "listQueues",
+            tags: ["Queue"],
+            responses: {
+              "200": {
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "array",
+                      items: { $ref: "#/components/schemas/QueueListDTO" },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        "/queues/search": {
+          post: {
+            operationId: "searchQueues",
+            tags: ["Queue"],
+            // Inline request body (no $ref) — the case that previously yielded an
+            // undefined modelType and silently dropped the generated mock handler.
+            requestBody: {
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    properties: { keyword: { type: "string" } },
+                  },
+                },
+              },
+            },
+            responses: {
+              "200": {
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "array",
+                      items: { $ref: "#/components/schemas/QueueListDTO" },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    };
+
+    const entities: ExtractedEntity[] = [
+      {
+        name: "queue",
+        pascalName: "Queue",
+        pluralName: "queues",
+        path: "/queues",
+        fields: [],
+        queryParams: [],
+        operations: [
+          { name: "list", method: "GET", path: "/queues", role: "list", hasInput: false, operationId: "listQueues", queryParams: [] },
+          { name: "search", method: "POST", path: "/queues/search", role: "search", hasInput: true, operationId: "searchQueues", queryParams: [] },
+        ],
+        tags: ["Queue"],
+      },
+    ];
+
+    enrichWithResponseInfo(rawSpec, entities);
+
+    // No item-detail GET and an inline (no-$ref) search body → fall back to the
+    // list/array response element "QueueListDTO" (matches the generated DTO) so
+    // the mock store/handler is emitted instead of silently dropped.
+    expect(entities[0].modelType).toBe("QueueListDTO");
+  });
+
   it("handles operations without operationId", () => {
     const rawSpec: OpenAPISpec = {
       openapi: "3.0.0",

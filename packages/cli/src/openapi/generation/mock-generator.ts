@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import { readdir } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import { writeFileWithDir, pathExists } from "../../utils/fs.js";
 import { toPascalCase } from "../../utils/case.js";
 import { generateOrvalSeedFile } from "./seed-generator.js";
@@ -74,9 +74,15 @@ export async function generateMockFiles(
   );
   await writeFileWithDir(join(targetDir, "src/generated/mock/handlers.ts"), handlersContent);
 
-  // 5. Generate mock/index.ts only on first creation
+  // 5. Generate mock/index.ts on first creation. On later runs, keep its
+  //    generated handler wiring in sync with handlers.ts by regenerating it,
+  //    but only when the developer has not added custom handler overrides
+  //    (the override marker region is empty). Customized entries are preserved.
   const entryPath = join(targetDir, "src/mock/index.ts");
-  if (!(await pathExists(entryPath))) {
+  const regenerateEntry =
+    !(await pathExists(entryPath)) ||
+    canRegenerateMockEntry(await readFile(entryPath, "utf-8"));
+  if (regenerateEntry) {
     const entryContent = generateMockEntryCode(
       domainName, storeEntities, hasStores, preset,
     );
@@ -108,6 +114,26 @@ const CRUD_STORE_ROLES = new Set([
   "list", "getAll", "search", "get", "create", "update", "delete",
   "batchDelete", "batchUpdate", "multiUpdate", "getForEdit", "tree", "subtree",
 ]);
+
+// Section markers in the generated mock/index.ts. Developers add custom handler
+// overrides between them; the generated handler spreads follow GENERATED_MARKER.
+const MOCK_OVERRIDE_MARKER =
+  "// Add custom handler overrides here (placed before generated handlers)";
+const MOCK_GENERATED_MARKER = "// Generated handlers";
+
+/**
+ * A generated mock/index.ts is safe to regenerate only when it is still in the
+ * pristine generated shape: both section markers are present and the override
+ * region between them holds no developer-authored handlers. Any custom override
+ * — or an unrecognized structure — is preserved untouched so regeneration never
+ * clobbers hand-written wiring.
+ */
+function canRegenerateMockEntry(content: string): boolean {
+  const start = content.indexOf(MOCK_OVERRIDE_MARKER);
+  const end = content.indexOf(MOCK_GENERATED_MARKER);
+  if (start === -1 || end === -1 || end <= start) return false;
+  return content.slice(start + MOCK_OVERRIDE_MARKER.length, end).trim() === "";
+}
 
 // ── Resolver ─────────────────────────────────────────────────
 
@@ -299,9 +325,9 @@ function generateMockEntryCode(
     "  return {",
     `    name: "${domainName}",`,
     "    handlers: [",
-    "      // Add custom handler overrides here (placed before generated handlers)",
+    `      ${MOCK_OVERRIDE_MARKER}`,
     "",
-    "      // Generated handlers",
+    `      ${MOCK_GENERATED_MARKER}`,
     ...handlerSpreads,
     "    ],",
     "  };",

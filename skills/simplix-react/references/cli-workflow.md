@@ -43,6 +43,8 @@ Generates domain packages from an OpenAPI spec (file path or URL) using Orval. R
 | `--no-http` | Skip `.http` file generation |
 | `-y, --yes` | Auto-confirm without prompts |
 
+Without `-d`, all configured domains are generated; operations not mapped to any configured domain are grouped into a spec-title fallback that has no package and is skipped with a notice (the run still exits 0). Per-domain `-d <name>` avoids the fallback entirely.
+
 ### simplix add-domain `<name>`
 
 Adds a domain package **skeleton only** — you then author the contract's `operations` by hand. Reads `api.baseUrl` (for `basePath`) and `openapi` (to detect a matching spec).
