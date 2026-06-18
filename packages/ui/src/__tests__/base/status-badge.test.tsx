@@ -47,9 +47,14 @@ describe("StatusBadge", () => {
     expect((sm.firstElementChild as HTMLElement).className).toContain("text-xs");
 
     const { container: def } = render(
-      <StatusBadge tone="info" label="d" />,
+      <StatusBadge tone="info" label="d" size="default" />,
     );
     expect((def.firstElementChild as HTMLElement).className).toContain("text-sm");
+  });
+
+  it("defaults to the compact sm size when size is omitted", () => {
+    const { container } = render(<StatusBadge tone="info" label="d" />);
+    expect((container.firstElementChild as HTMLElement).className).toContain("text-xs");
   });
 
   it("renders a leading icon with tone icon color in outline mode", () => {

@@ -26,7 +26,7 @@ export interface StatusBadgeProps
   pulse?: boolean;
   /** `filled` solid badge or `outline` bordered badge (default `outline`). */
   appearance?: "filled" | "outline";
-  /** Text sizing token (default `default`). */
+  /** Text sizing token (default `sm`, matching list/detail badge density). */
   size?: "xs" | "sm" | "default";
 }
 
@@ -54,7 +54,7 @@ export const StatusBadge = forwardRef<HTMLSpanElement, StatusBadgeProps>(
       showDot = false,
       pulse = false,
       appearance = "outline",
-      size = "default",
+      size = "sm",
       className,
       ...rest
     },
