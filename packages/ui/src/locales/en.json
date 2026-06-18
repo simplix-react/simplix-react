@@ -66,6 +66,13 @@
     "calendar": "Calendar",
     "from": "From",
     "to": "To",
+    "expand": "Expand to selection",
+    "clear": "Clear selection",
+    "custom": "Custom",
+    "zoomOut": "Zoom out to preset window",
+    "roleDescription": "Time range heatmap",
+    "loadError": "Failed to load",
+    "retry": "Retry",
     "units": {
       "m": "m",
       "h": "h",

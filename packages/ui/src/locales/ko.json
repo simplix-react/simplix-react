@@ -66,6 +66,13 @@
     "calendar": "달력",
     "from": "시작",
     "to": "종료",
+    "expand": "선택 영역으로 확장",
+    "clear": "선택 해제",
+    "custom": "사용자 지정",
+    "zoomOut": "프리셋 윈도우로 축소",
+    "roleDescription": "기간 히트맵",
+    "loadError": "불러오기 실패",
+    "retry": "다시 시도",
     "units": {
       "m": "분",
       "h": "시간",

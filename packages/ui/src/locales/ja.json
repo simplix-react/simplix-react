@@ -66,6 +66,13 @@
     "calendar": "カレンダー",
     "from": "開始",
     "to": "終了",
+    "expand": "選択範囲に拡大",
+    "clear": "選択をクリア",
+    "custom": "カスタム",
+    "zoomOut": "プリセット範囲に戻す",
+    "roleDescription": "期間ヒートマップ",
+    "loadError": "読み込みに失敗しました",
+    "retry": "再試行",
     "units": {
       "m": "分",
       "h": "時間",
