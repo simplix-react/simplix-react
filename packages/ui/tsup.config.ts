@@ -15,5 +15,9 @@ export default defineConfig((options) => ({
     /^maplibre/, /^pmtiles/, /^protomaps/, /^apexcharts/,
     /^@?platejs/, /^lowlight/, /^lucide-react/,
   ],
-  onSuccess: "cp src/styles.css dist/styles.css && cp src/theme.css dist/theme.css",
+  // Ship the raw CSS layer verbatim: the flat entries plus the whole theme/
+  // subtree (base + presets) the aggregator @imports. rm -rf guards stale
+  // presets across --watch rebuilds (clean is off in watch mode).
+  onSuccess:
+    "cp src/styles.css dist/styles.css && cp src/theme.css dist/theme.css && rm -rf dist/theme && cp -R src/theme dist/theme && rm -f dist/theme/manifest.ts",
 }));

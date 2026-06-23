@@ -704,3 +704,8 @@ export type { AttachmentTransport } from "./fields/file-attachment";
 // feeds FileField/ImageField defaults via precedence Y)
 export { createAppConfig, useFilePolicy } from "./config";
 export type { RemoteConfigQueryDef } from "./config";
+
+// Color theme registry (pure data) — drives a host theme picker. Token
+// values ship in theme.css / theme/presets/*.css; this only enumerates them.
+export { THEMES } from "./theme/manifest";
+export type { ColorTheme } from "./theme/manifest";

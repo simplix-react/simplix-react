@@ -6,6 +6,7 @@
   "sideEffects": [
     "./dist/styles.css",
     "./dist/theme.css",
+    "./src/theme.css",
     "./dist/index.js",
     "./dist/plate-editor.js",
     "./src/locales/*"
@@ -22,7 +23,10 @@
       "import": "./dist/plate-editor.js"
     },
     "./styles.css": "./dist/styles.css",
-    "./theme.css": "./dist/theme.css"
+    "./theme.css": {
+      "style": "./src/theme.css",
+      "default": "./dist/theme.css"
+    }
   },
   "files": [
     "dist"

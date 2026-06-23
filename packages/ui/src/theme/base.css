@@ -1,0 +1,318 @@
+/* ====================================================================
+ * @simplix-react/ui — base theme tokens
+ *
+ * Generic, shadcn-aligned design tokens in oklch. Every @simplix-react/ui
+ * component reads these via var(--*) / Tailwind utilities; the component
+ * CSS ships no values. Apps pull this in through the theme.css aggregator
+ * and may override any token afterwards. Color presets (theme/presets/*.css)
+ * layer on top, scoped by [data-color-theme]. Dark mode is the .dark class.
+ *
+ * App-specific tokens (status tone seeds, categorical accents, brand fonts)
+ * are NOT defined here — the consuming app owns them.
+ *
+ * Type scale is intentionally left to Tailwind's default text-* utilities;
+ * redefining --text-* here would override every font-size utility app-wide.
+ * ==================================================================== */
+
+:root {
+  --radius: 0.375rem;
+
+  /* ── surfaces ── */
+  --background: oklch(1 0 0);
+  --card: oklch(1 0 0);
+  --surface-2: oklch(0.985 0.002 247.86);
+  --surface-3: oklch(0.968 0.004 247.9);
+  --popover: oklch(1 0 0);
+
+  /* ── text ── */
+  --foreground: oklch(0.129 0.042 264.695);
+  --card-foreground: oklch(0.129 0.042 264.695);
+  --popover-foreground: oklch(0.129 0.042 264.695);
+  --secondary-foreground: oklch(0.208 0.042 265.755);
+  --muted-foreground: oklch(0.554 0.046 257.417);
+  --muted-2: oklch(0.646 0.04 257);
+
+  /* ── borders ── */
+  --border: oklch(0.929 0.013 255.508);
+  --border-strong: oklch(0.885 0.014 255.5);
+  --input: oklch(0.929 0.013 255.508);
+  --ring: oklch(0.704 0.04 256.788);
+
+  /* ── primary ── */
+  --primary: oklch(0.208 0.042 265.755);
+  --primary-foreground: oklch(0.984 0.003 247.858);
+  --primary-hover: oklch(0.28 0.05 265.755);
+  --primary-soft: oklch(0.955 0.012 265);
+  --primary-soft-2: oklch(0.92 0.018 265);
+
+  /* ── secondary / muted / accent ── */
+  --secondary: oklch(0.968 0.007 247.896);
+  --muted: oklch(0.968 0.007 247.896);
+  --accent: oklch(0.968 0.007 247.896);
+  --accent-foreground: oklch(0.208 0.042 265.755);
+
+  /* ── status ── */
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --danger-soft: oklch(0.952 0.03 25);
+  --success: oklch(0.6 0.13 160);
+  --success-soft: oklch(0.95 0.035 162);
+  --warning: oklch(0.55 0.2 65);
+  --warn-soft: oklch(0.96 0.05 80);
+  --info: oklch(0.55 0.2 250);
+
+  /* ── accent (purple) ── */
+  --purple: oklch(0.55 0.2 295);
+  --purple-soft: oklch(0.965 0.018 300);
+  --purple-soft-2: oklch(0.92 0.04 300);
+
+  /* ── sidebar ── */
+  --sidebar: oklch(0.208 0.042 265.755);
+  --sidebar-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-primary: oklch(0.984 0.003 247.858);
+  --sidebar-primary-foreground: oklch(0.208 0.042 265.755);
+  --sidebar-accent: oklch(0.279 0.041 260.031);
+  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.551 0.027 264.364);
+
+  /* ── brand / chrome ── */
+  --brand-bg: var(--primary);
+  --brand-fg: var(--primary-foreground);
+  --hatch-stroke: var(--foreground);
+  --hover-bg: oklch(0 0 0 / 0.04);
+  --hover-bg-strong: oklch(0 0 0 / 0.07);
+  --scroll-thumb: oklch(0 0 0 / 0.2);
+  --scroll-thumb-hover: oklch(0 0 0 / 0.36);
+
+  /* ── charts ── */
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+
+  /* ── shadows ── */
+  --shadow-1: 0 1px 2px oklch(0 0 0 / 0.04), 0 0 0 1px oklch(0 0 0 / 0.04);
+  --shadow-2: 0 4px 12px oklch(0 0 0 / 0.08), 0 2px 4px oklch(0 0 0 / 0.04);
+  --shadow-3: 0 12px 28px oklch(0 0 0 / 0.12), 0 2px 6px oklch(0 0 0 / 0.04);
+  --shadow-card: var(--shadow-1);
+  --shadow-pop: var(--shadow-3);
+
+  /* ── spacing scale (custom names; independent of Tailwind --spacing) ── */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-7: 32px;
+
+  /* ── font weights ── */
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  /* ── vertical rhythm (chrome / structural heights) ── */
+  --h-topnav: 56px;
+  --h-tab: 48px;
+  --h-section-head: 44px;
+  --h-input: 40px;
+  --h-btn: 40px;
+  --h-btn-sm: 32px;
+  --h-icon-btn: 36px;
+
+  /* ── canon mnemonic aliases (themed vars → adapt to light/dark automatically) ── */
+  --bg: var(--background);
+  --surface: var(--card);
+  --fg: var(--foreground);
+  --fg-soft: var(--secondary-foreground);
+  --hairline: var(--border);
+  --hairline-2: var(--border-strong);
+  --primary-strong: var(--primary-hover);
+  --warn: var(--warning);
+  --danger: var(--destructive);
+
+  color-scheme: light;
+}
+
+.dark {
+  /* ── surfaces ── */
+  --background: oklch(0.129 0.042 264.695);
+  --card: oklch(0.14 0.04 259.21);
+  --surface-2: oklch(0.2 0.04 259);
+  --surface-3: oklch(0.25 0.04 259);
+  --popover: oklch(0.208 0.042 265.755);
+
+  /* ── text ── */
+  --foreground: oklch(0.984 0.003 247.858);
+  --card-foreground: oklch(0.984 0.003 247.858);
+  --popover-foreground: oklch(0.984 0.003 247.858);
+  --secondary-foreground: oklch(0.984 0.003 247.858);
+  --muted-foreground: oklch(0.704 0.04 256.788);
+  --muted-2: oklch(0.58 0.035 257);
+
+  /* ── borders ── */
+  --border: oklch(1 0 0 / 10%);
+  --border-strong: oklch(1 0 0 / 18%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.551 0.027 264.364);
+
+  /* ── primary ── */
+  --primary: oklch(0.929 0.013 255.508);
+  --primary-foreground: oklch(0.208 0.042 265.755);
+  --primary-hover: oklch(0.86 0.02 255.5);
+  --primary-soft: oklch(0.929 0.013 255.508 / 0.15);
+  --primary-soft-2: oklch(0.929 0.013 255.508 / 0.28);
+
+  /* ── secondary / muted / accent ── */
+  --secondary: oklch(0.279 0.041 260.031);
+  --muted: oklch(0.279 0.041 260.031);
+  --accent: oklch(0.279 0.041 260.031);
+  --accent-foreground: oklch(0.984 0.003 247.858);
+
+  /* ── status ── */
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --danger-soft: oklch(0.28 0.07 25);
+  --success: oklch(0.7 0.14 160);
+  --success-soft: oklch(0.3 0.06 162);
+  --warning: oklch(0.75 0.17 75);
+  --warn-soft: oklch(0.3 0.05 80);
+  --info: oklch(0.72 0.17 250);
+
+  /* ── accent (purple) ── */
+  --purple: oklch(0.7 0.15 295);
+  --purple-soft: oklch(0.35 0.09 300);
+  --purple-soft-2: oklch(0.3 0.11 300);
+
+  /* ── brand / chrome ── */
+  --hover-bg: oklch(1 0 0 / 0.05);
+  --hover-bg-strong: oklch(1 0 0 / 0.09);
+  --scroll-thumb: oklch(1 0 0 / 0.16);
+  --scroll-thumb-hover: oklch(1 0 0 / 0.3);
+
+  /* ── charts ── */
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+
+  /* ── shadows ── */
+  --shadow-1: 0 1px 2px oklch(0 0 0 / 0.32), 0 0 0 1px oklch(1 1 1 / 0.05);
+  --shadow-2: 0 4px 12px oklch(0 0 0 / 0.4), 0 2px 4px oklch(0 0 0 / 0.3);
+  --shadow-3: 0 12px 28px oklch(0 0 0 / 0.45), 0 2px 6px oklch(0 0 0 / 0.2);
+
+  color-scheme: dark;
+}
+
+/* radius + fonts: single source. Non-inline @theme so the vars are emitted
+   to :root (var(--radius-*) / var(--font-*) consumers) AND the utilities
+   reference the runtime var, keeping them re-skinnable by app overrides. */
+@theme {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, "JetBrains Mono", monospace;
+}
+
+/* Color utilities. inline → utilities reference the runtime var directly,
+   so [data-color-theme] preset overrides apply. */
+@theme inline {
+  /* shadcn core */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* surfaces / text / borders (extended) */
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-muted-2: var(--muted-2);
+  --color-border-strong: var(--border-strong);
+
+  /* primary variants */
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-strong: var(--primary-strong);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-soft-2: var(--primary-soft-2);
+
+  /* semantic status (soft tints + warn/success/danger aliases) */
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+
+  /* accent (purple) */
+  --color-purple: var(--purple);
+  --color-purple-soft: var(--purple-soft);
+  --color-purple-soft-2: var(--purple-soft-2);
+
+  /* brand + canon mnemonic */
+  --color-brand-bg: var(--brand-bg);
+  --color-brand-fg: var(--brand-fg);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-fg: var(--fg);
+  --color-fg-soft: var(--fg-soft);
+  --color-hairline: var(--hairline);
+  --color-hairline-2: var(--hairline-2);
+}
+
+/* Status indicator animation — the one-shot ring used by StatusDot
+   animation="flash" (re-triggered by a changing key on data updates). */
+@theme {
+  --animate-status-flash: status-flash 0.9s ease-out;
+}
+
+@keyframes status-flash {
+  0% {
+    opacity: 0.75;
+    transform: scale(1);
+  }
+  80%,
+  100% {
+    opacity: 0;
+    transform: scale(2.2);
+  }
+}

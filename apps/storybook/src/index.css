@@ -1,10 +1,7 @@
 @import "tailwindcss";
-@import "./themes/default.css";
-@import "./themes/blue.css";
-@import "./themes/green.css";
-@import "./themes/rose.css";
-@import "./themes/orange.css";
-@import "./themes/violet.css";
+/* Framework theme layer (single import): styles.css + base tokens + every
+   color preset. Presets activate via [data-color-theme]; dark mode via .dark. */
+@import "@simplix-react/ui/theme.css";
 
 @source "../../../packages/ui/src/**/*.tsx";
 
