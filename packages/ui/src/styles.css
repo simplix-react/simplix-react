@@ -10,30 +10,39 @@
 @source "./**/*.js";
 
 /*
- * Chrome 121+ ignores ::-webkit-scrollbar when scrollbar-width is not 'auto'.
- * Reset to 'auto' so the pseudo-element styles take effect (persistent scrollbar on macOS).
+ * Scroll containers — Table + CRUD detail/form body slots (data-slot /
+ * data-crud-slot are framework-emitted hooks). Chrome 121+ ignores
+ * ::-webkit-scrollbar when scrollbar-width is not 'auto', so reset to 'auto'
+ * to let the pseudo-element styles take effect. Width is pinned to
+ * --scrollbar-w (default 6px; consuming apps may override the token) so
+ * detail/table scrollbars read uniform and unobtrusive.
  */
-[data-slot="table-container"] {
+[data-slot="table-container"],
+[data-crud-slot="body"] {
   scrollbar-width: auto;
   scrollbar-color: auto;
 }
 
-[data-slot="table-container"]::-webkit-scrollbar {
-  height: 6px;
+[data-slot="table-container"]::-webkit-scrollbar,
+[data-crud-slot="body"]::-webkit-scrollbar {
+  width: var(--scrollbar-w, 6px);
+  height: var(--scrollbar-w, 6px);
 }
 
 [data-slot="table-container"]::-webkit-scrollbar-track {
   background: var(--muted);
 }
 
-[data-slot="table-container"]::-webkit-scrollbar-thumb {
+[data-slot="table-container"]::-webkit-scrollbar-thumb,
+[data-crud-slot="body"]::-webkit-scrollbar-thumb {
   background-color: var(--border);
   border-radius: 3px;
 }
 
 /* Firefox: standard properties (Firefox always shows scrollbars, thin is fine) */
 @supports not selector(::-webkit-scrollbar) {
-  [data-slot="table-container"] {
+  [data-slot="table-container"],
+  [data-crud-slot="body"] {
     scrollbar-width: thin;
     scrollbar-color: var(--border) transparent;
   }
