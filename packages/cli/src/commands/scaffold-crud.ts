@@ -990,19 +990,6 @@ async function updateLocaleJsons(
     // Entity key already exists → skip
     if (json[entityName]) continue;
 
-    // Add common keys if missing
-    if (!json.common) {
-      json.common = {
-        close: "Close", edit: "Edit", delete: "Delete",
-        deleting: "Deleting...", cancel: "Cancel", back: "\u2190 Back",
-        noResults: "No results", rows: "Rows:",
-        range: "{{start}}-{{end}} of {{total}}",
-        noData: "No data available.",
-        noFilter: "No items match the selected filters.",
-        noSearch: "No items match the search query.",
-      };
-    }
-
     // Entity-specific default keys
     const entityPlural = `${entityName}s`;
     const EntityPluralPascal = `${EntityPascal}s`;
