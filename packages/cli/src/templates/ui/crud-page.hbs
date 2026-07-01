@@ -22,7 +22,7 @@ interface {{EntityPascal}}CrudPageProps {
 export function {{EntityPascal}}CrudPage({ variant = "panel", search, onNavigate }: {{EntityPascal}}CrudPageProps) {
   const list = use{{EntityPascal}}List();
   const { t } = useTranslation("{{moduleNamespace}}/widgets");
-  const { t: tc } = useTranslation("simplix/ui");
+  const { t: tUi } = useTranslation("simplix/ui");
 
   const nav = useCrudNavigation(search, onNavigate);
   const { view, selectedId, showList, showDetail{{#if hasCreate}}, showNew{{/if}}{{#if hasUpdate}}, showEdit{{/if}} } = nav;
@@ -35,9 +35,9 @@ export function {{EntityPascal}}CrudPage({ variant = "panel", search, onNavigate
     labels: {
       title: () => t("{{entity}}.delete{{EntityPascal}}Title"),
       description: (target) => t("{{entity}}.delete{{EntityPascal}}Desc", { name: target.name }),
-      cancel: tc("common.cancel"),
-      delete: tc("common.delete"),
-      deleting: tc("common.deleting"),
+      cancel: tUi("common.cancel"),
+      delete: tUi("common.delete"),
+      deleting: tUi("common.deleting"),
     },
     onDeleted: showList,
   });
@@ -49,9 +49,9 @@ export function {{EntityPascal}}CrudPage({ variant = "panel", search, onNavigate
     labels: {
       title: () => t("{{entity}}.delete{{EntityPascal}}Title"),
       description: (target) => t("{{entity}}.delete{{EntityPascal}}Desc", { name: target.name }),
-      cancel: tc("common.cancel"),
-      delete: tc("common.delete"),
-      deleting: tc("common.deleting"),
+      cancel: tUi("common.cancel"),
+      delete: tUi("common.delete"),
+      deleting: tUi("common.deleting"),
     },
     onDeleted: showList,
   });
