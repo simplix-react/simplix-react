@@ -664,6 +664,7 @@ export type { TimezoneOption } from "./utils/use-timezone-options";
 // Menu
 export {
   MenuProvider,
+  MENU_TREE_QUERY_KEY,
   useMenu,
   useActiveMenuItem,
   RouteMatcherContext,

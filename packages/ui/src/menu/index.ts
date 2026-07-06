@@ -1,4 +1,4 @@
-export { MenuProvider, useMenu } from "./menu-provider";
+export { MenuProvider, useMenu, MENU_TREE_QUERY_KEY } from "./menu-provider";
 export { transformToGroup, transformMenuNodes } from "./menu-transformer";
 export { useActiveMenuItem } from "./use-active-menu-item";
 export { MenuLink } from "./menu-link";

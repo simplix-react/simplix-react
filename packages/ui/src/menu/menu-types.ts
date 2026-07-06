@@ -83,6 +83,9 @@ export interface MenuProviderProps {
   fixedGroups?: FixedMenuGroup[];
   permissionFilter?: MenuPermissionFilter;
   locale?: string;
+  // Freshness window (ms) for the menu-tree queries. Defaults to 5 minutes.
+  // Set to Infinity to serve persisted/cached menus without refetching on mount or focus.
+  staleTime?: number;
   children: ReactNode;
 }
 

@@ -11,19 +11,25 @@ import type {
 
 const MenuContext = createContext<MenuContextValue | null>(null);
 
+// Query-key prefix for the nav menu-tree queries (one query per menu group code).
+// Exported so hosts can register or invalidate it (e.g. localStorage persistence,
+// or refreshing the nav after a menu edit).
+export const MENU_TREE_QUERY_KEY = ["menu", "tree"] as const;
+
 export function MenuProvider({
   fetchMenuTree,
   menuGroups,
   fixedGroups = [],
   permissionFilter,
   locale = "ko",
+  staleTime = 5 * 60 * 1000,
   children,
 }: MenuProviderProps) {
   const results = useQueries({
     queries: menuGroups.map((config) => ({
-      queryKey: ["menu", "tree", config.menuCode] as const,
+      queryKey: [...MENU_TREE_QUERY_KEY, config.menuCode] as const,
       queryFn: ({ signal }) => fetchMenuTree(config.menuCode, signal),
-      staleTime: 5 * 60 * 1000,
+      staleTime,
       refetchOnWindowFocus: true,
     })),
   });
