@@ -6,7 +6,8 @@ import { Flex } from "../../primitives/flex";
 import { Stack } from "../../primitives/stack";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
-import { formatDateRange } from "../../utils/format-date";
+import { formatDateRange, toLocalDateString } from "../../utils/format-date";
+import { parseDate } from "../../utils/parse-date";
 import { useCrudListColumns } from "../shared/column-context";
 import { CheckIcon, ColumnsIcon, EyeIcon, FunnelIcon, LayoutGridIcon, RowsIcon, XIcon } from "../shared/icons";
 import { CountryFormField } from "./country-form-field";
@@ -50,6 +51,14 @@ export interface ToggleFilterDef extends FilterDefBase {
 
 export interface DateRangeFilterDef extends FilterDefBase {
   type: "dateRange";
+  /**
+   * Set for a `LocalDate` (`format:date`) column: the range boundaries are
+   * serialized as zone-neutral `yyyy-MM-dd` (local) instead of a UTC ISO
+   * timestamp, so date filtering matches the stored calendar date regardless
+   * of the browser timezone. Leave unset (default) for `date-time` columns,
+   * which keep full UTC ISO serialization.
+   */
+  dateOnly?: boolean;
 }
 
 export interface CountryFilterDef extends FilterDefBase {
@@ -745,8 +754,14 @@ function DateRangeFormField({
   const locale = useLocale();
   const gteKey = makeFilterKey(def.field, SearchOperator.GREATER_THAN_OR_EQUAL);
   const lteKey = makeFilterKey(def.field, SearchOperator.LESS_THAN_OR_EQUAL);
-  const from = state.values[gteKey] ? new Date(state.values[gteKey] as string) : undefined;
-  const to = state.values[lteKey] ? new Date(state.values[lteKey] as string) : undefined;
+  // date-only columns store the boundary as a local yyyy-MM-dd; parse it back
+  // locally so the calendar shows the picked day in any timezone.
+  const from = state.values[gteKey]
+    ? (def.dateOnly ? parseDate(state.values[gteKey] as string) : new Date(state.values[gteKey] as string))
+    : undefined;
+  const to = state.values[lteKey]
+    ? (def.dateOnly ? parseDate(state.values[lteKey] as string) : new Date(state.values[lteKey] as string))
+    : undefined;
   const hasValue = from || to;
 
   const rangeText = useMemo(() => {
@@ -755,12 +770,14 @@ function DateRangeFormField({
 
   const handleRangeSelect = useCallback(
     (range: DateRange) => {
+      // For a LocalDate column, send zone-neutral yyyy-MM-dd (never UTC ISO,
+      // which shifts the boundary a day east/west of UTC).
       state.setValues({
-        [gteKey]: range.from?.toISOString(),
-        [lteKey]: range.to?.toISOString(),
+        [gteKey]: range.from ? (def.dateOnly ? toLocalDateString(range.from) : range.from.toISOString()) : undefined,
+        [lteKey]: range.to ? (def.dateOnly ? toLocalDateString(range.to) : range.to.toISOString()) : undefined,
       });
     },
-    [state, gteKey, lteKey],
+    [state, gteKey, lteKey, def.dateOnly],
   );
 
   const handleClear = useCallback(() => {
