@@ -3,7 +3,7 @@ import { useCallback, useMemo } from "react";
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { DatePicker } from "../../base/inputs/date-picker";
 import type { DateLike } from "../../utils/parse-date";
-import { parseDate } from "../../utils/parse-date";
+import { asPlainDate, parseDate } from "../../utils/parse-date";
 import { FieldWrapper } from "../shared/field-wrapper";
 
 /** Props for the {@link DateField} form component. */
@@ -63,8 +63,13 @@ export function DateField({
 }: DateFieldProps) {
   const parsed = useMemo(() => parseDate(value), [value]);
 
+  // DateField is the LocalDate (date-only) input: tag every picked Date so it
+  // serializes as a zone-neutral yyyy-MM-dd (never UTC). Unconditional by design
+  // — the date-vs-datetime distinction is the component (DateField vs DateTimeField),
+  // not a runtime branch. The calendar hands us a fresh local-midnight instance
+  // per selection, so in-place tagging is safe.
   const handleChange = useCallback(
-    (date: Date | undefined) => onChange(date ?? null),
+    (date: Date | undefined) => onChange(date ? asPlainDate(date) : null),
     [onChange],
   );
 

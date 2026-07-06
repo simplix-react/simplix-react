@@ -52,6 +52,23 @@ export function formatDateMedium(date: Date, locale?: string): string {
   return new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(date);
 }
 
+/**
+ * Format a Date as a zone-neutral calendar date string `yyyy-MM-dd` using the
+ * LOCAL calendar fields (never UTC). This is the single source for the
+ * date-only wire format shared by {@link asPlainDate}'s `toJSON` and any
+ * hand-rolled DTO serialization of a `LocalDate` (`format:date`) field.
+ *
+ * @remarks
+ * Use this instead of `date.toISOString().slice(0, 10)`, which computes the
+ * date in UTC and shifts by a day for local-midnight Dates east/west of UTC.
+ */
+export function toLocalDateString(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
 /** Medium date + short time — e.g. "Mar 3, 2026, 2:30 PM". */
 export function formatDateTime(date: Date, locale?: string): string {
   return new Intl.DateTimeFormat(locale, {

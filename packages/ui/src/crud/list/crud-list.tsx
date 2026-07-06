@@ -18,6 +18,7 @@ import {useFlatUIComponents} from "../../provider/ui-provider";
 import {Flex, Stack} from "../../primitives";
 import {cn} from "../../utils/cn";
 import {formatDateMedium, formatDateTime, formatRelativeTime} from "../../utils/format-date";
+import {parseDate} from "../../utils/parse-date";
 import type {ColumnInfo, EmptyReason, SortState} from "../shared";
 import {CrudListColumnContext, useCrudListColumns} from "../shared";
 import type {CrudListViewMode} from "../shared";
@@ -261,8 +262,15 @@ function formatCellValue(value: unknown, format?: "date" | "datetime" | "relativ
   if (value == null) return "";
   if (!format) return String(value);
 
-  const date = value instanceof Date ? value : new Date(String(value));
-  if (Number.isNaN(date.getTime())) return String(value);
+  // Date-only columns (format="date") parse the LocalDate string as a local
+  // calendar date (parseDate), avoiding new Date("2026-07-06")'s UTC-midnight
+  // shift that renders the previous day west of UTC. datetime/relative keep
+  // UTC/offset-aware parsing for real timestamps.
+  const date =
+    format === "date"
+      ? (value instanceof Date ? value : parseDate(String(value)))
+      : (value instanceof Date ? value : new Date(String(value)));
+  if (!date || Number.isNaN(date.getTime())) return String(value);
 
   if (format === "date") return formatDateMedium(date, locale);
   if (format === "datetime") return formatDateTime(date, locale);
