@@ -18,6 +18,7 @@
     "notFoundTitle": "データが見つかりません",
     "notFoundDescription": "リクエストされたデータが見つかりません。削除されたか、存在しない可能性があります。",
     "deleting": "削除中...",
+    "save": "保存",
     "saving": "保存中...",
     "confirm": "確認",
     "continue": "続ける",

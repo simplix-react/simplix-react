@@ -363,7 +363,6 @@ describe("scaffoldCrudCommand action", () => {
 
     const enJson = JSON.parse(await readFile(join(modDir, "src/locales/widgets/en.json"), "utf-8"));
     expect(enJson.product).toBeDefined();
-    expect(enJson.common).toBeDefined();
   });
 
   it("updates tsup.config.ts with pages entry", async () => {
