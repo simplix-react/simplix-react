@@ -654,6 +654,7 @@ export {
 export { formatDateShort, formatDateMedium, formatDateTime, formatRelativeTime, formatDateRange, toLocalDateString } from "./utils/format-date";
 export { asPlainDate, parseDate } from "./utils/parse-date";
 export type { DateLike } from "./utils/parse-date";
+export { toUtcDateIso, asUtcDate, fromUtcDateIso } from "./utils/utc-date";
 export { sanitizeHtml } from "./utils/sanitize";
 export { countryFromTimezone } from "./utils/timezone-country-map";
 export { useCountryOptions } from "./utils/use-country-options";
