@@ -1,4 +1,4 @@
-import { type ComponentType, type ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { type ComponentType, Fragment, type ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslation } from "@simplix-react/i18n/react";
 
 import type { DateRange } from "../../base/controls/calendar";
@@ -23,6 +23,12 @@ import type { CrudListFilters } from "../list/use-crud-list";
 interface FilterDefBase {
   field: string;
   label: string;
+  /**
+   * When the filter popover renders in multiple columns, start a new column at
+   * this filter. Up to (columns - 1) flags take effect, in order; without flags
+   * the fields are split evenly (column-major). Ignored in single-column layout.
+   */
+  columnBreak?: boolean;
 }
 
 export interface TextFilterDef extends FilterDefBase {
@@ -96,17 +102,77 @@ export interface FilterBarProps {
   previewLabel?: string;
   /** When provided, renders a standard total-count badge at the start of the leading group. */
   count?: number;
+  /**
+   * Column layout of the filter popover form.
+   *
+   * - `"auto"` (default) — one column; switches to two columns when the form
+   *   overflows its max height (a vertical scrollbar would appear).
+   * - `1` — always a single 320px column.
+   * - `2` — always two columns in a 560px popover.
+   * - `3` — always three columns in an 800px popover.
+   *
+   * Column boundaries follow `columnBreak` flags on the filter definitions;
+   * without flags the filters are split evenly.
+   */
+  popoverColumns?: 1 | 2 | 3 | "auto";
   className?: string;
+}
+
+/**
+ * Split filters into `count` popover columns. Explicit `columnBreak` flags win
+ * (each flagged filter starts the next column, up to `count - 1` flags);
+ * otherwise the list is split evenly, column-major.
+ */
+export function splitFilterColumns(filters: FilterDef[], count = 2): FilterDef[][] {
+  const flagged: number[] = [];
+  filters.forEach((def, i) => {
+    if (i > 0 && def.columnBreak && flagged.length < count - 1) flagged.push(i);
+  });
+  const bounds = flagged.length > 0
+    ? flagged
+    : Array.from({ length: count - 1 }, (_, c) => Math.ceil((filters.length * (c + 1)) / count));
+  const columns: FilterDef[][] = [];
+  let start = 0;
+  for (const end of [...bounds, filters.length]) {
+    columns.push(filters.slice(start, end));
+    start = end;
+  }
+  return columns.filter((column) => column.length > 0);
 }
 
 // ── FilterBar Component ──
 
-export function FilterBar({ filters, state, leading, maxBadges, onPreview, previewLabel, count, className }: FilterBarProps) {
+export function FilterBar({ filters, state, leading, maxBadges, onPreview, previewLabel, count, popoverColumns = "auto", className }: FilterBarProps) {
   const { Badge, Button, Popover, PopoverTrigger, PopoverContent, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuCheckboxItem } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const locale = useLocale();
   const columnCtx = useCrudListColumns();
   const [open, setOpen] = useState(false);
+
+  // ── Two-column overflow layout ──
+  // When the filter form overflows its max height (vertical scrollbar), latch into a
+  // wider two-column layout for the remainder of this open cycle. The latch is one-way
+  // to avoid oscillation (two columns reduce the height, which would clear the overflow).
+  const fieldsRef = useRef<HTMLDivElement>(null);
+  const [overflowTwoColumn, setOverflowTwoColumn] = useState(false);
+  useLayoutEffect(() => {
+    if (popoverColumns !== "auto") return;
+    if (!open) {
+      setOverflowTwoColumn(false);
+      return;
+    }
+    const frame = requestAnimationFrame(() => {
+      const el = fieldsRef.current;
+      if (el && el.scrollHeight > el.clientHeight + 1) {
+        setOverflowTwoColumn(true);
+      }
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [open, popoverColumns]);
+  const columnCount = typeof popoverColumns === "number"
+    ? popoverColumns
+    : overflowTwoColumn ? 2 : 1;
+  const twoColumn = columnCount > 1;
 
   // Track current operator per text/number field
   const [operators, setOperators] = useState<Record<string, SearchOperator>>(() => {
@@ -382,7 +448,10 @@ export function FilterBar({ filters, state, leading, maxBadges, onPreview, previ
             </button>
           </PopoverTrigger>
           <PopoverContent
-            className="flex max-h-[min(70vh,var(--radix-popover-content-available-height,70vh))] w-[320px] flex-col p-0"
+            className={cn(
+              "flex max-h-[min(70vh,var(--radix-popover-content-available-height,70vh))] flex-col p-0",
+              columnCount === 3 ? "w-[800px]" : twoColumn ? "w-[560px]" : "w-[320px]",
+            )}
             align="end"
             collisionPadding={16}
           >
@@ -397,18 +466,46 @@ export function FilterBar({ filters, state, leading, maxBadges, onPreview, previ
                 </Button>
               </Flex>
             </Flex>
-            <Stack gap="none" className="flex-1 overflow-y-auto p-4">
-              {filters.map((def, i) => (
-                <FilterFormField
-                  key={def.field}
-                  def={def}
-                  state={state}
-                  operators={operators}
-                  onOperatorChange={handleOperatorChange}
-                  className={i > 0 ? "mt-4" : undefined}
-                />
-              ))}
-            </Stack>
+            <div ref={fieldsRef} className="flex-1 overflow-y-auto p-4">
+              {twoColumn ? (
+                // Two fully independent columns: fields are split column-major in JS and
+                // each column is its own flex stack, so a tall field (e.g. a calendar)
+                // neither stretches its horizontal neighbor nor gets fragmented the way
+                // CSS multi-column would fragment it.
+                <Flex gap="lg" align="stretch">
+                  {splitFilterColumns(filters, columnCount).map((column, c) => (
+                    <Fragment key={c}>
+                      {c > 0 && <div aria-hidden className="w-px self-stretch bg-border" />}
+                      <div className="flex min-w-0 flex-1 flex-col">
+                        {column.map((def, i) => (
+                          <FilterFormField
+                            key={def.field}
+                            def={def}
+                            state={state}
+                            operators={operators}
+                            onOperatorChange={handleOperatorChange}
+                            className={i > 0 ? "mt-4" : undefined}
+                          />
+                        ))}
+                      </div>
+                    </Fragment>
+                  ))}
+                </Flex>
+              ) : (
+                <div className="flex flex-col">
+                  {filters.map((def, i) => (
+                    <FilterFormField
+                      key={def.field}
+                      def={def}
+                      state={state}
+                      operators={operators}
+                      onOperatorChange={handleOperatorChange}
+                      className={i > 0 ? "mt-4" : undefined}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           </PopoverContent>
         </Popover>
         {showColumnsToggle && <span aria-hidden className="mx-0.5 h-4 w-px bg-border" />}
