@@ -41,12 +41,11 @@ export function wrapEnvelope<T>(body: T): BootEnvelope<T> {
 }
 
 function isBootEnvelope(wire: unknown): wire is BootEnvelope {
-  return (
-    wire != null &&
-    typeof wire === "object" &&
-    "type" in wire &&
-    "body" in wire
-  );
+  if (wire == null || typeof wire !== "object" || !("type" in wire)) return false;
+  // Error envelopes may omit `body` entirely (no data to return), so a `type` +
+  // `message` + `timestamp` triple is an equally valid envelope signature —
+  // requiring `body` alone would let bodyless failures pass through unthrown.
+  return "body" in wire || ("message" in wire && "timestamp" in wire);
 }
 
 export function unwrapEnvelope<T>(wire: unknown): T {

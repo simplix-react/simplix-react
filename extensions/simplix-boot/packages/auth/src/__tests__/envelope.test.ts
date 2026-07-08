@@ -127,6 +127,23 @@ describe("unwrapEnvelope", () => {
     }
   });
 
+  it("throws for a failure envelope with no `body` key at all (real backend shape)", () => {
+    // The backend omits `body` entirely on error responses instead of sending `body: null`.
+    const envelope = {
+      type: "FAILURE",
+      message: "Cannot delete node with children. Delete or move children first.",
+      timestamp: "2024-01-01T00:00:00Z",
+    };
+
+    expect(() => unwrapEnvelope(envelope)).toThrow(ApiResponseError);
+    try {
+      unwrapEnvelope(envelope);
+    } catch (e) {
+      const err = e as ApiResponseError;
+      expect(err.errorMessage).toBe("Cannot delete node with children. Delete or move children first.");
+    }
+  });
+
   it("throws for failure without errorCode/errorDetail", () => {
     const envelope = {
       type: "FAILURE",
