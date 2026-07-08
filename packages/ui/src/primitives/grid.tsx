@@ -44,6 +44,18 @@ export interface GridProps
    */
   responsive?: boolean;
   /**
+   * When true, renders a vertical separator line between columns for visual
+   * grouping (e.g. a two-column switch matrix in a form section).
+   *
+   * Supported for fixed-column grids (`responsive={false}`) and for responsive
+   * grids with `columns={2}` (the line hides while the grid is collapsed to a
+   * single column). Ignored when `template` is set or for responsive grids with
+   * more than two columns, where the active column count varies by breakpoint.
+   *
+   * @default false
+   */
+  divider?: boolean;
+  /**
    * Arbitrary `grid-template-columns` value applied as an inline style,
    * covering cases the `columns` enum cannot express (e.g. `"repeat(auto-fill, minmax(12rem, 1fr))"`
    * or `"200px 1fr"`). When provided, the `columns` class and responsive
@@ -87,6 +99,41 @@ const gapClassMap: Record<string, string> = {
   xl: "gap-8",
 };
 
+/** Gap sizes as CSS lengths, used to position column divider lines. */
+const gapSizeMap: Record<string, string> = {
+  none: "0rem",
+  px: "1px",
+  xs: "0.25rem",
+  sm: "0.5rem",
+  md: "1rem",
+  lg: "1.5rem",
+  xl: "2rem",
+};
+
+/**
+ * Vertical separator lines rendered between grid columns.
+ * With N equal columns and gap G, the center of the gutter after column i sits
+ * at `i * (100% + G) / N - G / 2`, so each line lands exactly mid-gutter.
+ */
+function ColumnDividers({ cols, gap, hiddenWhenCollapsed }: { cols: number; gap: string; hiddenWhenCollapsed?: boolean }) {
+  const g = gapSizeMap[gap] ?? "1rem";
+  return (
+    <>
+      {Array.from({ length: cols - 1 }, (_, i) => (
+        <div
+          key={i}
+          aria-hidden
+          className={cn(
+            "pointer-events-none absolute inset-y-0 w-px -translate-x-1/2 bg-border",
+            hiddenWhenCollapsed && "hidden @md:block",
+          )}
+          style={{ left: `calc(${i + 1} * (100% + ${g}) / ${cols} - ${g} / 2)` }}
+        />
+      ))}
+    </>
+  );
+}
+
 /**
  * CSS Grid layout primitive with configurable columns and gap.
  * By default, columns responsively decrease based on container width.
@@ -111,9 +158,12 @@ const gapClassMap: Record<string, string> = {
  * ```
  */
 export const GridBase = forwardRef<HTMLDivElement, GridProps>(
-  ({ className, columns, gap, responsive = true, template, children, style, ...rest }, ref) => {
+  ({ className, columns, gap, responsive = true, divider = false, template, children, style, ...rest }, ref) => {
     const cols = columns ?? 1;
     const isResponsive = responsive && cols > 1;
+    // Divider lines assume a stable column count: fixed grids always qualify;
+    // responsive grids only in the two-column case (the line hides when collapsed).
+    const showDivider = divider && cols > 1 && !template && (!isResponsive || cols === 2);
 
     // An explicit grid-template-columns string overrides the columns enum and
     // responsive container-query path; apply it as an inline style.
@@ -138,8 +188,9 @@ export const GridBase = forwardRef<HTMLDivElement, GridProps>(
 
       return (
         <div ref={ref} className="@container" style={style} {...rest}>
-          <div className={cn("grid", colClass, gapClass, className)}>
+          <div className={cn("relative grid", colClass, gapClass, className)}>
             {children}
+            {showDivider && <ColumnDividers cols={cols} gap={(gap ?? "md") as string} hiddenWhenCollapsed />}
           </div>
         </div>
       );
@@ -148,11 +199,12 @@ export const GridBase = forwardRef<HTMLDivElement, GridProps>(
     return (
       <div
         ref={ref}
-        className={cn(gridVariants({ columns, gap }), className)}
+        className={cn(gridVariants({ columns, gap }), showDivider && "relative", className)}
         style={style}
         {...rest}
       >
         {children}
+        {showDivider && <ColumnDividers cols={cols} gap={(gap ?? "md") as string} />}
       </div>
     );
   },
