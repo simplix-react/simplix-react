@@ -181,3 +181,54 @@ describe("Grid", () => {
     expect(ref.current?.className).toContain("@container");
   });
 });
+
+describe("Grid divider", () => {
+  it("renders column separator lines for fixed grids", () => {
+    const { container } = render(
+      <Grid columns={3} gap="md" responsive={false} divider>
+        <div>a</div>
+        <div>b</div>
+        <div>c</div>
+      </Grid>,
+    );
+    expect(container.querySelectorAll("[aria-hidden].bg-border")).toHaveLength(2);
+  });
+
+  it("renders a collapsible separator for responsive two-column grids", () => {
+    const { container } = render(
+      <Grid columns={2} gap="md" divider>
+        <div>a</div>
+        <div>b</div>
+      </Grid>,
+    );
+    const lines = container.querySelectorAll("[aria-hidden].bg-border");
+    expect(lines).toHaveLength(1);
+    expect(lines[0].className).toContain("hidden");
+  });
+
+  it("ignores divider for responsive grids with more than two columns", () => {
+    const { container } = render(
+      <Grid columns={3} gap="md" divider>
+        <div>a</div>
+        <div>b</div>
+        <div>c</div>
+      </Grid>,
+    );
+    expect(container.querySelectorAll("[aria-hidden].bg-border")).toHaveLength(0);
+  });
+});
+
+describe("Grid per-axis gap", () => {
+  it("applies gapX and gapY overrides on fixed grids", () => {
+    const { container } = render(
+      <Grid columns={2} gapX="lg" gapY="sm" responsive={false}>
+        <div>a</div>
+        <div>b</div>
+      </Grid>,
+    );
+    const el = container.firstElementChild as HTMLElement;
+    expect(el.className).toContain("gap-x-6");
+    expect(el.className).toContain("gap-y-2");
+  });
+});
+

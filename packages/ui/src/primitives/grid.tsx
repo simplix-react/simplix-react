@@ -56,6 +56,16 @@ export interface GridProps
    */
   divider?: boolean;
   /**
+   * Column (horizontal) gap override. Takes precedence over `gap` on the x axis,
+   * letting a grid combine a wide gutter between columns with tight row spacing
+   * (e.g. `gapX="lg" gapY="sm"` for a two-column switch matrix).
+   */
+  gapX?: GridVariants["gap"];
+  /**
+   * Row (vertical) gap override. Takes precedence over `gap` on the y axis.
+   */
+  gapY?: GridVariants["gap"];
+  /**
    * Arbitrary `grid-template-columns` value applied as an inline style,
    * covering cases the `columns` enum cannot express (e.g. `"repeat(auto-fill, minmax(12rem, 1fr))"`
    * or `"200px 1fr"`). When provided, the `columns` class and responsive
@@ -98,6 +108,35 @@ const gapClassMap: Record<string, string> = {
   lg: "gap-6",
   xl: "gap-8",
 };
+
+const gapXClassMap: Record<string, string> = {
+  none: "gap-x-0",
+  px: "gap-x-px",
+  xs: "gap-x-1",
+  sm: "gap-x-2",
+  md: "gap-x-4",
+  lg: "gap-x-6",
+  xl: "gap-x-8",
+};
+
+const gapYClassMap: Record<string, string> = {
+  none: "gap-y-0",
+  px: "gap-y-px",
+  xs: "gap-y-1",
+  sm: "gap-y-2",
+  md: "gap-y-4",
+  lg: "gap-y-6",
+  xl: "gap-y-8",
+};
+
+/** Resolve the combined gap classes honoring per-axis overrides. */
+function resolveGapClasses(gap: string, gapX?: string | null, gapY?: string | null): string {
+  return cn(
+    gapClassMap[gap] ?? "gap-4",
+    gapX ? gapXClassMap[gapX] : undefined,
+    gapY ? gapYClassMap[gapY] : undefined,
+  );
+}
 
 /** Gap sizes as CSS lengths, used to position column divider lines. */
 const gapSizeMap: Record<string, string> = {
@@ -158,9 +197,13 @@ function ColumnDividers({ cols, gap, hiddenWhenCollapsed }: { cols: number; gap:
  * ```
  */
 export const GridBase = forwardRef<HTMLDivElement, GridProps>(
-  ({ className, columns, gap, responsive = true, divider = false, template, children, style, ...rest }, ref) => {
+  ({ className, columns, gap, gapX, gapY, responsive = true, divider = false, template, children, style, ...rest }, ref) => {
     const cols = columns ?? 1;
     const isResponsive = responsive && cols > 1;
+    const gapKey = (gap ?? "md") as string;
+    // Divider lines sit mid-gutter, so their position follows the horizontal gap.
+    const dividerGap = (gapX as string | undefined) ?? gapKey;
+    const gapClasses = resolveGapClasses(gapKey, gapX as string | undefined, gapY as string | undefined);
     // Divider lines assume a stable column count: fixed grids always qualify;
     // responsive grids only in the two-column case (the line hides when collapsed).
     const showDivider = divider && cols > 1 && !template && (!isResponsive || cols === 2);
@@ -168,12 +211,10 @@ export const GridBase = forwardRef<HTMLDivElement, GridProps>(
     // An explicit grid-template-columns string overrides the columns enum and
     // responsive container-query path; apply it as an inline style.
     if (template) {
-      const gapClass = gapClassMap[(gap ?? "md") as string] ?? "gap-4";
-
       return (
         <div
           ref={ref}
-          className={cn("grid", gapClass, className)}
+          className={cn("grid", gapClasses, className)}
           style={{ gridTemplateColumns: template, ...style }}
           {...rest}
         >
@@ -184,13 +225,12 @@ export const GridBase = forwardRef<HTMLDivElement, GridProps>(
 
     if (isResponsive) {
       const colClass = responsiveColumnClasses[cols] ?? `grid-cols-${cols}`;
-      const gapClass = gapClassMap[(gap ?? "md") as string] ?? "gap-4";
 
       return (
         <div ref={ref} className="@container" style={style} {...rest}>
-          <div className={cn("relative grid", colClass, gapClass, className)}>
+          <div className={cn("relative grid", colClass, gapClasses, className)}>
             {children}
-            {showDivider && <ColumnDividers cols={cols} gap={(gap ?? "md") as string} hiddenWhenCollapsed />}
+            {showDivider && <ColumnDividers cols={cols} gap={dividerGap} hiddenWhenCollapsed />}
           </div>
         </div>
       );
@@ -199,12 +239,12 @@ export const GridBase = forwardRef<HTMLDivElement, GridProps>(
     return (
       <div
         ref={ref}
-        className={cn(gridVariants({ columns, gap }), showDivider && "relative", className)}
+        className={cn(gridVariants({ columns }), gapClasses, showDivider && "relative", className)}
         style={style}
         {...rest}
       >
         {children}
-        {showDivider && <ColumnDividers cols={cols} gap={(gap ?? "md") as string} />}
+        {showDivider && <ColumnDividers cols={cols} gap={dividerGap} />}
       </div>
     );
   },

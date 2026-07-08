@@ -183,7 +183,7 @@ Semantic layout components built with CVA variants.
 | --- | --- | --- |
 | `Stack` | Vertical/horizontal flex layout | `direction`, `gap`, `align`, `justify`, `wrap` |
 | `Flex` | Horizontal flex (alias for `Stack direction="row"`) | Same as Stack |
-| `Grid` | CSS Grid layout | `columns` (1-6), `gap`, `template` (arbitrary `grid-template-columns`) |
+| `Grid` | CSS Grid layout | `columns` (1-6), `gap`, `gapX`/`gapY` (per-axis overrides), `divider` (vertical line between columns), `template` (arbitrary `grid-template-columns`) |
 | `Container` | Centered max-width wrapper | `size` (sm/md/lg/xl/full) |
 | `Section` | Content section with title/description | `title`, `description` |
 | `Card` | Card container with border and shadow | `padding` (none/sm/md/lg), `interactive` |
