@@ -1,6 +1,14 @@
-import { useEffect, useId, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useStreamContext } from "./stream-provider";
 import type { SubscriptionRequest } from "./types";
+
+// Registry keys must stay unique across every React root that shares the
+// provider. `useId` cannot guarantee that: renderers with their own root
+// (react-konva stages, extra `createRoot` trees) restart the id sequence,
+// so a colliding id from another root silently overwrites — and later
+// deletes — another component's registry entry. A module-scope counter is
+// collision-free by construction.
+let nextSubscriptionKey = 0;
 
 interface StreamSubscriptionOptions {
   /** Optional parameters for the subscription. */
@@ -34,7 +42,9 @@ export function useStreamSubscription<T = unknown>(
   const { params, subscribe: shouldSubscribe = true } = options ?? {};
   const { addEventListener, registerSubscription, unregisterSubscription } = useStreamContext();
   const [data, setData] = useState<T | null>(null);
-  const id = useId();
+  const idRef = useRef<string | null>(null);
+  idRef.current ??= `stream-subscription:${++nextSubscriptionKey}`;
+  const id = idRef.current;
 
   // Register/unregister subscription in the global registry
   useEffect(() => {
