@@ -8,6 +8,7 @@ import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
 import { formatDateRange, toLocalDateString } from "../../utils/format-date";
 import { parseDate } from "../../utils/parse-date";
+import { parseRfc3339, serializeRfc3339Local } from "../../utils/rfc3339-date";
 import { useCrudListColumns } from "../shared/column-context";
 import { CheckIcon, ColumnsIcon, EyeIcon, FunnelIcon, LayoutGridIcon, RowsIcon, XIcon } from "../shared/icons";
 import { CountryFormField } from "./country-form-field";
@@ -65,6 +66,13 @@ export interface DateRangeFilterDef extends FilterDefBase {
    * which keep full UTC ISO serialization.
    */
   dateOnly?: boolean;
+  /**
+   * Set for a column stored as an offset-preserving canonical RFC 3339 `String`
+   * (`yyyy-MM-ddT00:00:00±hh:mm`): the range boundaries are serialized in the SAME
+   * canonical format (via {@link serializeRfc3339Local}) so a lexicographic string
+   * comparison equals chronological order. Takes precedence over {@link dateOnly}.
+   */
+  rfc3339Local?: boolean;
 }
 
 export interface CountryFilterDef extends FilterDefBase {
@@ -854,10 +862,18 @@ function DateRangeFormField({
   // date-only columns store the boundary as a local yyyy-MM-dd; parse it back
   // locally so the calendar shows the picked day in any timezone.
   const from = state.values[gteKey]
-    ? (def.dateOnly ? parseDate(state.values[gteKey] as string) : new Date(state.values[gteKey] as string))
+    ? (def.rfc3339Local
+        ? parseRfc3339(state.values[gteKey] as string)
+        : def.dateOnly
+          ? parseDate(state.values[gteKey] as string)
+          : new Date(state.values[gteKey] as string))
     : undefined;
   const to = state.values[lteKey]
-    ? (def.dateOnly ? parseDate(state.values[lteKey] as string) : new Date(state.values[lteKey] as string))
+    ? (def.rfc3339Local
+        ? parseRfc3339(state.values[lteKey] as string)
+        : def.dateOnly
+          ? parseDate(state.values[lteKey] as string)
+          : new Date(state.values[lteKey] as string))
     : undefined;
   const hasValue = from || to;
 
@@ -870,11 +886,15 @@ function DateRangeFormField({
       // For a LocalDate column, send zone-neutral yyyy-MM-dd (never UTC ISO,
       // which shifts the boundary a day east/west of UTC).
       state.setValues({
-        [gteKey]: range.from ? (def.dateOnly ? toLocalDateString(range.from) : range.from.toISOString()) : undefined,
-        [lteKey]: range.to ? (def.dateOnly ? toLocalDateString(range.to) : range.to.toISOString()) : undefined,
+        [gteKey]: range.from
+          ? (def.rfc3339Local ? serializeRfc3339Local(range.from) : def.dateOnly ? toLocalDateString(range.from) : range.from.toISOString())
+          : undefined,
+        [lteKey]: range.to
+          ? (def.rfc3339Local ? serializeRfc3339Local(range.to) : def.dateOnly ? toLocalDateString(range.to) : range.to.toISOString())
+          : undefined,
       });
     },
-    [state, gteKey, lteKey, def.dateOnly],
+    [state, gteKey, lteKey, def.dateOnly, def.rfc3339Local],
   );
 
   const handleClear = useCallback(() => {
