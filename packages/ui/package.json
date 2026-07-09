@@ -9,6 +9,7 @@
     "./src/theme.css",
     "./dist/index.js",
     "./dist/plate-editor.js",
+    "./src/index.ts",
     "./src/locales/*"
   ],
   "exports": {
