@@ -2,6 +2,7 @@ import { type ComponentType, Fragment, type ReactNode, useCallback, useEffect, u
 import { useLocale, useTranslation } from "@simplix-react/i18n/react";
 
 import type { DateRange } from "../../base/controls/calendar";
+import { FieldChevron } from "../../base/inputs/field-chevron";
 import { Flex } from "../../primitives/flex";
 import { Stack } from "../../primitives/stack";
 import { useFlatUIComponents } from "../../provider/ui-provider";
@@ -49,6 +50,12 @@ export interface FacetedFilterDef extends FilterDefBase {
   type: "faceted";
   options: Array<{ value: string; label: string; icon?: ComponentType<{ className?: string }> }>;
   multiSelect?: boolean;
+  /**
+   * Presentation of the option list. "list" (default) renders the searchable
+   * checkbox list inline; "dropdown" collapses it behind a combobox-style
+   * trigger — use for long option sets such as entity/user pickers.
+   */
+  display?: "list" | "dropdown";
 }
 
 export interface ToggleFilterDef extends FilterDefBase {
@@ -739,8 +746,9 @@ function FacetedFormField({
   state: CrudListFilters;
   className?: string;
 }) {
-  const { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem, Label } = useFlatUIComponents();
+  const { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem, Label, Popover, PopoverTrigger, PopoverContent } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
+  const [open, setOpen] = useState(false);
   const key = makeFilterKey(def.field, SearchOperator.IN);
   const rawValue = state.values[key];
   const selectedValues = useMemo(
@@ -761,6 +769,74 @@ function FacetedFormField({
     [selectedValues, state, key],
   );
 
+  const optionList = (
+    <Command className={def.display === "dropdown" ? "rounded-md" : "rounded-md border"}>
+      <CommandInput placeholder={def.label} className="h-8" />
+      <CommandList className="max-h-[160px]">
+        <CommandEmpty>{t("filter.noResultsFound")}</CommandEmpty>
+        <CommandGroup>
+          {def.options.map((option) => {
+            const isSelected = selectedValues.has(option.value);
+            return (
+              <CommandItem
+                key={option.value}
+                onSelect={() => handleSelect(option.value)}
+              >
+                <span
+                  className={cn(
+                    "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                    isSelected
+                      ? "bg-primary text-primary-foreground"
+                      : "opacity-50 [&_svg]:invisible",
+                  )}
+                >
+                  <CheckIcon className="h-3 w-3" />
+                </span>
+                {option.icon && <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />}
+                <span>{option.label}</span>
+              </CommandItem>
+            );
+          })}
+        </CommandGroup>
+      </CommandList>
+    </Command>
+  );
+
+  if (def.display === "dropdown") {
+    const selectedLabels = def.options
+      .filter((option) => selectedValues.has(option.value))
+      .map((option) => option.label);
+
+    return (
+      <Stack gap="xs" className={className}>
+        <Flex align="center" justify="between">
+          <Label className="text-sm font-medium text-secondary-foreground">{def.label}</Label>
+          {selectedValues.size > 0 && <FieldClearButton onClick={() => state.setValue(key, undefined)} label={def.label} />}
+        </Flex>
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              className="flex h-8 w-full items-center gap-1 rounded-md border border-input bg-background px-3 text-sm focus:border-foreground focus:outline-none"
+            >
+              <span className={cn("flex-1 truncate text-left", selectedValues.size === 0 && "text-muted-foreground")}>
+                {selectedValues.size > 0 ? selectedLabels.join(", ") : t("field.selectOption")}
+              </span>
+              <FieldChevron />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent
+            className="w-[var(--radix-popover-trigger-width)] p-0"
+            align="start"
+            onOpenAutoFocus={(e: Event) => e.preventDefault()}
+          >
+            {optionList}
+          </PopoverContent>
+        </Popover>
+      </Stack>
+    );
+  }
+
   return (
     <Stack gap="xs" className={className}>
       <Flex align="center" justify="between">
@@ -768,36 +844,7 @@ function FacetedFormField({
         {selectedValues.size > 0 && <FieldClearButton onClick={() => state.setValue(key, undefined)} label={def.label} />}
       </Flex>
       {def.options.length > 0 ? (
-        <Command className="rounded-md border">
-          <CommandInput placeholder={def.label} className="h-8" />
-          <CommandList className="max-h-[160px]">
-            <CommandEmpty>{t("filter.noResultsFound")}</CommandEmpty>
-            <CommandGroup>
-              {def.options.map((option) => {
-                const isSelected = selectedValues.has(option.value);
-                return (
-                  <CommandItem
-                    key={option.value}
-                    onSelect={() => handleSelect(option.value)}
-                  >
-                    <span
-                      className={cn(
-                        "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                        isSelected
-                          ? "bg-primary text-primary-foreground"
-                          : "opacity-50 [&_svg]:invisible",
-                      )}
-                    >
-                      <CheckIcon className="h-3 w-3" />
-                    </span>
-                    {option.icon && <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />}
-                    <span>{option.label}</span>
-                  </CommandItem>
-                );
-              })}
-            </CommandGroup>
-          </CommandList>
-        </Command>
+        optionList
       ) : (
         <span className="text-xs text-muted-foreground">No options available</span>
       )}

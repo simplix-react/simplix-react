@@ -28,6 +28,9 @@ export type { IconFieldProps } from "./icon-field";
 export { MultiSelectField } from "./multi-select-field";
 export type { MultiSelectFieldProps } from "./multi-select-field";
 
+export { TreeMultiSelectField } from "./tree-multi-select-field";
+export type { TreeMultiSelectFieldProps } from "./tree-multi-select-field";
+
 export { GroupedToggleField } from "./grouped-toggle-field";
 export type {
   GroupedToggleFieldProps,
