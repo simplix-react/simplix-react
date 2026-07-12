@@ -20,6 +20,8 @@ export type { CrudErrorBoundaryProps, ErrorBoundaryState } from "./error-boundar
 export { QueryFallback } from "./query-fallback";
 export type { QueryFallbackProps } from "./query-fallback";
 
+export { ListTotalBadge } from "./list-total-badge";
+export type { ListTotalBadgeProps } from "./list-total-badge";
 export { SectionShell } from "./section-shell";
 export type { SectionShellProps } from "./section-shell";
 

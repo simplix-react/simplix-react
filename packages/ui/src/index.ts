@@ -298,9 +298,10 @@ export type {
 export {
   EmptyState,
   FieldVariantContext,
+  ListTotalBadge,
   useFieldVariant,
 } from "./crud/shared";
-export type { EmptyStateProps } from "./crud/shared";
+export type { EmptyStateProps, ListTotalBadgeProps } from "./crud/shared";
 export type {
   CommonDetailFieldProps,
   CommonFieldProps,
