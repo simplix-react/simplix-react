@@ -1,0 +1,40 @@
+{
+  "heatmap": {
+    "less": "Less",
+    "more": "More"
+  },
+  "events": {
+    "eventCount": "{{count}} event",
+    "eventCount_plural": "{{count}} events",
+    "dayCount": "Day {{current}} of {{total}}",
+    "allDay": "All day",
+    "noEventsScheduled": "No events scheduled for the selected month",
+    "noEventsScheduledYear": "No events scheduled for the selected year"
+  },
+  "dayView": {
+    "noAppointments": "No appointments or consultations at the moment",
+    "happeningNow": "Happening now"
+  },
+  "userSelect": {
+    "all": "All"
+  },
+  "weekView": {
+    "notAvailableOnMobile": "Weekly view is not available on smaller devices.",
+    "switchToOtherView": "Please switch to daily or monthly view."
+  },
+  "timeline": {
+    "noResources": "No resources to display",
+    "noResourcesHint": "No records exist for the selected date and filters."
+  },
+  "accessibility": {
+    "viewByDay": "View by day",
+    "viewByWeek": "View by week",
+    "viewByMonth": "View by month",
+    "viewByYear": "View by year",
+    "viewByAgenda": "View by agenda",
+    "viewByResourceTimeline": "View by resource timeline",
+    "viewByHeatmap": "View by heatmap",
+    "viewByGanttWeek": "Week timeline view",
+    "viewByGanttDay": "Day timeline view"
+  }
+}

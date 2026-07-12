@@ -7,6 +7,10 @@ export interface BooleanBadgeProps {
   value: boolean | null | undefined;
   trueVariant?: BadgeVariants["variant"];
   falseVariant?: BadgeVariants["variant"];
+  /** Accessible name for the true state (default "yes"). */
+  trueLabel?: string;
+  /** Accessible name for the false state (default "no"). */
+  falseLabel?: string;
   className?: string;
 }
 
@@ -14,6 +18,8 @@ export function BooleanBadge({
   value,
   trueVariant = "success",
   falseVariant = "outline",
+  trueLabel = "yes",
+  falseLabel = "no",
   className,
 }: BooleanBadgeProps) {
   const isTrue = !!value;
@@ -21,8 +27,12 @@ export function BooleanBadge({
   const Icon = isTrue ? CheckIcon : XIcon;
 
   return (
-    <Badge variant={variant} className={cn("px-1.5", className)}>
-      <Icon className="size-3" />
+    <Badge
+      variant={variant}
+      className={cn("px-1.5", className)}
+      aria-label={isTrue ? trueLabel : falseLabel}
+    >
+      <Icon className="size-3" aria-hidden />
     </Badge>
   );
 }

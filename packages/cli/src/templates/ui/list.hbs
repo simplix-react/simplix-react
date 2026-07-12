@@ -2,10 +2,10 @@
 import { useMemo } from "react";
 {{/unless}}
 
-import { {{#if hookList}}adaptOrvalList, {{/if}}{{#if hookOrder}}adaptOrvalOrder, {{/if}}Badge, CrudList, DetailFieldWrapper, {{#if hasEnumFields}}Flex, {{/if}}{{#if hasI18nFields}}I18nText, {{/if}}{{#if hasFilters}}SearchOperator, {{/if}}Stack, useCrudList{{#if hookOrder}}, useInvalidateEntity{{/if}} } from "@simplix-react/ui";
+import { {{#if hookList}}adaptOrvalList, {{/if}}{{#if hookOrder}}adaptOrvalOrder, {{/if}}Badge, CrudList, DetailFieldWrapper, {{#if hasFilters}}ListTotalBadge, {{/if}}{{#if hasEnumFields}}Flex, {{/if}}{{#if hasI18nFields}}I18nText, {{/if}}{{#if hasFilters}}SearchOperator, {{/if}}Stack, useCrudList{{#if hookOrder}}, useInvalidateEntity{{/if}} } from "@simplix-react/ui";
 import type { ActionVariant, RowActionDef } from "@simplix-react/ui";
 import { useEntityTranslation, useTranslation } from "@simplix-react/i18n/react";
-import { {{#if hasFilters}}ListIcon, {{/if}}{{entityIcon}} } from "lucide-react";
+import { {{entityIcon}} } from "lucide-react";
 {{#if packageName}}
 {{#if hookList}}
 import { {{hookList}}{{#if hookOrder}}, {{hookOrder}}{{/if}} } from "{{packageName}}";
@@ -76,12 +76,7 @@ export function {{EntityPascal}}ListToolbar({ list }: {{EntityPascal}}ListToolba
 {{#if hasFilters}}
       <CrudList.FilterBar
         maxBadges={3}
-        leading={
-          <Badge variant="outline" className="gap-1.5 font-normal">
-            <ListIcon className="size-3.5 text-muted-foreground" />
-            {t("list.totalCount", { count: list.pagination.total })}
-          </Badge>
-        }
+        leading={<ListTotalBadge count={list.pagination.total} />}
         filters={[
 {{#each filterBarDefs}}
 {{#if isText}}

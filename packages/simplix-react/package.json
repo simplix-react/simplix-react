@@ -8,17 +8,18 @@
     "access": "public"
   },
   "dependencies": {
-    "@simplix-react/contract": "workspace:*",
-    "@simplix-react/api": "workspace:*",
-    "@simplix-react/react": "workspace:*",
-    "@simplix-react/form": "workspace:*",
-    "@simplix-react/ui": "workspace:*",
-    "@simplix-react/auth": "workspace:*",
     "@simplix-react/access": "workspace:*",
-    "@simplix-react/mock": "workspace:*",
-    "@simplix-react/i18n": "workspace:*",
+    "@simplix-react/api": "workspace:*",
+    "@simplix-react/auth": "workspace:*",
+    "@simplix-react/calendar": "workspace:*",
     "@simplix-react/cli": "workspace:*",
-    "@simplix-react/testing": "workspace:*"
+    "@simplix-react/contract": "workspace:*",
+    "@simplix-react/form": "workspace:*",
+    "@simplix-react/i18n": "workspace:*",
+    "@simplix-react/mock": "workspace:*",
+    "@simplix-react/react": "workspace:*",
+    "@simplix-react/testing": "workspace:*",
+    "@simplix-react/ui": "workspace:*"
   },
   "keywords": [
     "react",

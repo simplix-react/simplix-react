@@ -13,7 +13,9 @@ const AUTO_DISMISS_MS: Record<Toast["type"], number | null> = {
   success: 5000,
   info: 5000,
   warning: 10000,
-  error: null, // manual dismiss only
+  // Errors linger longer but still auto-dismiss: a permanent toast survives
+  // route changes and can sit over action buttons indefinitely.
+  error: 15000,
 };
 
 // Module-level state

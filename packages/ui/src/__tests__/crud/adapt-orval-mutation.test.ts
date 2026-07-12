@@ -62,14 +62,26 @@ describe("adaptOrvalCreate", () => {
 });
 
 describe("adaptOrvalUpdate", () => {
-  it("maps { id, dto } to { [pathParam]: id, data: dto }", () => {
+  it("maps { id, dto } to { [pathParam]: id, data: { [pathParam]: id, ...dto } }", () => {
     const mutation = createMockMutation();
     const adapted = adaptOrvalUpdate(mutation, "petId");
 
     adapted.mutate({ id: "5", dto: { name: "Rex" } });
 
     expect(mutation.mutate).toHaveBeenCalledWith(
-      { petId: "5", data: { name: "Rex" } },
+      { petId: "5", data: { petId: "5", name: "Rex" } },
+      expect.any(Object),
+    );
+  });
+
+  it("overrides a stale id already present in the dto", () => {
+    const mutation = createMockMutation();
+    const adapted = adaptOrvalUpdate(mutation, "petId");
+
+    adapted.mutate({ id: "5", dto: { petId: "999", name: "Rex" } });
+
+    expect(mutation.mutate).toHaveBeenCalledWith(
+      { petId: "5", data: { petId: "5", name: "Rex" } },
       expect.any(Object),
     );
   });
@@ -93,7 +105,7 @@ describe("adaptOrvalUpdate", () => {
     await adapted.mutateAsync({ id: "10", dto: { floor: 3 } });
 
     expect(mutation.mutateAsync).toHaveBeenCalledWith(
-      { buildingId: "10", data: { floor: 3 } },
+      { buildingId: "10", data: { buildingId: "10", floor: 3 } },
       expect.any(Object),
     );
   });

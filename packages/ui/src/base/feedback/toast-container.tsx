@@ -51,6 +51,7 @@ function ToastItem({ toast }: { toast: Toast }) {
 
   return (
     <div
+      role={toast.type === "error" || toast.type === "warning" ? "alert" : "status"}
       className={cn(
         "pointer-events-auto w-80 rounded-lg border p-3 shadow-lg backdrop-blur-sm transition-all duration-200",
         config.containerClassName,

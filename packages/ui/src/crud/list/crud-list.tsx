@@ -65,7 +65,7 @@ function EmptyReasonCard({ reason, bordered = true }: { reason: Exclude<EmptyRea
   const { t } = useTranslation("simplix/ui");
   const config = emptyReasonConfig[reason];
   return (
-    <div className={cn("flex flex-col items-center justify-center px-6 py-16 text-center", bordered && "rounded-lg border")}>
+    <div className={cn("flex min-h-[280px] flex-col items-center justify-center px-6 py-16 text-center", bordered && "rounded-lg border")}>
       <div className={`mb-3 rounded-full p-4 [&_svg]:size-8 ${config.iconClassName}`}>
         {config.icon}
       </div>
@@ -609,13 +609,13 @@ function ReorderableTable<T>({
 
   if (emptyReason && data.length === 0) {
     if (emptyReason === "no-data" && emptyState) {
-      return <EmptyState {...emptyState} />;
+      return <EmptyState className="min-h-[280px]" {...emptyState} />;
     }
     if (emptyReason !== "no-data") {
       return <EmptyReasonCard reason={emptyReason} />;
     }
     return (
-      <div className="flex h-24 items-center justify-center rounded-lg border text-sm text-muted-foreground">
+      <div className="flex min-h-[280px] items-center justify-center rounded-lg border text-sm text-muted-foreground">
         {emptyMessages[emptyReason]}
       </div>
     );
@@ -749,13 +749,13 @@ function ReorderableCardList<T>({
 
   if (emptyReason && data.length === 0) {
     if (emptyReason === "no-data" && emptyState) {
-      return <EmptyState {...emptyState} />;
+      return <EmptyState className="min-h-[280px]" {...emptyState} />;
     }
     if (emptyReason !== "no-data") {
       return <EmptyReasonCard reason={emptyReason} />;
     }
     return (
-      <div className="flex h-24 items-center justify-center rounded-lg border text-sm text-muted-foreground">
+      <div className="flex min-h-[280px] items-center justify-center rounded-lg border text-sm text-muted-foreground">
         {emptyMessages[emptyReason]}
       </div>
     );
@@ -1051,7 +1051,7 @@ function ListTable<T>({
     if (emptyReason === "no-data" && emptyState) {
       return (
         <div ref={containerRef} className="w-full">
-          <EmptyState {...emptyState} />
+          <EmptyState className="min-h-[280px]" {...emptyState} />
         </div>
       );
     }

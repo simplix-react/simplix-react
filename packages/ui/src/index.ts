@@ -298,9 +298,10 @@ export type {
 export {
   EmptyState,
   FieldVariantContext,
+  ListTotalBadge,
   useFieldVariant,
 } from "./crud/shared";
-export type { EmptyStateProps } from "./crud/shared";
+export type { EmptyStateProps, ListTotalBadgeProps } from "./crud/shared";
 export type {
   CommonDetailFieldProps,
   CommonFieldProps,
@@ -395,6 +396,8 @@ export type {
 // Tree field
 export { TreeSelectField } from "./fields/form/tree-select-field";
 export type { TreeSelectFieldProps } from "./fields/form/tree-select-field";
+export { TreeMultiSelectField } from "./fields/form/tree-multi-select-field";
+export type { TreeMultiSelectFieldProps } from "./fields/form/tree-multi-select-field";
 
 // Icon field
 export { IconField } from "./fields/form/icon-field";
