@@ -1,0 +1,40 @@
+{
+  "heatmap": {
+    "less": "少ない",
+    "more": "多い"
+  },
+  "events": {
+    "eventCount": "{{count}}件のイベント",
+    "eventCount_plural": "{{count}}件のイベント",
+    "dayCount": "{{total}}日中{{current}}日目",
+    "allDay": "終日",
+    "noEventsScheduled": "選択した月にイベントはありません",
+    "noEventsScheduledYear": "選択した年にイベントはありません"
+  },
+  "dayView": {
+    "noAppointments": "現在予定や相談はありません",
+    "happeningNow": "現在進行中"
+  },
+  "userSelect": {
+    "all": "全員"
+  },
+  "weekView": {
+    "notAvailableOnMobile": "週表示は小さいデバイスでは利用できません。",
+    "switchToOtherView": "日表示または月表示に切り替えてください。"
+  },
+  "timeline": {
+    "noResources": "表示する対象がありません",
+    "noResourcesHint": "選択した日付とフィルターに該当する記録がありません。"
+  },
+  "accessibility": {
+    "viewByDay": "日表示",
+    "viewByWeek": "週表示",
+    "viewByMonth": "月表示",
+    "viewByYear": "年表示",
+    "viewByAgenda": "アジェンダ表示",
+    "viewByResourceTimeline": "リソースタイムライン表示",
+    "viewByHeatmap": "ヒートマップ表示",
+    "viewByGanttWeek": "週タイムライン表示",
+    "viewByGanttDay": "日タイムライン表示"
+  }
+}

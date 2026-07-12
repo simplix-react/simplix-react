@@ -1,0 +1,49 @@
+/*
+ * Register this package's compiled output as a Tailwind v4 content source.
+ * Consuming apps `@import "@simplix-react/calendar/styles.css"`; Tailwind
+ * resolves @source relative to THIS file (shipped as dist/styles.css next to
+ * the compiled dist/*.js), so every utility class the calendar components emit
+ * is detected without hardcoding a node_modules path.
+ */
+@source "./**/*.js";
+
+/*
+ * Gantt scroll container — its horizontal time axis routinely exceeds the
+ * viewport, so the scrollbar must stay visible whenever it overflows. Consuming
+ * apps set a global `scrollbar-width: thin`, which both makes Chromium ignore
+ * ::-webkit-scrollbar styling and opts into macOS overlay auto-hiding; reset it
+ * to auto here so the classic, always-present scrollbar below takes effect.
+ */
+[data-calendar-slot="scroll"] {
+  scrollbar-width: auto;
+  scrollbar-color: auto;
+}
+
+[data-calendar-slot="scroll"]::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+  /* Default arrow over the scrollbar so it reads distinct from the pointer
+     cursor the clickable timeline bars/cells carry. */
+  cursor: default;
+}
+
+[data-calendar-slot="scroll"]::-webkit-scrollbar-track {
+  background: transparent;
+  cursor: default;
+}
+
+[data-calendar-slot="scroll"]::-webkit-scrollbar-thumb {
+  background-color: var(--border);
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  cursor: default;
+}
+
+/* Firefox lacks ::-webkit-scrollbar but always shows scrollbars; thin is fine. */
+@supports not selector(::-webkit-scrollbar) {
+  [data-calendar-slot="scroll"] {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+}

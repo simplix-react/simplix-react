@@ -1,0 +1,65 @@
+{
+  "name": "@simplix-react/calendar",
+  "version": "0.3.0",
+  "description": "Domain-agnostic calendar components (month/week/day/year/agenda/gantt/timeline/heatmap views) with pluggable rendering and interaction callbacks",
+  "type": "module",
+  "sideEffects": [
+    "./dist/index.js",
+    "./src/index.ts",
+    "./src/locales/*"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup && cp src/styles.css dist/styles.css",
+    "dev": "tsup --no-clean --no-dts",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint src",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "date-fns": "catalog:",
+    "lucide-react": "catalog:",
+    "react-dnd": "catalog:",
+    "react-dnd-html5-backend": "catalog:",
+    "zustand": "catalog:"
+  },
+  "peerDependencies": {
+    "@simplix-react/i18n": "workspace:*",
+    "@simplix-react/ui": "workspace:*",
+    "react": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@simplix-react/config-typescript": "workspace:*",
+    "@simplix-react/i18n": "workspace:*",
+    "@simplix-react/ui": "workspace:*",
+    "@testing-library/react": "catalog:",
+    "@types/react": "catalog:",
+    "jsdom": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/simplix-react/simplix-react.git"
+  }
+}

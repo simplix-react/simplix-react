@@ -1,0 +1,40 @@
+{
+  "heatmap": {
+    "less": "적음",
+    "more": "많음"
+  },
+  "events": {
+    "eventCount": "{{count}}개 일정",
+    "eventCount_plural": "{{count}}개 일정",
+    "dayCount": "{{total}}일 중 {{current}}일째",
+    "allDay": "종일",
+    "noEventsScheduled": "선택한 월에 일정이 없습니다",
+    "noEventsScheduledYear": "선택한 연도에 일정이 없습니다"
+  },
+  "dayView": {
+    "noAppointments": "현재 일정이나 예약이 없습니다",
+    "happeningNow": "진행 중"
+  },
+  "userSelect": {
+    "all": "전체"
+  },
+  "weekView": {
+    "notAvailableOnMobile": "주간 보기는 작은 기기에서 사용할 수 없습니다.",
+    "switchToOtherView": "일간 또는 월간 보기로 전환해 주세요."
+  },
+  "timeline": {
+    "noResources": "표시할 대상이 없습니다",
+    "noResourcesHint": "선택한 날짜와 필터에 해당하는 기록이 없습니다."
+  },
+  "accessibility": {
+    "viewByDay": "일 보기",
+    "viewByWeek": "주 보기",
+    "viewByMonth": "월 보기",
+    "viewByYear": "년 보기",
+    "viewByAgenda": "일정 보기",
+    "viewByResourceTimeline": "리소스 타임라인 보기",
+    "viewByHeatmap": "히트맵 보기",
+    "viewByGanttWeek": "주 타임라인 보기",
+    "viewByGanttDay": "일 타임라인 보기"
+  }
+}
