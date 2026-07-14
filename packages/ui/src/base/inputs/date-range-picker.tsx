@@ -252,7 +252,10 @@ export function DateRangePicker({
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    // modal: inside a Dialog, the dialog's scroll lock blocks wheel events on
+    // body-portaled popovers; a modal popover registers its own scroll-lock
+    // layer so wheel scrolling works in the calendar's option lists.
+    <Popover open={open} onOpenChange={setOpen} modal>
       <PopoverTrigger asChild>
         <button
           type="button"
