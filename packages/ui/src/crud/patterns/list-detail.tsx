@@ -330,10 +330,11 @@ const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }
             !dialogHeight && "max-h-[85vh]",
             "flex flex-col overflow-hidden",
             "rounded-lg border bg-background py-4 shadow-lg",
-            // Push horizontal padding into CrudDetail/CrudForm slots so border lines span full dialog width
+            // Push horizontal padding into CrudDetail/CrudForm slots so border lines span full dialog width.
+            // Body/footer slots carry their own panel padding — zero it so the pushed padding does not stack.
             "[&_[data-crud-slot=header]]:px-6",
-            "[&_[data-crud-slot=body]>*]:px-6",
-            "[&_[data-crud-slot=footer]>*]:px-6",
+            "[&_[data-crud-slot=body]]:px-0 [&_[data-crud-slot=body]>*]:px-6",
+            "[&_[data-crud-slot=footer]]:px-0 [&_[data-crud-slot=footer]>*]:px-6",
             "data-[state=open]:animate-in data-[state=closed]:animate-out",
             "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
             "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
