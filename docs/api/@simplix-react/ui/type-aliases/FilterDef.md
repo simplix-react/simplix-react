@@ -8,4 +8,4 @@
 
 > **FilterDef** = [`TextFilterDef`](../interfaces/TextFilterDef.md) \| [`NumberFilterDef`](../interfaces/NumberFilterDef.md) \| [`FacetedFilterDef`](../interfaces/FacetedFilterDef.md) \| [`ToggleFilterDef`](../interfaces/ToggleFilterDef.md) \| [`DateRangeFilterDef`](../interfaces/DateRangeFilterDef.md) \| [`CountryFilterDef`](../interfaces/CountryFilterDef.md) \| [`TimezoneFilterDef`](../interfaces/TimezoneFilterDef.md)
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:93](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L93)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:94](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L94)

@@ -175,3 +175,15 @@ consumers whose data is not item-based (aggregate views) turn it off.
 Defined in: [context/calendar-context.tsx:40](https://github.com/simplix-react/simplix-react/blob/main/context/calendar-context.tsx#L40)
 
 Full-width background bands drawn on the resource-timeline axis.
+
+***
+
+### timelineEmptyState?
+
+> `optional` **timelineEmptyState**: `ReactNode`
+
+Defined in: [context/calendar-context.tsx:74](https://github.com/simplix-react/simplix-react/blob/main/context/calendar-context.tsx#L74)
+
+Replaces the built-in empty state of the gantt and resource-timeline views.
+Consumers whose rows only exist for timed records use this to explain what
+a rowless day means (e.g. "absences appear in the side panel").

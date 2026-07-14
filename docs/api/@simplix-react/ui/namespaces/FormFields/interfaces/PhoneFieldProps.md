@@ -2,13 +2,13 @@
 
 ***
 
-[Documentation](../../../../../README.md) / [@simplix-react/ui](../../../README.md) / [FormFields](../README.md) / DateRangeFieldProps
+[Documentation](../../../../../README.md) / [@simplix-react/ui](../../../README.md) / [FormFields](../README.md) / PhoneFieldProps
 
-# Interface: DateRangeFieldProps
+# Interface: PhoneFieldProps
 
-Defined in: [packages/ui/src/fields/form/date-range-field.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/date-range-field.tsx#L7)
+Defined in: [packages/ui/src/fields/form/phone-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/phone-field.tsx#L15)
 
-Props for the [DateRangeField](../functions/DateRangeField.md) form component.
+Props for the [PhoneField](../functions/PhoneField.md) form component.
 
 ## Extends
 
@@ -25,6 +25,16 @@ Defined in: [packages/ui/src/crud/shared/types.ts:49](https://github.com/simplix
 #### Inherited from
 
 [`CommonFieldProps`](../../../interfaces/CommonFieldProps.md).[`className`](../../../interfaces/CommonFieldProps.md#classname)
+
+***
+
+### defaultCountry?
+
+> `optional` **defaultCountry**: `string`
+
+Defined in: [packages/ui/src/fields/form/phone-field.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/phone-field.tsx#L21)
+
+ISO 3166-1 alpha-2 country preselected when the value carries no country.
 
 ***
 
@@ -106,45 +116,19 @@ label for screen readers only.
 
 ***
 
-### locale?
-
-> `optional` **locale**: `string`
-
-Defined in: [packages/ui/src/fields/form/date-range-field.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/date-range-field.tsx#L13)
-
-Short locale code (e.g. `"ko"`, `"en"`, `"ja"`).
-
-***
-
-### numberOfMonths?
-
-> `optional` **numberOfMonths**: `1` \| `2`
-
-Defined in: [packages/ui/src/fields/form/date-range-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/date-range-field.tsx#L17)
-
-Number of calendar months to display.
-
-#### Default Value
-
-```ts
-2
-```
-
-***
-
 ### onChange()
 
-> **onChange**: (`range`) => `void`
+> **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/fields/form/date-range-field.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/date-range-field.tsx#L11)
+Defined in: [packages/ui/src/fields/form/phone-field.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/phone-field.tsx#L19)
 
-Called when the range changes.
+Receives the E.164 number for the current input, or `""` when cleared.
 
 #### Parameters
 
-##### range
+##### value
 
-[`DateRange`](../../../interfaces/DateRange.md)
+`string`
 
 #### Returns
 
@@ -156,9 +140,7 @@ Called when the range changes.
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/fields/form/date-range-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/date-range-field.tsx#L15)
-
-Placeholder text when no range is selected.
+Defined in: [packages/ui/src/fields/form/phone-field.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/phone-field.tsx#L22)
 
 ***
 
@@ -220,11 +202,11 @@ below at full width.
 
 ### value
 
-> **value**: [`DateRange`](../../../interfaces/DateRange.md)
+> **value**: `string`
 
-Defined in: [packages/ui/src/fields/form/date-range-field.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/date-range-field.tsx#L9)
+Defined in: [packages/ui/src/fields/form/phone-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/phone-field.tsx#L17)
 
-Currently selected date range.
+E.164 phone number (e.g. `"+821012345678"`), or an empty string.
 
 ***
 

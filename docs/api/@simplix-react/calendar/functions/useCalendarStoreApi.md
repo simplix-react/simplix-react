@@ -8,7 +8,7 @@
 
 > **useCalendarStoreApi**(): `StoreApi`
 
-Defined in: [context/calendar-context.tsx:199](https://github.com/simplix-react/simplix-react/blob/main/context/calendar-context.tsx#L199)
+Defined in: [context/calendar-context.tsx:208](https://github.com/simplix-react/simplix-react/blob/main/context/calendar-context.tsx#L208)
 
 The raw store API for the enclosing provider. Throws outside a provider.
 

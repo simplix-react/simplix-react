@@ -8,7 +8,7 @@
 
 > **useFieldVariant**(`override?`): [`FieldVariant`](../interfaces/FieldVariant.md)
 
-Defined in: [packages/ui/src/crud/shared/types.ts:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L16)
+Defined in: [packages/ui/src/crud/shared/types.ts:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L23)
 
 Retrieves the current field variant from context, merged with optional overrides.
 

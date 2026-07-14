@@ -8,7 +8,7 @@
 
 > **useCalendarSelector**\<`T`\>(`selector`): `T`
 
-Defined in: [context/calendar-context.tsx:206](https://github.com/simplix-react/simplix-react/blob/main/context/calendar-context.tsx#L206)
+Defined in: [context/calendar-context.tsx:215](https://github.com/simplix-react/simplix-react/blob/main/context/calendar-context.tsx#L215)
 
 Subscribe to a slice of calendar store state.
 

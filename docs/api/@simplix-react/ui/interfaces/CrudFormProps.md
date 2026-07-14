@@ -33,7 +33,7 @@ Props for the [CrudForm](../variables/CrudForm.md) compound component root.
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/form/crud-form.tsx:52](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/crud-form.tsx#L52)
+Defined in: [packages/ui/src/crud/form/crud-form.tsx:59](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/crud-form.tsx#L59)
 
 ***
 
@@ -41,7 +41,7 @@ Defined in: [packages/ui/src/crud/form/crud-form.tsx:52](https://github.com/simp
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/form/crud-form.tsx:51](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/crud-form.tsx#L51)
+Defined in: [packages/ui/src/crud/form/crud-form.tsx:58](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/crud-form.tsx#L58)
 
 ***
 
@@ -49,7 +49,7 @@ Defined in: [packages/ui/src/crud/form/crud-form.tsx:51](https://github.com/simp
 
 > `optional` **fieldVariant**: [`FieldVariant`](FieldVariant.md)
 
-Defined in: [packages/ui/src/crud/form/crud-form.tsx:49](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/crud-form.tsx#L49)
+Defined in: [packages/ui/src/crud/form/crud-form.tsx:56](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/crud-form.tsx#L56)
 
 ***
 
@@ -115,8 +115,21 @@ Defined in: [packages/ui/src/crud/form/crud-form.tsx:40](https://github.com/simp
 
 ***
 
+### variant?
+
+> `optional` **variant**: `"page"` \| `"panel"`
+
+Defined in: [packages/ui/src/crud/form/crud-form.tsx:55](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/crud-form.tsx#L55)
+
+Layout context. `"panel"` (default) fills its host, scrolls its own body,
+and pads header/body/footer edges for the panel scrollbar. `"page"` flows
+with the document — the page owns the scroll and no horizontal inset is
+added, so sections align with surrounding page content.
+
+***
+
 ### warnOnUnsavedChanges?
 
 > `optional` **warnOnUnsavedChanges**: `boolean`
 
-Defined in: [packages/ui/src/crud/form/crud-form.tsx:50](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/crud-form.tsx#L50)
+Defined in: [packages/ui/src/crud/form/crud-form.tsx:57](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/crud-form.tsx#L57)

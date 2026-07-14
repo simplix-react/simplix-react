@@ -6,7 +6,7 @@
 
 # Interface: DateRangeFilterDef
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:66](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L66)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:67](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L67)
 
 ## Extends
 
@@ -18,7 +18,7 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:66](https://github.com/
 
 > `optional` **columnBreak**: `boolean`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:33](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L33)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:34](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L34)
 
 When the filter popover renders in multiple columns, start a new column at
 this filter. Up to (columns - 1) flags take effect, in order; without flags
@@ -34,7 +34,7 @@ the fields are split evenly (column-major). Ignored in single-column layout.
 
 > `optional` **dateOnly**: `boolean`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:75](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L75)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:76](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L76)
 
 Set for a `LocalDate` (`format:date`) column: the range boundaries are
 serialized as zone-neutral `yyyy-MM-dd` (local) instead of a UTC ISO
@@ -48,7 +48,7 @@ which keep full UTC ISO serialization.
 
 > **field**: `string`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L26)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L27)
 
 #### Inherited from
 
@@ -60,7 +60,7 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:26](https://github.com/
 
 > **label**: `string`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L27)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L28)
 
 #### Inherited from
 
@@ -72,7 +72,7 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:27](https://github.com/
 
 > `optional` **rfc3339Local**: `boolean`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:82](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L82)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:83](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L83)
 
 Set for a column stored as an offset-preserving canonical RFC 3339 `String`
 (`yyyy-MM-ddT00:00:00±hh:mm`): the range boundaries are serialized in the SAME
@@ -85,4 +85,4 @@ comparison equals chronological order. Takes precedence over [dateOnly](#dateonl
 
 > **type**: `"dateRange"`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:67](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L67)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:68](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L68)

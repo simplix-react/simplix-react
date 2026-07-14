@@ -6,7 +6,7 @@
 
 # Interface: CalendarProviderProps
 
-Defined in: [context/calendar-context.tsx:72](https://github.com/simplix-react/simplix-react/blob/main/context/calendar-context.tsx#L72)
+Defined in: [context/calendar-context.tsx:78](https://github.com/simplix-react/simplix-react/blob/main/context/calendar-context.tsx#L78)
 
 Props for [CalendarProvider](../functions/CalendarProvider.md).
 
@@ -46,7 +46,7 @@ Defined in: [model/calendar-store.ts:51](https://github.com/simplix-react/simpli
 
 > **children**: `ReactNode`
 
-Defined in: [context/calendar-context.tsx:79](https://github.com/simplix-react/simplix-react/blob/main/context/calendar-context.tsx#L79)
+Defined in: [context/calendar-context.tsx:85](https://github.com/simplix-react/simplix-react/blob/main/context/calendar-context.tsx#L85)
 
 ***
 
@@ -104,7 +104,7 @@ Defined in: [model/calendar-store.ts:46](https://github.com/simplix-react/simpli
 
 > `optional` **dndEnabled**: `boolean`
 
-Defined in: [context/calendar-context.tsx:78](https://github.com/simplix-react/simplix-react/blob/main/context/calendar-context.tsx#L78)
+Defined in: [context/calendar-context.tsx:84](https://github.com/simplix-react/simplix-react/blob/main/context/calendar-context.tsx#L84)
 
 Enable react-dnd drag-drop of items across cells/time slots.
 
@@ -156,7 +156,7 @@ Pixels per hour in the time grids (default 96); `"fit"` fills the body height.
 
 > **items**: [`CalendarItem`](CalendarItem.md)\<`unknown`\>[]
 
-Defined in: [context/calendar-context.tsx:74](https://github.com/simplix-react/simplix-react/blob/main/context/calendar-context.tsx#L74)
+Defined in: [context/calendar-context.tsx:80](https://github.com/simplix-react/simplix-react/blob/main/context/calendar-context.tsx#L80)
 
 Items to render. Consumer converts DTOs to the [CalendarItem](CalendarItem.md) shape.
 
@@ -462,7 +462,7 @@ Render an extra per-day summary block under the week-view day header.
 
 > `optional` **resources**: [`CalendarResource`](CalendarResource.md)[]
 
-Defined in: [context/calendar-context.tsx:76](https://github.com/simplix-react/simplix-react/blob/main/context/calendar-context.tsx#L76)
+Defined in: [context/calendar-context.tsx:82](https://github.com/simplix-react/simplix-react/blob/main/context/calendar-context.tsx#L82)
 
 Resource directory used to resolve `item.resourceId`.
 
@@ -494,6 +494,22 @@ Full-width background bands drawn on the resource-timeline axis.
 #### Inherited from
 
 [`CalendarPlugins`](CalendarPlugins.md).[`timeBands`](CalendarPlugins.md#timebands)
+
+***
+
+### timelineEmptyState?
+
+> `optional` **timelineEmptyState**: `ReactNode`
+
+Defined in: [context/calendar-context.tsx:74](https://github.com/simplix-react/simplix-react/blob/main/context/calendar-context.tsx#L74)
+
+Replaces the built-in empty state of the gantt and resource-timeline views.
+Consumers whose rows only exist for timed records use this to explain what
+a rowless day means (e.g. "absences appear in the side panel").
+
+#### Inherited from
+
+[`CalendarPlugins`](CalendarPlugins.md).[`timelineEmptyState`](CalendarPlugins.md#timelineemptystate)
 
 ***
 

@@ -250,6 +250,18 @@ Tone tokens are exported directly for custom rendering: `STATUS_TONES`, `STATUS_
 
 All form fields follow the same pattern: `value` + `onChange` + common field props (label, error, description, required, disabled, className).
 
+Every field also accepts `prefixControl` / `suffixControl` — a control rendered on the same row as the input (e.g. an add button, IconPicker, ColorPicker). Use these instead of composing a button next to the field: the control stays aligned with the input while description and error render below at full width.
+
+```tsx
+<FormFields.TextField
+  label="Training key"
+  value={draft}
+  onChange={setDraft}
+  description="Added on submit."
+  suffixControl={<Button onClick={add}>Add</Button>}
+/>
+```
+
 ```tsx
 import { FormFields } from "@simplix-react/ui";
 ```
@@ -327,8 +339,8 @@ Low-level wrappers used internally by `FormFields` and `DetailFields`. Export th
 
 | Component | Purpose | Key Props |
 | --- | --- | --- |
-| `FieldWrapper` | Wraps editable inputs with label, error, description | `label`, `error`, `description`, `required`, `disabled`, `labelPosition`, `size` |
-| `DetailFieldWrapper` | Wraps read-only display values with label | `label`, `labelPosition`, `size` |
+| `FieldWrapper` | Wraps editable inputs with label, error, description | `label`, `error`, `description`, `required`, `disabled`, `layout`, `size` |
+| `DetailFieldWrapper` | Wraps read-only display values with label | `label`, `layout`, `size` |
 
 ```tsx
 import { FieldWrapper } from "@simplix-react/ui";
@@ -346,14 +358,14 @@ Control field label position and size across a section or page using context:
 import { FieldVariantContext } from "@simplix-react/ui";
 
 // All fields inside will use left-aligned labels at small size
-<FieldVariantContext.Provider value={{ labelPosition: "left", size: "sm" }}>
+<FieldVariantContext.Provider value={{ layout: "left", size: "sm" }}>
   <FormFields.TextField label="Name" value={name} onChange={setName} />
   <FormFields.TextField label="Email" value={email} onChange={setEmail} />
 </FieldVariantContext.Provider>
 ```
 
 Options:
-- `labelPosition`: `"top"` (default) | `"left"` | `"hidden"` (sr-only for accessibility)
+- `layout`: `"top"` (default) | `"left"` | `"inline"` | `"trailing"` (control right-aligned with a dashed leader line from the label — the `SwitchField` default) | `"hidden"` (sr-only for accessibility)
 - `size`: `"sm"` | `"md"` (default) | `"lg"`
 
 ### CRUD Layout Components
@@ -928,6 +940,8 @@ See root LICENSE file.
 - [ContainerProps](interfaces/ContainerProps.md)
 - [CountryFilterDef](interfaces/CountryFilterDef.md)
 - [CountryOption](interfaces/CountryOption.md)
+- [CropArea](interfaces/CropArea.md)
+- [CropModalProps](interfaces/CropModalProps.md)
 - [CrudDeleteProps](interfaces/CrudDeleteProps.md)
 - [CrudDeleteWiredLabels](interfaces/CrudDeleteWiredLabels.md)
 - [CrudDetailActionsProps](interfaces/CrudDetailActionsProps.md)
@@ -1121,6 +1135,7 @@ See root LICENSE file.
 - [UseCrudPageStateResult](interfaces/UseCrudPageStateResult.md)
 - [UseFadeTransitionOptions](interfaces/UseFadeTransitionOptions.md)
 - [UseFadeTransitionResult](interfaces/UseFadeTransitionResult.md)
+- [UseFilterBarStateOptions](interfaces/UseFilterBarStateOptions.md)
 - [UseKeyboardNavOptions](interfaces/UseKeyboardNavOptions.md)
 - [UseListDetailStateOptions](interfaces/UseListDetailStateOptions.md)
 - [UseListDetailStateResult](interfaces/UseListDetailStateResult.md)
@@ -1418,6 +1433,8 @@ See root LICENSE file.
 - [createFileFieldApi](functions/createFileFieldApi.md)
 - [createOverrides](functions/createOverrides.md)
 - [createReactRouterAdapter](functions/createReactRouterAdapter.md)
+- [cropImageToFile](functions/cropImageToFile.md)
+- [CropModal](functions/CropModal.md)
 - [CrudDelete](functions/CrudDelete.md)
 - [CrudProvider](functions/CrudProvider.md)
 - [DateFilter](functions/DateFilter.md)
@@ -1537,6 +1554,7 @@ See root LICENSE file.
 - [useFadeTransition](functions/useFadeTransition.md)
 - [useFieldVariant](functions/useFieldVariant.md)
 - [useFilePolicy](functions/useFilePolicy.md)
+- [useFilterBarState](functions/useFilterBarState.md)
 - [useFlatUIComponents](functions/useFlatUIComponents.md)
 - [useInvalidateEntity](functions/useInvalidateEntity.md)
 - [useIsDirty](functions/useIsDirty.md)

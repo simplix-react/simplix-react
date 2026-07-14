@@ -8,7 +8,7 @@
 
 > **useCalendarPreferences**(): `object`
 
-Defined in: [context/calendar-context.tsx:244](https://github.com/simplix-react/simplix-react/blob/main/context/calendar-context.tsx#L244)
+Defined in: [context/calendar-context.tsx:253](https://github.com/simplix-react/simplix-react/blob/main/context/calendar-context.tsx#L253)
 
 Badge/working-hours/visible-hours preferences and setters.
 
