@@ -28,7 +28,7 @@ interface ResourceTimelineViewProps {
 export function ResourceTimelineView({ items }: ResourceTimelineViewProps) {
   const { selectedResourceId, resources } = useCalendarResourceFilter();
   const { visibleHours } = useCalendarPreferences();
-  const { timeBands } = useCalendarData();
+  const { timeBands, timelineEmptyState } = useCalendarData();
   const { selectedDate } = useCalendarDate();
   const { t } = useCalendarTranslation();
   const highlights = useDayHighlights();
@@ -79,8 +79,12 @@ export function ResourceTimelineView({ items }: ResourceTimelineViewProps) {
   if (columns.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-1 py-16 text-center">
-        <p className="text-sm font-medium text-muted-foreground">{t("timeline.noResources")}</p>
-        <p className="text-xs text-muted-foreground">{t("timeline.noResourcesHint")}</p>
+        {timelineEmptyState ?? (
+          <>
+            <p className="text-sm font-medium text-muted-foreground">{t("timeline.noResources")}</p>
+            <p className="text-xs text-muted-foreground">{t("timeline.noResourcesHint")}</p>
+          </>
+        )}
       </div>
     );
   }

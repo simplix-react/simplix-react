@@ -56,7 +56,8 @@ function estimateLabelWidth(title: string): number {
  * `renderGanttRowExtra` plugin slot.
  */
 export function GanttView({ items, days }: GanttViewProps) {
-  const { resources, onItemClick, onCellClick, onResourceClick, timeBands, renderGanttRowExtra } = useCalendarData();
+  const { resources, onItemClick, onCellClick, onResourceClick, timeBands, renderGanttRowExtra, timelineEmptyState } =
+    useCalendarData();
   const { visibleHours } = useCalendarPreferences();
   const { t, locale } = useCalendarTranslation();
   const highlights = useDayHighlights();
@@ -104,8 +105,12 @@ export function GanttView({ items, days }: GanttViewProps) {
   if (totalRows === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-1 py-16 text-center">
-        <p className="text-sm font-medium text-muted-foreground">{t("timeline.noResources")}</p>
-        <p className="text-xs text-muted-foreground">{t("timeline.noResourcesHint")}</p>
+        {timelineEmptyState ?? (
+          <>
+            <p className="text-sm font-medium text-muted-foreground">{t("timeline.noResources")}</p>
+            <p className="text-xs text-muted-foreground">{t("timeline.noResourcesHint")}</p>
+          </>
+        )}
       </div>
     );
   }

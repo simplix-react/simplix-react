@@ -23,7 +23,9 @@ export function AgendaItemCard({ item, itemCurrentDay, itemTotalDays }: AgendaIt
   const { onItemClick, resourceById } = useCalendarData();
   const { t, language, locale } = useCalendarTranslation();
 
-  const resource = item.resourceId ? resourceById.get(item.resourceId) : undefined;
+  // The per-item resource label only disambiguates multi-resource calendars;
+  // with a single resource it repeats the same name on every row.
+  const resource = item.resourceId && resourceById.size > 1 ? resourceById.get(item.resourceId) : undefined;
   const cardClasses = cn(CARD_BASE, itemColorClass(item.color, badgeVariant), patternClass(item.pattern));
 
   const activate = () => onItemClick?.(item);

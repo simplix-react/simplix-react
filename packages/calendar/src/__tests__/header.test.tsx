@@ -41,7 +41,8 @@ describe("CalendarHeader view switcher", () => {
     renderHeader({ views: ["year"] }, "year");
     // Switcher hidden.
     expect(screen.queryByLabelText("accessibility.viewByYear")).toBeNull();
-    // DateNavigator still renders and shows the year-view range label.
-    expect(screen.getByText("2026")).toBeDefined();
+    // DateNavigator still renders: the title and the range label both carry
+    // the year-only text in the year view.
+    expect(screen.getAllByText("2026").length).toBeGreaterThanOrEqual(1);
   });
 });

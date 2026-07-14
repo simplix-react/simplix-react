@@ -4,12 +4,16 @@ import { useCalendarResourceFilter } from "../../context/calendar-context";
 import { useCalendarTranslation } from "../../lib/use-calendar-translation";
 import { ResourceAvatar } from "../resource-avatar";
 
-/** Dropdown that filters items down to a single resource (or all). */
+/**
+ * Dropdown that filters items down to a single resource (or all). Hidden when
+ * there is at most one resource — filtering a single-resource calendar is a
+ * no-op that only adds noise.
+ */
 export function ResourceSelect() {
   const { selectedResourceId, setSelectedResourceId, resources } = useCalendarResourceFilter();
   const { t } = useCalendarTranslation();
 
-  if (resources.length === 0) return null;
+  if (resources.length <= 1) return null;
 
   return (
     <Select value={selectedResourceId} onValueChange={setSelectedResourceId}>

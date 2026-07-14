@@ -57,8 +57,8 @@ export type {
 } from "./model/types";
 
 // ---- Date helpers ----
-export { datePart, toDateString, getViewDateRange, navigateDate } from "./helpers";
-export { dotBgClass } from "./lib/item-colors";
+export { datePart, toDateString, getViewDateRange, navigateDate, patternClass } from "./helpers";
+export { dotBgClass, timelineBarClass } from "./lib/item-colors";
 
 // ---- i18n ----
 export { PACKAGE_NAMESPACE } from "./locales";

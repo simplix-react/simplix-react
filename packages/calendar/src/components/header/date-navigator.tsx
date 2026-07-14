@@ -14,7 +14,10 @@ export function DateNavigator() {
   const { effectiveView } = useEffectiveRangeView();
   const { t, language, locale } = useCalendarTranslation();
 
-  const monthYearDisplay = formatDate(selectedDate, "monthYear", language, locale);
+  // Year-scoped views title with the year alone — a month in the title would
+  // suggest a narrower window than the view actually shows.
+  const titleFormat = effectiveView === "year" ? "yearRange" : "monthYear";
+  const monthYearDisplay = formatDate(selectedDate, titleFormat, language, locale);
   const itemCount = useMemo(() => getItemsCount(items, selectedDate, effectiveView, locale), [items, selectedDate, effectiveView, locale]);
 
   return (

@@ -66,6 +66,12 @@ export interface CalendarPlugins {
   renderWeekDayHeader?: (date: Date) => ReactNode;
   /** Render an action overlay pinned to a time-grid item's bottom-right corner. */
   renderItemOverlay?: (item: CalendarItem) => ReactNode;
+  /**
+   * Replaces the built-in empty state of the gantt and resource-timeline views.
+   * Consumers whose rows only exist for timed records use this to explain what
+   * a rowless day means (e.g. "absences appear in the side panel").
+   */
+  timelineEmptyState?: ReactNode;
 }
 
 /** Props for {@link CalendarProvider}. */
@@ -130,6 +136,7 @@ export function CalendarProvider({
   renderItemOverlay,
   renderGanttRowExtra,
   showItemCountBadge = true,
+  timelineEmptyState,
   children,
   ...storeOptions
 }: CalendarProviderProps) {
@@ -161,6 +168,7 @@ export function CalendarProvider({
       renderItemOverlay,
       renderGanttRowExtra,
       showItemCountBadge,
+      timelineEmptyState,
     }),
     [
       items,
@@ -182,6 +190,7 @@ export function CalendarProvider({
       renderItemOverlay,
       renderGanttRowExtra,
       showItemCountBadge,
+      timelineEmptyState,
     ]
   );
 
