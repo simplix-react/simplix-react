@@ -195,6 +195,9 @@ catalogs:
     jsdom:
       specifier: 29.0.0
       version: 29.0.0
+    libphonenumber-js:
+      specifier: ^1.12.10
+      version: 1.13.8
     lowlight:
       specifier: ^3.3.0
       version: 3.3.0
@@ -1066,6 +1069,9 @@ importers:
       dompurify:
         specifier: 'catalog:'
         version: 3.3.3
+      libphonenumber-js:
+        specifier: 'catalog:'
+        version: 1.13.8
       lowlight:
         specifier: 'catalog:'
         version: 3.3.0
@@ -3579,6 +3585,9 @@ packages:
   kleur@3.0.3:
     resolution: {integrity: sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==}
     engines: {node: '>=6'}
+
+  libphonenumber-js@1.13.8:
+    resolution: {integrity: sha512-80xal1m93rADejw2pMp2MSzFhHCPLEspjHxnH2UtqI+DgAmElsbmLMiqk9niwH9NWAfjsRtaJI+qBrOEmRx9nQ==}
 
   lightningcss-android-arm64@1.31.1:
     resolution: {integrity: sha512-HXJF3x8w9nQ4jbXRiNppBCqeZPIAfUo8zE/kOEGbW5NZvGc/K7nMxbhIr+YlFlHW5mpbg/YFPdbnCh1wAXCKFg==}
@@ -7112,6 +7121,8 @@ snapshots:
   kdbush@4.0.2: {}
 
   kleur@3.0.3: {}
+
+  libphonenumber-js@1.13.8: {}
 
   lightningcss-android-arm64@1.31.1:
     optional: true

@@ -11,6 +11,7 @@ import { formatDateRange, toLocalDateString } from "../../utils/format-date";
 import { parseDate } from "../../utils/parse-date";
 import { parseRfc3339, serializeRfc3339Local } from "../../utils/rfc3339-date";
 import { useCrudListColumns } from "../shared/column-context";
+import { ListTotalBadge } from "../shared/list-total-badge";
 import { CheckIcon, ColumnsIcon, EyeIcon, FunnelIcon, LayoutGridIcon, RowsIcon, XIcon } from "../shared/icons";
 import { CountryFormField } from "./country-form-field";
 import { FieldClearButton } from "./field-clear-button";
@@ -367,12 +368,7 @@ export function FilterBar({ filters, state, leading, trailing, maxBadges, onPrev
     >
       {hasLeadingGroup && (
         <Flex gap="xs" align="center" wrap>
-          {showCount && (
-            <span className="box-border inline-flex h-8 items-center gap-1.5 rounded-md border border-input bg-card px-2.5 text-sm text-muted-foreground [&_svg]:size-3.5">
-              <RowsIcon />
-              {t("list.totalCount", { count: count! })}
-            </span>
-          )}
+          {showCount && <ListTotalBadge count={count!} />}
           {leading}
           {showViewToggle && (
             <div

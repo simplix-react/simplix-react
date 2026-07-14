@@ -487,6 +487,9 @@ export {
   FilterBar,
 } from "./crud/filters";
 
+export { useFilterBarState } from "./crud/filters";
+export type { UseFilterBarStateOptions } from "./crud/filters";
+
 export type {
   TextFilterProps,
   MultiTextFilterProps,
@@ -570,8 +573,8 @@ export type { ModalSidebarBlockProps, ModalSidebarProps, ModalSidebarRowProps } 
 export { ArrowLeftIcon } from "./crud/shared/icons";
 
 // Field components
-export { DetailFields, DetailFieldWrapper, FieldMessage, FieldWrapper, FormFields } from "./fields";
-export type { DetailFieldWrapperProps, FieldMessageProps, FieldWrapperProps } from "./fields";
+export { CropModal, cropImageToFile, DetailFields, DetailFieldWrapper, FieldMessage, FieldWrapper, FormFields } from "./fields";
+export type { CropArea, CropModalProps, DetailFieldWrapperProps, FieldMessageProps, FieldWrapperProps } from "./fields";
 export { I18nText } from "./fields/detail/i18n-text-field";
 export type { I18nTextProps } from "./fields/detail/i18n-text-field";
 

@@ -45,6 +45,9 @@ export type { NumberFieldProps } from "./number-field";
 export { PasswordField } from "./password-field";
 export type { PasswordFieldProps } from "./password-field";
 
+export { PhoneField } from "./phone-field";
+export type { PhoneFieldProps } from "./phone-field";
+
 export { RadioGroupField } from "./radio-group-field";
 export type { RadioGroupFieldProps } from "./radio-group-field";
 
