@@ -701,7 +701,11 @@ export type {
 // File attachment API factory (builds a FileFieldApi for the standard
 // per-module endpoints from a FileFieldSource address) + host transport
 export { createFileFieldApi } from "./fields/file-attachment";
-export type { FileFieldSource } from "./fields/file-attachment";
+export type {
+  AttachmentRecord,
+  FileFieldApi,
+  FileFieldSource,
+} from "./fields/file-attachment";
 export {
   configureAttachmentTransport,
   getAttachmentTransport,
