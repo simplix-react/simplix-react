@@ -12,6 +12,7 @@ const fieldWrapperVariants = cva("py-1", {
       top: "flex flex-col gap-1",
       left: "grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-1",
       inline: "flex items-center justify-between gap-3",
+      trailing: "flex flex-col gap-1",
       hidden: "flex flex-col gap-1.5",
     },
     size: {
@@ -97,16 +98,20 @@ export function FieldWrapper({
   const statusMessage = error ?? warning;
   const statusVariant = error ? "error" : warning ? "warning" : undefined;
 
-  const labelElement = label && !isHidden ? (
+  const labelText = label ? (
+    <Label htmlFor={id}>
+      {label}
+      {required && (
+        <span className="text-destructive ml-0.5" aria-hidden="true">
+          *
+        </span>
+      )}
+    </Label>
+  ) : null;
+
+  const labelElement = label && !isHidden && layout !== "trailing" ? (
     <div className="flex items-center justify-between min-h-6">
-      <Label htmlFor={id}>
-        {label}
-        {required && (
-          <span className="text-destructive ml-0.5" aria-hidden="true">
-            *
-          </span>
-        )}
-      </Label>
+      {labelText}
       {labelExtra}
     </div>
   ) : null;
@@ -130,7 +135,31 @@ export function FieldWrapper({
       ) : null}
 
       {/* Content area - spans full width in left layout for description/error */}
-      {layout === "left" ? (
+      {layout === "trailing" ? (
+        <>
+          {/* Settings-row style: label left, control right, a dashed leader
+              line between the two. Messages start at the label's left edge. */}
+          {label ? (
+            <div className="flex min-h-6 items-center gap-3">
+              {labelText}
+              {labelExtra}
+              <span
+                aria-hidden="true"
+                className="min-w-4 flex-1 border-b border-dashed border-border"
+              />
+              {inputRow}
+            </div>
+          ) : (
+            inputRow
+          )}
+          {description && (
+            <FieldMessage variant="description">{description}</FieldMessage>
+          )}
+          {statusMessage && statusVariant && (
+            <FieldMessage variant={statusVariant}>{statusMessage}</FieldMessage>
+          )}
+        </>
+      ) : layout === "left" ? (
         <>
           {inputRow}
           {/* Description and status message occupy the second column */}

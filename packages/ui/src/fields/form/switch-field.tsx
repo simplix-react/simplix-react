@@ -16,7 +16,10 @@ export interface SwitchFieldProps extends CommonFieldProps {
 }
 
 /**
- * Toggle switch field. Defaults to `layout="left"` for natural layout.
+ * Toggle switch field. Defaults to `layout="trailing"` — the switch is
+ * right-aligned with a dashed leader line from the label, so a column of
+ * toggles reads as a settings list; the description starts below at the
+ * label's left edge.
  *
  * @example
  * ```tsx
@@ -34,7 +37,7 @@ export function SwitchField({
   required,
   disabled,
   className,
-  layout = "left",
+  layout = "trailing",
   ...variantProps
 }: SwitchFieldProps) {
   const { Switch } = useFlatUIComponents();

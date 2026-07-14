@@ -2,7 +2,14 @@ import { createContext, useContext } from "react";
 
 /** Field display configuration for label position and size. */
 export interface FieldVariant {
-  layout?: "top" | "left" | "inline" | "hidden";
+  /**
+   * Label placement. `"top"` stacks the label above the input, `"left"` puts
+   * it in a leading column, `"inline"` keeps label and input on one row,
+   * `"trailing"` right-aligns the control with a dashed leader line from the
+   * label (settings-row style, used by toggle fields), `"hidden"` renders the
+   * label for screen readers only.
+   */
+  layout?: "top" | "left" | "inline" | "trailing" | "hidden";
   size?: "sm" | "md" | "lg";
 }
 
