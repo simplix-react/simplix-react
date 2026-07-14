@@ -8,4 +8,4 @@
 
 > `const` **TableFooter**: `ForwardRefExoticComponent`\<`Omit`\<`DetailedHTMLProps`\<`HTMLAttributes`\<`HTMLTableSectionElement`\>, `HTMLTableSectionElement`\>, `"ref"`\> & `RefAttributes`\<`HTMLTableSectionElement`\>\>
 
-Defined in: [packages/ui/src/base/display/table.tsx:169](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/table.tsx#L169)
+Defined in: [packages/ui/src/base/display/table.tsx:256](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/table.tsx#L256)

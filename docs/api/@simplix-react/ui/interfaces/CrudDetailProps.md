@@ -113,5 +113,5 @@ Renders a close button (panel-right-close icon) at the right side of the header 
 Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:86](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L86)
 
 Layout variant.
-- `"default"` — compact padding for side panels (px-2).
+- `"default"` — compact padding for side panels (px-3).
 - `"dialog"` — generous padding for use inside Dialog (px-5, extra vertical padding on header/footer).

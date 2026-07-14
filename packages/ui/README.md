@@ -408,6 +408,8 @@ const { data, filters, sort, pagination, selection, emptyReason } = useCrudList(
 
 Sub-components: `List.Toolbar`, `List.Search`, `List.Filter`, `List.Table`, `List.Column`, `List.RowActions`, `List.Action`, `List.Pagination`, `List.BulkActions`, `List.BulkAction`, `List.Empty`
 
+`List.Table` and `Tree.Table` render a sticky header by default — once scrolling an outer container (a page, dialog, or detail-pane body) would hide the header row, it sticks to the top of the nearest scrollable ancestor. Wide tables keep their own horizontal scrollbar, and the floating header scrolls with its columns. Pass `stickyHeader={false}` to disable. Inside a `List.TableCard` the table owns its scroll region and the header is always sticky.
+
 #### CardList
 
 Mobile-friendly card-based layout alternative to table.

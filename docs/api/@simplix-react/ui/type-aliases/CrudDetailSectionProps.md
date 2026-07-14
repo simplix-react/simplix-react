@@ -8,7 +8,7 @@
 
 > **CrudDetailSectionProps** = [`SectionShellProps`](../interfaces/SectionShellProps.md)
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:186](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L186)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:188](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L188)
 
 Section sub-component for CrudDetail.
 

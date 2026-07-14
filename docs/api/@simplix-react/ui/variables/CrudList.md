@@ -8,7 +8,7 @@
 
 > `const` **CrudList**: (`__namedParameters`) => `Element` & `object`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:1563](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1563)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:1570](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1570)
 
 Compound component for building CRUD list views with toolbar, table,
 pagination, selection, and bulk actions.

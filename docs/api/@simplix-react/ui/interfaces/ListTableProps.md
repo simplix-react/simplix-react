@@ -22,7 +22,7 @@ Props for the List.Table sub-component built on TanStack Table.
 
 > `optional` **actionColumnWidth**: `number`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:346](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L346)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:353](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L353)
 
 Override the auto-calculated action column width (px).
 
@@ -32,7 +32,7 @@ Override the auto-calculated action column width (px).
 
 > `optional` **actions**: [`RowActionDef`](RowActionDef.md)\<`T`\>[]
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:342](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L342)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:349](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L349)
 
 Declarative row action buttons. Automatically appends an action column to the table.
 
@@ -42,7 +42,7 @@ Declarative row action buttons. Automatically appends an action column to the ta
 
 > `optional` **actionVariant**: [`ActionVariant`](../type-aliases/ActionVariant.md)
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:344](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L344)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:351](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L351)
 
 Visual variant for action buttons. Defaults to `"outline"`.
 
@@ -124,7 +124,7 @@ Render prop for the card title area. Displayed with a bottom border, inline with
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:363](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L363)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:370](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L370)
 
 ***
 
@@ -132,7 +132,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:363](https://github.com/sim
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:362](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L362)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:369](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L369)
 
 ***
 
@@ -158,7 +158,7 @@ Vertical density (padding). Overrides size-based vertical spacing when set.
 
 > `optional` **emptyReason**: [`EmptyReason`](../type-aliases/EmptyReason.md) \| `null`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:352](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L352)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:359](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L359)
 
 When set, displays an empty-state message inside the table body.
 
@@ -168,7 +168,7 @@ When set, displays an empty-state message inside the table body.
 
 > `optional` **emptyState**: `object`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:354](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L354)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:361](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L361)
 
 Rich empty state config for "no-data" reason. Replaces the entire table with a centered illustration.
 
@@ -280,7 +280,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:312](https://github.com/sim
 
 > `optional` **reorder**: [`ReorderConfig`](ReorderConfig.md)\<`T`\>
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:350](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L350)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:357](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L357)
 
 Drag-and-drop row reorder configuration.
 
@@ -300,7 +300,7 @@ Container border radius.
 
 > `optional` **rowClassName**: (`row`) => `string` \| `undefined`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:361](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L361)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:368](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L368)
 
 Callback to compute extra class names for each table/card row.
 
@@ -364,7 +364,7 @@ Cell padding size.
 
 > `optional` **slots**: [`ListTableSlots`](ListTableSlots.md)\<`T`\>
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:348](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L348)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:355](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L355)
 
 Per-instance render overrides for the action cluster and empty state.
 
@@ -375,6 +375,19 @@ Per-instance render overrides for the action cluster and empty state.
 > `optional` **sort**: [`SortState`](SortState.md) \| `null`
 
 Defined in: [packages/ui/src/crud/list/crud-list.tsx:311](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L311)
+
+***
+
+### stickyHeader?
+
+> `optional` **stickyHeader**: `boolean`
+
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:347](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L347)
+
+Sticks the header row to the top of the nearest scrollable ancestor
+(e.g. a page, dialog, or detail-pane body) once scrolling would hide it.
+The table keeps its own horizontal scrollbar; the floating header scrolls
+with its columns. Enabled by default; pass `false` to disable.
 
 ***
 
