@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext, type ReactNode } from "react";
 
 /** Field display configuration for label position and size. */
 export interface FieldVariant {
@@ -34,6 +34,18 @@ export interface CommonFieldProps extends Partial<FieldVariant> {
   description?: string;
   required?: boolean;
   disabled?: boolean;
+  /**
+   * Control rendered on the leading (left in LTR) side of the input, on the
+   * same row. Use for IconPicker, ColorPicker, or similar adornments.
+   */
+  prefixControl?: ReactNode;
+  /**
+   * Control rendered on the trailing (right in LTR) side of the input, on the
+   * same row. Use instead of composing a button next to the field — the
+   * control stays aligned with the input while description and error render
+   * below at full width.
+   */
+  suffixControl?: ReactNode;
   className?: string;
 }
 
