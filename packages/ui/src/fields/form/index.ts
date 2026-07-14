@@ -69,6 +69,9 @@ export type { TextareaFieldProps } from "./textarea-field";
 export { LocationPickerField } from "./location-picker-field";
 export type { LocationPickerFieldProps } from "./location-picker-field";
 
+export { TimeField } from "./time-field";
+export type { TimeFieldProps } from "./time-field";
+
 export { TimezoneField } from "./timezone-field";
 export type { TimezoneFieldProps } from "./timezone-field";
 
