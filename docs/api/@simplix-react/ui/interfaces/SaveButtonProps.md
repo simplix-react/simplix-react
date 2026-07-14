@@ -919,6 +919,22 @@ Defines the human readable text alternative of aria-valuenow for a range widget.
 
 ***
 
+### asChild?
+
+> `optional` **asChild**: `boolean`
+
+Defined in: [packages/ui/src/base/controls/button.tsx:63](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L63)
+
+Render the single child element instead of a `<button>`, merging the
+button styling and behavior onto it (e.g. wrap a router `<Link>`). The
+loading spinner is not composed in this mode.
+
+#### Inherited from
+
+[`ButtonProps`](ButtonProps.md).[`asChild`](ButtonProps.md#aschild)
+
+***
+
 ### autoCapitalize?
 
 > `optional` **autoCapitalize**: `"none"` \| `string` & `object` \| `"off"` \| `"on"` \| `"sentences"` \| `"words"` \| `"characters"`
@@ -1122,6 +1138,22 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 #### Inherited from
 
 [`CardProps`](CardProps.md).[`draggable`](CardProps.md#draggable)
+
+***
+
+### dropdown?
+
+> `optional` **dropdown**: `boolean`
+
+Defined in: [packages/ui/src/base/controls/button.tsx:57](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L57)
+
+Append a trailing chevron-down caret so the button reads as a menu/dropdown
+trigger. Use on a `DropdownMenuTrigger` button. Suppressed while loading and
+in `asChild` mode.
+
+#### Inherited from
+
+[`ButtonProps`](ButtonProps.md).[`dropdown`](ButtonProps.md#dropdown)
 
 ***
 
@@ -1431,7 +1463,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **loadingText**: `ReactNode`
 
-Defined in: [packages/ui/src/base/controls/button.tsx:48](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L48)
+Defined in: [packages/ui/src/base/controls/button.tsx:51](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L51)
 
 Text to show while loading. Replaces children if provided.
 

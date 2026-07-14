@@ -8,4 +8,4 @@
 
 > **BadgeVariants** = `VariantProps`\<*typeof* [`badgeVariants`](../variables/badgeVariants.md)\>
 
-Defined in: [packages/ui/src/base/display/badge.tsx:75](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L75)
+Defined in: [packages/ui/src/base/display/badge.tsx:77](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L77)

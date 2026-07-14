@@ -66,7 +66,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:25](https://github.com/simplix
 
 ### inputProps?
 
-> `optional` **inputProps**: `DetailedHTMLProps`\<`InputHTMLAttributes`\<`HTMLInputElement`\>, `HTMLInputElement`\>
+> `optional` **inputProps**: `Omit`\<`DetailedHTMLProps`\<`InputHTMLAttributes`\<`HTMLInputElement`\>, `HTMLInputElement`\>, `"value"` \| `"type"` \| `"onChange"`\>
 
 Defined in: [packages/ui/src/fields/form/number-field.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/number-field.tsx#L19)
 

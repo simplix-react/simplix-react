@@ -210,6 +210,7 @@ Unstyled Radix UI primitives with Tailwind CSS styling. Used internally by field
 - `Select` (Root, Trigger, Value, Content, Item, Group, Label, Separator)
 - `RadioGroup` (Root, Item)
 - `Calendar` (date picker grid)
+- `TimePicker` (time-of-day input with AM/PM toggle and drop-open hour/minute lists)
 - `Popover` (Root, Trigger, Content, Anchor)
 - `Dialog` (Root, Trigger, Content, Header, Footer, Title, Description, Close)
 - `DropdownMenu` (Root, Trigger, Content, Item, CheckboxItem, RadioItem, RadioGroup, Label, Separator, Sub, SubTrigger, SubContent, Group)
@@ -257,6 +258,8 @@ import { FormFields } from "@simplix-react/ui";
 | `FormFields.CheckboxField` | `boolean` | `checkboxProps` |
 | `FormFields.RadioGroupField` | `string` | `options` (label/value/description), `direction` |
 | `FormFields.DateField` | `Date \| null` | `minDate`, `maxDate`, `format`, `placeholder` |
+| `FormFields.DateTimeField` | `Date \| string \| number \| null` | `minDate`, `maxDate`, `hideTime`, `hour12`, `minuteStep` |
+| `FormFields.TimeField` | `TimeValue \| null` (`{ hours, minutes }`) | `minTime`, `maxTime`, `hour12`, `minuteStep` |
 | `FormFields.ComboboxField` | `string \| null` | `options`, `onSearch`, `loading`, `emptyMessage` |
 | `FormFields.PasswordField` | `string` | `placeholder`, `maxLength` (with visibility toggle) |
 | `FormFields.ColorField` | `string` (hex) | Native color picker + hex text input |

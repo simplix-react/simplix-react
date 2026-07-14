@@ -245,6 +245,8 @@ Next Step → `@simplix-react/mock`
 
 ## Interfaces
 
+- [LocalQueryDef](interfaces/LocalQueryDef.md)
+- [LocalQueryStoreOptions](interfaces/LocalQueryStoreOptions.md)
 - [OperationHooks](interfaces/OperationHooks.md)
 
 ## Type Aliases
@@ -264,5 +266,6 @@ Next Step → `@simplix-react/mock`
 
 ## Functions
 
+- [createLocalQueryStore](functions/createLocalQueryStore.md)
 - [deriveEntityHooks](functions/deriveEntityHooks.md)
 - [useBatchDetails](functions/useBatchDetails.md)

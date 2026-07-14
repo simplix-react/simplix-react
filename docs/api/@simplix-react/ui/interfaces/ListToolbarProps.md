@@ -6,7 +6,7 @@
 
 # Interface: ListToolbarProps
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:128](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L128)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:129](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L129)
 
 Props for the List.Toolbar sub-component.
 
@@ -16,7 +16,7 @@ Props for the List.Toolbar sub-component.
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:130](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L130)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:131](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L131)
 
 ***
 
@@ -24,4 +24,4 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:130](https://github.com/sim
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:129](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L129)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:130](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L130)

@@ -6,7 +6,7 @@
 
 # Interface: CountryFilterDef
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:55](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L55)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:85](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L85)
 
 ## Extends
 
@@ -14,11 +14,27 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:55](https://github.com/
 
 ## Properties
 
+### columnBreak?
+
+> `optional` **columnBreak**: `boolean`
+
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:33](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L33)
+
+When the filter popover renders in multiple columns, start a new column at
+this filter. Up to (columns - 1) flags take effect, in order; without flags
+the fields are split evenly (column-major). Ignored in single-column layout.
+
+#### Inherited from
+
+`FilterDefBase.columnBreak`
+
+***
+
 ### field
 
 > **field**: `string`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L23)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L26)
 
 #### Inherited from
 
@@ -30,7 +46,7 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:23](https://github.com/
 
 > **label**: `string`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L24)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L27)
 
 #### Inherited from
 
@@ -42,4 +58,4 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:24](https://github.com/
 
 > **type**: `"country"`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:56](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L56)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:86](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L86)

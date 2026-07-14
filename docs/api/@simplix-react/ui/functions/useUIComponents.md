@@ -8,10 +8,13 @@
 
 > **useUIComponents**(): [`UIComponents`](../interfaces/UIComponents.md)
 
-Defined in: [packages/ui/src/provider/ui-provider.tsx:166](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/ui-provider.tsx#L166)
+Defined in: [packages/ui/src/provider/ui-provider.tsx:80](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/ui-provider.tsx#L80)
 
 Returns the resolved set of UI base components, merging defaults with
 any overrides provided by ancestor [UIProvider](UIProvider.md) instances.
+
+Leaf overrides replace the default outright; partial compound overrides are
+deep-merged so sibling sub-components are preserved.
 
 ## Returns
 

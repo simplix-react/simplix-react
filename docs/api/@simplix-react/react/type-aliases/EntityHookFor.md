@@ -8,7 +8,7 @@
 
 > **EntityHookFor**\<`Role`, `Op`, `TSchema`\> = `Role` *extends* `"list"` ? [`DerivedListHook`](DerivedListHook.md)\<`InferEntityData`\<`TSchema`\>\> : `Role` *extends* `"get"` ? [`DerivedGetHook`](DerivedGetHook.md)\<`InferEntityData`\<`TSchema`\>\> : `Role` *extends* `"create"` ? [`DerivedCreateHook`](DerivedCreateHook.md)\<`InferOpInput`\<`Op`\>, `InferEntityData`\<`TSchema`\>\> : `Role` *extends* `"update"` ? [`DerivedUpdateHook`](DerivedUpdateHook.md)\<`InferOpInput`\<`Op`\>, `InferEntityData`\<`TSchema`\>\> : `Role` *extends* `"delete"` ? [`DerivedDeleteHook`](DerivedDeleteHook.md) : `Role` *extends* `"tree"` ? [`DerivedTreeHook`](DerivedTreeHook.md)\<`InferEntityData`\<`TSchema`\>\> : `Op` *extends* `object` ? [`DerivedQueryHook`](DerivedQueryHook.md)\<`InferOpOutputData`\<`Op`, `TSchema`\>\> : [`OperationMutationHook`](OperationMutationHook.md)\<`InferOpInput`\<`Op`\>, `InferOpOutputData`\<`Op`, `TSchema`\>\>
 
-Defined in: [types.ts:210](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L210)
+Defined in: [packages/react/src/types.ts:210](https://github.com/simplix-react/simplix-react/blob/main/packages/react/src/types.ts#L210)
 
 Maps a single entity operation to its derived hook type, by resolved CRUD role.
 

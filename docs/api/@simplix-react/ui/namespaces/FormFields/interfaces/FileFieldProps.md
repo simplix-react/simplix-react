@@ -6,7 +6,7 @@
 
 # Interface: FileFieldProps
 
-Defined in: [packages/ui/src/fields/file-attachment/types.ts:129](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/file-attachment/types.ts#L129)
+Defined in: [packages/ui/src/fields/file-attachment/types.ts:175](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/file-attachment/types.ts#L175)
 
 Props for the FileField form component.
 Extends CommonFieldProps (label, error, disabled, layout, size, etc.).
@@ -22,9 +22,9 @@ does NOT call api.list() on mount. Callers pre-fetch and pass the list here.
 
 ### api
 
-> **api**: `FileFieldApi`
+> **api**: [`FileFieldApi`](../../../interfaces/FileFieldApi.md)
 
-Defined in: [packages/ui/src/fields/file-attachment/types.ts:143](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/file-attachment/types.ts#L143)
+Defined in: [packages/ui/src/fields/file-attachment/types.ts:189](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/file-attachment/types.ts#L189)
 
 API implementation provided by the caller.
 
@@ -46,7 +46,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:30](https://github.com/simplix
 
 > `optional` **config**: `FileFieldConfig`
 
-Defined in: [packages/ui/src/fields/file-attachment/types.ts:145](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/file-attachment/types.ts#L145)
+Defined in: [packages/ui/src/fields/file-attachment/types.ts:191](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/file-attachment/types.ts#L191)
 
 Capacity / MIME constraints.
 
@@ -90,9 +90,9 @@ Defined in: [packages/ui/src/crud/shared/types.ts:25](https://github.com/simplix
 
 ### initialAttachments?
 
-> `optional` **initialAttachments**: `AttachmentRecord`[]
+> `optional` **initialAttachments**: [`AttachmentRecord`](../../../interfaces/AttachmentRecord.md)[]
 
-Defined in: [packages/ui/src/fields/file-attachment/types.ts:141](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/file-attachment/types.ts#L141)
+Defined in: [packages/ui/src/fields/file-attachment/types.ts:187](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/file-attachment/types.ts#L187)
 
 Seed for the hook's internal items state (DEC-1/UD-8).
 Pass the pre-fetched attachment list from the server here.
@@ -128,7 +128,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:24](https://github.com/simplix
 
 > `optional` **languages**: `LocaleConfig`[]
 
-Defined in: [packages/ui/src/fields/file-attachment/types.ts:150](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/file-attachment/types.ts#L150)
+Defined in: [packages/ui/src/fields/file-attachment/types.ts:196](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/file-attachment/types.ts#L196)
 
 Supported locale list for the i18n description dialog.
 When omitted the dialog renders a single plain-text input.
@@ -151,7 +151,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-
 
 > `optional` **onAuthError**: (`error`) => `void`
 
-Defined in: [packages/ui/src/fields/file-attachment/types.ts:135](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/file-attachment/types.ts#L135)
+Defined in: [packages/ui/src/fields/file-attachment/types.ts:181](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/file-attachment/types.ts#L181)
 
 Called when an API call returns 401 or 403 (R2-5/R2-6).
 
@@ -171,7 +171,7 @@ Called when an API call returns 401 or 403 (R2-5/R2-6).
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/fields/file-attachment/types.ts:133](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/file-attachment/types.ts#L133)
+Defined in: [packages/ui/src/fields/file-attachment/types.ts:179](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/file-attachment/types.ts#L179)
 
 Called whenever the completed attachment list changes.
 
@@ -179,7 +179,7 @@ Called whenever the completed attachment list changes.
 
 ##### value
 
-`AttachmentRecord`[]
+[`AttachmentRecord`](../../../interfaces/AttachmentRecord.md)[]
 
 #### Returns
 
@@ -213,9 +213,9 @@ Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-
 
 ### value
 
-> **value**: `AttachmentRecord`[]
+> **value**: [`AttachmentRecord`](../../../interfaces/AttachmentRecord.md)[]
 
-Defined in: [packages/ui/src/fields/file-attachment/types.ts:131](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/file-attachment/types.ts#L131)
+Defined in: [packages/ui/src/fields/file-attachment/types.ts:177](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/file-attachment/types.ts#L177)
 
 Controlled list of completed attachments (server records).
 

@@ -8,7 +8,7 @@
 
 > `const` **cardVariants**: (`props?`) => `string`
 
-Defined in: [packages/ui/src/primitives/card.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/card.tsx#L14)
+Defined in: [packages/ui/src/primitives/card.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/card.tsx#L13)
 
 CVA variants for the Card component visual configuration.
 

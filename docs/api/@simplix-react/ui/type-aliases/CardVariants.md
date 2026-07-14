@@ -8,6 +8,6 @@
 
 > **CardVariants** = `VariantProps`\<*typeof* [`cardVariants`](../variables/cardVariants.md)\>
 
-Defined in: [packages/ui/src/primitives/card.tsx:34](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/card.tsx#L34)
+Defined in: [packages/ui/src/primitives/card.tsx:33](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/card.tsx#L33)
 
 Variant props extracted from [cardVariants](../variables/cardVariants.md).

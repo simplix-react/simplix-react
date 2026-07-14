@@ -6,7 +6,7 @@
 
 # Interface: ButtonProps
 
-Defined in: [packages/ui/src/base/controls/button.tsx:42](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L42)
+Defined in: [packages/ui/src/base/controls/button.tsx:45](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L45)
 
 ## Extends
 
@@ -22,7 +22,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`about`](CardProps.md#about)
+`ComponentPropsWithRef.about`
 
 ***
 
@@ -34,7 +34,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`accessKey`](CardProps.md#accesskey)
+`ComponentPropsWithRef.accessKey`
 
 ***
 
@@ -915,6 +915,18 @@ Defines the human readable text alternative of aria-valuenow for a range widget.
 
 ***
 
+### asChild?
+
+> `optional` **asChild**: `boolean`
+
+Defined in: [packages/ui/src/base/controls/button.tsx:63](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L63)
+
+Render the single child element instead of a `<button>`, merging the
+button styling and behavior onto it (e.g. wrap a router `<Link>`). The
+loading spinner is not composed in this mode.
+
+***
+
 ### autoCapitalize?
 
 > `optional` **autoCapitalize**: `"none"` \| `string` & `object` \| `"off"` \| `"on"` \| `"sentences"` \| `"words"` \| `"characters"`
@@ -923,7 +935,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`autoCapitalize`](CardProps.md#autocapitalize)
+`ComponentPropsWithRef.autoCapitalize`
 
 ***
 
@@ -935,7 +947,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`autoCorrect`](CardProps.md#autocorrect)
+`ComponentPropsWithRef.autoCorrect`
 
 ***
 
@@ -947,7 +959,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`autoFocus`](CardProps.md#autofocus)
+`ComponentPropsWithRef.autoFocus`
 
 ***
 
@@ -959,7 +971,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`autoSave`](CardProps.md#autosave)
+`ComponentPropsWithRef.autoSave`
 
 ***
 
@@ -995,7 +1007,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`color`](CardProps.md#color)
+`ComponentPropsWithRef.color`
 
 ***
 
@@ -1007,7 +1019,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`content`](CardProps.md#content)
+`ComponentPropsWithRef.content`
 
 ***
 
@@ -1019,7 +1031,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`contentEditable`](CardProps.md#contenteditable)
+`ComponentPropsWithRef.contentEditable`
 
 ***
 
@@ -1031,7 +1043,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`contextMenu`](CardProps.md#contextmenu)
+`ComponentPropsWithRef.contextMenu`
 
 ***
 
@@ -1059,7 +1071,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`datatype`](CardProps.md#datatype)
+`ComponentPropsWithRef.datatype`
 
 ***
 
@@ -1071,7 +1083,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`defaultChecked`](CardProps.md#defaultchecked)
+`ComponentPropsWithRef.defaultChecked`
 
 ***
 
@@ -1083,7 +1095,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`defaultValue`](CardProps.md#defaultvalue)
+`ComponentPropsWithRef.defaultValue`
 
 ***
 
@@ -1095,7 +1107,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`dir`](CardProps.md#dir)
+`ComponentPropsWithRef.dir`
 
 ***
 
@@ -1119,7 +1131,19 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`draggable`](CardProps.md#draggable)
+`ComponentPropsWithRef.draggable`
+
+***
+
+### dropdown?
+
+> `optional` **dropdown**: `boolean`
+
+Defined in: [packages/ui/src/base/controls/button.tsx:57](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L57)
+
+Append a trailing chevron-down caret so the button reads as a menu/dropdown
+trigger. Use on a `DropdownMenuTrigger` button. Suppressed while loading and
+in `asChild` mode.
 
 ***
 
@@ -1131,7 +1155,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`enterKeyHint`](CardProps.md#enterkeyhint)
+`ComponentPropsWithRef.enterKeyHint`
 
 ***
 
@@ -1147,7 +1171,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`exportparts`](CardProps.md#exportparts)
+`ComponentPropsWithRef.exportparts`
 
 ***
 
@@ -1231,7 +1255,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`hidden`](CardProps.md#hidden)
+`ComponentPropsWithRef.hidden`
 
 ***
 
@@ -1243,7 +1267,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`id`](CardProps.md#id)
+`ComponentPropsWithRef.id`
 
 ***
 
@@ -1259,7 +1283,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`inert`](CardProps.md#inert)
+`ComponentPropsWithRef.inert`
 
 ***
 
@@ -1271,7 +1295,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`inlist`](CardProps.md#inlist)
+`ComponentPropsWithRef.inlist`
 
 ***
 
@@ -1289,7 +1313,7 @@ Hints at the type of data that might be entered by the user while editing the el
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`inputMode`](CardProps.md#inputmode)
+`ComponentPropsWithRef.inputMode`
 
 ***
 
@@ -1307,7 +1331,7 @@ Specify that a standard HTML element should behave like a defined custom built-i
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`is`](CardProps.md#is)
+`ComponentPropsWithRef.is`
 
 ***
 
@@ -1319,7 +1343,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`itemID`](CardProps.md#itemid)
+`ComponentPropsWithRef.itemID`
 
 ***
 
@@ -1331,7 +1355,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`itemProp`](CardProps.md#itemprop)
+`ComponentPropsWithRef.itemProp`
 
 ***
 
@@ -1343,7 +1367,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`itemRef`](CardProps.md#itemref)
+`ComponentPropsWithRef.itemRef`
 
 ***
 
@@ -1355,7 +1379,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`itemScope`](CardProps.md#itemscope)
+`ComponentPropsWithRef.itemScope`
 
 ***
 
@@ -1367,7 +1391,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`itemType`](CardProps.md#itemtype)
+`ComponentPropsWithRef.itemType`
 
 ***
 
@@ -1391,7 +1415,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`lang`](CardProps.md#lang)
+`ComponentPropsWithRef.lang`
 
 ***
 
@@ -1399,7 +1423,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **loading**: `boolean`
 
-Defined in: [packages/ui/src/base/controls/button.tsx:46](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L46)
+Defined in: [packages/ui/src/base/controls/button.tsx:49](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L49)
 
 Show loading spinner and disable button.
 
@@ -1409,7 +1433,7 @@ Show loading spinner and disable button.
 
 > `optional` **loadingText**: `ReactNode`
 
-Defined in: [packages/ui/src/base/controls/button.tsx:48](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L48)
+Defined in: [packages/ui/src/base/controls/button.tsx:51](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L51)
 
 Text to show while loading. Replaces children if provided.
 
@@ -1435,7 +1459,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`nonce`](CardProps.md#nonce)
+`ComponentPropsWithRef.nonce`
 
 ***
 
@@ -3475,7 +3499,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`part`](CardProps.md#part)
+`ComponentPropsWithRef.part`
 
 ***
 
@@ -3487,7 +3511,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`popover`](CardProps.md#popover)
+`ComponentPropsWithRef.popover`
 
 ***
 
@@ -3499,7 +3523,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`popoverTarget`](CardProps.md#popovertarget)
+`ComponentPropsWithRef.popoverTarget`
 
 ***
 
@@ -3511,7 +3535,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`popoverTargetAction`](CardProps.md#popovertargetaction)
+`ComponentPropsWithRef.popoverTargetAction`
 
 ***
 
@@ -3523,7 +3547,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`prefix`](CardProps.md#prefix)
+`ComponentPropsWithRef.prefix`
 
 ***
 
@@ -3535,7 +3559,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`property`](CardProps.md#property)
+`ComponentPropsWithRef.property`
 
 ***
 
@@ -3547,7 +3571,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`radioGroup`](CardProps.md#radiogroup)
+`ComponentPropsWithRef.radioGroup`
 
 ***
 
@@ -3579,7 +3603,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`rel`](CardProps.md#rel)
+`ComponentPropsWithRef.rel`
 
 ***
 
@@ -3591,7 +3615,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`resource`](CardProps.md#resource)
+`ComponentPropsWithRef.resource`
 
 ***
 
@@ -3603,7 +3627,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`results`](CardProps.md#results)
+`ComponentPropsWithRef.results`
 
 ***
 
@@ -3615,7 +3639,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`rev`](CardProps.md#rev)
+`ComponentPropsWithRef.rev`
 
 ***
 
@@ -3627,7 +3651,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`role`](CardProps.md#role)
+`ComponentPropsWithRef.role`
 
 ***
 
@@ -3639,7 +3663,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`security`](CardProps.md#security)
+`ComponentPropsWithRef.security`
 
 ***
 
@@ -3647,7 +3671,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **size**: `"default"` \| `"icon"` \| `"xs"` \| `"sm"` \| `"lg"` \| `"icon-sm"` \| `"icon-xs"` \| `null`
 
-Defined in: [packages/ui/src/base/controls/button.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L23)
+Defined in: [packages/ui/src/base/controls/button.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L26)
 
 #### Inherited from
 
@@ -3663,7 +3687,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`slot`](CardProps.md#slot)
+`ComponentPropsWithRef.slot`
 
 ***
 
@@ -3675,7 +3699,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`spellCheck`](CardProps.md#spellcheck)
+`ComponentPropsWithRef.spellCheck`
 
 ***
 
@@ -3699,7 +3723,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`suppressContentEditableWarning`](CardProps.md#suppresscontenteditablewarning)
+`ComponentPropsWithRef.suppressContentEditableWarning`
 
 ***
 
@@ -3711,7 +3735,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`suppressHydrationWarning`](CardProps.md#suppresshydrationwarning)
+`ComponentPropsWithRef.suppressHydrationWarning`
 
 ***
 
@@ -3723,7 +3747,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`tabIndex`](CardProps.md#tabindex)
+`ComponentPropsWithRef.tabIndex`
 
 ***
 
@@ -3735,7 +3759,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`title`](CardProps.md#title)
+`ComponentPropsWithRef.title`
 
 ***
 
@@ -3747,7 +3771,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`translate`](CardProps.md#translate)
+`ComponentPropsWithRef.translate`
 
 ***
 
@@ -3771,7 +3795,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`typeof`](CardProps.md#typeof)
+`ComponentPropsWithRef.typeof`
 
 ***
 
@@ -3783,7 +3807,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`unselectable`](CardProps.md#unselectable)
+`ComponentPropsWithRef.unselectable`
 
 ***
 
@@ -3803,7 +3827,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **variant**: `"default"` \| `"outline"` \| `"link"` \| `"primary"` \| `"destructive"` \| `"secondary"` \| `"ghost"` \| `null`
 
-Defined in: [packages/ui/src/base/controls/button.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L10)
+Defined in: [packages/ui/src/base/controls/button.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L13)
 
 #### Inherited from
 
@@ -3819,4 +3843,4 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 #### Inherited from
 
-[`CardProps`](CardProps.md).[`vocab`](CardProps.md#vocab)
+`ComponentPropsWithRef.vocab`

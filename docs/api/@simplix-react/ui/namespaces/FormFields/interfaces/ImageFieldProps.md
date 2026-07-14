@@ -6,7 +6,7 @@
 
 # Interface: ImageFieldProps
 
-Defined in: [packages/ui/src/fields/form/image-field.tsx:40](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/image-field.tsx#L40)
+Defined in: [packages/ui/src/fields/form/image-field.tsx:41](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/image-field.tsx#L41)
 
 Shared props for all form field components.
 
@@ -18,9 +18,9 @@ Shared props for all form field components.
 
 ### api
 
-> **api**: `FileFieldApi`
+> **api**: [`FileFieldApi`](../../../interfaces/FileFieldApi.md)
 
-Defined in: [packages/ui/src/fields/form/image-field.tsx:46](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/image-field.tsx#L46)
+Defined in: [packages/ui/src/fields/form/image-field.tsx:47](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/image-field.tsx#L47)
 
 ***
 
@@ -40,7 +40,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:30](https://github.com/simplix
 
 > `optional` **config**: `FileFieldConfig`
 
-Defined in: [packages/ui/src/fields/form/image-field.tsx:47](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/image-field.tsx#L47)
+Defined in: [packages/ui/src/fields/form/image-field.tsx:48](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/image-field.tsx#L48)
 
 ***
 
@@ -82,9 +82,9 @@ Defined in: [packages/ui/src/crud/shared/types.ts:25](https://github.com/simplix
 
 ### initialAttachments?
 
-> `optional` **initialAttachments**: `AttachmentRecord`[]
+> `optional` **initialAttachments**: [`AttachmentRecord`](../../../interfaces/AttachmentRecord.md)[]
 
-Defined in: [packages/ui/src/fields/form/image-field.tsx:45](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/image-field.tsx#L45)
+Defined in: [packages/ui/src/fields/form/image-field.tsx:46](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/image-field.tsx#L46)
 
 ***
 
@@ -116,7 +116,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:24](https://github.com/simplix
 
 > `optional` **languages**: `LocaleConfig`[]
 
-Defined in: [packages/ui/src/fields/form/image-field.tsx:48](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/image-field.tsx#L48)
+Defined in: [packages/ui/src/fields/form/image-field.tsx:49](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/image-field.tsx#L49)
 
 ***
 
@@ -136,7 +136,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-
 
 > **maxCount**: `number`
 
-Defined in: [packages/ui/src/fields/form/image-field.tsx:57](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/image-field.tsx#L57)
+Defined in: [packages/ui/src/fields/form/image-field.tsx:58](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/image-field.tsx#L58)
 
 Maximum number of images that can be attached.
   1  → Single mode (StageDropzone + crop + bottom-right actions, representative toggle off)
@@ -150,7 +150,7 @@ OQ-2: maxCount serves as both mode selector and effective attachment limit.
 
 > `optional` **onAuthError**: (`error`) => `void`
 
-Defined in: [packages/ui/src/fields/form/image-field.tsx:44](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/image-field.tsx#L44)
+Defined in: [packages/ui/src/fields/form/image-field.tsx:45](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/image-field.tsx#L45)
 
 #### Parameters
 
@@ -168,13 +168,13 @@ Defined in: [packages/ui/src/fields/form/image-field.tsx:44](https://github.com/
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/fields/form/image-field.tsx:43](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/image-field.tsx#L43)
+Defined in: [packages/ui/src/fields/form/image-field.tsx:44](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/image-field.tsx#L44)
 
 #### Parameters
 
 ##### value
 
-`AttachmentRecord`[]
+[`AttachmentRecord`](../../../interfaces/AttachmentRecord.md)[]
 
 #### Returns
 
@@ -208,9 +208,9 @@ Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-
 
 ### value
 
-> **value**: `AttachmentRecord`[]
+> **value**: [`AttachmentRecord`](../../../interfaces/AttachmentRecord.md)[]
 
-Defined in: [packages/ui/src/fields/form/image-field.tsx:42](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/image-field.tsx#L42)
+Defined in: [packages/ui/src/fields/form/image-field.tsx:43](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/image-field.tsx#L43)
 
 ***
 

@@ -6,7 +6,7 @@
 
 # Interface: DateTimeFieldProps
 
-Defined in: [packages/ui/src/fields/form/datetime-field.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/datetime-field.tsx#L12)
+Defined in: [packages/ui/src/fields/form/datetime-field.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/datetime-field.tsx#L10)
 
 Props for the [DateTimeField](../functions/DateTimeField.md) form component.
 
@@ -56,7 +56,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:29](https://github.com/simplix
 
 > `optional` **endYear**: `number`
 
-Defined in: [packages/ui/src/fields/form/datetime-field.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/datetime-field.tsx#L28)
+Defined in: [packages/ui/src/fields/form/datetime-field.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/datetime-field.tsx#L26)
 
 End year for the year dropdown.
 
@@ -78,14 +78,30 @@ Defined in: [packages/ui/src/crud/shared/types.ts:25](https://github.com/simplix
 
 > `optional` **hideTime**: `boolean`
 
-Defined in: [packages/ui/src/fields/form/datetime-field.tsx:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/datetime-field.tsx#L30)
+Defined in: [packages/ui/src/fields/form/datetime-field.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/datetime-field.tsx#L28)
 
-Hide time inputs and act as date-only picker.
+Hide time selection and act as date-only picker.
 
 #### Default Value
 
 ```ts
 false
+```
+
+***
+
+### hour12?
+
+> `optional` **hour12**: `boolean`
+
+Defined in: [packages/ui/src/fields/form/datetime-field.tsx:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/datetime-field.tsx#L30)
+
+Use a 12-hour clock with an AM/PM toggle.
+
+#### Default Value
+
+```ts
+true
 ```
 
 ***
@@ -130,7 +146,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-
 
 > `optional` **locale**: `string`
 
-Defined in: [packages/ui/src/fields/form/datetime-field.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/datetime-field.tsx#L22)
+Defined in: [packages/ui/src/fields/form/datetime-field.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/datetime-field.tsx#L20)
 
 Short locale code (e.g. `"ko"`, `"en"`, `"ja"`).
 
@@ -140,7 +156,7 @@ Short locale code (e.g. `"ko"`, `"en"`, `"ja"`).
 
 > `optional` **maxDate**: `Date`
 
-Defined in: [packages/ui/src/fields/form/datetime-field.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/datetime-field.tsx#L20)
+Defined in: [packages/ui/src/fields/form/datetime-field.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/datetime-field.tsx#L18)
 
 Latest selectable date.
 
@@ -150,9 +166,25 @@ Latest selectable date.
 
 > `optional` **minDate**: `Date`
 
-Defined in: [packages/ui/src/fields/form/datetime-field.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/datetime-field.tsx#L18)
+Defined in: [packages/ui/src/fields/form/datetime-field.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/datetime-field.tsx#L16)
 
 Earliest selectable date.
+
+***
+
+### minuteStep?
+
+> `optional` **minuteStep**: `number`
+
+Defined in: [packages/ui/src/fields/form/datetime-field.tsx:32](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/datetime-field.tsx#L32)
+
+Interval between minute options in the scroll column.
+
+#### Default Value
+
+```ts
+1
+```
 
 ***
 
@@ -160,7 +192,7 @@ Earliest selectable date.
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/fields/form/datetime-field.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/datetime-field.tsx#L16)
+Defined in: [packages/ui/src/fields/form/datetime-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/datetime-field.tsx#L14)
 
 Called when the date-time changes.
 
@@ -180,7 +212,7 @@ Called when the date-time changes.
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/fields/form/datetime-field.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/datetime-field.tsx#L24)
+Defined in: [packages/ui/src/fields/form/datetime-field.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/datetime-field.tsx#L22)
 
 Placeholder text when no date is selected.
 
@@ -214,7 +246,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-
 
 > `optional` **startYear**: `number`
 
-Defined in: [packages/ui/src/fields/form/datetime-field.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/datetime-field.tsx#L26)
+Defined in: [packages/ui/src/fields/form/datetime-field.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/datetime-field.tsx#L24)
 
 Start year for the year dropdown.
 
@@ -224,7 +256,7 @@ Start year for the year dropdown.
 
 > **value**: [`DateLike`](../../../type-aliases/DateLike.md) \| `null`
 
-Defined in: [packages/ui/src/fields/form/datetime-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/datetime-field.tsx#L14)
+Defined in: [packages/ui/src/fields/form/datetime-field.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/datetime-field.tsx#L12)
 
 Currently selected date-time. Accepts Date, ISO string, or unix timestamp.
 

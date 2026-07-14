@@ -6,7 +6,7 @@
 
 # Interface: UseActiveMenuItemOptions
 
-Defined in: [packages/ui/src/menu/menu-types.ts:105](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/menu/menu-types.ts#L105)
+Defined in: [packages/ui/src/menu/menu-types.ts:108](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/menu/menu-types.ts#L108)
 
 ## Properties
 
@@ -14,4 +14,4 @@ Defined in: [packages/ui/src/menu/menu-types.ts:105](https://github.com/simplix-
 
 > `optional` **menuCode**: `string`
 
-Defined in: [packages/ui/src/menu/menu-types.ts:108](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/menu/menu-types.ts#L108)
+Defined in: [packages/ui/src/menu/menu-types.ts:111](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/menu/menu-types.ts#L111)

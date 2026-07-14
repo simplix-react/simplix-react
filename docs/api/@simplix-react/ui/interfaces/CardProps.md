@@ -6,7 +6,7 @@
 
 # Interface: CardProps
 
-Defined in: [packages/ui/src/primitives/card.tsx:39](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/card.tsx#L39)
+Defined in: [packages/ui/src/primitives/card.tsx:38](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/card.tsx#L38)
 
 Props for the [Card](../variables/Card.md) component.
 
@@ -921,7 +921,7 @@ Defines the human readable text alternative of aria-valuenow for a range widget.
 
 > `optional` **as**: [`CardTag`](../type-aliases/CardTag.md)
 
-Defined in: [packages/ui/src/primitives/card.tsx:43](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/card.tsx#L43)
+Defined in: [packages/ui/src/primitives/card.tsx:42](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/card.tsx#L42)
 
 Override the rendered HTML tag (default: "div", "button" when interactive).
 
@@ -979,7 +979,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/primitives/card.tsx:44](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/card.tsx#L44)
+Defined in: [packages/ui/src/primitives/card.tsx:43](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/card.tsx#L43)
 
 #### Overrides
 
@@ -1225,7 +1225,7 @@ Hints at the type of data that might be entered by the user while editing the el
 
 > `optional` **interactive**: `boolean` \| `null`
 
-Defined in: [packages/ui/src/primitives/card.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/card.tsx#L24)
+Defined in: [packages/ui/src/primitives/card.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/card.tsx#L23)
 
 #### Inherited from
 
@@ -3375,7 +3375,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **padding**: `"none"` \| `"sm"` \| `"lg"` \| `"md"` \| `null`
 
-Defined in: [packages/ui/src/primitives/card.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/card.tsx#L18)
+Defined in: [packages/ui/src/primitives/card.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/card.tsx#L17)
 
 #### Inherited from
 

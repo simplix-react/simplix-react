@@ -14,7 +14,17 @@ Defined in: [packages/ui/src/base/display/boolean-badge.tsx:6](https://github.co
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/base/display/boolean-badge.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/boolean-badge.tsx#L10)
+Defined in: [packages/ui/src/base/display/boolean-badge.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/boolean-badge.tsx#L14)
+
+***
+
+### falseLabel?
+
+> `optional` **falseLabel**: `string`
+
+Defined in: [packages/ui/src/base/display/boolean-badge.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/boolean-badge.tsx#L13)
+
+Accessible name for the false state (default "no").
 
 ***
 
@@ -23,6 +33,16 @@ Defined in: [packages/ui/src/base/display/boolean-badge.tsx:10](https://github.c
 > `optional` **falseVariant**: `"default"` \| `"success"` \| `"warning"` \| `"outline"` \| `"blue"` \| `"cyan"` \| `"fuchsia"` \| `"green"` \| `"indigo"` \| `"lime"` \| `"orange"` \| `"pink"` \| `"purple"` \| `"red"` \| `"teal"` \| `"violet"` \| `"yellow"` \| `"destructive"` \| `"secondary"` \| `"slate"` \| `"amber"` \| `"emerald"` \| `"sky"` \| `"rose"` \| `null`
 
 Defined in: [packages/ui/src/base/display/boolean-badge.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/boolean-badge.tsx#L9)
+
+***
+
+### trueLabel?
+
+> `optional` **trueLabel**: `string`
+
+Defined in: [packages/ui/src/base/display/boolean-badge.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/boolean-badge.tsx#L11)
+
+Accessible name for the true state (default "yes").
 
 ***
 

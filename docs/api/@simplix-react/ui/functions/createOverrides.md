@@ -8,9 +8,13 @@
 
 > **createOverrides**(`factory`): `Partial`\<[`UIComponents`](../interfaces/UIComponents.md)\>
 
-Defined in: [packages/ui/src/provider/ui-provider.tsx:318](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/ui-provider.tsx#L318)
+Defined in: [packages/ui/src/provider/ui-provider.tsx:232](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/ui-provider.tsx#L232)
 
 Creates a type-safe override map, optionally wrapping/extending defaults.
+
+The factory receives the raw `*Base` implementations, so
+`withOverride(defaults.Button, …)` wraps the non-resolving base and never
+re-enters the resolver.
 
 ## Parameters
 

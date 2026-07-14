@@ -8,13 +8,16 @@
 
 > **TimeRangeSelector**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:193](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L193)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/index.tsx:81](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/index.tsx#L81)
 
 Time range selector with heatmap visualization.
 
 <p>Displays a single-row heatmap showing count distribution over a time window.
-Users can select sub-ranges via drag, switch window sizes via presets, navigate
-with ◀ ▶ buttons, or pick dates directly via calendar.
+Select a sub-range by dragging (mouse, touch, or pen) or with the keyboard
+(arrow keys move, Shift+arrows resize, Home/End jump, PageUp/Down navigate),
+switch window sizes via presets, navigate with ◀ ▶, jump to Now, or pick dates
+via the calendar. Expanding a selection zooms the view into it (a preset-less
+"custom" window); the Custom chip zooms back out.
 
 ## Parameters
 

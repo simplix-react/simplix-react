@@ -6,7 +6,7 @@
 
 # Interface: TextProps
 
-Defined in: [packages/ui/src/primitives/text.tsx:42](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/text.tsx#L42)
+Defined in: [packages/ui/src/primitives/text.tsx:41](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/text.tsx#L41)
 
 Props for the [Text](../variables/Text.md) component.
 
@@ -921,7 +921,7 @@ Defines the human readable text alternative of aria-valuenow for a range widget.
 
 > `optional` **as**: [`TextTag`](../type-aliases/TextTag.md)
 
-Defined in: [packages/ui/src/primitives/text.tsx:46](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/text.tsx#L46)
+Defined in: [packages/ui/src/primitives/text.tsx:45](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/text.tsx#L45)
 
 Override the rendered HTML tag (default: "p", "code" when font="mono").
 
@@ -1155,7 +1155,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **font**: `"display"` \| `"sans"` \| `"mono"` \| `null`
 
-Defined in: [packages/ui/src/primitives/text.tsx:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/text.tsx#L27)
+Defined in: [packages/ui/src/primitives/text.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/text.tsx#L26)
 
 #### Inherited from
 
@@ -3555,7 +3555,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **size**: `"base"` \| `"caption"` \| `"sm"` \| `"lg"` \| `null`
 
-Defined in: [packages/ui/src/primitives/text.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/text.tsx#L15)
+Defined in: [packages/ui/src/primitives/text.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/text.tsx#L14)
 
 #### Inherited from
 
@@ -3651,7 +3651,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **tone**: `"default"` \| `"primary"` \| `"destructive"` \| `"muted"` \| `null`
 
-Defined in: [packages/ui/src/primitives/text.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/text.tsx#L21)
+Defined in: [packages/ui/src/primitives/text.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/text.tsx#L20)
 
 #### Inherited from
 

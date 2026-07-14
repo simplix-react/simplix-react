@@ -26,6 +26,7 @@ Shared props for all detail (read-only) field components.
 - [`DetailLocationFieldProps`](../namespaces/DetailFields/interfaces/DetailLocationFieldProps.md)
 - [`DetailListFieldProps`](../namespaces/DetailFields/interfaces/DetailListFieldProps.md)
 - [`DetailNumberFieldProps`](../namespaces/DetailFields/interfaces/DetailNumberFieldProps.md)
+- [`DetailStatusFieldProps`](../namespaces/DetailFields/interfaces/DetailStatusFieldProps.md)
 - [`DetailTextFieldProps`](../namespaces/DetailFields/interfaces/DetailTextFieldProps.md)
 - [`DetailTextareaFieldProps`](../namespaces/DetailFields/interfaces/DetailTextareaFieldProps.md)
 - [`DetailTimezoneFieldProps`](../namespaces/DetailFields/interfaces/DetailTimezoneFieldProps.md)

@@ -8,4 +8,4 @@
 
 > **SwitchProps** = `ComponentPropsWithRef`\<*typeof* `SwitchPrimitive.Root`\> & `VariantProps`\<*typeof* [`switchVariants`](../variables/switchVariants.md)\>
 
-Defined in: [packages/ui/src/base/inputs/switch.tsx:37](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/switch.tsx#L37)
+Defined in: [packages/ui/src/base/inputs/switch.tsx:38](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/switch.tsx#L38)

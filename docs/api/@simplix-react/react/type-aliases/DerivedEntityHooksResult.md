@@ -8,7 +8,7 @@
 
 > **DerivedEntityHooksResult**\<`TEntities`, `TOperations`\> = `{ [K in keyof TEntities]: EntityHooks<TEntities[K]["schema"], TEntities[K]["operations"]> }` & `{ [K in keyof TOperations]: TOperations[K] extends OperationDefinition<infer TInput, infer TOutput> ? OperationHooks<TInput, TOutput> : never }`
 
-Defined in: [derive-hooks.ts:560](https://github.com/simplix-react/simplix-react/blob/main/derive-hooks.ts#L560)
+Defined in: [packages/react/src/derive-hooks.ts:560](https://github.com/simplix-react/simplix-react/blob/main/packages/react/src/derive-hooks.ts#L560)
 
 The fully typed return value of [deriveEntityHooks](../functions/deriveEntityHooks.md).
 

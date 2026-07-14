@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/menu/menu-types.ts:80](https://github.com/simplix-r
 
 > **children**: `ReactNode`
 
-Defined in: [packages/ui/src/menu/menu-types.ts:86](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/menu/menu-types.ts#L86)
+Defined in: [packages/ui/src/menu/menu-types.ts:89](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/menu/menu-types.ts#L89)
 
 ***
 
@@ -69,3 +69,11 @@ Defined in: [packages/ui/src/menu/menu-types.ts:82](https://github.com/simplix-r
 > `optional` **permissionFilter**: [`MenuPermissionFilter`](../type-aliases/MenuPermissionFilter.md)
 
 Defined in: [packages/ui/src/menu/menu-types.ts:84](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/menu/menu-types.ts#L84)
+
+***
+
+### staleTime?
+
+> `optional` **staleTime**: `number`
+
+Defined in: [packages/ui/src/menu/menu-types.ts:88](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/menu/menu-types.ts#L88)

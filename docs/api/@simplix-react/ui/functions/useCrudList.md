@@ -8,7 +8,7 @@
 
 > **useCrudList**\<`T`\>(`useList`, `options?`): [`UseCrudListResult`](../interfaces/UseCrudListResult.md)\<`T`\>
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:135](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L135)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:143](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L143)
 
 State management hook for CRUD list views.
 
@@ -46,6 +46,14 @@ Handles filtering, sorting, pagination, and row selection with
 support for both server-side and client-side data processing.
 In `"server"` mode, filter/sort/pagination params are forwarded to the list hook.
 In `"client"` mode, all processing happens in-memory.
+
+This is the **headless escape hatch** for the list view: it returns the full
+data/filter/sort/pagination/selection state so a consumer can render any
+markup they want and still drive it with the framework's list engine — total
+control without forking. This guarantee is **list-only**; the form and tree
+views have no single equivalent hook, so their ceiling for deep customization
+is per-instance slots / render-props (e.g. [ListTableSlots](../interfaces/ListTableSlots.md)), not a
+headless hook.
 
 ## Example
 

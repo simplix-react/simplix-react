@@ -8,7 +8,7 @@
 
 > `const` **StatusBadge**: `ForwardRefExoticComponent`\<`Omit`\<[`StatusBadgeProps`](../interfaces/StatusBadgeProps.md), `"ref"`\> & `RefAttributes`\<`HTMLSpanElement`\>\>
 
-Defined in: [packages/ui/src/base/display/status-badge.tsx:47](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-badge.tsx#L47)
+Defined in: [packages/ui/src/base/display/status-badge.tsx:48](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-badge.tsx#L48)
 
 Compact status pill combining a tone-colored label with an optional leading
 dot or icon.

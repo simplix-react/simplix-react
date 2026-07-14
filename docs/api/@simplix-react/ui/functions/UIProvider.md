@@ -8,7 +8,7 @@
 
 > **UIProvider**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/provider/ui-provider.tsx:147](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/ui-provider.tsx#L147)
+Defined in: [packages/ui/src/provider/ui-provider.tsx:50](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/ui-provider.tsx#L50)
 
 Provides overridable base component implementations to the component tree.
 Supports nesting for scoped overrides.
@@ -26,7 +26,7 @@ Supports nesting for scoped overrides.
 ## Example
 
 ```tsx
-<UIProvider overrides={{ Button: MyButton, SectionShell: MySectionShell }}>
+<UIProvider overrides={{ Button: MyButton }} statusTones={{ success: { badge: "bg-teal-100 text-teal-800" } }}>
   <App />
 </UIProvider>
 ```

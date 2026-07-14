@@ -6,7 +6,7 @@
 
 # Interface: SelectTriggerProps
 
-Defined in: [packages/ui/src/base/inputs/select.tsx:35](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/select.tsx#L35)
+Defined in: [packages/ui/src/base/inputs/select.tsx:36](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/select.tsx#L36)
 
 ## Extends
 
@@ -3639,7 +3639,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **size**: `"default"` \| `"xs"` \| `"sm"` \| `null`
 
-Defined in: [packages/ui/src/base/inputs/select.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/select.tsx#L21)
+Defined in: [packages/ui/src/base/inputs/select.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/select.tsx#L22)
 
 #### Inherited from
 

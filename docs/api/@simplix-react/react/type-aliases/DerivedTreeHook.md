@@ -8,7 +8,7 @@
 
 > **DerivedTreeHook**\<`TData`\> = (`params?`, `options?`) => `UseQueryResult`\<`TData`\>
 
-Defined in: [types.ts:188](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L188)
+Defined in: [packages/react/src/types.ts:188](https://github.com/simplix-react/simplix-react/blob/main/packages/react/src/types.ts#L188)
 
 Represents a derived tree query hook produced for a `tree`-role operation.
 

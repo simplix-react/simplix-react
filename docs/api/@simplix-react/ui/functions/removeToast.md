@@ -8,7 +8,7 @@
 
 > **removeToast**(`id`): `void`
 
-Defined in: [packages/ui/src/base/feedback/toast-store.ts:67](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/toast-store.ts#L67)
+Defined in: [packages/ui/src/base/feedback/toast-store.ts:69](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/toast-store.ts#L69)
 
 ## Parameters
 

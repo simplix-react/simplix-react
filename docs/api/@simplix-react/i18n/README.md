@@ -245,6 +245,9 @@ function LocaleBadge() {
 - [CreateI18nConfigOptions](interfaces/CreateI18nConfigOptions.md)
 - [DateTimeFormatOptions](interfaces/DateTimeFormatOptions.md)
 - [DomainTranslationConfig](interfaces/DomainTranslationConfig.md)
+- [FormatDateOptions](interfaces/FormatDateOptions.md)
+- [FormatDateTimeOptions](interfaces/FormatDateTimeOptions.md)
+- [FormatTimeOptions](interfaces/FormatTimeOptions.md)
 - [I18nConfigResult](interfaces/I18nConfigResult.md)
 - [I18nextAdapterOptions](interfaces/I18nextAdapterOptions.md)
 - [II18nAdapter](interfaces/II18nAdapter.md)
@@ -256,6 +259,7 @@ function LocaleBadge() {
 
 ## Type Aliases
 
+- [DateInput](type-aliases/DateInput.md)
 - [DateTimeStyle](type-aliases/DateTimeStyle.md)
 - [LocaleCode](type-aliases/LocaleCode.md)
 - [NumberFormatStyle](type-aliases/NumberFormatStyle.md)
@@ -277,6 +281,12 @@ function LocaleBadge() {
 ## Functions
 
 - [buildModuleTranslations](functions/buildModuleTranslations.md)
+- [clearFormatterCaches](functions/clearFormatterCaches.md)
 - [createI18nConfig](functions/createI18nConfig.md)
+- [formatDate](functions/formatDate.md)
+- [formatDateTime](functions/formatDateTime.md)
+- [formatRelative](functions/formatRelative.md)
+- [formatTime](functions/formatTime.md)
 - [registerDomainTranslations](functions/registerDomainTranslations.md)
 - [registerModuleTranslations](functions/registerModuleTranslations.md)
+- [toBCP47Locale](functions/toBCP47Locale.md)

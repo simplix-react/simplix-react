@@ -6,7 +6,7 @@
 
 # Interface: TimeRangeSelectorProps
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:82](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L82)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/types.ts#L30)
 
 Props for the [TimeRangeSelector](../functions/TimeRangeSelector.md) component.
 
@@ -16,7 +16,7 @@ Props for the [TimeRangeSelector](../functions/TimeRangeSelector.md) component.
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:108](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L108)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:58](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/types.ts#L58)
 
 CSS class
 
@@ -26,7 +26,7 @@ CSS class
 
 > `optional` **colorStepBaseMinutes**: `number`
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:96](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L96)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:44](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/types.ts#L44)
 
 Bucket size (in minutes) that colorSteps are calibrated for.
 
@@ -42,7 +42,7 @@ Bucket size (in minutes) that colorSteps are calibrated for.
 
 > `optional` **colorSteps**: `number`[]
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:94](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L94)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:42](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/types.ts#L42)
 
 Color scale step boundaries calibrated to 1-hour buckets (e.g., [1, 3, 5, 10]).
  Steps are auto-scaled proportionally when bucket size differs from 1 hour.
@@ -54,7 +54,7 @@ Color scale step boundaries calibrated to 1-hour buckets (e.g., [1, 3, 5, 10]).
 
 > `optional` **colorTheme**: [`HeatmapColorTheme`](../type-aliases/HeatmapColorTheme.md)
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:98](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L98)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:46](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/types.ts#L46)
 
 Heatmap color theme.
 
@@ -70,7 +70,7 @@ Heatmap color theme.
 
 > `optional` **defaultWindow**: `string`
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:102](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L102)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:50](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/types.ts#L50)
 
 Initial window preset key.
 
@@ -86,7 +86,7 @@ Initial window preset key.
 
 > **fetchCounts**: (`from`, `to`, `bucketCount`) => `Promise`\<`number`[]\>
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:88](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L88)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:36](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/types.ts#L36)
 
 Fetch counts for the visible window. Called when view range changes.
 
@@ -110,11 +110,27 @@ Fetch counts for the visible window. Called when view range changes.
 
 ***
 
+### hour12?
+
+> `optional` **hour12**: `boolean`
+
+Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:56](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/types.ts#L56)
+
+Use 12-hour time formatting (AM/PM).
+
+#### Default Value
+
+```ts
+false — compact 24-hour, suited to the dense label row.
+```
+
+***
+
 ### maxCount?
 
 > `optional` **maxCount**: `number`
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:90](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L90)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:38](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/types.ts#L38)
 
 Fixed max value for heatmap scale. Auto-calculated if omitted.
 
@@ -124,7 +140,7 @@ Fixed max value for heatmap scale. Auto-calculated if omitted.
 
 > `optional` **maxDate**: `Date`
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:106](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L106)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:54](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/types.ts#L54)
 
 Latest allowed date
 
@@ -134,7 +150,7 @@ Latest allowed date
 
 > `optional` **minDate**: `Date`
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:104](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L104)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:52](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/types.ts#L52)
 
 Earliest allowed date
 
@@ -144,7 +160,7 @@ Earliest allowed date
 
 > **onChange**: (`range`) => `void`
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:86](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L86)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:34](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/types.ts#L34)
 
 Range change callback
 
@@ -164,7 +180,7 @@ Range change callback
 
 > `optional` **presets**: [`WindowPreset`](WindowPreset.md)[]
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:100](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L100)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:48](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/types.ts#L48)
 
 Available window presets. Defaults provided if omitted.
 
@@ -174,6 +190,6 @@ Available window presets. Defaults provided if omitted.
 
 > **value**: `TimeRange`
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:84](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L84)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:32](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/types.ts#L32)
 
 Current selected range

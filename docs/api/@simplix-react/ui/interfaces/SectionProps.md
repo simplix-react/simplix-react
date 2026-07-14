@@ -6,7 +6,7 @@
 
 # Interface: SectionProps
 
-Defined in: [packages/ui/src/primitives/section.tsx:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/section.tsx#L8)
+Defined in: [packages/ui/src/primitives/section.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/section.tsx#L7)
 
 Props for the [Section](../variables/Section.md) layout component.
 
@@ -969,7 +969,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/primitives/section.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/section.tsx#L14)
+Defined in: [packages/ui/src/primitives/section.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/section.tsx#L13)
 
 #### Overrides
 
@@ -1093,7 +1093,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **description**: `string`
 
-Defined in: [packages/ui/src/primitives/section.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/section.tsx#L13)
+Defined in: [packages/ui/src/primitives/section.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/section.tsx#L12)
 
 Descriptive text rendered below the title.
 
@@ -3615,7 +3615,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **title**: `ReactNode`
 
-Defined in: [packages/ui/src/primitives/section.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/section.tsx#L11)
+Defined in: [packages/ui/src/primitives/section.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/section.tsx#L10)
 
 Section heading rendered as an h3 element.
 

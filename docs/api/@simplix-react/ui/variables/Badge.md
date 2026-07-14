@@ -6,6 +6,6 @@
 
 # Variable: Badge
 
-> `const` **Badge**: `ForwardRefExoticComponent`\<`Omit`\<[`BadgeProps`](../interfaces/BadgeProps.md), `"ref"`\> & `RefAttributes`\<`HTMLSpanElement`\>\>
+> `const` **Badge**: `ComponentType`\<`Omit`\<[`BadgeProps`](../interfaces/BadgeProps.md), `"ref"`\> & `RefAttributes`\<`HTMLSpanElement`\>\>
 
-Defined in: [packages/ui/src/base/display/badge.tsx:81](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L81)
+Defined in: [packages/ui/src/base/display/badge.tsx:104](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L104)

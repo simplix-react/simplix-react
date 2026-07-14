@@ -6,7 +6,7 @@
 
 # Interface: TimeRangeValue
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:31](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L31)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/types.ts#L24)
 
 Date range with bucket information, emitted via onChange.
 
@@ -20,7 +20,7 @@ Date range with bucket information, emitted via onChange.
 
 > **bucketMinutes**: `number`
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:33](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L33)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/types.ts#L26)
 
 Current bucket granularity in minutes. Useful for server-side aggregation.
 
@@ -30,7 +30,7 @@ Current bucket granularity in minutes. Useful for server-side aggregation.
 
 > **from**: `Date`
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L26)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/types.ts#L19)
 
 #### Inherited from
 
@@ -42,7 +42,7 @@ Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:26](https://git
 
 > **to**: `Date`
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L27)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/types.ts#L20)
 
 #### Inherited from
 

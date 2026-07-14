@@ -6,7 +6,7 @@
 
 # Interface: ListProps
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:91](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L91)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:92](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L92)
 
 Props for the [CrudList](../variables/CrudList.md) compound component root.
 
@@ -26,7 +26,7 @@ Props for the [CrudList](../variables/CrudList.md) compound component root.
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:93](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L93)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:94](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L94)
 
 ***
 
@@ -34,4 +34,4 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:93](https://github.com/simp
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:92](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L92)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:93](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L93)

@@ -8,7 +8,7 @@
 
 > `const` **switchVariants**: (`props?`) => `string`
 
-Defined in: [packages/ui/src/base/inputs/switch.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/switch.tsx#L7)
+Defined in: [packages/ui/src/base/inputs/switch.tsx:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/switch.tsx#L8)
 
 ## Parameters
 

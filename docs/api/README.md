@@ -9,6 +9,7 @@
 - [@simplix-react/access](@simplix-react/access/README.md)
 - [@simplix-react/api](@simplix-react/api/README.md)
 - [@simplix-react/auth](@simplix-react/auth/README.md)
+- [@simplix-react/calendar](@simplix-react/calendar/README.md)
 - [@simplix-react/cli](@simplix-react/cli/README.md)
 - [@simplix-react/contract](@simplix-react/contract/README.md)
 - [@simplix-react/form](@simplix-react/form/README.md)
@@ -17,3 +18,4 @@
 - [@simplix-react/react](@simplix-react/react/README.md)
 - [@simplix-react/testing](@simplix-react/testing/README.md)
 - [@simplix-react/ui](@simplix-react/ui/README.md)
+- [simplix-react-ext](simplix-react-ext/README.md)

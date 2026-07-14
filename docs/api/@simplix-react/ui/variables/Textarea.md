@@ -6,6 +6,6 @@
 
 # Variable: Textarea
 
-> `const` **Textarea**: `ForwardRefExoticComponent`\<`Omit`\<`DetailedHTMLProps`\<`TextareaHTMLAttributes`\<`HTMLTextAreaElement`\>, `HTMLTextAreaElement`\>, `"ref"`\> & `RefAttributes`\<`HTMLTextAreaElement`\>\>
+> `const` **Textarea**: `ComponentType`\<`Omit`\<`DetailedHTMLProps`\<`TextareaHTMLAttributes`\<`HTMLTextAreaElement`\>, `HTMLTextAreaElement`\>, `"ref"`\> & `RefAttributes`\<`HTMLTextAreaElement`\>\>
 
-Defined in: [packages/ui/src/base/inputs/textarea.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/textarea.tsx#L7)
+Defined in: [packages/ui/src/base/inputs/textarea.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/textarea.tsx#L23)

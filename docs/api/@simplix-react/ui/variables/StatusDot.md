@@ -8,7 +8,7 @@
 
 > `const` **StatusDot**: `ForwardRefExoticComponent`\<`Omit`\<[`StatusDotProps`](../interfaces/StatusDotProps.md), `"ref"`\> & `RefAttributes`\<`HTMLSpanElement`\>\>
 
-Defined in: [packages/ui/src/base/display/status-dot.tsx:46](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-dot.tsx#L46)
+Defined in: [packages/ui/src/base/display/status-dot.tsx:47](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-dot.tsx#L47)
 
 Small status indicator dot with an optional animated ring.
 

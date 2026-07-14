@@ -6,7 +6,7 @@
 
 # Interface: MultiSelectFieldProps\<T\>
 
-Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/multi-select-field.tsx#L9)
+Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/multi-select-field.tsx#L10)
 
 Props for the [MultiSelectField](../functions/MultiSelectField.md) form component.
 
@@ -110,7 +110,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-
 
 > `optional` **maxCount**: `number`
 
-Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/multi-select-field.tsx#L19)
+Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/multi-select-field.tsx#L20)
 
 Maximum number of selections allowed.
 
@@ -120,7 +120,7 @@ Maximum number of selections allowed.
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/multi-select-field.tsx#L14)
+Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/multi-select-field.tsx#L15)
 
 Called when the selection changes.
 
@@ -140,7 +140,7 @@ Called when the selection changes.
 
 > **options**: `object`[]
 
-Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/multi-select-field.tsx#L16)
+Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/multi-select-field.tsx#L17)
 
 Available options with label/value pairs.
 
@@ -158,7 +158,7 @@ Available options with label/value pairs.
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/multi-select-field.tsx#L17)
+Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/multi-select-field.tsx#L18)
 
 ***
 
@@ -190,7 +190,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-
 
 > **value**: `T`[]
 
-Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/multi-select-field.tsx#L12)
+Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/multi-select-field.tsx#L13)
 
 Currently selected values.
 
