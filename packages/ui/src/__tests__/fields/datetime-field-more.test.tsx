@@ -12,7 +12,16 @@ vi.mock("@simplix-react/i18n/react", () => ({
 
 import { DateTimeField } from "../../fields/form/datetime-field";
 
+// First popover mount pays one-time Radix/jsdom initialization cost
+vi.setConfig({ testTimeout: 20_000 });
+
 afterEach(cleanup);
+
+function openPicker() {
+  const fieldset = screen.getByTestId("form-field-start");
+  const trigger = fieldset.querySelector("button") as HTMLButtonElement;
+  fireEvent.click(trigger);
+}
 
 describe("DateTimeField (more coverage)", () => {
   it("renders with error", () => {
@@ -29,47 +38,42 @@ describe("DateTimeField (more coverage)", () => {
     expect(screen.getByText("Pick date and time")).toBeDefined();
   });
 
-  it("strips non-digit characters from hour input", () => {
+  it("ignores non-digit characters in the hour input", () => {
     const onChange = vi.fn();
     const date = new Date("2024-06-15T10:30:00");
     render(<DateTimeField label="Start" value={date} onChange={onChange} />);
-    const fieldset = screen.getByTestId("form-field-start");
-    const inputs = fieldset.querySelectorAll("input[type='text']");
-    fireEvent.change(inputs[0], { target: { value: "ab" } });
-    expect(onChange).toHaveBeenCalled();
-    const result = onChange.mock.calls[0][0] as Date;
-    // "ab" stripped to "" -> parseInt("") is NaN -> Math.max(0, NaN||0) = 0
-    expect(result.getHours()).toBe(0);
+    openPicker();
+    fireEvent.change(screen.getByRole("textbox", { name: "date.hour" }), {
+      target: { value: "ab" },
+    });
+    expect(onChange).not.toHaveBeenCalled();
   });
 
-  it("strips non-digit characters from minute input", () => {
+  it("ignores non-digit characters in the minute input", () => {
     const onChange = vi.fn();
     const date = new Date("2024-06-15T10:30:00");
     render(<DateTimeField label="Start" value={date} onChange={onChange} />);
-    const fieldset = screen.getByTestId("form-field-start");
-    const inputs = fieldset.querySelectorAll("input[type='text']");
-    fireEvent.change(inputs[1], { target: { value: "xy" } });
-    expect(onChange).toHaveBeenCalled();
-    const result = onChange.mock.calls[0][0] as Date;
-    expect(result.getMinutes()).toBe(0);
+    openPicker();
+    fireEvent.change(screen.getByRole("textbox", { name: "date.minute" }), {
+      target: { value: "xy" },
+    });
+    expect(onChange).not.toHaveBeenCalled();
   });
 
-  it("renders initial hours/minutes as 00/00 when value is null", () => {
-    render(<DateTimeField label="Start" value={null} onChange={vi.fn()} />);
-    const fieldset = screen.getByTestId("form-field-start");
-    const inputs = fieldset.querySelectorAll("input[type='text']");
-    expect((inputs[0] as HTMLInputElement).value).toBe("00");
-    expect((inputs[1] as HTMLInputElement).value).toBe("00");
+  it("renders initial time as 00:00 when value is null", () => {
+    render(<DateTimeField label="Start" value={null} onChange={vi.fn()} hour12={false} />);
+    openPicker();
+    expect((screen.getByRole("textbox", { name: "date.hour" }) as HTMLInputElement).value).toBe("00");
+    expect((screen.getByRole("textbox", { name: "date.minute" }) as HTMLInputElement).value).toBe("00");
   });
 
   it("parses ISO string value", () => {
     render(
-      <DateTimeField label="Start" value="2024-06-15T14:30:00" onChange={vi.fn()} />,
+      <DateTimeField label="Start" value="2024-06-15T14:30:00" onChange={vi.fn()} hour12={false} />,
     );
-    const fieldset = screen.getByTestId("form-field-start");
-    const inputs = fieldset.querySelectorAll("input[type='text']");
-    expect((inputs[0] as HTMLInputElement).value).toBe("14");
-    expect((inputs[1] as HTMLInputElement).value).toBe("30");
+    openPicker();
+    expect((screen.getByRole("textbox", { name: "date.hour" }) as HTMLInputElement).value).toBe("14");
+    expect((screen.getByRole("textbox", { name: "date.minute" }) as HTMLInputElement).value).toBe("30");
   });
 
   it("forwards locale, startYear, endYear props", () => {
