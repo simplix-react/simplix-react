@@ -106,6 +106,8 @@ export interface FilterBarProps {
   state: CrudListFilters;
   /** Content rendered on the left side of the filter bar. */
   leading?: ReactNode;
+  /** Content rendered on the right side of the filter bar, before the filter/columns group. */
+  trailing?: ReactNode;
   /** Max number of visible filter badges before collapsing into "+N". */
   maxBadges?: number;
   /**
@@ -157,7 +159,7 @@ export function splitFilterColumns(filters: FilterDef[], count = 2): FilterDef[]
 
 // ── FilterBar Component ──
 
-export function FilterBar({ filters, state, leading, maxBadges, onPreview, previewLabel, count, popoverColumns = "auto", className }: FilterBarProps) {
+export function FilterBar({ filters, state, leading, trailing, maxBadges, onPreview, previewLabel, count, popoverColumns = "auto", className }: FilterBarProps) {
   const { Badge, Button, Popover, PopoverTrigger, PopoverContent, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuCheckboxItem } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const locale = useLocale();
@@ -440,6 +442,7 @@ export function FilterBar({ filters, state, leading, maxBadges, onPreview, previ
           +{hiddenCount}
         </Badge>
       )}
+      {trailing}
       {/* Segmented group: filter trigger + columns toggle, styled like the view toggle. */}
       <div className="box-border inline-flex h-8 items-center gap-0.5 rounded-md border border-input bg-card p-0.5">
         <Popover open={open} onOpenChange={setOpen}>
