@@ -1,12 +1,13 @@
 import type { CommonDetailFieldProps } from "../../crud/shared/types";
 import { cn } from "../../utils/cn";
+import { detailFallback } from "../shared/detail-fallback";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
 
 /** Props for the {@link DetailTextareaField} component. */
 export interface DetailTextareaFieldProps extends CommonDetailFieldProps {
   /** Multi-line text value to display. Line breaks are preserved. */
   value: string | null | undefined;
-  /** Fallback text when value is null, undefined, or empty string. */
+  /** Fallback text when value is null, undefined, or empty string. Defaults to the shared no-value badge. */
   fallback?: string;
 }
 
@@ -22,7 +23,7 @@ export interface DetailTextareaFieldProps extends CommonDetailFieldProps {
  */
 export function DetailTextareaField({
   value,
-  fallback = "",
+  fallback,
   label,
   labelKey,
   layout,
@@ -30,7 +31,6 @@ export function DetailTextareaField({
   className,
 }: DetailTextareaFieldProps) {
   const hasValue = value != null && value !== "";
-  const display = hasValue ? value : fallback;
 
   return (
     <DetailFieldWrapper
@@ -40,7 +40,11 @@ export function DetailTextareaField({
       size={size}
       className={className}
     >
-      <span className={cn("whitespace-pre-wrap")}>{display}</span>
+      {hasValue ? (
+        <span className={cn("whitespace-pre-wrap")}>{value}</span>
+      ) : (
+        detailFallback(fallback)
+      )}
     </DetailFieldWrapper>
   );
 }

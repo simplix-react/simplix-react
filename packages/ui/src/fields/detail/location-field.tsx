@@ -4,6 +4,7 @@ import { useTranslation } from "@simplix-react/i18n/react";
 import type { CommonDetailFieldProps } from "../../crud/shared/types";
 import { MapPinIcon, LocateIcon, SunIcon, MoonIcon } from "../../crud/shared/icons";
 import { cn } from "../../utils/cn";
+import { detailFallback } from "../shared/detail-fallback";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
 import { Map, MapMarker } from "../../base/map/map";
 import {
@@ -19,7 +20,7 @@ export interface DetailLocationFieldProps extends CommonDetailFieldProps {
   latitude: number;
   longitude: number;
   zoom?: number;
-  /** Fallback text when coordinates are empty (0,0). Defaults to em-dash. */
+  /** Fallback text when coordinates are empty (0,0). Defaults to the shared no-value badge. */
   fallback?: string;
   /** When true, renders nothing if coordinates are empty. Defaults to false. */
   hideWhenEmpty?: boolean;
@@ -49,7 +50,7 @@ export function DetailLocationField({
   latitude,
   longitude,
   zoom = 13,
-  fallback = "",
+  fallback,
   hideWhenEmpty = false,
   markerIcon,
   fallbackTileUrl,
@@ -203,7 +204,7 @@ export function DetailLocationField({
           </Dialog>
         </>
       ) : (
-        <span>{fallback}</span>
+        detailFallback(fallback)
       )}
     </DetailFieldWrapper>
   );

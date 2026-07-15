@@ -2,13 +2,14 @@ import { useMemo } from "react";
 
 import type { CommonDetailFieldProps } from "../../crud/shared/types";
 import { useTimezoneOptions } from "../../utils/use-timezone-options";
+import { detailFallback } from "../shared/detail-fallback";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
 
 /** Props for the {@link DetailTimezoneField} component. */
 export interface DetailTimezoneFieldProps extends CommonDetailFieldProps {
   /** IANA timezone ID (e.g. "Asia/Seoul"). */
   value: string | null | undefined;
-  /** Fallback text when value is null, undefined, or empty string. Defaults to em-dash. */
+  /** Fallback text when value is null, undefined, or empty string. Defaults to the shared no-value badge. */
   fallback?: string;
 }
 
@@ -22,7 +23,7 @@ export interface DetailTimezoneFieldProps extends CommonDetailFieldProps {
  */
 export function DetailTimezoneField({
   value,
-  fallback = "",
+  fallback,
   label,
   labelKey,
   layout,
@@ -55,8 +56,10 @@ export function DetailTimezoneField({
             <span className="text-muted-foreground"> ({option.localizedName})</span>
           )}
         </span>
+      ) : value ? (
+        <span>{value}</span>
       ) : (
-        <span>{value || fallback}</span>
+        detailFallback(fallback)
       )}
     </DetailFieldWrapper>
   );

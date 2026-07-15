@@ -5,6 +5,7 @@ import type { CommonDetailFieldProps } from "../../crud/shared/types";
 import type { DateLike } from "../../utils/parse-date";
 import { formatDateMedium, formatDateTime, formatRelativeTime } from "../../utils/format-date";
 import { parseDate } from "../../utils/parse-date";
+import { detailFallback } from "../shared/detail-fallback";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
 
 /** Props for the {@link DetailDateField} component. */
@@ -13,7 +14,7 @@ export interface DetailDateFieldProps extends CommonDetailFieldProps {
   value: DateLike | null;
   /** Display format. Defaults to `"date"`. */
   format?: "date" | "datetime" | "relative";
-  /** Fallback text when value is null. Defaults to em-dash. */
+  /** Fallback text when value is null. Defaults to the shared no-value badge. */
   fallback?: string;
 }
 
@@ -43,7 +44,7 @@ function formatDate(
 export function DetailDateField({
   value,
   format = "date",
-  fallback = "",
+  fallback,
   label,
   labelKey,
   layout,
@@ -53,11 +54,11 @@ export function DetailDateField({
   const { locale } = useTranslation("simplix/ui");
 
   const displayValue = useMemo(() => {
-    if (value == null) return fallback;
+    if (value == null) return null;
     const date = parseDate(value);
-    if (!date) return fallback;
+    if (!date) return null;
     return formatDate(date, format, locale);
-  }, [value, format, fallback, locale]);
+  }, [value, format, locale]);
 
   return (
     <DetailFieldWrapper
@@ -67,7 +68,7 @@ export function DetailDateField({
       size={size}
       className={className}
     >
-      {displayValue}
+      {displayValue ?? detailFallback(fallback)}
     </DetailFieldWrapper>
   );
 }

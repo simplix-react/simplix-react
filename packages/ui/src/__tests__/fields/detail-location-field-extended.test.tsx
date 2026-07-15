@@ -94,7 +94,7 @@ describe("DetailLocationField hideWhenEmpty", () => {
 
   it("renders fallback when empty and hideWhenEmpty=false", () => {
     render(<DetailLocationField label="Location" latitude={0} longitude={0} />);
-    expect(screen.queryByText("\u2014")).toBeNull();
+    expect(screen.getByTestId("empty-value-badge")).toBeDefined();
   });
 
   it("renders custom fallback text", () => {
@@ -106,21 +106,21 @@ describe("DetailLocationField hideWhenEmpty", () => {
 describe("DetailLocationField invalid coordinates", () => {
   it("treats NaN as invalid", () => {
     render(<DetailLocationField label="Location" latitude={NaN} longitude={NaN} />);
-    expect(screen.queryByText("\u2014")).toBeNull();
+    expect(screen.getByTestId("empty-value-badge")).toBeDefined();
   });
 
   it("treats Infinity as invalid", () => {
     render(<DetailLocationField label="Location" latitude={Infinity} longitude={0} />);
-    expect(screen.queryByText("\u2014")).toBeNull();
+    expect(screen.getByTestId("empty-value-badge")).toBeDefined();
   });
 
   it("treats out-of-range latitude as invalid", () => {
     render(<DetailLocationField label="Location" latitude={-91} longitude={0} />);
-    expect(screen.queryByText("\u2014")).toBeNull();
+    expect(screen.getByTestId("empty-value-badge")).toBeDefined();
   });
 
   it("treats out-of-range longitude as invalid", () => {
     render(<DetailLocationField label="Location" latitude={0} longitude={181} />);
-    expect(screen.queryByText("\u2014")).toBeNull();
+    expect(screen.getByTestId("empty-value-badge")).toBeDefined();
   });
 });

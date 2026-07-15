@@ -83,20 +83,20 @@ export interface GridProps
 
 /**
  * Container-query responsive column classes.
- * Each column needs ~200px minimum width.
+ * Each column needs ~190px minimum width.
  *
  * Tailwind v4 container breakpoints:
- * - `@md` = 28rem (448px) → 2 columns
+ * - `@sm` = 24rem (384px) → 2 columns (narrow side panels still fit two ~190px fields)
  * - `@2xl` = 42rem (672px) → 3 columns
  * - `@4xl` = 56rem (896px) → 4 columns
  * - `@5xl` = 64rem (1024px) → 5+ columns
  */
 const responsiveColumnClasses: Record<number, string> = {
-  2: "grid-cols-1 @md:grid-cols-2",
-  3: "grid-cols-1 @md:grid-cols-2 @2xl:grid-cols-3",
-  4: "grid-cols-1 @md:grid-cols-2 @2xl:grid-cols-3 @4xl:grid-cols-4",
-  5: "grid-cols-1 @md:grid-cols-2 @2xl:grid-cols-3 @4xl:grid-cols-4 @5xl:grid-cols-5",
-  6: "grid-cols-1 @md:grid-cols-2 @2xl:grid-cols-3 @4xl:grid-cols-4 @5xl:grid-cols-6",
+  2: "grid-cols-1 @sm:grid-cols-2",
+  3: "grid-cols-1 @sm:grid-cols-2 @2xl:grid-cols-3",
+  4: "grid-cols-1 @sm:grid-cols-2 @2xl:grid-cols-3 @4xl:grid-cols-4",
+  5: "grid-cols-1 @sm:grid-cols-2 @2xl:grid-cols-3 @4xl:grid-cols-4 @5xl:grid-cols-5",
+  6: "grid-cols-1 @sm:grid-cols-2 @2xl:grid-cols-3 @4xl:grid-cols-4 @5xl:grid-cols-6",
 };
 
 const gapClassMap: Record<string, string> = {
@@ -164,7 +164,7 @@ function ColumnDividers({ cols, gap, hiddenWhenCollapsed }: { cols: number; gap:
           aria-hidden
           className={cn(
             "pointer-events-none absolute inset-y-0 w-px -translate-x-1/2 bg-border",
-            hiddenWhenCollapsed && "hidden @md:block",
+            hiddenWhenCollapsed && "hidden @sm:block",
           )}
           style={{ left: `calc(${i + 1} * (100% + ${g}) / ${cols} - ${g} / 2)` }}
         />

@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 
 import type { CommonDetailFieldProps } from "../../crud/shared/types";
+import { detailFallback } from "../shared/detail-fallback";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
 
 /** Props for the {@link DetailNumberField} component. */
@@ -13,7 +14,7 @@ export interface DetailNumberFieldProps extends CommonDetailFieldProps {
   locale?: string;
   /** Currency code when `format="currency"` (e.g., `"USD"`). */
   currency?: string;
-  /** Fallback text when value is null. Defaults to em-dash. */
+  /** Fallback text when value is null. Defaults to the shared no-value badge. */
   fallback?: string;
 }
 
@@ -31,7 +32,7 @@ export function DetailNumberField({
   format = "decimal",
   locale,
   currency,
-  fallback = "",
+  fallback,
   label,
   labelKey,
   layout,
@@ -39,7 +40,7 @@ export function DetailNumberField({
   className,
 }: DetailNumberFieldProps) {
   const displayValue = useMemo(() => {
-    if (value == null) return fallback;
+    if (value == null) return null;
 
     const options: Intl.NumberFormatOptions = {};
 
@@ -58,7 +59,7 @@ export function DetailNumberField({
     }
 
     return new Intl.NumberFormat(locale, options).format(value);
-  }, [value, format, locale, currency, fallback]);
+  }, [value, format, locale, currency]);
 
   return (
     <DetailFieldWrapper
@@ -68,7 +69,7 @@ export function DetailNumberField({
       size={size}
       className={className}
     >
-      {displayValue}
+      {displayValue ?? detailFallback(fallback)}
     </DetailFieldWrapper>
   );
 }

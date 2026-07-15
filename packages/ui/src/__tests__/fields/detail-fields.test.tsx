@@ -23,14 +23,14 @@ describe("DetailTextField", () => {
     expect(screen.getByText("test@example.com")).toBeDefined();
   });
 
-  it("renders empty by default when value is null", () => {
+  it("renders the no-value badge by default when value is null", () => {
     render(<DetailTextField label="Email" value={null} />);
-    expect(screen.queryByText("\u2014")).toBeNull();
+    expect(screen.getByTestId("empty-value-badge")).toBeDefined();
   });
 
-  it("renders empty by default when value is undefined", () => {
+  it("renders the no-value badge by default when value is undefined", () => {
     render(<DetailTextField label="Email" value={undefined} />);
-    expect(screen.queryByText("\u2014")).toBeNull();
+    expect(screen.getByTestId("empty-value-badge")).toBeDefined();
   });
 
   it("shows custom fallback", () => {
@@ -79,7 +79,7 @@ describe("DetailBooleanField", () => {
 
   it("shows fallback for null value", () => {
     render(<DetailBooleanField label="Active" value={null} />);
-    expect(screen.queryByText("\u2014")).toBeNull();
+    expect(screen.getByTestId("empty-value-badge")).toBeDefined();
   });
 
   it("supports custom labels", () => {
@@ -121,7 +121,7 @@ describe("DetailNumberField", () => {
 
   it("shows fallback for null value", () => {
     render(<DetailNumberField label="Count" value={null} />);
-    expect(screen.queryByText("\u2014")).toBeNull();
+    expect(screen.getByTestId("empty-value-badge")).toBeDefined();
   });
 
   it("shows custom fallback", () => {
@@ -246,12 +246,12 @@ describe("DetailListField", () => {
 
   it("shows fallback for null value", () => {
     render(<DetailListField label="Tags" value={null} />);
-    expect(screen.queryByText("\u2014")).toBeNull();
+    expect(screen.getByTestId("empty-value-badge")).toBeDefined();
   });
 
   it("shows fallback for empty array", () => {
     render(<DetailListField label="Tags" value={[]} />);
-    expect(screen.queryByText("\u2014")).toBeNull();
+    expect(screen.getByTestId("empty-value-badge")).toBeDefined();
   });
 
   it("renders comma mode", () => {
@@ -341,12 +341,12 @@ describe("DetailDateField", () => {
 
   it("shows fallback for null value", () => {
     render(<DetailDateField label="Updated" value={null} />);
-    expect(screen.queryByText("\u2014")).toBeNull();
+    expect(screen.getByTestId("empty-value-badge")).toBeDefined();
   });
 
   it("shows fallback for invalid date string", () => {
     render(<DetailDateField label="Date" value="not-a-date" />);
-    expect(screen.queryByText("\u2014")).toBeNull();
+    expect(screen.getByTestId("empty-value-badge")).toBeDefined();
   });
 
   it("renders from ISO string", () => {

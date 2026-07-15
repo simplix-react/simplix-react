@@ -1,4 +1,5 @@
 import type { CommonDetailFieldProps } from "../../crud/shared/types";
+import { detailFallback } from "../shared/detail-fallback";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
 
 /** Props for the {@link DetailLinkField} component. */
@@ -9,7 +10,7 @@ export interface DetailLinkFieldProps extends CommonDetailFieldProps {
   href: string | null | undefined;
   /** Whether the link opens in a new tab with `rel="noopener noreferrer"`. */
   external?: boolean;
-  /** Fallback text when value is null, undefined, or empty string. Defaults to em-dash. */
+  /** Fallback text when value is null, undefined, or empty string. Defaults to the shared no-value badge. */
   fallback?: string;
 }
 
@@ -25,7 +26,7 @@ export function DetailLinkField({
   value,
   href,
   external,
-  fallback = "",
+  fallback,
   label,
   labelKey,
   layout,
@@ -54,7 +55,7 @@ export function DetailLinkField({
           {value}
         </a>
       ) : (
-        <span>{fallback}</span>
+        detailFallback(fallback)
       )}
     </DetailFieldWrapper>
   );

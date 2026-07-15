@@ -2,13 +2,14 @@ import { useMemo } from "react";
 
 import type { CommonDetailFieldProps } from "../../crud/shared/types";
 import { useCountryOptions } from "../../utils/use-country-options";
+import { detailFallback } from "../shared/detail-fallback";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
 
 /** Props for the {@link DetailCountryField} component. */
 export interface DetailCountryFieldProps extends CommonDetailFieldProps {
   /** ISO 3166-1 alpha-2 country code (e.g. "KR"). */
   value: string | null | undefined;
-  /** Fallback text when value is null, undefined, or empty string. Defaults to em-dash. */
+  /** Fallback text when value is null, undefined, or empty string. Defaults to the shared no-value badge. */
   fallback?: string;
 }
 
@@ -22,7 +23,7 @@ export interface DetailCountryFieldProps extends CommonDetailFieldProps {
  */
 export function DetailCountryField({
   value,
-  fallback = "",
+  fallback,
   label,
   labelKey,
   layout,
@@ -49,8 +50,10 @@ export function DetailCountryField({
           <option.Flag className="h-3 w-4.5 shrink-0 rounded-[1px]" />
           <span>{option.localName}</span>
         </span>
+      ) : value ? (
+        <span>{value}</span>
       ) : (
-        <span>{value || fallback}</span>
+        detailFallback(fallback)
       )}
     </DetailFieldWrapper>
   );

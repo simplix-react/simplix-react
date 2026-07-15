@@ -50,7 +50,7 @@ describe("Grid", () => {
     const inner = wrapper.firstElementChild!;
     expect(inner.className).toContain("grid");
     expect(inner.className).toContain("grid-cols-1");
-    expect(inner.className).toContain("@md:grid-cols-2");
+    expect(inner.className).toContain("@sm:grid-cols-2");
   });
 
   it("does not wrap when columns=1", () => {
@@ -64,7 +64,7 @@ describe("Grid", () => {
   it("applies responsive classes for columns=3", () => {
     render(<Grid data-testid="grid" columns={3}>content</Grid>);
     const inner = screen.getByTestId("grid").firstElementChild!;
-    expect(inner.className).toContain("@md:grid-cols-2");
+    expect(inner.className).toContain("@sm:grid-cols-2");
     expect(inner.className).toContain("@2xl:grid-cols-3");
   });
 

@@ -102,7 +102,17 @@
     "clickOrDragToSelect": "지도를 클릭하거나 마커를 드래그하여 위치를 선택하세요",
     "selectOption": "선택...",
     "searchOption": "검색...",
-    "noResults": "결과를 찾을 수 없습니다."
+    "noResults": "결과를 찾을 수 없습니다.",
+    "noValue": "값 없음"
+  },
+  "unit": {
+    "minutes": "분",
+    "hours": "시간",
+    "days": "일",
+    "months": "개월",
+    "years": "년",
+    "persons": "명",
+    "multiplier": "배"
   },
   "operator": {
     "equals": "같음",

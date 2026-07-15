@@ -102,7 +102,17 @@
     "clickOrDragToSelect": "Click the map or drag the marker to select a location",
     "selectOption": "Select...",
     "searchOption": "Search...",
-    "noResults": "No results found."
+    "noResults": "No results found.",
+    "noValue": "No value"
+  },
+  "unit": {
+    "minutes": "min",
+    "hours": "hr",
+    "days": "days",
+    "months": "mo",
+    "years": "yr",
+    "persons": "persons",
+    "multiplier": "×"
   },
   "operator": {
     "equals": "Equals",

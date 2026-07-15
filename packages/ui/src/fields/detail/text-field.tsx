@@ -2,13 +2,14 @@ import { useCallback, useState } from "react";
 
 import type { CommonDetailFieldProps } from "../../crud/shared/types";
 import { cn } from "../../utils/cn";
+import { detailFallback } from "../shared/detail-fallback";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
 
 /** Props for the {@link DetailTextField} component. */
 export interface DetailTextFieldProps extends CommonDetailFieldProps {
   /** Text value to display. */
   value: string | null | undefined;
-  /** Fallback text when value is null, undefined, or empty string. Defaults to empty string. */
+  /** Fallback text when value is null, undefined, or empty string. Defaults to the shared no-value badge. */
   fallback?: string;
   /** Whether to show a copy-to-clipboard button. */
   copyable?: boolean;
@@ -24,7 +25,7 @@ export interface DetailTextFieldProps extends CommonDetailFieldProps {
  */
 export function DetailTextField({
   value,
-  fallback = "",
+  fallback,
   copyable,
   label,
   labelKey,
@@ -43,7 +44,7 @@ export function DetailTextField({
     setTimeout(() => setCopied(false), 2000);
   }, [hasValue, value]);
 
-  const displayValue = hasValue ? value : fallback;
+  const displayValue = hasValue ? value : detailFallback(fallback);
 
   return (
     <DetailFieldWrapper

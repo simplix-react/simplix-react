@@ -1,5 +1,6 @@
 import type { CommonDetailFieldProps } from "../../crud/shared/types";
 import { useFlatUIComponents } from "../../provider";
+import { detailFallback } from "../shared/detail-fallback";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
 
 export type BadgeVariant = NonNullable<
@@ -17,7 +18,7 @@ export interface DetailBadgeFieldProps<T extends string = string>
   displayValue?: string;
   /** Mapping from value to badge variant for visual differentiation. */
   variants: Record<T, BadgeVariant>;
-  /** Fallback text when value is null, undefined, or empty string. Defaults to em-dash. */
+  /** Fallback text when value is null, undefined, or empty string. Defaults to the shared no-value badge. */
   fallback?: string;
 }
 
@@ -37,7 +38,7 @@ export function DetailBadgeField<T extends string = string>({
   value,
   displayValue,
   variants,
-  fallback = "",
+  fallback,
   label,
   labelKey,
   layout,
@@ -58,7 +59,7 @@ export function DetailBadgeField<T extends string = string>({
       {hasValue ? (
         <Badge variant={variants[value] ?? "default"}>{displayValue ?? value}</Badge>
       ) : (
-        <span>{fallback}</span>
+        detailFallback(fallback)
       )}
     </DetailFieldWrapper>
   );
