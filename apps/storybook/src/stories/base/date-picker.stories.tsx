@@ -17,6 +17,9 @@ const meta = {
     clearable: { control: "boolean" },
     disabled: { control: "boolean" },
     reverseYears: { control: "boolean" },
+    showTime: { control: "boolean" },
+    hour12: { control: "boolean" },
+    minuteStep: { control: "number" },
   },
 } satisfies Meta<typeof DatePicker>;
 
@@ -71,5 +74,49 @@ export const WithMinMax: Story = {
     onChange: () => {},
     minDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
     maxDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
+  },
+};
+
+export const WithTime: Story = {
+  name: "With Time (12-hour)",
+  render: (args) => <DatePickerControlled {...args} />,
+  args: {
+    value: new Date(),
+    onChange: () => {},
+    showTime: true,
+  },
+};
+
+export const WithTime24Hour: Story = {
+  name: "With Time (24-hour)",
+  render: (args) => <DatePickerControlled {...args} />,
+  args: {
+    value: new Date(),
+    onChange: () => {},
+    showTime: true,
+    hour12: false,
+  },
+};
+
+export const WithTimeMinuteStep: Story = {
+  name: "With Time (5-minute step)",
+  render: (args) => <DatePickerControlled {...args} />,
+  args: {
+    value: new Date(),
+    onChange: () => {},
+    showTime: true,
+    minuteStep: 5,
+  },
+};
+
+export const WithTimeMinMax: Story = {
+  name: "With Time + Min/Max",
+  render: (args) => <DatePickerControlled {...args} />,
+  args: {
+    value: new Date(new Date().setHours(12, 0, 0, 0)),
+    onChange: () => {},
+    showTime: true,
+    minDate: new Date(new Date().setHours(9, 30, 0, 0)),
+    maxDate: new Date(new Date().setHours(18, 15, 0, 0)),
   },
 };

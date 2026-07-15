@@ -1,4 +1,5 @@
 import type { CommonDetailFieldProps } from "../../crud/shared/types";
+import { detailFallback } from "../shared/detail-fallback";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
 
 /** Display mode for the {@link DetailBooleanField} component. */
@@ -12,7 +13,7 @@ export interface DetailBooleanFieldProps extends CommonDetailFieldProps {
   mode?: BooleanDisplayMode;
   /** Custom labels for true/false values when using `"text"` mode. */
   labels?: { true: string; false: string };
-  /** Fallback text when value is null or undefined. Defaults to em-dash. */
+  /** Fallback text when value is null or undefined. Defaults to the shared no-value badge. */
   fallback?: string;
 }
 
@@ -29,7 +30,7 @@ export function DetailBooleanField({
   value,
   mode = "text",
   labels = { true: "Yes", false: "No" },
-  fallback = "",
+  fallback,
   label,
   labelKey,
   layout,
@@ -45,7 +46,7 @@ export function DetailBooleanField({
         size={size}
         className={className}
       >
-        <span>{fallback}</span>
+        {detailFallback(fallback)}
       </DetailFieldWrapper>
     );
   }

@@ -58,6 +58,30 @@ export const HideTime: Story = {
   },
 };
 
+export const Hour24: Story = {
+  name: "24-Hour Clock",
+  render: (args) => {
+    const [value, setValue] = React.useState<Date | null>(new Date("2024-06-15T14:30:00"));
+    return <FormFields.DateTimeField {...args} value={value} onChange={setValue} />;
+  },
+  args: {
+    label: "Departure",
+    hour12: false,
+  },
+};
+
+export const MinuteStep: Story = {
+  name: "5-Minute Step",
+  render: (args) => {
+    const [value, setValue] = React.useState<Date | null>(new Date("2024-06-15T14:30:00"));
+    return <FormFields.DateTimeField {...args} value={value} onChange={setValue} />;
+  },
+  args: {
+    label: "Reservation",
+    minuteStep: 5,
+  },
+};
+
 export const WithError: Story = {
   render: (args) => {
     const [value, setValue] = React.useState<Date | null>(null);

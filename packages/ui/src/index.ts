@@ -159,6 +159,7 @@ export {
   TabsList,
   TabsTrigger,
   Textarea,
+  TimePicker,
   TimeRangeSelector,
   HEATMAP_THEMES,
   ToastContainer,
@@ -267,6 +268,8 @@ export type {
   TabsListProps,
   TabsTriggerProps,
   TextareaProps,
+  TimePickerProps,
+  TimeValue,
   TimeRangeSelectorProps,
   TimeRangeValue,
   HeatmapColorTheme,
@@ -298,9 +301,10 @@ export type {
 export {
   EmptyState,
   FieldVariantContext,
+  ListTotalBadge,
   useFieldVariant,
 } from "./crud/shared";
-export type { EmptyStateProps } from "./crud/shared";
+export type { EmptyStateProps, ListTotalBadgeProps } from "./crud/shared";
 export type {
   CommonDetailFieldProps,
   CommonFieldProps,
@@ -395,6 +399,8 @@ export type {
 // Tree field
 export { TreeSelectField } from "./fields/form/tree-select-field";
 export type { TreeSelectFieldProps } from "./fields/form/tree-select-field";
+export { TreeMultiSelectField } from "./fields/form/tree-multi-select-field";
+export type { TreeMultiSelectFieldProps } from "./fields/form/tree-multi-select-field";
 
 // Icon field
 export { IconField } from "./fields/form/icon-field";
@@ -481,6 +487,9 @@ export {
   FilterBar,
 } from "./crud/filters";
 
+export { useFilterBarState } from "./crud/filters";
+export type { UseFilterBarStateOptions } from "./crud/filters";
+
 export type {
   TextFilterProps,
   MultiTextFilterProps,
@@ -564,8 +573,8 @@ export type { ModalSidebarBlockProps, ModalSidebarProps, ModalSidebarRowProps } 
 export { ArrowLeftIcon } from "./crud/shared/icons";
 
 // Field components
-export { DetailFields, DetailFieldWrapper, FieldMessage, FieldWrapper, FormFields } from "./fields";
-export type { DetailFieldWrapperProps, FieldMessageProps, FieldWrapperProps } from "./fields";
+export { CropModal, cropImageToFile, DetailFields, DetailFieldWrapper, FieldMessage, FieldWrapper, FormFields } from "./fields";
+export type { CropArea, CropModalProps, DetailFieldWrapperProps, FieldMessageProps, FieldWrapperProps } from "./fields";
 export { I18nText } from "./fields/detail/i18n-text-field";
 export type { I18nTextProps } from "./fields/detail/i18n-text-field";
 
@@ -695,7 +704,11 @@ export type {
 // File attachment API factory (builds a FileFieldApi for the standard
 // per-module endpoints from a FileFieldSource address) + host transport
 export { createFileFieldApi } from "./fields/file-attachment";
-export type { FileFieldSource } from "./fields/file-attachment";
+export type {
+  AttachmentRecord,
+  FileFieldApi,
+  FileFieldSource,
+} from "./fields/file-attachment";
 export {
   configureAttachmentTransport,
   getAttachmentTransport,

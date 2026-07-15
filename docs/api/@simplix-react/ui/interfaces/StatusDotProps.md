@@ -6,7 +6,7 @@
 
 # Interface: StatusDotProps
 
-Defined in: [packages/ui/src/base/display/status-dot.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-dot.tsx#L13)
+Defined in: [packages/ui/src/base/display/status-dot.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-dot.tsx#L14)
 
 ## Extends
 
@@ -42,7 +42,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **active**: `boolean`
 
-Defined in: [packages/ui/src/base/display/status-dot.tsx:25](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-dot.tsx#L25)
+Defined in: [packages/ui/src/base/display/status-dot.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-dot.tsx#L26)
 
 When `false`, the indicator is dimmed to a neutral dot and the ring is
 suppressed regardless of `animation`. Defaults to `true`.
@@ -53,7 +53,7 @@ suppressed regardless of `animation`. Defaults to `true`.
 
 > `optional` **animation**: `"none"` \| `"ping"` \| `"flash"`
 
-Defined in: [packages/ui/src/base/display/status-dot.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-dot.tsx#L20)
+Defined in: [packages/ui/src/base/display/status-dot.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-dot.tsx#L21)
 
 Animated ring affordance behind the dot. `none` (default) renders no ring.
 
@@ -988,7 +988,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/base/display/status-dot.tsx:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-dot.tsx#L27)
+Defined in: [packages/ui/src/base/display/status-dot.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-dot.tsx#L28)
 
 Optional foreground (e.g. an icon) rendered in place of the solid dot.
 
@@ -1322,7 +1322,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **label**: `string`
 
-Defined in: [packages/ui/src/base/display/status-dot.tsx:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-dot.tsx#L29)
+Defined in: [packages/ui/src/base/display/status-dot.tsx:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-dot.tsx#L30)
 
 Accessible label exposed via `aria-label`.
 
@@ -3560,7 +3560,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **size**: `"sm"` \| `"lg"` \| `"md"`
 
-Defined in: [packages/ui/src/base/display/status-dot.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-dot.tsx#L18)
+Defined in: [packages/ui/src/base/display/status-dot.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-dot.tsx#L19)
 
 Diameter token: `sm`=size-1.5, `md`=size-2 (default), `lg`=size-3.
 
@@ -3654,7 +3654,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > **tone**: [`StatusTone`](../type-aliases/StatusTone.md)
 
-Defined in: [packages/ui/src/base/display/status-dot.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-dot.tsx#L16)
+Defined in: [packages/ui/src/base/display/status-dot.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-dot.tsx#L17)
 
 Semantic tone driving the dot/ring color.
 

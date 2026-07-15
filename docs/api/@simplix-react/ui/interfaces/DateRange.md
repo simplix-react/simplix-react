@@ -6,7 +6,7 @@
 
 # Interface: DateRange
 
-Defined in: [packages/ui/src/base/controls/calendar.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L13)
+Defined in: [packages/ui/src/base/controls/calendar.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L14)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/base/controls/calendar.tsx:13](https://github.com/s
 
 > **from**: `Date` \| `undefined`
 
-Defined in: [packages/ui/src/base/controls/calendar.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L14)
+Defined in: [packages/ui/src/base/controls/calendar.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L15)
 
 ***
 
@@ -22,4 +22,4 @@ Defined in: [packages/ui/src/base/controls/calendar.tsx:14](https://github.com/s
 
 > **to**: `Date` \| `undefined`
 
-Defined in: [packages/ui/src/base/controls/calendar.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L15)
+Defined in: [packages/ui/src/base/controls/calendar.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L16)

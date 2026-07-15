@@ -6,7 +6,7 @@
 
 # Interface: SheetComponents
 
-Defined in: [packages/ui/src/provider/types.ts:92](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L92)
+Defined in: [packages/ui/src/provider/types.ts:90](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L90)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/provider/types.ts:92](https://github.com/simplix-re
 
 > **Close**: `ComponentType`\<\{ `asChild?`: `boolean`; `children?`: `ReactNode`; \}\>
 
-Defined in: [packages/ui/src/provider/types.ts:100](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L100)
+Defined in: [packages/ui/src/provider/types.ts:98](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L98)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [packages/ui/src/provider/types.ts:100](https://github.com/simplix-r
 
 > **Content**: `ComponentType`\<[`SheetContentProps`](../type-aliases/SheetContentProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:95](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L95)
+Defined in: [packages/ui/src/provider/types.ts:93](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L93)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [packages/ui/src/provider/types.ts:95](https://github.com/simplix-re
 
 > **Description**: `ComponentType`\<`DialogDescriptionProps` & `RefAttributes`\<`HTMLParagraphElement`\>\>
 
-Defined in: [packages/ui/src/provider/types.ts:99](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L99)
+Defined in: [packages/ui/src/provider/types.ts:97](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L97)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [packages/ui/src/provider/types.ts:99](https://github.com/simplix-re
 
 > **Footer**: `ComponentType`\<[`SheetFooterProps`](../type-aliases/SheetFooterProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:97](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L97)
+Defined in: [packages/ui/src/provider/types.ts:95](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L95)
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: [packages/ui/src/provider/types.ts:97](https://github.com/simplix-re
 
 > **Header**: `ComponentType`\<[`SheetHeaderProps`](../type-aliases/SheetHeaderProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:96](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L96)
+Defined in: [packages/ui/src/provider/types.ts:94](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L94)
 
 ***
 
@@ -54,7 +54,7 @@ Defined in: [packages/ui/src/provider/types.ts:96](https://github.com/simplix-re
 
 > **Root**: `ComponentType`\<\{ `children?`: `ReactNode`; `onOpenChange?`: (`open`) => `void`; `open?`: `boolean`; \}\>
 
-Defined in: [packages/ui/src/provider/types.ts:93](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L93)
+Defined in: [packages/ui/src/provider/types.ts:91](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L91)
 
 ***
 
@@ -62,7 +62,7 @@ Defined in: [packages/ui/src/provider/types.ts:93](https://github.com/simplix-re
 
 > **Title**: `ComponentType`\<`DialogTitleProps` & `RefAttributes`\<`HTMLHeadingElement`\>\>
 
-Defined in: [packages/ui/src/provider/types.ts:98](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L98)
+Defined in: [packages/ui/src/provider/types.ts:96](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L96)
 
 ***
 
@@ -70,4 +70,4 @@ Defined in: [packages/ui/src/provider/types.ts:98](https://github.com/simplix-re
 
 > **Trigger**: `ComponentType`\<\{ `asChild?`: `boolean`; `children?`: `ReactNode`; \}\>
 
-Defined in: [packages/ui/src/provider/types.ts:94](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L94)
+Defined in: [packages/ui/src/provider/types.ts:92](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L92)

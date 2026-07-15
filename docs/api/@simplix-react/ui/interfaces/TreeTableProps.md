@@ -44,7 +44,7 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:364](https://github.com/sim
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:376](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L376)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:383](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L383)
 
 ***
 
@@ -52,7 +52,7 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:376](https://github.com/sim
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:375](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L375)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:382](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L382)
 
 ***
 
@@ -177,6 +177,19 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:372](https://github.com/sim
 > `optional` **sort**: [`SortState`](SortState.md) \| `null`
 
 Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:361](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L361)
+
+***
+
+### stickyHeader?
+
+> `optional` **stickyHeader**: `boolean`
+
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:381](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L381)
+
+Sticks the header row to the top of the nearest scrollable ancestor
+(e.g. a page, dialog, or detail-pane body) once scrolling would hide it.
+The table keeps its own horizontal scrollbar; the floating header scrolls
+with its columns. Enabled by default; pass `false` to disable.
 
 ***
 

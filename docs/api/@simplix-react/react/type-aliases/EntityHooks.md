@@ -8,7 +8,7 @@
 
 > **EntityHooks**\<`TSchema`, `TOperations`\> = `` { [K in keyof TOperations & string as `use${Capitalize<K>}`]: EntityHookFor<ResolveRole<K, TOperations[K]>, TOperations[K], TSchema> } `` & `EntityHasListRole`\<`TOperations`\> *extends* `true` ? `object` : `Record`\<`never`, `never`\>
 
-Defined in: [types.ts:260](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L260)
+Defined in: [packages/react/src/types.ts:260](https://github.com/simplix-react/simplix-react/blob/main/packages/react/src/types.ts#L260)
 
 The complete set of React Query hooks derived from an entity definition.
 

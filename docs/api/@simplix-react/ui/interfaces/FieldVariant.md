@@ -14,9 +14,15 @@ Field display configuration for label position and size.
 
 ### layout?
 
-> `optional` **layout**: `"inline"` \| `"left"` \| `"top"` \| `"hidden"`
+> `optional` **layout**: `"inline"` \| `"left"` \| `"top"` \| `"hidden"` \| `"trailing"`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L5)
+Defined in: [packages/ui/src/crud/shared/types.ts:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L12)
+
+Label placement. `"top"` stacks the label above the input, `"left"` puts
+it in a leading column, `"inline"` keeps label and input on one row,
+`"trailing"` right-aligns the control with a dashed leader line from the
+label (settings-row style, used by toggle fields), `"hidden"` renders the
+label for screen readers only.
 
 ***
 
@@ -24,4 +30,4 @@ Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-
 
 > `optional` **size**: `"sm"` \| `"lg"` \| `"md"`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L6)
+Defined in: [packages/ui/src/crud/shared/types.ts:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L13)

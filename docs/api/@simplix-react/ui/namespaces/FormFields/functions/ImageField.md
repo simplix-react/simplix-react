@@ -8,7 +8,7 @@
 
 > **ImageField**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/form/image-field.tsx:60](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/image-field.tsx#L60)
+Defined in: [packages/ui/src/fields/form/image-field.tsx:61](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/image-field.tsx#L61)
 
 ## Parameters
 

@@ -8,7 +8,7 @@
 
 > `const` **textVariants**: (`props?`) => `string`
 
-Defined in: [packages/ui/src/primitives/text.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/text.tsx#L13)
+Defined in: [packages/ui/src/primitives/text.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/text.tsx#L12)
 
 CVA variants for the Text component body typography scale.
 

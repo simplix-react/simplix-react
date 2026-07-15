@@ -35,7 +35,9 @@ export function adaptOrvalCreate<T>(
  * Adapts an Orval **update** mutation to the {@link CrudMutation} interface
  * (`mutate({ id, dto })`).
  *
- * - With `pathParam`: sends `{ [pathParam]: id, data: dto }`
+ * - With `pathParam`: sends `{ [pathParam]: id, data: { [pathParam]: id, ...dto } }` —
+ *   the id is mirrored into the body because update DTOs commonly declare the
+ *   id field as required, while form values only carry editable fields.
  * - Without `pathParam`: sends `{ data: dto }` (body-only update)
  *
  * @param mutation - Orval update mutation hook result
@@ -47,14 +49,16 @@ export function adaptOrvalUpdate<T, TId = string>(
   pathParam?: string,
   opts?: { onSettled?: () => void },
 ): CrudMutation<{ id: TId; dto: T }> {
+  const withId = (id: TId, dto: T) =>
+    pathParam ? { ...(dto as Record<string, unknown>), [pathParam]: id } : dto;
   return {
     mutate: ({ id, dto }, options) =>
       pathParam
-        ? mutation.mutate({ [pathParam]: id, data: dto }, { ...options, onSettled: opts?.onSettled })
+        ? mutation.mutate({ [pathParam]: id, data: withId(id, dto) }, { ...options, onSettled: opts?.onSettled })
         : mutation.mutate({ data: dto }, { ...options, onSettled: opts?.onSettled }),
     mutateAsync: ({ id, dto }) =>
       pathParam
-        ? mutation.mutateAsync({ [pathParam]: id, data: dto }, { onSettled: opts?.onSettled })
+        ? mutation.mutateAsync({ [pathParam]: id, data: withId(id, dto) }, { onSettled: opts?.onSettled })
         : mutation.mutateAsync({ data: dto }, { onSettled: opts?.onSettled }),
     isPending: mutation.isPending,
   };

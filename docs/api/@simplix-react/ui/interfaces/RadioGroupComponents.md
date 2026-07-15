@@ -6,7 +6,7 @@
 
 # Interface: RadioGroupComponents
 
-Defined in: [packages/ui/src/provider/types.ts:75](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L75)
+Defined in: [packages/ui/src/provider/types.ts:73](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L73)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/provider/types.ts:75](https://github.com/simplix-re
 
 > **Item**: `ComponentType`\<`RadioGroupItemProps` & `RefAttributes`\<`HTMLButtonElement`\>\>
 
-Defined in: [packages/ui/src/provider/types.ts:77](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L77)
+Defined in: [packages/ui/src/provider/types.ts:75](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L75)
 
 ***
 
@@ -22,4 +22,4 @@ Defined in: [packages/ui/src/provider/types.ts:77](https://github.com/simplix-re
 
 > **Root**: `ComponentType`\<`RadioGroupProps` & `RefAttributes`\<`HTMLDivElement`\>\>
 
-Defined in: [packages/ui/src/provider/types.ts:76](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L76)
+Defined in: [packages/ui/src/provider/types.ts:74](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L74)

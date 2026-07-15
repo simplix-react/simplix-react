@@ -8,7 +8,7 @@
 
 > `const` **containerVariants**: (`props?`) => `string`
 
-Defined in: [packages/ui/src/primitives/container.tsx:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/container.tsx#L8)
+Defined in: [packages/ui/src/primitives/container.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/container.tsx#L7)
 
 CVA variants for the Container component max-width configuration.
 

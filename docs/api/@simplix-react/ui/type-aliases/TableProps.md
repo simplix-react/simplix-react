@@ -8,7 +8,7 @@
 
 > **TableProps** = `ComponentPropsWithRef`\<`"table"`\> & `object`
 
-Defined in: [packages/ui/src/base/display/table.tsx:58](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/table.tsx#L58)
+Defined in: [packages/ui/src/base/display/table.tsx:133](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/table.tsx#L133)
 
 ## Type Declaration
 
@@ -40,7 +40,11 @@ Bounds the scroll container height so the body scrolls vertically. Pair with `st
 
 > `optional` **stickyHeader**: `boolean`
 
-Sticks header cells to the top of the scroll container while the body scrolls.
+Sticks the header to the top of the scroll container while the body scrolls.
+With `maxHeight`/`fill` the table owns the scroll region and CSS sticky is
+used; without them the header follows the nearest scrollable ancestor
+(e.g. a page, dialog, or detail-pane body) via a scroll-synced transform,
+so the container keeps its own horizontal scrollbar.
 
 ### variant?
 

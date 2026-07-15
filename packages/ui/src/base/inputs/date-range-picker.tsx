@@ -211,26 +211,51 @@ export function DateRangePicker({
     return `${formatDateMedium(value.from, bcp47)} – ...`;
   }, [value, bcp47, numberOfMonths]);
 
-  const YearSelect = (
-    <MonthYearSelect
-      value={viewMonth.getFullYear().toString()}
-      options={yearOptions}
-      onChange={(v) => setViewMonth((prev) => new Date(parseInt(v), prev.getMonth(), 1))}
-      className="w-[80px]"
-    />
+  // Inclusive number of days in the selected range
+  const dayCount = useMemo(() => {
+    if (!value.from || !value.to) return null;
+    const from = new Date(value.from);
+    from.setHours(0, 0, 0, 0);
+    const to = new Date(value.to);
+    to.setHours(0, 0, 0, 0);
+    return Math.round((to.getTime() - from.getTime()) / 86_400_000) + 1;
+  }, [value]);
+
+  // The second calendar always shows the month after the first
+  const secondViewMonth = useMemo(
+    () => new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1),
+    [viewMonth],
   );
 
-  const MonthSelectEl = (
-    <MonthYearSelect
-      value={viewMonth.getMonth().toString()}
-      options={monthOptions}
-      onChange={(v) => setViewMonth((prev) => new Date(prev.getFullYear(), parseInt(v), 1))}
-      className="w-[72px]"
-    />
-  );
+  const renderMonthYear = (
+    month: Date,
+    onMonthChange: (value: string) => void,
+    onYearChange: (value: string) => void,
+  ) => {
+    const yearSelect = (
+      <MonthYearSelect
+        value={month.getFullYear().toString()}
+        options={yearOptions}
+        onChange={onYearChange}
+        className="w-[80px]"
+      />
+    );
+    const monthSelect = (
+      <MonthYearSelect
+        value={month.getMonth().toString()}
+        options={monthOptions}
+        onChange={onMonthChange}
+        className="w-[72px]"
+      />
+    );
+    return yearFirst ? <>{yearSelect}{monthSelect}</> : <>{monthSelect}{yearSelect}</>;
+  };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    // modal: inside a Dialog, the dialog's scroll lock blocks wheel events on
+    // body-portaled popovers; a modal popover registers its own scroll-lock
+    // layer so wheel scrolling works in the calendar's option lists.
+    <Popover open={open} onOpenChange={setOpen} modal>
       <PopoverTrigger asChild>
         <button
           type="button"
@@ -275,7 +300,7 @@ export function DateRangePicker({
         <div className="flex">
           {/* Presets panel (desktop only, dual month) */}
           {numberOfMonths === 2 && (
-            <div className="hidden md:flex flex-col border-r w-44">
+            <div className="hidden md:flex flex-col border-r">
               <div className="px-3 pt-3 pb-2">
                 <h4 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{t("date.presets")}</h4>
               </div>
@@ -289,7 +314,7 @@ export function DateRangePicker({
                           key={preset.label}
                           type="button"
                           className={cn(
-                            "rounded-md px-2 py-1 text-xs text-start transition-colors shrink-0",
+                            "rounded-md px-2 py-1 text-xs text-start whitespace-nowrap transition-colors shrink-0",
                             selectedPreset === preset.label
                               ? "bg-primary text-primary-foreground font-medium"
                               : "text-foreground hover:bg-accent",
@@ -308,11 +333,11 @@ export function DateRangePicker({
 
           {/* Calendar area */}
           <div className="flex flex-col p-3">
-            {/* Month/Year navigation */}
-            <div className="flex items-center justify-between gap-2 mb-2">
+            {/* Month/Year navigation — one select pair per visible calendar */}
+            <div className="flex items-center gap-2 mb-2">
               <button
                 type="button"
-                className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-input hover:bg-accent hover:text-accent-foreground"
+                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-input hover:bg-accent hover:text-accent-foreground"
                 onClick={handlePrevMonth}
                 aria-label="Previous month"
               >
@@ -320,12 +345,26 @@ export function DateRangePicker({
                   <path d="M8.84182 3.13514C9.04327 3.32401 9.05348 3.64042 8.86462 3.84188L5.43521 7.49991L8.86462 11.1579C9.05348 11.3594 9.04327 11.6758 8.84182 11.8647C8.64036 12.0535 8.32394 12.0433 8.13508 11.8419L4.38508 7.84188C4.20477 7.64955 4.20477 7.35027 4.38508 7.15794L8.13508 3.15794C8.32394 2.95648 8.64036 2.94628 8.84182 3.13514Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd" />
                 </svg>
               </button>
-              <div className="flex items-center gap-1">
-                {yearFirst ? <>{YearSelect}{MonthSelectEl}</> : <>{MonthSelectEl}{YearSelect}</>}
+              <div className="flex flex-1 items-center justify-center gap-1">
+                {renderMonthYear(
+                  viewMonth,
+                  (v) => setViewMonth((prev) => new Date(prev.getFullYear(), parseInt(v), 1)),
+                  (v) => setViewMonth((prev) => new Date(parseInt(v), prev.getMonth(), 1)),
+                )}
               </div>
+              {numberOfMonths === 2 && (
+                <div className="flex flex-1 items-center justify-center gap-1">
+                  {renderMonthYear(
+                    secondViewMonth,
+                    // The first calendar follows: keep it one month behind the second
+                    (v) => setViewMonth(new Date(secondViewMonth.getFullYear(), parseInt(v) - 1, 1)),
+                    (v) => setViewMonth(new Date(parseInt(v), secondViewMonth.getMonth() - 1, 1)),
+                  )}
+                </div>
+              )}
               <button
                 type="button"
-                className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-input hover:bg-accent hover:text-accent-foreground"
+                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-input hover:bg-accent hover:text-accent-foreground"
                 onClick={handleNextMonth}
                 aria-label="Next month"
               >
@@ -346,6 +385,24 @@ export function DateRangePicker({
               locale={bcp47}
               hideHeader
             />
+
+            {/* Range summary: start / end / day count */}
+            {value.from && (
+              <div className="mt-2 flex items-center justify-center gap-2 rounded-md bg-muted/50 px-3 py-1.5 text-xs">
+                <span className="text-muted-foreground">{t("date.startDate")}</span>
+                <span className="font-medium">{formatDateMedium(value.from, bcp47)}</span>
+                <span className="text-muted-foreground">→</span>
+                <span className="text-muted-foreground">{t("date.endDate")}</span>
+                <span className="font-medium">
+                  {value.to ? formatDateMedium(value.to, bcp47) : "..."}
+                </span>
+                {dayCount != null && (
+                  <span className="rounded bg-primary/10 px-1.5 py-0.5 font-semibold text-primary">
+                    {t("date.daysCount", { count: dayCount })}
+                  </span>
+                )}
+              </div>
+            )}
 
             {/* Footer: Today / Reset / Close */}
             <div className="flex justify-between gap-2 border-t pt-2 mt-2">

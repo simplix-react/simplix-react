@@ -7,6 +7,9 @@ export type { BooleanBadgeProps } from "./boolean-badge";
 export { EmptyValue } from "./empty-value";
 export type { EmptyValueProps } from "./empty-value";
 
+export { EmptyValueBadge } from "./empty-value-badge";
+export type { EmptyValueBadgeProps } from "./empty-value-badge";
+
 export { ColorDot } from "./color-dot";
 export type { ColorDotProps } from "./color-dot";
 

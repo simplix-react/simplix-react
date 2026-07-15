@@ -28,6 +28,9 @@ export type { IconFieldProps } from "./icon-field";
 export { MultiSelectField } from "./multi-select-field";
 export type { MultiSelectFieldProps } from "./multi-select-field";
 
+export { TreeMultiSelectField } from "./tree-multi-select-field";
+export type { TreeMultiSelectFieldProps } from "./tree-multi-select-field";
+
 export { GroupedToggleField } from "./grouped-toggle-field";
 export type {
   GroupedToggleFieldProps,
@@ -41,6 +44,9 @@ export type { NumberFieldProps } from "./number-field";
 
 export { PasswordField } from "./password-field";
 export type { PasswordFieldProps } from "./password-field";
+
+export { PhoneField } from "./phone-field";
+export type { PhoneFieldProps } from "./phone-field";
 
 export { RadioGroupField } from "./radio-group-field";
 export type { RadioGroupFieldProps } from "./radio-group-field";
@@ -65,6 +71,9 @@ export type { TextareaFieldProps } from "./textarea-field";
 
 export { LocationPickerField } from "./location-picker-field";
 export type { LocationPickerFieldProps } from "./location-picker-field";
+
+export { TimeField } from "./time-field";
+export type { TimeFieldProps } from "./time-field";
 
 export { TimezoneField } from "./timezone-field";
 export type { TimezoneFieldProps } from "./timezone-field";

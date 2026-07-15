@@ -11,6 +11,8 @@ const detailFieldWrapperVariants = cva("py-1", {
       top: "flex flex-col gap-1",
       left: "grid grid-cols-[auto_1fr] items-baseline gap-x-3",
       inline: "flex items-baseline justify-between gap-3",
+      // Read-only values need no leader line — trailing just right-aligns.
+      trailing: "flex items-baseline justify-between gap-3",
       hidden: "flex flex-col",
     },
     size: {

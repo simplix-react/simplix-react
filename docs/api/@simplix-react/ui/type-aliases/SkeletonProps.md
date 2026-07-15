@@ -8,6 +8,6 @@
 
 > **SkeletonProps** = `React.HTMLAttributes`\<`HTMLDivElement`\>
 
-Defined in: [packages/ui/src/base/display/skeleton.tsx:4](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/skeleton.tsx#L4)
+Defined in: [packages/ui/src/base/display/skeleton.tsx:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/skeleton.tsx#L5)
 
-Props for the [Skeleton](../functions/Skeleton.md) component.
+Props for the [Skeleton](../variables/Skeleton.md) component.

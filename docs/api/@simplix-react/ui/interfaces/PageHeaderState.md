@@ -6,7 +6,7 @@
 
 # Interface: PageHeaderState
 
-Defined in: [packages/ui/src/layout/page-header.tsx:3](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L3)
+Defined in: [packages/ui/src/layout/page-header.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L12)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/layout/page-header.tsx:3](https://github.com/simpli
 
 > `optional` **actions**: `ReactNode`
 
-Defined in: [packages/ui/src/layout/page-header.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L10)
+Defined in: [packages/ui/src/layout/page-header.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L19)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [packages/ui/src/layout/page-header.tsx:10](https://github.com/simpl
 
 > `optional` **center**: `ReactNode`
 
-Defined in: [packages/ui/src/layout/page-header.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L9)
+Defined in: [packages/ui/src/layout/page-header.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L18)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [packages/ui/src/layout/page-header.tsx:9](https://github.com/simpli
 
 > `optional` **description**: `ReactNode`
 
-Defined in: [packages/ui/src/layout/page-header.tsx:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L5)
+Defined in: [packages/ui/src/layout/page-header.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L14)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [packages/ui/src/layout/page-header.tsx:5](https://github.com/simpli
 
 > `optional` **metadata**: `ReactNode`
 
-Defined in: [packages/ui/src/layout/page-header.tsx:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L6)
+Defined in: [packages/ui/src/layout/page-header.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L15)
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: [packages/ui/src/layout/page-header.tsx:6](https://github.com/simpli
 
 > `optional` **metadataKey**: `string`
 
-Defined in: [packages/ui/src/layout/page-header.tsx:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L8)
+Defined in: [packages/ui/src/layout/page-header.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L17)
 
 Stable primitive key to trigger header updates when metadata changes
 
@@ -56,4 +56,4 @@ Stable primitive key to trigger header updates when metadata changes
 
 > `optional` **title**: `ReactNode`
 
-Defined in: [packages/ui/src/layout/page-header.tsx:4](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L4)
+Defined in: [packages/ui/src/layout/page-header.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L13)

@@ -8,7 +8,7 @@
 
 > **usePageHeaderState**(): [`PageHeaderState`](../interfaces/PageHeaderState.md)
 
-Defined in: [packages/ui/src/layout/page-header.tsx:51](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L51)
+Defined in: [packages/ui/src/layout/page-header.tsx:63](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L63)
 
 ## Returns
 

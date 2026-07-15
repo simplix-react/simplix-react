@@ -6,7 +6,7 @@
 
 # Interface: PopoverComponents
 
-Defined in: [packages/ui/src/provider/types.ts:103](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L103)
+Defined in: [packages/ui/src/provider/types.ts:101](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L101)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/provider/types.ts:103](https://github.com/simplix-r
 
 > **Content**: `ComponentType`\<`PopoverContentProps` & `RefAttributes`\<`HTMLDivElement`\>\>
 
-Defined in: [packages/ui/src/provider/types.ts:106](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L106)
+Defined in: [packages/ui/src/provider/types.ts:104](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L104)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [packages/ui/src/provider/types.ts:106](https://github.com/simplix-r
 
 > **Root**: `ComponentType`\<\{ `children?`: `ReactNode`; `onOpenChange?`: (`open`) => `void`; `open?`: `boolean`; \}\>
 
-Defined in: [packages/ui/src/provider/types.ts:104](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L104)
+Defined in: [packages/ui/src/provider/types.ts:102](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L102)
 
 ***
 
@@ -30,4 +30,4 @@ Defined in: [packages/ui/src/provider/types.ts:104](https://github.com/simplix-r
 
 > **Trigger**: `ComponentType`\<\{ `asChild?`: `boolean`; `children?`: `ReactNode`; \}\>
 
-Defined in: [packages/ui/src/provider/types.ts:105](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L105)
+Defined in: [packages/ui/src/provider/types.ts:103](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L103)

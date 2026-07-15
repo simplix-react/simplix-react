@@ -14,19 +14,83 @@ describe("NumberInput", () => {
     expect(input).toHaveProperty("type", "number");
   });
 
-  it("applies base classes", () => {
+  it("applies base classes to the wrapper", () => {
     render(<NumberInput data-testid="num" />);
-    const input = screen.getByTestId("num");
-    expect(input.className).toContain("flex");
-    expect(input.className).toContain("rounded-md");
-    expect(input.className).toContain("border-input");
+    const wrapper = screen.getByTestId("num").parentElement as HTMLElement;
+    expect(wrapper.className).toContain("flex");
+    expect(wrapper.className).toContain("rounded-md");
+    expect(wrapper.className).toContain("border-input");
   });
 
-  it("merges custom className", () => {
+  it("merges custom className on the wrapper", () => {
     render(<NumberInput data-testid="num" className="my-num" />);
-    const input = screen.getByTestId("num");
-    expect(input.className).toContain("my-num");
-    expect(input.className).toContain("border-input");
+    const wrapper = screen.getByTestId("num").parentElement as HTMLElement;
+    expect(wrapper.className).toContain("my-num");
+    expect(wrapper.className).toContain("border-input");
+  });
+
+  it("renders always-visible spinner buttons", () => {
+    render(<NumberInput data-testid="num" />);
+    expect(screen.getByRole("button", { name: "Increase" })).toBeDefined();
+    expect(screen.getByRole("button", { name: "Decrease" })).toBeDefined();
+  });
+
+  it("steps up with the spinner button", () => {
+    const onChange = vi.fn();
+    render(<NumberInput data-testid="num" defaultValue={5} onChange={onChange} />);
+    fireEvent.click(screen.getByRole("button", { name: "Increase" }));
+    expect(onChange).toHaveBeenCalledWith(6);
+    expect((screen.getByTestId("num") as HTMLInputElement).value).toBe("6");
+  });
+
+  it("steps down with the spinner button respecting step", () => {
+    const onChange = vi.fn();
+    render(<NumberInput data-testid="num" defaultValue={10} step={5} onChange={onChange} />);
+    fireEvent.click(screen.getByRole("button", { name: "Decrease" }));
+    expect(onChange).toHaveBeenCalledWith(5);
+  });
+
+  it("clamps spinner steps to min/max", () => {
+    const onChange = vi.fn();
+    render(<NumberInput data-testid="num" defaultValue={99} max={99} onChange={onChange} />);
+    fireEvent.click(screen.getByRole("button", { name: "Increase" }));
+    expect(onChange).toHaveBeenCalledWith(99);
+  });
+
+  it("lands on min when stepping from an empty input", () => {
+    const onChange = vi.fn();
+    render(<NumberInput data-testid="num" min={10} max={99} onChange={onChange} />);
+    fireEvent.click(screen.getByRole("button", { name: "Increase" }));
+    expect(onChange).toHaveBeenCalledWith(10);
+  });
+
+  it("emits the new value for controlled usage without touching the input", () => {
+    const onChange = vi.fn();
+    render(<NumberInput data-testid="num" value={7} onChange={onChange} readOnly />);
+    fireEvent.click(screen.getByRole("button", { name: "Increase" }));
+    expect(onChange).toHaveBeenCalledWith(8);
+    // Display comes from the controlled prop, unchanged until the parent re-renders
+    expect((screen.getByTestId("num") as HTMLInputElement).value).toBe("7");
+  });
+
+  it("renders a suffix between the number and the spinner", () => {
+    render(<NumberInput data-testid="num" suffix="sec" />);
+    const wrapper = screen.getByTestId("num").parentElement as HTMLElement;
+    const suffix = screen.getByText("sec");
+    expect(suffix.parentElement).toBe(wrapper);
+  });
+
+  it("parses decimal input", () => {
+    const onChange = vi.fn();
+    render(<NumberInput data-testid="num" step={0.1} onChange={onChange} />);
+    fireEvent.change(screen.getByTestId("num"), { target: { value: "2.5" } });
+    expect(onChange).toHaveBeenCalledWith(2.5);
+  });
+
+  it("disables spinner buttons when disabled", () => {
+    render(<NumberInput data-testid="num" disabled />);
+    expect((screen.getByRole("button", { name: "Increase" }) as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByRole("button", { name: "Decrease" }) as HTMLButtonElement).disabled).toBe(true);
   });
 
   it("forwards ref", () => {

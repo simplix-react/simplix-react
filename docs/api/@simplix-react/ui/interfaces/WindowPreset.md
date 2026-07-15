@@ -6,7 +6,7 @@
 
 # Interface: WindowPreset
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L13)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/types.ts#L6)
 
 A window preset defines a viewing window size and its bucket granularity.
 
@@ -16,7 +16,7 @@ A window preset defines a viewing window size and its bucket granularity.
 
 > **bucketMinutes**: `number`
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L21)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/types.ts#L14)
 
 Bucket size in minutes (sub-minute values use fractions, e.g., 10s = 10/60)
 
@@ -26,9 +26,9 @@ Bucket size in minutes (sub-minute values use fractions, e.g., 10s = 10/60)
 
 > **key**: `string`
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L15)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/types.ts#L8)
 
-Unique key (e.g., "1h", "1d")
+Unique key (e.g., "1h", "1d"). The reserved key "custom" denotes a preset-less window.
 
 ***
 
@@ -36,7 +36,7 @@ Unique key (e.g., "1h", "1d")
 
 > **label**: `string`
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L17)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/types.ts#L10)
 
 Display label
 
@@ -46,6 +46,6 @@ Display label
 
 > **windowMinutes**: `number`
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L19)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/types.ts#L12)
 
 Window size in minutes

@@ -6,7 +6,7 @@
 
 # Interface: BadgeProps
 
-Defined in: [packages/ui/src/base/display/badge.tsx:77](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L77)
+Defined in: [packages/ui/src/base/display/badge.tsx:79](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L79)
 
 ## Extends
 
@@ -912,6 +912,17 @@ Defines the human readable text alternative of aria-valuenow for a range widget.
 #### Inherited from
 
 `ComponentPropsWithRef.aria-valuetext`
+
+***
+
+### asChild?
+
+> `optional` **asChild**: `boolean`
+
+Defined in: [packages/ui/src/base/display/badge.tsx:86](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L86)
+
+Render the single child element instead of a `<span>`, merging the badge
+styling onto it (e.g. wrap an `<a>`).
 
 ***
 
@@ -3519,7 +3530,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **rounded**: `"none"` \| `"sm"` \| `"lg"` \| `"full"` \| `"md"` \| `"xl"` \| `null`
 
-Defined in: [packages/ui/src/base/display/badge.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L10)
+Defined in: [packages/ui/src/base/display/badge.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L12)
 
 #### Inherited from
 
@@ -3543,7 +3554,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **size**: `"default"` \| `"sm"` \| `null`
 
-Defined in: [packages/ui/src/base/display/badge.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L18)
+Defined in: [packages/ui/src/base/display/badge.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L20)
 
 #### Inherited from
 
@@ -3675,7 +3686,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **variant**: `"default"` \| `"success"` \| `"warning"` \| `"outline"` \| `"blue"` \| `"cyan"` \| `"fuchsia"` \| `"green"` \| `"indigo"` \| `"lime"` \| `"orange"` \| `"pink"` \| `"purple"` \| `"red"` \| `"teal"` \| `"violet"` \| `"yellow"` \| `"destructive"` \| `"secondary"` \| `"slate"` \| `"amber"` \| `"emerald"` \| `"sky"` \| `"rose"` \| `null`
 
-Defined in: [packages/ui/src/base/display/badge.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L22)
+Defined in: [packages/ui/src/base/display/badge.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L24)
 
 #### Inherited from
 

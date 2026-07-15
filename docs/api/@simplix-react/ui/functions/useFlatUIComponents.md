@@ -8,7 +8,7 @@
 
 > **useFlatUIComponents**(): `object`
 
-Defined in: [packages/ui/src/provider/ui-provider.tsx:202](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/ui-provider.tsx#L202)
+Defined in: [packages/ui/src/provider/ui-provider.tsx:114](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/ui-provider.tsx#L114)
 
 Flat-destructuring variant of [useUIComponents](useUIComponents.md).
 
@@ -66,10 +66,6 @@ with the same names used in direct base imports (e.g. `Table`, `TableRow`).
 ### CommandSeparator
 
 > **CommandSeparator**: `ComponentType`\<`any`\> = `ui.Command.Separator`
-
-### Container
-
-> **Container**: `ComponentType`\<[`ContainerProps`](../interfaces/ContainerProps.md)\> = `ui.Container`
 
 ### CrudDelete
 
@@ -214,10 +210,6 @@ with the same names used in direct base imports (e.g. `Table`, `TableRow`).
 ### RadioGroupItem
 
 > **RadioGroupItem**: `ComponentType`\<`RadioGroupItemProps` & `RefAttributes`\<`HTMLButtonElement`\>\> = `ui.RadioGroup.Item`
-
-### Section
-
-> **Section**: `ComponentType`\<[`SectionProps`](../interfaces/SectionProps.md)\> = `ui.Section`
 
 ### SectionShell
 

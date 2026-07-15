@@ -1004,11 +1004,10 @@ async function updateLocaleJsons(
       entityKeys.view = "View";
       entityKeys.edit = "Edit";
       entityKeys.delete = "Delete";
-      entityKeys.back = "\u2190 Back";
+      entityKeys.back = "Back";
     }
-    if (hasTree) {
-      entityKeys.sectionTitle = `${EntityPascal} Information`;
-    }
+    // Form/detail Section headers reference `<entity>.sectionTitle` for every entity.
+    entityKeys.sectionTitle = `${EntityPascal} Information`;
     if (ops.hasCreate) entityKeys[`new${EntityPascal}`] = `New ${EntityPascal}`;
     if (ops.hasCreate) entityKeys[`addNew${EntityPascal}`] = `Add New ${EntityPascal}`;
     if (ops.hasCreate || ops.hasUpdate) entityKeys[`save${EntityPascal}`] = `Save ${EntityPascal}`;

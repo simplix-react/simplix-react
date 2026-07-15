@@ -8,7 +8,7 @@
 
 > **useBatchDetails**\<`TList`, `TDetail`\>(`listData`, `extractId`, `getQueryOptions`): `object`
 
-Defined in: [use-batch-details.ts:32](https://github.com/simplix-react/simplix-react/blob/main/use-batch-details.ts#L32)
+Defined in: [packages/react/src/use-batch-details.ts:32](https://github.com/simplix-react/simplix-react/blob/main/packages/react/src/use-batch-details.ts#L32)
 
 Fetches detail records for every item in a list query, using `useQueries` + `combine`.
 

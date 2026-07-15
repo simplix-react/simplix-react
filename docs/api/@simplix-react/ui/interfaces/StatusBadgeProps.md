@@ -6,7 +6,7 @@
 
 # Interface: StatusBadgeProps
 
-Defined in: [packages/ui/src/base/display/status-badge.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-badge.tsx#L14)
+Defined in: [packages/ui/src/base/display/status-badge.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-badge.tsx#L15)
 
 ## Extends
 
@@ -42,7 +42,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **appearance**: `"outline"` \| `"filled"`
 
-Defined in: [packages/ui/src/base/display/status-badge.tsx:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-badge.tsx#L27)
+Defined in: [packages/ui/src/base/display/status-badge.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-badge.tsx#L28)
 
 `filled` solid badge or `outline` bordered badge (default `outline`).
 
@@ -1153,7 +1153,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **icon**: [`IconComponent`](../type-aliases/IconComponent.md)
 
-Defined in: [packages/ui/src/base/display/status-badge.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-badge.tsx#L21)
+Defined in: [packages/ui/src/base/display/status-badge.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-badge.tsx#L22)
 
 Optional leading icon component (mutually exclusive with `showDot`).
 
@@ -1311,7 +1311,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > **label**: `ReactNode`
 
-Defined in: [packages/ui/src/base/display/status-badge.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-badge.tsx#L19)
+Defined in: [packages/ui/src/base/display/status-badge.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-badge.tsx#L20)
 
 Already-translated label content.
 
@@ -3445,7 +3445,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **pulse**: `boolean`
 
-Defined in: [packages/ui/src/base/display/status-badge.tsx:25](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-badge.tsx#L25)
+Defined in: [packages/ui/src/base/display/status-badge.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-badge.tsx#L26)
 
 Animate the leading dot/icon (passes `animation="ping"` to the inner dot).
 
@@ -3559,7 +3559,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **showDot**: `boolean`
 
-Defined in: [packages/ui/src/base/display/status-badge.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-badge.tsx#L23)
+Defined in: [packages/ui/src/base/display/status-badge.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-badge.tsx#L24)
 
 Render a leading [StatusDot](../variables/StatusDot.md) of the same tone.
 
@@ -3569,9 +3569,9 @@ Render a leading [StatusDot](../variables/StatusDot.md) of the same tone.
 
 > `optional` **size**: `"default"` \| `"xs"` \| `"sm"`
 
-Defined in: [packages/ui/src/base/display/status-badge.tsx:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-badge.tsx#L29)
+Defined in: [packages/ui/src/base/display/status-badge.tsx:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-badge.tsx#L30)
 
-Text sizing token (default `default`).
+Text sizing token (default `sm`, matching list/detail badge density).
 
 ***
 
@@ -3663,7 +3663,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > **tone**: [`StatusTone`](../type-aliases/StatusTone.md)
 
-Defined in: [packages/ui/src/base/display/status-badge.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-badge.tsx#L17)
+Defined in: [packages/ui/src/base/display/status-badge.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/status-badge.tsx#L18)
 
 Semantic tone driving the pill color.
 

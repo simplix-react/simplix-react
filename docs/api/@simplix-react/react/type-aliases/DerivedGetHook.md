@@ -8,7 +8,7 @@
 
 > **DerivedGetHook**\<`TData`\> = (`id`, `options?`) => `UseQueryResult`\<`TData`\>
 
-Defined in: [types.ts:69](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L69)
+Defined in: [packages/react/src/types.ts:69](https://github.com/simplix-react/simplix-react/blob/main/packages/react/src/types.ts#L69)
 
 Represents a derived detail query hook that fetches a single entity by ID.
 

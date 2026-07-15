@@ -6,7 +6,7 @@
 
 # Interface: PaginationState
 
-Defined in: [packages/ui/src/crud/shared/types.ts:49](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L49)
+Defined in: [packages/ui/src/crud/shared/types.ts:68](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L68)
 
 Represents pagination state with page, size, and total count.
 
@@ -16,7 +16,7 @@ Represents pagination state with page, size, and total count.
 
 > **page**: `number`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:50](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L50)
+Defined in: [packages/ui/src/crud/shared/types.ts:69](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L69)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:50](https://github.com/simplix
 
 > **pageSize**: `number`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:51](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L51)
+Defined in: [packages/ui/src/crud/shared/types.ts:70](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L70)
 
 ***
 
@@ -32,4 +32,4 @@ Defined in: [packages/ui/src/crud/shared/types.ts:51](https://github.com/simplix
 
 > **total**: `number`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:52](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L52)
+Defined in: [packages/ui/src/crud/shared/types.ts:71](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L71)

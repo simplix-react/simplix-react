@@ -8,7 +8,7 @@
 
 > `const` **buttonVariants**: (`props?`) => `string`
 
-Defined in: [packages/ui/src/base/controls/button.tsx:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L6)
+Defined in: [packages/ui/src/base/controls/button.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L9)
 
 ## Parameters
 

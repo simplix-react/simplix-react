@@ -6,6 +6,6 @@
 
 # Variable: Calendar
 
-> `const` **Calendar**: `ForwardRefExoticComponent`\<`Omit`\<[`CalendarProps`](../interfaces/CalendarProps.md), `"ref"`\> & `RefAttributes`\<`HTMLDivElement`\>\>
+> `const` **Calendar**: `ComponentType`\<`Omit`\<[`CalendarProps`](../interfaces/CalendarProps.md), `"ref"`\> & `RefAttributes`\<`HTMLDivElement`\>\>
 
-Defined in: [packages/ui/src/base/controls/calendar.tsx:175](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L175)
+Defined in: [packages/ui/src/base/controls/calendar.tsx:455](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L455)

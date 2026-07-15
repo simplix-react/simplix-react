@@ -8,6 +8,6 @@
 
 > `const` **HEATMAP\_THEMES**: `Record`\<[`HeatmapColorTheme`](../type-aliases/HeatmapColorTheme.md), [`HeatmapPalette`](../interfaces/HeatmapPalette.md)\>
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:48](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L48)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/themes.ts:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/themes.ts#L15)
 
 Built-in heatmap color themes. All use muted/desaturated tones to avoid conflicting with alert colors.

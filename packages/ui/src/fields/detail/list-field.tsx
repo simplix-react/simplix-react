@@ -1,5 +1,6 @@
 import type { CommonDetailFieldProps } from "../../crud/shared/types";
 import { useFlatUIComponents } from "../../provider";
+import { detailFallback } from "../shared/detail-fallback";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
 
 /** Display mode for the {@link DetailListField} component. */
@@ -11,7 +12,7 @@ export interface DetailListFieldProps extends CommonDetailFieldProps {
   value: string[] | null | undefined;
   /** Display mode. Defaults to `"badges"`. */
   mode?: ListDisplayMode;
-  /** Fallback text when value is null, undefined, or empty array. Defaults to em-dash. */
+  /** Fallback text when value is null, undefined, or empty array. Defaults to the shared no-value badge. */
   fallback?: string;
 }
 
@@ -28,7 +29,7 @@ export interface DetailListFieldProps extends CommonDetailFieldProps {
 export function DetailListField({
   value,
   mode = "badges",
-  fallback = "",
+  fallback,
   label,
   labelKey,
   layout,
@@ -46,7 +47,7 @@ export function DetailListField({
         size={size}
         className={className}
       >
-        <span>{fallback}</span>
+        {detailFallback(fallback)}
       </DetailFieldWrapper>
     );
   }

@@ -279,7 +279,22 @@ describe("CrudTree.TableCard", () => {
       </CrudTree>,
     );
     expect(container.querySelector(".rounded-lg.border.bg-card")).toBeNull();
+    // Standalone tables use the ancestor-driven sticky header by default:
+    // no CSS-sticky cells, the container is marked for the scroll-synced mode.
     expect(container.querySelector("thead th.sticky")).toBeNull();
+    expect(container.querySelector('[data-sticky-header="ancestor"]')).toBeTruthy();
+  });
+
+  it("disables the sticky header with stickyHeader={false}", () => {
+    const { container } = render(
+      <CrudTree>
+        <CrudTree.Table data={treeData} stickyHeader={false}>
+          <CrudTree.Column<TreeNode> field="name" header="Name" />
+        </CrudTree.Table>
+      </CrudTree>,
+    );
+    expect(container.querySelector("thead th.sticky")).toBeNull();
+    expect(container.querySelector("[data-sticky-header]")).toBeNull();
   });
 });
 

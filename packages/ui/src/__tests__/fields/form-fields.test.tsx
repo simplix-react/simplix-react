@@ -164,12 +164,14 @@ describe("SwitchField", () => {
     expect(switchEl).toBeDefined();
   });
 
-  it("defaults to left label position", () => {
-    render(
+  it("defaults to the trailing settings-row layout", () => {
+    const { container } = render(
       <SwitchField label="Mode" value={false} onChange={vi.fn()} />,
     );
     const fieldset = screen.getByRole("group");
-    expect(fieldset.className).toContain("grid");
+    expect(fieldset.className).toContain("flex-col");
+    // Leader line between label and the right-aligned switch
+    expect(container.querySelector(".border-dashed")).toBeTruthy();
   });
 
   it("shows error", () => {

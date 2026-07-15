@@ -189,7 +189,7 @@ Semantic layout components built with CVA variants.
 | --- | --- | --- |
 | `Stack` | Vertical/horizontal flex layout | `direction`, `gap`, `align`, `justify`, `wrap` |
 | `Flex` | Horizontal flex (alias for `Stack direction="row"`) | Same as Stack |
-| `Grid` | CSS Grid layout | `columns` (1-6), `gap`, `template` (arbitrary `grid-template-columns`) |
+| `Grid` | CSS Grid layout | `columns` (1-6), `gap`, `gapX`/`gapY` (per-axis overrides), `divider` (vertical line between columns), `template` (arbitrary `grid-template-columns`) |
 | `Container` | Centered max-width wrapper | `size` (sm/md/lg/xl/full) |
 | `Section` | Content section with title/description | `title`, `description` |
 | `Card` | Card container with border and shadow | `padding` (none/sm/md/lg), `interactive` |
@@ -216,6 +216,7 @@ Unstyled Radix UI primitives with Tailwind CSS styling. Used internally by field
 - `Select` (Root, Trigger, Value, Content, Item, Group, Label, Separator)
 - `RadioGroup` (Root, Item)
 - `Calendar` (date picker grid)
+- `TimePicker` (time-of-day input with AM/PM toggle and drop-open hour/minute lists)
 - `Popover` (Root, Trigger, Content, Anchor)
 - `Dialog` (Root, Trigger, Content, Header, Footer, Title, Description, Close)
 - `DropdownMenu` (Root, Trigger, Content, Item, CheckboxItem, RadioItem, RadioGroup, Label, Separator, Sub, SubTrigger, SubContent, Group)
@@ -249,6 +250,18 @@ Tone tokens are exported directly for custom rendering: `STATUS_TONES`, `STATUS_
 
 All form fields follow the same pattern: `value` + `onChange` + common field props (label, error, description, required, disabled, className).
 
+Every field also accepts `prefixControl` / `suffixControl` — a control rendered on the same row as the input (e.g. an add button, IconPicker, ColorPicker). Use these instead of composing a button next to the field: the control stays aligned with the input while description and error render below at full width.
+
+```tsx
+<FormFields.TextField
+  label="Training key"
+  value={draft}
+  onChange={setDraft}
+  description="Added on submit."
+  suffixControl={<Button onClick={add}>Add</Button>}
+/>
+```
+
 ```tsx
 import { FormFields } from "@simplix-react/ui";
 ```
@@ -263,6 +276,8 @@ import { FormFields } from "@simplix-react/ui";
 | `FormFields.CheckboxField` | `boolean` | `checkboxProps` |
 | `FormFields.RadioGroupField` | `string` | `options` (label/value/description), `direction` |
 | `FormFields.DateField` | `Date \| null` | `minDate`, `maxDate`, `format`, `placeholder` |
+| `FormFields.DateTimeField` | `Date \| string \| number \| null` | `minDate`, `maxDate`, `hideTime`, `hour12`, `minuteStep` |
+| `FormFields.TimeField` | `TimeValue \| null` (`{ hours, minutes }`) | `minTime`, `maxTime`, `hour12`, `minuteStep` |
 | `FormFields.ComboboxField` | `string \| null` | `options`, `onSearch`, `loading`, `emptyMessage` |
 | `FormFields.PasswordField` | `string` | `placeholder`, `maxLength` (with visibility toggle) |
 | `FormFields.ColorField` | `string` (hex) | Native color picker + hex text input |
@@ -324,8 +339,8 @@ Low-level wrappers used internally by `FormFields` and `DetailFields`. Export th
 
 | Component | Purpose | Key Props |
 | --- | --- | --- |
-| `FieldWrapper` | Wraps editable inputs with label, error, description | `label`, `error`, `description`, `required`, `disabled`, `labelPosition`, `size` |
-| `DetailFieldWrapper` | Wraps read-only display values with label | `label`, `labelPosition`, `size` |
+| `FieldWrapper` | Wraps editable inputs with label, error, description | `label`, `error`, `description`, `required`, `disabled`, `layout`, `size` |
+| `DetailFieldWrapper` | Wraps read-only display values with label | `label`, `layout`, `size` |
 
 ```tsx
 import { FieldWrapper } from "@simplix-react/ui";
@@ -343,14 +358,14 @@ Control field label position and size across a section or page using context:
 import { FieldVariantContext } from "@simplix-react/ui";
 
 // All fields inside will use left-aligned labels at small size
-<FieldVariantContext.Provider value={{ labelPosition: "left", size: "sm" }}>
+<FieldVariantContext.Provider value={{ layout: "left", size: "sm" }}>
   <FormFields.TextField label="Name" value={name} onChange={setName} />
   <FormFields.TextField label="Email" value={email} onChange={setEmail} />
 </FieldVariantContext.Provider>
 ```
 
 Options:
-- `labelPosition`: `"top"` (default) | `"left"` | `"hidden"` (sr-only for accessibility)
+- `layout`: `"top"` (default) | `"left"` | `"inline"` | `"trailing"` (control right-aligned with a dashed leader line from the label — the `SwitchField` default) | `"hidden"` (sr-only for accessibility)
 - `size`: `"sm"` | `"md"` (default) | `"lg"`
 
 ### CRUD Layout Components
@@ -410,6 +425,8 @@ const { data, filters, sort, pagination, selection, emptyReason } = useCrudList(
 ```
 
 Sub-components: `List.Toolbar`, `List.Search`, `List.Filter`, `List.Table`, `List.Column`, `List.RowActions`, `List.Action`, `List.Pagination`, `List.BulkActions`, `List.BulkAction`, `List.Empty`
+
+`List.Table` and `Tree.Table` render a sticky header by default — once scrolling an outer container (a page, dialog, or detail-pane body) would hide the header row, it sticks to the top of the nearest scrollable ancestor. Wide tables keep their own horizontal scrollbar, and the floating header scrolls with its columns. Pass `stickyHeader={false}` to disable. Inside a `List.TableCard` the table owns its scroll region and the header is always sticky.
 
 #### CardList
 
@@ -895,7 +912,8 @@ See root LICENSE file.
 - [AlertBannerProps](interfaces/AlertBannerProps.md)
 - [AreaChartProps](interfaces/AreaChartProps.md)
 - [AssignmentChipProps](interfaces/AssignmentChipProps.md)
-- [AttachmentHttpClient](interfaces/AttachmentHttpClient.md)
+- [AttachmentRecord](interfaces/AttachmentRecord.md)
+- [AttachmentTransport](interfaces/AttachmentTransport.md)
 - [AuditData](interfaces/AuditData.md)
 - [BadgeProps](interfaces/BadgeProps.md)
 - [BarChartProps](interfaces/BarChartProps.md)
@@ -913,6 +931,7 @@ See root LICENSE file.
 - [ChipFilterOption](interfaces/ChipFilterOption.md)
 - [ChipFilterProps](interfaces/ChipFilterProps.md)
 - [ColorPickerProps](interfaces/ColorPickerProps.md)
+- [ColorTheme](interfaces/ColorTheme.md)
 - [ColumnInfo](interfaces/ColumnInfo.md)
 - [CommandComponents](interfaces/CommandComponents.md)
 - [CommonDetailFieldProps](interfaces/CommonDetailFieldProps.md)
@@ -921,7 +940,8 @@ See root LICENSE file.
 - [ContainerProps](interfaces/ContainerProps.md)
 - [CountryFilterDef](interfaces/CountryFilterDef.md)
 - [CountryOption](interfaces/CountryOption.md)
-- [CreateFileFieldApiOptions](interfaces/CreateFileFieldApiOptions.md)
+- [CropArea](interfaces/CropArea.md)
+- [CropModalProps](interfaces/CropModalProps.md)
 - [CrudDeleteProps](interfaces/CrudDeleteProps.md)
 - [CrudDeleteWiredLabels](interfaces/CrudDeleteWiredLabels.md)
 - [CrudDetailActionsProps](interfaces/CrudDetailActionsProps.md)
@@ -968,6 +988,8 @@ See root LICENSE file.
 - [FieldMessageProps](interfaces/FieldMessageProps.md)
 - [FieldVariant](interfaces/FieldVariant.md)
 - [FieldWrapperProps](interfaces/FieldWrapperProps.md)
+- [FileFieldApi](interfaces/FileFieldApi.md)
+- [FileFieldSource](interfaces/FileFieldSource.md)
 - [FilterActionsProps](interfaces/FilterActionsProps.md)
 - [FilterBarProps](interfaces/FilterBarProps.md)
 - [FilterDateRange](interfaces/FilterDateRange.md)
@@ -1005,7 +1027,9 @@ See root LICENSE file.
 - [ListProps](interfaces/ListProps.md)
 - [ListSearchProps](interfaces/ListSearchProps.md)
 - [ListTableProps](interfaces/ListTableProps.md)
+- [ListTableSlots](interfaces/ListTableSlots.md)
 - [ListToolbarProps](interfaces/ListToolbarProps.md)
+- [ListTotalBadgeProps](interfaces/ListTotalBadgeProps.md)
 - [MapAutoFitProps](interfaces/MapAutoFitProps.md)
 - [MapBoundsOverlayProps](interfaces/MapBoundsOverlayProps.md)
 - [MapFitOptions](interfaces/MapFitOptions.md)
@@ -1027,6 +1051,7 @@ See root LICENSE file.
 - [NumberFilterProps](interfaces/NumberFilterProps.md)
 - [NumberInputProps](interfaces/NumberInputProps.md)
 - [OperatorMeta](interfaces/OperatorMeta.md)
+- [OrvalGetResultLike](interfaces/OrvalGetResultLike.md)
 - [OrvalMutationLike](interfaces/OrvalMutationLike.md)
 - [PageHeaderState](interfaces/PageHeaderState.md)
 - [PaginationState](interfaces/PaginationState.md)
@@ -1038,6 +1063,7 @@ See root LICENSE file.
 - [QueryFallbackProps](interfaces/QueryFallbackProps.md)
 - [RadioGroupComponents](interfaces/RadioGroupComponents.md)
 - [ReactRouterHooks](interfaces/ReactRouterHooks.md)
+- [RemoteConfigQueryDef](interfaces/RemoteConfigQueryDef.md)
 - [ReorderConfig](interfaces/ReorderConfig.md)
 - [RouteMatcherProviderProps](interfaces/RouteMatcherProviderProps.md)
 - [RouterAdapter](interfaces/RouterAdapter.md)
@@ -1066,8 +1092,10 @@ See root LICENSE file.
 - [TextFilterDef](interfaces/TextFilterDef.md)
 - [TextFilterProps](interfaces/TextFilterProps.md)
 - [TextProps](interfaces/TextProps.md)
+- [TimePickerProps](interfaces/TimePickerProps.md)
 - [TimeRangeSelectorProps](interfaces/TimeRangeSelectorProps.md)
 - [TimeRangeValue](interfaces/TimeRangeValue.md)
+- [TimeValue](interfaces/TimeValue.md)
 - [TimezoneFilterDef](interfaces/TimezoneFilterDef.md)
 - [TimezoneOption](interfaces/TimezoneOption.md)
 - [Toast](interfaces/Toast.md)
@@ -1079,6 +1107,7 @@ See root LICENSE file.
 - [TreeHeaderActionsProps](interfaces/TreeHeaderActionsProps.md)
 - [TreeMoveConfig](interfaces/TreeMoveConfig.md)
 - [TreeMoveDialogProps](interfaces/TreeMoveDialogProps.md)
+- [TreeMultiSelectFieldProps](interfaces/TreeMultiSelectFieldProps.md)
 - [TreeNodeMetadata](interfaces/TreeNodeMetadata.md)
 - [TreeProps](interfaces/TreeProps.md)
 - [TreeReorderConfig](interfaces/TreeReorderConfig.md)
@@ -1106,6 +1135,7 @@ See root LICENSE file.
 - [UseCrudPageStateResult](interfaces/UseCrudPageStateResult.md)
 - [UseFadeTransitionOptions](interfaces/UseFadeTransitionOptions.md)
 - [UseFadeTransitionResult](interfaces/UseFadeTransitionResult.md)
+- [UseFilterBarStateOptions](interfaces/UseFilterBarStateOptions.md)
 - [UseKeyboardNavOptions](interfaces/UseKeyboardNavOptions.md)
 - [UseListDetailStateOptions](interfaces/UseListDetailStateOptions.md)
 - [UseListDetailStateResult](interfaces/UseListDetailStateResult.md)
@@ -1300,6 +1330,7 @@ See root LICENSE file.
 - [Label](variables/Label.md)
 - [ListDetail](variables/ListDetail.md)
 - [Map](variables/Map.md)
+- [MENU\_TREE\_QUERY\_KEY](variables/MENU_TREE_QUERY_KEY.md)
 - [ModalSidebar](variables/ModalSidebar.md)
 - [NavigationMenuContent](variables/NavigationMenuContent.md)
 - [NavigationMenuIndicator](variables/NavigationMenuIndicator.md)
@@ -1337,6 +1368,7 @@ See root LICENSE file.
 - [SheetDescription](variables/SheetDescription.md)
 - [SheetTitle](variables/SheetTitle.md)
 - [SheetTrigger](variables/SheetTrigger.md)
+- [Skeleton](variables/Skeleton.md)
 - [Stack](variables/Stack.md)
 - [stackVariants](variables/stackVariants.md)
 - [STATUS\_TONE\_NAMES](variables/STATUS_TONE_NAMES.md)
@@ -1362,6 +1394,7 @@ See root LICENSE file.
 - [Textarea](variables/Textarea.md)
 - [textOperatorOrder](variables/textOperatorOrder.md)
 - [textVariants](variables/textVariants.md)
+- [THEMES](variables/THEMES.md)
 - [Tooltip](variables/Tooltip.md)
 - [TooltipContent](variables/TooltipContent.md)
 - [TooltipTrigger](variables/TooltipTrigger.md)
@@ -1372,6 +1405,7 @@ See root LICENSE file.
 
 - [adaptOrvalCreate](functions/adaptOrvalCreate.md)
 - [adaptOrvalDelete](functions/adaptOrvalDelete.md)
+- [adaptOrvalGet](functions/adaptOrvalGet.md)
 - [adaptOrvalList](functions/adaptOrvalList.md)
 - [adaptOrvalOrder](functions/adaptOrvalOrder.md)
 - [adaptOrvalUpdate](functions/adaptOrvalUpdate.md)
@@ -1380,20 +1414,27 @@ See root LICENSE file.
 - [AdvancedSelectFilter](functions/AdvancedSelectFilter.md)
 - [AdvancedTextFilter](functions/AdvancedTextFilter.md)
 - [ArrowLeftIcon](functions/ArrowLeftIcon.md)
+- [asPlainDate](functions/asPlainDate.md)
 - [BooleanBadge](functions/BooleanBadge.md)
 - [buildCrudSearch](functions/buildCrudSearch.md)
 - [CardList](functions/CardList.md)
 - [ChartProvider](functions/ChartProvider.md)
 - [ChipFilter](functions/ChipFilter.md)
 - [cn](functions/cn.md)
+- [collectExpandKeys](functions/collectExpandKeys.md)
+- [ColorDot](functions/ColorDot.md)
 - [ColorPicker](functions/ColorPicker.md)
 - [computeBoundingCircle](functions/computeBoundingCircle.md)
 - [computeBounds](functions/computeBounds.md)
+- [configureAttachmentTransport](functions/configureAttachmentTransport.md)
 - [ConfirmDialog](functions/ConfirmDialog.md)
 - [countryFromTimezone](functions/countryFromTimezone.md)
+- [createAppConfig](functions/createAppConfig.md)
 - [createFileFieldApi](functions/createFileFieldApi.md)
 - [createOverrides](functions/createOverrides.md)
 - [createReactRouterAdapter](functions/createReactRouterAdapter.md)
+- [cropImageToFile](functions/cropImageToFile.md)
+- [CropModal](functions/CropModal.md)
 - [CrudDelete](functions/CrudDelete.md)
 - [CrudProvider](functions/CrudProvider.md)
 - [DateFilter](functions/DateFilter.md)
@@ -1408,6 +1449,7 @@ See root LICENSE file.
 - [DynamicColorIcon](functions/DynamicColorIcon.md)
 - [EditorFooter](functions/EditorFooter.md)
 - [EmptyState](functions/EmptyState.md)
+- [EmptyValue](functions/EmptyValue.md)
 - [endOfDay](functions/endOfDay.md)
 - [endOfMonth](functions/endOfMonth.md)
 - [endOfWeek](functions/endOfWeek.md)
@@ -1425,6 +1467,7 @@ See root LICENSE file.
 - [formatDateTime](functions/formatDateTime.md)
 - [formatRelativeTime](functions/formatRelativeTime.md)
 - [geoCircle](functions/geoCircle.md)
+- [getAttachmentTransport](functions/getAttachmentTransport.md)
 - [getFilterLayout](functions/getFilterLayout.md)
 - [getSiblings](functions/getSiblings.md)
 - [GroupedToggleField](functions/GroupedToggleField.md)
@@ -1433,6 +1476,7 @@ See root LICENSE file.
 - [I18nText](functions/I18nText.md)
 - [IconField](functions/IconField.md)
 - [insertFilterSeparators](functions/insertFilterSeparators.md)
+- [isOnPath](functions/isOnPath.md)
 - [isSameDay](functions/isSameDay.md)
 - [isSameMonth](functions/isSameMonth.md)
 - [isSameWeek](functions/isSameWeek.md)
@@ -1440,6 +1484,7 @@ See root LICENSE file.
 - [LabeledField](functions/LabeledField.md)
 - [ListDetailRoot](functions/ListDetailRoot.md)
 - [ListDetailViewSwitch](functions/ListDetailViewSwitch.md)
+- [ListTotalBadge](functions/ListTotalBadge.md)
 - [makeFilterKey](functions/makeFilterKey.md)
 - [MapAutoFit](functions/MapAutoFit.md)
 - [MapBoundsOverlay](functions/MapBoundsOverlay.md)
@@ -1448,6 +1493,7 @@ See root LICENSE file.
 - [MapNavigator](functions/MapNavigator.md)
 - [MapPinContainer](functions/MapPinContainer.md)
 - [MapProvider](functions/MapProvider.md)
+- [MenuLink](functions/MenuLink.md)
 - [MenuProvider](functions/MenuProvider.md)
 - [MultiTextFilter](functions/MultiTextFilter.md)
 - [NavigationMenu](functions/NavigationMenu.md)
@@ -1457,6 +1503,7 @@ See root LICENSE file.
 - [parseCrudSearch](functions/parseCrudSearch.md)
 - [parseDate](functions/parseDate.md)
 - [parseFilterKey](functions/parseFilterKey.md)
+- [parseRfc3339](functions/parseRfc3339.md)
 - [QueryFallback](functions/QueryFallback.md)
 - [removeToast](functions/removeToast.md)
 - [RouteMatcherProvider](functions/RouteMatcherProvider.md)
@@ -1464,10 +1511,10 @@ See root LICENSE file.
 - [SaveButton](functions/SaveButton.md)
 - [SearchPopover](functions/SearchPopover.md)
 - [SectionShell](functions/SectionShell.md)
+- [serializeRfc3339Local](functions/serializeRfc3339Local.md)
 - [SettingSwitch](functions/SettingSwitch.md)
 - [SheetFooter](functions/SheetFooter.md)
 - [SheetHeader](functions/SheetHeader.md)
-- [Skeleton](functions/Skeleton.md)
 - [startOfDay](functions/startOfDay.md)
 - [startOfMonth](functions/startOfMonth.md)
 - [startOfWeek](functions/startOfWeek.md)
@@ -1477,13 +1524,16 @@ See root LICENSE file.
 - [subDays](functions/subDays.md)
 - [TableCardFrame](functions/TableCardFrame.md)
 - [TextFilter](functions/TextFilter.md)
+- [TimePicker](functions/TimePicker.md)
 - [TimeRangeSelector](functions/TimeRangeSelector.md)
 - [ToastContainer](functions/ToastContainer.md)
 - [ToggleFilter](functions/ToggleFilter.md)
+- [toLocalDateString](functions/toLocalDateString.md)
 - [TooltipProvider](functions/TooltipProvider.md)
 - [toRad](functions/toRad.md)
 - [toTestId](functions/toTestId.md)
 - [TreeMoveDialog](functions/TreeMoveDialog.md)
+- [TreeMultiSelectField](functions/TreeMultiSelectField.md)
 - [TreeReorderDialog](functions/TreeReorderDialog.md)
 - [TreeSelectField](functions/TreeSelectField.md)
 - [UIProvider](functions/UIProvider.md)
@@ -1503,6 +1553,8 @@ See root LICENSE file.
 - [useCrudPageState](functions/useCrudPageState.md)
 - [useFadeTransition](functions/useFadeTransition.md)
 - [useFieldVariant](functions/useFieldVariant.md)
+- [useFilePolicy](functions/useFilePolicy.md)
+- [useFilterBarState](functions/useFilterBarState.md)
 - [useFlatUIComponents](functions/useFlatUIComponents.md)
 - [useInvalidateEntity](functions/useInvalidateEntity.md)
 - [useIsDirty](functions/useIsDirty.md)
@@ -1514,6 +1566,7 @@ See root LICENSE file.
 - [useMapPageData](functions/useMapPageData.md)
 - [useMediaQuery](functions/useMediaQuery.md)
 - [useMenu](functions/useMenu.md)
+- [useMenuSelection](functions/useMenuSelection.md)
 - [useOrvalOptions](functions/useOrvalOptions.md)
 - [usePageHeader](functions/usePageHeader.md)
 - [usePageHeaderState](functions/usePageHeaderState.md)
@@ -1521,6 +1574,7 @@ See root LICENSE file.
 - [usePulseOnUpdate](functions/usePulseOnUpdate.md)
 - [useRouter](functions/useRouter.md)
 - [useServerSearchOptions](functions/useServerSearchOptions.md)
+- [useSidebar](functions/useSidebar.md)
 - [useTableCardFrame](functions/useTableCardFrame.md)
 - [useTimezoneOptions](functions/useTimezoneOptions.md)
 - [useToastStore](functions/useToastStore.md)

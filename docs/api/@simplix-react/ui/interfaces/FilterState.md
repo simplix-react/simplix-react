@@ -6,7 +6,7 @@
 
 # Interface: FilterState
 
-Defined in: [packages/ui/src/crud/shared/types.ts:56](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L56)
+Defined in: [packages/ui/src/crud/shared/types.ts:75](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L75)
 
 Represents filter state with search text and key-value filters.
 
@@ -16,7 +16,7 @@ Represents filter state with search text and key-value filters.
 
 > **search**: `string`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:57](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L57)
+Defined in: [packages/ui/src/crud/shared/types.ts:76](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L76)
 
 ***
 
@@ -24,4 +24,4 @@ Defined in: [packages/ui/src/crud/shared/types.ts:57](https://github.com/simplix
 
 > **values**: `Record`\<`string`, `unknown`\>
 
-Defined in: [packages/ui/src/crud/shared/types.ts:58](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L58)
+Defined in: [packages/ui/src/crud/shared/types.ts:77](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L77)

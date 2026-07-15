@@ -6,7 +6,7 @@
 
 # Interface: HeatmapPalette
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:40](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L40)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/themes.ts:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/themes.ts#L7)
 
 A pair of light/dark palettes for heatmap rendering.
 
@@ -16,7 +16,7 @@ A pair of light/dark palettes for heatmap rendering.
 
 > **accent**: `object`
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:44](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L44)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/themes.ts:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/themes.ts#L11)
 
 Accent color for selection markers, contrasting with the heatmap palette.
 
@@ -34,7 +34,7 @@ Accent color for selection markers, contrasting with the heatmap palette.
 
 > **dark**: `string`[]
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:42](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L42)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/themes.ts:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/themes.ts#L9)
 
 ***
 
@@ -42,4 +42,4 @@ Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:42](https://git
 
 > **light**: `string`[]
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector.tsx:41](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector.tsx#L41)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/themes.ts:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/themes.ts#L8)

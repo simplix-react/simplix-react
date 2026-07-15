@@ -46,6 +46,13 @@ export interface CrudFormProps {
   footer?: ReactNode;
   /** When true, indicates form is being submitted. Propagated via `data-submitting` attribute. */
   isSubmitting?: boolean;
+  /**
+   * Layout context. `"panel"` (default) fills its host, scrolls its own body,
+   * and pads header/body/footer edges for the panel scrollbar. `"page"` flows
+   * with the document — the page owns the scroll and no horizontal inset is
+   * added, so sections align with surrounding page content.
+   */
+  variant?: "panel" | "page";
   fieldVariant?: FieldVariant;
   warnOnUnsavedChanges?: boolean;
   className?: string;
@@ -58,6 +65,7 @@ function FormRoot({
   header,
   footer,
   isSubmitting,
+  variant = "panel",
   fieldVariant,
   warnOnUnsavedChanges,
   className,
@@ -74,10 +82,12 @@ function FormRoot({
     [onSubmit],
   );
 
+  const isPage = variant === "page";
+
   const content = (
-    <form onSubmit={handleSubmit} className={cn("flex flex-col w-full flex-1 min-h-0", className)} data-testid="crud-form" data-submitting={isSubmitting || undefined}>
+    <form onSubmit={handleSubmit} className={cn("flex flex-col w-full", !isPage && "flex-1 min-h-0", className)} data-testid="crud-form" data-submitting={isSubmitting || undefined}>
       {(onClose || header) && (
-        <Flex data-crud-slot="header" justify={header ? "between" : "end"} align="center" className="shrink-0 border-b pb-2 px-2">
+        <Flex data-crud-slot="header" justify={header ? "between" : "end"} align="center" className={cn("shrink-0 border-b pb-2", !isPage && "px-3")}>
           {header}
           {onClose && (
             <Button type="button" variant="ghost" size="icon-xs" onClick={onClose}>
@@ -86,13 +96,17 @@ function FormRoot({
           )}
         </Flex>
       )}
-      <div data-crud-slot="body" className="flex-1 min-h-0 overflow-auto [scrollbar-gutter:stable]">
+      {/* Panel variant: horizontal padding keeps a visible gap between fields
+          and the body scrollbar; header/body/footer share it so their edges
+          stay aligned. Page variant: the document owns the scroll, so the body
+          neither scrolls nor insets. */}
+      <div data-crud-slot="body" className={cn(!isPage && "flex-1 min-h-0 overflow-auto [scrollbar-gutter:stable] px-3")}>
         <Stack gap="sm" className={cn("relative py-2", !(onClose || header) && "pt-2")}>
           {children}
         </Stack>
       </div>
       {footer && (
-        <div data-crud-slot="footer" className="shrink-0">{footer}</div>
+        <div data-crud-slot="footer" className={cn("shrink-0", !isPage && "px-3")}>{footer}</div>
       )}
     </form>
   );
@@ -165,7 +179,7 @@ export interface CrudFormActionsProps {
 
 function FormActions({ spread, className, children }: CrudFormActionsProps) {
   return (
-    <Flex gap="sm" justify={spread ? "between" : "end"} className={cn("border-t pt-2 px-2", className)}>
+    <Flex gap="sm" justify={spread ? "between" : "end"} className={cn("border-t pt-2", className)}>
       {children}
     </Flex>
   );

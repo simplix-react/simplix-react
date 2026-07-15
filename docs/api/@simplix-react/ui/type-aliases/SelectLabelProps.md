@@ -8,4 +8,4 @@
 
 > **SelectLabelProps** = `ComponentPropsWithRef`\<*typeof* `SelectPrimitive.Label`\>
 
-Defined in: [packages/ui/src/base/inputs/select.tsx:151](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/select.tsx#L151)
+Defined in: [packages/ui/src/base/inputs/select.tsx:136](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/select.tsx#L136)

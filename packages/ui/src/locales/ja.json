@@ -3,6 +3,7 @@
     "close": "閉じる",
     "back": "戻る",
     "edit": "編集",
+    "add": "追加",
     "delete": "削除",
     "cancel": "キャンセル",
     "clear": "クリア",
@@ -101,7 +102,17 @@
     "clickOrDragToSelect": "地図をクリックするかマーカーをドラッグして位置を選択してください",
     "selectOption": "選択...",
     "searchOption": "検索...",
-    "noResults": "結果が見つかりません。"
+    "noResults": "結果が見つかりません。",
+    "noValue": "値なし"
+  },
+  "unit": {
+    "minutes": "分",
+    "hours": "時間",
+    "days": "日",
+    "months": "か月",
+    "years": "年",
+    "persons": "名",
+    "multiplier": "倍"
   },
   "operator": {
     "equals": "等しい",
@@ -146,10 +157,17 @@
   },
   "date": {
     "pickDate": "日付を選択",
+    "pickDateTime": "日時を選択",
     "pickDateRange": "日付範囲を選択",
     "custom": "カスタム",
     "hour": "時",
     "minute": "分",
+    "am": "午前",
+    "pm": "午後",
+    "now": "今",
+    "startDate": "開始日",
+    "endDate": "終了日",
+    "daysCount": "{{count}}日間",
     "today": "今日",
     "yesterday": "昨日",
     "thisWeek": "今週",

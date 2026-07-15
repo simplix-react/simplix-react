@@ -1113,6 +1113,28 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 ***
 
+### divider?
+
+> `optional` **divider**: `boolean`
+
+Defined in: [packages/ui/src/primitives/grid.tsx:57](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/grid.tsx#L57)
+
+When true, renders a vertical separator line between columns for visual
+grouping (e.g. a two-column switch matrix in a form section).
+
+Supported for fixed-column grids (`responsive={false}`) and for responsive
+grids with `columns={2}` (the line hides while the grid is collapsed to a
+single column). Ignored when `template` is set or for responsive grids with
+more than two columns, where the active column count varies by breakpoint.
+
+#### Default
+
+```ts
+false
+```
+
+***
+
 ### draggable?
 
 > `optional` **draggable**: `Booleanish`
@@ -1162,6 +1184,28 @@ Defined in: [packages/ui/src/primitives/grid.tsx:18](https://github.com/simplix-
 #### Inherited from
 
 `GridVariants.gap`
+
+***
+
+### gapX?
+
+> `optional` **gapX**: `"none"` \| `"xs"` \| `"sm"` \| `"lg"` \| `"md"` \| `"xl"` \| `"px"` \| `null`
+
+Defined in: [packages/ui/src/primitives/grid.tsx:63](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/grid.tsx#L63)
+
+Column (horizontal) gap override. Takes precedence over `gap` on the x axis,
+letting a grid combine a wide gutter between columns with tight row spacing
+(e.g. `gapX="lg" gapY="sm"` for a two-column switch matrix).
+
+***
+
+### gapY?
+
+> `optional` **gapY**: `"none"` \| `"xs"` \| `"sm"` \| `"lg"` \| `"md"` \| `"xl"` \| `"px"` \| `null`
+
+Defined in: [packages/ui/src/primitives/grid.tsx:67](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/grid.tsx#L67)
+
+Row (vertical) gap override. Takes precedence over `gap` on the y axis.
 
 ***
 
@@ -3646,7 +3690,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **template**: `string`
 
-Defined in: [packages/ui/src/primitives/grid.tsx:59](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/grid.tsx#L59)
+Defined in: [packages/ui/src/primitives/grid.tsx:81](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/grid.tsx#L81)
 
 Arbitrary `grid-template-columns` value applied as an inline style,
 covering cases the `columns` enum cannot express (e.g. `"repeat(auto-fill, minmax(12rem, 1fr))"`

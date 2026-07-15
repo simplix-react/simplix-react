@@ -8,4 +8,4 @@
 
 > `const` **SelectSeparator**: `ForwardRefExoticComponent`\<`Omit`\<`SelectSeparatorProps` & `RefAttributes`\<`HTMLDivElement`\>, `"ref"`\> & `RefAttributes`\<`HTMLDivElement`\>\>
 
-Defined in: [packages/ui/src/base/inputs/select.tsx:172](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/select.tsx#L172)
+Defined in: [packages/ui/src/base/inputs/select.tsx:157](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/select.tsx#L157)

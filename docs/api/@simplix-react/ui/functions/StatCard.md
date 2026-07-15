@@ -8,7 +8,7 @@
 
 > **StatCard**(`props`): `Element`
 
-Defined in: [packages/ui/src/base/charts/stat-card.tsx:41](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/charts/stat-card.tsx#L41)
+Defined in: [packages/ui/src/base/charts/stat-card.tsx:42](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/charts/stat-card.tsx#L42)
 
 Compact metric card showing a title, a primary value, and optional trend,
 description, icon, and footer content. Set `highlighted` together with a

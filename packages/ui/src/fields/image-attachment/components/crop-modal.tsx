@@ -19,6 +19,11 @@ export interface CropModalProps {
   onClose: () => void
   /** area === null means "original" — upload the source file without cropping. */
   onSave: (area: CropArea | null) => void
+  /**
+   * Aspect ratio preselected each time the modal opens: -1 = original (default),
+   * 0 = free, > 0 = fixed ratio (e.g. 1 for a square avatar crop).
+   */
+  initialRatio?: number
 }
 
 interface Frame {
@@ -38,7 +43,7 @@ const ASPECTS: { ratio: number; label: string }[] = [
 
 const MIN_SIDE = 40
 
-export function CropModal({ open, file, onClose, onSave }: CropModalProps) {
+export function CropModal({ open, file, onClose, onSave, initialRatio = -1 }: CropModalProps) {
   const { t } = useTranslation('simplix/ui')
   const { Dialog, DialogContent } = useFlatUIComponents()
 
@@ -107,9 +112,9 @@ export function CropModal({ open, file, onClose, onSave }: CropModalProps) {
     const url = URL.createObjectURL(file)
     objUrlRef.current = url
     setSrc(url)
-    // Each new file opens in "original" mode by default (no crop).
-    ratioRef.current = -1
-    setRatio(-1)
+    // Each new file opens in the caller's initial mode (default: original, no crop).
+    ratioRef.current = initialRatio
+    setRatio(initialRatio)
     setNatural(null)
     return () => {
       if (objUrlRef.current) {
@@ -117,7 +122,7 @@ export function CropModal({ open, file, onClose, onSave }: CropModalProps) {
         objUrlRef.current = null
       }
     }
-  }, [open, file, onClose])
+  }, [open, file, onClose, initialRatio])
 
   // ESC close + body scroll lock while open.
   useEffect(() => {

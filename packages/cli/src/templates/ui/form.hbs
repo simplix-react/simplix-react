@@ -199,9 +199,9 @@ function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}I
   const onFormSubmit = useCallback(
     (e: FormEvent) => {
       e.preventDefault();
-      handleSubmit(values as {{EntityPascal}}FormValues);
+      onSubmit(values as {{EntityPascal}}FormValues);
     },
-    [handleSubmit, values],
+    [onSubmit, values],
   );
 
 {{#if hasUpdate}}
@@ -231,6 +231,7 @@ function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}I
       <CrudForm.Section title={t("{{entity}}.sectionTitle")} variant="card">
 {{#each fields}}
 {{#unless this.isSystemField}}
+{{#unless (eq this.name ../rowIdField)}}
 {{#unless this.isI18nPair}}
 {{#if (eq this.name ../treeParentIdField)}}
         <TreeSelectField<{{../EntityPascal}}>
@@ -317,6 +318,7 @@ function {{EntityPascal}}FormInner({ {{#if hasTree}}{{#if hasUpdate}}{{entity}}I
         />
 {{/if}}
 {{/unless}}  {{!-- isI18nPair --}}
+{{/unless}}  {{!-- rowIdField --}}
 {{/unless}}  {{!-- isSystemField --}}
 {{/each}}
       </CrudForm.Section>

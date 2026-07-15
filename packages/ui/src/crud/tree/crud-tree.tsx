@@ -372,6 +372,13 @@ export interface TreeTableProps<T> {
   size?: TableProps["size"];
   density?: TableProps["density"];
   rounded?: TableProps["rounded"];
+  /**
+   * Sticks the header row to the top of the nearest scrollable ancestor
+   * (e.g. a page, dialog, or detail-pane body) once scrolling would hide it.
+   * The table keeps its own horizontal scrollbar; the floating header scrolls
+   * with its columns. Enabled by default; pass `false` to disable.
+   */
+  stickyHeader?: boolean;
   className?: string;
   children?: ReactNode;
 }
@@ -393,6 +400,7 @@ function TreeTable<T>({
   size,
   density,
   rounded,
+  stickyHeader = true,
   className,
   children,
 }: TreeTableProps<T>) {
@@ -613,7 +621,6 @@ function TreeTable<T>({
     <div
       className={cn(
         "w-full",
-        !framed && "overflow-x-auto",
         framed && frame?.fill && "flex min-h-0 flex-1 flex-col",
       )}
     >
@@ -624,7 +631,7 @@ function TreeTable<T>({
         rounded={rounded}
         maxHeight={framed ? frame?.maxHeight : undefined}
         fill={framed ? frame?.fill : undefined}
-        stickyHeader={framed}
+        stickyHeader={framed || stickyHeader}
         className={cn("table-auto", className)}
       >
         <TableHeader>

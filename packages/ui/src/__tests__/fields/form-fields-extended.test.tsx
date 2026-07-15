@@ -837,6 +837,12 @@ describe("DateRangeField", () => {
 // ── DateTimeField ──
 
 describe("DateTimeField", () => {
+  function openDateTimePicker(testId: string) {
+    const fieldset = screen.getByTestId(testId);
+    const trigger = fieldset.querySelector("button") as HTMLButtonElement;
+    fireEvent.click(trigger);
+  }
+
   it("renders with label", () => {
     render(
       <DateTimeField label="Event Start" value={null} onChange={vi.fn()} />,
@@ -845,47 +851,44 @@ describe("DateTimeField", () => {
     expect(screen.getByTestId("form-field-event-start")).toBeDefined();
   });
 
-  it("renders date picker and time inputs", () => {
+  it("renders time inputs inside the picker popover", () => {
     render(
       <DateTimeField label="Start" value={null} onChange={vi.fn()} />,
     );
-    const fieldset = screen.getByTestId("form-field-start");
-    // Should have a date picker button
-    const button = fieldset.querySelector("button");
-    expect(button).not.toBeNull();
-    // Should have hour and minute text inputs
-    const inputs = fieldset.querySelectorAll("input[type='text']");
-    expect(inputs.length).toBe(2);
+    openDateTimePicker("form-field-start");
+    expect(screen.getByRole("textbox", { name: "date.hour" })).toBeDefined();
+    expect(screen.getByRole("textbox", { name: "date.minute" })).toBeDefined();
   });
 
   it("initializes time inputs to 00:00 when value is null", () => {
     render(
-      <DateTimeField label="Start" value={null} onChange={vi.fn()} />,
+      <DateTimeField label="Start" value={null} onChange={vi.fn()} hour12={false} />,
     );
-    const fieldset = screen.getByTestId("form-field-start");
-    const inputs = fieldset.querySelectorAll("input[type='text']");
-    expect((inputs[0] as HTMLInputElement).value).toBe("00");
-    expect((inputs[1] as HTMLInputElement).value).toBe("00");
+    openDateTimePicker("form-field-start");
+    const hour = screen.getByRole("textbox", { name: "date.hour" }) as HTMLInputElement;
+    const minute = screen.getByRole("textbox", { name: "date.minute" }) as HTMLInputElement;
+    expect(hour.value).toBe("00");
+    expect(minute.value).toBe("00");
   });
 
   it("initializes time inputs from value", () => {
     const date = new Date("2024-06-15T14:30:00");
     render(
-      <DateTimeField label="Start" value={date} onChange={vi.fn()} />,
+      <DateTimeField label="Start" value={date} onChange={vi.fn()} hour12={false} />,
     );
-    const fieldset = screen.getByTestId("form-field-start");
-    const inputs = fieldset.querySelectorAll("input[type='text']");
-    expect((inputs[0] as HTMLInputElement).value).toBe("14");
-    expect((inputs[1] as HTMLInputElement).value).toBe("30");
+    openDateTimePicker("form-field-start");
+    const hour = screen.getByRole("textbox", { name: "date.hour" }) as HTMLInputElement;
+    const minute = screen.getByRole("textbox", { name: "date.minute" }) as HTMLInputElement;
+    expect(hour.value).toBe("14");
+    expect(minute.value).toBe("30");
   });
 
   it("hides time inputs when hideTime is true", () => {
     render(
       <DateTimeField label="Start" value={null} onChange={vi.fn()} hideTime />,
     );
-    const fieldset = screen.getByTestId("form-field-start");
-    const textInputs = fieldset.querySelectorAll("input[type='text']");
-    expect(textInputs.length).toBe(0);
+    openDateTimePicker("form-field-start");
+    expect(screen.queryByRole("textbox", { name: "date.hour" })).toBeNull();
   });
 
   it("shows error", () => {
@@ -904,11 +907,12 @@ describe("DateTimeField", () => {
     const onChange = vi.fn();
     const date = new Date("2024-06-15T10:30:00");
     render(
-      <DateTimeField label="Start" value={date} onChange={onChange} />,
+      <DateTimeField label="Start" value={date} onChange={onChange} hour12={false} />,
     );
-    const fieldset = screen.getByTestId("form-field-start");
-    const inputs = fieldset.querySelectorAll("input[type='text']");
-    fireEvent.change(inputs[0], { target: { value: "15" } });
+    openDateTimePicker("form-field-start");
+    fireEvent.change(screen.getByRole("textbox", { name: "date.hour" }), {
+      target: { value: "15" },
+    });
     expect(onChange).toHaveBeenCalled();
     const result = onChange.mock.calls[0][0] as Date;
     expect(result.getHours()).toBe(15);
@@ -921,9 +925,10 @@ describe("DateTimeField", () => {
     render(
       <DateTimeField label="Start" value={date} onChange={onChange} />,
     );
-    const fieldset = screen.getByTestId("form-field-start");
-    const inputs = fieldset.querySelectorAll("input[type='text']");
-    fireEvent.change(inputs[1], { target: { value: "45" } });
+    openDateTimePicker("form-field-start");
+    fireEvent.change(screen.getByRole("textbox", { name: "date.minute" }), {
+      target: { value: "45" },
+    });
     expect(onChange).toHaveBeenCalled();
     const result = onChange.mock.calls[0][0] as Date;
     expect(result.getHours()).toBe(10);
@@ -934,11 +939,12 @@ describe("DateTimeField", () => {
     const onChange = vi.fn();
     const date = new Date("2024-06-15T10:30:00");
     render(
-      <DateTimeField label="Start" value={date} onChange={onChange} />,
+      <DateTimeField label="Start" value={date} onChange={onChange} hour12={false} />,
     );
-    const fieldset = screen.getByTestId("form-field-start");
-    const inputs = fieldset.querySelectorAll("input[type='text']");
-    fireEvent.change(inputs[0], { target: { value: "99" } });
+    openDateTimePicker("form-field-start");
+    fireEvent.change(screen.getByRole("textbox", { name: "date.hour" }), {
+      target: { value: "99" },
+    });
     expect(onChange).toHaveBeenCalled();
     const result = onChange.mock.calls[0][0] as Date;
     expect(result.getHours()).toBe(23);
@@ -950,9 +956,10 @@ describe("DateTimeField", () => {
     render(
       <DateTimeField label="Start" value={date} onChange={onChange} />,
     );
-    const fieldset = screen.getByTestId("form-field-start");
-    const inputs = fieldset.querySelectorAll("input[type='text']");
-    fireEvent.change(inputs[1], { target: { value: "99" } });
+    openDateTimePicker("form-field-start");
+    fireEvent.change(screen.getByRole("textbox", { name: "date.minute" }), {
+      target: { value: "99" },
+    });
     expect(onChange).toHaveBeenCalled();
     const result = onChange.mock.calls[0][0] as Date;
     expect(result.getMinutes()).toBe(59);
@@ -963,10 +970,11 @@ describe("DateTimeField", () => {
     render(
       <DateTimeField label="Start" value={null} onChange={onChange} />,
     );
-    const fieldset = screen.getByTestId("form-field-start");
-    const inputs = fieldset.querySelectorAll("input[type='text']");
-    fireEvent.change(inputs[0], { target: { value: "15" } });
-    // handleTimeChange updates state but doesn't call onChange because parsed is null
+    openDateTimePicker("form-field-start");
+    fireEvent.change(screen.getByRole("textbox", { name: "date.hour" }), {
+      target: { value: "3" },
+    });
+    // Time is kept as pending state until a date is picked
     expect(onChange).not.toHaveBeenCalled();
   });
 
@@ -975,9 +983,8 @@ describe("DateTimeField", () => {
       <DateTimeField label="Start" value={null} onChange={vi.fn()} disabled />,
     );
     const fieldset = screen.getByTestId("form-field-start");
-    const inputs = fieldset.querySelectorAll("input[type='text']");
-    expect((inputs[0] as HTMLInputElement).disabled).toBe(true);
-    expect((inputs[1] as HTMLInputElement).disabled).toBe(true);
+    const trigger = fieldset.querySelector("button") as HTMLButtonElement;
+    expect(trigger.disabled).toBe(true);
   });
 });
 

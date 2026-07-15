@@ -65,7 +65,7 @@ function EmptyReasonCard({ reason, bordered = true }: { reason: Exclude<EmptyRea
   const { t } = useTranslation("simplix/ui");
   const config = emptyReasonConfig[reason];
   return (
-    <div className={cn("flex flex-col items-center justify-center px-6 py-16 text-center", bordered && "rounded-lg border")}>
+    <div className={cn("flex min-h-[280px] flex-col items-center justify-center px-6 py-16 text-center", bordered && "rounded-lg border")}>
       <div className={`mb-3 rounded-full p-4 [&_svg]:size-8 ${config.iconClassName}`}>
         {config.icon}
       </div>
@@ -338,6 +338,13 @@ export interface ListTableProps<T> {
   density?: TableProps["density"];
   /** Container border radius. */
   rounded?: TableProps["rounded"];
+  /**
+   * Sticks the header row to the top of the nearest scrollable ancestor
+   * (e.g. a page, dialog, or detail-pane body) once scrolling would hide it.
+   * The table keeps its own horizontal scrollbar; the floating header scrolls
+   * with its columns. Enabled by default; pass `false` to disable.
+   */
+  stickyHeader?: boolean;
   /** Declarative row action buttons. Automatically appends an action column to the table. */
   actions?: RowActionDef<T>[];
   /** Visual variant for action buttons. Defaults to `"outline"`. */
@@ -609,13 +616,13 @@ function ReorderableTable<T>({
 
   if (emptyReason && data.length === 0) {
     if (emptyReason === "no-data" && emptyState) {
-      return <EmptyState {...emptyState} />;
+      return <EmptyState className="min-h-[280px]" {...emptyState} />;
     }
     if (emptyReason !== "no-data") {
       return <EmptyReasonCard reason={emptyReason} />;
     }
     return (
-      <div className="flex h-24 items-center justify-center rounded-lg border text-sm text-muted-foreground">
+      <div className="flex min-h-[280px] items-center justify-center rounded-lg border text-sm text-muted-foreground">
         {emptyMessages[emptyReason]}
       </div>
     );
@@ -749,13 +756,13 @@ function ReorderableCardList<T>({
 
   if (emptyReason && data.length === 0) {
     if (emptyReason === "no-data" && emptyState) {
-      return <EmptyState {...emptyState} />;
+      return <EmptyState className="min-h-[280px]" {...emptyState} />;
     }
     if (emptyReason !== "no-data") {
       return <EmptyReasonCard reason={emptyReason} />;
     }
     return (
-      <div className="flex h-24 items-center justify-center rounded-lg border text-sm text-muted-foreground">
+      <div className="flex min-h-[280px] items-center justify-center rounded-lg border text-sm text-muted-foreground">
         {emptyMessages[emptyReason]}
       </div>
     );
@@ -820,6 +827,7 @@ function ListTable<T>({
   size,
   density,
   rounded,
+  stickyHeader = true,
   actions,
   actionVariant = "icon",
   actionColumnWidth: actionColumnWidthOverride,
@@ -1051,7 +1059,7 @@ function ListTable<T>({
     if (emptyReason === "no-data" && emptyState) {
       return (
         <div ref={containerRef} className="w-full">
-          <EmptyState {...emptyState} />
+          <EmptyState className="min-h-[280px]" {...emptyState} />
         </div>
       );
     }
@@ -1069,7 +1077,6 @@ function ListTable<T>({
       ref={containerRef}
       className={cn(
         "w-full",
-        !isCardMode && !framed && "overflow-x-auto",
         framed && frame?.fill && "flex min-h-0 flex-1 flex-col",
       )}
     >
@@ -1196,7 +1203,7 @@ function ListTable<T>({
               rounded={rounded}
               maxHeight={framed ? frame?.maxHeight : undefined}
               fill={framed ? frame?.fill : undefined}
-              stickyHeader={framed}
+              stickyHeader={framed || stickyHeader}
               className={className}
             />
           ) : (
@@ -1207,7 +1214,7 @@ function ListTable<T>({
               rounded={rounded}
               maxHeight={framed ? frame?.maxHeight : undefined}
               fill={framed ? frame?.fill : undefined}
-              stickyHeader={framed}
+              stickyHeader={framed || stickyHeader}
               className={cn("table-auto", className)}
             >
               <TableHeader>

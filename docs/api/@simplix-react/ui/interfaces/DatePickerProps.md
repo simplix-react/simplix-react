@@ -6,7 +6,7 @@
 
 # Interface: DatePickerProps
 
-Defined in: [packages/ui/src/base/inputs/date-picker.tsx:59](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L59)
+Defined in: [packages/ui/src/base/inputs/date-picker.tsx:67](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L67)
 
 Props for the [DatePicker](../functions/DatePicker.md) component.
 
@@ -16,7 +16,7 @@ Props for the [DatePicker](../functions/DatePicker.md) component.
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/base/inputs/date-picker.tsx:83](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L83)
+Defined in: [packages/ui/src/base/inputs/date-picker.tsx:91](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L91)
 
 Additional class name for the trigger button.
 
@@ -26,7 +26,7 @@ Additional class name for the trigger button.
 
 > `optional` **clearable**: `boolean`
 
-Defined in: [packages/ui/src/base/inputs/date-picker.tsx:79](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L79)
+Defined in: [packages/ui/src/base/inputs/date-picker.tsx:87](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L87)
 
 Show clear button when a value is selected.
 
@@ -42,7 +42,7 @@ true
 
 > `optional` **disabled**: `boolean`
 
-Defined in: [packages/ui/src/base/inputs/date-picker.tsx:81](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L81)
+Defined in: [packages/ui/src/base/inputs/date-picker.tsx:89](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L89)
 
 Disable the picker.
 
@@ -52,7 +52,7 @@ Disable the picker.
 
 > `optional` **endYear**: `number`
 
-Defined in: [packages/ui/src/base/inputs/date-picker.tsx:71](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L71)
+Defined in: [packages/ui/src/base/inputs/date-picker.tsx:79](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L79)
 
 End year for the year dropdown.
 
@@ -64,11 +64,29 @@ current year + 10
 
 ***
 
+### hour12?
+
+> `optional` **hour12**: `boolean`
+
+Defined in: [packages/ui/src/base/inputs/date-picker.tsx:105](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L105)
+
+Use a 12-hour clock with an AM/PM toggle. Set to `false` for a 24-hour
+clock (the toggle is hidden and the hour list shows 0-23).
+Only applies when [DatePickerProps.showTime](#showtime) is enabled.
+
+#### Default Value
+
+```ts
+true
+```
+
+***
+
 ### locale?
 
 > `optional` **locale**: `string`
 
-Defined in: [packages/ui/src/base/inputs/date-picker.tsx:67](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L67)
+Defined in: [packages/ui/src/base/inputs/date-picker.tsx:75](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L75)
 
 Short locale code (e.g. `"ko"`, `"en"`, `"ja"`). Defaults to current i18n language.
 
@@ -78,9 +96,9 @@ Short locale code (e.g. `"ko"`, `"en"`, `"ja"`). Defaults to current i18n langua
 
 > `optional` **maxDate**: `Date`
 
-Defined in: [packages/ui/src/base/inputs/date-picker.tsx:77](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L77)
+Defined in: [packages/ui/src/base/inputs/date-picker.tsx:85](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L85)
 
-Latest selectable date.
+Latest selectable date. When it carries a time of day, hour/minute options outside the range are disabled.
 
 ***
 
@@ -88,9 +106,27 @@ Latest selectable date.
 
 > `optional` **minDate**: `Date`
 
-Defined in: [packages/ui/src/base/inputs/date-picker.tsx:75](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L75)
+Defined in: [packages/ui/src/base/inputs/date-picker.tsx:83](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L83)
 
-Earliest selectable date.
+Earliest selectable date. When it carries a time of day, hour/minute options outside the range are disabled.
+
+***
+
+### minuteStep?
+
+> `optional` **minuteStep**: `number`
+
+Defined in: [packages/ui/src/base/inputs/date-picker.tsx:112](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L112)
+
+Interval between minute options in the option list. Direct input and
+the spinner still accept any minute.
+Only applies when [DatePickerProps.showTime](#showtime) is enabled.
+
+#### Default Value
+
+```ts
+1
+```
 
 ***
 
@@ -98,7 +134,7 @@ Earliest selectable date.
 
 > **onChange**: (`date`) => `void`
 
-Defined in: [packages/ui/src/base/inputs/date-picker.tsx:63](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L63)
+Defined in: [packages/ui/src/base/inputs/date-picker.tsx:71](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L71)
 
 Called when the date changes.
 
@@ -118,7 +154,7 @@ Called when the date changes.
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/base/inputs/date-picker.tsx:65](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L65)
+Defined in: [packages/ui/src/base/inputs/date-picker.tsx:73](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L73)
 
 Placeholder text when no date is selected.
 
@@ -128,9 +164,27 @@ Placeholder text when no date is selected.
 
 > `optional` **reverseYears**: `boolean`
 
-Defined in: [packages/ui/src/base/inputs/date-picker.tsx:73](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L73)
+Defined in: [packages/ui/src/base/inputs/date-picker.tsx:81](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L81)
 
 Reverse year order in dropdown.
+
+***
+
+### showTime?
+
+> `optional` **showTime**: `boolean`
+
+Defined in: [packages/ui/src/base/inputs/date-picker.tsx:98](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L98)
+
+Show time selection: an hour/minute spinner input row under the calendar.
+Focusing the hour or minute box drops a scrollable option list open.
+Selecting a day keeps the popover open so the time can be adjusted.
+
+#### Default Value
+
+```ts
+false
+```
 
 ***
 
@@ -138,7 +192,7 @@ Reverse year order in dropdown.
 
 > `optional` **startYear**: `number`
 
-Defined in: [packages/ui/src/base/inputs/date-picker.tsx:69](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L69)
+Defined in: [packages/ui/src/base/inputs/date-picker.tsx:77](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L77)
 
 Start year for the year dropdown.
 
@@ -154,6 +208,6 @@ current year - 10
 
 > **value**: `Date` \| `undefined`
 
-Defined in: [packages/ui/src/base/inputs/date-picker.tsx:61](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L61)
+Defined in: [packages/ui/src/base/inputs/date-picker.tsx:69](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L69)
 
 Currently selected date.

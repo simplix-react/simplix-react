@@ -1,5 +1,5 @@
+import { NumberInput } from "../../base/inputs/number-input";
 import type { CommonFieldProps } from "../../crud/shared/types";
-import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
 import { FieldWrapper } from "../shared/field-wrapper";
 
@@ -16,11 +16,12 @@ export interface NumberFieldProps extends CommonFieldProps {
   /** Unit suffix displayed inside the input (e.g. "sec", "px", "kg"). */
   suffix?: string;
   /** Additional props forwarded to the underlying input element. */
-  inputProps?: React.ComponentProps<"input">;
+  inputProps?: Omit<React.ComponentProps<"input">, "type" | "onChange" | "value">;
 }
 
 /**
- * Numeric input field with null handling for empty values.
+ * Numeric input field with null handling for empty values and
+ * always-visible spinner buttons.
  *
  * @example
  * ```tsx
@@ -45,42 +46,6 @@ export function NumberField({
   className,
   ...variantProps
 }: NumberFieldProps) {
-  const { Input } = useFlatUIComponents();
-
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const raw = e.target.value;
-    if (raw === "") {
-      onChange(null);
-      return;
-    }
-    const parsed = Number(raw);
-    if (!Number.isNaN(parsed)) {
-      onChange(parsed);
-    }
-  }
-
-  const input = (
-    <Input
-      type="number"
-      value={value === null ? "" : String(value)}
-      onChange={handleChange}
-      min={min}
-      max={max}
-      step={step}
-      placeholder={placeholder}
-      disabled={disabled}
-      required={required}
-      aria-invalid={!!error}
-      aria-label={variantProps.layout === "hidden" ? label : undefined}
-      {...inputProps}
-      className={cn(
-        error && "border-destructive",
-        suffix && "pr-10 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
-        inputProps?.className,
-      )}
-    />
-  );
-
   return (
     <FieldWrapper
       label={label}
@@ -92,16 +57,26 @@ export function NumberField({
       className={className}
       {...variantProps}
     >
-      {suffix ? (
-        <div className="relative">
-          {input}
-          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
-            {suffix}
-          </span>
-        </div>
-      ) : (
-        input
-      )}
+      <NumberInput
+        value={value === null ? "" : String(value)}
+        onChange={onChange}
+        // The NumberInput change handler ignores empty input (nothing to
+        // parse); catch it here so clearing the field propagates null.
+        onChangeCapture={(e) => {
+          if ((e.target as HTMLInputElement).value === "") onChange(null);
+        }}
+        min={min}
+        max={max}
+        step={step}
+        placeholder={placeholder}
+        disabled={disabled}
+        required={required}
+        suffix={suffix}
+        aria-invalid={!!error}
+        aria-label={variantProps.layout === "hidden" ? label : undefined}
+        {...inputProps}
+        className={cn("h-9", error && "border-destructive", inputProps?.className)}
+      />
     </FieldWrapper>
   );
 }

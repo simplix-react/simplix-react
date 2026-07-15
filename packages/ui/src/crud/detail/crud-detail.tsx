@@ -80,7 +80,7 @@ export interface CrudDetailProps {
   footer?: ReactNode;
   /**
    * Layout variant.
-   * - `"default"` — compact padding for side panels (px-2).
+   * - `"default"` — compact padding for side panels (px-3).
    * - `"dialog"` — generous padding for use inside Dialog (px-5, extra vertical padding on header/footer).
    */
   variant?: CrudDetailVariant;
@@ -94,7 +94,9 @@ export interface CrudDetailProps {
 function DetailRoot({ isLoading, onClose, header, footer, variant = "default", auditData, fieldVariant, className, children }: CrudDetailProps) {
   const { Button } = useFlatUIComponents();
   const isDialog = variant === "dialog";
-  const px = isDialog ? "px-5" : "px-2";
+  // Side-panel padding keeps a visible gap between content and the body
+  // scrollbar; header/body/footer share it so their edges stay aligned.
+  const px = isDialog ? "px-5" : "px-3";
 
   const content = (
     <div className={cn("flex flex-col flex-1 min-h-0 w-full", className)} data-testid="crud-detail">

@@ -8,7 +8,7 @@
 
 > **FileField**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/form/file-field.tsx:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/file-field.tsx#L30)
+Defined in: [packages/ui/src/fields/form/file-field.tsx:31](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/file-field.tsx#L31)
 
 FileField — general-purpose file attachment form field.
 

@@ -8,9 +8,10 @@
 
 > **DateTimeField**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/form/datetime-field.tsx:45](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/datetime-field.tsx#L45)
+Defined in: [packages/ui/src/fields/form/datetime-field.tsx:48](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/datetime-field.tsx#L48)
 
-Date-time picker field with calendar popover and hour/minute inputs.
+Date-time picker field with a popover calendar, hour/minute spinner inputs,
+and scrollable hour/minute columns.
 
 ## Parameters
 

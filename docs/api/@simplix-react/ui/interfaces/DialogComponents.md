@@ -6,7 +6,7 @@
 
 # Interface: DialogComponents
 
-Defined in: [packages/ui/src/provider/types.ts:80](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L80)
+Defined in: [packages/ui/src/provider/types.ts:78](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L78)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/provider/types.ts:80](https://github.com/simplix-re
 
 > **Close**: `ComponentType`\<\{ `asChild?`: `boolean`; `children?`: `ReactNode`; \}\>
 
-Defined in: [packages/ui/src/provider/types.ts:89](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L89)
+Defined in: [packages/ui/src/provider/types.ts:87](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L87)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [packages/ui/src/provider/types.ts:89](https://github.com/simplix-re
 
 > **Content**: `ComponentType`\<[`DialogContentProps`](../type-aliases/DialogContentProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:83](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L83)
+Defined in: [packages/ui/src/provider/types.ts:81](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L81)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [packages/ui/src/provider/types.ts:83](https://github.com/simplix-re
 
 > **Description**: `ComponentType`\<`DialogDescriptionProps` & `RefAttributes`\<`HTMLParagraphElement`\>\>
 
-Defined in: [packages/ui/src/provider/types.ts:87](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L87)
+Defined in: [packages/ui/src/provider/types.ts:85](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L85)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [packages/ui/src/provider/types.ts:87](https://github.com/simplix-re
 
 > **Footer**: `ComponentType`\<[`DialogFooterProps`](../type-aliases/DialogFooterProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:85](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L85)
+Defined in: [packages/ui/src/provider/types.ts:83](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L83)
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: [packages/ui/src/provider/types.ts:85](https://github.com/simplix-re
 
 > **Header**: `ComponentType`\<[`DialogHeaderProps`](../type-aliases/DialogHeaderProps.md)\>
 
-Defined in: [packages/ui/src/provider/types.ts:84](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L84)
+Defined in: [packages/ui/src/provider/types.ts:82](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L82)
 
 ***
 
@@ -54,7 +54,7 @@ Defined in: [packages/ui/src/provider/types.ts:84](https://github.com/simplix-re
 
 > **Overlay**: `ComponentType`\<`DialogOverlayProps` & `RefAttributes`\<`HTMLDivElement`\>\>
 
-Defined in: [packages/ui/src/provider/types.ts:88](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L88)
+Defined in: [packages/ui/src/provider/types.ts:86](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L86)
 
 ***
 
@@ -62,7 +62,7 @@ Defined in: [packages/ui/src/provider/types.ts:88](https://github.com/simplix-re
 
 > **Root**: `ComponentType`\<\{ `children?`: `ReactNode`; `onOpenChange?`: (`open`) => `void`; `open?`: `boolean`; \}\>
 
-Defined in: [packages/ui/src/provider/types.ts:81](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L81)
+Defined in: [packages/ui/src/provider/types.ts:79](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L79)
 
 ***
 
@@ -70,7 +70,7 @@ Defined in: [packages/ui/src/provider/types.ts:81](https://github.com/simplix-re
 
 > **Title**: `ComponentType`\<`DialogTitleProps` & `RefAttributes`\<`HTMLHeadingElement`\>\>
 
-Defined in: [packages/ui/src/provider/types.ts:86](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L86)
+Defined in: [packages/ui/src/provider/types.ts:84](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L84)
 
 ***
 
@@ -78,4 +78,4 @@ Defined in: [packages/ui/src/provider/types.ts:86](https://github.com/simplix-re
 
 > **Trigger**: `ComponentType`\<\{ `asChild?`: `boolean`; `children?`: `ReactNode`; \}\>
 
-Defined in: [packages/ui/src/provider/types.ts:82](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L82)
+Defined in: [packages/ui/src/provider/types.ts:80](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L80)

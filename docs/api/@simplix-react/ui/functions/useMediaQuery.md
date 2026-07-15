@@ -8,9 +8,9 @@
 
 > **useMediaQuery**(`query`): `boolean`
 
-Defined in: [packages/ui/src/crud/list/use-media-query.ts:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-media-query.ts#L14)
+Defined in: [packages/ui/src/hooks/use-media-query.ts:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/hooks/use-media-query.ts#L14)
 
-Responsive breakpoint detection hook using the `matchMedia` API.
+Responsive media-query detection hook using the `matchMedia` API.
 
 ## Parameters
 
@@ -18,7 +18,7 @@ Responsive breakpoint detection hook using the `matchMedia` API.
 
 `string`
 
-CSS media query string (e.g. `"(min-width: 768px)"`).
+CSS media query string (e.g. `"(min-width: 768px)"`, `"(prefers-reduced-motion: reduce)"`).
 
 ## Returns
 

@@ -8,7 +8,7 @@
 
 > `const` **AlertBanner**: `ForwardRefExoticComponent`\<`Omit`\<[`AlertBannerProps`](../interfaces/AlertBannerProps.md), `"ref"`\> & `RefAttributes`\<`HTMLDivElement`\>\>
 
-Defined in: [packages/ui/src/base/feedback/alert-banner.tsx:109](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/alert-banner.tsx#L109)
+Defined in: [packages/ui/src/base/feedback/alert-banner.tsx:110](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/alert-banner.tsx#L110)
 
 Tinted status banner — the de-facto canonical alert pattern promoted into the
 shared UI. Renders a rounded, tone-tinted surface with an optional leading

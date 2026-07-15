@@ -8,7 +8,7 @@
 
 > **AlertDensity** = `"default"` \| `"sm"` \| `"hint"`
 
-Defined in: [packages/ui/src/base/feedback/alert-banner.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/alert-banner.tsx#L21)
+Defined in: [packages/ui/src/base/feedback/alert-banner.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/alert-banner.tsx#L22)
 
 Visual density of [AlertBanner](../variables/AlertBanner.md).
 

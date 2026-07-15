@@ -210,6 +210,7 @@ Unstyled Radix UI primitives with Tailwind CSS styling. Used internally by field
 - `Select` (Root, Trigger, Value, Content, Item, Group, Label, Separator)
 - `RadioGroup` (Root, Item)
 - `Calendar` (date picker grid)
+- `TimePicker` (time-of-day input with AM/PM toggle and drop-open hour/minute lists)
 - `Popover` (Root, Trigger, Content, Anchor)
 - `Dialog` (Root, Trigger, Content, Header, Footer, Title, Description, Close)
 - `DropdownMenu` (Root, Trigger, Content, Item, CheckboxItem, RadioItem, RadioGroup, Label, Separator, Sub, SubTrigger, SubContent, Group)
@@ -243,6 +244,18 @@ Tone tokens are exported directly for custom rendering: `STATUS_TONES`, `STATUS_
 
 All form fields follow the same pattern: `value` + `onChange` + common field props (label, error, description, required, disabled, className).
 
+Every field also accepts `prefixControl` / `suffixControl` — a control rendered on the same row as the input (e.g. an add button, IconPicker, ColorPicker). Use these instead of composing a button next to the field: the control stays aligned with the input while description and error render below at full width.
+
+```tsx
+<FormFields.TextField
+  label="Training key"
+  value={draft}
+  onChange={setDraft}
+  description="Added on submit."
+  suffixControl={<Button onClick={add}>Add</Button>}
+/>
+```
+
 ```tsx
 import { FormFields } from "@simplix-react/ui";
 ```
@@ -257,6 +270,8 @@ import { FormFields } from "@simplix-react/ui";
 | `FormFields.CheckboxField` | `boolean` | `checkboxProps` |
 | `FormFields.RadioGroupField` | `string` | `options` (label/value/description), `direction` |
 | `FormFields.DateField` | `Date \| null` | `minDate`, `maxDate`, `format`, `placeholder` |
+| `FormFields.DateTimeField` | `Date \| string \| number \| null` | `minDate`, `maxDate`, `hideTime`, `hour12`, `minuteStep` |
+| `FormFields.TimeField` | `TimeValue \| null` (`{ hours, minutes }`) | `minTime`, `maxTime`, `hour12`, `minuteStep` |
 | `FormFields.ComboboxField` | `string \| null` | `options`, `onSearch`, `loading`, `emptyMessage` |
 | `FormFields.PasswordField` | `string` | `placeholder`, `maxLength` (with visibility toggle) |
 | `FormFields.ColorField` | `string` (hex) | Native color picker + hex text input |
@@ -318,8 +333,8 @@ Low-level wrappers used internally by `FormFields` and `DetailFields`. Export th
 
 | Component | Purpose | Key Props |
 | --- | --- | --- |
-| `FieldWrapper` | Wraps editable inputs with label, error, description | `label`, `error`, `description`, `required`, `disabled`, `labelPosition`, `size` |
-| `DetailFieldWrapper` | Wraps read-only display values with label | `label`, `labelPosition`, `size` |
+| `FieldWrapper` | Wraps editable inputs with label, error, description | `label`, `error`, `description`, `required`, `disabled`, `layout`, `size` |
+| `DetailFieldWrapper` | Wraps read-only display values with label | `label`, `layout`, `size` |
 
 ```tsx
 import { FieldWrapper } from "@simplix-react/ui";
@@ -337,14 +352,14 @@ Control field label position and size across a section or page using context:
 import { FieldVariantContext } from "@simplix-react/ui";
 
 // All fields inside will use left-aligned labels at small size
-<FieldVariantContext.Provider value={{ labelPosition: "left", size: "sm" }}>
+<FieldVariantContext.Provider value={{ layout: "left", size: "sm" }}>
   <FormFields.TextField label="Name" value={name} onChange={setName} />
   <FormFields.TextField label="Email" value={email} onChange={setEmail} />
 </FieldVariantContext.Provider>
 ```
 
 Options:
-- `labelPosition`: `"top"` (default) | `"left"` | `"hidden"` (sr-only for accessibility)
+- `layout`: `"top"` (default) | `"left"` | `"inline"` | `"trailing"` (control right-aligned with a dashed leader line from the label — the `SwitchField` default) | `"hidden"` (sr-only for accessibility)
 - `size`: `"sm"` | `"md"` (default) | `"lg"`
 
 ### CRUD Layout Components
@@ -404,6 +419,8 @@ const { data, filters, sort, pagination, selection, emptyReason } = useCrudList(
 ```
 
 Sub-components: `List.Toolbar`, `List.Search`, `List.Filter`, `List.Table`, `List.Column`, `List.RowActions`, `List.Action`, `List.Pagination`, `List.BulkActions`, `List.BulkAction`, `List.Empty`
+
+`List.Table` and `Tree.Table` render a sticky header by default — once scrolling an outer container (a page, dialog, or detail-pane body) would hide the header row, it sticks to the top of the nearest scrollable ancestor. Wide tables keep their own horizontal scrollbar, and the floating header scrolls with its columns. Pass `stickyHeader={false}` to disable. Inside a `List.TableCard` the table owns its scroll region and the header is always sticky.
 
 #### CardList
 

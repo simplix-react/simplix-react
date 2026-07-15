@@ -62,6 +62,19 @@ export const WithMinMax: Story = {
   },
 };
 
+export const WithSuffix: Story = {
+  render: (args) => {
+    const [value, setValue] = React.useState<number | null>(args.value ?? null);
+    return <FormFields.NumberField {...args} value={value} onChange={setValue} />;
+  },
+  args: {
+    label: "Timeout",
+    value: 30,
+    min: 0,
+    suffix: "sec",
+  },
+};
+
 export const WithStep: Story = {
   render: (args) => {
     const [value, setValue] = React.useState<number | null>(args.value ?? 0);

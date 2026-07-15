@@ -6,7 +6,7 @@
 
 # Interface: CommonDetailFieldProps
 
-Defined in: [packages/ui/src/crud/shared/types.ts:34](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L34)
+Defined in: [packages/ui/src/crud/shared/types.ts:53](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L53)
 
 Shared props for all detail (read-only) field components.
 
@@ -26,6 +26,7 @@ Shared props for all detail (read-only) field components.
 - [`DetailLocationFieldProps`](../namespaces/DetailFields/interfaces/DetailLocationFieldProps.md)
 - [`DetailListFieldProps`](../namespaces/DetailFields/interfaces/DetailListFieldProps.md)
 - [`DetailNumberFieldProps`](../namespaces/DetailFields/interfaces/DetailNumberFieldProps.md)
+- [`DetailStatusFieldProps`](../namespaces/DetailFields/interfaces/DetailStatusFieldProps.md)
 - [`DetailTextFieldProps`](../namespaces/DetailFields/interfaces/DetailTextFieldProps.md)
 - [`DetailTextareaFieldProps`](../namespaces/DetailFields/interfaces/DetailTextareaFieldProps.md)
 - [`DetailTimezoneFieldProps`](../namespaces/DetailFields/interfaces/DetailTimezoneFieldProps.md)
@@ -38,7 +39,7 @@ Shared props for all detail (read-only) field components.
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:37](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L37)
+Defined in: [packages/ui/src/crud/shared/types.ts:56](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L56)
 
 ***
 
@@ -46,7 +47,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:37](https://github.com/simplix
 
 > `optional` **label**: `string`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:35](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L35)
+Defined in: [packages/ui/src/crud/shared/types.ts:54](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L54)
 
 ***
 
@@ -54,15 +55,21 @@ Defined in: [packages/ui/src/crud/shared/types.ts:35](https://github.com/simplix
 
 > `optional` **labelKey**: `string`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:36](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L36)
+Defined in: [packages/ui/src/crud/shared/types.ts:55](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L55)
 
 ***
 
 ### layout?
 
-> `optional` **layout**: `"inline"` \| `"left"` \| `"top"` \| `"hidden"`
+> `optional` **layout**: `"inline"` \| `"left"` \| `"top"` \| `"hidden"` \| `"trailing"`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L5)
+Defined in: [packages/ui/src/crud/shared/types.ts:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L12)
+
+Label placement. `"top"` stacks the label above the input, `"left"` puts
+it in a leading column, `"inline"` keeps label and input on one row,
+`"trailing"` right-aligns the control with a dashed leader line from the
+label (settings-row style, used by toggle fields), `"hidden"` renders the
+label for screen readers only.
 
 #### Inherited from
 
@@ -74,7 +81,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:5](https://github.com/simplix-
 
 > `optional` **size**: `"sm"` \| `"lg"` \| `"md"`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L6)
+Defined in: [packages/ui/src/crud/shared/types.ts:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L13)
 
 #### Inherited from
 

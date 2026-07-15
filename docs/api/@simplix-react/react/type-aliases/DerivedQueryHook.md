@@ -8,7 +8,7 @@
 
 > **DerivedQueryHook**\<`TData`\> = (`params?`, `options?`) => `UseQueryResult`\<`TData`\>
 
-Defined in: [types.ts:198](https://github.com/simplix-react/simplix-react/blob/main/types.ts#L198)
+Defined in: [packages/react/src/types.ts:198](https://github.com/simplix-react/simplix-react/blob/main/packages/react/src/types.ts#L198)
 
 Represents a derived query hook produced for a custom GET operation.
 

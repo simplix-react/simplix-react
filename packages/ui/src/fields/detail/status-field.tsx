@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import type { CommonDetailFieldProps } from "../../crud/shared/types";
 import type { IconComponent, StatusTone } from "../../base/status-tone";
 import { StatusBadge } from "../../base/display/status-badge";
+import { detailFallback } from "../shared/detail-fallback";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
 
 /** Props for the {@link DetailStatusField} component. */
@@ -23,14 +24,14 @@ export interface DetailStatusFieldProps extends CommonDetailFieldProps {
   appearance?: "filled" | "outline";
   /** Pill size; defaults to `sm` (detail density). */
   badgeSize?: "xs" | "sm" | "default";
-  /** Fallback text when value is null, undefined, or empty string. Defaults to em-dash. */
+  /** Fallback text when value is null, undefined, or empty string. Defaults to the shared no-value badge. */
   fallback?: string;
 }
 
 /**
  * Read-only status display field. Renders a tone-driven {@link StatusBadge}
- * inside the standard detail field wrapper, with the same em-dash empty
- * fallback as other `DetailFields.*` components.
+ * inside the standard detail field wrapper, with the same no-value-badge
+ * empty fallback as other `DetailFields.*` components.
  *
  * Unlike {@link DetailBadgeField} (which maps values to legacy Badge variants),
  * this field takes a resolved {@link StatusTone}, so semantic status/severity
@@ -53,7 +54,7 @@ export function DetailStatusField({
   icon,
   appearance = "outline",
   badgeSize = "sm",
-  fallback = "—",
+  fallback,
   label,
   labelKey,
   layout,
@@ -80,7 +81,7 @@ export function DetailStatusField({
           size={badgeSize}
         />
       ) : (
-        <span>{fallback}</span>
+        detailFallback(fallback)
       )}
     </DetailFieldWrapper>
   );

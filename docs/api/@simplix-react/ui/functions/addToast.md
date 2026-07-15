@@ -8,7 +8,7 @@
 
 > **addToast**(`toast`): `void`
 
-Defined in: [packages/ui/src/base/feedback/toast-store.ts:32](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/toast-store.ts#L32)
+Defined in: [packages/ui/src/base/feedback/toast-store.ts:34](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/toast-store.ts#L34)
 
 ## Parameters
 
