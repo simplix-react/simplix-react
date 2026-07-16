@@ -92,6 +92,7 @@ export {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
+  useDialogMaximized,
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,

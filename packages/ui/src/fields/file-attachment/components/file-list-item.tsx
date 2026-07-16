@@ -58,7 +58,7 @@ export function FileListItem({
       )}
     >
       {/* Main row — gaps/padding step up with container width (@md, @2xl) */}
-      <div className="flex min-h-[40px] items-center gap-2 px-2.5 py-2.5 @md:gap-3 @md:px-3">
+      <div className="flex min-h-[34px] items-center gap-2 px-2 py-1.5 @md:gap-2.5 @md:px-2.5">
         {!hideHandle && (
           <DragHandleCell
             disabled={status !== 'completed'}

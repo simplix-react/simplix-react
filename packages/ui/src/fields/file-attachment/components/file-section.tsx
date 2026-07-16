@@ -100,14 +100,14 @@ function SortableFileListItem({
             ? () => onSetRepresentative(item.localId)
             : undefined
         }
-        size={40}
+        size={32}
       />
     ) : (
       <FileTypeIcon
         extension={extension}
         mimeType={item.attachment?.mimeType ?? item.file?.type}
         fileName={name}
-        size={36}
+        size={28}
       />
     )
 
