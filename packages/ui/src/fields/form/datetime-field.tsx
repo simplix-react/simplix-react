@@ -1,9 +1,12 @@
 import { useCallback, useMemo } from "react";
 
+import type { ReactNode } from "react";
+
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { DatePicker } from "../../base/inputs/date-picker";
 import type { DateLike } from "../../utils/parse-date";
 import { parseDate } from "../../utils/parse-date";
+import { asZonedInstant, decodeInstant } from "../../utils/rfc3339-date";
 import { FieldWrapper } from "../shared/field-wrapper";
 
 /** Props for the {@link DateTimeField} form component. */
@@ -30,6 +33,17 @@ export interface DateTimeFieldProps extends CommonFieldProps {
   hour12?: boolean;
   /** Interval between minute options in the scroll column. @defaultValue 1 */
   minuteStep?: number;
+  /**
+   * IANA display timezone for a site-scoped `Instant` field. When set, the
+   * incoming server string is decoded into the site's wall clock and the emitted
+   * value is tagged (via `asZonedInstant`) so `JSON.stringify` re-encodes it in
+   * this zone. The consumer must NOT `toISOString()` the resulting floating Date.
+   * Ignored when {@link DateTimeFieldProps.hideTime} is set (date-only mode is
+   * zone-neutral; use `DateField` for a calendar date).
+   */
+  displayZone?: string;
+  /** Optional label shown under the picker, e.g. "Site time · Asia/Seoul". Defaults to the IANA id. */
+  displayZoneLabel?: ReactNode;
 }
 
 /**
@@ -57,6 +71,8 @@ export function DateTimeField({
   hideTime = false,
   hour12,
   minuteStep,
+  displayZone,
+  displayZoneLabel,
   label,
   labelKey,
   error,
@@ -66,13 +82,23 @@ export function DateTimeField({
   className,
   ...variantProps
 }: DateTimeFieldProps) {
-  const parsed = useMemo(() => parseDate(value), [value]);
+  // Zone logic applies only when a time is shown; date-only mode is zone-neutral.
+  const zone = hideTime ? undefined : displayZone;
+
+  const parsed = useMemo(() => {
+    if (value == null) return undefined;
+    // A Date coming back from the picker is already floating; pass it through.
+    if (value instanceof Date) return Number.isNaN(value.getTime()) ? undefined : value;
+    // Server string/number → floating (display zone) or true instant (legacy).
+    return zone ? decodeInstant(value, zone) : parseDate(value);
+  }, [value, zone]);
 
   const handleChange = useCallback(
     (date: Date | undefined) => {
-      onChange(date ?? null);
+      if (!date) return onChange(null);
+      onChange(zone ? asZonedInstant(date, zone) : date);
     },
-    [onChange],
+    [onChange, zone],
   );
 
   return (
@@ -99,6 +125,8 @@ export function DateTimeField({
         showTime={!hideTime}
         hour12={hour12}
         minuteStep={minuteStep}
+        displayZone={zone}
+        displayZoneLabel={displayZoneLabel}
       />
     </FieldWrapper>
   );

@@ -7,9 +7,10 @@ import { Flex } from "../../primitives/flex";
 import { Stack } from "../../primitives/stack";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
+import { endOfDay, startOfDay } from "../../utils/date-math";
 import { formatDateRange, toLocalDateString } from "../../utils/format-date";
 import { parseDate } from "../../utils/parse-date";
-import { parseRfc3339, serializeRfc3339Local } from "../../utils/rfc3339-date";
+import { decodeInstant, serializeInstant } from "../../utils/rfc3339-date";
 import { useCrudListColumns } from "../shared/column-context";
 import { ListTotalBadge } from "../shared/list-total-badge";
 import { CheckIcon, ColumnsIcon, EyeIcon, FunnelIcon, LayoutGridIcon, RowsIcon, XIcon } from "../shared/icons";
@@ -75,12 +76,13 @@ export interface DateRangeFilterDef extends FilterDefBase {
    */
   dateOnly?: boolean;
   /**
-   * Set for a column stored as an offset-preserving canonical RFC 3339 `String`
-   * (`yyyy-MM-ddT00:00:00±hh:mm`): the range boundaries are serialized in the SAME
-   * canonical format (via {@link serializeRfc3339Local}) so a lexicographic string
-   * comparison equals chronological order. Takes precedence over {@link dateOnly}.
+   * Set for a site-scoped `Instant` column whose day boundaries must be computed
+   * in the site zone: the picked day's start-of-day / end-of-day are interpreted
+   * IN this IANA zone and sent as offset-bearing instants (via
+   * {@link serializeInstant}), so the fetched window is identical in any browser
+   * zone. Takes precedence over {@link dateOnly}.
    */
-  rfc3339Local?: boolean;
+  displayZone?: string;
 }
 
 export interface CountryFilterDef extends FilterDefBase {
@@ -905,18 +907,19 @@ function DateRangeFormField({
   const locale = useLocale();
   const gteKey = makeFilterKey(def.field, SearchOperator.GREATER_THAN_OR_EQUAL);
   const lteKey = makeFilterKey(def.field, SearchOperator.LESS_THAN_OR_EQUAL);
-  // date-only columns store the boundary as a local yyyy-MM-dd; parse it back
-  // locally so the calendar shows the picked day in any timezone.
+  // Parse each committed boundary back for the calendar. A site-zone Instant
+  // column decodes into the site's wall clock; a date-only column parses the
+  // local yyyy-MM-dd; otherwise the boundary is a plain UTC ISO instant.
   const from = state.values[gteKey]
-    ? (def.rfc3339Local
-        ? parseRfc3339(state.values[gteKey] as string)
+    ? (def.displayZone
+        ? decodeInstant(state.values[gteKey] as string, def.displayZone)
         : def.dateOnly
           ? parseDate(state.values[gteKey] as string)
           : new Date(state.values[gteKey] as string))
     : undefined;
   const to = state.values[lteKey]
-    ? (def.rfc3339Local
-        ? parseRfc3339(state.values[lteKey] as string)
+    ? (def.displayZone
+        ? decodeInstant(state.values[lteKey] as string, def.displayZone)
         : def.dateOnly
           ? parseDate(state.values[lteKey] as string)
           : new Date(state.values[lteKey] as string))
@@ -929,18 +932,30 @@ function DateRangeFormField({
 
   const handleRangeSelect = useCallback(
     (range: DateRange) => {
-      // For a LocalDate column, send zone-neutral yyyy-MM-dd (never UTC ISO,
-      // which shifts the boundary a day east/west of UTC).
+      // Site-zone Instant column: reinterpret the picked day's start/end-of-day
+      // in the site zone and send offset-bearing instants (identical window in
+      // any browser). LocalDate column: send zone-neutral yyyy-MM-dd (never UTC
+      // ISO, which shifts the boundary a day east/west of UTC).
       state.setValues({
         [gteKey]: range.from
-          ? (def.rfc3339Local ? serializeRfc3339Local(range.from) : def.dateOnly ? toLocalDateString(range.from) : range.from.toISOString())
+          ? (def.displayZone
+              ? serializeInstant(startOfDay(range.from), def.displayZone)
+              : def.dateOnly
+                ? toLocalDateString(range.from)
+                : range.from.toISOString())
           : undefined,
         [lteKey]: range.to
-          ? (def.rfc3339Local ? serializeRfc3339Local(range.to) : def.dateOnly ? toLocalDateString(range.to) : range.to.toISOString())
+          ? (def.displayZone
+              // Inclusive end-of-day (23:59:59.999) in the site zone, matching a
+              // LESS_THAN_OR_EQUAL bound on the Instant column.
+              ? serializeInstant(endOfDay(range.to), def.displayZone)
+              : def.dateOnly
+                ? toLocalDateString(range.to)
+                : range.to.toISOString())
           : undefined,
       });
     },
-    [state, gteKey, lteKey, def.dateOnly, def.rfc3339Local],
+    [state, gteKey, lteKey, def.dateOnly, def.displayZone],
   );
 
   const handleClear = useCallback(() => {

@@ -663,7 +663,17 @@ export {
 export { formatDateShort, formatDateMedium, formatDateTime, formatRelativeTime, formatDateRange, toLocalDateString } from "./utils/format-date";
 export { asPlainDate, parseDate } from "./utils/parse-date";
 export type { DateLike } from "./utils/parse-date";
-export { serializeRfc3339Local, parseRfc3339 } from "./utils/rfc3339-date";
+export {
+  serializeInstant,
+  decodeInstant,
+  asZonedInstant,
+  serializeCalendarDate,
+  decodeCalendarDate,
+  serializeWallClockTime,
+  decodeWallClockTime,
+  serializeRfc3339Local,
+  parseRfc3339,
+} from "./utils/rfc3339-date";
 export { sanitizeHtml } from "./utils/sanitize";
 export { countryFromTimezone } from "./utils/timezone-country-map";
 export { useCountryOptions } from "./utils/use-country-options";

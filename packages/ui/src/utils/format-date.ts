@@ -24,7 +24,7 @@ export function isYearFirstLocale(locale: string): boolean {
   return ["ko", "ja", "zh", "zh-CN", "zh-TW"].includes(locale);
 }
 
-/** Localized short month names — e.g. ["Jan", …] or ["1월", …]. */
+/** Localized short month names — e.g. ["Jan", …] in the given locale. */
 export function getMonthNames(locale: string): string[] {
   const bcp47 = toBcp47(locale);
   const formatter = new Intl.DateTimeFormat(bcp47, { month: "short" });
@@ -39,7 +39,7 @@ export function generateYears(start: number, end: number, reverse = false): numb
 
 // ── Formatting functions ──
 
-/** Short date without year — e.g. "Mar 3" / "3월 3일". */
+/** Short date without year — e.g. "Mar 3", localized. */
 export function formatDateShort(date: Date, locale?: string): string {
   return new Intl.DateTimeFormat(locale, {
     month: "short",
@@ -47,9 +47,17 @@ export function formatDateShort(date: Date, locale?: string): string {
   }).format(date);
 }
 
-/** Medium date with year — e.g. "Mar 3, 2026" / "2026년 3월 3일". */
-export function formatDateMedium(date: Date, locale?: string): string {
-  return new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(date);
+/**
+ * Medium date with year — e.g. "Mar 3, 2026". Rendered in the given locale.
+ *
+ * Pass `timeZone` (IANA) to render an absolute `Date` in that zone instead of
+ * the browser zone (site-scoped detail/display); omit it for zone-neutral use.
+ */
+export function formatDateMedium(date: Date, locale?: string, timeZone?: string): string {
+  return new Intl.DateTimeFormat(locale, {
+    dateStyle: "medium",
+    ...(timeZone ? { timeZone } : {}),
+  }).format(date);
 }
 
 /**
@@ -69,15 +77,21 @@ export function toLocalDateString(date: Date): string {
   return `${y}-${m}-${d}`;
 }
 
-/** Medium date + short time — e.g. "Mar 3, 2026, 2:30 PM". */
-export function formatDateTime(date: Date, locale?: string): string {
+/**
+ * Medium date + short time — e.g. "Mar 3, 2026, 2:30 PM".
+ *
+ * Pass `timeZone` (IANA) to render an absolute `Date` in that zone instead of
+ * the browser zone (site-scoped detail/display); omit it for zone-neutral use.
+ */
+export function formatDateTime(date: Date, locale?: string, timeZone?: string): string {
   return new Intl.DateTimeFormat(locale, {
     dateStyle: "medium",
     timeStyle: "short",
+    ...(timeZone ? { timeZone } : {}),
   }).format(date);
 }
 
-/** Locale-aware relative time — e.g. "3 days ago" / "3일 전". */
+/** Locale-aware relative time — e.g. "3 days ago", localized. */
 export function formatRelativeTime(date: Date, locale?: string): string {
   const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
   const diffInSeconds = Math.round((date.getTime() - Date.now()) / 1000);
@@ -102,7 +116,7 @@ export function formatRelativeTime(date: Date, locale?: string): string {
 }
 
 /**
- * Format a date range as a short string — e.g. "Mar 3 – Mar 27" / "3월 3일 – 3월 27일".
+ * Format a date range as a short string — e.g. "Mar 3 – Mar 27", localized.
  * Returns `null` when both `from` and `to` are undefined.
  */
 export function formatDateRange(

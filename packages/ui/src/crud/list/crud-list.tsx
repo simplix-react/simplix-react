@@ -18,6 +18,7 @@ import {useFlatUIComponents} from "../../provider/ui-provider";
 import {Flex, Stack} from "../../primitives";
 import {cn} from "../../utils/cn";
 import {formatDateMedium, formatDateTime, formatRelativeTime} from "../../utils/format-date";
+import {formatWallClockTime} from "../../utils/rfc3339-date";
 import {parseDate} from "../../utils/parse-date";
 import type {ColumnInfo, EmptyReason, SortState} from "../shared";
 import {CrudListColumnContext, useCrudListColumns} from "../shared";
@@ -234,7 +235,7 @@ export interface ListColumnProps<T> {
   sortable?: boolean;
   width?: number;
   display?: "badge" | "boolean";
-  format?: "date" | "datetime" | "relative";
+  format?: "date" | "datetime" | "time" | "relative";
   variants?: Record<string, BadgeVariants["variant"]>;
   children?: (props: { value: unknown; row: T }) => ReactNode;
 }
@@ -258,9 +259,13 @@ function resolveValue(value: unknown): unknown {
   return value;
 }
 
-function formatCellValue(value: unknown, format?: "date" | "datetime" | "relative", locale?: string): string {
+function formatCellValue(value: unknown, format?: "date" | "datetime" | "time" | "relative", locale?: string): string {
   if (value == null) return "";
   if (!format) return String(value);
+
+  // Wall-clock columns (format="time") hold an HH:mm[:ss] LocalTime string with no
+  // calendar day, so they never go through Date parsing.
+  if (format === "time") return formatWallClockTime(String(value), locale) ?? String(value);
 
   // Date-only columns (format="date") parse the LocalDate string as a local
   // calendar date (parseDate), avoiding new Date("2026-07-06")'s UTC-midnight
