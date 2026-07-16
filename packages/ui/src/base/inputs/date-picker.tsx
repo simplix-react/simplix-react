@@ -31,6 +31,7 @@ import {
   isMinuteDisabled,
   withTime,
 } from "../../utils/time-select";
+import { decodeInstant } from "../../utils/rfc3339-date";
 
 // ── MonthYearSelect (internal) ──
 
@@ -110,6 +111,21 @@ export interface DatePickerProps {
    * @defaultValue 1
    */
   minuteStep?: number;
+  /**
+   * IANA display timezone. When set, the picker treats its value's local fields
+   * as this zone's wall clock and renders a zone label; `Now` and the default
+   * view month use this zone's clock.
+   *
+   * @remarks
+   * The incoming `value` must be a FLOATING `Date` whose local fields are the
+   * display-zone wall clock (produced by the parent via `decodeInstant`). When
+   * `displayZone` is set, `minDate`/`maxDate` should likewise be passed as
+   * floating Dates in the same zone (or left undefined); mixing a floating value
+   * with a true-instant bound compares misaligned clocks.
+   */
+  displayZone?: string;
+  /** Optional label shown under the calendar, e.g. "Site time · Asia/Seoul". Defaults to the IANA id. */
+  displayZoneLabel?: React.ReactNode;
 }
 
 /**
@@ -139,6 +155,8 @@ export function DatePicker({
   showTime = false,
   hour12 = true,
   minuteStep = 1,
+  displayZone,
+  displayZoneLabel,
 }: DatePickerProps) {
   const { t, locale: currentLocale } = useTranslation("simplix/ui");
   const locale = localeProp ?? currentLocale;
@@ -147,7 +165,9 @@ export function DatePicker({
   const defaultPlaceholder = placeholder ?? t(showTime ? "date.pickDateTime" : "date.pickDate");
 
   const [open, setOpen] = useState(false);
-  const [viewMonth, setViewMonth] = useState<Date>(value ?? new Date());
+  const [viewMonth, setViewMonth] = useState<Date>(
+    () => value ?? (displayZone ? decodeInstant(new Date(), displayZone) ?? new Date() : new Date()),
+  );
   const [hours, setHours] = useState(() => value?.getHours() ?? 0);
   const [minutes, setMinutes] = useState(() => value?.getMinutes() ?? 0);
 
@@ -213,11 +233,13 @@ export function DatePicker({
   );
 
   const handleNow = useCallback(() => {
-    const now = clampToRange(new Date(), minDate, maxDate);
+    // When zoned, produce a floating now (local fields = display-zone wall clock).
+    const base = displayZone ? decodeInstant(new Date(), displayZone) ?? new Date() : new Date();
+    const now = clampToRange(base, minDate, maxDate);
     now.setSeconds(0, 0);
     setViewMonth(now);
     onChange(now);
-  }, [onChange, minDate, maxDate]);
+  }, [onChange, minDate, maxDate, displayZone]);
 
   const handleClear = useCallback(
     (e: React.MouseEvent) => {
@@ -378,6 +400,9 @@ export function DatePicker({
                 {t("date.now")}
               </button>
             </div>
+          )}
+          {displayZone && (
+            <div className="mt-2 text-xs text-muted-foreground">{displayZoneLabel ?? displayZone}</div>
           )}
         </div>
       </PopoverContent>
