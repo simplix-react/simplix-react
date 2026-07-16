@@ -158,6 +158,9 @@ describe("generateHttpFile", () => {
     expect(output).toContain("00000000-0000-0000-0000-000000000001");
     expect(output).toContain("example.com");
     expect(output).toContain("192.168.1.1");
+    // Date/date-time samples are fixed constants so regeneration is deterministic.
+    expect(output).toContain('"createdAt": "2020-01-01T00:00:00.000Z"');
+    expect(output).toContain('"birthDate": "2020-01-01"');
   });
 
   it("generates body with number and boolean types", () => {

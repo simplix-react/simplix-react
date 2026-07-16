@@ -148,7 +148,8 @@ export interface DomainGroup {
 /** Snapshot stored as .openapi-snapshot.json for diff comparison */
 export interface OpenAPISnapshot {
   version?: number;
-  generatedAt: string;
+  /** Optional generation timestamp; older snapshots may carry it. Not written, to keep the file deterministic. */
+  generatedAt?: string;
   specSource: string;
   entities: ExtractedEntity[];
 }
