@@ -879,11 +879,16 @@ function ToggleFormField({
   const isActive = typeof rawValue === "boolean";
 
   return (
-    <Flex align="center" justify="between" className={cn("py-1", className)}>
+    <Flex align="center" gap="sm" className={cn("min-h-6 py-1", className)}>
       <Label className="text-sm font-medium text-secondary-foreground">{def.label}</Label>
+      <span
+        aria-hidden="true"
+        className="min-w-4 flex-1 border-b border-dashed border-border"
+      />
       <Flex align="center" gap="xs">
         {isActive && <FieldClearButton onClick={() => state.setValue(key, undefined)} label={def.label} />}
         <Switch
+          size="sm"
           checked={checked}
           onCheckedChange={(v) => state.setValue(key, v)}
         />
