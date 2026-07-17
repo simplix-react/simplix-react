@@ -247,9 +247,11 @@ export interface CrudDetailDefaultActionsProps {
   /** Label for the edit button (defaults to `"Edit"`). */
   editLabel?: string;
   className?: string;
+  /** Extra action buttons rendered in the right-side group, before Edit. */
+  children?: React.ReactNode;
 }
 
-function DetailDefaultActions({ onClose, onBack, onDelete, onEdit, isPending, closeLabel, backLabel, editLabel, className }: CrudDetailDefaultActionsProps) {
+function DetailDefaultActions({ onClose, onBack, onDelete, onEdit, isPending, closeLabel, backLabel, editLabel, className, children }: CrudDetailDefaultActionsProps) {
   const { Button } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const hasLeft = onBack || onClose;
@@ -271,6 +273,7 @@ function DetailDefaultActions({ onClose, onBack, onDelete, onEdit, isPending, cl
             <TrashIcon className="h-4 w-4" />
           </Button>
         )}
+        {children}
         {onEdit && (
           <Button type="button" size="sm" variant="primary" onClick={onEdit} disabled={isPending}>
             {editLabel ?? t("common.edit")}
