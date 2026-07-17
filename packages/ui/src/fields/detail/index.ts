@@ -31,6 +31,9 @@ export type { DetailNoteFieldProps } from "./note-field";
 export { DetailNumberField } from "./number-field";
 export type { DetailNumberFieldProps } from "./number-field";
 
+export { DetailPhoneField } from "./phone-field";
+export type { DetailPhoneFieldProps } from "./phone-field";
+
 export { DetailStatusField } from "./status-field";
 export type { DetailStatusFieldProps } from "./status-field";
 
