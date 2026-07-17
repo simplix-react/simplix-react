@@ -25,6 +25,7 @@ import {CrudListColumnContext, useCrudListColumns} from "../shared";
 import type {CrudListViewMode} from "../shared";
 import {EmptyState} from "../shared/empty-state";
 import {TableCardFrame, useTableCardFrame} from "../shared/table-card-frame";
+import { CountryCell, PhoneCell } from "./cells";
 import {AlertTriangleIcon, ArrowUpDownIcon, EyeIcon, FolderTreeIcon, FunnelIcon, MagnifyingGlassIcon, MapPinIcon, PencilIcon, PlusIcon, TrashIcon, UnlinkIcon} from "../shared/icons";
 import {
   AdvancedSelectFilter,
@@ -234,7 +235,7 @@ export interface ListColumnProps<T> {
   header?: string;
   sortable?: boolean;
   width?: number;
-  display?: "badge" | "boolean";
+  display?: "badge" | "boolean" | "country" | "phone";
   format?: "date" | "datetime" | "time" | "relative";
   variants?: Record<string, BadgeVariants["variant"]>;
   children?: (props: { value: unknown; row: T }) => ReactNode;
@@ -993,6 +994,16 @@ function ListTable<T>({
           // Boolean display
           if (colDef.display === "boolean") {
             return <BooleanBadge value={!!value} />;
+          }
+
+          // Country display
+          if (colDef.display === "country") {
+            return <CountryCell value={String(value ?? "")} />;
+          }
+
+          // Phone display
+          if (colDef.display === "phone") {
+            return <PhoneCell value={String(value ?? "")} />;
           }
 
           // Format
