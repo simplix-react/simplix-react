@@ -70,3 +70,6 @@ export type { TimePickerProps, TimeSelectControlProps, TimeValue } from "./time-
 
 export { TimeRangeSelector, HEATMAP_THEMES } from "./time-range-selector";
 export type { TimeRangeSelectorProps, TimeRangeValue, WindowPreset, HeatmapColorTheme, HeatmapPalette } from "./time-range-selector";
+
+export { SignaturePad } from "./signature-pad";
+export type { SignaturePadProps } from "./signature-pad";

@@ -85,6 +85,7 @@
     "cmdk": "catalog:",
     "country-flag-icons": "catalog:",
     "dompurify": "catalog:",
+    "qrcode": "catalog:",
     "libphonenumber-js": "catalog:",
     "maplibre-gl": "catalog:",
     "pmtiles": "catalog:",
@@ -108,6 +109,7 @@
     "react-file-icon": "catalog:"
   },
   "devDependencies": {
+    "@types/qrcode": "catalog:",
     "@simplix-react/api": "workspace:*",
     "@simplix-react/config-typescript": "workspace:*",
     "@simplix-react/form": "workspace:*",

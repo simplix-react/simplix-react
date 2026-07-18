@@ -68,6 +68,8 @@ export {
   badgeVariants,
   BooleanBadge,
   Button,
+  QrCode,
+  SignaturePad,
   buttonVariants,
   Calendar,
   Command,
@@ -184,6 +186,8 @@ export {
   TooltipTrigger,
 } from "./base";
 export type {
+  QrCodeProps,
+  SignaturePadProps,
   MapAutoFitProps,
   MapBoundsOverlayProps,
   MapControlsPosition,

@@ -55,3 +55,6 @@ export type {
   TableProps,
   TableRowProps,
 } from "./table";
+
+export { QrCode } from "./qr-code";
+export type { QrCodeProps } from "./qr-code";
