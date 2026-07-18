@@ -31,7 +31,7 @@ export const LinkToolbarButton = forwardRef<HTMLButtonElement, LinkToolbarButton
         className={className}
         onClick={() => triggerFloatingLink(editor, { focused: true })}
       >
-        <Link className="h-4 w-4" />
+        <Link className="h-3.5 w-3.5" />
       </ToolbarButton>
     )
   }

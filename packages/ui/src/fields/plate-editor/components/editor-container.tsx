@@ -92,19 +92,10 @@ export const Editor = forwardRef<HTMLDivElement, EditorProps>(
       <PlateContent
         ref={ref}
         className={cn(
-          'prose prose-sm dark:prose-invert max-w-none w-full p-4 outline-none',
-          'prose-headings:font-semibold prose-headings:leading-tight',
-          'prose-h1:text-2xl prose-h1:mb-4',
-          'prose-h2:text-xl prose-h2:mb-3',
-          'prose-h3:text-lg prose-h3:mb-2',
-          'prose-p:my-2',
-          'prose-blockquote:border-l-4 prose-blockquote:border-muted-foreground/30 prose-blockquote:pl-4 prose-blockquote:italic',
-          'prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm',
-          'prose-pre:bg-muted prose-pre:p-4 prose-pre:rounded-md prose-pre:overflow-x-auto prose-pre:max-w-full',
-          'prose-ul:list-disc prose-ul:pl-6',
-          'prose-ol:list-decimal prose-ol:pl-6',
-          'prose-li:my-1',
-          'prose-a:text-primary prose-a:underline prose-a:underline-offset-4',
+          // Base body text matches the app-wide content size (text-sm, same as
+          // inputs and detail fields). Block/mark typography lives on the node
+          // components (heading-node, list-node, ...), not on this container.
+          'max-w-none w-full p-4 outline-none text-sm',
           '[&_*::selection]:bg-primary/20',
           // Prevent horizontal overflow from long content
           'break-words',

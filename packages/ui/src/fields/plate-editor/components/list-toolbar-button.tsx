@@ -39,9 +39,9 @@ export function ListToolbarButton({ nodeType, tooltip }: ListToolbarButtonProps)
       onClick={handleClick}
     >
       {nodeType === 'ul' ? (
-        <List className="h-4 w-4" />
+        <List className="h-3.5 w-3.5" />
       ) : (
-        <ListOrdered className="h-4 w-4" />
+        <ListOrdered className="h-3.5 w-3.5" />
       )}
     </ToolbarButton>
   )

@@ -150,31 +150,31 @@ export function PlateEditorStandard({
                 nodeType={KEYS.bold}
                 tooltip={`${t('plateEditor.toolbar.bold')} (Cmd+B)`}
               >
-                <Bold className="h-4 w-4" />
+                <Bold className="h-3.5 w-3.5" />
               </MarkToolbarButton>
               <MarkToolbarButton
                 nodeType={KEYS.italic}
                 tooltip={`${t('plateEditor.toolbar.italic')} (Cmd+I)`}
               >
-                <Italic className="h-4 w-4" />
+                <Italic className="h-3.5 w-3.5" />
               </MarkToolbarButton>
               <MarkToolbarButton
                 nodeType={KEYS.underline}
                 tooltip={`${t('plateEditor.toolbar.underline')} (Cmd+U)`}
               >
-                <Underline className="h-4 w-4" />
+                <Underline className="h-3.5 w-3.5" />
               </MarkToolbarButton>
               <MarkToolbarButton
                 nodeType={KEYS.strikethrough}
                 tooltip={`${t('plateEditor.toolbar.strikethrough')} (Cmd+Shift+X)`}
               >
-                <Strikethrough className="h-4 w-4" />
+                <Strikethrough className="h-3.5 w-3.5" />
               </MarkToolbarButton>
               <MarkToolbarButton
                 nodeType={KEYS.code}
                 tooltip={`${t('plateEditor.toolbar.code')} (Cmd+E)`}
               >
-                <Code className="h-4 w-4" />
+                <Code className="h-3.5 w-3.5" />
               </MarkToolbarButton>
             </ToolbarGroup>
 
@@ -201,7 +201,7 @@ export function PlateEditorStandard({
                     tooltip={t('plateEditor.toolbar.image')}
                     onClick={handleImageButtonClick}
                   >
-                    <Image className="h-4 w-4" />
+                    <Image className="h-3.5 w-3.5" />
                   </ToolbarButton>
                   <input
                     ref={fileInputRef}
@@ -216,7 +216,7 @@ export function PlateEditorStandard({
                 tooltip={`${t('plateEditor.toolbar.codeBlock')} (Cmd+Alt+8)`}
                 onClick={handleCodeBlockToggle}
               >
-                <FileCode className="h-4 w-4" />
+                <FileCode className="h-3.5 w-3.5" />
               </ToolbarButton>
             </ToolbarGroup>
           </FixedToolbar>

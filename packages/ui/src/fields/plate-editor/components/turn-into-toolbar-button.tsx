@@ -62,7 +62,7 @@ export const TurnIntoToolbarButton = forwardRef<
           className={cn('min-w-[100px] justify-between gap-1', className)}
         >
           <span className="truncate">{currentOption?.label || 'Paragraph'}</span>
-          <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+          <ChevronDown className="h-3 w-3 shrink-0 opacity-50" />
         </ToolbarButton>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="min-w-[150px]">
