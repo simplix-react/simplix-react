@@ -64,3 +64,6 @@ export type { ScrollBoxProps } from "./scroll-box";
 
 export { MediaEmbed } from "./media-embed";
 export type { MediaEmbedProps } from "./media-embed";
+
+export { Stepline } from "./stepline";
+export type { SteplineItem, SteplineProps } from "./stepline";
