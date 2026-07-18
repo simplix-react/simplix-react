@@ -3,6 +3,10 @@ export { PlateEditorBasic } from './plate-editor-basic'
 export { PlateEditorStandard } from './plate-editor-standard'
 export { PlateEditorAdvanced } from './plate-editor-advanced'
 
+// Read-only renderer
+export { PlateViewer } from './plate-viewer'
+export type { PlateViewerProps, PlateViewerVariant } from './plate-viewer'
+
 // Types
 export type {
   PlateEditorBaseProps,
@@ -26,5 +30,8 @@ export {
   convertPlateI18nToJson,
   parsePlateI18nFromJson,
   getFilledLanguagesFromPlateI18n,
+  parsePlateValue,
+  plainTextToPlateValue,
+  plateValueToText,
 } from '../shared/plate-editor-helpers'
 export { getFilledLanguages } from '../shared/filled-languages'
