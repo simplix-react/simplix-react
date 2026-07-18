@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useTranslation } from "@simplix-react/i18n/react";
 
 import type { CommonDetailFieldProps } from "../../crud/shared/types";
+import { useDefaultDisplayZone } from "../../crud/shared/display-zone-context";
 import type { DateLike } from "../../utils/parse-date";
 import { formatDateMedium, formatDateTime, formatRelativeTime } from "../../utils/format-date";
 import { parseDate } from "../../utils/parse-date";
@@ -67,14 +68,18 @@ export function DetailDateField({
   className,
 }: DetailDateFieldProps) {
   const { locale } = useTranslation("simplix/ui");
+  // Explicit prop wins; otherwise the app-level ambient default replaces the
+  // browser zone for absolute instants (date/time formats stay zone-neutral).
+  const defaultZone = useDefaultDisplayZone();
+  const zone = displayZone ?? defaultZone;
 
   const displayValue = useMemo(() => {
     if (value == null) return null;
     if (format === "time") return formatWallClockTime(typeof value === "string" ? value : null, locale) ?? null;
     const date = parseDate(value);
     if (!date) return null;
-    return formatDate(date, format, locale, format === "date" ? undefined : displayZone);
-  }, [value, format, locale, displayZone]);
+    return formatDate(date, format, locale, format === "date" ? undefined : zone);
+  }, [value, format, locale, zone]);
 
   return (
     <DetailFieldWrapper

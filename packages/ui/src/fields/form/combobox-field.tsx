@@ -1,5 +1,5 @@
 import { useTranslation } from "@simplix-react/i18n/react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { FieldChevron } from "../../base/inputs/field-chevron";
@@ -20,6 +20,10 @@ export interface ComboboxFieldProps<T extends string = string>
   emptyMessage?: string;
   /** When true, options are rendered as-is from the server — local filtering is skipped. */
   serverSearch?: boolean;
+  /** When set, an expand button renders in the trigger (e.g. to open a full search dialog). */
+  onExpand?: () => void;
+  /** Rendered below the option list (e.g. a "more results" hint). */
+  footer?: React.ReactNode;
 }
 
 /**
@@ -47,6 +51,8 @@ export function ComboboxField<T extends string = string>({
   placeholder,
   emptyMessage,
   serverSearch,
+  onExpand,
+  footer,
   label,
   labelKey,
   error,
@@ -60,6 +66,9 @@ export function ComboboxField<T extends string = string>({
   const { t } = useTranslation("simplix/ui");
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [highlighted, setHighlighted] = useState(0);
+  const listRef = useRef<HTMLUListElement>(null);
+  const listboxId = useId();
 
   const selectPlaceholder = placeholder ?? t("field.selectOption");
   const searchPlaceholder = t("field.searchOption");
@@ -92,6 +101,37 @@ export function ComboboxField<T extends string = string>({
     setOpen(false);
   }
 
+  // Keep the keyboard highlight on a real row as the visible set changes
+  // (typing, async server results, reopening).
+  useEffect(() => {
+    setHighlighted(0);
+  }, [query, options, open]);
+
+  // Keep the highlighted row visible while arrowing through a long list.
+  useEffect(() => {
+    listRef.current
+      ?.querySelector('[data-highlighted="true"]')
+      ?.scrollIntoView({ block: "nearest" });
+  }, [highlighted]);
+
+  const handleInputKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+        e.preventDefault();
+        if (filtered.length === 0) return;
+        const delta = e.key === "ArrowDown" ? 1 : -1;
+        setHighlighted((prev) => (prev + delta + filtered.length) % filtered.length);
+      } else if (e.key === "Enter") {
+        // Always swallow Enter — the field lives inside forms and must never submit them.
+        e.preventDefault();
+        const option = filtered[highlighted];
+        if (option) handleSelect(option.value);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [filtered, highlighted],
+  );
+
   function handleClear() {
     onChange(null);
     setQuery("");
@@ -109,7 +149,19 @@ export function ComboboxField<T extends string = string>({
       className={className}
       {...variantProps}
     >
-      <Popover open={open} onOpenChange={(v) => { if (disabled) return; setOpen(v); if (!v) setQuery(""); }}>
+      <Popover
+        open={open}
+        onOpenChange={(v) => {
+          if (disabled) return;
+          setOpen(v);
+          if (!v) {
+            setQuery("");
+            // Server-search callers hold the query externally — reset it too so a
+            // re-open starts from the default result set, matching the empty input.
+            if (serverSearch) onSearch?.("");
+          }
+        }}
+      >
         <PopoverTrigger asChild>
           <span
             className={cn(
@@ -150,6 +202,34 @@ export function ComboboxField<T extends string = string>({
                 </svg>
               </button>
             )}
+            {onExpand && !disabled && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onExpand();
+                }}
+                className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
+                aria-label={t("field.expandSearch")}
+                title={t("field.expandSearch")}
+              >
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 15 15"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-3 w-3"
+                >
+                  <path
+                    d="M2 2.5C2 2.22386 2.22386 2 2.5 2H5.5C5.77614 2 6 2.22386 6 2.5C6 2.77614 5.77614 3 5.5 3H3V5.5C3 5.77614 2.77614 6 2.5 6C2.22386 6 2 5.77614 2 5.5V2.5ZM9 2.5C9 2.22386 9.22386 2 9.5 2H12.5C12.7761 2 13 2.22386 13 2.5V5.5C13 5.77614 12.7761 6 12.5 6C12.2239 6 12 5.77614 12 5.5V3H9.5C9.22386 3 9 2.77614 9 2.5ZM2.5 9C2.77614 9 3 9.22386 3 9.5V12H5.5C5.77614 12 6 12.2239 6 12.5C6 12.7761 5.77614 13 5.5 13H2.5C2.22386 13 2 12.7761 2 12.5V9.5C2 9.22386 2.22386 9 2.5 9ZM12.5 9C12.7761 9 13 9.22386 13 9.5V12.5C13 12.7761 12.7761 13 12.5 13H9.5C9.22386 13 9 12.7761 9 12.5C9 12.2239 9.22386 12 9.5 12H12V9.5C12 9.22386 12.2239 9 12.5 9Z"
+                    fill="currentColor"
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+            )}
             <FieldChevron />
           </span>
         </PopoverTrigger>
@@ -163,11 +243,14 @@ export function ComboboxField<T extends string = string>({
               type="search"
               value={query}
               onChange={handleInputChange}
+              onKeyDown={handleInputKeyDown}
               placeholder={searchPlaceholder}
               className="mb-2"
               autoFocus
+              aria-controls={listboxId}
+              aria-activedescendant={filtered.length > 0 ? `${listboxId}-${highlighted}` : undefined}
             />
-            <ul className="max-h-60 overflow-y-auto" role="listbox">
+            <ul className="max-h-60 overflow-y-auto" role="listbox" id={listboxId} ref={listRef}>
               {loading && (
                 <li className="flex items-center justify-center py-4 text-sm text-muted-foreground">
                   <svg
@@ -199,23 +282,35 @@ export function ComboboxField<T extends string = string>({
                 </li>
               )}
               {!loading &&
-                filtered.map((opt) => (
+                filtered.map((opt, index) => (
                   <li
                     key={opt.value}
+                    id={`${listboxId}-${index}`}
                     role="option"
                     aria-selected={opt.value === value}
+                    data-highlighted={index === highlighted || undefined}
                     className={cn(
                       "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none",
                       "hover:bg-accent hover:text-accent-foreground",
-                      opt.value === value && "bg-accent text-accent-foreground",
+                      // The accent background marks the CURSOR only; the selected
+                      // option is indicated by the trailing check + weight, so the
+                      // two states stay distinguishable while arrowing around.
+                      index === highlighted && "bg-accent text-accent-foreground",
+                      opt.value === value && "font-medium",
                     )}
                     onClick={() => handleSelect(opt.value)}
+                    onMouseEnter={() => setHighlighted(index)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
                         handleSelect(opt.value);
                       }
                     }}
                   >
+                    <span className="flex flex-1 items-center gap-1.5 truncate">
+                      {opt.icon}
+                      {opt.label}
+                    </span>
+                    {/* Trailing check keeps every row's icon/label aligned to the same left edge. */}
                     {opt.value === value && (
                       <svg
                         width="15"
@@ -223,7 +318,7 @@ export function ComboboxField<T extends string = string>({
                         viewBox="0 0 15 15"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
-                        className="mr-2 h-4 w-4"
+                        className="ml-2 h-4 w-4 shrink-0"
                       >
                         <path
                           d="M11.4669 3.72684C11.7558 3.91574 11.8369 4.30308 11.648 4.59198L7.39799 11.092C7.29783 11.2452 7.13556 11.3467 6.95402 11.3699C6.77247 11.3931 6.58989 11.3354 6.45446 11.2124L3.70446 8.71241C3.44905 8.48022 3.43023 8.08494 3.66242 7.82953C3.89461 7.57412 4.28989 7.5553 4.5453 7.78749L6.75292 9.79441L10.6018 3.90792C10.7907 3.61902 11.178 3.53795 11.4669 3.72684Z"
@@ -233,13 +328,10 @@ export function ComboboxField<T extends string = string>({
                         />
                       </svg>
                     )}
-                    <span className={cn("flex items-center gap-1.5", opt.value === value && "ml-0")}>
-                      {opt.icon}
-                      {opt.label}
-                    </span>
                   </li>
                 ))}
             </ul>
+            {footer}
           </Stack>
         </PopoverContent>
       </Popover>

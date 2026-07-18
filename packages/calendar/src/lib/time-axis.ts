@@ -4,7 +4,14 @@ export function parseHmToMinutes(hm: string): number {
   return (Number(h) || 0) * 60 + (Number(m) || 0);
 }
 
-/** Minutes-since-midnight for a Date. */
+/**
+ * Minutes-since-midnight for a Date, read from its LOCAL fields (wall clock).
+ *
+ * The axis position therefore follows the wall clock the `Date` carries: pass
+ * absolute instants through a display-zone projection (a floating carrier, e.g.
+ * `decodeInstant(iso, zone)` from `@simplix-react/ui`) before they reach the
+ * calendar so bars sit at the display zone's clock, not the browser's.
+ */
 export function dateToMinutes(date: Date): number {
   return date.getHours() * 60 + date.getMinutes();
 }

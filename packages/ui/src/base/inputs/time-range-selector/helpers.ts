@@ -2,6 +2,7 @@
 // boundary/label/now computation, and the ApexCharts options builder. No React.
 
 import { hideGridRect, toHex6 } from "../../charts/apexcharts/use-chart-theme";
+import { decodeInstant, serializeInstant } from "../../../utils/rfc3339-date";
 import { HEATMAP_THEMES, type HeatmapColorTheme } from "./themes";
 import { BOUNDARY_CLIP, CUSTOM_PRESET_KEY, type TimeRange, type WindowPreset } from "./types";
 
@@ -98,34 +99,64 @@ export function snapSelectionToBuckets(
 // ── Formatting ──
 
 /** Resolve the `hour12` option: explicit override wins, otherwise let Intl follow the locale. */
-function hourOptions(hour12?: boolean): Intl.DateTimeFormatOptions {
+function hourOptions(hour12?: boolean, timeZone?: string): Intl.DateTimeFormatOptions {
   const base: Intl.DateTimeFormatOptions = { hour: "2-digit", minute: "2-digit" };
   if (hour12 !== undefined) base.hour12 = hour12;
+  if (timeZone) base.timeZone = timeZone;
   return base;
 }
 
-export function formatBucketLabel(date: Date, bucketMinutes: number, locale?: string, hour12?: boolean): string {
+export function formatBucketLabel(
+  date: Date,
+  bucketMinutes: number,
+  locale?: string,
+  hour12?: boolean,
+  timeZone?: string,
+): string {
   const loc = locale || undefined;
   if (bucketMinutes >= 1440) {
-    return date.toLocaleDateString(loc, { month: "2-digit", day: "2-digit" });
+    return date.toLocaleDateString(loc, { month: "2-digit", day: "2-digit", ...(timeZone ? { timeZone } : {}) });
   }
-  return date.toLocaleTimeString(loc, hourOptions(hour12));
+  return date.toLocaleTimeString(loc, hourOptions(hour12, timeZone));
 }
 
-export function formatRangeDisplay(from: Date, to: Date, locale?: string, hour12?: boolean): string {
-  const sameDay =
-    from.getFullYear() === to.getFullYear() &&
-    from.getMonth() === to.getMonth() &&
-    from.getDate() === to.getDate();
+export function formatRangeDisplay(
+  from: Date,
+  to: Date,
+  locale?: string,
+  hour12?: boolean,
+  timeZone?: string,
+): string {
+  // Same-day is judged in the display zone (browser zone when omitted).
+  const dayKey = (d: Date) => d.toLocaleDateString("en-CA", timeZone ? { timeZone } : undefined);
+  const sameDay = dayKey(from) === dayKey(to);
 
   const loc = locale || undefined;
-  const dateOpts: Intl.DateTimeFormatOptions = { year: "numeric", month: "2-digit", day: "2-digit" };
-  const timeOpts = hourOptions(hour12);
+  const dateOpts: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    ...(timeZone ? { timeZone } : {}),
+  };
+  const timeOpts = hourOptions(hour12, timeZone);
 
   if (sameDay) {
     return `${from.toLocaleDateString(loc, dateOpts)} ${from.toLocaleTimeString(loc, timeOpts)} — ${to.toLocaleTimeString(loc, timeOpts)}`;
   }
   return `${from.toLocaleDateString(loc, dateOpts)} ${from.toLocaleTimeString(loc, timeOpts)} — ${to.toLocaleDateString(loc, dateOpts)} ${to.toLocaleTimeString(loc, timeOpts)}`;
+}
+
+/**
+ * Zone-aware calendar anchor: runs local-field calendar math on `at`'s wall
+ * clock IN `zone` and returns the true boundary instant. Without a zone the
+ * math runs on the browser-local fields (legacy behavior).
+ */
+export function calendarAnchor(at: Date, zone: string | undefined, build: (wall: Date) => Date): Date {
+  if (!zone) return build(at);
+  const carrier = decodeInstant(at, zone);
+  if (!carrier) return build(at);
+  const iso = serializeInstant(build(carrier), zone);
+  return iso ? new Date(iso) : build(at);
 }
 
 // ── View-relative computation (markers, labels, now) ──
@@ -198,6 +229,7 @@ export function computeTimeLabels(
   bucketMinutes: number,
   locale?: string,
   hour12?: boolean,
+  timeZone?: string,
 ): { pct: number; text: string }[] {
   const windowMs = minutesToMs(windowMinutes);
   if (!(windowMs > 0)) return [];
@@ -211,7 +243,7 @@ export function computeTimeLabels(
   const labels: { pct: number; text: string }[] = [];
   const startMs = viewFrom.getTime();
   for (let ms = 0; ms <= windowMs; ms += minutesToMs(labelIntervalMin)) {
-    labels.push({ pct: ms / windowMs, text: formatBucketLabel(new Date(startMs + ms), bucketMinutes, locale, hour12) });
+    labels.push({ pct: ms / windowMs, text: formatBucketLabel(new Date(startMs + ms), bucketMinutes, locale, hour12, timeZone) });
   }
   return labels;
 }
@@ -270,6 +302,7 @@ export interface BuildChartParams {
   bucketMinutes: number;
   locale?: string;
   hour12?: boolean;
+  timeZone?: string;
   maxCount?: number;
   colorTheme: HeatmapColorTheme;
   colorStepsProp?: number[];
@@ -285,13 +318,13 @@ export function buildChartOptions(params: BuildChartParams): {
   series: { name: string; data: { x: string; y: number }[] }[];
 } {
   const {
-    counts, bucketCount, viewFrom, bucketMinutes, locale, hour12, maxCount,
+    counts, bucketCount, viewFrom, bucketMinutes, locale, hour12, timeZone, maxCount,
     colorTheme, colorStepsProp, colorStepBaseMinutes, isDark, theme, animationsEnabled,
   } = params;
 
   const bucketMs = minutesToMs(bucketMinutes);
   const data = Array.from({ length: bucketCount }, (_, i) => ({
-    x: formatBucketLabel(new Date(viewFrom.getTime() + i * bucketMs), bucketMinutes, locale, hour12),
+    x: formatBucketLabel(new Date(viewFrom.getTime() + i * bucketMs), bucketMinutes, locale, hour12, timeZone),
     y: counts[i] ?? 0,
   }));
 

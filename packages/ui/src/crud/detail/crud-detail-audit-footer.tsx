@@ -2,6 +2,8 @@ import { useTranslation } from "@simplix-react/i18n/react";
 import { useCallback, useState } from "react";
 
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
+import { decodeInstant } from "../../utils/rfc3339-date";
+import { useDefaultDisplayZone } from "../shared/display-zone-context";
 import { CalendarIcon, CheckIcon, IdCardIcon, PencilIcon } from "../shared/icons";
 
 // ── AuditFooter ──
@@ -24,6 +26,11 @@ export interface AuditData {
 export interface CrudDetailAuditFooterProps {
   /** Audit metadata. When nullish or all fields empty, the component renders nothing. */
   auditData?: AuditData;
+  /**
+   * IANA display zone for the created/updated instants. When set, both stamps
+   * render as that zone's wall clock; when omitted, the browser zone applies.
+   */
+  displayZone?: string;
 }
 
 /** Display last 12 chars when the value is a UUID. */
@@ -32,11 +39,16 @@ function formatDisplayId(id: string): string {
   return uuidRegex.test(id) ? id.slice(-12) : id;
 }
 
-/** Format an ISO string into a compact 24h date-time (e.g. "2026-03-12 17:44"). Returns `null` on failure. */
-function formatAuditDate(dateString: string): string | null {
+/**
+ * Format an ISO string into a compact 24h date-time (e.g. "2026-03-12 17:44") in
+ * `displayZone` (browser zone when omitted). Returns `null` on failure.
+ */
+function formatAuditDate(dateString: string, displayZone?: string): string | null {
   try {
-    const date = new Date(dateString);
-    if (Number.isNaN(date.getTime())) return null;
+    // decodeInstant projects the instant into the display zone (floating carrier),
+    // so the local getters below read that zone's wall clock.
+    const date = decodeInstant(dateString, displayZone);
+    if (!date || Number.isNaN(date.getTime())) return null;
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, "0");
     const d = String(date.getDate()).padStart(2, "0");
@@ -48,8 +60,11 @@ function formatAuditDate(dateString: string): string | null {
   }
 }
 
-export function DetailAuditFooter({ auditData }: CrudDetailAuditFooterProps) {
+export function DetailAuditFooter({ auditData, displayZone }: CrudDetailAuditFooterProps) {
   const { t } = useTranslation("simplix/ui");
+  // Explicit prop wins; otherwise the app-level ambient default replaces the browser zone.
+  const defaultZone = useDefaultDisplayZone();
+  const zone = displayZone ?? defaultZone;
   const [copied, setCopied] = useState(false);
 
   const handleCopyId = useCallback(async () => {
@@ -107,13 +122,13 @@ export function DetailAuditFooter({ auditData }: CrudDetailAuditFooterProps) {
           {hasCreated && (
             <span className="flex items-center gap-1">
               <CalendarIcon className="h-3.5 w-3.5 shrink-0" />
-              {formatAuditDate(auditData!.createdAt!) ?? auditData!.createdAt}
+              {formatAuditDate(auditData!.createdAt!, zone) ?? auditData!.createdAt}
             </span>
           )}
           {hasUpdated && (
             <span className="flex items-center gap-1">
               <PencilIcon className="h-3.5 w-3.5 shrink-0" />
-              {formatAuditDate(auditData!.updatedAt!) ?? auditData!.updatedAt}
+              {formatAuditDate(auditData!.updatedAt!, zone) ?? auditData!.updatedAt}
             </span>
           )}
         </div>

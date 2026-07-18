@@ -25,7 +25,7 @@ import { cn } from "../../utils/cn";
 import type { ColumnInfo, EmptyReason, SortState } from "../shared";
 import { TableCardFrame, useTableCardFrame } from "../shared/table-card-frame";
 import type { ActionType, ActionVariant, ListColumnProps, RowActionDef } from "../list/crud-list";
-import { ArrowUpDownIcon, ChevronsDownUpIcon, ChevronsUpDownIcon, EyeIcon, FolderTreeIcon, MagnifyingGlassIcon, MapPinIcon, PencilIcon, PlusIcon, TrashIcon, UnlinkIcon, XIcon } from "../shared/icons";
+import { ArrowUpDownIcon, CheckIcon, ChevronsDownUpIcon, ChevronsUpDownIcon, EyeIcon, FolderTreeIcon, MagnifyingGlassIcon, MapPinIcon, PencilIcon, PlusIcon, TrashIcon, UnlinkIcon, XIcon } from "../shared/icons";
 import type { TreeConfig, TreeNodeMetadata } from "./tree-types";
 import { useTreeExpansion } from "./use-tree-expansion";
 import { filterTreeWithAncestors, getAllNodeIds, treeToFlat } from "./tree-utils";
@@ -247,6 +247,7 @@ const ACTION_LABEL_KEYS: Record<ActionType, string> = {
   reorder: "tree.reorder",
   move: "tree.move",
   unlink: "common.unlink",
+  select: "common.select",
 };
 
 const ACTION_ICONS: Record<ActionType, ReactNode> = {
@@ -258,6 +259,7 @@ const ACTION_ICONS: Record<ActionType, ReactNode> = {
   reorder: <ArrowUpDownIcon className="size-4" />,
   move: <FolderTreeIcon className="size-4" />,
   unlink: <UnlinkIcon className="size-4" />,
+  select: <CheckIcon className="size-4" />,
 };
 
 function getActionColumnWidth(actions: RowActionDef<unknown>[], variant: ActionVariant): number {

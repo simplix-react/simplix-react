@@ -26,7 +26,8 @@
     "discard": "破棄",
     "unsavedTitle": "未保存の変更",
     "unsavedDescription": "未保存の変更があります。このページを離れてもよろしいですか？変更内容は失われます。",
-    "unlink": "リンク解除"
+    "unlink": "リンク解除",
+    "select": "選択"
   },
   "list": {
     "searchPlaceholder": "検索...",
@@ -103,7 +104,8 @@
     "selectOption": "選択...",
     "searchOption": "検索...",
     "noResults": "結果が見つかりません。",
-    "noValue": "値なし"
+    "noValue": "値なし",
+    "expandSearch": "詳細検索"
   },
   "unit": {
     "minutes": "分",

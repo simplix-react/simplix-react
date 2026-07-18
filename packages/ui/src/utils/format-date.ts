@@ -39,11 +39,17 @@ export function generateYears(start: number, end: number, reverse = false): numb
 
 // ── Formatting functions ──
 
-/** Short date without year — e.g. "Mar 3", localized. */
-export function formatDateShort(date: Date, locale?: string): string {
+/**
+ * Short date without year — e.g. "Mar 3", localized.
+ *
+ * Pass `timeZone` (IANA) to render an absolute `Date` in that zone instead of
+ * the browser zone (site-scoped detail/display); omit it for zone-neutral use.
+ */
+export function formatDateShort(date: Date, locale?: string, timeZone?: string): string {
   return new Intl.DateTimeFormat(locale, {
     month: "short",
     day: "numeric",
+    ...(timeZone ? { timeZone } : {}),
   }).format(date);
 }
 
@@ -123,9 +129,11 @@ export function formatDateRange(
   from: Date | undefined,
   to: Date | undefined,
   locale?: string,
+  timeZone?: string,
 ): string | null {
-  if (from && to) return `${formatDateShort(from, locale)} \u2013 ${formatDateShort(to, locale)}`;
-  if (from) return `${formatDateShort(from, locale)} \u2013 ...`;
-  if (to) return `... \u2013 ${formatDateShort(to, locale)}`;
+  if (from && to)
+    return `${formatDateShort(from, locale, timeZone)} \u2013 ${formatDateShort(to, locale, timeZone)}`;
+  if (from) return `${formatDateShort(from, locale, timeZone)} \u2013 ...`;
+  if (to) return `... \u2013 ${formatDateShort(to, locale, timeZone)}`;
   return null;
 }

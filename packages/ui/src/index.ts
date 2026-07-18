@@ -300,12 +300,14 @@ export type {
 
 // CRUD types
 export {
+  DisplayZoneProvider,
   EmptyState,
   FieldVariantContext,
   ListTotalBadge,
+  useDefaultDisplayZone,
   useFieldVariant,
 } from "./crud/shared";
-export type { EmptyStateProps, ListTotalBadgeProps } from "./crud/shared";
+export type { DisplayZoneProviderProps, EmptyStateProps, ListTotalBadgeProps } from "./crud/shared";
 export type {
   CommonDetailFieldProps,
   CommonFieldProps,

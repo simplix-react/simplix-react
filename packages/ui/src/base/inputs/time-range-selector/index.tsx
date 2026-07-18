@@ -24,6 +24,7 @@ import {
   clamp01,
   clampMonthStart,
   computeBoundaryMarkers,
+  calendarAnchor,
   computeNowMarkerPct,
   computeTimeLabels,
   formatRangeDisplay,
@@ -91,6 +92,7 @@ export function TimeRangeSelector({
   minDate,
   maxDate,
   hour12 = false,
+  displayZone,
   className,
 }: TimeRangeSelectorProps) {
   const { t, locale } = useTranslation("simplix/ui");
@@ -214,8 +216,8 @@ export function TimeRangeSelector({
   const nowPct = useMemo(() => computeNowMarkerPct(viewFrom, viewTo, nowTick), [viewFrom, viewTo, nowTick]);
   const boundaryMarkers = useMemo(() => computeBoundaryMarkers(viewFrom, viewTo, activePreset), [viewFrom, viewTo, activePreset]);
   const timeLabels = useMemo(
-    () => computeTimeLabels(viewFrom, activePreset.windowMinutes, activePreset.bucketMinutes, locale, hour12),
-    [viewFrom, activePreset, locale, hour12],
+    () => computeTimeLabels(viewFrom, activePreset.windowMinutes, activePreset.bucketMinutes, locale, hour12, displayZone),
+    [viewFrom, activePreset, locale, hour12, displayZone],
   );
 
   const { options: chartOptions, series: chartSeries } = useMemo(
@@ -227,6 +229,7 @@ export function TimeRangeSelector({
         bucketMinutes: activePreset.bucketMinutes,
         locale,
         hour12,
+        timeZone: displayZone,
         maxCount,
         colorTheme,
         colorStepsProp,
@@ -235,7 +238,7 @@ export function TimeRangeSelector({
         theme: { fontFamily: theme.fontFamily, background: theme.background },
         animationsEnabled: !reducedMotion,
       }),
-    [counts, bucketCount, viewFrom, activePreset, locale, hour12, maxCount, colorTheme, colorStepsProp, colorStepBaseMinutes, isDark, theme, reducedMotion],
+    [counts, bucketCount, viewFrom, activePreset, locale, hour12, displayZone, maxCount, colorTheme, colorStepsProp, colorStepBaseMinutes, isDark, theme, reducedMotion],
   );
   const chartKey = `${isDark ? "d" : "l"}-${activePreset.key}`;
 
@@ -253,7 +256,7 @@ export function TimeRangeSelector({
     return sum;
   }, [value, viewFrom, viewTo, bucketCount, counts]);
 
-  const rangeText = formatRangeDisplay(value.from, value.to, locale, hour12);
+  const rangeText = formatRangeDisplay(value.from, value.to, locale, hour12, displayZone);
   const ariaSummary = `${rangeText} · ${selectedCount}`;
 
   // ── Helpers ──
@@ -279,13 +282,14 @@ export function TimeRangeSelector({
       let newTo: Date;
 
       if (preset.key === "1mo") {
-        newFrom = new Date(now.getFullYear(), now.getMonth(), 1);
-        newTo = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+        newFrom = calendarAnchor(now, displayZone, (w) => new Date(w.getFullYear(), w.getMonth(), 1));
+        newTo = calendarAnchor(now, displayZone, (w) => new Date(w.getFullYear(), w.getMonth() + 1, 1));
         setViewFrom(newFrom);
         onChange({ from: newFrom, to: newTo, bucketMinutes: preset.bucketMinutes });
         return;
       } else if (preset.windowMinutes >= 1440) {
-        const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+        // Day-and-longer windows anchor to the display zone's end of today.
+        const todayEnd = calendarAnchor(now, displayZone, (w) => new Date(w.getFullYear(), w.getMonth(), w.getDate() + 1));
         newTo = todayEnd;
         newFrom = new Date(todayEnd.getTime() - windowMs);
       } else {
@@ -298,15 +302,19 @@ export function TimeRangeSelector({
       setViewFrom(newFrom);
       onChange({ from: newFrom, to: newTo, bucketMinutes: preset.bucketMinutes });
     },
-    [clampViewFrom, onChange],
+    [clampViewFrom, onChange, displayZone],
   );
 
   const handleNavigate = useCallback(
     (direction: -1 | 1) => {
       if (activePreset.key === "1mo") {
-        // Step by whole calendar months so the window stays month-aligned.
-        const from = clampMonthStart(new Date(viewFrom.getFullYear(), viewFrom.getMonth() + direction, 1), minDate, maxDate);
-        const to = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+        // Step by whole calendar months (in the display zone) so the window stays month-aligned.
+        const from = clampMonthStart(
+          calendarAnchor(viewFrom, displayZone, (w) => new Date(w.getFullYear(), w.getMonth() + direction, 1)),
+          minDate,
+          maxDate,
+        );
+        const to = calendarAnchor(from, displayZone, (w) => new Date(w.getFullYear(), w.getMonth() + 1, 1));
         setViewFrom(from);
         onChange({ from, to, bucketMinutes: activePreset.bucketMinutes });
         return;
@@ -320,14 +328,18 @@ export function TimeRangeSelector({
       setViewFrom(newFrom);
       onChange({ from: newFrom, to: newTo, bucketMinutes: activePreset.bucketMinutes });
     },
-    [activePreset, viewFrom, minDate, maxDate, onChange],
+    [activePreset, viewFrom, minDate, maxDate, onChange, displayZone],
   );
 
   const handleNow = useCallback(() => {
     const now = new Date();
     if (activePreset.key === "1mo") {
-      const from = clampMonthStart(new Date(now.getFullYear(), now.getMonth(), 1), minDate, maxDate);
-      const to = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+      const from = clampMonthStart(
+        calendarAnchor(now, displayZone, (w) => new Date(w.getFullYear(), w.getMonth(), 1)),
+        minDate,
+        maxDate,
+      );
+      const to = calendarAnchor(from, displayZone, (w) => new Date(w.getFullYear(), w.getMonth() + 1, 1));
       setViewFrom(from);
       onChange({ from, to, bucketMinutes: activePreset.bucketMinutes });
       return;
@@ -337,7 +349,7 @@ export function TimeRangeSelector({
     const newTo = new Date(newFrom.getTime() + windowMs);
     setViewFrom(newFrom);
     onChange({ from: newFrom, to: newTo, bucketMinutes: activePreset.bucketMinutes });
-  }, [activePreset, clampViewFrom, minDate, maxDate, onChange]);
+  }, [activePreset, clampViewFrom, minDate, maxDate, onChange, displayZone]);
 
   const handleDateRangeChange = useCallback(
     (edited: "from" | "to", d: Date) => {
@@ -656,6 +668,7 @@ export function TimeRangeSelector({
               counts={counts}
               locale={locale}
               hour12={hour12}
+              timeZone={displayZone}
             />
           )}
 

@@ -209,9 +209,10 @@ interface HoverTooltipProps {
   counts: number[];
   locale?: string;
   hour12?: boolean;
+  timeZone?: string;
 }
 
-export function HoverTooltip({ hoverIdx, bucketCount, viewFrom, bucketMinutes, counts, locale, hour12 }: HoverTooltipProps) {
+export function HoverTooltip({ hoverIdx, bucketCount, viewFrom, bucketMinutes, counts, locale, hour12, timeZone }: HoverTooltipProps) {
   return (
     <div
       className="absolute pointer-events-none z-50"
@@ -222,7 +223,7 @@ export function HoverTooltip({ hoverIdx, bucketCount, viewFrom, bucketMinutes, c
           <polygon points="0,5 10,5 5,0" fill="currentColor" />
         </svg>
         <div className="rounded-md bg-foreground px-2 py-0.5 text-xs text-background shadow-md whitespace-nowrap">
-          {formatBucketLabel(new Date(viewFrom.getTime() + hoverIdx * bucketMinutes * 60 * 1000), bucketMinutes, locale, hour12)}
+          {formatBucketLabel(new Date(viewFrom.getTime() + hoverIdx * bucketMinutes * 60 * 1000), bucketMinutes, locale, hour12, timeZone)}
           {" — "}
           <span className="font-semibold">{counts[hoverIdx] ?? 0}</span>
         </div>
