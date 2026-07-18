@@ -68,7 +68,9 @@ export {
   badgeVariants,
   BooleanBadge,
   Button,
+  MediaEmbed,
   QrCode,
+  ScrollBox,
   SignaturePad,
   buttonVariants,
   Calendar,
@@ -186,7 +188,9 @@ export {
   TooltipTrigger,
 } from "./base";
 export type {
+  MediaEmbedProps,
   QrCodeProps,
+  ScrollBoxProps,
   SignaturePadProps,
   MapAutoFitProps,
   MapBoundsOverlayProps,

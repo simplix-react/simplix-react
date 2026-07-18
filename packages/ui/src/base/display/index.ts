@@ -58,3 +58,9 @@ export type {
 
 export { QrCode } from "./qr-code";
 export type { QrCodeProps } from "./qr-code";
+
+export { ScrollBox } from "./scroll-box";
+export type { ScrollBoxProps } from "./scroll-box";
+
+export { MediaEmbed } from "./media-embed";
+export type { MediaEmbedProps } from "./media-embed";
