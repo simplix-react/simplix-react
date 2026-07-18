@@ -27,7 +27,7 @@ export function ResourceSelect() {
         {resources.map((resource) => (
           <SelectItem key={resource.id} value={resource.id} className="flex-1">
             <div className="flex items-center gap-2">
-              <ResourceAvatar name={resource.name} src={resource.avatarUrl} />
+              <ResourceAvatar name={resource.name} src={resource.avatarUrl} fallbackSrc={resource.avatarFallbackUrl} />
               <p className="truncate">{resource.name}</p>
             </div>
           </SelectItem>

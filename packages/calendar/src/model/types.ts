@@ -71,6 +71,8 @@ export interface CalendarResource {
   badge?: string;
   /** Optional avatar image URL; falls back to an initials circle when absent. */
   avatarUrl?: string;
+  /** Optional image used when `avatarUrl` fails to load (e.g. the endpoint 404s). */
+  avatarFallbackUrl?: string;
 }
 
 /**
@@ -78,14 +80,22 @@ export interface CalendarResource {
  * consumers convert their DTOs (usually ISO strings) via an adapter and keep
  * the original DTO on {@link CalendarItem.payload}.
  *
+ * Every view positions and day-attributes items by reading the `Date`s' LOCAL
+ * fields (wall clock). To render absolute instants in an explicit display zone
+ * (a site's clock rather than the browser's), the adapter must convert them to
+ * floating carriers whose local fields hold that zone's wall clock — e.g.
+ * `decodeInstant(iso, displayZone)` from `@simplix-react/ui` — instead of
+ * `new Date(iso)`. Zone-free values (a calendar date plus an `"HH:mm"` wall
+ * clock) are already carriers and need no conversion.
+ *
  * @typeParam T - The original domain DTO carried through untouched.
  */
 export interface CalendarItem<T = unknown> {
   id: string;
   title: string;
-  /** Start instant. Already converted to a `Date` by the consumer. */
+  /** Start of the item — a `Date` whose LOCAL fields are the display wall clock. */
   start: Date;
-  /** End instant. Already converted to a `Date` by the consumer. */
+  /** End of the item — a `Date` whose LOCAL fields are the display wall clock. */
   end: Date;
   color: CalendarColor;
   /** Visual treatment hint; defaults to a solid fill. */
