@@ -9,6 +9,7 @@ export {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
+  useDialogMaximized,
 } from "./dialog";
 export type {
   DialogContentProps,

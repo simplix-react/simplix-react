@@ -1,0 +1,6 @@
+{
+  "issueFailed": "Could not issue a QR code.",
+  "retry": "Retry",
+  "refreshFailed": "Refresh failed — showing the last code.",
+  "validFor": "Valid for {{seconds}}s"
+}

@@ -1,0 +1,71 @@
+{
+  "common": {
+    "close": "閉じる",
+    "back": "戻る",
+    "cancel": "キャンセル",
+    "confirm": "確認",
+    "done": "完了",
+    "edit": "編集",
+    "add": "追加",
+    "delete": "削除",
+    "clear": "クリア",
+    "search": "検索",
+    "apply": "適用",
+    "reset": "リセット",
+    "loading": "読み込み中...",
+    "retry": "再試行",
+    "yes": "はい",
+    "no": "いいえ",
+    "on": "オン",
+    "off": "オフ",
+    "save": "保存",
+    "notFound": "見つかりません。"
+  },
+  "list": {
+    "searchPlaceholder": "検索...",
+    "noData": "データがありません。",
+    "noFilter": "選択したフィルターに一致する項目がありません。",
+    "noSearch": "検索条件に一致する項目がありません。",
+    "error": "データの読み込み中にエラーが発生しました。",
+    "errorTitle": "データを読み込めませんでした",
+    "totalCount": "全{{count}}件",
+    "loadingMore": "さらに読み込み中...",
+    "endOfList": "これ以上の項目はありません。",
+    "create": "作成"
+  },
+  "filter": {
+    "title": "フィルター",
+    "apply": "適用",
+    "reset": "リセット",
+    "clear": "クリア",
+    "all": "すべて",
+    "active": "{{count}}件適用中"
+  },
+  "field": {
+    "selectPlaceholder": "選択...",
+    "searchPlaceholder": "検索...",
+    "noOptions": "選択できる項目がありません。",
+    "optional": "任意",
+    "takePhoto": "写真を撮る",
+    "chooseFromLibrary": "アルバムから選択",
+    "removeImage": "画像を削除",
+    "chooseFile": "ファイルを選択",
+    "removeFile": "ファイルを削除",
+    "selectDate": "日付を選択",
+    "selectTime": "時刻を選択",
+    "multiSelected": "{{count}}件選択中",
+    "invalidPhone": "電話番号が正しくありません",
+    "show": "表示",
+    "hide": "非表示",
+    "cameraPermissionDenied": "カメラの権限が拒否されました。"
+  },
+  "stepFlow": {
+    "next": "次へ",
+    "previous": "前へ",
+    "stepOf": "{{total}}ステップ中{{current}}ステップ目"
+  },
+  "error": {
+    "title": "問題が発生しました",
+    "codeLabel": "エラーコード"
+  }
+}

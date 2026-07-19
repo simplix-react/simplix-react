@@ -21,11 +21,12 @@ import {formatDateMedium, formatDateTime, formatRelativeTime} from "../../utils/
 import {formatWallClockTime} from "../../utils/rfc3339-date";
 import {parseDate} from "../../utils/parse-date";
 import type {ColumnInfo, EmptyReason, SortState} from "../shared";
-import {CrudListColumnContext, useCrudListColumns} from "../shared";
+import {CrudListColumnContext, useCrudListColumns, useDefaultDisplayZone} from "../shared";
 import type {CrudListViewMode} from "../shared";
 import {EmptyState} from "../shared/empty-state";
 import {TableCardFrame, useTableCardFrame} from "../shared/table-card-frame";
-import {AlertTriangleIcon, ArrowUpDownIcon, EyeIcon, FolderTreeIcon, FunnelIcon, MagnifyingGlassIcon, MapPinIcon, PencilIcon, PlusIcon, TrashIcon, UnlinkIcon} from "../shared/icons";
+import { CountryCell, PhoneCell } from "./cells";
+import {AlertTriangleIcon, ArrowUpDownIcon, CheckIcon, EyeIcon, FolderTreeIcon, FunnelIcon, MagnifyingGlassIcon, MapPinIcon, PencilIcon, PlusIcon, TrashIcon, UnlinkIcon} from "../shared/icons";
 import {
   AdvancedSelectFilter,
   AdvancedTextFilter,
@@ -234,8 +235,16 @@ export interface ListColumnProps<T> {
   header?: string;
   sortable?: boolean;
   width?: number;
-  display?: "badge" | "boolean";
+  display?: "badge" | "boolean" | "country" | "phone";
   format?: "date" | "datetime" | "time" | "relative";
+  /**
+   * IANA display zone for `format="datetime"` cells. A string applies one zone to
+   * every row (a screen pinned to one site); a function resolves the zone per row
+   * (mixed-site lists, e.g. `(row) => zoneOf(row.siteId)`). Returning `undefined`
+   * falls back to the browser zone. Ignored by `date` / `time` / `relative`
+   * formats — those are zone-neutral by kind.
+   */
+  displayZone?: string | ((row: T) => string | undefined);
   variants?: Record<string, BadgeVariants["variant"]>;
   children?: (props: { value: unknown; row: T }) => ReactNode;
 }
@@ -259,7 +268,12 @@ function resolveValue(value: unknown): unknown {
   return value;
 }
 
-function formatCellValue(value: unknown, format?: "date" | "datetime" | "time" | "relative", locale?: string): string {
+function formatCellValue(
+  value: unknown,
+  format?: "date" | "datetime" | "time" | "relative",
+  locale?: string,
+  timeZone?: string,
+): string {
   if (value == null) return "";
   if (!format) return String(value);
 
@@ -278,13 +292,14 @@ function formatCellValue(value: unknown, format?: "date" | "datetime" | "time" |
   if (!date || Number.isNaN(date.getTime())) return String(value);
 
   if (format === "date") return formatDateMedium(date, locale);
-  if (format === "datetime") return formatDateTime(date, locale);
+  // timeZone applies to absolute instants only; date/time/relative are zone-neutral.
+  if (format === "datetime") return formatDateTime(date, locale, timeZone);
   return formatRelativeTime(date, locale);
 }
 
 // ── Action types ──
 
-export type ActionType = "view" | "edit" | "delete" | "locate" | "add-child" | "reorder" | "move" | "unlink";
+export type ActionType = "view" | "edit" | "delete" | "locate" | "add-child" | "reorder" | "move" | "unlink" | "select";
 export type ActionVariant = "outline" | "ghost" | "icon";
 
 export interface RowActionDef<T> {
@@ -386,6 +401,7 @@ const ACTION_LABEL_KEYS: Record<ActionType, string> = {
   reorder: "tree.reorder",
   move: "tree.move",
   unlink: "common.unlink",
+  select: "common.select",
 };
 
 const ACTION_ICONS: Record<ActionType, ReactNode> = {
@@ -397,6 +413,7 @@ const ACTION_ICONS: Record<ActionType, ReactNode> = {
   reorder: <ArrowUpDownIcon className="size-4" />,
   move: <FolderTreeIcon className="size-4" />,
   unlink: <UnlinkIcon className="size-4" />,
+  select: <CheckIcon className="size-4" />,
 };
 
 function getActionColumnWidth(actions: RowActionDef<unknown>[], variant: ActionVariant): number {
@@ -462,7 +479,7 @@ function RowActionCell<T>({ row, actions, variant }: { row: T; actions: RowActio
         return (
           <Button
             key={action.type}
-            size="sm"
+            size="xs"
             variant={variant}
             onClick={(e) => handleClick(e, action)}
             disabled={isDisabled}
@@ -845,6 +862,9 @@ function ListTable<T>({
   children,
 }: ListTableProps<T>) {
   const { t, locale } = useTranslation("simplix/ui");
+  // Ambient default for datetime cells whose column declares no displayZone —
+  // replaces the implicit browser zone when the app mounts a DisplayZoneProvider.
+  const defaultDisplayZone = useDefaultDisplayZone();
   const { Badge, Skeleton, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } = useFlatUIComponents();
   const emptyMessages: Record<EmptyReason, string> = {
     "no-data": t("list.noData"),
@@ -995,8 +1015,22 @@ function ListTable<T>({
             return <BooleanBadge value={!!value} />;
           }
 
+          // Country display
+          if (colDef.display === "country") {
+            return <CountryCell value={String(value ?? "")} />;
+          }
+
+          // Phone display
+          if (colDef.display === "phone") {
+            return <PhoneCell value={String(value ?? "")} />;
+          }
+
           // Format
-          return formatCellValue(value, colDef.format, locale);
+          const cellZone =
+            (typeof colDef.displayZone === "function"
+              ? colDef.displayZone(row.original)
+              : colDef.displayZone) ?? defaultDisplayZone;
+          return formatCellValue(value, colDef.format, locale, cellZone);
         },
         size: colDef.width,
       });
@@ -1034,6 +1068,7 @@ function ListTable<T>({
     actionVariant,
     actionColumnWidthOverride,
     slots,
+    defaultDisplayZone,
   ]);
 
   const columnVisibility: VisibilityState = useMemo(() => {

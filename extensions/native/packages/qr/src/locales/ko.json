@@ -1,0 +1,6 @@
+{
+  "issueFailed": "QR 코드를 발급하지 못했습니다.",
+  "retry": "다시 시도",
+  "refreshFailed": "갱신에 실패해 마지막 코드를 표시하고 있습니다.",
+  "validFor": "유효 시간 {{seconds}}초"
+}

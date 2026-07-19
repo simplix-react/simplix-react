@@ -1,0 +1,25 @@
+{
+  "name": "simplix-react-native",
+  "version": "0.3.0",
+  "description": "Meta package that installs the @simplix-react-native/* core packages (ui, runtime) in one dependency",
+  "type": "module",
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@simplix-react-native/runtime": "workspace:*",
+    "@simplix-react-native/ui": "workspace:*"
+  },
+  "keywords": [
+    "simplix-react",
+    "react-native",
+    "expo",
+    "meta"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/simplix-react/simplix-react.git"
+  }
+}

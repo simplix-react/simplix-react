@@ -1,0 +1,13 @@
+{
+  "searching": "Position your face inside the frame.",
+  "holding": "Hold still...",
+  "countdown": "Capturing in {{count}}",
+  "offCenter": "Move to the center of the frame.",
+  "tooSmall": "Move closer to the camera.",
+  "tooLarge": "Move back a little.",
+  "noFace": "Position your face inside the frame.",
+  "manualHint": "Automatic detection is unavailable — use the capture button.",
+  "capture": "Capture",
+  "retake": "Retake",
+  "usePhoto": "Use this photo"
+}

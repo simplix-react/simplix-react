@@ -68,6 +68,11 @@ export {
   badgeVariants,
   BooleanBadge,
   Button,
+  MediaEmbed,
+  QrCode,
+  ScrollBox,
+  SignaturePad,
+  Stepline,
   buttonVariants,
   Calendar,
   Command,
@@ -92,6 +97,7 @@ export {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
+  useDialogMaximized,
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
@@ -183,6 +189,12 @@ export {
   TooltipTrigger,
 } from "./base";
 export type {
+  MediaEmbedProps,
+  QrCodeProps,
+  ScrollBoxProps,
+  SignaturePadProps,
+  SteplineItem,
+  SteplineProps,
   MapAutoFitProps,
   MapBoundsOverlayProps,
   MapControlsPosition,
@@ -299,12 +311,14 @@ export type {
 
 // CRUD types
 export {
+  DisplayZoneProvider,
   EmptyState,
   FieldVariantContext,
   ListTotalBadge,
+  useDefaultDisplayZone,
   useFieldVariant,
 } from "./crud/shared";
-export type { EmptyStateProps, ListTotalBadgeProps } from "./crud/shared";
+export type { DisplayZoneProviderProps, EmptyStateProps, ListTotalBadgeProps } from "./crud/shared";
 export type {
   CommonDetailFieldProps,
   CommonFieldProps,

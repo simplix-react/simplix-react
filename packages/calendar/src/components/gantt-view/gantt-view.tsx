@@ -207,7 +207,7 @@ export function GanttView({ items, days }: GanttViewProps) {
                       "sticky left-0 z-30 flex items-center gap-2 overflow-hidden bg-background px-3 text-left hover:bg-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring"
                     )}
                   >
-                    <ResourceAvatar name={resource.name} src={resource.avatarUrl} />
+                    <ResourceAvatar name={resource.name} src={resource.avatarUrl} fallbackSrc={resource.avatarFallbackUrl} />
                     <span className="truncate text-xs font-medium">{resource.name}</span>
                     {renderGanttRowExtra?.(resource, day)}
                   </button>

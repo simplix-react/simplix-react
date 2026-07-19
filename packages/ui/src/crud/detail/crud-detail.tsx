@@ -86,12 +86,19 @@ export interface CrudDetailProps {
   variant?: CrudDetailVariant;
   /** Audit metadata rendered as a fixed bar between the scrollable body and the footer. */
   auditData?: AuditData;
+  /**
+   * IANA display timezone for the audit footer's timestamps. Falls back to the
+   * ambient `DisplayZoneProvider` zone (then the browser zone) when omitted —
+   * pass it on screens whose fields pin a zone other than the ambient one so
+   * the audit stamps agree with the rest of the panel.
+   */
+  displayZone?: string;
   fieldVariant?: FieldVariant;
   className?: string;
   children?: ReactNode;
 }
 
-function DetailRoot({ isLoading, onClose, header, footer, variant = "default", auditData, fieldVariant, className, children }: CrudDetailProps) {
+function DetailRoot({ isLoading, onClose, header, footer, variant = "default", auditData, displayZone, fieldVariant, className, children }: CrudDetailProps) {
   const { Button } = useFlatUIComponents();
   const isDialog = variant === "dialog";
   // Side-panel padding keeps a visible gap between content and the body
@@ -125,7 +132,7 @@ function DetailRoot({ isLoading, onClose, header, footer, variant = "default", a
         </Stack>
         {auditData && (
           <div data-crud-slot="audit" className="pb-2">
-            <DetailAuditFooter auditData={auditData} />
+            <DetailAuditFooter auditData={auditData} displayZone={displayZone} />
           </div>
         )}
       </div>
@@ -247,9 +254,11 @@ export interface CrudDetailDefaultActionsProps {
   /** Label for the edit button (defaults to `"Edit"`). */
   editLabel?: string;
   className?: string;
+  /** Extra action buttons rendered in the right-side group, before Edit. */
+  children?: React.ReactNode;
 }
 
-function DetailDefaultActions({ onClose, onBack, onDelete, onEdit, isPending, closeLabel, backLabel, editLabel, className }: CrudDetailDefaultActionsProps) {
+function DetailDefaultActions({ onClose, onBack, onDelete, onEdit, isPending, closeLabel, backLabel, editLabel, className, children }: CrudDetailDefaultActionsProps) {
   const { Button } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const hasLeft = onBack || onClose;
@@ -271,6 +280,7 @@ function DetailDefaultActions({ onClose, onBack, onDelete, onEdit, isPending, cl
             <TrashIcon className="h-4 w-4" />
           </Button>
         )}
+        {children}
         {onEdit && (
           <Button type="button" size="sm" variant="primary" onClick={onEdit} disabled={isPending}>
             {editLabel ?? t("common.edit")}

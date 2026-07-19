@@ -53,10 +53,10 @@ export function FontSizeToolbarButton({
   return (
     <>
       <ToolbarButton tooltip={decreaseTooltip} onClick={handleDecrease}>
-        <AArrowDown className="h-4 w-4" />
+        <AArrowDown className="h-3.5 w-3.5" />
       </ToolbarButton>
       <ToolbarButton tooltip={increaseTooltip} onClick={handleIncrease}>
-        <AArrowUp className="h-4 w-4" />
+        <AArrowUp className="h-3.5 w-3.5" />
       </ToolbarButton>
     </>
   )

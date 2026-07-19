@@ -139,31 +139,31 @@ export function PlateEditorAdvanced({
                 nodeType={KEYS.bold}
                 tooltip={`${t('plateEditor.toolbar.bold')} (Cmd+B)`}
               >
-                <Bold className="h-4 w-4" />
+                <Bold className="h-3.5 w-3.5" />
               </MarkToolbarButton>
               <MarkToolbarButton
                 nodeType={KEYS.italic}
                 tooltip={`${t('plateEditor.toolbar.italic')} (Cmd+I)`}
               >
-                <Italic className="h-4 w-4" />
+                <Italic className="h-3.5 w-3.5" />
               </MarkToolbarButton>
               <MarkToolbarButton
                 nodeType={KEYS.underline}
                 tooltip={`${t('plateEditor.toolbar.underline')} (Cmd+U)`}
               >
-                <Underline className="h-4 w-4" />
+                <Underline className="h-3.5 w-3.5" />
               </MarkToolbarButton>
               <MarkToolbarButton
                 nodeType={KEYS.strikethrough}
                 tooltip={`${t('plateEditor.toolbar.strikethrough')} (Cmd+Shift+X)`}
               >
-                <Strikethrough className="h-4 w-4" />
+                <Strikethrough className="h-3.5 w-3.5" />
               </MarkToolbarButton>
               <MarkToolbarButton
                 nodeType={KEYS.code}
                 tooltip={`${t('plateEditor.toolbar.code')} (Cmd+E)`}
               >
-                <Code className="h-4 w-4" />
+                <Code className="h-3.5 w-3.5" />
               </MarkToolbarButton>
             </ToolbarGroup>
 
@@ -175,13 +175,13 @@ export function PlateEditorAdvanced({
                 nodeType="subscript"
                 tooltip={`${t('plateEditor.toolbar.subscript')} (Cmd+,)`}
               >
-                <Subscript className="h-4 w-4" />
+                <Subscript className="h-3.5 w-3.5" />
               </MarkToolbarButton>
               <MarkToolbarButton
                 nodeType="superscript"
                 tooltip={`${t('plateEditor.toolbar.superscript')} (Cmd+.)`}
               >
-                <Superscript className="h-4 w-4" />
+                <Superscript className="h-3.5 w-3.5" />
               </MarkToolbarButton>
             </ToolbarGroup>
 
@@ -193,14 +193,14 @@ export function PlateEditorAdvanced({
                 nodeType={KEYS.color}
                 tooltip={t('plateEditor.toolbar.fontColor')}
               >
-                <Palette className="h-4 w-4" />
+                <Palette className="h-3.5 w-3.5" />
               </ColorToolbarButton>
               <ColorToolbarButton
                 nodeType={KEYS.backgroundColor}
                 tooltip={t('plateEditor.toolbar.backgroundColor')}
                 isBackground
               >
-                <Highlighter className="h-4 w-4" />
+                <Highlighter className="h-3.5 w-3.5" />
               </ColorToolbarButton>
             </ToolbarGroup>
 
@@ -234,7 +234,7 @@ export function PlateEditorAdvanced({
                 tooltip={`${t('plateEditor.toolbar.codeBlock')} (Cmd+Alt+8)`}
                 onClick={() => editor.tf.toggleBlock(KEYS.codeBlock)}
               >
-                <FileCode className="h-4 w-4" />
+                <FileCode className="h-3.5 w-3.5" />
               </ToolbarButton>
               <TableDropdownMenu />
             </ToolbarGroup>

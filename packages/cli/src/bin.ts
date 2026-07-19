@@ -4,6 +4,7 @@ import { pathToFileURL } from "node:url";
 import { Command } from "commander";
 import { initCommand } from "./commands/init.js";
 import { initUiCommand } from "./commands/init-ui.js";
+import { addAppCommand } from "./commands/add-app.js";
 import { addDomainCommand } from "./commands/add-domain.js";
 import { addModuleCommand } from "./commands/add-module.js";
 import { validateCommand } from "./commands/validate.js";
@@ -70,6 +71,7 @@ program
   .version(frameworkVersion("@simplix-react/cli"));
 
 program.addCommand(initCommand);
+program.addCommand(addAppCommand);
 program.addCommand(addDomainCommand);
 program.addCommand(addModuleCommand);
 program.addCommand(validateCommand);

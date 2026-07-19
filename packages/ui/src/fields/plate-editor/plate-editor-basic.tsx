@@ -98,25 +98,25 @@ export function PlateEditorBasic({
                 nodeType={KEYS.bold}
                 tooltip={`${t('plateEditor.toolbar.bold')} (Cmd+B)`}
               >
-                <Bold className="h-4 w-4" />
+                <Bold className="h-3.5 w-3.5" />
               </MarkToolbarButton>
               <MarkToolbarButton
                 nodeType={KEYS.italic}
                 tooltip={`${t('plateEditor.toolbar.italic')} (Cmd+I)`}
               >
-                <Italic className="h-4 w-4" />
+                <Italic className="h-3.5 w-3.5" />
               </MarkToolbarButton>
               <MarkToolbarButton
                 nodeType={KEYS.underline}
                 tooltip={`${t('plateEditor.toolbar.underline')} (Cmd+U)`}
               >
-                <Underline className="h-4 w-4" />
+                <Underline className="h-3.5 w-3.5" />
               </MarkToolbarButton>
               <MarkToolbarButton
                 nodeType={KEYS.strikethrough}
                 tooltip={`${t('plateEditor.toolbar.strikethrough')} (Cmd+Shift+X)`}
               >
-                <Strikethrough className="h-4 w-4" />
+                <Strikethrough className="h-3.5 w-3.5" />
               </MarkToolbarButton>
             </ToolbarGroup>
 

@@ -54,6 +54,14 @@ export interface TimeRangeSelectorProps {
   maxDate?: Date;
   /** Use 12-hour time formatting (AM/PM). @defaultValue false — compact 24-hour, suited to the dense label row. */
   hour12?: boolean;
+  /**
+   * IANA display zone for the selector's calendar semantics: the calendar-flavored
+   * preset boundaries ("today"-anchored day windows, calendar-month windows) are
+   * computed at THIS zone's midnights, and axis/hover/range labels render in it.
+   * Omitted → browser zone (legacy). Relative windows (last N minutes/hours) are
+   * zone-independent instants either way.
+   */
+  displayZone?: string;
   /** CSS class */
   className?: string;
 }

@@ -1,0 +1,36 @@
+import {
+  configureNativeBootMutator,
+  createNativeQueryClient,
+  createSecureTokenStore,
+  startNativeMocks,
+} from "@simplix-react-native/runtime";
+
+import { i18n } from "./i18n";
+
+/** Device-keychain token store — hydrated before the first frame. */
+export const tokenStore = createSecureTokenStore();
+
+/** API origin: set EXPO_PUBLIC_API_URL in .env / eas.json per environment. */
+const apiBaseUrl = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:8080";
+
+configureNativeBootMutator({
+  baseUrl: apiBaseUrl,
+  getToken: () => (tokenStore.hydrated ? tokenStore.get("access_token") : null),
+});
+
+export const queryClient = createNativeQueryClient();
+
+async function startMocksWhenEnabled(): Promise<void> {
+  if (process.env.EXPO_PUBLIC_ENABLE_MOCKS !== "true") return;
+  // Register generated domain handlers here once domains exist:
+  //   const { mockHandlers } = await import("@{{projectName}}/domain-<name>/mock");
+  //   await startNativeMocks({ handlers: mockHandlers });
+  await startNativeMocks({ handlers: [] });
+}
+
+/** Boot gates awaited by the root provider before the first frame. */
+export const bootReady = Promise.all([
+  i18n.i18nReady,
+  tokenStore.hydrate(),
+  startMocksWhenEnabled(),
+]);

@@ -101,10 +101,9 @@ export function FileDropzone({
       aria-disabled={disabled}
       aria-label={resolvedTitle}
       className={cn(
-        // base (mobile): stacked column; @md (448px+): horizontal row (matches Grid breakpoints)
-        'flex flex-col gap-3 rounded-md border-2 border-dashed border-input',
-        '@md:flex-row @md:items-center @md:gap-3.5',
-        'bg-muted px-3.5 py-3 transition-colors @md:px-[18px] @md:py-[14px]',
+        // Compact single row at any width: small icon + constraint meta + inline CTA.
+        'flex items-center gap-2.5 rounded-md border border-dashed border-input',
+        'bg-muted/60 px-3 py-2 transition-colors',
         isDragOver && !disabled && 'border-primary bg-primary/10',
         disabled && 'pointer-events-none opacity-50',
       )}
@@ -114,49 +113,41 @@ export function FileDropzone({
       }}
       onClick={() => inputRef.current?.click()}
     >
-      {/* Icon + text: stays a row; sits above the full-width CTA on narrow containers */}
-      <div className="flex min-w-0 flex-1 items-center gap-3 @md:gap-3.5">
-        {/* Icon box */}
-        <div className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-          <Upload size={18} aria-hidden="true" />
-        </div>
-
-        {/* Text area */}
-        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <span className="hidden text-sm font-semibold @md:block">{resolvedTitle}</span>
-          {/* Constraint pills: lucide icon + label. Each pill is an atomic inline-flex unit and
-              carries its separator dot as a TRAILING child, so a wrapped second line never starts
-              with a dot (prevents the extensions pill from being indented on wrap).
-              gap-x for inline spacing, smaller gap-y for the wrapped line. */}
-          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-muted-foreground">
-            {maxFiles != null && (
-              <span className="inline-flex items-center gap-1">
-                <Layers size={12} aria-hidden="true" />
-                {t('file.dropzone.maxFiles', { max: maxFiles })}
-                <span className="ml-0.5 font-bold tabular-nums text-foreground">
-                  {t('file.dropzone.count', { current: currentCount, max: maxFiles })}
-                </span>
-                <PillDot />
-              </span>
-            )}
-            {maxSizeLabel && (
-              <span className="inline-flex items-center gap-1">
-                <HardDrive size={12} aria-hidden="true" />
-                {maxSizeLabel}
-                <PillDot />
-              </span>
-            )}
-            <ExtensionsPill allowedExtensions={allowedExtensions} />
-          </div>
-        </div>
+      {/* Icon */}
+      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-primary/10 text-primary">
+        <Upload size={15} aria-hidden="true" />
       </div>
 
-      {/* CTA button: full-width below on narrow containers, inline from @md */}
+      {/* Constraint pills: lucide icon + label. Each pill is an atomic inline-flex unit and
+          carries its separator dot as a TRAILING child, so a wrapped second line never starts
+          with a dot. gap-x for inline spacing, smaller gap-y for the wrapped line. */}
+      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2.5 gap-y-0.5 text-xs text-muted-foreground">
+        {maxFiles != null && (
+          <span className="inline-flex items-center gap-1">
+            <Layers size={12} aria-hidden="true" />
+            {t('file.dropzone.maxFiles', { max: maxFiles })}
+            <span className="ml-0.5 font-bold tabular-nums text-foreground">
+              {t('file.dropzone.count', { current: currentCount, max: maxFiles })}
+            </span>
+            <PillDot />
+          </span>
+        )}
+        {maxSizeLabel && (
+          <span className="inline-flex items-center gap-1">
+            <HardDrive size={12} aria-hidden="true" />
+            {maxSizeLabel}
+            <PillDot />
+          </span>
+        )}
+        <ExtensionsPill allowedExtensions={allowedExtensions} />
+      </div>
+
+      {/* CTA button — inline, compact */}
       <Button
         type="button"
         variant="default"
         size="sm"
-        className="h-9 w-full shrink-0 @md:h-8 @md:w-auto"
+        className="h-7 shrink-0"
         disabled={disabled}
         onClick={(e) => {
           e.stopPropagation()

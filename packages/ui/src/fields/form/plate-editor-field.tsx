@@ -1,5 +1,6 @@
 import type { Value } from "platejs";
 import type { CommonFieldProps } from "../../crud/shared/types";
+import { isPlateEditorEmpty, parsePlateValue } from "../shared/plate-editor-helpers";
 import { EMPTY_EDITOR_VALUE } from "../plate-editor/types";
 import { PlateEditorBasic } from "../plate-editor/plate-editor-basic";
 import { PlateEditorStandard } from "../plate-editor/plate-editor-standard";
@@ -44,17 +45,12 @@ export function PlateEditorField({
   className,
   ...variantProps
 }: PlateEditorFieldProps) {
-  let plateValue: Value = EMPTY_EDITOR_VALUE;
-  if (value) {
-    try {
-      plateValue = JSON.parse(value) as Value;
-    } catch {
-      plateValue = EMPTY_EDITOR_VALUE;
-    }
-  }
+  // Legacy plain-text values become paragraphs instead of resetting to empty.
+  const plateValue: Value = parsePlateValue(value, EMPTY_EDITOR_VALUE);
 
+  // An emptied document serializes to "" so `value || undefined` idioms keep working.
   const handleChange = (v: Value) => {
-    onChange(JSON.stringify(v));
+    onChange(isPlateEditorEmpty(v) ? "" : JSON.stringify(v));
   };
 
   const PresetComponent = PRESET_BY_VARIANT[variant];

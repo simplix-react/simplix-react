@@ -474,7 +474,6 @@ async function saveSnapshot(
 ): Promise<void> {
   const snapshot: OpenAPISnapshot = {
     version: 2,
-    generatedAt: new Date().toISOString(),
     specSource,
     entities,
   };

@@ -36,3 +36,6 @@ export type { TableCardFrameProps, TableCardFrameValue } from "./table-card-fram
 
 export { FeatureCard } from "./feature-card";
 export type { FeatureCardProps } from "./feature-card";
+
+export { DisplayZoneProvider, useDefaultDisplayZone } from "./display-zone-context";
+export type { DisplayZoneProviderProps } from "./display-zone-context";

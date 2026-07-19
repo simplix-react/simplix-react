@@ -26,7 +26,8 @@
     "discard": "Discard",
     "unsavedTitle": "Unsaved changes",
     "unsavedDescription": "You have unsaved changes. Are you sure you want to leave? Your changes will be lost.",
-    "unlink": "Unlink"
+    "unlink": "Unlink",
+    "select": "Select"
   },
   "list": {
     "searchPlaceholder": "Search...",
@@ -103,7 +104,8 @@
     "selectOption": "Select...",
     "searchOption": "Search...",
     "noResults": "No results found.",
-    "noValue": "No value"
+    "noValue": "No value",
+    "expandSearch": "Full search"
   },
   "unit": {
     "minutes": "min",

@@ -29,6 +29,7 @@ export default defineConfig({
         },
       },
       "extensions/simplix-boot/packages/*",
+      "extensions/native/packages/*",
     ],
     coverage: {
       provider: "v8",
@@ -37,6 +38,7 @@ export default defineConfig({
       include: [
         "packages/*/src/**/*.{ts,tsx}",
         "extensions/simplix-boot/packages/*/src/**/*.{ts,tsx}",
+        "extensions/native/packages/*/src/**/*.{ts,tsx}",
       ],
       exclude: [
         "**/__tests__/**",

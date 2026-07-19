@@ -1,0 +1,24 @@
+const { join } = require("path");
+
+// Resolve the framework kit's source directory through the package itself —
+// symlink-safe under pnpm workspaces.
+const uiRoot = join(
+  require.resolve("@simplix-react-native/ui/tailwind-preset"),
+  "..",
+);
+
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+    join(uiRoot, "src/**/*.{ts,tsx}"),
+  ],
+  presets: [
+    require("nativewind/preset"),
+    require("@simplix-react-native/ui/tailwind-preset"),
+  ],
+  theme: {
+    extend: {},
+  },
+};

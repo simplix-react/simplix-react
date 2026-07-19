@@ -1,0 +1,69 @@
+{
+  "name": "@simplix-react-native-ext/kiosk",
+  "version": "0.3.0",
+  "description": "Kiosk device control for simplix-react-native: keep-awake, Android Lock Task Mode, idle reset timer, network recovery screen",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "sideEffects": [
+    "./src/index.ts",
+    "./src/locales/*"
+  ],
+  "files": [
+    "src",
+    "android",
+    "expo-module.config.json"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint src",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rm -rf .turbo"
+  },
+  "peerDependencies": {
+    "@react-native-community/netinfo": ">=11.0.0",
+    "@simplix-react-native/ui": "workspace:*",
+    "@simplix-react/i18n": "workspace:*",
+    "expo-keep-awake": ">=14.0.0",
+    "expo-modules-core": ">=2.0.0",
+    "react": ">=18.0.0",
+    "react-native": ">=0.76.0"
+  },
+  "devDependencies": {
+    "@react-native-community/netinfo": "catalog:",
+    "@simplix-react-native/ui": "workspace:*",
+    "@simplix-react/config-typescript": "workspace:*",
+    "@simplix-react/i18n": "workspace:*",
+    "@testing-library/react": "catalog:",
+    "@types/react": "catalog:",
+    "expo-keep-awake": "catalog:",
+    "expo-modules-core": "catalog:",
+    "jsdom": "catalog:",
+    "nativewind": "catalog:",
+    "react": "catalog:",
+    "react-native": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "keywords": [
+    "simplix-react",
+    "react-native",
+    "kiosk",
+    "lock-task"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/simplix-react/simplix-react.git"
+  }
+}

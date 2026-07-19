@@ -1,0 +1,19 @@
+import { Heading, Screen, Section, Text } from "@simplix-react-native/ui";
+import { useTranslation } from "@simplix-react/i18n/react";
+import { Stack } from "expo-router";
+
+export default function HomeScreen() {
+  const { t } = useTranslation("common");
+
+  return (
+    <>
+      <Stack.Screen options={{ldb}} title: t("appName") {{rdb}} />
+      <Screen>
+        <Section>
+          <Heading level={3}>{t("welcomeTitle")}</Heading>
+          <Text tone="muted">{t("welcomeDescription")}</Text>
+        </Section>
+      </Screen>
+    </>
+  );
+}

@@ -41,7 +41,7 @@ export function ResourceColumn({ resource, items, day, left, width, headerHeight
         className="sticky top-0 z-20 flex w-full items-center gap-1.5 border-b bg-background px-2 hover:bg-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         style={{ height: headerHeight }}
       >
-        <ResourceAvatar name={resource.name} src={resource.avatarUrl} className="size-5" />
+        <ResourceAvatar name={resource.name} src={resource.avatarUrl} fallbackSrc={resource.avatarFallbackUrl} className="size-5" />
         <span className="truncate text-xs font-semibold">{resource.name}</span>
         {resource.badge && (
           <Badge variant="secondary" className="shrink-0 px-1 py-0 text-[0.625rem]">

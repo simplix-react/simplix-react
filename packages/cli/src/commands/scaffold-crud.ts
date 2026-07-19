@@ -517,7 +517,7 @@ interface SchemaResult {
   packageName: string | null;
 }
 
-async function findSchemaFile(
+export async function findSchemaFile(
   rootDir: string,
   entityName: string,
 ): Promise<SchemaResult | null> {
@@ -549,7 +549,7 @@ async function findSchemaFile(
   return null;
 }
 
-async function resolvePackageName(
+export async function resolvePackageName(
   schemaPath: string,
 ): Promise<string | null> {
   let dir = resolve(schemaPath, "..");
@@ -570,7 +570,7 @@ async function resolvePackageName(
   return null;
 }
 
-async function findModuleDirs(rootDir: string): Promise<string[]> {
+export async function findModuleDirs(rootDir: string): Promise<string[]> {
   const modulesDir = join(rootDir, "modules");
   if (!(await pathExists(modulesDir))) return [];
 
@@ -638,7 +638,7 @@ function extractOperationRoles(
   }
 }
 
-async function parseEntityOperations(
+export async function parseEntityOperations(
   rootDir: string,
   entityName: string,
 ): Promise<EntityOperations> {
@@ -1068,7 +1068,7 @@ async function ensurePackageJsonPagesExport(moduleDir: string): Promise<void> {
   log.info("Updated package.json with pages export");
 }
 
-async function resolveModuleNamespace(moduleDir: string): Promise<string> {
+export async function resolveModuleNamespace(moduleDir: string): Promise<string> {
   const pkgPath = join(moduleDir, "package.json");
   if (!(await pathExists(pkgPath))) return "unknown";
   const pkg = await readJsonFile<{ name: string }>(pkgPath);
@@ -1086,7 +1086,7 @@ async function resolveModuleNamespace(moduleDir: string): Promise<string> {
  * - `const { petId } = props` → returns "petId" (path-param-only mutation)
  * - `const { username, data } = props` → returns "username" (path-param + body)
  */
-async function findMutationPathParam(
+export async function findMutationPathParam(
   rootDir: string,
   operationId: string,
 ): Promise<string | null> {
@@ -1131,7 +1131,7 @@ async function findMutationPathParam(
 
 // ── Snapshot-based entity lookup ──
 
-async function findEntityFromSnapshot(
+export async function findEntityFromSnapshot(
   rootDir: string,
   entityName: string,
 ): Promise<ExtractedEntity | null> {
@@ -1455,7 +1455,22 @@ export const scaffoldCrudCommand = new Command("scaffold")
     "--output <dir>",
     "Custom output directory (overrides --module, relative to cwd)",
   )
-  .action(async (entity: string, options: { module?: string; output?: string }) => {
+  .option(
+    "--native",
+    "Generate the mobile entity screen set (EntityList / push detail / full-screen form + expo-router routes)",
+  )
+  .option(
+    "--app <dir>",
+    "Target Expo app under apps/ for route files (with --native)",
+  )
+  .action(async (entity: string, options: { module?: string; output?: string; native?: boolean; app?: string }) => {
+    if (options.native) {
+      // Dynamic import keeps the module graph acyclic (scaffold-native reuses
+      // the metadata pipeline exported from this file).
+      const { runNativeScaffold } = await import("./scaffold-native.js");
+      await runNativeScaffold(entity, { module: options.module, app: options.app });
+      return;
+    }
     const rootDir = await findProjectRoot(process.cwd());
     const entityKebab = toKebabCase(entity);
     const EntityPascal = toPascalCase(entity);
