@@ -1,0 +1,24 @@
+import { {{EntityPascal}}DetailScreen } from "{{modulePkgName}}";
+import { useTranslation } from "@simplix-react/i18n/react";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+
+export default function {{EntityPascal}}DetailRoute() {
+  const { t } = useTranslation("{{moduleNamespace}}/widgets");
+  const router = useRouter();
+  const { id } = useLocalSearchParams<{ id: string }>();
+
+  return (
+    <>
+      <Stack.Screen options={{ldb}} title: t("{{entity}}.title") {{rdb}} />
+      <{{EntityPascal}}DetailScreen
+        {{entity}}Id={id}
+{{#if hookUpdate}}
+        onEdit={() => router.push(`/{{entityKebab}}/${id}/edit`)}
+{{/if}}
+{{#if hookDelete}}
+        onDeleted={() => router.back()}
+{{/if}}
+      />
+    </>
+  );
+}

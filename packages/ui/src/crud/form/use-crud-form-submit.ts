@@ -4,17 +4,10 @@ import {
   getValidationErrors,
   type ValidationFieldError,
 } from "@simplix-react/api";
+import type { CrudMutation } from "@simplix-react/headless";
 import { applyI18nFallback } from "./i18n-submit-helper";
 
-/** Minimal mutation shape used by {@link useCrudFormSubmit}. */
-export interface CrudMutation<TInput> {
-  /** Trigger the mutation with the given input. */
-  mutate: (input: TInput, options?: { onSuccess?: () => void }) => void;
-  /** Promise-based mutation trigger for error handling. */
-  mutateAsync: (input: TInput) => Promise<unknown>;
-  /** Whether the mutation is currently in flight. */
-  isPending: boolean;
-}
+export type { CrudMutation } from "@simplix-react/headless";
 
 /** Options for the {@link useCrudFormSubmit} hook. */
 export interface UseCrudFormSubmitOptions<T, TId = unknown> {

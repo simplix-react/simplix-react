@@ -1,0 +1,6 @@
+{
+  "issueFailed": "QRコードを発行できませんでした。",
+  "retry": "再試行",
+  "refreshFailed": "更新に失敗したため、最後のコードを表示しています。",
+  "validFor": "有効時間 {{seconds}}秒"
+}

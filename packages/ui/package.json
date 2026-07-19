@@ -60,6 +60,7 @@
   },
   "dependencies": {
     "@dnd-kit/core": "catalog:",
+    "@simplix-react/headless": "workspace:*",
     "@dnd-kit/sortable": "catalog:",
     "@dnd-kit/utilities": "catalog:",
     "@radix-ui/react-alert-dialog": "catalog:",

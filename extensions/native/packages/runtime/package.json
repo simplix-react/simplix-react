@@ -1,0 +1,81 @@
+{
+  "name": "@simplix-react-native/runtime",
+  "version": "0.3.0",
+  "description": "Expo runtime glue for simplix-react-native: secure token store adapters, Boot mutator assembly, app boot (error dialog, i18n registration, msw/native wiring)",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "src"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint src",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rm -rf .turbo"
+  },
+  "peerDependencies": {
+    "@react-native-async-storage/async-storage": ">=2.0.0",
+    "@simplix-react-ext/simplix-boot-auth": "workspace:*",
+    "@simplix-react-native/ui": "workspace:*",
+    "@simplix-react/api": "workspace:*",
+    "@simplix-react/auth": "workspace:*",
+    "@simplix-react/i18n": "workspace:*",
+    "@tanstack/react-query": ">=5.0.0",
+    "expo-localization": ">=16.0.0",
+    "expo-secure-store": ">=14.0.0",
+    "msw": ">=2.0.0",
+    "react": ">=18.0.0",
+    "react-native": ">=0.76.0",
+    "react-native-safe-area-context": ">=5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "msw": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@react-native-async-storage/async-storage": "catalog:",
+    "@simplix-react-ext/simplix-boot-auth": "workspace:*",
+    "@simplix-react-native/ui": "workspace:*",
+    "@simplix-react/api": "workspace:*",
+    "@simplix-react/auth": "workspace:*",
+    "@simplix-react/config-typescript": "workspace:*",
+    "@simplix-react/i18n": "workspace:*",
+    "@tanstack/react-query": "catalog:",
+    "@testing-library/react": "catalog:",
+    "@types/react": "catalog:",
+    "expo-localization": "catalog:",
+    "expo-secure-store": "catalog:",
+    "jsdom": "catalog:",
+    "msw": "catalog:",
+    "nativewind": "catalog:",
+    "react": "catalog:",
+    "react-native": "catalog:",
+    "react-native-safe-area-context": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "keywords": [
+    "simplix-react",
+    "react-native",
+    "expo",
+    "runtime"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/simplix-react/simplix-react.git"
+  }
+}

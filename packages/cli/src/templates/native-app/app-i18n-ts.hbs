@@ -1,0 +1,24 @@
+import { createNativeI18n } from "@simplix-react-native/runtime";
+
+import commonEn from "../locales/common/en.json";
+{{#each locales}}
+{{#unless (eq this "en")}}
+import common{{pascalCase this}} from "../locales/common/{{this}}.json";
+{{/unless}}
+{{/each}}
+
+// Metro has no import.meta.glob — app translations register through static
+// imports keyed by the same "/locales/{namespace}/{locale}.json" pattern.
+export const i18n = createNativeI18n({
+  defaultLocale: "{{defaultLocale}}",
+  fallbackLocale: "{{defaultLocale}}",
+  supportedLocales: [{{#each locales}}"{{this}}"{{#unless @last}}, {{/unless}}{{/each}}],
+  appTranslations: {
+    "/locales/common/en.json": commonEn,
+{{#each locales}}
+{{#unless (eq this "en")}}
+    "/locales/common/{{this}}.json": common{{pascalCase this}},
+{{/unless}}
+{{/each}}
+  },
+});

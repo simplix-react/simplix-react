@@ -23,6 +23,7 @@ Core packages define abstract contracts (e.g., `AccessAdapter`, `TokenPair`). Ex
 | Extension                       | Target Environment     | Packages                                     | Description                                              |
 | ------------------------------- | ---------------------- | -------------------------------------------- | -------------------------------------------------------- |
 | [simplix-boot](./simplix-boot/) | SimpliX (Spring Boot)  | `@simplix-react-ext/simplix-boot-access`, `@simplix-react-ext/simplix-boot-auth` | SimpliX Spring Security authentication and authorization adapters |
+| [native](./native/)             | React Native (Expo)    | `@simplix-react-native/ui`, `@simplix-react-native/runtime`, `@simplix-react-native-ext/*`, `simplix-react-native` | Mobile UI kit, Expo runtime glue, and device-layer packages |
 
 ## Creating a New Extension
 

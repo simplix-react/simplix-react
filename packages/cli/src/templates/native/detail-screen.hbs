@@ -1,0 +1,120 @@
+import {
+  {{#if hookDelete}}AlertDialog, {{/if}}Button,
+  DetailFields,
+  Flex,
+  Screen,
+  Skeleton,
+  Stack,
+} from "@simplix-react-native/ui";
+import { adaptOrvalGet{{#if hookDelete}}, adaptOrvalDelete{{/if}} } from "@simplix-react/headless";
+import { useTranslation } from "@simplix-react/i18n/react";
+{{#if hookDelete}}
+import { useState } from "react";
+{{/if}}
+import { ScrollView } from "react-native";
+{{#if packageName}}
+import { {{hookGet}}{{#if hookDelete}}, {{hookDelete}}{{/if}} } from "{{packageName}}";
+{{/if}}
+
+export interface {{EntityPascal}}DetailScreenProps {
+  {{entity}}Id: string;
+{{#if hookUpdate}}
+  /** Push the edit route. */
+  onEdit?: () => void;
+{{/if}}
+{{#if hookDelete}}
+  /** Navigate back after deletion. */
+  onDeleted?: () => void;
+{{/if}}
+}
+
+interface {{EntityPascal}}Detail {
+{{#each fields}}
+  {{this.name}}?: {{this.tsType}} | null;
+{{/each}}
+}
+
+/** Full-screen push detail for a {{entity}} with a pinned action bar. */
+export function {{EntityPascal}}DetailScreen({
+  {{entity}}Id,
+{{#if hookUpdate}}
+  onEdit,
+{{/if}}
+{{#if hookDelete}}
+  onDeleted,
+{{/if}}
+}: {{EntityPascal}}DetailScreenProps) {
+  const { t } = useTranslation("{{moduleNamespace}}/widgets");
+{{#if hookDelete}}
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const deleteMutation = {{hookDelete}}();
+{{/if}}
+
+  const query = {{hookGet}}({{entity}}Id);
+  const { data, isLoading } = adaptOrvalGet<{{EntityPascal}}Detail>(query);
+
+  if (isLoading || !data) {
+    return (
+      <Screen>
+        <Stack gap="sm">
+          <Skeleton className="h-5 w-2/3" />
+          <Skeleton className="h-5 w-1/2" />
+          <Skeleton className="h-5 w-3/5" />
+        </Stack>
+      </Screen>
+    );
+  }
+
+  return (
+    <Screen padded={false} scroll={false}>
+      <ScrollView className="flex-1" contentContainerClassName="gap-1 p-4">
+{{#each detailFields}}
+{{#if this.isDetailBoolean}}
+        <DetailFields.BooleanField label={t("{{../entity}}.fields.{{this.name}}")} value={data.{{this.name}} } />
+{{else if this.isDetailNumber}}
+        <DetailFields.NumberField label={t("{{../entity}}.fields.{{this.name}}")} value={data.{{this.name}} } />
+{{else if this.isDetailDate}}
+        <DetailFields.DateField label={t("{{../entity}}.fields.{{this.name}}")} value={data.{{this.name}} }{{#if this.isDetailDateTime}} format="datetime"{{/if}} />
+{{else if this.isDetailBadge}}
+        <DetailFields.BadgeField label={t("{{../entity}}.fields.{{this.name}}")} value={data.{{this.name}} == null ? null : String(data.{{this.name}})} />
+{{else}}
+        <DetailFields.TextField label={t("{{../entity}}.fields.{{this.name}}")} value={data.{{this.name}} == null ? null : String(data.{{this.name}})} />
+{{/if}}
+{{/each}}
+      </ScrollView>
+{{#if hasDetailActions}}
+      <Flex gap="sm" className="border-t border-border p-4">
+{{#if hookUpdate}}
+        <Button variant="outline" className="flex-1" onPress={onEdit}>
+          {t("{{entity}}.actions.edit")}
+        </Button>
+{{/if}}
+{{#if hookDelete}}
+        <Button
+          variant="destructive"
+          className="flex-1"
+          loading={deleteMutation.isPending}
+          onPress={() => setConfirmingDelete(true)}
+        >
+          {t("{{entity}}.actions.delete")}
+        </Button>
+{{/if}}
+      </Flex>
+{{/if}}
+{{#if hookDelete}}
+      <AlertDialog
+        open={confirmingDelete}
+        onOpenChange={setConfirmingDelete}
+        title={t("{{entity}}.actions.deleteConfirm")}
+        destructive
+        onConfirm={() => {
+          setConfirmingDelete(false);
+          void adaptOrvalDelete(deleteMutation, "{{deletePathParam}}")
+            .mutateAsync({{entity}}Id)
+            .then(() => onDeleted?.());
+        }}
+      />
+{{/if}}
+    </Screen>
+  );
+}

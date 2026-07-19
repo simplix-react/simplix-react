@@ -1,0 +1,112 @@
+import {
+  EntityList,
+  Screen,
+  useEntityFeed,
+  type EntityFilterDef,
+} from "@simplix-react-native/ui";
+import { useTranslation } from "@simplix-react/i18n/react";
+{{#if packageName}}
+import { {{hookList}} } from "{{packageName}}";
+{{#if listRowType}}
+import type { {{listRowType}} } from "{{packageName}}";
+{{/if}}
+{{/if}}
+
+{{#if listRowType}}
+type {{EntityPascal}}Row = {{listRowType}};
+{{else}}
+interface {{EntityPascal}}Row {
+{{#each fields}}
+  {{this.name}}: {{this.tsType}};
+{{/each}}
+}
+{{/if}}
+
+export interface {{EntityPascal}}ListScreenProps {
+  /** Push the detail route for a row. */
+  onOpenDetail?: (id: string) => void;
+{{#if hookCreate}}
+  /** Push the create route. */
+  onCreate?: () => void;
+{{/if}}
+}
+
+/**
+ * {{EntityPascal}} feed list — card rows, search bar, filter sheet,
+ * infinite scroll (the mobile list grammar over the paged searchable
+ * endpoint).
+ */
+export function {{EntityPascal}}ListScreen({
+  onOpenDetail,
+{{#if hookCreate}}
+  onCreate,
+{{/if}}
+}: {{EntityPascal}}ListScreenProps) {
+  const { t } = useTranslation("{{moduleNamespace}}/widgets");
+
+  const feed = useEntityFeed<{{EntityPascal}}Row>({{hookList}}{{#if searchField}}, {
+    searchField: "{{searchField}}",
+  }{{/if}});
+
+{{#if hasNativeFilters}}
+  const filters: EntityFilterDef[] = [
+{{#each nativeFilters}}
+{{#if this.isFaceted}}
+    {
+      type: "faceted",
+      key: "{{this.key}}",
+      label: t("{{../entity}}.filters.{{this.field}}"),
+      multiple: true,
+      options: [
+{{#each this.options}}
+        { value: "{{this}}", label: "{{this}}" },
+{{/each}}
+      ],
+    },
+{{/if}}
+{{#if this.isToggle}}
+    { type: "toggle", key: "{{this.key}}", label: t("{{../entity}}.filters.{{this.field}}") },
+{{/if}}
+{{#if this.isText}}
+    { type: "text", key: "{{this.key}}", label: t("{{../entity}}.filters.{{this.field}}") },
+{{/if}}
+{{#if this.isDateRange}}
+    {
+      type: "date-range",
+      fromKey: "{{this.fromKey}}",
+      toKey: "{{this.toKey}}",
+      label: t("{{../entity}}.filters.{{this.field}}"),
+    },
+{{/if}}
+{{/each}}
+  ];
+{{/if}}
+
+  return (
+    <Screen scroll={false} padded={false}>
+      <EntityList
+        feed={feed}
+        keyExtractor={(row) => String(row.{{rowIdField}})}
+        renderItem={(row) => (
+          <EntityList.Row
+            title={String(row.{{listTitleField}} ?? "")}
+{{#if listSubtitleField}}
+            subtitle={row.{{listSubtitleField}} == null ? undefined : String(row.{{listSubtitleField}})}
+{{/if}}
+            onPress={onOpenDetail ? () => onOpenDetail(String(row.{{rowIdField}})) : undefined}
+          />
+        )}
+{{#if hasNativeFilters}}
+        filters={filters}
+{{/if}}
+{{#unless searchField}}
+        hideSearch
+{{/unless}}
+{{#if hookCreate}}
+        onCreate={onCreate}
+        createLabel={t("{{entity}}.actions.create")}
+{{/if}}
+      />
+    </Screen>
+  );
+}

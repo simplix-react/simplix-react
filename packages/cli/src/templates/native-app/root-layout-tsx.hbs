@@ -1,0 +1,19 @@
+import "../global.css";
+
+import { SimplixNativeProvider } from "@simplix-react-native/runtime";
+import { Stack } from "expo-router";
+
+import { bootReady, queryClient } from "../src/app/boot";
+import { i18n } from "../src/app/i18n";
+
+export default function RootLayout() {
+  return (
+    <SimplixNativeProvider
+      queryClient={queryClient}
+      i18nAdapter={i18n.adapter}
+      ready={bootReady}
+    >
+      <Stack />
+    </SimplixNativeProvider>
+  );
+}

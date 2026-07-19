@@ -1,0 +1,178 @@
+import { Button, FormFields, Screen, Stack } from "@simplix-react-native/ui";
+import {
+  adaptOrvalCreate{{#if hookUpdate}},
+  adaptOrvalUpdate{{/if}}{{#if editHook}},
+  adaptOrvalGet{{/if}}{{#if hasDateFields}},
+  serializeCalendarDate,
+  decodeCalendarDate{{/if}},
+  type CrudMutation,
+} from "@simplix-react/headless";
+import { useTranslation } from "@simplix-react/i18n/react";
+import { useEffect, useState } from "react";
+{{#if packageName}}
+import { {{#if hookCreate}}{{hookCreate}}{{/if}}{{#if hookUpdate}}{{#if hookCreate}}, {{/if}}{{hookUpdate}}{{/if}}{{#if editHook}}, {{editHook}}{{/if}} } from "{{packageName}}";
+{{/if}}
+
+/** Form value shape for creating or editing a {{entity}}. */
+export interface {{EntityPascal}}FormValues {
+{{#each formFields}}
+{{#if this.isFormNumber}}
+  {{this.name}}: number | null;
+{{else if this.isFormSwitch}}
+  {{this.name}}: boolean;
+{{else if this.isFormDate}}
+  {{this.name}}: Date | null;
+{{else}}
+  {{this.name}}: string;
+{{/if}}
+{{/each}}
+}
+
+export interface {{EntityPascal}}FormScreenProps {
+{{#if hookUpdate}}
+  /** Edit mode when set; create mode otherwise. */
+  {{entity}}Id?: string;
+{{/if}}
+  /** Navigate away after a successful submit. */
+  onDone?: () => void;
+}
+
+const EMPTY_VALUES: {{EntityPascal}}FormValues = {
+{{#each formFields}}
+{{#if this.isFormNumber}}
+  {{this.name}}: null,
+{{else if this.isFormSwitch}}
+  {{this.name}}: false,
+{{else if this.isFormDate}}
+  {{this.name}}: null,
+{{else}}
+  {{this.name}}: "",
+{{/if}}
+{{/each}}
+};
+
+/** Full-screen {{entity}} form — keyboard-avoiding scroll, sheet pickers. */
+export function {{EntityPascal}}FormScreen({
+{{#if hookUpdate}}
+  {{entity}}Id,
+{{/if}}
+  onDone,
+}: {{EntityPascal}}FormScreenProps) {
+  const { t } = useTranslation("{{moduleNamespace}}/widgets");
+  const [values, setValues] = useState<{{EntityPascal}}FormValues>(EMPTY_VALUES);
+  const setValue = <K extends keyof {{EntityPascal}}FormValues>(
+    key: K,
+    value: {{EntityPascal}}FormValues[K],
+  ) => setValues((prev) => ({ ...prev, [key]: value }));
+
+{{#if hookCreate}}
+  const createMutation = {{hookCreate}}();
+{{/if}}
+{{#if hookUpdate}}
+  const updateMutation = {{hookUpdate}}();
+  const isEdit = {{entity}}Id != null;
+{{/if}}
+
+{{#if editHook}}
+  // Prefill in edit mode from the entity's read endpoint.
+  const editQuery = {{editHook}}({{#if hookUpdate}}{{entity}}Id ?? ""{{/if}}, {
+    query: { enabled: {{#if hookUpdate}}isEdit{{else}}false{{/if}} },
+  });
+  const { data: editData } = adaptOrvalGet<Partial<Record<keyof {{EntityPascal}}FormValues, unknown>>>(editQuery);
+  useEffect(() => {
+    if (!editData) return;
+    setValues({
+{{#each formFields}}
+{{#if this.isFormNumber}}
+      {{this.name}}: typeof editData.{{this.name}} === "number" ? editData.{{this.name}} : null,
+{{else if this.isFormSwitch}}
+      {{this.name}}: editData.{{this.name}} === true,
+{{else if this.isFormDate}}
+      {{this.name}}: decodeCalendarDate(editData.{{this.name}} as string | undefined) ?? null,
+{{else}}
+      {{this.name}}: editData.{{this.name}} == null ? "" : String(editData.{{this.name}}),
+{{/if}}
+{{/each}}
+    });
+  }, [editData]);
+{{/if}}
+
+  const buildDto = () => ({
+{{#each formFields}}
+{{#if this.isFormDate}}
+    {{this.name}}: serializeCalendarDate(values.{{this.name}}),
+{{else}}
+    {{this.name}}: values.{{this.name}},
+{{/if}}
+{{/each}}
+  });
+
+  const submit = () => {
+    const dto = buildDto();
+{{#if hookUpdate}}
+    const done = isEdit
+      ? (adaptOrvalUpdate(updateMutation, "{{updateMutationKey}}") as CrudMutation<{ id: string; dto: unknown }>)
+          .mutateAsync({ id: {{entity}}Id!, dto })
+      : {{#if hookCreate}}(adaptOrvalCreate(createMutation) as CrudMutation<unknown>).mutateAsync(dto){{else}}Promise.reject(new Error("create operation not available")){{/if}};
+{{else}}
+    const done = (adaptOrvalCreate(createMutation) as CrudMutation<unknown>).mutateAsync(dto);
+{{/if}}
+    void done.then(() => onDone?.());
+  };
+
+  const isPending = {{#if hookCreate}}createMutation.isPending{{/if}}{{#if hookUpdate}}{{#if hookCreate}} || {{/if}}updateMutation.isPending{{/if}};
+
+  return (
+    <Screen keyboardAvoiding>
+      <Stack gap="sm">
+{{#each formFields}}
+{{#if this.isFormTextarea}}
+        <FormFields.TextareaField
+          label={t("{{../entity}}.fields.{{this.name}}")}
+          value={values.{{this.name}} }
+          onChange={(next) => setValue("{{this.name}}", next)}
+        />
+{{else if this.isFormNumber}}
+        <FormFields.NumberField
+          label={t("{{../entity}}.fields.{{this.name}}")}
+          value={values.{{this.name}} }
+          onChange={(next) => setValue("{{this.name}}", next)}
+        />
+{{else if this.isFormSelect}}
+        <FormFields.SelectField
+          label={t("{{../entity}}.fields.{{this.name}}")}
+          value={values.{{this.name}} }
+          onChange={(next) => setValue("{{this.name}}", next)}
+          options={[
+{{#each this.options}}
+            { value: "{{this}}", label: "{{this}}" },
+{{/each}}
+          ]}
+        />
+{{else if this.isFormSwitch}}
+        <FormFields.SwitchField
+          label={t("{{../entity}}.fields.{{this.name}}")}
+          value={values.{{this.name}} }
+          onChange={(next) => setValue("{{this.name}}", next)}
+        />
+{{else if this.isFormDate}}
+        <FormFields.DateField
+          label={t("{{../entity}}.fields.{{this.name}}")}
+          value={values.{{this.name}} }
+          onChange={(next) => setValue("{{this.name}}", next)}
+        />
+{{else}}
+        <FormFields.TextField
+          label={t("{{../entity}}.fields.{{this.name}}")}
+          value={values.{{this.name}} }
+          onChange={(next) => setValue("{{this.name}}", next)}
+        />
+{{/if}}
+{{/each}}
+        <Button loading={isPending} onPress={submit} className="mt-2">
+          {t("{{entity}}.actions.save")}
+        </Button>
+      </Stack>
+    </Screen>
+  );
+}

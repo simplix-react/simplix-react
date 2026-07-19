@@ -1,0 +1,71 @@
+{
+  "common": {
+    "close": "Close",
+    "back": "Back",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "done": "Done",
+    "edit": "Edit",
+    "add": "Add",
+    "delete": "Delete",
+    "clear": "Clear",
+    "search": "Search",
+    "apply": "Apply",
+    "reset": "Reset",
+    "loading": "Loading...",
+    "retry": "Retry",
+    "yes": "Yes",
+    "no": "No",
+    "on": "On",
+    "off": "Off",
+    "save": "Save",
+    "notFound": "Not found."
+  },
+  "list": {
+    "searchPlaceholder": "Search...",
+    "noData": "No data available.",
+    "noFilter": "No items match the selected filters.",
+    "noSearch": "No items match the search query.",
+    "error": "An error occurred while loading data.",
+    "errorTitle": "Failed to load data",
+    "totalCount": "Total {{count}}",
+    "loadingMore": "Loading more...",
+    "endOfList": "No more items.",
+    "create": "Create"
+  },
+  "filter": {
+    "title": "Filters",
+    "apply": "Apply",
+    "reset": "Reset",
+    "clear": "Clear",
+    "all": "All",
+    "active": "{{count}} active"
+  },
+  "field": {
+    "selectPlaceholder": "Select...",
+    "searchPlaceholder": "Search...",
+    "noOptions": "No options available.",
+    "optional": "Optional",
+    "takePhoto": "Take photo",
+    "chooseFromLibrary": "Choose from library",
+    "removeImage": "Remove image",
+    "chooseFile": "Choose file",
+    "removeFile": "Remove file",
+    "selectDate": "Select date",
+    "selectTime": "Select time",
+    "multiSelected": "{{count}} selected",
+    "invalidPhone": "Invalid phone number",
+    "show": "Show",
+    "hide": "Hide",
+    "cameraPermissionDenied": "Camera permission was denied."
+  },
+  "stepFlow": {
+    "next": "Next",
+    "previous": "Previous",
+    "stepOf": "Step {{current}} of {{total}}"
+  },
+  "error": {
+    "title": "Something went wrong",
+    "codeLabel": "Error code"
+  }
+}

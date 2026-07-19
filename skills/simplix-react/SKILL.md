@@ -32,6 +32,8 @@ Three rules govern every change. They exist because simplix-react's value is a s
 | Fetch / mutate data | `deriveEntityHooks` → `useList` / `useGet` / … | `useQuery` + manual `fetch` |
 | Build a create/edit form | `deriveEntityFormHooks` → `useCreateForm` / `useUpdateForm` | hand-managed form state |
 | Mock the API (dev & tests) | `deriveMockHandlers` + `setupMockWorker` | hand-written MSW handlers |
+| Start a native (Expo) app | `simplix add-app <name> --native` | hand-create the Expo shell |
+| Generate native entity screens | `simplix scaffold <entity> --native` | hand-build EntityList/detail/form |
 | Check structure / FSD / imports | `simplix validate` | — |
 
 Full command reference and step-by-step walkthroughs: [CLI & Scaffolding Workflow](./references/cli-workflow.md).
@@ -315,3 +317,4 @@ export default defineConfig({
 - [API Patterns](./references/api-patterns.md) — full signatures and type details for every package
 - [Recipes](./references/recipes.md) — complete, copy-ready code examples
 - [Configuration](./references/configuration.md) — `simplix.config.ts` option reference
+- [React Native](./references/react-native.md) — `simplix-react-native` invariants, mobile screen grammar, standard-kit registry, `add-app --native` / `scaffold --native`

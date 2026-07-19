@@ -1,0 +1,12 @@
+{{#if hookList}}
+export { {{EntityPascal}}ListScreen } from "./list-screen";
+export type { {{EntityPascal}}ListScreenProps } from "./list-screen";
+{{/if}}
+{{#if hookGet}}
+export { {{EntityPascal}}DetailScreen } from "./detail-screen";
+export type { {{EntityPascal}}DetailScreenProps } from "./detail-screen";
+{{/if}}
+{{#if hasForm}}
+export { {{EntityPascal}}FormScreen } from "./form-screen";
+export type { {{EntityPascal}}FormScreenProps, {{EntityPascal}}FormValues } from "./form-screen";
+{{/if}}
