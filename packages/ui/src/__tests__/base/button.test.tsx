@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { createRef } from "react";
+import { createRef, type FormEvent } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -141,5 +141,46 @@ describe("Button", () => {
     expect(link.getAttribute("href")).toBe("/x");
     // Button variant styling is merged onto the anchor.
     expect(link.className).toContain("inline-flex");
+  });
+
+  it("defaults type to 'button'", () => {
+    render(<Button>Plain</Button>);
+    expect(screen.getByRole("button").getAttribute("type")).toBe("button");
+  });
+
+  it("keeps an explicit type='submit'", () => {
+    render(<Button type="submit">Save</Button>);
+    expect(screen.getByRole("button").getAttribute("type")).toBe("submit");
+  });
+
+  it("does not submit an enclosing form when type is omitted", () => {
+    const onSubmit = vi.fn((e: FormEvent) => e.preventDefault());
+    render(
+      <form onSubmit={onSubmit}>
+        <Button>Inside</Button>
+      </form>,
+    );
+    fireEvent.click(screen.getByRole("button"));
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("submits an enclosing form when type='submit'", () => {
+    const onSubmit = vi.fn((e: FormEvent) => e.preventDefault());
+    render(
+      <form onSubmit={onSubmit}>
+        <Button type="submit">Save</Button>
+      </form>,
+    );
+    fireEvent.click(screen.getByRole("button"));
+    expect(onSubmit).toHaveBeenCalledOnce();
+  });
+
+  it("does not inject type in asChild mode", () => {
+    render(
+      <Button asChild>
+        <a href="/x">Go</a>
+      </Button>,
+    );
+    expect(screen.getByRole("link").getAttribute("type")).toBeNull();
   });
 });

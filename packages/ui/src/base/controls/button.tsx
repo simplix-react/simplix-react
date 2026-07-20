@@ -100,6 +100,9 @@ export const ButtonBase = forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button
         ref={ref}
+        // Default to type="button": an untyped <button> inside a <form> is an implicit
+        // submit button per the HTML spec. An explicit `type` in rest overrides this.
+        type="button"
         className={classes}
         disabled={loading || disabled}
         aria-busy={loading || undefined}
