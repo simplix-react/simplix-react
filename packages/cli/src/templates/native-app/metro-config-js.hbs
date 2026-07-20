@@ -1,6 +1,111 @@
 const { getDefaultConfig } = require("expo/metro-config");
 const { withNativeWind } = require("nativewind/metro");
+const path = require("path");
+const fs = require("fs");
 
 const config = getDefaultConfig(__dirname);
+
+// The simplix-react-native packages may be pnpm-linked to a framework
+// checkout outside this workspace (local co-development profile). Metro only
+// bundles files it watches, and its crawler does not follow chained symlinks,
+// so the framework repo joins the watch folders and every framework package
+// maps to its real directory. Registry installs skip this entirely.
+let frameworkRoot = null;
+try {
+  const metaManifest = require.resolve("simplix-react-native/package.json", {
+    paths: [__dirname],
+  });
+  // <framework>/extensions/native/packages/meta/package.json → <framework>
+  const resolvedRoot = fs.realpathSync(
+    path.resolve(path.dirname(metaManifest), "../../../.."),
+  );
+  // Inside node_modules → a registry install; outside → a linked checkout.
+  if (!resolvedRoot.includes(`${path.sep}node_modules${path.sep}`)) {
+    frameworkRoot = resolvedRoot;
+    config.watchFolders = [...(config.watchFolders ?? []), frameworkRoot];
+
+    const extra = {};
+    const scan = (subdir) => {
+      const base = path.join(frameworkRoot, subdir);
+      let entries = [];
+      try {
+        entries = fs.readdirSync(base, { withFileTypes: true });
+      } catch {
+        return;
+      }
+      for (const entry of entries) {
+        if (!entry.isDirectory()) continue;
+        try {
+          const manifest = JSON.parse(
+            fs.readFileSync(path.join(base, entry.name, "package.json"), "utf8"),
+          );
+          if (manifest.name) extra[manifest.name] = path.join(base, entry.name);
+        } catch {
+          // not a package directory
+        }
+      }
+    };
+    scan("packages");
+    scan("extensions/simplix-boot/packages");
+    scan("extensions/native/packages");
+    config.resolver.extraNodeModules = {
+      ...(config.resolver.extraNodeModules ?? {}),
+      ...extra,
+    };
+  }
+} catch {
+  // Framework packages not installed yet — nothing to map.
+}
+
+// Modules that must exist exactly once at runtime (React renderer, native
+// modules, query/mock state). Files bundled from a linked framework checkout
+// would otherwise resolve these from the framework's own node_modules and
+// ship a second copy — framework-origin imports are re-anchored to the app.
+// Every listed name must be a direct app dependency.
+const SINGLETON_MODULES = [
+  "react",
+  "react-native",
+  "react-native-safe-area-context",
+  "react-native-screens",
+  "react-native-svg",
+  "react-native-view-shot",
+  "@tanstack/react-query",
+  "nativewind",
+  "react-native-css-interop",
+  "expo",
+  "expo-camera",
+  "expo-constants",
+  "expo-file-system",
+  "expo-keep-awake",
+  "expo-linking",
+  "expo-localization",
+  "expo-router",
+  "expo-secure-store",
+  "expo-status-bar",
+  "@react-native-async-storage/async-storage",
+  "@react-native-community/netinfo",
+  "@react-native-community/datetimepicker",
+  "msw",
+];
+
+const defaultResolveRequest = config.resolver.resolveRequest;
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  const fromFramework =
+    frameworkRoot != null &&
+    typeof context.originModulePath === "string" &&
+    context.originModulePath.startsWith(frameworkRoot);
+  const isSingleton =
+    fromFramework &&
+    SINGLETON_MODULES.some(
+      (name) => moduleName === name || moduleName.startsWith(`${name}/`),
+    );
+  const effectiveContext = isSingleton
+    ? { ...context, originModulePath: __filename }
+    : context;
+  if (defaultResolveRequest) {
+    return defaultResolveRequest(effectiveContext, moduleName, platform);
+  }
+  return effectiveContext.resolveRequest(effectiveContext, moduleName, platform);
+};
 
 module.exports = withNativeWind(config, { input: "./global.css" });
