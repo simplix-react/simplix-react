@@ -6,7 +6,8 @@
   "sideEffects": [
     "./dist/index.js",
     "./src/index.ts",
-    "./src/locales/*"
+    "**/index.ts",
+    "**/locales/**"
   ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
