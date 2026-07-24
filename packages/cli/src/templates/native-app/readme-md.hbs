@@ -16,7 +16,7 @@ pnpm --filter {{#if scope}}{{scope}}/{{/if}}{{appName}} start
 
 ```
 app/                expo-router routes (screens own their headers via Stack.Screen)
-src/app/            boot wiring (mutator, query client, i18n, mocks)
+src/bootstrap/            boot wiring (mutator, query client, i18n, mocks)
 src/locales/        app-level translations (common namespace)
 ```
 

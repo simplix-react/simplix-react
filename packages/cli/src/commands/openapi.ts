@@ -583,6 +583,14 @@ function mergeLocaleJson(
     }
   }
 
+  // Keys only the existing file has (server-overlaid enum labels, hand-added
+  // sections) must survive regeneration: the generated skeleton knows nothing
+  // about them, and dropping them here destroys translations whenever a later
+  // overlay download fails.
+  for (const [key, exValue] of Object.entries(existing)) {
+    if (!(key in result)) result[key] = exValue;
+  }
+
   return result;
 }
 
