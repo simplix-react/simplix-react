@@ -23,8 +23,13 @@ function openPicker() {
   fireEvent.click(trigger);
 }
 
+/** Press the Select button to commit the pending draft to the field. */
+function commit() {
+  fireEvent.click(screen.getByRole("button", { name: "common.select" }));
+}
+
 describe("DateTimeField time selection", () => {
-  it("applies typed hours to the selected date", () => {
+  it("applies typed hours to the selected date on Select", () => {
     const onChange = vi.fn();
     const date = new Date("2024-06-15T10:30:00");
     render(<DateTimeField label="Start" value={date} onChange={onChange} hour12={false} />);
@@ -32,7 +37,9 @@ describe("DateTimeField time selection", () => {
     fireEvent.change(screen.getByRole("textbox", { name: "date.hour" }), {
       target: { value: "14" },
     });
-    expect(onChange).toHaveBeenCalled();
+    // Editing the time stages the draft but does not touch the field yet
+    expect(onChange).not.toHaveBeenCalled();
+    commit();
     const result = onChange.mock.calls[0][0] as Date;
     expect(result.getHours()).toBe(14);
   });
@@ -45,7 +52,7 @@ describe("DateTimeField time selection", () => {
     fireEvent.change(screen.getByRole("textbox", { name: "date.hour" }), {
       target: { value: "99" },
     });
-    expect(onChange).toHaveBeenCalled();
+    commit();
     const result = onChange.mock.calls[0][0] as Date;
     expect(result.getHours()).toBe(23);
   });
@@ -58,7 +65,7 @@ describe("DateTimeField time selection", () => {
     fireEvent.change(screen.getByRole("textbox", { name: "date.minute" }), {
       target: { value: "99" },
     });
-    expect(onChange).toHaveBeenCalled();
+    commit();
     const result = onChange.mock.calls[0][0] as Date;
     expect(result.getMinutes()).toBe(59);
   });
@@ -81,17 +88,20 @@ describe("DateTimeField time selection", () => {
     expect(screen.queryByRole("textbox", { name: "date.hour" })).toBeNull();
   });
 
-  it("syncs time inputs when value changes externally", () => {
-    const onChange = vi.fn();
+  it("snapshots the value's time on open and picks up a new value on reopen", () => {
     const date1 = new Date("2024-06-15T10:30:00");
     const { rerender } = render(
-      <DateTimeField label="Start" value={date1} onChange={onChange} hour12={false} />,
+      <DateTimeField label="Start" value={date1} onChange={vi.fn()} hour12={false} />,
     );
     openPicker();
     expect((screen.getByRole("textbox", { name: "date.hour" }) as HTMLInputElement).value).toBe("10");
 
+    // Close, change the value externally, reopen → the fresh time is shown.
+    // While open, the draft is isolated, so an external change never clobbers it.
+    fireEvent.click(screen.getByRole("button", { name: "common.close" }));
     const date2 = new Date("2024-06-15T18:45:00");
-    rerender(<DateTimeField label="Start" value={date2} onChange={onChange} hour12={false} />);
+    rerender(<DateTimeField label="Start" value={date2} onChange={vi.fn()} hour12={false} />);
+    openPicker();
     expect((screen.getByRole("textbox", { name: "date.hour" }) as HTMLInputElement).value).toBe("18");
     expect((screen.getByRole("textbox", { name: "date.minute" }) as HTMLInputElement).value).toBe("45");
   });

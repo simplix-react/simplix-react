@@ -8,7 +8,7 @@
 
 > **DetailLocationField**(`__namedParameters`): `Element` \| `null`
 
-Defined in: [packages/ui/src/fields/detail/location-field.tsx:48](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/location-field.tsx#L48)
+Defined in: [packages/ui/src/fields/detail/location-field.tsx:49](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/location-field.tsx#L49)
 
 Read-only location display with map preview.
 Shows coordinates and a small interactive map.

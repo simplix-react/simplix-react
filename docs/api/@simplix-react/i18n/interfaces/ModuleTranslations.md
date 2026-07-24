@@ -13,11 +13,24 @@ collection of namespaced translations for a module.
 
 ## Properties
 
+### components?
+
+> `optional` **components**: `string`[]
+
+Defined in: [module-translations.ts:47](https://github.com/simplix-react/simplix-react/blob/main/module-translations.ts#L47)
+
+Component paths served by this descriptor. Part of the registry identity:
+several packages may share one namespace with disjoint components (e.g.
+`simplix/native` and `simplix/native-qr`), so the namespace alone must
+not be the registry key or later registrations clobber earlier ones.
+
+***
+
 ### load()
 
 > **load**: (`locale`) => `Promise`\<`Record`\<`string`, `Record`\<`string`, `unknown`\>\>\>
 
-Defined in: [module-translations.ts:42](https://github.com/simplix-react/simplix-react/blob/main/module-translations.ts#L42)
+Defined in: [module-translations.ts:49](https://github.com/simplix-react/simplix-react/blob/main/module-translations.ts#L49)
 
 Loads all component translations for the given locale.
 

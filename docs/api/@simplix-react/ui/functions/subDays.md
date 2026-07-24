@@ -8,7 +8,7 @@
 
 > **subDays**(`d`, `n`): `Date`
 
-Defined in: [packages/ui/src/utils/date-math.ts:44](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/utils/date-math.ts#L44)
+Defined in: [packages/headless/dist/index.d.ts:409](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L409)
 
 ## Parameters
 

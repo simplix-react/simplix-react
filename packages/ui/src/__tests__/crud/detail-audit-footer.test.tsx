@@ -13,6 +13,13 @@ vi.mock("@simplix-react/i18n/react", () => ({
 }));
 
 import { DetailAuditFooter } from "../../crud/detail/crud-detail-audit-footer";
+import { formatDateTime } from "../../utils/format-date";
+import { parseDate } from "../../utils/parse-date";
+
+/** The stamp the footer is expected to render for an instant, in the mocked locale. */
+function stamp(iso: string): string {
+  return formatDateTime(parseDate(iso)!, "en");
+}
 
 describe("DetailAuditFooter", () => {
   it("renders nothing when auditData is undefined", () => {
@@ -42,15 +49,15 @@ describe("DetailAuditFooter", () => {
     render(
       <DetailAuditFooter auditData={{ createdAt: "2026-03-11T10:30:00Z" }} />,
     );
-    // Should show formatted date like "2026-03-11 ..."
-    expect(screen.getByText(/2026-03-11/)).toBeTruthy();
+    // The stamp reads in the viewer's locale, matching the panel's date fields.
+    expect(screen.getByText(stamp("2026-03-11T10:30:00Z"))).toBeTruthy();
   });
 
   it("renders updated date when provided", () => {
     render(
       <DetailAuditFooter auditData={{ updatedAt: "2026-03-12T14:00:00Z" }} />,
     );
-    expect(screen.getByText(/2026-03-12/)).toBeTruthy();
+    expect(screen.getByText(stamp("2026-03-12T14:00:00Z"))).toBeTruthy();
   });
 
   it("renders both created and updated dates", () => {
@@ -62,8 +69,8 @@ describe("DetailAuditFooter", () => {
         }}
       />,
     );
-    expect(screen.getByText(/2026-01-01/)).toBeTruthy();
-    expect(screen.getByText(/2026-02-01/)).toBeTruthy();
+    expect(screen.getByText(stamp("2026-01-01T00:00:00Z"))).toBeTruthy();
+    expect(screen.getByText(stamp("2026-02-01T00:00:00Z"))).toBeTruthy();
   });
 
   it("copies ID to clipboard on click", async () => {

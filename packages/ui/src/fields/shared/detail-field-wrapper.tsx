@@ -5,14 +5,16 @@ import type { FieldVariant } from "../../crud/shared/types";
 import { useFieldVariant } from "../../crud/shared/types";
 import { cn, toTestId } from "../../utils/cn";
 
-const detailFieldWrapperVariants = cva("py-1", {
+const detailFieldWrapperVariants = cva("py-0.5", {
   variants: {
     layout: {
       top: "flex flex-col gap-1",
       left: "grid grid-cols-[auto_1fr] items-baseline gap-x-3",
-      inline: "flex items-baseline justify-between gap-3",
-      // Settings-row style, matching the form wrapper's trailing layout: the
-      // dashed leader between label and value carries the eye across the row.
+      // Center, not baseline: a row whose value carries an avatar or a badge is
+      // taller than its label, and baseline alignment drops the label out of line.
+      inline: "flex items-center justify-between gap-3",
+      // Settings-row style: the label stays left and the value is pushed to the
+      // right edge of the row by a blank gap — no leader rule between them.
       trailing: "flex items-baseline gap-3",
       hidden: "flex flex-col",
     },
@@ -70,15 +72,12 @@ export function DetailFieldWrapper({
       aria-label={layout === "hidden" && displayLabel ? displayLabel : undefined}
     >
       {layout !== "hidden" && displayLabel && (
-        <span className="field-label text-muted-foreground">
+        <span className="field-label shrink-0 text-muted-foreground">
           {displayLabel}
         </span>
       )}
       {layout === "trailing" && displayLabel ? (
-        <span
-          aria-hidden="true"
-          className="min-w-4 flex-1 self-center border-b border-dashed border-border"
-        />
+        <span aria-hidden="true" className="min-w-4 flex-1 self-center" />
       ) : null}
       <span className="field-value text-foreground">{children}</span>
     </span>

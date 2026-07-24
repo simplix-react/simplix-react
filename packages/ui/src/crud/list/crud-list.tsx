@@ -13,6 +13,10 @@ import {
   type BadgeVariants,
   BooleanBadge,
   type TableProps,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
 } from "../../base";
 import {useFlatUIComponents} from "../../provider/ui-provider";
 import {Flex, Stack} from "../../primitives";
@@ -219,7 +223,7 @@ function SortIcon({ direction }: { direction: "asc" | "desc" | null }) {
       strokeLinecap="round"
       strokeLinejoin="round"
       xmlns="http://www.w3.org/2000/svg"
-      className={cn("ml-1 inline-block", direction ? "opacity-100" : "opacity-30")}
+      className={cn("ml-1 inline-block shrink-0", direction ? "opacity-100" : "opacity-30")}
       aria-hidden="true"
     >
       {direction === "asc" ? <path d="m18 15-6-6-6 6" /> : <path d="m6 9 6 6 6-6" />}
@@ -234,6 +238,12 @@ export interface ListColumnProps<T> {
   field?: keyof T & string;
   header?: string;
   sortable?: boolean;
+  /**
+   * Column content width in pixels. Also sizes the header box, so a header
+   * longer than the width ellipsizes (full text in a tooltip) instead of
+   * stretching the column. The cell's horizontal padding sits outside this
+   * width, and on a sortable column the sort icon shares it with the label.
+   */
   width?: number;
   display?: "badge" | "boolean" | "country" | "phone";
   format?: "date" | "datetime" | "time" | "relative";
@@ -443,7 +453,7 @@ function RowActionCell<T>({ row, actions, variant }: { row: T; actions: RowActio
               const icon = resolvedIcon ?? ACTION_ICONS[action.type];
               const isDisabled = action.disabled?.(row) ?? false;
               return (
-                <Tooltip key={action.type}>
+                <Tooltip key={`${action.type}-${i}`}>
                   <TooltipTrigger asChild>
                     <Button
                       size="icon-xs"
@@ -471,14 +481,14 @@ function RowActionCell<T>({ row, actions, variant }: { row: T; actions: RowActio
   // outline / ghost variant
   return (
     <Flex gap="xs" justify="end">
-      {visible.map((action) => {
+      {visible.map((action, i) => {
         const label = action.label ?? t(ACTION_LABEL_KEYS[action.type]);
         const resolvedIcon = typeof action.icon === "function" ? action.icon(row) : action.icon;
         const icon = resolvedIcon ?? ACTION_ICONS[action.type];
         const isDisabled = action.disabled?.(row) ?? false;
         return (
           <Button
-            key={action.type}
+            key={`${action.type}-${i}`}
             size="xs"
             variant={variant}
             onClick={(e) => handleClick(e, action)}
@@ -976,23 +986,50 @@ function ListTable<T>({
         header: () => {
           const isSorted = colDef.field ? sort?.field === colDef.field : false;
           const dir = isSorted ? sort!.direction : null;
+          const label = colDef.header ?? "";
+          // A declared width gives the header box a definite size, which caps the
+          // column's intrinsic width in the auto table layout — otherwise the
+          // nowrap label keeps the column as wide as its longest header. The label
+          // then ellipsizes and carries its full text in a tooltip.
+          const headerStyle = colDef.width ? { width: colDef.width } : undefined;
 
-          if (colDef.sortable && colDef.field) {
-            return (
+          const content =
+            colDef.sortable && colDef.field ? (
               <button
                 type="button"
                 onClick={() => handleSortChange(colDef.field!)}
                 className={cn(
-                  "inline-flex items-center font-semibold hover:text-foreground",
+                  "inline-flex max-w-full items-center font-semibold hover:text-foreground",
                   isSorted && "text-foreground",
                 )}
+                style={headerStyle}
               >
-                {colDef.header ?? ""}
+                <span className="truncate">{label}</span>
                 <SortIcon direction={dir} />
               </button>
+            ) : colDef.width ? (
+              <span className="block truncate" style={headerStyle}>
+                {label}
+              </span>
+            ) : (
+              label
+            );
+
+          // A width-constrained header can ellipsize, so its full text stays
+          // reachable on hover / keyboard focus.
+          if (colDef.width && label) {
+            return (
+              <TooltipProvider delayDuration={200}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    {typeof content === "string" ? <span>{content}</span> : content}
+                  </TooltipTrigger>
+                  <TooltipContent side="top">{label}</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             );
           }
-          return colDef.header ?? "";
+          return content;
         },
         cell: ({ getValue, row }) => {
           const raw = getValue();

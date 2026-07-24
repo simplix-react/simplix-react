@@ -1,19 +1,12 @@
+import { Suspense } from "react";
 import type { Value } from "platejs";
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { isPlateEditorEmpty, parsePlateValue } from "../shared/plate-editor-helpers";
 import { EMPTY_EDITOR_VALUE } from "../plate-editor/types";
-import { PlateEditorBasic } from "../plate-editor/plate-editor-basic";
-import { PlateEditorStandard } from "../plate-editor/plate-editor-standard";
-import { PlateEditorAdvanced } from "../plate-editor/plate-editor-advanced";
+import { LAZY_PRESET_BY_VARIANT } from "../shared/plate-editor-presets";
 import { FieldWrapper } from "../shared/field-wrapper";
 
 export type PlateEditorVariant = "basic" | "standard" | "advanced";
-
-const PRESET_BY_VARIANT = {
-  basic: PlateEditorBasic,
-  standard: PlateEditorStandard,
-  advanced: PlateEditorAdvanced,
-} as const;
 
 export interface PlateEditorFieldProps extends CommonFieldProps {
   value: string;
@@ -53,7 +46,7 @@ export function PlateEditorField({
     onChange(isPlateEditorEmpty(v) ? "" : JSON.stringify(v));
   };
 
-  const PresetComponent = PRESET_BY_VARIANT[variant];
+  const PresetComponent = LAZY_PRESET_BY_VARIANT[variant];
 
   return (
     <FieldWrapper
@@ -67,17 +60,19 @@ export function PlateEditorField({
       className={className}
       {...variantProps}
     >
-      <PresetComponent
-        value={plateValue}
-        onChange={handleChange}
-        placeholder={placeholder}
-        readOnly={disabled}
-        disabled={disabled}
-        defaultHeight={defaultHeight}
-        minHeight={minHeight}
-        maxHeight={maxHeight}
-        resizable={resizable}
-      />
+      <Suspense fallback={null}>
+        <PresetComponent
+          value={plateValue}
+          onChange={handleChange}
+          placeholder={placeholder}
+          readOnly={disabled}
+          disabled={disabled}
+          defaultHeight={defaultHeight}
+          minHeight={minHeight}
+          maxHeight={maxHeight}
+          resizable={resizable}
+        />
+      </Suspense>
     </FieldWrapper>
   );
 }

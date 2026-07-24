@@ -8,7 +8,7 @@
 
 > **TimeRangeSelector**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector/index.tsx:81](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/index.tsx#L81)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/index.tsx:82](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/index.tsx#L82)
 
 Time range selector with heatmap visualization.
 

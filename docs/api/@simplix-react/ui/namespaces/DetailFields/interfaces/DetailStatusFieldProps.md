@@ -6,7 +6,7 @@
 
 # Interface: DetailStatusFieldProps
 
-Defined in: [packages/ui/src/fields/detail/status-field.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/status-field.tsx#L9)
+Defined in: [packages/ui/src/fields/detail/status-field.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/status-field.tsx#L10)
 
 Props for the [DetailStatusField](../functions/DetailStatusField.md) component.
 
@@ -20,7 +20,7 @@ Props for the [DetailStatusField](../functions/DetailStatusField.md) component.
 
 > `optional` **appearance**: `"outline"` \| `"filled"`
 
-Defined in: [packages/ui/src/fields/detail/status-field.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/status-field.tsx#L23)
+Defined in: [packages/ui/src/fields/detail/status-field.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/status-field.tsx#L24)
 
 Pill appearance; defaults to `outline`.
 
@@ -30,7 +30,7 @@ Pill appearance; defaults to `outline`.
 
 > `optional` **badgeSize**: `"default"` \| `"xs"` \| `"sm"`
 
-Defined in: [packages/ui/src/fields/detail/status-field.tsx:25](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/status-field.tsx#L25)
+Defined in: [packages/ui/src/fields/detail/status-field.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/status-field.tsx#L26)
 
 Pill size; defaults to `sm` (detail density).
 
@@ -52,9 +52,9 @@ Defined in: [packages/ui/src/crud/shared/types.ts:56](https://github.com/simplix
 
 > `optional` **fallback**: `string`
 
-Defined in: [packages/ui/src/fields/detail/status-field.tsx:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/status-field.tsx#L27)
+Defined in: [packages/ui/src/fields/detail/status-field.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/status-field.tsx#L28)
 
-Fallback text when value is null, undefined, or empty string. Defaults to em-dash.
+Fallback text when value is null, undefined, or empty string. Defaults to the shared no-value badge.
 
 ***
 
@@ -62,7 +62,7 @@ Fallback text when value is null, undefined, or empty string. Defaults to em-das
 
 > `optional` **icon**: [`IconComponent`](../../../type-aliases/IconComponent.md)
 
-Defined in: [packages/ui/src/fields/detail/status-field.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/status-field.tsx#L21)
+Defined in: [packages/ui/src/fields/detail/status-field.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/status-field.tsx#L22)
 
 Optional leading icon (mutually exclusive with `showDot`).
 
@@ -114,7 +114,7 @@ label for screen readers only.
 
 > `optional` **showDot**: `boolean`
 
-Defined in: [packages/ui/src/fields/detail/status-field.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/status-field.tsx#L19)
+Defined in: [packages/ui/src/fields/detail/status-field.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/status-field.tsx#L20)
 
 Render a leading [StatusDot](../../../variables/StatusDot.md) of the same tone (mutually exclusive with `icon`).
 
@@ -136,7 +136,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:13](https://github.com/simplix
 
 > **tone**: [`StatusTone`](../../../type-aliases/StatusTone.md)
 
-Defined in: [packages/ui/src/fields/detail/status-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/status-field.tsx#L15)
+Defined in: [packages/ui/src/fields/detail/status-field.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/status-field.tsx#L16)
 
 Resolved semantic tone for the status pill. Look this up via a shared tone
 map (e.g. `@pacs-studio/pacs-ui` `cardholderStatusToTone[value] ?? "neutral"`)
@@ -148,6 +148,6 @@ map (e.g. `@pacs-studio/pacs-ui` `cardholderStatusToTone[value] ?? "neutral"`)
 
 > **value**: `ReactNode`
 
-Defined in: [packages/ui/src/fields/detail/status-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/status-field.tsx#L17)
+Defined in: [packages/ui/src/fields/detail/status-field.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/status-field.tsx#L18)
 
 Already-translated status label shown inside the pill.

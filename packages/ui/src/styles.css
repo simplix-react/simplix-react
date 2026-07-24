@@ -39,6 +39,23 @@
   border-radius: 3px;
 }
 
+/*
+ * CRUD detail body: the side panel sits flush to its width (no horizontal
+ * padding), so a scrollbar would otherwise touch the content. Widen the body
+ * scrollbar and inset the thumb with a transparent, padding-box-clipped border
+ * so a gap opens between the content and the thumb ONLY while the scrollbar is
+ * present; with no overflow there is no track and the content stays flush. The
+ * visible thumb keeps its ~6px width; the transparent border is the gap.
+ */
+[data-crud-slot="body"]::-webkit-scrollbar {
+  width: 16px;
+}
+
+[data-crud-slot="body"]::-webkit-scrollbar-thumb {
+  border: 5px solid transparent;
+  background-clip: padding-box;
+}
+
 /* Firefox: standard properties (Firefox always shows scrollbars, thin is fine) */
 @supports not selector(::-webkit-scrollbar) {
   [data-slot="table-container"],

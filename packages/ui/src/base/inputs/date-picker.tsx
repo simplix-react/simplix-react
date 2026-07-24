@@ -1,13 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "@simplix-react/i18n/react";
 
 import { Calendar } from "../controls";
 import { CalendarDotIcon, XIcon } from "../../crud/shared/icons";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "../overlay";
+import { ResponsivePopover } from "../overlay/responsive-popover";
 import {
   Select,
   SelectContent,
@@ -93,7 +89,6 @@ export interface DatePickerProps {
   /**
    * Show time selection: an hour/minute spinner input row under the calendar.
    * Focusing the hour or minute box drops a scrollable option list open.
-   * Selecting a day keeps the popover open so the time can be adjusted.
    * @defaultValue false
    */
   showTime?: boolean;
@@ -134,6 +129,11 @@ export interface DatePickerProps {
  * spinner input row (with AM/PM toggle) whose fields drop scrollable
  * option lists open on focus.
  *
+ * The calendar and time inputs edit a pending draft: a pick reaches
+ * {@link DatePickerProps.onChange} only when the user presses Select, and
+ * Close (or an outside click) discards it. The trigger's clear button still
+ * clears the field immediately.
+ *
  * @example
  * ```tsx
  * <DatePicker value={date} onChange={setDate} locale="ko" showTime />
@@ -164,20 +164,46 @@ export function DatePicker({
   const yearFirst = isYearFirstLocale(locale);
   const defaultPlaceholder = placeholder ?? t(showTime ? "date.pickDateTime" : "date.pickDate");
 
-  const [open, setOpen] = useState(false);
-  const [viewMonth, setViewMonth] = useState<Date>(
-    () => value ?? (displayZone ? decodeInstant(new Date(), displayZone) ?? new Date() : new Date()),
+  // Default view month: the display zone's current wall clock when zoned, else now.
+  const defaultView = useCallback(
+    () => (displayZone ? decodeInstant(new Date(), displayZone) ?? new Date() : new Date()),
+    [displayZone],
   );
+
+  // Draft pre-selected when the field has no value: today, floored to the start
+  // of the day and clamped into [minDate, maxDate]. Display-zone aware.
+  const defaultDraft = useCallback(() => {
+    const today = defaultView();
+    today.setHours(0, 0, 0, 0);
+    return clampToRange(today, minDate, maxDate);
+  }, [defaultView, minDate, maxDate]);
+
+  const [open, setOpen] = useState(false);
+  // Draft holds the pending selection inside the popover. It is copied to the
+  // field (via onChange) only when the user presses Select; closing via Close
+  // or an outside click discards it.
+  const [draft, setDraft] = useState<Date | undefined>(value);
+  const [viewMonth, setViewMonth] = useState<Date>(() => value ?? defaultView());
   const [hours, setHours] = useState(() => value?.getHours() ?? 0);
   const [minutes, setMinutes] = useState(() => value?.getMinutes() ?? 0);
 
-  // Sync time state when value changes externally
-  useEffect(() => {
-    if (value) {
-      setHours(value.getHours());
-      setMinutes(value.getMinutes());
-    }
-  }, [value]);
+  // Reset the draft to the committed value each time the popover opens, so a
+  // previously abandoned edit never leaks into the next session.
+  const handleOpenChange = useCallback(
+    (next: boolean) => {
+      if (next) {
+        // With no committed value, pre-select today so the calendar opens with
+        // the current date highlighted and Select immediately enabled.
+        const initialDraft = value ?? defaultDraft();
+        setDraft(initialDraft);
+        setHours(value?.getHours() ?? 0);
+        setMinutes(value?.getMinutes() ?? 0);
+        setViewMonth(initialDraft);
+      }
+      setOpen(next);
+    },
+    [value, defaultDraft],
+  );
 
   const years = useMemo(() => generateYears(startYear, endYear, reverseYears), [startYear, endYear, reverseYears]);
   const monthNames = useMemo(() => getMonthNames(locale), [locale]);
@@ -208,38 +234,38 @@ export function DatePicker({
     setViewMonth((prev) => new Date(prev.getFullYear(), parseInt(monthIndex), 1));
   }, []);
 
-  const handleSelect = useCallback(
-    (date: Date) => {
-      if (showTime) {
-        // Keep the popover open so the time can still be adjusted
-        onChange(clampToRange(withTime(date, hours, minutes), minDate, maxDate));
-        return;
-      }
-      onChange(date);
-      setOpen(false);
-    },
-    [onChange, showTime, hours, minutes, minDate, maxDate],
-  );
+  const handleSelect = useCallback((date: Date) => {
+    // Stage the pick; it reaches the field only when Select is pressed.
+    setDraft(date);
+  }, []);
 
-  const commitTime = useCallback(
-    (h24: number, m: number) => {
-      setHours(h24);
-      setMinutes(m);
-      if (value) {
-        onChange(clampToRange(withTime(value, h24, m), minDate, maxDate));
-      }
-    },
-    [value, onChange, minDate, maxDate],
-  );
+  const commitTime = useCallback((h24: number, m: number) => {
+    setHours(h24);
+    setMinutes(m);
+  }, []);
 
   const handleNow = useCallback(() => {
     // When zoned, produce a floating now (local fields = display-zone wall clock).
-    const base = displayZone ? decodeInstant(new Date(), displayZone) ?? new Date() : new Date();
-    const now = clampToRange(base, minDate, maxDate);
+    const now = clampToRange(defaultView(), minDate, maxDate);
     now.setSeconds(0, 0);
     setViewMonth(now);
-    onChange(now);
-  }, [onChange, minDate, maxDate, displayZone]);
+    setDraft(now);
+    setHours(now.getHours());
+    setMinutes(now.getMinutes());
+  }, [minDate, maxDate, defaultView]);
+
+  // Commit the draft to the field and close.
+  const handleCommit = useCallback(() => {
+    if (!draft) {
+      setOpen(false);
+      return;
+    }
+    const next = showTime
+      ? clampToRange(withTime(draft, hours, minutes), minDate, maxDate)
+      : draft;
+    onChange(next);
+    setOpen(false);
+  }, [draft, showTime, hours, minutes, minDate, maxDate, onChange]);
 
   const handleClear = useCallback(
     (e: React.MouseEvent) => {
@@ -259,14 +285,14 @@ export function DatePicker({
   }, [showTime, minDate]);
 
   const hourDisabledInDay = useCallback(
-    (hour24: number) => (value ? isHourDisabled(value, hour24, minDate, maxDate) : false),
-    [value, minDate, maxDate],
+    (hour24: number) => (draft ? isHourDisabled(draft, hour24, minDate, maxDate) : false),
+    [draft, minDate, maxDate],
   );
 
   const minuteDisabledInDay = useCallback(
     (hour24: number, minute: number) =>
-      value ? isMinuteDisabled(value, hour24, minute, minDate, maxDate) : false,
-    [value, minDate, maxDate],
+      draft ? isMinuteDisabled(draft, hour24, minute, minDate, maxDate) : false,
+    [draft, minDate, maxDate],
   );
 
   const YearSelect = (
@@ -274,7 +300,7 @@ export function DatePicker({
       value={viewMonth.getFullYear().toString()}
       options={yearOptions}
       onChange={handleYearChange}
-      className="w-[80px]"
+      className="w-auto min-w-[76px]"
     />
   );
 
@@ -283,16 +309,16 @@ export function DatePicker({
       value={viewMonth.getMonth().toString()}
       options={monthOptions}
       onChange={handleMonthChange}
-      className="w-[72px]"
+      className="w-auto min-w-[68px]"
     />
   );
 
   return (
-    // modal: inside a Dialog, the dialog's scroll lock blocks wheel events on
-    // body-portaled popovers; a modal popover registers its own scroll-lock
-    // layer so wheel scrolling works in the calendar's time option lists.
-    <Popover open={open} onOpenChange={setOpen} modal>
-      <PopoverTrigger asChild>
+    <ResponsivePopover
+      open={open}
+      onOpenChange={handleOpenChange}
+      title={defaultPlaceholder}
+      trigger={
         <button
           type="button"
           disabled={disabled}
@@ -327,9 +353,9 @@ export function DatePicker({
             </span>
           )}
         </button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        <div className="p-3">
+      }
+    >
+      <div className="p-3">
           {/* Header: month/year navigation + optional time inputs */}
           <div className="mb-2 flex items-center gap-3">
             <div className="flex flex-1 items-center justify-between gap-2">
@@ -363,9 +389,14 @@ export function DatePicker({
             </div>
           </div>
           {/* Calendar (header hidden — we provide our own) */}
+          {/* p-0, and no width override: the popover already pads, so the calendar's
+              own padding on top of it inset the day grid and left dead space at both
+              edges. Its intrinsic (w-fit) width must survive though — forcing w-full
+              hands sizing to the narrower month/year row above, and the day cells then
+              overflow their tracks and overlap sideways while rows keep full height. */}
           <Calendar
             mode="single"
-            selected={value}
+            selected={draft}
             onSelect={handleSelect}
             month={viewMonth}
             onMonthChange={setViewMonth}
@@ -373,6 +404,7 @@ export function DatePicker({
             maxDate={maxDate}
             locale={bcp47}
             hideHeader
+            className="p-0"
           />
           {/* Time input under the calendar; focusing hour or minute drops its option list open.
               The lists drop UP over the calendar: the popover ends right below the time
@@ -390,22 +422,41 @@ export function DatePicker({
               className="mt-2"
             />
           )}
-          {showTime && (
-            <div className="mt-2 flex justify-end border-t border-input pt-2">
-              <button
-                type="button"
-                onClick={handleNow}
-                className="inline-flex h-7 items-center rounded-md px-2 text-xs hover:bg-accent hover:text-accent-foreground"
-              >
-                {t("date.now")}
-              </button>
-            </div>
-          )}
           {displayZone && (
             <div className="mt-2 text-xs text-muted-foreground">{displayZoneLabel ?? displayZone}</div>
           )}
+          {/* Footer: optional Now, plus explicit Close (discard) / Select (commit) */}
+          <div className="mt-3 flex items-center justify-between gap-2 border-t border-input pt-2">
+            <div>
+              {showTime && (
+                <button
+                  type="button"
+                  onClick={handleNow}
+                  className="inline-flex h-7 items-center rounded-md px-2 text-xs hover:bg-accent hover:text-accent-foreground"
+                >
+                  {t("date.now")}
+                </button>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="inline-flex h-7 items-center rounded-md border border-input px-2.5 text-xs hover:bg-accent hover:text-accent-foreground"
+              >
+                {t("common.close")}
+              </button>
+              <button
+                type="button"
+                onClick={handleCommit}
+                disabled={!draft}
+                className="inline-flex h-7 items-center rounded-md bg-primary px-2.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {t("common.select")}
+              </button>
+            </div>
+          </div>
         </div>
-      </PopoverContent>
-    </Popover>
+    </ResponsivePopover>
   );
 }

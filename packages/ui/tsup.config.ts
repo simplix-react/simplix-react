@@ -4,6 +4,9 @@ export default defineConfig((options) => ({
   entry: {
     index: "src/index.ts",
     "plate-editor": "src/fields/plate-editor/index.ts",
+    // Viewer-only entry: read-only consumers import this instead of the full
+    // plate-editor barrel, whose plugin re-exports carry the heavy runtime.
+    "plate-viewer": "src/fields/plate-editor/plate-viewer.tsx",
   },
   format: ["esm"],
   dts: !options.watch,

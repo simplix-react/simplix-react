@@ -1,8 +1,8 @@
-import { useLocale } from "@simplix-react/i18n/react";
+import { useLocale, useTranslation } from "@simplix-react/i18n/react";
 import { useMemo } from "react";
 
 import { ComboboxSheet } from "../inputs/combobox-sheet";
-import { COUNTRIES, countryDisplayName } from "./countries";
+import { COUNTRIES, countryDisplayName, countryFlagEmoji } from "./countries";
 import { FieldWrapper } from "./field-wrapper";
 import type { CommonFieldProps } from "./types";
 
@@ -15,8 +15,9 @@ export interface CountryFieldProps extends CommonFieldProps {
 }
 
 /**
- * Country picker over a search sheet. Names localize via `Intl.DisplayNames`
- * when the runtime provides it, falling back to bundled English names.
+ * Country picker over a search sheet: flag + localized name rows, searchable
+ * by localized name, English name, ISO code, and calling code. Names resolve
+ * via `Intl.DisplayNames` when available, then the bundled CLDR names.
  */
 export function CountryField({
   value,
@@ -32,14 +33,21 @@ export function CountryField({
   className,
 }: CountryFieldProps) {
   const locale = useLocale();
+  const { t } = useTranslation("simplix/native");
 
   const options = useMemo(
     () =>
       COUNTRIES.map((entry) => ({
-        value: entry.code,
-        label: countryDisplayName(entry.code, locale),
-        description: `${entry.code} · +${entry.callingCode}`,
-      })).sort((a, b) => a.label.localeCompare(b.label)),
+        entry,
+        localName: countryDisplayName(entry.code, locale),
+      }))
+        .sort((a, b) => a.localName.localeCompare(b.localName, locale))
+        .map(({ entry, localName }) => ({
+          value: entry.code,
+          label: `${countryFlagEmoji(entry.code)}  ${localName}`.trim(),
+          description: `${entry.code} · +${entry.callingCode}`,
+          searchText: `${localName} ${entry.name} ${entry.code} +${entry.callingCode}`,
+        })),
     [locale],
   );
 
@@ -57,8 +65,8 @@ export function CountryField({
         value={value || undefined}
         onChange={onChange}
         options={options}
-        title={label}
-        placeholder={placeholder}
+        title={label ?? t("field.selectCountry")}
+        placeholder={placeholder ?? t("field.selectCountry")}
         disabled={disabled}
         invalid={!!error}
       />

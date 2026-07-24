@@ -24,12 +24,12 @@ import {
 import { Skeleton } from "../display/skeleton";
 import { cn } from "../../utils/cn";
 import type { LucideProps, LucideIcon } from "lucide-react";
-import {
-  DynamicIcon,
-  dynamicIconImports,
-  type IconName,
-} from "lucide-react/dynamic";
-import { iconsData } from "./icon-picker/icons-data";
+// Type-only imports on purpose: the dynamic icon registry and the icon catalog
+// are heavy payloads, so their runtime values are loaded lazily (see
+// DynamicIconLazy and useIconsData) and must never be statically imported here.
+import type { IconName } from "lucide-react/dynamic";
+import { DynamicIconLazy } from "../display/dynamic-icon-lazy";
+import type { IconData } from "./icon-picker/icons-data";
 import {
   getIconPickerLocale,
   getCategoryName,
@@ -37,8 +37,7 @@ import {
   type IconPickerLocale,
 } from "./icon-picker/locales";
 
-/** A single icon entry from the built-in icons catalog. */
-export type IconData = (typeof iconsData)[number];
+export type { IconData };
 
 /** Props for the {@link Icon} sub-component. */
 export interface IconProps extends Omit<LucideProps, "ref"> {
@@ -124,7 +123,10 @@ const useIconsData = () => {
     const loadIcons = async () => {
       setIsLoading(true);
 
-      const { iconsData } = await import("./icon-picker/icons-data");
+      const [{ iconsData }, { dynamicIconImports }] = await Promise.all([
+        import("./icon-picker/icons-data"),
+        import("lucide-react/dynamic"),
+      ]);
       if (isMounted) {
         setIcons(
           iconsData.filter((icon: IconData) => {
@@ -420,7 +422,7 @@ IconPicker.displayName = "IconPicker";
 
 const Icon = forwardRef<ComponentRef<LucideIcon>, IconProps>(
   ({ name, ...props }, ref) => {
-    return <DynamicIcon name={name} {...props} ref={ref} />;
+    return <DynamicIconLazy name={name} {...props} ref={ref} />;
   }
 );
 Icon.displayName = "Icon";

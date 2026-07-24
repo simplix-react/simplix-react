@@ -6,7 +6,7 @@
 
 # Interface: I18nTextProps
 
-Defined in: [packages/ui/src/fields/detail/i18n-text-field.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/i18n-text-field.tsx#L7)
+Defined in: [packages/ui/src/fields/detail/i18n-text-field.tsx:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/i18n-text-field.tsx#L8)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/fields/detail/i18n-text-field.tsx:7](https://github
 
 > `optional` **emptyAlign**: `"center"` \| `"left"`
 
-Defined in: [packages/ui/src/fields/detail/i18n-text-field.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/i18n-text-field.tsx#L10)
+Defined in: [packages/ui/src/fields/detail/i18n-text-field.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/i18n-text-field.tsx#L11)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [packages/ui/src/fields/detail/i18n-text-field.tsx:10](https://githu
 
 > `optional` **fallback**: `string`
 
-Defined in: [packages/ui/src/fields/detail/i18n-text-field.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/i18n-text-field.tsx#L9)
+Defined in: [packages/ui/src/fields/detail/i18n-text-field.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/i18n-text-field.tsx#L10)
 
 ***
 
@@ -30,4 +30,4 @@ Defined in: [packages/ui/src/fields/detail/i18n-text-field.tsx:9](https://github
 
 > **value**: `Record`\<`string`, `string`\> \| `null` \| `undefined`
 
-Defined in: [packages/ui/src/fields/detail/i18n-text-field.tsx:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/i18n-text-field.tsx#L8)
+Defined in: [packages/ui/src/fields/detail/i18n-text-field.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/i18n-text-field.tsx#L9)

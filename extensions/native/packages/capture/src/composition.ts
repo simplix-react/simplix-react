@@ -6,6 +6,8 @@ import type {
 
 const DEFAULTS: Required<CompositionConfig> = {
   centerTolerance: 0.18,
+  targetX: 0.5,
+  targetY: 0.5,
   minFaceRatio: 0.18,
   maxFaceRatio: 0.6,
 };
@@ -19,7 +21,7 @@ export function evaluateComposition(
   faces: FaceBox[],
   config?: CompositionConfig,
 ): CompositionResult {
-  const { centerTolerance, minFaceRatio, maxFaceRatio } = {
+  const { centerTolerance, targetX, targetY, minFaceRatio, maxFaceRatio } = {
     ...DEFAULTS,
     ...config,
   };
@@ -35,8 +37,8 @@ export function evaluateComposition(
   const centerX = face.x + face.width / 2;
   const centerY = face.y + face.height / 2;
   if (
-    Math.abs(centerX - 0.5) > centerTolerance ||
-    Math.abs(centerY - 0.5) > centerTolerance
+    Math.abs(centerX - targetX) > centerTolerance ||
+    Math.abs(centerY - targetY) > centerTolerance
   ) {
     return { ok: false, reason: "off-center", face };
   }

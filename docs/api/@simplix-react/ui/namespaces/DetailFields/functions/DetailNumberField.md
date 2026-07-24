@@ -8,7 +8,7 @@
 
 > **DetailNumberField**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/detail/number-field.tsx:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/number-field.tsx#L29)
+Defined in: [packages/ui/src/fields/detail/number-field.tsx:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/number-field.tsx#L30)
 
 Read-only number display field with Intl.NumberFormat formatting.
 

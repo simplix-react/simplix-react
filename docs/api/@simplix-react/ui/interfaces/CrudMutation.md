@@ -6,9 +6,9 @@
 
 # Interface: CrudMutation\<TInput\>
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L10)
+Defined in: [packages/headless/dist/index.d.ts:46](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L46)
 
-Minimal mutation shape used by [useCrudFormSubmit](../functions/useCrudFormSubmit.md).
+Minimal mutation shape consumed by form submit helpers on every platform.
 
 ## Type Parameters
 
@@ -22,7 +22,7 @@ Minimal mutation shape used by [useCrudFormSubmit](../functions/useCrudFormSubmi
 
 > **isPending**: `boolean`
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L16)
+Defined in: [packages/headless/dist/index.d.ts:54](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L54)
 
 Whether the mutation is currently in flight.
 
@@ -32,7 +32,7 @@ Whether the mutation is currently in flight.
 
 > **mutate**: (`input`, `options?`) => `void`
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L12)
+Defined in: [packages/headless/dist/index.d.ts:48](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L48)
 
 Trigger the mutation with the given input.
 
@@ -58,7 +58,7 @@ Trigger the mutation with the given input.
 
 > **mutateAsync**: (`input`) => `Promise`\<`unknown`\>
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L14)
+Defined in: [packages/headless/dist/index.d.ts:52](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L52)
 
 Promise-based mutation trigger for error handling.
 

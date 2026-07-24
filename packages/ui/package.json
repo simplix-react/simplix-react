@@ -9,8 +9,8 @@
     "./src/theme.css",
     "./dist/index.js",
     "./dist/plate-editor.js",
-    "./src/index.ts",
-    "./src/locales/*"
+    "**/index.ts",
+    "**/locales/**"
   ],
   "exports": {
     ".": {
@@ -22,6 +22,11 @@
       "source": "./src/fields/plate-editor/index.ts",
       "types": "./dist/plate-editor.d.ts",
       "import": "./dist/plate-editor.js"
+    },
+    "./plate-viewer": {
+      "source": "./src/fields/plate-editor/plate-viewer.tsx",
+      "types": "./dist/plate-viewer.d.ts",
+      "import": "./dist/plate-viewer.js"
     },
     "./styles.css": "./dist/styles.css",
     "./theme.css": {

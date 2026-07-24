@@ -6,11 +6,11 @@
 
 # Function: formatDateRange()
 
-> **formatDateRange**(`from`, `to`, `locale?`): `string` \| `null`
+> **formatDateRange**(`from`, `to`, `locale?`, `timeZone?`): `string` \| `null`
 
-Defined in: [packages/ui/src/utils/format-date.ts:108](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/utils/format-date.ts#L108)
+Defined in: [packages/headless/dist/index.d.ts:392](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L392)
 
-Format a date range as a short string — e.g. "Mar 3 – Mar 27" / "3월 3일 – 3월 27일".
+Format a date range as a short string — e.g. "Mar 3 – Mar 27", localized.
 Returns `null` when both `from` and `to` are undefined.
 
 ## Parameters
@@ -24,6 +24,10 @@ Returns `null` when both `from` and `to` are undefined.
 `Date` | `undefined`
 
 ### locale?
+
+`string`
+
+### timeZone?
 
 `string`
 

@@ -1,8 +1,15 @@
-import { getDomainTranslationRegistry } from "./domain-translations.js";
+import type { DomainTranslationConfig } from "./domain-translations.js";
+import {
+  getDomainTranslationRegistry,
+  onDomainTranslationsRegistered,
+} from "./domain-translations.js";
 import { I18nextAdapter } from "./i18next-adapter.js";
 import type { TranslationResources } from "./i18next-adapter.js";
 import type { ModuleTranslations } from "./module-translations.js";
-import { getModuleTranslationRegistry } from "./module-translations.js";
+import {
+  getModuleTranslationRegistry,
+  onModuleTranslationsRegistered,
+} from "./module-translations.js";
 import type { LocaleCode, LocaleConfig } from "./types.js";
 import { DEFAULT_LOCALES } from "./utils/locale-config.js";
 
@@ -124,6 +131,45 @@ export function createI18nConfig(
     ? detectLocale(detection, supportedCodes)
     : undefined;
 
+  const loadModuleTranslations = async (
+    mod: ModuleTranslations,
+  ): Promise<void> => {
+    for (const locale of mod.locales) {
+      const translations = await mod.load(locale);
+      for (const [componentPath, data] of Object.entries(translations)) {
+        const namespace = `${mod.namespace}/${componentPath}`;
+        adapter.addResources(locale, namespace, data);
+      }
+    }
+  };
+
+  const loadDomainTranslations = async (
+    config: DomainTranslationConfig,
+  ): Promise<void> => {
+    for (const [locale, loader] of Object.entries(config.locales)) {
+      const mod = await loader();
+      const json =
+        (mod as Record<string, unknown>).default ?? (mod as unknown);
+      for (const [key, data] of Object.entries(
+        json as Record<string, unknown>,
+      )) {
+        if (key === "enums") {
+          adapter.addResources(
+            locale,
+            "enums",
+            data as Record<string, unknown>,
+          );
+        } else {
+          adapter.addResources(
+            locale,
+            `entity/${key}`,
+            data as Record<string, unknown>,
+          );
+        }
+      }
+    }
+  };
+
   const i18nReady = (async () => {
     await adapter.initialize(detectedLocale ?? defaultLocale);
 
@@ -131,45 +177,49 @@ export function createI18nConfig(
       persistLocale(adapter, storageKey);
     }
 
+    // Packages may evaluate — and therefore register — after this snapshot
+    // (lazy bundles, inline requires). Subscribing keeps late registrations
+    // loading into the active adapter instead of silently missing.
+    const loadedModules = new Set<ModuleTranslations>();
+    onModuleTranslationsRegistered((mod) => {
+      if (loadedModules.has(mod)) return;
+      loadedModules.add(mod);
+      void loadModuleTranslations(mod).catch((error: unknown) => {
+        console.error(
+          `createI18nConfig: failed to load module translations "${mod.namespace}"`,
+          error,
+        );
+      });
+    });
+
+    const loadedDomains = new Set<DomainTranslationConfig>();
+    onDomainTranslationsRegistered((config) => {
+      if (loadedDomains.has(config)) return;
+      loadedDomains.add(config);
+      void loadDomainTranslations(config).catch((error: unknown) => {
+        console.error(
+          `createI18nConfig: failed to load domain translations "${config.domain}"`,
+          error,
+        );
+      });
+    });
+
     const allModuleTranslations = [
       ...moduleTranslations,
       ...getModuleTranslationRegistry().values(),
     ];
 
     for (const mod of allModuleTranslations) {
-      for (const locale of mod.locales) {
-        const translations = await mod.load(locale);
-        for (const [componentPath, data] of Object.entries(translations)) {
-          const namespace = `${mod.namespace}/${componentPath}`;
-          adapter.addResources(locale, namespace, data);
-        }
-      }
+      if (loadedModules.has(mod)) continue;
+      loadedModules.add(mod);
+      await loadModuleTranslations(mod);
     }
 
     // Load domain translations from the global registry
     for (const [, config] of getDomainTranslationRegistry()) {
-      for (const [locale, loader] of Object.entries(config.locales)) {
-        const mod = await loader();
-        const json =
-          (mod as Record<string, unknown>).default ?? (mod as unknown);
-        for (const [key, data] of Object.entries(
-          json as Record<string, unknown>,
-        )) {
-          if (key === "enums") {
-            adapter.addResources(
-              locale,
-              "enums",
-              data as Record<string, unknown>,
-            );
-          } else {
-            adapter.addResources(
-              locale,
-              `entity/${key}`,
-              data as Record<string, unknown>,
-            );
-          }
-        }
-      }
+      if (loadedDomains.has(config)) continue;
+      loadedDomains.add(config);
+      await loadDomainTranslations(config);
     }
   })();
 

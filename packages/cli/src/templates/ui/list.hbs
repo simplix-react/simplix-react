@@ -2,7 +2,7 @@
 import { useMemo } from "react";
 {{/unless}}
 
-import { {{#if hookList}}adaptOrvalList, {{/if}}{{#if hookOrder}}adaptOrvalOrder, {{/if}}Badge, CrudList, DetailFieldWrapper, {{#if hasFilters}}ListTotalBadge, {{/if}}{{#if hasEnumFields}}Flex, {{/if}}{{#if hasI18nFields}}I18nText, {{/if}}{{#if hasFilters}}SearchOperator, {{/if}}Stack, useCrudList{{#if hookOrder}}, useInvalidateEntity{{/if}} } from "@simplix-react/ui";
+import { {{#if hookList}}adaptOrvalList, {{/if}}{{#if hookOrder}}adaptOrvalOrder, {{/if}}Badge, CrudList, DetailFieldWrapper, {{#if hasEnumFields}}Flex, {{/if}}{{#if hasI18nFields}}I18nText, {{/if}}{{#if hasFilters}}SearchOperator, {{/if}}Stack, useCrudList{{#if hookOrder}}, useInvalidateEntity{{/if}} } from "@simplix-react/ui";
 import type { ActionVariant, RowActionDef } from "@simplix-react/ui";
 import { useEntityTranslation, useTranslation } from "@simplix-react/i18n/react";
 import { {{entityIcon}} } from "lucide-react";
@@ -76,7 +76,7 @@ export function {{EntityPascal}}ListToolbar({ list }: {{EntityPascal}}ListToolba
 {{#if hasFilters}}
       <CrudList.FilterBar
         maxBadges={3}
-        leading={<ListTotalBadge count={list.pagination.total} />}
+        count={list.pagination.total}
         filters={[
 {{#each filterBarDefs}}
 {{#if isText}}

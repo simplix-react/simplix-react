@@ -1,5 +1,6 @@
 import { type CSSProperties, type ReactElement } from "react";
-import { DynamicIcon, type IconName } from "lucide-react/dynamic";
+import type { IconName } from "lucide-react/dynamic";
+import { DynamicIconLazy } from "./dynamic-icon-lazy";
 import { cn } from "../../utils/cn";
 
 /**
@@ -122,7 +123,7 @@ export function DynamicColorIcon({
   }
 
   return (
-    <DynamicIcon
+    <DynamicIconLazy
       name={resolvedIconName as IconName}
       className={cn("shrink-0", className)}
       style={{
@@ -132,7 +133,7 @@ export function DynamicColorIcon({
         ...style,
       }}
       fallback={(): ReactElement | null => (
-        <DynamicIcon
+        <DynamicIconLazy
           name={normalizeIconName(defaultIcon) as IconName}
           className={cn("shrink-0", className)}
           style={{

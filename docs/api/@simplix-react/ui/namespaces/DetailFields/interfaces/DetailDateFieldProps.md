@@ -6,7 +6,7 @@
 
 # Interface: DetailDateFieldProps
 
-Defined in: [packages/ui/src/fields/detail/date-field.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/date-field.tsx#L11)
+Defined in: [packages/ui/src/fields/detail/date-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/date-field.tsx#L14)
 
 Props for the [DetailDateField](../functions/DetailDateField.md) component.
 
@@ -28,21 +28,34 @@ Defined in: [packages/ui/src/crud/shared/types.ts:56](https://github.com/simplix
 
 ***
 
+### displayZone?
+
+> `optional` **displayZone**: `string`
+
+Defined in: [packages/ui/src/fields/detail/date-field.tsx:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/date-field.tsx#L30)
+
+IANA display timezone for a site-scoped `Instant` value. Applies to
+`format: "datetime"` (rendered in this zone instead of the browser zone).
+`format: "date"`/`"time"` are zone-neutral and `format: "relative"` is
+inherently zone-independent, so all three ignore it.
+
+***
+
 ### fallback?
 
 > `optional` **fallback**: `string`
 
-Defined in: [packages/ui/src/fields/detail/date-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/date-field.tsx#L17)
+Defined in: [packages/ui/src/fields/detail/date-field.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/date-field.tsx#L23)
 
-Fallback text when value is null. Defaults to em-dash.
+Fallback text when value is null. Defaults to the shared no-value badge.
 
 ***
 
 ### format?
 
-> `optional` **format**: `"date"` \| `"relative"` \| `"datetime"`
+> `optional` **format**: `"date"` \| `"time"` \| `"relative"` \| `"datetime"`
 
-Defined in: [packages/ui/src/fields/detail/date-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/date-field.tsx#L15)
+Defined in: [packages/ui/src/fields/detail/date-field.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/date-field.tsx#L21)
 
 Display format. Defaults to `"date"`.
 
@@ -106,6 +119,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:13](https://github.com/simplix
 
 > **value**: [`DateLike`](../../../type-aliases/DateLike.md) \| `null`
 
-Defined in: [packages/ui/src/fields/detail/date-field.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/date-field.tsx#L13)
+Defined in: [packages/ui/src/fields/detail/date-field.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/date-field.tsx#L19)
 
-Date value as Date object, ISO string, or unix timestamp.
+The value to display. For `date`/`datetime`/`relative` it is a `Date`, ISO string, or
+unix timestamp; for `time` it is a wall-clock `HH:mm[:ss]` string (a `LocalTime`).

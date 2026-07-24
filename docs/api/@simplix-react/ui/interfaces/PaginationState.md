@@ -6,7 +6,7 @@
 
 # Interface: PaginationState
 
-Defined in: [packages/ui/src/crud/shared/types.ts:68](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L68)
+Defined in: [packages/headless/dist/index.d.ts:7](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L7)
 
 Represents pagination state with page, size, and total count.
 
@@ -16,7 +16,7 @@ Represents pagination state with page, size, and total count.
 
 > **page**: `number`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:69](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L69)
+Defined in: [packages/headless/dist/index.d.ts:8](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L8)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:69](https://github.com/simplix
 
 > **pageSize**: `number`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:70](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L70)
+Defined in: [packages/headless/dist/index.d.ts:9](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L9)
 
 ***
 
@@ -32,4 +32,4 @@ Defined in: [packages/ui/src/crud/shared/types.ts:70](https://github.com/simplix
 
 > **total**: `number`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:71](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L71)
+Defined in: [packages/headless/dist/index.d.ts:10](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L10)

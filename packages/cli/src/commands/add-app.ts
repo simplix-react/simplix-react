@@ -140,8 +140,8 @@ export const addAppCommand = new Command("add-app")
         "README.md": renderTemplate(nativeAppReadme, ctx),
         "app/_layout.tsx": renderTemplate(nativeAppRootLayout, ctx),
         "app/index.tsx": renderTemplate(nativeAppIndexScreen, ctx),
-        "src/app/boot.ts": renderTemplate(nativeAppBootTs, ctx),
-        "src/app/i18n.ts": renderTemplate(nativeAppI18nTs, ctx),
+        "src/bootstrap/boot.ts": renderTemplate(nativeAppBootTs, ctx),
+        "src/bootstrap/i18n.ts": renderTemplate(nativeAppI18nTs, ctx),
       };
 
       for (const locale of locales) {

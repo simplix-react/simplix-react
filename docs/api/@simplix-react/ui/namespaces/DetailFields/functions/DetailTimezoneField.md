@@ -8,7 +8,7 @@
 
 > **DetailTimezoneField**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/detail/timezone-field.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/timezone-field.tsx#L23)
+Defined in: [packages/ui/src/fields/detail/timezone-field.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/timezone-field.tsx#L24)
 
 Read-only timezone display field with offset and localized name.
 

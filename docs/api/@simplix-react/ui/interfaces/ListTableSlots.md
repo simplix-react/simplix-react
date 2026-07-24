@@ -6,7 +6,7 @@
 
 # Interface: ListTableSlots\<T\>
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:300](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L300)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:320](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L320)
 
 Per-instance render overrides for List.Table seams. Each slot replaces the
 default rendering for that seam; omitted slots keep the built-in behavior.
@@ -23,7 +23,7 @@ default rendering for that seam; omitted slots keep the built-in behavior.
 
 > `optional` **empty**: (`ctx`) => `ReactNode`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:304](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L304)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:324](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L324)
 
 Replace the empty / filtered / error state body. Receives the reason.
 
@@ -45,7 +45,7 @@ Replace the empty / filtered / error state body. Receives the reason.
 
 > `optional` **rowActions**: (`ctx`) => `ReactNode`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:302](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L302)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:322](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L322)
 
 Replace the per-row action cluster. Receives the row.
 

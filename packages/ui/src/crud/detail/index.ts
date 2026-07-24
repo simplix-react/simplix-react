@@ -1,6 +1,7 @@
 export { CrudDetail } from "./crud-detail";
 export type {
   CrudDetailActionsProps,
+  CrudDetailActionFooterProps,
   CrudDetailDefaultActionsProps,
   CrudDetailProps,
   CrudDetailSectionProps,

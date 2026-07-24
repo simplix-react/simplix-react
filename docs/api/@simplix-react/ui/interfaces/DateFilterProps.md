@@ -44,7 +44,7 @@ Defined in: [packages/ui/src/crud/filters/date-filter.tsx:18](https://github.com
 
 ##### value
 
-`Date` | [`DateRange`](DateRange.md) | `undefined`
+[`DateRange`](DateRange.md) | `Date` | `undefined`
 
 #### Returns
 
@@ -88,6 +88,6 @@ Defined in: [packages/ui/src/crud/filters/date-filter.tsx:20](https://github.com
 
 ### value
 
-> **value**: `Date` \| [`DateRange`](DateRange.md) \| `undefined`
+> **value**: [`DateRange`](DateRange.md) \| `Date` \| `undefined`
 
 Defined in: [packages/ui/src/crud/filters/date-filter.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/date-filter.tsx#L16)

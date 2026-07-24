@@ -6,7 +6,7 @@
 
 # Interface: DetailCountryFieldProps
 
-Defined in: [packages/ui/src/fields/detail/country-field.tsx:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/country-field.tsx#L8)
+Defined in: [packages/ui/src/fields/detail/country-field.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/country-field.tsx#L9)
 
 Props for the [DetailCountryField](../functions/DetailCountryField.md) component.
 
@@ -32,9 +32,9 @@ Defined in: [packages/ui/src/crud/shared/types.ts:56](https://github.com/simplix
 
 > `optional` **fallback**: `string`
 
-Defined in: [packages/ui/src/fields/detail/country-field.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/country-field.tsx#L12)
+Defined in: [packages/ui/src/fields/detail/country-field.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/country-field.tsx#L13)
 
-Fallback text when value is null, undefined, or empty string. Defaults to em-dash.
+Fallback text when value is null, undefined, or empty string. Defaults to the shared no-value badge.
 
 ***
 
@@ -96,6 +96,6 @@ Defined in: [packages/ui/src/crud/shared/types.ts:13](https://github.com/simplix
 
 > **value**: `string` \| `null` \| `undefined`
 
-Defined in: [packages/ui/src/fields/detail/country-field.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/country-field.tsx#L10)
+Defined in: [packages/ui/src/fields/detail/country-field.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/country-field.tsx#L11)
 
 ISO 3166-1 alpha-2 country code (e.g. "KR").

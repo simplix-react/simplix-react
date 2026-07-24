@@ -31,6 +31,9 @@ export function BooleanBadge({
       variant={variant}
       className={cn("px-1.5", className)}
       aria-label={isTrue ? trueLabel : falseLabel}
+      // Opt out of the list-cell uniform-width rule ([data-slot=badge]); a
+      // boolean indicator is a compact icon pill, not a labeled status pill.
+      data-slot="boolean-badge"
     >
       <Icon className="size-3" aria-hidden />
     </Badge>

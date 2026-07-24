@@ -8,7 +8,7 @@
 
 > **startOfYear**(`d`): `Date`
 
-Defined in: [packages/ui/src/utils/date-math.ts:36](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/utils/date-math.ts#L36)
+Defined in: [packages/headless/dist/index.d.ts:407](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L407)
 
 ## Parameters
 

@@ -6,7 +6,7 @@
 
 # Interface: AuditData
 
-Defined in: [packages/ui/src/crud/detail/crud-detail-audit-footer.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail-audit-footer.tsx#L17)
+Defined in: [packages/ui/src/crud/detail/crud-detail-audit-footer.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail-audit-footer.tsx#L19)
 
 Audit metadata passed to [DetailAuditFooter](../variables/CrudDetail.md).
 
@@ -16,7 +16,7 @@ Audit metadata passed to [DetailAuditFooter](../variables/CrudDetail.md).
 
 > `optional` **createdAt**: `string`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail-audit-footer.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail-audit-footer.tsx#L19)
+Defined in: [packages/ui/src/crud/detail/crud-detail-audit-footer.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail-audit-footer.tsx#L21)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [packages/ui/src/crud/detail/crud-detail-audit-footer.tsx:19](https:
 
 > `optional` **id**: `string`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail-audit-footer.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail-audit-footer.tsx#L18)
+Defined in: [packages/ui/src/crud/detail/crud-detail-audit-footer.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail-audit-footer.tsx#L20)
 
 ***
 
@@ -32,4 +32,4 @@ Defined in: [packages/ui/src/crud/detail/crud-detail-audit-footer.tsx:18](https:
 
 > `optional` **updatedAt**: `string`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail-audit-footer.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail-audit-footer.tsx#L20)
+Defined in: [packages/ui/src/crud/detail/crud-detail-audit-footer.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail-audit-footer.tsx#L22)

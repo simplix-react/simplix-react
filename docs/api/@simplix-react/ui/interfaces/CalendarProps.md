@@ -1359,7 +1359,7 @@ Defined in: [packages/ui/src/base/controls/calendar.tsx:23](https://github.com/s
 
 ### mode?
 
-> `optional` **mode**: `"month"` \| `"week"` \| `"single"` \| `"range"`
+> `optional` **mode**: `"month"` \| `"single"` \| `"range"` \| `"week"`
 
 Defined in: [packages/ui/src/base/controls/calendar.tsx:25](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/calendar.tsx#L25)
 

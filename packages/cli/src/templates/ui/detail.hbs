@@ -77,7 +77,9 @@ export function {{EntityPascal}}Detail({ {{entity}}Id, onClose, onBack{{#if hasU
 {{/if}}
         />
       }>
-        <CrudDetail.Section title={t("{{entity}}.sectionTitle")} variant="flat">
+        {/* Scalar fields sit two to a row — a detail panel that stacks one value per
+            line runs off-screen long before it runs out of fields. */}
+        <CrudDetail.Section title={t("{{entity}}.sectionTitle")} variant="flat" layout="two-column">
 {{#each fields}}
 {{#unless this.isSystemField}}
 {{#unless this.isI18nPair}}

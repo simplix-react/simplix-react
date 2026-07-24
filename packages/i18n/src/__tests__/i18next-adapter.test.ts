@@ -416,6 +416,22 @@ describe("I18nextAdapter", () => {
       adapter.addResources("en", "extra", { msg: "Extra message" });
       expect(adapter.tn("extra", "msg")).toBe("Extra message");
     });
+
+    it("bumps resourcesVersion and notifies onResourcesChange subscribers", async () => {
+      await adapter.initialize();
+      const before = adapter.resourcesVersion;
+      const handler = vi.fn();
+      const unsubscribe = adapter.onResourcesChange(handler);
+
+      adapter.addResources("en", "extra", { msg: "Extra message" });
+      expect(adapter.resourcesVersion).toBe(before + 1);
+      expect(handler).toHaveBeenCalledTimes(1);
+
+      unsubscribe();
+      adapter.addResources("en", "extra", { more: "More" });
+      expect(adapter.resourcesVersion).toBe(before + 2);
+      expect(handler).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe("getI18nextInstance", () => {

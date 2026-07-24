@@ -44,6 +44,7 @@
   "field": {
     "selectPlaceholder": "選択...",
     "searchPlaceholder": "検索...",
+    "selectCountry": "国を選択",
     "noOptions": "選択できる項目がありません。",
     "optional": "任意",
     "takePhoto": "写真を撮る",

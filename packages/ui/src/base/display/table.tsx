@@ -352,6 +352,12 @@ export const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(
           // Data cells default to text-sm (the header row is text-xs); keeps record
           // typography consistent so bare cells don't inherit the table root's text-base.
           "align-middle text-sm [&:has([role=checkbox])]:pr-0",
+          // A single status/enum pill fills a uniform min width so a column's
+          // badges line up regardless of label length — whether it is the cell's
+          // own child or the lone child of an alignment wrapper. Multi-badge /
+          // chip cells hold several badges, so `:only-child` leaves them untouched.
+          "[&>[data-slot=badge]]:min-w-20",
+          "[&>*>[data-slot=badge]:only-child]:min-w-20",
           cellPxMap[size],
           density ? densityCellPyMap[density] : cellPyMap[size],
           variant === "bordered" && "border border-border",

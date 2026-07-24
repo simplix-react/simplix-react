@@ -8,6 +8,6 @@
 
 > **ListDisplayMode** = `"badges"` \| `"comma"` \| `"bullet"`
 
-Defined in: [packages/ui/src/fields/detail/list-field.tsx:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/list-field.tsx#L6)
+Defined in: [packages/ui/src/fields/detail/list-field.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/list-field.tsx#L7)
 
 Display mode for the [DetailListField](../functions/DetailListField.md) component.

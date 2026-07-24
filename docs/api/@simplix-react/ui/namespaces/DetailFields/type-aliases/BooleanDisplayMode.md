@@ -8,6 +8,6 @@
 
 > **BooleanDisplayMode** = `"text"` \| `"icon"`
 
-Defined in: [packages/ui/src/fields/detail/boolean-field.tsx:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/boolean-field.tsx#L5)
+Defined in: [packages/ui/src/fields/detail/boolean-field.tsx:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/boolean-field.tsx#L6)
 
 Display mode for the [DetailBooleanField](../functions/DetailBooleanField.md) component.

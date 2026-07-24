@@ -22,6 +22,11 @@ function openPicker(container: HTMLElement) {
   fireEvent.click(trigger);
 }
 
+/** Press the Select button to commit the pending draft to the field. */
+function commit() {
+  fireEvent.click(screen.getByRole("button", { name: "common.select" }));
+}
+
 /** The option list carries the same aria-label as the spinner input; pick the div. */
 function getColumn(label: string): HTMLElement {
   const column = screen
@@ -77,7 +82,7 @@ describe("DatePicker showTime", () => {
     expect(screen.getByRole("button", { name: "date.pm" }).getAttribute("aria-pressed")).toBe("true");
   });
 
-  it("keeps the popover open and preserves time when a day is clicked", () => {
+  it("stages the day without committing until Select; keeps the popover open", () => {
     const onChange = vi.fn();
     const { container } = render(
       <DatePicker value={value} onChange={onChange} showTime />,
@@ -85,23 +90,27 @@ describe("DatePicker showTime", () => {
     openPicker(container);
     fireEvent.click(screen.getByText("5"));
 
-    expect(onChange).toHaveBeenCalled();
+    // Draft only — nothing reaches the field, popover stays open
+    expect(onChange).not.toHaveBeenCalled();
+    expect(screen.getByLabelText("Previous month")).toBeDefined();
+
+    commit();
     const result = onChange.mock.calls[0][0] as Date;
     expect(result.getDate()).toBe(5);
     expect(result.getHours()).toBe(10);
     expect(result.getMinutes()).toBe(30);
-    // Popover stays open
-    expect(screen.getByLabelText("Previous month")).toBeDefined();
   });
 
-  it("updates the hour when a scroll column item is clicked", () => {
+  it("stages an hour picked from the scroll column and commits it on Select", () => {
     const onChange = vi.fn();
     const { container } = render(
       <DatePicker value={value} onChange={onChange} showTime />,
     );
     openPicker(container);
     fireEvent.click(within(openColumn("date.hour")).getByText("date.am 03"));
+    expect(onChange).not.toHaveBeenCalled();
 
+    commit();
     const result = onChange.mock.calls[0][0] as Date;
     expect(result.getHours()).toBe(3);
     expect(result.getMinutes()).toBe(30);
@@ -123,17 +132,19 @@ describe("DatePicker showTime", () => {
 
     // Clicking a PM hour from an AM value switches the meridiem too
     fireEvent.click(within(hourColumn).getByText("date.pm 03"));
+    commit();
     const result = onChange.mock.calls[0][0] as Date;
     expect(result.getHours()).toBe(15);
   });
 
-  it("updates the minute when a scroll column item is clicked", () => {
+  it("stages a minute picked from the scroll column and commits it on Select", () => {
     const onChange = vi.fn();
     const { container } = render(
       <DatePicker value={value} onChange={onChange} showTime />,
     );
     openPicker(container);
     fireEvent.click(within(openColumn("date.minute")).getByText("45"));
+    commit();
 
     const result = onChange.mock.calls[0][0] as Date;
     expect(result.getHours()).toBe(10);
@@ -147,6 +158,7 @@ describe("DatePicker showTime", () => {
     );
     openPicker(container);
     fireEvent.click(screen.getByRole("button", { name: "date.hour +" }));
+    commit();
 
     const result = onChange.mock.calls[0][0] as Date;
     expect(result.getHours()).toBe(11);
@@ -159,6 +171,7 @@ describe("DatePicker showTime", () => {
     );
     openPicker(container);
     fireEvent.click(screen.getByRole("button", { name: "date.minute -" }));
+    commit();
 
     const result = onChange.mock.calls[0][0] as Date;
     expect(result.getMinutes()).toBe(29);
@@ -171,6 +184,7 @@ describe("DatePicker showTime", () => {
     );
     openPicker(container);
     fireEvent.click(screen.getByRole("button", { name: "date.minute +" }));
+    commit();
 
     const result = onChange.mock.calls[0][0] as Date;
     expect(result.getMinutes()).toBe(0);
@@ -183,12 +197,13 @@ describe("DatePicker showTime", () => {
     );
     openPicker(container);
     fireEvent.keyDown(screen.getByRole("textbox", { name: "date.hour" }), { key: "ArrowUp" });
+    commit();
 
     const result = onChange.mock.calls[0][0] as Date;
     expect(result.getHours()).toBe(11);
   });
 
-  it("commits typed minutes", () => {
+  it("applies typed minutes on Select", () => {
     const onChange = vi.fn();
     const { container } = render(
       <DatePicker value={value} onChange={onChange} showTime />,
@@ -197,6 +212,8 @@ describe("DatePicker showTime", () => {
     fireEvent.change(screen.getByRole("textbox", { name: "date.minute" }), {
       target: { value: "45" },
     });
+    expect(onChange).not.toHaveBeenCalled();
+    commit();
 
     const result = onChange.mock.calls[0][0] as Date;
     expect(result.getMinutes()).toBe(45);
@@ -218,12 +235,15 @@ describe("DatePicker showTime", () => {
     fireEvent.change(hourInput, { target: { value: "108" } });
     // Extra digits beyond two are ignored
     expect(hourInput.value).toBe("10");
-
-    const result = onChange.mock.calls.at(-1)?.[0] as Date;
-    expect(result.getHours()).toBe(10);
+    // Typing stages the draft but does not touch the field yet
+    expect(onChange).not.toHaveBeenCalled();
 
     fireEvent.blur(hourInput);
     expect(hourInput.value).toBe("10");
+
+    commit();
+    const result = onChange.mock.calls.at(-1)?.[0] as Date;
+    expect(result.getHours()).toBe(10);
   });
 
   it("restores the padded value on blur after clearing the input", () => {
@@ -252,6 +272,7 @@ describe("DatePicker showTime", () => {
     fireEvent.change(screen.getByRole("textbox", { name: "date.hour" }), {
       target: { value: "99" },
     });
+    commit();
 
     const result = onChange.mock.calls[0][0] as Date;
     expect(result.getHours()).toBe(23);
@@ -264,6 +285,7 @@ describe("DatePicker showTime", () => {
     );
     openPicker(container);
     fireEvent.click(screen.getByRole("button", { name: "date.pm" }));
+    commit();
 
     const result = onChange.mock.calls[0][0] as Date;
     expect(result.getHours()).toBe(22);
@@ -323,15 +345,16 @@ describe("DatePicker showTime", () => {
     expect((within(hourColumn).getByText("19") as HTMLButtonElement).disabled).toBe(true);
   });
 
-  it("sets the current date and time with the now button", () => {
+  it("stages the current date and time with the now button, committing on Select", () => {
     const onChange = vi.fn();
     const { container } = render(
       <DatePicker value={undefined} onChange={onChange} showTime />,
     );
     openPicker(container);
     fireEvent.click(screen.getByRole("button", { name: "date.now" }));
+    expect(onChange).not.toHaveBeenCalled();
 
-    expect(onChange).toHaveBeenCalled();
+    commit();
     const result = onChange.mock.calls[0][0] as Date;
     expect(Math.abs(result.getTime() - Date.now())).toBeLessThan(60_000);
     expect(result.getSeconds()).toBe(0);
@@ -347,7 +370,7 @@ describe("DatePicker showTime", () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
-  it("applies the pending time when a day is then selected", () => {
+  it("applies the pending time when a day is then selected and committed", () => {
     const onChange = vi.fn();
     const { container } = render(
       <DatePicker value={undefined} onChange={onChange} showTime hour12={false} />,
@@ -359,6 +382,9 @@ describe("DatePicker showTime", () => {
     expect(onChange).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByText("5"));
+    expect(onChange).not.toHaveBeenCalled();
+
+    commit();
     const result = onChange.mock.calls[0][0] as Date;
     expect(result.getDate()).toBe(5);
     expect(result.getHours()).toBe(14);

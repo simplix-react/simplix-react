@@ -78,6 +78,16 @@ Defined in: [packages/ui/src/crud/shared/types.ts:32](https://github.com/simplix
 
 ***
 
+### footer?
+
+> `optional` **footer**: `ReactNode`
+
+Defined in: [packages/ui/src/fields/form/combobox-field.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L26)
+
+Rendered below the option list (e.g. a "more results" hint).
+
+***
+
 ### label?
 
 > `optional` **label**: `string`
@@ -139,6 +149,20 @@ Defined in: [packages/ui/src/fields/form/combobox-field.tsx:15](https://github.c
 ##### value
 
 `T` | `null`
+
+#### Returns
+
+`void`
+
+***
+
+### onExpand()?
+
+> `optional` **onExpand**: () => `void`
+
+Defined in: [packages/ui/src/fields/form/combobox-field.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/combobox-field.tsx#L24)
+
+When set, an expand button renders in the trigger (e.g. to open a full search dialog).
 
 #### Returns
 

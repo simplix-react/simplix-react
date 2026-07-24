@@ -8,6 +8,6 @@
 
 > `const` **textOperatorOrder**: [`SearchOperator`](../enumerations/SearchOperator.md)[]
 
-Defined in: [packages/ui/src/crud/filters/filter-types.ts:49](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-types.ts#L49)
+Defined in: [packages/headless/dist/index.d.ts:291](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L291)
 
 Display order for text filter operators

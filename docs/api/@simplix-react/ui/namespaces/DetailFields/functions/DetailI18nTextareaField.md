@@ -8,7 +8,7 @@
 
 > **DetailI18nTextareaField**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/detail/i18n-text-field.tsx:37](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/i18n-text-field.tsx#L37)
+Defined in: [packages/ui/src/fields/detail/i18n-text-field.tsx:38](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/i18n-text-field.tsx#L38)
 
 ## Parameters
 

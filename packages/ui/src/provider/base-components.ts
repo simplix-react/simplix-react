@@ -73,7 +73,12 @@ import {
 import { CrudDelete } from "../crud/delete";
 import { QueryFallback } from "../crud/shared";
 import { SectionShell } from "../crud/shared/section-shell";
-import { DetailFieldWrapper, FieldWrapper } from "../fields";
+// Deep imports on purpose: the fields barrel re-exports the full field
+// namespaces (FormFields/DetailFields), and this registry is loaded eagerly by
+// UIProvider — importing the barrel here would pull every field (and its data
+// payloads) into the initial bundle of every app.
+import { DetailFieldWrapper } from "../fields/shared/detail-field-wrapper";
+import { FieldWrapper } from "../fields/shared/field-wrapper";
 import { CardBase, FlexBase, GridBase, HeadingBase, StackBase, TextBase } from "../primitives";
 import type { UIComponents } from "./types";
 

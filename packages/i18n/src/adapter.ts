@@ -179,4 +179,20 @@ export interface II18nAdapter {
    * @returns A function that unregisters the handler when called.
    */
   onLocaleChange(handler: (locale: LocaleCode) => void): () => void;
+
+  /**
+   * A monotonically increasing counter bumped each time translation resources
+   * are added or replaced. Lets reactive consumers detect late-arriving
+   * resources (lazy bundles register after the first render).
+   */
+  readonly resourcesVersion?: number;
+
+  /**
+   * Registers a callback invoked whenever translation resources are added or
+   * replaced after initialization. Reactive bindings subscribe to re-render
+   * views that rendered before a lazily loaded namespace arrived.
+   * @param handler - The callback invoked on each resource change.
+   * @returns A function that unregisters the handler when called.
+   */
+  onResourcesChange?(handler: () => void): () => void;
 }

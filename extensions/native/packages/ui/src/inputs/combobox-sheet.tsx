@@ -1,5 +1,5 @@
 import { useTranslation } from "@simplix-react/i18n/react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { ActivityIndicator, ScrollView, View } from "react-native";
 
 import { BottomSheet } from "../overlays/bottom-sheet";
@@ -28,6 +28,14 @@ export interface ComboboxSheetProps<T extends string = string> {
   onSearchChange?: (query: string) => void;
   /** Shows a spinner row while a server search is in flight. */
   loading?: boolean;
+  /**
+   * Replaces the default input-shaped {@link SelectTrigger} — e.g. a compact
+   * calling-code button. Receives the current selection and the sheet opener.
+   */
+  renderTrigger?: (args: {
+    selected: SelectOption<T> | undefined;
+    open: () => void;
+  }) => ReactNode;
   className?: string;
 }
 
@@ -46,6 +54,7 @@ export function ComboboxSheet<T extends string = string>({
   invalid,
   onSearchChange,
   loading,
+  renderTrigger,
   className,
 }: ComboboxSheetProps<T>) {
   const { t } = useTranslation("simplix/native");
@@ -55,7 +64,11 @@ export function ComboboxSheet<T extends string = string>({
   const visibleOptions = useMemo(() => {
     if (onSearchChange || !query) return options;
     const lower = query.toLowerCase();
-    return options.filter((o) => o.label.toLowerCase().includes(lower));
+    return options.filter(
+      (o) =>
+        o.label.toLowerCase().includes(lower) ||
+        (o.searchText?.toLowerCase().includes(lower) ?? false),
+    );
   }, [options, query, onSearchChange]);
 
   const selected = options.find((o) => o.value === value);
@@ -65,20 +78,26 @@ export function ComboboxSheet<T extends string = string>({
     onSearchChange?.(next);
   };
 
+  const openSheet = () => {
+    setQuery("");
+    onSearchChange?.("");
+    setOpen(true);
+  };
+
   return (
     <>
-      <SelectTrigger
-        displayValue={selected?.label}
-        placeholder={placeholder}
-        disabled={disabled}
-        invalid={invalid}
-        onPress={() => {
-          setQuery("");
-          onSearchChange?.("");
-          setOpen(true);
-        }}
-        className={className}
-      />
+      {renderTrigger ? (
+        renderTrigger({ selected, open: openSheet })
+      ) : (
+        <SelectTrigger
+          displayValue={selected?.label}
+          placeholder={placeholder}
+          disabled={disabled}
+          invalid={invalid}
+          onPress={openSheet}
+          className={className}
+        />
+      )}
       <BottomSheet open={open} onClose={() => setOpen(false)} title={title}>
         <View className="border-b border-border px-4 pb-3">
           <Input

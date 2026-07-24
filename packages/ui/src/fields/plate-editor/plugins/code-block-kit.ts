@@ -4,7 +4,7 @@ import {
   CodeLinePlugin,
   CodeSyntaxPlugin,
 } from '@platejs/code-block/react'
-import { all, createLowlight } from 'lowlight'
+import { common, createLowlight } from 'lowlight'
 
 import {
   CodeBlockElement,
@@ -12,8 +12,9 @@ import {
   CodeSyntaxLeaf,
 } from '../components/code-node'
 
-// Create lowlight instance with all languages
-const lowlight = createLowlight(all)
+// Common language set only — the full grammar registry is several times larger
+// and dominates the bundle for consumers that merely render rich text.
+const lowlight = createLowlight(common)
 
 /**
  * Code block with syntax highlighting

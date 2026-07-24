@@ -5,6 +5,8 @@
  * available.
  */
 
+import { BUNDLED_COUNTRY_NAMES } from "./country-names";
+
 export interface CountryEntry {
   /** ISO 3166-1 alpha-2 code. */
   code: string;
@@ -263,8 +265,9 @@ export const COUNTRIES: CountryEntry[] = [
 ];
 
 /**
- * Resolve a localized country name, falling back to the bundled English name
- * when Intl.DisplayNames is unavailable (Hermes) or cannot resolve the code.
+ * Resolve a localized country name: `Intl.DisplayNames` when the runtime
+ * provides it, then the bundled CLDR names for locales the kit ships
+ * (Hermes has no `Intl.DisplayNames`), then the bundled English name.
  */
 export function countryDisplayName(code: string, locale?: string): string {
   const entry = COUNTRIES.find((c) => c.code === code);
@@ -275,7 +278,26 @@ export function countryDisplayName(code: string, locale?: string): string {
       if (resolved && resolved !== code) return resolved;
     }
   } catch {
-    // fall through to the bundled English name
+    // fall through to the bundled names
+  }
+  const language = locale?.split("-")[0];
+  if (language) {
+    const bundled = BUNDLED_COUNTRY_NAMES[language]?.[code];
+    if (bundled) return bundled;
   }
   return entry?.name ?? code;
+}
+
+/**
+ * Flag emoji for an ISO 3166-1 alpha-2 code (regional indicator pair).
+ * Returns an empty string for malformed codes.
+ */
+export function countryFlagEmoji(code: string): string {
+  if (!/^[A-Za-z]{2}$/.test(code)) return "";
+  const base = 0x1f1e6 - 0x41;
+  const upper = code.toUpperCase();
+  return (
+    String.fromCodePoint(base + upper.charCodeAt(0)) +
+    String.fromCodePoint(base + upper.charCodeAt(1))
+  );
 }

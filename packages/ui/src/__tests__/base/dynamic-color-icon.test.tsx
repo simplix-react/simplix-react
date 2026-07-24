@@ -23,9 +23,10 @@ import { DynamicColorIcon } from "../../base/display/dynamic-color-icon";
 afterEach(cleanup);
 
 describe("DynamicColorIcon", () => {
-  it("TC-DCI-1: kebab-case input passes through unchanged", () => {
+  it("TC-DCI-1: kebab-case input passes through unchanged", async () => {
     render(<DynamicColorIcon iconName="circle" />);
-    const icon = screen.getByTestId("dyn-icon");
+    // The icon renders through the lazy DynamicIcon wrapper, so wait for it.
+    const icon = await screen.findByTestId("dyn-icon");
     expect(icon.getAttribute("data-name")).toBe("circle");
   });
 

@@ -6,7 +6,7 @@
 
 # Interface: ColorTheme
 
-Defined in: [packages/ui/src/theme/manifest.ts:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/theme/manifest.ts#L12)
+Defined in: [packages/headless/dist/index.d.ts:620](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L620)
 
 Registry of the color themes shipped by @simplix-react/ui.
 
@@ -24,7 +24,7 @@ attribute — it is the bare `:root` base; selecting it clears the attribute.
 
 > **label**: `string`
 
-Defined in: [packages/ui/src/theme/manifest.ts:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/theme/manifest.ts#L16)
+Defined in: [packages/headless/dist/index.d.ts:624](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L624)
 
 Human-readable picker label.
 
@@ -34,7 +34,7 @@ Human-readable picker label.
 
 > **primaryColor**: `string`
 
-Defined in: [packages/ui/src/theme/manifest.ts:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/theme/manifest.ts#L18)
+Defined in: [packages/headless/dist/index.d.ts:626](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L626)
 
 Light-mode `--primary` of this theme, for the picker swatch.
 
@@ -44,6 +44,6 @@ Light-mode `--primary` of this theme, for the picker swatch.
 
 > **value**: `string`
 
-Defined in: [packages/ui/src/theme/manifest.ts:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/theme/manifest.ts#L14)
+Defined in: [packages/headless/dist/index.d.ts:622](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L622)
 
 Identifier set as `data-color-theme` (`default` = no attribute / base).

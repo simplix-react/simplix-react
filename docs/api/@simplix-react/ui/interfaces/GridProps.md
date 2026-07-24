@@ -1003,7 +1003,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 ### columns?
 
-> `optional` **columns**: `1` \| `2` \| `3` \| `4` \| `6` \| `5` \| `null`
+> `optional` **columns**: `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `null`
 
 Defined in: [packages/ui/src/primitives/grid.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/grid.tsx#L10)
 

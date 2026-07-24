@@ -44,6 +44,7 @@
   "field": {
     "selectPlaceholder": "Select...",
     "searchPlaceholder": "Search...",
+    "selectCountry": "Select country",
     "noOptions": "No options available.",
     "optional": "Optional",
     "takePhoto": "Take photo",

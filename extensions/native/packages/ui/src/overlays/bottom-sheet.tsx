@@ -125,7 +125,17 @@ export function BottomSheet({
   const maxHeight = Dimensions.get("window").height * maxHeightFraction;
 
   return (
-    <Modal transparent visible={visible} onRequestClose={close} animationType="none">
+    <Modal
+      transparent
+      visible={visible}
+      onRequestClose={close}
+      animationType="none"
+      // Modal's default orientation set is portrait-only; an app whose
+      // Info.plist locks to landscape then has no common orientation and
+      // UIKit aborts on presentation. Support every orientation and let
+      // the app's own mask decide.
+      supportedOrientations={["portrait", "portrait-upside-down", "landscape", "landscape-left", "landscape-right"]}
+    >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1 justify-end"

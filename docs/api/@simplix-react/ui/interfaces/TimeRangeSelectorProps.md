@@ -16,7 +16,7 @@ Props for the [TimeRangeSelector](../functions/TimeRangeSelector.md) component.
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:58](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/types.ts#L58)
+Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:66](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/types.ts#L66)
 
 CSS class
 
@@ -79,6 +79,20 @@ Initial window preset key.
 ```ts
 "1d"
 ```
+
+***
+
+### displayZone?
+
+> `optional` **displayZone**: `string`
+
+Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:64](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-range-selector/types.ts#L64)
+
+IANA display zone for the selector's calendar semantics: the calendar-flavored
+preset boundaries ("today"-anchored day windows, calendar-month windows) are
+computed at THIS zone's midnights, and axis/hover/range labels render in it.
+Omitted → browser zone (legacy). Relative windows (last N minutes/hours) are
+zone-independent instants either way.
 
 ***
 

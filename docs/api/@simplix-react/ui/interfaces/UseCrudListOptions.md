@@ -6,7 +6,7 @@
 
 # Interface: UseCrudListOptions
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:34](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L34)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L12)
 
 Configuration options for the [useCrudList](../functions/useCrudList.md) hook.
 
@@ -16,7 +16,7 @@ Configuration options for the [useCrudList](../functions/useCrudList.md) hook.
 
 > `optional` **defaultFilters**: `Record`\<`string`, `unknown`\>
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:46](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L46)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L24)
 
 Initial filter values.
 
@@ -26,7 +26,7 @@ Initial filter values.
 
 > `optional` **defaultPageSize**: `number`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:44](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L44)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L22)
 
 Initial page size. Defaults to `10`.
 
@@ -36,7 +36,7 @@ Initial page size. Defaults to `10`.
 
 > `optional` **defaultSort**: [`SortState`](SortState.md)
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:42](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L42)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L20)
 
 Initial sort field and direction.
 
@@ -46,7 +46,7 @@ Initial sort field and direction.
 
 > `optional` **filterMode**: `"immediate"` \| `"deferred"`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:38](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L38)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L16)
 
 Whether filter changes apply immediately or require an explicit `apply()` call. Defaults to `"deferred"`.
 
@@ -56,7 +56,7 @@ Whether filter changes apply immediately or require an explicit `apply()` call. 
 
 > `optional` **maxRows**: `number`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:40](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L40)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L18)
 
 Maximum number of rows to display.
 
@@ -66,6 +66,6 @@ Maximum number of rows to display.
 
 > `optional` **stateMode**: `"server"` \| `"client"`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:36](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L36)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L14)
 
 Whether filtering/sorting/pagination is handled by the server or client. Defaults to `"server"`.

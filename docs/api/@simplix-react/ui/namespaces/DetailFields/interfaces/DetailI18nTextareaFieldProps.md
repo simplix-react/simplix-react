@@ -6,7 +6,7 @@
 
 # Interface: DetailI18nTextareaFieldProps
 
-Defined in: [packages/ui/src/fields/detail/i18n-text-field.tsx:32](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/i18n-text-field.tsx#L32)
+Defined in: [packages/ui/src/fields/detail/i18n-text-field.tsx:33](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/i18n-text-field.tsx#L33)
 
 Shared props for all detail (read-only) field components.
 
@@ -32,7 +32,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:56](https://github.com/simplix
 
 > `optional` **fallback**: `string`
 
-Defined in: [packages/ui/src/fields/detail/i18n-text-field.tsx:34](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/i18n-text-field.tsx#L34)
+Defined in: [packages/ui/src/fields/detail/i18n-text-field.tsx:35](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/i18n-text-field.tsx#L35)
 
 ***
 
@@ -94,4 +94,4 @@ Defined in: [packages/ui/src/crud/shared/types.ts:13](https://github.com/simplix
 
 > **value**: `Record`\<`string`, `string`\> \| `null` \| `undefined`
 
-Defined in: [packages/ui/src/fields/detail/i18n-text-field.tsx:33](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/i18n-text-field.tsx#L33)
+Defined in: [packages/ui/src/fields/detail/i18n-text-field.tsx:34](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/i18n-text-field.tsx#L34)

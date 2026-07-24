@@ -453,6 +453,7 @@ export { CrudDetail, usePreviousData } from "./crud/detail";
 export type {
   AuditData,
   CrudDetailActionsProps,
+  CrudDetailActionFooterProps,
   CrudDetailAuditFooterProps,
   CrudDetailDefaultActionsProps,
   CrudDetailProps,
@@ -645,6 +646,10 @@ export type {
   DetailListRowProps,
   LabeledFieldProps,
 } from "./base";
+
+// Inline date/time display text — raw-text siblings of DetailDateField for cells, cards, captions
+export { InstantText, CalendarDateText, WallClockText } from "./base";
+export type { InstantTextProps, CalendarDateTextProps, WallClockTextProps } from "./base";
 
 // Map utilities
 export { useMapPageData } from "./map/use-map-page-data";

@@ -3,11 +3,8 @@ import { useTranslation } from "@simplix-react/i18n/react";
 
 import { Calendar, type DateRange } from "../controls/calendar";
 import { CalendarDotsIcon, XIcon } from "../../crud/shared/icons";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "../overlay/popover";
+import { MOBILE_MEDIA_QUERY, ResponsivePopover } from "../overlay/responsive-popover";
+import { useMediaQuery } from "../../hooks/use-media-query";
 import {
   Select,
   SelectContent,
@@ -80,7 +77,7 @@ export interface DateRangePickerProps {
   numberOfMonths?: 1 | 2;
   /** Years range around current year for dropdowns. @defaultValue 10 */
   yearsRange?: number;
-  /** Called when reset is clicked. If not provided, onChange is called with empty range. */
+  /** Called when the field is cleared via the trigger's clear button. If not provided, onChange is called with an empty range. */
   onReset?: () => void;
   /** Disable the picker. */
   disabled?: boolean;
@@ -90,6 +87,11 @@ export interface DateRangePickerProps {
 
 /**
  * Standalone date range picker with a popover calendar, preset ranges, and month/year dropdowns.
+ *
+ * Range and preset picks edit a pending draft: they reach
+ * {@link DateRangePickerProps.onChange} only when the user presses Select, and
+ * Close (or an outside click) discards them. Reset clears the pending draft,
+ * while the trigger's clear button clears the field immediately.
  *
  * @example
  * ```tsx
@@ -113,12 +115,34 @@ export function DateRangePicker({
   const yearFirst = isYearFirstLocale(locale);
   const defaultPlaceholder = placeholder ?? t("date.pickDateRange");
 
+  // On mobile the overlay centers as a dialog and a two-month layout cannot fit,
+  // so fall back to a single visible calendar there.
+  const isMobile = useMediaQuery(MOBILE_MEDIA_QUERY);
+  const visibleMonths = isMobile ? 1 : numberOfMonths;
+
   const [open, setOpen] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
 
   const today = useMemo(() => new Date(), []);
 
+  // Draft holds the pending range inside the popover. It reaches the field
+  // (via onChange) only when the user presses Select; closing via Close or an
+  // outside click discards it.
+  const [draft, setDraft] = useState<DateRange>(value);
   const [viewMonth, setViewMonth] = useState<Date>(value.from ?? today);
+
+  // Reset the draft to the committed value each time the popover opens.
+  const handleOpenChange = useCallback(
+    (next: boolean) => {
+      if (next) {
+        setDraft(value);
+        setSelectedPreset(null);
+        setViewMonth(value.from ?? today);
+      }
+      setOpen(next);
+    },
+    [value, today],
+  );
 
   const currentYear = today.getFullYear();
   const years = useMemo(
@@ -164,33 +188,40 @@ export function DateRangePicker({
 
   const handlePresetSelect = useCallback(
     (preset: { label: string; from: Date; to: Date }) => {
-      onChange({ from: preset.from, to: preset.to });
+      setDraft({ from: preset.from, to: preset.to });
       setSelectedPreset(preset.label);
       setViewMonth(preset.from);
     },
-    [onChange],
+    [],
   );
 
-  const handleRangeSelect = useCallback(
-    (range: DateRange) => {
-      onChange(range);
-      setSelectedPreset(null);
-      if (range.from && range.to) {
-        // Don't auto-close for range pickers - user may want presets
-      }
-    },
-    [onChange],
-  );
+  const handleRangeSelect = useCallback((range: DateRange) => {
+    setDraft(range);
+    setSelectedPreset(null);
+  }, []);
 
-  const handleReset = useCallback(() => {
+  // Footer "Reset": clears the pending selection only (no commit).
+  const handleResetDraft = useCallback(() => {
+    setDraft({ from: undefined, to: undefined });
+    setSelectedPreset(null);
+    setViewMonth(today);
+  }, [today]);
+
+  // Trigger clear (X): clears the committed field immediately.
+  const handleClearField = useCallback(() => {
     if (onReset) {
       onReset();
     } else {
       onChange({ from: undefined, to: undefined });
     }
-    setSelectedPreset(null);
-    setViewMonth(today);
-  }, [onChange, onReset, today]);
+    setOpen(false);
+  }, [onChange, onReset]);
+
+  // Commit the draft to the field and close.
+  const handleCommit = useCallback(() => {
+    onChange(draft);
+    setOpen(false);
+  }, [onChange, draft]);
 
   const handlePrevMonth = useCallback(() => {
     setViewMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
@@ -211,15 +242,15 @@ export function DateRangePicker({
     return `${formatDateMedium(value.from, bcp47)} – ...`;
   }, [value, bcp47, numberOfMonths]);
 
-  // Inclusive number of days in the selected range
+  // Inclusive number of days in the pending (draft) range
   const dayCount = useMemo(() => {
-    if (!value.from || !value.to) return null;
-    const from = new Date(value.from);
+    if (!draft.from || !draft.to) return null;
+    const from = new Date(draft.from);
     from.setHours(0, 0, 0, 0);
-    const to = new Date(value.to);
+    const to = new Date(draft.to);
     to.setHours(0, 0, 0, 0);
     return Math.round((to.getTime() - from.getTime()) / 86_400_000) + 1;
-  }, [value]);
+  }, [draft]);
 
   // The second calendar always shows the month after the first
   const secondViewMonth = useMemo(
@@ -252,11 +283,11 @@ export function DateRangePicker({
   };
 
   return (
-    // modal: inside a Dialog, the dialog's scroll lock blocks wheel events on
-    // body-portaled popovers; a modal popover registers its own scroll-lock
-    // layer so wheel scrolling works in the calendar's option lists.
-    <Popover open={open} onOpenChange={setOpen} modal>
-      <PopoverTrigger asChild>
+    <ResponsivePopover
+      open={open}
+      onOpenChange={handleOpenChange}
+      title={defaultPlaceholder}
+      trigger={
         <button
           type="button"
           disabled={disabled}
@@ -277,12 +308,12 @@ export function DateRangePicker({
             <span
               role="button"
               tabIndex={0}
-              onClick={(e) => { e.stopPropagation(); handleReset(); }}
+              onClick={(e) => { e.stopPropagation(); handleClearField(); }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.stopPropagation();
                   e.preventDefault();
-                  handleReset();
+                  handleClearField();
                 }
               }}
               className="rounded-sm p-0.5 hover:bg-muted transition-colors"
@@ -291,15 +322,11 @@ export function DateRangePicker({
             </span>
           )}
         </button>
-      </PopoverTrigger>
-      <PopoverContent
-        className="w-auto p-0"
-        align="start"
-        style={{ maxHeight: "var(--radix-popover-content-available-height)", overflowY: "auto" }}
-      >
-        <div className="flex">
+      }
+    >
+      <div className="flex">
           {/* Presets panel (desktop only, dual month) */}
-          {numberOfMonths === 2 && (
+          {visibleMonths === 2 && (
             <div className="hidden md:flex flex-col border-r">
               <div className="px-3 pt-3 pb-2">
                 <h4 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{t("date.presets")}</h4>
@@ -352,7 +379,7 @@ export function DateRangePicker({
                   (v) => setViewMonth((prev) => new Date(parseInt(v), prev.getMonth(), 1)),
                 )}
               </div>
-              {numberOfMonths === 2 && (
+              {visibleMonths === 2 && (
                 <div className="flex flex-1 items-center justify-center gap-1">
                   {renderMonthYear(
                     secondViewMonth,
@@ -377,24 +404,24 @@ export function DateRangePicker({
             {/* Calendar */}
             <Calendar
               mode="range"
-              selectedRange={value}
+              selectedRange={draft}
               onSelectRange={handleRangeSelect}
               month={viewMonth}
               onMonthChange={setViewMonth}
-              numberOfMonths={numberOfMonths}
+              numberOfMonths={visibleMonths}
               locale={bcp47}
               hideHeader
             />
 
-            {/* Range summary: start / end / day count */}
-            {value.from && (
+            {/* Range summary: start / end / day count (reflects the pending draft) */}
+            {draft.from && (
               <div className="mt-2 flex items-center justify-center gap-2 rounded-md bg-muted/50 px-3 py-1.5 text-xs">
                 <span className="text-muted-foreground">{t("date.startDate")}</span>
-                <span className="font-medium">{formatDateMedium(value.from, bcp47)}</span>
+                <span className="font-medium">{formatDateMedium(draft.from, bcp47)}</span>
                 <span className="text-muted-foreground">→</span>
                 <span className="text-muted-foreground">{t("date.endDate")}</span>
                 <span className="font-medium">
-                  {value.to ? formatDateMedium(value.to, bcp47) : "..."}
+                  {draft.to ? formatDateMedium(draft.to, bcp47) : "..."}
                 </span>
                 {dayCount != null && (
                   <span className="rounded bg-primary/10 px-1.5 py-0.5 font-semibold text-primary">
@@ -404,7 +431,7 @@ export function DateRangePicker({
               </div>
             )}
 
-            {/* Footer: Today / Reset / Close */}
+            {/* Footer: Today / Reset (draft) / Close (discard) / Select (commit) */}
             <div className="flex justify-between gap-2 border-t pt-2 mt-2">
               <button
                 type="button"
@@ -417,7 +444,7 @@ export function DateRangePicker({
                 <button
                   type="button"
                   className="inline-flex h-7 items-center rounded-md border border-input px-2 text-xs hover:bg-accent"
-                  onClick={handleReset}
+                  onClick={handleResetDraft}
                 >
                   {t("date.reset")}
                 </button>
@@ -428,11 +455,17 @@ export function DateRangePicker({
                 >
                   {t("common.close")}
                 </button>
+                <button
+                  type="button"
+                  className="inline-flex h-7 items-center rounded-md bg-primary px-2.5 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+                  onClick={handleCommit}
+                >
+                  {t("common.select")}
+                </button>
               </div>
             </div>
           </div>
-        </div>
-      </PopoverContent>
-    </Popover>
+      </div>
+    </ResponsivePopover>
   );
 }

@@ -8,11 +8,11 @@
 
 > **DetailStatusField**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/detail/status-field.tsx:49](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/status-field.tsx#L49)
+Defined in: [packages/ui/src/fields/detail/status-field.tsx:50](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/status-field.tsx#L50)
 
 Read-only status display field. Renders a tone-driven [StatusBadge](../../../variables/StatusBadge.md)
-inside the standard detail field wrapper, with the same em-dash empty
-fallback as other `DetailFields.*` components.
+inside the standard detail field wrapper, with the same no-value-badge
+empty fallback as other `DetailFields.*` components.
 
 Unlike [DetailBadgeField](DetailBadgeField.md) (which maps values to legacy Badge variants),
 this field takes a resolved [StatusTone](../../../type-aliases/StatusTone.md), so semantic status/severity

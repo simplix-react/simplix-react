@@ -20,7 +20,7 @@ Props for the [ChipFilter](../functions/ChipFilter.md) component.
 
 ### columns?
 
-> `optional` **columns**: `1` \| `2` \| `3` \| `4` \| `6` \| `5`
+> `optional` **columns**: `1` \| `2` \| `3` \| `4` \| `5` \| `6`
 
 Defined in: [packages/ui/src/crud/filters/chip-filter.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/chip-filter.tsx#L28)
 

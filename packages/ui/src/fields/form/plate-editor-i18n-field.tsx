@@ -1,21 +1,13 @@
 import type { LocaleCode, LocaleConfig } from "@simplix-react/i18n";
 import type { Value } from "platejs";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { EMPTY_EDITOR_VALUE } from "../plate-editor/types";
-import { PlateEditorBasic } from "../plate-editor/plate-editor-basic";
-import { PlateEditorStandard } from "../plate-editor/plate-editor-standard";
-import { PlateEditorAdvanced } from "../plate-editor/plate-editor-advanced";
+import { LAZY_PRESET_BY_VARIANT } from "../shared/plate-editor-presets";
 import { isPlateEditorEmpty, parsePlateI18nFromJson } from "../shared/plate-editor-helpers";
 import { FieldWrapper } from "../shared/field-wrapper";
 import { LanguageSelector } from "../shared/language-selector";
 import type { PlateEditorVariant } from "./plate-editor-field";
-
-const PRESET_BY_VARIANT = {
-  basic: PlateEditorBasic,
-  standard: PlateEditorStandard,
-  advanced: PlateEditorAdvanced,
-} as const;
 
 export interface PlateEditorI18nFieldProps extends CommonFieldProps {
   value: Record<LocaleCode, string>;
@@ -88,7 +80,7 @@ export function PlateEditorI18nField({
     />
   ) : undefined;
 
-  const PresetComponent = PRESET_BY_VARIANT[variant];
+  const PresetComponent = LAZY_PRESET_BY_VARIANT[variant];
 
   return (
     <FieldWrapper
@@ -103,18 +95,20 @@ export function PlateEditorI18nField({
       className={className}
       {...variantProps}
     >
-      <PresetComponent
-        key={currentLang}
-        value={currentPlateValue}
-        onChange={handleChange}
-        placeholder={placeholder}
-        readOnly={disabled}
-        disabled={disabled}
-        defaultHeight={defaultHeight}
-        minHeight={minHeight}
-        maxHeight={maxHeight}
-        resizable={resizable}
-      />
+      <Suspense fallback={null}>
+        <PresetComponent
+          key={currentLang}
+          value={currentPlateValue}
+          onChange={handleChange}
+          placeholder={placeholder}
+          readOnly={disabled}
+          disabled={disabled}
+          defaultHeight={defaultHeight}
+          minHeight={minHeight}
+          maxHeight={maxHeight}
+          resizable={resizable}
+        />
+      </Suspense>
     </FieldWrapper>
   );
 }

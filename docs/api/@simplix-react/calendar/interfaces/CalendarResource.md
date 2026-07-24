@@ -13,6 +13,16 @@ the consumer maps its own entities onto this shape.
 
 ## Properties
 
+### avatarFallbackUrl?
+
+> `optional` **avatarFallbackUrl**: `string`
+
+Defined in: [model/types.ts:75](https://github.com/simplix-react/simplix-react/blob/main/model/types.ts#L75)
+
+Optional image used when `avatarUrl` fails to load (e.g. the endpoint 404s).
+
+***
+
 ### avatarUrl?
 
 > `optional` **avatarUrl**: `string`

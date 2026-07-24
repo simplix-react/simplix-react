@@ -13,6 +13,32 @@ export interface DomainTranslationConfig {
 
 const registry = new Map<string, DomainTranslationConfig>();
 
+/** Listener invoked whenever domain translations are (re)registered. */
+export type DomainTranslationsListener = (
+  config: DomainTranslationConfig,
+) => void;
+
+const domainListeners = new Set<DomainTranslationsListener>();
+
+/**
+ * Subscribes to future {@link registerDomainTranslations} calls.
+ *
+ * Used internally by {@link createI18nConfig} so domain packages whose module
+ * evaluation happens after i18n initialization (lazy bundles, inline
+ * requires) still get their translations loaded into the active adapter.
+ *
+ * @param listener - Called with each newly registered configuration.
+ * @returns An unsubscribe function.
+ */
+export function onDomainTranslationsRegistered(
+  listener: DomainTranslationsListener,
+): () => void {
+  domainListeners.add(listener);
+  return () => {
+    domainListeners.delete(listener);
+  };
+}
+
 /**
  * Registers domain-specific translations into the global registry.
  *
@@ -38,6 +64,9 @@ export function registerDomainTranslations(
   config: DomainTranslationConfig,
 ): void {
   registry.set(config.domain, config);
+  for (const listener of domainListeners) {
+    listener(config);
+  }
 }
 
 /**

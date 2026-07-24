@@ -58,10 +58,13 @@ try {
 }
 
 // Modules that must exist exactly once at runtime (React renderer, native
-// modules, query/mock state). Files bundled from a linked framework checkout
-// would otherwise resolve these from the framework's own node_modules and
-// ship a second copy — framework-origin imports are re-anchored to the app.
-// Every listed name must be a direct app dependency.
+// modules, query/mock state). Files bundled from outside the app directory —
+// a linked framework checkout AND sibling workspace packages/modules — would
+// otherwise resolve these from their own node_modules and ship a second copy
+// (a version drift there means two Reacts in one bundle and "Cannot read
+// property 'useState' of null"). Imports of these from any non-app origin are
+// re-anchored to the app's dependency graph — Metro's equivalent of Vite's
+// resolve.dedupe. Every listed name must be a direct app dependency.
 const SINGLETON_MODULES = [
   "react",
   "react-native",
@@ -90,12 +93,11 @@ const SINGLETON_MODULES = [
 
 const defaultResolveRequest = config.resolver.resolveRequest;
 config.resolver.resolveRequest = (context, moduleName, platform) => {
-  const fromFramework =
-    frameworkRoot != null &&
+  const externalOrigin =
     typeof context.originModulePath === "string" &&
-    context.originModulePath.startsWith(frameworkRoot);
+    !context.originModulePath.startsWith(__dirname);
   const isSingleton =
-    fromFramework &&
+    externalOrigin &&
     SINGLETON_MODULES.some(
       (name) => moduleName === name || moduleName.startsWith(`${name}/`),
     );
