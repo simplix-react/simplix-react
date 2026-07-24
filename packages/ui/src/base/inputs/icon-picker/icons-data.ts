@@ -8334,3 +8334,5 @@ export const iconsData: Array<{
     "tags": ["magnifying glass","plus"]
   }
     ];
+/** A single icon entry from the built-in icons catalog. */
+export type IconData = (typeof iconsData)[number];

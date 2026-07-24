@@ -1,5 +1,6 @@
 import { Check } from "lucide-react";
-import { DynamicIcon, type IconName } from "lucide-react/dynamic";
+import type { IconName } from "lucide-react/dynamic";
+import { DynamicIconLazy } from "../../base/display/dynamic-icon-lazy";
 import { useMemo, type ReactNode } from "react";
 
 import type { CommonFieldProps } from "../../crud/shared/types";
@@ -115,7 +116,7 @@ function ToggleChip<T extends string>({
         aria-hidden="true"
         className={cn("size-3 opacity-50", pressed && "opacity-100")}
       />
-      {option.icon && <DynamicIcon name={option.icon} className="size-3" />}
+      {option.icon && <DynamicIconLazy name={option.icon} className="size-3" />}
       {option.label}
     </button>
   );
@@ -246,7 +247,7 @@ export function GroupedToggleField<T extends string = string>({
                   className="gap-1.5 text-sm font-medium text-foreground"
                 >
                   {group.icon && (
-                    <DynamicIcon
+                    <DynamicIconLazy
                       name={group.icon}
                       className="size-4 text-muted-foreground"
                       aria-hidden="true"

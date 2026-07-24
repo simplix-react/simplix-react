@@ -92,6 +92,7 @@ export const BadgeBase = forwardRef<HTMLSpanElement, BadgeProps>(
     return (
       <Comp
         ref={ref}
+        data-slot="badge"
         className={cn(badgeVariants({ variant, rounded, size }), className)}
         {...rest}
       />

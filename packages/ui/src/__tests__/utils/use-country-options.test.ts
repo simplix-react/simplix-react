@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { renderHook } from "@testing-library/react";
+import { renderHook, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@simplix-react/i18n/react", () => ({
@@ -18,26 +18,25 @@ vi.mock("country-flag-icons/react/3x2", () => ({
   XX: undefined, // intentionally undefined to test the !Flag branch
 }));
 
-import { useCountryOptions, flagComponents } from "../../utils/use-country-options";
+import { useCountryOptions } from "../../utils/use-country-options";
 
-describe("flagComponents", () => {
-  it("is a record mapping country codes to components", () => {
-    expect(flagComponents).toBeDefined();
-    expect(typeof flagComponents["US"]).toBe("function");
-    expect(typeof flagComponents["KR"]).toBe("function");
-  });
-});
+// The flag catalog loads lazily, so every assertion waits for the async fill.
+async function renderLoaded() {
+  const rendered = renderHook(() => useCountryOptions());
+  await waitFor(() => expect(rendered.result.current.length).toBeGreaterThan(0));
+  return rendered;
+}
 
 describe("useCountryOptions", () => {
-  it("returns an array of country options", () => {
-    const { result } = renderHook(() => useCountryOptions());
+  it("returns an array of country options once loaded", async () => {
+    const { result } = await renderLoaded();
 
     expect(Array.isArray(result.current)).toBe(true);
     expect(result.current.length).toBe(4);
   });
 
-  it("each option has code, localName, englishName, and Flag", () => {
-    const { result } = renderHook(() => useCountryOptions());
+  it("each option has code, localName, englishName, and Flag", async () => {
+    const { result } = await renderLoaded();
 
     for (const option of result.current) {
       expect(option).toHaveProperty("code");
@@ -51,16 +50,16 @@ describe("useCountryOptions", () => {
     }
   });
 
-  it("options are sorted by localName", () => {
-    const { result } = renderHook(() => useCountryOptions());
+  it("options are sorted by localName", async () => {
+    const { result } = await renderLoaded();
 
     const names = result.current.map((o) => o.localName);
     const sorted = [...names].sort((a, b) => a.localeCompare(b, "en"));
     expect(names).toEqual(sorted);
   });
 
-  it("uses Intl.DisplayNames for name resolution", () => {
-    const { result } = renderHook(() => useCountryOptions());
+  it("uses Intl.DisplayNames for name resolution", async () => {
+    const { result } = await renderLoaded();
 
     const us = result.current.find((o) => o.code === "US");
     expect(us).toBeDefined();
@@ -68,9 +67,9 @@ describe("useCountryOptions", () => {
     expect(us!.englishName).toContain("United States");
   });
 
-  it("skips countries without a flag component", () => {
+  it("skips countries without a flag component", async () => {
     // Our mock includes "XX" in countries but no XX flag in react/3x2
-    const { result } = renderHook(() => useCountryOptions());
+    const { result } = await renderLoaded();
     const codes = result.current.map((o) => o.code);
     expect(codes).toContain("US");
     expect(codes).toContain("KR");

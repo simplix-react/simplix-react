@@ -116,4 +116,36 @@ describe("DateRangePicker", () => {
     const preset = screen.getByText("date.last15Days");
     expect(preset.className).toContain("whitespace-nowrap");
   });
+
+  it("stages a preset and commits it only when Select is pressed", () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <DateRangePicker value={{ from: undefined, to: undefined }} onChange={onChange} />,
+    );
+    openPicker(container);
+
+    // A preset stages the range without committing
+    fireEvent.click(screen.getByRole("button", { name: "date.yesterday" }));
+    expect(onChange).not.toHaveBeenCalled();
+    // Summary reflects the pending draft
+    expect(screen.getByText("date.startDate")).toBeDefined();
+
+    fireEvent.click(screen.getByRole("button", { name: "common.select" }));
+    expect(onChange).toHaveBeenCalledTimes(1);
+    const committed = onChange.mock.calls[0][0] as { from?: Date; to?: Date };
+    expect(committed.from).toBeInstanceOf(Date);
+    expect(committed.to).toBeInstanceOf(Date);
+  });
+
+  it("discards the pending range when Close is pressed", () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <DateRangePicker value={{ from: undefined, to: undefined }} onChange={onChange} />,
+    );
+    openPicker(container);
+
+    fireEvent.click(screen.getByRole("button", { name: "date.yesterday" }));
+    fireEvent.click(screen.getByRole("button", { name: "common.close" }));
+    expect(onChange).not.toHaveBeenCalled();
+  });
 });

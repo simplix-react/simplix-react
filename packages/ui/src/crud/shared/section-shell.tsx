@@ -107,7 +107,7 @@ export function SectionShell({
             {trailing}
             {collapsible && (
               <CollapsiblePrimitive.Trigger asChild>
-                <Button type="button" variant="ghost" size="icon-xs">
+                <Button type="button" variant="ghost" size="icon-xs" className="size-6">
                   <CaretDownIcon
                     className={cn(
                       "h-4 w-4 transition-transform duration-200",
@@ -127,7 +127,7 @@ export function SectionShell({
   );
 
   const header = isCard ? (
-    <div className="rounded-t-lg border-b bg-muted/50 pl-4 pr-2 py-1">
+    <div className="rounded-t-lg border-b bg-muted/50 pl-4 pr-2 py-0.5">
       {headerContent}
     </div>
   ) : (

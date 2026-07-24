@@ -13,6 +13,7 @@ import {
   wrapValue,
   type TimeValue,
 } from "../../utils/time-select";
+import { useMediaQuery } from "../../hooks/use-media-query";
 
 export type { TimeValue };
 
@@ -311,6 +312,14 @@ export function TimeSelectControl({
   const [columnWidths, setColumnWidths] = useState<{ hour?: number; minute?: number }>({});
   // Which time input is being edited — its option list is the one that drops open.
   const [activeTimeField, setActiveTimeField] = useState<"hour" | "minute" | null>(null);
+  // On a phone the floating list covers the very field it belongs to and fights
+  // the on-screen keyboard, so the spinner boxes and their steppers are the whole
+  // control there — every value stays reachable by typing or stepping.
+  const listSuppressed = useMediaQuery("(max-width: 767px)");
+  const activateField = useCallback(
+    (field: "hour" | "minute") => setActiveTimeField(listSuppressed ? null : field),
+    [listSuppressed],
+  );
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   // True while a pointer interaction that started inside the wrapper is ongoing.
@@ -462,7 +471,7 @@ export function TimeSelectControl({
             onCommit={handleHourCommit}
             ariaLabel={t("date.hour")}
             disabled={disabled}
-            onActivate={() => setActiveTimeField("hour")}
+            onActivate={() => activateField("hour")}
           />
         </div>
         <div ref={setMinuteInputEl} className="flex grow items-stretch">
@@ -474,7 +483,7 @@ export function TimeSelectControl({
             onCommit={handleMinuteCommit}
             ariaLabel={t("date.minute")}
             disabled={disabled}
-            onActivate={() => setActiveTimeField("minute")}
+            onActivate={() => activateField("minute")}
           />
         </div>
       </div>

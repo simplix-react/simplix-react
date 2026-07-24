@@ -1,6 +1,9 @@
 export { DetailBadgeField } from "./badge-field";
 export type { BadgeVariant, DetailBadgeFieldProps } from "./badge-field";
 
+export { DetailBlockField } from "./block-field";
+export type { DetailBlockFieldProps } from "./block-field";
+
 export { DetailBooleanField } from "./boolean-field";
 export type { DetailBooleanFieldProps, BooleanDisplayMode } from "./boolean-field";
 

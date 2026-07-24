@@ -341,10 +341,10 @@ export const CalendarBase = forwardRef<HTMLDivElement, CalendarProps>(
         {/* Month mode: sizing row + month grid */}
         {isMonthMode && (
           <div>
-            {/* Invisible sizing row — 7 cells matching day grid w-8 to maintain consistent width */}
-            <div className="grid grid-cols-7 gap-0">
+            {/* Invisible sizing row — 7 cells matching the day grid to maintain consistent width */}
+            <div className="grid grid-cols-[repeat(7,minmax(0,2.75rem))] gap-0 md:grid-cols-[repeat(7,minmax(0,2.25rem))]">
               {Array.from({ length: 7 }, (_, i) => (
-                <span key={i} className="h-0 w-8" aria-hidden="true" />
+                <span key={i} className="h-0 w-full" aria-hidden="true" />
               ))}
             </div>
             <MonthGrid
@@ -364,11 +364,11 @@ export const CalendarBase = forwardRef<HTMLDivElement, CalendarProps>(
             {months.map(({ year, month, days }) => (
               <div key={`${year}-${month}`} className={cn("flex-1 min-w-0", numberOfMonths > 1 && "rounded-md border border-input p-2")}>
                 {/* Day-of-week headers */}
-                <header className="grid grid-cols-7 gap-0">
+                <header className="grid grid-cols-[repeat(7,minmax(0,2.75rem))] gap-0 md:grid-cols-[repeat(7,minmax(0,2.25rem))]">
                   {weekdayNames.map((day, i) => (
                     <span
                       key={i}
-                      className="flex h-8 w-8 items-center justify-center text-xs font-medium text-muted-foreground"
+                      className="flex h-9 w-full items-center justify-center text-sm font-medium text-muted-foreground md:h-7 md:text-xs"
                     >
                       {day}
                     </span>
@@ -376,7 +376,7 @@ export const CalendarBase = forwardRef<HTMLDivElement, CalendarProps>(
                 </header>
 
                 {/* Day grid */}
-                <div className="grid grid-cols-7 gap-0">
+                <div className="grid grid-cols-[repeat(7,minmax(0,2.75rem))] gap-0 md:grid-cols-[repeat(7,minmax(0,2.25rem))]">
                   {days.map((date, i) => {
                     if (!date) {
                       return <span key={`empty-${i}`} className="h-8" />;
@@ -416,7 +416,9 @@ export const CalendarBase = forwardRef<HTMLDivElement, CalendarProps>(
                         onMouseEnter={mode === "week" ? () => setHoveredDate(date) : undefined}
                         onMouseLeave={mode === "week" ? () => setHoveredDate(undefined) : undefined}
                         className={cn(
-                          "flex h-8 w-8 items-center justify-center rounded-md text-sm",
+                          // Normal weight and a softened foreground: at this size full
+                          // contrast reads heavier than the muted weekday row above it.
+                          "flex h-11 w-full items-center justify-center rounded-md text-lg font-normal text-foreground/80 md:h-9 md:text-[15px]",
                           "hover:bg-accent hover:text-accent-foreground",
                           "focus-visible:outline-none",
                           "disabled:pointer-events-none disabled:opacity-50",

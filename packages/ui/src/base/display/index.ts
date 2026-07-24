@@ -7,6 +7,9 @@ export type { BooleanBadgeProps } from "./boolean-badge";
 export { EmptyValue } from "./empty-value";
 export type { EmptyValueProps } from "./empty-value";
 
+export { InstantText, CalendarDateText, WallClockText } from "./date-time-text";
+export type { InstantTextProps, CalendarDateTextProps, WallClockTextProps } from "./date-time-text";
+
 export { EmptyValueBadge } from "./empty-value-badge";
 export type { EmptyValueBadgeProps } from "./empty-value-badge";
 

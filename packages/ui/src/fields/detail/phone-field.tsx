@@ -1,8 +1,8 @@
 import { useMemo } from "react";
-import { parsePhoneNumberFromString } from "libphonenumber-js";
 
 import type { CommonDetailFieldProps } from "../../crud/shared/types";
 import { useCountryOptions } from "../../utils/use-country-options";
+import { useLibphonenumber } from "../../utils/use-libphonenumber";
 import { detailFallback } from "../shared/detail-fallback";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
 
@@ -34,10 +34,11 @@ export function DetailPhoneField({
   className,
 }: DetailPhoneFieldProps) {
   const options = useCountryOptions();
+  const lib = useLibphonenumber();
 
   const parsed = useMemo(
-    () => (value ? parsePhoneNumberFromString(value) : undefined),
-    [value],
+    () => (value && lib ? lib.parsePhoneNumberFromString(value) : undefined),
+    [value, lib],
   );
   const option = useMemo(
     () => (parsed?.country ? options.find((o) => o.code === parsed.country) : undefined),

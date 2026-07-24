@@ -1,5 +1,4 @@
 import { useMemo, useRef, useState } from "react";
-import { AsYouType, getCountryCallingCode, parsePhoneNumberFromString } from "libphonenumber-js";
 import type { CountryCode } from "libphonenumber-js";
 import { useTranslation } from "@simplix-react/i18n/react";
 
@@ -9,6 +8,7 @@ import { Flex } from "../../primitives/flex";
 import { cn } from "../../utils/cn";
 import { useCountryOptions } from "../../utils/use-country-options";
 import type { CountryOption } from "../../utils/use-country-options";
+import { useLibphonenumber, type LibphonenumberModule } from "../../utils/use-libphonenumber";
 import { FieldWrapper } from "../shared/field-wrapper";
 
 /** Props for the {@link PhoneField} form component. */
@@ -26,17 +26,22 @@ interface PhoneCountryOption extends CountryOption {
   callingCode: string;
 }
 
-function callingCodeOf(code: string): string | undefined {
+function callingCodeOf(lib: LibphonenumberModule | null, code: string): string | undefined {
+  if (!lib) return undefined;
   try {
-    return getCountryCallingCode(code as CountryCode);
+    return lib.getCountryCallingCode(code as CountryCode);
   } catch {
     return undefined;
   }
 }
 
 /** Formats an E.164 value for display in its national convention. */
-function toNational(value: string, country: CountryCode | undefined): string {
-  const parsed = parsePhoneNumberFromString(value, country);
+function toNational(
+  lib: LibphonenumberModule | null,
+  value: string,
+  country: CountryCode | undefined,
+): string {
+  const parsed = lib?.parsePhoneNumberFromString(value, country);
   if (parsed) return parsed.formatNational();
   return value.replace(/^\+\d*/, "");
 }
@@ -63,36 +68,44 @@ export function PhoneField({
 }: PhoneFieldProps) {
   const { Popover, PopoverTrigger, PopoverContent, Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem, Input } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
+  const lib = useLibphonenumber();
   const countryOptions = useCountryOptions();
   const [open, setOpen] = useState(false);
 
   const options = useMemo<PhoneCountryOption[]>(
     () =>
       countryOptions.flatMap((option) => {
-        const callingCode = callingCodeOf(option.code);
+        const callingCode = callingCodeOf(lib, option.code);
         return callingCode ? [{ ...option, callingCode }] : [];
       }),
-    [countryOptions],
+    [countryOptions, lib],
   );
 
   // Country and national text are derived from the incoming value once, then
   // owned locally while the user types; an external value change (form reset,
-  // server refresh) re-derives both.
-  const initialCountry = (): CountryCode | undefined => {
-    const parsed = value ? parsePhoneNumberFromString(value) : undefined;
+  // server refresh) re-derives both. The phone library loads lazily, so the
+  // derivation also re-runs once when it arrives.
+  const deriveCountry = (l: LibphonenumberModule | null): CountryCode | undefined => {
+    const parsed = value && l ? l.parsePhoneNumberFromString(value) : undefined;
     if (parsed?.country) return parsed.country;
-    if (defaultCountry && callingCodeOf(defaultCountry)) return defaultCountry as CountryCode;
+    if (defaultCountry && callingCodeOf(l, defaultCountry)) return defaultCountry as CountryCode;
     return undefined;
   };
-  const [country, setCountry] = useState<CountryCode | undefined>(initialCountry);
-  const [national, setNational] = useState(() => (value ? toNational(value, initialCountry()) : ""));
+  const [country, setCountry] = useState<CountryCode | undefined>(() => deriveCountry(lib));
+  const [national, setNational] = useState(() => (value ? toNational(lib, value, deriveCountry(lib)) : ""));
   const lastEmitted = useRef(value);
+  const lastLib = useRef(lib);
 
   if (value !== lastEmitted.current) {
     lastEmitted.current = value;
-    const nextCountry = value ? (parsePhoneNumberFromString(value)?.country ?? country) : country;
+    const nextCountry = value ? (lib?.parsePhoneNumberFromString(value)?.country ?? country) : country;
     setCountry(nextCountry);
-    setNational(value ? toNational(value, nextCountry) : "");
+    setNational(value ? toNational(lib, value, nextCountry) : "");
+  } else if (lib !== lastLib.current) {
+    lastLib.current = lib;
+    const nextCountry = deriveCountry(lib) ?? country;
+    setCountry(nextCountry);
+    setNational(value ? toNational(lib, value, nextCountry) : national);
   }
 
   const emit = (next: string) => {
@@ -101,7 +114,7 @@ export function PhoneField({
   };
 
   const handleNationalChange = (text: string) => {
-    if (!country) {
+    if (!country || !lib) {
       setNational(text);
       emit(text.replace(/[^\d+]/g, ""));
       return;
@@ -112,10 +125,10 @@ export function PhoneField({
       emit("");
       return;
     }
-    const formatter = new AsYouType(country);
+    const formatter = new lib.AsYouType(country);
     const formatted = formatter.input(digits);
     setNational(formatted);
-    emit(formatter.getNumber()?.number ?? `+${getCountryCallingCode(country)}${digits}`);
+    emit(formatter.getNumber()?.number ?? `+${lib.getCountryCallingCode(country)}${digits}`);
   };
 
   const handleCountrySelect = (code: string) => {
@@ -123,11 +136,11 @@ export function PhoneField({
     setCountry(nextCountry);
     setOpen(false);
     const digits = national.replace(/[^\d]/g, "");
-    if (!digits) return;
-    const formatter = new AsYouType(nextCountry);
+    if (!digits || !lib) return;
+    const formatter = new lib.AsYouType(nextCountry);
     const formatted = formatter.input(digits);
     setNational(formatted);
-    emit(formatter.getNumber()?.number ?? `+${getCountryCallingCode(nextCountry)}${digits}`);
+    emit(formatter.getNumber()?.number ?? `+${lib.getCountryCallingCode(nextCountry)}${digits}`);
   };
 
   const selected = country ? options.find((option) => option.code === country) : undefined;

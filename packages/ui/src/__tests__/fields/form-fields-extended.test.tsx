@@ -913,7 +913,9 @@ describe("DateTimeField", () => {
     fireEvent.change(screen.getByRole("textbox", { name: "date.hour" }), {
       target: { value: "15" },
     });
-    expect(onChange).toHaveBeenCalled();
+    // Time edits stage the draft; committing via Select reaches the field
+    expect(onChange).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "common.select" }));
     const result = onChange.mock.calls[0][0] as Date;
     expect(result.getHours()).toBe(15);
     expect(result.getMinutes()).toBe(30);
@@ -929,7 +931,8 @@ describe("DateTimeField", () => {
     fireEvent.change(screen.getByRole("textbox", { name: "date.minute" }), {
       target: { value: "45" },
     });
-    expect(onChange).toHaveBeenCalled();
+    expect(onChange).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "common.select" }));
     const result = onChange.mock.calls[0][0] as Date;
     expect(result.getHours()).toBe(10);
     expect(result.getMinutes()).toBe(45);
@@ -945,7 +948,8 @@ describe("DateTimeField", () => {
     fireEvent.change(screen.getByRole("textbox", { name: "date.hour" }), {
       target: { value: "99" },
     });
-    expect(onChange).toHaveBeenCalled();
+    expect(onChange).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "common.select" }));
     const result = onChange.mock.calls[0][0] as Date;
     expect(result.getHours()).toBe(23);
   });
@@ -960,7 +964,8 @@ describe("DateTimeField", () => {
     fireEvent.change(screen.getByRole("textbox", { name: "date.minute" }), {
       target: { value: "99" },
     });
-    expect(onChange).toHaveBeenCalled();
+    expect(onChange).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "common.select" }));
     const result = onChange.mock.calls[0][0] as Date;
     expect(result.getMinutes()).toBe(59);
   });

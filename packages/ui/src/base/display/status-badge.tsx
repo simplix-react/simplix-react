@@ -69,6 +69,7 @@ export const StatusBadge = forwardRef<HTMLSpanElement, StatusBadgeProps>(
     return (
       <span
         ref={ref}
+        data-slot="badge"
         className={cn(
           "inline-flex items-center justify-center whitespace-nowrap rounded-full font-medium",
           SIZE_CLASS[size],

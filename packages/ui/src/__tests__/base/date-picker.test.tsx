@@ -130,4 +130,36 @@ describe("DatePicker", () => {
     expect(screen.getByLabelText("Previous month")).toBeDefined();
     expect(screen.getByLabelText("Next month")).toBeDefined();
   });
+
+  it("stages a day pick and commits it only when Select is pressed", () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <DatePicker value={new Date(2024, 0, 15)} onChange={onChange} />,
+    );
+    fireEvent.click(container.querySelector("button") as HTMLButtonElement);
+    fireEvent.click(screen.getByText("20"));
+
+    // The pick is staged; the field is untouched and the popover stays open
+    expect(onChange).not.toHaveBeenCalled();
+    expect(screen.getByLabelText("Previous month")).toBeDefined();
+
+    fireEvent.click(screen.getByRole("button", { name: "common.select" }));
+    expect(onChange).toHaveBeenCalledTimes(1);
+    const result = onChange.mock.calls[0][0] as Date;
+    expect(result.getFullYear()).toBe(2024);
+    expect(result.getMonth()).toBe(0);
+    expect(result.getDate()).toBe(20);
+  });
+
+  it("discards the staged pick when Close is pressed", () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <DatePicker value={new Date(2024, 0, 15)} onChange={onChange} />,
+    );
+    fireEvent.click(container.querySelector("button") as HTMLButtonElement);
+    fireEvent.click(screen.getByText("20"));
+    fireEvent.click(screen.getByRole("button", { name: "common.close" }));
+
+    expect(onChange).not.toHaveBeenCalled();
+  });
 });

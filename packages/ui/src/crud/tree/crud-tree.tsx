@@ -289,7 +289,7 @@ function RowActionCell<T>({ row, actions, variant }: { row: T; actions: RowActio
               const icon = resolvedIcon ?? ACTION_ICONS[action.type];
               const isDisabled = action.disabled?.(row) ?? false;
               return (
-                <Tooltip key={action.type}>
+                <Tooltip key={`${action.type}-${i}`}>
                   <TooltipTrigger asChild>
                     <Button
                       size="icon-xs"
@@ -316,14 +316,14 @@ function RowActionCell<T>({ row, actions, variant }: { row: T; actions: RowActio
 
   return (
     <Flex gap="xs" justify="end">
-      {visible.map((action) => {
+      {visible.map((action, i) => {
         const label = action.label ?? t(ACTION_LABEL_KEYS[action.type]);
         const resolvedIcon = typeof action.icon === "function" ? action.icon(row) : action.icon;
         const icon = resolvedIcon ?? ACTION_ICONS[action.type];
         const isDisabled = action.disabled?.(row) ?? false;
         return (
           <Button
-            key={action.type}
+            key={`${action.type}-${i}`}
             size="sm"
             variant={variant}
             onClick={(e) => handleClick(e, action)}
