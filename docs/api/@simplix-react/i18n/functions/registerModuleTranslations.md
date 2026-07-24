@@ -8,7 +8,7 @@
 
 > **registerModuleTranslations**(`translations`): `void`
 
-Defined in: [module-translations.ts:68](https://github.com/simplix-react/simplix-react/blob/main/module-translations.ts#L68)
+Defined in: [module-translations.ts:101](https://github.com/simplix-react/simplix-react/blob/main/module-translations.ts#L101)
 
 Registers module translations into the global registry.
 

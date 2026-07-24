@@ -8,7 +8,7 @@
 
 > **useCrudFormSubmit**\<`T`, `TId`\>(`options`): [`UseCrudFormSubmitResult`](../interfaces/UseCrudFormSubmitResult.md)\<`T`\>
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:132](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L132)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:125](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L125)
 
 Handles create/update mutation dispatch for CRUD forms.
 Determines whether to create or update based on `entityId` presence.

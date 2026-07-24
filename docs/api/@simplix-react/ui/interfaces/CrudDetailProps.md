@@ -42,7 +42,7 @@ Audit metadata rendered as a fixed bar between the scrollable body and the foote
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:91](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L91)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:98](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L98)
 
 ***
 
@@ -50,7 +50,20 @@ Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:91](https://github.com/
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:90](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L90)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:97](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L97)
+
+***
+
+### displayZone?
+
+> `optional` **displayZone**: `string`
+
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:95](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L95)
+
+IANA display timezone for the audit footer's timestamps. Falls back to the
+ambient `DisplayZoneProvider` zone (then the browser zone) when omitted —
+pass it on screens whose fields pin a zone other than the ambient one so
+the audit stamps agree with the rest of the panel.
 
 ***
 
@@ -58,7 +71,7 @@ Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:90](https://github.com/
 
 > `optional` **fieldVariant**: [`FieldVariant`](FieldVariant.md)
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:89](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L89)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:96](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L96)
 
 ***
 

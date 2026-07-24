@@ -6,7 +6,7 @@
 
 # Interface: PlateEditorFieldProps
 
-Defined in: [packages/ui/src/fields/form/plate-editor-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-field.tsx#L17)
+Defined in: [packages/ui/src/fields/form/plate-editor-field.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-field.tsx#L18)
 
 Shared props for all form field components.
 
@@ -32,7 +32,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:49](https://github.com/simplix
 
 > `optional` **defaultHeight**: `string` \| `number`
 
-Defined in: [packages/ui/src/fields/form/plate-editor-field.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-field.tsx#L22)
+Defined in: [packages/ui/src/fields/form/plate-editor-field.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-field.tsx#L23)
 
 ***
 
@@ -118,7 +118,7 @@ label for screen readers only.
 
 > `optional` **maxHeight**: `string` \| `number`
 
-Defined in: [packages/ui/src/fields/form/plate-editor-field.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-field.tsx#L24)
+Defined in: [packages/ui/src/fields/form/plate-editor-field.tsx:25](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-field.tsx#L25)
 
 ***
 
@@ -126,7 +126,7 @@ Defined in: [packages/ui/src/fields/form/plate-editor-field.tsx:24](https://gith
 
 > `optional` **minHeight**: `string` \| `number`
 
-Defined in: [packages/ui/src/fields/form/plate-editor-field.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-field.tsx#L23)
+Defined in: [packages/ui/src/fields/form/plate-editor-field.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-field.tsx#L24)
 
 ***
 
@@ -134,7 +134,7 @@ Defined in: [packages/ui/src/fields/form/plate-editor-field.tsx:23](https://gith
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/fields/form/plate-editor-field.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-field.tsx#L19)
+Defined in: [packages/ui/src/fields/form/plate-editor-field.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-field.tsx#L20)
 
 #### Parameters
 
@@ -152,7 +152,7 @@ Defined in: [packages/ui/src/fields/form/plate-editor-field.tsx:19](https://gith
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/fields/form/plate-editor-field.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-field.tsx#L21)
+Defined in: [packages/ui/src/fields/form/plate-editor-field.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-field.tsx#L22)
 
 ***
 
@@ -187,7 +187,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:35](https://github.com/simplix
 
 > `optional` **resizable**: `boolean`
 
-Defined in: [packages/ui/src/fields/form/plate-editor-field.tsx:25](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-field.tsx#L25)
+Defined in: [packages/ui/src/fields/form/plate-editor-field.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-field.tsx#L26)
 
 ***
 
@@ -224,7 +224,7 @@ below at full width.
 
 > **value**: `string`
 
-Defined in: [packages/ui/src/fields/form/plate-editor-field.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-field.tsx#L18)
+Defined in: [packages/ui/src/fields/form/plate-editor-field.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-field.tsx#L19)
 
 ***
 
@@ -232,7 +232,7 @@ Defined in: [packages/ui/src/fields/form/plate-editor-field.tsx:18](https://gith
 
 > `optional` **variant**: [`PlateEditorVariant`](../type-aliases/PlateEditorVariant.md)
 
-Defined in: [packages/ui/src/fields/form/plate-editor-field.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-field.tsx#L20)
+Defined in: [packages/ui/src/fields/form/plate-editor-field.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-field.tsx#L21)
 
 ***
 

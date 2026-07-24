@@ -6,7 +6,7 @@
 
 # Interface: DetailLocationFieldProps
 
-Defined in: [packages/ui/src/fields/detail/location-field.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/location-field.tsx#L18)
+Defined in: [packages/ui/src/fields/detail/location-field.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/location-field.tsx#L19)
 
 Props for the [DetailLocationField](../functions/DetailLocationField.md) component.
 
@@ -32,9 +32,9 @@ Defined in: [packages/ui/src/crud/shared/types.ts:56](https://github.com/simplix
 
 > `optional` **fallback**: `string`
 
-Defined in: [packages/ui/src/fields/detail/location-field.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/location-field.tsx#L23)
+Defined in: [packages/ui/src/fields/detail/location-field.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/location-field.tsx#L24)
 
-Fallback text when coordinates are empty (0,0). Defaults to em-dash.
+Fallback text when coordinates are empty (0,0). Defaults to the shared no-value badge.
 
 ***
 
@@ -42,7 +42,7 @@ Fallback text when coordinates are empty (0,0). Defaults to em-dash.
 
 > `optional` **fallbackTileUrl**: `string`
 
-Defined in: [packages/ui/src/fields/detail/location-field.tsx:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/location-field.tsx#L29)
+Defined in: [packages/ui/src/fields/detail/location-field.tsx:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/location-field.tsx#L30)
 
 PMTiles file URL for offline map fallback (e.g. "/offline-map.pmtiles").
 
@@ -52,7 +52,7 @@ PMTiles file URL for offline map fallback (e.g. "/offline-map.pmtiles").
 
 > `optional` **hideWhenEmpty**: `boolean`
 
-Defined in: [packages/ui/src/fields/detail/location-field.tsx:25](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/location-field.tsx#L25)
+Defined in: [packages/ui/src/fields/detail/location-field.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/location-field.tsx#L26)
 
 When true, renders nothing if coordinates are empty. Defaults to false.
 
@@ -86,7 +86,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:55](https://github.com/simplix
 
 > **latitude**: `number`
 
-Defined in: [packages/ui/src/fields/detail/location-field.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/location-field.tsx#L19)
+Defined in: [packages/ui/src/fields/detail/location-field.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/location-field.tsx#L20)
 
 ***
 
@@ -112,7 +112,7 @@ label for screen readers only.
 
 > **longitude**: `number`
 
-Defined in: [packages/ui/src/fields/detail/location-field.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/location-field.tsx#L20)
+Defined in: [packages/ui/src/fields/detail/location-field.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/location-field.tsx#L21)
 
 ***
 
@@ -120,7 +120,7 @@ Defined in: [packages/ui/src/fields/detail/location-field.tsx:20](https://github
 
 > `optional` **markerIcon**: `ReactNode`
 
-Defined in: [packages/ui/src/fields/detail/location-field.tsx:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/location-field.tsx#L27)
+Defined in: [packages/ui/src/fields/detail/location-field.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/location-field.tsx#L28)
 
 Custom marker icon. Replaces the default blue dot.
 
@@ -142,4 +142,4 @@ Defined in: [packages/ui/src/crud/shared/types.ts:13](https://github.com/simplix
 
 > `optional` **zoom**: `number`
 
-Defined in: [packages/ui/src/fields/detail/location-field.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/location-field.tsx#L21)
+Defined in: [packages/ui/src/fields/detail/location-field.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/location-field.tsx#L22)

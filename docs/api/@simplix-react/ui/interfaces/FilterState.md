@@ -6,7 +6,7 @@
 
 # Interface: FilterState
 
-Defined in: [packages/ui/src/crud/shared/types.ts:75](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L75)
+Defined in: [packages/headless/dist/index.d.ts:13](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L13)
 
 Represents filter state with search text and key-value filters.
 
@@ -16,7 +16,7 @@ Represents filter state with search text and key-value filters.
 
 > **search**: `string`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:76](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L76)
+Defined in: [packages/headless/dist/index.d.ts:14](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L14)
 
 ***
 
@@ -24,4 +24,4 @@ Defined in: [packages/ui/src/crud/shared/types.ts:76](https://github.com/simplix
 
 > **values**: `Record`\<`string`, `unknown`\>
 
-Defined in: [packages/ui/src/crud/shared/types.ts:77](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L77)
+Defined in: [packages/headless/dist/index.d.ts:15](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L15)

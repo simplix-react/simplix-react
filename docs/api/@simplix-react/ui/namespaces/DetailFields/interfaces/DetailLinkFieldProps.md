@@ -6,7 +6,7 @@
 
 # Interface: DetailLinkFieldProps
 
-Defined in: [packages/ui/src/fields/detail/link-field.tsx:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/link-field.tsx#L5)
+Defined in: [packages/ui/src/fields/detail/link-field.tsx:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/link-field.tsx#L6)
 
 Props for the [DetailLinkField](../functions/DetailLinkField.md) component.
 
@@ -32,7 +32,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:56](https://github.com/simplix
 
 > `optional` **external**: `boolean`
 
-Defined in: [packages/ui/src/fields/detail/link-field.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/link-field.tsx#L11)
+Defined in: [packages/ui/src/fields/detail/link-field.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/link-field.tsx#L12)
 
 Whether the link opens in a new tab with `rel="noopener noreferrer"`.
 
@@ -42,9 +42,9 @@ Whether the link opens in a new tab with `rel="noopener noreferrer"`.
 
 > `optional` **fallback**: `string`
 
-Defined in: [packages/ui/src/fields/detail/link-field.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/link-field.tsx#L13)
+Defined in: [packages/ui/src/fields/detail/link-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/link-field.tsx#L14)
 
-Fallback text when value is null, undefined, or empty string. Defaults to em-dash.
+Fallback text when value is null, undefined, or empty string. Defaults to the shared no-value badge.
 
 ***
 
@@ -52,7 +52,7 @@ Fallback text when value is null, undefined, or empty string. Defaults to em-das
 
 > **href**: `string` \| `null` \| `undefined`
 
-Defined in: [packages/ui/src/fields/detail/link-field.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/link-field.tsx#L9)
+Defined in: [packages/ui/src/fields/detail/link-field.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/link-field.tsx#L10)
 
 Link URL.
 
@@ -116,6 +116,6 @@ Defined in: [packages/ui/src/crud/shared/types.ts:13](https://github.com/simplix
 
 > **value**: `string` \| `null` \| `undefined`
 
-Defined in: [packages/ui/src/fields/detail/link-field.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/link-field.tsx#L7)
+Defined in: [packages/ui/src/fields/detail/link-field.tsx:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/link-field.tsx#L8)
 
 Display text for the link.

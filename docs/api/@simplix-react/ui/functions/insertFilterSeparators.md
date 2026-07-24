@@ -8,7 +8,7 @@
 
 > **insertFilterSeparators**\<`T`\>(`filters`): (`T` \| \{ `type`: `"separator"`; \})[]
 
-Defined in: [packages/ui/src/crud/filters/filter-utils.ts:51](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-utils.ts#L51)
+Defined in: [packages/headless/dist/index.d.ts:318](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L318)
 
 Insert separator markers between filter groups for visual layout.
 Adds { type: "separator" } items between groups based on getFilterLayout.

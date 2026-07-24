@@ -6,9 +6,10 @@
 
 # Interface: ListHookResult\<T\>
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L13)
+Defined in: [packages/headless/dist/index.d.ts:26](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L26)
 
-Minimal return shape for list data hooks passed to [useCrudList](../functions/useCrudList.md).
+Minimal return shape for list data hooks passed to a list state machine
+(the web `useCrudList` page model or the native `useEntityFeed` feed model).
 
 ## Type Parameters
 
@@ -24,7 +25,7 @@ Row data type.
 
 > **data**: `T`[] \| `undefined`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L15)
+Defined in: [packages/headless/dist/index.d.ts:28](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L28)
 
 Array of row items, or `undefined` while loading.
 
@@ -34,7 +35,7 @@ Array of row items, or `undefined` while loading.
 
 > **error**: `Error` \| `null`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L21)
+Defined in: [packages/headless/dist/index.d.ts:34](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L34)
 
 Error object if the query failed, otherwise `null`.
 
@@ -44,7 +45,7 @@ Error object if the query failed, otherwise `null`.
 
 > **isLoading**: `boolean`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L19)
+Defined in: [packages/headless/dist/index.d.ts:32](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L32)
 
 Whether the query is currently loading.
 
@@ -54,6 +55,6 @@ Whether the query is currently loading.
 
 > `optional` **total**: `number`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L17)
+Defined in: [packages/headless/dist/index.d.ts:30](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L30)
 
 Total number of items (for server-side pagination).

@@ -6,7 +6,7 @@
 
 # Interface: ListHook()\<T\>
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L29)
+Defined in: [packages/headless/dist/index.d.ts:41](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L41)
 
 Hook signature for list data fetching, compatible with Orval-generated query hooks.
 
@@ -20,7 +20,7 @@ Row data type.
 
 > **ListHook**(`params?`, `options?`): [`ListHookResult`](ListHookResult.md)\<`T`\>
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L30)
+Defined in: [packages/headless/dist/index.d.ts:42](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L42)
 
 Hook signature for list data fetching, compatible with Orval-generated query hooks.
 

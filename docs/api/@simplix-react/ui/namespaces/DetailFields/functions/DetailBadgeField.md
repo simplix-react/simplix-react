@@ -8,7 +8,7 @@
 
 > **DetailBadgeField**\<`T`\>(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/detail/badge-field.tsx:36](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/badge-field.tsx#L36)
+Defined in: [packages/ui/src/fields/detail/badge-field.tsx:37](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/badge-field.tsx#L37)
 
 Read-only badge display field. Maps values to badge color variants.
 

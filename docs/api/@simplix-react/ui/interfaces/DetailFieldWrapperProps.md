@@ -6,7 +6,7 @@
 
 # Interface: DetailFieldWrapperProps
 
-Defined in: [packages/ui/src/fields/shared/detail-field-wrapper.tsx:33](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/detail-field-wrapper.tsx#L33)
+Defined in: [packages/ui/src/fields/shared/detail-field-wrapper.tsx:34](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/detail-field-wrapper.tsx#L34)
 
 Props for the [DetailFieldWrapper](../functions/DetailFieldWrapper.md) component.
 
@@ -20,7 +20,7 @@ Props for the [DetailFieldWrapper](../functions/DetailFieldWrapper.md) component
 
 > **children**: `ReactNode`
 
-Defined in: [packages/ui/src/fields/shared/detail-field-wrapper.tsx:39](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/detail-field-wrapper.tsx#L39)
+Defined in: [packages/ui/src/fields/shared/detail-field-wrapper.tsx:40](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/detail-field-wrapper.tsx#L40)
 
 ***
 
@@ -28,7 +28,7 @@ Defined in: [packages/ui/src/fields/shared/detail-field-wrapper.tsx:39](https://
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/fields/shared/detail-field-wrapper.tsx:38](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/detail-field-wrapper.tsx#L38)
+Defined in: [packages/ui/src/fields/shared/detail-field-wrapper.tsx:39](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/detail-field-wrapper.tsx#L39)
 
 ***
 
@@ -36,7 +36,7 @@ Defined in: [packages/ui/src/fields/shared/detail-field-wrapper.tsx:38](https://
 
 > `optional` **label**: `string`
 
-Defined in: [packages/ui/src/fields/shared/detail-field-wrapper.tsx:35](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/detail-field-wrapper.tsx#L35)
+Defined in: [packages/ui/src/fields/shared/detail-field-wrapper.tsx:36](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/detail-field-wrapper.tsx#L36)
 
 Visible label text for the field.
 
@@ -46,7 +46,7 @@ Visible label text for the field.
 
 > `optional` **labelKey**: `string`
 
-Defined in: [packages/ui/src/fields/shared/detail-field-wrapper.tsx:37](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/detail-field-wrapper.tsx#L37)
+Defined in: [packages/ui/src/fields/shared/detail-field-wrapper.tsx:38](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/detail-field-wrapper.tsx#L38)
 
 i18n key for label resolution.
 

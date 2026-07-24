@@ -3531,7 +3531,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 ### size?
 
-> `optional` **size**: `"sm"` \| `"lg"` \| `"full"` \| `"md"` \| `"xl"` \| `"2xl"` \| `null`
+> `optional` **size**: `"sm"` \| `"lg"` \| `"md"` \| `"xl"` \| `"full"` \| `"2xl"` \| `null`
 
 Defined in: [packages/ui/src/primitives/container.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/container.tsx#L9)
 

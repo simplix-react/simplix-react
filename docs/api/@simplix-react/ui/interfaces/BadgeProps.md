@@ -3528,7 +3528,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 ### rounded?
 
-> `optional` **rounded**: `"none"` \| `"sm"` \| `"lg"` \| `"full"` \| `"md"` \| `"xl"` \| `null`
+> `optional` **rounded**: `"none"` \| `"sm"` \| `"lg"` \| `"md"` \| `"xl"` \| `"full"` \| `null`
 
 Defined in: [packages/ui/src/base/display/badge.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L12)
 

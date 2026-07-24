@@ -6,7 +6,7 @@
 
 # Interface: DetailBooleanFieldProps
 
-Defined in: [packages/ui/src/fields/detail/boolean-field.tsx:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/boolean-field.tsx#L8)
+Defined in: [packages/ui/src/fields/detail/boolean-field.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/boolean-field.tsx#L9)
 
 Props for the [DetailBooleanField](../functions/DetailBooleanField.md) component.
 
@@ -32,9 +32,9 @@ Defined in: [packages/ui/src/crud/shared/types.ts:56](https://github.com/simplix
 
 > `optional` **fallback**: `string`
 
-Defined in: [packages/ui/src/fields/detail/boolean-field.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/boolean-field.tsx#L16)
+Defined in: [packages/ui/src/fields/detail/boolean-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/boolean-field.tsx#L17)
 
-Fallback text when value is null or undefined. Defaults to em-dash.
+Fallback text when value is null or undefined. Defaults to the shared no-value badge.
 
 ***
 
@@ -66,7 +66,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:55](https://github.com/simplix
 
 > `optional` **labels**: `object`
 
-Defined in: [packages/ui/src/fields/detail/boolean-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/boolean-field.tsx#L14)
+Defined in: [packages/ui/src/fields/detail/boolean-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/boolean-field.tsx#L15)
 
 Custom labels for true/false values when using `"text"` mode.
 
@@ -102,7 +102,7 @@ label for screen readers only.
 
 > `optional` **mode**: [`BooleanDisplayMode`](../type-aliases/BooleanDisplayMode.md)
 
-Defined in: [packages/ui/src/fields/detail/boolean-field.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/boolean-field.tsx#L12)
+Defined in: [packages/ui/src/fields/detail/boolean-field.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/boolean-field.tsx#L13)
 
 Display mode: `"text"` shows Yes/No, `"icon"` shows check/x icons. Defaults to `"text"`.
 
@@ -124,6 +124,6 @@ Defined in: [packages/ui/src/crud/shared/types.ts:13](https://github.com/simplix
 
 > **value**: `boolean` \| `null` \| `undefined`
 
-Defined in: [packages/ui/src/fields/detail/boolean-field.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/boolean-field.tsx#L10)
+Defined in: [packages/ui/src/fields/detail/boolean-field.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/boolean-field.tsx#L11)
 
 Boolean value to display.

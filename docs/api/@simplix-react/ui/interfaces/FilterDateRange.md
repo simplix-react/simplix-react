@@ -6,7 +6,7 @@
 
 # Interface: FilterDateRange
 
-Defined in: [packages/ui/src/crud/filters/filter-types.ts:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-types.ts#L23)
+Defined in: [packages/headless/dist/index.d.ts:278](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L278)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/crud/filters/filter-types.ts:23](https://github.com
 
 > **from**: `Date` \| `undefined`
 
-Defined in: [packages/ui/src/crud/filters/filter-types.ts:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-types.ts#L24)
+Defined in: [packages/headless/dist/index.d.ts:279](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L279)
 
 ***
 
@@ -22,4 +22,4 @@ Defined in: [packages/ui/src/crud/filters/filter-types.ts:24](https://github.com
 
 > **to**: `Date` \| `undefined`
 
-Defined in: [packages/ui/src/crud/filters/filter-types.ts:25](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-types.ts#L25)
+Defined in: [packages/headless/dist/index.d.ts:280](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L280)

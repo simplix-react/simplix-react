@@ -6,7 +6,7 @@
 
 # Enumeration: SearchOperator
 
-Defined in: [packages/ui/src/crud/filters/filter-types.ts:2](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-types.ts#L2)
+Defined in: [packages/headless/dist/index.d.ts:258](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L258)
 
 Search operators supported by searchable-jpa backend
 
@@ -16,7 +16,7 @@ Search operators supported by searchable-jpa backend
 
 > **BETWEEN**: `"between"`
 
-Defined in: [packages/ui/src/crud/filters/filter-types.ts:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-types.ts#L15)
+Defined in: [packages/headless/dist/index.d.ts:271](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L271)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [packages/ui/src/crud/filters/filter-types.ts:15](https://github.com
 
 > **CONTAINS**: `"contains"`
 
-Defined in: [packages/ui/src/crud/filters/filter-types.ts:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-types.ts#L5)
+Defined in: [packages/headless/dist/index.d.ts:261](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L261)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [packages/ui/src/crud/filters/filter-types.ts:5](https://github.com/
 
 > **ENDS\_WITH**: `"endsWith"`
 
-Defined in: [packages/ui/src/crud/filters/filter-types.ts:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-types.ts#L8)
+Defined in: [packages/headless/dist/index.d.ts:264](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L264)
 
 ***
 
@@ -40,7 +40,7 @@ Defined in: [packages/ui/src/crud/filters/filter-types.ts:8](https://github.com/
 
 > **EQUALS**: `"equals"`
 
-Defined in: [packages/ui/src/crud/filters/filter-types.ts:3](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-types.ts#L3)
+Defined in: [packages/headless/dist/index.d.ts:259](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L259)
 
 ***
 
@@ -48,7 +48,7 @@ Defined in: [packages/ui/src/crud/filters/filter-types.ts:3](https://github.com/
 
 > **GREATER\_THAN**: `"greaterThan"`
 
-Defined in: [packages/ui/src/crud/filters/filter-types.ts:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-types.ts#L9)
+Defined in: [packages/headless/dist/index.d.ts:265](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L265)
 
 ***
 
@@ -56,7 +56,7 @@ Defined in: [packages/ui/src/crud/filters/filter-types.ts:9](https://github.com/
 
 > **GREATER\_THAN\_OR\_EQUAL**: `"greaterThanOrEqualTo"`
 
-Defined in: [packages/ui/src/crud/filters/filter-types.ts:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-types.ts#L11)
+Defined in: [packages/headless/dist/index.d.ts:267](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L267)
 
 ***
 
@@ -64,7 +64,7 @@ Defined in: [packages/ui/src/crud/filters/filter-types.ts:11](https://github.com
 
 > **IN**: `"in"`
 
-Defined in: [packages/ui/src/crud/filters/filter-types.ts:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-types.ts#L13)
+Defined in: [packages/headless/dist/index.d.ts:269](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L269)
 
 ***
 
@@ -72,7 +72,7 @@ Defined in: [packages/ui/src/crud/filters/filter-types.ts:13](https://github.com
 
 > **IS\_FALSE**: `"isFalse"`
 
-Defined in: [packages/ui/src/crud/filters/filter-types.ts:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-types.ts#L20)
+Defined in: [packages/headless/dist/index.d.ts:276](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L276)
 
 ***
 
@@ -80,7 +80,7 @@ Defined in: [packages/ui/src/crud/filters/filter-types.ts:20](https://github.com
 
 > **IS\_NOT\_NULL**: `"isNotNull"`
 
-Defined in: [packages/ui/src/crud/filters/filter-types.ts:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-types.ts#L18)
+Defined in: [packages/headless/dist/index.d.ts:274](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L274)
 
 ***
 
@@ -88,7 +88,7 @@ Defined in: [packages/ui/src/crud/filters/filter-types.ts:18](https://github.com
 
 > **IS\_NULL**: `"isNull"`
 
-Defined in: [packages/ui/src/crud/filters/filter-types.ts:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-types.ts#L17)
+Defined in: [packages/headless/dist/index.d.ts:273](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L273)
 
 ***
 
@@ -96,7 +96,7 @@ Defined in: [packages/ui/src/crud/filters/filter-types.ts:17](https://github.com
 
 > **IS\_TRUE**: `"isTrue"`
 
-Defined in: [packages/ui/src/crud/filters/filter-types.ts:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-types.ts#L19)
+Defined in: [packages/headless/dist/index.d.ts:275](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L275)
 
 ***
 
@@ -104,7 +104,7 @@ Defined in: [packages/ui/src/crud/filters/filter-types.ts:19](https://github.com
 
 > **LESS\_THAN**: `"lessThan"`
 
-Defined in: [packages/ui/src/crud/filters/filter-types.ts:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-types.ts#L10)
+Defined in: [packages/headless/dist/index.d.ts:266](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L266)
 
 ***
 
@@ -112,7 +112,7 @@ Defined in: [packages/ui/src/crud/filters/filter-types.ts:10](https://github.com
 
 > **LESS\_THAN\_OR\_EQUAL**: `"lessThanOrEqualTo"`
 
-Defined in: [packages/ui/src/crud/filters/filter-types.ts:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-types.ts#L12)
+Defined in: [packages/headless/dist/index.d.ts:268](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L268)
 
 ***
 
@@ -120,7 +120,7 @@ Defined in: [packages/ui/src/crud/filters/filter-types.ts:12](https://github.com
 
 > **NOT\_BETWEEN**: `"notBetween"`
 
-Defined in: [packages/ui/src/crud/filters/filter-types.ts:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-types.ts#L16)
+Defined in: [packages/headless/dist/index.d.ts:272](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L272)
 
 ***
 
@@ -128,7 +128,7 @@ Defined in: [packages/ui/src/crud/filters/filter-types.ts:16](https://github.com
 
 > **NOT\_CONTAINS**: `"notContains"`
 
-Defined in: [packages/ui/src/crud/filters/filter-types.ts:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-types.ts#L6)
+Defined in: [packages/headless/dist/index.d.ts:262](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L262)
 
 ***
 
@@ -136,7 +136,7 @@ Defined in: [packages/ui/src/crud/filters/filter-types.ts:6](https://github.com/
 
 > **NOT\_EQUALS**: `"notEquals"`
 
-Defined in: [packages/ui/src/crud/filters/filter-types.ts:4](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-types.ts#L4)
+Defined in: [packages/headless/dist/index.d.ts:260](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L260)
 
 ***
 
@@ -144,7 +144,7 @@ Defined in: [packages/ui/src/crud/filters/filter-types.ts:4](https://github.com/
 
 > **NOT\_IN**: `"notIn"`
 
-Defined in: [packages/ui/src/crud/filters/filter-types.ts:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-types.ts#L14)
+Defined in: [packages/headless/dist/index.d.ts:270](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L270)
 
 ***
 
@@ -152,4 +152,4 @@ Defined in: [packages/ui/src/crud/filters/filter-types.ts:14](https://github.com
 
 > **STARTS\_WITH**: `"startsWith"`
 
-Defined in: [packages/ui/src/crud/filters/filter-types.ts:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-types.ts#L7)
+Defined in: [packages/headless/dist/index.d.ts:263](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L263)

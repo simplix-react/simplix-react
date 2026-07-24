@@ -6,7 +6,7 @@
 
 # Interface: DetailTextFieldProps
 
-Defined in: [packages/ui/src/fields/detail/text-field.tsx:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/text-field.tsx#L8)
+Defined in: [packages/ui/src/fields/detail/text-field.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/text-field.tsx#L9)
 
 Props for the [DetailTextField](../functions/DetailTextField.md) component.
 
@@ -32,7 +32,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:56](https://github.com/simplix
 
 > `optional` **copyable**: `boolean`
 
-Defined in: [packages/ui/src/fields/detail/text-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/text-field.tsx#L14)
+Defined in: [packages/ui/src/fields/detail/text-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/text-field.tsx#L15)
 
 Whether to show a copy-to-clipboard button.
 
@@ -42,9 +42,9 @@ Whether to show a copy-to-clipboard button.
 
 > `optional` **fallback**: `string`
 
-Defined in: [packages/ui/src/fields/detail/text-field.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/text-field.tsx#L12)
+Defined in: [packages/ui/src/fields/detail/text-field.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/text-field.tsx#L13)
 
-Fallback text when value is null, undefined, or empty string. Defaults to empty string.
+Fallback text when value is null, undefined, or empty string. Defaults to the shared no-value badge.
 
 ***
 
@@ -106,6 +106,6 @@ Defined in: [packages/ui/src/crud/shared/types.ts:13](https://github.com/simplix
 
 > **value**: `string` \| `null` \| `undefined`
 
-Defined in: [packages/ui/src/fields/detail/text-field.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/text-field.tsx#L10)
+Defined in: [packages/ui/src/fields/detail/text-field.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/text-field.tsx#L11)
 
 Text value to display.

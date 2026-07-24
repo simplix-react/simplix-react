@@ -6,11 +6,14 @@
 
 # Function: formatDateMedium()
 
-> **formatDateMedium**(`date`, `locale?`): `string`
+> **formatDateMedium**(`date`, `locale?`, `timeZone?`): `string`
 
-Defined in: [packages/ui/src/utils/format-date.ts:51](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/utils/format-date.ts#L51)
+Defined in: [packages/headless/dist/index.d.ts:367](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L367)
 
-Medium date with year — e.g. "Mar 3, 2026" / "2026년 3월 3일".
+Medium date with year — e.g. "Mar 3, 2026". Rendered in the given locale.
+
+Pass `timeZone` (IANA) to render an absolute `Date` in that zone instead of
+the browser zone (site-scoped detail/display); omit it for zone-neutral use.
 
 ## Parameters
 
@@ -19,6 +22,10 @@ Medium date with year — e.g. "Mar 3, 2026" / "2026년 3월 3일".
 `Date`
 
 ### locale?
+
+`string`
+
+### timeZone?
 
 `string`
 

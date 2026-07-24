@@ -8,10 +8,11 @@
 
 > **adaptOrvalList**\<`T`\>(`useApiHook`, `options?`): [`ListHook`](../interfaces/ListHook.md)\<`T`\>
 
-Defined in: [packages/ui/src/crud/list/adapt-orval-list.ts:54](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/adapt-orval-list.ts#L54)
+Defined in: [packages/headless/dist/index.d.ts:140](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L140)
 
 Adapt an Orval-generated list hook to the [ListHook](../interfaces/ListHook.md) interface
-expected by [useCrudList](useCrudList.md) with `stateMode: "server"`.
+expected by a list state machine in `"server"` mode (the web `useCrudList`
+page model).
 
 ## Type Parameters
 
@@ -43,8 +44,8 @@ A [ListHook](../interfaces/ListHook.md) compatible with `useCrudList`.
 
 ## Remarks
 
-Handles the following conversions:
-- Page: 1-based (`useCrudList`) to 0-based (Spring Data).
+Handles the following conversions (via buildSearchableParams):
+- Page: 1-based to 0-based (Spring Data).
 - Size: `pagination.limit` to `size`.
 - Sort: `{ field, direction }` to `["field.direction"]`.
 - Response: Spring Data Page (`content`, `totalElements`) to `ListHookResult`.

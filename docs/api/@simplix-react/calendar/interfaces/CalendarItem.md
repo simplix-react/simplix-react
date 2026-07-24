@@ -6,11 +6,19 @@
 
 # Interface: CalendarItem\<T\>
 
-Defined in: [model/types.ts:83](https://github.com/simplix-react/simplix-react/blob/main/model/types.ts#L83)
+Defined in: [model/types.ts:93](https://github.com/simplix-react/simplix-react/blob/main/model/types.ts#L93)
 
 A single scheduled item. The core works exclusively with `Date` fields;
 consumers convert their DTOs (usually ISO strings) via an adapter and keep
 the original DTO on [CalendarItem.payload](#payload).
+
+Every view positions and day-attributes items by reading the `Date`s' LOCAL
+fields (wall clock). To render absolute instants in an explicit display zone
+(a site's clock rather than the browser's), the adapter must convert them to
+floating carriers whose local fields hold that zone's wall clock — e.g.
+`decodeInstant(iso, displayZone)` from `@simplix-react/ui` — instead of
+`new Date(iso)`. Zone-free values (a calendar date plus an `"HH:mm"` wall
+clock) are already carriers and need no conversion.
 
 ## Type Parameters
 
@@ -26,7 +34,7 @@ The original domain DTO carried through untouched.
 
 > `optional` **allDay**: `boolean`
 
-Defined in: [model/types.ts:95](https://github.com/simplix-react/simplix-react/blob/main/model/types.ts#L95)
+Defined in: [model/types.ts:105](https://github.com/simplix-react/simplix-react/blob/main/model/types.ts#L105)
 
 ***
 
@@ -34,7 +42,7 @@ Defined in: [model/types.ts:95](https://github.com/simplix-react/simplix-react/b
 
 > **color**: [`CalendarColor`](../type-aliases/CalendarColor.md)
 
-Defined in: [model/types.ts:90](https://github.com/simplix-react/simplix-react/blob/main/model/types.ts#L90)
+Defined in: [model/types.ts:100](https://github.com/simplix-react/simplix-react/blob/main/model/types.ts#L100)
 
 ***
 
@@ -42,9 +50,9 @@ Defined in: [model/types.ts:90](https://github.com/simplix-react/simplix-react/b
 
 > **end**: `Date`
 
-Defined in: [model/types.ts:89](https://github.com/simplix-react/simplix-react/blob/main/model/types.ts#L89)
+Defined in: [model/types.ts:99](https://github.com/simplix-react/simplix-react/blob/main/model/types.ts#L99)
 
-End instant. Already converted to a `Date` by the consumer.
+End of the item — a `Date` whose LOCAL fields are the display wall clock.
 
 ***
 
@@ -52,7 +60,7 @@ End instant. Already converted to a `Date` by the consumer.
 
 > **id**: `string`
 
-Defined in: [model/types.ts:84](https://github.com/simplix-react/simplix-react/blob/main/model/types.ts#L84)
+Defined in: [model/types.ts:94](https://github.com/simplix-react/simplix-react/blob/main/model/types.ts#L94)
 
 ***
 
@@ -60,7 +68,7 @@ Defined in: [model/types.ts:84](https://github.com/simplix-react/simplix-react/b
 
 > `optional` **pattern**: [`EventPattern`](../type-aliases/EventPattern.md)
 
-Defined in: [model/types.ts:92](https://github.com/simplix-react/simplix-react/blob/main/model/types.ts#L92)
+Defined in: [model/types.ts:102](https://github.com/simplix-react/simplix-react/blob/main/model/types.ts#L102)
 
 Visual treatment hint; defaults to a solid fill.
 
@@ -70,7 +78,7 @@ Visual treatment hint; defaults to a solid fill.
 
 > **payload**: `T`
 
-Defined in: [model/types.ts:99](https://github.com/simplix-react/simplix-react/blob/main/model/types.ts#L99)
+Defined in: [model/types.ts:109](https://github.com/simplix-react/simplix-react/blob/main/model/types.ts#L109)
 
 The untouched domain object this item was derived from.
 
@@ -80,7 +88,7 @@ The untouched domain object this item was derived from.
 
 > `optional` **resizable**: `boolean`
 
-Defined in: [model/types.ts:94](https://github.com/simplix-react/simplix-react/blob/main/model/types.ts#L94)
+Defined in: [model/types.ts:104](https://github.com/simplix-react/simplix-react/blob/main/model/types.ts#L104)
 
 Enables edge drag-resize in the week/day time grids (requires `onItemResize`).
 
@@ -90,7 +98,7 @@ Enables edge drag-resize in the week/day time grids (requires `onItemResize`).
 
 > `optional` **resourceId**: `string`
 
-Defined in: [model/types.ts:97](https://github.com/simplix-react/simplix-react/blob/main/model/types.ts#L97)
+Defined in: [model/types.ts:107](https://github.com/simplix-react/simplix-react/blob/main/model/types.ts#L107)
 
 Owning resource id; looked up against the provider's `resources`.
 
@@ -100,9 +108,9 @@ Owning resource id; looked up against the provider's `resources`.
 
 > **start**: `Date`
 
-Defined in: [model/types.ts:87](https://github.com/simplix-react/simplix-react/blob/main/model/types.ts#L87)
+Defined in: [model/types.ts:97](https://github.com/simplix-react/simplix-react/blob/main/model/types.ts#L97)
 
-Start instant. Already converted to a `Date` by the consumer.
+Start of the item — a `Date` whose LOCAL fields are the display wall clock.
 
 ***
 
@@ -110,4 +118,4 @@ Start instant. Already converted to a `Date` by the consumer.
 
 > **title**: `string`
 
-Defined in: [model/types.ts:85](https://github.com/simplix-react/simplix-react/blob/main/model/types.ts#L85)
+Defined in: [model/types.ts:95](https://github.com/simplix-react/simplix-react/blob/main/model/types.ts#L95)

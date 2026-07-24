@@ -8,7 +8,7 @@
 
 > **DetailTextareaField**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/detail/textarea-field.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/textarea-field.tsx#L23)
+Defined in: [packages/ui/src/fields/detail/textarea-field.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/textarea-field.tsx#L24)
 
 Read-only multi-line text display field. Preserves line breaks via
 `whitespace-pre-wrap`. Counterpart to [DetailI18nTextareaField](DetailI18nTextareaField.md) for

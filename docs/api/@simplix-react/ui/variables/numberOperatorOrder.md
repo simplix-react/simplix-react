@@ -8,6 +8,6 @@
 
 > `const` **numberOperatorOrder**: [`SearchOperator`](../enumerations/SearchOperator.md)[]
 
-Defined in: [packages/ui/src/crud/filters/filter-types.ts:59](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-types.ts#L59)
+Defined in: [packages/headless/dist/index.d.ts:293](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L293)
 
 Display order for number filter operators

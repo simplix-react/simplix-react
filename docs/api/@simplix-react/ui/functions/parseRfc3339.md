@@ -8,12 +8,9 @@
 
 > **parseRfc3339**(`value`): `Date` \| `undefined`
 
-Defined in: [packages/ui/src/utils/rfc3339-date.ts:49](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/utils/rfc3339-date.ts#L49)
+Defined in: [packages/headless/dist/index.d.ts:548](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L548)
 
-Parse an offset-aware RFC 3339 string (as produced by [serializeRfc3339Local](serializeRfc3339Local.md))
-into a `Date` via the native offset-aware parser. The absolute instant is exact; a
-caller reads LOCAL getters to recover the wall-clock the writer intended (correct
-under a single-zone deployment where the viewer offset equals the stored offset).
+Legacy name preserved: pure offset-aware instant parse (no zone reprojection).
 
 ## Parameters
 

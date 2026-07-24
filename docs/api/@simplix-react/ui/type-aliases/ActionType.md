@@ -6,6 +6,6 @@
 
 # Type Alias: ActionType
 
-> **ActionType** = `"view"` \| `"edit"` \| `"delete"` \| `"locate"` \| `"add-child"` \| `"reorder"` \| `"move"` \| `"unlink"`
+> **ActionType** = `"view"` \| `"edit"` \| `"delete"` \| `"locate"` \| `"add-child"` \| `"reorder"` \| `"move"` \| `"unlink"` \| `"select"`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:282](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L282)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:302](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L302)

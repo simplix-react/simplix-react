@@ -6,7 +6,7 @@
 
 # Interface: DateRangeFilterDef
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:67](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L67)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:68](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L68)
 
 ## Extends
 
@@ -18,7 +18,7 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:67](https://github.com/
 
 > `optional` **columnBreak**: `boolean`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:34](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L34)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:35](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L35)
 
 When the filter popover renders in multiple columns, start a new column at
 this filter. Up to (columns - 1) flags take effect, in order; without flags
@@ -34,7 +34,7 @@ the fields are split evenly (column-major). Ignored in single-column layout.
 
 > `optional` **dateOnly**: `boolean`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:76](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L76)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:77](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L77)
 
 Set for a `LocalDate` (`format:date`) column: the range boundaries are
 serialized as zone-neutral `yyyy-MM-dd` (local) instead of a UTC ISO
@@ -44,11 +44,25 @@ which keep full UTC ISO serialization.
 
 ***
 
+### displayZone?
+
+> `optional` **displayZone**: `string`
+
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:85](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L85)
+
+Set for a site-scoped `Instant` column whose day boundaries must be computed
+in the site zone: the picked day's start-of-day / end-of-day are interpreted
+IN this IANA zone and sent as offset-bearing instants (via
+[serializeInstant](../functions/serializeInstant.md)), so the fetched window is identical in any browser
+zone. Takes precedence over [dateOnly](#dateonly).
+
+***
+
 ### field
 
 > **field**: `string`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L27)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L28)
 
 #### Inherited from
 
@@ -60,7 +74,7 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:27](https://github.com/
 
 > **label**: `string`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L28)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L29)
 
 #### Inherited from
 
@@ -68,21 +82,8 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:28](https://github.com/
 
 ***
 
-### rfc3339Local?
-
-> `optional` **rfc3339Local**: `boolean`
-
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:83](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L83)
-
-Set for a column stored as an offset-preserving canonical RFC 3339 `String`
-(`yyyy-MM-ddT00:00:00±hh:mm`): the range boundaries are serialized in the SAME
-canonical format (via [serializeRfc3339Local](../functions/serializeRfc3339Local.md)) so a lexicographic string
-comparison equals chronological order. Takes precedence over [dateOnly](#dateonly).
-
-***
-
 ### type
 
 > **type**: `"dateRange"`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:68](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L68)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:69](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L69)

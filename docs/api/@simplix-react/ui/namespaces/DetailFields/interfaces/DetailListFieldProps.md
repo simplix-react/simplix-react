@@ -6,7 +6,7 @@
 
 # Interface: DetailListFieldProps
 
-Defined in: [packages/ui/src/fields/detail/list-field.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/list-field.tsx#L9)
+Defined in: [packages/ui/src/fields/detail/list-field.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/list-field.tsx#L10)
 
 Props for the [DetailListField](../functions/DetailListField.md) component.
 
@@ -32,9 +32,9 @@ Defined in: [packages/ui/src/crud/shared/types.ts:56](https://github.com/simplix
 
 > `optional` **fallback**: `string`
 
-Defined in: [packages/ui/src/fields/detail/list-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/list-field.tsx#L15)
+Defined in: [packages/ui/src/fields/detail/list-field.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/list-field.tsx#L16)
 
-Fallback text when value is null, undefined, or empty array. Defaults to em-dash.
+Fallback text when value is null, undefined, or empty array. Defaults to the shared no-value badge.
 
 ***
 
@@ -84,7 +84,7 @@ label for screen readers only.
 
 > `optional` **mode**: [`ListDisplayMode`](../type-aliases/ListDisplayMode.md)
 
-Defined in: [packages/ui/src/fields/detail/list-field.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/list-field.tsx#L13)
+Defined in: [packages/ui/src/fields/detail/list-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/list-field.tsx#L14)
 
 Display mode. Defaults to `"badges"`.
 
@@ -106,6 +106,6 @@ Defined in: [packages/ui/src/crud/shared/types.ts:13](https://github.com/simplix
 
 > **value**: `string`[] \| `null` \| `undefined`
 
-Defined in: [packages/ui/src/fields/detail/list-field.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/list-field.tsx#L11)
+Defined in: [packages/ui/src/fields/detail/list-field.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/list-field.tsx#L12)
 
 Array of string values to display.

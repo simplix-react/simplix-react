@@ -1337,7 +1337,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 ### level?
 
-> `optional` **level**: `1` \| `2` \| `3` \| `4` \| `6` \| `5` \| `null`
+> `optional` **level**: `1` \| `2` \| `3` \| `4` \| `5` \| `6` \| `null`
 
 Defined in: [packages/ui/src/primitives/heading.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/heading.tsx#L10)
 

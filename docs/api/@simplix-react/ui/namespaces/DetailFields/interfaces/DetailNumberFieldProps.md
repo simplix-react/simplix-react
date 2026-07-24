@@ -6,7 +6,7 @@
 
 # Interface: DetailNumberFieldProps
 
-Defined in: [packages/ui/src/fields/detail/number-field.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/number-field.tsx#L7)
+Defined in: [packages/ui/src/fields/detail/number-field.tsx:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/number-field.tsx#L8)
 
 Props for the [DetailNumberField](../functions/DetailNumberField.md) component.
 
@@ -32,7 +32,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:56](https://github.com/simplix
 
 > `optional` **currency**: `string`
 
-Defined in: [packages/ui/src/fields/detail/number-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/number-field.tsx#L15)
+Defined in: [packages/ui/src/fields/detail/number-field.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/number-field.tsx#L16)
 
 Currency code when `format="currency"` (e.g., `"USD"`).
 
@@ -42,9 +42,9 @@ Currency code when `format="currency"` (e.g., `"USD"`).
 
 > `optional` **fallback**: `string`
 
-Defined in: [packages/ui/src/fields/detail/number-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/number-field.tsx#L17)
+Defined in: [packages/ui/src/fields/detail/number-field.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/number-field.tsx#L18)
 
-Fallback text when value is null. Defaults to em-dash.
+Fallback text when value is null. Defaults to the shared no-value badge.
 
 ***
 
@@ -52,7 +52,7 @@ Fallback text when value is null. Defaults to em-dash.
 
 > `optional` **format**: `"decimal"` \| `"currency"` \| `"percent"`
 
-Defined in: [packages/ui/src/fields/detail/number-field.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/number-field.tsx#L11)
+Defined in: [packages/ui/src/fields/detail/number-field.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/number-field.tsx#L12)
 
 Number formatting style. Defaults to `"decimal"`.
 
@@ -104,7 +104,7 @@ label for screen readers only.
 
 > `optional` **locale**: `string`
 
-Defined in: [packages/ui/src/fields/detail/number-field.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/number-field.tsx#L13)
+Defined in: [packages/ui/src/fields/detail/number-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/number-field.tsx#L14)
 
 Locale for number formatting (e.g., `"en-US"`).
 
@@ -126,6 +126,6 @@ Defined in: [packages/ui/src/crud/shared/types.ts:13](https://github.com/simplix
 
 > **value**: `number` \| `null`
 
-Defined in: [packages/ui/src/fields/detail/number-field.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/number-field.tsx#L9)
+Defined in: [packages/ui/src/fields/detail/number-field.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/number-field.tsx#L10)
 
 Numeric value to display.

@@ -6,11 +6,14 @@
 
 # Function: formatDateTime()
 
-> **formatDateTime**(`date`, `locale?`): `string`
+> **formatDateTime**(`date`, `locale?`, `timeZone?`): `string`
 
-Defined in: [packages/ui/src/utils/format-date.ts:73](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/utils/format-date.ts#L73)
+Defined in: [packages/headless/dist/index.d.ts:385](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L385)
 
 Medium date + short time — e.g. "Mar 3, 2026, 2:30 PM".
+
+Pass `timeZone` (IANA) to render an absolute `Date` in that zone instead of
+the browser zone (site-scoped detail/display); omit it for zone-neutral use.
 
 ## Parameters
 
@@ -19,6 +22,10 @@ Medium date + short time — e.g. "Mar 3, 2026, 2:30 PM".
 `Date`
 
 ### locale?
+
+`string`
+
+### timeZone?
 
 `string`
 

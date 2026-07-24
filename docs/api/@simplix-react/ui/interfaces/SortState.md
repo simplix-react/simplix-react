@@ -6,7 +6,7 @@
 
 # Interface: SortState
 
-Defined in: [packages/ui/src/crud/shared/types.ts:62](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L62)
+Defined in: [packages/headless/dist/index.d.ts:2](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L2)
 
 Represents a sort configuration with field name and direction.
 
@@ -16,7 +16,7 @@ Represents a sort configuration with field name and direction.
 
 > **direction**: `"desc"` \| `"asc"`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:64](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L64)
+Defined in: [packages/headless/dist/index.d.ts:4](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L4)
 
 ***
 
@@ -24,4 +24,4 @@ Defined in: [packages/ui/src/crud/shared/types.ts:64](https://github.com/simplix
 
 > **field**: `string`
 
-Defined in: [packages/ui/src/crud/shared/types.ts:63](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/types.ts#L63)
+Defined in: [packages/headless/dist/index.d.ts:3](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L3)
