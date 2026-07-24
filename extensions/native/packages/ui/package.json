@@ -15,7 +15,8 @@
   },
   "sideEffects": [
     "./src/index.ts",
-    "./src/locales/*"
+    "**/index.ts",
+    "**/locales/**"
   ],
   "files": [
     "src",

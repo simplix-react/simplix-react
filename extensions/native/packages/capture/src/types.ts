@@ -24,10 +24,19 @@ export interface FaceDetectorAdapter {
 /** Composition thresholds for the auto-capture judgement. */
 export interface CompositionConfig {
   /**
-   * Max distance of the face center from the frame center per axis
+   * Max distance of the face center from the target point per axis
    * (normalized). Defaults to `0.18`.
    */
   centerTolerance?: number;
+  /**
+   * Normalized X of the point the face should center on. Defaults to `0.5`.
+   */
+  targetX?: number;
+  /**
+   * Normalized Y of the point the face should center on. Defaults to `0.5` —
+   * lower it when the guide sits near the camera at the top of the screen.
+   */
+  targetY?: number;
   /** Min face size as a fraction of the frame's larger side. Defaults to `0.18`. */
   minFaceRatio?: number;
   /** Max face size as a fraction of the frame's larger side. Defaults to `0.6`. */

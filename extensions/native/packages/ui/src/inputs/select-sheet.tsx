@@ -13,6 +13,11 @@ export interface SelectOption<T extends string = string> {
   disabled?: boolean;
   /** Secondary line under the label. */
   description?: string;
+  /**
+   * Extra text matched by {@link ComboboxSheet} client-side filtering in
+   * addition to the label (e.g. a country's English name and calling code).
+   */
+  searchText?: string;
 }
 
 /** Props for the {@link SelectTrigger} building block. */

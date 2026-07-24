@@ -50,7 +50,9 @@ export async function downloadI18nMessages(
 
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000);
+    // A dev server compiling message bundles on first hit can take several
+    // seconds; a tight timeout silently skips the whole translation overlay.
+    const timeout = setTimeout(() => controller.abort(), 30000);
 
     const res = await fetch(url, { signal: controller.signal });
     clearTimeout(timeout);

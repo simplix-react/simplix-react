@@ -162,7 +162,15 @@ export function SignaturePad({
             </Svg>
           ) : typedName.trim() ? (
             <Text
-              style={{ fontSize: 40, fontStyle: "italic", color: strokeColor }}
+              // lineHeight and padding keep tall or slanted glyphs (Hangul,
+              // ascenders) from clipping at the preview bounds.
+              style={{
+                fontSize: 40,
+                lineHeight: 56,
+                paddingHorizontal: 12,
+                fontStyle: "italic",
+                color: strokeColor,
+              }}
               numberOfLines={1}
             >
               {typedName.trim()}

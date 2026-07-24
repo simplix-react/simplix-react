@@ -12,6 +12,12 @@ export interface GuideFrameProps {
   failure: CompositionFailure | null;
   /** Manual capture trigger, shown in manual mode. */
   onCaptureNow?: () => void;
+  /**
+   * Vertical placement of the face guide. `"top"` moves it toward the
+   * device camera so the visitor's eyes settle near the lens. Defaults to
+   * `"center"`.
+   */
+  anchor?: "center" | "top";
   className?: string;
 }
 
@@ -31,6 +37,7 @@ export function GuideFrame({
   countdown,
   failure,
   onCaptureNow,
+  anchor = "center",
   className,
 }: GuideFrameProps) {
   const { t } = useTranslation("simplix/native-capture");
@@ -48,7 +55,7 @@ export function GuideFrame({
 
   return (
     <View className={cn("flex-1 items-center justify-between p-6", className)}>
-      <View />
+      {anchor === "center" ? <View /> : <View className="h-2" />}
       <View
         pointerEvents="none"
         className={cn(
@@ -66,6 +73,7 @@ export function GuideFrame({
           </View>
         ) : null}
       </View>
+      {anchor === "top" ? <View className="flex-1" /> : null}
       <View className="w-full items-center gap-4 pb-2">
         <View className="rounded-full bg-black/60 px-5 py-2.5">
           <Text size="lg" className="text-center text-white">

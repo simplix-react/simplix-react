@@ -78,6 +78,8 @@ export function useAutoCaptureSession(
     onCaptured,
     onCaptureError,
     centerTolerance,
+    targetX,
+    targetY,
     minFaceRatio,
     maxFaceRatio,
   } = options;
@@ -93,8 +95,8 @@ export function useAutoCaptureSession(
   const countdownTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const compositionConfig = useMemo(
-    () => ({ centerTolerance, minFaceRatio, maxFaceRatio }),
-    [centerTolerance, minFaceRatio, maxFaceRatio],
+    () => ({ centerTolerance, targetX, targetY, minFaceRatio, maxFaceRatio }),
+    [centerTolerance, targetX, targetY, minFaceRatio, maxFaceRatio],
   );
 
   const clearCountdown = useCallback(() => {
