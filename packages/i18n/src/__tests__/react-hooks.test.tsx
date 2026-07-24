@@ -7,6 +7,7 @@ import { useTranslation, useI18n, useLocale } from "../react/use-translation.js"
 import { useLocalePicker } from "../react/use-locale-picker.js";
 import { useEntityTranslation } from "../react/use-entity-translation.js";
 import type { II18nAdapter } from "../adapter.js";
+import { I18nextAdapter } from "../i18next-adapter.js";
 
 // ── Mock Adapter ──
 
@@ -158,6 +159,23 @@ describe("useTranslation", () => {
     });
 
     expect(result.current.locale).toBe("ko");
+  });
+
+  it("re-renders with resolved labels when resources arrive after mount", async () => {
+    const realAdapter = new I18nextAdapter({ defaultLocale: "en" });
+    await realAdapter.initialize();
+    const realWrapper = createWrapper(realAdapter);
+
+    const { result } = renderHook(() => useTranslation("late/widgets"), {
+      wrapper: realWrapper,
+    });
+    expect(result.current.t("title")).toBe("title");
+
+    act(() => {
+      realAdapter.addResources("en", "late/widgets", { title: "Overview" });
+    });
+
+    expect(result.current.t("title")).toBe("Overview");
   });
 });
 

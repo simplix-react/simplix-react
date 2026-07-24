@@ -232,7 +232,113 @@ describe("registerModuleTranslations", () => {
     registerModuleTranslations(translations);
 
     const registry = getModuleTranslationRegistry();
-    expect(registry.has("dashboard")).toBe(true);
+    expect(
+      [...registry.values()].some((entry) => entry.namespace === "dashboard"),
+    ).toBe(true);
+  });
+
+  it("keeps packages that share a namespace with different components", () => {
+    registerModuleTranslations(
+      buildModuleTranslations({
+        namespace: "simplix",
+        locales: ["en"],
+        components: {
+          native: { en: () => Promise.resolve({ default: { a: "1" } }) },
+        },
+      }),
+    );
+    registerModuleTranslations(
+      buildModuleTranslations({
+        namespace: "simplix",
+        locales: ["en"],
+        components: {
+          "native-qr": { en: () => Promise.resolve({ default: { b: "2" } }) },
+        },
+      }),
+    );
+
+    const registry = getModuleTranslationRegistry();
+    expect(registry.size).toBe(2);
+  });
+
+  it("replaces a re-registration of the same namespace and components", () => {
+    registerModuleTranslations(
+      buildModuleTranslations({
+        namespace: "simplix",
+        locales: ["en"],
+        components: {
+          native: { en: () => Promise.resolve({ default: { a: "1" } }) },
+        },
+      }),
+    );
+    registerModuleTranslations(
+      buildModuleTranslations({
+        namespace: "simplix",
+        locales: ["en", "ko"],
+        components: {
+          native: {
+            en: () => Promise.resolve({ default: { a: "1" } }),
+            ko: () => Promise.resolve({ default: { a: "일" } }),
+          },
+        },
+      }),
+    );
+
+    const registry = getModuleTranslationRegistry();
+    expect(registry.size).toBe(1);
+    expect([...registry.values()][0]!.locales).toEqual(["en", "ko"]);
+  });
+
+  it("loads every same-namespace package through createI18nConfig", async () => {
+    registerModuleTranslations(
+      buildModuleTranslations({
+        namespace: "simplix",
+        locales: ["en"],
+        components: {
+          native: {
+            en: () => Promise.resolve({ default: { hello: "Native" } }),
+          },
+        },
+      }),
+    );
+    registerModuleTranslations(
+      buildModuleTranslations({
+        namespace: "simplix",
+        locales: ["en"],
+        components: {
+          "native-qr": {
+            en: () => Promise.resolve({ default: { hello: "Qr" } }),
+          },
+        },
+      }),
+    );
+
+    const { adapter, i18nReady } = createI18nConfig({ defaultLocale: "en" });
+    await i18nReady;
+
+    expect(adapter.tn("simplix/native", "hello")).toBe("Native");
+    expect(adapter.tn("simplix/native-qr", "hello")).toBe("Qr");
+  });
+
+  it("loads translations registered after initialization", async () => {
+    const { adapter, i18nReady } = createI18nConfig({ defaultLocale: "en" });
+    await i18nReady;
+
+    registerModuleTranslations(
+      buildModuleTranslations({
+        namespace: "late-mod",
+        locales: ["en"],
+        components: {
+          page: {
+            en: () => Promise.resolve({ default: { title: "Late" } }),
+          },
+        },
+      }),
+    );
+
+    await vi.waitFor(() => {
+      expect(adapter.tn("late-mod/page", "title")).toBe("Late");
+    });
   });
 
   it("overwrites duplicate namespace registrations", () => {

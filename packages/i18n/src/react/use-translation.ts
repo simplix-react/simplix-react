@@ -54,25 +54,35 @@ export function useTranslation<TKeys extends string = string>(
   const subscribe = useCallback(
     (onStoreChange: () => void) => {
       if (!i18n) return () => {};
-      return i18n.onLocaleChange(onStoreChange);
+      // Locale switches AND late-arriving resources both invalidate rendered
+      // labels: lazily registered bundles (route chunks, dynamic locale JSON)
+      // land after the first paint, so components must re-render then.
+      const offLocale = i18n.onLocaleChange(onStoreChange);
+      const offResources = i18n.onResourcesChange?.(onStoreChange);
+      return () => {
+        offLocale();
+        offResources?.();
+      };
     },
     [i18n],
   );
 
   const getSnapshot = useCallback(() => {
-    return i18n?.locale ?? "en";
+    return `${i18n?.locale ?? "en"}#${i18n?.resourcesVersion ?? 0}`;
   }, [i18n]);
 
-  const locale = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  const snapshot = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  const locale = i18n?.locale ?? "en";
 
   const t = useCallback(
     (key: TKeys, values?: TranslationValues): string => {
       if (!i18n) return key;
       return i18n.tn(namespace, key, values);
     },
-    // locale is included so that t's reference changes on locale switch,
-    // ensuring any useMemo/useCallback depending on t recomputes correctly.
-    [i18n, namespace, locale],
+    // snapshot is included so that t's reference changes on locale switch or
+    // resource arrival, ensuring any useMemo/useCallback depending on t
+    // recomputes correctly.
+    [i18n, namespace, snapshot],
   ) as TranslateFunction<TKeys>;
 
   const exists = useCallback(
@@ -80,7 +90,7 @@ export function useTranslation<TKeys extends string = string>(
       if (!i18n) return false;
       return i18n.exists(key, namespace);
     },
-    [i18n, namespace, locale],
+    [i18n, namespace, snapshot],
   );
 
   return useMemo(

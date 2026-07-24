@@ -89,6 +89,8 @@ export class I18nextAdapter implements II18nAdapter {
   private resources: TranslationResources;
   private debug: boolean;
   private localeChangeHandlers: Set<(locale: LocaleCode) => void> = new Set();
+  private resourcesChangeHandlers: Set<() => void> = new Set();
+  private _resourcesVersion = 0;
 
   constructor(options: I18nextAdapterOptions = {}) {
     this.defaultLocale = options.defaultLocale ?? "en";
@@ -336,7 +338,27 @@ export class I18nextAdapter implements II18nAdapter {
   }
 
   /**
+   * A monotonically increasing counter bumped on every {@link addResources} call.
+   * Reactive bindings pair it with {@link onResourcesChange} to detect
+   * late-arriving resources from lazily registered bundles.
+   */
+  get resourcesVersion(): number {
+    return this._resourcesVersion;
+  }
+
+  onResourcesChange(handler: () => void): () => void {
+    this.resourcesChangeHandlers.add(handler);
+    return () => {
+      this.resourcesChangeHandlers.delete(handler);
+    };
+  }
+
+  /**
    * Adds translation resources to the underlying i18next instance, merging with any existing resources.
+   *
+   * Notifies {@link onResourcesChange} subscribers so views rendered before a
+   * lazily loaded namespace arrived re-render with the resolved labels.
+   *
    * @param locale - The target locale code.
    * @param namespace - The translation namespace.
    * @param resources - The translation key-value pairs to add.
@@ -347,6 +369,14 @@ export class I18nextAdapter implements II18nAdapter {
     resources: Record<string, unknown>,
   ): void {
     this.i18n.addResourceBundle(locale, namespace, resources, true, true);
+    this._resourcesVersion += 1;
+    for (const handler of this.resourcesChangeHandlers) {
+      try {
+        handler();
+      } catch (error) {
+        console.error("Error in resources change handler:", error);
+      }
+    }
   }
 
   /**
