@@ -315,6 +315,7 @@ export {
   EmptyState,
   FieldVariantContext,
   ListTotalBadge,
+  resolveEmptyReason,
   useDefaultDisplayZone,
   useFieldVariant,
 } from "./crud/shared";
@@ -327,6 +328,7 @@ export type {
   FilterState,
   PaginationState,
   ReorderConfig,
+  ResolveEmptyReasonInput,
   SortState,
 } from "./crud/shared";
 

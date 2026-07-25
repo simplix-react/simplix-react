@@ -65,6 +65,9 @@ export type {
   EmptyReason,
 } from "@simplix-react/headless";
 
+export { resolveEmptyReason } from "@simplix-react/headless";
+export type { ResolveEmptyReasonInput } from "@simplix-react/headless";
+
 /** Configuration for drag-and-drop row reordering. */
 export interface ReorderConfig<T> {
   /** Field name used for ordering (e.g. "displayOrder", "sortOrder"). */

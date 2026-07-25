@@ -1,6 +1,8 @@
 // ── Shared list / filter / pagination types ──
 export type { SortState, PaginationState, FilterState, EmptyReason } from "./shared-types";
 export type { ListHook, ListHookResult } from "./list-types";
+export { resolveEmptyReason } from "./resolve-empty-reason";
+export type { ResolveEmptyReasonInput } from "./resolve-empty-reason";
 export type { CrudMutation } from "./crud-mutation";
 
 // ── Searchable param serialization ──

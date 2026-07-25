@@ -247,6 +247,18 @@ describe("CrudList.Table", () => {
     expect(screen.getByText("list.noSearchTitle")).toBeTruthy();
   });
 
+  it("renders EmptyReasonCard for unavailable reason when empty", () => {
+    render(
+      <CrudList>
+        <CrudList.Table data={[]} emptyReason="unavailable">
+          <CrudList.Column<TestItem> field="name" header="Name" />
+        </CrudList.Table>
+      </CrudList>,
+    );
+    expect(screen.getByText("list.unavailableTitle")).toBeTruthy();
+    expect(screen.getByText("list.unavailableDescription")).toBeTruthy();
+  });
+
   it("renders custom emptyState for no-data reason", () => {
     render(
       <CrudList>

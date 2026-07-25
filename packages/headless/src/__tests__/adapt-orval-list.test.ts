@@ -168,4 +168,30 @@ describe("adaptOrvalList", () => {
 
     expect(result.current.error).toBe(err);
   });
+
+  it("forwards the paused fetch state from the hook", () => {
+    const useApiHook = vi.fn().mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: null,
+      isPaused: true,
+      failureCount: 1,
+    });
+    const useAdapted = adaptOrvalList(useApiHook);
+
+    const { result } = renderHook(() => useAdapted());
+
+    expect(result.current.isPaused).toBe(true);
+    expect(result.current.failureCount).toBe(1);
+  });
+
+  it("leaves the fetch state undefined for hooks that do not report it", () => {
+    const useApiHook = createMockOrvalHook({ content: [], totalElements: 0 });
+    const useAdapted = adaptOrvalList(useApiHook);
+
+    const { result } = renderHook(() => useAdapted());
+
+    expect(result.current.isPaused).toBeUndefined();
+    expect(result.current.failureCount).toBeUndefined();
+  });
 });

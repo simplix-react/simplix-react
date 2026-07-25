@@ -28,6 +28,8 @@
     "noSearch": "No items match the search query.",
     "error": "An error occurred while loading data.",
     "errorTitle": "Failed to load data",
+    "unavailable": "The list could not be loaded.",
+    "unavailableTitle": "List could not be loaded",
     "totalCount": "Total {{count}}",
     "loadingMore": "Loading more...",
     "endOfList": "No more items.",

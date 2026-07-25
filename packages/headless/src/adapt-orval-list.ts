@@ -12,6 +12,10 @@ export type OrvalListHookLike = (params?: any, options?: any) => {
   data: unknown;
   isLoading: boolean;
   error: unknown;
+  /** React Query `fetchStatus === "paused"`. Absent on non-React-Query hooks. */
+  isPaused?: boolean;
+  /** React Query consecutive failed attempts. Absent on non-React-Query hooks. */
+  failureCount?: number;
 };
 
 /** Default: no cache for CRUD pages — always fetch fresh data. */
@@ -41,6 +45,9 @@ export interface AdaptOrvalListOptions {
  * - Size: `pagination.limit` to `size`.
  * - Sort: `{ field, direction }` to `["field.direction"]`.
  * - Response: Spring Data Page (`content`, `totalElements`) to `ListHookResult`.
+ *
+ * React Query's `isPaused` and `failureCount` are forwarded unchanged so the
+ * list can tell a stalled or retrying query apart from an empty result.
  *
  * @typeParam T - Row data type.
  * @param useApiHook - Orval-generated list query hook.
@@ -74,6 +81,8 @@ export function adaptOrvalList<T>(
       total: page?.totalElements as number | undefined,
       isLoading: query.isLoading,
       error: query.error as Error | null,
+      isPaused: query.isPaused,
+      failureCount: query.failureCount,
     };
   };
 }

@@ -62,6 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org).
 - Boot API enum object resolution in CrudList cell rendering
 - Page header actions and ListDetail dialog layout in UI
 - ESLint config for simplix-boot packages and i18n lint error
+- Lists no longer report a paused or retrying query as "no data" — `ListHookResult` carries `isPaused` / `failureCount`, `EmptyReason` gains `"unavailable"`, and `CrudList` / `AssignmentPanel` / `EntityList` render "the list could not be loaded"
 
 ### Removed
 

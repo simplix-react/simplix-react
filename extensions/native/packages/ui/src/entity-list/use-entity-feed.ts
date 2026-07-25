@@ -1,6 +1,7 @@
 import {
   buildSearchableParams,
   makeFilterKey,
+  resolveEmptyReason,
   type EmptyReason,
   type OrvalListHookLike,
   type SortState,
@@ -160,6 +161,8 @@ export function useEntityFeed<T>(
     isLoading: boolean;
     error: unknown;
     isFetching?: boolean;
+    isPaused?: boolean;
+    failureCount?: number;
     refetch?: () => Promise<unknown>;
   };
 
@@ -231,14 +234,24 @@ export function useEntityFeed<T>(
     [filterValues],
   );
 
-  const emptyReason = useMemo((): EmptyReason | null => {
-    if (items.length > 0) return null;
-    if (query.isLoading || query.isFetching) return null;
-    if (query.error) return "error";
-    if (debouncedSearch) return "no-search";
-    if (activeCount > 0) return "no-filter";
-    return "no-data";
-  }, [items.length, query.isLoading, query.isFetching, query.error, debouncedSearch, activeCount]);
+  const emptyReason = useMemo((): EmptyReason | null => resolveEmptyReason({
+    hasRows: items.length > 0,
+    isLoading: query.isLoading || !!query.isFetching,
+    error: query.error,
+    isPaused: query.isPaused,
+    failureCount: query.failureCount,
+    hasSearch: !!debouncedSearch,
+    hasFilters: activeCount > 0,
+  }), [
+    items.length,
+    query.isLoading,
+    query.isFetching,
+    query.error,
+    query.isPaused,
+    query.failureCount,
+    debouncedSearch,
+    activeCount,
+  ]);
 
   return {
     items,
