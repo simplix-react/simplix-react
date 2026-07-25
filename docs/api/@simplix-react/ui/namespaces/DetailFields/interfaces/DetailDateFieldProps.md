@@ -53,7 +53,7 @@ Fallback text when value is null. Defaults to the shared no-value badge.
 
 ### format?
 
-> `optional` **format**: `"date"` \| `"time"` \| `"relative"` \| `"datetime"`
+> `optional` **format**: `"date"` \| `"time"` \| `"datetime"` \| `"relative"`
 
 Defined in: [packages/ui/src/fields/detail/date-field.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/detail/date-field.tsx#L21)
 

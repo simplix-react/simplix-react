@@ -8,6 +8,6 @@
 
 > `const` **dateOperatorConfig**: `Record`\<`string`, \{ `requiresRange`: `boolean`; \}\>
 
-Defined in: [packages/headless/dist/index.d.ts:283](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L283)
+Defined in: [packages/headless/dist/index.d.ts:369](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L369)
 
 Date operators that require range selection vs single date

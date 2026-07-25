@@ -8,7 +8,7 @@
 
 > `const` **DynamicColorIconPresets**: `object`
 
-Defined in: [packages/ui/src/base/display/dynamic-color-icon.tsx:151](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/dynamic-color-icon.tsx#L151)
+Defined in: [packages/ui/src/base/display/dynamic-color-icon.tsx:152](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/dynamic-color-icon.tsx#L152)
 
 Preset configurations for common use cases.
 

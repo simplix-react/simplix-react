@@ -6,7 +6,7 @@
 
 # Interface: PlateEditorI18nFieldProps
 
-Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-i18n-field.tsx#L20)
+Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-i18n-field.tsx#L12)
 
 Shared props for all form field components.
 
@@ -32,7 +32,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:49](https://github.com/simplix
 
 > `optional` **defaultHeight**: `string` \| `number`
 
-Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-i18n-field.tsx#L28)
+Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-i18n-field.tsx#L20)
 
 ***
 
@@ -100,7 +100,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:31](https://github.com/simplix
 
 > **languages**: `LocaleConfig`[]
 
-Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-i18n-field.tsx#L23)
+Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-i18n-field.tsx#L15)
 
 ***
 
@@ -126,7 +126,7 @@ label for screen readers only.
 
 > `optional` **maxHeight**: `string` \| `number`
 
-Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-i18n-field.tsx#L30)
+Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-i18n-field.tsx#L22)
 
 ***
 
@@ -134,7 +134,7 @@ Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:30](https:/
 
 > `optional` **minHeight**: `string` \| `number`
 
-Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-i18n-field.tsx#L29)
+Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-i18n-field.tsx#L21)
 
 ***
 
@@ -142,7 +142,7 @@ Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:29](https:/
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-i18n-field.tsx#L22)
+Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-i18n-field.tsx#L14)
 
 #### Parameters
 
@@ -160,7 +160,7 @@ Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:22](https:/
 
 > `optional` **onLanguageChange**: (`language`) => `void`
 
-Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:25](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-i18n-field.tsx#L25)
+Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-i18n-field.tsx#L17)
 
 #### Parameters
 
@@ -178,7 +178,7 @@ Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:25](https:/
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-i18n-field.tsx#L27)
+Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-i18n-field.tsx#L19)
 
 ***
 
@@ -213,7 +213,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:35](https://github.com/simplix
 
 > `optional` **resizable**: `boolean`
 
-Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:31](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-i18n-field.tsx#L31)
+Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-i18n-field.tsx#L23)
 
 ***
 
@@ -221,7 +221,7 @@ Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:31](https:/
 
 > `optional` **selectedLanguage**: `string`
 
-Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-i18n-field.tsx#L24)
+Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-i18n-field.tsx#L16)
 
 ***
 
@@ -258,7 +258,7 @@ below at full width.
 
 > **value**: `Record`\<`LocaleCode`, `string`\>
 
-Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-i18n-field.tsx#L21)
+Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-i18n-field.tsx#L13)
 
 ***
 
@@ -266,7 +266,7 @@ Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:21](https:/
 
 > `optional` **variant**: [`PlateEditorVariant`](../type-aliases/PlateEditorVariant.md)
 
-Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-i18n-field.tsx#L26)
+Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-i18n-field.tsx#L18)
 
 ***
 

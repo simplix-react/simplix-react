@@ -8,7 +8,7 @@
 
 > **serializeCalendarDate**(`date`): `string` \| `undefined`
 
-Defined in: [packages/headless/dist/index.d.ts:566](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L566)
+Defined in: [packages/headless/dist/index.d.ts:652](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L652)
 
 Serialize a calendar date to bare `yyyy-MM-dd` from LOCAL fields (zone-neutral).
 Canonical name for [toLocalDateString](toLocalDateString.md).

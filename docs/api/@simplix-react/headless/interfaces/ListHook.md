@@ -6,7 +6,7 @@
 
 # Interface: ListHook()\<T\>
 
-Defined in: [list-types.ts:24](https://github.com/simplix-react/simplix-react/blob/main/list-types.ts#L24)
+Defined in: [list-types.ts:42](https://github.com/simplix-react/simplix-react/blob/main/list-types.ts#L42)
 
 Hook signature for list data fetching, compatible with Orval-generated query hooks.
 
@@ -20,7 +20,7 @@ Row data type.
 
 > **ListHook**(`params?`, `options?`): [`ListHookResult`](ListHookResult.md)\<`T`\>
 
-Defined in: [list-types.ts:25](https://github.com/simplix-react/simplix-react/blob/main/list-types.ts#L25)
+Defined in: [list-types.ts:43](https://github.com/simplix-react/simplix-react/blob/main/list-types.ts#L43)
 
 Hook signature for list data fetching, compatible with Orval-generated query hooks.
 

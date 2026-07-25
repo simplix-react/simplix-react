@@ -30,7 +30,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:76](https://github.com/s
 
 > **emptyReason**: [`EmptyReason`](../type-aliases/EmptyReason.md) \| `null`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:83](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L83)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:94](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L94)
 
 ***
 
@@ -42,11 +42,22 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:78](https://github.com/s
 
 ***
 
+### failureCount
+
+> **failureCount**: `number`
+
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:89](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L89)
+
+Consecutive failed fetch attempts on the underlying query. Greater than `0`
+with `error === null` means a retry is pending.
+
+***
+
 ### filters
 
 > **filters**: [`CrudListFilters`](CrudListFilters.md)
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:79](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L79)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:90](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L90)
 
 ***
 
@@ -58,11 +69,23 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:77](https://github.com/s
 
 ***
 
+### isPaused
+
+> **isPaused**: `boolean`
+
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:84](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L84)
+
+Whether the underlying query is in flight but stalled (React Query
+`fetchStatus === "paused"`). Such a query reports `isLoading: false` and
+`error: null`; consult this before treating an empty `data` as "no data".
+
+***
+
 ### pagination
 
 > **pagination**: [`CrudListPagination`](CrudListPagination.md)
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:81](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L81)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:92](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L92)
 
 ***
 
@@ -70,7 +93,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:81](https://github.com/s
 
 > **selection**: [`CrudListSelection`](CrudListSelection.md)\<`T`\>
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:82](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L82)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:93](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L93)
 
 ***
 
@@ -78,4 +101,4 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:82](https://github.com/s
 
 > **sort**: [`CrudListSort`](CrudListSort.md)
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:80](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L80)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:91](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L91)

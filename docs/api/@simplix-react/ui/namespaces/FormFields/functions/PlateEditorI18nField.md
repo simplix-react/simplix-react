@@ -8,7 +8,7 @@
 
 > **PlateEditorI18nField**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:34](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-i18n-field.tsx#L34)
+Defined in: [packages/ui/src/fields/form/plate-editor-i18n-field.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/plate-editor-i18n-field.tsx#L26)
 
 ## Parameters
 

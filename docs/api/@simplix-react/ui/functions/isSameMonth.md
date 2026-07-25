@@ -8,7 +8,7 @@
 
 > **isSameMonth**(`a`, `b`): `boolean`
 
-Defined in: [packages/headless/dist/index.d.ts:412](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L412)
+Defined in: [packages/headless/dist/index.d.ts:498](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L498)
 
 ## Parameters
 

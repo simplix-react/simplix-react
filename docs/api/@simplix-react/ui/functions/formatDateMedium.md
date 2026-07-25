@@ -8,7 +8,7 @@
 
 > **formatDateMedium**(`date`, `locale?`, `timeZone?`): `string`
 
-Defined in: [packages/headless/dist/index.d.ts:367](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L367)
+Defined in: [packages/headless/dist/index.d.ts:453](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L453)
 
 Medium date with year — e.g. "Mar 3, 2026". Rendered in the given locale.
 

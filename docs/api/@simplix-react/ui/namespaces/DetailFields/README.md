@@ -9,6 +9,7 @@
 ## Interfaces
 
 - [DetailBadgeFieldProps](interfaces/DetailBadgeFieldProps.md)
+- [DetailBlockFieldProps](interfaces/DetailBlockFieldProps.md)
 - [DetailBooleanFieldProps](interfaces/DetailBooleanFieldProps.md)
 - [DetailCountryFieldProps](interfaces/DetailCountryFieldProps.md)
 - [DetailDateFieldProps](interfaces/DetailDateFieldProps.md)
@@ -36,6 +37,7 @@
 ## Functions
 
 - [DetailBadgeField](functions/DetailBadgeField.md)
+- [DetailBlockField](functions/DetailBlockField.md)
 - [DetailBooleanField](functions/DetailBooleanField.md)
 - [DetailCountryField](functions/DetailCountryField.md)
 - [DetailDateField](functions/DetailDateField.md)

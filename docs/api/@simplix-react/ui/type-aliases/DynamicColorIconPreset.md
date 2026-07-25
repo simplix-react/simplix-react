@@ -8,4 +8,4 @@
 
 > **DynamicColorIconPreset** = keyof *typeof* [`DynamicColorIconPresets`](../variables/DynamicColorIconPresets.md)
 
-Defined in: [packages/ui/src/base/display/dynamic-color-icon.tsx:172](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/dynamic-color-icon.tsx#L172)
+Defined in: [packages/ui/src/base/display/dynamic-color-icon.tsx:173](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/dynamic-color-icon.tsx#L173)

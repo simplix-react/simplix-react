@@ -6,7 +6,7 @@
 
 # Interface: AdaptOrvalListOptions
 
-Defined in: [packages/headless/dist/index.d.ts:108](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L108)
+Defined in: [packages/headless/dist/index.d.ts:191](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L191)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/headless/dist/index.d.ts:108](https://github.com/simplix-r
 
 > `optional` **queryOptions**: `Record`\<`string`, `unknown`\>
 
-Defined in: [packages/headless/dist/index.d.ts:111](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L111)
+Defined in: [packages/headless/dist/index.d.ts:194](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L194)
 
 Extra query options forwarded to Orval's second argument (`{ query: {...} }`).
  Merged with defaults (`staleTime: 0, gcTime: 0`).
@@ -25,7 +25,7 @@ Extra query options forwarded to Orval's second argument (`{ query: {...} }`).
 
 > `optional` **transformFilters**: (`filters`) => `Record`\<`string`, `unknown`\>
 
-Defined in: [packages/headless/dist/index.d.ts:115](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L115)
+Defined in: [packages/headless/dist/index.d.ts:198](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L198)
 
 Transform filter key-value pairs before sending to the API.
  Use this to convert generic filter formats to backend-specific formats

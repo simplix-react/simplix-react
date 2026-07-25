@@ -8,7 +8,7 @@
 
 > **getFilterLayout**(`n`): `number`[]
 
-Defined in: [packages/headless/dist/index.d.ts:313](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L313)
+Defined in: [packages/headless/dist/index.d.ts:399](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L399)
 
 Calculate filter layout: distribute N filters into rows.
 Returns array of items-per-row.

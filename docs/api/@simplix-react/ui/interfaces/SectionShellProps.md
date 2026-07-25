@@ -13,6 +13,7 @@ Shared props for section components (CrudDetail.Section, CrudForm.Section).
 ## Extended by
 
 - [`CrudFormSectionProps`](CrudFormSectionProps.md)
+- [`CrudDetailSectionProps`](CrudDetailSectionProps.md)
 
 ## Properties
 

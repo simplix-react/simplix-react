@@ -8,7 +8,7 @@
 
 > **startOfMonth**(`d`): `Date`
 
-Defined in: [packages/headless/dist/index.d.ts:405](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L405)
+Defined in: [packages/headless/dist/index.d.ts:491](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L491)
 
 ## Parameters
 

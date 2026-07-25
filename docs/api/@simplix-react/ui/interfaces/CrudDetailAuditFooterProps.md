@@ -6,7 +6,7 @@
 
 # Interface: CrudDetailAuditFooterProps
 
-Defined in: [packages/ui/src/crud/detail/crud-detail-audit-footer.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail-audit-footer.tsx#L26)
+Defined in: [packages/ui/src/crud/detail/crud-detail-audit-footer.tsx:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail-audit-footer.tsx#L27)
 
 Props for the [DetailAuditFooter](../variables/CrudDetail.md) sub-component.
 
@@ -16,7 +16,7 @@ Props for the [DetailAuditFooter](../variables/CrudDetail.md) sub-component.
 
 > `optional` **auditData**: [`AuditData`](AuditData.md)
 
-Defined in: [packages/ui/src/crud/detail/crud-detail-audit-footer.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail-audit-footer.tsx#L28)
+Defined in: [packages/ui/src/crud/detail/crud-detail-audit-footer.tsx:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail-audit-footer.tsx#L29)
 
 Audit metadata. When nullish or all fields empty, the component renders nothing.
 
@@ -26,7 +26,7 @@ Audit metadata. When nullish or all fields empty, the component renders nothing.
 
 > `optional` **displayZone**: `string`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail-audit-footer.tsx:33](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail-audit-footer.tsx#L33)
+Defined in: [packages/ui/src/crud/detail/crud-detail-audit-footer.tsx:34](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail-audit-footer.tsx#L34)
 
 IANA display zone for the created/updated instants. When set, both stamps
 render as that zone's wall clock; when omitted, the browser zone applies.

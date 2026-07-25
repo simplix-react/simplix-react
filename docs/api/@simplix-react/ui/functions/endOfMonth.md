@@ -8,7 +8,7 @@
 
 > **endOfMonth**(`d`): `Date`
 
-Defined in: [packages/headless/dist/index.d.ts:406](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L406)
+Defined in: [packages/headless/dist/index.d.ts:492](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L492)
 
 ## Parameters
 

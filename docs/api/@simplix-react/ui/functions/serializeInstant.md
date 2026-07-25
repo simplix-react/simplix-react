@@ -8,7 +8,7 @@
 
 > **serializeInstant**(`date`, `displayZone?`): `string` \| `undefined`
 
-Defined in: [packages/headless/dist/index.d.ts:520](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L520)
+Defined in: [packages/headless/dist/index.d.ts:606](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L606)
 
 Serialize an absolute instant to `yyyy-MM-ddTHH:mm:ss±HH:MM`.
 

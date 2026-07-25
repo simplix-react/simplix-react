@@ -8,7 +8,7 @@
 
 > **DynamicColorIcon**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/base/display/dynamic-color-icon.tsx:83](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/dynamic-color-icon.tsx#L83)
+Defined in: [packages/ui/src/base/display/dynamic-color-icon.tsx:84](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/dynamic-color-icon.tsx#L84)
 
 Renders a dynamically loaded lucide icon with a configurable color and size.
 

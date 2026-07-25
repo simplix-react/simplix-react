@@ -6,7 +6,7 @@
 
 # Interface: OrvalMutationLike
 
-Defined in: [packages/headless/dist/index.d.ts:203](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L203)
+Defined in: [packages/headless/dist/index.d.ts:289](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L289)
 
 Loose mutation shape that accepts any Orval-generated hook result.
 Orval hooks return concretely typed `mutate` signatures (e.g. `{ petId: number }`)
@@ -19,7 +19,7 @@ We use `any` at this adapter boundary intentionally.
 
 > **isPending**: `boolean`
 
-Defined in: [packages/headless/dist/index.d.ts:206](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L206)
+Defined in: [packages/headless/dist/index.d.ts:292](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L292)
 
 ***
 
@@ -27,7 +27,7 @@ Defined in: [packages/headless/dist/index.d.ts:206](https://github.com/simplix-r
 
 > **mutate**: (...`args`) => `void`
 
-Defined in: [packages/headless/dist/index.d.ts:204](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L204)
+Defined in: [packages/headless/dist/index.d.ts:290](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L290)
 
 #### Parameters
 
@@ -45,7 +45,7 @@ Defined in: [packages/headless/dist/index.d.ts:204](https://github.com/simplix-r
 
 > **mutateAsync**: (...`args`) => `Promise`\<`any`\>
 
-Defined in: [packages/headless/dist/index.d.ts:205](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L205)
+Defined in: [packages/headless/dist/index.d.ts:291](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L291)
 
 #### Parameters
 
