@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org).
 
 ### Added
 
+- Server-search mode for `FilterBar` faceted filters — `onSearch` (debounced via `searchDebounceMs`), `loading`, `selectedOptions`, and `footer` on `FacetedFilterDef`, plus the exported `FacetedFilterOptionDef` option type. Eager `options` keep working unchanged
 - `@simplix-react/form` package with TanStack Form integration and derived form hooks
 - `@simplix-react/auth` package with authentication middleware (Bearer, API Key, OAuth2)
 - `@simplix-react/access` package with CASL-based authorization (RBAC/ABAC) and React bindings

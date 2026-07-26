@@ -86,6 +86,7 @@ export type {
   TextFilterDef,
   NumberFilterDef,
   FacetedFilterDef,
+  FacetedFilterOptionDef,
   ToggleFilterDef,
   DateRangeFilterDef,
 } from "../filters";

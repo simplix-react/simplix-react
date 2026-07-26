@@ -60,6 +60,7 @@
     "clearFilters": "Clear filters",
     "selectOperator": "Select operator",
     "noResultsFound": "No results found.",
+    "noOptions": "No options available",
     "numberPlaceholder": "Number",
     "numberFilter": "Number filter",
     "clearDateRange": "Clear date range",

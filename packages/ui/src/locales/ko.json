@@ -60,6 +60,7 @@
     "clearFilters": "필터 초기화",
     "selectOperator": "연산자 선택",
     "noResultsFound": "결과를 찾을 수 없습니다.",
+    "noOptions": "선택할 항목이 없습니다.",
     "numberPlaceholder": "숫자",
     "numberFilter": "숫자 필터",
     "clearDateRange": "날짜 범위 초기화",

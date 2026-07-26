@@ -995,6 +995,7 @@ See root LICENSE file.
 - [ErrorBoundaryState](interfaces/ErrorBoundaryState.md)
 - [FacetedFilterDef](interfaces/FacetedFilterDef.md)
 - [FacetedFilterOption](interfaces/FacetedFilterOption.md)
+- [FacetedFilterOptionDef](interfaces/FacetedFilterOptionDef.md)
 - [FacetedFilterProps](interfaces/FacetedFilterProps.md)
 - [FeatureCardProps](interfaces/FeatureCardProps.md)
 - [FieldMessageProps](interfaces/FieldMessageProps.md)

@@ -60,6 +60,7 @@
     "clearFilters": "フィルターをクリア",
     "selectOperator": "演算子を選択",
     "noResultsFound": "結果が見つかりません。",
+    "noOptions": "選択できる項目がありません。",
     "numberPlaceholder": "数値",
     "numberFilter": "数値フィルター",
     "clearDateRange": "日付範囲をクリア",

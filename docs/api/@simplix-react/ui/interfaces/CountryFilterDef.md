@@ -6,7 +6,7 @@
 
 # Interface: CountryFilterDef
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:88](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L88)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:121](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L121)
 
 ## Extends
 
@@ -58,4 +58,4 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:29](https://github.com/
 
 > **type**: `"country"`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:89](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L89)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:122](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L122)

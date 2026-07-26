@@ -416,6 +416,6 @@ describe("FilterBar popover form fields", () => {
     const state = createMockState();
     render(<FilterBar filters={[emptyFaceted]} state={state} />);
     openPopover();
-    expect(screen.getByText("No options available")).toBeTruthy();
+    expect(screen.getByText("filter.noOptions")).toBeTruthy();
   });
 });
