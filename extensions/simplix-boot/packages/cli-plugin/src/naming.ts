@@ -36,6 +36,26 @@ function buildEntityPrefixes(entityKebab: string): Set<string> {
 }
 
 /**
+ * Whether a path segment spells part of the entity's own name rather than an action.
+ *
+ * A path may spread the entity across segments — `userSecurityProfile` is served at
+ * `/user/security-profile`, whose trailing segment is the entity's tail, not something done to
+ * it. Reading that tail as an action gives every operation on the resource the same derived
+ * name, and two of them then declare the same response type.
+ *
+ * @param segment the kebab-case path segment
+ * @param entityKebab the entity name in kebab case
+ * @returns whether the segment belongs to the entity's name
+ */
+function isEntityNameSegment(segment: string, entityKebab: string): boolean {
+  return (
+    segment === entityKebab ||
+    entityKebab.startsWith(`${segment}-`) ||
+    entityKebab.endsWith(`-${segment}`)
+  );
+}
+
+/**
  * Scan path segments backwards to find a custom action suffix.
  * Skips params, the entity's kebab-case name, API prefix, and version segments.
  * Returns the camelCase action name, or undefined if no action found.
@@ -51,7 +71,7 @@ function findActionSuffix(segments: string[], entityName: string): string | unde
   for (let i = segments.length - 1; i >= 0; i--) {
     const seg = segments[i];
     if (seg.startsWith("{")) continue;
-    if (seg === entityKebab || entityPrefixes.has(seg) || seg === "api" || /^v\d+$/.test(seg)) return undefined;
+    if (isEntityNameSegment(seg, entityKebab) || entityPrefixes.has(seg) || seg === "api" || /^v\d+$/.test(seg)) return undefined;
     return toCamelCase(seg);
   }
   return undefined;
@@ -245,8 +265,12 @@ export const simplixBootNaming: OpenApiNamingStrategy = {
       // PUT with suffix after entity or param → custom action
       // e.g. /floor/{id}/zones, /floor/{id}/placements
       const entitySegment = entity.toLowerCase();
+      const entityKebabName = entity.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
       const lastSegmentNormalized = toCamelCase(lastSegment).toLowerCase();
-      const isEntityOrParam = lastSegment === entitySegment || lastSegmentNormalized === entitySegment || lastSegment.startsWith("{");
+      const isEntityOrParam = lastSegment === entitySegment
+        || lastSegmentNormalized === entitySegment
+        || isEntityNameSegment(lastSegment, entityKebabName)
+        || lastSegment.startsWith("{");
       if (!isEntityOrParam) {
         const actionSuffix = toCamelCase(lastSegment);
         const actionPascal = actionSuffix.charAt(0).toUpperCase() + actionSuffix.slice(1);
@@ -286,8 +310,12 @@ export const simplixBootNaming: OpenApiNamingStrategy = {
       // PATCH with suffix after entity or param → custom action
       // e.g. /floor/order, /floor/{id}/password
       const entitySegment = entity.toLowerCase();
+      const entityKebabName = entity.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
       const lastSegmentNormalized = toCamelCase(lastSegment).toLowerCase();
-      const isEntityOrParam = lastSegment === entitySegment || lastSegmentNormalized === entitySegment || lastSegment.startsWith("{");
+      const isEntityOrParam = lastSegment === entitySegment
+        || lastSegmentNormalized === entitySegment
+        || isEntityNameSegment(lastSegment, entityKebabName)
+        || lastSegment.startsWith("{");
       if (!isEntityOrParam) {
         const actionSuffix = toCamelCase(lastSegment);
         return {
