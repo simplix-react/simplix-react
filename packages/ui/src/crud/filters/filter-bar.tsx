@@ -35,11 +35,25 @@ interface FilterDefBase {
   columnBreak?: boolean;
 }
 
+/** One selectable value of a text filter whose values come from a closed catalogue. */
+export interface TextFilterOptionDef {
+  value: string;
+  label: string;
+}
+
 export interface TextFilterDef extends FilterDefBase {
   type: "text";
   operators: SearchOperator[];
   defaultOperator: SearchOperator;
   placeholder?: string;
+  /**
+   * Closed catalogue the value is picked from instead of typed. Use it for a column
+   * the server matches literally — a constant key, a code — where a typo produces an
+   * empty result the operator cannot tell from "no such row". The pick still travels
+   * under the current operator, so a CONTAINS filter over a column packing several
+   * keys keeps working.
+   */
+  options?: TextFilterOptionDef[];
 }
 
 export interface NumberFilterDef extends FilterDefBase {
@@ -297,7 +311,10 @@ export function FilterBar({ filters, state, leading, trailing, maxBadges, onPrev
       const vals = state.committedValues;
       switch (def.type) {
         case "text": {
-          return (vals[getFilterKey(def)] as string) ?? "";
+          const val = (vals[getFilterKey(def)] as string) ?? "";
+          // A catalogue-backed filter holds the stored key; the badge names it the
+          // way the picker did, falling back to the key when it is not on offer.
+          return def.options?.find((o) => o.value === val)?.label ?? val;
         }
         case "number": {
           return String(vals[getFilterKey(def)] ?? "");
@@ -688,7 +705,7 @@ function TextFormField({
   onOperatorChange: (def: TextFilterDef, op: SearchOperator) => void;
   className?: string;
 }) {
-  const { Input, Label } = useFlatUIComponents();
+  const { Input, Label, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } = useFlatUIComponents();
   const currentOp = operators[def.field] ?? def.defaultOperator;
   const key = makeFilterKey(def.field, currentOp);
   const value = (state.values[key] as string) ?? "";
@@ -705,13 +722,28 @@ function TextFormField({
           currentOp={currentOp}
           onOperatorChange={(op) => onOperatorChange(def, op)}
         />
-        <Input
-          type="text"
-          value={value}
-          onChange={(e) => state.setValue(key, e.target.value || undefined)}
-          placeholder={def.placeholder ?? def.label}
-          className="h-8 flex-1 text-sm"
-        />
+        {def.options ? (
+          <Select value={value} onValueChange={(v) => state.setValue(key, v || undefined)}>
+            <SelectTrigger className="h-8 flex-1 text-sm" aria-label={def.label}>
+              <SelectValue placeholder={def.placeholder ?? def.label} />
+            </SelectTrigger>
+            <SelectContent>
+              {def.options.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        ) : (
+          <Input
+            type="text"
+            value={value}
+            onChange={(e) => state.setValue(key, e.target.value || undefined)}
+            placeholder={def.placeholder ?? def.label}
+            className="h-8 flex-1 text-sm"
+          />
+        )}
       </Flex>
     </Stack>
   );

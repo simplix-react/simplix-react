@@ -528,6 +528,7 @@ export type {
   FilterBarProps,
   FilterDef,
   TextFilterDef,
+  TextFilterOptionDef,
   NumberFilterDef,
   FacetedFilterDef,
   FacetedFilterOptionDef,

@@ -109,7 +109,8 @@
     "searchOption": "검색...",
     "noResults": "결과를 찾을 수 없습니다.",
     "noValue": "값 없음",
-    "expandSearch": "전체 검색"
+    "expandSearch": "전체 검색",
+    "moreResults": "일치하는 항목이 더 있습니다. 계속 입력해 범위를 좁히세요"
   },
   "unit": {
     "minutes": "분",

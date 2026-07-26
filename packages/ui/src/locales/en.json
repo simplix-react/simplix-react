@@ -109,7 +109,8 @@
     "searchOption": "Search...",
     "noResults": "No results found.",
     "noValue": "No value",
-    "expandSearch": "Full search"
+    "expandSearch": "Full search",
+    "moreResults": "More matches — keep typing to narrow the list"
   },
   "unit": {
     "minutes": "min",
