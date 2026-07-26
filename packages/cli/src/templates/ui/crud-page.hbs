@@ -2,12 +2,18 @@ import type { CrudSearch } from "@simplix-react/ui";
 import { {{#if hasCreate}}Button, {{/if}}Container, ListDetail, Stack{{#if hasDelete}}, adaptOrvalDelete{{/if}}{{#if hasDelete}}, useCrudDeleteWired{{/if}}, useCrudNavigation, useCrudPageState{{#if hasDelete}}, useInvalidateEntity{{/if}}, usePageHeader } from "@simplix-react/ui";
 import { useTranslation } from "@simplix-react/i18n/react";
 {{#if hasCreate}}
+import { useCan } from "@simplix-react/access/react";
+{{/if}}
+{{#if hasCreate}}
 import { PlusIcon } from "lucide-react";
 {{/if}}
 {{#if hookDelete}}
 import { {{hookDelete}} } from "{{packageName}}";
 {{/if}}
 
+{{#if hasCreate}}
+import { SUBJECTS } from "../../shared/auth/subjects";
+{{/if}}
 import { {{EntityPascal}}Detail, {{#if hasForm}}{{EntityPascal}}Form, {{/if}}{{EntityPascal}}List, use{{EntityPascal}}List } from "../../widgets";
 
 interface {{EntityPascal}}CrudPageProps {
@@ -60,6 +66,10 @@ export function {{EntityPascal}}CrudPage({ variant = "panel", search, onNavigate
 
   const { state, fade, closePanel } = useCrudPageState(variant, nav);
 
+{{#if hasCreate}}
+  const canCreate = useCan("create", SUBJECTS.{{entity}});
+{{/if}}
+
   usePageHeader((() => {
     if (variant === "page") {
 {{#if hasCreate}}
@@ -74,7 +84,9 @@ export function {{EntityPascal}}CrudPage({ variant = "panel", search, onNavigate
       return {
         title: t("{{entity}}.{{entityPlural}}"),
 {{#if hasCreate}}
-        actions: <Button onClick={showNew}><PlusIcon className="size-4" />{t("{{entity}}.addNew{{EntityPascal}}")}</Button>,
+        actions: canCreate
+          ? <Button onClick={showNew}><PlusIcon className="size-4" />{t("{{entity}}.addNew{{EntityPascal}}")}</Button>
+          : undefined,
 {{/if}}
       };
     }
@@ -82,7 +94,9 @@ export function {{EntityPascal}}CrudPage({ variant = "panel", search, onNavigate
       title: t("{{entity}}.{{entityPlural}}"),
       description: t("{{entity}}.{{entityPlural}}Description"),
 {{#if hasCreate}}
-      actions: <Button onClick={showNew}><PlusIcon className="size-4" />{t("{{entity}}.addNew{{EntityPascal}}")}</Button>,
+      actions: canCreate
+        ? <Button onClick={showNew}><PlusIcon className="size-4" />{t("{{entity}}.addNew{{EntityPascal}}")}</Button>
+        : undefined,
 {{/if}}
     };
   })());

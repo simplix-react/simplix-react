@@ -855,6 +855,10 @@ async function generatePages(
   const pagesDir = join(moduleDir, "src", "pages", entityKebab);
   const generated: string[] = [];
 
+  if (ctx.hasCreate) {
+    await ensureSubjectsFile(moduleDir);
+  }
+
   const pageFiles: Record<string, string> = {};
 
   // CrudPage (list/tree + detail + new + edit in one component)
@@ -883,6 +887,33 @@ async function generatePages(
   return generated;
 }
 
+/**
+ * Guarantees the module has a permission-subject map for the generated page to read.
+ *
+ * The page gates its create action on `useCan("create", SUBJECTS.<entity>)`, and only the
+ * backend knows which group guards the entity's endpoints — so the map is declared, never
+ * guessed. Creating it empty makes the missing entry a compile error on the generated page,
+ * which is where the author is already looking.
+ */
+async function ensureSubjectsFile(moduleDir: string): Promise<void> {
+  const subjectsPath = join(moduleDir, "src", "shared", "auth", "subjects.ts");
+  if (await pathExists(subjectsPath)) return;
+  await writeFileWithDir(
+    subjectsPath,
+    [
+      "/**",
+      " * Permission group guarding each screen in this module, mirroring the backend's",
+      " * `hasPermission('<group>', '<action>')`. A screen reads its group from here so the affordances",
+      " * it offers and the rule the server enforces are changed in one place.",
+      " */",
+      "export const SUBJECTS = {",
+      "} as const;",
+      "",
+    ].join("\n"),
+  );
+  log.info("Created shared/auth/subjects.ts — add the entity's permission group to it");
+}
+
 async function updatePagesIndex(
   moduleDir: string,
   entityKebab: string,
@@ -890,7 +921,7 @@ async function updatePagesIndex(
 ): Promise<void> {
   const pagesIndexPath = join(moduleDir, "src", "pages", "index.ts");
 
-  // pages/index.ts가 없으면 생성 (locale side-effect 포함)
+  // Create pages/index.ts when absent, carrying the locale side-effect import
   if (!(await pathExists(pagesIndexPath))) {
     await writeFileWithDir(
       pagesIndexPath,

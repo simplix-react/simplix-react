@@ -3,12 +3,18 @@ import type { CrudSearch } from "@simplix-react/ui";
 import { {{#if hasCreate}}Button, {{/if}}Container, ListDetail, Stack{{#if hasTreeMove}}, TreeMoveDialog{{/if}}{{#if hasTreeReorder}}, TreeReorderDialog{{/if}}{{#if hasDelete}}, adaptOrvalDelete{{/if}}{{#if hasTreeReorder}}, getSiblings{{/if}}{{#if hasDelete}}, useCrudDeleteWired{{/if}}, useCrudNavigation, useCrudPageState{{#if hasDelete}}, useInvalidateEntity{{/if}}, usePageHeader } from "@simplix-react/ui";
 import { useTranslation } from "@simplix-react/i18n/react";
 {{#if hasCreate}}
+import { useCan } from "@simplix-react/access/react";
+{{/if}}
+{{#if hasCreate}}
 import { PlusIcon } from "lucide-react";
 {{/if}}
 {{#if packageName}}
 import { {{#if hookDelete}}{{hookDelete}}, {{/if}}{{#if hookUpdate}}{{hookUpdate}}{{/if}} } from "{{packageName}}";
 {{/if}}
 
+{{#if hasCreate}}
+import { SUBJECTS } from "../../shared/auth/subjects";
+{{/if}}
 import { {{#if hasDetail}}{{EntityPascal}}Detail, {{/if}}{{#if hasForm}}{{EntityPascal}}Form, {{/if}}{{EntityPascal}}Tree, use{{EntityPascal}}Tree } from "../../widgets";
 
 {{#if treeRowType}}
@@ -137,6 +143,10 @@ export function {{EntityPascal}}CrudPage({ variant = "panel", search, onNavigate
 
   const { state, fade, closePanel } = useCrudPageState(variant, nav);
 
+{{#if hasCreate}}
+  const canCreate = useCan("create", SUBJECTS.{{entity}});
+{{/if}}
+
   usePageHeader((() => {
     if (variant === "page") {
 {{#if hasCreate}}
@@ -151,7 +161,9 @@ export function {{EntityPascal}}CrudPage({ variant = "panel", search, onNavigate
       return {
         title: t("{{entity}}.{{entityPlural}}"),
 {{#if hasCreate}}
-        actions: <Button onClick={showNew}><PlusIcon className="size-4" />{t("{{entity}}.addNew{{EntityPascal}}")}</Button>,
+        actions: canCreate
+          ? <Button onClick={showNew}><PlusIcon className="size-4" />{t("{{entity}}.addNew{{EntityPascal}}")}</Button>
+          : undefined,
 {{/if}}
       };
     }
@@ -159,7 +171,9 @@ export function {{EntityPascal}}CrudPage({ variant = "panel", search, onNavigate
       title: t("{{entity}}.{{entityPlural}}"),
       description: t("{{entity}}.{{entityPlural}}Description"),
 {{#if hasCreate}}
-      actions: <Button onClick={showNew}><PlusIcon className="size-4" />{t("{{entity}}.addNew{{EntityPascal}}")}</Button>,
+      actions: canCreate
+        ? <Button onClick={showNew}><PlusIcon className="size-4" />{t("{{entity}}.addNew{{EntityPascal}}")}</Button>
+        : undefined,
 {{/if}}
     };
   })());
@@ -287,7 +301,7 @@ export function {{EntityPascal}}CrudPage({ variant = "panel", search, onNavigate
             actions={[
               { type: "view", onClick: (row: {{EntityPascal}}) => showDetail(String(row.{{rowIdField}})) },
 {{#if hasCreate}}
-              { type: "add-child", onClick: (row: {{EntityPascal}}) => { setNewParentId(String(row.{{rowIdField}})); showNew(); } },
+              ...(canCreate ? [{ type: "add-child" as const, onClick: (row: {{EntityPascal}}) => { setNewParentId(String(row.{{rowIdField}})); showNew(); } }] : []),
 {{/if}}
 {{#if hasTreeReorder}}
               { type: "reorder", onClick: (row: {{EntityPascal}}) => { setReorderTarget({ parentId: row.{{treeParentIdField}} }); } },
