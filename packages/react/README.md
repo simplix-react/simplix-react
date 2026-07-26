@@ -67,11 +67,13 @@ function TaskList() {
 
 ## API Overview
 
-The package exports a single function and a set of type definitions:
+The package exports hook derivation, query-runtime helpers, and a set of type definitions:
 
 | Export | Kind | Description |
 | --- | --- | --- |
 | `deriveEntityHooks` | Function | Derives all hooks from a contract |
+| `startOnlineStatusSync` | Function | Keeps React Query's connectivity flag in sync with `navigator.onLine` |
+| `resyncOnlineStatus` | Function | Repairs the connectivity flag once, on demand |
 | `EntityHooks` | Type | Hook interface for a single entity |
 | `OperationHooks` | Type | Hook interface for a custom operation |
 | `DerivedListHook` | Type | List query hook signature |
@@ -116,6 +118,27 @@ const createTask = hooks.task.useCreate(undefined, {
   onSuccess: (data) => console.log("Created:", data),
 });
 ```
+
+### Connectivity Flag Recovery
+
+React Query pauses a fetch while it believes the browser is offline, and it decides that from a cached flag written only by the window `online` / `offline` events. Because the manager detaches those listeners whenever nothing is subscribed, one missed `online` event leaves the flag stuck and every query paused for the lifetime of the page — a list that renders "could not be loaded" and never recovers without a reload.
+
+`startOnlineStatusSync()` repairs the flag from `navigator.onLine`, which is always current: once at boot, and again each time the document becomes visible. Restoring the flag is enough to recover — the `QueryClient` subscribes to the manager itself and resumes paused fetches when it flips back to online.
+
+Call it once where the app creates its `QueryClient`:
+
+```ts
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { startOnlineStatusSync } from "@simplix-react/react";
+
+const queryClient = new QueryClient();
+
+startOnlineStatusSync();
+```
+
+`resyncOnlineStatus()` performs the same repair once, for apps that run their own connectivity probe. Both are no-ops where `navigator.onLine` does not exist (server rendering, React Native), so neither overrides a platform-specific connectivity integration.
+
+`focusManager` needs no equivalent: its `isFocused()` reads `document.visibilityState` on every call rather than caching it, so it cannot go stale.
 
 ## Hook Reference
 

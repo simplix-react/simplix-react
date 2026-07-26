@@ -1,5 +1,6 @@
 import { QueryClient } from "@tanstack/query-core";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { startOnlineStatusSync } from "@simplix-react/react";
 import { UIProvider } from "@simplix-react/ui";
 import type { ReactNode } from "react";
 import { uiOverrides } from "./ui-overrides.js";
@@ -24,6 +25,11 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// React Query's connectivity flag is written only by the window online/offline
+// events, so a single missed event leaves every retry paused forever. Repair it
+// from navigator.onLine at boot and whenever the tab becomes visible again.
+startOnlineStatusSync();
 
 export function AppProviders({ children }: { children: ReactNode }) {
   return (

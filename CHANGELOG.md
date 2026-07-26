@@ -63,6 +63,7 @@ and this project adheres to [Semantic Versioning](https://semver.org).
 - Page header actions and ListDetail dialog layout in UI
 - ESLint config for simplix-boot packages and i18n lint error
 - Lists no longer report a paused or retrying query as "no data" — `ListHookResult` carries `isPaused` / `failureCount`, `EmptyReason` gains `"unavailable"`, and `CrudList` / `AssignmentPanel` / `EntityList` render "the list could not be loaded"
+- Queries no longer stay paused forever after a missed `online` event — `@simplix-react/react` exports `startOnlineStatusSync` / `resyncOnlineStatus`, which repair React Query's cached connectivity flag from `navigator.onLine` at boot and on `visibilitychange`; the project template wires the sync into generated apps
 
 ### Removed
 
