@@ -272,3 +272,66 @@ export const WithMaxBadges: StoryObj = {
     );
   },
 };
+
+/** A directory too large to send in one page, standing in for a server-backed list. */
+const CUSTOMER_DIRECTORY = Array.from({ length: 2400 }, (_, i) => ({
+  value: `c${i + 1}`,
+  label: `${["Acme", "Globex", "Initech", "Umbrella", "Soylent", "Stark"][i % 6]} Holdings ${i + 1}`,
+}));
+
+const SERVER_PAGE_SIZE = 20;
+
+/**
+ * A faceted filter over a directory larger than any one page. Typing queries the
+ * server (simulated with a delay) instead of filtering a preloaded list, and the
+ * selection keeps its label once the results move past it.
+ */
+export const ServerSearchedFaceted: StoryObj = {
+  render: () => {
+    const state = useMockFilterState();
+    const [options, setOptions] = useState(() => CUSTOMER_DIRECTORY.slice(0, SERVER_PAGE_SIZE));
+    const [loading, setLoading] = useState(false);
+    const [queries, setQueries] = useState<string[]>([]);
+
+    const onSearch = useCallback((query: string) => {
+      setQueries((prev) => [...prev, query === "" ? "(empty)" : query]);
+      setLoading(true);
+      const timer = setTimeout(() => {
+        const lower = query.toLowerCase();
+        setOptions(
+          CUSTOMER_DIRECTORY.filter((o) => o.label.toLowerCase().includes(lower))
+            .slice(0, SERVER_PAGE_SIZE),
+        );
+        setLoading(false);
+      }, 250);
+      return () => clearTimeout(timer);
+    }, []);
+
+    const selectedValues = (state.values["customerId.in"] as string[] | undefined) ?? [];
+    const selectedOptions = CUSTOMER_DIRECTORY.filter((o) => selectedValues.includes(o.value));
+
+    return (
+      <div>
+        <FilterBar
+          maxBadges={3}
+          filters={[
+            {
+              type: "faceted",
+              field: "customerId",
+              label: "Customer",
+              display: "dropdown",
+              options,
+              onSearch,
+              loading,
+              selectedOptions,
+            },
+          ]}
+          state={state}
+        />
+        <pre data-testid="server-queries" style={{ fontSize: 12, marginTop: 16 }}>
+          {`directory: ${CUSTOMER_DIRECTORY.length} rows | page: ${options.length} rows\nqueries sent to the server: ${queries.join(" → ") || "(none yet)"}`}
+        </pre>
+      </div>
+    );
+  },
+};
