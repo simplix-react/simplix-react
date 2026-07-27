@@ -14,6 +14,24 @@ export interface ListHookResult<T> {
   isLoading: boolean;
   /** Error object if the query failed, otherwise `null`. */
   error: Error | null;
+  /**
+   * Whether the query is in flight but stalled — React Query's
+   * `fetchStatus === "paused"`. A paused query reports `isLoading: false` and
+   * `error: null`, so without this flag a stalled fetch is indistinguishable
+   * from a successful empty result.
+   *
+   * @remarks
+   * Optional so that existing producers of this shape keep compiling; omit it
+   * and the list falls back to the settled-only interpretation.
+   */
+  isPaused?: boolean;
+  /**
+   * Number of consecutive failed fetch attempts — React Query's
+   * `failureCount`. A value greater than `0` while `error` is still `null`
+   * means an attempt failed and a retry is pending, which is a non-success
+   * state rather than an empty result.
+   */
+  failureCount?: number;
 }
 
 /**

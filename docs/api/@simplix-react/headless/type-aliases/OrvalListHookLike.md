@@ -27,8 +27,6 @@ We use `any` at this adapter boundary intentionally.
 
 ## Returns
 
-`object`
-
 ### data
 
 > **data**: `unknown`
@@ -37,6 +35,18 @@ We use `any` at this adapter boundary intentionally.
 
 > **error**: `unknown`
 
+### failureCount?
+
+> `optional` **failureCount**: `number`
+
+React Query consecutive failed attempts. Absent on non-React-Query hooks.
+
 ### isLoading
 
 > **isLoading**: `boolean`
+
+### isPaused?
+
+> `optional` **isPaused**: `boolean`
+
+React Query `fetchStatus === "paused"`. Absent on non-React-Query hooks.

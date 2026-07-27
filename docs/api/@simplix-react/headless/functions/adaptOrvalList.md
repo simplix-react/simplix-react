@@ -8,7 +8,7 @@
 
 > **adaptOrvalList**\<`T`\>(`useApiHook`, `options?`): [`ListHook`](../interfaces/ListHook.md)\<`T`\>
 
-Defined in: [adapt-orval-list.ts:56](https://github.com/simplix-react/simplix-react/blob/main/adapt-orval-list.ts#L56)
+Defined in: [adapt-orval-list.ts:63](https://github.com/simplix-react/simplix-react/blob/main/adapt-orval-list.ts#L63)
 
 Adapt an Orval-generated list hook to the [ListHook](../interfaces/ListHook.md) interface
 expected by a list state machine in `"server"` mode (the web `useCrudList`
@@ -49,6 +49,9 @@ Handles the following conversions (via [buildSearchableParams](buildSearchablePa
 - Size: `pagination.limit` to `size`.
 - Sort: `{ field, direction }` to `["field.direction"]`.
 - Response: Spring Data Page (`content`, `totalElements`) to `ListHookResult`.
+
+React Query's `isPaused` and `failureCount` are forwarded unchanged so the
+list can tell a stalled or retrying query apart from an empty result.
 
 ## Example
 

@@ -8,7 +8,7 @@
 
 > **GroupedToggleField**\<`T`\>(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/form/grouped-toggle-field.tsx:149](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/grouped-toggle-field.tsx#L149)
+Defined in: [packages/ui/src/fields/form/grouped-toggle-field.tsx:150](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/grouped-toggle-field.tsx#L150)
 
 Grouped inline multi-select. Each group renders an icon title, an optional
 select-all switch, and a row of toggle chips. Selection is namespaced per

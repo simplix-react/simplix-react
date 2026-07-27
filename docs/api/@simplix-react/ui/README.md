@@ -696,7 +696,15 @@ const result = useCrudList(useUserList, {
 });
 ```
 
-Returns: `{ data, isLoading, error, filters, sort, pagination, selection, emptyReason }`
+Returns: `{ data, isLoading, error, isPaused, failureCount, filters, sort, pagination, selection, emptyReason }`
+
+`emptyReason` is `"no-data"`, `"no-filter"`, `"no-search"`, `"error"`,
+`"unavailable"`, or `null`. `"unavailable"` covers a query that is neither
+settled successfully nor settled with an error — paused (React Query
+`fetchStatus === "paused"`, which happens while the document is hidden or the
+browser reports offline) or waiting to retry after a failed attempt. Such a
+query reports `isLoading: false` and `error: null`, so it is reported as "the
+list could not be loaded" rather than as an empty result.
 
 #### useUrlSync
 
@@ -921,6 +929,7 @@ See root LICENSE file.
 - [BooleanBadgeProps](interfaces/BooleanBadgeProps.md)
 - [Bounds](interfaces/Bounds.md)
 - [ButtonProps](interfaces/ButtonProps.md)
+- [CalendarDateTextProps](interfaces/CalendarDateTextProps.md)
 - [CalendarProps](interfaces/CalendarProps.md)
 - [CardListProps](interfaces/CardListProps.md)
 - [CardProps](interfaces/CardProps.md)
@@ -944,10 +953,12 @@ See root LICENSE file.
 - [CropModalProps](interfaces/CropModalProps.md)
 - [CrudDeleteProps](interfaces/CrudDeleteProps.md)
 - [CrudDeleteWiredLabels](interfaces/CrudDeleteWiredLabels.md)
+- [CrudDetailActionFooterProps](interfaces/CrudDetailActionFooterProps.md)
 - [CrudDetailActionsProps](interfaces/CrudDetailActionsProps.md)
 - [CrudDetailAuditFooterProps](interfaces/CrudDetailAuditFooterProps.md)
 - [CrudDetailDefaultActionsProps](interfaces/CrudDetailDefaultActionsProps.md)
 - [CrudDetailProps](interfaces/CrudDetailProps.md)
+- [CrudDetailSectionProps](interfaces/CrudDetailSectionProps.md)
 - [CrudErrorBoundaryProps](interfaces/CrudErrorBoundaryProps.md)
 - [CrudFormActionsProps](interfaces/CrudFormActionsProps.md)
 - [CrudFormProps](interfaces/CrudFormProps.md)
@@ -984,6 +995,7 @@ See root LICENSE file.
 - [ErrorBoundaryState](interfaces/ErrorBoundaryState.md)
 - [FacetedFilterDef](interfaces/FacetedFilterDef.md)
 - [FacetedFilterOption](interfaces/FacetedFilterOption.md)
+- [FacetedFilterOptionDef](interfaces/FacetedFilterOptionDef.md)
 - [FacetedFilterProps](interfaces/FacetedFilterProps.md)
 - [FeatureCardProps](interfaces/FeatureCardProps.md)
 - [FieldMessageProps](interfaces/FieldMessageProps.md)
@@ -1012,6 +1024,7 @@ See root LICENSE file.
 - [IconFieldProps](interfaces/IconFieldProps.md)
 - [IconPickerProps](interfaces/IconPickerProps.md)
 - [IconProps](interfaces/IconProps.md)
+- [InstantTextProps](interfaces/InstantTextProps.md)
 - [LabeledFieldProps](interfaces/LabeledFieldProps.md)
 - [LineChartProps](interfaces/LineChartProps.md)
 - [ListBulkActionProps](interfaces/ListBulkActionProps.md)
@@ -1068,6 +1081,7 @@ See root LICENSE file.
 - [ReactRouterHooks](interfaces/ReactRouterHooks.md)
 - [RemoteConfigQueryDef](interfaces/RemoteConfigQueryDef.md)
 - [ReorderConfig](interfaces/ReorderConfig.md)
+- [ResolveEmptyReasonInput](interfaces/ResolveEmptyReasonInput.md)
 - [RouteMatcherProviderProps](interfaces/RouteMatcherProviderProps.md)
 - [RouterAdapter](interfaces/RouterAdapter.md)
 - [RowActionDef](interfaces/RowActionDef.md)
@@ -1160,6 +1174,7 @@ See root LICENSE file.
 - [UseUnsavedChangesReturn](interfaces/UseUnsavedChangesReturn.md)
 - [UseUrlSyncOptions](interfaces/UseUrlSyncOptions.md)
 - [UseVirtualListOptions](interfaces/UseVirtualListOptions.md)
+- [WallClockTextProps](interfaces/WallClockTextProps.md)
 - [WindowPreset](interfaces/WindowPreset.md)
 - [WizardProps](interfaces/WizardProps.md)
 - [WizardStepProps](interfaces/WizardStepProps.md)
@@ -1177,7 +1192,6 @@ See root LICENSE file.
 - [CardVariants](type-aliases/CardVariants.md)
 - [CheckboxProps](type-aliases/CheckboxProps.md)
 - [ContainerVariants](type-aliases/ContainerVariants.md)
-- [CrudDetailSectionProps](type-aliases/CrudDetailSectionProps.md)
 - [CrudDetailVariant](type-aliases/CrudDetailVariant.md)
 - [CrudListViewMode](type-aliases/CrudListViewMode.md)
 - [CrudView](type-aliases/CrudView.md)
@@ -1425,6 +1439,7 @@ See root LICENSE file.
 - [asZonedInstant](functions/asZonedInstant.md)
 - [BooleanBadge](functions/BooleanBadge.md)
 - [buildCrudSearch](functions/buildCrudSearch.md)
+- [CalendarDateText](functions/CalendarDateText.md)
 - [CardList](functions/CardList.md)
 - [ChartProvider](functions/ChartProvider.md)
 - [ChipFilter](functions/ChipFilter.md)
@@ -1488,6 +1503,7 @@ See root LICENSE file.
 - [I18nText](functions/I18nText.md)
 - [IconField](functions/IconField.md)
 - [insertFilterSeparators](functions/insertFilterSeparators.md)
+- [InstantText](functions/InstantText.md)
 - [isOnPath](functions/isOnPath.md)
 - [isSameDay](functions/isSameDay.md)
 - [isSameMonth](functions/isSameMonth.md)
@@ -1520,6 +1536,7 @@ See root LICENSE file.
 - [QrCode](functions/QrCode.md)
 - [QueryFallback](functions/QueryFallback.md)
 - [removeToast](functions/removeToast.md)
+- [resolveEmptyReason](functions/resolveEmptyReason.md)
 - [RouteMatcherProvider](functions/RouteMatcherProvider.md)
 - [sanitizeHtml](functions/sanitizeHtml.md)
 - [SaveButton](functions/SaveButton.md)
@@ -1606,4 +1623,5 @@ See root LICENSE file.
 - [useUrlSync](functions/useUrlSync.md)
 - [useVirtualList](functions/useVirtualList.md)
 - [validateCrudSearch](functions/validateCrudSearch.md)
+- [WallClockText](functions/WallClockText.md)
 - [withOverride](functions/withOverride.md)

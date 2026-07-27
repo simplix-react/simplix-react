@@ -1,7 +1,13 @@
 import { Button, Container, Heading, Stack, Text } from "@simplix-react/ui";
 import { useTranslation } from "@simplix-react/i18n/react";
 {{#if hasCreate}}
+import { useCan } from "@simplix-react/access/react";
+{{/if}}
+{{#if hasCreate}}
 import { PlusIcon } from "lucide-react";
+{{/if}}
+{{#if hasCreate}}
+import { SUBJECTS } from "../../shared/auth/subjects";
 {{/if}}
 
 interface {{EntityPascal}}ListPageProps {
@@ -15,6 +21,9 @@ interface {{EntityPascal}}ListPageProps {
  */
 export function {{EntityPascal}}ListPage({ {{#if hasCreate}}onCreate{{EntityPascal}}{{/if}} }: {{EntityPascal}}ListPageProps) {
   const { t } = useTranslation("{{moduleNamespace}}/widgets");
+{{#if hasCreate}}
+  const canCreate = useCan("create", SUBJECTS.{{entity}});
+{{/if}}
   return (
     <Container size="full">
       <Stack gap="md" align="center">
@@ -23,7 +32,7 @@ export function {{EntityPascal}}ListPage({ {{#if hasCreate}}onCreate{{EntityPasc
           {t("{{entity}}.description")}
         </Text>
 {{#if hasCreate}}
-        <Button onClick={onCreate{{EntityPascal}} }><PlusIcon className="size-4" />{t("{{entity}}.addNew{{EntityPascal}}")}</Button>
+        {canCreate && <Button onClick={onCreate{{EntityPascal}} }><PlusIcon className="size-4" />{t("{{entity}}.addNew{{EntityPascal}}")}</Button>}
 {{/if}}
       </Stack>
     </Container>

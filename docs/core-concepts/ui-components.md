@@ -222,6 +222,31 @@ The filter system provides a collection of specialized filter components for lis
 
 Filters use a structured key format (`makeFilterKey`, `parseFilterKey`) for URL serialization and the `SearchOperator` enum for operator-based filtering. The `FilterBar` component accepts an array of `FilterDef` definitions and renders the appropriate filter components automatically.
 
+A faceted filter sources its options either eagerly or from the server. Eagerly is the default: `options` holds the whole set and the popover's input filters it locally, which suits enums and other bounded sets. Setting `onSearch` switches the filter to server search — `options` then carries the current result page, the typed text is debounced (`searchDebounceMs`, default 300 ms) and handed to the callback, `loading` renders a pending row, and local filtering is switched off so the server's answer renders as given. `selectedOptions` names values that were picked from an earlier page: they head the option list and back the active-filter badge, so a selection keeps its label as the search text moves on. Use server search for any directory whose row count grows past a page — an eager option list silently truncates at whatever page size fetched it.
+
+```tsx
+const [query, setQuery] = useState("");
+const { rows, isLoading } = useCustomerSearch(query);      // your own paged search
+const selected = useCustomerLabels(list.filters);          // labels for the picked ids
+
+<CrudList.FilterBar
+  maxBadges={3}
+  filters={[
+    {
+      type: "faceted",
+      field: "customerId",
+      label: "Customer",
+      display: "dropdown",
+      options: rows,
+      onSearch: setQuery,
+      loading: isLoading,
+      selectedOptions: selected,
+    },
+  ]}
+  state={list.filters}
+/>
+```
+
 ## Design Decisions
 
 ### Why Compound Components?

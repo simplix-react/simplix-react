@@ -77,6 +77,18 @@ Defined in: [adapter.ts:33](https://github.com/simplix-react/simplix-react/blob/
 
 Human-readable name for this adapter.
 
+***
+
+### resourcesVersion?
+
+> `readonly` `optional` **resourcesVersion**: `number`
+
+Defined in: [adapter.ts:188](https://github.com/simplix-react/simplix-react/blob/main/adapter.ts#L188)
+
+A monotonically increasing counter bumped each time translation resources
+are added or replaced. Lets reactive consumers detect late-arriving
+resources (lazy bundles register after the first render).
+
 ## Methods
 
 ### dispose()
@@ -426,6 +438,36 @@ Registers a callback invoked whenever the active locale changes.
 (`locale`) => `void`
 
 The callback receiving the new locale code.
+
+#### Returns
+
+A function that unregisters the handler when called.
+
+> (): `void`
+
+##### Returns
+
+`void`
+
+***
+
+### onResourcesChange()?
+
+> `optional` **onResourcesChange**(`handler`): () => `void`
+
+Defined in: [adapter.ts:197](https://github.com/simplix-react/simplix-react/blob/main/adapter.ts#L197)
+
+Registers a callback invoked whenever translation resources are added or
+replaced after initialization. Reactive bindings subscribe to re-render
+views that rendered before a lazily loaded namespace arrived.
+
+#### Parameters
+
+##### handler
+
+() => `void`
+
+The callback invoked on each resource change.
 
 #### Returns
 

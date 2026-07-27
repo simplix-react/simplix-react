@@ -1,5 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 
+import { useTranslation } from "@simplix-react/i18n/react";
+
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { FieldChevron } from "../../base/inputs/field-chevron";
 import { useFlatUIComponents } from "../../provider/ui-provider";
@@ -15,7 +17,10 @@ export interface MultiSelectFieldProps<T extends string = string>
   onChange: (value: T[]) => void;
   /** Available options with label/value pairs. */
   options: Array<{ label: string; value: T }>;
+  /** Prompt shown while nothing is selected. Defaults to the translated "Select…". */
   placeholder?: string;
+  /** Line shown when the typed text matches no option. Defaults to the translated one. */
+  emptyMessage?: string;
   /** Maximum number of selections allowed. */
   maxCount?: number;
 }
@@ -41,7 +46,8 @@ export function MultiSelectField<T extends string = string>({
   value,
   onChange,
   options,
-  placeholder = "Select...",
+  placeholder,
+  emptyMessage,
   maxCount,
   label,
   labelKey,
@@ -53,6 +59,9 @@ export function MultiSelectField<T extends string = string>({
   ...variantProps
 }: MultiSelectFieldProps<T>) {
   const { Badge, Popover, PopoverContent, PopoverTrigger } = useFlatUIComponents();
+  const { t } = useTranslation("simplix/ui");
+  const selectPlaceholder = placeholder ?? t("field.selectOption");
+  const noResultsMessage = emptyMessage ?? t("field.noResults");
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -149,7 +158,7 @@ export function MultiSelectField<T extends string = string>({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onFocus={() => setOpen(true)}
-              placeholder={value.length === 0 ? placeholder : ""}
+              placeholder={value.length === 0 ? selectPlaceholder : ""}
               disabled={disabled}
               className="min-w-[60px] flex-1 bg-transparent outline-none text-sm placeholder:text-muted-foreground disabled:cursor-not-allowed"
             />
@@ -165,7 +174,7 @@ export function MultiSelectField<T extends string = string>({
           <ul className="max-h-60 overflow-y-auto p-1" role="listbox">
             {filtered.length === 0 && (
               <li className="py-4 text-center text-sm text-muted-foreground">
-                No results found.
+                {noResultsMessage}
               </li>
             )}
             {filtered.map((opt) => {

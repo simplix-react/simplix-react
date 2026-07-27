@@ -392,17 +392,19 @@ export function EntityList<T>({
     const message =
       reason === "error"
         ? t("list.error")
-        : reason === "no-search"
-          ? t("list.noSearch")
-          : reason === "no-filter"
-            ? t("list.noFilter")
-            : t("list.noData");
+        : reason === "unavailable"
+          ? t("list.unavailable")
+          : reason === "no-search"
+            ? t("list.noSearch")
+            : reason === "no-filter"
+              ? t("list.noFilter")
+              : t("list.noData");
     return (
       <View className="items-center gap-3 py-16">
         <Text size="sm" tone="muted">
           {message}
         </Text>
-        {reason === "error" ? (
+        {reason === "error" || reason === "unavailable" ? (
           <Button variant="outline" size="sm" onPress={feed.refresh}>
             {t("common.retry")}
           </Button>

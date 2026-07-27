@@ -2,6 +2,8 @@ export { deriveEntityHooks } from "./derive-hooks.js";
 export type { DerivedEntityHooksResult } from "./derive-hooks.js";
 export { useBatchDetails } from "./use-batch-details.js";
 
+export { resyncOnlineStatus, startOnlineStatusSync } from "./online-status-sync.js";
+
 export { createLocalQueryStore } from "./local-query.js";
 export type { LocalQueryStoreOptions, LocalQueryDef } from "./local-query.js";
 

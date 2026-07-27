@@ -8,7 +8,7 @@
 
 > **formatRelativeTime**(`date`, `locale?`): `string`
 
-Defined in: [packages/headless/dist/index.d.ts:387](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L387)
+Defined in: [packages/headless/dist/index.d.ts:473](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L473)
 
 Locale-aware relative time — e.g. "3 days ago", localized.
 

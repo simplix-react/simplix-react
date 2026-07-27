@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
-import type { ListHook, ListHookResult } from "@simplix-react/headless";
+import { resolveEmptyReason, type ListHook, type ListHookResult } from "@simplix-react/headless";
 
 import type { EmptyReason, SortState } from "../shared/types";
 
@@ -76,6 +76,17 @@ export interface UseCrudListResult<T> {
   data: T[];
   isLoading: boolean;
   error: Error | null;
+  /**
+   * Whether the underlying query is in flight but stalled (React Query
+   * `fetchStatus === "paused"`). Such a query reports `isLoading: false` and
+   * `error: null`; consult this before treating an empty `data` as "no data".
+   */
+  isPaused: boolean;
+  /**
+   * Consecutive failed fetch attempts on the underlying query. Greater than `0`
+   * with `error === null` means a retry is pending.
+   */
+  failureCount: number;
   filters: CrudListFilters;
   sort: CrudListSort;
   pagination: CrudListPagination;
@@ -345,22 +356,35 @@ export function useCrudList<T>(
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   // ── Empty reason detection ──
-  const emptyReason = useMemo((): EmptyReason | null => {
-    if (paginatedData.length > 0) return null;
-    if (queryResult.isLoading) return null;
-    if (queryResult.error) return "error";
+  const isPaused = queryResult.isPaused ?? false;
+  const failureCount = queryResult.failureCount ?? 0;
 
-    if (search) return "no-search";
-    if (Object.values(committedFilterValues).some((v) => v !== undefined && v !== null && v !== "")) {
-      return "no-filter";
-    }
-    return "no-data";
-  }, [paginatedData.length, queryResult.isLoading, queryResult.error, search, committedFilterValues]);
+  const emptyReason = useMemo((): EmptyReason | null => resolveEmptyReason({
+    hasRows: paginatedData.length > 0,
+    isLoading: queryResult.isLoading,
+    error: queryResult.error,
+    isPaused,
+    failureCount,
+    hasSearch: !!search,
+    hasFilters: Object.values(committedFilterValues).some(
+      (v) => v !== undefined && v !== null && v !== "",
+    ),
+  }), [
+    paginatedData.length,
+    queryResult.isLoading,
+    queryResult.error,
+    isPaused,
+    failureCount,
+    search,
+    committedFilterValues,
+  ]);
 
   return {
     data: paginatedData,
     isLoading: queryResult.isLoading,
     error: queryResult.error,
+    isPaused,
+    failureCount,
     filters: {
       search,
       setSearch: setSearchWithReset,

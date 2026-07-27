@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { useTranslation } from "@simplix-react/i18n/react";
+import { resolveEmptyReason } from "@simplix-react/headless";
 import { Card, Flex, Text } from "../../primitives";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { EmptyState } from "../shared/empty-state";
@@ -41,6 +42,16 @@ interface AssignmentTableProps<T> {
   emptyState?: { icon?: ReactNode; title: string; description?: string };
   /** Computed empty reason (overrides auto-detection from data). */
   emptyReason?: EmptyReason;
+  /** Settled query rejection. Feeds auto-detection when `emptyReason` is omitted. */
+  error?: Error | null;
+  /**
+   * Whether the query is stalled (React Query `fetchStatus === "paused"`).
+   * Feeds auto-detection when `emptyReason` is omitted — without it a stalled
+   * fetch renders as "no data".
+   */
+  isPaused?: boolean;
+  /** Consecutive failed fetch attempts. Feeds auto-detection when `emptyReason` is omitted. */
+  failureCount?: number;
   /** Extract unique row ID. */
   rowId: (row: T) => string;
   /** Row actions (e.g. unlink). */
@@ -93,12 +104,21 @@ function AssignmentTable<T>({
   isLoading,
   emptyState,
   emptyReason,
+  error = null,
+  isPaused,
+  failureCount,
   rowId,
   actions,
   children,
 }: AssignmentTableProps<T>) {
   const { t } = useTranslation("simplix/ui");
-  const computedEmptyReason = emptyReason ?? (data.length === 0 ? "no-data" : undefined);
+  const computedEmptyReason = emptyReason ?? resolveEmptyReason({
+    hasRows: data.length > 0,
+    isLoading: !!isLoading,
+    error,
+    isPaused,
+    failureCount,
+  }) ?? undefined;
 
   if (!isLoading && computedEmptyReason === "no-data" && data.length === 0) {
     const resolved = emptyState ?? { title: t("list.noData") };

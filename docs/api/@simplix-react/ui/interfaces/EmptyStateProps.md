@@ -22,7 +22,7 @@ Defined in: [packages/ui/src/crud/shared/empty-state.tsx:8](https://github.com/s
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/shared/empty-state.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/empty-state.tsx#L9)
+Defined in: [packages/ui/src/crud/shared/empty-state.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/empty-state.tsx#L15)
 
 ***
 
@@ -39,6 +39,18 @@ Defined in: [packages/ui/src/crud/shared/empty-state.tsx:7](https://github.com/s
 > `optional` **icon**: `ReactNode`
 
 Defined in: [packages/ui/src/crud/shared/empty-state.tsx:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/empty-state.tsx#L5)
+
+***
+
+### size?
+
+> `optional` **size**: `"default"` \| `"sm"`
+
+Defined in: [packages/ui/src/crud/shared/empty-state.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/empty-state.tsx#L14)
+
+Vertical weight. `"default"` fills an empty page or table body; `"sm"` is for
+a panel section, where a full-height placeholder pushes the real content
+off-screen for a state that carries no information.
 
 ***
 

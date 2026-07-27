@@ -6,7 +6,7 @@
 
 # Interface: ToggleFilterDef
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:64](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L64)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:97](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L97)
 
 ## Extends
 
@@ -58,4 +58,4 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:29](https://github.com/
 
 > **type**: `"toggle"`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:65](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L65)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:98](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L98)

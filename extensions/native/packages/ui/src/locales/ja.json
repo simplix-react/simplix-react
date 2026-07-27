@@ -28,6 +28,8 @@
     "noSearch": "検索条件に一致する項目がありません。",
     "error": "データの読み込み中にエラーが発生しました。",
     "errorTitle": "データを読み込めませんでした",
+    "unavailable": "リストを読み込めませんでした。",
+    "unavailableTitle": "リストを読み込めませんでした",
     "totalCount": "全{{count}}件",
     "loadingMore": "さらに読み込み中...",
     "endOfList": "これ以上の項目はありません。",

@@ -4,8 +4,13 @@ import { describe, it, expect, vi } from "vitest";
 
 import { useCrudList, type ListHook } from "../../crud/list/use-crud-list";
 
-function createMockListHook<T>(data: T[], isLoading = false, error: Error | null = null): ListHook<T> {
-  return vi.fn().mockReturnValue({ data, isLoading, error });
+function createMockListHook<T>(
+  data: T[],
+  isLoading = false,
+  error: Error | null = null,
+  fetchState: { isPaused?: boolean; failureCount?: number } = {},
+): ListHook<T> {
+  return vi.fn().mockReturnValue({ data, isLoading, error, ...fetchState });
 }
 
 describe("useCrudList", () => {
@@ -277,6 +282,69 @@ describe("useCrudList", () => {
       const { result } = renderHook(() => useCrudList(useList));
 
       expect(result.current.emptyReason).toBe("no-data");
+    });
+
+    // A paused React Query reports isLoading: false and error: null, so without
+    // the isPaused signal a stalled fetch is reported as absence of data.
+    it("returns 'unavailable' when the query is paused", () => {
+      const useList = createMockListHook([], false, null, { isPaused: true });
+      const { result } = renderHook(() => useCrudList(useList));
+
+      expect(result.current.emptyReason).toBe("unavailable");
+    });
+
+    it("returns 'unavailable' when an attempt failed and a retry is pending", () => {
+      const useList = createMockListHook([], false, null, { failureCount: 1 });
+      const { result } = renderHook(() => useCrudList(useList));
+
+      expect(result.current.emptyReason).toBe("unavailable");
+    });
+
+    it("reproduces the paused rejected-query state (pending, paused, failureCount 1)", () => {
+      const useList = createMockListHook([], false, null, { isPaused: true, failureCount: 1 });
+      const { result } = renderHook(() => useCrudList(useList));
+
+      expect(result.current.emptyReason).toBe("unavailable");
+      expect(result.current.isPaused).toBe(true);
+      expect(result.current.failureCount).toBe(1);
+    });
+
+    it("prefers 'unavailable' over 'no-search' when a paused query has a search term", () => {
+      const useList = createMockListHook([], false, null, { isPaused: true });
+      const { result } = renderHook(() => useCrudList(useList));
+
+      act(() => result.current.filters.setSearch("nonexistent"));
+      expect(result.current.emptyReason).toBe("unavailable");
+    });
+
+    it("prefers 'unavailable' over 'no-filter' when a retrying query has active filters", () => {
+      const useList = createMockListHook([], false, null, { failureCount: 2 });
+      const { result } = renderHook(() => useCrudList(useList, { filterMode: "immediate" }));
+
+      act(() => result.current.filters.setValue("status", "archived"));
+      expect(result.current.emptyReason).toBe("unavailable");
+    });
+
+    it("returns 'error' once the retries are exhausted and the query settles", () => {
+      const useList = createMockListHook([], false, new Error("400"), { failureCount: 2 });
+      const { result } = renderHook(() => useCrudList(useList));
+
+      expect(result.current.emptyReason).toBe("error");
+    });
+
+    it("returns 'no-data' when a settled query reports no failures", () => {
+      const useList = createMockListHook([], false, null, { isPaused: false, failureCount: 0 });
+      const { result } = renderHook(() => useCrudList(useList));
+
+      expect(result.current.emptyReason).toBe("no-data");
+    });
+
+    it("defaults the fetch-state fields when the list hook omits them", () => {
+      const useList = createMockListHook([{ id: 1 }]);
+      const { result } = renderHook(() => useCrudList(useList));
+
+      expect(result.current.isPaused).toBe(false);
+      expect(result.current.failureCount).toBe(0);
     });
   });
 

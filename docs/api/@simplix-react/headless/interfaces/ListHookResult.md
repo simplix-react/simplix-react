@@ -41,6 +41,19 @@ Error object if the query failed, otherwise `null`.
 
 ***
 
+### failureCount?
+
+> `optional` **failureCount**: `number`
+
+Defined in: [list-types.ts:34](https://github.com/simplix-react/simplix-react/blob/main/list-types.ts#L34)
+
+Number of consecutive failed fetch attempts — React Query's
+`failureCount`. A value greater than `0` while `error` is still `null`
+means an attempt failed and a retry is pending, which is a non-success
+state rather than an empty result.
+
+***
+
 ### isLoading
 
 > **isLoading**: `boolean`
@@ -48,6 +61,24 @@ Error object if the query failed, otherwise `null`.
 Defined in: [list-types.ts:14](https://github.com/simplix-react/simplix-react/blob/main/list-types.ts#L14)
 
 Whether the query is currently loading.
+
+***
+
+### isPaused?
+
+> `optional` **isPaused**: `boolean`
+
+Defined in: [list-types.ts:27](https://github.com/simplix-react/simplix-react/blob/main/list-types.ts#L27)
+
+Whether the query is in flight but stalled — React Query's
+`fetchStatus === "paused"`. A paused query reports `isLoading: false` and
+`error: null`, so without this flag a stalled fetch is indistinguishable
+from a successful empty result.
+
+#### Remarks
+
+Optional so that existing producers of this shape keep compiling; omit it
+and the list falls back to the settled-only interpretation.
 
 ***
 

@@ -8,4 +8,4 @@
 
 > `const` **Badge**: `ComponentType`\<`Omit`\<[`BadgeProps`](../interfaces/BadgeProps.md), `"ref"`\> & `RefAttributes`\<`HTMLSpanElement`\>\>
 
-Defined in: [packages/ui/src/base/display/badge.tsx:104](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L104)
+Defined in: [packages/ui/src/base/display/badge.tsx:105](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L105)

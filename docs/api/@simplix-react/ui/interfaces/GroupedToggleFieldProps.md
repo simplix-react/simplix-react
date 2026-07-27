@@ -6,7 +6,7 @@
 
 # Interface: GroupedToggleFieldProps\<T\>
 
-Defined in: [packages/ui/src/fields/form/grouped-toggle-field.tsx:50](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/grouped-toggle-field.tsx#L50)
+Defined in: [packages/ui/src/fields/form/grouped-toggle-field.tsx:51](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/grouped-toggle-field.tsx#L51)
 
 Props for the [GroupedToggleField](../functions/GroupedToggleField.md) form component.
 
@@ -38,7 +38,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:49](https://github.com/simplix
 
 > `optional` **columns**: `number`
 
-Defined in: [packages/ui/src/fields/form/grouped-toggle-field.tsx:69](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/grouped-toggle-field.tsx#L69)
+Defined in: [packages/ui/src/fields/form/grouped-toggle-field.tsx:70](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/grouped-toggle-field.tsx#L70)
 
 Number of group columns at the `sm` breakpoint and up.
 
@@ -90,7 +90,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:32](https://github.com/simplix
 
 > **groups**: [`GroupedToggleGroup`](GroupedToggleGroup.md)\<`T`\>[]
 
-Defined in: [packages/ui/src/fields/form/grouped-toggle-field.tsx:57](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/grouped-toggle-field.tsx#L57)
+Defined in: [packages/ui/src/fields/form/grouped-toggle-field.tsx:58](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/grouped-toggle-field.tsx#L58)
 
 Group definitions rendered as cards.
 
@@ -142,7 +142,7 @@ label for screen readers only.
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/fields/form/grouped-toggle-field.tsx:55](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/grouped-toggle-field.tsx#L55)
+Defined in: [packages/ui/src/fields/form/grouped-toggle-field.tsx:56](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/grouped-toggle-field.tsx#L56)
 
 Called when the selection changes. Receives the full next record.
 
@@ -177,7 +177,7 @@ same row. Use for IconPicker, ColorPicker, or similar adornments.
 
 > `optional` **renderOtherNote**: (`info`) => `ReactNode`
 
-Defined in: [packages/ui/src/fields/form/grouped-toggle-field.tsx:67](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/grouped-toggle-field.tsx#L67)
+Defined in: [packages/ui/src/fields/form/grouped-toggle-field.tsx:68](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/grouped-toggle-field.tsx#L68)
 
 Renders a note about selected values that match no option in any group's
 catalog. These values are always preserved across toggles and select-all,
@@ -211,7 +211,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:35](https://github.com/simplix
 
 > **selectAllLabel**: `string`
 
-Defined in: [packages/ui/src/fields/form/grouped-toggle-field.tsx:61](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/grouped-toggle-field.tsx#L61)
+Defined in: [packages/ui/src/fields/form/grouped-toggle-field.tsx:62](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/grouped-toggle-field.tsx#L62)
 
 Label for the select-all switch, resolved by the consumer (already localized).
 
@@ -221,7 +221,7 @@ Label for the select-all switch, resolved by the consumer (already localized).
 
 > `optional` **showSelectAll**: `boolean`
 
-Defined in: [packages/ui/src/fields/form/grouped-toggle-field.tsx:59](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/grouped-toggle-field.tsx#L59)
+Defined in: [packages/ui/src/fields/form/grouped-toggle-field.tsx:60](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/grouped-toggle-field.tsx#L60)
 
 Show the per-group "select all" switch.
 
@@ -266,7 +266,7 @@ below at full width.
 
 > **value**: `Record`\<`string`, `T`[]\>
 
-Defined in: [packages/ui/src/fields/form/grouped-toggle-field.tsx:53](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/grouped-toggle-field.tsx#L53)
+Defined in: [packages/ui/src/fields/form/grouped-toggle-field.tsx:54](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/grouped-toggle-field.tsx#L54)
 
 Selected values keyed by group id.
 

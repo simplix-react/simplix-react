@@ -8,7 +8,7 @@
 
 > **PhoneField**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/form/phone-field.tsx:50](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/phone-field.tsx#L50)
+Defined in: [packages/ui/src/fields/form/phone-field.tsx:55](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/phone-field.tsx#L55)
 
 International phone number field: a searchable country calling-code selector
 (flag + dial code) paired with an as-you-type formatted national number

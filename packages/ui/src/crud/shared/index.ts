@@ -1,5 +1,6 @@
 export {
   FieldVariantContext,
+  resolveEmptyReason,
   useFieldVariant,
 } from "./types";
 export { CrudListColumnContext, useCrudListColumns } from "./column-context";
@@ -12,6 +13,7 @@ export type {
   FilterState,
   PaginationState,
   ReorderConfig,
+  ResolveEmptyReasonInput,
   SortState,
 } from "./types";
 export { PanelRightCloseIcon } from "./icons";

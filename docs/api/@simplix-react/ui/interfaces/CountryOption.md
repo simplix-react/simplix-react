@@ -6,7 +6,7 @@
 
 # Interface: CountryOption
 
-Defined in: [packages/ui/src/utils/use-country-options.ts:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/utils/use-country-options.ts#L6)
+Defined in: [packages/ui/src/utils/use-country-options.ts:4](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/utils/use-country-options.ts#L4)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/utils/use-country-options.ts:6](https://github.com/
 
 > **code**: `string`
 
-Defined in: [packages/ui/src/utils/use-country-options.ts:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/utils/use-country-options.ts#L7)
+Defined in: [packages/ui/src/utils/use-country-options.ts:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/utils/use-country-options.ts#L5)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [packages/ui/src/utils/use-country-options.ts:7](https://github.com/
 
 > **englishName**: `string`
 
-Defined in: [packages/ui/src/utils/use-country-options.ts:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/utils/use-country-options.ts#L9)
+Defined in: [packages/ui/src/utils/use-country-options.ts:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/utils/use-country-options.ts#L7)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [packages/ui/src/utils/use-country-options.ts:9](https://github.com/
 
 > **Flag**: `ComponentType`\<\{ `className?`: `string`; \}\>
 
-Defined in: [packages/ui/src/utils/use-country-options.ts:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/utils/use-country-options.ts#L10)
+Defined in: [packages/ui/src/utils/use-country-options.ts:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/utils/use-country-options.ts#L8)
 
 ***
 
@@ -38,4 +38,4 @@ Defined in: [packages/ui/src/utils/use-country-options.ts:10](https://github.com
 
 > **localName**: `string`
 
-Defined in: [packages/ui/src/utils/use-country-options.ts:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/utils/use-country-options.ts#L8)
+Defined in: [packages/ui/src/utils/use-country-options.ts:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/utils/use-country-options.ts#L6)

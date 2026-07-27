@@ -13,7 +13,7 @@ import { parseDate } from "../../utils/parse-date";
 import { decodeInstant, serializeInstant } from "../../utils/rfc3339-date";
 import { useCrudListColumns } from "../shared/column-context";
 import { ListTotalBadge } from "../shared/list-total-badge";
-import { CheckIcon, ColumnsIcon, EyeIcon, FunnelIcon, LayoutGridIcon, RowsIcon, XIcon } from "../shared/icons";
+import { CheckIcon, ColumnsIcon, EyeIcon, FunnelIcon, LayoutGridIcon, RowsIcon, SpinnerIcon, XIcon } from "../shared/icons";
 import { CountryFormField } from "./country-form-field";
 import { FieldClearButton } from "./field-clear-button";
 import { operatorConfig } from "./filter-icons";
@@ -35,11 +35,25 @@ interface FilterDefBase {
   columnBreak?: boolean;
 }
 
+/** One selectable value of a text filter whose values come from a closed catalogue. */
+export interface TextFilterOptionDef {
+  value: string;
+  label: string;
+}
+
 export interface TextFilterDef extends FilterDefBase {
   type: "text";
   operators: SearchOperator[];
   defaultOperator: SearchOperator;
   placeholder?: string;
+  /**
+   * Closed catalogue the value is picked from instead of typed. Use it for a column
+   * the server matches literally — a constant key, a code — where a typo produces an
+   * empty result the operator cannot tell from "no such row". The pick still travels
+   * under the current operator, so a CONTAINS filter over a column packing several
+   * keys keeps working.
+   */
+  options?: TextFilterOptionDef[];
 }
 
 export interface NumberFilterDef extends FilterDefBase {
@@ -49,9 +63,20 @@ export interface NumberFilterDef extends FilterDefBase {
   placeholder?: string;
 }
 
+/** One selectable value of a faceted filter. */
+export interface FacetedFilterOptionDef {
+  value: string;
+  label: string;
+  icon?: ComponentType<{ className?: string }>;
+}
+
 export interface FacetedFilterDef extends FilterDefBase {
   type: "faceted";
-  options: Array<{ value: string; label: string; icon?: ComponentType<{ className?: string }> }>;
+  /**
+   * The values on offer. In server-search mode (see {@link onSearch}) this is the
+   * current result page rather than the whole set.
+   */
+  options: FacetedFilterOptionDef[];
   multiSelect?: boolean;
   /**
    * Presentation of the option list. "list" (default) renders the searchable
@@ -59,6 +84,28 @@ export interface FacetedFilterDef extends FilterDefBase {
    * trigger — use for long option sets such as entity/user pickers.
    */
   display?: "list" | "dropdown";
+  /**
+   * Switches the filter to server search: what the operator types is debounced and
+   * handed here instead of filtering {@link options} locally, so a directory larger
+   * than one page stays reachable. The caller answers by replacing `options` with
+   * the matching page.
+   *
+   * Pair it with {@link selectedOptions}, or a value picked from an earlier page
+   * loses its label as soon as the search text moves past it.
+   */
+  onSearch?: (query: string) => void;
+  /** Debounce applied to {@link onSearch}, in milliseconds. Default 300. */
+  searchDebounceMs?: number;
+  /** Whether the query behind {@link onSearch} is in flight. */
+  loading?: boolean;
+  /**
+   * Labels for values that are selected but absent from the current {@link options}
+   * page. They head the option list and back the active-filter badge, so a selection
+   * keeps its name instead of degrading to a raw id.
+   */
+  selectedOptions?: FacetedFilterOptionDef[];
+  /** Rendered below the option list — e.g. a "more results" hint. */
+  footer?: ReactNode;
 }
 
 export interface ToggleFilterDef extends FilterDefBase {
@@ -101,6 +148,9 @@ export type FilterDef =
   | DateRangeFilterDef
   | CountryFilterDef
   | TimezoneFilterDef;
+
+/** How long a faceted filter waits after the last keystroke before searching. */
+const DEFAULT_FACET_SEARCH_DEBOUNCE_MS = 300;
 
 // ── FilterBar Props ──
 
@@ -261,7 +311,10 @@ export function FilterBar({ filters, state, leading, trailing, maxBadges, onPrev
       const vals = state.committedValues;
       switch (def.type) {
         case "text": {
-          return (vals[getFilterKey(def)] as string) ?? "";
+          const val = (vals[getFilterKey(def)] as string) ?? "";
+          // A catalogue-backed filter holds the stored key; the badge names it the
+          // way the picker did, falling back to the key when it is not on offer.
+          return def.options?.find((o) => o.value === val)?.label ?? val;
         }
         case "number": {
           return String(vals[getFilterKey(def)] ?? "");
@@ -269,8 +322,16 @@ export function FilterBar({ filters, state, leading, trailing, maxBadges, onPrev
         case "faceted": {
           const val = vals[getFilterKey(def)] as string[];
           if (val.length <= 2) {
+            // A server-searched facet holds only the current result page in
+            // `options`, so a selection made on an earlier page is named from
+            // `selectedOptions` before falling back to the raw value.
             return val
-              .map((v) => def.options.find((o) => o.value === v)?.label ?? v)
+              .map(
+                (v) =>
+                  def.selectedOptions?.find((o) => o.value === v)?.label ??
+                  def.options.find((o) => o.value === v)?.label ??
+                  v,
+              )
               .join(", ");
           }
           return t("list.selected", { count: val.length });
@@ -644,7 +705,7 @@ function TextFormField({
   onOperatorChange: (def: TextFilterDef, op: SearchOperator) => void;
   className?: string;
 }) {
-  const { Input, Label } = useFlatUIComponents();
+  const { Input, Label, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } = useFlatUIComponents();
   const currentOp = operators[def.field] ?? def.defaultOperator;
   const key = makeFilterKey(def.field, currentOp);
   const value = (state.values[key] as string) ?? "";
@@ -661,13 +722,28 @@ function TextFormField({
           currentOp={currentOp}
           onOperatorChange={(op) => onOperatorChange(def, op)}
         />
-        <Input
-          type="text"
-          value={value}
-          onChange={(e) => state.setValue(key, e.target.value || undefined)}
-          placeholder={def.placeholder ?? def.label}
-          className="h-8 flex-1 text-sm"
-        />
+        {def.options ? (
+          <Select value={value} onValueChange={(v) => state.setValue(key, v || undefined)}>
+            <SelectTrigger className="h-8 flex-1 text-sm" aria-label={def.label}>
+              <SelectValue placeholder={def.placeholder ?? def.label} />
+            </SelectTrigger>
+            <SelectContent>
+              {def.options.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        ) : (
+          <Input
+            type="text"
+            value={value}
+            onChange={(e) => state.setValue(key, e.target.value || undefined)}
+            placeholder={def.placeholder ?? def.label}
+            className="h-8 flex-1 text-sm"
+          />
+        )}
       </Flex>
     </Stack>
   );
@@ -765,6 +841,19 @@ function FacetedFormField({
     [rawValue],
   );
 
+  const { onSearch, searchDebounceMs = DEFAULT_FACET_SEARCH_DEBOUNCE_MS } = def;
+  const serverSearch = onSearch != null;
+  const [query, setQuery] = useState("");
+
+  // Hold the keystrokes back so a directory search runs once the operator pauses
+  // rather than once per character. The input stays uncontrolled-fast; only the
+  // dispatch to the caller is delayed.
+  useEffect(() => {
+    if (!onSearch) return undefined;
+    const timer = setTimeout(() => onSearch(query), searchDebounceMs);
+    return () => clearTimeout(timer);
+  }, [onSearch, query, searchDebounceMs]);
+
   const handleSelect = useCallback(
     (optionValue: string) => {
       const next = new Set(selectedValues);
@@ -778,17 +867,44 @@ function FacetedFormField({
     [selectedValues, state, key],
   );
 
+  // A server-searched page does not contain the values picked from earlier pages,
+  // so those are pinned to the head of the list. Without them a selected row would
+  // vanish from the list — and lose its label — the moment the query changes.
+  const visibleOptions = useMemo(() => {
+    if (!def.selectedOptions?.length) return def.options;
+    const pinned = def.selectedOptions.filter((o) => selectedValues.has(o.value));
+    const pinnedValues = new Set(pinned.map((o) => o.value));
+    return [...pinned, ...def.options.filter((o) => !pinnedValues.has(o.value))];
+  }, [def.options, def.selectedOptions, selectedValues]);
+
   const optionList = (
-    <Command className={def.display === "dropdown" ? "rounded-md" : "rounded-md border"}>
-      <CommandInput placeholder={def.label} className="h-8" />
+    <Command
+      className={def.display === "dropdown" ? "rounded-md" : "rounded-md border"}
+      // The server already answered the query; filtering that answer again locally
+      // would hide rows whose match is on a field the label does not show.
+      shouldFilter={!serverSearch}
+    >
+      <CommandInput
+        placeholder={def.label}
+        className="h-8"
+        {...(serverSearch ? { value: query, onValueChange: setQuery } : {})}
+      />
       <CommandList className="max-h-[160px]">
-        <CommandEmpty>{t("filter.noResultsFound")}</CommandEmpty>
+        {def.loading ? (
+          <div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
+            <SpinnerIcon className="h-4 w-4" />
+            {t("common.loading")}
+          </div>
+        ) : (
+          <CommandEmpty>{t("filter.noResultsFound")}</CommandEmpty>
+        )}
         <CommandGroup>
-          {def.options.map((option) => {
+          {visibleOptions.map((option) => {
             const isSelected = selectedValues.has(option.value);
             return (
               <CommandItem
                 key={option.value}
+                value={option.value}
                 onSelect={() => handleSelect(option.value)}
               >
                 <span
@@ -808,12 +924,14 @@ function FacetedFormField({
           })}
         </CommandGroup>
       </CommandList>
+      {def.footer}
     </Command>
   );
 
   if (def.display === "dropdown") {
-    const selectedLabels = def.options
+    const selectedLabels = [...(def.selectedOptions ?? []), ...def.options]
       .filter((option) => selectedValues.has(option.value))
+      .filter((option, index, all) => all.findIndex((o) => o.value === option.value) === index)
       .map((option) => option.label);
 
     return (
@@ -822,10 +940,19 @@ function FacetedFormField({
           <Label className="text-sm font-medium text-secondary-foreground">{def.label}</Label>
           {selectedValues.size > 0 && <FieldClearButton onClick={() => state.setValue(key, undefined)} label={def.label} />}
         </Flex>
-        <Popover open={open} onOpenChange={setOpen}>
+        <Popover
+          open={open}
+          onOpenChange={(next: boolean) => {
+            setOpen(next);
+            // Re-opening starts from the default page, so the input the operator
+            // sees and the results behind it agree.
+            if (!next) setQuery("");
+          }}
+        >
           <PopoverTrigger asChild>
             <button
               type="button"
+              aria-label={def.label}
               className="flex h-8 w-full items-center gap-1 rounded-md border border-input bg-background px-3 text-sm focus:border-foreground focus:outline-none"
             >
               <span className={cn("flex-1 truncate text-left", selectedValues.size === 0 && "text-muted-foreground")}>
@@ -852,10 +979,12 @@ function FacetedFormField({
         <Label className="text-sm font-medium text-secondary-foreground">{def.label}</Label>
         {selectedValues.size > 0 && <FieldClearButton onClick={() => state.setValue(key, undefined)} label={def.label} />}
       </Flex>
-      {def.options.length > 0 ? (
+      {/* A server-searched facet starts empty on purpose — the input is what fills
+          it, so the "nothing to pick" notice applies to eager option sets only. */}
+      {serverSearch || visibleOptions.length > 0 ? (
         optionList
       ) : (
-        <span className="text-xs text-muted-foreground">No options available</span>
+        <span className="text-xs text-muted-foreground">{t("filter.noOptions")}</span>
       )}
     </Stack>
   );

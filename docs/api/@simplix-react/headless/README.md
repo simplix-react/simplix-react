@@ -15,6 +15,7 @@ Platform-neutral headless logic shared by the web UI kit (`@simplix-react/ui`) a
 | Orval adapters | `adaptOrvalList`, `adaptOrvalGet`, `adaptOrvalCreate`, `adaptOrvalUpdate`, `adaptOrvalDelete`, `adaptOrvalOrder` |
 | Searchable serialization | `buildSearchableParams`, `SearchOperator`, `makeFilterKey`, `parseFilterKey`, operator config tables |
 | List contracts | `ListHook`, `ListHookResult`, `SortState`, `PaginationState`, `FilterState`, `EmptyReason`, `CrudMutation` |
+| Empty-state classification | `resolveEmptyReason` — ranks a non-success query (`"error"`, `"unavailable"`) above the empty-result reasons |
 | Toast store | `addToast`, `removeToast`, `useToastStore` (renderers live in each platform kit) |
 | Formatting | `formatBytes`, `formatDateShort` / `formatDateMedium` / `formatDateTime` / `formatRelativeTime` / `formatDateRange` |
 | Date math | `startOfDay` … `endOfYear`, `addDays` / `subDays`, `isSameDay` / `isSameMonth` / `isSameWeek`, `parseDate`, `asPlainDate` |
@@ -49,6 +50,7 @@ The list state machines are intentionally NOT here: the web page model (`useCrud
 - [OrvalGetResultLike](interfaces/OrvalGetResultLike.md)
 - [OrvalMutationLike](interfaces/OrvalMutationLike.md)
 - [PaginationState](interfaces/PaginationState.md)
+- [ResolveEmptyReasonInput](interfaces/ResolveEmptyReasonInput.md)
 - [SearchableListParams](interfaces/SearchableListParams.md)
 - [SortState](interfaces/SortState.md)
 - [TimeValue](interfaces/TimeValue.md)
@@ -116,6 +118,7 @@ The list state machines are intentionally NOT here: the web page model (`useCrud
 - [parseFilterKey](functions/parseFilterKey.md)
 - [parseRfc3339](functions/parseRfc3339.md)
 - [removeToast](functions/removeToast.md)
+- [resolveEmptyReason](functions/resolveEmptyReason.md)
 - [serializeCalendarDate](functions/serializeCalendarDate.md)
 - [serializeInstant](functions/serializeInstant.md)
 - [serializeRfc3339Local](functions/serializeRfc3339Local.md)

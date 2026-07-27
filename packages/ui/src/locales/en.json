@@ -39,6 +39,9 @@
     "errorTitle": "Failed to load data",
     "errorDescription": "An error occurred while loading data. Please try again later.",
     "error": "An error occurred while loading data.",
+    "unavailableTitle": "List could not be loaded",
+    "unavailableDescription": "The request to the server has not completed. It retries automatically once the connection is back and this window is active.",
+    "unavailable": "The list could not be loaded.",
     "noResults": "No results",
     "totalCount": "Total {{count}}",
     "rows": "Rows:",
@@ -57,6 +60,7 @@
     "clearFilters": "Clear filters",
     "selectOperator": "Select operator",
     "noResultsFound": "No results found.",
+    "noOptions": "No options available",
     "numberPlaceholder": "Number",
     "numberFilter": "Number filter",
     "clearDateRange": "Clear date range",
@@ -105,7 +109,8 @@
     "searchOption": "Search...",
     "noResults": "No results found.",
     "noValue": "No value",
-    "expandSearch": "Full search"
+    "expandSearch": "Full search",
+    "moreResults": "More matches — keep typing to narrow the list"
   },
   "unit": {
     "minutes": "min",

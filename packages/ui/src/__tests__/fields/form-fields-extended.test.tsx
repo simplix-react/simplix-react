@@ -1200,7 +1200,7 @@ describe("MultiSelectField", () => {
     expect(opts[0].textContent).toContain("React");
   });
 
-  it("shows no results message when filter matches nothing", () => {
+  it("shows the translated no-results message when the filter matches nothing", () => {
     render(
       <MultiSelectField
         label="Tags"
@@ -1213,7 +1213,22 @@ describe("MultiSelectField", () => {
     const input = fieldset.querySelector("input")!;
     fireEvent.focus(input);
     fireEvent.change(input, { target: { value: "zzz" } });
-    expect(screen.getByText("No results found.")).toBeDefined();
+    // The mocked translator echoes the key, so the line is proven to come from i18n.
+    expect(screen.getByText("field.noResults")).toBeDefined();
+  });
+
+  it("prompts with the translated placeholder while nothing is selected", () => {
+    render(
+      <MultiSelectField
+        label="Tags"
+        value={[]}
+        onChange={vi.fn()}
+        options={options}
+      />,
+    );
+    const fieldset = screen.getByTestId("form-field-tags");
+    const input = fieldset.querySelector("input")!;
+    expect(input.getAttribute("placeholder")).toBe("field.selectOption");
   });
 
   it("marks selected options with aria-selected", () => {

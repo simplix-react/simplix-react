@@ -50,6 +50,50 @@ describe("simplixBootNaming", () => {
       extensions: {} as Record<string, unknown>,
     };
 
+    // --- Entity names that span several path segments ---
+
+    it("does not read the entity's own tail as an action", () => {
+      // `userSecurityProfile` is served at `/user/security-profile`. Reading the trailing
+      // segment as an action gave every operation on the resource the same derived name, and
+      // two of them then declared the same response type — a file that will not compile.
+      const spanning = { ...baseContext, entityName: "userSecurityProfile" };
+
+      const created = simplixBootNaming.resolveOperation({
+        ...spanning,
+        method: "post",
+        path: "/api/v1/admin/user/security-profile/{userId}",
+        pathParams: ["userId"],
+      });
+      const multiUpdated = simplixBootNaming.resolveOperation({
+        ...spanning,
+        method: "patch",
+        path: "/api/v1/admin/user/security-profile",
+        pathParams: [],
+      });
+      const updated = simplixBootNaming.resolveOperation({
+        ...spanning,
+        method: "put",
+        path: "/api/v1/admin/user/security-profile/{userId}",
+        pathParams: ["userId"],
+      });
+
+      expect(created).toEqual({ role: "create", hookName: "createUserSecurityProfile" });
+      expect(multiUpdated).toEqual({ role: "multiUpdate", hookName: "multiUpdateUserSecurityProfiles" });
+      expect(updated).toEqual({ role: "update", hookName: "updateUserSecurityProfile" });
+      expect(new Set([created.hookName, multiUpdated.hookName, updated.hookName]).size).toBe(3);
+    });
+
+    it("still reads a real action on a segment-spanning entity", () => {
+      const result = simplixBootNaming.resolveOperation({
+        ...baseContext,
+        entityName: "userSecurityProfile",
+        method: "patch",
+        path: "/api/v1/admin/user/security-profile/{userId}/unlock",
+        pathParams: ["userId"],
+      });
+      expect(result).toEqual({ role: "unlock", hookName: "unlockUserSecurityProfile" });
+    });
+
     // --- GET patterns ---
 
     it("resolves GET /search as list", () => {

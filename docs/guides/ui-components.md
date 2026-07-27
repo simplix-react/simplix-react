@@ -179,11 +179,21 @@ function UserListPage() {
 | `data` | The current page of data |
 | `isLoading` | Loading state |
 | `error` | Error object if query failed |
+| `isPaused` | Query is in flight but stalled (React Query `fetchStatus === "paused"`) |
+| `failureCount` | Consecutive failed fetch attempts; `> 0` with `error === null` means a retry is pending |
 | `filters` | `{ search, setSearch, values, setValues }` |
 | `sort` | `{ field, direction, setSort }` |
 | `pagination` | `{ page, pageSize, total, totalPages, setPage, setPageSize }` |
 | `selection` | `{ selected, toggle, toggleAll, clear }` |
-| `emptyReason` | `"no-data"`, `"no-results"`, or `null` |
+| `emptyReason` | `"no-data"`, `"no-filter"`, `"no-search"`, `"error"`, `"unavailable"`, or `null` |
+
+A query that is neither settled successfully nor settled with an error — paused,
+or waiting to retry after a failed attempt — reports `emptyReason:
+"unavailable"`. React Query pauses a fetch while the document is hidden or the
+browser reports offline, and such a query exposes `isLoading: false` with
+`error: null`, so rendering it as "no data" would tell the operator the list is
+empty when the server never answered. `CrudList` renders "the list could not be
+loaded" for that reason instead.
 
 ### Step 3 -- Build a Create/Edit Form
 

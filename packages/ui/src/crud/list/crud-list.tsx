@@ -30,7 +30,7 @@ import type {CrudListViewMode} from "../shared";
 import {EmptyState} from "../shared/empty-state";
 import {TableCardFrame, useTableCardFrame} from "../shared/table-card-frame";
 import { CountryCell, PhoneCell } from "./cells";
-import {AlertTriangleIcon, ArrowUpDownIcon, CheckIcon, EyeIcon, FolderTreeIcon, FunnelIcon, MagnifyingGlassIcon, MapPinIcon, PencilIcon, PlusIcon, TrashIcon, UnlinkIcon} from "../shared/icons";
+import {AlertTriangleIcon, ArrowUpDownIcon, CheckIcon, CloudOffIcon, EyeIcon, FolderTreeIcon, FunnelIcon, MagnifyingGlassIcon, MapPinIcon, PencilIcon, PlusIcon, TrashIcon, UnlinkIcon} from "../shared/icons";
 import {
   AdvancedSelectFilter,
   AdvancedTextFilter,
@@ -63,6 +63,7 @@ import {useContainerWidth} from "./use-container-width";
 
 const emptyReasonConfig = {
   error: { icon: <AlertTriangleIcon />, iconClassName: "bg-destructive/10 text-destructive", titleKey: "list.errorTitle", descKey: "list.errorDescription" },
+  unavailable: { icon: <CloudOffIcon />, iconClassName: "bg-destructive/10 text-destructive", titleKey: "list.unavailableTitle", descKey: "list.unavailableDescription" },
   "no-filter": { icon: <FunnelIcon />, iconClassName: "bg-muted text-muted-foreground", titleKey: "list.noFilterTitle", descKey: "list.noFilter" },
   "no-search": { icon: <MagnifyingGlassIcon />, iconClassName: "bg-muted text-muted-foreground", titleKey: "list.noSearchTitle", descKey: "list.noSearch" },
 } as const;
@@ -573,6 +574,7 @@ function ReorderableTable<T>({
     "no-filter": t("list.noFilter"),
     "no-search": t("list.noSearch"),
     "error": t("list.error"),
+    "unavailable": t("list.unavailable"),
   };
   const {
     sensors,
@@ -753,6 +755,7 @@ function ReorderableCardList<T>({
     "no-filter": t("list.noFilter"),
     "no-search": t("list.noSearch"),
     "error": t("list.error"),
+    "unavailable": t("list.unavailable"),
   };
   const {
     sensors,
@@ -881,6 +884,7 @@ function ListTable<T>({
     "no-filter": t("list.noFilter"),
     "no-search": t("list.noSearch"),
     "error": t("list.error"),
+    "unavailable": t("list.unavailable"),
   };
   const containerRef = useRef<HTMLDivElement>(null);
   const containerWidth = useContainerWidth(containerRef);
@@ -1606,6 +1610,7 @@ function ListEmpty({ reason = "no-data", messages, className, children }: ListEm
     "no-filter": t("list.noFilter"),
     "no-search": t("list.noSearch"),
     "error": t("list.error"),
+    "unavailable": t("list.unavailable"),
   };
   const mergedMessages = messages ? { ...defaultMessages, ...messages } : defaultMessages;
   const content = typeof children === "function"

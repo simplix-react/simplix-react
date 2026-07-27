@@ -826,6 +826,7 @@ function TreeEmpty({ reason = "no-data", messages, className, children }: TreeEm
     "no-filter": t("list.noFilter"),
     "no-search": t("list.noSearch"),
     "error": t("list.error"),
+    "unavailable": t("list.unavailable"),
   };
   const mergedMessages = messages ? { ...defaultMessages, ...messages } : defaultMessages;
   const content = typeof children === "function"

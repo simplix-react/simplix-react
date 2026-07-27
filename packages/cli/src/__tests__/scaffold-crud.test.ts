@@ -10,6 +10,9 @@ import {
   formTemplate,
   detailTemplate,
   featureIndexTemplate,
+  crudPageTemplate,
+  treeCrudPageTemplate,
+  hubPageTemplate,
 } from "../templates/ui/index.js";
 
 // ── parseZodType ──
@@ -573,4 +576,38 @@ describe("featureIndexTemplate", () => {
   });
 });
 
+// ── Create-action permission gate ──
 
+describe("create-action permission gate", () => {
+  it("gates the crud page's create button on the module's permission subject", () => {
+    const result = renderTemplate(crudPageTemplate, baseCtx);
+    expect(result).toContain('import { useCan } from "@simplix-react/access/react"');
+    expect(result).toContain('import { SUBJECTS } from "../../shared/auth/subjects"');
+    expect(result).toContain('const canCreate = useCan("create", SUBJECTS.product)');
+    expect(result).toContain("actions: canCreate");
+    // Both header variants — page and panel — go through the same gate.
+    expect(result.match(/actions: canCreate/g)).toHaveLength(2);
+  });
+
+  it("gates both of the tree page's create paths", () => {
+    const result = renderTemplate(treeCrudPageTemplate, baseCtx);
+    expect(result).toContain('const canCreate = useCan("create", SUBJECTS.product)');
+    expect(result).toContain("actions: canCreate");
+    // A tree also offers creation per row, which the header gate does not cover.
+    expect(result).toContain('...(canCreate ? [{ type: "add-child" as const');
+  });
+
+  it("gates the hub page's create button", () => {
+    const result = renderTemplate(hubPageTemplate, baseCtx);
+    expect(result).toContain('const canCreate = useCan("create", SUBJECTS.product)');
+    expect(result).toContain("{canCreate && <Button onClick={onCreateProduct }>");
+  });
+
+  it("leaves no gate behind when the entity has no create operation", () => {
+    for (const template of [crudPageTemplate, treeCrudPageTemplate, hubPageTemplate]) {
+      const result = renderTemplate(template, { ...baseCtx, hasCreate: false });
+      expect(result).not.toContain("useCan");
+      expect(result).not.toContain("SUBJECTS");
+    }
+  });
+});

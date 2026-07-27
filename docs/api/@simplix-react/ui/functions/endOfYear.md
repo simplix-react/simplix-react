@@ -8,7 +8,7 @@
 
 > **endOfYear**(`d`): `Date`
 
-Defined in: [packages/headless/dist/index.d.ts:408](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L408)
+Defined in: [packages/headless/dist/index.d.ts:494](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L494)
 
 ## Parameters
 

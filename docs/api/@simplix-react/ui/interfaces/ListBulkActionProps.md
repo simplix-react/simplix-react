@@ -6,7 +6,7 @@
 
 # Interface: ListBulkActionProps
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:1523](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1523)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:1564](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1564)
 
 Props for individual bulk action buttons.
 
@@ -16,7 +16,7 @@ Props for individual bulk action buttons.
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:1528](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1528)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:1569](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1569)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:1528](https://github.com/si
 
 > `optional` **icon**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:1525](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1525)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:1566](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1566)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:1525](https://github.com/si
 
 > **label**: `string`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:1524](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1524)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:1565](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1565)
 
 ***
 
@@ -40,7 +40,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:1524](https://github.com/si
 
 > **onClick**: () => `void`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:1526](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1526)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:1567](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1567)
 
 #### Returns
 
@@ -52,4 +52,4 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:1526](https://github.com/si
 
 > `optional` **variant**: `"default"` \| `"destructive"`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:1527](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1527)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:1568](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1568)

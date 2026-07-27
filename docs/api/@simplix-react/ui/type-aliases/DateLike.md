@@ -8,6 +8,6 @@
 
 > **DateLike** = `Date` \| `string` \| `number`
 
-Defined in: [packages/headless/dist/index.d.ts:416](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L416)
+Defined in: [packages/headless/dist/index.d.ts:502](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L502)
 
 Value types that can be coerced to a Date.

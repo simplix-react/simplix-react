@@ -691,7 +691,15 @@ const result = useCrudList(useUserList, {
 });
 ```
 
-Returns: `{ data, isLoading, error, filters, sort, pagination, selection, emptyReason }`
+Returns: `{ data, isLoading, error, isPaused, failureCount, filters, sort, pagination, selection, emptyReason }`
+
+`emptyReason` is `"no-data"`, `"no-filter"`, `"no-search"`, `"error"`,
+`"unavailable"`, or `null`. `"unavailable"` covers a query that is neither
+settled successfully nor settled with an error — paused (React Query
+`fetchStatus === "paused"`, which happens while the document is hidden or the
+browser reports offline) or waiting to retry after a failed attempt. Such a
+query reports `isLoading: false` and `error: null`, so it is reported as "the
+list could not be loaded" rather than as an empty result.
 
 #### useUrlSync
 

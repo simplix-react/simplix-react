@@ -6,7 +6,7 @@
 
 # Interface: TimeValue
 
-Defined in: [packages/headless/dist/index.d.ts:475](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L475)
+Defined in: [packages/headless/dist/index.d.ts:561](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L561)
 
 A time of day without a date.
 
@@ -16,7 +16,7 @@ A time of day without a date.
 
 > **hours**: `number`
 
-Defined in: [packages/headless/dist/index.d.ts:477](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L477)
+Defined in: [packages/headless/dist/index.d.ts:563](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L563)
 
 Hours in 24-hour form (0-23).
 
@@ -26,6 +26,6 @@ Hours in 24-hour form (0-23).
 
 > **minutes**: `number`
 
-Defined in: [packages/headless/dist/index.d.ts:479](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L479)
+Defined in: [packages/headless/dist/index.d.ts:565](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L565)
 
 Minutes (0-59).

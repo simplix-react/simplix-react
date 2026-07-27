@@ -6,7 +6,7 @@
 
 # Interface: FacetedFilterDef
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:52](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L52)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:59](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L59)
 
 ## Extends
 
@@ -34,7 +34,7 @@ the fields are split evenly (column-major). Ignored in single-column layout.
 
 > `optional` **display**: `"list"` \| `"dropdown"`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:61](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L61)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:72](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L72)
 
 Presentation of the option list. "list" (default) renders the searchable
 checkbox list inline; "dropdown" collapses it behind a combobox-style
@@ -54,6 +54,16 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:28](https://github.com/
 
 ***
 
+### footer?
+
+> `optional` **footer**: `ReactNode`
+
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:94](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L94)
+
+Rendered below the option list — e.g. a "more results" hint.
+
+***
+
 ### label
 
 > **label**: `string`
@@ -66,31 +76,80 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:29](https://github.com/
 
 ***
 
+### loading?
+
+> `optional` **loading**: `boolean`
+
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:86](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L86)
+
+Whether the query behind [onSearch](#onsearch) is in flight.
+
+***
+
 ### multiSelect?
 
 > `optional` **multiSelect**: `boolean`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:55](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L55)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:66](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L66)
+
+***
+
+### onSearch()?
+
+> `optional` **onSearch**: (`query`) => `void`
+
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:82](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L82)
+
+Switches the filter to server search: what the operator types is debounced and
+handed here instead of filtering [options](#options) locally, so a directory larger
+than one page stays reachable. The caller answers by replacing `options` with
+the matching page.
+
+Pair it with [selectedOptions](#selectedoptions), or a value picked from an earlier page
+loses its label as soon as the search text moves past it.
+
+#### Parameters
+
+##### query
+
+`string`
+
+#### Returns
+
+`void`
 
 ***
 
 ### options
 
-> **options**: `object`[]
+> **options**: [`FacetedFilterOptionDef`](FacetedFilterOptionDef.md)[]
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:54](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L54)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:65](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L65)
 
-#### icon?
+The values on offer. In server-search mode (see [onSearch](#onsearch)) this is the
+current result page rather than the whole set.
 
-> `optional` **icon**: `ComponentType`\<\{ `className?`: `string`; \}\>
+***
 
-#### label
+### searchDebounceMs?
 
-> **label**: `string`
+> `optional` **searchDebounceMs**: `number`
 
-#### value
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:84](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L84)
 
-> **value**: `string`
+Debounce applied to [onSearch](#onsearch), in milliseconds. Default 300.
+
+***
+
+### selectedOptions?
+
+> `optional` **selectedOptions**: [`FacetedFilterOptionDef`](FacetedFilterOptionDef.md)[]
+
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:92](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L92)
+
+Labels for values that are selected but absent from the current [options](#options)
+page. They head the option list and back the active-filter badge, so a selection
+keeps its name instead of degrading to a raw id.
 
 ***
 
@@ -98,4 +157,4 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:54](https://github.com/
 
 > **type**: `"faceted"`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:53](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L53)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:60](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L60)

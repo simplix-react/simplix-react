@@ -8,7 +8,7 @@
 
 > **parseFilterKey**(`key`): \{ `field`: `string`; `operator`: `string`; \} \| `null`
 
-Defined in: [packages/headless/dist/index.d.ts:304](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L304)
+Defined in: [packages/headless/dist/index.d.ts:390](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L390)
 
 Parse a filter key back into field and operator.
 Example: parseFilterKey("name.contains") -> { field: "name", operator: "contains" }

@@ -6,7 +6,7 @@
 
 # Interface: DynamicColorIconProps
 
-Defined in: [packages/ui/src/base/display/dynamic-color-icon.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/dynamic-color-icon.tsx#L12)
+Defined in: [packages/ui/src/base/display/dynamic-color-icon.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/dynamic-color-icon.tsx#L13)
 
 Props for the [DynamicColorIcon](../functions/DynamicColorIcon.md) component.
 
@@ -16,7 +16,7 @@ Props for the [DynamicColorIcon](../functions/DynamicColorIcon.md) component.
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/base/display/dynamic-color-icon.tsx:51](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/dynamic-color-icon.tsx#L51)
+Defined in: [packages/ui/src/base/display/dynamic-color-icon.tsx:52](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/dynamic-color-icon.tsx#L52)
 
 Additional CSS classes applied to the icon element.
 
@@ -26,7 +26,7 @@ Additional CSS classes applied to the icon element.
 
 > `optional` **color**: `string` \| `null`
 
-Defined in: [packages/ui/src/base/display/dynamic-color-icon.tsx:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/dynamic-color-icon.tsx#L29)
+Defined in: [packages/ui/src/base/display/dynamic-color-icon.tsx:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/dynamic-color-icon.tsx#L30)
 
 Icon color as a CSS color value (e.g. `"#3b82f6"`).
 Accepts `null` for DTO compatibility; falls back to `defaultColor`.
@@ -37,7 +37,7 @@ Accepts `null` for DTO compatibility; falls back to `defaultColor`.
 
 > `optional` **defaultColor**: `string`
 
-Defined in: [packages/ui/src/base/display/dynamic-color-icon.tsx:41](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/dynamic-color-icon.tsx#L41)
+Defined in: [packages/ui/src/base/display/dynamic-color-icon.tsx:42](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/dynamic-color-icon.tsx#L42)
 
 Fallback color when `color` is not provided.
 
@@ -53,7 +53,7 @@ Fallback color when `color` is not provided.
 
 > `optional` **defaultIcon**: `string`
 
-Defined in: [packages/ui/src/base/display/dynamic-color-icon.tsx:35](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/dynamic-color-icon.tsx#L35)
+Defined in: [packages/ui/src/base/display/dynamic-color-icon.tsx:36](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/dynamic-color-icon.tsx#L36)
 
 Fallback icon name when `iconName` is not found or not provided.
 
@@ -69,7 +69,7 @@ Fallback icon name when `iconName` is not found or not provided.
 
 > `optional` **fallbackText**: `string`
 
-Defined in: [packages/ui/src/base/display/dynamic-color-icon.tsx:48](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/dynamic-color-icon.tsx#L48)
+Defined in: [packages/ui/src/base/display/dynamic-color-icon.tsx:49](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/dynamic-color-icon.tsx#L49)
 
 Fallback text shown when `iconName` is empty/null.
 The first character (after trim) is rendered as a letter glyph at the same
@@ -81,7 +81,7 @@ box size. When set, takes precedence over `defaultIcon`.
 
 > `optional` **iconLibrary**: [`IconLibrary`](../type-aliases/IconLibrary.md)
 
-Defined in: [packages/ui/src/base/display/dynamic-color-icon.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/dynamic-color-icon.tsx#L23)
+Defined in: [packages/ui/src/base/display/dynamic-color-icon.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/dynamic-color-icon.tsx#L24)
 
 Icon library to use.
 
@@ -97,7 +97,7 @@ Icon library to use.
 
 > `optional` **iconName**: `string` \| `null`
 
-Defined in: [packages/ui/src/base/display/dynamic-color-icon.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/dynamic-color-icon.tsx#L17)
+Defined in: [packages/ui/src/base/display/dynamic-color-icon.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/dynamic-color-icon.tsx#L18)
 
 Icon name in any format (kebab-case, PascalCase, camelCase, snake_case).
 Normalized to kebab-case internally. Accepts `null` for DTO compatibility.
@@ -108,7 +108,7 @@ Normalized to kebab-case internally. Accepts `null` for DTO compatibility.
 
 > `optional` **size**: `string` \| `number`
 
-Defined in: [packages/ui/src/base/display/dynamic-color-icon.tsx:57](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/dynamic-color-icon.tsx#L57)
+Defined in: [packages/ui/src/base/display/dynamic-color-icon.tsx:58](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/dynamic-color-icon.tsx#L58)
 
 Icon size. Numbers are converted to pixels; strings are used as-is.
 
@@ -124,6 +124,6 @@ Icon size. Numbers are converted to pixels; strings are used as-is.
 
 > `optional` **style**: `CSSProperties`
 
-Defined in: [packages/ui/src/base/display/dynamic-color-icon.tsx:60](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/dynamic-color-icon.tsx#L60)
+Defined in: [packages/ui/src/base/display/dynamic-color-icon.tsx:61](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/dynamic-color-icon.tsx#L61)
 
 Inline style overrides applied after computed styles.

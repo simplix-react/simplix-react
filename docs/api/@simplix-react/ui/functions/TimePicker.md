@@ -8,7 +8,7 @@
 
 > **TimePicker**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/base/inputs/time-picker.tsx:544](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-picker.tsx#L544)
+Defined in: [packages/ui/src/base/inputs/time-picker.tsx:553](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/time-picker.tsx#L553)
 
 Standalone time-of-day input: hour/minute spinner boxes with an AM/PM
 toggle, where focusing a box drops a scrollable option list open.
