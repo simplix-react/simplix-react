@@ -214,7 +214,10 @@ function generateHandlersFileCode(
       imports.push(`import { buildEmbeddedTree } from "@simplix-react/mock";`);
     }
 
-    const typeNames = storeEntities.map((e) => e.modelType ?? e.pascalName).join(", ");
+    // Two entities can share a model type — an avatar read by its owner and by an
+    // administrator is the same attachment — and naming it twice in one import is a
+    // duplicate declaration the generated file cannot compile with.
+    const typeNames = [...new Set(storeEntities.map((e) => e.modelType ?? e.pascalName))].join(", ");
     imports.push(`import type { ${typeNames} } from "../model";`);
   }
 
@@ -264,7 +267,10 @@ function generateMockEntryCode(
   if (hasStores) {
     imports.push('import { createMockEntityStore } from "@simplix-react/mock";');
 
-    const typeNames = storeEntities.map((e) => e.modelType ?? e.pascalName).join(", ");
+    // Two entities can share a model type — an avatar read by its owner and by an
+    // administrator is the same attachment — and naming it twice in one import is a
+    // duplicate declaration the generated file cannot compile with.
+    const typeNames = [...new Set(storeEntities.map((e) => e.modelType ?? e.pascalName))].join(", ");
     imports.push(`import type { ${typeNames} } from "../generated/model";`);
 
     const seedNames = storeEntities.map((e) => `${e.name}Seeds`).join(", ");
