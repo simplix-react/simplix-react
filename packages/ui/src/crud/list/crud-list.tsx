@@ -30,7 +30,8 @@ import type {CrudListViewMode} from "../shared";
 import {EmptyState} from "../shared/empty-state";
 import {TableCardFrame, useTableCardFrame} from "../shared/table-card-frame";
 import { CountryCell, PhoneCell } from "./cells";
-import {AlertTriangleIcon, ArrowUpDownIcon, CheckIcon, CloudOffIcon, EyeIcon, FolderTreeIcon, FunnelIcon, MagnifyingGlassIcon, MapPinIcon, PencilIcon, PlusIcon, TrashIcon, UnlinkIcon} from "../shared/icons";
+import {AlertTriangleIcon, CloudOffIcon, FunnelIcon, MagnifyingGlassIcon} from "../shared/icons";
+import {getActionColumnWidth, RowActionCell, type ActionVariant, type RowActionDef} from "../shared/row-actions";
 import {
   AdvancedSelectFilter,
   AdvancedTextFilter,
@@ -257,6 +258,18 @@ export interface ListColumnProps<T> {
    */
   displayZone?: string | ((row: T) => string | undefined);
   variants?: Record<string, BadgeVariants["variant"]>;
+  /**
+   * Enum this column's values belong to, e.g. `"OrderStatus"`. Paired with
+   * `enumLabel`, a `display="badge"` cell shows the translated label instead of
+   * the constant the API sends.
+   */
+  enumName?: string;
+  /**
+   * Translates an enum constant — pass the entity translation's `enumLabel`.
+   * Without it (or without `enumName`) the badge falls back to the raw value,
+   * which is a constant like `IN_TRANSIT` rather than anything an operator reads.
+   */
+  enumLabel?: (enumName: string, value: string) => string;
   children?: (props: { value: unknown; row: T }) => ReactNode;
 }
 
@@ -310,17 +323,7 @@ function formatCellValue(
 
 // ── Action types ──
 
-export type ActionType = "view" | "edit" | "delete" | "locate" | "add-child" | "reorder" | "move" | "unlink" | "select";
-export type ActionVariant = "outline" | "ghost" | "icon";
-
-export interface RowActionDef<T> {
-  type: ActionType;
-  onClick: (row: T) => void;
-  label?: string;
-  icon?: ReactNode | ((row: T) => ReactNode);
-  when?: (row: T) => boolean;
-  disabled?: (row: T) => boolean;
-}
+export type { ActionType, ActionVariant, RowActionDef } from "../shared/row-actions";
 
 // ── List.Table ──
 
@@ -399,109 +402,6 @@ export interface ListTableProps<T> {
   rowClassName?: (row: T) => string | undefined;
   className?: string;
   children?: ReactNode;
-}
-
-// ── Default action config ──
-
-const ACTION_LABEL_KEYS: Record<ActionType, string> = {
-  view: "common.view",
-  edit: "common.edit",
-  delete: "common.delete",
-  locate: "common.locate",
-  "add-child": "tree.addChild",
-  reorder: "tree.reorder",
-  move: "tree.move",
-  unlink: "common.unlink",
-  select: "common.select",
-};
-
-const ACTION_ICONS: Record<ActionType, ReactNode> = {
-  view: <EyeIcon className="size-4" />,
-  edit: <PencilIcon className="size-4" />,
-  delete: <TrashIcon className="size-4" />,
-  locate: <MapPinIcon className="size-4" />,
-  "add-child": <PlusIcon className="size-4" />,
-  reorder: <ArrowUpDownIcon className="size-4" />,
-  move: <FolderTreeIcon className="size-4" />,
-  unlink: <UnlinkIcon className="size-4" />,
-  select: <CheckIcon className="size-4" />,
-};
-
-function getActionColumnWidth(actions: RowActionDef<unknown>[], variant: ActionVariant): number {
-  if (variant === "icon") return actions.length * 30 + 4;
-  return 120;
-}
-
-function RowActionCell<T>({ row, actions, variant }: { row: T; actions: RowActionDef<T>[]; variant: ActionVariant }) {
-  const { t } = useTranslation("simplix/ui");
-  const { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } = useFlatUIComponents();
-  const visible = actions.filter((a) => !a.when || a.when(row));
-  if (visible.length === 0) return null;
-
-  const handleClick = (e: React.MouseEvent, action: RowActionDef<T>) => {
-    e.stopPropagation();
-    action.onClick(row);
-  };
-
-  if (variant === "icon") {
-    return (
-      <TooltipProvider>
-        <Flex justify="end" align="center">
-          <div className="inline-flex items-center rounded-md border overflow-hidden">
-            {visible.map((action, i) => {
-              const label = action.label ?? t(ACTION_LABEL_KEYS[action.type]);
-              const resolvedIcon = typeof action.icon === "function" ? action.icon(row) : action.icon;
-              const icon = resolvedIcon ?? ACTION_ICONS[action.type];
-              const isDisabled = action.disabled?.(row) ?? false;
-              return (
-                <Tooltip key={`${action.type}-${i}`}>
-                  <TooltipTrigger asChild>
-                    <Button
-                      size="icon-xs"
-                      variant="ghost"
-                      className={cn(
-                        "rounded-none",
-                        i > 0 && "border-l",
-                      )}
-                      onClick={(e) => handleClick(e, action)}
-                      disabled={isDisabled}
-                    >
-                      {icon}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>{label}</TooltipContent>
-                </Tooltip>
-              );
-            })}
-          </div>
-        </Flex>
-      </TooltipProvider>
-    );
-  }
-
-  // outline / ghost variant
-  return (
-    <Flex gap="xs" justify="end">
-      {visible.map((action, i) => {
-        const label = action.label ?? t(ACTION_LABEL_KEYS[action.type]);
-        const resolvedIcon = typeof action.icon === "function" ? action.icon(row) : action.icon;
-        const icon = resolvedIcon ?? ACTION_ICONS[action.type];
-        const isDisabled = action.disabled?.(row) ?? false;
-        return (
-          <Button
-            key={`${action.type}-${i}`}
-            size="xs"
-            variant={variant}
-            onClick={(e) => handleClick(e, action)}
-            disabled={isDisabled}
-          >
-            {icon}
-            {label}
-          </Button>
-        );
-      })}
-    </Flex>
-  );
 }
 
 function extractColumnDefs<T>(children: ReactNode): ListColumnProps<T>[] {
@@ -1048,7 +948,8 @@ function ListTable<T>({
           if (colDef.display === "badge" && colDef.variants) {
             const strVal = String(value ?? "");
             const variant = colDef.variants[strVal] ?? "default";
-            return <Badge variant={variant}>{strVal}</Badge>;
+            const label = colDef.enumName && colDef.enumLabel ? colDef.enumLabel(colDef.enumName, strVal) : strVal;
+            return <Badge variant={variant}>{label}</Badge>;
           }
 
           // Boolean display
