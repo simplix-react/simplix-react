@@ -1,4 +1,4 @@
-export { ListDetail, ListDetailRoot } from "./list-detail";
+export { ListDetail, ListDetailRoot, DETAIL_PANEL_WIDTH } from "./list-detail";
 export type {
   ListDetailBaseProps,
   ListDetailProps,

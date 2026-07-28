@@ -602,7 +602,7 @@ export { CrudProvider, createReactRouterAdapter, RouterContext, useRouter } from
 export type { CrudProviderProps, ReactRouterHooks, RouterAdapter } from "./adapters";
 
 // CRUD patterns
-export { ListDetail, ListDetailRoot, ListDetailViewSwitch, useCrudNavigation, useCrudPageState, useFadeTransition, useListDetailState, validateCrudSearch, parseCrudSearch, buildCrudSearch } from "./crud/patterns";
+export { ListDetail, ListDetailRoot, DETAIL_PANEL_WIDTH, ListDetailViewSwitch, useCrudNavigation, useCrudPageState, useFadeTransition, useListDetailState, validateCrudSearch, parseCrudSearch, buildCrudSearch } from "./crud/patterns";
 export type {
   CrudSearch,
   CrudView,

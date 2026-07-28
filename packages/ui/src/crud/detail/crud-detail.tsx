@@ -214,6 +214,8 @@ export interface CrudDetailSectionProps extends SectionShellProps {
   layout?: keyof typeof detailLayoutColumns;
 }
 
+
+
 function DetailSection({ layout = "single-column", ...props }: CrudDetailSectionProps) {
   const { SectionShell } = useFlatUIComponents();
   const columns = detailLayoutColumns[layout];
