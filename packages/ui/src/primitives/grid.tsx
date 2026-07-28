@@ -1,5 +1,5 @@
 import { type VariantProps, cva } from "class-variance-authority";
-import { type ComponentPropsWithRef, forwardRef, type ReactNode } from "react";
+import { Children, cloneElement, type ComponentPropsWithRef, forwardRef, isValidElement, type ReactNode } from "react";
 
 import { createSelfResolving } from "../provider/self-resolving";
 import { cn } from "../utils/cn";
@@ -149,28 +149,63 @@ const gapSizeMap: Record<string, string> = {
   xl: "2rem",
 };
 
+
+/** Half of each gap, as the Tailwind spacing step used to centre a cell border in the gutter. */
 /**
- * Vertical separator lines rendered between grid columns.
- * With N equal columns and gap G, the center of the gutter after column i sits
- * at `i * (100% + G) / N - G / 2`, so each line lands exactly mid-gutter.
+ * The column rule, per horizontal gap, for a grid whose column count is fixed and for one that
+ * collapses to a single column at narrow widths.
+ *
+ * <p>Written out rather than assembled from the gap size: the CSS compiler only emits classes it
+ * can read in the source, so a name built at runtime resolves to no rule at all.
  */
-function ColumnDividers({ cols, gap, hiddenWhenCollapsed }: { cols: number; gap: string; hiddenWhenCollapsed?: boolean }) {
-  const g = gapSizeMap[gap] ?? "1rem";
-  return (
-    <>
-      {Array.from({ length: cols - 1 }, (_, i) => (
-        <div
-          key={i}
-          aria-hidden
-          className={cn(
-            "pointer-events-none absolute inset-y-0 w-px -translate-x-1/2 bg-border",
-            hiddenWhenCollapsed && "hidden @sm:block",
-          )}
-          style={{ left: `calc(${i + 1} * (100% + ${g}) / ${cols} - ${g} / 2)` }}
-        />
-      ))}
-    </>
-  );
+const columnRuleClasses: Record<string, { fixed: string; collapsing: string }> = {
+  none: { fixed: "border-l", collapsing: "@sm:border-l" },
+  px: { fixed: "border-l", collapsing: "@sm:border-l" },
+  xs: { fixed: "-ml-0.5 border-l pl-0.5", collapsing: "@sm:-ml-0.5 @sm:border-l @sm:pl-0.5" },
+  sm: { fixed: "-ml-1 border-l pl-1", collapsing: "@sm:-ml-1 @sm:border-l @sm:pl-1" },
+  md: { fixed: "-ml-2 border-l pl-2", collapsing: "@sm:-ml-2 @sm:border-l @sm:pl-2" },
+  lg: { fixed: "-ml-3 border-l pl-3", collapsing: "@sm:-ml-3 @sm:border-l @sm:pl-3" },
+  xl: { fixed: "-ml-4 border-l pl-4", collapsing: "@sm:-ml-4 @sm:border-l @sm:pl-4" },
+};
+
+/**
+ * Draws the column rule on the cells that actually start a new column.
+ *
+ * <p>A single line down the gutter spans the grid's full height, so it crosses the middle of any
+ * cell wide enough to claim the whole row. Bordering the cells instead means the rule appears
+ * exactly where two fields sit side by side and stops where one field takes the row. The border
+ * sits on the cell's left edge, so the cell is widened by half a gutter and padded back by the
+ * same amount, which puts the line mid-gutter without moving the content.
+ *
+ * @param children the grid's cells
+ * @param cols how many columns the grid has
+ * @param gap the horizontal gap key, which fixes the offset
+ * @param hiddenWhenCollapsed true when the grid drops to one column at narrow widths
+ * @returns the cells, with the rule applied to those that follow another in their row
+ */
+function withColumnRules(
+  children: ReactNode,
+  cols: number,
+  gap: string,
+  hiddenWhenCollapsed?: boolean,
+): ReactNode {
+  const classes = columnRuleClasses[gap] ?? columnRuleClasses.md;
+  const rule = hiddenWhenCollapsed ? classes.collapsing : classes.fixed;
+
+  let filled = 0;
+  return Children.map(children, (child) => {
+    if (!isValidElement<{ className?: string }>(child)) return child;
+
+    const spansRow = (child.props.className ?? "").includes("col-span-full");
+    const span = spansRow ? cols : 1;
+    // A cell that cannot fit in what is left of the row starts the next one.
+    if (spansRow && filled % cols !== 0) filled += cols - (filled % cols);
+    const startsRow = filled % cols === 0;
+    filled += span;
+
+    if (startsRow) return child;
+    return cloneElement(child, { className: cn(child.props.className, rule) });
+  });
 }
 
 /**
@@ -229,8 +264,7 @@ export const GridBase = forwardRef<HTMLDivElement, GridProps>(
       return (
         <div ref={ref} className="@container" style={style} {...rest}>
           <div className={cn("relative grid", colClass, gapClasses, className)}>
-            {children}
-            {showDivider && <ColumnDividers cols={cols} gap={dividerGap} hiddenWhenCollapsed />}
+            {showDivider ? withColumnRules(children, cols, dividerGap, true) : children}
           </div>
         </div>
       );
@@ -243,8 +277,7 @@ export const GridBase = forwardRef<HTMLDivElement, GridProps>(
         style={style}
         {...rest}
       >
-        {children}
-        {showDivider && <ColumnDividers cols={cols} gap={dividerGap} />}
+        {showDivider ? withColumnRules(children, cols, dividerGap) : children}
       </div>
     );
   },
