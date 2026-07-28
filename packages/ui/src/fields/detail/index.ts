@@ -10,6 +10,9 @@ export type { DetailBooleanFieldProps, BooleanDisplayMode } from "./boolean-fiel
 export { DetailCountryField } from "./country-field";
 export type { DetailCountryFieldProps } from "./country-field";
 
+export { DetailCurrencyField } from "./currency-field";
+export type { DetailCurrencyFieldProps } from "./currency-field";
+
 export { DetailDateField } from "./date-field";
 export type { DetailDateFieldProps } from "./date-field";
 

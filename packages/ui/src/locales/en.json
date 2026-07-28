@@ -92,6 +92,8 @@
   "field": {
     "selectCountry": "Select country",
     "searchCountry": "Search country...",
+    "selectCurrency": "Select currency",
+    "searchCurrency": "Search currency...",
     "detectCountry": "Detect country",
     "selectTimezone": "Select timezone",
     "searchTimezone": "Search timezone...",

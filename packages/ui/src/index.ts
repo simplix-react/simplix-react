@@ -701,6 +701,8 @@ export { sanitizeHtml } from "./utils/sanitize";
 export { countryFromTimezone } from "./utils/timezone-country-map";
 export { useCountryOptions } from "./utils/use-country-options";
 export type { CountryOption } from "./utils/use-country-options";
+export { useCurrencyOptions, currencyDecimalPlaces } from "./utils/use-currency-options";
+export type { CurrencyOption } from "./utils/use-currency-options";
 export { useTimezoneOptions } from "./utils/use-timezone-options";
 export type { TimezoneOption } from "./utils/use-timezone-options";
 

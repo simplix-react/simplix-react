@@ -92,6 +92,8 @@
   "field": {
     "selectCountry": "국가 선택",
     "searchCountry": "국가 검색...",
+    "selectCurrency": "통화 선택",
+    "searchCurrency": "통화 검색...",
     "detectCountry": "국가 감지",
     "selectTimezone": "시간대 선택",
     "searchTimezone": "시간대 검색...",

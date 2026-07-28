@@ -92,6 +92,8 @@
   "field": {
     "selectCountry": "国を選択",
     "searchCountry": "国を検索...",
+    "selectCurrency": "通貨を選択",
+    "searchCurrency": "通貨を検索...",
     "detectCountry": "国を検出",
     "selectTimezone": "タイムゾーンを選択",
     "searchTimezone": "タイムゾーンを検索...",
