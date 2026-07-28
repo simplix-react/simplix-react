@@ -272,6 +272,11 @@ const baseCtx = {
   ],
 };
 
+// The list row renders only what the list projection returns; the templates take that set
+// separately from the write-schema fields the form and detail use.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(baseCtx as any).listFields = (baseCtx as any).fields;
+
 describe("listTemplate", () => {
   it("renders with correct imports", () => {
     const result = renderTemplate(listTemplate, baseCtx);
@@ -305,6 +310,56 @@ describe("listTemplate", () => {
     expect(result).toContain("list.pagination.page");
     expect(result).toContain("list.pagination.totalPages");
     expect(result).toContain("list.emptyReason");
+  });
+
+  it("omits a column for a field the list projection does not return", () => {
+    // The scaffold's field set comes from the write schema, which is wider than the list row.
+    // A column for a field the row lacks compiles to an error the generator reports as success.
+    const listOnly = (baseCtx.fields as { name: string }[]).filter((f) => f.name !== "price");
+    const result = renderTemplate(listTemplate, { ...baseCtx, listFields: listOnly });
+
+    expect(result).toContain('field="name"');
+    expect(result).not.toContain('field="price"');
+  });
+
+  it("labels a badge column with its enum when the row type names one", () => {
+    const status = {
+      name: "status",
+      capitalizedName: "Status",
+      label: "Status",
+      tsType: "string",
+      formComponent: "SelectField",
+      inputType: "select",
+      component: "Select",
+      options: ["OPEN", "CLOSED"],
+      defaultValue: '""',
+      enumTypeName: "ProductStatus",
+    };
+    const result = renderTemplate(listTemplate, { ...baseCtx, listFields: [status] });
+
+    expect(result).toContain('enumName="ProductStatus"');
+    expect(result).toContain("enumLabel={enumLabel}");
+  });
+
+  it("leaves a badge column unlabelled when no enum name is known", () => {
+    // Without a name there is no message key to look up, so the badge shows the constant
+    // rather than a key that would resolve to itself.
+    const status = {
+      name: "status",
+      capitalizedName: "Status",
+      label: "Status",
+      tsType: "string",
+      formComponent: "SelectField",
+      inputType: "select",
+      component: "Select",
+      options: ["OPEN", "CLOSED"],
+      defaultValue: '""',
+    };
+    const result = renderTemplate(listTemplate, { ...baseCtx, listFields: [status] });
+
+    expect(result).toContain('display="badge"');
+    expect(result).toContain("width={120}");
+    expect(result).not.toContain("enumName=");
   });
 
   it("uses useEntityTranslation for field labels", () => {

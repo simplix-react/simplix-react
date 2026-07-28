@@ -182,7 +182,7 @@ export function {{EntityPascal}}List({ list: externalList, activeRowId, actions,
         )}
         cardContent={({ row }) => (
           <Stack gap="xs">
-{{#each fields}}
+{{#each listFields}}
 {{#unless @first}}
 {{#unless this.isI18nPair}}
 {{#unless this.hideInList}}
@@ -218,7 +218,7 @@ export function {{EntityPascal}}List({ list: externalList, activeRowId, actions,
           </Stack>
         )}
       >
-{{#each fields}}
+{{#each listFields}}
 {{#unless this.isI18nPair}}
 {{#unless this.hideInList}}
 {{#if (eq this.component "I18nText")}}
@@ -236,11 +236,18 @@ export function {{EntityPascal}}List({ list: externalList, activeRowId, actions,
           render={(value) => <I18nText value={value as unknown as Record<string, string> | undefined} />}
         />
 {{else if (eq this.component "Select")}}
+        {{!-- A pill is as wide as its word. Without a width the table hands it an equal share
+              of the free space, pushing the columns a reader actually scans off to the side. --}}
         <CrudList.Column<{{../EntityPascal}}>
           field="{{this.name}}"
           header={fieldLabel("{{this.name}}")}
           display="badge"
+          width={120}
           sortable
+{{#if this.enumTypeName}}
+          enumName="{{this.enumTypeName}}"
+          enumLabel={enumLabel}
+{{/if}}
           variants={{ldb}} {{#each this.options}}"{{this}}": "default"{{#unless @last}}, {{/unless}}{{/each}} {{rdb}}
         />
 {{else}}

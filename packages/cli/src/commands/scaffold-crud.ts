@@ -45,6 +45,11 @@ export interface FieldInfo {
   category?: ColumnCategory;
   /** Whether the field should be hidden by default in scaffolded lists/trees. */
   hideInList?: boolean;
+  /**
+   * Enum the field's values belong to, taken from the list row type's declared type. Present
+   * only on enum fields the row type declares; a badge without it shows the raw constant.
+   */
+  enumTypeName?: string;
 }
 
 /** Fields that exist in the data model but should not be displayed or edited by users. */
@@ -515,6 +520,50 @@ interface SchemaResult {
   path: string;
   content: string;
   packageName: string | null;
+}
+
+/**
+ * What the list projection actually returns, as property name to declared TypeScript type.
+ *
+ * The scaffold's field set comes from the write schema, which is the union of what a record
+ * holds; a list projection is deliberately narrower. Emitting a column for a field the list
+ * never returns produces a screen that does not compile, and the author only finds out after
+ * the generator has reported success — so the columns are limited to what the row type has.
+ *
+ * <p>The declared type is kept because it is where an enum field names its enum: the write
+ * schema knows only the constants, while the row type says which enum they belong to, and a
+ * badge needs that name to show a label rather than the constant.
+ *
+ * @param rootDir workspace root
+ * @param listRowType the list DTO's type name (e.g. `UserAccountListDTO`)
+ * @returns the properties, or null when the model file cannot be read
+ */
+async function readListDtoFieldNames(
+  rootDir: string,
+  listRowType: string | null,
+): Promise<Map<string, string> | null> {
+  if (!listRowType) return null;
+  const fileBase = listRowType.charAt(0).toLowerCase() + listRowType.slice(1);
+  const packagesDir = join(rootDir, "packages");
+  let packages: string[];
+  try {
+    packages = await readdir(packagesDir);
+  } catch {
+    return null;
+  }
+  for (const pkg of packages) {
+    const modelPath = join(packagesDir, pkg, "src/generated/model", `${fileBase}.ts`);
+    if (!(await pathExists(modelPath))) continue;
+    const content = await readFile(modelPath, "utf-8");
+    const at = content.indexOf(`interface ${listRowType}`);
+    if (at < 0) continue;
+    const names = new Map<string, string>();
+    for (const m of content.slice(at).matchAll(/^ {2}(\w+)\??:\s*([^;]+);/gm)) {
+      names.set(m[1], m[2].trim());
+    }
+    if (names.size > 0) return names;
+  }
+  return null;
 }
 
 export async function findSchemaFile(
@@ -1786,12 +1835,25 @@ export const scaffoldCrudCommand = new Command("scaffold")
           : null;
 
       const entityPlural = `${entity}s`;
+      // Columns and card lines render the list row, so they are limited to what the list
+      // projection returns; the full set stays available to the form and detail templates.
+      const listDtoFields = await readListDtoFieldNames(rootDir, listRowType);
+      // An enum column shows a translated label only if it can name its enum, and the row type
+      // is where that name is written. Fields the row type does not declare keep no name, so
+      // their badge falls back to the constant rather than asking for a key nothing defines.
+      const withEnumType = (f: FieldInfo) => {
+        if (f.component !== "Select") return f;
+        const declared = listDtoFields?.get(f.name)?.replace(/\[\]|\s|\|\s*null|\|\s*undefined/g, "");
+        return declared && /^[A-Z]\w*$/.test(declared) ? { ...f, enumTypeName: declared } : f;
+      };
+      const listFields = (listDtoFields ? fields.filter((f) => listDtoFields.has(f.name)) : fields).map(withEnumType);
       const ctx = {
         EntityPascal,
         entityKebab,
         entity,
         entityPlural,
         fields,
+        listFields,
         packageName,
         listRowType,
         treeRowType,
