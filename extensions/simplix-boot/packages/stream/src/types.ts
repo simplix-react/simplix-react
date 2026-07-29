@@ -90,6 +90,16 @@ export interface SubscriptionSyncConfig {
   method?: string;
   /** Build the request body. Default: `{ subscriptions }` */
   body?: (subscriptions: SubscriptionRequest[]) => unknown;
+  /**
+   * Extra request headers, resolved per sync.
+   *
+   * Supply this when the app's session travels in a header rather than a
+   * cookie: the server checks that the session syncing subscriptions owns the
+   * stream session, so an unauthenticated sync is refused even though the
+   * connect itself succeeded on a ticket. Read the token at call time — a
+   * value captured once goes stale on re-login.
+   */
+  headers?: () => Record<string, string>;
 }
 
 /** Staleness threshold configuration (in seconds) */

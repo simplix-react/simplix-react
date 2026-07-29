@@ -108,6 +108,26 @@ interface StreamProviderProps {
    * built-in exponential backoff).
    */
   maxConsecutiveRetries?: number;
+  /**
+   * Endpoint that mints a single-use connect ticket, for apps whose session
+   * does not travel in a cookie.
+   *
+   * `EventSource` cannot send request headers, so an app authenticated by one
+   * — a bearer token, or a header of its own — cannot authenticate the connect
+   * request. Set this and the provider asks for a ticket over an ordinary
+   * (authenticated) request first, then hands that back on the connect URL.
+   * The ticket is single-use and expires in seconds, so it is safe in a URL in
+   * a way the session itself is not.
+   *
+   * Leave unset for cookie-authenticated apps, which need no ticket.
+   */
+  ticketUrl?: string;
+  /**
+   * How to ask for a connect ticket. Supply this when the request needs the
+   * app's own auth header; the default is a plain same-origin POST, which is
+   * enough when a cookie or an interceptor already carries the session.
+   */
+  requestTicket?: (url: string) => Promise<string | null>;
 }
 
 export function StreamProvider({
@@ -120,6 +140,8 @@ export function StreamProvider({
   heartbeatTimeoutMs = DEFAULT_HEARTBEAT_TIMEOUT_MS,
   disabled = false,
   maxConsecutiveRetries = DEFAULT_MAX_CONSECUTIVE_RETRIES,
+  ticketUrl,
+  requestTicket,
 }: StreamProviderProps) {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("connecting");
@@ -203,6 +225,7 @@ export function StreamProvider({
         headers: {
           "Content-Type": "application/json",
           "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+          ...cfg.headers?.(),
         },
         body: JSON.stringify(bodyBuilder(subscriptions)),
       });
@@ -279,6 +302,10 @@ export function StreamProvider({
     // Reset retry state on (re-)enable so a fresh enable starts clean.
     retryCountRef.current = 0;
 
+    // Fetching a connect ticket makes connect() asynchronous, so an unmount can land
+    // between the request and the EventSource. This says the effect has gone away.
+    let cancelled = false;
+
     let heartbeatThrottleTimer: ReturnType<typeof setTimeout> | null = null;
     function touchHeartbeat() {
       const now = Date.now();
@@ -343,11 +370,11 @@ export function StreamProvider({
       retryCountRef.current += 1;
       retryTimerRef.current = setTimeout(() => {
         retryTimerRef.current = null;
-        connect();
+        void connect();
       }, delay);
     }
 
-    function connect() {
+    async function connect() {
       setConnectionStatus((prev) =>
         prev === "disconnected" || retryCountRef.current > 0 ? "reconnecting" : "connecting",
       );
@@ -355,7 +382,25 @@ export function StreamProvider({
       // EventSource does not support custom headers; pass timezone as query param
       const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
       const separator = url.includes("?") ? "&" : "?";
-      const es = new EventSource(`${url}${separator}timezone=${encodeURIComponent(tz)}`);
+      let connectUrl = `${url}${separator}timezone=${encodeURIComponent(tz)}`;
+
+      // A ticket carries the identity this request cannot. Fetched per connection —
+      // it is single-use — and a failure to get one falls through to an anonymous
+      // connect, which the server refuses or downgrades as its own rules say.
+      if (ticketUrl) {
+        const ticket = await (requestTicket
+          ? requestTicket(ticketUrl)
+          : fetch(ticketUrl, { method: "POST" })
+              .then((r) => (r.ok ? r.json() : null))
+              .then((body) => (body as { ticket?: string } | null)?.ticket ?? null)
+              .catch(() => null));
+        if (cancelled) return;
+        if (ticket) {
+          connectUrl += `&ticket=${encodeURIComponent(ticket)}`;
+        }
+      }
+
+      const es = new EventSource(connectUrl);
       eventSourceRef.current = es;
 
       const names = evNamesRef.current;
@@ -447,7 +492,7 @@ export function StreamProvider({
       };
     }
 
-    connect();
+    void connect();
 
     // Heartbeat watchdog: if no activity for timeout, force reconnect.
     // Vite proxy may keep the TCP connection alive after the backend dies,
@@ -461,6 +506,7 @@ export function StreamProvider({
     }, 5_000);
 
     return () => {
+      cancelled = true;
       if (retryTimerRef.current) {
         clearTimeout(retryTimerRef.current);
         retryTimerRef.current = null;
@@ -475,7 +521,7 @@ export function StreamProvider({
       }
       cleanupEventSource();
     };
-  }, [url, mock, dispatch, heartbeatTimeoutMs, disabled]);
+  }, [url, mock, dispatch, heartbeatTimeoutMs, disabled, ticketUrl, requestTicket]);
 
   const value: StreamContextValue = {
     sessionId,
