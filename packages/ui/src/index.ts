@@ -282,6 +282,7 @@ export type {
   TextareaProps,
   TimePickerProps,
   TimeValue,
+  TimeRange,
   TimeRangeSelectorProps,
   TimeRangeValue,
   HeatmapColorTheme,

@@ -17,7 +17,7 @@ import {
   SelectionBox,
   TimeLabels,
 } from "./components";
-import { AlertIcon, CalendarIcon } from "./icons";
+import { AlertIcon, CalendarIcon, ClearIcon, ExpandIcon } from "./icons";
 import {
   bucketToDate,
   buildChartOptions,
@@ -34,7 +34,7 @@ import {
   snapSelectionToBuckets,
   snapToFloor,
 } from "./helpers";
-import { HEATMAP_THEMES, pickReadableForeground } from "./themes";
+import { HEATMAP_THEMES } from "./themes";
 import {
   CUSTOM_PRESET_KEY,
   DEFAULT_PRESETS,
@@ -79,6 +79,27 @@ interface DragState {
  * />
  * ```
  */
+/**
+ * Where a preset's window begins, measured from the moment given.
+ *
+ * <p>A month starts at the first of the month and a day-or-longer window ends at the end of
+ * today, both at the display zone's midnights; anything shorter is a rolling span ending at the
+ * current bucket. Shared so the window a screen opens on and the window a preset button produces
+ * are the same window.
+ */
+function presetWindowStart(preset: WindowPreset, now: Date, displayZone?: string): Date {
+  if (preset.key === "1mo") {
+    return calendarAnchor(now, displayZone, (w) => new Date(w.getFullYear(), w.getMonth(), 1));
+  }
+  const windowMs = minutesToMs(preset.windowMinutes);
+  if (preset.windowMinutes >= 1440) {
+    const todayEnd = calendarAnchor(now, displayZone, (w) => new Date(w.getFullYear(), w.getMonth(), w.getDate() + 1));
+    return new Date(todayEnd.getTime() - windowMs);
+  }
+  const bucketMs = minutesToMs(preset.bucketMinutes);
+  return new Date(Math.ceil(now.getTime() / bucketMs) * bucketMs - windowMs);
+}
+
 export function TimeRangeSelector({
   value,
   onChange,
@@ -112,6 +133,11 @@ export function TimeRangeSelector({
 
   // View window
   const [viewFrom, setViewFrom] = useState<Date>(() => {
+    // With nothing selected the window opens exactly where picking the same preset would put
+    // it — today, in the display zone — rather than on a rolling span that ends at this second.
+    if (!value) {
+      return presetWindowStart(activePreset, new Date(), displayZone);
+    }
     const mid = new Date((value.from.getTime() + value.to.getTime()) / 2);
     const halfMs = minutesToMs(activePreset.windowMinutes) / 2;
     return snapToFloor(new Date(mid.getTime() - halfMs), activePreset.bucketMinutes);
@@ -136,7 +162,6 @@ export function TimeRangeSelector({
     const palette = HEATMAP_THEMES[colorTheme] ?? HEATMAP_THEMES.slate;
     return isDark ? palette.accent.dark : palette.accent.light;
   }, [colorTheme, isDark]);
-  const accentForeground = useMemo(() => pickReadableForeground(accentColor), [accentColor]);
 
   // ── Counts data ──
   const [counts, setCounts] = useState<number[]>([]);
@@ -178,6 +203,7 @@ export function TimeRangeSelector({
   const viewRef = useRef({ viewFrom, viewTo, preset: activePreset });
   viewRef.current = { viewFrom, viewTo, preset: activePreset };
   useEffect(() => {
+    if (!value) return;
     const { viewFrom: vf, viewTo: vt, preset } = viewRef.current;
     if (value.from.getTime() >= vt.getTime() || value.to.getTime() <= vf.getTime()) {
       const mid = new Date((value.from.getTime() + value.to.getTime()) / 2);
@@ -201,6 +227,7 @@ export function TimeRangeSelector({
 
   // ── Selection highlight ──
   const selectionOverlay = useMemo(() => {
+    if (!value) return null;
     const viewFromMs = viewFrom.getTime();
     const viewToMs = viewTo.getTime();
     const windowMs = viewToMs - viewFromMs;
@@ -247,8 +274,9 @@ export function TimeRangeSelector({
     // Sum counts over the selected range intersected with the view (0 when out of view).
     const windowMs = viewTo.getTime() - viewFrom.getTime();
     if (windowMs <= 0) return 0;
-    const lf = clamp01((value.from.getTime() - viewFrom.getTime()) / windowMs);
-    const rf = clamp01((value.to.getTime() - viewFrom.getTime()) / windowMs);
+    const range = value ?? { from: viewFrom, to: viewTo };
+    const lf = clamp01((range.from.getTime() - viewFrom.getTime()) / windowMs);
+    const rf = clamp01((range.to.getTime() - viewFrom.getTime()) / windowMs);
     const fromB = Math.max(0, Math.floor(lf * bucketCount));
     const toB = Math.min(bucketCount, Math.ceil(rf * bucketCount));
     let sum = 0;
@@ -256,7 +284,11 @@ export function TimeRangeSelector({
     return sum;
   }, [value, viewFrom, viewTo, bucketCount, counts]);
 
-  const rangeText = formatRangeDisplay(value.from, value.to, locale, hour12, displayZone);
+  // What the controls read when nothing is selected: the window on screen. The badge names the
+  // span being looked at either way, and the calendar edits that span.
+  const shownRange = value ?? { from: viewFrom, to: viewTo };
+
+  const rangeText = formatRangeDisplay(shownRange.from, shownRange.to, locale, hour12, displayZone);
   const ariaSummary = `${rangeText} · ${selectedCount}`;
 
   // ── Helpers ──
@@ -356,8 +388,9 @@ export function TimeRangeSelector({
       // Single-endpoint edit: clamp the edited side against its sibling. A crossing
       // edit is rejected (the field snaps back) rather than swapped, so the typed
       // value never teleports into the other field during per-keystroke editing.
-      const from = edited === "from" ? d : value.from;
-      const to = edited === "to" ? d : value.to;
+      const base = value ?? { from: viewFrom, to: viewTo };
+      const from = edited === "from" ? d : base.from;
+      const to = edited === "to" ? d : base.to;
       if (to.getTime() <= from.getTime()) return;
       // An explicit calendar range becomes a preset-less custom window (no false preset highlight).
       const custom = makeCustomPreset(presets, from, to);
@@ -365,7 +398,7 @@ export function TimeRangeSelector({
       setViewFrom(from);
       onChange({ from, to, bucketMinutes: custom.bucketMinutes });
     },
-    [value, presets, onChange],
+    [value, viewFrom, viewTo, presets, onChange],
   );
 
   const handleReset = useCallback(() => {
@@ -373,7 +406,7 @@ export function TimeRangeSelector({
   }, [viewFrom, viewTo, activePreset, onChange]);
 
   const handleExpandToSelection = useCallback(() => {
-    if (value.to.getTime() <= value.from.getTime()) return;
+    if (!value || value.to.getTime() <= value.from.getTime()) return;
     const custom = makeCustomPreset(presets, value.from, value.to);
     setActivePreset(custom);
     setViewFrom(value.from);
@@ -553,54 +586,91 @@ export function TimeRangeSelector({
   return (
     <div className={cn("relative w-full rounded-lg border border-border bg-card", className)}>
       {/* Controls bar */}
-      <div className="flex items-center justify-between px-2 pt-2 pb-1">
-        <div className="flex items-center gap-1.5">
-          <span className="text-sm font-semibold tabular-nums">{rangeText}</span>
-          {selectionOverlay && (
+      <div className="flex min-w-0 items-center justify-between gap-2 px-2 pt-2 pb-1">
+        <div className="flex min-w-0 items-center gap-1.5">
+          {/* The window, and the two things that can be done to the selection inside it —
+              one set, because all three are about the span itself. */}
+          <div className="flex items-center">
+            {/* The badge closes the group's right edge itself when nothing follows it, rather
+                than leaning on a filler element to round the corner. */}
+            <span
+              className={cn(
+                "inline-flex h-6 items-center whitespace-nowrap rounded-l-md border border-input bg-muted/40 px-2 text-xs font-semibold tabular-nums",
+                !selectionOverlay && "rounded-r-md",
+              )}
+            >
+              {rangeText}
+            </span>
+            {selectionOverlay && (
+              <>
+                <button
+                  type="button"
+                  className="inline-flex h-6 w-6 items-center justify-center border-y border-r border-input bg-background text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  onClick={handleExpandToSelection}
+                  aria-label={t("timeRange.expand", { defaultValue: "Expand to selection" })}
+                  title={t("timeRange.expand", { defaultValue: "Expand to selection" })}
+                >
+                  <ExpandIcon size={9} />
+                </button>
+                <button
+                  type="button"
+                  className="inline-flex h-6 w-6 items-center justify-center rounded-r-md border-y border-r border-input bg-background text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  onClick={handleReset}
+                  aria-label={t("timeRange.clear", { defaultValue: "Clear selection" })}
+                  title={t("timeRange.clear", { defaultValue: "Clear selection" })}
+                >
+                  <ClearIcon size={9} />
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Picking a window outright, rather than acting on the one already shown. */}
+          <div className="flex items-center">
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  className="inline-flex h-6 w-6 items-center justify-center rounded-l-md border border-input bg-background text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  aria-label={t("timeRange.calendar", { defaultValue: "Calendar" })}
+                  title={t("timeRange.calendar", { defaultValue: "Calendar" })}
+                >
+                  <CalendarIcon className="size-3" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent align="start" className="w-auto p-3">
+                <div className="flex flex-col gap-3">
+                  <DateTimeInput
+                    label={t("timeRange.from", { defaultValue: "From" })}
+                    value={shownRange.from}
+                    onChange={(d) => handleDateRangeChange("from", d)}
+                  />
+                  <DateTimeInput
+                    label={t("timeRange.to", { defaultValue: "To" })}
+                    value={shownRange.to}
+                    onChange={(d) => handleDateRangeChange("to", d)}
+                  />
+                </div>
+              </PopoverContent>
+            </Popover>
             <button
               type="button"
-              className="px-1.5 py-0.5 rounded text-[10px] text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              onClick={handleReset}
-              aria-label={t("timeRange.clear", { defaultValue: "Clear selection" })}
+              className="inline-flex h-6 items-center rounded-r-md border-y border-r border-input bg-background px-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              onClick={handleNow}
             >
-              ✕
+              {t("timeRange.now", { defaultValue: "Now" })}
             </button>
-          )}
-          <Popover>
-            <PopoverTrigger asChild>
-              <button
-                type="button"
-                className="inline-flex items-center justify-center h-7 w-7 rounded-md border border-input bg-background text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                aria-label={t("timeRange.calendar", { defaultValue: "Calendar" })}
-              >
-                <CalendarIcon className="size-3.5" />
-              </button>
-            </PopoverTrigger>
-            <PopoverContent align="start" className="w-auto p-3">
-              <div className="flex flex-col gap-3">
-                <DateTimeInput
-                  label={t("timeRange.from", { defaultValue: "From" })}
-                  value={value.from}
-                  onChange={(d) => handleDateRangeChange("from", d)}
-                />
-                <DateTimeInput
-                  label={t("timeRange.to", { defaultValue: "To" })}
-                  value={value.to}
-                  onChange={(d) => handleDateRangeChange("to", d)}
-                />
-              </div>
-            </PopoverContent>
-          </Popover>
-          <button
-            type="button"
-            className="h-7 px-2 rounded-md text-xs font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors border border-input focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            onClick={handleNow}
-          >
-            {t("timeRange.now", { defaultValue: "Now" })}
-          </button>
+          </div>
         </div>
 
-        <PresetBar presets={presets} activeKey={activePreset.key} onSelect={handlePresetChange} isCustom={isCustom} onZoomOut={handleZoomOut} t={t} />
+        <PresetBar
+          presets={presets}
+          activeKey={activePreset.key}
+          onSelect={handlePresetChange}
+          isCustom={isCustom}
+          onZoomOut={handleZoomOut}
+          t={t}
+        />
       </div>
 
       {/* Heatmap with nav buttons */}
@@ -636,11 +706,6 @@ export function TimeRangeSelector({
               left={selectionOverlay.left}
               right={selectionOverlay.right}
               accentColor={accentColor}
-              accentForeground={accentForeground}
-              onExpand={handleExpandToSelection}
-              onClear={handleReset}
-              expandLabel={t("timeRange.expand", { defaultValue: "Expand to selection" })}
-              clearLabel={t("timeRange.clear", { defaultValue: "Clear selection" })}
             />
           )}
 

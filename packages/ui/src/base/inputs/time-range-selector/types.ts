@@ -29,7 +29,13 @@ export interface TimeRangeValue extends TimeRange {
 /** Props for the {@link TimeRangeSelector} component. */
 export interface TimeRangeSelectorProps {
   /** Current selected range */
-  value: TimeRange;
+  /**
+   * The selected sub-range, or null when nothing is selected.
+   *
+   * <p>A screen opens with null: the strip shows its default window's shape and the list under
+   * it is unnarrowed. Selecting a span is a deliberate act, not the state a page loads in.
+   */
+  value: TimeRange | null;
   /** Range change callback */
   onChange: (range: TimeRangeValue) => void;
   /** Fetch counts for the visible window. Called when view range changes. */
