@@ -1,8 +1,11 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen, fireEvent } from "@testing-library/react";
-import { afterEach, describe, it, expect, vi } from "vitest";
+import { beforeEach, afterEach, describe, it, expect, vi } from "vitest";
 
 afterEach(cleanup);
+beforeEach(() => {
+  addMarks.mockClear();
+});
 
 vi.mock("@simplix-react/i18n/react", () => ({
   useTranslation: () => ({ t: (key: string) => key, locale: "en", exists: () => true }),
@@ -20,7 +23,6 @@ vi.mock("platejs/react", () => ({
   useEditorSelector: () => undefined,
 }));
 
-import React from "react";
 import { ColorToolbarButton } from "../../fields/plate-editor/components/color-toolbar-button";
 
 describe("ColorToolbarButton", () => {
