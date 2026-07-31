@@ -74,6 +74,10 @@ export function ColorToolbarButton({
   const handleCustomColorSubmit = useCallback(
     (e: FormEvent) => {
       e.preventDefault()
+      // This form is a submit boundary for the same reason CrudForm is: it lives in
+      // a portaled popover, so its submit would otherwise travel up the React tree
+      // and submit whatever form hosts the editor.
+      e.stopPropagation()
       if (customColor && /^#[0-9A-Fa-f]{6}$/.test(customColor)) {
         handleSelect(customColor)
         setCustomColor('')
