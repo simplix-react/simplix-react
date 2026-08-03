@@ -6,7 +6,6 @@
   "sideEffects": [
     "./dist/styles.css",
     "./dist/theme.css",
-    "./src/theme.css",
     "./dist/index.js",
     "./dist/plate-editor.js",
     "**/index.ts",
@@ -14,25 +13,19 @@
   ],
   "exports": {
     ".": {
-      "source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
     "./plate-editor": {
-      "source": "./src/fields/plate-editor/index.ts",
       "types": "./dist/plate-editor.d.ts",
       "import": "./dist/plate-editor.js"
     },
     "./plate-viewer": {
-      "source": "./src/fields/plate-editor/plate-viewer.tsx",
       "types": "./dist/plate-viewer.d.ts",
       "import": "./dist/plate-viewer.js"
     },
     "./styles.css": "./dist/styles.css",
-    "./theme.css": {
-      "style": "./src/theme.css",
-      "default": "./dist/theme.css"
-    }
+    "./theme.css": "./dist/theme.css"
   },
   "files": [
     "dist"
