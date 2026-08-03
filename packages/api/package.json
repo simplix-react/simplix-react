@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react/api",
-  "version": "0.3.1",
+  "version": "0.3.2-SNAPSHOT",
   "description": "Orval mutator singleton for simplix-react domain packages",
   "type": "module",
   "sideEffects": false,

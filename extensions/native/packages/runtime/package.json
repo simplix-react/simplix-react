@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react-native/runtime",
-  "version": "0.3.1",
+  "version": "0.3.2-SNAPSHOT",
   "description": "Expo runtime glue for simplix-react-native: secure token store adapters, Boot mutator assembly, app boot (error dialog, i18n registration, msw/native wiring)",
   "type": "module",
   "main": "./src/index.ts",

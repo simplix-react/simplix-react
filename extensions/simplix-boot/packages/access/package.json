@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react-ext/simplix-boot-access",
-  "version": "0.3.1",
+  "version": "0.3.2-SNAPSHOT",
   "description": "Spring Security authorization adapter for @simplix-react/access",
   "type": "module",
   "exports": {
