@@ -15,6 +15,7 @@ import {
 } from "@simplix-react/auth";
 import { createBootHttpFetch, type BootFetchOptions } from "./boot-fetch.js";
 import { unwrapEnvelope, type BootEnvelope } from "./envelope.js";
+import { ApiResponseError } from "./api-response-error.js";
 
 export interface BootAuthOptions {
   storePrefix?: string;
@@ -226,6 +227,40 @@ export function createBootAuth(options: BootAuthOptions = {}): BootAuthResult {
     }
   }
 
+  /**
+   * Turns a refused attachment request into the error a screen can show.
+   *
+   * <p>The status alone is a machine value: a screen that prints `HTTP 409` tells the operator
+   * that something was refused and nothing about what to do next. Boot answers a refusal with
+   * the same envelope it answers everything else with, so the concrete reason is already in the
+   * body — read it, and keep the status for the callers that branch on it.
+   */
+  function transportFailure(status: number, responseText: string): Error & { status: number } {
+    let wire: unknown;
+    try {
+      wire = JSON.parse(responseText);
+    } catch {
+      // Not an envelope at all (a proxy page, an empty body): the status is all there is.
+      wire = null;
+    }
+    if (wire != null && typeof wire === "object") {
+      const env = wire as Partial<BootEnvelope>;
+      if (typeof env.message === "string" && env.message.length > 0) {
+        return new ApiResponseError(
+          status,
+          env.type ?? "ERROR",
+          env.message,
+          env.timestamp ?? new Date().toISOString(),
+          env.errorCode ?? undefined,
+          env.errorDetail ?? undefined,
+        ) as ApiResponseError & { status: number };
+      }
+    }
+    const error = new Error(`HTTP ${status}`) as Error & { status: number };
+    error.status = status;
+    return error;
+  }
+
   function uploadWithProgress<T = unknown>(
     url: string,
     formData: FormData,
@@ -252,9 +287,7 @@ export function createBootAuth(options: BootAuthOptions = {}): BootAuthResult {
                 reject(parseError);
               }
             } else {
-              const error = new Error(`HTTP ${xhr.status}`) as Error & { status: number };
-              error.status = xhr.status;
-              reject(error);
+              reject(transportFailure(xhr.status, xhr.responseText));
             }
           });
           xhr.addEventListener("error", () =>
@@ -280,9 +313,7 @@ export function createBootAuth(options: BootAuthOptions = {}): BootAuthResult {
     return withAuthRetry(async (headers) => {
       const res = await fetch(attachmentBaseUrl + url, { headers });
       if (!res.ok) {
-        const error = new Error(`HTTP ${res.status}`) as Error & { status: number };
-        error.status = res.status;
-        throw error;
+        throw transportFailure(res.status, await res.text().catch(() => ""));
       }
       return res.blob();
     });
