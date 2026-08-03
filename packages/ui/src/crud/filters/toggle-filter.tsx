@@ -21,18 +21,25 @@ export function ToggleFilter({
   const { t } = useTranslation("simplix/ui");
   const isActive = value !== undefined;
 
+  // The chip and its clear affordance are siblings inside the border, never one inside the other:
+  // a control nested in a control leaves the keyboard and assistive technology to guess which of
+  // the two a press belongs to, and the guesses disagree.
   return (
-    <button
-      type="button"
-      onClick={() => onChange(isActive ? !value : true)}
+    <span
       className={cn(
         "inline-flex h-8 items-center gap-2 rounded-md border px-3 text-sm",
         isActive ? "border-solid" : "border-dashed text-muted-foreground",
         className,
       )}
     >
-      <ToggleLeftIcon className="h-4 w-4" />
-      {label}
+      <button
+        type="button"
+        onClick={() => onChange(isActive ? !value : true)}
+        className="inline-flex items-center gap-2 rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+      >
+        <ToggleLeftIcon className="h-4 w-4" />
+        {label}
+      </button>
       <Separator
         orientation="vertical"
         className={cn("mx-1 h-4", !isActive && "opacity-0")}
@@ -46,28 +53,19 @@ export function ToggleFilter({
       >
         {value ? t("common.yes") : t("common.no")}
       </Badge>
-      <span
-        role="button"
+      <button
+        type="button"
         tabIndex={isActive ? 0 : -1}
-        onClick={(e) => {
-          e.stopPropagation();
-          onChange(undefined);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.stopPropagation();
-            e.preventDefault();
-            onChange(undefined);
-          }
-        }}
+        onClick={() => onChange(undefined)}
         className={cn(
           "inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground",
+          "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
           !isActive && "pointer-events-none opacity-0",
         )}
         aria-label={t("filter.clearFilter")}
       >
         <XIcon className="h-3 w-3" />
-      </span>
-    </button>
+      </button>
+    </span>
   );
 }

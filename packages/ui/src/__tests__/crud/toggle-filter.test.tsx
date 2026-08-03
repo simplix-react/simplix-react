@@ -26,24 +26,24 @@ describe("ToggleFilter", () => {
     const { container } = render(
       <ToggleFilter label="Active" value={undefined} onChange={vi.fn()} />,
     );
-    const btn = container.querySelector("button");
-    expect(btn?.className).toContain("border-dashed");
+    const chip = container.firstElementChild;
+    expect(chip?.className).toContain("border-dashed");
   });
 
   it("shows solid border when active (value=true)", () => {
     const { container } = render(
       <ToggleFilter label="Active" value={true} onChange={vi.fn()} />,
     );
-    const btn = container.querySelector("button");
-    expect(btn?.className).toContain("border-solid");
+    const chip = container.firstElementChild;
+    expect(chip?.className).toContain("border-solid");
   });
 
   it("shows solid border when active (value=false)", () => {
     const { container } = render(
       <ToggleFilter label="Active" value={false} onChange={vi.fn()} />,
     );
-    const btn = container.querySelector("button");
-    expect(btn?.className).toContain("border-solid");
+    const chip = container.firstElementChild;
+    expect(chip?.className).toContain("border-solid");
   });
 
   it("calls onChange(true) on first click (from undefined)", () => {
@@ -104,22 +104,13 @@ describe("ToggleFilter", () => {
     expect(clearBtn.className).toContain("pointer-events-none");
   });
 
-  it("calls onChange(undefined) when clear is triggered via Enter key", () => {
-    const onChange = vi.fn();
+  it("clears from the keyboard because the affordance is a real button", () => {
     render(
-      <ToggleFilter label="Active" value={true} onChange={onChange} />,
+      <ToggleFilter label="Active" value={true} onChange={vi.fn()} />,
     );
-    fireEvent.keyDown(screen.getByLabelText("filter.clearFilter"), { key: "Enter" });
-    expect(onChange).toHaveBeenCalledWith(undefined);
-  });
-
-  it("calls onChange(undefined) when clear is triggered via Space key", () => {
-    const onChange = vi.fn();
-    render(
-      <ToggleFilter label="Active" value={false} onChange={onChange} />,
-    );
-    fireEvent.keyDown(screen.getByLabelText("filter.clearFilter"), { key: " " });
-    expect(onChange).toHaveBeenCalledWith(undefined);
+    // Enter and Space reach it through the platform's own button activation, which is the point of
+    // not hand-rolling the control out of a span.
+    expect(screen.getByLabelText("filter.clearFilter").tagName).toBe("BUTTON");
   });
 
   it("does not clear on unrelated key press", () => {
@@ -131,7 +122,7 @@ describe("ToggleFilter", () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
-  it("clear button stops propagation to avoid toggling parent", () => {
+  it("clearing does not also toggle, because the two controls are siblings", () => {
     const onChange = vi.fn();
     render(
       <ToggleFilter label="Active" value={true} onChange={onChange} />,
@@ -146,8 +137,8 @@ describe("ToggleFilter", () => {
     const { container } = render(
       <ToggleFilter label="Active" value={undefined} onChange={vi.fn()} className="my-toggle" />,
     );
-    const btn = container.querySelector("button");
-    expect(btn?.className).toContain("my-toggle");
+    const chip = container.firstElementChild;
+    expect(chip?.className).toContain("my-toggle");
   });
 
   it("clear button has tabIndex -1 when value is undefined", () => {

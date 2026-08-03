@@ -118,6 +118,7 @@ export function DetailLocationField({
               type="button"
               onClick={() => setOpen(true)}
               className="block w-full transition-opacity hover:opacity-90"
+              aria-label="Open map"
             >
               <div className="pointer-events-none h-[150px] bg-neutral-100 dark:bg-neutral-900">
                 <Map

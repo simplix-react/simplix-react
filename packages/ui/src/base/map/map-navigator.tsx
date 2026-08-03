@@ -94,7 +94,7 @@ function MapNavigator({ total, focusedIndex, label, fallbackLabel, onPrev, onNex
   return (
     <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center p-3" style={{ zIndex: 10 }}>
       <div className="pointer-events-auto flex items-center rounded-md border bg-background shadow-md">
-        <Button size="icon-sm" variant="ghost" className="rounded-none rounded-l-md" onClick={onPrev}>
+        <Button size="icon-sm" variant="ghost" className="rounded-none rounded-l-md" aria-label="Previous location" onClick={onPrev}>
           <ChevronLeftIcon />
         </Button>
         <div className="w-px bg-border" />
@@ -108,7 +108,7 @@ function MapNavigator({ total, focusedIndex, label, fallbackLabel, onPrev, onNex
           <span className="text-muted-foreground">/ {total}</span>
         </button>
         <div className="w-px bg-border" />
-        <Button size="icon-sm" variant="ghost" className="rounded-none rounded-r-md" onClick={onNext}>
+        <Button size="icon-sm" variant="ghost" className="rounded-none rounded-r-md" aria-label="Next location" onClick={onNext}>
           <ChevronRightIcon />
         </Button>
       </div>

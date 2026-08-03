@@ -1,10 +1,18 @@
 import type { DraggableAttributes, DraggableSyntheticListeners } from "@dnd-kit/core";
+import { useTranslation } from "@simplix-react/i18n/react";
 
 import { cn } from "../../utils/cn";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 
 interface DragHandleCellProps {
   disabled?: boolean;
+  /**
+   * Why the handle is inert, from the caller that knows. Nothing here can say it: a file list
+   * disables the handle while an upload is in flight or has failed, a record list disables it for
+   * reasons of its own, and a wrong explanation is worse than none. Omit it and the dead grip stays
+   * a silent decoration.
+   */
+  disabledLabel?: string;
   listeners?: DraggableSyntheticListeners;
   attributes?: DraggableAttributes;
 }
@@ -29,14 +37,24 @@ function GripIcon({ className }: { className?: string }) {
   );
 }
 
-export function DragHandleCell({ disabled, listeners, attributes }: DragHandleCellProps) {
+export function DragHandleCell({ disabled, disabledLabel, listeners, attributes }: DragHandleCellProps) {
+  const { t } = useTranslation("simplix/ui");
+
   if (disabled) {
-    return <GripIcon className="text-muted-foreground/30" />;
+    if (!disabledLabel) {
+      return <GripIcon className="text-muted-foreground/30" />;
+    }
+    return (
+      <span role="img" aria-label={disabledLabel} title={disabledLabel} className="inline-flex">
+        <GripIcon className="text-muted-foreground/30" />
+      </span>
+    );
   }
 
   return (
     <button
       type="button"
+      aria-label={t("file.handle.reorder")}
       className={cn(
         "inline-flex cursor-grab items-center justify-center rounded p-0.5",
         "text-muted-foreground hover:text-foreground",
@@ -88,6 +106,7 @@ export function DragHandleHeader({ isDragEnabled, onActivate }: DragHandleHeader
       onClick={isDragEnabled ? undefined : onActivate}
       disabled={isDragEnabled}
       className={cn(isDragEnabled && "pointer-events-none opacity-100")}
+      aria-label="Sort by display order"
       title="Sort by display order"
     >
       <ArrowDown01Icon />

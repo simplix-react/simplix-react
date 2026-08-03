@@ -373,6 +373,7 @@ const IconPicker = forwardRef<
                         <TooltipTrigger asChild>
                           <button
                             type="button"
+                            aria-label={icon.name}
                             className={cn(
                               "flex size-9 items-center justify-center rounded-md border transition-colors",
                               "hover:bg-accent hover:text-accent-foreground",

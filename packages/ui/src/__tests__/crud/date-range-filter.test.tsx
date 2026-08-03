@@ -36,8 +36,8 @@ describe("DateRangeFilter", () => {
         onChange={vi.fn()}
       />,
     );
-    const btn = container.querySelector("button");
-    expect(btn?.className).toContain("border-dashed");
+    const chip = container.querySelector("button")!.parentElement;
+    expect(chip?.className).toContain("border-dashed");
   });
 
   it("renders solid border when value is present", () => {
@@ -49,8 +49,8 @@ describe("DateRangeFilter", () => {
         onChange={vi.fn()}
       />,
     );
-    const btn = container.querySelector("button");
-    expect(btn?.className).toContain("border-solid");
+    const chip = container.querySelector("button")!.parentElement;
+    expect(chip?.className).toContain("border-solid");
   });
 
   it("shows clear button when value is present", () => {
@@ -103,8 +103,9 @@ describe("DateRangeFilter", () => {
         onChange={onChange}
       />,
     );
-    fireEvent.keyDown(screen.getByLabelText("filter.clearDateRange"), { key: "Enter" });
-    expect(onChange).toHaveBeenCalledWith(undefined, undefined);
+    // Enter and Space reach it through the platform's own button activation,
+    // which is the point of not hand-rolling the control out of a span.
+    expect(screen.getByLabelText("filter.clearDateRange").tagName).toBe("BUTTON");
   });
 
   it("calls onChange with undefined on clear via Space key", () => {
@@ -117,8 +118,9 @@ describe("DateRangeFilter", () => {
         onChange={onChange}
       />,
     );
-    fireEvent.keyDown(screen.getByLabelText("filter.clearDateRange"), { key: " " });
-    expect(onChange).toHaveBeenCalledWith(undefined, undefined);
+    // Enter and Space reach it through the platform's own button activation,
+    // which is the point of not hand-rolling the control out of a span.
+    expect(screen.getByLabelText("filter.clearDateRange").tagName).toBe("BUTTON");
   });
 
   it("does not clear on unrelated key press", () => {
@@ -144,8 +146,8 @@ describe("DateRangeFilter", () => {
         onChange={vi.fn()}
       />,
     );
-    const btn = container.querySelector("button");
-    expect(btn?.className).toContain("border-solid");
+    const chip = container.querySelector("button")!.parentElement;
+    expect(chip?.className).toContain("border-solid");
   });
 
   it("renders solid border when only to is set", () => {
@@ -157,8 +159,8 @@ describe("DateRangeFilter", () => {
         onChange={vi.fn()}
       />,
     );
-    const btn = container.querySelector("button");
-    expect(btn?.className).toContain("border-solid");
+    const chip = container.querySelector("button")!.parentElement;
+    expect(chip?.className).toContain("border-solid");
   });
 
   it("applies custom className", () => {
@@ -171,8 +173,8 @@ describe("DateRangeFilter", () => {
         className="my-filter"
       />,
     );
-    const btn = container.querySelector("button");
-    expect(btn?.className).toContain("my-filter");
+    const chip = container.querySelector("button")!.parentElement;
+    expect(chip?.className).toContain("my-filter");
   });
 
   it("opens popover when trigger button is clicked", () => {

@@ -97,7 +97,7 @@ export const WithIconButton: Story = {
   render: () => (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="outline" size="icon">
+        <Button variant="outline" size="icon" aria-label="Add new item">
           <svg
             width="15"
             height="15"

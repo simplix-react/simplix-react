@@ -53,7 +53,12 @@ export const TabsList = forwardRef<HTMLDivElement, TabsListProps>(
           variant === "bookmark"
             ? cn(lineListBase, "gap-0")
             : cn(
-                "h-9 items-center justify-center rounded-lg border border-input bg-card p-1 text-muted-foreground",
+                // Vertical padding is half the horizontal one so the 28px trigger fits inside the
+                // 34px content box of an h-9 bordered track. With `p-1` the trigger overflows the
+                // box by 2px — invisible on its own, but a list wrapped in `overflow-x-auto` has
+                // its overflow-y computed to `auto` as well, and that 1px of bottom overflow paints
+                // a scrollbar. `items-center` keeps the trigger exactly where `p-1` rendered it.
+                "h-9 items-center justify-center rounded-lg border border-input bg-card px-1 py-0.5 text-muted-foreground",
                 variant === "full"
                   ? "mt-3 flex w-full [&>*]:flex-1"
                   : "inline-flex",

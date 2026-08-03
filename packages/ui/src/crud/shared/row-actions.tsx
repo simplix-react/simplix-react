@@ -104,6 +104,11 @@ export function RowActionCell<T>({
                     <Button
                       size="icon-xs"
                       variant="ghost"
+                      // The button's only content is a mark, so without this it has no accessible
+                      // name at all: a Radix tooltip describes a control while it is open, it does
+                      // not name one, and a control nobody has hovered is never open. Assistive
+                      // technology would announce every row's actions as unlabelled buttons.
+                      aria-label={label}
                       className={cn(
                         "rounded-none",
                         i > 0 && "border-l",

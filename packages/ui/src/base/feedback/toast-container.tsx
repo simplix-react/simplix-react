@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
+import { useTranslation } from "@simplix-react/i18n/react";
+
 import { cn } from "../../utils/cn";
 import { AlertTriangleIcon, CheckCircleIcon, InfoIcon, XCircleIcon, XIcon } from "../../crud/shared/icons";
 import { Button } from "../controls/button";
@@ -33,6 +35,7 @@ const typeConfig: Record<
 };
 
 function ToastItem({ toast }: { toast: Toast }) {
+  const { t } = useTranslation("simplix/ui");
   const config = typeConfig[toast.type];
   const [isExiting, setIsExiting] = useState(false);
   const [isEntering, setIsEntering] = useState(true);
@@ -77,6 +80,7 @@ function ToastItem({ toast }: { toast: Toast }) {
           variant="ghost"
           size="icon-xs"
           className="shrink-0 -mt-0.5 -mr-1"
+          aria-label={t("common.close")}
           onClick={handleDismiss}
         >
           <XIcon className="size-3.5" />

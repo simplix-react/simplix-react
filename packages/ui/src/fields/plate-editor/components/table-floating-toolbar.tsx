@@ -118,6 +118,7 @@ export function TableFloatingToolbar({ className }: TableFloatingToolbarProps) {
               variant="ghost"
               size="icon"
               className="h-7 w-7"
+              aria-label={t('plateEditor.table.insertRowAbove')}
               onClick={handleInsertRowAbove}
             >
               <ArrowUp className="h-4 w-4" />
@@ -134,6 +135,7 @@ export function TableFloatingToolbar({ className }: TableFloatingToolbarProps) {
               variant="ghost"
               size="icon"
               className="h-7 w-7"
+              aria-label={t('plateEditor.table.insertRowBelow')}
               onClick={handleInsertRowBelow}
             >
               <ArrowDown className="h-4 w-4" />
@@ -153,6 +155,7 @@ export function TableFloatingToolbar({ className }: TableFloatingToolbarProps) {
               variant="ghost"
               size="icon"
               className="h-7 w-7"
+              aria-label={t('plateEditor.table.insertColumnLeft')}
               onClick={handleInsertColumnLeft}
             >
               <ArrowLeft className="h-4 w-4" />
@@ -169,6 +172,7 @@ export function TableFloatingToolbar({ className }: TableFloatingToolbarProps) {
               variant="ghost"
               size="icon"
               className="h-7 w-7"
+              aria-label={t('plateEditor.table.insertColumnRight')}
               onClick={handleInsertColumnRight}
             >
               <ArrowRight className="h-4 w-4" />
@@ -188,6 +192,7 @@ export function TableFloatingToolbar({ className }: TableFloatingToolbarProps) {
               variant="ghost"
               size="icon"
               className="h-7 w-7"
+              aria-label={t('plateEditor.table.mergeCells')}
               onClick={handleMergeCells}
               disabled={!canMerge}
             >
@@ -205,6 +210,7 @@ export function TableFloatingToolbar({ className }: TableFloatingToolbarProps) {
               variant="ghost"
               size="icon"
               className="h-7 w-7"
+              aria-label={t('plateEditor.table.splitCell')}
               onClick={handleSplitCell}
               disabled={!canSplit}
             >
@@ -225,6 +231,7 @@ export function TableFloatingToolbar({ className }: TableFloatingToolbarProps) {
               variant="ghost"
               size="icon"
               className="h-7 w-7 text-destructive hover:text-destructive"
+              aria-label={t('plateEditor.table.deleteRow')}
               onClick={handleDeleteRow}
             >
               <Trash2 className="h-4 w-4" />
@@ -241,6 +248,7 @@ export function TableFloatingToolbar({ className }: TableFloatingToolbarProps) {
               variant="ghost"
               size="icon"
               className="h-7 w-7 text-destructive hover:text-destructive"
+              aria-label={t('plateEditor.table.deleteColumn')}
               onClick={handleDeleteColumn}
             >
               <Trash2 className="h-4 w-4" />
@@ -257,6 +265,7 @@ export function TableFloatingToolbar({ className }: TableFloatingToolbarProps) {
               variant="ghost"
               size="icon"
               className="h-7 w-7 text-destructive hover:text-destructive"
+              aria-label={t('plateEditor.table.deleteTable')}
               onClick={handleDeleteTable}
             >
               <Trash2 className="h-4 w-4" />

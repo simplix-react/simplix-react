@@ -93,9 +93,9 @@ describe("DatePicker", () => {
     const { container } = render(
       <DatePicker value={new Date(2024, 0, 15)} onChange={onChange} />,
     );
-    const clearBtn = container.querySelector("[role='button']");
-    expect(clearBtn).not.toBeNull();
-    fireEvent.click(clearBtn!);
+    const clearBtn = container.querySelectorAll("button")[1];
+    expect(clearBtn).not.toBeUndefined();
+    fireEvent.click(clearBtn);
     expect(onChange).toHaveBeenCalledWith(undefined);
   });
 
@@ -103,8 +103,8 @@ describe("DatePicker", () => {
     const { container } = render(
       <DatePicker value={undefined} onChange={vi.fn()} className="my-picker" />,
     );
-    const trigger = container.querySelector("button") as HTMLButtonElement;
-    expect(trigger.className).toContain("my-picker");
+    const field = container.firstElementChild;
+    expect(field?.className).toContain("my-picker");
   });
 
   it("sets data-empty=true when no value", () => {

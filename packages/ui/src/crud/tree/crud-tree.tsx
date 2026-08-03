@@ -207,6 +207,7 @@ function TreeExpandToggle({ className }: { className?: string }) {
             <Button
               variant="outline"
               size="icon-sm"
+              aria-label={t("tree.expandAll")}
               onClick={expansion.expandAll}
             >
               <ChevronsUpDownIcon className="size-4" />
@@ -219,6 +220,7 @@ function TreeExpandToggle({ className }: { className?: string }) {
             <Button
               variant="outline"
               size="icon-sm"
+              aria-label={t("tree.collapseAll")}
               onClick={expansion.collapseAll}
             >
               <ChevronsDownUpIcon className="size-4" />
@@ -650,7 +652,7 @@ function TreeHeaderActions({ searchPlaceholder, className }: TreeHeaderActionsPr
           <Tooltip>
             <TooltipTrigger asChild>
               <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon-xs">
+                <Button variant="ghost" size="icon-xs" aria-label={t("common.search")}>
                   <MagnifyingGlassIcon className="size-4" />
                 </Button>
               </PopoverTrigger>
@@ -677,6 +679,7 @@ function TreeHeaderActions({ searchPlaceholder, className }: TreeHeaderActionsPr
               <button
                 type="button"
                 onClick={handleClear}
+                aria-label={t("common.clear")}
                 className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-sm p-0.5 text-muted-foreground hover:text-foreground"
               >
                 <XIcon className="size-3.5" />
@@ -688,7 +691,7 @@ function TreeHeaderActions({ searchPlaceholder, className }: TreeHeaderActionsPr
           <>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon-xs" onClick={expansion.expandAll}>
+                <Button variant="ghost" size="icon-xs" aria-label={t("tree.expandAll")} onClick={expansion.expandAll}>
                   <ChevronsUpDownIcon className="size-4" />
                 </Button>
               </TooltipTrigger>
@@ -696,7 +699,7 @@ function TreeHeaderActions({ searchPlaceholder, className }: TreeHeaderActionsPr
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon-xs" onClick={expansion.collapseAll}>
+                <Button variant="ghost" size="icon-xs" aria-label={t("tree.collapseAll")} onClick={expansion.collapseAll}>
                   <ChevronsDownUpIcon className="size-4" />
                 </Button>
               </TooltipTrigger>

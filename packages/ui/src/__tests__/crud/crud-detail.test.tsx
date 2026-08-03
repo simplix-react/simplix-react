@@ -191,6 +191,20 @@ describe("CrudDetail.DefaultActions", () => {
     expect(onDelete).toHaveBeenCalledTimes(1);
   });
 
+  it("names the delete button", () => {
+    const { container } = render(<CrudDetail.DefaultActions onDelete={vi.fn()} />);
+    // An icon-only button reaches assistive technology unnamed — the reader
+    // cannot tell what it removes.
+    expect(container.textContent).toContain("common.delete");
+  });
+
+  it("accepts a custom delete label", () => {
+    const { container } = render(
+      <CrudDetail.DefaultActions onDelete={vi.fn()} deleteLabel="Remove order" />,
+    );
+    expect(container.textContent).toContain("Remove order");
+  });
+
   it("disables edit and delete when isPending", () => {
     const { container } = render(
       <CrudDetail.DefaultActions

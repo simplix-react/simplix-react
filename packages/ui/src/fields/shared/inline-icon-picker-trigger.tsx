@@ -29,11 +29,12 @@ const LazyTrigger = lazy(() =>
   })),
 );
 
-function TriggerPlaceholder({ disabled }: { disabled?: boolean }) {
+function TriggerPlaceholder({ disabled, ariaLabel }: { disabled?: boolean; ariaLabel?: string }) {
   return (
     <button
       type="button"
       disabled={disabled}
+      aria-label={ariaLabel}
       className={cn(
         "flex h-9 w-9 shrink-0 items-center justify-center rounded-md border-2 border-dashed bg-background",
         "disabled:cursor-not-allowed disabled:opacity-50",
@@ -46,7 +47,7 @@ function TriggerPlaceholder({ disabled }: { disabled?: boolean }) {
 
 export function InlineIconPickerTrigger(props: InlineIconPickerTriggerProps) {
   return (
-    <Suspense fallback={<TriggerPlaceholder disabled={props.disabled} />}>
+    <Suspense fallback={<TriggerPlaceholder disabled={props.disabled} ariaLabel={props["aria-label"]} />}>
       <LazyTrigger {...props} />
     </Suspense>
   );

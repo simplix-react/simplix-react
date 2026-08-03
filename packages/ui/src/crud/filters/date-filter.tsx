@@ -143,54 +143,52 @@ export function DateFilter({
         </DropdownMenu>
       )}
       <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <button
-            type="button"
+        {/* The chip's border is the wrapper's, so the trigger and the clear affordance sit side by
+            side inside it rather than one inside the other — a control nested in a control leaves
+            the keyboard and assistive technology to guess which of the two a press belongs to. */}
+        <span
+          className={cn(
+            "inline-flex h-8 items-center gap-2 rounded-md border px-3 text-sm",
+            hasValue ? "border-solid" : "border-dashed text-muted-foreground",
+          )}
+        >
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              className="inline-flex items-center gap-2 rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            >
+              <Icon className="h-4 w-4" />
+              {label ?? "Pick a date"}
+            </button>
+          </PopoverTrigger>
+          <Separator
+            orientation="vertical"
+            className={cn("mx-1 h-4", !hasValue && "opacity-0")}
+          />
+          <Badge
+            variant="secondary"
             className={cn(
-              "inline-flex h-8 items-center gap-2 rounded-md border px-3 text-sm",
-              hasValue ? "border-solid" : "border-dashed text-muted-foreground",
+              badgeWidth,
+              "justify-center font-normal",
+              !hasValue && "opacity-0",
             )}
           >
-            <Icon className="h-4 w-4" />
-            {label ?? "Pick a date"}
-            <Separator
-              orientation="vertical"
-              className={cn("mx-1 h-4", !hasValue && "opacity-0")}
-            />
-            <Badge
-              variant="secondary"
-              className={cn(
-                badgeWidth,
-                "justify-center font-normal",
-                !hasValue && "opacity-0",
-              )}
-            >
-              {displayText ?? "–"}
-            </Badge>
-            <span
-              role="button"
-              tabIndex={hasValue ? 0 : -1}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleClear();
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  handleClear();
-                }
-              }}
-              className={cn(
-                "inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground",
-                !hasValue && "pointer-events-none opacity-0",
-              )}
-              aria-label={t("filter.clearDate")}
-            >
-              <XIcon className="h-3 w-3" />
-            </span>
+            {displayText ?? "–"}
+          </Badge>
+          <button
+            type="button"
+            tabIndex={hasValue ? 0 : -1}
+            onClick={handleClear}
+            className={cn(
+              "inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground",
+              "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+              !hasValue && "pointer-events-none opacity-0",
+            )}
+            aria-label={t("filter.clearDate")}
+          >
+            <XIcon className="h-3 w-3" />
           </button>
-        </PopoverTrigger>
+        </span>
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar {...calendarProps} />
         </PopoverContent>

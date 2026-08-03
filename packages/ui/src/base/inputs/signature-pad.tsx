@@ -152,6 +152,7 @@ export function SignaturePad({
         <button
           type="button"
           onClick={clear}
+          aria-label="Clear"
           className="absolute right-2 top-2 rounded-sm px-1.5 py-0.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
         >
           ⟲

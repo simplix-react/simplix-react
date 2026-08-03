@@ -84,10 +84,11 @@ function TreeItem<T>({
 
   return (
     <>
-      <button
-        type="button"
-        disabled={isDisabled}
-        onClick={() => !isDisabled && onSelect(id)}
+      {/* Expanding a branch and choosing it are two different acts, so they are two sibling
+          controls inside the row rather than one nested in the other — a control inside a control
+          leaves the keyboard and assistive technology to guess which of the two a press belongs
+          to, and the guesses disagree. */}
+      <span
         className={cn(
           "flex w-full items-center gap-1 rounded-sm px-2 py-1.5 text-sm",
           isSelected && "bg-accent text-accent-foreground",
@@ -96,33 +97,39 @@ function TreeItem<T>({
         )}
       >
         <span className="shrink-0" style={{ width: depth * 20 }} />
-        <span
-          role="button"
+        <button
+          type="button"
           tabIndex={hasChildren ? 0 : -1}
+          aria-label={hasChildren ? (isExpanded ? "Collapse" : "Expand") : undefined}
           className={cn(
             "inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-sm",
+            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
             hasChildren ? "text-muted-foreground hover:text-foreground" : "invisible",
           )}
-          onClick={(e) => {
-            e.stopPropagation();
+          onClick={() => {
             if (hasChildren) onToggleExpand(id);
-          }}
-          onKeyDown={(e) => {
-            if (hasChildren && (e.key === "Enter" || e.key === " ")) {
-              e.stopPropagation();
-              onToggleExpand(id);
-            }
           }}
         >
           {hasChildren ? (isExpanded ? <ChevronDownIcon /> : <ChevronRightIcon />) : null}
-        </span>
-        <FolderIcon />
-        <span className="ml-1 truncate">{config.getDisplayName(item)}</span>
-        <span className="ml-auto shrink-0">
-          {isDisabled && <LockIcon />}
-          {isSelected && !isDisabled && <CheckIcon />}
-        </span>
-      </button>
+        </button>
+        <button
+          type="button"
+          disabled={isDisabled}
+          onClick={() => !isDisabled && onSelect(id)}
+          className={cn(
+            "flex min-w-0 flex-1 items-center gap-1 rounded-sm text-start",
+            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+            isDisabled && "cursor-not-allowed",
+          )}
+        >
+          <FolderIcon />
+          <span className="ml-1 truncate">{config.getDisplayName(item)}</span>
+          <span className="ml-auto shrink-0">
+            {isDisabled && <LockIcon />}
+            {isSelected && !isDisabled && <CheckIcon />}
+          </span>
+        </button>
+      </span>
       {hasChildren && isExpanded && children.map((child) => (
         <TreeItem
           key={String((child as Record<string, unknown>)[idField])}

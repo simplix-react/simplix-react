@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { useTranslation } from "@simplix-react/i18n/react";
+
 import { XIcon } from "../crud/shared/icons";
 import { useFlatUIComponents } from "../provider/ui-provider";
 import { cn } from "../utils/cn";
@@ -30,6 +32,7 @@ export function PanelHeader({
   borderVariant,
 }: PanelHeaderProps) {
   const { Button } = useFlatUIComponents();
+  const { t } = useTranslation("simplix/ui");
 
   return (
     <Flex align="center" gap="sm" className={cn("border-b px-0 py-4 shrink-0", borderVariant)}>
@@ -43,8 +46,10 @@ export function PanelHeader({
       {children}
       {trailing}
       {onClose && (
-        <Button variant="ghost" size="icon-xs" onClick={onClose}>
-          <XIcon className="size-3" />
+        // Icon-only: without this the button has no accessible name at all, and a screen
+        // reader announces the one way out of the panel as an unlabelled button.
+        <Button variant="ghost" size="icon-xs" aria-label={t("common.close")} onClick={onClose}>
+          <XIcon className="size-3" aria-hidden />
         </Button>
       )}
     </Flex>

@@ -406,10 +406,11 @@ const POSITION_CLASSES: Record<MapControlsPosition, string> = {
   "bottom-right": "bottom-0 right-0",
 };
 
-function MapControlButton({ onClick, children, className: cls }: { onClick: () => void; children: ReactNode; className?: string }) {
+function MapControlButton({ onClick, label, children, className: cls }: { onClick: () => void; label: string; children: ReactNode; className?: string }) {
   return (
     <button
       type="button"
+      aria-label={label}
       className={cn(
         "flex h-8 w-8 items-center justify-center text-foreground/80 hover:bg-accent hover:text-foreground transition-colors",
         cls,
@@ -470,11 +471,11 @@ function MapControls({
 
   if (showZoom) {
     controls.push(
-      <MapControlButton key="zoom-in" onClick={() => map?.zoomIn()}>
+      <MapControlButton key="zoom-in" label="Zoom in" onClick={() => map?.zoomIn()}>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
       </MapControlButton>,
       <div key="zoom-sep" className="h-px w-full bg-border" />,
-      <MapControlButton key="zoom-out" onClick={() => map?.zoomOut()}>
+      <MapControlButton key="zoom-out" label="Zoom out" onClick={() => map?.zoomOut()}>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /></svg>
       </MapControlButton>,
     );
@@ -483,7 +484,7 @@ function MapControls({
   if (showCompass) {
     if (controls.length > 0) controls.push(<div key="compass-sep" className="h-px w-full bg-border" />);
     controls.push(
-      <MapControlButton key="compass" onClick={() => {
+      <MapControlButton key="compass" label="Compass" onClick={() => {
         if (onCompass) {
           onCompass();
         } else if (compassPoints) {
@@ -506,7 +507,7 @@ function MapControls({
   if (showLocate) {
     if (controls.length > 0) controls.push(<div key="locate-sep" className="h-px w-full bg-border" />);
     controls.push(
-      <MapControlButton key="locate" onClick={handleLocate}>
+      <MapControlButton key="locate" label="Locate" onClick={handleLocate}>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="2" x2="5" y1="12" y2="12" /><line x1="19" x2="22" y1="12" y2="12" /><line x1="12" x2="12" y1="2" y2="5" /><line x1="12" x2="12" y1="19" y2="22" /><circle cx="12" cy="12" r="7" /><circle cx="12" cy="12" r="3" /></svg>
       </MapControlButton>,
     );
@@ -515,7 +516,11 @@ function MapControls({
   if (showFullscreen) {
     if (controls.length > 0) controls.push(<div key="fs-sep" className="h-px w-full bg-border" />);
     controls.push(
-      <MapControlButton key="fullscreen" onClick={handleFullscreen}>
+      <MapControlButton
+        key="fullscreen"
+        label={isFullscreen ? "Exit full screen" : "Enter full screen"}
+        onClick={handleFullscreen}
+      >
         {isFullscreen ? (
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3" /><path d="M21 8h-3a2 2 0 0 1-2-2V3" /><path d="M3 16h3a2 2 0 0 1 2 2v3" /><path d="M16 21v-3a2 2 0 0 1 2-2h3" /></svg>
         ) : (

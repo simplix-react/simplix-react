@@ -62,6 +62,11 @@ function MonthYearSelect({
 
 /** Props for the {@link DatePicker} component. */
 export interface DatePickerProps {
+  /**
+   * Id placed on the trigger button so an enclosing field label can point its
+   * `htmlFor` at it — without it the label names nothing.
+   */
+  id?: string;
   /** Currently selected date. */
   value: Date | undefined;
   /** Called when the date changes. */
@@ -140,6 +145,7 @@ export interface DatePickerProps {
  * ```
  */
 export function DatePicker({
+  id,
   value,
   onChange,
   placeholder,
@@ -313,22 +319,29 @@ export function DatePicker({
     />
   );
 
+  const isClearable = clearable && value !== undefined && value !== null && !disabled;
+
+  // The clear affordance overlays the trigger instead of sitting inside it: a control nested in a
+  // control leaves the keyboard and assistive technology to guess which of the two a press belongs
+  // to, and the guesses disagree.
   return (
+    <span className={cn("relative inline-flex w-full items-center", className)}>
     <ResponsivePopover
       open={open}
       onOpenChange={handleOpenChange}
       title={defaultPlaceholder}
       trigger={
         <button
+          id={id}
           type="button"
           disabled={disabled}
           data-empty={!value}
           className={cn(
-            "inline-flex h-9 w-full items-center justify-start gap-2 rounded-md border border-input bg-background px-3 text-sm font-normal",
+            "inline-flex h-9 w-full items-center justify-start gap-2 rounded-md border border-input bg-background pl-3 text-sm font-normal",
             "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
             "disabled:cursor-not-allowed disabled:opacity-50",
             "data-[empty=true]:text-muted-foreground",
-            className,
+            isClearable ? "pr-9" : "pr-3",
           )}
         >
           <CalendarDotIcon className="h-4 w-4 shrink-0 opacity-50" />
@@ -339,19 +352,6 @@ export function DatePicker({
                 : formatDateMedium(value, bcp47)
               : defaultPlaceholder}
           </span>
-          {clearable && value && !disabled && (
-            <span
-              role="button"
-              tabIndex={0}
-              onClick={handleClear}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") handleClear(e as unknown as React.MouseEvent);
-              }}
-              className="rounded-sm p-0.5 hover:bg-muted transition-colors"
-            >
-              <XIcon className="h-3.5 w-3.5 opacity-50 hover:opacity-100" />
-            </span>
-          )}
         </button>
       }
     >
@@ -458,5 +458,16 @@ export function DatePicker({
           </div>
         </div>
     </ResponsivePopover>
+      {isClearable && (
+        <button
+          type="button"
+          aria-label={t("common.clear")}
+          onClick={handleClear}
+          className="absolute right-2 rounded-sm p-0.5 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        >
+          <XIcon className="h-3.5 w-3.5 opacity-50 hover:opacity-100" />
+        </button>
+      )}
+    </span>
   );
 }

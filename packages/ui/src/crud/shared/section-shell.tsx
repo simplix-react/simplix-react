@@ -107,7 +107,13 @@ export function SectionShell({
             {trailing}
             {collapsible && (
               <CollapsiblePrimitive.Trigger asChild>
-                <Button type="button" variant="ghost" size="icon-xs" className="size-6">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-xs"
+                  className="size-6"
+                  aria-label={open ? "Collapse" : "Expand"}
+                >
                   <CaretDownIcon
                     className={cn(
                       "h-4 w-4 transition-transform duration-200",

@@ -65,6 +65,11 @@ function MonthYearSelect({
 
 /** Props for the {@link DateRangePicker} component. */
 export interface DateRangePickerProps {
+  /**
+   * Id placed on the trigger button so an enclosing field label can point its
+   * `htmlFor` at it — without it the label names nothing.
+   */
+  id?: string;
   /** Currently selected date range. */
   value: DateRange;
   /** Called when the range changes. */
@@ -99,6 +104,7 @@ export interface DateRangePickerProps {
  * ```
  */
 export function DateRangePicker({
+  id,
   value,
   onChange,
   placeholder,
@@ -282,45 +288,35 @@ export function DateRangePicker({
     return yearFirst ? <>{yearSelect}{monthSelect}</> : <>{monthSelect}{yearSelect}</>;
   };
 
+  const isClearable = !!value.from && !disabled;
+
+  // The clear affordance overlays the trigger instead of sitting inside it: a control nested in a
+  // control leaves the keyboard and assistive technology to guess which of the two a press belongs
+  // to, and the guesses disagree.
   return (
+    <span className={cn("relative inline-flex w-full items-center", className)}>
     <ResponsivePopover
       open={open}
       onOpenChange={handleOpenChange}
       title={defaultPlaceholder}
       trigger={
         <button
+          id={id}
           type="button"
           disabled={disabled}
           data-empty={!value.from}
           className={cn(
-            "inline-flex h-9 w-full items-center justify-start gap-2 rounded-md border border-input bg-background px-3 text-sm font-normal",
+            "inline-flex h-9 w-full items-center justify-start gap-2 rounded-md border border-input bg-background pl-3 text-sm font-normal",
             "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
             "disabled:cursor-not-allowed disabled:opacity-50",
             "data-[empty=true]:text-muted-foreground",
-            className,
+            isClearable ? "pr-9" : "pr-3",
           )}
         >
           <CalendarDotsIcon className="h-4 w-4 shrink-0 opacity-50" />
           <span className="flex-1 truncate text-start">
             {displayText ?? defaultPlaceholder}
           </span>
-          {value.from && !disabled && (
-            <span
-              role="button"
-              tabIndex={0}
-              onClick={(e) => { e.stopPropagation(); handleClearField(); }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  handleClearField();
-                }
-              }}
-              className="rounded-sm p-0.5 hover:bg-muted transition-colors"
-            >
-              <XIcon className="h-3.5 w-3.5 opacity-50 hover:opacity-100" />
-            </span>
-          )}
         </button>
       }
     >
@@ -467,5 +463,16 @@ export function DateRangePicker({
           </div>
       </div>
     </ResponsivePopover>
+      {isClearable && (
+        <button
+          type="button"
+          aria-label={t("common.clear")}
+          onClick={handleClearField}
+          className="absolute right-2 rounded-sm p-0.5 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        >
+          <XIcon className="h-3.5 w-3.5 opacity-50 hover:opacity-100" />
+        </button>
+      )}
+    </span>
   );
 }

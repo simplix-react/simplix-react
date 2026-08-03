@@ -25,9 +25,11 @@ describe("DatePicker (extended coverage)", () => {
     const { container } = render(
       <DatePicker value={new Date(2024, 0, 15)} onChange={onChange} />,
     );
-    const clearBtn = container.querySelector("[role='button']");
-    expect(clearBtn).not.toBeNull();
-    fireEvent.keyDown(clearBtn!, { key: "Enter" });
+    // Enter and Space reach it through the platform's own button activation, which is the point
+    // of not hand-rolling the control out of a span.
+    const clearBtn = container.querySelectorAll("button")[1];
+    expect(clearBtn.tagName).toBe("BUTTON");
+    fireEvent.click(clearBtn);
     expect(onChange).toHaveBeenCalledWith(undefined);
   });
 
@@ -36,9 +38,11 @@ describe("DatePicker (extended coverage)", () => {
     const { container } = render(
       <DatePicker value={new Date(2024, 0, 15)} onChange={onChange} />,
     );
-    const clearBtn = container.querySelector("[role='button']");
-    expect(clearBtn).not.toBeNull();
-    fireEvent.keyDown(clearBtn!, { key: " " });
+    // Enter and Space reach it through the platform's own button activation, which is the point
+    // of not hand-rolling the control out of a span.
+    const clearBtn = container.querySelectorAll("button")[1];
+    expect(clearBtn.tagName).toBe("BUTTON");
+    fireEvent.click(clearBtn);
     expect(onChange).toHaveBeenCalledWith(undefined);
   });
 

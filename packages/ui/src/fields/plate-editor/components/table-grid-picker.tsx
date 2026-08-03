@@ -55,6 +55,7 @@ export function TableGridPicker({
               <button
                 key={`${row}-${col}`}
                 type="button"
+                aria-label={`${row} x ${col}`}
                 className={cn(
                   'h-4 w-4 border border-border rounded-[2px] transition-colors',
                   isHighlighted

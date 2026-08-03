@@ -63,8 +63,9 @@ describe("FacetedFilter (extended coverage)", () => {
         options={options}
       />,
     );
-    fireEvent.keyDown(screen.getByLabelText("filter.clearFilter"), { key: "Enter" });
-    expect(onChange).toHaveBeenCalledWith([]);
+    // Enter and Space reach it through the platform's own button activation,
+    // which is the point of not hand-rolling the control out of a span.
+    expect(screen.getByLabelText("filter.clearFilter").tagName).toBe("BUTTON");
   });
 
   it("handles keyboard clear with Space key", () => {
@@ -77,8 +78,9 @@ describe("FacetedFilter (extended coverage)", () => {
         options={options}
       />,
     );
-    fireEvent.keyDown(screen.getByLabelText("filter.clearFilter"), { key: " " });
-    expect(onChange).toHaveBeenCalledWith([]);
+    // Enter and Space reach it through the platform's own button activation,
+    // which is the point of not hand-rolling the control out of a span.
+    expect(screen.getByLabelText("filter.clearFilter").tagName).toBe("BUTTON");
   });
 
   it("does not clear on unrelated key press", () => {
@@ -134,9 +136,8 @@ describe("FacetedFilter (extended coverage)", () => {
         className="my-filter"
       />,
     );
-    // The root Popover trigger wraps in a parent
-    const btn = container.querySelector("button");
-    expect(btn?.className).toContain("my-filter");
+    const chip = container.querySelector("button")!.parentElement;
+    expect(chip?.className).toContain("my-filter");
   });
 
   it("opens popover and shows options with command list", () => {
@@ -210,7 +211,7 @@ describe("FacetedFilter (extended coverage)", () => {
         multiSelect={false}
       />,
     );
-    const btn = container.querySelector("button");
-    expect(btn?.className).toContain("border-dashed");
+    const chip = container.querySelector("button")!.parentElement;
+    expect(chip?.className).toContain("border-dashed");
   });
 });

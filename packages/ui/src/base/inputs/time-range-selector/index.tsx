@@ -585,8 +585,13 @@ export function TimeRangeSelector({
   // ── Render ──
   return (
     <div className={cn("relative w-full rounded-lg border border-border bg-card", className)}>
-      {/* Controls bar */}
-      <div className="flex min-w-0 items-center justify-between gap-2 px-2 pt-2 pb-1">
+      {/* Controls bar. It owns the sideways scroll, because it is the only row that can be wider
+          than the card: the preset row is a dozen buttons that neither wrap nor shrink, while the
+          heatmap and the labels under it are sized to whatever width they are given. The scroll
+          must NOT live on the root — one axis of `overflow` makes the browser compute the other
+          axis as `auto` too, and the hover tooltip is positioned to hang below the heatmap, so a
+          scrolling root turns it into a vertical scrollbar. */}
+      <div className="flex min-w-0 items-center justify-between gap-2 overflow-x-auto px-2 pt-2 pb-1">
         <div className="flex min-w-0 items-center gap-1.5">
           {/* The window, and the two things that can be done to the selection inside it —
               one set, because all three are about the span itself. */}

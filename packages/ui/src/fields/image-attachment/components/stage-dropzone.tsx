@@ -39,24 +39,20 @@ export function StageDropzone({
       ? allowedExtensions.map((e) => `.${e}`).join(', ')
       : null
 
+  // A drop target and a mouse shortcut, not a control: the CTA inside it is the control, and a
+  // control nested in a control leaves the keyboard and assistive technology to guess which of the
+  // two a press belongs to. The zone therefore takes no button role, no tab stop, and no key
+  // handler — reaching the picker from the keyboard goes through the CTA.
   return (
     <div
       className={cn(
         'absolute inset-0 grid place-items-center cursor-pointer',
         'bg-muted transition-[background]',
         isDragOver ? 'bg-[color-mix(in_srgb,var(--primary)_10%,transparent)]' : '',
-        'focus-visible:bg-[color-mix(in_srgb,var(--primary)_10%,transparent)]',
       )}
-      role="button"
-      tabIndex={0}
+      role="group"
       aria-label={t('file.stage.dropTitle')}
       onClick={() => inputRef.current?.click()}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          inputRef.current?.click()
-        }
-      }}
       {...dragProps}
     >
       {/* Dashed border affordance — same style as FileDropzone (border-2 border-dashed

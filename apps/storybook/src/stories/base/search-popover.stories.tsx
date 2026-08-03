@@ -108,6 +108,7 @@ export const FlatList: StoryObj = {
               <Text size="sm">{level.name}</Text>
               <button
                 type="button"
+                aria-label={`Remove ${level.name}`}
                 onClick={() => setAssigned((prev) => prev.filter((a) => a.id !== level.id))}
                 className="ml-1 text-muted-foreground hover:text-foreground"
               >
@@ -148,6 +149,7 @@ export const GroupedList: StoryObj = {
                 <Text size="sm">{door.name}</Text>
                 <button
                   type="button"
+                  aria-label={`Remove ${door.name}`}
                   onClick={() => setAssigned((prev) => prev.filter((d) => d.id !== door.id))}
                   className="text-muted-foreground hover:text-foreground"
                 >

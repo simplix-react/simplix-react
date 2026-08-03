@@ -313,6 +313,7 @@ export const ChipsMode: StoryObj = {
                 </span>
                 <button
                   type="button"
+                  aria-label={`Remove ${group.name}`}
                   onClick={() => setGroups((prev) => prev.filter((g) => g.id !== group.id))}
                   className="ml-1 rounded-sm text-muted-foreground hover:text-foreground"
                 >
@@ -405,6 +406,7 @@ export const CustomBody: StoryObj = {
                     <Text size="sm" className="font-medium">{door.name}</Text>
                     <button
                       type="button"
+                      aria-label={`Unlink ${door.name}`}
                       onClick={() => setDoors((prev) => prev.filter((d) => d.id !== door.id))}
                       className="text-muted-foreground hover:text-foreground"
                     >

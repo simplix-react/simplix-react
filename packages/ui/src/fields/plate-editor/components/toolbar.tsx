@@ -137,6 +137,11 @@ export const ToolbarButton = forwardRef<HTMLButtonElement, ToolbarButtonProps>(
         ref={ref}
         type="button"
         aria-pressed={pressed}
+        // A tooltip only describes an open trigger, it never names it, so an
+        // icon-only toolbar button takes its accessible name from the same
+        // word the tooltip carries. A caller-supplied aria-label still wins:
+        // it arrives in props, which spread after this.
+        aria-label={tooltip}
         disabled={disabled}
         className={cn(
           'inline-flex h-6 min-w-6 items-center justify-center rounded px-1 text-xs font-medium transition-colors',
