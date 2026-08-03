@@ -35,6 +35,7 @@ vi.mock("../../crud/form/use-before-unload", () => ({
 }));
 
 import React from "react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { CrudForm } from "../../crud/form/crud-form";
 
 describe("CrudForm (FormRoot)", () => {
@@ -63,6 +64,33 @@ describe("CrudForm (FormRoot)", () => {
     );
     fireEvent.submit(screen.getByTestId("crud-form"));
     expect(onSubmit).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not submit an ancestor form when a nested CrudForm submits through a portal", () => {
+    const hostSubmit = vi.fn();
+    // A nested form that does nothing in its own handler — the abort case must not
+    // re-open propagation either.
+    const nestedSubmit = vi.fn();
+
+    render(
+      <CrudForm onSubmit={hostSubmit}>
+        <DialogPrimitive.Root open>
+          <DialogPrimitive.Portal>
+            <DialogPrimitive.Content>
+              <DialogPrimitive.Title>Nested</DialogPrimitive.Title>
+              <CrudForm onSubmit={nestedSubmit}>
+                <button type="submit">Save nested</button>
+              </CrudForm>
+            </DialogPrimitive.Content>
+          </DialogPrimitive.Portal>
+        </DialogPrimitive.Root>
+      </CrudForm>,
+    );
+
+    fireEvent.click(screen.getByText("Save nested"));
+
+    expect(nestedSubmit).toHaveBeenCalledTimes(1);
+    expect(hostSubmit).not.toHaveBeenCalled();
   });
 
   it("renders header when provided", () => {

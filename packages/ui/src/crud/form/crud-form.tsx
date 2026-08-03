@@ -80,6 +80,12 @@ function FormRoot({
   const handleSubmit = useCallback(
     (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      // A CrudForm is its own submit boundary. React propagates events along the
+      // React tree rather than the DOM tree, so a form embedded in a portal (a
+      // child-entity panel in a dialog) would otherwise submit the host form too.
+      // Stopping before onSubmit keeps the boundary closed even when the handler
+      // aborts.
+      e.stopPropagation();
       onSubmit(e);
     },
     [onSubmit],
