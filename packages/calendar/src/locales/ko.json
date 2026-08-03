@@ -35,6 +35,7 @@
     "viewByResourceTimeline": "리소스 타임라인 보기",
     "viewByHeatmap": "히트맵 보기",
     "viewByGanttWeek": "주 타임라인 보기",
-    "viewByGanttDay": "일 타임라인 보기"
+    "viewByGanttDay": "일 타임라인 보기",
+    "selectTimeSlot": "{{time}} 선택"
   }
 }

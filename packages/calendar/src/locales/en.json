@@ -35,6 +35,7 @@
     "viewByResourceTimeline": "View by resource timeline",
     "viewByHeatmap": "View by heatmap",
     "viewByGanttWeek": "Week timeline view",
-    "viewByGanttDay": "Day timeline view"
+    "viewByGanttDay": "Day timeline view",
+    "selectTimeSlot": "Select {{time}}"
   }
 }
