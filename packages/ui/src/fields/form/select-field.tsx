@@ -58,13 +58,16 @@ export function SelectField<T extends string = string>({
 }: SelectFieldProps<T>) {
   const { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } = useFlatUIComponents();
 
-  const selectElement = (
+  // `id` lands on the trigger button — the labelable element the wrapper's
+  // label points at. Compact mode has no wrapper and so no id.
+  const renderSelect = (id?: string) => (
     <Select
       value={value}
       onValueChange={(v) => onChange(v as T)}
       disabled={disabled}
     >
       <SelectTrigger
+        id={id}
         aria-invalid={!!error}
         aria-label={compact ? label ?? placeholder : variantProps.layout === "hidden" ? label : undefined}
         className={compact ? "h-8 text-sm" : undefined}
@@ -109,7 +112,7 @@ export function SelectField<T extends string = string>({
             <option key={opt.value}>{opt.label}</option>
           ))}
         </select>
-        <span className="col-start-1 row-start-1">{selectElement}</span>
+        <span className="col-start-1 row-start-1">{renderSelect()}</span>
       </span>
     );
   }
@@ -125,7 +128,7 @@ export function SelectField<T extends string = string>({
       className={className}
       {...variantProps}
     >
-      {selectElement}
+      {({ id }) => renderSelect(id)}
     </FieldWrapper>
   );
 }

@@ -112,22 +112,25 @@ export function DateTimeField({
       className={className}
       {...variantProps}
     >
-      <DatePicker
-        value={parsed}
-        onChange={handleChange}
-        minDate={minDate}
-        maxDate={maxDate}
-        locale={locale}
-        placeholder={placeholder}
-        startYear={startYear}
-        endYear={endYear}
-        disabled={disabled}
-        showTime={!hideTime}
-        hour12={hour12}
-        minuteStep={minuteStep}
-        displayZone={zone}
-        displayZoneLabel={displayZoneLabel}
-      />
+      {({ id }) => (
+        <DatePicker
+          id={id}
+          value={parsed}
+          onChange={handleChange}
+          minDate={minDate}
+          maxDate={maxDate}
+          locale={locale}
+          placeholder={placeholder}
+          startYear={startYear}
+          endYear={endYear}
+          disabled={disabled}
+          showTime={!hideTime}
+          hour12={hour12}
+          minuteStep={minuteStep}
+          displayZone={zone}
+          displayZoneLabel={displayZoneLabel}
+        />
+      )}
     </FieldWrapper>
   );
 }

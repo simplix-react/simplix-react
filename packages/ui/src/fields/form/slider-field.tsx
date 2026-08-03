@@ -53,31 +53,34 @@ export function SliderField({
       className={className}
       {...variantProps}
     >
-      <span className="flex items-center gap-3">
-        <input
-          type="range"
-          value={value}
-          onChange={(e) => onChange(Number(e.target.value))}
-          min={min}
-          max={max}
-          step={step}
-          disabled={disabled}
-          aria-invalid={!!error}
-          aria-label={
-            variantProps.layout === "hidden" ? label : undefined
-          }
-          aria-valuemin={min}
-          aria-valuemax={max}
-          aria-valuenow={value}
-          {...inputProps}
-          className={cn("w-full", inputProps?.className)}
-        />
-        {showValue && (
-          <span className="min-w-[3ch] text-right text-sm tabular-nums text-muted-foreground">
-            {value}
-          </span>
-        )}
-      </span>
+      {({ id }) => (
+        <span className="flex items-center gap-3">
+          <input
+            id={id}
+            type="range"
+            value={value}
+            onChange={(e) => onChange(Number(e.target.value))}
+            min={min}
+            max={max}
+            step={step}
+            disabled={disabled}
+            aria-invalid={!!error}
+            aria-label={
+              variantProps.layout === "hidden" ? label : undefined
+            }
+            aria-valuemin={min}
+            aria-valuemax={max}
+            aria-valuenow={value}
+            {...inputProps}
+            className={cn("w-full", inputProps?.className)}
+          />
+          {showValue && (
+            <span className="min-w-[3ch] text-right text-sm tabular-nums text-muted-foreground">
+              {value}
+            </span>
+          )}
+        </span>
+      )}
     </FieldWrapper>
   );
 }

@@ -57,26 +57,29 @@ export function NumberField({
       className={className}
       {...variantProps}
     >
-      <NumberInput
-        value={value === null ? "" : String(value)}
-        onChange={onChange}
-        // The NumberInput change handler ignores empty input (nothing to
-        // parse); catch it here so clearing the field propagates null.
-        onChangeCapture={(e) => {
-          if ((e.target as HTMLInputElement).value === "") onChange(null);
-        }}
-        min={min}
-        max={max}
-        step={step}
-        placeholder={placeholder}
-        disabled={disabled}
-        required={required}
-        suffix={suffix}
-        aria-invalid={!!error}
-        aria-label={variantProps.layout === "hidden" ? label : undefined}
-        {...inputProps}
-        className={cn("h-9", error && "border-destructive", inputProps?.className)}
-      />
+      {({ id }) => (
+        <NumberInput
+          id={id}
+          value={value === null ? "" : String(value)}
+          onChange={onChange}
+          // The NumberInput change handler ignores empty input (nothing to
+          // parse); catch it here so clearing the field propagates null.
+          onChangeCapture={(e) => {
+            if ((e.target as HTMLInputElement).value === "") onChange(null);
+          }}
+          min={min}
+          max={max}
+          step={step}
+          placeholder={placeholder}
+          disabled={disabled}
+          required={required}
+          suffix={suffix}
+          aria-invalid={!!error}
+          aria-label={variantProps.layout === "hidden" ? label : undefined}
+          {...inputProps}
+          className={cn("h-9", error && "border-destructive", inputProps?.className)}
+        />
+      )}
     </FieldWrapper>
   );
 }

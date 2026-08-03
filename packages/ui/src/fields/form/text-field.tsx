@@ -92,19 +92,22 @@ export function TextField({
       className={className}
       {...variantProps}
     >
-      <Input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        maxLength={maxLength}
-        disabled={disabled}
-        required={required}
-        aria-invalid={!!error}
-        aria-label={variantProps.layout === "hidden" ? label : undefined}
-        {...inputProps}
-        className={cn(error && "border-destructive", inputProps?.className)}
-      />
+      {({ id }) => (
+        <Input
+          id={id}
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          maxLength={maxLength}
+          disabled={disabled}
+          required={required}
+          aria-invalid={!!error}
+          aria-label={variantProps.layout === "hidden" ? label : undefined}
+          {...inputProps}
+          className={cn(error && "border-destructive", inputProps?.className)}
+        />
+      )}
     </FieldWrapper>
   );
 }

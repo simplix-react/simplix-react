@@ -60,15 +60,18 @@ export function TimeField({
       className={className}
       {...variantProps}
     >
-      <TimePicker
-        value={value ?? undefined}
-        onChange={onChange}
-        hour12={hour12}
-        minuteStep={minuteStep}
-        minTime={minTime}
-        maxTime={maxTime}
-        disabled={disabled}
-      />
+      {({ labelId }) => (
+        <TimePicker
+          aria-labelledby={labelId}
+          value={value ?? undefined}
+          onChange={onChange}
+          hour12={hour12}
+          minuteStep={minuteStep}
+          minTime={minTime}
+          maxTime={maxTime}
+          disabled={disabled}
+        />
+      )}
     </FieldWrapper>
   );
 }

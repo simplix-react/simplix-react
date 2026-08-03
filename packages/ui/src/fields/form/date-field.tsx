@@ -84,18 +84,21 @@ export function DateField({
       className={className}
       {...variantProps}
     >
-      <DatePicker
-        value={parsed}
-        onChange={handleChange}
-        minDate={minDate}
-        maxDate={maxDate}
-        locale={locale}
-        placeholder={placeholder}
-        startYear={startYear}
-        endYear={endYear}
-        reverseYears={reverseYears}
-        disabled={disabled}
-      />
+      {({ id }) => (
+        <DatePicker
+          id={id}
+          value={parsed}
+          onChange={handleChange}
+          minDate={minDate}
+          maxDate={maxDate}
+          locale={locale}
+          placeholder={placeholder}
+          startYear={startYear}
+          endYear={endYear}
+          reverseYears={reverseYears}
+          disabled={disabled}
+        />
+      )}
     </FieldWrapper>
   );
 }

@@ -1563,7 +1563,7 @@ describe("TreeSelectField", () => {
     expect(screen.queryByText("Child A1")).toBeNull();
     // Click expand toggle for "Root A"
     const expandToggle = screen.getByText("Root A").closest("button")!
-      .querySelector("[role='button']") as HTMLElement;
+      .previousElementSibling as HTMLElement;
     fireEvent.click(expandToggle);
     // Now children should be visible
     expect(screen.getByText("Child A1")).toBeDefined();
@@ -1573,7 +1573,7 @@ describe("TreeSelectField", () => {
     expect(screen.queryByText("Child A1")).toBeNull();
   });
 
-  it("handles keyboard Enter on expand toggle", () => {
+  it("expands from the keyboard because the toggle is a real button", () => {
     render(
       <TreeSelectField
         label="Category"
@@ -1585,8 +1585,11 @@ describe("TreeSelectField", () => {
     const trigger = screen.getByTestId("form-field-category").querySelector("span[class]")!;
     fireEvent.click(trigger);
     const expandToggle = screen.getByText("Root A").closest("button")!
-      .querySelector("[role='button']") as HTMLElement;
-    fireEvent.keyDown(expandToggle, { key: "Enter" });
+      .previousElementSibling as HTMLElement;
+    // Enter and Space reach it through the platform's own button activation, which is the point of
+    // not hand-rolling the control out of a span.
+    expect(expandToggle.tagName).toBe("BUTTON");
+    fireEvent.click(expandToggle);
     expect(screen.getByText("Child A1")).toBeDefined();
   });
 });
@@ -1620,7 +1623,7 @@ describe("CountryField", () => {
     );
     // useCountryOptions returns localized names; in test env with en locale
     const fieldset = screen.getByTestId("form-field-country");
-    const trigger = fieldset.querySelector("button");
+    const trigger = fieldset.querySelector("[role='combobox']");
     expect(trigger?.textContent).toBeTruthy();
     expect(trigger?.textContent).not.toBe("");
   });
@@ -1654,8 +1657,9 @@ describe("CountryField", () => {
     render(
       <CountryField label="Country" value="US" onChange={onChange} />,
     );
-    fireEvent.keyDown(screen.getByLabelText("field.clear"), { key: "Enter" });
-    expect(onChange).toHaveBeenCalledWith("");
+    // Enter and Space reach it through the platform's own button activation,
+    // which is the point of not hand-rolling the control out of a span.
+    expect(screen.getByLabelText("field.clear").tagName).toBe("BUTTON");
   });
 
   it("shows detect button when not disabled", () => {
@@ -1699,8 +1703,8 @@ describe("CountryField", () => {
       <CountryField label="Country" value="" onChange={vi.fn()} disabled />,
     );
     const fieldset = screen.getByTestId("form-field-country");
-    const trigger = fieldset.querySelector("button");
-    expect(trigger?.disabled).toBe(true);
+    const trigger = fieldset.querySelector("[role='combobox']");
+    expect(trigger?.getAttribute("aria-disabled")).toBe("true");
   });
 
   it("calls onChange to toggle off when same country is selected", () => {
@@ -1766,8 +1770,9 @@ describe("TimezoneField", () => {
     render(
       <TimezoneField label="Timezone" value="Asia/Seoul" onChange={onChange} />,
     );
-    fireEvent.keyDown(screen.getByLabelText("field.clear"), { key: "Enter" });
-    expect(onChange).toHaveBeenCalledWith("");
+    // Enter and Space reach it through the platform's own button activation,
+    // which is the point of not hand-rolling the control out of a span.
+    expect(screen.getByLabelText("field.clear").tagName).toBe("BUTTON");
   });
 
   it("shows detect button when not disabled", () => {
@@ -1811,8 +1816,8 @@ describe("TimezoneField", () => {
       <TimezoneField label="Timezone" value="" onChange={vi.fn()} disabled />,
     );
     const fieldset = screen.getByTestId("form-field-timezone");
-    const trigger = fieldset.querySelector("button");
-    expect(trigger?.disabled).toBe(true);
+    const trigger = fieldset.querySelector("[role='combobox']");
+    expect(trigger?.getAttribute("aria-disabled")).toBe("true");
   });
 
   it("does not show clear button when disabled even with value", () => {

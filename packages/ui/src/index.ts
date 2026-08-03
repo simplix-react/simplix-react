@@ -594,7 +594,7 @@ export { ArrowLeftIcon } from "./crud/shared/icons";
 
 // Field components
 export { CropModal, cropImageToFile, DetailFields, DetailFieldWrapper, FieldMessage, FieldWrapper, FormFields } from "./fields";
-export type { CropArea, CropModalProps, DetailFieldWrapperProps, FieldMessageProps, FieldWrapperProps } from "./fields";
+export type { CropArea, CropModalProps, DetailFieldWrapperProps, FieldControlProps, FieldMessageProps, FieldWrapperChildren, FieldWrapperProps } from "./fields";
 export { I18nText } from "./fields/detail/i18n-text-field";
 export type { I18nTextProps } from "./fields/detail/i18n-text-field";
 
@@ -623,6 +623,7 @@ export type {
 } from "./crud/patterns";
 
 // CRUD list hooks
+export { useContainerWidth } from "./crud/list/use-container-width";
 export { useUrlSync } from "./crud/list/use-url-sync";
 export type { UseUrlSyncOptions } from "./crud/list/use-url-sync";
 export { useVirtualList } from "./crud/list/use-virtual";

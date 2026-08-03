@@ -8,7 +8,7 @@ export { FieldMessage } from "./shared/field-message";
 export type { FieldMessageProps } from "./shared/field-message";
 
 export { FieldWrapper } from "./shared/field-wrapper";
-export type { FieldWrapperProps } from "./shared/field-wrapper";
+export type { FieldControlProps, FieldWrapperChildren, FieldWrapperProps } from "./shared/field-wrapper";
 
 export { CropModal, cropImageToFile } from "./image-attachment";
 export type { CropModalProps, CropArea } from "./image-attachment";

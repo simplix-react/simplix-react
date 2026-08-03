@@ -54,15 +54,18 @@ export function SwitchField({
       layout={layout}
       {...variantProps}
     >
-      <Switch
-        checked={value}
-        onCheckedChange={onChange}
-        disabled={disabled}
-        aria-invalid={!!error}
-        aria-label={layout === "hidden" ? label : undefined}
-        size={"sm"}
-        {...switchProps}
-      />
+      {({ id }) => (
+        <Switch
+          id={id}
+          checked={value}
+          onCheckedChange={onChange}
+          disabled={disabled}
+          aria-invalid={!!error}
+          aria-label={layout === "hidden" ? label : undefined}
+          size={"sm"}
+          {...switchProps}
+        />
+      )}
     </FieldWrapper>
   );
 }

@@ -58,17 +58,20 @@ export function IconField({
       className={className}
       {...variantProps}
     >
-      <IconPicker
-        value={value as IconName}
-        onChange={onChange}
-        categorized={categorized}
-        iconsList={iconsList}
-        triggerPlaceholder={triggerPlaceholder}
-        modal={modal}
-        lang={lang}
-        disabled={disabled}
-        aria-label={variantProps.layout === "hidden" ? label : undefined}
-      />
+      {({ id }) => (
+        <IconPicker
+          id={id}
+          value={value as IconName}
+          onChange={onChange}
+          categorized={categorized}
+          iconsList={iconsList}
+          triggerPlaceholder={triggerPlaceholder}
+          modal={modal}
+          lang={lang}
+          disabled={disabled}
+          aria-label={variantProps.layout === "hidden" ? label : undefined}
+        />
+      )}
     </FieldWrapper>
   );
 }

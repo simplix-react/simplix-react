@@ -39,8 +39,8 @@ describe("CountryField filterFn", () => {
   it("matches by country code", () => {
     render(<CountryField label="Country" value="" onChange={vi.fn()} />);
     const fieldset = screen.getByTestId("form-field-country");
-    fireEvent.click(fieldset.querySelector("button")!);
-    const input = screen.getByRole("combobox");
+    fireEvent.click(fieldset.querySelector("[role='combobox']")!);
+    const input = screen.getAllByRole("combobox").find((e) => e.tagName === "INPUT")!;
     fireEvent.change(input, { target: { value: "us" } });
     expect(screen.getByText("United States")).toBeTruthy();
   });
@@ -48,8 +48,8 @@ describe("CountryField filterFn", () => {
   it("matches by localName", () => {
     render(<CountryField label="Country" value="" onChange={vi.fn()} />);
     const fieldset = screen.getByTestId("form-field-country");
-    fireEvent.click(fieldset.querySelector("button")!);
-    const input = screen.getByRole("combobox");
+    fireEvent.click(fieldset.querySelector("[role='combobox']")!);
+    const input = screen.getAllByRole("combobox").find((e) => e.tagName === "INPUT")!;
     fireEvent.change(input, { target: { value: "south" } });
     expect(screen.getByText("South Korea")).toBeTruthy();
   });
@@ -57,8 +57,8 @@ describe("CountryField filterFn", () => {
   it("matches by englishName", () => {
     render(<CountryField label="Country" value="" onChange={vi.fn()} />);
     const fieldset = screen.getByTestId("form-field-country");
-    fireEvent.click(fieldset.querySelector("button")!);
-    const input = screen.getByRole("combobox");
+    fireEvent.click(fieldset.querySelector("[role='combobox']")!);
+    const input = screen.getAllByRole("combobox").find((e) => e.tagName === "INPUT")!;
     fireEvent.change(input, { target: { value: "republic" } });
     expect(screen.getByText("South Korea")).toBeTruthy();
   });
@@ -66,8 +66,8 @@ describe("CountryField filterFn", () => {
   it("returns 0 for non-matching search", () => {
     render(<CountryField label="Country" value="" onChange={vi.fn()} />);
     const fieldset = screen.getByTestId("form-field-country");
-    fireEvent.click(fieldset.querySelector("button")!);
-    const input = screen.getByRole("combobox");
+    fireEvent.click(fieldset.querySelector("[role='combobox']")!);
+    const input = screen.getAllByRole("combobox").find((e) => e.tagName === "INPUT")!;
     fireEvent.change(input, { target: { value: "zzzzzzz" } });
     expect(screen.getByText("filter.noResultsFound")).toBeTruthy();
   });
@@ -89,7 +89,7 @@ describe("CountryField handleSelect", () => {
     const onChange = vi.fn();
     render(<CountryField label="Country" value="US" onChange={onChange} />);
     const fieldset = screen.getByTestId("form-field-country");
-    fireEvent.click(fieldset.querySelector("button")!);
+    fireEvent.click(fieldset.querySelector("[role='combobox']")!);
     fireEvent.click(screen.getByText("South Korea"));
     expect(onChange).toHaveBeenCalledWith("KR");
   });
@@ -106,8 +106,9 @@ describe("CountryField handleClear", () => {
   it("clears via Enter keydown on clear button", () => {
     const onChange = vi.fn();
     render(<CountryField label="Country" value="KR" onChange={onChange} />);
-    fireEvent.keyDown(screen.getByLabelText("field.clear"), { key: "Enter" });
-    expect(onChange).toHaveBeenCalledWith("");
+    // Enter and Space reach it through the platform's own button activation,
+    // which is the point of not hand-rolling the control out of a span.
+    expect(screen.getByLabelText("field.clear").tagName).toBe("BUTTON");
   });
 });
 

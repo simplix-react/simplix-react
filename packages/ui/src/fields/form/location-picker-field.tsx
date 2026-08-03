@@ -142,6 +142,7 @@ export function LocationPickerField({
               disabled={disabled}
               onClick={() => setOpen(true)}
               className="block w-full transition-opacity hover:opacity-90 disabled:pointer-events-none disabled:opacity-50"
+              aria-label="Open map"
             >
               <div className="pointer-events-none h-[150px] bg-neutral-100 dark:bg-neutral-900">
                 <Map

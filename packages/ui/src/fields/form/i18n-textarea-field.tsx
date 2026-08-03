@@ -81,23 +81,26 @@ export function I18nTextareaField({
       className={className}
       {...variantProps}
     >
-      <Textarea
-        value={value?.[currentLang] ?? ""}
-        onChange={(e) => onChange({ ...value, [currentLang]: e.target.value })}
-        placeholder={currentPlaceholder}
-        maxLength={maxLength}
-        rows={rows}
-        required={required}
-        disabled={disabled}
-        aria-invalid={!!error}
-        aria-label={variantProps.layout === "hidden" ? label : undefined}
-        {...textareaProps}
-        className={cn(
-          resizeClasses[resize],
-          error && "border-destructive",
-          textareaProps?.className,
-        )}
-      />
+      {({ id }) => (
+        <Textarea
+          id={id}
+          value={value?.[currentLang] ?? ""}
+          onChange={(e) => onChange({ ...value, [currentLang]: e.target.value })}
+          placeholder={currentPlaceholder}
+          maxLength={maxLength}
+          rows={rows}
+          required={required}
+          disabled={disabled}
+          aria-invalid={!!error}
+          aria-label={variantProps.layout === "hidden" ? label : undefined}
+          {...textareaProps}
+          className={cn(
+            resizeClasses[resize],
+            error && "border-destructive",
+            textareaProps?.className,
+          )}
+        />
+      )}
     </FieldWrapper>
   );
 }

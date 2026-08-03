@@ -1,21 +1,23 @@
-import type { ReactNode } from "react";
-
 import type { CommonFieldProps } from "../../crud/shared/types";
-import { FieldWrapper } from "../shared/field-wrapper";
+import { FieldWrapper, type FieldWrapperChildren } from "../shared/field-wrapper";
 
 /** Props for the generic {@link Field} form wrapper. */
 export interface FormFieldProps extends CommonFieldProps {
-  children: ReactNode;
+  children: FieldWrapperChildren;
 }
 
 /**
  * Generic field wrapper for custom content. Provides label, error,
  * and description display around arbitrary children.
  *
+ * Take the render-function form when the content has a control of its own —
+ * it hands over the ids the label needs, which is what gives the control an
+ * accessible name.
+ *
  * @example
  * ```tsx
  * <Field label="Custom Widget" error={errors.widget}>
- *   <MyCustomWidget value={val} onChange={setVal} />
+ *   {({ id }) => <MyCustomWidget id={id} value={val} onChange={setVal} />}
  * </Field>
  * ```
  */
