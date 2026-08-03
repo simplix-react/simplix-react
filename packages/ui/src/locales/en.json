@@ -45,6 +45,7 @@
     "unavailable": "The list could not be loaded.",
     "noResults": "No results",
     "totalCount": "Total {{count}}",
+    "totalCountUnknown": "Total —",
     "rows": "Rows:",
     "viewList": "List",
     "viewGrid": "Grid",

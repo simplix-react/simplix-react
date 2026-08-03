@@ -45,6 +45,7 @@
     "unavailable": "リストを読み込めませんでした。",
     "noResults": "結果なし",
     "totalCount": "全{{count}}件",
+    "totalCountUnknown": "全—件",
     "rows": "行:",
     "viewList": "リスト",
     "viewGrid": "グリッド",

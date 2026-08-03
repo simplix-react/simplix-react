@@ -7,7 +7,7 @@ import {
   useReactTable,
   type VisibilityState,
 } from "@tanstack/react-table";
-import {createElement, type ReactNode, useCallback, useEffect, useMemo, useRef, useState,} from "react";
+import {createElement, type ReactNode, type Ref, useCallback, useEffect, useMemo, useRef, useState,} from "react";
 
 import {
   type BadgeVariants,
@@ -100,9 +100,17 @@ function EmptyReasonCard({ reason, bordered = true }: { reason: Exclude<EmptyRea
 export interface ListProps {
   className?: string;
   children?: ReactNode;
+  /**
+   * The list's own outermost element.
+   *
+   * <p>What a screen measures when its column set depends on how much room the list actually has —
+   * which is not how much the window has, because a detail panel takes most of it. Pair with
+   * `useContainerWidth`.
+   */
+  ref?: Ref<HTMLDivElement>;
 }
 
-function ListRoot({ className, children }: ListProps) {
+function ListRoot({ className, children, ref }: ListProps) {
   const [columns, setColumns] = useState<ColumnInfo[]>([]);
   const [hiddenColumns, setHiddenColumns] = useState<Set<string>>(new Set());
   const [isCardMode, setIsCardMode] = useState(false);
@@ -121,6 +129,7 @@ function ListRoot({ className, children }: ListProps) {
   return (
     <CrudListColumnContext.Provider value={columnCtx}>
       <Stack
+        ref={ref}
         gap="sm"
         className={cn("w-full", className)}
         data-testid="crud-list"
@@ -247,6 +256,22 @@ export interface ListColumnProps<T> {
    * width, and on a sortable column the sort icon shares it with the label.
    */
   width?: number;
+  /**
+   * The column's floor in pixels, rather than its whole allowance: it never
+   * renders narrower than this, and it takes a share of whatever width the
+   * table has left over. The cell stops contributing its own content to the
+   * table's intrinsic width, so long values ellipsize instead of widening the
+   * column, and a table with room to spare spends that room here.
+   *
+   * Use this where the value is free text of unpredictable length — a summary,
+   * a target, a description. Use {@link width} instead where the column holds
+   * something of known size and extra room would only be padding.
+   *
+   * The cell's own content must fill the cell for the extra width to be
+   * visible: render it as a block that truncates (`className="block truncate"`)
+   * and give it no width of its own. Ignored when {@link width} is also set.
+   */
+  minWidth?: number;
   display?: "badge" | "boolean" | "country" | "phone";
   format?: "date" | "datetime" | "time" | "relative";
   /**
@@ -882,6 +907,13 @@ function ListTable<T>({
 
     for (let i = 0; i < columnDefs.length; i++) {
       const colDef = columnDefs[i];
+      // Both props size the header box the same way; they differ only in whether
+      // the body cell is allowed to widen the column past it (see `flexible`).
+      const declaredWidth = colDef.width ?? colDef.minWidth;
+      // A floor rather than a fixed width: the header holds the column open at
+      // `minWidth`, and zeroing the body cell's max-width keeps the data from
+      // setting the column's intrinsic width, so spare table width lands here.
+      const flexible = colDef.width === undefined && colDef.minWidth !== undefined;
       cols.push({
         id: colDef.field ?? `_col_${i}`,
         accessorFn: colDef.field
@@ -895,7 +927,7 @@ function ListTable<T>({
           // column's intrinsic width in the auto table layout — otherwise the
           // nowrap label keeps the column as wide as its longest header. The label
           // then ellipsizes and carries its full text in a tooltip.
-          const headerStyle = colDef.width ? { width: colDef.width } : undefined;
+          const headerStyle = declaredWidth ? { width: declaredWidth } : undefined;
 
           const content =
             colDef.sortable && colDef.field ? (
@@ -911,7 +943,7 @@ function ListTable<T>({
                 <span className="truncate">{label}</span>
                 <SortIcon direction={dir} />
               </button>
-            ) : colDef.width ? (
+            ) : declaredWidth ? (
               <span className="block truncate" style={headerStyle}>
                 {label}
               </span>
@@ -921,7 +953,7 @@ function ListTable<T>({
 
           // A width-constrained header can ellipsize, so its full text stays
           // reachable on hover / keyboard focus.
-          if (colDef.width && label) {
+          if (declaredWidth && label) {
             return (
               <TooltipProvider delayDuration={200}>
                 <Tooltip>
@@ -974,7 +1006,8 @@ function ListTable<T>({
               : colDef.displayZone) ?? defaultDisplayZone;
           return formatCellValue(value, colDef.format, locale, cellZone);
         },
-        size: colDef.width,
+        size: declaredWidth,
+        meta: { flexible },
       });
     }
 
@@ -1245,7 +1278,21 @@ function ListTable<T>({
                           data-testid={`list-row-${rid}`}
                         >
                           {row.getVisibleCells().map((cell) => (
-                            <TableCell key={cell.id} className="truncate">
+                            // A `minWidth` column zeroes its cell's max-width so the auto table
+                            // layout stops reading the cell's content as the column's minimum.
+                            // The column then rests on the header's declared width and grows
+                            // into whatever the table has spare; the cell renders at the
+                            // column's width regardless of the zero.
+                            <TableCell
+                              key={cell.id}
+                              className="truncate"
+                              style={
+                                (cell.column.columnDef.meta as { flexible?: boolean } | undefined)
+                                  ?.flexible
+                                  ? { maxWidth: 0 }
+                                  : undefined
+                              }
+                            >
                               {flexRender(cell.column.columnDef.cell, cell.getContext())}
                             </TableCell>
                           ))}

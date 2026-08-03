@@ -45,6 +45,7 @@
     "unavailable": "목록을 불러오지 못했습니다.",
     "noResults": "결과 없음",
     "totalCount": "전체 {{count}}건",
+    "totalCountUnknown": "전체 —건",
     "rows": "행:",
     "viewList": "목록",
     "viewGrid": "그리드",

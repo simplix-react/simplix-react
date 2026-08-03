@@ -83,6 +83,25 @@ describe("FilterBar", () => {
     expect(screen.getByRole("button", { name: "filter.label" })).toBeTruthy();
   });
 
+  it("keeps the total badge in place while the count is unknown", () => {
+    const state = createMockState();
+    const { rerender } = render(
+      <FilterBar filters={[textFilter]} state={{ ...state, isLoading: true }} count={0} />,
+    );
+    // Loading must not read as "nothing here", and the badge must not appear
+    // only once the value lands — that shifts the toolbar.
+    expect(screen.getByText("list.totalCountUnknown")).toBeTruthy();
+
+    rerender(<FilterBar filters={[textFilter]} state={state} count={12} />);
+    expect(screen.getByText("12 selected")).toBeTruthy();
+  });
+
+  it("lets a standalone FilterBar declare the count unknown itself", () => {
+    const state = createMockState();
+    render(<FilterBar filters={[textFilter]} state={state} countLoading />);
+    expect(screen.getByText("list.totalCountUnknown")).toBeTruthy();
+  });
+
   it("renders leading content", () => {
     const state = createMockState();
     render(
