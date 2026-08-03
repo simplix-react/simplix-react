@@ -2,8 +2,9 @@
 // so the monorepo version is defined in exactly one place: the repository root.
 //
 // Usage:
-//   node scripts/sync-version.mjs          # write root version to all packages
-//   node scripts/sync-version.mjs --check  # exit 1 if any package is out of sync (no writes)
+//   node scripts/sync-version.mjs               # write root version to all packages
+//   node scripts/sync-version.mjs --check       # exit 1 if any package is out of sync (no writes)
+//   node scripts/sync-version.mjs --set X.Y.Z   # set the root version, then propagate it
 //
 // Internal dependencies use `workspace:*` and are rewritten to the concrete
 // version at publish time by pnpm, so only the top-level "version" field is touched here.
@@ -43,17 +44,40 @@ function findPackageJsonFiles(dir, found = []) {
 }
 
 const checkOnly = process.argv.includes('--check');
+const setIndex = process.argv.indexOf('--set');
+const setVersion = setIndex !== -1 ? process.argv[setIndex + 1] : null;
+
+// Only the FIRST `"version": "..."` (the top-level field) is replaced; nested
+// keys in package.json never use the literal key `version`.
+const versionField = /("version"\s*:\s*)"[^"]*"/;
 
 const rootPkgPath = join(repoRoot, 'package.json');
+
+// `--set` moves the single source of truth, then falls through to the same
+// propagation, so the release flow can retarget the version in one command.
+if (setVersion) {
+  if (checkOnly) {
+    console.error('✖ --set cannot be combined with --check');
+    process.exit(1);
+  }
+  if (!/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(setVersion)) {
+    console.error(`✖ --set expects a semver version, got "${setVersion ?? ''}"`);
+    process.exit(1);
+  }
+  const rootRaw = readFileSync(rootPkgPath, 'utf8');
+  if (!versionField.test(rootRaw)) {
+    console.error('✖ root package.json has no "version" field to set');
+    process.exit(1);
+  }
+  writeFileSync(rootPkgPath, rootRaw.replace(versionField, `$1"${setVersion}"`));
+  console.log(`✔ set root version to ${setVersion}`);
+}
+
 const rootVersion = JSON.parse(readFileSync(rootPkgPath, 'utf8')).version;
 if (!rootVersion) {
   console.error('✖ root package.json has no "version" field');
   process.exit(1);
 }
-
-// Only the FIRST `"version": "..."` (the top-level field) is replaced; nested
-// keys in package.json never use the literal key `version`.
-const versionField = /("version"\s*:\s*)"[^"]*"/;
 
 const targets = findPackageJsonFiles(repoRoot).filter((file) => file !== rootPkgPath);
 

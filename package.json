@@ -1,6 +1,6 @@
 {
   "name": "simplix-react",
-  "version": "0.3.0",
+  "version": "0.3.0-SNAPSHOT",
   "private": true,
   "description": "Package-first React framework that auto-generates reusable domain packages from OpenAPI specs",
   "type": "module",
@@ -13,7 +13,7 @@
     "clean": "turbo run clean",
     "docs:api": "typedoc",
     "sync-version": "node scripts/sync-version.mjs",
-    "release": "pnpm sync-version && turbo run build && pnpm -r publish --access public",
+    "release": "node -e \"if(require('./package.json').version.endsWith('-SNAPSHOT')){console.error('Refusing to publish a -SNAPSHOT version; releases run via .github/workflows/release.yml');process.exit(1)}\" && pnpm sync-version && turbo run build && pnpm -r publish --access public",
     "storybook": "pnpm --filter @simplix-react/storybook storybook",
     "dev:storybook": "turbo run dev storybook --filter=@simplix-react/ui --filter=@simplix-react/storybook --concurrency=3",
     "build:storybook": "turbo run build-storybook"
