@@ -365,6 +365,7 @@ function generateHandlerEntry(
 
   const store = storeName ?? `${entity.name}Store`;
   const idField = findIdField(entity);
+  const hasId = hasDeclaredIdField(entity);
   const pathParam = extractPathParam(operation.path);
   const isNumericId = isIdFieldNumeric(entity);
   const paramIsIdField = !pathParam || isPathParamIdField(pathParam, idField);
@@ -388,7 +389,7 @@ function generateHandlerEntry(
       break;
     case "update":
       entry = paramIsIdField
-        ? generateUpdateHandler(method, pattern, store, typeName, pathParam, idField, isNumericId, isVoid)
+        ? generateUpdateHandler(method, pattern, store, typeName, pathParam, idField, isNumericId, isVoid, hasId)
         : generateUpdateByFieldHandler(method, pattern, store, typeName, pathParam!, idField, isVoid);
       break;
     case "delete":
@@ -398,7 +399,7 @@ function generateHandlerEntry(
       break;
     case "multiUpdate":
     case "batchUpdate":
-      entry = generateUpdateHandler(method, pattern, store, typeName, undefined, idField, isNumericId, isVoid);
+      entry = generateUpdateHandler(method, pattern, store, typeName, undefined, idField, isNumericId, isVoid, hasId);
       break;
     case "getForEdit": {
       const parentParam = extractParentPathParam(operation.path);
@@ -594,6 +595,7 @@ function generateUpdateHandler(
   idField: string,
   isNumericId: boolean,
   isVoid: boolean,
+  hasId: boolean,
 ): string {
   if (pathParam) {
     const idExpr = isNumericId
@@ -605,12 +607,20 @@ function generateUpdateHandler(
     return `    http.${method}("${pattern}", async ({ request, params }) => HttpResponse.json(${store}.update(${idExpr}, await request.json() as ${pascalName}))),`;
   }
 
-  // Body-based update (PUT /pet — no path param)
+  // Body-based update (PUT /pet — no path param). A singleton resource declares no identifier,
+  // so the key is read through a cast and the write falls through to a create when there is none.
+  const keyLine = hasId
+    ? `      const key = body.${idField}!;`
+    : `      const key = (body as { ${idField}?: string | number }).${idField};`;
+  const updateExpr = hasId
+    ? `${store}.update(key, body)`
+    : `(key === undefined ? undefined : ${store}.update(key, body))`;
   if (isVoid) {
     const lines = [
       `    http.${method}("${pattern}", async ({ request }) => {`,
       `      const body = await request.json() as ${pascalName};`,
-      `      ${store}.update(body.${idField}!, body) ?? ${store}.create(body);`,
+      keyLine,
+      `      ${updateExpr} ?? ${store}.create(body);`,
       `      return new HttpResponse(null, { status: 204 });`,
       `    }),`,
     ];
@@ -619,7 +629,8 @@ function generateUpdateHandler(
   const lines = [
     `    http.${method}("${pattern}", async ({ request }) => {`,
     `      const body = await request.json() as ${pascalName};`,
-    `      return HttpResponse.json(${store}.update(body.${idField}!, body) ?? ${store}.create(body));`,
+    keyLine,
+    `      return HttpResponse.json(${updateExpr} ?? ${store}.create(body));`,
     `    }),`,
   ];
   return lines.join("\n");
@@ -733,6 +744,18 @@ function findIdField(entity: ExtractedEntity): string {
   const idLike = entity.fields.find((f) => /[A-Z]?[Ii]d$/.test(f.name));
   if (idLike) return idLike.name;
   return "id";
+}
+
+/**
+ * Whether the entity actually declares the field {@link findIdField} named.
+ *
+ * A singleton resource — a settings document read and written whole — carries no identifier at
+ * all, and `findIdField` falls back to `"id"` for it. Emitting `body.id` against such a DTO
+ * produces a handler that does not compile, so the body-update path asks this first.
+ */
+function hasDeclaredIdField(entity: ExtractedEntity): boolean {
+  const idField = findIdField(entity);
+  return entity.fields.some((f) => f.name === idField);
 }
 
 function isIdFieldNumeric(entity: ExtractedEntity): boolean {
