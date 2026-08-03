@@ -6,7 +6,7 @@
 
 # Interface: MultiSelectFieldProps\<T\>
 
-Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/multi-select-field.tsx#L10)
+Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/multi-select-field.tsx#L12)
 
 Props for the [MultiSelectField](../functions/MultiSelectField.md) form component.
 
@@ -55,6 +55,16 @@ Defined in: [packages/ui/src/crud/shared/types.ts:36](https://github.com/simplix
 #### Inherited from
 
 [`CommonFieldProps`](../../../interfaces/CommonFieldProps.md).[`disabled`](../../../interfaces/CommonFieldProps.md#disabled)
+
+***
+
+### emptyMessage?
+
+> `optional` **emptyMessage**: `string`
+
+Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/multi-select-field.tsx#L23)
+
+Line shown when the typed text matches no option. Defaults to the translated one.
 
 ***
 
@@ -116,7 +126,7 @@ label for screen readers only.
 
 > `optional` **maxCount**: `number`
 
-Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/multi-select-field.tsx#L20)
+Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:25](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/multi-select-field.tsx#L25)
 
 Maximum number of selections allowed.
 
@@ -126,7 +136,7 @@ Maximum number of selections allowed.
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/multi-select-field.tsx#L15)
+Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/multi-select-field.tsx#L17)
 
 Called when the selection changes.
 
@@ -146,7 +156,7 @@ Called when the selection changes.
 
 > **options**: `object`[]
 
-Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/multi-select-field.tsx#L17)
+Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/multi-select-field.tsx#L19)
 
 Available options with label/value pairs.
 
@@ -164,7 +174,9 @@ Available options with label/value pairs.
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/multi-select-field.tsx#L18)
+Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/multi-select-field.tsx#L21)
+
+Prompt shown while nothing is selected. Defaults to the translated "Select…".
 
 ***
 
@@ -228,7 +240,7 @@ below at full width.
 
 > **value**: `T`[]
 
-Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/multi-select-field.tsx#L13)
+Defined in: [packages/ui/src/fields/form/multi-select-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/multi-select-field.tsx#L15)
 
 Currently selected values.
 

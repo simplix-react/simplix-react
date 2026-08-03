@@ -8,4 +8,4 @@
 
 > `const` **Grid**: `ComponentType`\<`Omit`\<[`GridProps`](../interfaces/GridProps.md), `"ref"`\> & `RefAttributes`\<`HTMLDivElement`\>\>
 
-Defined in: [packages/ui/src/primitives/grid.tsx:254](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/grid.tsx#L254)
+Defined in: [packages/ui/src/primitives/grid.tsx:287](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/grid.tsx#L287)

@@ -6,7 +6,7 @@
 
 # Interface: DateRangeFilterDef
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:101](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L101)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:115](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L115)
 
 ## Extends
 
@@ -34,7 +34,7 @@ the fields are split evenly (column-major). Ignored in single-column layout.
 
 > `optional` **dateOnly**: `boolean`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:110](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L110)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:124](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L124)
 
 Set for a `LocalDate` (`format:date`) column: the range boundaries are
 serialized as zone-neutral `yyyy-MM-dd` (local) instead of a UTC ISO
@@ -48,7 +48,7 @@ which keep full UTC ISO serialization.
 
 > `optional` **displayZone**: `string`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:118](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L118)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:132](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L132)
 
 Set for a site-scoped `Instant` column whose day boundaries must be computed
 in the site zone: the picked day's start-of-day / end-of-day are interpreted
@@ -86,4 +86,4 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:29](https://github.com/
 
 > **type**: `"dateRange"`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:102](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L102)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:116](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L116)

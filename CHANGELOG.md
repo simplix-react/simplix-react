@@ -35,6 +35,10 @@ and this project adheres to [Semantic Versioning](https://semver.org).
 - MIT license
 - Sample petstore store module
 - Comprehensive test suites: CLI (fsd-rules, import-rules, config-loader), form hooks, mock handlers, UI (364 tests across 34 files)
+- `FieldWrapper` accepts a render-function child that receives `{ id, labelId }`, so a custom control earns an accessible name — `id` on a labelable control, `aria-labelledby={labelId}` on a composite (radio group, date picker); a plain-element child is named by the wrapping fieldset. `FieldControlProps` and `FieldWrapperChildren` are exported
+- `List.Column` `minWidth` floors a column's width and lets long free-text ellipsize instead of stretching the table; `useContainerWidth` is exported
+- `CrudDetail` default actions accept `deleteLabel`; `FilterBar` accepts `countLoading`; `CrudListFilters` carries `isLoading`
+- i18n keys `list.totalCountUnknown` (`@simplix-react/ui`) and `accessibility.selectTimeSlot` (`@simplix-react/calendar`)
 
 ### Changed
 
@@ -54,6 +58,9 @@ and this project adheres to [Semantic Versioning](https://semver.org).
 - Switched test runner to vitest across all packages
 - Unified all package versions to 0.1.0, then bumped through 0.1.1, 0.1.2, to 0.1.3
 - Comprehensive framework improvements from review
+- Form fields, icon-only controls (row actions, toolbar and map buttons, close/clear affordances), and the calendar's time-grid slots now carry accessible names so assistive technology announces them; a custom `FieldWrapper` override must resolve a function child by calling it with `{ id, labelId }`
+- `ListTotalBadge` and `FilterBar` show `Total —` while the first page is in flight instead of claiming `Total 0`; `CrudDetail`'s delete action is a labeled button rather than an icon-only one
+- Boot attachment upload/download failures reject with an `ApiResponseError` carrying the server envelope's `message` / `errorCode` / `errorDetail` (was a bare `HTTP <status>` error); `.status` is preserved
 
 ### Fixed
 
@@ -65,6 +72,8 @@ and this project adheres to [Semantic Versioning](https://semver.org).
 - ESLint config for simplix-boot packages and i18n lint error
 - Lists no longer report a paused or retrying query as "no data" — `ListHookResult` carries `isPaused` / `failureCount`, `EmptyReason` gains `"unavailable"`, and `CrudList` / `AssignmentPanel` / `EntityList` render "the list could not be loaded"
 - Queries no longer stay paused forever after a missed `online` event — `@simplix-react/react` exports `startOnlineStatusSync` / `resyncOnlineStatus`, which repair React Query's cached connectivity flag from `navigator.onLine` at boot and on `visibilitychange`; the project template wires the sync into generated apps
+- Clear and remove affordances nested inside a filter or date-picker trigger are lifted to sibling buttons, so no interactive control nests inside another
+- CLI mock update handlers compile for a singleton resource whose DTO declares no id field
 
 ### Removed
 

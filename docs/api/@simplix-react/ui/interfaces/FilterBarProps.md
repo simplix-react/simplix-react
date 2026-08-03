@@ -6,7 +6,7 @@
 
 # Interface: FilterBarProps
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:143](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L143)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:157](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L157)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:143](https://github.com
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:174](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L174)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:195](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L195)
 
 ***
 
@@ -22,9 +22,22 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:174](https://github.com
 
 > `optional` **count**: `number`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:160](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L160)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:174](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L174)
 
 When provided, renders a standard total-count badge at the start of the leading group.
+
+***
+
+### countLoading?
+
+> `optional` **countLoading**: `boolean`
+
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:181](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L181)
+
+Overrides where the badge takes its "count not known yet" state from.
+Defaults to the list state's own `isLoading`, so a `useCrudList` list needs
+nothing here; pass it on a standalone FilterBar whose count comes from a
+query the filter state knows nothing about.
 
 ***
 
@@ -32,7 +45,7 @@ When provided, renders a standard total-count badge at the start of the leading 
 
 > **filters**: [`FilterDef`](../type-aliases/FilterDef.md)[]
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:144](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L144)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:158](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L158)
 
 ***
 
@@ -40,7 +53,7 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:144](https://github.com
 
 > `optional` **leading**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:147](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L147)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:161](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L161)
 
 Content rendered on the left side of the filter bar.
 
@@ -50,7 +63,7 @@ Content rendered on the left side of the filter bar.
 
 > `optional` **maxBadges**: `number`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:151](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L151)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:165](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L165)
 
 Max number of visible filter badges before collapsing into "+N".
 
@@ -60,7 +73,7 @@ Max number of visible filter badges before collapsing into "+N".
 
 > `optional` **onPreview**: () => `void`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:156](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L156)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:170](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L170)
 
 When provided, renders a preview button in the leading group that invokes
 this handler on click. Omit to hide the button.
@@ -75,7 +88,7 @@ this handler on click. Omit to hide the button.
 
 > `optional` **popoverColumns**: `1` \| `2` \| `3` \| `"auto"`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:173](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L173)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:194](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L194)
 
 Column layout of the filter popover form.
 
@@ -94,7 +107,7 @@ without flags the filters are split evenly.
 
 > `optional` **previewLabel**: `string`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:158](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L158)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:172](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L172)
 
 Label for the preview button. Defaults to the `list.preview` translation.
 
@@ -104,7 +117,7 @@ Label for the preview button. Defaults to the `list.preview` translation.
 
 > **state**: [`CrudListFilters`](CrudListFilters.md)
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:145](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L145)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:159](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L159)
 
 ***
 
@@ -112,6 +125,6 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:145](https://github.com
 
 > `optional` **trailing**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:149](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L149)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:163](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L163)
 
 Content rendered on the right side of the filter bar, before the filter/columns group.

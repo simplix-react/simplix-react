@@ -6,7 +6,7 @@
 
 # Interface: TimezoneFilterDef
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:125](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L125)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:139](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L139)
 
 ## Extends
 
@@ -58,4 +58,4 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:29](https://github.com/
 
 > **type**: `"timezone"`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:126](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L126)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:140](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L140)

@@ -6,7 +6,7 @@
 
 # Interface: TreeEmptyProps
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:815](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L815)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:717](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L717)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:815](https://github.com/sim
 
 > `optional` **children**: `ReactNode` \| (`props`) => `ReactNode`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:819](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L819)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:721](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L721)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:819](https://github.com/sim
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:818](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L818)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:720](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L720)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:818](https://github.com/sim
 
 > `optional` **messages**: `Partial`\<`Record`\<[`EmptyReason`](../type-aliases/EmptyReason.md), `string`\>\>
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:817](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L817)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:719](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L719)
 
 ***
 
@@ -38,4 +38,4 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:817](https://github.com/sim
 
 > `optional` **reason**: [`EmptyReason`](../type-aliases/EmptyReason.md)
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:816](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L816)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:718](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L718)

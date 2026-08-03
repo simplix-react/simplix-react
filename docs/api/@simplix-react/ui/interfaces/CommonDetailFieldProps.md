@@ -19,6 +19,7 @@ Shared props for all detail (read-only) field components.
 - [`DetailBadgeFieldProps`](../namespaces/DetailFields/interfaces/DetailBadgeFieldProps.md)
 - [`DetailBooleanFieldProps`](../namespaces/DetailFields/interfaces/DetailBooleanFieldProps.md)
 - [`DetailCountryFieldProps`](../namespaces/DetailFields/interfaces/DetailCountryFieldProps.md)
+- [`DetailCurrencyFieldProps`](../namespaces/DetailFields/interfaces/DetailCurrencyFieldProps.md)
 - [`DetailDateFieldProps`](../namespaces/DetailFields/interfaces/DetailDateFieldProps.md)
 - [`DetailFieldProps`](../namespaces/DetailFields/interfaces/DetailFieldProps.md)
 - [`DetailImageFieldProps`](../namespaces/DetailFields/interfaces/DetailImageFieldProps.md)

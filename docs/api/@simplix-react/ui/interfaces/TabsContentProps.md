@@ -6,7 +6,7 @@
 
 # Interface: TabsContentProps
 
-Defined in: [packages/ui/src/base/navigation/tabs.tsx:105](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/tabs.tsx#L105)
+Defined in: [packages/ui/src/base/navigation/tabs.tsx:110](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/tabs.tsx#L110)
 
 ## Extends
 
@@ -3378,7 +3378,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **padded**: `boolean`
 
-Defined in: [packages/ui/src/base/navigation/tabs.tsx:112](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/tabs.tsx#L112)
+Defined in: [packages/ui/src/base/navigation/tabs.tsx:117](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/tabs.tsx#L117)
 
 Adds bottom padding for scrollable containers.
 

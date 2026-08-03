@@ -8,7 +8,7 @@
 
 > **PanelHeader**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/layout/panel-header.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/panel-header.tsx#L23)
+Defined in: [packages/ui/src/layout/panel-header.tsx:25](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/panel-header.tsx#L25)
 
 ## Parameters
 

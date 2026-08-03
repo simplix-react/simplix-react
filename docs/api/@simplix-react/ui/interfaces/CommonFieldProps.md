@@ -24,6 +24,7 @@ Shared props for all form field components.
 - [`ColorFieldProps`](../namespaces/FormFields/interfaces/ColorFieldProps.md)
 - [`ComboboxFieldProps`](../namespaces/FormFields/interfaces/ComboboxFieldProps.md)
 - [`CountryFieldProps`](../namespaces/FormFields/interfaces/CountryFieldProps.md)
+- [`CurrencyFieldProps`](../namespaces/FormFields/interfaces/CurrencyFieldProps.md)
 - [`DateFieldProps`](../namespaces/FormFields/interfaces/DateFieldProps.md)
 - [`DateRangeFieldProps`](../namespaces/FormFields/interfaces/DateRangeFieldProps.md)
 - [`DateTimeFieldProps`](../namespaces/FormFields/interfaces/DateTimeFieldProps.md)

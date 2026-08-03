@@ -8,7 +8,7 @@
 
 > `const` **ListDetail**: *typeof* [`ListDetailRoot`](../functions/ListDetailRoot.md) & `object`
 
-Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:382](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L382)
+Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:393](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L393)
 
 List-detail layout with two variants:
 - `"panel"` (default): Side-by-side layout with draggable divider.

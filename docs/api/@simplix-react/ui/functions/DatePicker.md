@@ -8,7 +8,7 @@
 
 > **DatePicker**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/base/inputs/date-picker.tsx:142](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L142)
+Defined in: [packages/ui/src/base/inputs/date-picker.tsx:147](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-picker.tsx#L147)
 
 Standalone date picker with a popover calendar and month/year dropdowns.
 With [DatePickerProps.showTime](../interfaces/DatePickerProps.md#showtime) it also renders an hour/minute

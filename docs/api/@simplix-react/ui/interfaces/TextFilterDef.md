@@ -6,7 +6,7 @@
 
 # Interface: TextFilterDef
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:38](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L38)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:44](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L44)
 
 ## Extends
 
@@ -34,7 +34,7 @@ the fields are split evenly (column-major). Ignored in single-column layout.
 
 > **defaultOperator**: [`SearchOperator`](../enumerations/SearchOperator.md)
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:41](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L41)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:47](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L47)
 
 ***
 
@@ -66,7 +66,21 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:29](https://github.com/
 
 > **operators**: [`SearchOperator`](../enumerations/SearchOperator.md)[]
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:40](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L40)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:46](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L46)
+
+***
+
+### options?
+
+> `optional` **options**: [`TextFilterOptionDef`](TextFilterOptionDef.md)[]
+
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:56](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L56)
+
+Closed catalogue the value is picked from instead of typed. Use it for a column
+the server matches literally — a constant key, a code — where a typo produces an
+empty result the operator cannot tell from "no such row". The pick still travels
+under the current operator, so a CONTAINS filter over a column packing several
+keys keeps working.
 
 ***
 
@@ -74,7 +88,7 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:40](https://github.com/
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:42](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L42)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:48](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L48)
 
 ***
 
@@ -82,4 +96,4 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:42](https://github.com/
 
 > **type**: `"text"`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:39](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L39)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:45](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L45)

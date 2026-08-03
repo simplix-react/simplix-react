@@ -6,7 +6,7 @@
 
 # Interface: TreeMultiSelectFieldProps\<T\>
 
-Defined in: [packages/ui/src/fields/form/tree-multi-select-field.tsx:149](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-multi-select-field.tsx#L149)
+Defined in: [packages/ui/src/fields/form/tree-multi-select-field.tsx:155](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-multi-select-field.tsx#L155)
 
 Shared props for all form field components.
 
@@ -38,7 +38,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:49](https://github.com/simplix
 
 > `optional` **config**: `Pick`\<[`TreeConfig`](TreeConfig.md)\<`T`\>, `"idField"` \| `"childrenField"`\>
 
-Defined in: [packages/ui/src/fields/form/tree-multi-select-field.tsx:156](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-multi-select-field.tsx#L156)
+Defined in: [packages/ui/src/fields/form/tree-multi-select-field.tsx:162](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-multi-select-field.tsx#L162)
 
 ***
 
@@ -82,7 +82,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:32](https://github.com/simplix
 
 > `optional` **getDisplayName**: (`item`) => `ReactNode`
 
-Defined in: [packages/ui/src/fields/form/tree-multi-select-field.tsx:157](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-multi-select-field.tsx#L157)
+Defined in: [packages/ui/src/fields/form/tree-multi-select-field.tsx:163](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-multi-select-field.tsx#L163)
 
 #### Parameters
 
@@ -100,7 +100,7 @@ Defined in: [packages/ui/src/fields/form/tree-multi-select-field.tsx:157](https:
 
 > `optional` **isLoading**: `boolean`
 
-Defined in: [packages/ui/src/fields/form/tree-multi-select-field.tsx:155](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-multi-select-field.tsx#L155)
+Defined in: [packages/ui/src/fields/form/tree-multi-select-field.tsx:161](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-multi-select-field.tsx#L161)
 
 ***
 
@@ -150,7 +150,7 @@ label for screen readers only.
 
 > `optional` **maxCount**: `number`
 
-Defined in: [packages/ui/src/fields/form/tree-multi-select-field.tsx:160](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-multi-select-field.tsx#L160)
+Defined in: [packages/ui/src/fields/form/tree-multi-select-field.tsx:166](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-multi-select-field.tsx#L166)
 
 Maximum number of selections allowed.
 
@@ -160,7 +160,7 @@ Maximum number of selections allowed.
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/fields/form/tree-multi-select-field.tsx:153](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-multi-select-field.tsx#L153)
+Defined in: [packages/ui/src/fields/form/tree-multi-select-field.tsx:159](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-multi-select-field.tsx#L159)
 
 Called with the full selection whenever an item is toggled or removed.
 
@@ -180,7 +180,7 @@ Called with the full selection whenever an item is toggled or removed.
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/fields/form/tree-multi-select-field.tsx:158](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-multi-select-field.tsx#L158)
+Defined in: [packages/ui/src/fields/form/tree-multi-select-field.tsx:164](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-multi-select-field.tsx#L164)
 
 ***
 
@@ -244,7 +244,7 @@ below at full width.
 
 > **treeData**: `T`[]
 
-Defined in: [packages/ui/src/fields/form/tree-multi-select-field.tsx:154](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-multi-select-field.tsx#L154)
+Defined in: [packages/ui/src/fields/form/tree-multi-select-field.tsx:160](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-multi-select-field.tsx#L160)
 
 ***
 
@@ -252,7 +252,7 @@ Defined in: [packages/ui/src/fields/form/tree-multi-select-field.tsx:154](https:
 
 > **value**: `string`[]
 
-Defined in: [packages/ui/src/fields/form/tree-multi-select-field.tsx:151](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-multi-select-field.tsx#L151)
+Defined in: [packages/ui/src/fields/form/tree-multi-select-field.tsx:157](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/tree-multi-select-field.tsx#L157)
 
 Currently selected item ids.
 

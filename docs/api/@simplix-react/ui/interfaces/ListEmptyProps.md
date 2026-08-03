@@ -6,7 +6,7 @@
 
 # Interface: ListEmptyProps
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:1598](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1598)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:1546](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1546)
 
 Props for the List.Empty state display.
 
@@ -16,7 +16,7 @@ Props for the List.Empty state display.
 
 > `optional` **children**: `ReactNode` \| (`props`) => `ReactNode`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:1603](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1603)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:1551](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1551)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:1603](https://github.com/si
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:1602](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1602)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:1550](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1550)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:1602](https://github.com/si
 
 > `optional` **messages**: `Partial`\<`Record`\<[`EmptyReason`](../type-aliases/EmptyReason.md), `string`\>\>
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:1601](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1601)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:1549](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1549)
 
 Override default empty messages per reason.
 
@@ -42,4 +42,4 @@ Override default empty messages per reason.
 
 > `optional` **reason**: [`EmptyReason`](../type-aliases/EmptyReason.md)
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:1599](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1599)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:1547](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1547)
