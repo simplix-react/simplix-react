@@ -5,6 +5,7 @@ import type {
   FormatTimeOptions,
   FormatDateTimeOptions,
 } from "../datetime.js";
+import { sharedState } from "../utils/shared-state.js";
 
 /**
  * DateTime context value — locale/timezone-bound formatters.
@@ -27,7 +28,11 @@ export interface DateTimeContextValue {
   formatRelative: (date: DateInput, baseDate?: Date) => string;
 }
 
-export const DateTimeContext = createContext<DateTimeContextValue | null>(null);
+// Realm-wide, not module-wide — a second copy of this module would leave every
+// consumer outside the provider it is actually wrapped in. See `sharedState`.
+export const DateTimeContext = sharedState("datetime-context", () =>
+  createContext<DateTimeContextValue | null>(null),
+);
 
 /**
  * Access the locale/timezone-bound date formatters.

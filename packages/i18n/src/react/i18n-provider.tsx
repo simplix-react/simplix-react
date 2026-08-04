@@ -1,7 +1,13 @@
 import { createContext, type ReactNode, useContext } from "react";
 import type { II18nAdapter } from "../adapter.js";
+import { sharedState } from "../utils/shared-state.js";
 
-const I18nContext = createContext<II18nAdapter | null>(null);
+// Realm-wide, not module-wide: with a second copy of this module the provider fills
+// one context while components subscribe to another, `useTranslation` finds no adapter,
+// and every framework string renders as its own key. See `sharedState`.
+const I18nContext = sharedState("i18n-context", () =>
+  createContext<II18nAdapter | null>(null),
+);
 
 /**
  * Props for the {@link I18nProvider} component.
