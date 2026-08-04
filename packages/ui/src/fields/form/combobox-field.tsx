@@ -2,11 +2,11 @@ import { useTranslation } from "@simplix-react/i18n/react";
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 
 import type { CommonFieldProps } from "../../crud/shared/types";
-import { FieldChevron } from "../../base/inputs/field-chevron";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { Stack } from "../../primitives";
 import { cn } from "../../utils/cn";
 import { FieldWrapper } from "../shared/field-wrapper";
+import { SelectFieldTrigger } from "../shared/select-field-trigger";
 
 /** Props for the {@link ComboboxField} form component. */
 export interface ComboboxFieldProps<T extends string = string>
@@ -62,7 +62,7 @@ export function ComboboxField<T extends string = string>({
   className,
   ...variantProps
 }: ComboboxFieldProps<T>) {
-  const { Input, Popover, PopoverTrigger, PopoverContent } = useFlatUIComponents();
+  const { Input, Popover, PopoverContent } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -163,32 +163,19 @@ export function ComboboxField<T extends string = string>({
             }
           }}
         >
-          <PopoverTrigger asChild>
-            <span
-              id={id}
-              role="combobox"
-              aria-expanded={open}
-              aria-labelledby={labelId}
-              className={cn(
-                "flex h-8 w-full items-center gap-1 rounded-md border border-input bg-background px-3 text-sm",
-                "focus-within:border-foreground",
-                disabled && "cursor-not-allowed opacity-50",
-                error && "border-destructive focus-within:border-destructive",
-              )}
-            >
-              <span className={cn("flex flex-1 items-center gap-1.5 truncate", !value && "text-muted-foreground")}>
-                {selectedOption?.icon}
-                {value ? selectedOption?.label ?? "" : selectPlaceholder}
-              </span>
-              {value && !disabled && (
+          <SelectFieldTrigger
+            id={id}
+            labelId={labelId}
+            open={open}
+            disabled={disabled}
+            error={error}
+            clearAction={
+              value && !disabled ? (
                 <button
                   type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleClear();
-                  }}
+                  onClick={handleClear}
                   className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
-                  aria-label="Clear selection"
+                  aria-label={t("field.clearSelection")}
                 >
                   <svg
                     width="15"
@@ -206,14 +193,13 @@ export function ComboboxField<T extends string = string>({
                     />
                   </svg>
                 </button>
-              )}
-              {onExpand && !disabled && (
+              ) : undefined
+            }
+            expandAction={
+              onExpand && !disabled ? (
                 <button
                   type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onExpand();
-                  }}
+                  onClick={onExpand}
                   className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
                   aria-label={t("field.expandSearch")}
                   title={t("field.expandSearch")}
@@ -234,10 +220,14 @@ export function ComboboxField<T extends string = string>({
                     />
                   </svg>
                 </button>
-              )}
-              <FieldChevron />
+              ) : undefined
+            }
+          >
+            <span className={cn("flex flex-1 items-center gap-1.5 truncate", !value && "text-muted-foreground")}>
+              {selectedOption?.icon}
+              {value ? selectedOption?.label ?? "" : selectPlaceholder}
             </span>
-          </PopoverTrigger>
+          </SelectFieldTrigger>
           <PopoverContent
             className="w-[var(--radix-popover-trigger-width)] p-0"
             align="start"
@@ -278,7 +268,7 @@ export function ComboboxField<T extends string = string>({
                         d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
                       />
                     </svg>
-                    Loading...
+                    {t("common.loading")}
                   </li>
                 )}
                 {!loading && filtered.length === 0 && (

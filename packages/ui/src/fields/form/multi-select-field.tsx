@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useId, useMemo, useRef, useState } from "react";
 
 import { useTranslation } from "@simplix-react/i18n/react";
 
@@ -58,13 +58,15 @@ export function MultiSelectField<T extends string = string>({
   className,
   ...variantProps
 }: MultiSelectFieldProps<T>) {
-  const { Badge, Popover, PopoverContent, PopoverTrigger } = useFlatUIComponents();
+  const { Badge, Popover, PopoverAnchor, PopoverContent } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const selectPlaceholder = placeholder ?? t("field.selectOption");
   const noResultsMessage = emptyMessage ?? t("field.noResults");
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const boxRef = useRef<HTMLSpanElement>(null);
+  const listboxId = useId();
 
   const filtered = useMemo(() => {
     if (!query) return options;
@@ -103,21 +105,27 @@ export function MultiSelectField<T extends string = string>({
     >
       {({ id, labelId }) => (
         <Popover open={open} onOpenChange={(v) => { if (disabled) return; setOpen(v); }}>
-          <PopoverTrigger asChild>
+          {/* The box holds controls of its own — a chip's remove button, the search
+              input — so it anchors the popover instead of triggering it. A trigger
+              here would nest a control inside a control, and the keyboard and
+              assistive technology would have to guess which of the two a press
+              belongs to. */}
+          <PopoverAnchor asChild>
             <span
+              ref={boxRef}
               className={cn(
                 "flex h-8 w-full items-center gap-1 rounded-md border border-input bg-background px-3 text-sm",
                 "focus-within:outline-none focus-within:border-foreground",
                 disabled && "cursor-not-allowed opacity-50",
                 error && "border-destructive focus-within:border-destructive",
               )}
-              id={id}
-              role="combobox"
-              aria-expanded={open}
-              aria-labelledby={labelId}
-              aria-label={
-                variantProps.layout === "hidden" ? label : undefined
-              }
+              onMouseDown={(e) => {
+                // A press on the box's own surface belongs to the search input.
+                if (disabled || (e.target as HTMLElement).closest("button, input")) return;
+                e.preventDefault();
+                inputRef.current?.focus();
+                setOpen(true);
+              }}
             >
               <span className="flex flex-1 items-center gap-1 overflow-hidden">
               {selectedLabels.map((opt) => (
@@ -130,12 +138,9 @@ export function MultiSelectField<T extends string = string>({
                   {!disabled && (
                     <button
                       type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeOption(opt.value);
-                      }}
+                      onClick={() => removeOption(opt.value)}
                       className="ml-0.5 rounded-sm hover:bg-muted"
-                      aria-label={`Remove ${opt.label}`}
+                      aria-label={t("field.removeOption", { label: opt.label })}
                     >
                       <svg
                         width="14"
@@ -158,9 +163,17 @@ export function MultiSelectField<T extends string = string>({
               ))}
               <input
                 ref={inputRef}
+                id={id}
+                role="combobox"
+                aria-expanded={open}
+                aria-controls={open ? listboxId : undefined}
+                aria-autocomplete="list"
+                aria-labelledby={labelId}
+                aria-label={variantProps.layout === "hidden" ? label : undefined}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onFocus={() => setOpen(true)}
+                onClick={() => setOpen(true)}
                 placeholder={value.length === 0 ? selectPlaceholder : ""}
                 disabled={disabled}
                 className="min-w-[60px] flex-1 bg-transparent outline-none text-sm placeholder:text-muted-foreground disabled:cursor-not-allowed"
@@ -168,13 +181,18 @@ export function MultiSelectField<T extends string = string>({
               </span>
               <FieldChevron />
             </span>
-          </PopoverTrigger>
+          </PopoverAnchor>
           <PopoverContent
             className="w-[var(--radix-popover-trigger-width)] p-0"
             align="start"
             onOpenAutoFocus={(e) => e.preventDefault()}
+            // The box is the anchor, not the trigger, so Radix reads a press on a
+            // chip or on the input as an outside press. Keep those from dismissing.
+            onInteractOutside={(e) => {
+              if (boxRef.current?.contains(e.target as Node)) e.preventDefault();
+            }}
           >
-            <ul className="max-h-60 overflow-y-auto p-1" role="listbox">
+            <ul className="max-h-60 overflow-y-auto p-1" role="listbox" id={listboxId}>
               {filtered.length === 0 && (
                 <li className="py-4 text-center text-sm text-muted-foreground">
                   {noResultsMessage}

@@ -58,14 +58,14 @@ describe("ComboboxField", () => {
     render(
       <ComboboxField label="Fruit" value="apple" onChange={vi.fn()} options={options} />,
     );
-    expect(screen.getByLabelText("Clear selection")).toBeDefined();
+    expect(screen.getByLabelText("field.clearSelection")).toBeDefined();
   });
 
   it("does not show clear button when value is null", () => {
     render(
       <ComboboxField label="Fruit" value={null} onChange={vi.fn()} options={options} />,
     );
-    expect(screen.queryByLabelText("Clear selection")).toBeNull();
+    expect(screen.queryByLabelText("field.clearSelection")).toBeNull();
   });
 
   it("calls onChange with null when clear is clicked", () => {
@@ -73,7 +73,7 @@ describe("ComboboxField", () => {
     render(
       <ComboboxField label="Fruit" value="apple" onChange={onChange} options={options} />,
     );
-    fireEvent.click(screen.getByLabelText("Clear selection"));
+    fireEvent.click(screen.getByLabelText("field.clearSelection"));
     expect(onChange).toHaveBeenCalledWith(null);
   });
 
@@ -81,7 +81,7 @@ describe("ComboboxField", () => {
     render(
       <ComboboxField label="Fruit" value="apple" onChange={vi.fn()} options={options} disabled />,
     );
-    expect(screen.queryByLabelText("Clear selection")).toBeNull();
+    expect(screen.queryByLabelText("field.clearSelection")).toBeNull();
   });
 
   it("shows error", () => {
@@ -186,7 +186,7 @@ describe("ComboboxField", () => {
     );
     const trigger = screen.getByTestId("form-field-fruit").querySelector("span[class]")!;
     fireEvent.click(trigger);
-    expect(screen.getByText("Loading...")).toBeDefined();
+    expect(screen.getByText("common.loading")).toBeDefined();
   });
 
   it("shows no results message when filtered list is empty", () => {
@@ -1077,7 +1077,7 @@ describe("MultiSelectField", () => {
         options={options}
       />,
     );
-    expect(screen.getByLabelText("Remove React")).toBeDefined();
+    expect(screen.getByLabelText("field.removeOption")).toBeDefined();
   });
 
   it("does not show remove button on badges when disabled", () => {
@@ -1090,7 +1090,7 @@ describe("MultiSelectField", () => {
         disabled
       />,
     );
-    expect(screen.queryByLabelText("Remove React")).toBeNull();
+    expect(screen.queryByLabelText("field.removeOption")).toBeNull();
   });
 
   it("calls onChange without removed value when badge remove is clicked", () => {
@@ -1103,7 +1103,7 @@ describe("MultiSelectField", () => {
         options={options}
       />,
     );
-    fireEvent.click(screen.getByLabelText("Remove React"));
+    fireEvent.click(screen.getAllByLabelText("field.removeOption")[0]);
     expect(onChange).toHaveBeenCalledWith(["vue"]);
   });
 
@@ -1354,7 +1354,7 @@ describe("TreeSelectField", () => {
         treeData={treeData}
       />,
     );
-    expect(screen.getByLabelText("Clear selection")).toBeDefined();
+    expect(screen.getByLabelText("field.clearSelection")).toBeDefined();
   });
 
   it("does not show clear button when value is null", () => {
@@ -1366,7 +1366,7 @@ describe("TreeSelectField", () => {
         treeData={treeData}
       />,
     );
-    expect(screen.queryByLabelText("Clear selection")).toBeNull();
+    expect(screen.queryByLabelText("field.clearSelection")).toBeNull();
   });
 
   it("calls onChange with null when clear is clicked", () => {
@@ -1379,7 +1379,7 @@ describe("TreeSelectField", () => {
         treeData={treeData}
       />,
     );
-    fireEvent.click(screen.getByLabelText("Clear selection"));
+    fireEvent.click(screen.getByLabelText("field.clearSelection"));
     expect(onChange).toHaveBeenCalledWith(null);
   });
 
@@ -1393,7 +1393,7 @@ describe("TreeSelectField", () => {
         disabled
       />,
     );
-    expect(screen.queryByLabelText("Clear selection")).toBeNull();
+    expect(screen.queryByLabelText("field.clearSelection")).toBeNull();
   });
 
   it("shows error", () => {
@@ -1704,7 +1704,7 @@ describe("CountryField", () => {
     );
     const fieldset = screen.getByTestId("form-field-country");
     const trigger = fieldset.querySelector("[role='combobox']");
-    expect(trigger?.getAttribute("aria-disabled")).toBe("true");
+    expect((trigger as HTMLButtonElement).disabled).toBe(true);
   });
 
   it("calls onChange to toggle off when same country is selected", () => {
@@ -1817,7 +1817,7 @@ describe("TimezoneField", () => {
     );
     const fieldset = screen.getByTestId("form-field-timezone");
     const trigger = fieldset.querySelector("[role='combobox']");
-    expect(trigger?.getAttribute("aria-disabled")).toBe("true");
+    expect((trigger as HTMLButtonElement).disabled).toBe(true);
   });
 
   it("does not show clear button when disabled even with value", () => {

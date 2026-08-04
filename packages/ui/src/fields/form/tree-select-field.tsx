@@ -4,11 +4,11 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react
 import type { CommonFieldProps } from "../../crud/shared/types";
 import type { TreeConfig } from "../../crud/tree/tree-types";
 import { filterTreeWithAncestors, getDescendantIds } from "../../crud/tree/tree-utils";
-import { FieldChevron } from "../../base/inputs/field-chevron";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { Stack } from "../../primitives";
 import { cn } from "../../utils/cn";
 import { FieldWrapper } from "../shared/field-wrapper";
+import { SelectFieldTrigger } from "../shared/select-field-trigger";
 
 // ── Icons ──
 
@@ -188,7 +188,7 @@ export function TreeSelectField<T>({
   className,
   ...variantProps
 }: TreeSelectFieldProps<T>) {
-  const { Input, Popover, PopoverTrigger, PopoverContent } = useFlatUIComponents();
+  const { Input, Popover, PopoverContent } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -294,38 +294,29 @@ export function TreeSelectField<T>({
     >
       {({ id, labelId }) => (
         <Popover open={open} onOpenChange={(v) => { if (disabled) return; setOpen(v); }}>
-          <PopoverTrigger asChild>
-            <span
-              id={id}
-              role="combobox"
-              aria-expanded={open}
-              aria-labelledby={labelId}
-              className={cn(
-                "flex h-8 w-full items-center gap-1 rounded-md border border-input bg-background px-3 text-sm",
-                "focus-within:border-foreground",
-                disabled && "cursor-not-allowed opacity-50",
-                error && "border-destructive focus-within:border-destructive",
-              )}
-            >
-              <span className={cn("flex-1 truncate", !value && "text-muted-foreground")}>
-                {value ? selectedLabel : (placeholder ?? t("tree.searchPlaceholder"))}
-              </span>
-              {value && !disabled && (
+          <SelectFieldTrigger
+            id={id}
+            labelId={labelId}
+            open={open}
+            disabled={disabled}
+            error={error}
+            clearAction={
+              value && !disabled ? (
                 <button
                   type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleClear();
-                  }}
+                  onClick={handleClear}
                   className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
-                  aria-label="Clear selection"
+                  aria-label={t("field.clearSelection")}
                 >
                   <ClearIcon />
                 </button>
-              )}
-              <FieldChevron />
+              ) : undefined
+            }
+          >
+            <span className={cn("flex-1 truncate", !value && "text-muted-foreground")}>
+              {value ? selectedLabel : (placeholder ?? t("tree.searchPlaceholder"))}
             </span>
-          </PopoverTrigger>
+          </SelectFieldTrigger>
           <PopoverContent
             className="w-[var(--radix-popover-trigger-width)] p-0"
             align="start"

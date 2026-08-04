@@ -1,5 +1,5 @@
 import { useTranslation } from "@simplix-react/i18n/react";
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import type { CommonFieldProps } from "../../crud/shared/types";
 import type { TreeConfig } from "../../crud/tree/tree-types";
@@ -202,7 +202,8 @@ export function TreeMultiSelectField<T>({
   className,
   ...variantProps
 }: TreeMultiSelectFieldProps<T>) {
-  const { Badge, Input, Popover, PopoverTrigger, PopoverContent } = useFlatUIComponents();
+  const { Badge, Input, Popover, PopoverAnchor, PopoverTrigger, PopoverContent } = useFlatUIComponents();
+  const boxRef = useRef<HTMLSpanElement>(null);
   const { t } = useTranslation("simplix/ui");
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -299,19 +300,26 @@ export function TreeMultiSelectField<T>({
     >
       {({ id, labelId }) => (
         <Popover open={open} onOpenChange={(v) => { if (disabled) return; setOpen(v); }}>
-          <PopoverTrigger asChild>
+          {/* The box holds a remove button per selected chip, so it anchors the
+              popover and the chevron beside them triggers it. A trigger on the box
+              would nest a control inside a control, and the keyboard and assistive
+              technology would have to guess which of the two a press belongs to. */}
+          <PopoverAnchor asChild>
             <span
+              ref={boxRef}
               className={cn(
                 "flex min-h-8 w-full items-center gap-1 rounded-md border border-input bg-background px-3 py-1 text-sm",
                 "focus-within:border-foreground",
                 disabled && "cursor-not-allowed opacity-50",
                 error && "border-destructive focus-within:border-destructive",
               )}
-              id={id}
-              role="combobox"
-              aria-expanded={open}
-              aria-labelledby={labelId}
-              aria-label={variantProps.layout === "hidden" ? label : undefined}
+              onMouseDown={(e) => {
+                // A press on the box's own surface reaches the same popover the
+                // chevron opens; a press on a chip's remove button does not.
+                if (disabled || (e.target as HTMLElement).closest("button")) return;
+                e.preventDefault();
+                setOpen((v) => !v);
+              }}
             >
               <span className="flex flex-1 flex-wrap items-center gap-1 overflow-hidden">
                 {value.length === 0 && (
@@ -329,12 +337,11 @@ export function TreeMultiSelectField<T>({
                     {!disabled && (
                       <button
                         type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeSelected(id);
-                        }}
+                        onClick={() => removeSelected(id)}
                         className="ml-0.5 rounded-sm hover:bg-muted"
-                        aria-label={`Remove ${String(labelById.get(id) ?? id)}`}
+                        aria-label={t("field.removeOption", {
+                          label: String(labelById.get(id) ?? id),
+                        })}
                       >
                         <RemoveIcon />
                       </button>
@@ -342,13 +349,31 @@ export function TreeMultiSelectField<T>({
                   </Badge>
                 ))}
               </span>
-              <FieldChevron />
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  id={id}
+                  role="combobox"
+                  aria-expanded={open}
+                  aria-labelledby={labelId}
+                  aria-label={variantProps.layout === "hidden" ? label : undefined}
+                  disabled={disabled}
+                  className="flex shrink-0 items-center rounded-sm outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                >
+                  <FieldChevron />
+                </button>
+              </PopoverTrigger>
             </span>
-          </PopoverTrigger>
+          </PopoverAnchor>
           <PopoverContent
             className="w-[var(--radix-popover-trigger-width)] p-0"
             align="start"
             onOpenAutoFocus={(e) => e.preventDefault()}
+            // The box is the anchor, not the trigger, so Radix reads a press on a
+            // chip as an outside press. Keep those from dismissing.
+            onInteractOutside={(e) => {
+              if (boxRef.current?.contains(e.target as Node)) e.preventDefault();
+            }}
           >
             <Stack gap="none" className="p-2">
               <Input
