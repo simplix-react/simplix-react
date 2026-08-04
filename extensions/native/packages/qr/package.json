@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react-native-ext/qr",
-  "version": "0.3.2-SNAPSHOT",
+  "version": "0.3.2",
   "description": "QR display for simplix-react-native: static QR rendering and rotating presence-token QR with remaining-validity display",
   "type": "module",
   "main": "./src/index.ts",
