@@ -6,7 +6,7 @@
 
 # Interface: TooltipComponents
 
-Defined in: [packages/ui/src/provider/types.ts:107](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L107)
+Defined in: [packages/ui/src/provider/types.ts:114](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L114)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/provider/types.ts:107](https://github.com/simplix-r
 
 > **Content**: `ComponentType`\<`TooltipContentProps` & `RefAttributes`\<`HTMLDivElement`\>\>
 
-Defined in: [packages/ui/src/provider/types.ts:111](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L111)
+Defined in: [packages/ui/src/provider/types.ts:118](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L118)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [packages/ui/src/provider/types.ts:111](https://github.com/simplix-r
 
 > **Provider**: `ComponentType`\<`TooltipProviderProps`\>
 
-Defined in: [packages/ui/src/provider/types.ts:108](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L108)
+Defined in: [packages/ui/src/provider/types.ts:115](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L115)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [packages/ui/src/provider/types.ts:108](https://github.com/simplix-r
 
 > **Root**: `ComponentType`\<\{ `children?`: `ReactNode`; `onOpenChange?`: (`open`) => `void`; `open?`: `boolean`; \}\>
 
-Defined in: [packages/ui/src/provider/types.ts:109](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L109)
+Defined in: [packages/ui/src/provider/types.ts:116](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L116)
 
 ***
 
@@ -38,4 +38,4 @@ Defined in: [packages/ui/src/provider/types.ts:109](https://github.com/simplix-r
 
 > **Trigger**: `ComponentType`\<\{ `asChild?`: `boolean`; `children?`: `ReactNode`; \}\>
 
-Defined in: [packages/ui/src/provider/types.ts:110](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L110)
+Defined in: [packages/ui/src/provider/types.ts:117](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L117)

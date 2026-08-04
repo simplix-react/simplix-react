@@ -8,7 +8,7 @@
 
 > **MapNavigator**(`__namedParameters`): `Element` \| `null`
 
-Defined in: [packages/ui/src/base/map/map-navigator.tsx:91](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/map/map-navigator.tsx#L91)
+Defined in: [packages/ui/src/base/map/map-navigator.tsx:92](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/map/map-navigator.tsx#L92)
 
 ## Parameters
 

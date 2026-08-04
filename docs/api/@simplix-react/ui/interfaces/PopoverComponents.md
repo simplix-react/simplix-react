@@ -10,11 +10,24 @@ Defined in: [packages/ui/src/provider/types.ts:101](https://github.com/simplix-r
 
 ## Properties
 
+### Anchor
+
+> **Anchor**: `ComponentType`\<\{ `asChild?`: `boolean`; `children?`: `ReactNode`; \}\>
+
+Defined in: [packages/ui/src/provider/types.ts:110](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L110)
+
+Positions the popover against something other than its trigger. A field whose
+box holds controls of its own (removable chips, a search input) cannot make
+that box the trigger without nesting a control inside a control, so the box
+anchors and a button inside it triggers.
+
+***
+
 ### Content
 
 > **Content**: `ComponentType`\<`PopoverContentProps` & `RefAttributes`\<`HTMLDivElement`\>\>
 
-Defined in: [packages/ui/src/provider/types.ts:104](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L104)
+Defined in: [packages/ui/src/provider/types.ts:111](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/types.ts#L111)
 
 ***
 

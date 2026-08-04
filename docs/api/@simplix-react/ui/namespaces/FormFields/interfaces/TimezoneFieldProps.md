@@ -6,7 +6,7 @@
 
 # Interface: TimezoneFieldProps
 
-Defined in: [packages/ui/src/fields/form/timezone-field.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/timezone-field.tsx#L13)
+Defined in: [packages/ui/src/fields/form/timezone-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/timezone-field.tsx#L14)
 
 Props for the [TimezoneField](../functions/TimezoneField.md) form component.
 
@@ -110,7 +110,7 @@ label for screen readers only.
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/fields/form/timezone-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/timezone-field.tsx#L15)
+Defined in: [packages/ui/src/fields/form/timezone-field.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/timezone-field.tsx#L16)
 
 #### Parameters
 
@@ -128,7 +128,7 @@ Defined in: [packages/ui/src/fields/form/timezone-field.tsx:15](https://github.c
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/fields/form/timezone-field.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/timezone-field.tsx#L16)
+Defined in: [packages/ui/src/fields/form/timezone-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/timezone-field.tsx#L17)
 
 ***
 
@@ -192,7 +192,7 @@ below at full width.
 
 > **value**: `string`
 
-Defined in: [packages/ui/src/fields/form/timezone-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/timezone-field.tsx#L14)
+Defined in: [packages/ui/src/fields/form/timezone-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/timezone-field.tsx#L15)
 
 ***
 

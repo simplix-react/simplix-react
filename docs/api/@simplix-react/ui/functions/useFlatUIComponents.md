@@ -191,6 +191,10 @@ with the same names used in direct base imports (e.g. `Table`, `TableRow`).
 
 > **Popover**: `ComponentType`\<\{ `children?`: `ReactNode`; `onOpenChange?`: (`open`) => `void`; `open?`: `boolean`; \}\> = `ui.Popover.Root`
 
+### PopoverAnchor
+
+> **PopoverAnchor**: `ComponentType`\<\{ `asChild?`: `boolean`; `children?`: `ReactNode`; \}\> = `ui.Popover.Anchor`
+
 ### PopoverContent
 
 > **PopoverContent**: `ComponentType`\<`PopoverContentProps` & `RefAttributes`\<`HTMLDivElement`\>\> = `ui.Popover.Content`

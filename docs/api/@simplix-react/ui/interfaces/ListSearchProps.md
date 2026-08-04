@@ -6,7 +6,7 @@
 
 # Interface: ListSearchProps
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:199](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L199)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:206](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L206)
 
 Props for the List.Search sub-component.
 
@@ -16,7 +16,7 @@ Props for the List.Search sub-component.
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:203](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L203)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:210](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L210)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:203](https://github.com/sim
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:201](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L201)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:208](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L208)
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:201](https://github.com/sim
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:202](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L202)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:209](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L209)
 
 ***
 
@@ -50,4 +50,4 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:202](https://github.com/sim
 
 > **value**: `string`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:200](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L200)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:207](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L207)

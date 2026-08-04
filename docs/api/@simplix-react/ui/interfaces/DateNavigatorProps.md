@@ -6,7 +6,7 @@
 
 # Interface: DateNavigatorProps
 
-Defined in: [packages/ui/src/base/inputs/date-navigator.tsx:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-navigator.tsx#L8)
+Defined in: [packages/ui/src/base/inputs/date-navigator.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-navigator.tsx#L9)
 
 Props for the [DateNavigator](../functions/DateNavigator.md) component.
 
@@ -280,7 +280,7 @@ false
 
 > `optional` **size**: `"default"` \| `"sm"`
 
-Defined in: [packages/ui/src/base/inputs/date-navigator.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-navigator.tsx#L10)
+Defined in: [packages/ui/src/base/inputs/date-navigator.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-navigator.tsx#L11)
 
 Size variant.
 

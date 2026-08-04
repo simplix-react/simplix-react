@@ -6,7 +6,7 @@
 
 # Interface: CurrencyFieldProps
 
-Defined in: [packages/ui/src/fields/form/currency-field.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/currency-field.tsx#L11)
+Defined in: [packages/ui/src/fields/form/currency-field.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/currency-field.tsx#L12)
 
 Props for the [CurrencyField](../functions/CurrencyField.md) form component.
 
@@ -110,7 +110,7 @@ label for screen readers only.
 
 > **onChange**: (`value`, `option`) => `void`
 
-Defined in: [packages/ui/src/fields/form/currency-field.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/currency-field.tsx#L19)
+Defined in: [packages/ui/src/fields/form/currency-field.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/currency-field.tsx#L20)
 
 Receives the picked code, and the currency itself alongside it — a form that stores an
 amount's scale can take `decimalPlaces` from here rather than asking the operator to
@@ -136,7 +136,7 @@ know that the won has none.
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/fields/form/currency-field.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/currency-field.tsx#L20)
+Defined in: [packages/ui/src/fields/form/currency-field.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/currency-field.tsx#L21)
 
 ***
 
@@ -200,7 +200,7 @@ below at full width.
 
 > **value**: `string`
 
-Defined in: [packages/ui/src/fields/form/currency-field.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/currency-field.tsx#L13)
+Defined in: [packages/ui/src/fields/form/currency-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/currency-field.tsx#L14)
 
 The ISO 4217 code, empty while none is picked.
 

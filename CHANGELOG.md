@@ -11,6 +11,17 @@ workflow stamps it with the released version and date, then opens a fresh
 
 ## [0.3.2] - Unreleased
 
+### Added
+
+- `Popover.Anchor` is a registered UI component, reachable through `useFlatUIComponents()`. A field box that holds controls of its own positions the popover from the box while a button inside it triggers
+
+### Fixed
+
+- `usePageHeader` now publishes on every render of its caller, so an action in the page header reflects the state it was written against. It re-registered only when `title`, `description`, or `metadataKey` changed, which froze `actions`, `metadata`, and `center` at the values of the render that last changed one of those three — a save button installed disabled never enabled, and a period selector never moved its highlight. Consumers worked around it by encoding the state into `metadataKey`; that is no longer needed and the field goes back to meaning what it says. The header is held in a store the header chrome subscribes to rather than in provider state, so publishing no longer re-renders the page that published and the dependency list that caused the freeze is gone
+- Popover-backed select fields (`ComboboxField`, `MultiSelectField`, `TreeSelectField`, `TreeMultiSelectField`, `CountryField`, `CurrencyField`, `TimezoneField`) no longer put a control inside their popover trigger. The trigger is a real `<button role="combobox">` — reachable by Tab, opened with Enter or Space, closed with Escape — and the clear, expand, and chip-remove buttons are its siblings. The trigger was a `<span role="combobox">` holding those buttons, which left it out of the tab order entirely and gave assistive technology a control nested inside a control
+- `CrudList` row presses that start in the selection cell, the row-action cell, or the drag-handle cell no longer reach `onRowClick`. A list wired to both selection and a detail panel opened the panel when a row was ticked, because the whole `<tr>` carried the handler and the caller could not tell which cell a press came from. Covers the table, the card mode, and the reorderable variants of both
+- Every user-facing `aria-label`, `title`, and placeholder in `@simplix-react/ui` resolves through the `simplix/ui` catalogue. Row selection, pagination, the column toggle, the display-order sort, the filter clear and remove buttons, the wizard steps, the map and date navigators, the number and signature inputs, and the language selector carried English string literals, so a screen reader announced them in English whatever the locale
+
 ## [0.3.1] - 2026-08-03
 
 ### Changed

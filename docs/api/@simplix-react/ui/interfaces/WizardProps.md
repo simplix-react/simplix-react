@@ -6,7 +6,7 @@
 
 # Interface: WizardProps
 
-Defined in: [packages/ui/src/crud/form/wizard.tsx:133](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/wizard.tsx#L133)
+Defined in: [packages/ui/src/crud/form/wizard.tsx:135](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/wizard.tsx#L135)
 
 Props for the [Wizard](../variables/Wizard.md) compound component root.
 
@@ -28,7 +28,7 @@ Props for the [Wizard](../variables/Wizard.md) compound component root.
 
 > **children**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/form/wizard.tsx:138](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/wizard.tsx#L138)
+Defined in: [packages/ui/src/crud/form/wizard.tsx:140](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/wizard.tsx#L140)
 
 One or more `<Wizard.Step>` children.
 
@@ -38,7 +38,7 @@ One or more `<Wizard.Step>` children.
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/form/wizard.tsx:136](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/wizard.tsx#L136)
+Defined in: [packages/ui/src/crud/form/wizard.tsx:138](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/wizard.tsx#L138)
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: [packages/ui/src/crud/form/wizard.tsx:136](https://github.com/simpli
 
 > **onComplete**: () => `void`
 
-Defined in: [packages/ui/src/crud/form/wizard.tsx:135](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/wizard.tsx#L135)
+Defined in: [packages/ui/src/crud/form/wizard.tsx:137](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/wizard.tsx#L137)
 
 Called when the user completes the final step.
 

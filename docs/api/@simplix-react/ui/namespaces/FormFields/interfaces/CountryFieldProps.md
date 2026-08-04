@@ -6,7 +6,7 @@
 
 # Interface: CountryFieldProps
 
-Defined in: [packages/ui/src/fields/form/country-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/country-field.tsx#L14)
+Defined in: [packages/ui/src/fields/form/country-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/country-field.tsx#L15)
 
 Props for the [CountryField](../functions/CountryField.md) form component.
 
@@ -110,7 +110,7 @@ label for screen readers only.
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/fields/form/country-field.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/country-field.tsx#L16)
+Defined in: [packages/ui/src/fields/form/country-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/country-field.tsx#L17)
 
 #### Parameters
 
@@ -128,7 +128,7 @@ Defined in: [packages/ui/src/fields/form/country-field.tsx:16](https://github.co
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/fields/form/country-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/country-field.tsx#L17)
+Defined in: [packages/ui/src/fields/form/country-field.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/country-field.tsx#L18)
 
 ***
 
@@ -192,7 +192,7 @@ below at full width.
 
 > **value**: `string`
 
-Defined in: [packages/ui/src/fields/form/country-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/country-field.tsx#L15)
+Defined in: [packages/ui/src/fields/form/country-field.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/country-field.tsx#L16)
 
 ***
 

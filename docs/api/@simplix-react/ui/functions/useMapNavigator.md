@@ -8,7 +8,7 @@
 
 > **useMapNavigator**\<`T`\>(`__namedParameters`): [`UseMapNavigatorResult`](../interfaces/UseMapNavigatorResult.md)
 
-Defined in: [packages/ui/src/base/map/map-navigator.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/map/map-navigator.tsx#L24)
+Defined in: [packages/ui/src/base/map/map-navigator.tsx:25](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/map/map-navigator.tsx#L25)
 
 ## Type Parameters
 

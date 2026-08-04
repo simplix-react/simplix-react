@@ -8,7 +8,7 @@
 
 > **CurrencyField**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/form/currency-field.tsx:40](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/currency-field.tsx#L40)
+Defined in: [packages/ui/src/fields/form/currency-field.tsx:41](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/currency-field.tsx#L41)
 
 Currency selector field over the ISO 4217 codes the runtime knows, with localized names.
 Searchable by code, localized name, and English name.

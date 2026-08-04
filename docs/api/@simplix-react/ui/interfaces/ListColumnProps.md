@@ -6,7 +6,7 @@
 
 # Interface: ListColumnProps\<T\>
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:248](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L248)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:255](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L255)
 
 Declarative column definition for List.Table. Not rendered directly.
 
@@ -22,7 +22,7 @@ Declarative column definition for List.Table. Not rendered directly.
 
 > `optional` **children**: (`props`) => `ReactNode`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:298](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L298)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:305](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L305)
 
 #### Parameters
 
@@ -46,7 +46,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:298](https://github.com/sim
 
 > `optional` **display**: `"boolean"` \| `"badge"` \| `"phone"` \| `"country"`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:275](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L275)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:282](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L282)
 
 ***
 
@@ -54,7 +54,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:275](https://github.com/sim
 
 > `optional` **displayZone**: `string` \| (`row`) => `string` \| `undefined`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:284](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L284)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:291](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L291)
 
 IANA display zone for `format="datetime"` cells. A string applies one zone to
 every row (a screen pinned to one site); a function resolves the zone per row
@@ -68,7 +68,7 @@ formats — those are zone-neutral by kind.
 
 > `optional` **enumLabel**: (`enumName`, `value`) => `string`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:297](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L297)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:304](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L304)
 
 Translates an enum constant — pass the entity translation's `enumLabel`.
 Without it (or without `enumName`) the badge falls back to the raw value,
@@ -94,7 +94,7 @@ which is a constant like `IN_TRANSIT` rather than anything an operator reads.
 
 > `optional` **enumName**: `string`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:291](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L291)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:298](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L298)
 
 Enum this column's values belong to, e.g. `"OrderStatus"`. Paired with
 `enumLabel`, a `display="badge"` cell shows the translated label instead of
@@ -106,7 +106,7 @@ the constant the API sends.
 
 > `optional` **field**: keyof `T` & `string`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:249](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L249)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:256](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L256)
 
 ***
 
@@ -114,7 +114,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:249](https://github.com/sim
 
 > `optional` **format**: `"date"` \| `"time"` \| `"datetime"` \| `"relative"`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:276](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L276)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:283](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L283)
 
 ***
 
@@ -122,7 +122,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:276](https://github.com/sim
 
 > `optional` **header**: `string`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:250](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L250)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:257](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L257)
 
 ***
 
@@ -130,7 +130,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:250](https://github.com/sim
 
 > `optional` **minWidth**: `number`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:274](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L274)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:281](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L281)
 
 The column's floor in pixels, rather than its whole allowance: it never
 renders narrower than this, and it takes a share of whatever width the
@@ -152,7 +152,7 @@ and give it no width of its own. Ignored when [width](#width) is also set.
 
 > `optional` **sortable**: `boolean`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:251](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L251)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:258](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L258)
 
 ***
 
@@ -160,7 +160,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:251](https://github.com/sim
 
 > `optional` **variants**: `Record`\<`string`, `"default"` \| `"success"` \| `"warning"` \| `"outline"` \| `"blue"` \| `"cyan"` \| `"fuchsia"` \| `"green"` \| `"indigo"` \| `"lime"` \| `"orange"` \| `"pink"` \| `"purple"` \| `"red"` \| `"teal"` \| `"violet"` \| `"yellow"` \| `"destructive"` \| `"secondary"` \| `"slate"` \| `"amber"` \| `"emerald"` \| `"sky"` \| `"rose"` \| `null` \| `undefined`\>
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:285](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L285)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:292](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L292)
 
 ***
 
@@ -168,7 +168,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:285](https://github.com/sim
 
 > `optional` **width**: `number`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:258](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L258)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:265](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L265)
 
 Column content width in pixels. Also sizes the header box, so a header
 longer than the width ellipsizes (full text in a tooltip) instead of
