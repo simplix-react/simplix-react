@@ -98,6 +98,8 @@ interface DragHandleHeaderProps {
 
 export function DragHandleHeader({ isDragEnabled, onActivate }: DragHandleHeaderProps) {
   const { Button } = useFlatUIComponents();
+  const { t } = useTranslation("simplix/ui");
+  const label = t("list.sortByDisplayOrder");
   return (
     <Button
       type="button"
@@ -106,8 +108,8 @@ export function DragHandleHeader({ isDragEnabled, onActivate }: DragHandleHeader
       onClick={isDragEnabled ? undefined : onActivate}
       disabled={isDragEnabled}
       className={cn(isDragEnabled && "pointer-events-none opacity-100")}
-      aria-label="Sort by display order"
-      title="Sort by display order"
+      aria-label={label}
+      title={label}
     >
       <ArrowDown01Icon />
     </Button>

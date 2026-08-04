@@ -133,7 +133,7 @@ describe("CrudList.Table (card mode)", () => {
         </CrudList.Table>
       </CrudList>,
     );
-    expect(screen.getByLabelText("Select all")).toBeTruthy();
+    expect(screen.getByLabelText("list.selectAll")).toBeTruthy();
   });
 
   it("calls onSelectAll in card mode", () => {
@@ -152,7 +152,7 @@ describe("CrudList.Table (card mode)", () => {
         </CrudList.Table>
       </CrudList>,
     );
-    fireEvent.click(screen.getByLabelText("Select all"));
+    fireEvent.click(screen.getByLabelText("list.selectAll"));
     expect(onSelectAll).toHaveBeenCalledTimes(1);
   });
 
@@ -171,7 +171,7 @@ describe("CrudList.Table (card mode)", () => {
         </CrudList.Table>
       </CrudList>,
     );
-    const row2Checkbox = screen.getByLabelText("Select row 2") as HTMLInputElement;
+    const row2Checkbox = screen.getAllByLabelText("list.selectRow")[1] as HTMLInputElement;
     expect(row2Checkbox.checked).toBe(true);
   });
 
@@ -191,7 +191,7 @@ describe("CrudList.Table (card mode)", () => {
         </CrudList.Table>
       </CrudList>,
     );
-    fireEvent.click(screen.getByLabelText("Select row 1"));
+    fireEvent.click(screen.getAllByLabelText("list.selectRow")[0]);
     expect(onSelectionChange).toHaveBeenCalledWith(0);
   });
 

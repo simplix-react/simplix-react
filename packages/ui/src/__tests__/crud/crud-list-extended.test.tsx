@@ -197,7 +197,7 @@ describe("CrudList.Table (extended coverage)", () => {
         </CrudList.Table>
       </CrudList>,
     );
-    const selectAllCheckbox = screen.getByLabelText("Select all rows");
+    const selectAllCheckbox = screen.getByLabelText("list.selectAllRows");
     expect(selectAllCheckbox).toBeTruthy();
   });
 
@@ -216,9 +216,9 @@ describe("CrudList.Table (extended coverage)", () => {
       </CrudList>,
     );
     // All checkboxes should be checked
-    const row1Checkbox = screen.getByLabelText("Select row 1") as HTMLInputElement;
-    const row2Checkbox = screen.getByLabelText("Select row 2") as HTMLInputElement;
-    const row3Checkbox = screen.getByLabelText("Select row 3") as HTMLInputElement;
+    const [row1Checkbox, row2Checkbox, row3Checkbox] = screen.getAllByLabelText(
+      "list.selectRow",
+    ) as HTMLInputElement[];
     expect(row1Checkbox.checked).toBe(true);
     expect(row2Checkbox.checked).toBe(true);
     expect(row3Checkbox.checked).toBe(true);
@@ -316,7 +316,8 @@ describe("CrudList.Pagination (extended)", () => {
       />,
     );
     // Some implementation shows total, check if rendered
-    const paginationRoot = screen.getByLabelText("Page 1").closest("nav") ?? screen.getByLabelText("Page 1").parentElement;
+    const firstPage = screen.getAllByLabelText("list.pageNumber")[0];
+    const paginationRoot = firstPage.closest("nav") ?? firstPage.parentElement;
     expect(paginationRoot).toBeTruthy();
   });
 });

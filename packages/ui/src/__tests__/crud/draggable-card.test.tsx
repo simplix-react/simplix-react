@@ -149,7 +149,7 @@ describe("DraggableCard", () => {
         cardTitle={<span>Title</span>}
       />,
     );
-    expect(screen.getByLabelText("Select row 1")).toBeTruthy();
+    expect(screen.getByLabelText("list.selectRow")).toBeTruthy();
   });
 
   it("calls onSelectionChange when checkbox is clicked", () => {
@@ -167,7 +167,7 @@ describe("DraggableCard", () => {
         cardTitle={<span>Title</span>}
       />,
     );
-    fireEvent.click(screen.getByLabelText("Select row 1"));
+    fireEvent.click(screen.getByLabelText("list.selectRow"));
     expect(onSelectionChange).toHaveBeenCalledWith(0);
   });
 

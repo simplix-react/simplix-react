@@ -129,7 +129,7 @@ function DetailRoot({ isLoading, onClose, header, footer, variant = "default", a
           {isLoading && (
             <output
               aria-busy="true"
-              aria-label="Loading"
+              aria-label={t("common.loading")}
               className="absolute inset-0 z-10 flex items-center justify-center rounded-md bg-background/60 animate-in fade-in-0 duration-150"
             >
               <span className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />

@@ -6,6 +6,7 @@ import type { Row } from "@tanstack/react-table";
 import { cn } from "../../utils/cn";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import type { ReorderConfig } from "../shared";
+import { rowClickHandler, rowClickIgnoreForColumn, rowClickIgnoreProps } from "../shared";
 import { DragHandleCell } from "./drag-handle";
 
 interface DraggableRowProps<T> {
@@ -57,10 +58,10 @@ export function DraggableRow<T>({
         isDragging && "z-10 opacity-50",
         onRowClick && "cursor-pointer",
       )}
-      onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+      onClick={rowClickHandler(row.original, onRowClick)}
       data-testid={`list-row-${rowId}`}
     >
-      <TableCell className="w-10 px-2">
+      <TableCell className="w-10 px-2" {...rowClickIgnoreProps}>
         <DragHandleCell
           disabled={!canDrag}
           listeners={listeners}
@@ -68,7 +69,11 @@ export function DraggableRow<T>({
         />
       </TableCell>
       {row.getVisibleCells().map((cell) => (
-        <TableCell key={cell.id} className="truncate">
+        <TableCell
+          key={cell.id}
+          className="truncate"
+          {...rowClickIgnoreForColumn(cell.column.id)}
+        >
           {flexRender(cell.column.columnDef.cell, cell.getContext())}
         </TableCell>
       ))}

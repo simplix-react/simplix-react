@@ -25,7 +25,14 @@ import {formatDateMedium, formatDateTime, formatRelativeTime} from "../../utils/
 import {formatWallClockTime} from "../../utils/rfc3339-date";
 import {parseDate} from "../../utils/parse-date";
 import type {ColumnInfo, EmptyReason, SortState} from "../shared";
-import {CrudListColumnContext, useCrudListColumns, useDefaultDisplayZone} from "../shared";
+import {
+  CrudListColumnContext,
+  rowClickHandler,
+  rowClickIgnoreForColumn,
+  rowClickIgnoreProps,
+  useCrudListColumns,
+  useDefaultDisplayZone,
+} from "../shared";
 import type {CrudListViewMode} from "../shared";
 import {EmptyState} from "../shared/empty-state";
 import {TableCardFrame, useTableCardFrame} from "../shared/table-card-frame";
@@ -889,7 +896,7 @@ function ListTable<T>({
             checked={selectedIndices?.size === data.length && data.length > 0}
             onChange={() => onSelectAll?.()}
             className="h-4 w-4 rounded border-gray-300"
-            aria-label="Select all rows"
+            aria-label={t("list.selectAllRows")}
           />
         ),
         cell: ({ row }) => (
@@ -898,7 +905,7 @@ function ListTable<T>({
             checked={selectedIndices?.has(row.index) ?? false}
             onChange={() => onSelectionChange?.(row.index)}
             className="h-4 w-4 rounded border-gray-300"
-            aria-label={`Select row ${row.index + 1}`}
+            aria-label={t("list.selectRow", { index: row.index + 1 })}
           />
         ),
         size: 40,
@@ -1044,6 +1051,7 @@ function ListTable<T>({
     actionColumnWidthOverride,
     slots,
     defaultDisplayZone,
+    t,
   ]);
 
   const columnVisibility: VisibilityState = useMemo(() => {
@@ -1106,7 +1114,7 @@ function ListTable<T>({
                     checked={selectedIndices?.size === data.length && data.length > 0}
                     onChange={() => onSelectAll?.()}
                     className="h-4 w-4 rounded border-gray-300"
-                    aria-label="Select all"
+                    aria-label={t("list.selectAll")}
                   />
                   {t("list.selectAll")}
                 </label>
@@ -1159,13 +1167,13 @@ function ListTable<T>({
                         onRowClick && "cursor-pointer",
                         rowClassName?.(row),
                       )}
-                      onClick={onRowClick ? () => onRowClick(row) : undefined}
+                      onClick={rowClickHandler(row, onRowClick)}
                       data-testid={`list-row-${rid}`}
                     >
                       {cardTitle && (
                         <Flex align="center" justify="between" className={cn("border-b px-2 py-1.5")}>
                           <div className="min-w-0 flex-1">{createElement(cardTitle, { row, index })}</div>
-                          <Flex gap="xs" align="center" className="shrink-0 ml-2">
+                          <Flex gap="xs" align="center" className="shrink-0 ml-2" {...rowClickIgnoreProps}>
                             {slots?.rowActions
                               ? slots.rowActions({ row })
                               : actions && actions.length > 0 && (
@@ -1175,12 +1183,9 @@ function ListTable<T>({
                               <input
                                 type="checkbox"
                                 checked={isSelected ?? false}
-                                onChange={(e) => {
-                                  e.stopPropagation();
-                                  onSelectionChange?.(index);
-                                }}
+                                onChange={() => onSelectionChange?.(index)}
                                 className="h-4 w-4 rounded border-gray-300"
-                                aria-label={`Select row ${index + 1}`}
+                                aria-label={t("list.selectRow", { index: index + 1 })}
                               />
                             )}
                           </Flex>
@@ -1274,7 +1279,7 @@ function ListTable<T>({
                             onRowClick && "cursor-pointer",
                             rowClassName?.(row.original),
                           )}
-                          onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+                          onClick={rowClickHandler(row.original, onRowClick)}
                           data-testid={`list-row-${rid}`}
                         >
                           {row.getVisibleCells().map((cell) => (
@@ -1286,6 +1291,7 @@ function ListTable<T>({
                             <TableCell
                               key={cell.id}
                               className="truncate"
+                              {...rowClickIgnoreForColumn(cell.column.id)}
                               style={
                                 (cell.column.columnDef.meta as { flexible?: boolean } | undefined)
                                   ?.flexible
@@ -1375,7 +1381,7 @@ function ListPagination({
         value={String(pageSize)}
         onValueChange={(v) => onPageSizeChange(Number(v))}
       >
-        <SelectTrigger size="xs" className="w-[64px] rounded-md border-border bg-card font-medium text-secondary-foreground" aria-label="Page size">
+        <SelectTrigger size="xs" className="w-[64px] rounded-md border-border bg-card font-medium text-secondary-foreground" aria-label={t("list.pageSize")}>
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -1398,7 +1404,7 @@ function ListPagination({
       disabled={page <= 1}
       onClick={() => onPageChange(page - 1)}
       className={cn(navCell, "w-8")}
-      aria-label="Previous page"
+      aria-label={t("list.previousPage")}
     >
       <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
         <path d="M10 4L6 8L10 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -1412,7 +1418,7 @@ function ListPagination({
       disabled={page >= totalPages}
       onClick={() => onPageChange(page + 1)}
       className={cn(navCell, "w-8")}
-      aria-label="Next page"
+      aria-label={t("list.nextPage")}
     >
       <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
         <path d="M6 4L10 8L6 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -1447,7 +1453,7 @@ function ListPagination({
                   p === page &&
                     "border-primary bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
                 )}
-                aria-label={`Page ${p}`}
+                aria-label={t("list.pageNumber", { page: p })}
                 aria-current={p === page ? "page" : undefined}
               >
                 {p}

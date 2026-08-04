@@ -327,9 +327,9 @@ describe("CrudList.Table", () => {
         </CrudList.Table>
       </CrudList>,
     );
-    const selectAllCheckbox = screen.getByLabelText("Select all rows");
+    const selectAllCheckbox = screen.getByLabelText("list.selectAllRows");
     expect(selectAllCheckbox).toBeTruthy();
-    const row2Checkbox = screen.getByLabelText("Select row 2") as HTMLInputElement;
+    const row2Checkbox = screen.getAllByLabelText("list.selectRow")[1] as HTMLInputElement;
     expect(row2Checkbox.checked).toBe(true);
   });
 
@@ -348,7 +348,7 @@ describe("CrudList.Table", () => {
         </CrudList.Table>
       </CrudList>,
     );
-    fireEvent.click(screen.getByLabelText("Select all rows"));
+    fireEvent.click(screen.getByLabelText("list.selectAllRows"));
     expect(onSelectAll).toHaveBeenCalledTimes(1);
   });
 
@@ -367,7 +367,7 @@ describe("CrudList.Table", () => {
         </CrudList.Table>
       </CrudList>,
     );
-    fireEvent.click(screen.getByLabelText("Select row 1"));
+    fireEvent.click(screen.getAllByLabelText("list.selectRow")[0]);
     expect(onSelectionChange).toHaveBeenCalledWith(0);
   });
 
@@ -382,6 +382,53 @@ describe("CrudList.Table", () => {
     );
     fireEvent.click(screen.getByText("Alice").closest("tr")!);
     expect(onRowClick).toHaveBeenCalledWith(testData[0]);
+  });
+
+  it("does not call onRowClick when the selection checkbox is clicked", () => {
+    const onRowClick = vi.fn();
+    const onSelectionChange = vi.fn();
+    render(
+      <CrudList>
+        <CrudList.Table
+          data={testData}
+          onRowClick={onRowClick}
+          selectable
+          selectedIndices={new Set()}
+          onSelectionChange={onSelectionChange}
+          onSelectAll={vi.fn()}
+        >
+          <CrudList.Column<TestItem> field="name" header="Name" />
+        </CrudList.Table>
+      </CrudList>,
+    );
+    fireEvent.click(screen.getAllByLabelText("list.selectRow")[0]);
+    expect(onSelectionChange).toHaveBeenCalledWith(0);
+    expect(onRowClick).not.toHaveBeenCalled();
+  });
+
+  it("does not call onRowClick when a custom row action is clicked", () => {
+    const onRowClick = vi.fn();
+    const onCustomAction = vi.fn();
+    render(
+      <CrudList>
+        <CrudList.Table
+          data={testData}
+          onRowClick={onRowClick}
+          slots={{
+            rowActions: () => (
+              <button type="button" onClick={onCustomAction}>
+                Archive
+              </button>
+            ),
+          }}
+        >
+          <CrudList.Column<TestItem> field="name" header="Name" />
+        </CrudList.Table>
+      </CrudList>,
+    );
+    fireEvent.click(screen.getAllByText("Archive")[0]);
+    expect(onCustomAction).toHaveBeenCalledTimes(1);
+    expect(onRowClick).not.toHaveBeenCalled();
   });
 
   it("renders action column with buttons", () => {
@@ -532,8 +579,9 @@ describe("CrudList.Pagination", () => {
         onPageChange={vi.fn()}
       />,
     );
-    expect(screen.getByLabelText("Page 1")).toBeTruthy();
-    expect(screen.getByLabelText("Page 5")).toBeTruthy();
+    const pageButtons = screen.getAllByLabelText("list.pageNumber");
+    expect(pageButtons[0].textContent).toBe("1");
+    expect(pageButtons[pageButtons.length - 1].textContent).toBe("5");
   });
 
   it("calls onPageChange when page button is clicked", () => {
@@ -547,7 +595,7 @@ describe("CrudList.Pagination", () => {
         onPageChange={onPageChange}
       />,
     );
-    fireEvent.click(screen.getByLabelText("Page 3"));
+    fireEvent.click(screen.getAllByLabelText("list.pageNumber").find((b) => b.textContent === "3")!);
     expect(onPageChange).toHaveBeenCalledWith(3);
   });
 
@@ -561,7 +609,7 @@ describe("CrudList.Pagination", () => {
         onPageChange={vi.fn()}
       />,
     );
-    const prevBtn = screen.getByLabelText("Previous page");
+    const prevBtn = screen.getByLabelText("list.previousPage");
     expect(prevBtn).toHaveProperty("disabled", true);
   });
 
@@ -575,7 +623,7 @@ describe("CrudList.Pagination", () => {
         onPageChange={vi.fn()}
       />,
     );
-    const nextBtn = screen.getByLabelText("Next page");
+    const nextBtn = screen.getByLabelText("list.nextPage");
     expect(nextBtn).toHaveProperty("disabled", true);
   });
 
@@ -590,7 +638,7 @@ describe("CrudList.Pagination", () => {
         onPageChange={onPageChange}
       />,
     );
-    fireEvent.click(screen.getByLabelText("Previous page"));
+    fireEvent.click(screen.getByLabelText("list.previousPage"));
     expect(onPageChange).toHaveBeenCalledWith(2);
   });
 
@@ -605,7 +653,7 @@ describe("CrudList.Pagination", () => {
         onPageChange={onPageChange}
       />,
     );
-    fireEvent.click(screen.getByLabelText("Next page"));
+    fireEvent.click(screen.getByLabelText("list.nextPage"));
     expect(onPageChange).toHaveBeenCalledWith(4);
   });
 
@@ -635,7 +683,7 @@ describe("CrudList.Pagination", () => {
         onPageChange={vi.fn()}
       />,
     );
-    const currentBtn = screen.getByLabelText("Page 3");
+    const currentBtn = screen.getAllByLabelText("list.pageNumber").find((b) => b.textContent === "3")!;
     expect(currentBtn.getAttribute("aria-current")).toBe("page");
   });
 });
