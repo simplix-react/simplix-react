@@ -1,3 +1,4 @@
+import { useTranslation } from "@simplix-react/i18n/react";
 import { useCallback } from "react";
 
 import { cn } from "../../utils/cn";
@@ -37,6 +38,7 @@ export function DateNavigator({
   className,
   ...rest
 }: DateNavigatorProps) {
+  const { t } = useTranslation("simplix/ui");
   const current = value ?? new Date();
 
   const prevDisabled = rest.disabled || (minDate != null && isSameDay(current, minDate));
@@ -68,7 +70,7 @@ export function DateNavigator({
         )}
         disabled={prevDisabled}
         onClick={goPrev}
-        aria-label="Previous day"
+        aria-label={t("date.previousDay")}
       >
         <ChevronLeftIcon className={sm ? "size-3.5" : "size-4"} />
       </button>
@@ -95,7 +97,7 @@ export function DateNavigator({
         )}
         disabled={nextDisabled}
         onClick={goNext}
-        aria-label="Next day"
+        aria-label={t("date.nextDay")}
       >
         <ChevronRightIcon className={sm ? "size-3.5" : "size-4"} />
       </button>

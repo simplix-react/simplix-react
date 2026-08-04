@@ -1,5 +1,7 @@
 
+import { useTranslation } from '@simplix-react/i18n/react'
 import { useState } from 'react'
+
 import { cn } from '../../../utils/cn'
 
 export interface TableGridPickerProps {
@@ -23,6 +25,7 @@ export function TableGridPicker({
   onSelect,
   formatLabel = (rows, cols) => `${cols} x ${rows}`,
 }: TableGridPickerProps) {
+  const { t } = useTranslation('simplix/ui')
   const [hoveredCell, setHoveredCell] = useState<{ row: number; col: number } | null>(null)
 
   const handleCellHover = (row: number, col: number) => {
@@ -55,7 +58,7 @@ export function TableGridPicker({
               <button
                 key={`${row}-${col}`}
                 type="button"
-                aria-label={`${row} x ${col}`}
+                aria-label={t('plateEditor.table.gridSize', { rows: row, cols: col })}
                 className={cn(
                   'h-4 w-4 border border-border rounded-[2px] transition-colors',
                   isHighlighted

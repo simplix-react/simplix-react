@@ -313,35 +313,35 @@ describe("FilterBar popover form fields", () => {
     const state = createMockState({ "name.contains": "hello" });
     render(<FilterBar filters={[textFilter]} state={state} />);
     openPopover();
-    expect(screen.getByLabelText("Clear Name")).toBeTruthy();
+    expect(screen.getByLabelText("filter.clearField")).toBeTruthy();
   });
 
   it("shows clear button for number field when value exists", () => {
     const state = createMockState({ "age.equals": 25 });
     render(<FilterBar filters={[numberFilter]} state={state} />);
     openPopover();
-    expect(screen.getByLabelText("Clear Age")).toBeTruthy();
+    expect(screen.getByLabelText("filter.clearField")).toBeTruthy();
   });
 
   it("shows clear button for toggle when active", () => {
     const state = createMockState({ "enabled.equals": true });
     render(<FilterBar filters={[toggleFilter]} state={state} />);
     openPopover();
-    expect(screen.getByLabelText("Clear Enabled")).toBeTruthy();
+    expect(screen.getByLabelText("filter.clearField")).toBeTruthy();
   });
 
   it("shows clear button for faceted when items selected", () => {
     const state = createMockState({ "status.in": ["active"] });
     render(<FilterBar filters={[facetedFilter]} state={state} />);
     openPopover();
-    expect(screen.getByLabelText("Clear Status")).toBeTruthy();
+    expect(screen.getByLabelText("filter.clearField")).toBeTruthy();
   });
 
   it("clears faceted selection via clear button", () => {
     const state = createMockState({ "status.in": ["active"] });
     render(<FilterBar filters={[facetedFilter]} state={state} />);
     openPopover();
-    fireEvent.click(screen.getByLabelText("Clear Status"));
+    fireEvent.click(screen.getByLabelText("filter.clearField"));
     expect(state.setValue).toHaveBeenCalledWith("status.in", undefined);
   });
 
@@ -349,7 +349,7 @@ describe("FilterBar popover form fields", () => {
     const state = createMockState({ "enabled.equals": true });
     render(<FilterBar filters={[toggleFilter]} state={state} />);
     openPopover();
-    fireEvent.click(screen.getByLabelText("Clear Enabled"));
+    fireEvent.click(screen.getByLabelText("filter.clearField"));
     expect(state.setValue).toHaveBeenCalledWith("enabled.equals", undefined);
   });
 
@@ -357,7 +357,7 @@ describe("FilterBar popover form fields", () => {
     const state = createMockState({ "name.contains": "hello" });
     render(<FilterBar filters={[textFilter]} state={state} />);
     openPopover();
-    fireEvent.click(screen.getByLabelText("Clear Name"));
+    fireEvent.click(screen.getByLabelText("filter.clearField"));
     expect(state.setValue).toHaveBeenCalledWith("name.contains", undefined);
   });
 
@@ -365,7 +365,7 @@ describe("FilterBar popover form fields", () => {
     const state = createMockState({ "age.equals": 25 });
     render(<FilterBar filters={[numberFilter]} state={state} />);
     openPopover();
-    fireEvent.click(screen.getByLabelText("Clear Age"));
+    fireEvent.click(screen.getByLabelText("filter.clearField"));
     expect(state.setValue).toHaveBeenCalledWith("age.equals", undefined);
   });
 
@@ -387,7 +387,7 @@ describe("FilterBar popover form fields", () => {
     render(<FilterBar filters={[dateRangeFilter]} state={state} />);
     openPopover();
     // Should show a clear button for the dateRange
-    expect(screen.getByLabelText("Clear Created")).toBeTruthy();
+    expect(screen.getByLabelText("filter.clearField")).toBeTruthy();
   });
 
   it("clears dateRange via clear button", () => {
@@ -399,7 +399,7 @@ describe("FilterBar popover form fields", () => {
     });
     render(<FilterBar filters={[dateRangeFilter]} state={state} />);
     openPopover();
-    fireEvent.click(screen.getByLabelText("Clear Created"));
+    fireEvent.click(screen.getByLabelText("filter.clearField"));
     expect(state.setValues).toHaveBeenCalledWith({
       [gteKey]: undefined,
       [lteKey]: undefined,

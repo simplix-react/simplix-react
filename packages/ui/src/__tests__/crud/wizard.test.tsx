@@ -159,6 +159,6 @@ describe("Wizard", () => {
       </Wizard>,
     );
     const section = document.querySelector("section");
-    expect(section?.getAttribute("aria-label")).toContain("Basic");
+    expect(section?.getAttribute("aria-label")).toBe("wizard.stepLabel");
   });
 });

@@ -1,4 +1,6 @@
+import { useTranslation } from "@simplix-react/i18n/react";
 import { useCallback, useEffect, useRef } from "react";
+
 import { cn } from "../../utils/cn";
 
 /** Props for the {@link SignaturePad} component. */
@@ -45,6 +47,7 @@ export function SignaturePad({
   disabled,
   className,
 }: SignaturePadProps) {
+  const { t } = useTranslation("simplix/ui");
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawingRef = useRef(false);
   const hasStrokesRef = useRef(false);
@@ -152,7 +155,7 @@ export function SignaturePad({
         <button
           type="button"
           onClick={clear}
-          aria-label="Clear"
+          aria-label={t("field.clearSignature")}
           className="absolute right-2 top-2 rounded-sm px-1.5 py-0.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
         >
           ⟲

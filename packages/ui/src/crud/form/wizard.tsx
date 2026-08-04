@@ -1,3 +1,4 @@
+import { useTranslation } from "@simplix-react/i18n/react";
 import {
   Children,
   type ReactElement,
@@ -41,8 +42,9 @@ interface StepIndicatorProps {
 }
 
 function StepIndicator({ steps, currentStep }: StepIndicatorProps) {
+  const { t } = useTranslation("simplix/ui");
   return (
-    <nav aria-label="Form steps">
+    <nav aria-label={t("wizard.steps")}>
       <ol className="flex items-center gap-0">
         {steps.map((step, index) => {
           const isActive = index === currentStep;
@@ -139,6 +141,7 @@ export interface WizardProps {
 }
 
 function WizardRoot({ onComplete, className, children }: WizardProps) {
+  const { t } = useTranslation("simplix/ui");
   const [currentStep, setCurrentStep] = useState(0);
   const [isValidating, setIsValidating] = useState(false);
 
@@ -192,7 +195,12 @@ function WizardRoot({ onComplete, className, children }: WizardProps) {
       <StepIndicator steps={steps} currentStep={currentStep} />
 
       {/* Active step content */}
-      <section aria-label={`Step ${currentStep + 1}: ${steps[currentStep]?.title}`}>
+      <section
+        aria-label={t("wizard.stepLabel", {
+          step: currentStep + 1,
+          title: steps[currentStep]?.title ?? "",
+        })}
+      >
         {activeStep}
       </section>
 

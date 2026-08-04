@@ -500,7 +500,7 @@ export function FilterBar({ filters, state, leading, trailing, maxBadges, onPrev
               type="button"
               onClick={() => removeFilter(def)}
               className="ml-0.5 inline-flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
-              aria-label={`Remove ${def.label} filter`}
+              aria-label={t("filter.removeFilter", { label: def.label })}
             >
               <XIcon className="h-2.5 w-2.5" />
             </button>
@@ -602,7 +602,7 @@ export function FilterBar({ filters, state, leading, trailing, maxBadges, onPrev
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                aria-label="Toggle columns"
+                aria-label={t("list.toggleColumns")}
                 className="inline-grid h-full w-7 place-items-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground [&_svg]:size-3.5"
               >
                 <ColumnsIcon className="h-3.5 w-3.5" />

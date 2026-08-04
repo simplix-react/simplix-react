@@ -78,7 +78,7 @@ describe("LocationPickerField", () => {
         onLocationChange={vi.fn()}
       />,
     );
-    expect(screen.getByLabelText("Clear location")).toBeDefined();
+    expect(screen.getByLabelText("field.clearLocation")).toBeDefined();
   });
 
   it("calls onLocationChange(0, 0) when clear button is clicked", () => {
@@ -91,7 +91,7 @@ describe("LocationPickerField", () => {
         onLocationChange={onLocationChange}
       />,
     );
-    fireEvent.click(screen.getByLabelText("Clear location"));
+    fireEvent.click(screen.getByLabelText("field.clearLocation"));
     expect(onLocationChange).toHaveBeenCalledWith(0, 0);
   });
 
@@ -104,7 +104,7 @@ describe("LocationPickerField", () => {
         onLocationChange={vi.fn()}
       />,
     );
-    expect(screen.getByLabelText("Select location on map")).toBeDefined();
+    expect(screen.getByLabelText("field.selectLocationOnMap")).toBeDefined();
   });
 
   it("opens dialog when select button is clicked", () => {
@@ -116,7 +116,7 @@ describe("LocationPickerField", () => {
         onLocationChange={vi.fn()}
       />,
     );
-    fireEvent.click(screen.getByLabelText("Select location on map"));
+    fireEvent.click(screen.getByLabelText("field.selectLocationOnMap"));
     // Dialog should open with title
     expect(screen.getByText("field.selectLocation")).toBeDefined();
   });
@@ -188,10 +188,10 @@ describe("LocationPickerField", () => {
       />,
     );
     // Clear button should be disabled
-    const clearBtn = screen.getByLabelText("Clear location");
+    const clearBtn = screen.getByLabelText("field.clearLocation");
     expect(clearBtn).toHaveProperty("disabled", true);
     // Map pin button should be disabled
-    const mapBtn = screen.getByLabelText("Select location on map");
+    const mapBtn = screen.getByLabelText("field.selectLocationOnMap");
     expect(mapBtn).toHaveProperty("disabled", true);
   });
 
@@ -204,7 +204,7 @@ describe("LocationPickerField", () => {
         onLocationChange={vi.fn()}
       />,
     );
-    fireEvent.click(screen.getByLabelText("Select location on map"));
+    fireEvent.click(screen.getByLabelText("field.selectLocationOnMap"));
     expect(screen.getByText("field.cancelLocation")).toBeDefined();
     expect(screen.getByText("field.confirmLocation")).toBeDefined();
   });
@@ -218,7 +218,7 @@ describe("LocationPickerField", () => {
         onLocationChange={vi.fn()}
       />,
     );
-    fireEvent.click(screen.getByLabelText("Select location on map"));
+    fireEvent.click(screen.getByLabelText("field.selectLocationOnMap"));
     expect(screen.getByPlaceholderText("field.searchLocation")).toBeDefined();
   });
 
@@ -231,7 +231,7 @@ describe("LocationPickerField", () => {
         onLocationChange={vi.fn()}
       />,
     );
-    fireEvent.click(screen.getByLabelText("Select location on map"));
+    fireEvent.click(screen.getByLabelText("field.selectLocationOnMap"));
     expect(screen.getByLabelText("field.detectLocation")).toBeDefined();
   });
 
@@ -244,9 +244,9 @@ describe("LocationPickerField", () => {
         onLocationChange={vi.fn()}
       />,
     );
-    fireEvent.click(screen.getByLabelText("Select location on map"));
-    expect(screen.getByLabelText("Light map")).toBeDefined();
-    expect(screen.getByLabelText("Dark map")).toBeDefined();
+    fireEvent.click(screen.getByLabelText("field.selectLocationOnMap"));
+    expect(screen.getByLabelText("field.mapLight")).toBeDefined();
+    expect(screen.getByLabelText("field.mapDark")).toBeDefined();
   });
 
   it("renders dialog with coordinates display", () => {
@@ -258,7 +258,7 @@ describe("LocationPickerField", () => {
         onLocationChange={vi.fn()}
       />,
     );
-    fireEvent.click(screen.getByLabelText("Select location on map"));
+    fireEvent.click(screen.getByLabelText("field.selectLocationOnMap"));
     // Temp coordinates displayed
     const coords = screen.getAllByText(/37\.566500/);
     expect(coords.length).toBeGreaterThan(0);
@@ -274,7 +274,7 @@ describe("LocationPickerField", () => {
         onLocationChange={onLocationChange}
       />,
     );
-    fireEvent.click(screen.getByLabelText("Select location on map"));
+    fireEvent.click(screen.getByLabelText("field.selectLocationOnMap"));
     fireEvent.click(screen.getByText("field.confirmLocation"));
     expect(onLocationChange).toHaveBeenCalled();
   });
@@ -288,7 +288,7 @@ describe("LocationPickerField", () => {
         onLocationChange={vi.fn()}
       />,
     );
-    fireEvent.click(screen.getByLabelText("Select location on map"));
+    fireEvent.click(screen.getByLabelText("field.selectLocationOnMap"));
     expect(screen.getByText("field.selectLocation")).toBeDefined();
     fireEvent.click(screen.getByText("field.cancelLocation"));
     // Dialog should close
@@ -303,8 +303,8 @@ describe("LocationPickerField", () => {
         onLocationChange={vi.fn()}
       />,
     );
-    fireEvent.click(screen.getByLabelText("Select location on map"));
-    fireEvent.click(screen.getByLabelText("Dark map"));
+    fireEvent.click(screen.getByLabelText("field.selectLocationOnMap"));
+    fireEvent.click(screen.getByLabelText("field.mapDark"));
     // No error means it switched
   });
 
@@ -317,8 +317,8 @@ describe("LocationPickerField", () => {
         onLocationChange={vi.fn()}
       />,
     );
-    fireEvent.click(screen.getByLabelText("Select location on map"));
-    fireEvent.click(screen.getByLabelText("Light map"));
+    fireEvent.click(screen.getByLabelText("field.selectLocationOnMap"));
+    fireEvent.click(screen.getByLabelText("field.mapLight"));
     // No error means it switched
   });
 
@@ -336,9 +336,9 @@ describe("LocationPickerField", () => {
       />,
     );
     // Should show manual inputs instead of map
-    expect(screen.getByPlaceholderText("Latitude")).toBeDefined();
-    expect(screen.getByPlaceholderText("Longitude")).toBeDefined();
-    expect(screen.getByLabelText("Map unavailable")).toBeDefined();
+    expect(screen.getByPlaceholderText("field.latitude")).toBeDefined();
+    expect(screen.getByPlaceholderText("field.longitude")).toBeDefined();
+    expect(screen.getByLabelText("field.mapUnavailable")).toBeDefined();
 
     // Restore
     if (originalOnLine) {
@@ -360,7 +360,7 @@ describe("LocationPickerField", () => {
         onLocationChange={onLocationChange}
       />,
     );
-    const latInput = screen.getByPlaceholderText("Latitude");
+    const latInput = screen.getByPlaceholderText("field.latitude");
     fireEvent.change(latInput, { target: { value: "38.0" } });
     expect(onLocationChange).toHaveBeenCalledWith(38, 126.978);
 
@@ -379,7 +379,7 @@ describe("LocationPickerField", () => {
         onLocationChange={onLocationChange}
       />,
     );
-    const lngInput = screen.getByPlaceholderText("Longitude");
+    const lngInput = screen.getByPlaceholderText("field.longitude");
     fireEvent.change(lngInput, { target: { value: "127.0" } });
     expect(onLocationChange).toHaveBeenCalledWith(37.5665, 127);
 
@@ -398,7 +398,7 @@ describe("LocationPickerField", () => {
         onLocationChange={onLocationChange}
       />,
     );
-    const latInput = screen.getByPlaceholderText("Latitude");
+    const latInput = screen.getByPlaceholderText("field.latitude");
     fireEvent.change(latInput, { target: { value: "" } });
     expect(onLocationChange).toHaveBeenCalledWith(0, 126.978);
 
@@ -418,7 +418,7 @@ describe("LocationPickerField", () => {
       />,
     );
     // Should show map (not manual inputs) because fallbackTileUrl is available
-    expect(screen.queryByPlaceholderText("Latitude")).toBeNull();
+    expect(screen.queryByPlaceholderText("field.latitude")).toBeNull();
     expect(screen.getByTestId("mock-map")).toBeDefined();
 
     Object.defineProperty(navigator, "onLine", { value: true, configurable: true });
@@ -473,7 +473,7 @@ describe("LocationPickerField", () => {
       />,
     );
     // In offline mode with 0,0, inputs show empty
-    const latInput = screen.getByPlaceholderText("Latitude") as HTMLInputElement;
+    const latInput = screen.getByPlaceholderText("field.latitude") as HTMLInputElement;
     expect(latInput.value).toBe("");
     Object.defineProperty(navigator, "onLine", { value: true, configurable: true });
   });
@@ -495,7 +495,7 @@ describe("LocationPickerField", () => {
       window.dispatchEvent(new Event("offline"));
     });
     // Should now show manual inputs
-    expect(screen.getByPlaceholderText("Latitude")).toBeDefined();
+    expect(screen.getByPlaceholderText("field.latitude")).toBeDefined();
 
     // Simulate going back online
     act(() => {
@@ -517,7 +517,7 @@ describe("LocationPickerField", () => {
         onLocationChange={onLocationChange}
       />,
     );
-    const lngInput = screen.getByPlaceholderText("Longitude");
+    const lngInput = screen.getByPlaceholderText("field.longitude");
     fireEvent.change(lngInput, { target: { value: "" } });
     expect(onLocationChange).toHaveBeenCalledWith(37.5665, 0);
 

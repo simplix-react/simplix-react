@@ -118,7 +118,7 @@ export function DetailLocationField({
               type="button"
               onClick={() => setOpen(true)}
               className="block w-full transition-opacity hover:opacity-90"
-              aria-label="Open map"
+              aria-label={t("field.openMap")}
             >
               <div className="pointer-events-none h-[150px] bg-neutral-100 dark:bg-neutral-900">
                 <Map
@@ -176,7 +176,7 @@ export function DetailLocationField({
                           ? "bg-white text-neutral-800"
                           : "bg-black/40 text-white/70 hover:text-white",
                       )}
-                      aria-label="Light map"
+                      aria-label={t("field.mapLight")}
                     >
                       <SunIcon className="h-3.5 w-3.5" />
                     </button>
@@ -189,7 +189,7 @@ export function DetailLocationField({
                           ? "bg-neutral-800 text-white"
                           : "bg-white/80 text-neutral-400 hover:text-neutral-600",
                       )}
-                      aria-label="Dark map"
+                      aria-label={t("field.mapDark")}
                     >
                       <MoonIcon className="h-3.5 w-3.5" />
                     </button>

@@ -49,7 +49,7 @@ describe("DatePicker (extended coverage)", () => {
   it("opens popover and navigates to previous month", () => {
     render(<DatePicker value={undefined} onChange={vi.fn()} />);
     fireEvent.click(screen.getByText("Pick a date"));
-    const prevBtn = screen.getByLabelText("Previous month");
+    const prevBtn = screen.getByLabelText("date.previousMonth");
     fireEvent.click(prevBtn);
     // No error means navigation succeeded
     expect(prevBtn).toBeDefined();
@@ -58,7 +58,7 @@ describe("DatePicker (extended coverage)", () => {
   it("opens popover and navigates to next month", () => {
     render(<DatePicker value={undefined} onChange={vi.fn()} />);
     fireEvent.click(screen.getByText("Pick a date"));
-    const nextBtn = screen.getByLabelText("Next month");
+    const nextBtn = screen.getByLabelText("date.nextMonth");
     fireEvent.click(nextBtn);
     expect(nextBtn).toBeDefined();
   });
@@ -82,13 +82,13 @@ describe("DatePicker (extended coverage)", () => {
     render(<DatePicker value={undefined} onChange={vi.fn()} reverseYears />);
     fireEvent.click(screen.getByText("Pick a date"));
     // Verify it renders without error
-    expect(screen.getByLabelText("Previous month")).toBeDefined();
+    expect(screen.getByLabelText("date.previousMonth")).toBeDefined();
   });
 
   it("renders with custom startYear and endYear", () => {
     render(<DatePicker value={undefined} onChange={vi.fn()} startYear={2020} endYear={2025} />);
     fireEvent.click(screen.getByText("Pick a date"));
-    expect(screen.getByLabelText("Previous month")).toBeDefined();
+    expect(screen.getByLabelText("date.previousMonth")).toBeDefined();
   });
 
   it("passes minDate and maxDate to Calendar", () => {
@@ -98,6 +98,6 @@ describe("DatePicker (extended coverage)", () => {
       <DatePicker value={undefined} onChange={vi.fn()} minDate={min} maxDate={max} />,
     );
     fireEvent.click(screen.getByText("Pick a date"));
-    expect(screen.getByLabelText("Previous month")).toBeDefined();
+    expect(screen.getByLabelText("date.previousMonth")).toBeDefined();
   });
 });

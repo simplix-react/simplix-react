@@ -52,7 +52,7 @@ describe("date pickers — responsive overlay", () => {
     const { container } = render(<DatePicker value={undefined} onChange={vi.fn()} />);
     openTrigger(container);
     expect(hasDialogOverlay()).toBe(true);
-    expect(screen.getByLabelText("Previous month")).toBeDefined();
+    expect(screen.getByLabelText("date.previousMonth")).toBeDefined();
   });
 
   it("DatePicker opens an anchored popover (no dialog overlay) on desktop", () => {
@@ -60,7 +60,7 @@ describe("date pickers — responsive overlay", () => {
     const { container } = render(<DatePicker value={undefined} onChange={vi.fn()} />);
     openTrigger(container);
     expect(hasDialogOverlay()).toBe(false);
-    expect(screen.getByLabelText("Previous month")).toBeDefined();
+    expect(screen.getByLabelText("date.previousMonth")).toBeDefined();
   });
 
   it("DateRangePicker collapses to a single month inside a dialog on mobile", () => {

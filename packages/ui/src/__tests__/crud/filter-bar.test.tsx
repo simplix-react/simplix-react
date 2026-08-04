@@ -140,7 +140,7 @@ describe("FilterBar", () => {
       { "name.contains": "hello" },
     );
     render(<FilterBar filters={[textFilter]} state={state} />);
-    const removeBtn = screen.getByLabelText("Remove Name filter");
+    const removeBtn = screen.getByLabelText("filter.removeFilter");
     expect(removeBtn).toBeTruthy();
   });
 
@@ -150,7 +150,7 @@ describe("FilterBar", () => {
       { "name.contains": "hello" },
     );
     render(<FilterBar filters={[textFilter]} state={state} />);
-    fireEvent.click(screen.getByLabelText("Remove Name filter"));
+    fireEvent.click(screen.getByLabelText("filter.removeFilter"));
     expect(state.commitValue).toHaveBeenCalledWith("name.contains", undefined);
   });
 

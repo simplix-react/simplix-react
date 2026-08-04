@@ -1,3 +1,4 @@
+import { useTranslation } from "@simplix-react/i18n/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { GeoPoint, MapFitOptions } from "../../utils/geo";
@@ -89,12 +90,13 @@ interface MapNavigatorProps {
 }
 
 function MapNavigator({ total, focusedIndex, label, fallbackLabel, onPrev, onNext, onSelect }: MapNavigatorProps) {
+  const { t } = useTranslation("simplix/ui");
   if (total === 0) return null;
 
   return (
     <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center p-3" style={{ zIndex: 10 }}>
       <div className="pointer-events-auto flex items-center rounded-md border bg-background shadow-md">
-        <Button size="icon-sm" variant="ghost" className="rounded-none rounded-l-md" aria-label="Previous location" onClick={onPrev}>
+        <Button size="icon-sm" variant="ghost" className="rounded-none rounded-l-md" aria-label={t("field.mapPrevious")} onClick={onPrev}>
           <ChevronLeftIcon />
         </Button>
         <div className="w-px bg-border" />
@@ -108,7 +110,7 @@ function MapNavigator({ total, focusedIndex, label, fallbackLabel, onPrev, onNex
           <span className="text-muted-foreground">/ {total}</span>
         </button>
         <div className="w-px bg-border" />
-        <Button size="icon-sm" variant="ghost" className="rounded-none rounded-r-md" aria-label="Next location" onClick={onNext}>
+        <Button size="icon-sm" variant="ghost" className="rounded-none rounded-r-md" aria-label={t("field.mapNext")} onClick={onNext}>
           <ChevronRightIcon />
         </Button>
       </div>

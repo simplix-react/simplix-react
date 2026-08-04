@@ -127,8 +127,8 @@ describe("DatePicker", () => {
     render(<DatePicker value={undefined} onChange={vi.fn()} />);
     fireEvent.click(screen.getByText("Pick a date"));
     // Previous/Next month navigation should be visible
-    expect(screen.getByLabelText("Previous month")).toBeDefined();
-    expect(screen.getByLabelText("Next month")).toBeDefined();
+    expect(screen.getByLabelText("date.previousMonth")).toBeDefined();
+    expect(screen.getByLabelText("date.nextMonth")).toBeDefined();
   });
 
   it("stages a day pick and commits it only when Select is pressed", () => {
@@ -141,7 +141,7 @@ describe("DatePicker", () => {
 
     // The pick is staged; the field is untouched and the popover stays open
     expect(onChange).not.toHaveBeenCalled();
-    expect(screen.getByLabelText("Previous month")).toBeDefined();
+    expect(screen.getByLabelText("date.previousMonth")).toBeDefined();
 
     fireEvent.click(screen.getByRole("button", { name: "common.select" }));
     expect(onChange).toHaveBeenCalledTimes(1);

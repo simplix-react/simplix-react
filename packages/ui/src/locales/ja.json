@@ -28,7 +28,9 @@
     "unsavedDescription": "未保存の変更があります。このページを離れてもよろしいですか？変更内容は失われます。",
     "unlink": "リンク解除",
     "select": "選択",
-    "duplicate": "複製"
+    "duplicate": "複製",
+    "increase": "増やす",
+    "decrease": "減らす"
   },
   "list": {
     "searchPlaceholder": "検索...",
@@ -53,7 +55,15 @@
     "selectAll": "すべて選択",
     "selected": "{{count}}件選択中",
     "deleteTitle": "{{entity}}の削除",
-    "deleteDescription": "この{{entity}}を削除してもよろしいですか？この操作は取り消せません。"
+    "deleteDescription": "この{{entity}}を削除してもよろしいですか？この操作は取り消せません。",
+    "selectAllRows": "すべての行を選択",
+    "selectRow": "{{index}} 行目を選択",
+    "pageSize": "ページサイズ",
+    "previousPage": "前のページ",
+    "nextPage": "次のページ",
+    "pageNumber": "{{page}} ページ",
+    "toggleColumns": "列の表示切り替え",
+    "sortByDisplayOrder": "表示順で並べ替え"
   },
   "filter": {
     "label": "フィルター",
@@ -66,7 +76,9 @@
     "numberPlaceholder": "数値",
     "numberFilter": "数値フィルター",
     "clearDateRange": "日付範囲をクリア",
-    "clearDate": "日付をクリア"
+    "clearDate": "日付をクリア",
+    "removeFilter": "{{label}} フィルターを削除",
+    "clearField": "{{label}} をクリア"
   },
   "timeRange": {
     "previous": "前へ",
@@ -114,7 +126,23 @@
     "noResults": "結果が見つかりません。",
     "noValue": "値なし",
     "expandSearch": "詳細検索",
-    "moreResults": "一致する項目がまだあります。入力を続けて絞り込んでください"
+    "moreResults": "一致する項目がまだあります。入力を続けて絞り込んでください",
+    "clearSelection": "選択をクリア",
+    "removeOption": "{{label}} を削除",
+    "clearLocation": "位置をクリア",
+    "selectLocationOnMap": "地図で位置を選択",
+    "openMap": "地図を開く",
+    "mapLight": "ライトマップ",
+    "mapDark": "ダークマップ",
+    "mapPrevious": "前の位置",
+    "mapNext": "次の位置",
+    "selectLanguage": "言語を選択",
+    "previousLanguage": "前の言語",
+    "nextLanguage": "次の言語",
+    "switchToLanguage": "{{language}} に切り替え",
+    "clearSignature": "署名をクリア",
+    "latitude": "緯度",
+    "longitude": "経度"
   },
   "unit": {
     "minutes": "分",
@@ -195,7 +223,11 @@
     "days": "日間",
     "reset": "リセット",
     "year": "年",
-    "month": "月"
+    "month": "月",
+    "previousMonth": "前の月",
+    "nextMonth": "次の月",
+    "previousDay": "前の日",
+    "nextDay": "次の日"
   },
   "plateEditor": {
     "toolbar": {
@@ -259,7 +291,8 @@
       "deleteColumn": "列を削除",
       "deleteTable": "表を削除",
       "mergeCells": "セルを結合",
-      "splitCell": "セルを分割"
+      "splitCell": "セルを分割",
+      "gridSize": "{{rows}} × {{cols}}"
     },
     "mention": {
       "noResults": "結果が見つかりません",
@@ -371,5 +404,9 @@
     "thumb": {
       "uploadFailed": "アップロード失敗"
     }
+  },
+  "wizard": {
+    "steps": "入力ステップ",
+    "stepLabel": "ステップ {{step}}: {{title}}"
   }
 }

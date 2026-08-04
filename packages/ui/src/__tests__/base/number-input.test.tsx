@@ -31,14 +31,14 @@ describe("NumberInput", () => {
 
   it("renders always-visible spinner buttons", () => {
     render(<NumberInput data-testid="num" />);
-    expect(screen.getByRole("button", { name: "Increase" })).toBeDefined();
-    expect(screen.getByRole("button", { name: "Decrease" })).toBeDefined();
+    expect(screen.getByRole("button", { name: "common.increase" })).toBeDefined();
+    expect(screen.getByRole("button", { name: "common.decrease" })).toBeDefined();
   });
 
   it("steps up with the spinner button", () => {
     const onChange = vi.fn();
     render(<NumberInput data-testid="num" defaultValue={5} onChange={onChange} />);
-    fireEvent.click(screen.getByRole("button", { name: "Increase" }));
+    fireEvent.click(screen.getByRole("button", { name: "common.increase" }));
     expect(onChange).toHaveBeenCalledWith(6);
     expect((screen.getByTestId("num") as HTMLInputElement).value).toBe("6");
   });
@@ -46,28 +46,28 @@ describe("NumberInput", () => {
   it("steps down with the spinner button respecting step", () => {
     const onChange = vi.fn();
     render(<NumberInput data-testid="num" defaultValue={10} step={5} onChange={onChange} />);
-    fireEvent.click(screen.getByRole("button", { name: "Decrease" }));
+    fireEvent.click(screen.getByRole("button", { name: "common.decrease" }));
     expect(onChange).toHaveBeenCalledWith(5);
   });
 
   it("clamps spinner steps to min/max", () => {
     const onChange = vi.fn();
     render(<NumberInput data-testid="num" defaultValue={99} max={99} onChange={onChange} />);
-    fireEvent.click(screen.getByRole("button", { name: "Increase" }));
+    fireEvent.click(screen.getByRole("button", { name: "common.increase" }));
     expect(onChange).toHaveBeenCalledWith(99);
   });
 
   it("lands on min when stepping from an empty input", () => {
     const onChange = vi.fn();
     render(<NumberInput data-testid="num" min={10} max={99} onChange={onChange} />);
-    fireEvent.click(screen.getByRole("button", { name: "Increase" }));
+    fireEvent.click(screen.getByRole("button", { name: "common.increase" }));
     expect(onChange).toHaveBeenCalledWith(10);
   });
 
   it("emits the new value for controlled usage without touching the input", () => {
     const onChange = vi.fn();
     render(<NumberInput data-testid="num" value={7} onChange={onChange} readOnly />);
-    fireEvent.click(screen.getByRole("button", { name: "Increase" }));
+    fireEvent.click(screen.getByRole("button", { name: "common.increase" }));
     expect(onChange).toHaveBeenCalledWith(8);
     // Display comes from the controlled prop, unchanged until the parent re-renders
     expect((screen.getByTestId("num") as HTMLInputElement).value).toBe("7");
@@ -89,8 +89,8 @@ describe("NumberInput", () => {
 
   it("disables spinner buttons when disabled", () => {
     render(<NumberInput data-testid="num" disabled />);
-    expect((screen.getByRole("button", { name: "Increase" }) as HTMLButtonElement).disabled).toBe(true);
-    expect((screen.getByRole("button", { name: "Decrease" }) as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByRole("button", { name: "common.increase" }) as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByRole("button", { name: "common.decrease" }) as HTMLButtonElement).disabled).toBe(true);
   });
 
   it("forwards ref", () => {

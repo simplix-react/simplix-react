@@ -1,3 +1,4 @@
+import { useTranslation } from "@simplix-react/i18n/react";
 import { type ComponentPropsWithRef, forwardRef, useRef } from "react";
 
 import { CaretDownIcon } from "../../crud/shared/icons";
@@ -20,6 +21,7 @@ export interface NumberInputProps extends Omit<ComponentPropsWithRef<"input">, "
 export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
   ({ className, min, max, step, onChange, disabled, suffix, ...rest }, ref) => {
     const innerRef = useRef<HTMLInputElement | null>(null);
+    const { t } = useTranslation("simplix/ui");
 
     const clamp = (v: number) => {
       const minVal = typeof min === "number" ? min : -Infinity;
@@ -83,7 +85,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
           <button
             type="button"
             tabIndex={-1}
-            aria-label="Increase"
+            aria-label={t("common.increase")}
             disabled={disabled}
             onClick={() => stepBy(1)}
             className="flex flex-1 items-center justify-center px-0.5 hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none"
@@ -93,7 +95,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
           <button
             type="button"
             tabIndex={-1}
-            aria-label="Decrease"
+            aria-label={t("common.decrease")}
             disabled={disabled}
             onClick={() => stepBy(-1)}
             className="flex flex-1 items-center justify-center border-t border-input px-0.5 hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none"
