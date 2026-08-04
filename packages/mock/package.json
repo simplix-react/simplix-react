@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react/mock",
-  "version": "0.3.2",
+  "version": "0.3.3-SNAPSHOT",
   "description": "Auto-generated MSW handlers and in-memory stores from @simplix-react/contract",
   "type": "module",
   "sideEffects": false,
