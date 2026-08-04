@@ -120,6 +120,45 @@ describe("usePageHeader", () => {
     expect(screen.getByTestId("title").textContent).toBe("");
   });
 
+  // The defect this hook shipped with: the header was re-registered only when a primitive
+  // changed, so anything stateful put in `actions` froze at the first render's value. A save
+  // button installed disabled never enabled, and nothing said so.
+  it("updates actions when they change under an unchanged title", () => {
+    const { rerender } = render(
+      <PageHeaderProvider>
+        <HeaderSetter title="Same" actions={<span>save-off</span>} />
+        <HeaderDisplay />
+      </PageHeaderProvider>,
+    );
+    expect(screen.getByTestId("actions").textContent).toBe("save-off");
+
+    rerender(
+      <PageHeaderProvider>
+        <HeaderSetter title="Same" actions={<span>save-on</span>} />
+        <HeaderDisplay />
+      </PageHeaderProvider>,
+    );
+    expect(screen.getByTestId("actions").textContent).toBe("save-on");
+  });
+
+  it("updates metadata when it changes under an unchanged metadataKey", () => {
+    const { rerender } = render(
+      <PageHeaderProvider>
+        <HeaderSetter title="Same" metadataKey="v1" metadata={<span>2 selected</span>} />
+        <HeaderDisplay />
+      </PageHeaderProvider>,
+    );
+    expect(screen.getByTestId("metadata").textContent).toBe("2 selected");
+
+    rerender(
+      <PageHeaderProvider>
+        <HeaderSetter title="Same" metadataKey="v1" metadata={<span>3 selected</span>} />
+        <HeaderDisplay />
+      </PageHeaderProvider>,
+    );
+    expect(screen.getByTestId("metadata").textContent).toBe("3 selected");
+  });
+
   it("sets metadata and center", () => {
     render(
       <PageHeaderProvider>
