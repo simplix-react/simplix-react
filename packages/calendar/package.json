@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react/calendar",
-  "version": "0.3.0",
+  "version": "0.3.3-SNAPSHOT",
   "description": "Domain-agnostic calendar components (month/week/day/year/agenda/gantt/timeline/heatmap views) with pluggable rendering and interaction callbacks",
   "type": "module",
   "sideEffects": [
@@ -13,7 +13,6 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },

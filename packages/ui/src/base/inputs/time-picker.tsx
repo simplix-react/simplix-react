@@ -277,6 +277,12 @@ export interface TimeSelectControlProps {
   className?: string;
   /** Class name merged into the bordered input row (e.g. to change its height). */
   rowClassName?: string;
+  /**
+   * Id of the element naming this control. The hour/minute boxes are a
+   * composite with no single labelable element, so a field label reaches it
+   * as the group's name rather than through `htmlFor`.
+   */
+  "aria-labelledby"?: string;
 }
 
 /**
@@ -296,6 +302,7 @@ export function TimeSelectControl({
   dropDirection = "down",
   className,
   rowClassName,
+  "aria-labelledby": ariaLabelledBy,
 }: TimeSelectControlProps) {
   const { t } = useTranslation("simplix/ui");
   const step = Math.max(1, Math.floor(minuteStep));
@@ -428,6 +435,8 @@ export function TimeSelectControl({
   return (
     <div
       ref={wrapperRef}
+      role="group"
+      aria-labelledby={ariaLabelledBy}
       className={cn("relative", className)}
       onPointerDownCapture={() => {
         pointerInsideRef.current = true;
@@ -538,6 +547,8 @@ export interface TimePickerProps {
   disabled?: boolean;
   /** Additional class name for the wrapper. */
   className?: string;
+  /** Id of the element naming this picker — see {@link TimeSelectControlProps}. */
+  "aria-labelledby"?: string;
 }
 
 /**
@@ -559,6 +570,7 @@ export function TimePicker({
   maxTime,
   disabled = false,
   className,
+  "aria-labelledby": ariaLabelledBy,
 }: TimePickerProps) {
   const handleCommit = useCallback(
     (hours24: number, minutes: number) => {
@@ -588,6 +600,7 @@ export function TimePicker({
       isHourDisabled={hourDisabled}
       isMinuteDisabled={minuteDisabled}
       dropDirection="down"
+      aria-labelledby={ariaLabelledBy}
       // A time of day is a short value: cap the control instead of letting it
       // stretch across a full form column, which reads as a text input. The
       // floor keeps the AM/PM labels on one line when the column is narrow.

@@ -4,11 +4,11 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react
 import type { CommonFieldProps } from "../../crud/shared/types";
 import type { TreeConfig } from "../../crud/tree/tree-types";
 import { filterTreeWithAncestors, getDescendantIds } from "../../crud/tree/tree-utils";
-import { FieldChevron } from "../../base/inputs/field-chevron";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { Stack } from "../../primitives";
 import { cn } from "../../utils/cn";
 import { FieldWrapper } from "../shared/field-wrapper";
+import { SelectFieldTrigger } from "../shared/select-field-trigger";
 
 // ── Icons ──
 
@@ -93,10 +93,11 @@ function TreeSelectItem<T>({
 
   return (
     <>
-      <button
-        type="button"
-        disabled={isDisabled}
-        onClick={() => !isDisabled && onSelect(id)}
+      {/* Expanding a branch and choosing it are two different acts, so they are two sibling
+          controls inside the row rather than one nested in the other — a control inside a control
+          leaves the keyboard and assistive technology to guess which of the two a press belongs
+          to, and the guesses disagree. */}
+      <span
         className={cn(
           "flex w-full items-center gap-1 rounded-sm px-2 py-1.5 text-sm",
           isSelected && "bg-accent text-accent-foreground",
@@ -105,32 +106,38 @@ function TreeSelectItem<T>({
         )}
       >
         <span className="shrink-0" style={{ width: depth * 16 }} />
-        <span
-          role="button"
+        <button
+          type="button"
           tabIndex={hasChildren ? 0 : -1}
+          aria-label={hasChildren ? (isExpanded ? "Collapse" : "Expand") : undefined}
           className={cn(
-            "inline-flex h-4 w-4 shrink-0 items-center justify-center",
+            "inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-sm",
+            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
             hasChildren ? "text-muted-foreground hover:text-foreground" : "invisible",
           )}
-          onClick={(e) => {
-            e.stopPropagation();
+          onClick={() => {
             if (hasChildren) onToggleExpand(id);
-          }}
-          onKeyDown={(e) => {
-            if (hasChildren && (e.key === "Enter" || e.key === " ")) {
-              e.stopPropagation();
-              onToggleExpand(id);
-            }
           }}
         >
           {hasChildren ? (isExpanded ? <ChevronDownIcon /> : <ChevronRightIcon />) : null}
-        </span>
-        <FolderIcon />
-        <span className="ml-0.5 truncate">{getDisplayName(item)}</span>
-        {isSelected && (
-          <span className="ml-auto shrink-0"><CheckIcon /></span>
-        )}
-      </button>
+        </button>
+        <button
+          type="button"
+          disabled={isDisabled}
+          onClick={() => !isDisabled && onSelect(id)}
+          className={cn(
+            "flex min-w-0 flex-1 items-center gap-1 rounded-sm text-start",
+            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+            isDisabled && "cursor-not-allowed",
+          )}
+        >
+          <FolderIcon />
+          <span className="ml-0.5 truncate">{getDisplayName(item)}</span>
+          {isSelected && (
+            <span className="ml-auto shrink-0"><CheckIcon /></span>
+          )}
+        </button>
+      </span>
       {hasChildren && isExpanded && children.map((child) => (
         <TreeSelectItem
           key={String((child as Record<string, unknown>)[idField])}
@@ -181,7 +188,7 @@ export function TreeSelectField<T>({
   className,
   ...variantProps
 }: TreeSelectFieldProps<T>) {
-  const { Input, Popover, PopoverTrigger, PopoverContent } = useFlatUIComponents();
+  const { Input, Popover, PopoverContent } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -285,78 +292,75 @@ export function TreeSelectField<T>({
       className={className}
       {...variantProps}
     >
-      <Popover open={open} onOpenChange={(v) => { if (disabled) return; setOpen(v); }}>
-        <PopoverTrigger asChild>
-          <span
-            className={cn(
-              "flex h-8 w-full items-center gap-1 rounded-md border border-input bg-background px-3 text-sm",
-              "focus-within:border-foreground",
-              disabled && "cursor-not-allowed opacity-50",
-              error && "border-destructive focus-within:border-destructive",
-            )}
+      {({ id, labelId }) => (
+        <Popover open={open} onOpenChange={(v) => { if (disabled) return; setOpen(v); }}>
+          <SelectFieldTrigger
+            id={id}
+            labelId={labelId}
+            open={open}
+            disabled={disabled}
+            error={error}
+            clearAction={
+              value && !disabled ? (
+                <button
+                  type="button"
+                  onClick={handleClear}
+                  className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
+                  aria-label={t("field.clearSelection")}
+                >
+                  <ClearIcon />
+                </button>
+              ) : undefined
+            }
           >
             <span className={cn("flex-1 truncate", !value && "text-muted-foreground")}>
               {value ? selectedLabel : (placeholder ?? t("tree.searchPlaceholder"))}
             </span>
-            {value && !disabled && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleClear();
-                }}
-                className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
-                aria-label="Clear selection"
-              >
-                <ClearIcon />
-              </button>
-            )}
-            <FieldChevron />
-          </span>
-        </PopoverTrigger>
-        <PopoverContent
-          className="w-[var(--radix-popover-trigger-width)] p-0"
-          align="start"
-          onOpenAutoFocus={(e) => e.preventDefault()}
-        >
-          <Stack gap="none" className="p-2">
-            <Input
-              type="search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={t("tree.searchPlaceholder")}
-              className="mb-2"
-            />
-            <div className="max-h-60 overflow-y-auto">
-              {isLoading ? (
-                <p className="py-4 text-center text-sm text-muted-foreground">
-                  {t("common.loading")}
-                </p>
-              ) : filteredData.length === 0 ? (
-                <p className="py-4 text-center text-sm text-muted-foreground">
-                  {t("list.noResults")}
-                </p>
-              ) : (
-                filteredData.map((item) => (
-                  <TreeSelectItem
-                    key={String((item as Record<string, unknown>)[idField])}
-                    item={item}
-                    depth={0}
-                    idField={idField}
-                    childrenField={childrenField}
-                    getDisplayName={getDisplayName}
-                    disabledIds={disabledIds}
-                    selectedId={value}
-                    expandedIds={expandedIds}
-                    onSelect={handleSelect}
-                    onToggleExpand={toggleExpand}
-                  />
-                ))
-              )}
-            </div>
-          </Stack>
-        </PopoverContent>
-      </Popover>
+          </SelectFieldTrigger>
+          <PopoverContent
+            className="w-[var(--radix-popover-trigger-width)] p-0"
+            align="start"
+            onOpenAutoFocus={(e) => e.preventDefault()}
+          >
+            <Stack gap="none" className="p-2">
+              <Input
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={t("tree.searchPlaceholder")}
+                className="mb-2"
+              />
+              <div className="max-h-60 overflow-y-auto">
+                {isLoading ? (
+                  <p className="py-4 text-center text-sm text-muted-foreground">
+                    {t("common.loading")}
+                  </p>
+                ) : filteredData.length === 0 ? (
+                  <p className="py-4 text-center text-sm text-muted-foreground">
+                    {t("list.noResults")}
+                  </p>
+                ) : (
+                  filteredData.map((item) => (
+                    <TreeSelectItem
+                      key={String((item as Record<string, unknown>)[idField])}
+                      item={item}
+                      depth={0}
+                      idField={idField}
+                      childrenField={childrenField}
+                      getDisplayName={getDisplayName}
+                      disabledIds={disabledIds}
+                      selectedId={value}
+                      expandedIds={expandedIds}
+                      onSelect={handleSelect}
+                      onToggleExpand={toggleExpand}
+                    />
+                  ))
+                )}
+              </div>
+            </Stack>
+          </PopoverContent>
+        </Popover>
+      )}
     </FieldWrapper>
   );
 }

@@ -345,8 +345,12 @@ Low-level wrappers used internally by `FormFields` and `DetailFields`. Export th
 ```tsx
 import { FieldWrapper } from "@simplix-react/ui";
 
+// Pass a render function to receive { id, labelId }. Put `id` on a labelable
+// control so the label names it; use `labelId` with `aria-labelledby` for a
+// composite control (radio group, date picker) with no single labelable element.
+// A plain-element child is instead named by the wrapping fieldset.
 <FieldWrapper label="Custom Field" error={errors.custom} required>
-  <MyCustomInput value={value} onChange={onChange} />
+  {({ id }) => <MyCustomInput id={id} value={value} onChange={onChange} />}
 </FieldWrapper>
 ```
 
@@ -871,11 +875,12 @@ Overridable components: `Input`, `Textarea`, `Label`, `Switch`, `Checkbox`, `Bad
 
 ## Accessibility
 
-- All form fields generate unique IDs via `useId()` and associate labels via `htmlFor`
+- `FieldWrapper` generates the field's ids and hands `{ id, labelId }` to a render-function child, so every control gets an accessible name: `id` plus the label's `htmlFor` for a labelable control, or `aria-labelledby={labelId}` for a composite one. A plain-element child is named by the wrapping fieldset instead.
+- Icon-only controls (row actions, toolbar buttons) carry their own `aria-label`; a tooltip describes a control but does not name one.
 - Hidden labels use `sr-only` class for screen reader accessibility
 - Error messages use `role="alert"` for live announcements
 - `aria-invalid` set on inputs when errors are present
-- `aria-label` provided when `labelPosition="hidden"`
+- `aria-label` provided when `layout="hidden"`
 - Keyboard navigation support via `useKeyboardNav` hook
 - Sort buttons and pagination controls have descriptive `aria-label`
 - Selection checkboxes have row-specific `aria-label`
@@ -971,6 +976,7 @@ See root LICENSE file.
 - [CrudMutation](interfaces/CrudMutation.md)
 - [CrudProviderProps](interfaces/CrudProviderProps.md)
 - [CrudSearch](interfaces/CrudSearch.md)
+- [CurrencyOption](interfaces/CurrencyOption.md)
 - [DateFilterProps](interfaces/DateFilterProps.md)
 - [DateNavigatorProps](interfaces/DateNavigatorProps.md)
 - [DatePickerProps](interfaces/DatePickerProps.md)
@@ -998,6 +1004,7 @@ See root LICENSE file.
 - [FacetedFilterOptionDef](interfaces/FacetedFilterOptionDef.md)
 - [FacetedFilterProps](interfaces/FacetedFilterProps.md)
 - [FeatureCardProps](interfaces/FeatureCardProps.md)
+- [FieldControlProps](interfaces/FieldControlProps.md)
 - [FieldMessageProps](interfaces/FieldMessageProps.md)
 - [FieldVariant](interfaces/FieldVariant.md)
 - [FieldWrapperProps](interfaces/FieldWrapperProps.md)
@@ -1111,9 +1118,11 @@ See root LICENSE file.
 - [TabsContentProps](interfaces/TabsContentProps.md)
 - [TabsListProps](interfaces/TabsListProps.md)
 - [TextFilterDef](interfaces/TextFilterDef.md)
+- [TextFilterOptionDef](interfaces/TextFilterOptionDef.md)
 - [TextFilterProps](interfaces/TextFilterProps.md)
 - [TextProps](interfaces/TextProps.md)
 - [TimePickerProps](interfaces/TimePickerProps.md)
+- [TimeRange](interfaces/TimeRange.md)
 - [TimeRangeSelectorProps](interfaces/TimeRangeSelectorProps.md)
 - [TimeRangeValue](interfaces/TimeRangeValue.md)
 - [TimeValue](interfaces/TimeValue.md)
@@ -1213,6 +1222,7 @@ See root LICENSE file.
 - [DropdownMenuSubTriggerProps](type-aliases/DropdownMenuSubTriggerProps.md)
 - [DynamicColorIconPreset](type-aliases/DynamicColorIconPreset.md)
 - [EmptyReason](type-aliases/EmptyReason.md)
+- [FieldWrapperChildren](type-aliases/FieldWrapperChildren.md)
 - [FilterDef](type-aliases/FilterDef.md)
 - [FlexProps](type-aliases/FlexProps.md)
 - [GeoPoint](type-aliases/GeoPoint.md)
@@ -1312,6 +1322,7 @@ See root LICENSE file.
 - [CrudTree](variables/CrudTree.md)
 - [dateOperatorConfig](variables/dateOperatorConfig.md)
 - [DEFAULT\_MAP\_FIT\_OPTIONS](variables/DEFAULT_MAP_FIT_OPTIONS.md)
+- [DETAIL\_PANEL\_WIDTH](variables/DETAIL_PANEL_WIDTH.md)
 - [DetailList](variables/DetailList.md)
 - [DetailListRow](variables/DetailListRow.md)
 - [DetailProfile](variables/DetailProfile.md)
@@ -1460,6 +1471,7 @@ See root LICENSE file.
 - [CropModal](functions/CropModal.md)
 - [CrudDelete](functions/CrudDelete.md)
 - [CrudProvider](functions/CrudProvider.md)
+- [currencyDecimalPlaces](functions/currencyDecimalPlaces.md)
 - [DateFilter](functions/DateFilter.md)
 - [DateNavigator](functions/DateNavigator.md)
 - [DatePicker](functions/DatePicker.md)
@@ -1579,6 +1591,7 @@ See root LICENSE file.
 - [useAutosave](functions/useAutosave.md)
 - [useBeforeUnload](functions/useBeforeUnload.md)
 - [useChartAdapter](functions/useChartAdapter.md)
+- [useContainerWidth](functions/useContainerWidth.md)
 - [useCountryOptions](functions/useCountryOptions.md)
 - [useCrudDeleteDetail](functions/useCrudDeleteDetail.md)
 - [useCrudDeleteList](functions/useCrudDeleteList.md)
@@ -1588,6 +1601,7 @@ See root LICENSE file.
 - [useCrudListColumns](functions/useCrudListColumns.md)
 - [useCrudNavigation](functions/useCrudNavigation.md)
 - [useCrudPageState](functions/useCrudPageState.md)
+- [useCurrencyOptions](functions/useCurrencyOptions.md)
 - [useDefaultDisplayZone](functions/useDefaultDisplayZone.md)
 - [useDialogMaximized](functions/useDialogMaximized.md)
 - [useFadeTransition](functions/useFadeTransition.md)

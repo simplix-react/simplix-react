@@ -71,8 +71,8 @@ describe("DetailLocationField dialog map interactions", () => {
   it("theme toggle buttons work without error", () => {
     render(<DetailLocationField label="Location" latitude={37.5665} longitude={126.978} />);
     fireEvent.click(screen.getByLabelText("field.locationTitle"));
-    fireEvent.click(screen.getByLabelText("Dark map"));
-    fireEvent.click(screen.getByLabelText("Light map"));
+    fireEvent.click(screen.getByLabelText("field.mapDark"));
+    fireEvent.click(screen.getByLabelText("field.mapLight"));
     expect(screen.getByRole("dialog")).toBeTruthy();
   });
 

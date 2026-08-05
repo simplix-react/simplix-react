@@ -173,6 +173,13 @@ export interface FilterBarProps {
   /** When provided, renders a standard total-count badge at the start of the leading group. */
   count?: number;
   /**
+   * Overrides where the badge takes its "count not known yet" state from.
+   * Defaults to the list state's own `isLoading`, so a `useCrudList` list needs
+   * nothing here; pass it on a standalone FilterBar whose count comes from a
+   * query the filter state knows nothing about.
+   */
+  countLoading?: boolean;
+  /**
    * Column layout of the filter popover form.
    *
    * - `"auto"` (default) — one column; switches to two columns when the form
@@ -212,7 +219,7 @@ export function splitFilterColumns(filters: FilterDef[], count = 2): FilterDef[]
 
 // ── FilterBar Component ──
 
-export function FilterBar({ filters, state, leading, trailing, maxBadges, onPreview, previewLabel, count, popoverColumns = "auto", className }: FilterBarProps) {
+export function FilterBar({ filters, state, leading, trailing, maxBadges, onPreview, previewLabel, count, countLoading, popoverColumns = "auto", className }: FilterBarProps) {
   const { Badge, Button, Popover, PopoverTrigger, PopoverContent, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuCheckboxItem } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const locale = useLocale();
@@ -416,7 +423,11 @@ export function FilterBar({ filters, state, leading, trailing, maxBadges, onPrev
   const visibleDefs = maxBadges != null ? activeDefs.slice(0, maxBadges) : activeDefs;
   const hiddenCount = activeDefs.length - visibleDefs.length;
 
-  const showCount = count != null;
+  // The first page in flight has no total: the badge holds its place with an
+  // empty value rather than stating `Total 0` (read as "nothing here") or
+  // appearing only once the value lands (which shifts the toolbar).
+  const countUnknown = countLoading ?? state.isLoading ?? false;
+  const showCount = count != null || countUnknown;
   const showViewToggle = !!columnCtx?.canGridView && !columnCtx?.responsiveCardMode;
   const showColumnsToggle = !!columnCtx && columnCtx.columns.length > 0 && !columnCtx.isCardMode;
   const hasLeadingGroup = showCount || !!leading || showViewToggle || !!onPreview;
@@ -431,7 +442,7 @@ export function FilterBar({ filters, state, leading, trailing, maxBadges, onPrev
     >
       {hasLeadingGroup && (
         <Flex gap="xs" align="center" wrap>
-          {showCount && <ListTotalBadge count={count!} />}
+          {showCount && <ListTotalBadge count={countUnknown ? undefined : count} />}
           {leading}
           {showViewToggle && (
             <div
@@ -489,7 +500,7 @@ export function FilterBar({ filters, state, leading, trailing, maxBadges, onPrev
               type="button"
               onClick={() => removeFilter(def)}
               className="ml-0.5 inline-flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
-              aria-label={`Remove ${def.label} filter`}
+              aria-label={t("filter.removeFilter", { label: def.label })}
             >
               <XIcon className="h-2.5 w-2.5" />
             </button>
@@ -591,7 +602,7 @@ export function FilterBar({ filters, state, leading, trailing, maxBadges, onPrev
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                aria-label="Toggle columns"
+                aria-label={t("list.toggleColumns")}
                 className="inline-grid h-full w-7 place-items-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground [&_svg]:size-3.5"
               >
                 <ColumnsIcon className="h-3.5 w-3.5" />

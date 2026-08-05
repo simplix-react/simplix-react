@@ -109,6 +109,28 @@ describe("CrudDetail.Section", () => {
     expect(screen.getByText("Basic Info")).toBeTruthy();
     expect(screen.getByText("Field A")).toBeTruthy();
   });
+
+  it("rules the gutter of a two-column section whose fields all share a row", () => {
+    const { container } = render(
+      <CrudDetail.Section title="Basic Info" layout="two-column">
+        <div>Field A</div>
+        <div>Field B</div>
+      </CrudDetail.Section>,
+    );
+    expect(container.querySelectorAll("[class*=border-l]").length).toBe(1);
+  });
+
+  it("leaves a field that claims the whole row unruled", () => {
+    // A rule beside a value that spans both columns would sit in the middle of it.
+    const { container } = render(
+      <CrudDetail.Section title="Basic Info" layout="two-column">
+        <div>Field A</div>
+        <div className="col-span-full">A fingerprint</div>
+      </CrudDetail.Section>,
+    );
+    expect(container.querySelectorAll("[class*=border-l]").length).toBe(0);
+  });
+
 });
 
 describe("CrudDetail.Actions", () => {
@@ -167,6 +189,20 @@ describe("CrudDetail.DefaultActions", () => {
     expect(buttons.length).toBe(1);
     fireEvent.click(buttons[0]);
     expect(onDelete).toHaveBeenCalledTimes(1);
+  });
+
+  it("names the delete button", () => {
+    const { container } = render(<CrudDetail.DefaultActions onDelete={vi.fn()} />);
+    // An icon-only button reaches assistive technology unnamed — the reader
+    // cannot tell what it removes.
+    expect(container.textContent).toContain("common.delete");
+  });
+
+  it("accepts a custom delete label", () => {
+    const { container } = render(
+      <CrudDetail.DefaultActions onDelete={vi.fn()} deleteLabel="Remove order" />,
+    );
+    expect(container.textContent).toContain("Remove order");
   });
 
   it("disables edit and delete when isPending", () => {

@@ -54,8 +54,8 @@ export function DetailTextField({
       size={size}
       className={className}
     >
-      <span className="inline-flex items-center gap-1.5">
-        <span>{displayValue}</span>
+      <span className="inline-flex min-w-0 items-start gap-1.5">
+        <span className="min-w-0 break-words">{displayValue}</span>
         {copyable && hasValue && (
           <button
             type="button"

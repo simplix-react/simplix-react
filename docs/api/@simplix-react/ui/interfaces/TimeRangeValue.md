@@ -12,7 +12,7 @@ Date range with bucket information, emitted via onChange.
 
 ## Extends
 
-- `TimeRange`
+- [`TimeRange`](TimeRange.md)
 
 ## Properties
 
@@ -34,7 +34,7 @@ Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:19](https:
 
 #### Inherited from
 
-`TimeRange.from`
+[`TimeRange`](TimeRange.md).[`from`](TimeRange.md#from)
 
 ***
 
@@ -46,4 +46,4 @@ Defined in: [packages/ui/src/base/inputs/time-range-selector/types.ts:20](https:
 
 #### Inherited from
 
-`TimeRange.to`
+[`TimeRange`](TimeRange.md).[`to`](TimeRange.md#to)

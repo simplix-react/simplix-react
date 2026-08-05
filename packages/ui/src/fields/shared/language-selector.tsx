@@ -1,4 +1,6 @@
 import type { LocaleCode, LocaleConfig } from "@simplix-react/i18n";
+import { useTranslation } from "@simplix-react/i18n/react";
+
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
 
@@ -61,6 +63,7 @@ export function LanguageSelector({
 }: LanguageSelectorProps) {
   const { Select, SelectTrigger, SelectContent, SelectItem } =
     useFlatUIComponents();
+  const { t } = useTranslation("simplix/ui");
 
   if (languages.length <= 1) return null;
 
@@ -93,7 +96,7 @@ export function LanguageSelector({
           type="button"
           onClick={handlePrev}
           disabled={disabled}
-          aria-label="Previous language"
+          aria-label={t("field.previousLanguage")}
           className="flex h-4 w-4 items-center justify-center border-r border-input hover:bg-muted-foreground/10 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <ChevronLeftIcon />
@@ -101,7 +104,7 @@ export function LanguageSelector({
 
         <Select value={value} onValueChange={onChange} disabled={disabled}>
           <SelectTrigger
-            aria-label="Select language"
+            aria-label={t("field.selectLanguage")}
             className="!h-auto !min-h-0 w-[80px] border-0 !bg-transparent dark:!bg-transparent !p-0 !py-0 text-[10px] leading-none shadow-none focus-visible:ring-0 [&>svg]:hidden justify-center [&>span]:leading-none"
           >
             <span className="flex items-center gap-1.5">
@@ -141,7 +144,7 @@ export function LanguageSelector({
           type="button"
           onClick={handleNext}
           disabled={disabled}
-          aria-label="Next language"
+          aria-label={t("field.nextLanguage")}
           className="flex h-4 w-4 items-center justify-center border-l border-input hover:bg-muted-foreground/10 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <ChevronRightIcon />
@@ -155,7 +158,7 @@ export function LanguageSelector({
             type="button"
             onClick={() => onChange(lang.code)}
             disabled={disabled}
-            aria-label={`Switch to ${lang.name}`}
+            aria-label={t("field.switchToLanguage", { language: lang.name })}
             className={cn(
               "h-1 flex-1 transition-colors disabled:cursor-not-allowed",
               isFilled(lang.code) ? "bg-green-500" : "bg-muted-foreground/30",

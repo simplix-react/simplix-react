@@ -8,4 +8,4 @@
 
 > `const` **Icon**: `ForwardRefExoticComponent`\<[`IconProps`](../interfaces/IconProps.md) & `RefAttributes`\<`SVGSVGElement`\>\>
 
-Defined in: [packages/ui/src/base/inputs/icon-picker.tsx:423](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/icon-picker.tsx#L423)
+Defined in: [packages/ui/src/base/inputs/icon-picker.tsx:424](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/icon-picker.tsx#L424)

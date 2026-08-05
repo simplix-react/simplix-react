@@ -84,7 +84,7 @@ describe("DateTimeField time selection", () => {
     render(<DateTimeField label="Start" value={null} onChange={vi.fn()} hideTime />);
     openPicker();
     // Calendar is shown, time inputs are not
-    expect(screen.getByLabelText("Previous month")).toBeDefined();
+    expect(screen.getByLabelText("date.previousMonth")).toBeDefined();
     expect(screen.queryByRole("textbox", { name: "date.hour" })).toBeNull();
   });
 

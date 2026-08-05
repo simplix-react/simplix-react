@@ -6,7 +6,7 @@
 
 # Interface: CrudListSort
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:48](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L48)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:56](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L56)
 
 Sort state returned by [useCrudList](../functions/useCrudList.md).
 
@@ -16,7 +16,7 @@ Sort state returned by [useCrudList](../functions/useCrudList.md).
 
 > **direction**: `"desc"` \| `"asc"`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:50](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L50)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:58](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L58)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:50](https://github.com/s
 
 > **field**: `string` \| `null`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:49](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L49)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:57](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L57)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:49](https://github.com/s
 
 > **setSort**: (`field`, `direction`) => `void`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:51](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L51)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:59](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L59)
 
 #### Parameters
 
@@ -54,7 +54,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:51](https://github.com/s
 
 > **toggleSort**: (`field`) => `void`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:52](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L52)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:60](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L60)
 
 #### Parameters
 

@@ -322,7 +322,7 @@ describe("CrudList.Pagination (more coverage)", () => {
       />,
     );
     // Should render the page size selector
-    expect(screen.getByLabelText("Page size")).toBeTruthy();
+    expect(screen.getByLabelText("list.pageSize")).toBeTruthy();
   });
 
   it("renders with custom rowsLabel", () => {
@@ -351,9 +351,9 @@ describe("CrudList.Pagination (more coverage)", () => {
       />,
     );
     // Should have 3 page buttons
-    expect(screen.getByLabelText("Page 1")).toBeTruthy();
-    expect(screen.getByLabelText("Page 2")).toBeTruthy();
-    expect(screen.getByLabelText("Page 3")).toBeTruthy();
+    expect(
+      screen.getAllByLabelText("list.pageNumber").map((b) => b.textContent),
+    ).toEqual(["1", "2", "3"]);
     // No ellipsis
     const spans = container.querySelectorAll("span");
     const hasEllipsis = Array.from(spans).some((el) => el.textContent?.includes("\u2026"));

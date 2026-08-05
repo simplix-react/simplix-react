@@ -1,0 +1,124 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Release branch'
+        required: true
+        default: 'main'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+          fetch-depth: 0
+
+      - name: Extract and validate version
+        id: version
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "Current version: $CURRENT_VERSION"
+
+          # Strict X.Y.Z-SNAPSHOT: guards the release AND keeps the derived version
+          # free of shell metacharacters before it is used in later commands.
+          if [[ ! "$CURRENT_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT$ ]]; then
+            echo "✖ Error: Current version ($CURRENT_VERSION) is not a valid X.Y.Z-SNAPSHOT version."
+            echo "  Release can only be performed from a SNAPSHOT version."
+            exit 1
+          fi
+
+          RELEASE_VERSION="${CURRENT_VERSION%-SNAPSHOT}"
+          echo "✔ Release version: $RELEASE_VERSION"
+          echo "current=$CURRENT_VERSION" >> "$GITHUB_OUTPUT"
+          echo "release=$RELEASE_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: 'https://registry.npmjs.org'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Set release version
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.release }}
+        run: node scripts/sync-version.mjs --set "$RELEASE_VERSION"
+
+      - name: Publish
+        env:
+          # Publishes @simplix-react/* to the public npm registry. Set NPM_TOKEN
+          # (a token with publish rights to the @simplix-react scope) in the repo secrets.
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: pnpm -r publish --access public --no-git-checks
+
+      - name: Commit and tag the release version
+        env:
+          RELEASE_BRANCH: ${{ github.event.inputs.branch }}
+          RELEASE_VERSION: ${{ steps.version.outputs.release }}
+        run: |
+          git config --global user.email "devteam@simplecore.dev"
+          git config --global user.name "simplecore"
+          git ls-files -m --full-name | grep -E '(^|/)package\.json$' | xargs -r git add
+          git add CHANGELOG.md
+          git commit -m "release: v${RELEASE_VERSION}"
+          git push origin "$RELEASE_BRANCH"
+          git tag -a "v${RELEASE_VERSION}" -m "v${RELEASE_VERSION}"
+          git push origin "v${RELEASE_VERSION}"
+
+      - name: Update to next development version
+        env:
+          RELEASE_BRANCH: ${{ github.event.inputs.branch }}
+          RELEASE_VERSION: ${{ steps.version.outputs.release }}
+        run: |
+          NEXT_VERSION=$(echo "$RELEASE_VERSION" | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')-SNAPSHOT
+          node scripts/sync-version.mjs --set "$NEXT_VERSION"
+          git ls-files -m --full-name | grep -E '(^|/)package\.json$' | xargs -r git add
+          git add CHANGELOG.md
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: prepare for next development version ${NEXT_VERSION}"
+            git push origin "$RELEASE_BRANCH"
+          else
+            echo "Version already set to $NEXT_VERSION, skipping commit"
+          fi
+
+      - name: Generate release notes
+        id: release_notes
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.release }}
+        run: |
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 "v${RELEASE_VERSION}^" 2>/dev/null || echo "")
+          if [ -z "$PREVIOUS_TAG" ]; then
+            NOTES=$(git log --pretty=format:"* %s (%an)" --no-merges "v${RELEASE_VERSION}" | grep -v "github-actions" || true)
+          else
+            NOTES=$(git log --pretty=format:"* %s (%an)" --no-merges "${PREVIOUS_TAG}..v${RELEASE_VERSION}" | grep -v "github-actions" || true)
+          fi
+          {
+            echo "notes<<EOF"
+            echo "$NOTES"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.release }}
+          name: Release v${{ steps.version.outputs.release }}
+          body: ${{ steps.release_notes.outputs.notes }}
+          draft: false
+          prerelease: false

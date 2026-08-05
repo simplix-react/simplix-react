@@ -34,12 +34,12 @@ async function mockFetchCounts(_from: Date, _to: Date, bucketCount: number): Pro
 }
 
 function TimeRangeSelectorControlled(props: React.ComponentProps<typeof TimeRangeSelector>) {
-  const [value, setValue] = useState({ from: props.value.from, to: props.value.to });
+  const [value, setValue] = useState(props.value);
   return (
     <TimeRangeSelector
       {...props}
       value={value}
-      onChange={(range: TimeRangeValue) => setValue({ from: range.from, to: range.to })}
+      onChange={(range: TimeRangeValue) => setValue(range)}
     />
   );
 }

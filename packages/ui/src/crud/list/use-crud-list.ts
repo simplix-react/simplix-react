@@ -36,6 +36,14 @@ export interface CrudListFilters {
   clear: () => void;
   apply: () => void;
   isPending: boolean;
+  /**
+   * Whether the list's first page is still in flight — no rows and no total
+   * have arrived yet. `CrudList.FilterBar` reads it to hold the total-count
+   * badge in its unknown state instead of stating `Total 0`, which a reader
+   * takes as "there is nothing here". Stays `false` on a refetch that already
+   * has data, so paging does not blank a known count.
+   */
+  isLoading?: boolean;
   /** Committed (applied) filter values — used by badges, URL sync, and queries. */
   committedValues: Record<string, unknown>;
   /** Update a single filter in both pending and committed state, triggering a re-query. */
@@ -386,6 +394,7 @@ export function useCrudList<T>(
     isPaused,
     failureCount,
     filters: {
+      isLoading: queryResult.isLoading,
       search,
       setSearch: setSearchWithReset,
       values: pendingFilterValues,

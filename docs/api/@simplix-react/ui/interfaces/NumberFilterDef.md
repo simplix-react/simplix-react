@@ -6,7 +6,7 @@
 
 # Interface: NumberFilterDef
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:45](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L45)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:59](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L59)
 
 ## Extends
 
@@ -34,7 +34,7 @@ the fields are split evenly (column-major). Ignored in single-column layout.
 
 > **defaultOperator**: [`SearchOperator`](../enumerations/SearchOperator.md)
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:48](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L48)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:62](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L62)
 
 ***
 
@@ -66,7 +66,7 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:29](https://github.com/
 
 > **operators**: [`SearchOperator`](../enumerations/SearchOperator.md)[]
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:47](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L47)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:61](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L61)
 
 ***
 
@@ -74,7 +74,7 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:47](https://github.com/
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:49](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L49)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:63](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L63)
 
 ***
 
@@ -82,4 +82,4 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:49](https://github.com/
 
 > **type**: `"number"`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:46](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L46)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:60](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L60)

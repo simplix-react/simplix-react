@@ -6,7 +6,7 @@
 
 # Interface: NumberInputProps
 
-Defined in: [packages/ui/src/base/inputs/number-input.tsx:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/number-input.tsx#L6)
+Defined in: [packages/ui/src/base/inputs/number-input.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/number-input.tsx#L7)
 
 ## Extends
 
@@ -1795,7 +1795,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/base/inputs/number-input.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/number-input.tsx#L7)
+Defined in: [packages/ui/src/base/inputs/number-input.tsx:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/number-input.tsx#L8)
 
 #### Parameters
 
@@ -3897,7 +3897,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **suffix**: `string`
 
-Defined in: [packages/ui/src/base/inputs/number-input.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/number-input.tsx#L9)
+Defined in: [packages/ui/src/base/inputs/number-input.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/number-input.tsx#L10)
 
 Unit suffix displayed between the number and the spinner (e.g. "sec", "px", "kg").
 

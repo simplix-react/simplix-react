@@ -6,7 +6,7 @@
 
 # Interface: TreeReorderDialogProps\<T\>
 
-Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:66](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-reorder-dialog.tsx#L66)
+Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:68](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-reorder-dialog.tsx#L68)
 
 ## Type Parameters
 
@@ -20,7 +20,7 @@ Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:66](https://githu
 
 > **config**: [`TreeReorderConfig`](TreeReorderConfig.md)\<`T`\>
 
-Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:71](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-reorder-dialog.tsx#L71)
+Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:73](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-reorder-dialog.tsx#L73)
 
 ***
 
@@ -28,7 +28,7 @@ Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:71](https://githu
 
 > `optional` **description**: `string`
 
-Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:74](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-reorder-dialog.tsx#L74)
+Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:76](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-reorder-dialog.tsx#L76)
 
 ***
 
@@ -36,7 +36,7 @@ Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:74](https://githu
 
 > **getDisplayName**: (`item`) => `ReactNode`
 
-Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:72](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-reorder-dialog.tsx#L72)
+Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:74](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-reorder-dialog.tsx#L74)
 
 #### Parameters
 
@@ -54,7 +54,7 @@ Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:72](https://githu
 
 > **onOpenChange**: (`open`) => `void`
 
-Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:68](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-reorder-dialog.tsx#L68)
+Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:70](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-reorder-dialog.tsx#L70)
 
 #### Parameters
 
@@ -72,7 +72,7 @@ Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:68](https://githu
 
 > **open**: `boolean`
 
-Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:67](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-reorder-dialog.tsx#L67)
+Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:69](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-reorder-dialog.tsx#L69)
 
 ***
 
@@ -80,7 +80,7 @@ Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:67](https://githu
 
 > **parentId**: `string` \| `null`
 
-Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:69](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-reorder-dialog.tsx#L69)
+Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:71](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-reorder-dialog.tsx#L71)
 
 ***
 
@@ -88,7 +88,7 @@ Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:69](https://githu
 
 > **siblings**: `T`[]
 
-Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:70](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-reorder-dialog.tsx#L70)
+Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:72](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-reorder-dialog.tsx#L72)
 
 ***
 
@@ -96,4 +96,4 @@ Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:70](https://githu
 
 > `optional` **title**: `string`
 
-Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:73](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-reorder-dialog.tsx#L73)
+Defined in: [packages/ui/src/crud/tree/tree-reorder-dialog.tsx:75](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/tree-reorder-dialog.tsx#L75)

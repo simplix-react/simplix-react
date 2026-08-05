@@ -339,8 +339,12 @@ Low-level wrappers used internally by `FormFields` and `DetailFields`. Export th
 ```tsx
 import { FieldWrapper } from "@simplix-react/ui";
 
+// Pass a render function to receive { id, labelId }. Put `id` on a labelable
+// control so the label names it; use `labelId` with `aria-labelledby` for a
+// composite control (radio group, date picker) with no single labelable element.
+// A plain-element child is instead named by the wrapping fieldset.
 <FieldWrapper label="Custom Field" error={errors.custom} required>
-  <MyCustomInput value={value} onChange={onChange} />
+  {({ id }) => <MyCustomInput id={id} value={value} onChange={onChange} />}
 </FieldWrapper>
 ```
 
@@ -867,11 +871,12 @@ Overridable components: `Input`, `Textarea`, `Label`, `Switch`, `Checkbox`, `Bad
 
 ## Accessibility
 
-- All form fields generate unique IDs via `useId()` and associate labels via `htmlFor`
+- `FieldWrapper` generates the field's ids and hands `{ id, labelId }` to a render-function child, so every control gets an accessible name: `id` plus the label's `htmlFor` for a labelable control, or `aria-labelledby={labelId}` for a composite one. A plain-element child is named by the wrapping fieldset instead.
+- Icon-only controls (row actions, toolbar buttons) carry their own `aria-label`; a tooltip describes a control but does not name one.
 - Hidden labels use `sr-only` class for screen reader accessibility
 - Error messages use `role="alert"` for live announcements
 - `aria-invalid` set on inputs when errors are present
-- `aria-label` provided when `labelPosition="hidden"`
+- `aria-label` provided when `layout="hidden"`
 - Keyboard navigation support via `useKeyboardNav` hook
 - Sort buttons and pagination controls have descriptive `aria-label`
 - Selection checkboxes have row-specific `aria-label`

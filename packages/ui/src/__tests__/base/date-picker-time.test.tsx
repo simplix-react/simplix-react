@@ -92,7 +92,7 @@ describe("DatePicker showTime", () => {
 
     // Draft only — nothing reaches the field, popover stays open
     expect(onChange).not.toHaveBeenCalled();
-    expect(screen.getByLabelText("Previous month")).toBeDefined();
+    expect(screen.getByLabelText("date.previousMonth")).toBeDefined();
 
     commit();
     const result = onChange.mock.calls[0][0] as Date;

@@ -8,7 +8,7 @@
 
 > **SignaturePad**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/base/inputs/signature-pad.tsx:40](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/signature-pad.tsx#L40)
+Defined in: [packages/ui/src/base/inputs/signature-pad.tsx:42](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/signature-pad.tsx#L42)
 
 Signature capture surface with two modes: freehand drawing on a canvas and a
 typed name rendered in a signature typeface. Either mode reports the result

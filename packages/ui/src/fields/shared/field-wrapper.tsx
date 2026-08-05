@@ -27,6 +27,37 @@ const fieldWrapperVariants = cva("py-1", {
 /** Variant props extracted from {@link fieldWrapperVariants}. */
 export type FieldWrapperVariants = VariantProps<typeof fieldWrapperVariants>;
 
+/**
+ * Identifiers a {@link FieldWrapper} hands to the control it wraps so the label
+ * actually names it in the accessibility tree.
+ *
+ * - `id` — put it on a labelable control (`input`, `textarea`, `select`,
+ *   `button`, and Radix primitives that render one). The wrapper's `<Label>`
+ *   points its `htmlFor` here, so clicking the label focuses the control.
+ * - `labelId` — the id of the rendered label element. Use it with
+ *   `aria-labelledby` when the control is a composite with no single labelable
+ *   element (radio group, time picker, rich-text editor, tag combobox).
+ */
+export interface FieldControlProps {
+  /** Id for the labelable control the label points at. */
+  id: string;
+  /**
+   * Id of the label element, for `aria-labelledby` on composite controls.
+   * `undefined` when the field has no label — pointing `aria-labelledby` at a
+   * missing id would blank out a name the control derives from its content.
+   */
+  labelId: string | undefined;
+}
+
+/**
+ * Children accepted by {@link FieldWrapper}. Prefer the render-function form —
+ * it receives the ids the label needs, which is the only way the control ends
+ * up with an accessible name.
+ */
+export type FieldWrapperChildren =
+  | ReactNode
+  | ((control: FieldControlProps) => ReactNode);
+
 /** Props for the {@link FieldWrapper} component. */
 export interface FieldWrapperProps extends Partial<FieldVariant> {
   /** Visible label text for the field. */
@@ -55,7 +86,7 @@ export interface FieldWrapperProps extends Partial<FieldVariant> {
    */
   suffixControl?: ReactNode;
   className?: string;
-  children: ReactNode;
+  children: FieldWrapperChildren;
 }
 
 /**
@@ -63,6 +94,13 @@ export interface FieldWrapperProps extends Partial<FieldVariant> {
  * Handles label positioning, accessibility attributes, and field variants.
  *
  * Message priority: error > warning > (description is always shown).
+ *
+ * @example Naming the control
+ * ```tsx
+ * <FieldWrapper label="Name">
+ *   {({ id }) => <Input id={id} value={v} onChange={…} />}
+ * </FieldWrapper>
+ * ```
  */
 export function FieldWrapper({
   label,
@@ -79,19 +117,27 @@ export function FieldWrapper({
   const { layout, size } = useFieldVariant(variantOverride);
   const { Label } = useFlatUIComponents();
   const id = useId();
+  const labelId = `${id}-label`;
 
   const isHidden = layout === "hidden";
   const testId = label ? `form-field-${toTestId(label)}` : undefined;
   const { labelExtra, disabled } = variantOverride;
 
+  // The render-function form is what lets the label reach the control: the ids
+  // are generated here, so only the field component knows where to put them.
+  const control =
+    typeof children === "function"
+      ? children({ id, labelId: label ? labelId : undefined })
+      : children;
+
   const inputRow = (prefixControl || suffixControl) ? (
     <div className="flex items-center gap-2">
       {prefixControl}
-      <div className="flex-1 min-w-0">{children}</div>
+      <div className="flex-1 min-w-0">{control}</div>
       {suffixControl}
     </div>
   ) : (
-    children
+    control
   );
 
   // Determine which status message to show (error takes priority over warning)
@@ -99,7 +145,7 @@ export function FieldWrapper({
   const statusVariant = error ? "error" : warning ? "warning" : undefined;
 
   const labelText = label ? (
-    <Label htmlFor={id}>
+    <Label id={labelId} htmlFor={id}>
       {label}
       {required && (
         <span className="text-destructive ml-0.5" aria-hidden="true">
@@ -125,11 +171,18 @@ export function FieldWrapper({
       disabled={disabled ?? undefined}
       data-testid={testId}
       aria-label={isHidden && label ? label : undefined}
+      // Fallback naming: children that took the ids name their own control, so
+      // naming the group too would announce the label twice. Children that did
+      // not — a composite with no labelable element, or arbitrary content from
+      // a caller — reach the accessibility tree only through the group.
+      aria-labelledby={
+        label && !isHidden && typeof children !== "function" ? labelId : undefined
+      }
     >
       {labelElement}
 
       {isHidden && label ? (
-        <span className="sr-only" id={`${id}-label`}>
+        <span className="sr-only" id={labelId}>
           {label}
         </span>
       ) : null}

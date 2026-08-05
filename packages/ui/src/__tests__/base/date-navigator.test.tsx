@@ -24,14 +24,14 @@ describe("DateNavigator", () => {
 
   it("renders prev and next navigation buttons", () => {
     render(<DateNavigator value={baseDate} onChange={vi.fn()} />);
-    expect(screen.getByLabelText("Previous day")).toBeDefined();
-    expect(screen.getByLabelText("Next day")).toBeDefined();
+    expect(screen.getByLabelText("date.previousDay")).toBeDefined();
+    expect(screen.getByLabelText("date.nextDay")).toBeDefined();
   });
 
   it("calls onChange with previous day on prev click", () => {
     const onChange = vi.fn();
     render(<DateNavigator value={baseDate} onChange={onChange} />);
-    fireEvent.click(screen.getByLabelText("Previous day"));
+    fireEvent.click(screen.getByLabelText("date.previousDay"));
     expect(onChange).toHaveBeenCalledOnce();
     const newDate = onChange.mock.calls[0][0] as Date;
     expect(newDate.getDate()).toBe(14);
@@ -40,7 +40,7 @@ describe("DateNavigator", () => {
   it("calls onChange with next day on next click", () => {
     const onChange = vi.fn();
     render(<DateNavigator value={baseDate} onChange={onChange} />);
-    fireEvent.click(screen.getByLabelText("Next day"));
+    fireEvent.click(screen.getByLabelText("date.nextDay"));
     expect(onChange).toHaveBeenCalledOnce();
     const newDate = onChange.mock.calls[0][0] as Date;
     expect(newDate.getDate()).toBe(16);
@@ -50,7 +50,7 @@ describe("DateNavigator", () => {
     render(
       <DateNavigator value={baseDate} onChange={vi.fn()} minDate={baseDate} />,
     );
-    const prevBtn = screen.getByLabelText("Previous day");
+    const prevBtn = screen.getByLabelText("date.previousDay");
     expect(prevBtn).toHaveProperty("disabled", true);
   });
 
@@ -58,7 +58,7 @@ describe("DateNavigator", () => {
     render(
       <DateNavigator value={baseDate} onChange={vi.fn()} maxDate={baseDate} />,
     );
-    const nextBtn = screen.getByLabelText("Next day");
+    const nextBtn = screen.getByLabelText("date.nextDay");
     expect(nextBtn).toHaveProperty("disabled", true);
   });
 
@@ -66,8 +66,8 @@ describe("DateNavigator", () => {
     render(
       <DateNavigator value={baseDate} onChange={vi.fn()} disabled />,
     );
-    const prevBtn = screen.getByLabelText("Previous day");
-    const nextBtn = screen.getByLabelText("Next day");
+    const prevBtn = screen.getByLabelText("date.previousDay");
+    const nextBtn = screen.getByLabelText("date.nextDay");
     expect(prevBtn).toHaveProperty("disabled", true);
     expect(nextBtn).toHaveProperty("disabled", true);
   });
@@ -76,7 +76,7 @@ describe("DateNavigator", () => {
     render(
       <DateNavigator value={baseDate} onChange={vi.fn()} />,
     );
-    const prevBtn = screen.getByLabelText("Previous day");
+    const prevBtn = screen.getByLabelText("date.previousDay");
     expect(prevBtn.className).toContain("h-9");
   });
 
@@ -84,7 +84,7 @@ describe("DateNavigator", () => {
     render(
       <DateNavigator value={baseDate} onChange={vi.fn()} size="sm" />,
     );
-    const prevBtn = screen.getByLabelText("Previous day");
+    const prevBtn = screen.getByLabelText("date.previousDay");
     expect(prevBtn.className).toContain("h-7");
   });
 
@@ -102,7 +102,7 @@ describe("DateNavigator", () => {
     render(
       <DateNavigator value={baseDate} onChange={onChange} minDate={baseDate} />,
     );
-    fireEvent.click(screen.getByLabelText("Previous day"));
+    fireEvent.click(screen.getByLabelText("date.previousDay"));
     expect(onChange).not.toHaveBeenCalled();
   });
 
@@ -111,7 +111,7 @@ describe("DateNavigator", () => {
     render(
       <DateNavigator value={baseDate} onChange={onChange} maxDate={baseDate} />,
     );
-    fireEvent.click(screen.getByLabelText("Next day"));
+    fireEvent.click(screen.getByLabelText("date.nextDay"));
     expect(onChange).not.toHaveBeenCalled();
   });
 
@@ -119,7 +119,7 @@ describe("DateNavigator", () => {
     const onChange = vi.fn();
     render(<DateNavigator value={undefined} onChange={onChange} />);
     // Should still render without error
-    const prevBtn = screen.getByLabelText("Previous day");
+    const prevBtn = screen.getByLabelText("date.previousDay");
     expect(prevBtn).toBeDefined();
   });
 });

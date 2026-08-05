@@ -58,23 +58,26 @@ export function TextareaField({
       className={className}
       {...variantProps}
     >
-      <Textarea
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        rows={rows}
-        maxLength={maxLength}
-        disabled={disabled}
-        required={required}
-        aria-invalid={!!error}
-        aria-label={variantProps.layout === "hidden" ? label : undefined}
-        {...textareaProps}
-        className={cn(
-          resizeClasses[resize],
-          error && "border-destructive",
-          textareaProps?.className,
-        )}
-      />
+      {({ id }) => (
+        <Textarea
+          id={id}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          rows={rows}
+          maxLength={maxLength}
+          disabled={disabled}
+          required={required}
+          aria-invalid={!!error}
+          aria-label={variantProps.layout === "hidden" ? label : undefined}
+          {...textareaProps}
+          className={cn(
+            resizeClasses[resize],
+            error && "border-destructive",
+            textareaProps?.className,
+          )}
+        />
+      )}
     </FieldWrapper>
   );
 }

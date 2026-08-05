@@ -162,6 +162,8 @@ function AssignmentChips<T>({
 }
 
 function AssignmentChip({ label, icon, trailing, onRemove }: AssignmentChipProps) {
+  const { t } = useTranslation("simplix/ui");
+
   return (
     <Flex align="center" gap="xs" className="h-8 rounded-md border bg-card px-3">
       {icon}
@@ -171,6 +173,7 @@ function AssignmentChip({ label, icon, trailing, onRemove }: AssignmentChipProps
         <button
           type="button"
           onClick={onRemove}
+          aria-label={t("common.unlink")}
           className="ml-1 rounded-sm text-muted-foreground hover:text-foreground"
         >
           <XIcon />

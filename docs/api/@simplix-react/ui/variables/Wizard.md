@@ -8,7 +8,7 @@
 
 > `const` **Wizard**: (`__namedParameters`) => `Element` & `object`
 
-Defined in: [packages/ui/src/crud/form/wizard.tsx:262](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/wizard.tsx#L262)
+Defined in: [packages/ui/src/crud/form/wizard.tsx:270](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/wizard.tsx#L270)
 
 Multi-step form wizard with step indicator, validation, and navigation.
 

@@ -8,6 +8,8 @@ import { Flex } from "../../primitives/flex";
 import { Grid } from "../../primitives/grid";
 import { Stack } from "../../primitives/stack";
 import { cn } from "../../utils/cn";
+import { useTranslation } from "@simplix-react/i18n/react";
+
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { XIcon } from "../shared/icons";
 import type { SectionShellProps } from "../shared/section-shell";
@@ -72,6 +74,7 @@ function FormRoot({
   children,
 }: CrudFormProps) {
   const { Button } = useFlatUIComponents();
+  const { t } = useTranslation("simplix/ui");
   useBeforeUnload(!!warnOnUnsavedChanges);
 
   const handleSubmit = useCallback(
@@ -96,8 +99,10 @@ function FormRoot({
         <Flex data-crud-slot="header" justify={header ? "between" : "end"} align="center" className={cn("shrink-0 border-b pb-2", !isPage && "px-3")}>
           {header}
           {onClose && (
-            <Button type="button" variant="ghost" size="icon-xs" onClick={onClose}>
-              <XIcon className="h-3 w-3" />
+            // Icon-only: without this the button has no accessible name at all, and a screen
+            // reader announces the one way out of the panel as an unlabelled button.
+            <Button type="button" variant="ghost" size="icon-xs" aria-label={t("common.close")} onClick={onClose}>
+              <XIcon className="h-3 w-3" aria-hidden />
             </Button>
           )}
         </Flex>

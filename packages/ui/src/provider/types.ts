@@ -101,6 +101,13 @@ export interface SheetComponents {
 export interface PopoverComponents {
   Root: ComponentType<{ children?: React.ReactNode; open?: boolean; onOpenChange?: (open: boolean) => void }>;
   Trigger: ComponentType<{ children?: React.ReactNode; asChild?: boolean }>;
+  /**
+   * Positions the popover against something other than its trigger. A field whose
+   * box holds controls of its own (removable chips, a search input) cannot make
+   * that box the trigger without nesting a control inside a control, so the box
+   * anchors and a button inside it triggers.
+   */
+  Anchor: ComponentType<{ children?: React.ReactNode; asChild?: boolean }>;
   Content: ComponentType<PopoverContentProps>;
 }
 

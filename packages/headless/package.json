@@ -1,12 +1,11 @@
 {
   "name": "@simplix-react/headless",
-  "version": "0.3.0",
+  "version": "0.3.3-SNAPSHOT",
   "description": "Platform-neutral headless logic shared by the web and native UI kits: Orval adapters, searchable filter serialization, toast store, formatting and date utilities, theme registry",
   "type": "module",
   "sideEffects": false,
   "exports": {
     ".": {
-      "source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     }

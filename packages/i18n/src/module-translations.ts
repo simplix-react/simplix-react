@@ -1,3 +1,5 @@
+import { sharedState } from "./utils/shared-state.js";
+
 /**
  * Maps locale codes to lazy-loading functions that return translation modules.
  *
@@ -49,14 +51,23 @@ export interface ModuleTranslations {
   load: (locale: string) => Promise<Record<string, Record<string, unknown>>>;
 }
 
-const moduleRegistry = new Map<string, ModuleTranslations>();
+// Realm-wide, not module-wide: a package registering into a second copy of this
+// module writes to a registry the application never reads, and every framework
+// string then renders as its own key with nothing raised. See `sharedState`.
+const moduleRegistry = sharedState(
+  "module-registry",
+  () => new Map<string, ModuleTranslations>(),
+);
 
 /** Listener invoked whenever module translations are (re)registered. */
 export type ModuleTranslationsListener = (
   translations: ModuleTranslations,
 ) => void;
 
-const moduleListeners = new Set<ModuleTranslationsListener>();
+const moduleListeners = sharedState(
+  "module-listeners",
+  () => new Set<ModuleTranslationsListener>(),
+);
 
 /**
  * Subscribes to future {@link registerModuleTranslations} calls.

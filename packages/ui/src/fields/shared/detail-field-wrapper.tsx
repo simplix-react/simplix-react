@@ -12,7 +12,7 @@ const detailFieldWrapperVariants = cva("py-0.5", {
       left: "grid grid-cols-[auto_1fr] items-baseline gap-x-3",
       // Center, not baseline: a row whose value carries an avatar or a badge is
       // taller than its label, and baseline alignment drops the label out of line.
-      inline: "flex items-center justify-between gap-3",
+      inline: "flex items-start justify-between gap-3",
       // Settings-row style: the label stays left and the value is pushed to the
       // right edge of the row by a blank gap — no leader rule between them.
       trailing: "flex items-baseline gap-3",
@@ -79,7 +79,7 @@ export function DetailFieldWrapper({
       {layout === "trailing" && displayLabel ? (
         <span aria-hidden="true" className="min-w-4 flex-1 self-center" />
       ) : null}
-      <span className="field-value text-foreground">{children}</span>
+      <span className="field-value min-w-0 break-words text-foreground">{children}</span>
     </span>
   );
 }

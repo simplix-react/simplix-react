@@ -6,6 +6,8 @@
 
 # Type Alias: ActionType
 
-> **ActionType** = `"view"` \| `"edit"` \| `"delete"` \| `"locate"` \| `"add-child"` \| `"reorder"` \| `"move"` \| `"unlink"` \| `"select"`
+> **ActionType** = `"view"` \| `"edit"` \| `"delete"` \| `"duplicate"` \| `"locate"` \| `"add-child"` \| `"reorder"` \| `"move"` \| `"unlink"` \| `"select"`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:313](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L313)
+Defined in: [packages/ui/src/crud/shared/row-actions.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/row-actions.tsx#L21)
+
+Row-level action kinds a list or tree row can offer.

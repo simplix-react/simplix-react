@@ -452,9 +452,10 @@ describe("orderAndCategorizeFields", () => {
 
 describe("listTemplate column visibility (INV#18)", () => {
   it("omits hidden columns while keeping visible ones", () => {
-    const ctx = {
-      ...baseCtx,
-      fields: [
+    // The list row renders `listFields` — the subset of `fields` the list projection returns.
+    // Nothing here is hidden by the projection, so the two are the same set and `hideInList`
+    // is the only thing deciding what a column shows.
+    const fields = [
         {
           name: "id",
           capitalizedName: "Id",
@@ -479,8 +480,8 @@ describe("listTemplate column visibility (INV#18)", () => {
           defaultValue: '""',
           hideInList: false,
         },
-      ],
-    };
+    ];
+    const ctx = { ...baseCtx, fields, listFields: fields };
     const result = renderTemplate(listTemplate, ctx);
     expect(result).not.toContain('field="id"');
     expect(result).toContain('field="name"');

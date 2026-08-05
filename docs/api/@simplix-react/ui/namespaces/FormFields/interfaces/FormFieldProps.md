@@ -6,7 +6,7 @@
 
 # Interface: FormFieldProps
 
-Defined in: [packages/ui/src/fields/form/field.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/field.tsx#L7)
+Defined in: [packages/ui/src/fields/form/field.tsx:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/field.tsx#L5)
 
 Props for the generic [Field](../functions/Field.md) form wrapper.
 
@@ -18,9 +18,9 @@ Props for the generic [Field](../functions/Field.md) form wrapper.
 
 ### children
 
-> **children**: `ReactNode`
+> **children**: [`FieldWrapperChildren`](../../../type-aliases/FieldWrapperChildren.md)
 
-Defined in: [packages/ui/src/fields/form/field.tsx:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/field.tsx#L8)
+Defined in: [packages/ui/src/fields/form/field.tsx:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/field.tsx#L6)
 
 ***
 

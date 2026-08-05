@@ -64,30 +64,33 @@ export function RadioGroupField<T extends string = string>({
       className={className}
       {...variantProps}
     >
-      <RadioGroup
-        value={value}
-        onValueChange={(v) => onChange(v as T)}
-        disabled={disabled}
-        className={cn(directionClasses[direction])}
-        aria-label={variantProps.layout === "hidden" ? label : undefined}
-      >
-        {options.map((opt) => (
-          <label
-            key={opt.value}
-            className="flex items-center gap-2 cursor-pointer"
-          >
-            <RadioGroupItem value={opt.value} />
-            <span className="text-sm">
-              {opt.label}
-              {opt.description && (
-                <span className="block text-xs text-muted-foreground">
-                  {opt.description}
-                </span>
-              )}
-            </span>
-          </label>
-        ))}
-      </RadioGroup>
+      {({ labelId }) => (
+        <RadioGroup
+          value={value}
+          onValueChange={(v) => onChange(v as T)}
+          disabled={disabled}
+          className={cn(directionClasses[direction])}
+          aria-labelledby={labelId}
+          aria-label={variantProps.layout === "hidden" ? label : undefined}
+        >
+          {options.map((opt) => (
+            <label
+              key={opt.value}
+              className="flex items-center gap-2 cursor-pointer"
+            >
+              <RadioGroupItem value={opt.value} />
+              <span className="text-sm">
+                {opt.label}
+                {opt.description && (
+                  <span className="block text-xs text-muted-foreground">
+                    {opt.description}
+                  </span>
+                )}
+              </span>
+            </label>
+          ))}
+        </RadioGroup>
+      )}
     </FieldWrapper>
   );
 }

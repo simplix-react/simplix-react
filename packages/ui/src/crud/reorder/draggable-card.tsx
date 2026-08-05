@@ -1,10 +1,12 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { useTranslation } from "@simplix-react/i18n/react";
 import type { ReactNode } from "react";
 
 import { Flex } from "../../primitives/flex";
 import { cn } from "../../utils/cn";
 import type { ReorderConfig } from "../shared";
+import { rowClickHandler, rowClickIgnoreProps } from "../shared";
 import { DragHandleCell } from "./drag-handle";
 
 type CardDensity = "compact" | "default" | "comfortable";
@@ -51,6 +53,7 @@ export function DraggableCard<T>({
   cardTitle,
   cardContent,
 }: DraggableCardProps<T>) {
+  const { t } = useTranslation("simplix/ui");
   const canDrag = isDragEnabled && (reorderConfig.canDrag?.(row) ?? true);
 
   const {
@@ -83,12 +86,12 @@ export function DraggableCard<T>({
         isDragging && "z-10 opacity-50",
         onRowClick && "cursor-pointer",
       )}
-      onClick={onRowClick ? () => onRowClick(row) : undefined}
+      onClick={rowClickHandler(row, onRowClick)}
       data-testid={`list-row-${rowId}`}
     >
       {cardTitle && (
         <Flex align="center" className="border-b px-1 py-1.5 gap-1">
-          <div className="flex shrink-0">
+          <div className="flex shrink-0" {...rowClickIgnoreProps}>
             <DragHandleCell
               disabled={!canDrag}
               listeners={listeners}
@@ -96,18 +99,15 @@ export function DraggableCard<T>({
             />
           </div>
           <div className="min-w-0 flex-1">{cardTitle}</div>
-          <Flex gap="xs" align="center" className="shrink-0 ml-2">
+          <Flex gap="xs" align="center" className="shrink-0 ml-2" {...rowClickIgnoreProps}>
             {cardActions}
             {selectable && (
               <input
                 type="checkbox"
                 checked={isSelected ?? false}
-                onChange={(e) => {
-                  e.stopPropagation();
-                  onSelectionChange?.(index);
-                }}
+                onChange={() => onSelectionChange?.(index)}
                 className="h-4 w-4 rounded border-gray-300"
-                aria-label={`Select row ${index + 1}`}
+                aria-label={t("list.selectRow", { index: index + 1 })}
               />
             )}
           </Flex>

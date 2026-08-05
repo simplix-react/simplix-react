@@ -45,8 +45,8 @@ describe("FacetedFilter", () => {
         options={options}
       />,
     );
-    const btn = container.querySelector("button");
-    expect(btn?.className).toContain("border-dashed");
+    const chip = container.querySelector("button")!.parentElement;
+    expect(chip?.className).toContain("border-dashed");
   });
 
   it("renders solid border when selection exists", () => {
@@ -58,8 +58,8 @@ describe("FacetedFilter", () => {
         options={options}
       />,
     );
-    const btn = container.querySelector("button");
-    expect(btn?.className).toContain("border-solid");
+    const chip = container.querySelector("button")!.parentElement;
+    expect(chip?.className).toContain("border-solid");
   });
 
   it("shows clear button when selection exists", () => {
@@ -96,8 +96,8 @@ describe("FacetedFilter", () => {
         multiSelect={false}
       />,
     );
-    const btn = container.querySelector("button");
-    expect(btn?.className).toContain("border-solid");
+    const chip = container.querySelector("button")!.parentElement;
+    expect(chip?.className).toContain("border-solid");
   });
 
   it("shows count badge when many selections exceed maxDisplayCount", () => {

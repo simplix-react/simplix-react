@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { useId } from "react";
 import {
   Button,
   type FieldWrapperProps,
@@ -145,10 +146,20 @@ function HorizontalFieldWrapper({
   children,
   className,
 }: FieldWrapperProps) {
+  const controlId = useId();
+  // Children may arrive as a render function carrying the ids that let the
+  // label name the control — a replacement wrapper resolves it and keeps the
+  // association it hands over.
+  const control =
+    typeof children === "function"
+      ? children({ id: controlId, labelId: label ? `${controlId}-label` : undefined })
+      : children;
   return (
     <div className={className} style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
       {label && (
-        <div
+        <label
+          htmlFor={controlId}
+          id={`${controlId}-label`}
           style={{
             width: 100,
             flexShrink: 0,
@@ -160,10 +171,10 @@ function HorizontalFieldWrapper({
         >
           {label}
           {required && <span style={{ color: "#ef4444", marginLeft: 2 }}>*</span>}
-        </div>
+        </label>
       )}
       <div style={{ flex: 1 }}>
-        {children}
+        {control}
         {error && (
           <p style={{ fontSize: 12, color: "#ef4444", marginTop: 4 }}>{error}</p>
         )}

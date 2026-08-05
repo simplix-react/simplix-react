@@ -1,13 +1,13 @@
 // Presentational subcomponents for the time range selector. These are pure of
 // interaction logic; the parent wires handlers and passes computed geometry.
 
-import { memo } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 
 import { cn } from "../../../utils/cn";
 import { DatePicker } from "../date-picker";
 import { formatBucketLabel } from "./helpers";
-import { ChevronLeftIcon, ChevronRightIcon, ClearIcon, ExpandIcon } from "./icons";
+import { ChevronLeftIcon, ChevronRightIcon, ClearIcon } from "./icons";
 import { CHART_HEIGHT, CUSTOM_PRESET_KEY, type WindowPreset } from "./types";
 
 type TFunc = (key: string, opts?: { defaultValue?: string }) => string;
@@ -59,33 +59,79 @@ interface PresetBarProps {
   onSelect: (preset: WindowPreset) => void;
   isCustom: boolean;
   onZoomOut: () => void;
+  /** Whether a span is selected — the two selection actions only mean something then. */
   t: TFunc;
 }
 
+/**
+ * Below this controls-bar width the eleven presets no longer fit beside the range badge, and
+ * the row folds into a select. Measured on the bar rather than on the preset group itself: the
+ * group is what gets squeezed, so its own width never tells you it has run out of room.
+ */
+const PRESET_ROW_MIN_PX = 620;
+
 export function PresetBar({ presets, activeKey, onSelect, isCustom, onZoomOut, t }: PresetBarProps) {
-  return (
-    <div className="flex items-center gap-0.5">
-      {isCustom && (
-        <button
-          type="button"
-          className={cn("flex items-center gap-1 pl-2 pr-1 py-0.5 rounded text-xs font-medium bg-primary text-primary-foreground", FOCUS_RING)}
-          onClick={onZoomOut}
-          aria-label={t("timeRange.zoomOut", { defaultValue: "Zoom out to preset window" })}
-          title={t("timeRange.zoomOut", { defaultValue: "Zoom out to preset window" })}
+  const ref = useRef<HTMLDivElement>(null);
+  const [compact, setCompact] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current?.parentElement;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(([entry]) => setCompact(entry.contentRect.width < PRESET_ROW_MIN_PX));
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const customChip = isCustom && (
+    <button
+      type="button"
+      className={cn("flex items-center gap-1 pl-2 pr-1 py-0.5 rounded text-xs font-medium bg-primary text-primary-foreground", FOCUS_RING)}
+      onClick={onZoomOut}
+      aria-label={t("timeRange.zoomOut", { defaultValue: "Zoom out to preset window" })}
+      title={t("timeRange.zoomOut", { defaultValue: "Zoom out to preset window" })}
+    >
+      {t("timeRange.custom", { defaultValue: "Custom" })}
+      <span className="inline-flex items-center justify-center size-3.5 rounded-sm hover:bg-primary-foreground/20" aria-hidden="true">
+        <ClearIcon size={8} />
+      </span>
+    </button>
+  );
+
+  // Narrow: one control instead of eleven. The presets are mutually exclusive, so a select says
+  // the same thing as the row and costs a line instead of a wrap.
+  if (compact) {
+    return (
+      <div ref={ref} className="flex items-center gap-1">
+        {customChip}
+        <select
+          className={cn("h-6 rounded border border-input bg-background px-1 text-xs font-medium text-muted-foreground", FOCUS_RING)}
+          value={activeKey}
+          onChange={(e) => {
+            const picked = presets.find((p) => p.key === e.target.value);
+            if (picked) onSelect(picked);
+          }}
+          aria-label={t("timeRange.window", { defaultValue: "Window" })}
         >
-          {t("timeRange.custom", { defaultValue: "Custom" })}
-          <span className="inline-flex items-center justify-center size-3.5 rounded-sm hover:bg-primary-foreground/20" aria-hidden="true">
-            <ClearIcon size={8} />
-          </span>
-        </button>
-      )}
+          {presets.map((preset) => (
+            <option key={preset.key} value={preset.key}>
+              {formatPresetLabel(preset, t)}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
+  }
+
+  return (
+    <div ref={ref} className="flex items-center gap-px">
+      {customChip}
       {presets.map((preset) => (
         <button
           key={preset.key}
           type="button"
           aria-pressed={activeKey === preset.key}
           className={cn(
-            "px-2 py-0.5 rounded text-xs font-medium transition-colors",
+            "px-1.5 py-0.5 rounded text-xs font-medium transition-colors",
             FOCUS_RING,
             activeKey === preset.key
               ? "bg-primary text-primary-foreground"
@@ -106,51 +152,29 @@ interface SelectionBoxProps {
   left: number;
   right: number;
   accentColor: string;
-  accentForeground: string;
-  onExpand: () => void;
-  onClear: () => void;
-  expandLabel: string;
-  clearLabel: string;
 }
 
-export function SelectionBox({ left, right, accentColor, accentForeground, onExpand, onClear, expandLabel, clearLabel }: SelectionBoxProps) {
-  const glyphStyle = { backgroundColor: accentColor, color: accentForeground };
+/**
+ * The span of the strip that is currently selected.
+ *
+ * <p>A marker only. What can be done with the selection — zoom into it, drop it — sits with the
+ * window controls above, where the eye already goes for anything that changes the window, rather
+ * than pinned to an edge that moves as the selection is dragged.
+ */
+export function SelectionBox({ left, right, accentColor }: SelectionBoxProps) {
   return (
     <div
-      className="absolute rounded-[3px]"
+      className="absolute rounded-[2px] pointer-events-none"
       style={{
-        left: `calc(${left * 100}% - 3px)`,
-        top: -2,
-        bottom: -2,
-        width: `calc(${(right - left) * 100}% + 6px)`,
-        border: `2px solid ${accentColor}`,
+        left: `calc(${left * 100}% - 1px)`,
+        top: -1,
+        bottom: -1,
+        width: `calc(${(right - left) * 100}% + 2px)`,
+        // Dashed and hairline: the selection marks a span of the strip, and a solid band that
+        // heavy competes with the density it is supposed to be framing.
+        border: `1.5px dashed ${accentColor}`,
       }}
-    >
-      {/* Action bars pinned to the selection's right edge — always visible for touch devices */}
-      <div className="absolute top-0 bottom-0 right-0 flex items-stretch z-10">
-        <button
-          type="button"
-          className={cn("flex items-center justify-center w-4 rounded-none cursor-pointer transition-[filter] hover:brightness-110", FOCUS_RING)}
-          style={glyphStyle}
-          onPointerDown={(e) => e.stopPropagation()}
-          onClick={(e) => { e.stopPropagation(); onExpand(); }}
-          aria-label={expandLabel}
-        >
-          <ExpandIcon />
-        </button>
-        <span className="self-stretch w-px bg-white/20" aria-hidden="true" />
-        <button
-          type="button"
-          className={cn("flex items-center justify-center w-4 rounded-none cursor-pointer transition-[filter] hover:brightness-110", FOCUS_RING)}
-          style={glyphStyle}
-          onPointerDown={(e) => e.stopPropagation()}
-          onClick={(e) => { e.stopPropagation(); onClear(); }}
-          aria-label={clearLabel}
-        >
-          <ClearIcon />
-        </button>
-      </div>
-    </div>
+    />
   );
 }
 
@@ -159,13 +183,13 @@ export function SelectionBox({ left, right, accentColor, accentForeground, onExp
 export function DragPreviewBox({ left, right, accentColor }: { left: number; right: number; accentColor: string }) {
   return (
     <div
-      className="absolute rounded-[3px] pointer-events-none"
+      className="absolute rounded-[2px] pointer-events-none"
       style={{
-        left: `calc(${left * 100}% - 3px)`,
-        top: -2,
-        bottom: -2,
-        width: `calc(${(right - left) * 100}% + 6px)`,
-        border: `2px solid ${accentColor}`,
+        left: `calc(${left * 100}% - 1px)`,
+        top: -1,
+        bottom: -1,
+        width: `calc(${(right - left) * 100}% + 2px)`,
+        border: `1.5px dashed ${accentColor}`,
       }}
     />
   );
@@ -234,10 +258,32 @@ export function HoverTooltip({ hoverIdx, bucketCount, viewFrom, bucketMinutes, c
 
 // ── Time labels row (first/last anchored to avoid edge clipping) ──
 
+/** Roughly how much room one axis label needs before its neighbour starts touching it. */
+const LABEL_MIN_PX = 56;
+
 export function TimeLabels({ labels }: { labels: { pct: number; text: string }[] }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(0);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(([entry]) => setWidth(entry.contentRect.width));
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Every nth label, where n is whatever keeps them from colliding at this width. Dropping
+  // labels is what a narrow axis needs; overlapping them reads as neither.
+  const step = width > 0 && labels.length > 1
+    ? Math.max(1, Math.ceil((labels.length * LABEL_MIN_PX) / width))
+    : 1;
+
   return (
-    <div className="relative mx-7 h-4 mb-2 pointer-events-none">
+    <div ref={ref} className="relative mx-7 h-4 mb-2 pointer-events-none">
       {labels.map((l, i) => {
+        // The last label always survives: it names where the window ends.
+        if (i % step !== 0 && i !== labels.length - 1) return null;
         const atStart = l.pct <= 0.001;
         const atEnd = l.pct >= 0.999;
         const translate = atStart ? "translate-x-0" : atEnd ? "-translate-x-full" : "-translate-x-1/2";

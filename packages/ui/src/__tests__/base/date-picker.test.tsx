@@ -93,9 +93,9 @@ describe("DatePicker", () => {
     const { container } = render(
       <DatePicker value={new Date(2024, 0, 15)} onChange={onChange} />,
     );
-    const clearBtn = container.querySelector("[role='button']");
-    expect(clearBtn).not.toBeNull();
-    fireEvent.click(clearBtn!);
+    const clearBtn = container.querySelectorAll("button")[1];
+    expect(clearBtn).not.toBeUndefined();
+    fireEvent.click(clearBtn);
     expect(onChange).toHaveBeenCalledWith(undefined);
   });
 
@@ -103,8 +103,8 @@ describe("DatePicker", () => {
     const { container } = render(
       <DatePicker value={undefined} onChange={vi.fn()} className="my-picker" />,
     );
-    const trigger = container.querySelector("button") as HTMLButtonElement;
-    expect(trigger.className).toContain("my-picker");
+    const field = container.firstElementChild;
+    expect(field?.className).toContain("my-picker");
   });
 
   it("sets data-empty=true when no value", () => {
@@ -127,8 +127,8 @@ describe("DatePicker", () => {
     render(<DatePicker value={undefined} onChange={vi.fn()} />);
     fireEvent.click(screen.getByText("Pick a date"));
     // Previous/Next month navigation should be visible
-    expect(screen.getByLabelText("Previous month")).toBeDefined();
-    expect(screen.getByLabelText("Next month")).toBeDefined();
+    expect(screen.getByLabelText("date.previousMonth")).toBeDefined();
+    expect(screen.getByLabelText("date.nextMonth")).toBeDefined();
   });
 
   it("stages a day pick and commits it only when Select is pressed", () => {
@@ -141,7 +141,7 @@ describe("DatePicker", () => {
 
     // The pick is staged; the field is untouched and the popover stays open
     expect(onChange).not.toHaveBeenCalled();
-    expect(screen.getByLabelText("Previous month")).toBeDefined();
+    expect(screen.getByLabelText("date.previousMonth")).toBeDefined();
 
     fireEvent.click(screen.getByRole("button", { name: "common.select" }));
     expect(onChange).toHaveBeenCalledTimes(1);

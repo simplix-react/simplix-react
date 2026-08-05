@@ -111,19 +111,22 @@ export function I18nTextField({
       className={className}
       {...variantProps}
     >
-      <Input
-        type={type}
-        value={value?.[currentLang] ?? ""}
-        onChange={(e) => onChange({ ...value, [currentLang]: e.target.value })}
-        placeholder={currentPlaceholder}
-        maxLength={maxLength}
-        required={required}
-        disabled={disabled}
-        aria-invalid={!!error}
-        aria-label={variantProps.layout === "hidden" ? label : undefined}
-        {...inputProps}
-        className={cn(error && "border-destructive", inputProps?.className)}
-      />
+      {({ id }) => (
+        <Input
+          id={id}
+          type={type}
+          value={value?.[currentLang] ?? ""}
+          onChange={(e) => onChange({ ...value, [currentLang]: e.target.value })}
+          placeholder={currentPlaceholder}
+          maxLength={maxLength}
+          required={required}
+          disabled={disabled}
+          aria-invalid={!!error}
+          aria-label={variantProps.layout === "hidden" ? label : undefined}
+          {...inputProps}
+          className={cn(error && "border-destructive", inputProps?.className)}
+        />
+      )}
     </FieldWrapper>
   );
 }

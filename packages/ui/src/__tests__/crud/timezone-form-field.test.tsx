@@ -92,19 +92,19 @@ describe("TimezoneFormField", () => {
   it("shows clear button when values are selected", () => {
     const state = createMockState({ "timezone.in": ["Asia/Seoul"] });
     render(<TimezoneFormField field="timezone" label="Timezone" state={state} />);
-    expect(screen.getByLabelText("Clear Timezone")).toBeTruthy();
+    expect(screen.getByLabelText("filter.clearField")).toBeTruthy();
   });
 
   it("hides clear button when no values selected", () => {
     const state = createMockState();
     render(<TimezoneFormField field="timezone" label="Timezone" state={state} />);
-    expect(screen.queryByLabelText("Clear Timezone")).toBeNull();
+    expect(screen.queryByLabelText("filter.clearField")).toBeNull();
   });
 
   it("clears values when clear button is clicked", () => {
     const state = createMockState({ "timezone.in": ["Asia/Seoul"] });
     render(<TimezoneFormField field="timezone" label="Timezone" state={state} />);
-    fireEvent.click(screen.getByLabelText("Clear Timezone"));
+    fireEvent.click(screen.getByLabelText("filter.clearField"));
     expect(state.setValue).toHaveBeenCalledWith("timezone.in", undefined);
   });
 

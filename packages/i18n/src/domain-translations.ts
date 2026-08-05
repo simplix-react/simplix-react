@@ -1,3 +1,5 @@
+import { sharedState } from "./utils/shared-state.js";
+
 /**
  * Configuration for registering domain-specific translations.
  *
@@ -11,14 +13,22 @@ export interface DomainTranslationConfig {
   locales: Record<string, () => Promise<{ default: Record<string, unknown> }>>;
 }
 
-const registry = new Map<string, DomainTranslationConfig>();
+// Realm-wide, not module-wide — see `sharedState` for why a second copy of this
+// module is a silent failure rather than an error.
+const registry = sharedState(
+  "domain-registry",
+  () => new Map<string, DomainTranslationConfig>(),
+);
 
 /** Listener invoked whenever domain translations are (re)registered. */
 export type DomainTranslationsListener = (
   config: DomainTranslationConfig,
 ) => void;
 
-const domainListeners = new Set<DomainTranslationsListener>();
+const domainListeners = sharedState(
+  "domain-listeners",
+  () => new Set<DomainTranslationsListener>(),
+);
 
 /**
  * Subscribes to future {@link registerDomainTranslations} calls.

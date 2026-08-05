@@ -32,6 +32,7 @@ interface SortableItemProps {
 }
 
 function SortableItem({ id, label }: SortableItemProps) {
+  const { t } = useTranslation("simplix/ui");
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
 
   const style = {
@@ -50,6 +51,7 @@ function SortableItem({ id, label }: SortableItemProps) {
     >
       <button
         type="button"
+        aria-label={t("tree.reorder")}
         className="cursor-grab text-muted-foreground hover:text-foreground active:cursor-grabbing"
         {...attributes}
         {...listeners}

@@ -8,4 +8,4 @@
 
 > **TabsTriggerProps** = `ComponentPropsWithRef`\<*typeof* `TabsPrimitive.Trigger`\>
 
-Defined in: [packages/ui/src/base/navigation/tabs.tsx:73](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/tabs.tsx#L73)
+Defined in: [packages/ui/src/base/navigation/tabs.tsx:78](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/tabs.tsx#L78)

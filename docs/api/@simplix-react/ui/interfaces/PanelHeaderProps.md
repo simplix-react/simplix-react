@@ -6,7 +6,7 @@
 
 # Interface: PanelHeaderProps
 
-Defined in: [packages/ui/src/layout/panel-header.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/panel-header.tsx#L10)
+Defined in: [packages/ui/src/layout/panel-header.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/panel-header.tsx#L12)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/layout/panel-header.tsx:10](https://github.com/simp
 
 > `optional` **borderVariant**: `string`
 
-Defined in: [packages/ui/src/layout/panel-header.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/panel-header.tsx#L20)
+Defined in: [packages/ui/src/layout/panel-header.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/panel-header.tsx#L22)
 
 Additional border variant class name (e.g. color-coded bottom border).
 
@@ -24,7 +24,7 @@ Additional border variant class name (e.g. color-coded bottom border).
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/layout/panel-header.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/panel-header.tsx#L14)
+Defined in: [packages/ui/src/layout/panel-header.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/panel-header.tsx#L16)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [packages/ui/src/layout/panel-header.tsx:14](https://github.com/simp
 
 > `optional` **description**: `string`
 
-Defined in: [packages/ui/src/layout/panel-header.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/panel-header.tsx#L12)
+Defined in: [packages/ui/src/layout/panel-header.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/panel-header.tsx#L14)
 
 ***
 
@@ -40,7 +40,7 @@ Defined in: [packages/ui/src/layout/panel-header.tsx:12](https://github.com/simp
 
 > `optional` **onClose**: () => `void`
 
-Defined in: [packages/ui/src/layout/panel-header.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/panel-header.tsx#L13)
+Defined in: [packages/ui/src/layout/panel-header.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/panel-header.tsx#L15)
 
 #### Returns
 
@@ -52,7 +52,7 @@ Defined in: [packages/ui/src/layout/panel-header.tsx:13](https://github.com/simp
 
 > `optional` **thumbnail**: `ReactNode`
 
-Defined in: [packages/ui/src/layout/panel-header.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/panel-header.tsx#L16)
+Defined in: [packages/ui/src/layout/panel-header.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/panel-header.tsx#L18)
 
 Optional thumbnail element rendered before the title.
 
@@ -62,7 +62,7 @@ Optional thumbnail element rendered before the title.
 
 > **title**: `string`
 
-Defined in: [packages/ui/src/layout/panel-header.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/panel-header.tsx#L11)
+Defined in: [packages/ui/src/layout/panel-header.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/panel-header.tsx#L13)
 
 ***
 
@@ -70,6 +70,6 @@ Defined in: [packages/ui/src/layout/panel-header.tsx:11](https://github.com/simp
 
 > `optional` **trailing**: `ReactNode`
 
-Defined in: [packages/ui/src/layout/panel-header.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/panel-header.tsx#L18)
+Defined in: [packages/ui/src/layout/panel-header.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/panel-header.tsx#L20)
 
 Optional trailing element rendered after children, before the close button.

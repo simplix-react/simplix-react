@@ -56,14 +56,17 @@ export function DateRangeField({
       className={className}
       {...variantProps}
     >
-      <DateRangePicker
-        value={value}
-        onChange={onChange}
-        locale={locale}
-        placeholder={placeholder}
-        numberOfMonths={numberOfMonths}
-        disabled={disabled}
-      />
+      {({ id }) => (
+        <DateRangePicker
+          id={id}
+          value={value}
+          onChange={onChange}
+          locale={locale}
+          placeholder={placeholder}
+          numberOfMonths={numberOfMonths}
+          disabled={disabled}
+        />
+      )}
     </FieldWrapper>
   );
 }

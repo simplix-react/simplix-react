@@ -121,7 +121,7 @@ export function LocationPickerField({
                   disabled={disabled}
                   onClick={() => onLocationChange(0, 0)}
                   className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
-                  aria-label="Clear location"
+                  aria-label={t("field.clearLocation")}
                 >
                   <XIcon className="h-3.5 w-3.5" />
                 </button>
@@ -130,7 +130,7 @@ export function LocationPickerField({
                   disabled={disabled}
                   onClick={() => setOpen(true)}
                   className="inline-flex h-7 items-center gap-1.5 rounded-md border border-input px-2 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
-                  aria-label="Select location on map"
+                  aria-label={t("field.selectLocationOnMap")}
                 >
                   <MapPinIcon className="h-3.5 w-3.5" />
                 </button>
@@ -142,6 +142,7 @@ export function LocationPickerField({
               disabled={disabled}
               onClick={() => setOpen(true)}
               className="block w-full transition-opacity hover:opacity-90 disabled:pointer-events-none disabled:opacity-50"
+              aria-label={t("field.openMap")}
             >
               <div className="pointer-events-none h-[150px] bg-neutral-100 dark:bg-neutral-900">
                 <Map
@@ -192,7 +193,7 @@ export function LocationPickerField({
               const v = e.target.value === "" ? 0 : Number(e.target.value);
               if (!Number.isNaN(v)) onLocationChange(v, longitude);
             }}
-            placeholder="Latitude"
+            placeholder={t("field.latitude")}
             step="any"
             disabled={disabled}
             className="w-32"
@@ -204,7 +205,7 @@ export function LocationPickerField({
               const v = e.target.value === "" ? 0 : Number(e.target.value);
               if (!Number.isNaN(v)) onLocationChange(latitude, v);
             }}
-            placeholder="Longitude"
+            placeholder={t("field.longitude")}
             step="any"
             disabled={disabled}
             className="w-32"
@@ -213,8 +214,8 @@ export function LocationPickerField({
             type="button"
             disabled
             className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-input bg-background text-muted-foreground opacity-50"
-            title="Map unavailable offline"
-            aria-label="Map unavailable"
+            title={t("field.mapUnavailable")}
+            aria-label={t("field.mapUnavailable")}
           >
             <MapPinIcon className="h-4 w-4" />
           </button>
@@ -381,7 +382,7 @@ function LocationPickerDialog({
                   ? "bg-white text-neutral-800"
                   : "bg-black/40 text-white/70 hover:text-white",
               )}
-              aria-label="Light map"
+              aria-label={t("field.mapLight")}
             >
               <SunIcon className="h-3.5 w-3.5" />
             </button>
@@ -394,7 +395,7 @@ function LocationPickerDialog({
                   ? "bg-neutral-800 text-white"
                   : "bg-white/80 text-neutral-400 hover:text-neutral-600",
               )}
-              aria-label="Dark map"
+              aria-label={t("field.mapDark")}
             >
               <MoonIcon className="h-3.5 w-3.5" />
             </button>

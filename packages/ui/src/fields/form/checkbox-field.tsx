@@ -51,14 +51,17 @@ export function CheckboxField({
       layout={layout}
       {...variantProps}
     >
-      <Checkbox
-        checked={value}
-        onCheckedChange={(checked) => onChange(checked === true)}
-        disabled={disabled}
-        aria-invalid={!!error}
-        aria-label={layout === "hidden" ? label : undefined}
-        {...checkboxProps}
-      />
+      {({ id }) => (
+        <Checkbox
+          id={id}
+          checked={value}
+          onCheckedChange={(checked) => onChange(checked === true)}
+          disabled={disabled}
+          aria-invalid={!!error}
+          aria-label={layout === "hidden" ? label : undefined}
+          {...checkboxProps}
+        />
+      )}
     </FieldWrapper>
   );
 }

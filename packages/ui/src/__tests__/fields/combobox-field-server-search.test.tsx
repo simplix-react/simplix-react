@@ -62,7 +62,7 @@ describe("ComboboxField — serverSearch prop", () => {
         serverSearch
       />,
     );
-    const clearBtn = screen.getByRole("button", { name: "Clear selection" });
+    const clearBtn = screen.getByRole("button", { name: "field.clearSelection" });
     fireEvent.click(clearBtn);
     expect(onChange).toHaveBeenCalledWith(null);
     expect(onSearch).toHaveBeenCalledWith("");
@@ -101,7 +101,7 @@ describe("ComboboxField — serverSearch prop", () => {
         onSearch={onSearch}
       />,
     );
-    const clearBtn = screen.getByRole("button", { name: "Clear selection" });
+    const clearBtn = screen.getByRole("button", { name: "field.clearSelection" });
     fireEvent.click(clearBtn);
     expect(onChange).toHaveBeenCalledWith(null);
     expect(onSearch).not.toHaveBeenCalled();

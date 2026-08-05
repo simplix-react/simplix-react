@@ -1,6 +1,8 @@
 import { areIntervalsOverlapping } from "date-fns";
 
 import { cn } from "../../lib/cn";
+import { formatDate } from "../../lib/date-formats";
+import { useCalendarTranslation } from "../../lib/use-calendar-translation";
 import { getItemBlockStyle, isWorkingHour } from "../../helpers";
 import { useCalendarData } from "../../context/calendar-context";
 import type { CalendarItem, WorkingHours } from "../../model/types";
@@ -29,6 +31,7 @@ function slotDate(day: Date, hour: number, minute: number): Date {
 /** One day's worth of hour rows plus its absolutely-positioned timed items. */
 export function TimeGridColumn({ day, hours, workingHours, groupedItems, visibleRange, highlightBgClass }: TimeGridColumnProps) {
   const { onCellClick } = useCalendarData();
+  const { t, language, locale } = useCalendarTranslation();
   const hourPx = useHourPx();
 
   return (
@@ -42,15 +45,21 @@ export function TimeGridColumn({ day, hours, workingHours, groupedItems, visible
             {index !== 0 && <div className="pointer-events-none absolute inset-x-0 top-0 border-b" />}
             <div className="pointer-events-none absolute inset-x-0 top-1/2 border-b border-dashed" />
 
-            {QUARTERS.map((minute) => (
-              <DroppableTimeBlock key={minute} date={day} hour={hour} minute={minute}>
-                <button
-                  type="button"
-                  className="size-full cursor-pointer transition-colors hover:bg-accent"
-                  onClick={() => onCellClick?.(slotDate(day, hour, minute))}
-                />
-              </DroppableTimeBlock>
-            ))}
+            {QUARTERS.map((minute) => {
+              const slot = slotDate(day, hour, minute);
+              return (
+                <DroppableTimeBlock key={minute} date={day} hour={hour} minute={minute}>
+                  <button
+                    type="button"
+                    aria-label={t("accessibility.selectTimeSlot", {
+                      time: formatDate(slot, "dateTimeWithTime", language, locale),
+                    })}
+                    className="size-full cursor-pointer transition-colors hover:bg-accent"
+                    onClick={() => onCellClick?.(slot)}
+                  />
+                </DroppableTimeBlock>
+              );
+            })}
           </div>
         );
       })}

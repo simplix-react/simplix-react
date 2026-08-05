@@ -123,54 +123,52 @@ export function AdvancedSelectFilter({
         </DropdownMenu>
       )}
       <Popover>
-        <PopoverTrigger asChild>
-          <button
-            type="button"
-            className={cn(
-              "inline-flex h-8 items-center gap-2 rounded-md border px-3 text-sm",
-              selectedCount > 0 ? "border-solid" : "border-dashed text-muted-foreground",
-            )}
-          >
-            {label ?? t(currentOp.labelKey)}
-            {selectedCount > 0 && (
-              <>
-                <Separator orientation="vertical" className="mx-1 h-4" />
-                {selectedCount <= maxDisplayCount ? (
-                  <Flex gap="xs">
-                    {selectedOptions.map((opt) => (
-                      <Badge key={opt.value} variant="secondary" className="font-normal">
-                        {opt.label}
-                      </Badge>
-                    ))}
-                  </Flex>
-                ) : (
-                  <Badge variant="secondary" className="font-normal">
-                    {t("list.selected", { count: selectedCount })}
-                  </Badge>
-                )}
-                <span
-                  role="button"
-                  tabIndex={0}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleClear();
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.stopPropagation();
-                      e.preventDefault();
-                      handleClear();
-                    }
-                  }}
-                  className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
-                  aria-label={t("filter.clearFilter")}
-                >
-                  <XIcon className="h-3 w-3" />
-                </span>
-              </>
-            )}
-          </button>
-        </PopoverTrigger>
+        {/* The chip's border is the wrapper's, so the trigger and the clear affordance sit side by
+            side inside it rather than one inside the other — a control nested in a control leaves
+            the keyboard and assistive technology to guess which of the two a press belongs to. */}
+        <span
+          className={cn(
+            "inline-flex h-8 items-center gap-2 rounded-md border px-3 text-sm",
+            selectedCount > 0 ? "border-solid" : "border-dashed text-muted-foreground",
+          )}
+        >
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              className="inline-flex items-center gap-2 rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            >
+              {label ?? t(currentOp.labelKey)}
+              {selectedCount > 0 && (
+                <>
+                  <Separator orientation="vertical" className="mx-1 h-4" />
+                  {selectedCount <= maxDisplayCount ? (
+                    <Flex gap="xs">
+                      {selectedOptions.map((opt) => (
+                        <Badge key={opt.value} variant="secondary" className="font-normal">
+                          {opt.label}
+                        </Badge>
+                      ))}
+                    </Flex>
+                  ) : (
+                    <Badge variant="secondary" className="font-normal">
+                      {t("list.selected", { count: selectedCount })}
+                    </Badge>
+                  )}
+                </>
+              )}
+            </button>
+          </PopoverTrigger>
+          {selectedCount > 0 && (
+            <button
+              type="button"
+              onClick={handleClear}
+              className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              aria-label={t("filter.clearFilter")}
+            >
+              <XIcon className="h-3 w-3" />
+            </button>
+          )}
+        </span>
         <PopoverContent className="w-[200px] p-0" align="start">
           <Command>
             <CommandInput placeholder={`Search ${label ?? ""}...`} />

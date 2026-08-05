@@ -7,7 +7,7 @@ import {
   useReactTable,
   type VisibilityState,
 } from "@tanstack/react-table";
-import {createElement, type ReactNode, useCallback, useEffect, useMemo, useRef, useState,} from "react";
+import {createElement, type ReactNode, type Ref, useCallback, useEffect, useMemo, useRef, useState,} from "react";
 
 import {
   type BadgeVariants,
@@ -25,12 +25,20 @@ import {formatDateMedium, formatDateTime, formatRelativeTime} from "../../utils/
 import {formatWallClockTime} from "../../utils/rfc3339-date";
 import {parseDate} from "../../utils/parse-date";
 import type {ColumnInfo, EmptyReason, SortState} from "../shared";
-import {CrudListColumnContext, useCrudListColumns, useDefaultDisplayZone} from "../shared";
+import {
+  CrudListColumnContext,
+  rowClickHandler,
+  rowClickIgnoreForColumn,
+  rowClickIgnoreProps,
+  useCrudListColumns,
+  useDefaultDisplayZone,
+} from "../shared";
 import type {CrudListViewMode} from "../shared";
 import {EmptyState} from "../shared/empty-state";
 import {TableCardFrame, useTableCardFrame} from "../shared/table-card-frame";
 import { CountryCell, PhoneCell } from "./cells";
-import {AlertTriangleIcon, ArrowUpDownIcon, CheckIcon, CloudOffIcon, EyeIcon, FolderTreeIcon, FunnelIcon, MagnifyingGlassIcon, MapPinIcon, PencilIcon, PlusIcon, TrashIcon, UnlinkIcon} from "../shared/icons";
+import {AlertTriangleIcon, CloudOffIcon, FunnelIcon, MagnifyingGlassIcon} from "../shared/icons";
+import {getActionColumnWidth, RowActionCell, type ActionVariant, type RowActionDef} from "../shared/row-actions";
 import {
   AdvancedSelectFilter,
   AdvancedTextFilter,
@@ -99,9 +107,17 @@ function EmptyReasonCard({ reason, bordered = true }: { reason: Exclude<EmptyRea
 export interface ListProps {
   className?: string;
   children?: ReactNode;
+  /**
+   * The list's own outermost element.
+   *
+   * <p>What a screen measures when its column set depends on how much room the list actually has —
+   * which is not how much the window has, because a detail panel takes most of it. Pair with
+   * `useContainerWidth`.
+   */
+  ref?: Ref<HTMLDivElement>;
 }
 
-function ListRoot({ className, children }: ListProps) {
+function ListRoot({ className, children, ref }: ListProps) {
   const [columns, setColumns] = useState<ColumnInfo[]>([]);
   const [hiddenColumns, setHiddenColumns] = useState<Set<string>>(new Set());
   const [isCardMode, setIsCardMode] = useState(false);
@@ -120,6 +136,7 @@ function ListRoot({ className, children }: ListProps) {
   return (
     <CrudListColumnContext.Provider value={columnCtx}>
       <Stack
+        ref={ref}
         gap="sm"
         className={cn("w-full", className)}
         data-testid="crud-list"
@@ -246,6 +263,22 @@ export interface ListColumnProps<T> {
    * width, and on a sortable column the sort icon shares it with the label.
    */
   width?: number;
+  /**
+   * The column's floor in pixels, rather than its whole allowance: it never
+   * renders narrower than this, and it takes a share of whatever width the
+   * table has left over. The cell stops contributing its own content to the
+   * table's intrinsic width, so long values ellipsize instead of widening the
+   * column, and a table with room to spare spends that room here.
+   *
+   * Use this where the value is free text of unpredictable length — a summary,
+   * a target, a description. Use {@link width} instead where the column holds
+   * something of known size and extra room would only be padding.
+   *
+   * The cell's own content must fill the cell for the extra width to be
+   * visible: render it as a block that truncates (`className="block truncate"`)
+   * and give it no width of its own. Ignored when {@link width} is also set.
+   */
+  minWidth?: number;
   display?: "badge" | "boolean" | "country" | "phone";
   format?: "date" | "datetime" | "time" | "relative";
   /**
@@ -257,6 +290,18 @@ export interface ListColumnProps<T> {
    */
   displayZone?: string | ((row: T) => string | undefined);
   variants?: Record<string, BadgeVariants["variant"]>;
+  /**
+   * Enum this column's values belong to, e.g. `"OrderStatus"`. Paired with
+   * `enumLabel`, a `display="badge"` cell shows the translated label instead of
+   * the constant the API sends.
+   */
+  enumName?: string;
+  /**
+   * Translates an enum constant — pass the entity translation's `enumLabel`.
+   * Without it (or without `enumName`) the badge falls back to the raw value,
+   * which is a constant like `IN_TRANSIT` rather than anything an operator reads.
+   */
+  enumLabel?: (enumName: string, value: string) => string;
   children?: (props: { value: unknown; row: T }) => ReactNode;
 }
 
@@ -310,17 +355,7 @@ function formatCellValue(
 
 // ── Action types ──
 
-export type ActionType = "view" | "edit" | "delete" | "locate" | "add-child" | "reorder" | "move" | "unlink" | "select";
-export type ActionVariant = "outline" | "ghost" | "icon";
-
-export interface RowActionDef<T> {
-  type: ActionType;
-  onClick: (row: T) => void;
-  label?: string;
-  icon?: ReactNode | ((row: T) => ReactNode);
-  when?: (row: T) => boolean;
-  disabled?: (row: T) => boolean;
-}
+export type { ActionType, ActionVariant, RowActionDef } from "../shared/row-actions";
 
 // ── List.Table ──
 
@@ -399,109 +434,6 @@ export interface ListTableProps<T> {
   rowClassName?: (row: T) => string | undefined;
   className?: string;
   children?: ReactNode;
-}
-
-// ── Default action config ──
-
-const ACTION_LABEL_KEYS: Record<ActionType, string> = {
-  view: "common.view",
-  edit: "common.edit",
-  delete: "common.delete",
-  locate: "common.locate",
-  "add-child": "tree.addChild",
-  reorder: "tree.reorder",
-  move: "tree.move",
-  unlink: "common.unlink",
-  select: "common.select",
-};
-
-const ACTION_ICONS: Record<ActionType, ReactNode> = {
-  view: <EyeIcon className="size-4" />,
-  edit: <PencilIcon className="size-4" />,
-  delete: <TrashIcon className="size-4" />,
-  locate: <MapPinIcon className="size-4" />,
-  "add-child": <PlusIcon className="size-4" />,
-  reorder: <ArrowUpDownIcon className="size-4" />,
-  move: <FolderTreeIcon className="size-4" />,
-  unlink: <UnlinkIcon className="size-4" />,
-  select: <CheckIcon className="size-4" />,
-};
-
-function getActionColumnWidth(actions: RowActionDef<unknown>[], variant: ActionVariant): number {
-  if (variant === "icon") return actions.length * 30 + 4;
-  return 120;
-}
-
-function RowActionCell<T>({ row, actions, variant }: { row: T; actions: RowActionDef<T>[]; variant: ActionVariant }) {
-  const { t } = useTranslation("simplix/ui");
-  const { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } = useFlatUIComponents();
-  const visible = actions.filter((a) => !a.when || a.when(row));
-  if (visible.length === 0) return null;
-
-  const handleClick = (e: React.MouseEvent, action: RowActionDef<T>) => {
-    e.stopPropagation();
-    action.onClick(row);
-  };
-
-  if (variant === "icon") {
-    return (
-      <TooltipProvider>
-        <Flex justify="end" align="center">
-          <div className="inline-flex items-center rounded-md border overflow-hidden">
-            {visible.map((action, i) => {
-              const label = action.label ?? t(ACTION_LABEL_KEYS[action.type]);
-              const resolvedIcon = typeof action.icon === "function" ? action.icon(row) : action.icon;
-              const icon = resolvedIcon ?? ACTION_ICONS[action.type];
-              const isDisabled = action.disabled?.(row) ?? false;
-              return (
-                <Tooltip key={`${action.type}-${i}`}>
-                  <TooltipTrigger asChild>
-                    <Button
-                      size="icon-xs"
-                      variant="ghost"
-                      className={cn(
-                        "rounded-none",
-                        i > 0 && "border-l",
-                      )}
-                      onClick={(e) => handleClick(e, action)}
-                      disabled={isDisabled}
-                    >
-                      {icon}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>{label}</TooltipContent>
-                </Tooltip>
-              );
-            })}
-          </div>
-        </Flex>
-      </TooltipProvider>
-    );
-  }
-
-  // outline / ghost variant
-  return (
-    <Flex gap="xs" justify="end">
-      {visible.map((action, i) => {
-        const label = action.label ?? t(ACTION_LABEL_KEYS[action.type]);
-        const resolvedIcon = typeof action.icon === "function" ? action.icon(row) : action.icon;
-        const icon = resolvedIcon ?? ACTION_ICONS[action.type];
-        const isDisabled = action.disabled?.(row) ?? false;
-        return (
-          <Button
-            key={`${action.type}-${i}`}
-            size="xs"
-            variant={variant}
-            onClick={(e) => handleClick(e, action)}
-            disabled={isDisabled}
-          >
-            {icon}
-            {label}
-          </Button>
-        );
-      })}
-    </Flex>
-  );
 }
 
 function extractColumnDefs<T>(children: ReactNode): ListColumnProps<T>[] {
@@ -964,7 +896,7 @@ function ListTable<T>({
             checked={selectedIndices?.size === data.length && data.length > 0}
             onChange={() => onSelectAll?.()}
             className="h-4 w-4 rounded border-gray-300"
-            aria-label="Select all rows"
+            aria-label={t("list.selectAllRows")}
           />
         ),
         cell: ({ row }) => (
@@ -973,7 +905,7 @@ function ListTable<T>({
             checked={selectedIndices?.has(row.index) ?? false}
             onChange={() => onSelectionChange?.(row.index)}
             className="h-4 w-4 rounded border-gray-300"
-            aria-label={`Select row ${row.index + 1}`}
+            aria-label={t("list.selectRow", { index: row.index + 1 })}
           />
         ),
         size: 40,
@@ -982,6 +914,13 @@ function ListTable<T>({
 
     for (let i = 0; i < columnDefs.length; i++) {
       const colDef = columnDefs[i];
+      // Both props size the header box the same way; they differ only in whether
+      // the body cell is allowed to widen the column past it (see `flexible`).
+      const declaredWidth = colDef.width ?? colDef.minWidth;
+      // A floor rather than a fixed width: the header holds the column open at
+      // `minWidth`, and zeroing the body cell's max-width keeps the data from
+      // setting the column's intrinsic width, so spare table width lands here.
+      const flexible = colDef.width === undefined && colDef.minWidth !== undefined;
       cols.push({
         id: colDef.field ?? `_col_${i}`,
         accessorFn: colDef.field
@@ -995,7 +934,7 @@ function ListTable<T>({
           // column's intrinsic width in the auto table layout — otherwise the
           // nowrap label keeps the column as wide as its longest header. The label
           // then ellipsizes and carries its full text in a tooltip.
-          const headerStyle = colDef.width ? { width: colDef.width } : undefined;
+          const headerStyle = declaredWidth ? { width: declaredWidth } : undefined;
 
           const content =
             colDef.sortable && colDef.field ? (
@@ -1011,7 +950,7 @@ function ListTable<T>({
                 <span className="truncate">{label}</span>
                 <SortIcon direction={dir} />
               </button>
-            ) : colDef.width ? (
+            ) : declaredWidth ? (
               <span className="block truncate" style={headerStyle}>
                 {label}
               </span>
@@ -1021,7 +960,7 @@ function ListTable<T>({
 
           // A width-constrained header can ellipsize, so its full text stays
           // reachable on hover / keyboard focus.
-          if (colDef.width && label) {
+          if (declaredWidth && label) {
             return (
               <TooltipProvider delayDuration={200}>
                 <Tooltip>
@@ -1048,7 +987,8 @@ function ListTable<T>({
           if (colDef.display === "badge" && colDef.variants) {
             const strVal = String(value ?? "");
             const variant = colDef.variants[strVal] ?? "default";
-            return <Badge variant={variant}>{strVal}</Badge>;
+            const label = colDef.enumName && colDef.enumLabel ? colDef.enumLabel(colDef.enumName, strVal) : strVal;
+            return <Badge variant={variant}>{label}</Badge>;
           }
 
           // Boolean display
@@ -1073,7 +1013,8 @@ function ListTable<T>({
               : colDef.displayZone) ?? defaultDisplayZone;
           return formatCellValue(value, colDef.format, locale, cellZone);
         },
-        size: colDef.width,
+        size: declaredWidth,
+        meta: { flexible },
       });
     }
 
@@ -1110,6 +1051,7 @@ function ListTable<T>({
     actionColumnWidthOverride,
     slots,
     defaultDisplayZone,
+    t,
   ]);
 
   const columnVisibility: VisibilityState = useMemo(() => {
@@ -1172,7 +1114,7 @@ function ListTable<T>({
                     checked={selectedIndices?.size === data.length && data.length > 0}
                     onChange={() => onSelectAll?.()}
                     className="h-4 w-4 rounded border-gray-300"
-                    aria-label="Select all"
+                    aria-label={t("list.selectAll")}
                   />
                   {t("list.selectAll")}
                 </label>
@@ -1225,13 +1167,13 @@ function ListTable<T>({
                         onRowClick && "cursor-pointer",
                         rowClassName?.(row),
                       )}
-                      onClick={onRowClick ? () => onRowClick(row) : undefined}
+                      onClick={rowClickHandler(row, onRowClick)}
                       data-testid={`list-row-${rid}`}
                     >
                       {cardTitle && (
                         <Flex align="center" justify="between" className={cn("border-b px-2 py-1.5")}>
                           <div className="min-w-0 flex-1">{createElement(cardTitle, { row, index })}</div>
-                          <Flex gap="xs" align="center" className="shrink-0 ml-2">
+                          <Flex gap="xs" align="center" className="shrink-0 ml-2" {...rowClickIgnoreProps}>
                             {slots?.rowActions
                               ? slots.rowActions({ row })
                               : actions && actions.length > 0 && (
@@ -1241,12 +1183,9 @@ function ListTable<T>({
                               <input
                                 type="checkbox"
                                 checked={isSelected ?? false}
-                                onChange={(e) => {
-                                  e.stopPropagation();
-                                  onSelectionChange?.(index);
-                                }}
+                                onChange={() => onSelectionChange?.(index)}
                                 className="h-4 w-4 rounded border-gray-300"
-                                aria-label={`Select row ${index + 1}`}
+                                aria-label={t("list.selectRow", { index: index + 1 })}
                               />
                             )}
                           </Flex>
@@ -1340,11 +1279,26 @@ function ListTable<T>({
                             onRowClick && "cursor-pointer",
                             rowClassName?.(row.original),
                           )}
-                          onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+                          onClick={rowClickHandler(row.original, onRowClick)}
                           data-testid={`list-row-${rid}`}
                         >
                           {row.getVisibleCells().map((cell) => (
-                            <TableCell key={cell.id} className="truncate">
+                            // A `minWidth` column zeroes its cell's max-width so the auto table
+                            // layout stops reading the cell's content as the column's minimum.
+                            // The column then rests on the header's declared width and grows
+                            // into whatever the table has spare; the cell renders at the
+                            // column's width regardless of the zero.
+                            <TableCell
+                              key={cell.id}
+                              className="truncate"
+                              {...rowClickIgnoreForColumn(cell.column.id)}
+                              style={
+                                (cell.column.columnDef.meta as { flexible?: boolean } | undefined)
+                                  ?.flexible
+                                  ? { maxWidth: 0 }
+                                  : undefined
+                              }
+                            >
                               {flexRender(cell.column.columnDef.cell, cell.getContext())}
                             </TableCell>
                           ))}
@@ -1427,7 +1381,7 @@ function ListPagination({
         value={String(pageSize)}
         onValueChange={(v) => onPageSizeChange(Number(v))}
       >
-        <SelectTrigger size="xs" className="w-[64px] rounded-md border-border bg-card font-medium text-secondary-foreground" aria-label="Page size">
+        <SelectTrigger size="xs" className="w-[64px] rounded-md border-border bg-card font-medium text-secondary-foreground" aria-label={t("list.pageSize")}>
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -1450,7 +1404,7 @@ function ListPagination({
       disabled={page <= 1}
       onClick={() => onPageChange(page - 1)}
       className={cn(navCell, "w-8")}
-      aria-label="Previous page"
+      aria-label={t("list.previousPage")}
     >
       <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
         <path d="M10 4L6 8L10 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -1464,7 +1418,7 @@ function ListPagination({
       disabled={page >= totalPages}
       onClick={() => onPageChange(page + 1)}
       className={cn(navCell, "w-8")}
-      aria-label="Next page"
+      aria-label={t("list.nextPage")}
     >
       <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
         <path d="M6 4L10 8L6 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -1499,7 +1453,7 @@ function ListPagination({
                   p === page &&
                     "border-primary bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
                 )}
-                aria-label={`Page ${p}`}
+                aria-label={t("list.pageNumber", { page: p })}
                 aria-current={p === page ? "page" : undefined}
               >
                 {p}

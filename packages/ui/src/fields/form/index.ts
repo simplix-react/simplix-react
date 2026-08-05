@@ -10,6 +10,9 @@ export type { ComboboxFieldProps } from "./combobox-field";
 export { CountryField } from "./country-field";
 export type { CountryFieldProps } from "./country-field";
 
+export { CurrencyField } from "./currency-field";
+export type { CurrencyFieldProps } from "./currency-field";
+
 export { DateField } from "./date-field";
 export type { DateFieldProps } from "./date-field";
 

@@ -101,6 +101,7 @@ export interface CrudDetailProps {
 
 function DetailRoot({ isLoading, onClose, header, footer, variant = "default", auditData, displayZone, fieldVariant, className, children }: CrudDetailProps) {
   const { Button } = useFlatUIComponents();
+  const { t } = useTranslation("simplix/ui");
   const isDialog = variant === "dialog";
   // Header / body / footer share one horizontal padding so their edges stay
   // aligned. Side panels sit flush to the panel width (the enclosing
@@ -115,8 +116,10 @@ function DetailRoot({ isLoading, onClose, header, footer, variant = "default", a
         <Flex data-crud-slot="header" justify={header ? "between" : "end"} align="center" className={cn("shrink-0 border-b pb-2", px, isDialog && "pt-3")}>
           {header}
           {onClose && (
-            <Button type="button" variant="ghost" size="icon-xs" onClick={onClose}>
-              <XIcon className="h-3 w-3" />
+            // Icon-only: without this the button has no accessible name at all, and a screen
+            // reader announces the one way out of the panel as an unlabelled button.
+            <Button type="button" variant="ghost" size="icon-xs" aria-label={t("common.close")} onClick={onClose}>
+              <XIcon className="h-3 w-3" aria-hidden />
             </Button>
           )}
         </Flex>
@@ -126,7 +129,7 @@ function DetailRoot({ isLoading, onClose, header, footer, variant = "default", a
           {isLoading && (
             <output
               aria-busy="true"
-              aria-label="Loading"
+              aria-label={t("common.loading")}
               className="absolute inset-0 z-10 flex items-center justify-center rounded-md bg-background/60 animate-in fade-in-0 duration-150"
             >
               <span className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
@@ -214,6 +217,8 @@ export interface CrudDetailSectionProps extends SectionShellProps {
   layout?: keyof typeof detailLayoutColumns;
 }
 
+
+
 function DetailSection({ layout = "single-column", ...props }: CrudDetailSectionProps) {
   const { SectionShell } = useFlatUIComponents();
   const columns = detailLayoutColumns[layout];
@@ -258,10 +263,10 @@ function DetailActions({ className, children }: CrudDetailActionsProps) {
 // ┌─────────────────────────────────────┐
 // │ DefaultActions  (border-t)          │
 // │                                     │
-// │ ┌──────────┐     ┌──────┐ ┌──────┐  │
-// │ │ ← Back   │     │  [X] │ │ Edit │  │
-// │ │ or Close │     │      │ │      │  │
-// │ └──────────┘     └──────┘ └──────┘  │
+// │ ┌──────────┐   ┌──────────┐ ┌──────┐│
+// │ │ ← Back   │   │ 🗑 Delete │ │ Edit ││
+// │ │ or Close │   │          │ │      ││
+// │ └──────────┘   └──────────┘ └──────┘│
 // │  (onBack/Close)  (onDelete)(onEdit) │
 // └─────────────────────────────────────┘
 
@@ -280,6 +285,8 @@ export interface CrudDetailDefaultActionsProps {
   backLabel?: string;
   /** Label for the edit button (defaults to `"Edit"`). */
   editLabel?: string;
+  /** Label for the delete button (defaults to `"Delete"`). */
+  deleteLabel?: string;
   className?: string;
   /** Extra action buttons rendered in the right-side group, before Edit. */
   children?: React.ReactNode;
@@ -299,7 +306,7 @@ export interface CrudDetailDefaultActionsProps {
  * {@link DetailActionFooter}. A not-applicable Edit/Delete stays visible but disabled,
  * carrying a `title` reason, rather than being hidden — the action bar is stable.
  */
-function useStandardDetailActions({ onClose, onBack, onDelete, onEdit, isPending, closeLabel, backLabel, editLabel, children, editDisabled, editDisabledReason, deleteDisabled, deleteDisabledReason }: CrudDetailDefaultActionsProps) {
+function useStandardDetailActions({ onClose, onBack, onDelete, onEdit, isPending, closeLabel, backLabel, editLabel, deleteLabel, children, editDisabled, editDisabledReason, deleteDisabled, deleteDisabledReason }: CrudDetailDefaultActionsProps) {
   const { Button } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const hasLeft = Boolean(onBack || onClose);
@@ -318,15 +325,19 @@ function useStandardDetailActions({ onClose, onBack, onDelete, onEdit, isPending
   const rightGroup = (
     <Flex gap="sm">
       {onDelete && (
+        // Named like the row's other actions: an icon-only button reaches
+        // assistive technology as an unnamed button, and the reader is left
+        // guessing what it removes.
         <Button
           type="button"
-          size="icon-sm"
+          size="sm"
           variant="outline"
           onClick={onDelete}
           disabled={isPending || deleteDisabled}
           title={deleteDisabled ? deleteDisabledReason : undefined}
         >
           <TrashIcon className="h-4 w-4" />
+          {deleteLabel ?? t("common.delete")}
         </Button>
       )}
       {children}
@@ -368,9 +379,9 @@ function DetailDefaultActions(props: CrudDetailDefaultActionsProps) {
 // ┌─────────────────────────────────────┐
 // │ ActionFooter  (border-t)            │
 // │  [ Submit ] [ Review ] [ Cancel ]   │  ← domain lifecycle actions (wrap)
-// │ ┌──────────┐     ┌──────┐ ┌──────┐  │
-// │ │ ← Close  │     │ [X]  │ │ Edit │  │  ← standard row
-// │ └──────────┘     └──────┘ └──────┘  │
+// │ ┌──────────┐   ┌──────────┐ ┌──────┐│
+// │ │ ← Close  │   │ 🗑 Delete │ │ Edit ││  ← standard row
+// │ └──────────┘   └──────────┘ └──────┘│
 // └─────────────────────────────────────┘
 
 /** Props for the CrudDetail.ActionFooter sub-component. */

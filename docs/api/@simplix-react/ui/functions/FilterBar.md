@@ -8,7 +8,7 @@
 
 > **FilterBar**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:201](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L201)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:222](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L222)
 
 ## Parameters
 

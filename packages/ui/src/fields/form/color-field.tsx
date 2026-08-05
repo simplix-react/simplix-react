@@ -58,34 +58,37 @@ export function ColorField({
       className={className}
       {...variantProps}
     >
-      <span className="flex items-center gap-2">
-        <ColorPicker
-          value={value}
-          onChange={onChange}
-          presetColors={presetColors}
-          showCustomPicker={showCustomPicker}
-          clearable={clearable}
-          disabled={disabled}
-          aria-label={
-            variantProps.layout === "hidden" ? label : undefined
-          }
-        />
-        <Input
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder="#000000"
-          maxLength={7}
-          disabled={disabled}
-          aria-invalid={!!error}
-          {...inputProps}
-          className={cn(
-            "font-mono",
-            error && "border-destructive",
-            inputProps?.className,
-          )}
-        />
-      </span>
+      {({ id }) => (
+        <span className="flex items-center gap-2">
+          <ColorPicker
+            value={value}
+            onChange={onChange}
+            presetColors={presetColors}
+            showCustomPicker={showCustomPicker}
+            clearable={clearable}
+            disabled={disabled}
+            aria-label={
+              variantProps.layout === "hidden" ? label : undefined
+            }
+          />
+          <Input
+            id={id}
+            type="text"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder="#000000"
+            maxLength={7}
+            disabled={disabled}
+            aria-invalid={!!error}
+            {...inputProps}
+            className={cn(
+              "font-mono",
+              error && "border-destructive",
+              inputProps?.className,
+            )}
+          />
+        </span>
+      )}
     </FieldWrapper>
   );
 }

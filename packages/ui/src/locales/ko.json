@@ -27,7 +27,10 @@
     "unsavedTitle": "저장하지 않은 변경사항",
     "unsavedDescription": "저장하지 않은 변경사항이 있습니다. 이 페이지를 떠나시겠습니까? 변경사항이 사라집니다.",
     "unlink": "연결 해제",
-    "select": "선택"
+    "select": "선택",
+    "duplicate": "복제",
+    "increase": "증가",
+    "decrease": "감소"
   },
   "list": {
     "searchPlaceholder": "검색...",
@@ -44,6 +47,7 @@
     "unavailable": "목록을 불러오지 못했습니다.",
     "noResults": "결과 없음",
     "totalCount": "전체 {{count}}건",
+    "totalCountUnknown": "전체 —건",
     "rows": "행:",
     "viewList": "목록",
     "viewGrid": "그리드",
@@ -51,7 +55,15 @@
     "selectAll": "전체 선택",
     "selected": "{{count}}개 선택됨",
     "deleteTitle": "{{entity}} 삭제",
-    "deleteDescription": "이 {{entity}}을(를) 삭제하시겠습니까? 이 작업은 취소할 수 없습니다."
+    "deleteDescription": "이 {{entity}}을(를) 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.",
+    "selectAllRows": "모든 행 선택",
+    "selectRow": "{{index}}번째 행 선택",
+    "pageSize": "쪽 크기",
+    "previousPage": "이전 쪽",
+    "nextPage": "다음 쪽",
+    "pageNumber": "{{page}}쪽",
+    "toggleColumns": "열 표시 전환",
+    "sortByDisplayOrder": "표시 순서로 정렬"
   },
   "filter": {
     "label": "검색",
@@ -64,7 +76,9 @@
     "numberPlaceholder": "숫자",
     "numberFilter": "숫자 필터",
     "clearDateRange": "날짜 범위 초기화",
-    "clearDate": "날짜 초기화"
+    "clearDate": "날짜 초기화",
+    "removeFilter": "{{label}} 필터 제거",
+    "clearField": "{{label}} 지우기"
   },
   "timeRange": {
     "previous": "이전",
@@ -91,6 +105,8 @@
   "field": {
     "selectCountry": "국가 선택",
     "searchCountry": "국가 검색...",
+    "selectCurrency": "통화 선택",
+    "searchCurrency": "통화 검색...",
     "detectCountry": "국가 감지",
     "selectTimezone": "시간대 선택",
     "searchTimezone": "시간대 검색...",
@@ -110,7 +126,23 @@
     "noResults": "결과를 찾을 수 없습니다.",
     "noValue": "값 없음",
     "expandSearch": "전체 검색",
-    "moreResults": "일치하는 항목이 더 있습니다. 계속 입력해 범위를 좁히세요"
+    "moreResults": "일치하는 항목이 더 있습니다. 계속 입력해 범위를 좁히세요",
+    "clearSelection": "선택 지우기",
+    "removeOption": "{{label}} 제거",
+    "clearLocation": "위치 지우기",
+    "selectLocationOnMap": "지도에서 위치 선택",
+    "openMap": "지도 열기",
+    "mapLight": "밝은 지도",
+    "mapDark": "어두운 지도",
+    "mapPrevious": "이전 위치",
+    "mapNext": "다음 위치",
+    "selectLanguage": "언어 선택",
+    "previousLanguage": "이전 언어",
+    "nextLanguage": "다음 언어",
+    "switchToLanguage": "{{language}}(으)로 전환",
+    "clearSignature": "서명 지우기",
+    "latitude": "위도",
+    "longitude": "경도"
   },
   "unit": {
     "minutes": "분",
@@ -191,7 +223,11 @@
     "days": "일",
     "reset": "초기화",
     "year": "년",
-    "month": "월"
+    "month": "월",
+    "previousMonth": "이전 달",
+    "nextMonth": "다음 달",
+    "previousDay": "이전 날",
+    "nextDay": "다음 날"
   },
   "plateEditor": {
     "toolbar": {
@@ -255,7 +291,8 @@
       "deleteColumn": "열 삭제",
       "deleteTable": "표 삭제",
       "mergeCells": "셀 병합",
-      "splitCell": "셀 분할"
+      "splitCell": "셀 분할",
+      "gridSize": "{{rows}} × {{cols}}"
     },
     "mention": {
       "noResults": "검색 결과 없음",
@@ -367,5 +404,9 @@
     "thumb": {
       "uploadFailed": "업로드 실패"
     }
+  },
+  "wizard": {
+    "steps": "입력 단계",
+    "stepLabel": "{{step}}단계: {{title}}"
   }
 }

@@ -6,7 +6,7 @@
 
 # Interface: ListTableProps\<T\>
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:339](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L339)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:374](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L374)
 
 Props for the List.Table sub-component built on TanStack Table.
 
@@ -22,7 +22,7 @@ Props for the List.Table sub-component built on TanStack Table.
 
 > `optional` **actionColumnWidth**: `number`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:384](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L384)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:419](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L419)
 
 Override the auto-calculated action column width (px).
 
@@ -32,7 +32,7 @@ Override the auto-calculated action column width (px).
 
 > `optional` **actions**: [`RowActionDef`](RowActionDef.md)\<`T`\>[]
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:380](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L380)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:415](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L415)
 
 Declarative row action buttons. Automatically appends an action column to the table.
 
@@ -42,7 +42,7 @@ Declarative row action buttons. Automatically appends an action column to the ta
 
 > `optional` **actionVariant**: [`ActionVariant`](../type-aliases/ActionVariant.md)
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:382](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L382)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:417](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L417)
 
 Visual variant for action buttons. Defaults to `"outline"`.
 
@@ -52,7 +52,7 @@ Visual variant for action buttons. Defaults to `"outline"`.
 
 > `optional` **activeRowId**: `string` \| `null`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:347](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L347)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:382](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L382)
 
 Highlights the row whose `rowId` matches this value.
 
@@ -62,7 +62,7 @@ Highlights the row whose `rowId` matches this value.
 
 > `optional` **cardBreakpoint**: `number`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:353](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L353)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:388](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L388)
 
 Container width threshold (px) below which card mode activates. Disabled when omitted.
 
@@ -72,7 +72,7 @@ Container width threshold (px) below which card mode activates. Disabled when om
 
 > `optional` **cardContent**: (`props`) => `ReactNode`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:363](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L363)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:398](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L398)
 
 Render prop for the card content area below the title.
 
@@ -98,7 +98,7 @@ Render prop for the card content area below the title.
 
 > `optional` **cardTitle**: (`props`) => `ReactNode`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:361](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L361)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:396](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L396)
 
 Render prop for the card title area. Displayed with a bottom border, inline with action buttons.
 
@@ -124,7 +124,7 @@ Render prop for the card title area. Displayed with a bottom border, inline with
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:401](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L401)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:436](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L436)
 
 ***
 
@@ -132,7 +132,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:401](https://github.com/sim
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:400](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L400)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:435](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L435)
 
 ***
 
@@ -140,7 +140,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:400](https://github.com/sim
 
 > **data**: `T`[]
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:340](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L340)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:375](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L375)
 
 ***
 
@@ -148,7 +148,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:340](https://github.com/sim
 
 > `optional` **density**: `"default"` \| `"compact"` \| `"comfortable"`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:369](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L369)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:404](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L404)
 
 Vertical density (padding). Overrides size-based vertical spacing when set.
 
@@ -158,7 +158,7 @@ Vertical density (padding). Overrides size-based vertical spacing when set.
 
 > `optional` **emptyReason**: [`EmptyReason`](../type-aliases/EmptyReason.md) \| `null`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:390](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L390)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:425](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L425)
 
 When set, displays an empty-state message inside the table body.
 
@@ -168,7 +168,7 @@ When set, displays an empty-state message inside the table body.
 
 > `optional` **emptyState**: `object`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:392](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L392)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:427](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L427)
 
 Rich empty state config for "no-data" reason. Replaces the entire table with a centered illustration.
 
@@ -194,7 +194,7 @@ Rich empty state config for "no-data" reason. Replaces the entire table with a c
 
 > `optional` **gridView**: `boolean`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:359](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L359)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:394](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L394)
 
 Declares grid as a user-selectable view (requires `cardTitle`/`cardContent`).
 When set, the FilterBar auto-shows a list/grid toggle. Independent of the
@@ -206,7 +206,7 @@ responsive `cardBreakpoint` fallback.
 
 > `optional` **isLoading**: `boolean`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:341](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L341)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:376](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L376)
 
 ***
 
@@ -214,7 +214,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:341](https://github.com/sim
 
 > `optional` **onRowClick**: (`row`) => `void`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:345](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L345)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:380](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L380)
 
 #### Parameters
 
@@ -232,7 +232,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:345](https://github.com/sim
 
 > `optional` **onSelectAll**: () => `void`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:350](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L350)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:385](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L385)
 
 #### Returns
 
@@ -244,7 +244,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:350](https://github.com/sim
 
 > `optional` **onSelectionChange**: (`index`) => `void`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:349](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L349)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:384](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L384)
 
 #### Parameters
 
@@ -262,7 +262,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:349](https://github.com/sim
 
 > `optional` **onSortChange**: (`sort`) => `void`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:343](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L343)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:378](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L378)
 
 #### Parameters
 
@@ -280,7 +280,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:343](https://github.com/sim
 
 > `optional` **reorder**: [`ReorderConfig`](ReorderConfig.md)\<`T`\>
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:388](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L388)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:423](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L423)
 
 Drag-and-drop row reorder configuration.
 
@@ -290,7 +290,7 @@ Drag-and-drop row reorder configuration.
 
 > `optional` **rounded**: `"none"` \| `"sm"` \| `"lg"` \| `"md"`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:371](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L371)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:406](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L406)
 
 Container border radius.
 
@@ -300,7 +300,7 @@ Container border radius.
 
 > `optional` **rowClassName**: (`row`) => `string` \| `undefined`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:399](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L399)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:434](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L434)
 
 Callback to compute extra class names for each table/card row.
 
@@ -320,7 +320,7 @@ Callback to compute extra class names for each table/card row.
 
 > `optional` **rowId**: (`row`) => `string`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:351](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L351)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:386](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L386)
 
 #### Parameters
 
@@ -338,7 +338,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:351](https://github.com/sim
 
 > `optional` **selectable**: `boolean`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:344](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L344)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:379](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L379)
 
 ***
 
@@ -346,7 +346,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:344](https://github.com/sim
 
 > `optional` **selectedIndices**: `Set`\<`number`\>
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:348](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L348)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:383](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L383)
 
 ***
 
@@ -354,7 +354,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:348](https://github.com/sim
 
 > `optional` **size**: `"sm"` \| `"lg"` \| `"md"`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:367](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L367)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:402](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L402)
 
 Cell padding size.
 
@@ -364,7 +364,7 @@ Cell padding size.
 
 > `optional` **slots**: [`ListTableSlots`](ListTableSlots.md)\<`T`\>
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:386](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L386)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:421](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L421)
 
 Per-instance render overrides for the action cluster and empty state.
 
@@ -374,7 +374,7 @@ Per-instance render overrides for the action cluster and empty state.
 
 > `optional` **sort**: [`SortState`](SortState.md) \| `null`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:342](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L342)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:377](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L377)
 
 ***
 
@@ -382,7 +382,7 @@ Defined in: [packages/ui/src/crud/list/crud-list.tsx:342](https://github.com/sim
 
 > `optional` **stickyHeader**: `boolean`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:378](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L378)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:413](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L413)
 
 Sticks the header row to the top of the nearest scrollable ancestor
 (e.g. a page, dialog, or detail-pane body) once scrolling would hide it.
@@ -395,6 +395,6 @@ with its columns. Enabled by default; pass `false` to disable.
 
 > `optional` **variant**: `"default"` \| `"striped"` \| `"bordered"`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:365](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L365)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:400](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L400)
 
 Table visual variant.

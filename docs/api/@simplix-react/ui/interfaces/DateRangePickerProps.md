@@ -16,7 +16,7 @@ Props for the [DateRangePicker](../functions/DateRangePicker.md) component.
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/base/inputs/date-range-picker.tsx:85](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-range-picker.tsx#L85)
+Defined in: [packages/ui/src/base/inputs/date-range-picker.tsx:90](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-range-picker.tsx#L90)
 
 Additional class name for the trigger button.
 
@@ -26,9 +26,20 @@ Additional class name for the trigger button.
 
 > `optional` **disabled**: `boolean`
 
-Defined in: [packages/ui/src/base/inputs/date-range-picker.tsx:83](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-range-picker.tsx#L83)
+Defined in: [packages/ui/src/base/inputs/date-range-picker.tsx:88](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-range-picker.tsx#L88)
 
 Disable the picker.
+
+***
+
+### id?
+
+> `optional` **id**: `string`
+
+Defined in: [packages/ui/src/base/inputs/date-range-picker.tsx:72](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-range-picker.tsx#L72)
+
+Id placed on the trigger button so an enclosing field label can point its
+`htmlFor` at it — without it the label names nothing.
 
 ***
 
@@ -36,7 +47,7 @@ Disable the picker.
 
 > `optional` **locale**: `string`
 
-Defined in: [packages/ui/src/base/inputs/date-range-picker.tsx:75](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-range-picker.tsx#L75)
+Defined in: [packages/ui/src/base/inputs/date-range-picker.tsx:80](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-range-picker.tsx#L80)
 
 Short locale code (e.g. `"ko"`, `"en"`, `"ja"`). Defaults to current i18n language.
 
@@ -46,7 +57,7 @@ Short locale code (e.g. `"ko"`, `"en"`, `"ja"`). Defaults to current i18n langua
 
 > `optional` **numberOfMonths**: `1` \| `2`
 
-Defined in: [packages/ui/src/base/inputs/date-range-picker.tsx:77](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-range-picker.tsx#L77)
+Defined in: [packages/ui/src/base/inputs/date-range-picker.tsx:82](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-range-picker.tsx#L82)
 
 Number of months to display.
 
@@ -62,7 +73,7 @@ Number of months to display.
 
 > **onChange**: (`range`) => `void`
 
-Defined in: [packages/ui/src/base/inputs/date-range-picker.tsx:71](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-range-picker.tsx#L71)
+Defined in: [packages/ui/src/base/inputs/date-range-picker.tsx:76](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-range-picker.tsx#L76)
 
 Called when the range changes.
 
@@ -82,7 +93,7 @@ Called when the range changes.
 
 > `optional` **onReset**: () => `void`
 
-Defined in: [packages/ui/src/base/inputs/date-range-picker.tsx:81](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-range-picker.tsx#L81)
+Defined in: [packages/ui/src/base/inputs/date-range-picker.tsx:86](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-range-picker.tsx#L86)
 
 Called when the field is cleared via the trigger's clear button. If not provided, onChange is called with an empty range.
 
@@ -96,7 +107,7 @@ Called when the field is cleared via the trigger's clear button. If not provided
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/base/inputs/date-range-picker.tsx:73](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-range-picker.tsx#L73)
+Defined in: [packages/ui/src/base/inputs/date-range-picker.tsx:78](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-range-picker.tsx#L78)
 
 Placeholder text when no range is selected.
 
@@ -106,7 +117,7 @@ Placeholder text when no range is selected.
 
 > **value**: [`DateRange`](DateRange.md)
 
-Defined in: [packages/ui/src/base/inputs/date-range-picker.tsx:69](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-range-picker.tsx#L69)
+Defined in: [packages/ui/src/base/inputs/date-range-picker.tsx:74](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-range-picker.tsx#L74)
 
 Currently selected date range.
 
@@ -116,7 +127,7 @@ Currently selected date range.
 
 > `optional` **yearsRange**: `number`
 
-Defined in: [packages/ui/src/base/inputs/date-range-picker.tsx:79](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-range-picker.tsx#L79)
+Defined in: [packages/ui/src/base/inputs/date-range-picker.tsx:84](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-range-picker.tsx#L84)
 
 Years range around current year for dropdowns.
 

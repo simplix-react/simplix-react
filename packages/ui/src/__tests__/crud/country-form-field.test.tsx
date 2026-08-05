@@ -94,19 +94,19 @@ describe("CountryFormField", () => {
   it("shows clear button when values are selected", () => {
     const state = createMockState({ "country.in": ["US", "KR"] });
     render(<CountryFormField field="country" label="Country" state={state} />);
-    expect(screen.getByLabelText("Clear Country")).toBeTruthy();
+    expect(screen.getByLabelText("filter.clearField")).toBeTruthy();
   });
 
   it("hides clear button when no values selected", () => {
     const state = createMockState();
     render(<CountryFormField field="country" label="Country" state={state} />);
-    expect(screen.queryByLabelText("Clear Country")).toBeNull();
+    expect(screen.queryByLabelText("filter.clearField")).toBeNull();
   });
 
   it("clears values when clear button is clicked", () => {
     const state = createMockState({ "country.in": ["US"] });
     render(<CountryFormField field="country" label="Country" state={state} />);
-    fireEvent.click(screen.getByLabelText("Clear Country"));
+    fireEvent.click(screen.getByLabelText("filter.clearField"));
     expect(state.setValue).toHaveBeenCalledWith("country.in", undefined);
   });
 

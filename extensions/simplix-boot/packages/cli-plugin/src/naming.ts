@@ -287,10 +287,16 @@ export const simplixBootNaming: OpenApiNamingStrategy = {
       if (lastSegment === "batch") {
         return { role: "batchDelete", hookName: `batchDelete${pascal}s` };
       }
-      // Sub-resource DELETE: /entity/{id}/groups/{groupId}
-      // Detected by counting non-param, non-api, non-version segments.
-      // More than 1 resource segment means a sub-resource path.
-      // Uses "delete" prefix to avoid collision with POST custom actions.
+      // Standard DELETE addresses the entity by its own id and nothing else:
+      // the path ends in a parameter and carries exactly that one parameter,
+      // however many namespace segments precede it (/licensing/products/{productId}).
+      if (lastSegment.startsWith("{") && context.pathParams.length === 1) {
+        return { role: "delete", hookName: `delete${pascal}` };
+      }
+      // Anything else addresses something below the entity — a sub-resource
+      // (/entity/{id}/groups/{groupId}) or an owned singleton (/entity/{id}/avatar).
+      // The trailing resource segment names it, prefixed with "delete" so it
+      // cannot collide with a POST custom action of the same name.
       const resourceSegments = pathSegments.filter(
         s => !s.startsWith("{") && s !== "api" && !/^v\d+$/.test(s),
       );

@@ -3,6 +3,12 @@ export {
   resolveEmptyReason,
   useFieldVariant,
 } from "./types";
+export {
+  ROW_CLICK_IGNORE_ATTR,
+  rowClickHandler,
+  rowClickIgnoreForColumn,
+  rowClickIgnoreProps,
+} from "./row-click";
 export { CrudListColumnContext, useCrudListColumns } from "./column-context";
 export type { ColumnInfo, CrudListColumnContextValue, CrudListViewMode } from "./column-context";
 export type {

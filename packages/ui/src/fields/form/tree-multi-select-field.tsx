@@ -1,5 +1,5 @@
 import { useTranslation } from "@simplix-react/i18n/react";
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import type { CommonFieldProps } from "../../crud/shared/types";
 import type { TreeConfig } from "../../crud/tree/tree-types";
@@ -90,9 +90,11 @@ function TreeMultiSelectItem<T>({
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => onToggleSelect(id)}
+      {/* Expanding a branch and selecting it are two different acts, so they are two sibling
+          controls inside the row rather than one nested in the other — a control inside a control
+          leaves the keyboard and assistive technology to guess which of the two a press belongs
+          to, and the guesses disagree. */}
+      <span
         className={cn(
           "flex w-full items-center gap-1 rounded-sm px-2 py-1.5 text-sm",
           isSelected && "bg-accent text-accent-foreground",
@@ -100,32 +102,36 @@ function TreeMultiSelectItem<T>({
         )}
       >
         <span className="shrink-0" style={{ width: depth * 16 }} />
-        <span
-          role="button"
+        <button
+          type="button"
           tabIndex={hasChildren ? 0 : -1}
+          aria-label={hasChildren ? (isExpanded ? "Collapse" : "Expand") : undefined}
           className={cn(
-            "inline-flex h-4 w-4 shrink-0 items-center justify-center",
+            "inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-sm",
+            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
             hasChildren ? "text-muted-foreground hover:text-foreground" : "invisible",
           )}
-          onClick={(e) => {
-            e.stopPropagation();
+          onClick={() => {
             if (hasChildren) onToggleExpand(id);
-          }}
-          onKeyDown={(e) => {
-            if (hasChildren && (e.key === "Enter" || e.key === " ")) {
-              e.stopPropagation();
-              onToggleExpand(id);
-            }
           }}
         >
           {hasChildren ? (isExpanded ? <ChevronDownIcon /> : <ChevronRightIcon />) : null}
-        </span>
-        <FolderIcon />
-        <span className="ml-0.5 truncate">{getDisplayName(item)}</span>
-        {isSelected && (
-          <span className="ml-auto shrink-0"><CheckIcon /></span>
-        )}
-      </button>
+        </button>
+        <button
+          type="button"
+          onClick={() => onToggleSelect(id)}
+          className={cn(
+            "flex min-w-0 flex-1 items-center gap-1 rounded-sm text-start",
+            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+          )}
+        >
+          <FolderIcon />
+          <span className="ml-0.5 truncate">{getDisplayName(item)}</span>
+          {isSelected && (
+            <span className="ml-auto shrink-0"><CheckIcon /></span>
+          )}
+        </button>
+      </span>
       {hasChildren && isExpanded && children.map((child) => (
         <TreeMultiSelectItem
           key={String((child as Record<string, unknown>)[idField])}
@@ -196,7 +202,8 @@ export function TreeMultiSelectField<T>({
   className,
   ...variantProps
 }: TreeMultiSelectFieldProps<T>) {
-  const { Badge, Input, Popover, PopoverTrigger, PopoverContent } = useFlatUIComponents();
+  const { Badge, Input, Popover, PopoverAnchor, PopoverTrigger, PopoverContent } = useFlatUIComponents();
+  const boxRef = useRef<HTMLSpanElement>(null);
   const { t } = useTranslation("simplix/ui");
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -291,93 +298,121 @@ export function TreeMultiSelectField<T>({
       className={className}
       {...variantProps}
     >
-      <Popover open={open} onOpenChange={(v) => { if (disabled) return; setOpen(v); }}>
-        <PopoverTrigger asChild>
-          <span
-            className={cn(
-              "flex min-h-8 w-full items-center gap-1 rounded-md border border-input bg-background px-3 py-1 text-sm",
-              "focus-within:border-foreground",
-              disabled && "cursor-not-allowed opacity-50",
-              error && "border-destructive focus-within:border-destructive",
-            )}
-            role="combobox"
-            aria-expanded={open}
-            aria-label={variantProps.layout === "hidden" ? label : undefined}
-          >
-            <span className="flex flex-1 flex-wrap items-center gap-1 overflow-hidden">
-              {value.length === 0 && (
-                <span className="truncate text-muted-foreground">
-                  {placeholder ?? t("tree.searchPlaceholder")}
-                </span>
+      {({ id, labelId }) => (
+        <Popover open={open} onOpenChange={(v) => { if (disabled) return; setOpen(v); }}>
+          {/* The box holds a remove button per selected chip, so it anchors the
+              popover and the chevron beside them triggers it. A trigger on the box
+              would nest a control inside a control, and the keyboard and assistive
+              technology would have to guess which of the two a press belongs to. */}
+          <PopoverAnchor asChild>
+            <span
+              ref={boxRef}
+              className={cn(
+                "flex min-h-8 w-full items-center gap-1 rounded-md border border-input bg-background px-3 py-1 text-sm",
+                "focus-within:border-foreground",
+                disabled && "cursor-not-allowed opacity-50",
+                error && "border-destructive focus-within:border-destructive",
               )}
-              {value.map((id) => (
-                <Badge
-                  key={id}
-                  variant="secondary"
-                  className="shrink-0 gap-0.5 pr-0.5 text-[11px] py-0 h-5"
+              onMouseDown={(e) => {
+                // A press on the box's own surface reaches the same popover the
+                // chevron opens; a press on a chip's remove button does not.
+                if (disabled || (e.target as HTMLElement).closest("button")) return;
+                e.preventDefault();
+                setOpen((v) => !v);
+              }}
+            >
+              <span className="flex flex-1 flex-wrap items-center gap-1 overflow-hidden">
+                {value.length === 0 && (
+                  <span className="truncate text-muted-foreground">
+                    {placeholder ?? t("tree.searchPlaceholder")}
+                  </span>
+                )}
+                {value.map((id) => (
+                  <Badge
+                    key={id}
+                    variant="secondary"
+                    className="shrink-0 gap-0.5 pr-0.5 text-[11px] py-0 h-5"
+                  >
+                    {labelById.get(id) ?? id}
+                    {!disabled && (
+                      <button
+                        type="button"
+                        onClick={() => removeSelected(id)}
+                        className="ml-0.5 rounded-sm hover:bg-muted"
+                        aria-label={t("field.removeOption", {
+                          label: String(labelById.get(id) ?? id),
+                        })}
+                      >
+                        <RemoveIcon />
+                      </button>
+                    )}
+                  </Badge>
+                ))}
+              </span>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  id={id}
+                  role="combobox"
+                  aria-expanded={open}
+                  aria-labelledby={labelId}
+                  aria-label={variantProps.layout === "hidden" ? label : undefined}
+                  disabled={disabled}
+                  className="flex shrink-0 items-center rounded-sm outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 >
-                  {labelById.get(id) ?? id}
-                  {!disabled && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeSelected(id);
-                      }}
-                      className="ml-0.5 rounded-sm hover:bg-muted"
-                      aria-label={`Remove ${String(labelById.get(id) ?? id)}`}
-                    >
-                      <RemoveIcon />
-                    </button>
-                  )}
-                </Badge>
-              ))}
+                  <FieldChevron />
+                </button>
+              </PopoverTrigger>
             </span>
-            <FieldChevron />
-          </span>
-        </PopoverTrigger>
-        <PopoverContent
-          className="w-[var(--radix-popover-trigger-width)] p-0"
-          align="start"
-          onOpenAutoFocus={(e) => e.preventDefault()}
-        >
-          <Stack gap="none" className="p-2">
-            <Input
-              type="search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={t("tree.searchPlaceholder")}
-              className="mb-2"
-            />
-            <div className="max-h-60 overflow-y-auto">
-              {isLoading ? (
-                <p className="py-4 text-center text-sm text-muted-foreground">
-                  {t("common.loading")}
-                </p>
-              ) : filteredData.length === 0 ? (
-                <p className="py-4 text-center text-sm text-muted-foreground">
-                  {t("list.noResults")}
-                </p>
-              ) : (
-                filteredData.map((item) => (
-                  <TreeMultiSelectItem
-                    key={String((item as Record<string, unknown>)[idField])}
-                    item={item}
-                    depth={0}
-                    idField={idField}
-                    childrenField={childrenField}
-                    getDisplayName={getDisplayName}
-                    selectedIds={selectedIds}
-                    expandedIds={expandedIds}
-                    onToggleSelect={toggleSelect}
-                    onToggleExpand={toggleExpand}
-                  />
-                ))
-              )}
-            </div>
-          </Stack>
-        </PopoverContent>
-      </Popover>
+          </PopoverAnchor>
+          <PopoverContent
+            className="w-[var(--radix-popover-trigger-width)] p-0"
+            align="start"
+            onOpenAutoFocus={(e) => e.preventDefault()}
+            // The box is the anchor, not the trigger, so Radix reads a press on a
+            // chip as an outside press. Keep those from dismissing.
+            onInteractOutside={(e) => {
+              if (boxRef.current?.contains(e.target as Node)) e.preventDefault();
+            }}
+          >
+            <Stack gap="none" className="p-2">
+              <Input
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={t("tree.searchPlaceholder")}
+                className="mb-2"
+              />
+              <div className="max-h-60 overflow-y-auto">
+                {isLoading ? (
+                  <p className="py-4 text-center text-sm text-muted-foreground">
+                    {t("common.loading")}
+                  </p>
+                ) : filteredData.length === 0 ? (
+                  <p className="py-4 text-center text-sm text-muted-foreground">
+                    {t("list.noResults")}
+                  </p>
+                ) : (
+                  filteredData.map((item) => (
+                    <TreeMultiSelectItem
+                      key={String((item as Record<string, unknown>)[idField])}
+                      item={item}
+                      depth={0}
+                      idField={idField}
+                      childrenField={childrenField}
+                      getDisplayName={getDisplayName}
+                      selectedIds={selectedIds}
+                      expandedIds={expandedIds}
+                      onToggleSelect={toggleSelect}
+                      onToggleExpand={toggleExpand}
+                    />
+                  ))
+                )}
+              </div>
+            </Stack>
+          </PopoverContent>
+        </Popover>
+      )}
     </FieldWrapper>
   );
 }

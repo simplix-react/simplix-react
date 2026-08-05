@@ -183,7 +183,7 @@ describe("Grid", () => {
 });
 
 describe("Grid divider", () => {
-  it("renders column separator lines for fixed grids", () => {
+  it("rules every cell that follows another in its row", () => {
     const { container } = render(
       <Grid columns={3} gap="md" responsive={false} divider>
         <div>a</div>
@@ -191,7 +191,22 @@ describe("Grid divider", () => {
         <div>c</div>
       </Grid>,
     );
-    expect(container.querySelectorAll("[aria-hidden].bg-border")).toHaveLength(2);
+    // The first cell of the row opens it; the other two each get the rule on their left edge.
+    expect(container.querySelectorAll("[class*=border-l]")).toHaveLength(2);
+  });
+
+  it("leaves a cell spanning the row unruled, and reopens the rule after it", () => {
+    const { container } = render(
+      <Grid columns={2} gap="md" responsive={false} divider>
+        <div>a</div>
+        <div>b</div>
+        <div className="col-span-full">wide</div>
+        <div>c</div>
+        <div>d</div>
+      </Grid>,
+    );
+    const ruled = [...container.querySelectorAll("[class*=border-l]")].map((n) => n.textContent);
+    expect(ruled).toEqual(["b", "d"]);
   });
 
   it("renders a collapsible separator for responsive two-column grids", () => {
@@ -201,9 +216,10 @@ describe("Grid divider", () => {
         <div>b</div>
       </Grid>,
     );
-    const lines = container.querySelectorAll("[aria-hidden].bg-border");
+    const lines = container.querySelectorAll("[class*=border-l]");
     expect(lines).toHaveLength(1);
-    expect(lines[0].className).toContain("hidden");
+    // Collapsed to one column there is no gutter to rule, so the border is container-gated.
+    expect(lines[0].className).toContain("@sm:border-l");
   });
 
   it("ignores divider for responsive grids with more than two columns", () => {

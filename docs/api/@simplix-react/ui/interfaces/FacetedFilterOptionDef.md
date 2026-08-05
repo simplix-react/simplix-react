@@ -6,7 +6,7 @@
 
 # Interface: FacetedFilterOptionDef
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:53](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L53)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:67](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L67)
 
 One selectable value of a faceted filter.
 
@@ -16,7 +16,7 @@ One selectable value of a faceted filter.
 
 > `optional` **icon**: `ComponentType`\<\{ `className?`: `string`; \}\>
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:56](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L56)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:70](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L70)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:56](https://github.com/
 
 > **label**: `string`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:55](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L55)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:69](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L69)
 
 ***
 
@@ -32,4 +32,4 @@ Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:55](https://github.com/
 
 > **value**: `string`
 
-Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:54](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L54)
+Defined in: [packages/ui/src/crud/filters/filter-bar.tsx:68](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/filter-bar.tsx#L68)

@@ -66,9 +66,8 @@ describe("AdvancedSelectFilter", () => {
         options={options}
       />,
     );
-    const buttons = container.querySelectorAll("button");
-    const triggerBtn = Array.from(buttons).find((b) => b.className.includes("border-dashed"));
-    expect(triggerBtn).toBeTruthy();
+    const chip = container.querySelector("button")!.parentElement;
+    expect(chip?.className).toContain("border-dashed");
   });
 
   it("renders solid border when selection exists", () => {
@@ -83,9 +82,8 @@ describe("AdvancedSelectFilter", () => {
         options={options}
       />,
     );
-    const buttons = container.querySelectorAll("button");
-    const triggerBtn = Array.from(buttons).find((b) => b.className.includes("border-solid"));
-    expect(triggerBtn).toBeTruthy();
+    const chip = container.querySelector("button")!.parentElement;
+    expect(chip?.className).toContain("border-solid");
   });
 
   it("shows clear button when selection exists", () => {
@@ -160,9 +158,8 @@ describe("AdvancedSelectFilter", () => {
         options={options}
       />,
     );
-    const buttons = container.querySelectorAll("button");
-    const triggerBtn = Array.from(buttons).find((b) => b.className.includes("border-solid"));
-    expect(triggerBtn).toBeTruthy();
+    const chip = container.querySelector("button")!.parentElement;
+    expect(chip?.className).toContain("border-solid");
   });
 
   it("shows count when selections exceed maxDisplayCount", () => {
@@ -212,8 +209,9 @@ describe("AdvancedSelectFilter", () => {
       />,
     );
     const clearBtn = screen.getByLabelText("filter.clearFilter");
-    fireEvent.keyDown(clearBtn, { key: "Enter" });
-    expect(onChange).toHaveBeenCalledWith([]);
+    // Enter and Space reach it through the platform's own button activation,
+    // which is the point of not hand-rolling the control out of a span.
+    expect(clearBtn.tagName).toBe("BUTTON");
   });
 
   it("handles keyboard clear with Space key", () => {
@@ -230,8 +228,9 @@ describe("AdvancedSelectFilter", () => {
       />,
     );
     const clearBtn = screen.getByLabelText("filter.clearFilter");
-    fireEvent.keyDown(clearBtn, { key: " " });
-    expect(onChange).toHaveBeenCalledWith([]);
+    // Enter and Space reach it through the platform's own button activation,
+    // which is the point of not hand-rolling the control out of a span.
+    expect(clearBtn.tagName).toBe("BUTTON");
   });
 
   it("shows selected badges within maxDisplayCount", () => {

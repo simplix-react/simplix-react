@@ -8,7 +8,7 @@
 
 > **ArrowLeftIcon**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/crud/shared/icons.tsx:252](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/icons.tsx#L252)
+Defined in: [packages/ui/src/crud/shared/icons.tsx:261](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/icons.tsx#L261)
 
 ## Parameters
 

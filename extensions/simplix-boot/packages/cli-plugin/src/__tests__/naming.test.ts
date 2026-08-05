@@ -322,6 +322,17 @@ describe("simplixBootNaming", () => {
       expect(result).toEqual({ role: "batchDelete", hookName: "batchDeletePets" });
     });
 
+    it("resolves DELETE /{id} under a namespaced path as delete", () => {
+      const result = simplixBootNaming.resolveOperation({
+        ...baseContext,
+        entityName: "product",
+        method: "delete",
+        path: "/api/v1/licensing/products/{productId}",
+        pathParams: ["productId"],
+      });
+      expect(result).toEqual({ role: "delete", hookName: "deleteProduct" });
+    });
+
     it("resolves DELETE sub-resource /entity/{id}/groups/{groupId}", () => {
       const result = simplixBootNaming.resolveOperation({
         ...baseContext,
@@ -331,6 +342,17 @@ describe("simplixBootNaming", () => {
         pathParams: ["id", "groupId"],
       });
       expect(result).toEqual({ role: "deleteGroups", hookName: "deleteGroupsUser" });
+    });
+
+    it("resolves DELETE of an owned singleton as a sub-resource delete", () => {
+      const result = simplixBootNaming.resolveOperation({
+        ...baseContext,
+        entityName: "userAvatar",
+        method: "delete",
+        path: "/api/v1/admin/user/account/{userId}/avatar",
+        pathParams: ["userId"],
+      });
+      expect(result).toEqual({ role: "deleteAvatar", hookName: "deleteAvatarUserAvatar" });
     });
 
     // --- PATCH patterns ---

@@ -8,10 +8,13 @@
 
 > **ListTotalBadge**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/crud/shared/list-total-badge.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/list-total-badge.tsx#L15)
+Defined in: [packages/ui/src/crud/shared/list-total-badge.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/list-total-badge.tsx#L23)
 
 The standard "Total N" leading badge of a list FilterBar. Renders the shared
 outline badge with the list icon and the framework-translated count label.
+
+The badge always occupies the toolbar, whether or not the count is known, so
+the row does not shift when the value lands.
 
 ## Parameters
 

@@ -58,14 +58,14 @@ describe("ComboboxField", () => {
     render(
       <ComboboxField label="Fruit" value="apple" onChange={vi.fn()} options={options} />,
     );
-    expect(screen.getByLabelText("Clear selection")).toBeDefined();
+    expect(screen.getByLabelText("field.clearSelection")).toBeDefined();
   });
 
   it("does not show clear button when value is null", () => {
     render(
       <ComboboxField label="Fruit" value={null} onChange={vi.fn()} options={options} />,
     );
-    expect(screen.queryByLabelText("Clear selection")).toBeNull();
+    expect(screen.queryByLabelText("field.clearSelection")).toBeNull();
   });
 
   it("calls onChange with null when clear is clicked", () => {
@@ -73,7 +73,7 @@ describe("ComboboxField", () => {
     render(
       <ComboboxField label="Fruit" value="apple" onChange={onChange} options={options} />,
     );
-    fireEvent.click(screen.getByLabelText("Clear selection"));
+    fireEvent.click(screen.getByLabelText("field.clearSelection"));
     expect(onChange).toHaveBeenCalledWith(null);
   });
 
@@ -81,7 +81,7 @@ describe("ComboboxField", () => {
     render(
       <ComboboxField label="Fruit" value="apple" onChange={vi.fn()} options={options} disabled />,
     );
-    expect(screen.queryByLabelText("Clear selection")).toBeNull();
+    expect(screen.queryByLabelText("field.clearSelection")).toBeNull();
   });
 
   it("shows error", () => {
@@ -186,7 +186,7 @@ describe("ComboboxField", () => {
     );
     const trigger = screen.getByTestId("form-field-fruit").querySelector("span[class]")!;
     fireEvent.click(trigger);
-    expect(screen.getByText("Loading...")).toBeDefined();
+    expect(screen.getByText("common.loading")).toBeDefined();
   });
 
   it("shows no results message when filtered list is empty", () => {
@@ -1077,7 +1077,7 @@ describe("MultiSelectField", () => {
         options={options}
       />,
     );
-    expect(screen.getByLabelText("Remove React")).toBeDefined();
+    expect(screen.getByLabelText("field.removeOption")).toBeDefined();
   });
 
   it("does not show remove button on badges when disabled", () => {
@@ -1090,7 +1090,7 @@ describe("MultiSelectField", () => {
         disabled
       />,
     );
-    expect(screen.queryByLabelText("Remove React")).toBeNull();
+    expect(screen.queryByLabelText("field.removeOption")).toBeNull();
   });
 
   it("calls onChange without removed value when badge remove is clicked", () => {
@@ -1103,7 +1103,7 @@ describe("MultiSelectField", () => {
         options={options}
       />,
     );
-    fireEvent.click(screen.getByLabelText("Remove React"));
+    fireEvent.click(screen.getAllByLabelText("field.removeOption")[0]);
     expect(onChange).toHaveBeenCalledWith(["vue"]);
   });
 
@@ -1354,7 +1354,7 @@ describe("TreeSelectField", () => {
         treeData={treeData}
       />,
     );
-    expect(screen.getByLabelText("Clear selection")).toBeDefined();
+    expect(screen.getByLabelText("field.clearSelection")).toBeDefined();
   });
 
   it("does not show clear button when value is null", () => {
@@ -1366,7 +1366,7 @@ describe("TreeSelectField", () => {
         treeData={treeData}
       />,
     );
-    expect(screen.queryByLabelText("Clear selection")).toBeNull();
+    expect(screen.queryByLabelText("field.clearSelection")).toBeNull();
   });
 
   it("calls onChange with null when clear is clicked", () => {
@@ -1379,7 +1379,7 @@ describe("TreeSelectField", () => {
         treeData={treeData}
       />,
     );
-    fireEvent.click(screen.getByLabelText("Clear selection"));
+    fireEvent.click(screen.getByLabelText("field.clearSelection"));
     expect(onChange).toHaveBeenCalledWith(null);
   });
 
@@ -1393,7 +1393,7 @@ describe("TreeSelectField", () => {
         disabled
       />,
     );
-    expect(screen.queryByLabelText("Clear selection")).toBeNull();
+    expect(screen.queryByLabelText("field.clearSelection")).toBeNull();
   });
 
   it("shows error", () => {
@@ -1563,7 +1563,7 @@ describe("TreeSelectField", () => {
     expect(screen.queryByText("Child A1")).toBeNull();
     // Click expand toggle for "Root A"
     const expandToggle = screen.getByText("Root A").closest("button")!
-      .querySelector("[role='button']") as HTMLElement;
+      .previousElementSibling as HTMLElement;
     fireEvent.click(expandToggle);
     // Now children should be visible
     expect(screen.getByText("Child A1")).toBeDefined();
@@ -1573,7 +1573,7 @@ describe("TreeSelectField", () => {
     expect(screen.queryByText("Child A1")).toBeNull();
   });
 
-  it("handles keyboard Enter on expand toggle", () => {
+  it("expands from the keyboard because the toggle is a real button", () => {
     render(
       <TreeSelectField
         label="Category"
@@ -1585,8 +1585,11 @@ describe("TreeSelectField", () => {
     const trigger = screen.getByTestId("form-field-category").querySelector("span[class]")!;
     fireEvent.click(trigger);
     const expandToggle = screen.getByText("Root A").closest("button")!
-      .querySelector("[role='button']") as HTMLElement;
-    fireEvent.keyDown(expandToggle, { key: "Enter" });
+      .previousElementSibling as HTMLElement;
+    // Enter and Space reach it through the platform's own button activation, which is the point of
+    // not hand-rolling the control out of a span.
+    expect(expandToggle.tagName).toBe("BUTTON");
+    fireEvent.click(expandToggle);
     expect(screen.getByText("Child A1")).toBeDefined();
   });
 });
@@ -1620,7 +1623,7 @@ describe("CountryField", () => {
     );
     // useCountryOptions returns localized names; in test env with en locale
     const fieldset = screen.getByTestId("form-field-country");
-    const trigger = fieldset.querySelector("button");
+    const trigger = fieldset.querySelector("[role='combobox']");
     expect(trigger?.textContent).toBeTruthy();
     expect(trigger?.textContent).not.toBe("");
   });
@@ -1654,8 +1657,9 @@ describe("CountryField", () => {
     render(
       <CountryField label="Country" value="US" onChange={onChange} />,
     );
-    fireEvent.keyDown(screen.getByLabelText("field.clear"), { key: "Enter" });
-    expect(onChange).toHaveBeenCalledWith("");
+    // Enter and Space reach it through the platform's own button activation,
+    // which is the point of not hand-rolling the control out of a span.
+    expect(screen.getByLabelText("field.clear").tagName).toBe("BUTTON");
   });
 
   it("shows detect button when not disabled", () => {
@@ -1699,8 +1703,8 @@ describe("CountryField", () => {
       <CountryField label="Country" value="" onChange={vi.fn()} disabled />,
     );
     const fieldset = screen.getByTestId("form-field-country");
-    const trigger = fieldset.querySelector("button");
-    expect(trigger?.disabled).toBe(true);
+    const trigger = fieldset.querySelector("[role='combobox']");
+    expect((trigger as HTMLButtonElement).disabled).toBe(true);
   });
 
   it("calls onChange to toggle off when same country is selected", () => {
@@ -1766,8 +1770,9 @@ describe("TimezoneField", () => {
     render(
       <TimezoneField label="Timezone" value="Asia/Seoul" onChange={onChange} />,
     );
-    fireEvent.keyDown(screen.getByLabelText("field.clear"), { key: "Enter" });
-    expect(onChange).toHaveBeenCalledWith("");
+    // Enter and Space reach it through the platform's own button activation,
+    // which is the point of not hand-rolling the control out of a span.
+    expect(screen.getByLabelText("field.clear").tagName).toBe("BUTTON");
   });
 
   it("shows detect button when not disabled", () => {
@@ -1811,8 +1816,8 @@ describe("TimezoneField", () => {
       <TimezoneField label="Timezone" value="" onChange={vi.fn()} disabled />,
     );
     const fieldset = screen.getByTestId("form-field-timezone");
-    const trigger = fieldset.querySelector("button");
-    expect(trigger?.disabled).toBe(true);
+    const trigger = fieldset.querySelector("[role='combobox']");
+    expect((trigger as HTMLButtonElement).disabled).toBe(true);
   });
 
   it("does not show clear button when disabled even with value", () => {

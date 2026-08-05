@@ -24,8 +24,9 @@ import { Flex, Stack } from "../../primitives";
 import { cn } from "../../utils/cn";
 import type { ColumnInfo, EmptyReason, SortState } from "../shared";
 import { TableCardFrame, useTableCardFrame } from "../shared/table-card-frame";
-import type { ActionType, ActionVariant, ListColumnProps, RowActionDef } from "../list/crud-list";
-import { ArrowUpDownIcon, CheckIcon, ChevronsDownUpIcon, ChevronsUpDownIcon, EyeIcon, FolderTreeIcon, MagnifyingGlassIcon, MapPinIcon, PencilIcon, PlusIcon, TrashIcon, UnlinkIcon, XIcon } from "../shared/icons";
+import type { ListColumnProps } from "../list/crud-list";
+import { getActionColumnWidth, RowActionCell, type ActionVariant, type RowActionDef } from "../shared/row-actions";
+import { ChevronsDownUpIcon, ChevronsUpDownIcon, MagnifyingGlassIcon, XIcon } from "../shared/icons";
 import type { TreeConfig, TreeNodeMetadata } from "./tree-types";
 import { useTreeExpansion } from "./use-tree-expansion";
 import { filterTreeWithAncestors, getAllNodeIds, treeToFlat } from "./tree-utils";
@@ -206,6 +207,7 @@ function TreeExpandToggle({ className }: { className?: string }) {
             <Button
               variant="outline"
               size="icon-sm"
+              aria-label={t("tree.expandAll")}
               onClick={expansion.expandAll}
             >
               <ChevronsUpDownIcon className="size-4" />
@@ -218,6 +220,7 @@ function TreeExpandToggle({ className }: { className?: string }) {
             <Button
               variant="outline"
               size="icon-sm"
+              aria-label={t("tree.collapseAll")}
               onClick={expansion.collapseAll}
             >
               <ChevronsDownUpIcon className="size-4" />
@@ -234,108 +237,6 @@ function TreeExpandToggle({ className }: { className?: string }) {
 
 function TreeColumn<T>(_props: ListColumnProps<T>): ReactNode {
   return null;
-}
-
-// ── Action helpers (reused from CrudList pattern) ──
-
-const ACTION_LABEL_KEYS: Record<ActionType, string> = {
-  view: "common.view",
-  edit: "common.edit",
-  delete: "common.delete",
-  locate: "common.locate",
-  "add-child": "tree.addChild",
-  reorder: "tree.reorder",
-  move: "tree.move",
-  unlink: "common.unlink",
-  select: "common.select",
-};
-
-const ACTION_ICONS: Record<ActionType, ReactNode> = {
-  view: <EyeIcon className="size-4" />,
-  edit: <PencilIcon className="size-4" />,
-  delete: <TrashIcon className="size-4" />,
-  locate: <MapPinIcon className="size-4" />,
-  "add-child": <PlusIcon className="size-4" />,
-  reorder: <ArrowUpDownIcon className="size-4" />,
-  move: <FolderTreeIcon className="size-4" />,
-  unlink: <UnlinkIcon className="size-4" />,
-  select: <CheckIcon className="size-4" />,
-};
-
-function getActionColumnWidth(actions: RowActionDef<unknown>[], variant: ActionVariant): number {
-  if (variant === "icon") return actions.length * 30 + 4;
-  return 120;
-}
-
-function RowActionCell<T>({ row, actions, variant }: { row: T; actions: RowActionDef<T>[]; variant: ActionVariant }) {
-  const { t } = useTranslation("simplix/ui");
-  const { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } = useFlatUIComponents();
-  const visible = actions.filter((a) => !a.when || a.when(row));
-  if (visible.length === 0) return null;
-
-  const handleClick = (e: React.MouseEvent, action: RowActionDef<T>) => {
-    e.stopPropagation();
-    action.onClick(row);
-  };
-
-  if (variant === "icon") {
-    return (
-      <TooltipProvider>
-        <Flex justify="end" align="center">
-          <div className="inline-flex items-center rounded-md border overflow-hidden">
-            {visible.map((action, i) => {
-              const label = action.label ?? t(ACTION_LABEL_KEYS[action.type]);
-              const resolvedIcon = typeof action.icon === "function" ? action.icon(row) : action.icon;
-              const icon = resolvedIcon ?? ACTION_ICONS[action.type];
-              const isDisabled = action.disabled?.(row) ?? false;
-              return (
-                <Tooltip key={`${action.type}-${i}`}>
-                  <TooltipTrigger asChild>
-                    <Button
-                      size="icon-xs"
-                      variant="ghost"
-                      className={cn(
-                        "rounded-none",
-                        i > 0 && "border-l",
-                      )}
-                      onClick={(e) => handleClick(e, action)}
-                      disabled={isDisabled}
-                    >
-                      {icon}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>{label}</TooltipContent>
-                </Tooltip>
-              );
-            })}
-          </div>
-        </Flex>
-      </TooltipProvider>
-    );
-  }
-
-  return (
-    <Flex gap="xs" justify="end">
-      {visible.map((action, i) => {
-        const label = action.label ?? t(ACTION_LABEL_KEYS[action.type]);
-        const resolvedIcon = typeof action.icon === "function" ? action.icon(row) : action.icon;
-        const icon = resolvedIcon ?? ACTION_ICONS[action.type];
-        const isDisabled = action.disabled?.(row) ?? false;
-        return (
-          <Button
-            key={`${action.type}-${i}`}
-            size="sm"
-            variant={variant}
-            onClick={(e) => handleClick(e, action)}
-            disabled={isDisabled}
-          >
-            {icon}
-            {label}
-          </Button>
-        );
-      })}
-    </Flex>
-  );
 }
 
 function extractColumnDefs<T>(children: ReactNode): ListColumnProps<T>[] {
@@ -595,7 +496,7 @@ function TreeTable<T>({
         id: "_actions",
         header: () => headerActions ?? "",
         cell: ({ row }) => (
-          <RowActionCell row={row.original} actions={actions as RowActionDef<T & TreeNodeMetadata>[]} variant={actionVariant} />
+          <RowActionCell row={row.original} actions={actions as RowActionDef<T & TreeNodeMetadata>[]} variant={actionVariant} size="sm" />
         ),
         size: colWidth,
       });
@@ -751,7 +652,7 @@ function TreeHeaderActions({ searchPlaceholder, className }: TreeHeaderActionsPr
           <Tooltip>
             <TooltipTrigger asChild>
               <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon-xs">
+                <Button variant="ghost" size="icon-xs" aria-label={t("common.search")}>
                   <MagnifyingGlassIcon className="size-4" />
                 </Button>
               </PopoverTrigger>
@@ -778,6 +679,7 @@ function TreeHeaderActions({ searchPlaceholder, className }: TreeHeaderActionsPr
               <button
                 type="button"
                 onClick={handleClear}
+                aria-label={t("common.clear")}
                 className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-sm p-0.5 text-muted-foreground hover:text-foreground"
               >
                 <XIcon className="size-3.5" />
@@ -789,7 +691,7 @@ function TreeHeaderActions({ searchPlaceholder, className }: TreeHeaderActionsPr
           <>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon-xs" onClick={expansion.expandAll}>
+                <Button variant="ghost" size="icon-xs" aria-label={t("tree.expandAll")} onClick={expansion.expandAll}>
                   <ChevronsUpDownIcon className="size-4" />
                 </Button>
               </TooltipTrigger>
@@ -797,7 +699,7 @@ function TreeHeaderActions({ searchPlaceholder, className }: TreeHeaderActionsPr
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon-xs" onClick={expansion.collapseAll}>
+                <Button variant="ghost" size="icon-xs" aria-label={t("tree.collapseAll")} onClick={expansion.collapseAll}>
                   <ChevronsDownUpIcon className="size-4" />
                 </Button>
               </TooltipTrigger>

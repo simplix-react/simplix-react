@@ -69,10 +69,8 @@ describe("DateFilter", () => {
         operators={[SearchOperator.EQUALS]}
       />,
     );
-    const btn = container.querySelectorAll("button");
-    // The popover trigger button has dashed border
-    const triggerBtn = Array.from(btn).find((b) => b.className.includes("border-dashed"));
-    expect(triggerBtn).toBeTruthy();
+    const chip = container.querySelector("button")!.parentElement;
+    expect(chip?.className).toContain("border-dashed");
   });
 
   it("renders solid border when value is present", () => {
@@ -86,9 +84,8 @@ describe("DateFilter", () => {
         operators={[SearchOperator.EQUALS]}
       />,
     );
-    const btn = container.querySelectorAll("button");
-    const triggerBtn = Array.from(btn).find((b) => b.className.includes("border-solid"));
-    expect(triggerBtn).toBeTruthy();
+    const chip = container.querySelector("button")!.parentElement;
+    expect(chip?.className).toContain("border-solid");
   });
 
   it("shows operator dropdown when multiple operators provided", () => {

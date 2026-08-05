@@ -8,7 +8,7 @@
 
 > `const` **AssignmentPanel**: (`__namedParameters`) => `Element` & `object`
 
-Defined in: [packages/ui/src/crud/assignment/assignment-panel.tsx:212](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/assignment/assignment-panel.tsx#L212)
+Defined in: [packages/ui/src/crud/assignment/assignment-panel.tsx:215](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/assignment/assignment-panel.tsx#L215)
 
 Assignment panel for 1:N relationship management UIs.
 Provides a consistent frame (Card + header + body) where modules inject data and rendering.

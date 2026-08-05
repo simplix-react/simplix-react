@@ -35,6 +35,7 @@
     "viewByResourceTimeline": "リソースタイムライン表示",
     "viewByHeatmap": "ヒートマップ表示",
     "viewByGanttWeek": "週タイムライン表示",
-    "viewByGanttDay": "日タイムライン表示"
+    "viewByGanttDay": "日タイムライン表示",
+    "selectTimeSlot": "{{time}}を選択"
   }
 }

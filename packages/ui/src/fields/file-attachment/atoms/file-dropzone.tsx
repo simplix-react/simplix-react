@@ -95,10 +95,12 @@ export function FileDropzone({
   })
 
   return (
+    // A drop target and a mouse shortcut, not a control: the CTA inside it is the control, and a
+    // control nested in a control leaves the keyboard and assistive technology to guess which of
+    // the two a press belongs to. The zone therefore takes no role, no tab stop, and no key
+    // handler — reaching the picker from the keyboard goes through the CTA.
     <div
-      role="button"
-      tabIndex={disabled ? -1 : 0}
-      aria-disabled={disabled}
+      role="group"
       aria-label={resolvedTitle}
       className={cn(
         // Compact single row at any width: small icon + constraint meta + inline CTA.
@@ -108,9 +110,6 @@ export function FileDropzone({
         disabled && 'pointer-events-none opacity-50',
       )}
       {...dragProps}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') inputRef.current?.click()
-      }}
       onClick={() => inputRef.current?.click()}
     >
       {/* Icon */}

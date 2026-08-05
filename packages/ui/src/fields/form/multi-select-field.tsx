@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useId, useMemo, useRef, useState } from "react";
 
 import { useTranslation } from "@simplix-react/i18n/react";
 
@@ -58,13 +58,15 @@ export function MultiSelectField<T extends string = string>({
   className,
   ...variantProps
 }: MultiSelectFieldProps<T>) {
-  const { Badge, Popover, PopoverContent, PopoverTrigger } = useFlatUIComponents();
+  const { Badge, Popover, PopoverAnchor, PopoverContent } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const selectPlaceholder = placeholder ?? t("field.selectOption");
   const noResultsMessage = emptyMessage ?? t("field.noResults");
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const boxRef = useRef<HTMLSpanElement>(null);
+  const listboxId = useId();
 
   const filtered = useMemo(() => {
     if (!query) return options;
@@ -101,134 +103,154 @@ export function MultiSelectField<T extends string = string>({
       className={className}
       {...variantProps}
     >
-      <Popover open={open} onOpenChange={(v) => { if (disabled) return; setOpen(v); }}>
-        <PopoverTrigger asChild>
-          <span
-            className={cn(
-              "flex h-8 w-full items-center gap-1 rounded-md border border-input bg-background px-3 text-sm",
-              "focus-within:outline-none focus-within:border-foreground",
-              disabled && "cursor-not-allowed opacity-50",
-              error && "border-destructive focus-within:border-destructive",
-            )}
-            role="combobox"
-            aria-expanded={open}
-            aria-label={
-              variantProps.layout === "hidden" ? label : undefined
-            }
-          >
-            <span className="flex flex-1 items-center gap-1 overflow-hidden">
-            {selectedLabels.map((opt) => (
-              <Badge
-                key={opt.value}
-                variant="secondary"
-                className="shrink-0 gap-0.5 pr-0.5 text-[11px] py-0 h-5"
-              >
-                {opt.label}
-                {!disabled && (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeOption(opt.value);
-                    }}
-                    className="ml-0.5 rounded-sm hover:bg-muted"
-                    aria-label={`Remove ${opt.label}`}
-                  >
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 15 15"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-3 w-3"
-                    >
-                      <path
-                        d="M11.7816 4.03157C12.0062 3.80702 12.0062 3.44295 11.7816 3.2184C11.5571 2.99385 11.193 2.99385 10.9685 3.2184L7.50005 6.68682L4.03164 3.2184C3.80708 2.99385 3.44301 2.99385 3.21846 3.2184C2.99391 3.44295 2.99391 3.80702 3.21846 4.03157L6.68688 7.49999L3.21846 10.9684C2.99391 11.193 2.99391 11.557 3.21846 11.7816C3.44301 12.0061 3.80708 12.0061 4.03164 11.7816L7.50005 8.31316L10.9685 11.7816C11.193 12.0061 11.5571 12.0061 11.7816 11.7816C12.0062 11.557 12.0062 11.193 11.7816 10.9684L8.31322 7.49999L11.7816 4.03157Z"
-                        fill="currentColor"
-                        fillRule="evenodd"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </button>
-                )}
-              </Badge>
-            ))}
-            <input
-              ref={inputRef}
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onFocus={() => setOpen(true)}
-              placeholder={value.length === 0 ? selectPlaceholder : ""}
-              disabled={disabled}
-              className="min-w-[60px] flex-1 bg-transparent outline-none text-sm placeholder:text-muted-foreground disabled:cursor-not-allowed"
-            />
-            </span>
-            <FieldChevron />
-          </span>
-        </PopoverTrigger>
-        <PopoverContent
-          className="w-[var(--radix-popover-trigger-width)] p-0"
-          align="start"
-          onOpenAutoFocus={(e) => e.preventDefault()}
-        >
-          <ul className="max-h-60 overflow-y-auto p-1" role="listbox">
-            {filtered.length === 0 && (
-              <li className="py-4 text-center text-sm text-muted-foreground">
-                {noResultsMessage}
-              </li>
-            )}
-            {filtered.map((opt) => {
-              const selected = value.includes(opt.value);
-              return (
-                <li
+      {({ id, labelId }) => (
+        <Popover open={open} onOpenChange={(v) => { if (disabled) return; setOpen(v); }}>
+          {/* The box holds controls of its own — a chip's remove button, the search
+              input — so it anchors the popover instead of triggering it. A trigger
+              here would nest a control inside a control, and the keyboard and
+              assistive technology would have to guess which of the two a press
+              belongs to. */}
+          <PopoverAnchor asChild>
+            <span
+              ref={boxRef}
+              className={cn(
+                "flex h-8 w-full items-center gap-1 rounded-md border border-input bg-background px-3 text-sm",
+                "focus-within:outline-none focus-within:border-foreground",
+                disabled && "cursor-not-allowed opacity-50",
+                error && "border-destructive focus-within:border-destructive",
+              )}
+              onMouseDown={(e) => {
+                // A press on the box's own surface belongs to the search input.
+                if (disabled || (e.target as HTMLElement).closest("button, input")) return;
+                e.preventDefault();
+                inputRef.current?.focus();
+                setOpen(true);
+              }}
+            >
+              <span className="flex flex-1 items-center gap-1 overflow-hidden">
+              {selectedLabels.map((opt) => (
+                <Badge
                   key={opt.value}
-                  role="option"
-                  aria-selected={selected}
-                  className={cn(
-                    "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none",
-                    "hover:bg-accent hover:text-accent-foreground",
-                    selected && "bg-accent/50",
-                  )}
-                  onClick={() => toggleOption(opt.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      toggleOption(opt.value);
-                    }
-                  }}
+                  variant="secondary"
+                  className="shrink-0 gap-0.5 pr-0.5 text-[11px] py-0 h-5"
                 >
-                  <span
-                    className={cn(
-                      "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                      selected
-                        ? "bg-primary text-primary-foreground"
-                        : "opacity-50",
-                    )}
-                  >
-                    {selected && (
+                  {opt.label}
+                  {!disabled && (
+                    <button
+                      type="button"
+                      onClick={() => removeOption(opt.value)}
+                      className="ml-0.5 rounded-sm hover:bg-muted"
+                      aria-label={t("field.removeOption", { label: opt.label })}
+                    >
                       <svg
-                        width="15"
-                        height="15"
+                        width="14"
+                        height="14"
                         viewBox="0 0 15 15"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
                         className="h-3 w-3"
                       >
                         <path
-                          d="M11.4669 3.72684C11.7558 3.91574 11.8369 4.30308 11.648 4.59198L7.39799 11.092C7.29783 11.2452 7.13556 11.3467 6.95402 11.3699C6.77247 11.3931 6.58989 11.3354 6.45446 11.2124L3.70446 8.71241C3.44905 8.48022 3.43023 8.08494 3.66242 7.82953C3.89461 7.57412 4.28989 7.5553 4.5453 7.78749L6.75292 9.79441L10.6018 3.90792C10.7907 3.61902 11.178 3.53795 11.4669 3.72684Z"
+                          d="M11.7816 4.03157C12.0062 3.80702 12.0062 3.44295 11.7816 3.2184C11.5571 2.99385 11.193 2.99385 10.9685 3.2184L7.50005 6.68682L4.03164 3.2184C3.80708 2.99385 3.44301 2.99385 3.21846 3.2184C2.99391 3.44295 2.99391 3.80702 3.21846 4.03157L6.68688 7.49999L3.21846 10.9684C2.99391 11.193 2.99391 11.557 3.21846 11.7816C3.44301 12.0061 3.80708 12.0061 4.03164 11.7816L7.50005 8.31316L10.9685 11.7816C11.193 12.0061 11.5571 12.0061 11.7816 11.7816C12.0062 11.557 12.0062 11.193 11.7816 10.9684L8.31322 7.49999L11.7816 4.03157Z"
                           fill="currentColor"
                           fillRule="evenodd"
                           clipRule="evenodd"
                         />
                       </svg>
-                    )}
-                  </span>
-                  {opt.label}
+                    </button>
+                  )}
+                </Badge>
+              ))}
+              <input
+                ref={inputRef}
+                id={id}
+                role="combobox"
+                aria-expanded={open}
+                aria-controls={open ? listboxId : undefined}
+                aria-autocomplete="list"
+                aria-labelledby={labelId}
+                aria-label={variantProps.layout === "hidden" ? label : undefined}
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onFocus={() => setOpen(true)}
+                onClick={() => setOpen(true)}
+                placeholder={value.length === 0 ? selectPlaceholder : ""}
+                disabled={disabled}
+                className="min-w-[60px] flex-1 bg-transparent outline-none text-sm placeholder:text-muted-foreground disabled:cursor-not-allowed"
+              />
+              </span>
+              <FieldChevron />
+            </span>
+          </PopoverAnchor>
+          <PopoverContent
+            className="w-[var(--radix-popover-trigger-width)] p-0"
+            align="start"
+            onOpenAutoFocus={(e) => e.preventDefault()}
+            // The box is the anchor, not the trigger, so Radix reads a press on a
+            // chip or on the input as an outside press. Keep those from dismissing.
+            onInteractOutside={(e) => {
+              if (boxRef.current?.contains(e.target as Node)) e.preventDefault();
+            }}
+          >
+            <ul className="max-h-60 overflow-y-auto p-1" role="listbox" id={listboxId}>
+              {filtered.length === 0 && (
+                <li className="py-4 text-center text-sm text-muted-foreground">
+                  {noResultsMessage}
                 </li>
-              );
-            })}
-          </ul>
-        </PopoverContent>
-      </Popover>
+              )}
+              {filtered.map((opt) => {
+                const selected = value.includes(opt.value);
+                return (
+                  <li
+                    key={opt.value}
+                    role="option"
+                    aria-selected={selected}
+                    className={cn(
+                      "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none",
+                      "hover:bg-accent hover:text-accent-foreground",
+                      selected && "bg-accent/50",
+                    )}
+                    onClick={() => toggleOption(opt.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        toggleOption(opt.value);
+                      }
+                    }}
+                  >
+                    <span
+                      className={cn(
+                        "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                        selected
+                          ? "bg-primary text-primary-foreground"
+                          : "opacity-50",
+                      )}
+                    >
+                      {selected && (
+                        <svg
+                          width="15"
+                          height="15"
+                          viewBox="0 0 15 15"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-3 w-3"
+                        >
+                          <path
+                            d="M11.4669 3.72684C11.7558 3.91574 11.8369 4.30308 11.648 4.59198L7.39799 11.092C7.29783 11.2452 7.13556 11.3467 6.95402 11.3699C6.77247 11.3931 6.58989 11.3354 6.45446 11.2124L3.70446 8.71241C3.44905 8.48022 3.43023 8.08494 3.66242 7.82953C3.89461 7.57412 4.28989 7.5553 4.5453 7.78749L6.75292 9.79441L10.6018 3.90792C10.7907 3.61902 11.178 3.53795 11.4669 3.72684Z"
+                            fill="currentColor"
+                            fillRule="evenodd"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      )}
+                    </span>
+                    {opt.label}
+                  </li>
+                );
+              })}
+            </ul>
+          </PopoverContent>
+        </Popover>
+      )}
     </FieldWrapper>
   );
 }

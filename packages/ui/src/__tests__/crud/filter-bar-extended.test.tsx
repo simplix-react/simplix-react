@@ -150,7 +150,7 @@ describe("FilterBar (extended)", () => {
     render(<FilterBar filters={[dateRangeFilter]} state={state} />);
 
     // There should be a remove button for "Created" filter
-    const removeBtn = screen.getByLabelText("Remove Created filter");
+    const removeBtn = screen.getByLabelText("filter.removeFilter");
     fireEvent.click(removeBtn);
     expect(state.commitValues).toHaveBeenCalledWith({
       [gteKey]: undefined,
@@ -162,7 +162,7 @@ describe("FilterBar (extended)", () => {
     const state = createMockState();
     render(<FilterBar filters={[]} state={state} />);
     // Column toggle button should be visible (from the mocked column context)
-    const colToggle = screen.getByLabelText("Toggle columns");
+    const colToggle = screen.getByLabelText("list.toggleColumns");
     expect(colToggle).toBeTruthy();
   });
 

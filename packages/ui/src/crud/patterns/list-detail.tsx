@@ -103,10 +103,21 @@ export type ListDetailProps = ListDetailBaseProps & (
   | { detailWidth?: never; /** Fixed list panel width in px. The detail panel fills remaining space. */ listWidth?: number }
 );
 
+/**
+ * Standard width (px) of the detail panel in a list-detail screen.
+ *
+ * A detail body is a two-column field grid over a two-tier action footer, and at a narrower
+ * width the pairs collapse into one column while long values wrap mid-token. The list panel
+ * takes the remaining width, which is enough for the few columns a list shows before a row is
+ * opened. Exported so an application states the same width wherever it needs the number
+ * outside this component rather than repeating a literal.
+ */
+export const DETAIL_PANEL_WIDTH = 600;
+
 /** Minimum width (px) for both list and detail panels during drag. */
 const MIN_PANEL_WIDTH = 280;
 
-export function ListDetailRoot({ variant = "panel", activePanel: activePanelProp, detailWidth = 480, listWidth, onClose, dialogHeight, className, children }: ListDetailProps) {
+export function ListDetailRoot({ variant = "panel", activePanel: activePanelProp, detailWidth = DETAIL_PANEL_WIDTH, listWidth, onClose, dialogHeight, className, children }: ListDetailProps) {
 
   const [activePanelState, setActivePanel] = useState<"list" | "detail">("list");
   const activePanel = activePanelProp ?? activePanelState;

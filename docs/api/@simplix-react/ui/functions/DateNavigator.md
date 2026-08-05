@@ -8,7 +8,7 @@
 
 > **DateNavigator**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/base/inputs/date-navigator.tsx:31](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-navigator.tsx#L31)
+Defined in: [packages/ui/src/base/inputs/date-navigator.tsx:32](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/date-navigator.tsx#L32)
 
 Date picker with previous/next day navigation buttons in a unified button-group style.
 

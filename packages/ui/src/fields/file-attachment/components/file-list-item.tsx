@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import type { DraggableAttributes, DraggableSyntheticListeners } from '@dnd-kit/core'
+import { useTranslation } from '@simplix-react/i18n/react'
 import { cn } from '../../../utils/cn'
 import { useFlatUIComponents } from '../../../provider/ui-provider'
 import { DragHandleCell } from '../../../crud/reorder/drag-handle'
@@ -46,6 +47,7 @@ export function FileListItem({
   hideHandle,
 }: FileListItemProps) {
   const { Badge } = useFlatUIComponents()
+  const { t } = useTranslation('simplix/ui')
 
   return (
     <div
@@ -62,6 +64,7 @@ export function FileListItem({
         {!hideHandle && (
           <DragHandleCell
             disabled={status !== 'completed'}
+            disabledLabel={t('file.handle.reorderDisabled')}
             listeners={dragListeners}
             attributes={dragAttributes}
           />

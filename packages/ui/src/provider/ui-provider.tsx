@@ -156,6 +156,7 @@ export function useFlatUIComponents() {
     // Popover
     Popover: ui.Popover.Root,
     PopoverTrigger: ui.Popover.Trigger,
+    PopoverAnchor: ui.Popover.Anchor,
     PopoverContent: ui.Popover.Content,
     // Tooltip
     TooltipProvider: ui.Tooltip.Provider,
