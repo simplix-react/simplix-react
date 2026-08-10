@@ -113,10 +113,19 @@ export function usePageHeader(header: PageHeaderState | null) {
   // Clear header on unmount — but only if the current header is still the one
   // this hook installed. A deferred unmount (e.g. tab-exit animation) must not
   // wipe a header another component has registered in the meantime.
+  //
+  // Forgetting what was installed is the other half of that, and the half a remount needs.
+  // React's development remount rehearsal runs this cleanup between the publishing effect's
+  // two runs; on the second run the caller has not re-rendered, so it offers the very object
+  // `installed` still holds, `same` reports nothing to do, and the store stays empty. Whoever
+  // passes values that change on a later render — a fresh `actions` node, a title that arrives
+  // with a query — publishes again and never sees it. A caller passing only a stable title and
+  // description has no later render to save it, and renders no header at all.
   useEffect(() => {
     return () => {
       if (!store) return;
       if (installed.current != null && store.get() === installed.current) store.set(EMPTY);
+      installed.current = null;
     };
   }, [store]);
 }
