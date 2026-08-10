@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react-native-ext/signature",
-  "version": "0.3.4",
+  "version": "0.3.5-SNAPSHOT",
   "description": "Drawn / typed signature capture for simplix-react-native, exported as PNG for upload (same payload contract as the web SignaturePad)",
   "type": "module",
   "main": "./src/index.ts",

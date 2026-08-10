@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react-native-ext/kiosk",
-  "version": "0.3.4",
+  "version": "0.3.5-SNAPSHOT",
   "description": "Kiosk device control for simplix-react-native: keep-awake, Android Lock Task Mode, idle reset timer, network recovery screen",
   "type": "module",
   "main": "./src/index.ts",

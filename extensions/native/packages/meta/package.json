@@ -1,6 +1,6 @@
 {
   "name": "simplix-react-native",
-  "version": "0.3.4",
+  "version": "0.3.5-SNAPSHOT",
   "description": "Meta package that installs the @simplix-react-native/* core packages (ui, runtime) in one dependency",
   "type": "module",
   "sideEffects": false,

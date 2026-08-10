@@ -9,6 +9,8 @@ The topmost section is always the next version, marked `Unreleased`. The release
 workflow stamps it with the released version and date, then opens a fresh
 `Unreleased` section for the following development version.
 
+## [0.3.5] - Unreleased
+
 ## [0.3.4] - 2026-08-10
 
 ## [0.3.3] - 2026-08-10
