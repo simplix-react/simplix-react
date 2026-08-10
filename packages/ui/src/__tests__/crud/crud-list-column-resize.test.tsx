@@ -19,11 +19,12 @@ import { MIN_COLUMN_WIDTH, KEYBOARD_STEP } from "../../crud/list/column-widths";
 interface Row {
   code: string;
   name: string;
+  displayOrder: number;
 }
 
 const rows: Row[] = [
-  { code: "A-1", name: "First" },
-  { code: "A-2", name: "Second" },
+  { code: "A-1", name: "First", displayOrder: 1 },
+  { code: "A-2", name: "Second", displayOrder: 2 },
 ];
 
 const STORE_KEY = "simplix.prefs:list-columns:probe";
@@ -35,6 +36,25 @@ const STORE_KEY = "simplix.prefs:list-columns:probe";
 function renderList(resizableColumns?: string) {
   return render(
     <CrudList.Table<Row> data={rows} resizableColumns={resizableColumns} selectable>
+      <CrudList.Column<Row> field="code" header="Code" sortable />
+      <CrudList.Column<Row> field="name" header="Name" minWidth={120} />
+    </CrudList.Table>,
+  );
+}
+
+/**
+ * The same list, on the branch that lets a reader drag ROWS into a new order.
+ *
+ * @param resizableColumns the list key, or undefined to leave the columns fixed
+ * @returns the rendered list
+ */
+function renderReorderableList(resizableColumns?: string) {
+  return render(
+    <CrudList.Table<Row>
+      data={rows}
+      resizableColumns={resizableColumns}
+      reorder={{ orderField: "displayOrder", idField: "code", onReorder: () => {} }}
+    >
       <CrudList.Column<Row> field="code" header="Code" sortable />
       <CrudList.Column<Row> field="name" header="Name" minWidth={120} />
     </CrudList.Table>,
@@ -92,6 +112,24 @@ describe("List columns a reader can size", () => {
     fireEvent.keyDown(screen.getAllByRole("separator")[1], { key: "Home" });
 
     expect(localStorage.getItem(STORE_KEY)).toBeNull();
+  });
+
+  it("sizes a reorderable list's columns too, since dragging a row is not sizing a column", () => {
+    localStorage.setItem(STORE_KEY, JSON.stringify({ name: 300 }));
+
+    renderReorderableList("probe");
+
+    // The two branches divide over how a ROW moves, which says nothing about how wide a COLUMN
+    // is. A branch that took the declaration and drew no handle would leave the screen's author
+    // reading their own correct code and finding no fault in it.
+    expect(screen.getAllByRole("separator")).toHaveLength(2);
+    expect((screen.getByText("Name").closest("th") as HTMLElement).style.width).toBe("300px");
+  });
+
+  it("grows no grab zone on a reorderable list that named no key", () => {
+    renderReorderableList();
+
+    expect(screen.queryAllByRole("separator")).toHaveLength(0);
   });
 
   it("keys the width by field so inserting a column does not move it to the neighbour", () => {

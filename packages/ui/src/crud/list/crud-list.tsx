@@ -479,6 +479,20 @@ interface ReorderableTableProps<T> {
   sort: SortState | null;
   onSortChange?: (sort: SortState) => void;
   table: ReturnType<typeof useReactTable<T>>;
+  /**
+   * The list's key, when the reader may size its columns.
+   *
+   * <p>A reorderable list is still a list, and its columns are as likely to be too narrow as any
+   * other's. The two branches divide over how a ROW moves, which has nothing to say about how
+   * wide a COLUMN is — so a table that accepted this prop on one branch and dropped it on the
+   * other would take the declaration, store nothing, and draw no handle, with the screen's
+   * author left reading their own correct code.
+   */
+  resizableColumns?: string;
+  columnWidths: ColumnWidths;
+  onPreviewColumnWidth: (field: string, width: number) => void;
+  onCommitColumnWidth: (field: string, width: number) => void;
+  onResetColumnWidth: (field: string) => void;
   rowId?: (row: T) => string;
   activeRowId?: string | null;
   selectedIndices?: Set<number>;
@@ -502,6 +516,11 @@ function ReorderableTable<T>({
   sort,
   onSortChange,
   table,
+  resizableColumns,
+  columnWidths,
+  onPreviewColumnWidth,
+  onCommitColumnWidth,
+  onResetColumnWidth,
   rowId: rowIdFn,
   activeRowId,
   selectedIndices,
@@ -563,17 +582,39 @@ function ReorderableTable<T>({
               onActivate={() => onSortChange?.({ field: reorderConfig.orderField, direction: "asc" })}
             />
           </TableHead>
-          {headerGroup.headers.map((header) => (
-            <TableHead
-              key={header.id}
-              className="truncate"
-              style={header.column.getSize() !== 150 ? { width: header.column.getSize() } : undefined}
-            >
-              {header.isPlaceholder
-                ? null
-                : flexRender(header.column.columnDef.header, header.getContext())}
-            </TableHead>
-          ))}
+          {headerGroup.headers.map((header) => {
+            // A column the reader has sized wins over the declared width, exactly as on the
+            // plain branch. Kept as one expression in both places so a change to how a width is
+            // applied cannot land on one branch and not the other.
+            const readerWidth = columnWidths[header.column.id];
+            const sizable = !!resizableColumns && isSizableColumn(header.column.id);
+            return (
+              <TableHead
+                key={header.id}
+                className={cn("truncate", sizable && "relative")}
+                style={
+                  readerWidth !== undefined
+                    ? sizedHeaderStyle(readerWidth)
+                    : header.column.getSize() !== 150
+                      ? { width: header.column.getSize() }
+                      : undefined
+                }
+              >
+                {header.isPlaceholder
+                  ? null
+                  : flexRender(header.column.columnDef.header, header.getContext())}
+                {sizable && (
+                  <ColumnResizeHandle
+                    field={header.column.id}
+                    onPreview={onPreviewColumnWidth}
+                    onCommit={onCommitColumnWidth}
+                    onReset={onResetColumnWidth}
+                    label={t("list.resizeColumn")}
+                  />
+                )}
+              </TableHead>
+            );
+          })}
         </TableRow>
       ))}
     </TableHeader>
@@ -638,6 +679,7 @@ function ReorderableTable<T>({
                   isDragEnabled={isDragEnabled}
                   reorderConfig={reorderConfig}
                   onRowClick={onRowClick}
+                  columnWidths={columnWidths}
                 />
               );
             })}
@@ -1305,6 +1347,11 @@ function ListTable<T>({
               sort={sort ?? null}
               onSortChange={onSortChange}
               table={table}
+              resizableColumns={resizableColumns}
+              columnWidths={columnWidths}
+              onPreviewColumnWidth={previewColumnWidth}
+              onCommitColumnWidth={commitColumnWidth}
+              onResetColumnWidth={resetColumnWidth}
               rowId={rowId}
               activeRowId={activeRowId}
               selectedIndices={selectedIndices}
