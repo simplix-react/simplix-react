@@ -18,6 +18,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../../base";
+import {ColumnResizeHandle} from "./column-resize-handle";
+import {
+  type ColumnWidths,
+  readColumnWidths,
+  sizedHeaderStyle,
+  writeColumnWidths,
+} from "./column-widths";
 import {useFlatUIComponents} from "../../provider/ui-provider";
 import {Flex, Stack} from "../../primitives";
 import {cn} from "../../utils/cn";
@@ -417,6 +424,18 @@ export interface ListTableProps<T> {
   actionVariant?: ActionVariant;
   /** Override the auto-calculated action column width (px). */
   actionColumnWidth?: number;
+  /**
+   * Lets the reader drag a column's trailing edge, keeping the width under this key.
+   *
+   * <p>Omit and the columns stay exactly as the screen declared them. Supply a key — one per list
+   * screen — and every column carrying a `field` grows a grab zone whose width outlives the visit.
+   * Two renderings of the same list share a key on purpose: they are the same columns, and a
+   * reader who widened one meant the column rather than the placement.
+   *
+   * <p>Widths are stored by the column's `field`, so inserting a column does not move a stored
+   * width onto its neighbour and translating the header does not lose it.
+   */
+  resizableColumns?: string;
   /** Per-instance render overrides for the action cluster and empty state. */
   slots?: ListTableSlots<T>;
   /** Drag-and-drop row reorder configuration. */
@@ -774,6 +793,21 @@ function ReorderableCardList<T>({
   );
 }
 
+/**
+ * Whether a column is one a reader may size.
+ *
+ * <p>The selection box and the action cluster are not columns anyone sizes: one holds a checkbox
+ * and the other holds buttons, and both are as wide as their contents and no wider. They are also
+ * the two whose id the table invents rather than takes from a field, which is what identifies
+ * them here.
+ *
+ * @param columnId the column's id
+ * @returns whether it carries a grab zone
+ */
+function isSizableColumn(columnId: string): boolean {
+  return !columnId.startsWith("_");
+}
+
 function ListTable<T>({
   data,
   isLoading,
@@ -798,6 +832,7 @@ function ListTable<T>({
   actions,
   actionVariant = "icon",
   actionColumnWidth: actionColumnWidthOverride,
+  resizableColumns,
   slots,
   reorder,
   emptyReason,
@@ -821,6 +856,55 @@ function ListTable<T>({
   const containerRef = useRef<HTMLDivElement>(null);
   const containerWidth = useContainerWidth(containerRef);
   const hasCard = !!(cardTitle || cardContent);
+
+  // Read synchronously on the first render rather than in an effect: an effect would paint the
+  // table at the screen's widths and then snap it to the reader's on every load.
+  const [columnWidths, setColumnWidths] = useState<ColumnWidths>(() =>
+    resizableColumns ? readColumnWidths(resizableColumns) : {},
+  );
+  // A pointer move fires far faster than a table can usefully repaint, so the preview is folded
+  // into one update per frame. Without this the drag stutters on a full page of rows.
+  const previewFrame = useRef<number | null>(null);
+
+  const previewColumnWidth = useCallback((field: string, width: number) => {
+    if (previewFrame.current !== null) cancelAnimationFrame(previewFrame.current);
+    previewFrame.current = requestAnimationFrame(() => {
+      previewFrame.current = null;
+      setColumnWidths((current) => ({ ...current, [field]: width }));
+    });
+  }, []);
+
+  const commitColumnWidth = useCallback(
+    (field: string, width: number) => {
+      if (!resizableColumns) return;
+      setColumnWidths((current) => {
+        const next = { ...current, [field]: width };
+        writeColumnWidths(resizableColumns, next);
+        return next;
+      });
+    },
+    [resizableColumns],
+  );
+
+  const resetColumnWidth = useCallback(
+    (field: string) => {
+      if (!resizableColumns) return;
+      setColumnWidths((current) => {
+        const next = { ...current };
+        delete next[field];
+        writeColumnWidths(resizableColumns, next);
+        return next;
+      });
+    },
+    [resizableColumns],
+  );
+
+  useEffect(
+    () => () => {
+      if (previewFrame.current !== null) cancelAnimationFrame(previewFrame.current);
+    },
+    [],
+  );
 
   const columnCtx = useCrudListColumns();
 
@@ -934,7 +1018,17 @@ function ListTable<T>({
           // column's intrinsic width in the auto table layout — otherwise the
           // nowrap label keeps the column as wide as its longest header. The label
           // then ellipsizes and carries its full text in a tooltip.
-          const headerStyle = declaredWidth ? { width: declaredWidth } : undefined;
+          // The label carries the width so it ellipsizes at the column's edge. Left at the
+          // declared number it would go on ellipsizing at the old edge inside a column the
+          // reader has just widened — they would drag, watch the column grow, and watch the
+          // text not grow with it.
+          const readerWidth = columnWidths[colDef.field ?? `_col_${i}`];
+          const headerStyle =
+            readerWidth !== undefined
+              ? { width: "100%", maxWidth: "100%" }
+              : declaredWidth
+                ? { width: declaredWidth }
+                : undefined;
 
           const content =
             colDef.sortable && colDef.field ? (
@@ -1051,6 +1145,7 @@ function ListTable<T>({
     actionColumnWidthOverride,
     slots,
     defaultDisplayZone,
+    columnWidths,
     t,
   ]);
 
@@ -1240,17 +1335,38 @@ function ListTable<T>({
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <TableHead
-                        key={header.id}
-                        className="truncate"
-                        style={header.column.getSize() !== 150 ? { width: header.column.getSize() } : undefined}
-                      >
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(header.column.columnDef.header, header.getContext())}
-                      </TableHead>
-                    ))}
+                    {headerGroup.headers.map((header) => {
+                      // A column the reader has sized wins over the declared width. All three of
+                      // width/min/max, because an auto table treats width alone as a suggestion.
+                      const readerWidth = columnWidths[header.column.id];
+                      const sizable = !!resizableColumns && isSizableColumn(header.column.id);
+                      return (
+                        <TableHead
+                          key={header.id}
+                          className={cn("truncate", sizable && "relative")}
+                          style={
+                            readerWidth !== undefined
+                              ? sizedHeaderStyle(readerWidth)
+                              : header.column.getSize() !== 150
+                                ? { width: header.column.getSize() }
+                                : undefined
+                          }
+                        >
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(header.column.columnDef.header, header.getContext())}
+                          {sizable && (
+                            <ColumnResizeHandle
+                              field={header.column.id}
+                              onPreview={previewColumnWidth}
+                              onCommit={commitColumnWidth}
+                              onReset={resetColumnWidth}
+                              label={t("list.resizeColumn")}
+                            />
+                          )}
+                        </TableHead>
+                      );
+                    })}
                   </TableRow>
                 ))}
               </TableHeader>
@@ -1293,6 +1409,10 @@ function ListTable<T>({
                               className="truncate"
                               {...rowClickIgnoreForColumn(cell.column.id)}
                               style={
+                                // A column the reader sized is zeroed the same way, so its cell
+                                // stops offering its content as the column's minimum — that is
+                                // what lets a column also be dragged NARROWER than what it holds.
+                                columnWidths[cell.column.id] !== undefined ||
                                 (cell.column.columnDef.meta as { flexible?: boolean } | undefined)
                                   ?.flexible
                                   ? { maxWidth: 0 }

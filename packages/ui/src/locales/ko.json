@@ -63,7 +63,8 @@
     "nextPage": "다음 쪽",
     "pageNumber": "{{page}}쪽",
     "toggleColumns": "열 표시 전환",
-    "sortByDisplayOrder": "표시 순서로 정렬"
+    "sortByDisplayOrder": "표시 순서로 정렬",
+    "resizeColumn": "열 너비 조절"
   },
   "filter": {
     "label": "검색",
