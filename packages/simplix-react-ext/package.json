@@ -1,6 +1,6 @@
 {
   "name": "simplix-react-ext",
-  "version": "0.3.3-SNAPSHOT",
+  "version": "0.3.3",
   "description": "Meta package that installs all @simplix-react-ext/* extension packages (simplix-boot) in one dependency",
   "type": "module",
   "sideEffects": false,
