@@ -132,6 +132,22 @@ describe("List columns a reader can size", () => {
     expect(screen.queryAllByRole("separator")).toHaveLength(0);
   });
 
+  it("marks a sized cell so its content is released from the width the screen drew", () => {
+    localStorage.setItem(STORE_KEY, JSON.stringify({ name: 300 }));
+
+    renderList("probe");
+
+    // The mark is what the package's stylesheet keys off. Without it a cell's content goes on
+    // ellipsizing at the old number inside a column the reader has just widened — they drag,
+    // the column grows, the text does not.
+    const sized = screen.getAllByText("First")[0].closest("td") as HTMLElement;
+    expect(sized.getAttribute("data-column-sized")).toBe("");
+    expect(sized.style.maxWidth).toBe("0px");
+
+    const untouched = screen.getAllByText("A-1")[0].closest("td") as HTMLElement;
+    expect(untouched.hasAttribute("data-column-sized")).toBe(false);
+  });
+
   it("keys the width by field so inserting a column does not move it to the neighbour", () => {
     localStorage.setItem(STORE_KEY, JSON.stringify({ name: 300 }));
 

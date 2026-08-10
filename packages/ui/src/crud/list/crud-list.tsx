@@ -22,6 +22,7 @@ import {ColumnResizeHandle} from "./column-resize-handle";
 import {
   type ColumnWidths,
   readColumnWidths,
+  sizedCellProps,
   sizedHeaderStyle,
   writeColumnWidths,
 } from "./column-widths";
@@ -1446,25 +1447,15 @@ function ListTable<T>({
                           data-testid={`list-row-${rid}`}
                         >
                           {row.getVisibleCells().map((cell) => (
-                            // A `minWidth` column zeroes its cell's max-width so the auto table
-                            // layout stops reading the cell's content as the column's minimum.
-                            // The column then rests on the header's declared width and grows
-                            // into whatever the table has spare; the cell renders at the
-                            // column's width regardless of the zero.
                             <TableCell
                               key={cell.id}
                               className="truncate"
                               {...rowClickIgnoreForColumn(cell.column.id)}
-                              style={
-                                // A column the reader sized is zeroed the same way, so its cell
-                                // stops offering its content as the column's minimum — that is
-                                // what lets a column also be dragged NARROWER than what it holds.
-                                columnWidths[cell.column.id] !== undefined ||
-                                (cell.column.columnDef.meta as { flexible?: boolean } | undefined)
-                                  ?.flexible
-                                  ? { maxWidth: 0 }
-                                  : undefined
-                              }
+                              {...sizedCellProps(
+                                cell.column.id,
+                                columnWidths,
+                                cell.column.columnDef.meta as { flexible?: boolean } | undefined,
+                              )}
                             >
                               {flexRender(cell.column.columnDef.cell, cell.getContext())}
                             </TableCell>

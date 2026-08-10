@@ -96,3 +96,37 @@ export function sizedHeaderStyle(width: number): {
 } {
   return { width, minWidth: width, maxWidth: width };
 }
+
+/**
+ * What a body cell carries when its column rests on a width rather than on its own content.
+ *
+ * <p>Two cases reach this state and they want the same thing: a column the reader has sized, and
+ * one the screen declared as flexible. In both, zeroing the cell's max-width stops the auto table
+ * layout reading the cell's content as the column's minimum — which is what lets such a column be
+ * dragged narrower than what it happens to hold. The cell still renders at the column's width;
+ * the zero is what it offers, not what it takes.
+ *
+ * <p>The attribute is the other half, and it is for whatever the CALLER put inside the cell. A
+ * column holding a value of known size caps that content at the width the screen was drawn to, so
+ * a long value ellipsizes rather than pushing the table sideways — and that cap, left standing,
+ * goes on ellipsizing at the old number in a column the reader has just widened. They drag, watch
+ * the column grow, and watch the text not grow with it. The header's own label is released
+ * inline because this component renders it; a body cell's content is the caller's, so the release
+ * is a rule in this package's stylesheet keyed off this attribute.
+ *
+ * <p>Both halves come from one decision on purpose. Read separately they drifted: the header was
+ * released and the body was not, and the result reads as a column that refuses to widen.
+ *
+ * @param columnId the column the cell belongs to
+ * @param widths what the reader has sized
+ * @param meta the column's own declaration
+ * @returns the props to spread onto the cell
+ */
+export function sizedCellProps(
+  columnId: string,
+  widths: ColumnWidths,
+  meta: { flexible?: boolean } | undefined,
+): { style?: { maxWidth: number }; "data-column-sized"?: string } {
+  const sized = widths[columnId] !== undefined || meta?.flexible === true;
+  return sized ? { style: { maxWidth: 0 }, "data-column-sized": "" } : {};
+}
