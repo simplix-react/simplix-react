@@ -10,6 +10,24 @@
 @source "./**/*.js";
 
 /*
+ * A cell whose column rests on a width lets its content follow that width.
+ *
+ * The list marks such a cell with data-column-sized — a column the reader has dragged, or one the
+ * screen declared as flexible. What sits inside is the caller's: typically a node capped at the
+ * width the screen was drawn to, so a long value ellipsizes rather than pushing the table
+ * sideways. That cap has to go the moment the column stops resting on the declared width, or the
+ * reader drags the column wider, watches it grow, and watches the text go on ellipsizing at the
+ * old number. The header's own label is released inline, where the list renders it; this is the
+ * same release for content the list cannot reach.
+ *
+ * Marked important because the cap is typically a utility class on the element itself, which
+ * outranks a plain descendant selector.
+ */
+td[data-column-sized] * {
+  max-width: 100% !important;
+}
+
+/*
  * Scroll containers — Table + CRUD detail/form body slots (data-slot /
  * data-crud-slot are framework-emitted hooks). Chrome 121+ ignores
  * ::-webkit-scrollbar when scrollbar-width is not 'auto', so reset to 'auto'

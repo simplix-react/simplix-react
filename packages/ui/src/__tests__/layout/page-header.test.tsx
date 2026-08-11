@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { StrictMode } from "react";
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
@@ -157,6 +158,44 @@ describe("usePageHeader", () => {
       </PageHeaderProvider>,
     );
     expect(screen.getByTestId("metadata").textContent).toBe("3 selected");
+  });
+
+  // Every test above mounts once. Under StrictMode React mounts, unmounts, and mounts again,
+  // and a caller whose header never changes afterwards has only that rehearsal to survive: the
+  // cleanup empties the store, the second publish sees the same object it installed, and the
+  // page renders no header at all while the code that set one is correct.
+  it("keeps a header whose values never change through a StrictMode remount", () => {
+    render(
+      <StrictMode>
+        <PageHeaderProvider>
+          <HeaderSetter title="Check-in Desk" description="Visitors waiting at the desk" />
+          <HeaderDisplay />
+        </PageHeaderProvider>
+      </StrictMode>,
+    );
+    expect(screen.getByTestId("title").textContent).toBe("Check-in Desk");
+    expect(screen.getByTestId("description").textContent).toBe("Visitors waiting at the desk");
+  });
+
+  it("still clears the header on a real unmount under StrictMode", () => {
+    const { rerender } = render(
+      <StrictMode>
+        <PageHeaderProvider>
+          <HeaderSetter title="Active" />
+          <HeaderDisplay />
+        </PageHeaderProvider>
+      </StrictMode>,
+    );
+    expect(screen.getByTestId("title").textContent).toBe("Active");
+
+    rerender(
+      <StrictMode>
+        <PageHeaderProvider>
+          <HeaderDisplay />
+        </PageHeaderProvider>
+      </StrictMode>,
+    );
+    expect(screen.getByTestId("title").textContent).toBe("");
   });
 
   it("sets metadata and center", () => {

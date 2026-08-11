@@ -4,6 +4,7 @@ import { flexRender } from "@tanstack/react-table";
 import type { Row } from "@tanstack/react-table";
 
 import { cn } from "../../utils/cn";
+import { type ColumnWidths, sizedCellProps } from "../list/column-widths";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import type { ReorderConfig } from "../shared";
 import { rowClickHandler, rowClickIgnoreForColumn, rowClickIgnoreProps } from "../shared";
@@ -17,6 +18,8 @@ interface DraggableRowProps<T> {
   isDragEnabled: boolean;
   reorderConfig: ReorderConfig<T>;
   onRowClick?: (row: T) => void;
+  /** Widths the reader has set, so a sized column's cell is released the same way. */
+  columnWidths?: ColumnWidths;
 }
 
 export function DraggableRow<T>({
@@ -27,6 +30,7 @@ export function DraggableRow<T>({
   isDragEnabled,
   reorderConfig,
   onRowClick,
+  columnWidths,
 }: DraggableRowProps<T>) {
   const { TableCell, TableRow } = useFlatUIComponents();
   const canDrag = isDragEnabled && (reorderConfig.canDrag?.(row.original) ?? true);
@@ -73,6 +77,11 @@ export function DraggableRow<T>({
           key={cell.id}
           className="truncate"
           {...rowClickIgnoreForColumn(cell.column.id)}
+          {...sizedCellProps(
+            cell.column.id,
+            columnWidths ?? {},
+            cell.column.columnDef.meta as { flexible?: boolean } | undefined,
+          )}
         >
           {flexRender(cell.column.columnDef.cell, cell.getContext())}
         </TableCell>
