@@ -62,11 +62,28 @@ export interface SearchPopoverProps<T> {
   emptyMessage?: string;
   /** Popover alignment. Defaults to `"end"`. */
   align?: "start" | "center" | "end";
+  /**
+   * Controlled open state. When omitted the popover owns its open state internally and the
+   * parent has no way to read it — pass this (with `onOpenChange`) when something outside the
+   * popover depends on whether it is open, such as gating a query on the list being visible.
+   */
+  open?: boolean;
+  /**
+   * Called whenever the open state changes, in both modes. Required to drive `open`, since a
+   * controlled popover no longer closes itself.
+   */
+  onOpenChange?: (open: boolean) => void;
 }
 
 /**
  * Searchable popover for selecting items from a flat or grouped list.
  * Uses a unified trigger button design with PlusIcon.
+ *
+ * @remarks
+ * The open state is internal unless `open` is passed: with no `open` prop the popover opens and
+ * closes itself and nothing outside it can observe that. Passing `open` makes it controlled —
+ * the parent then owns every transition, including the close after a selection — and
+ * `onOpenChange` fires in both modes.
  *
  * @example
  * ```tsx
@@ -104,9 +121,18 @@ export function SearchPopover<T>({
   placeholder,
   emptyMessage,
   align = "end",
+  open: controlledOpen,
+  onOpenChange,
 }: SearchPopoverProps<T>) {
   const { t } = useTranslation("simplix/ui");
-  const [open, setOpen] = useState(false);
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+
+  const open = controlledOpen ?? uncontrolledOpen;
+
+  const setOpen = (next: boolean) => {
+    if (controlledOpen === undefined) setUncontrolledOpen(next);
+    onOpenChange?.(next);
+  };
 
   const searchPlaceholder = placeholder ?? t("field.searchOption");
   const noResultsMessage = emptyMessage ?? t("field.noResults");
