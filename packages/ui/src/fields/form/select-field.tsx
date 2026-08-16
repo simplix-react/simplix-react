@@ -1,5 +1,6 @@
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { useFlatUIComponents } from "../../provider/ui-provider";
+import { cn } from "../../utils/cn";
 import { FieldWrapper } from "../shared/field-wrapper";
 
 /** Props for the {@link SelectField} form component. */
@@ -12,12 +13,31 @@ export interface SelectFieldProps<T extends string = string>
   /** Available options with label/value pairs. */
   options: Array<{ label: string; value: T; disabled?: boolean; icon?: React.ReactNode; tag?: string }>;
   placeholder?: string;
-  /** Compact mode: renders without FieldWrapper, auto-width based on content. */
+  /**
+   * Compact mode: renders without FieldWrapper, and sizes itself to its longest option label
+   * using a hidden native `<select>`. That measurement also means `className` never reaches the
+   * rendered element — pass `fill` when the parent has to own the width.
+   */
   compact?: boolean;
+  /**
+   * Compact mode only: give the width back to the parent. The hidden measuring `<select>` is
+   * dropped, the field fills its container, and `className` lands on the wrapper — so a grid or
+   * flex cell can size the field instead of the option list doing it. No effect without `compact`;
+   * the non-compact path already passes `className` to the wrapper.
+   */
+  fill?: boolean;
 }
 
 /**
  * Dropdown select field built on Radix Select primitives.
+ *
+ * @remarks
+ * Two widths, and which one applies is decided by `compact`. The default (non-compact) field
+ * renders inside `FieldWrapper` and takes the width its container gives it, with `className`
+ * reaching that wrapper. `compact` instead measures itself against its longest option label —
+ * a hidden native `<select>` carrying every label does the measuring, so the field is as wide
+ * as its widest option and `className` is dropped on the floor. Pass `fill` alongside `compact`
+ * to take that measurement out and let the parent set the width.
  *
  * @example
  * ```tsx
@@ -39,6 +59,16 @@ export interface SelectFieldProps<T extends string = string>
  *   options={scheduleOptions}
  *   placeholder="Select..."
  * />
+ *
+ * // Compact mode whose width the parent owns (a grid cell, a flex row)
+ * <SelectField
+ *   compact
+ *   fill
+ *   className="min-w-0"
+ *   value={areaId}
+ *   onChange={setAreaId}
+ *   options={areaOptions}
+ * />
  * ```
  */
 export function SelectField<T extends string = string>({
@@ -47,6 +77,7 @@ export function SelectField<T extends string = string>({
   options,
   placeholder,
   compact = false,
+  fill = false,
   label,
   labelKey,
   error,
@@ -97,6 +128,11 @@ export function SelectField<T extends string = string>({
       </SelectContent>
     </Select>
   );
+
+  if (compact && fill) {
+    // No measuring select: the trigger is `w-full`, so the width is whatever the parent gives.
+    return <span className={cn("block w-full", className)}>{renderSelect()}</span>;
+  }
 
   if (compact) {
     return (
