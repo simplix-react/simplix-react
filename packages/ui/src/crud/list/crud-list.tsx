@@ -7,7 +7,7 @@ import {
   useReactTable,
   type VisibilityState,
 } from "@tanstack/react-table";
-import {createElement, type ReactNode, type Ref, useCallback, useEffect, useMemo, useRef, useState,} from "react";
+import {createElement, Fragment, type ReactNode, type Ref, useCallback, useEffect, useMemo, useRef, useState,} from "react";
 
 import {
   type BadgeVariants,
@@ -452,8 +452,77 @@ export interface ListTableProps<T> {
   };
   /** Callback to compute extra class names for each table/card row. */
   rowClassName?: (row: T) => string | undefined;
+  /**
+   * Puts the rows under headings, one heading per distinct key.
+   *
+   * A catalogue people navigate by band rather than by row — ranks under 임원 / 관리 / 현장,
+   * organizations under principal / contractor — reads as a flat list without this, and the
+   * reader scans every row to find where one band ends.
+   *
+   * Rows are bucketed, so a group is contiguous whatever the sort: `sort` then orders the rows
+   * *within* a group and `order` (or first appearance) orders the groups themselves. Without
+   * bucketing a catalogue sorted by rank would print the same heading twice the moment one
+   * member of a band sorted away from the rest, which is the usual case rather than the odd one.
+   *
+   * Grouping is a property of the page in front of the reader: it applies to the rows this page
+   * holds, and says nothing about the ones on the next. It does not apply in card mode, where
+   * the rows are no longer a table.
+   */
+  groupBy?: ListGroupConfig<T>;
   className?: string;
   children?: ReactNode;
+}
+
+/** How {@link ListTableProps.groupBy} decides the headings and their order. */
+export interface ListGroupConfig<T> {
+  /** The group a row belongs to. Return null for a row that belongs to none. */
+  of: (row: T) => string | null | undefined;
+  /** What a heading prints. Defaults to the key itself. */
+  label?: (key: string) => ReactNode;
+  /**
+   * The groups in the order they are drawn, by key. A key the rows never produce draws no
+   * heading, and a key not named here follows the named ones in first-appearance order — so a
+   * value added to the enum later appears rather than disappearing.
+   */
+  order?: readonly string[];
+  /**
+   * The heading the rows with no group sit under. Omit and they follow the groups with no
+   * heading of their own, which is right when 「no group」 is an absence rather than a category.
+   */
+  ungrouped?: ReactNode;
+}
+
+/** The page's rows as headings and rows, in the order they are drawn. */
+function groupRows<T, R extends { original: T }>(
+  rows: R[],
+  config: ListGroupConfig<T> | undefined,
+): { key: string | null; label: ReactNode; rows: R[] }[] | null {
+  if (!config) return null;
+  const buckets = new Map<string | null, R[]>();
+  for (const row of rows) {
+    const key = config.of(row.original) ?? null;
+    const bucket = buckets.get(key);
+    if (bucket) bucket.push(row);
+    else buckets.set(key, [row]);
+  }
+
+  // Named groups first, in the order the caller gave; then whatever the rows produced that the
+  // caller did not name, so a key added upstream shows up instead of taking its rows with it.
+  const named = (config.order ?? []).filter((key) => buckets.has(key));
+  const rest = [...buckets.keys()].filter(
+    (key) => key !== null && !named.includes(key),
+  ) as string[];
+
+  const out: { key: string | null; label: ReactNode; rows: R[] }[] = [];
+  for (const key of [...named, ...rest]) {
+    out.push({ key, label: config.label ? config.label(key) : key, rows: buckets.get(key) ?? [] });
+  }
+  // The ungrouped rows come last whether or not they are given a heading: they are what is left
+  // over, and putting them first would read as the first category.
+  if (buckets.has(null)) {
+    out.push({ key: null, label: config.ungrouped ?? null, rows: buckets.get(null) ?? [] });
+  }
+  return out;
 }
 
 function extractColumnDefs<T>(children: ReactNode): ListColumnProps<T>[] {
@@ -881,6 +950,7 @@ function ListTable<T>({
   emptyReason,
   emptyState,
   rowClassName,
+  groupBy,
   className,
   children,
 }: ListTableProps<T>) {
@@ -1431,38 +1501,65 @@ function ListTable<T>({
                     ))
                   : emptyReason && data.length === 0
                     ? <TableRow><TableCell colSpan={table.getAllColumns().length} className="h-24 text-center text-muted-foreground">{emptyMessages[emptyReason]}</TableCell></TableRow>
-                    : table.getRowModel().rows.map((row) => {
-                      const rid = rowId?.(row.original) ?? row.id;
-                      const isActive = activeRowId != null && rid === activeRowId;
-                      return (
-                        <TableRow
-                          key={row.id}
-                          className={cn(
-                            selectedIndices?.has(row.index) && "bg-muted",
-                            isActive && "bg-muted/50",
-                            onRowClick && "cursor-pointer",
-                            rowClassName?.(row.original),
-                          )}
-                          onClick={rowClickHandler(row.original, onRowClick)}
-                          data-testid={`list-row-${rid}`}
-                        >
-                          {row.getVisibleCells().map((cell) => (
-                            <TableCell
-                              key={cell.id}
-                              className="truncate"
-                              {...rowClickIgnoreForColumn(cell.column.id)}
-                              {...sizedCellProps(
-                                cell.column.id,
-                                columnWidths,
-                                cell.column.columnDef.meta as { flexible?: boolean } | undefined,
-                              )}
+                    : (() => {
+                      const modelRows = table.getRowModel().rows;
+                      const drawRow = (row: (typeof modelRows)[number]) => {
+                        const rid = rowId?.(row.original) ?? row.id;
+                        const isActive = activeRowId != null && rid === activeRowId;
+                        return (
+                          <TableRow
+                            key={row.id}
+                            className={cn(
+                              selectedIndices?.has(row.index) && "bg-muted",
+                              isActive && "bg-muted/50",
+                              onRowClick && "cursor-pointer",
+                              rowClassName?.(row.original),
+                            )}
+                            onClick={rowClickHandler(row.original, onRowClick)}
+                            data-testid={`list-row-${rid}`}
+                          >
+                            {row.getVisibleCells().map((cell) => (
+                              <TableCell
+                                key={cell.id}
+                                className="truncate"
+                                {...rowClickIgnoreForColumn(cell.column.id)}
+                                {...sizedCellProps(
+                                  cell.column.id,
+                                  columnWidths,
+                                  cell.column.columnDef.meta as { flexible?: boolean } | undefined,
+                                )}
+                              >
+                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        );
+                      };
+
+                      const grouped = groupRows(modelRows, groupBy);
+                      if (!grouped) return modelRows.map(drawRow);
+                      return grouped.map((group) => (
+                        <Fragment key={group.key ?? "\u0000ungrouped"}>
+                          {/* A heading is not a record: it is skipped by row navigation, it
+                              carries no row actions, and it spans the table so a reader does not
+                              look for a value under each column header. */}
+                          {group.label !== null && group.label !== undefined && (
+                            <TableRow
+                              className="hover:bg-transparent"
+                              data-testid={`list-group-${group.key ?? "ungrouped"}`}
                             >
-                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                            </TableCell>
-                          ))}
-                        </TableRow>
-                      );
-                    })}
+                              <TableCell
+                                colSpan={table.getAllColumns().length}
+                                className="bg-muted/40 py-1 text-xs font-semibold text-muted-foreground"
+                              >
+                                {group.label}
+                              </TableCell>
+                            </TableRow>
+                          )}
+                          {group.rows.map(drawRow)}
+                        </Fragment>
+                      ));
+                    })()}
               </TableBody>
             </Table>
           )}
