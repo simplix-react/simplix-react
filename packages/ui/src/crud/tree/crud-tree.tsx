@@ -7,6 +7,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import {
+  Children,
   createContext,
   type ReactNode,
   useCallback,
@@ -19,6 +20,7 @@ import {
 import {
   type TableProps,
 } from "../../base";
+import { useUIDefaults } from "../../provider/ui-defaults-context";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { Flex, Stack } from "../../primitives";
 import { cn } from "../../utils/cn";
@@ -142,14 +144,27 @@ export interface TreeToolbarProps {
 }
 
 function TreeToolbar({ className, children }: TreeToolbarProps) {
+  // The count is the figure the row is about; everything after it is a control on that figure.
+  const [lead, ...rest] = Children.toArray(children);
   return (
     <Flex
       gap="sm"
       align="center"
       wrap
-      className={cn("w-full rounded-lg border bg-card p-2 [&>*]:grow", className)}
+      className={cn("w-full rounded-lg border bg-card p-2", className)}
     >
-      {children}
+      {lead}
+      {/*
+        The controls are one element rather than several, so the row can only break in one place:
+        between the count and the whole group. Left flat, each control wrapped on its own and the
+        row rearranged itself at every width — the search dropped below the count at one size and
+        the expand buttons dropped below the search at the next, which is three different toolbars
+        for one screen. `min-w-0` is what lets the group narrow instead of pushing the break
+        earlier.
+      */}
+      <Flex gap="sm" align="center" className="ml-auto min-w-0">
+        {rest}
+      </Flex>
     </Flex>
   );
 }
@@ -169,7 +184,12 @@ function TreeSearch({ value, onChange, placeholder, className }: TreeSearchProps
   const ctx = useCrudTreeContext();
   const controlled = value !== undefined;
   return (
-    <div className={cn("relative max-w-xs", className)}>
+    // Capped rather than grown. The toolbar's auto margin already packs this against the
+    // controls on the right, and a box that also grows would push back against that margin and
+    // land wherever the two happened to balance. `min-w-0` lets it shrink beside a pinned
+    // detail, where the column is half as wide and a search at full width would fold the
+    // expand controls onto a second line.
+    <div className={cn("relative w-full min-w-0 max-w-56", className)}>
       <MagnifyingGlassIcon className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
       <Input
         type="search"
@@ -295,7 +315,7 @@ function TreeTable<T>({
   onRowClick,
   activeRowId,
   actions,
-  actionVariant = "icon",
+  actionVariant: actionVariantProp,
   headerActions,
   searchFields,
   searchPredicate,
@@ -309,6 +329,10 @@ function TreeTable<T>({
 }: TreeTableProps<T>) {
   useTranslation("simplix/ui");
   const { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Skeleton } = useFlatUIComponents();
+  // The console's own answer, the same one CrudList reads — a tree row's actions are the same
+  // affordance as a list row's and must not read differently for being drawn by another table.
+  const uiDefaults = useUIDefaults();
+  const actionVariant = actionVariantProp ?? uiDefaults.actionVariant;
   const treeCtx = useCrudTreeContext();
 
   // Inside a CrudTree.TableCard the table is the scroll region with a sticky header.
