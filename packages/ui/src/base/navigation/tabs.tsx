@@ -110,7 +110,14 @@ TabsTrigger.displayName = "TabsTrigger";
 export interface TabsContentProps
   extends ComponentPropsWithRef<typeof TabsPrimitive.Content> {
   /**
-   * Adds bottom padding for scrollable containers.
+   * Insets the panel from the strip above it and from whatever follows.
+   *
+   * <p><b>The same step top and bottom.</b> It was `pt-4 pb-8`, and the extra step at the bottom
+   * is the floor a list-detail page grows when its detail opens: the list column carries no
+   * padding of its own, so while the list runs past the panel the bottom step is never seen, and
+   * the moment the panel clips everything to one box it appears as a margin that belongs to
+   * nothing. A reader resizing the window watches it change, because the leftover height changes
+   * and the step does not.
    *
    * @default false
    */
@@ -121,7 +128,7 @@ export const TabsContent = forwardRef<HTMLDivElement, TabsContentProps>(
   ({ className, padded = false, ...rest }, ref) => (
     <TabsPrimitive.Content
       ref={ref}
-      className={cn("flex-1 outline-none", padded && "pt-4 pb-8", className)}
+      className={cn("flex-1 outline-none", padded && "py-4", className)}
       {...rest}
     />
   ),
