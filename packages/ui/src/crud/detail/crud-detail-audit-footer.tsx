@@ -19,19 +19,6 @@ import { CalendarIcon, CheckIcon, IdCardIcon, PencilIcon } from "../shared/icons
 /** Audit metadata passed to {@link DetailAuditFooter}. */
 export interface AuditData {
   id?: string;
-  /**
-   * What a person calls this record — `ORG-014`, `usr_0031`, a rank's code.
-   *
-   * <p><b>Shown instead of the identifier when it is given.</b> A UUID's last twelve characters
-   * (`3cef61f63b81`) are what the footer falls back to, and they are not an answer to any question
-   * a reader has: they cannot be read aloud, matched against a printed list, or searched for in
-   * another system. Most records already carry a code the operator knows — the DTO usually has it
-   * — and passing it turns the footer's one identifying line into something the reader recognises.
-   *
-   * <p>The identifier is still there: the tooltip shows it in full, so a developer reading over a
-   * shoulder can take it.
-   */
-  code?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -70,15 +57,18 @@ export function DetailAuditFooter({ auditData, displayZone }: CrudDetailAuditFoo
   const zone = displayZone ?? defaultZone;
   const [copied, setCopied] = useState(false);
 
-  const shown = auditData?.code || (auditData?.id ? formatDisplayId(auditData.id) : "");
+  // **This line is not where a record is named — it is where its machine identifier is picked up.**
+  // The short form, the tooltip's full value and the copy all point at the one thing, and the
+  // tooltip says so in as many words. That makes it a deliberate exception to 「a raw id is not
+  // drawn on a screen」, and the exception IS the control's reason for existing: a reader who wants
+  // the record's name has the panel's title, its fields and its list row, and nowhere else to get
+  // the UUID.
+  //
+  // It has been replaced with a human-readable code twice, both times by someone applying that
+  // general rule to this line without asking what the line was for. Anyone about to do it a third
+  // time: the name belongs above, not here.
+  const shown = auditData?.id ? formatDisplayId(auditData.id) : "";
 
-  // **What is shown and what is copied are deliberately different, and that is the point of this
-  // control.** It exists so somebody can get the record's identifier onto the clipboard — for a
-  // ticket, a query, a support thread — which is what the tooltip's own wording promises. The code
-  // beside it is there so a person can read the row; the identifier is there so a machine can be
-  // given it. Making the two agree looks like consistency and removes the only reason the button
-  // exists: a reader who wanted `NORTH-ELEC` on the clipboard can select it from the label, and a
-  // reader who wants the UUID has nowhere else to get it.
   const handleCopyId = useCallback(async () => {
     if (!auditData?.id) return;
     await navigator.clipboard.writeText(auditData.id);
@@ -86,8 +76,6 @@ export function DetailAuditFooter({ auditData, displayZone }: CrudDetailAuditFoo
     setTimeout(() => setCopied(false), 2000);
   }, [auditData?.id]);
 
-  // The row is drawn when there is something to show; the copy is wired only when there is an
-  // identifier to copy, which are not the same condition once a code can stand alone.
   const hasId = shown !== "";
   const hasCreated = auditData?.createdAt != null && auditData.createdAt !== "";
   const hasUpdated = auditData?.updatedAt != null && auditData.updatedAt !== "";
@@ -118,12 +106,7 @@ export function DetailAuditFooter({ auditData, displayZone }: CrudDetailAuditFoo
                 sideOffset={4}
                 className="z-50 rounded-md border bg-popover px-3 py-1.5 text-popover-foreground shadow-sm animate-in fade-in-0 zoom-in-95"
               >
-                <p className="font-mono text-[11px]">{shown}</p>
-                {/* The identifier stays reachable even when a code is what the row shows: the
-                    reader recognises the code, and whoever has to query the database needs this. */}
-                {auditData?.code && auditData?.id && (
-                  <p className="font-mono text-[11px] text-muted-foreground">{auditData.id}</p>
-                )}
+                <p className="font-mono text-[11px]">{auditData!.id}</p>
                 <p className="text-muted-foreground text-[11px]">
                   {copied ? t("audit.copied") : t("audit.clickToCopy")}
                 </p>
