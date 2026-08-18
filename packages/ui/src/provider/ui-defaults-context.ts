@@ -20,11 +20,32 @@ export interface UIDefaults {
    * `"ghost"`, where the label rides beside the icon.
    */
   actionVariant: ActionVariant;
+  /**
+   * How a list screen opens the record a reader picked, when the screen does not say.
+   *
+   * <p>`"panel"` is the framework's own default and what every screen has drawn until now: the
+   * detail takes a column beside the list, with a draggable divider between them. `"drawer"` slides
+   * it in from the right edge over the full height instead, leaving the list at its full width
+   * underneath.
+   *
+   * <p><b>This is an installation's choice, not a screen's.</b> The two show the same detail, with
+   * the same content, opened by the same act and closed back to the same list — what differs is
+   * where it appears, which is a matter of how wide the operators' monitors are and how they like
+   * to work. A screen that hardcodes one takes that choice away from every installation, which is
+   * why it belongs here.
+   *
+   * <p><b>`"dialog"` is deliberately not one of these.</b> A centred modal capped at `max-w-2xl`
+   * is a different claim — that the record is a short interruption rather than the thing being
+   * worked on — and a screen that wants it says so on its own `variant`. An installation-wide
+   * switch between a panel and a drawer never turns a working surface into an interruption.
+   */
+  detailPresentation: "panel" | "drawer";
 }
 
 /** What a product gets when it declares nothing. */
 export const UI_DEFAULTS: UIDefaults = {
   actionVariant: "icon",
+  detailPresentation: "panel",
 };
 
 export const UIDefaultsContext = createContext<UIDefaults>(UI_DEFAULTS);

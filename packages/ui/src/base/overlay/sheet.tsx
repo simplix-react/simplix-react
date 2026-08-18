@@ -35,15 +35,28 @@ export type SheetContentProps = ComponentPropsWithRef<
 > & {
   side?: "top" | "right" | "bottom" | "left";
   showCloseButton?: boolean;
+  /**
+   * Whether the dimmed sheet behind the panel is drawn. @defaultValue `true`
+   *
+   * <p><b>Set it false for a sheet that works beside its page rather than over it.</b> The overlay
+   * is what makes a sheet modal: it dims the page and swallows every click, so a reader who can
+   * see the row they want next has to close the sheet before they can reach it — two presses for
+   * what is one press when the same content sits in a column. Pair it with `modal={false}` on the
+   * `Sheet` root, which is what stops Radix trapping focus and locking the page's scroll.
+   *
+   * <p>Leave it on for a sheet that is genuinely an interruption — a form the reader must finish
+   * or abandon before anything else means anything.
+   */
+  showOverlay?: boolean;
 };
 
 export const SheetContent = forwardRef<HTMLDivElement, SheetContentProps>(
   (
-    { className, children, side = "right", showCloseButton = true, ...rest },
+    { className, children, side = "right", showCloseButton = true, showOverlay = true, ...rest },
     ref,
   ) => (
     <DialogPrimitive.Portal>
-      <SheetOverlay />
+      {showOverlay && <SheetOverlay />}
       <DialogPrimitive.Content
         ref={ref}
         className={cn(

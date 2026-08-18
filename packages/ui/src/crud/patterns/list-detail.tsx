@@ -10,11 +10,22 @@ import {
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 
+import { SheetContent } from "../../base/overlay/sheet";
+import { useUIDefaults } from "../../provider/ui-defaults-context";
 import { cn } from "../../utils/cn";
 
 // ── Context ──
 
-export type ListDetailVariant = "panel" | "dialog";
+/**
+ * How the detail appears.
+ *
+ * <p>`"panel"` beside the list, `"drawer"` slid in from the right edge over the full height,
+ * `"dialog"` as a centred modal. The first two are the same screen said two ways and an
+ * installation picks between them through `UIProvider`'s `detailPresentation`; the third is a
+ * screen's own decision, because a centred modal claims the record is an interruption rather than
+ * the thing being worked on.
+ */
+export type ListDetailVariant = "panel" | "dialog" | "drawer";
 
 export interface ListDetailContextValue {
   variant: ListDetailVariant;
@@ -117,7 +128,13 @@ export const DETAIL_PANEL_WIDTH = 600;
 /** Minimum width (px) for both list and detail panels during drag. */
 const MIN_PANEL_WIDTH = 280;
 
-export function ListDetailRoot({ variant = "panel", activePanel: activePanelProp, detailWidth = DETAIL_PANEL_WIDTH, listWidth, onClose, dialogHeight, className, children }: ListDetailProps) {
+export function ListDetailRoot({ variant: variantProp, activePanel: activePanelProp, detailWidth = DETAIL_PANEL_WIDTH, listWidth, onClose, dialogHeight, className, children }: ListDetailProps) {
+  // The installation's answer when the screen does not give one. A screen that names a variant
+  // wins — that is the escape hatch for the one surface whose shape is genuinely its own — but a
+  // screen naming `"panel"` because the scaffold wrote it there takes the choice away from every
+  // installation without meaning to.
+  const uiDefaults = useUIDefaults();
+  const variant = variantProp ?? uiDefaults.detailPresentation;
 
   const [activePanelState, setActivePanel] = useState<"list" | "detail">("list");
   const activePanel = activePanelProp ?? activePanelState;
@@ -144,10 +161,19 @@ export function ListDetailRoot({ variant = "panel", activePanel: activePanelProp
 
   const contextValue: ListDetailContextValue = { variant, activePanel, setActivePanel, dialogHeight };
 
-  if (variant === "dialog") {
+  // Both overlay shapes hang off the same root: what differs is the content's geometry, not when
+  // it opens or what closing it means.
+  if (variant === "dialog" || variant === "drawer") {
     return (
       <ListDetailContext.Provider value={contextValue}>
         <DialogPrimitive.Root
+          // The drawer is not modal, and that is what makes it the same screen as the panel rather
+          // than a different one. Modal, the list behind it is dimmed and swallows clicks, so a
+          // reader looking straight at the row they want next has to close the drawer first and
+          // press again — two presses for what is one press in a column. Non-modal, the row swaps
+          // the drawer's contents exactly as it swaps the panel's. It also stops Radix trapping
+          // focus and locking the page's scroll, neither of which a working surface wants.
+          modal={variant !== "drawer"}
           open={activePanel === "detail"}
           onOpenChange={(open) => {
             setActivePanel(open ? "detail" : "list");
@@ -322,6 +348,45 @@ ListPanel.displayName = "ListDetail.List";
 const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }, ref) => {
   const { variant, activePanel, dialogHeight } = useListDetail();
 
+  if (variant === "drawer") {
+    return (
+      <SheetContent
+        ref={ref as React.Ref<HTMLDivElement>}
+        side="right"
+        aria-describedby={undefined}
+        // No dimmed sheet behind it — see `modal` on the root. Without this the overlay goes on
+        // swallowing the clicks even with the root non-modal.
+        showOverlay={false}
+        // And the drawer does not dismiss itself when the reader presses the list. Non-modal is
+        // only half of it: Radix still closes on a pointer-down outside the content, so a press on
+        // the next row was spent closing the drawer and the row had to be pressed again. A panel
+        // never closes because somebody picked another record — it swaps — and the drawer has to
+        // read the same way, or the two are different screens rather than one screen set two ways.
+        // Escape and the detail's own close button remain the ways out.
+        onPointerDownOutside={(event) => event.preventDefault()}
+        onInteractOutside={(event) => event.preventDefault()}
+        // `Sheet`'s own close button is dropped: the detail this holds brings its own — the same
+        // one the panel variant shows — and two of them in one corner is a screen telling the
+        // reader there are two ways out of the same thing.
+        showCloseButton={false}
+        className={cn(
+          // Wider than the sheet's default `sm:max-w-sm`, which is sized for a settings pane. This
+          // holds what the panel column holds, so it is sized off the same measure.
+          "gap-0 py-4 sm:max-w-xl",
+          // The same slot padding the dialog variant pushes down, for the same reason: the header
+          // and footer rules have to span the full width rather than stopping inside a gutter.
+          "[&_[data-crud-slot=header]]:px-6",
+          "[&_[data-crud-slot=body]]:px-0 [&_[data-crud-slot=body]>*]:px-6",
+          "[&_[data-crud-slot=footer]]:px-0 [&_[data-crud-slot=footer]>*]:px-6",
+          className,
+        )}
+      >
+        <DialogPrimitive.Title className="sr-only">Detail</DialogPrimitive.Title>
+        {children}
+      </SheetContent>
+    );
+  }
+
   if (variant === "dialog") {
     return (
       <DialogPrimitive.Portal>
@@ -384,9 +449,21 @@ DetailPanel.displayName = "ListDetail.Detail";
 import { ListDetailViewSwitch } from "./list-detail-view-switch";
 
 /**
- * List-detail layout with two variants:
- * - `"panel"` (default): Side-by-side layout with draggable divider.
- * - `"dialog"`: List takes full width, detail opens in a modal dialog.
+ * List-detail layout in three shapes:
+ * - `"panel"`: side-by-side, with a draggable divider. The framework's default.
+ * - `"drawer"`: the list keeps its full width and the detail slides in from the right edge.
+ * - `"dialog"`: the list keeps its full width and the detail opens as a centred modal.
+ *
+ * **`variant` is normally not passed.** Panel and drawer are the same screen said two ways — the
+ * same detail, the same content, opened by the same act and closed back to the same list — and
+ * which one an installation gets is set once through `UIProvider`'s `detailPresentation`. A screen
+ * that hardcodes `variant="panel"` takes that choice away from every installation, usually without
+ * meaning to, because the scaffold wrote it there. Pass one only where the shape is genuinely this
+ * screen's own, and `"dialog"` is the case that usually is.
+ *
+ * **A wireframe board draws this as a list with a panel beside it whichever shape is in force.**
+ * The board's claim is that the detail opens next to the list, not that it is a panel; a screen
+ * rendering a drawer against a board drawn as list-detail is not a divergence.
  *
  * Sub-components: List, Detail, ViewSwitch, useListDetail.
  */
