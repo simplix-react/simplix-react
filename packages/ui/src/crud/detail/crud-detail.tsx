@@ -320,13 +320,17 @@ function useStandardDetailActions({ onClose, onBack, onDelete, onEdit, isPending
   const { t } = useTranslation("simplix/ui");
   const hasLeft = Boolean(onBack || onClose);
 
+  // Close and Back leave the record; every other button in the footer does something to it. That
+  // is the whole reason they need separate tones, and it is the only thing left separating them
+  // once the row divides evenly — before, position carried it, and an outline Close sat beside an
+  // outline domain action with the same background and nothing but a gap between them.
   const leftButton = onBack ? (
-    <Button type="button" size="sm" variant="outline" onClick={onBack}>
+    <Button type="button" size="sm" variant="ghost" onClick={onBack}>
       <ArrowLeftIcon className="h-4 w-4" />
       {backLabel ?? t("common.back")}
     </Button>
   ) : onClose ? (
-    <Button type="button" size="sm" variant="outline" onClick={onClose}>
+    <Button type="button" size="sm" variant="ghost" onClick={onClose}>
       {closeLabel ?? t("common.close")}
     </Button>
   ) : null;

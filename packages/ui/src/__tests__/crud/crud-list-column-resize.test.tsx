@@ -20,11 +20,15 @@ interface Row {
   code: string;
   name: string;
   displayOrder: number;
+  // The column one test inserts ahead of the others. It belongs on the row type because a column
+  // is addressed by a field of the row it renders, and a test that inserts one addressed by
+  // nothing proves the width follows a field name that could not exist.
+  inserted: string;
 }
 
 const rows: Row[] = [
-  { code: "A-1", name: "First", displayOrder: 1 },
-  { code: "A-2", name: "Second", displayOrder: 2 },
+  { code: "A-1", name: "First", displayOrder: 1, inserted: "I-1" },
+  { code: "A-2", name: "Second", displayOrder: 2, inserted: "I-2" },
 ];
 
 const STORE_KEY = "simplix.prefs:list-columns:probe";
