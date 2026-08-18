@@ -294,7 +294,7 @@ export type {
 } from "./base";
 
 // Provider
-export { createOverrides, UIComponentContext, UIProvider, useFlatUIComponents, useUIComponents, withOverride } from "./provider";
+export { createOverrides, UI_DEFAULTS, UIComponentContext, UIDefaultsContext, UIProvider, useFlatUIComponents, useUIComponents, useUIDefaults, withOverride } from "./provider";
 export type {
   CommandComponents,
   DialogComponents,
@@ -307,6 +307,7 @@ export type {
   TabsComponents,
   TooltipComponents,
   UIComponents,
+  UIDefaults,
   UIProviderProps,
 } from "./provider";
 

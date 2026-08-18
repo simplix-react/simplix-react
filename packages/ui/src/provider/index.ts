@@ -14,5 +14,6 @@ export type {
 
 export { withOverride } from "./override-utils";
 export { UIComponentContext } from "./ui-component-context";
+export { UI_DEFAULTS, UIDefaultsContext, useUIDefaults, type UIDefaults } from "./ui-defaults-context";
 export { createOverrides, UIProvider, useFlatUIComponents, useUIComponents } from "./ui-provider";
 export type { UIProviderProps } from "./ui-provider";

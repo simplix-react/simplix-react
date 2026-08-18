@@ -27,6 +27,7 @@ import {
   writeColumnWidths,
 } from "./column-widths";
 import {useFlatUIComponents} from "../../provider/ui-provider";
+import {useUIDefaults} from "../../provider/ui-defaults-context";
 import {Flex, Stack} from "../../primitives";
 import {cn} from "../../utils/cn";
 import {formatDateMedium, formatDateTime, formatRelativeTime} from "../../utils/format-date";
@@ -807,11 +808,15 @@ function ReorderableCardList<T>({
   emptyState,
   density = "default",
   actions,
-  actionVariant = "icon",
+  actionVariant,
   cardTitle,
   cardContent,
 }: ReorderableCardListProps<T>) {
   const { t } = useTranslation("simplix/ui");
+  // The product's answer, not this component's — see UIDefaults. A screen still overrides it
+  // where its own columns genuinely need the compact strip.
+  const uiDefaults = useUIDefaults();
+  const resolvedVariant = actionVariant ?? uiDefaults.actionVariant;
   const { Skeleton } = useFlatUIComponents();
   const emptyMessages: Record<EmptyReason, string> = {
     "no-data": t("list.noData"),
@@ -893,7 +898,7 @@ function ReorderableCardList<T>({
                 density={density}
                 onRowClick={onRowClick}
                 onSelectionChange={onSelectionChange}
-                cardActions={actions && actions.length > 0 ? <RowActionCell row={row} actions={actions} variant={actionVariant} /> : undefined}
+                cardActions={actions && actions.length > 0 ? <RowActionCell row={row} actions={actions} variant={resolvedVariant} /> : undefined}
                 cardTitle={createElement(cardTitle, { row, index })}
                 cardContent={createElement(cardContent, { row, index })}
               />
@@ -942,7 +947,7 @@ function ListTable<T>({
   rounded,
   stickyHeader = true,
   actions,
-  actionVariant = "icon",
+  actionVariant: actionVariantProp,
   actionColumnWidth: actionColumnWidthOverride,
   resizableColumns,
   slots,
@@ -955,6 +960,10 @@ function ListTable<T>({
   children,
 }: ListTableProps<T>) {
   const { t, locale } = useTranslation("simplix/ui");
+  // How dense a row action reads is the product's decision, not this table's — a screen that
+  // names nothing gets the console's own answer rather than a constant written here.
+  const uiDefaults = useUIDefaults();
+  const actionVariant = actionVariantProp ?? uiDefaults.actionVariant;
   // Ambient default for datetime cells whose column declares no displayZone —
   // replaces the implicit browser zone when the app mounts a DisplayZoneProvider.
   const defaultDisplayZone = useDefaultDisplayZone();

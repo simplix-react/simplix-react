@@ -4,6 +4,7 @@ import { StatusToneContext, type StatusToneOverrides } from "../base/status-tone
 import { baseComponents } from "./base-components";
 import type { UIComponents } from "./types";
 import { UIComponentContext } from "./ui-component-context";
+import { UIDefaultsContext, type UIDefaults } from "./ui-defaults-context";
 
 /**
  * Detects a compound component group from the DEFAULT's shape.
@@ -33,6 +34,13 @@ export interface UIProviderProps {
    * the channel for globally retoning status colors without forking components.
    */
   statusTones?: StatusToneOverrides;
+  /**
+   * Prop defaults for this whole console — see {@link UIDefaults}.
+   *
+   * <p>Set here rather than on every screen: a default written per screen is one a new screen
+   * forgets, and the screens then disagree about something the product decided once.
+   */
+  defaults?: Partial<UIDefaults>;
   children: ReactNode;
 }
 
@@ -47,9 +55,10 @@ export interface UIProviderProps {
  * </UIProvider>
  * ```
  */
-export function UIProvider({ overrides, statusTones, children }: UIProviderProps) {
+export function UIProvider({ overrides, statusTones, defaults, children }: UIProviderProps) {
   const parent = useContext(UIComponentContext);
   const parentTones = useContext(StatusToneContext);
+  const parentDefaults = useContext(UIDefaultsContext);
 
   const merged = useMemo(
     () => ({ ...parent, ...overrides }),
@@ -61,10 +70,17 @@ export function UIProvider({ overrides, statusTones, children }: UIProviderProps
     [parentTones, statusTones],
   );
 
+  const mergedDefaults = useMemo(
+    () => (defaults ? { ...parentDefaults, ...defaults } : parentDefaults),
+    [parentDefaults, defaults],
+  );
+
   return (
     <UIComponentContext.Provider value={merged}>
       <StatusToneContext.Provider value={mergedTones}>
-        {children}
+        <UIDefaultsContext.Provider value={mergedDefaults}>
+          {children}
+        </UIDefaultsContext.Provider>
       </StatusToneContext.Provider>
     </UIComponentContext.Provider>
   );
