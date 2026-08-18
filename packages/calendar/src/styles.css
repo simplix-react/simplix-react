@@ -1,11 +1,24 @@
 /*
- * Register this package's compiled output as a Tailwind v4 content source.
+ * Register this package as a Tailwind v4 content source — the compiled output and,
+ * where it exists, the source beside it.
  * Consuming apps `@import "@simplix-react/calendar/styles.css"`; Tailwind
  * resolves @source relative to THIS file (shipped as dist/styles.css next to
  * the compiled dist/*.js), so every utility class the calendar components emit
  * is detected without hardcoding a node_modules path.
+ *
+ * The second is what a linked checkout needs, and it is not redundant. This package's
+ * exports carry a `source` condition, so a dev server configured with
+ * resolve.conditions: ["source"] renders its TypeScript rather than its dist. Scanning
+ * dist alone then means the markup comes from source while the classes come from the
+ * last build: a new utility written in a component is silently absent, the screen shows
+ * the edit with none of its styling, and nothing errors. A glob that matches nothing
+ * costs nothing, which is what ../src is in a registry install.
+ *
+ * The CSS entry itself stays on dist deliberately — this directive is resolved relative
+ * to the stylesheet, so it only finds class-name literals beside the compiled output.
  */
 @source "./**/*.js";
+@source "../src/**/*.{ts,tsx}";
 
 /*
  * Gantt scroll container — its horizontal time axis routinely exceeds the

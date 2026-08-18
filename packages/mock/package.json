@@ -6,16 +6,19 @@
   "sideEffects": false,
   "exports": {
     ".": {
+      "source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
     "./vite": {
+      "source": "./src/vite-plugin.ts",
       "types": "./dist/vite.d.ts",
       "import": "./dist/vite.js"
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "publishConfig": {
     "access": "public"
