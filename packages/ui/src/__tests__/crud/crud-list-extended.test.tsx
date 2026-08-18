@@ -286,6 +286,63 @@ describe("CrudList.Table (extended coverage)", () => {
   });
 });
 
+describe("CrudList.Column minTableWidth", () => {
+  // The mocked width is module state, so a narrow case left behind leaks into every describe after
+  // this one — the pagination suite goes compact and fails on a control it never touched.
+  afterEach(() => {
+    mockContainerWidth = 1200;
+  });
+
+  const widthData = [{ id: 1, name: "Alice", email: "alice@example.test" }];
+
+  const withWidths = () => (
+    <CrudList>
+      <CrudList.Table data={widthData}>
+        <CrudList.Column field="name" header="Name" />
+        {/* Drops out below 800px of table — the width a list keeps when a detail opens beside it. */}
+        <CrudList.Column field="email" header="Email" minTableWidth={800} />
+      </CrudList.Table>
+    </CrudList>
+  );
+
+  it("draws the column when the table is wide enough", () => {
+    mockContainerWidth = 1200;
+    render(withWidths());
+    expect(screen.getByText("Name")).toBeTruthy();
+    expect(screen.getByText("Email")).toBeTruthy();
+    expect(screen.getByText("alice@example.test")).toBeTruthy();
+  });
+
+  it("drops header and cells together below the threshold", () => {
+    mockContainerWidth = 520;
+    render(withWidths());
+    expect(screen.getByText("Name")).toBeTruthy();
+    // Both halves, because a header left behind by its cells is the worse defect of the two.
+    expect(screen.queryByText("Email")).toBeNull();
+    expect(screen.queryByText("alice@example.test")).toBeNull();
+  });
+
+  it("draws everything while the table is still unmeasured", () => {
+    // 0 is 「the observer has not answered yet」, not 「a table of no width」. Reading it as the
+    // latter would blank every optional column on the first paint of every list.
+    mockContainerWidth = 0;
+    render(withWidths());
+    expect(screen.getByText("Email")).toBeTruthy();
+  });
+
+  it("leaves a column with no threshold alone at any width", () => {
+    mockContainerWidth = 320;
+    render(
+      <CrudList>
+        <CrudList.Table data={widthData}>
+          <CrudList.Column field="name" header="Name" />
+        </CrudList.Table>
+      </CrudList>,
+    );
+    expect(screen.getByText("Name")).toBeTruthy();
+  });
+});
+
 describe("CrudList.Pagination (extended)", () => {
   it("calls onPageSizeChange when page size is changed", () => {
     const onPageSizeChange = vi.fn();

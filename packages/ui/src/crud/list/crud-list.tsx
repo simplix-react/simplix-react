@@ -288,6 +288,28 @@ export interface ListColumnProps<T> {
    * and give it no width of its own. Ignored when {@link width} is also set.
    */
   minWidth?: number;
+  /**
+   * The narrowest table this column is worth drawing in, in pixels. Below it the column is not
+   * rendered at all — no header, no cells, and no entry in the columns dropdown.
+   *
+   * <p><b>The width measured is the table's own, not the window's.</b> A list screen loses most of
+   * its width the moment a detail opens beside it, and that is exactly when a column has to go: a
+   * table that fits at 1400px scrolls sideways at 520px, and a horizontal scrollbar under a list is
+   * a column the reader has to go looking for. Omit the prop and the column is always drawn, which
+   * is what every column did before this existed.
+   *
+   * <p><b>Only put it on a column whose value the detail panel also shows.</b> A column that
+   * disappears takes its value with it, and the reader has no way to ask for it back — there is no
+   * 「show anyway」. The arrangement only works because the thing that took the width is the panel
+   * that carries the value: open the record and it is there. A value that lives nowhere else stays
+   * in the table however narrow it gets.
+   *
+   * <p><b>Not a card-mode control.</b> Below `cardBreakpoint` the table becomes cards drawn by
+   * `cardTitle` / `cardContent`, where there are no columns to drop; this decides what the table
+   * holds while it is still a table. The two thresholds are read against the same measurement, so
+   * a `minTableWidth` below `cardBreakpoint` can never fire.
+   */
+  minTableWidth?: number;
   display?: "badge" | "boolean" | "country" | "phone";
   format?: "date" | "datetime" | "time" | "relative";
   /**
@@ -1057,7 +1079,19 @@ function ListTable<T>({
   useEffect(() => {
     columnCtx?.setResponsiveCardMode(responsiveCardMode);
   }, [responsiveCardMode, columnCtx?.setResponsiveCardMode]);
-  const columnDefs = useMemo(() => extractColumnDefs<T>(children), [children]);
+  const declaredColumnDefs = useMemo(() => extractColumnDefs<T>(children), [children]);
+
+  // Dropped here rather than at the point each column renders, so the header, the cells and the
+  // columns dropdown are all deciding from one list. `containerWidth` is 0 until the observer has
+  // measured, and an unmeasured table draws everything — the same rule `responsiveCardMode` uses,
+  // and the one that matches a column with no `minTableWidth` at all.
+  const columnDefs = useMemo(
+    () =>
+      declaredColumnDefs.filter(
+        (d) => d.minTableWidth == null || containerWidth === 0 || containerWidth >= d.minTableWidth,
+      ),
+    [declaredColumnDefs, containerWidth],
+  );
 
   // Register columns to context for FilterBar's Columns dropdown
   const derivedColumns = useMemo(
