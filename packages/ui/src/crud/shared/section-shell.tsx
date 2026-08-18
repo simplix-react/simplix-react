@@ -169,7 +169,13 @@ export function SectionShell({
       className={cn(
         isCard &&
           "overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm",
-        variant === "flat" && "flex flex-col gap-2 pb-2 border-b border-border/50 last:border-b-0 last:pb-0",
+        // The rule belongs to both sections it separates, so the inset is the same on each side.
+        // It was `pb-2` alone, which paid 8px under the content above and nothing over the
+        // heading below — the rule then sat against the next title and read as underlining it
+        // rather than as ending the section before. The `isLined` variant beside this one had
+        // the symmetric form already.
+        variant === "flat" &&
+          "flex flex-col gap-2 py-3 border-b border-border/50 first:pt-0 last:border-b-0 last:pb-0",
         isLined && "flex flex-col gap-2 py-2",
         className,
       )}
