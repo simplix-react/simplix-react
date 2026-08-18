@@ -13,14 +13,17 @@
   ],
   "exports": {
     ".": {
+      "source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
     "./plate-editor": {
+      "source": "./src/fields/plate-editor/index.ts",
       "types": "./dist/plate-editor.d.ts",
       "import": "./dist/plate-editor.js"
     },
     "./plate-viewer": {
+      "source": "./src/fields/plate-editor/plate-viewer.tsx",
       "types": "./dist/plate-viewer.d.ts",
       "import": "./dist/plate-viewer.js"
     },

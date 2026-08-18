@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { ListIcon } from "lucide-react";
 import { useTranslation } from "@simplix-react/i18n/react";
 
@@ -11,6 +12,20 @@ export interface ListTotalBadgeProps {
    * claiming zero. A reader takes `Total 0` as "there is nothing here".
    */
   count?: number | null;
+  /**
+   * What the badge says instead of the framework's `Total N`, for a total the
+   * framework cannot phrase.
+   *
+   * <p>Some rows are about more than one figure — a tree counting nodes beside a
+   * column counting the people under them, 「조직 39개 · 사용자 212명」 — and one
+   * number cannot carry that. Before this existed those screens drew their own
+   * badge, which is how a plain outline badge came to sit where every other list
+   * draws an icon and a framework-translated label: the same row, two shapes.
+   * Passing the sentence keeps the shape and replaces only the words.
+   *
+   * <p>`count` is ignored when this is given, so pass one or the other.
+   */
+  children?: ReactNode;
 }
 
 /**
@@ -20,13 +35,13 @@ export interface ListTotalBadgeProps {
  * The badge always occupies the toolbar, whether or not the count is known, so
  * the row does not shift when the value lands.
  */
-export function ListTotalBadge({ count }: ListTotalBadgeProps) {
+export function ListTotalBadge({ count, children }: ListTotalBadgeProps) {
   const { t } = useTranslation("simplix/ui");
-  const known = count != null;
+  const known = children !== undefined || count != null;
   return (
     <Badge variant="outline" className="gap-1.5 font-normal" aria-busy={known ? undefined : true}>
       <ListIcon className="size-3.5 text-muted-foreground" />
-      {known ? t("list.totalCount", { count }) : t("list.totalCountUnknown")}
+      {children ?? (count != null ? t("list.totalCount", { count }) : t("list.totalCountUnknown"))}
     </Badge>
   );
 }

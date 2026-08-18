@@ -1,13 +1,23 @@
 /*
- * Register this package's compiled output as a Tailwind v4 content source.
+ * Register this package as a Tailwind v4 content source — the compiled output and,
+ * where it exists, the source beside it.
  * Consuming apps `@import "@simplix-react/ui/styles.css"`; Tailwind resolves
  * @source relative to THIS file, so a consumer detects every utility class our
- * components emit without hardcoding a node_modules path. The path targets the
+ * components emit without hardcoding a node_modules path. The first path targets the
  * published layout (this file ships as dist/styles.css, components as dist/*.js;
  * package.json files: ["dist"]), where the class-name string literals survive
- * bundling — so detection works in both linked-source and registry installs.
+ * bundling — so detection works in a registry install.
+ *
+ * The second is what a linked checkout needs, and it is not redundant. The package's
+ * exports carry a `source` condition, so a dev server configured with
+ * resolve.conditions: ["source"] renders THIS package's TypeScript rather than its
+ * dist. Scanning dist alone then means the markup comes from source while the classes
+ * come from the last build: a new utility written in a component is silently absent,
+ * the screen shows the edit with none of its styling, and nothing errors. A glob that
+ * matches nothing costs nothing, which is what ../src is in a registry install.
  */
 @source "./**/*.js";
+@source "../src/**/*.{ts,tsx}";
 
 /*
  * A cell whose column rests on a width lets its content follow that width.

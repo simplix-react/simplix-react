@@ -25,6 +25,7 @@ import { useFlatUIComponents } from "../../provider/ui-provider";
 import { Flex, Stack } from "../../primitives";
 import { cn } from "../../utils/cn";
 import type { ColumnInfo, EmptyReason, SortState } from "../shared";
+import { ListTotalBadge } from "../shared/list-total-badge";
 import { TableCardFrame, useTableCardFrame } from "../shared/table-card-frame";
 import type { ListColumnProps } from "../list/crud-list";
 import { getActionColumnWidth, RowActionCell, type ActionVariant, type RowActionDef } from "../shared/row-actions";
@@ -140,12 +141,28 @@ function TreeRoot({ className, children }: TreeProps) {
 
 export interface TreeToolbarProps {
   className?: string;
+  /**
+   * The figure the row is about, drawn in the badge a list's `FilterBar` draws.
+   *
+   * <p>A number is phrased by the framework as its `Total N`. **Anything else is
+   * rendered as the badge's words**, which is how a tree says what one number
+   * cannot — 「조직 39개 · 사용자 212명」, where the tree counts nodes and the
+   * column beside it counts the people under them. Omitted, the row draws no
+   * badge and the first child is the lead as before.
+   *
+   * <p>It exists so a tree does not have to draw its own: a hand-rolled
+   * `<Badge variant="outline">` next to a list's icon-and-label badge is the same
+   * row wearing two shapes, and nothing about the screen says why.
+   */
+  count?: ReactNode;
   children?: ReactNode;
 }
 
-function TreeToolbar({ className, children }: TreeToolbarProps) {
+function TreeToolbar({ className, count, children }: TreeToolbarProps) {
   // The count is the figure the row is about; everything after it is a control on that figure.
-  const [lead, ...rest] = Children.toArray(children);
+  // Given `count` every child is a control, so the split is skipped rather than eating the first.
+  const given = count !== undefined;
+  const [lead, ...rest] = given ? [null, ...Children.toArray(children)] : Children.toArray(children);
   return (
     <Flex
       gap="sm"
@@ -153,7 +170,9 @@ function TreeToolbar({ className, children }: TreeToolbarProps) {
       wrap
       className={cn("w-full rounded-lg border bg-card p-2", className)}
     >
-      {lead}
+      {given
+        ? <ListTotalBadge>{typeof count === "number" ? undefined : count}</ListTotalBadge>
+        : lead}
       {/*
         The controls are one element rather than several, so the row can only break in one place:
         between the count and the whole group. Left flat, each control wrapped on its own and the
