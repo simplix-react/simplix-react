@@ -174,7 +174,12 @@
 
   /* ── status ── */
   --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
+  /* A dark theme's destructive is a light red, so near-white on it reads at 2.76:1 — under the
+     4.5:1 a person with low vision needs, on the one control whose label they most need to read
+     before pressing. The page's own near-black takes it to 6.97:1 and keeps the fill light,
+     which is what a dark theme wants; darkening the fill instead would put a dark button on a dark
+     surface. The light theme's destructive is already dark enough for near-white and keeps it. */
+  --destructive-foreground: oklch(0.129 0.042 264.695);
   --danger-soft: oklch(0.28 0.07 25);
   --success: oklch(0.7 0.14 160);
   --success-soft: oklch(0.3 0.06 162);
