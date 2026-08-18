@@ -176,7 +176,9 @@ export function MultiSelectField<T extends string = string>({
                 onClick={() => setOpen(true)}
                 placeholder={value.length === 0 ? selectPlaceholder : ""}
                 disabled={disabled}
-                className="min-w-[60px] flex-1 bg-transparent outline-none text-sm placeholder:text-muted-foreground disabled:cursor-not-allowed"
+                // `outline-none` with nothing put back: the box around this input carries
+              // `focus-within:border-foreground`, so focus shows on the whole control.
+              className="min-w-[60px] flex-1 bg-transparent outline-none text-sm placeholder:text-muted-foreground disabled:cursor-not-allowed"
               />
               </span>
               <FieldChevron />
@@ -206,6 +208,8 @@ export function MultiSelectField<T extends string = string>({
                     role="option"
                     aria-selected={selected}
                     className={cn(
+                      // `outline-none` with nothing put back: the input keeps focus and this row
+                      // is pointed at by hover and by the selected accent below.
                       "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none",
                       "hover:bg-accent hover:text-accent-foreground",
                       selected && "bg-accent/50",

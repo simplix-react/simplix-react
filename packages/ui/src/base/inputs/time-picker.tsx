@@ -103,6 +103,9 @@ function TimeSpinnerInput({
             step(-1);
           }
         }}
+        // `outline-none` with nothing put back: the box around the hour and minute fields
+        // carries `focus-within:border-foreground`, and two rings inside one control read as
+        // two controls.
         className="min-w-8 flex-1 bg-transparent text-center text-sm outline-none disabled:cursor-not-allowed"
       />
       <div className="flex shrink-0 flex-col border-l border-input">
@@ -457,6 +460,10 @@ export function TimeSelectControl({
       <div
         className={cn(
           "flex h-8 items-stretch overflow-hidden rounded-md border border-input bg-background",
+          // The hour and minute fields carry no ring of their own — two rings inside one control
+          // read as two controls — so the box they sit in shows where the keyboard is, the way
+          // `number-input` and `multi-select-field` do.
+          "focus-within:border-foreground",
           disabled && "opacity-50",
           rowClassName,
         )}

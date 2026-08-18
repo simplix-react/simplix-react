@@ -128,7 +128,14 @@ export const TabsContent = forwardRef<HTMLDivElement, TabsContentProps>(
   ({ className, padded = false, ...rest }, ref) => (
     <TabsPrimitive.Content
       ref={ref}
-      className={cn("flex-1 outline-none", padded && "py-4", className)}
+      className={cn(
+        // `outline-none` on the panel, and only on the panel. Radix moves focus here when a tab is
+        // chosen so the next Tab lands inside; it is a region rather than a control, and the first
+        // control in it rings normally.
+        "flex-1 outline-none",
+        padded && "py-4",
+        className,
+      )}
       {...rest}
     />
   ),

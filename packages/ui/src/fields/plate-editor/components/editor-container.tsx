@@ -95,6 +95,8 @@ export const Editor = forwardRef<HTMLDivElement, EditorProps>(
           // Base body text matches the app-wide content size (text-sm, same as
           // inputs and detail fields). Block/mark typography lives on the node
           // components (heading-node, list-node, ...), not on this container.
+          // `outline-none` with nothing put back: this is the writing surface, where the caret
+          // is what says the keyboard is here. A ring around the page would frame the document.
           'max-w-none w-full p-4 outline-none text-sm',
           '[&_*::selection]:bg-primary/20',
           // Prevent horizontal overflow from long content

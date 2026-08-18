@@ -90,7 +90,7 @@ export function CrudDelete({
                 "inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-medium",
                 "border border-input bg-background transition-colors",
                 "hover:bg-accent hover:text-accent-foreground",
-                "focus-visible:outline-none",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                 "disabled:pointer-events-none disabled:opacity-50",
               )}
               disabled={loading}
@@ -106,7 +106,7 @@ export function CrudDelete({
                 "inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-medium",
                 "bg-primary text-primary-foreground transition-colors",
                 "hover:bg-primary/90",
-                "focus-visible:outline-none",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                 "disabled:pointer-events-none disabled:opacity-50",
               )}
               disabled={loading}

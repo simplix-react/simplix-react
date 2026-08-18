@@ -69,6 +69,9 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
             onChange?.(clamp(v));
           }}
           className={cn(
+            // `outline-none` with nothing put back: the box around this input carries
+            // `focus-within:border-foreground`, so focus shows on the control the reader sees as
+            // one thing. A ring on the inner field would draw a second control inside the first.
             "min-w-0 flex-1 bg-transparent px-1.5 py-1.5 text-center outline-none",
             "placeholder:text-muted-foreground disabled:cursor-not-allowed",
             // Hide the hover-only native spinners; the buttons replace them

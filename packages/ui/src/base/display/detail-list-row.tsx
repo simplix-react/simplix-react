@@ -78,7 +78,7 @@ export const DetailListRow = forwardRef<HTMLDivElement, DetailListRowProps>(
         onKeyDown={interactive ? handleKeyDown : undefined}
       >
         {icon}
-        <Text size="sm" className="font-medium flex-1 truncate">
+        <Text as="div" size="sm" className="font-medium flex-1 truncate">
           {primary}
         </Text>
         {trailing}

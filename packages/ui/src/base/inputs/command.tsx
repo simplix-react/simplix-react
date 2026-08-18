@@ -25,6 +25,9 @@ const CommandInput = forwardRef<HTMLInputElement, ComponentPropsWithRef<typeof C
       <CommandPrimitive.Input
         ref={ref}
         className={cn(
+          // `outline-none` with nothing put back: this field is focused the moment the palette
+          // opens and is the only thing in it that takes typing, so the caret is where the
+          // keyboard is. A ring around the field inside a floating panel reads as a second border.
           "flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
           className,
         )}
@@ -79,6 +82,8 @@ const CommandItem = forwardRef<HTMLDivElement, ComponentPropsWithRef<typeof Comm
     <CommandPrimitive.Item
       ref={ref}
       className={cn(
+        // `outline-none` with nothing put back: an option row never holds focus — the input keeps
+        // it and the cursor moves by `data-[selected=true]`, which paints the accent below.
         "relative flex cursor-default gap-2 select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
         className,
       )}

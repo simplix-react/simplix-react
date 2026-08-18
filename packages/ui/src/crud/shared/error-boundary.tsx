@@ -77,7 +77,7 @@ export class CrudErrorBoundary extends Component<
             "inline-flex h-9 items-center justify-center rounded-md px-4 text-sm font-medium",
             "border border-input bg-background transition-colors",
             "hover:bg-accent hover:text-accent-foreground",
-            "focus-visible:outline-none",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
           )}
         >
           Try again

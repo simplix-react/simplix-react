@@ -156,7 +156,7 @@ function MonthGrid({
             className={cn(
               "flex h-8 items-center justify-center rounded-md text-sm",
               "hover:bg-accent hover:text-accent-foreground",
-              "focus-visible:outline-none",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
               "disabled:pointer-events-none disabled:opacity-50",
               isCurrentMonth && !isSelected && "bg-accent/50 font-semibold",
               isSelected &&
@@ -420,7 +420,7 @@ export const CalendarBase = forwardRef<HTMLDivElement, CalendarProps>(
                           // contrast reads heavier than the muted weekday row above it.
                           "flex h-11 w-full items-center justify-center rounded-md text-lg font-normal text-foreground/80 md:h-9 md:text-[15px]",
                           "hover:bg-accent hover:text-accent-foreground",
-                          "focus-visible:outline-none",
+                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                           "disabled:pointer-events-none disabled:opacity-50",
                           isToday && "bg-accent/50 font-semibold",
                           // Single mode selection

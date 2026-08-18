@@ -285,6 +285,8 @@ export function ComboboxField<T extends string = string>({
                       aria-selected={opt.value === value}
                       data-highlighted={index === highlighted || undefined}
                       className={cn(
+                        // `outline-none` with nothing put back: the input keeps focus and the
+                        // cursor moves by `data-highlighted`, which the accent below paints.
                         "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none",
                         "hover:bg-accent hover:text-accent-foreground",
                         // The accent background marks the CURSOR only; the selected

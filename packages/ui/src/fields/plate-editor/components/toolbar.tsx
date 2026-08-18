@@ -146,7 +146,7 @@ export const ToolbarButton = forwardRef<HTMLButtonElement, ToolbarButtonProps>(
         className={cn(
           'inline-flex h-6 min-w-6 items-center justify-center rounded px-1 text-xs font-medium transition-colors',
           'hover:bg-accent hover:text-accent-foreground',
-          'focus-visible:outline-none',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
           'disabled:pointer-events-none disabled:opacity-50',
           pressed && 'bg-accent text-accent-foreground',
           className
