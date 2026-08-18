@@ -70,17 +70,24 @@ export function DetailAuditFooter({ auditData, displayZone }: CrudDetailAuditFoo
   const zone = displayZone ?? defaultZone;
   const [copied, setCopied] = useState(false);
 
-  // What the button shows is what it copies. Showing `ORG-014` and putting a UUID on the clipboard
-  // is the kind of surprise nobody checks for until it has been pasted into a ticket.
   const shown = auditData?.code || (auditData?.id ? formatDisplayId(auditData.id) : "");
 
+  // **What is shown and what is copied are deliberately different, and that is the point of this
+  // control.** It exists so somebody can get the record's identifier onto the clipboard — for a
+  // ticket, a query, a support thread — which is what the tooltip's own wording promises. The code
+  // beside it is there so a person can read the row; the identifier is there so a machine can be
+  // given it. Making the two agree looks like consistency and removes the only reason the button
+  // exists: a reader who wanted `NORTH-ELEC` on the clipboard can select it from the label, and a
+  // reader who wants the UUID has nowhere else to get it.
   const handleCopyId = useCallback(async () => {
-    if (!shown) return;
-    await navigator.clipboard.writeText(shown);
+    if (!auditData?.id) return;
+    await navigator.clipboard.writeText(auditData.id);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  }, [shown]);
+  }, [auditData?.id]);
 
+  // The row is drawn when there is something to show; the copy is wired only when there is an
+  // identifier to copy, which are not the same condition once a code can stand alone.
   const hasId = shown !== "";
   const hasCreated = auditData?.createdAt != null && auditData.createdAt !== "";
   const hasUpdated = auditData?.updatedAt != null && auditData.updatedAt !== "";

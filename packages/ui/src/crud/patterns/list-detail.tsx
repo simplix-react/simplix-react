@@ -187,23 +187,21 @@ export function ListDetailRoot({ variant: variantProp, activePanel: activePanelP
 
   const contextValue: ListDetailContextValue = { variant, activePanel, setActivePanel, dialogHeight };
 
-  // Both overlay shapes hang off the same root: what differs is the content's geometry, not when
-  // it opens or what closing it means.
+  // Both overlay shapes hang off the same root, modal, with Radix's own behaviour: the backdrop is
+  // drawn, it takes the clicks, and pressing it closes the detail.
+  //
+  // **The drawer was briefly non-modal so that pressing the next row swapped the record in one
+  // press instead of two.** That was given up deliberately rather than lost: asked to choose, the
+  // product wanted the backdrop to block and to close, which is what every other sheet in the
+  // console does. Two presses to move between records is the price of that, and it is the price
+  // that was chosen. Anyone reversing this should know they are re-opening a decision, not fixing
+  // an oversight — three separate things had to be switched off to get the single press
+  // (`modal`, the overlay, and the dismissable layer's outside-press), and none of them was the
+  // whole answer on its own.
   if (variant === "dialog" || variant === "drawer") {
     return (
       <ListDetailContext.Provider value={contextValue}>
         <DialogPrimitive.Root
-          // The drawer is not modal, which is what stops Radix trapping focus and locking the
-          // page's scroll — neither of which a surface somebody works beside should do.
-          //
-          // **Being dimmed and swallowing clicks are two decisions, and the drawer takes only the
-          // first.** The backdrop is still drawn (`overlayClassName="pointer-events-none"` on the
-          // content) so the drawer visibly arrives over the list; what it does not do is eat the
-          // press. Nor is `modal={false}` enough on its own to keep that press — the content is a
-          // dismissable layer and closes itself on an outside pointer-down, which spends it. That
-          // is prevented separately, below. All three are needed, and each was found by the
-          // reader still having to press twice after the previous one.
-          modal={variant !== "drawer"}
           open={activePanel === "detail"}
           onOpenChange={(open) => {
             setActivePanel(open ? "detail" : "list");
@@ -384,19 +382,6 @@ const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }
         ref={ref as React.Ref<HTMLDivElement>}
         side="right"
         aria-describedby={undefined}
-        // Seen but not felt. The dim is drawn so the drawer visibly arrives over the list rather
-        // than floating with nothing behind it, and `pointer-events-none` is what keeps every
-        // click reaching the list underneath — being drawn and taking clicks are two decisions,
-        // and the drawer wants the first without the second.
-        overlay="inert"
-        // And the drawer does not dismiss itself when the reader presses the list. Non-modal is
-        // only half of it: Radix still closes on a pointer-down outside the content, so a press on
-        // the next row was spent closing the drawer and the row had to be pressed again. A panel
-        // never closes because somebody picked another record — it swaps — and the drawer has to
-        // read the same way, or the two are different screens rather than one screen set two ways.
-        // Escape and the detail's own close button remain the ways out.
-        onPointerDownOutside={(event) => event.preventDefault()}
-        onInteractOutside={(event) => event.preventDefault()}
         // `Sheet`'s own close button is dropped: the detail this holds brings its own — the same
         // one the panel variant shows — and two of them in one corner is a screen telling the
         // reader there are two ways out of the same thing.
