@@ -8,7 +8,7 @@
 
 > `const` **DetailList**: `ForwardRefExoticComponent`\<[`DetailListProps`](../interfaces/DetailListProps.md) & `RefAttributes`\<`HTMLDivElement`\>\>
 
-Defined in: [packages/ui/src/base/display/detail-list-row.tsx:113](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/detail-list-row.tsx#L113)
+Defined in: [packages/ui/src/base/display/detail-list-row.tsx:123](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/detail-list-row.tsx#L123)
 
 Bordered, rounded container that groups [DetailListRow](DetailListRow.md) items. The
 `overflow-hidden` clip lets each row's bottom border (and the

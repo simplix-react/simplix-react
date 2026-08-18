@@ -6,7 +6,7 @@
 
 # Interface: ComponentTranslations
 
-Defined in: [module-translations.ts:16](https://github.com/simplix-react/simplix-react/blob/main/module-translations.ts#L16)
+Defined in: [module-translations.ts:18](https://github.com/simplix-react/simplix-react/blob/main/module-translations.ts#L18)
 
 Maps locale codes to lazy-loading functions that return translation modules.
 

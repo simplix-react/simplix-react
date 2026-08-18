@@ -6,7 +6,7 @@
 
 # Interface: ModuleTranslations
 
-Defined in: [module-translations.ts:36](https://github.com/simplix-react/simplix-react/blob/main/module-translations.ts#L36)
+Defined in: [module-translations.ts:38](https://github.com/simplix-react/simplix-react/blob/main/module-translations.ts#L38)
 
 Represents the output of [buildModuleTranslations](../functions/buildModuleTranslations.md), providing a lazy-loadable
 collection of namespaced translations for a module.
@@ -17,7 +17,7 @@ collection of namespaced translations for a module.
 
 > `optional` **components**: `string`[]
 
-Defined in: [module-translations.ts:47](https://github.com/simplix-react/simplix-react/blob/main/module-translations.ts#L47)
+Defined in: [module-translations.ts:49](https://github.com/simplix-react/simplix-react/blob/main/module-translations.ts#L49)
 
 Component paths served by this descriptor. Part of the registry identity:
 several packages may share one namespace with disjoint components (e.g.
@@ -30,7 +30,7 @@ not be the registry key or later registrations clobber earlier ones.
 
 > **load**: (`locale`) => `Promise`\<`Record`\<`string`, `Record`\<`string`, `unknown`\>\>\>
 
-Defined in: [module-translations.ts:49](https://github.com/simplix-react/simplix-react/blob/main/module-translations.ts#L49)
+Defined in: [module-translations.ts:51](https://github.com/simplix-react/simplix-react/blob/main/module-translations.ts#L51)
 
 Loads all component translations for the given locale.
 
@@ -50,7 +50,7 @@ Loads all component translations for the given locale.
 
 > **locales**: `string`[]
 
-Defined in: [module-translations.ts:40](https://github.com/simplix-react/simplix-react/blob/main/module-translations.ts#L40)
+Defined in: [module-translations.ts:42](https://github.com/simplix-react/simplix-react/blob/main/module-translations.ts#L42)
 
 Supported locale codes.
 
@@ -60,6 +60,6 @@ Supported locale codes.
 
 > **namespace**: `string`
 
-Defined in: [module-translations.ts:38](https://github.com/simplix-react/simplix-react/blob/main/module-translations.ts#L38)
+Defined in: [module-translations.ts:40](https://github.com/simplix-react/simplix-react/blob/main/module-translations.ts#L40)
 
 The module's translation namespace.

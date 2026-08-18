@@ -3378,9 +3378,16 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **padded**: `boolean`
 
-Defined in: [packages/ui/src/base/navigation/tabs.tsx:117](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/tabs.tsx#L117)
+Defined in: [packages/ui/src/base/navigation/tabs.tsx:124](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/tabs.tsx#L124)
 
-Adds bottom padding for scrollable containers.
+Insets the panel from the strip above it and from whatever follows.
+
+<p><b>The same step top and bottom.</b> It was `pt-4 pb-8`, and the extra step at the bottom
+is the floor a list-detail page grows when its detail opens: the list column carries no
+padding of its own, so while the list runs past the panel the bottom step is never seen, and
+the moment the panel clips everything to one box it appears as a margin that belongs to
+nothing. A reader resizing the window watches it change, because the leftover height changes
+and the step does not.
 
 #### Default
 

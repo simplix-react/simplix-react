@@ -10,11 +10,25 @@ Defined in: [packages/ui/src/base/charts/stat-card.tsx:6](https://github.com/sim
 
 ## Properties
 
+### chart?
+
+> `optional` **chart**: `ReactNode`
+
+Defined in: [packages/ui/src/base/charts/stat-card.tsx:32](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/charts/stat-card.tsx#L32)
+
+The shape behind the figure, drawn in the card's reserved right-hand region.
+
+<p>The region is held whether or not this is set, so a tile that plots and a tile that does
+not are the same component rather than two that happen to resemble each other, and the figures
+down a row of them stay in one column.
+
+***
+
 ### children?
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/base/charts/stat-card.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/charts/stat-card.tsx#L26)
+Defined in: [packages/ui/src/base/charts/stat-card.tsx:34](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/charts/stat-card.tsx#L34)
 
 Optional content rendered below the value/description block.
 

@@ -6,7 +6,7 @@
 
 # Interface: CrudDetailSectionProps
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:209](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L209)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:211](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L211)
 
 Shared props for section components (CrudDetail.Section, CrudForm.Section).
 
@@ -84,7 +84,7 @@ Defined in: [packages/ui/src/crud/shared/section-shell.tsx:66](https://github.co
 
 > `optional` **layout**: `"single-column"` \| `"two-column"` \| `"three-column"`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:217](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L217)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:219](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L219)
 
 Field arrangement inside the section body. `"single-column"` (default)
 stacks rows; `"two-column"` / `"three-column"` lay fields out in a grid

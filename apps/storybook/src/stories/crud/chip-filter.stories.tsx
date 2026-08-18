@@ -62,7 +62,6 @@ export const Default: StoryObj = {
       <ChipFilter
         field="status.equals"
         state={state}
-        columns={3}
         options={[
           { value: "active", label: "Active", icon: <StatusDot color="#22c55e" /> },
           { value: "pending", label: "Pending", icon: <StatusDot color="#f59e0b" /> },
@@ -73,14 +72,13 @@ export const Default: StoryObj = {
   },
 };
 
-export const FourColumns: StoryObj = {
+export const ManyOptions: StoryObj = {
   render: () => {
     const state = useMockFilterState();
     return (
       <ChipFilter
         field="type.equals"
         state={state}
-        columns={4}
         options={[
           { value: "annual", label: "Annual" },
           { value: "sick", label: "Sick" },
@@ -99,7 +97,6 @@ export const WithDisabled: StoryObj = {
       <ChipFilter
         field="priority.equals"
         state={state}
-        columns={3}
         options={[
           { value: "high", label: "High" },
           { value: "medium", label: "Medium" },

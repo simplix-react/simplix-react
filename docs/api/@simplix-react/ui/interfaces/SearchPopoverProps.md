@@ -118,6 +118,27 @@ Flat list of items (mutually exclusive with `groups`).
 
 ***
 
+### onOpenChange()?
+
+> `optional` **onOpenChange**: (`open`) => `void`
+
+Defined in: [packages/ui/src/base/inputs/search-popover.tsx:75](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/search-popover.tsx#L75)
+
+Called whenever the open state changes, in both modes. Required to drive `open`, since a
+controlled popover no longer closes itself.
+
+#### Parameters
+
+##### open
+
+`boolean`
+
+#### Returns
+
+`void`
+
+***
+
 ### onSelect()
 
 > **onSelect**: (`item`) => `void`
@@ -135,6 +156,18 @@ Called when an item is selected.
 #### Returns
 
 `void`
+
+***
+
+### open?
+
+> `optional` **open**: `boolean`
+
+Defined in: [packages/ui/src/base/inputs/search-popover.tsx:70](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/search-popover.tsx#L70)
+
+Controlled open state. When omitted the popover owns its open state internally and the
+parent has no way to read it — pass this (with `onOpenChange`) when something outside the
+popover depends on whether it is open, such as gating a query on the list being visible.
 
 ***
 

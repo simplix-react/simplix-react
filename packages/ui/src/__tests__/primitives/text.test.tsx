@@ -14,12 +14,15 @@ describe("Text", () => {
     expect(el.tagName).toBe("P");
   });
 
-  it("applies default variant classes", () => {
+  it("applies default variant classes, and names no size of its own", () => {
     render(<Text data-testid="t">text</Text>);
     const classes = screen.getByTestId("t").className;
     expect(classes).toContain("font-normal");
-    expect(classes).toContain("text-base");
     expect(classes).toContain("text-foreground");
+    // A Text with no size takes the one its context sets, so it writes no size class itself.
+    for (const size of ["text-lg", "text-base", "text-sm", "text-xs"]) {
+      expect(classes).not.toContain(size);
+    }
   });
 
   it("applies size variants", () => {

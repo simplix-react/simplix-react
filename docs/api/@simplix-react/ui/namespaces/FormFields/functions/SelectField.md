@@ -8,7 +8,7 @@
 
 > **SelectField**\<`T`\>(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/form/select-field.tsx:44](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L44)
+Defined in: [packages/ui/src/fields/form/select-field.tsx:74](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L74)
 
 Dropdown select field built on Radix Select primitives.
 
@@ -27,6 +27,15 @@ Dropdown select field built on Radix Select primitives.
 ## Returns
 
 `Element`
+
+## Remarks
+
+Two widths, and which one applies is decided by `compact`. The default (non-compact) field
+renders inside `FieldWrapper` and takes the width its container gives it, with `className`
+reaching that wrapper. `compact` instead measures itself against its longest option label —
+a hidden native `<select>` carrying every label does the measuring, so the field is as wide
+as its widest option and `className` is dropped on the floor. Pass `fill` alongside `compact`
+to take that measurement out and let the parent set the width.
 
 ## Example
 
@@ -48,5 +57,15 @@ Dropdown select field built on Radix Select primitives.
   onChange={setScheduleId}
   options={scheduleOptions}
   placeholder="Select..."
+/>
+
+// Compact mode whose width the parent owns (a grid cell, a flex row)
+<SelectField
+  compact
+  fill
+  className="min-w-0"
+  value={areaId}
+  onChange={setAreaId}
+  options={areaOptions}
 />
 ```

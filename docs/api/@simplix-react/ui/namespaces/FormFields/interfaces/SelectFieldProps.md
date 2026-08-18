@@ -6,7 +6,7 @@
 
 # Interface: SelectFieldProps\<T\>
 
-Defined in: [packages/ui/src/fields/form/select-field.tsx:6](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L6)
+Defined in: [packages/ui/src/fields/form/select-field.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L7)
 
 Props for the [SelectField](../functions/SelectField.md) form component.
 
@@ -38,9 +38,11 @@ Defined in: [packages/ui/src/crud/shared/types.ts:49](https://github.com/simplix
 
 > `optional` **compact**: `boolean`
 
-Defined in: [packages/ui/src/fields/form/select-field.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L16)
+Defined in: [packages/ui/src/fields/form/select-field.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L21)
 
-Compact mode: renders without FieldWrapper, auto-width based on content.
+Compact mode: renders without FieldWrapper, and sizes itself to its longest option label
+using a hidden native `<select>`. That measurement also means `className` never reaches the
+rendered element — pass `fill` when the parent has to own the width.
 
 ***
 
@@ -77,6 +79,19 @@ Defined in: [packages/ui/src/crud/shared/types.ts:32](https://github.com/simplix
 #### Inherited from
 
 [`CommonFieldProps`](../../../interfaces/CommonFieldProps.md).[`error`](../../../interfaces/CommonFieldProps.md#error)
+
+***
+
+### fill?
+
+> `optional` **fill**: `boolean`
+
+Defined in: [packages/ui/src/fields/form/select-field.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L28)
+
+Compact mode only: give the width back to the parent. The hidden measuring `<select>` is
+dropped, the field fills its container, and `className` lands on the wrapper — so a grid or
+flex cell can size the field instead of the option list doing it. No effect without `compact`;
+the non-compact path already passes `className` to the wrapper.
 
 ***
 
@@ -126,7 +141,7 @@ label for screen readers only.
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/fields/form/select-field.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L11)
+Defined in: [packages/ui/src/fields/form/select-field.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L12)
 
 Called when the selection changes.
 
@@ -146,7 +161,7 @@ Called when the selection changes.
 
 > **options**: `object`[]
 
-Defined in: [packages/ui/src/fields/form/select-field.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L13)
+Defined in: [packages/ui/src/fields/form/select-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L14)
 
 Available options with label/value pairs.
 
@@ -176,7 +191,7 @@ Available options with label/value pairs.
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/fields/form/select-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L14)
+Defined in: [packages/ui/src/fields/form/select-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L15)
 
 ***
 
@@ -240,7 +255,7 @@ below at full width.
 
 > **value**: `T`
 
-Defined in: [packages/ui/src/fields/form/select-field.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L9)
+Defined in: [packages/ui/src/fields/form/select-field.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L10)
 
 Currently selected value.
 

@@ -1,7 +1,11 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
+
+/** This package's `src`, resolved from this file rather than from the working directory. */
+const SRC = fileURLToPath(new URL("..", import.meta.url));
 
 /**
  * Every control this package draws says where the keyboard is.
@@ -90,7 +94,7 @@ function classRegions(text: string): { region: string; line: number }[] {
 describe("focus is visible wherever the browser's outline is taken away", () => {
   it("every style that writes outline-none either shows focus another way or says why not", () => {
     const bare: string[] = [];
-    for (const file of sources("src")) {
+    for (const file of sources(SRC)) {
       const text = readFileSync(file, "utf8");
       for (const { region, line } of classRegions(text)) {
         if (!STRIPS_FOCUS.test(region)) continue;

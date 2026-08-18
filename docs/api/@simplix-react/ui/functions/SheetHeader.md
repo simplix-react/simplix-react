@@ -8,7 +8,7 @@
 
 > **SheetHeader**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/base/overlay/sheet.tsx:94](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/sheet.tsx#L94)
+Defined in: [packages/ui/src/base/overlay/sheet.tsx:117](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/sheet.tsx#L117)
 
 ## Parameters
 

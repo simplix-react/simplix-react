@@ -8,7 +8,7 @@
 
 > **useFlatUIComponents**(): `object`
 
-Defined in: [packages/ui/src/provider/ui-provider.tsx:114](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/ui-provider.tsx#L114)
+Defined in: [packages/ui/src/provider/ui-provider.tsx:130](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/ui-provider.tsx#L130)
 
 Flat-destructuring variant of [useUIComponents](useUIComponents.md).
 

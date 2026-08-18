@@ -6,7 +6,7 @@
 
 # Interface: UseCrudNavigationResult
 
-Defined in: [packages/ui/src/crud/patterns/use-crud-page.ts:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/use-crud-page.ts#L13)
+Defined in: [packages/ui/src/crud/patterns/use-crud-page.ts:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/use-crud-page.ts#L14)
 
 Return type of [useCrudNavigation](../functions/useCrudNavigation.md).
 
@@ -16,7 +16,7 @@ Return type of [useCrudNavigation](../functions/useCrudNavigation.md).
 
 > **selectedId**: `string` \| `undefined`
 
-Defined in: [packages/ui/src/crud/patterns/use-crud-page.ts:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/use-crud-page.ts#L15)
+Defined in: [packages/ui/src/crud/patterns/use-crud-page.ts:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/use-crud-page.ts#L16)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [packages/ui/src/crud/patterns/use-crud-page.ts:15](https://github.c
 
 > **showDetail**: (`id`) => `void`
 
-Defined in: [packages/ui/src/crud/patterns/use-crud-page.ts:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/use-crud-page.ts#L17)
+Defined in: [packages/ui/src/crud/patterns/use-crud-page.ts:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/use-crud-page.ts#L18)
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: [packages/ui/src/crud/patterns/use-crud-page.ts:17](https://github.c
 
 > **showEdit**: (`id`) => `void`
 
-Defined in: [packages/ui/src/crud/patterns/use-crud-page.ts:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/use-crud-page.ts#L19)
+Defined in: [packages/ui/src/crud/patterns/use-crud-page.ts:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/use-crud-page.ts#L20)
 
 #### Parameters
 
@@ -60,7 +60,7 @@ Defined in: [packages/ui/src/crud/patterns/use-crud-page.ts:19](https://github.c
 
 > **showList**: () => `void`
 
-Defined in: [packages/ui/src/crud/patterns/use-crud-page.ts:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/use-crud-page.ts#L16)
+Defined in: [packages/ui/src/crud/patterns/use-crud-page.ts:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/use-crud-page.ts#L17)
 
 #### Returns
 
@@ -72,7 +72,7 @@ Defined in: [packages/ui/src/crud/patterns/use-crud-page.ts:16](https://github.c
 
 > **showNew**: () => `void`
 
-Defined in: [packages/ui/src/crud/patterns/use-crud-page.ts:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/use-crud-page.ts#L18)
+Defined in: [packages/ui/src/crud/patterns/use-crud-page.ts:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/use-crud-page.ts#L19)
 
 #### Returns
 
@@ -84,4 +84,4 @@ Defined in: [packages/ui/src/crud/patterns/use-crud-page.ts:18](https://github.c
 
 > **view**: [`CrudView`](../type-aliases/CrudView.md)
 
-Defined in: [packages/ui/src/crud/patterns/use-crud-page.ts:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/use-crud-page.ts#L14)
+Defined in: [packages/ui/src/crud/patterns/use-crud-page.ts:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/use-crud-page.ts#L15)
