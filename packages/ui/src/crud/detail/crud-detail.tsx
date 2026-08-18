@@ -252,19 +252,18 @@ export interface CrudDetailActionsProps {
   children?: ReactNode;
 }
 
-// Every button in a detail footer divides the row evenly, in both tiers. A footer that hugs its
-// labels puts Close at one end and Edit at the other with a gulf between them, so the reader's eye
-// crosses the panel to find the action they came for; and at a narrow panel the natural widths run
-// past the edge, which nothing scrolls back. `flex-wrap` is what makes the second half true — the
-// buttons keep their labels and take a second line rather than one of them leaving the panel.
+// The domain-action tier divides its row evenly; the standard row below it does not. The two rows
+// are different kinds of thing — the tier is a set of peers the record's state offers, and an even
+// share says so, while the standard row is Close on one side and what acts on the record on the
+// other, and that opposition is what its layout carries. Making the standard row divide evenly
+// dissolves it: Close becomes a fourth action of equal weight rather than the way out.
 //
-// `min-w-fit` is what makes the first half true. A flex child floors at its own content, so the
-// primary variant's `min-w-32` made Edit claim 128px of a row whose even share was 97 and the two
-// short buttons absorbed the difference — the row filled the width without dividing it. Overriding
-// the floor to the button's own content leaves one honest cause of an uneven share: a label that is
-// genuinely longer than the others. `min-w-0` would even those out too, by cutting the label off,
-// and a footer button without its whole label is the thing this footer exists to avoid.
-const FOOTER_FILL = "flex-wrap [&>*]:min-w-fit [&>*]:flex-1";
+// `min-w-fit` overrides the primary variant's `min-w-32`. A flex child floors at its own content,
+// so a primary in this tier would claim 128px of a row whose even share is less and its neighbours
+// would absorb the difference — the row would fill the width without dividing it. `min-w-0` would
+// even out a genuinely longer label too, by cutting it off, and a footer button without its whole
+// label is what this tier exists to avoid.
+const ACTION_TIER_FILL = "flex-wrap [&>*]:min-w-fit [&>*]:flex-1";
 
 function DetailActions({ className, children }: CrudDetailActionsProps) {
   return (
@@ -327,10 +326,10 @@ function useStandardDetailActions({ onClose, onBack, onDelete, onEdit, isPending
   const { t } = useTranslation("simplix/ui");
   const hasLeft = Boolean(onBack || onClose);
 
-  // Close and Back leave the record; every other button in the footer does something to it. That
-  // is the whole reason they need separate tones, and it is the only thing left separating them
-  // once the row divides evenly — before, position carried it, and an outline Close sat beside an
-  // outline domain action with the same background and nothing but a gap between them.
+  // Close and Back leave the record; every other button in the footer does something to it. The
+  // tone says so on its own, rather than leaving the reader to infer it from which end the button
+  // sits at — every detail footer the wireframe board draws puts Close in this tone and none puts
+  // it in another.
   const leftButton = onBack ? (
     <Button type="button" size="sm" variant="ghost" onClick={onBack}>
       <ArrowLeftIcon className="h-4 w-4" />
@@ -342,8 +341,8 @@ function useStandardDetailActions({ onClose, onBack, onDelete, onEdit, isPending
     </Button>
   ) : null;
 
-  const rightButtons = (
-    <>
+  const rightGroup = (
+    <Flex gap="sm">
       {onDelete && (
         // Named like the row's other actions: an icon-only button reaches
         // assistive technology as an unnamed button, and the reader is left
@@ -373,10 +372,10 @@ function useStandardDetailActions({ onClose, onBack, onDelete, onEdit, isPending
           {editLabel ?? t("common.edit")}
         </Button>
       )}
-    </>
+    </Flex>
   );
 
-  return { leftButton, rightButtons, hasLeft };
+  return { leftButton, rightGroup, hasLeft };
 }
 
 /**
@@ -385,11 +384,14 @@ function useStandardDetailActions({ onClose, onBack, onDelete, onEdit, isPending
  * lifecycle actions that need their own row above this one.
  */
 function DetailDefaultActions(props: CrudDetailDefaultActionsProps) {
-  const { leftButton, rightButtons } = useStandardDetailActions(props);
+  const { leftButton, rightGroup, hasLeft } = useStandardDetailActions(props);
   return (
-    <DetailActions className={cn(FOOTER_FILL, props.className)}>
+    // `flex-wrap` without a grow: the buttons keep their own widths, and where they no longer fit
+    // the row takes a second line rather than pushing one of them outside the panel with nothing
+    // to scroll it back.
+    <DetailActions className={cn("flex-wrap", hasLeft ? "justify-between" : "justify-end", props.className)}>
       {leftButton}
-      {rightButtons}
+      {rightGroup}
     </DetailActions>
   );
 }
@@ -422,16 +424,16 @@ export interface CrudDetailActionFooterProps extends CrudDetailDefaultActionsPro
  * share one divider above the whole block.
  */
 function DetailActionFooter({ actions, ...rest }: CrudDetailActionFooterProps) {
-  const { leftButton, rightButtons } = useStandardDetailActions(rest);
+  const { leftButton, rightGroup, hasLeft } = useStandardDetailActions(rest);
   return (
     <Stack gap="sm" className={cn("border-t pt-2", rest.className)}>
-      <Flex gap="sm" align="center" className={FOOTER_FILL}>
+      <Flex gap="sm" align="center" className={ACTION_TIER_FILL}>
         {actions}
       </Flex>
       {/* A divider separates the domain-action tier from the standard row. */}
-      <Flex gap="sm" align="center" className={cn("border-t pt-2", FOOTER_FILL)}>
+      <Flex gap="sm" align="center" className={cn("flex-wrap border-t pt-2", hasLeft ? "justify-between" : "justify-end")}>
         {leftButton}
-        {rightButtons}
+        {rightGroup}
       </Flex>
     </Stack>
   );
