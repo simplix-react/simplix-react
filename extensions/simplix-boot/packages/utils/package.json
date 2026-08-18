@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react-ext/simplix-boot-utils",
-  "version": "0.3.7",
+  "version": "0.3.8-SNAPSHOT",
   "description": "Utility functions for simplix-boot",
   "type": "module",
   "exports": {
