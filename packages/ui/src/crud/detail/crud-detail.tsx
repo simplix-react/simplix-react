@@ -257,7 +257,14 @@ export interface CrudDetailActionsProps {
 // crosses the panel to find the action they came for; and at a narrow panel the natural widths run
 // past the edge, which nothing scrolls back. `flex-wrap` is what makes the second half true — the
 // buttons keep their labels and take a second line rather than one of them leaving the panel.
-const FOOTER_FILL = "flex-wrap [&>*]:flex-1";
+//
+// `min-w-fit` is what makes the first half true. A flex child floors at its own content, so the
+// primary variant's `min-w-32` made Edit claim 128px of a row whose even share was 97 and the two
+// short buttons absorbed the difference — the row filled the width without dividing it. Overriding
+// the floor to the button's own content leaves one honest cause of an uneven share: a label that is
+// genuinely longer than the others. `min-w-0` would even those out too, by cutting the label off,
+// and a footer button without its whole label is the thing this footer exists to avoid.
+const FOOTER_FILL = "flex-wrap [&>*]:min-w-fit [&>*]:flex-1";
 
 function DetailActions({ className, children }: CrudDetailActionsProps) {
   return (
