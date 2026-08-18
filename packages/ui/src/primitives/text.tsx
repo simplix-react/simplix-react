@@ -16,6 +16,18 @@ const textVariants = cva("font-normal", {
       base: "text-base",
       sm: "text-sm",
       caption: "text-xs",
+      /**
+       * Take the size of whatever encloses it. The default, so a Text that was not asked for a
+       * size does not impose one.
+       *
+       * <p>A typography primitive that defaults to a fixed size cannot compose: a table cell
+       * declares its record text at `text-sm` and the Text inside it silently renders at
+       * `text-base`, so the size the cell set never appears on screen. Nothing errors, the diff
+       * reads correctly, and the row is simply a size larger than every other row on the page.
+       * Inheriting makes the enclosing context the answer, which is what a caller who named no
+       * size meant.
+       */
+      inherit: "",
     },
     tone: {
       default: "text-foreground",
@@ -29,7 +41,7 @@ const textVariants = cva("font-normal", {
       mono: "font-mono",
     },
   },
-  defaultVariants: { size: "base", tone: "default" },
+  defaultVariants: { size: "inherit", tone: "default" },
 });
 
 /** Variant props extracted from {@link textVariants}. */
@@ -48,10 +60,14 @@ export interface TextProps
 /**
  * Typography primitive for body text with a consistent type scale.
  *
+ * <p><b>With no `size`, it takes the size of what encloses it</b> — the application's body size in
+ * a page, the cell's size in a table row, the caption size in a footer. State a size only where
+ * the text is meant to differ from its surroundings.
+ *
  * @example
  * ```tsx
  * <Text size="lg">Body text large for emphasis</Text>
- * <Text>Default body text for content</Text>
+ * <Text>Body text at whatever size the context sets</Text>
  * <Text size="sm">Smaller text for secondary info</Text>
  * <Text size="caption">Caption text for labels and hints</Text>
  * <Text font="mono" size="sm">const x = 42;</Text>

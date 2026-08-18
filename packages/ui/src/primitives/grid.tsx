@@ -66,6 +66,22 @@ export interface GridProps
    */
   gapY?: GridVariants["gap"];
   /**
+   * Never draw more columns than there are items, and spread what there are evenly over the rows.
+   *
+   * <p>A fixed column count is a maximum, not a promise: a four-column grid handed two items draws
+   * them at a quarter width each and leaves the other half of the row empty, which reads as two
+   * tiles that failed to load rather than as a set of two. With this set, two items make two
+   * columns, six items in a four-column grid make two rows of three rather than four and two, and
+   * seven make four and three — the row that cannot be filled is the only one left short.
+   *
+   * <p>Off by default, because a grid whose cells are positional (a form laid out two fields to a
+   * row) means its column count literally and must not reflow when a field is conditional. Set it
+   * on a grid whose children are peers — chips, tiles, cards.
+   *
+   * @default false
+   */
+  fit?: boolean;
+  /**
    * Arbitrary `grid-template-columns` value applied as an inline style,
    * covering cases the `columns` enum cannot express (e.g. `"repeat(auto-fill, minmax(12rem, 1fr))"`
    * or `"200px 1fr"`). When provided, the `columns` class and responsive
@@ -169,6 +185,24 @@ const columnRuleClasses: Record<string, { fixed: string; collapsing: string }> =
 };
 
 /**
+ * The column count that spreads `items` evenly over as few rows as `max` columns would need.
+ *
+ * <p>Fewer items than columns collapses to the item count, so nothing is drawn at a fraction of
+ * the row it does not use. More items than columns keeps the row count the maximum would have
+ * given and then widens the columns until the items fill them: six over four columns is two rows
+ * of three, not four and two.
+ *
+ * @param items how many children the grid has
+ * @param max the declared column count, read as a ceiling
+ * @returns the column count to draw with
+ */
+function balancedColumns(items: number, max: number): number {
+  if (items < 1) return max;
+  if (items <= max) return items;
+  return Math.ceil(items / Math.ceil(items / max));
+}
+
+/**
  * Draws the column rule on the cells that actually start a new column.
  *
  * <p>A single line down the gutter spans the grid's full height, so it crosses the middle of any
@@ -232,8 +266,11 @@ function withColumnRules(
  * ```
  */
 export const GridBase = forwardRef<HTMLDivElement, GridProps>(
-  ({ className, columns, gap, gapX, gapY, responsive = true, divider = false, template, children, style, ...rest }, ref) => {
-    const cols = columns ?? 1;
+  ({ className, columns, gap, gapX, gapY, responsive = true, divider = false, fit = false, template, children, style, ...rest }, ref) => {
+    const declared = columns ?? 1;
+    // toArray drops null / undefined / booleans, so a conditional child that rendered nothing
+    // does not claim a column.
+    const cols = fit ? balancedColumns(Children.toArray(children).length, declared) : declared;
     const isResponsive = responsive && cols > 1;
     const gapKey = (gap ?? "md") as string;
     // Divider lines sit mid-gutter, so their position follows the horizontal gap.
@@ -273,7 +310,7 @@ export const GridBase = forwardRef<HTMLDivElement, GridProps>(
     return (
       <div
         ref={ref}
-        className={cn(gridVariants({ columns }), gapClasses, showDivider && "relative", className)}
+        className={cn(gridVariants({ columns: cols as GridVariants["columns"] }), gapClasses, showDivider && "relative", className)}
         style={style}
         {...rest}
       >

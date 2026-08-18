@@ -14,11 +14,20 @@ const cardVariants = cva(
   "rounded-lg border border-border bg-card text-card-foreground shadow-sm",
   {
     variants: {
+      /**
+       * Horizontal and vertical padding are set apart, and the vertical one is a step smaller.
+       *
+       * <p>A card is wider than it is tall and its content is lines of text, so equal padding on
+       * all four sides spends the height that lines would use on empty space above and below them
+       * — a three-line stat card came out 130px tall, of which 48px was padding. The sides still
+       * need the full step: that is the gutter between the border and the first character, and
+       * narrowing it makes the text look pressed against the edge.
+       */
       padding: {
         none: "",
-        sm: "p-4",
-        md: "p-6",
-        lg: "p-8",
+        sm: "px-4 py-3",
+        md: "px-6 py-4",
+        lg: "px-8 py-6",
       },
       interactive: {
         true: "cursor-pointer hover:border-primary/30 hover:shadow-md transition-all",

@@ -24,7 +24,12 @@ export interface ChipFilterProps<T extends string | number = string> {
   options: ChipFilterOption<T>[];
   /** CrudList filter state to read/write. */
   state: CrudListFilters;
-  /** Grid columns. @defaultValue 4 */
+  /**
+   * The most chips to a row. Fewer options than this draw one row of that many, so a two-option
+   * filter fills its row instead of taking a quarter of it twice.
+   *
+   * @defaultValue 4
+   */
   columns?: 1 | 2 | 3 | 4 | 5 | 6;
   /** Grid gap. @defaultValue "xs" */
   gap?: "none" | "xs" | "sm" | "md" | "lg";
@@ -69,7 +74,7 @@ export function ChipFilter<T extends string | number = string>({
   );
 
   return (
-    <Grid columns={columns} gap={gap}>
+    <Grid columns={columns} gap={gap} fit>
       {options.map((opt) => {
         const isActive = activeValue === opt.value;
         return (

@@ -55,7 +55,9 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "rounded-lg border p-6 text-card-foreground shadow-sm",
+        // Same padding as Card's md step — a figure tile is a card and must not sit taller than
+        // the cards beside it just because it draws its own box.
+        "rounded-lg border px-6 py-4 text-card-foreground shadow-sm",
         highlighted && tone ? tones[tone].surface : "bg-card",
         className,
       )}
