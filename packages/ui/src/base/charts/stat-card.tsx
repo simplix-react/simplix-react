@@ -22,6 +22,14 @@ export interface StatCardProps {
   highlighted?: boolean;
   /** Extra classes merged onto the card root. */
   className?: string;
+  /**
+   * The shape behind the figure, drawn in the card's reserved right-hand region.
+   *
+   * <p>The region is held whether or not this is set, so a tile that plots and a tile that does
+   * not are the same component rather than two that happen to resemble each other, and the figures
+   * down a row of them stay in one column.
+   */
+  chart?: ReactNode;
   /** Optional content rendered below the value/description block. */
   children?: ReactNode;
 }
@@ -49,6 +57,7 @@ export function StatCard({
   tone,
   highlighted = false,
   className,
+  chart,
   children,
 }: StatCardProps) {
   const tones = useStatusTones();
@@ -65,38 +74,51 @@ export function StatCard({
         className,
       )}
     >
-      {/* Two lines, not three. The label and the figure are one thought — 「조직: 39개」 — and
-          stacking them spends a line on saying so; the basis underneath is the only thing that
-          needs its own. Baseline-aligned so the four tiles read as one row of numbers rather than
-          four boxes, and the figure sits at the end where the eye scanning a column of them
-          expects it. */}
-      <div className="flex items-baseline justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-1.5">
-          <p className="truncate text-sm font-medium text-muted-foreground">{title}</p>
-          {headerExtra}
-          {icon && <span className="shrink-0 text-muted-foreground">{icon}</span>}
-        </div>
-        <p className="shrink-0 text-2xl font-bold leading-none">{value}</p>
-      </div>
-      {(description || trend) && (
-        <div className="mt-1.5 flex items-baseline justify-between gap-3">
-          {description ? (
-            <p className="min-w-0 text-xs text-muted-foreground">{description}</p>
-          ) : (
-            <span />
-          )}
-          {trend && (
-            <p
-              className={cn(
-                "shrink-0 text-xs font-medium",
-                trend.value >= 0 ? tones.success.icon : tones.danger.icon,
+      {/* The card is two columns before it is two lines. The right one belongs to the shape behind
+          the figure and is held even when nothing plots yet — a figure pushed against the card's
+          right edge leaves a plot nowhere to go, and the tile that later gets one would have to be
+          laid out differently from its neighbours.
+
+          Inside the left column: two lines, not three. The label and the figure are one thought —
+          「조직: 39개」 — and stacking them spends a line on saying so; the basis underneath is the
+          only thing that needs its own. The figure sits at that column's end, so four tiles across
+          a screen read as one row of numbers rather than four boxes. */}
+      <div className="flex items-baseline gap-3">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-baseline justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-1.5">
+              <p className="truncate text-sm font-medium text-muted-foreground">{title}</p>
+              {headerExtra}
+              {icon && <span className="shrink-0 text-muted-foreground">{icon}</span>}
+            </div>
+            <p className="shrink-0 text-2xl font-bold leading-none">{value}</p>
+          </div>
+          {(description || trend) && (
+            <div className="mt-1.5 flex items-baseline justify-between gap-3">
+              {description ? (
+                <p className="min-w-0 text-xs text-muted-foreground">{description}</p>
+              ) : (
+                <span />
               )}
-            >
-              {trend.value >= 0 ? "+" : ""}{trend.value}%{trend.label ? ` ${trend.label}` : ""}
-            </p>
+              {trend && (
+                <p
+                  className={cn(
+                    "shrink-0 text-xs font-medium",
+                    trend.value >= 0 ? tones.success.icon : tones.danger.icon,
+                  )}
+                >
+                  {trend.value >= 0 ? "+" : ""}{trend.value}%{trend.label ? ` ${trend.label}` : ""}
+                </p>
+              )}
+            </div>
           )}
         </div>
-      )}
+        {/* 84px is the width the wireframe board draws a sparkline at, so a plot moved from a frame
+            into a tile arrives at the size it was drawn. */}
+        <div className="w-[84px] shrink-0 self-center" aria-hidden={chart ? undefined : true}>
+          {chart}
+        </div>
+      </div>
       {children}
     </div>
   );
