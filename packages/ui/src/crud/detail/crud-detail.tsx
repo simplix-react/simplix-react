@@ -252,6 +252,13 @@ export interface CrudDetailActionsProps {
   children?: ReactNode;
 }
 
+// Every button in a detail footer divides the row evenly, in both tiers. A footer that hugs its
+// labels puts Close at one end and Edit at the other with a gulf between them, so the reader's eye
+// crosses the panel to find the action they came for; and at a narrow panel the natural widths run
+// past the edge, which nothing scrolls back. `flex-wrap` is what makes the second half true — the
+// buttons keep their labels and take a second line rather than one of them leaving the panel.
+const FOOTER_FILL = "flex-wrap [&>*]:flex-1";
+
 function DetailActions({ className, children }: CrudDetailActionsProps) {
   return (
     <Flex gap="sm" className={cn("border-t pt-2", className)}>
@@ -324,8 +331,8 @@ function useStandardDetailActions({ onClose, onBack, onDelete, onEdit, isPending
     </Button>
   ) : null;
 
-  const rightGroup = (
-    <Flex gap="sm">
+  const rightButtons = (
+    <>
       {onDelete && (
         // Named like the row's other actions: an icon-only button reaches
         // assistive technology as an unnamed button, and the reader is left
@@ -355,10 +362,10 @@ function useStandardDetailActions({ onClose, onBack, onDelete, onEdit, isPending
           {editLabel ?? t("common.edit")}
         </Button>
       )}
-    </Flex>
+    </>
   );
 
-  return { leftButton, rightGroup, hasLeft };
+  return { leftButton, rightButtons, hasLeft };
 }
 
 /**
@@ -367,11 +374,11 @@ function useStandardDetailActions({ onClose, onBack, onDelete, onEdit, isPending
  * lifecycle actions that need their own row above this one.
  */
 function DetailDefaultActions(props: CrudDetailDefaultActionsProps) {
-  const { leftButton, rightGroup, hasLeft } = useStandardDetailActions(props);
+  const { leftButton, rightButtons } = useStandardDetailActions(props);
   return (
-    <DetailActions className={cn(hasLeft ? "justify-between" : "justify-end", props.className)}>
+    <DetailActions className={cn(FOOTER_FILL, props.className)}>
       {leftButton}
-      {rightGroup}
+      {rightButtons}
     </DetailActions>
   );
 }
@@ -404,18 +411,16 @@ export interface CrudDetailActionFooterProps extends CrudDetailDefaultActionsPro
  * share one divider above the whole block.
  */
 function DetailActionFooter({ actions, ...rest }: CrudDetailActionFooterProps) {
-  const { leftButton, rightGroup, hasLeft } = useStandardDetailActions(rest);
+  const { leftButton, rightButtons } = useStandardDetailActions(rest);
   return (
     <Stack gap="sm" className={cn("border-t pt-2", rest.className)}>
-      {/* Domain actions share the footer width evenly — an action tier that hugs
-          its labels reads as a stray button cluster next to the standard row. */}
-      <Flex gap="sm" align="center" className="flex-wrap [&>*]:flex-1">
+      <Flex gap="sm" align="center" className={FOOTER_FILL}>
         {actions}
       </Flex>
       {/* A divider separates the domain-action tier from the standard row. */}
-      <Flex gap="sm" align="center" className={cn("border-t pt-2", hasLeft ? "justify-between" : "justify-end")}>
+      <Flex gap="sm" align="center" className={cn("border-t pt-2", FOOTER_FILL)}>
         {leftButton}
-        {rightGroup}
+        {rightButtons}
       </Flex>
     </Stack>
   );
