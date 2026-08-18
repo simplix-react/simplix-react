@@ -1139,7 +1139,14 @@ async function ensurePackageJsonPagesExport(moduleDir: string): Promise<void> {
   const exports = (pkg.exports ?? {}) as Record<string, unknown>;
   if (exports["./pages"]) return;
 
+  // `source` first, and first in the object. A dev server resolves a workspace package through
+  // `resolve.conditions: ["source"]`, so an entry without it falls through to `import` — the built
+  // output — and every source edit under `./pages` is invisible in the browser while HMR reports a
+  // successful update. Nothing errors; the screen simply goes on showing the code as it was at the
+  // last build. The module's own three entries are written with it by the template, so a module
+  // acquires exactly one entry that is wrong at the moment somebody scaffolds its first page.
   exports["./pages"] = {
+    source: "./src/pages/index.ts",
     types: "./dist/pages/index.d.ts",
     import: "./dist/pages/index.js",
   };

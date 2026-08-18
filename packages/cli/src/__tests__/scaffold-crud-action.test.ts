@@ -408,7 +408,16 @@ describe("scaffoldCrudCommand action", () => {
     await scaffoldCrudCommand.parseAsync(["node", "simplix", "product"]);
 
     const pkgJson = JSON.parse(await readFile(join(modDir, "package.json"), "utf-8"));
-    expect(pkgJson.exports["./pages"]).toBeDefined();
+    // The `source` condition, not merely the key. Without it a dev server resolving through
+    // `resolve.conditions: ["source"]` falls through to `import` and serves `dist` — every edit
+    // under ./pages is then invisible in the browser while HMR reports success, and nothing
+    // errors. An assertion that the entry exists passes either way, which is how the module's
+    // one wrong entry survived: the other three come from the template with `source` on them.
+    expect(pkgJson.exports["./pages"]).toEqual({
+      source: "./src/pages/index.ts",
+      types: "./dist/pages/index.d.ts",
+      import: "./dist/pages/index.js",
+    });
   });
 
   it("updates locales/index.ts with widgets component", async () => {

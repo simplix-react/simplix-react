@@ -96,6 +96,29 @@ describe("addModuleCommand action (non-interactive)", () => {
     expect(await pathExists(join(targetDir, "src/manifest.ts"))).toBe(true);
   });
 
+  it("declares source on every export and publishes the source it names", async () => {
+    const { addModuleCommand } = await import("../commands/add-module.js");
+
+    await addModuleCommand.parseAsync(["node", "simplix", "editor", "-y"]);
+
+    const targetDir = join(tempDir, "modules/myapp-editor");
+    const pkgJson = JSON.parse(await readFile(join(targetDir, "package.json"), "utf-8"));
+
+    // Two halves of one contract. `source` is what a dev server resolves through, so an entry
+    // without it serves `dist` and swallows every source edit under that subpath in silence.
+    // `files` is what a publish carries, so a `source` naming a path outside it resolves in the
+    // checkout that wrote it and throws ERR_MODULE_NOT_FOUND for anyone installing the package —
+    // a failure no amount of local testing can produce.
+    for (const [subpath, entry] of Object.entries(pkgJson.exports as Record<string, unknown>)) {
+      if (typeof entry !== "object" || entry === null) continue;
+      const source = (entry as { source?: string }).source;
+      expect(source, `${subpath} declares no source condition`).toBeDefined();
+      expect(pkgJson.files, `${subpath} names ${source}, which files does not publish`).toContain(
+        source!.replace(/^\.\//, "").split("/")[0],
+      );
+    }
+  });
+
   it("creates FSD layers", async () => {
     const { addModuleCommand } = await import("../commands/add-module.js");
 
