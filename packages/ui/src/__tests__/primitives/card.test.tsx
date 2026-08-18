@@ -22,21 +22,23 @@ describe("Card", () => {
     expect(classes).toContain("border");
     expect(classes).toContain("bg-card");
     expect(classes).toContain("shadow-sm");
-    expect(classes).toContain("p-6");
+    expect(classes).toContain("px-6");
+    expect(classes).toContain("py-4");
   });
 
   it("applies padding variants", () => {
+    // Padding is set per axis: a card is wider than it is tall for the same step.
     const paddings = {
-      sm: "p-4",
-      md: "p-6",
-      lg: "p-8",
+      sm: ["px-4", "py-3"],
+      md: ["px-6", "py-4"],
+      lg: ["px-8", "py-6"],
     } as const;
 
     for (const [padding, expected] of Object.entries(paddings)) {
       const { unmount } = render(
         <Card data-testid="card" padding={padding as keyof typeof paddings} />,
       );
-      expect(screen.getByTestId("card").className).toContain(expected);
+      for (const cls of expected) expect(screen.getByTestId("card").className).toContain(cls);
       unmount();
     }
   });
@@ -44,9 +46,8 @@ describe("Card", () => {
   it("applies no padding class for 'none'", () => {
     render(<Card data-testid="card" padding="none" />);
     const classes = screen.getByTestId("card").className;
-    expect(classes).not.toContain("p-4");
-    expect(classes).not.toContain("p-6");
-    expect(classes).not.toContain("p-8");
+    expect(classes).not.toContain("px-");
+    expect(classes).not.toContain("py-");
   });
 
   it("renders a <button> when interactive", () => {
