@@ -8,7 +8,7 @@
 
 > **createOverrides**(`factory`): `Partial`\<[`UIComponents`](../interfaces/UIComponents.md)\>
 
-Defined in: [packages/ui/src/provider/ui-provider.tsx:233](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/ui-provider.tsx#L233)
+Defined in: [packages/ui/src/provider/ui-provider.tsx:249](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/provider/ui-provider.tsx#L249)
 
 Creates a type-safe override map, optionally wrapping/extending defaults.
 

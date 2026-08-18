@@ -8,7 +8,7 @@
 
 > `const` **CrudList**: (`__namedParameters`) => `Element` & `object`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:1606](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1606)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:1904](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1904)
 
 Compound component for building CRUD list views with toolbar, table,
 pagination, selection, and bulk actions.
@@ -94,9 +94,16 @@ BulkActions, BulkAction, Empty, and 10+ filter types.
 
 > **ChipFilter**: \<`T`\>(`__namedParameters`) => `Element`
 
-Toggle chip grid that integrates with [CrudListFilters](../interfaces/CrudListFilters.md) for server-side filtering.
+Toggle chips that integrate with [CrudListFilters](../interfaces/CrudListFilters.md) for server-side filtering.
 
 Single-select toggle: clicking an active chip deselects it (shows all).
+
+<p>The chips flow from the left at their label's width and wrap onto another line when the row
+runs out. They are deliberately NOT stretched to divide the row evenly: an option's width would
+then be decided by how many options happen to sit beside it, so the same filter reads as a
+segmented control on one screen and as chips on the next, and a two-option filter draws two
+half-page buttons. The row still spans the full width — what is left-aligned is the chips
+inside it.
 
 #### Type Parameters
 
@@ -119,7 +126,6 @@ Single-select toggle: clicking an active chip deselects it (shows all).
 ```tsx
 <CrudList.ChipFilter
   field="status.equals"
-  columns={3}
   state={list.filters}
   options={[
     { value: "active", label: "Active", icon: <StatusDot color="green" /> },

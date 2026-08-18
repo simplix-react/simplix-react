@@ -8,7 +8,7 @@
 
 > **SearchPopover**\<`T`\>(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/base/inputs/search-popover.tsx:95](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/search-popover.tsx#L95)
+Defined in: [packages/ui/src/base/inputs/search-popover.tsx:112](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/search-popover.tsx#L112)
 
 Searchable popover for selecting items from a flat or grouped list.
 Uses a unified trigger button design with PlusIcon.
@@ -28,6 +28,13 @@ Uses a unified trigger button design with PlusIcon.
 ## Returns
 
 `Element`
+
+## Remarks
+
+The open state is internal unless `open` is passed: with no `open` prop the popover opens and
+closes itself and nothing outside it can observe that. Passing `open` makes it controlled —
+the parent then owns every transition, including the close after a selection — and
+`onOpenChange` fires in both modes.
 
 ## Example
 

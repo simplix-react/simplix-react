@@ -8,7 +8,7 @@
 
 > **useCrudNavigation**(`search`, `onNavigate`): [`UseCrudNavigationResult`](../interfaces/UseCrudNavigationResult.md)
 
-Defined in: [packages/ui/src/crud/patterns/use-crud-page.ts:31](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/use-crud-page.ts#L31)
+Defined in: [packages/ui/src/crud/patterns/use-crud-page.ts:32](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/use-crud-page.ts#L32)
 
 Parses CRUD search params and returns memoized navigation callbacks.
 

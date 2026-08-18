@@ -6,7 +6,7 @@
 
 # Interface: ChipFilterOption\<T\>
 
-Defined in: [packages/ui/src/crud/filters/chip-filter.tsx:8](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/chip-filter.tsx#L8)
+Defined in: [packages/ui/src/crud/filters/chip-filter.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/chip-filter.tsx#L9)
 
 A single chip option.
 
@@ -22,7 +22,7 @@ A single chip option.
 
 > `optional` **disabled**: `boolean`
 
-Defined in: [packages/ui/src/crud/filters/chip-filter.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/chip-filter.tsx#L16)
+Defined in: [packages/ui/src/crud/filters/chip-filter.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/chip-filter.tsx#L22)
 
 Whether this option is disabled.
 
@@ -32,9 +32,12 @@ Whether this option is disabled.
 
 > `optional` **icon**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/filters/chip-filter.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/chip-filter.tsx#L14)
+Defined in: [packages/ui/src/crud/filters/chip-filter.tsx:20](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/chip-filter.tsx#L20)
 
-Optional leading icon (e.g. color dot).
+Replaces the chosen/unchosen mark with something else — a colour dot, a count.
+
+<p>Supplying one gives up the mark that says whether this chip is on, so only pass it where
+the chip's own colour already carries that.
 
 ***
 
@@ -42,7 +45,7 @@ Optional leading icon (e.g. color dot).
 
 > **label**: `string`
 
-Defined in: [packages/ui/src/crud/filters/chip-filter.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/chip-filter.tsx#L12)
+Defined in: [packages/ui/src/crud/filters/chip-filter.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/chip-filter.tsx#L13)
 
 Display label.
 
@@ -52,6 +55,6 @@ Display label.
 
 > **value**: `T`
 
-Defined in: [packages/ui/src/crud/filters/chip-filter.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/chip-filter.tsx#L10)
+Defined in: [packages/ui/src/crud/filters/chip-filter.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/chip-filter.tsx#L11)
 
 Value sent to the server filter.

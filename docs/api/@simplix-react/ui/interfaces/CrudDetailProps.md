@@ -6,7 +6,7 @@
 
 # Interface: CrudDetailProps
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:73](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L73)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:75](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L75)
 
 Props for the [CrudDetail](../variables/CrudDetail.md) compound component root.
 
@@ -32,7 +32,7 @@ Props for the [CrudDetail](../variables/CrudDetail.md) compound component root.
 
 > `optional` **auditData**: [`AuditData`](AuditData.md)
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:89](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L89)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:91](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L91)
 
 Audit metadata rendered as a fixed bar between the scrollable body and the footer.
 
@@ -42,7 +42,7 @@ Audit metadata rendered as a fixed bar between the scrollable body and the foote
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:99](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L99)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:101](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L101)
 
 ***
 
@@ -50,7 +50,7 @@ Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:99](https://github.com/
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:98](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L98)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:100](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L100)
 
 ***
 
@@ -58,7 +58,7 @@ Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:98](https://github.com/
 
 > `optional` **displayZone**: `string`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:96](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L96)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:98](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L98)
 
 IANA display timezone for the audit footer's timestamps. Falls back to the
 ambient `DisplayZoneProvider` zone (then the browser zone) when omitted —
@@ -71,7 +71,7 @@ the audit stamps agree with the rest of the panel.
 
 > `optional` **fieldVariant**: [`FieldVariant`](FieldVariant.md)
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:97](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L97)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:99](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L99)
 
 ***
 
@@ -79,7 +79,7 @@ Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:97](https://github.com/
 
 > `optional` **footer**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:81](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L81)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:83](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L83)
 
 Fixed footer rendered below the scrollable content (e.g. action buttons).
 
@@ -89,7 +89,7 @@ Fixed footer rendered below the scrollable content (e.g. action buttons).
 
 > `optional` **header**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:79](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L79)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:81](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L81)
 
 Content rendered at the left side of the header toolbar (e.g. breadcrumb, back button, label).
 
@@ -99,7 +99,7 @@ Content rendered at the left side of the header toolbar (e.g. breadcrumb, back b
 
 > `optional` **isLoading**: `boolean`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:75](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L75)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:77](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L77)
 
 Shows a semi-transparent overlay with a spinner on top of the detail content.
 
@@ -109,7 +109,7 @@ Shows a semi-transparent overlay with a spinner on top of the detail content.
 
 > `optional` **onClose**: () => `void`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:77](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L77)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:79](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L79)
 
 Renders a close button (panel-right-close icon) at the right side of the header toolbar.
 
@@ -123,7 +123,7 @@ Renders a close button (panel-right-close icon) at the right side of the header 
 
 > `optional` **variant**: [`CrudDetailVariant`](../type-aliases/CrudDetailVariant.md)
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:87](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L87)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:89](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L89)
 
 Layout variant.
 - `"default"` — compact padding for side panels (px-3).

@@ -1175,6 +1175,32 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 ***
 
+### fit?
+
+> `optional` **fit**: `boolean`
+
+Defined in: [packages/ui/src/primitives/grid.tsx:83](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/grid.tsx#L83)
+
+Never draw more columns than there are items, and spread what there are evenly over the rows.
+
+<p>A fixed column count is a maximum, not a promise: a four-column grid handed two items draws
+them at a quarter width each and leaves the other half of the row empty, which reads as two
+tiles that failed to load rather than as a set of two. With this set, two items make two
+columns, six items in a four-column grid make two rows of three rather than four and two, and
+seven make four and three — the row that cannot be filled is the only one left short.
+
+<p>Off by default, because a grid whose cells are positional (a form laid out two fields to a
+row) means its column count literally and must not reflow when a field is conditional. Set it
+on a grid whose children are peers — chips, tiles, cards.
+
+#### Default
+
+```ts
+false
+```
+
+***
+
 ### gap?
 
 > `optional` **gap**: `"none"` \| `"xs"` \| `"sm"` \| `"lg"` \| `"md"` \| `"xl"` \| `"px"` \| `null`
@@ -3690,7 +3716,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **template**: `string`
 
-Defined in: [packages/ui/src/primitives/grid.tsx:81](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/grid.tsx#L81)
+Defined in: [packages/ui/src/primitives/grid.tsx:97](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/grid.tsx#L97)
 
 Arbitrary `grid-template-columns` value applied as an inline style,
 covering cases the `columns` enum cannot express (e.g. `"repeat(auto-fill, minmax(12rem, 1fr))"`
