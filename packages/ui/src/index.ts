@@ -461,7 +461,9 @@ export type {
   CrudDetailAuditFooterProps,
   CrudDetailDefaultActionsProps,
   CrudDetailProps,
+  CrudDetailListProps,
   CrudDetailSectionProps,
+  CrudDetailTableProps,
   CrudDetailVariant,
 } from "./crud/detail";
 

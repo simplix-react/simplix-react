@@ -11,6 +11,7 @@ import type { SectionShellProps } from "../shared/section-shell";
 import { type FieldVariant, FieldVariantContext } from "../shared/types";
 import { DetailAuditFooter, type AuditData } from "./crud-detail-audit-footer";
 import { DetailPagedList } from "./crud-detail-list";
+import { DetailPagedTable } from "./crud-detail-table";
 
 // ── Detail Root ──
 //
@@ -440,7 +441,9 @@ function DetailActionFooter({ actions, ...rest }: CrudDetailActionFooterProps) {
  * └─────────────────────────────────────┘
  * ```
  *
- * Sub-components: Section, Actions, DefaultActions, ActionFooter, AuditFooter.
+ * Sub-components: Section, Actions, DefaultActions, ActionFooter, AuditFooter, List, Table.
+ * A sub-list inside the panel is `List` when its rows are a name and a value, and `Table` when
+ * the reader compares values down a column — anything with a header row is a `Table`.
  * Use `DefaultActions` for a single-row footer, `ActionFooter` for a two-tier footer
  * (a domain lifecycle-action row above the standard row).
  */
@@ -451,4 +454,5 @@ export const CrudDetail = Object.assign(DetailRoot, {
   ActionFooter: DetailActionFooter,
   AuditFooter: DetailAuditFooter,
   List: DetailPagedList,
+  Table: DetailPagedTable,
 });
