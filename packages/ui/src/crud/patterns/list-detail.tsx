@@ -190,14 +190,21 @@ export function ListDetailRoot({ variant: variantProp, activePanel: activePanelP
   // Both overlay shapes hang off the same root, modal, with Radix's own behaviour: the backdrop is
   // drawn, it takes the clicks, and pressing it closes the detail.
   //
-  // **The drawer was briefly non-modal so that pressing the next row swapped the record in one
-  // press instead of two.** That was given up deliberately rather than lost: asked to choose, the
+  // **The drawer was briefly non-modal so that pressing the next row swapped the record without
+  // closing anything.** That was given up deliberately rather than lost: asked to choose, the
   // product wanted the backdrop to block and to close, which is what every other sheet in the
-  // console does. Two presses to move between records is the price of that, and it is the price
-  // that was chosen. Anyone reversing this should know they are re-opening a decision, not fixing
-  // an oversight — three separate things had to be switched off to get the single press
-  // (`modal`, the overlay, and the dismissable layer's outside-press), and none of them was the
-  // whole answer on its own.
+  // console does.
+  //
+  // **The interaction that buys is 「close, then choose」 — not 「press the row twice」.** Those are
+  // different things and the difference is worth the sentence: the drawer covers the right of the
+  // list, so a press on a row's middle lands on the drawer and does nothing at all. What the
+  // reader actually does is press the part of the list still showing, which the backdrop takes as
+  // 「close」, and then pick the row. Written down as 「two presses」 the next reader takes it for a
+  // click that fails to register and goes looking for the bug.
+  //
+  // Anyone reversing this should know they are re-opening a decision, not fixing an oversight —
+  // three separate things had to be switched off to get the single press (`modal`, the overlay,
+  // and the dismissable layer's outside-press), and none of them was the whole answer alone.
   if (variant === "dialog" || variant === "drawer") {
     return (
       <ListDetailContext.Provider value={contextValue}>
@@ -380,7 +387,9 @@ const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }
     // **The drawer sits over the list and what is under it is covered — including, on a wide
     // monitor, a row's action column.** That is what a drawer is, and it is what this product
     // chose: the list is not narrowed to make room, so its right-hand columns are unreachable
-    // while the detail is open, and moving to another record means closing this one first.
+    // while the detail is open, and moving to another record is 「close, then choose」 rather than
+    // a press that swaps it. A covered action column is the shape working as chosen, not a defect
+    // to route around.
     //
     // Narrowing the list instead is the `panel` variant, which is the same detail in a column
     // beside it. Making the drawer narrow the list would not be a third option — it would make the
