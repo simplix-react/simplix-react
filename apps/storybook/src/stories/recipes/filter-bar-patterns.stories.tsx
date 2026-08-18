@@ -228,7 +228,6 @@ export const ChipFilterQuickSelect: StoryObj = {
         <CrudList.ChipFilter
           field="acknowledged.equals"
           state={state}
-          columns={2}
           options={[
             {
               value: "true",
