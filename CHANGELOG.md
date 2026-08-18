@@ -11,6 +11,10 @@ workflow stamps it with the released version and date, then opens a fresh
 
 ## [0.3.6] - Unreleased
 
+### Fixed
+
+- `useCrudPageState` accepts every `ListDetailVariant`, so a page that passes the variant it gave `ListDetail` compiles. `"drawer"` joined the variant type in 0.3.5 while the hook still named `"panel" | "dialog" | "page"` inline, and a consumer holding a `ListDetailVariant` could no longer call the hook at all — the two unions now share one source. The hook reads the variant only to decide whether the detail offers a close affordance, which `"drawer"` takes like a panel
+
 ## [0.3.5] - 2026-08-18
 
 ## [0.3.4] - 2026-08-10

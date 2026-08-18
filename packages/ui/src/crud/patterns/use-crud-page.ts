@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 
 import type { CrudSearch, CrudView } from "./crud-search";
+import type { ListDetailVariant } from "./list-detail";
 import type { UseFadeTransitionResult } from "./use-fade-transition";
 import type { UseListDetailStateResult } from "./use-list-detail-state";
 
@@ -61,7 +62,7 @@ export interface UseCrudPageStateResult {
  * ```
  */
 export function useCrudPageState(
-  variant: "panel" | "dialog" | "page",
+  variant: ListDetailVariant | "page",
   nav: UseCrudNavigationResult,
 ): UseCrudPageStateResult {
   const { view, selectedId, showList, showDetail, showNew, showEdit } = nav;
