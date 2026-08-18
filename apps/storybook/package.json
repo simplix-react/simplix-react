@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react/storybook",
-  "version": "0.3.5-SNAPSHOT",
+  "version": "0.3.5",
   "private": true,
   "type": "module",
   "scripts": {
