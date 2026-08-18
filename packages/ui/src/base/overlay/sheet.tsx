@@ -47,20 +47,57 @@ export type SheetContentProps = ComponentPropsWithRef<
    * <p>Leave it on for a sheet that is genuinely an interruption — a form the reader must finish
    * or abandon before anything else means anything.
    */
-  showOverlay?: boolean;
+  /**
+   * The dimmed layer behind the panel. @defaultValue `"modal"`
+   *
+   * <p><b>Being drawn and taking clicks are two decisions</b>, and the three values are the three
+   * useful answers:
+   *
+   * <ul>
+   *   <li>`"modal"` — Radix's own overlay: drawn, and it swallows every click. For a sheet that is
+   *       genuinely an interruption, which the reader must finish or abandon.
+   *   <li>`"inert"` — drawn and `pointer-events-none`. The dim says 「something opened over this」
+   *       while every press goes on reaching the page underneath, so a reader can pick the next row
+   *       without closing anything first. **Pair it with `modal={false}` on the `Sheet` root** —
+   *       and it must be this rather than Radix's overlay with a class on it, because
+   *       `DialogPrimitive.Overlay` renders nothing at all when the root is non-modal.
+   *   <li>`"none"` — nothing behind it.
+   * </ul>
+   */
+  overlay?: "modal" | "inert" | "none";
 };
 
 export const SheetContent = forwardRef<HTMLDivElement, SheetContentProps>(
   (
-    { className, children, side = "right", showCloseButton = true, showOverlay = true, ...rest },
+    {
+      className,
+      children,
+      side = "right",
+      showCloseButton = true,
+      overlay = "modal",
+      ...rest
+    },
     ref,
   ) => (
     <DialogPrimitive.Portal>
-      {showOverlay && <SheetOverlay />}
+      {overlay === "modal" && <SheetOverlay />}
+      {overlay === "inert" && (
+        // A plain element rather than Radix's overlay, which returns null under a non-modal root —
+        // so the sheet that most wants to be seen arriving is the one that could not draw itself.
+        <div
+          aria-hidden
+          className="pointer-events-none fixed inset-0 z-50 bg-black/50 data-[state=open]:animate-in data-[state=open]:fade-in-0"
+        />
+      )}
       <DialogPrimitive.Content
         ref={ref}
         className={cn(
-          "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 flex flex-col gap-4 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
+          // `outline-none` on the container, and only on the container. Radix moves focus here when
+          // the sheet opens, so the browser paints its focus ring around the whole panel — of which
+          // only the edge nearest the page is on screen, which reads as a stray coloured line down
+          // the side of the sheet rather than as focus. Nothing is lost by removing it: this element
+          // is a region, not a control, and the first control inside still rings normally.
+          "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 flex flex-col gap-4 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 focus:outline-none",
           side === "right" &&
             "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm",
           side === "left" &&

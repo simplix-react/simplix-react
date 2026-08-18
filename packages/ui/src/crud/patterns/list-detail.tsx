@@ -123,7 +123,33 @@ export type ListDetailProps = ListDetailBaseProps & (
  * opened. Exported so an application states the same width wherever it needs the number
  * outside this component rather than repeating a literal.
  */
-export const DETAIL_PANEL_WIDTH = 600;
+/**
+ * How much room the detail gets when the framework is the one deciding, in px.
+ *
+ * <p><b>One number, because three were three different screens.</b> The panel column, the drawer
+ * and the dialog were 600, 576 and 672, so an installation switching between them changed how much
+ * content fits — a footer that cleared in one clipped in another, and an audit reading the narrow
+ * one reported a screen defect that was really a setting.
+ *
+ * <p><b>768 because the widest of the three was 672 and still too narrow.</b> The organization
+ * detail's action row — four buttons, in English, at a 1280 viewport — pushed its last button
+ * 141px past the edge. At 768 that row ends 24px inside it.
+ *
+ * <p><b>A screen that pins `listWidth` does not use this in panel mode</b>, and today every screen
+ * in this console does: the list takes the width it asked for and the detail column takes whatever
+ * remains, which is wider than 768 on a large monitor and narrower on a small one. So this unifies
+ * the two presentations that float over the list and sets the default for the panel; making the
+ * third agree as well would mean overriding a number each screen chose for its own list, which is
+ * a different decision from this one.
+ */
+export const DETAIL_PANEL_WIDTH = 768;
+
+// The two presentations that float over the list carry it as an inline `maxWidth` rather than a
+// Tailwind cap. A class assembled from the constant (`sm:${DETAIL_MAX_WIDTH}`) is invisible to
+// Tailwind, which reads source text and never sees the composed string — the class is simply never
+// generated and the sheet silently falls back to the sheet default, narrower than any of the three
+// were before. The inline style also keeps one number rather than a px constant and a Tailwind
+// class that have to be edited in step.
 
 /** Minimum width (px) for both list and detail panels during drag. */
 const MIN_PANEL_WIDTH = 280;
@@ -167,12 +193,16 @@ export function ListDetailRoot({ variant: variantProp, activePanel: activePanelP
     return (
       <ListDetailContext.Provider value={contextValue}>
         <DialogPrimitive.Root
-          // The drawer is not modal, and that is what makes it the same screen as the panel rather
-          // than a different one. Modal, the list behind it is dimmed and swallows clicks, so a
-          // reader looking straight at the row they want next has to close the drawer first and
-          // press again — two presses for what is one press in a column. Non-modal, the row swaps
-          // the drawer's contents exactly as it swaps the panel's. It also stops Radix trapping
-          // focus and locking the page's scroll, neither of which a working surface wants.
+          // The drawer is not modal, which is what stops Radix trapping focus and locking the
+          // page's scroll — neither of which a surface somebody works beside should do.
+          //
+          // **Being dimmed and swallowing clicks are two decisions, and the drawer takes only the
+          // first.** The backdrop is still drawn (`overlayClassName="pointer-events-none"` on the
+          // content) so the drawer visibly arrives over the list; what it does not do is eat the
+          // press. Nor is `modal={false}` enough on its own to keep that press — the content is a
+          // dismissable layer and closes itself on an outside pointer-down, which spends it. That
+          // is prevented separately, below. All three are needed, and each was found by the
+          // reader still having to press twice after the previous one.
           modal={variant !== "drawer"}
           open={activePanel === "detail"}
           onOpenChange={(open) => {
@@ -354,9 +384,11 @@ const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }
         ref={ref as React.Ref<HTMLDivElement>}
         side="right"
         aria-describedby={undefined}
-        // No dimmed sheet behind it — see `modal` on the root. Without this the overlay goes on
-        // swallowing the clicks even with the root non-modal.
-        showOverlay={false}
+        // Seen but not felt. The dim is drawn so the drawer visibly arrives over the list rather
+        // than floating with nothing behind it, and `pointer-events-none` is what keeps every
+        // click reaching the list underneath — being drawn and taking clicks are two decisions,
+        // and the drawer wants the first without the second.
+        overlay="inert"
         // And the drawer does not dismiss itself when the reader presses the list. Non-modal is
         // only half of it: Radix still closes on a pointer-down outside the content, so a press on
         // the next row was spent closing the drawer and the row had to be pressed again. A panel
@@ -370,9 +402,11 @@ const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }
         // reader there are two ways out of the same thing.
         showCloseButton={false}
         className={cn(
-          // Wider than the sheet's default `sm:max-w-sm`, which is sized for a settings pane. This
-          // holds what the panel column holds, so it is sized off the same measure.
-          "gap-0 py-4 sm:max-w-xl",
+          // The sheet's own `sm:max-w-sm` is sized for a settings pane and made the drawer the
+          // narrowest of the three presentations — the one the reader was most likely looking at
+          // fitted the least. The inline `maxWidth` below replaces it; an inline style outranks any
+          // class, so nothing has to be unset here.
+          "gap-0 py-4",
           // The same slot padding the dialog variant pushes down, for the same reason: the header
           // and footer rules have to span the full width rather than stopping inside a gutter.
           "[&_[data-crud-slot=header]]:px-6",
@@ -380,6 +414,9 @@ const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }
           "[&_[data-crud-slot=footer]]:px-0 [&_[data-crud-slot=footer]>*]:px-6",
           className,
         )}
+        // `w-3/4` from the sheet still governs below the `sm` breakpoint, where three quarters of
+        // a phone is the right answer and 768 is not; this caps it everywhere above.
+        style={{ maxWidth: DETAIL_PANEL_WIDTH }}
       >
         <DialogPrimitive.Title className="sr-only">Detail</DialogPrimitive.Title>
         {children}
@@ -402,7 +439,7 @@ const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }
           aria-describedby={undefined}
           className={cn(
             "fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2",
-            "w-full max-w-2xl",
+            "w-full",
             !dialogHeight && "max-h-[85vh]",
             "flex flex-col overflow-hidden",
             "rounded-lg border bg-background py-4 shadow-lg",
@@ -416,7 +453,7 @@ const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }
             "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
             className,
           )}
-          style={dialogHeight ? { height: dialogHeight } : undefined}
+          style={{ maxWidth: DETAIL_PANEL_WIDTH, ...(dialogHeight ? { height: dialogHeight } : {}) }}
         >
           <DialogPrimitive.Title className="sr-only">Detail</DialogPrimitive.Title>
           {children}
