@@ -237,8 +237,10 @@ describe("TabsContent", () => {
       </Tabs>,
     );
     const content = screen.getByRole("tabpanel");
-    expect(content.className).toContain("pt-4");
-    expect(content.className).toContain("pb-8");
+    // `py-4`, not the `pt-4 pb-8` this asserted before. A panel's top and bottom insets were once
+    // set apart to keep the last row off the scroll container's edge; they are the same step now,
+    // and the extra space under a panel comes from whatever the panel holds.
+    expect(content.className).toContain("py-4");
   });
 
   it("does not apply padded class by default", () => {
@@ -251,7 +253,7 @@ describe("TabsContent", () => {
       </Tabs>,
     );
     const content = screen.getByRole("tabpanel");
-    expect(content.className).not.toContain("pt-4");
+    expect(content.className).not.toContain("py-4");
   });
 
   it("merges custom className", () => {

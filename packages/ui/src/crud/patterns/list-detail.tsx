@@ -377,6 +377,16 @@ const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }
   const { variant, activePanel, dialogHeight } = useListDetail();
 
   if (variant === "drawer") {
+    // **The drawer sits over the list and what is under it is covered — including, on a wide
+    // monitor, a row's action column.** That is what a drawer is, and it is what this product
+    // chose: the list is not narrowed to make room, so its right-hand columns are unreachable
+    // while the detail is open, and moving to another record means closing this one first.
+    //
+    // Narrowing the list instead is the `panel` variant, which is the same detail in a column
+    // beside it. Making the drawer narrow the list would not be a third option — it would make the
+    // two presentations the same thing with an animation between them, which is the reason there
+    // are two of them at all. Anyone reading a covered action column as a defect should read this
+    // first: it is the shape, chosen with that cost known.
     return (
       <SheetContent
         ref={ref as React.Ref<HTMLDivElement>}

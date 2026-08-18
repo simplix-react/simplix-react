@@ -55,34 +55,48 @@ export function StatCard({
   return (
     <div
       className={cn(
-        // Same padding as Card's md step — a figure tile is a card and must not sit taller than
-        // the cards beside it just because it draws its own box.
-        "rounded-lg border px-6 py-4 text-card-foreground shadow-sm",
+        // Card's `sm` step, not its `md`. A figure tile is a card and must not sit taller than the
+        // cards beside it; four of them across the top of a list screen is the first thing between
+        // the header and the rows, and every row of padding there is a row of the list pushed off
+        // the fold. The sides keep the full step — that is the gutter between the border and the
+        // first character, and narrowing it makes the text look pressed against the edge.
+        "rounded-lg border px-4 py-3 text-card-foreground shadow-sm",
         highlighted && tone ? tones[tone].surface : "bg-card",
         className,
       )}
     >
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1.5">
-          <p className="text-sm font-medium text-muted-foreground">{title}</p>
+      {/* Two lines, not three. The label and the figure are one thought — 「조직: 39개」 — and
+          stacking them spends a line on saying so; the basis underneath is the only thing that
+          needs its own. Baseline-aligned so the four tiles read as one row of numbers rather than
+          four boxes, and the figure sits at the end where the eye scanning a column of them
+          expects it. */}
+      <div className="flex items-baseline justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-1.5">
+          <p className="truncate text-sm font-medium text-muted-foreground">{title}</p>
           {headerExtra}
+          {icon && <span className="shrink-0 text-muted-foreground">{icon}</span>}
         </div>
-        {icon && <div className="text-muted-foreground">{icon}</div>}
+        <p className="shrink-0 text-2xl font-bold leading-none">{value}</p>
       </div>
-      <div className="mt-2">
-        <p className="text-2xl font-bold">{value}</p>
-        {trend && (
-          <p
-            className={cn(
-              "mt-1 text-xs font-medium",
-              trend.value >= 0 ? tones.success.icon : tones.danger.icon,
-            )}
-          >
-            {trend.value >= 0 ? "+" : ""}{trend.value}%{trend.label ? ` ${trend.label}` : ""}
-          </p>
-        )}
-        {description && <p className="mt-1 text-xs text-muted-foreground">{description}</p>}
-      </div>
+      {(description || trend) && (
+        <div className="mt-1.5 flex items-baseline justify-between gap-3">
+          {description ? (
+            <p className="min-w-0 text-xs text-muted-foreground">{description}</p>
+          ) : (
+            <span />
+          )}
+          {trend && (
+            <p
+              className={cn(
+                "shrink-0 text-xs font-medium",
+                trend.value >= 0 ? tones.success.icon : tones.danger.icon,
+              )}
+            >
+              {trend.value >= 0 ? "+" : ""}{trend.value}%{trend.label ? ` ${trend.label}` : ""}
+            </p>
+          )}
+        </div>
+      )}
       {children}
     </div>
   );
