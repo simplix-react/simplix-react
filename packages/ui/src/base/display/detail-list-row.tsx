@@ -93,6 +93,16 @@ DetailListRow.displayName = "DetailListRow";
 export interface DetailListProps {
   /** {@link DetailListRow} elements composing the bordered group. */
   children: ReactNode;
+  /**
+   * Docked under the last row, inside the same border and above the clip.
+   *
+   * <p>For whatever the group owes below its rows — a pager, a total, a 「show all」 link.
+   * Rendered only when supplied, and separated by its own top border so it reads as the group's
+   * footer rather than as one more row. `CrudDetail.List` fills it with the list's own pager,
+   * which is what a sub-list inside a detail panel should carry: the alternative each screen
+   * reaches for otherwise is a caption saying 「and N more」, and six screens produce six of them.
+   */
+  footer?: ReactNode;
   /** Additional classes merged onto the container root. */
   className?: string;
 }
@@ -111,13 +121,14 @@ export interface DetailListProps {
  * ```
  */
 export const DetailList = forwardRef<HTMLDivElement, DetailListProps>(
-  ({ children, className }, ref) => (
+  ({ children, footer, className }, ref) => (
     <Stack
       ref={ref}
       gap="none"
       className={cn("overflow-hidden rounded-lg border", className)}
     >
       {children}
+      {footer != null && <div className="border-t">{footer}</div>}
     </Stack>
   ),
 );

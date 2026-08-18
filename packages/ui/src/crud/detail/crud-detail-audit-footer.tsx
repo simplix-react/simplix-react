@@ -19,6 +19,19 @@ import { CalendarIcon, CheckIcon, IdCardIcon, PencilIcon } from "../shared/icons
 /** Audit metadata passed to {@link DetailAuditFooter}. */
 export interface AuditData {
   id?: string;
+  /**
+   * What a person calls this record — `ORG-014`, `usr_0031`, a rank's code.
+   *
+   * <p><b>Shown instead of the identifier when it is given.</b> A UUID's last twelve characters
+   * (`3cef61f63b81`) are what the footer falls back to, and they are not an answer to any question
+   * a reader has: they cannot be read aloud, matched against a printed list, or searched for in
+   * another system. Most records already carry a code the operator knows — the DTO usually has it
+   * — and passing it turns the footer's one identifying line into something the reader recognises.
+   *
+   * <p>The identifier is still there: the tooltip shows it in full, so a developer reading over a
+   * shoulder can take it.
+   */
+  code?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -57,14 +70,18 @@ export function DetailAuditFooter({ auditData, displayZone }: CrudDetailAuditFoo
   const zone = displayZone ?? defaultZone;
   const [copied, setCopied] = useState(false);
 
+  // What the button shows is what it copies. Showing `ORG-014` and putting a UUID on the clipboard
+  // is the kind of surprise nobody checks for until it has been pasted into a ticket.
+  const shown = auditData?.code || (auditData?.id ? formatDisplayId(auditData.id) : "");
+
   const handleCopyId = useCallback(async () => {
-    if (!auditData?.id) return;
-    await navigator.clipboard.writeText(auditData.id);
+    if (!shown) return;
+    await navigator.clipboard.writeText(shown);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  }, [auditData?.id]);
+  }, [shown]);
 
-  const hasId = auditData?.id != null && auditData.id !== "";
+  const hasId = shown !== "";
   const hasCreated = auditData?.createdAt != null && auditData.createdAt !== "";
   const hasUpdated = auditData?.updatedAt != null && auditData.updatedAt !== "";
 
@@ -83,7 +100,7 @@ export function DetailAuditFooter({ auditData, displayZone }: CrudDetailAuditFoo
                 className="flex items-center gap-1.5 font-mono text-left hover:text-foreground transition-colors"
               >
                 <IdCardIcon className="h-3.5 w-3.5 shrink-0" />
-                <span className="truncate">{formatDisplayId(auditData!.id!)}</span>
+                <span className="truncate">{shown}</span>
                 {copied && <CheckIcon className="h-3 w-3 shrink-0 text-green-600" />}
               </button>
             </TooltipPrimitive.Trigger>
@@ -94,7 +111,12 @@ export function DetailAuditFooter({ auditData, displayZone }: CrudDetailAuditFoo
                 sideOffset={4}
                 className="z-50 rounded-md border bg-popover px-3 py-1.5 text-popover-foreground shadow-sm animate-in fade-in-0 zoom-in-95"
               >
-                <p className="font-mono text-[11px]">{auditData!.id}</p>
+                <p className="font-mono text-[11px]">{shown}</p>
+                {/* The identifier stays reachable even when a code is what the row shows: the
+                    reader recognises the code, and whoever has to query the database needs this. */}
+                {auditData?.code && auditData?.id && (
+                  <p className="font-mono text-[11px] text-muted-foreground">{auditData.id}</p>
+                )}
                 <p className="text-muted-foreground text-[11px]">
                   {copied ? t("audit.copied") : t("audit.clickToCopy")}
                 </p>

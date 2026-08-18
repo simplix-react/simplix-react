@@ -10,6 +10,7 @@ import { ArrowLeftIcon, XIcon, TrashIcon } from "../shared/icons";
 import type { SectionShellProps } from "../shared/section-shell";
 import { type FieldVariant, FieldVariantContext } from "../shared/types";
 import { DetailAuditFooter, type AuditData } from "./crud-detail-audit-footer";
+import { DetailPagedList } from "./crud-detail-list";
 
 // ── Detail Root ──
 //
@@ -449,4 +450,5 @@ export const CrudDetail = Object.assign(DetailRoot, {
   DefaultActions: DetailDefaultActions,
   ActionFooter: DetailActionFooter,
   AuditFooter: DetailAuditFooter,
+  List: DetailPagedList,
 });

@@ -8,6 +8,7 @@ export type {
   CrudDetailVariant,
 } from "./crud-detail";
 export type { AuditData, CrudDetailAuditFooterProps } from "./crud-detail-audit-footer";
+export type { CrudDetailListProps } from "./crud-detail-list";
 export { DetailProfile } from "./detail-profile";
 export type {
   DetailProfileFeatsProps,
