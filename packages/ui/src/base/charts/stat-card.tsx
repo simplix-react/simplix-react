@@ -86,13 +86,11 @@ export function StatCard({
       </div>
       <div className="mt-1 flex items-end justify-between gap-3">
         <p className="min-w-0 truncate text-2xl font-bold leading-none">{value}</p>
-        {/* Held whether or not anything plots yet: a figure allowed to run to the card's right edge
-            leaves a plot nowhere to go, and the tile that later gets one would have to be laid out
-            differently from the tiles beside it. 84px is the width the board draws a sparkline at,
-            so a plot moved from a frame into a tile arrives at the size it was drawn. */}
-        <div className="w-[84px] shrink-0" aria-hidden={chart ? undefined : true}>
-          {chart}
-        </div>
+        {/* 84px is the width the wireframe board draws a sparkline at, so a plot moved from a frame
+            into a tile arrives at the size it was drawn. Nothing is rendered where there is no plot
+            — the figure is left-aligned either way, so an empty box would reserve a column that
+            already looks reserved, on the 94% of tiles that carry no plot at all. */}
+        {chart && <div className="w-[84px] shrink-0">{chart}</div>}
       </div>
       {(description || trend) && (
         <div className="mt-1.5 flex items-baseline justify-between gap-3">
