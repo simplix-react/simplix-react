@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react-ext/simplix-boot-stream",
-  "version": "0.3.7-SNAPSHOT",
+  "version": "0.3.7",
   "description": "SimpliX Boot SSE streaming infrastructure with EventSource management, subscriptions, and staleness detection",
   "type": "module",
   "sideEffects": false,

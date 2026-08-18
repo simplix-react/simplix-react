@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react/i18n",
-  "version": "0.3.7-SNAPSHOT",
+  "version": "0.3.7",
   "description": "Internationalization framework with i18next adapter",
   "type": "module",
   "sideEffects": false,
