@@ -277,6 +277,12 @@ describe("NumberField", () => {
     expect(wrapper.style.width).toBe("calc(8ch + 2.75rem)");
   });
 
+  it("reads a floor of zero as no measure at all, not as one digit", () => {
+    render(<NumberField label="Minimum length" value={8} onChange={vi.fn()} min={0} />);
+    const wrapper = screen.getByRole("spinbutton").parentElement as HTMLElement;
+    expect(wrapper.style.width).toBe("calc(8ch + 2.75rem)");
+  });
+
   it("lets a caller state the measure the bounds cannot imply", () => {
     render(<NumberField label="Year" value={2026} onChange={vi.fn()} digits={4} />);
     const wrapper = screen.getByRole("spinbutton").parentElement as HTMLElement;

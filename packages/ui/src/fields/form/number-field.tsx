@@ -43,10 +43,12 @@ const UNBOUNDED_DIGITS = 8;
  */
 function measureDigits(min?: number, max?: number, step?: number): number {
   const whole = (value: number) => String(Math.floor(Math.abs(value))).length;
-  const bounded = min !== undefined || max !== undefined;
-  const integers = bounded
-    ? Math.max(min === undefined ? 1 : whole(min), max === undefined ? 1 : whole(max))
-    : UNBOUNDED_DIGITS;
+  // Only the UPPER bound says how long the value can read. `min={0}` is the commonest bound in a
+  // form and says nothing at all about the length — read as one digit it draws a box too narrow
+  // for the two-digit value the field exists to take.
+  const integers = max === undefined
+    ? UNBOUNDED_DIGITS
+    : Math.max(whole(max), min === undefined ? 1 : whole(min));
   // A negative bound spends a character on the sign, and it is only ever the lower one.
   const sign = min !== undefined && min < 0 ? 1 : 0;
   // The decimal places come from the step: a field stepping by 0.25 accepts two of them, and the
