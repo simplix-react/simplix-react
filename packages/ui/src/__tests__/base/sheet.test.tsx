@@ -1,7 +1,18 @@
 // @vitest-environment jsdom
 import { createRef } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+// The close label resolves through the ui catalogue; with the hook mocked to echo its key, an
+// assertion on "common.close" proves the label came from the catalogue and is not a hardcoded
+// English string.
+vi.mock("@simplix-react/i18n/react", () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+    locale: "en",
+    exists: () => true,
+  }),
+}));
 
 import {
   Sheet,
@@ -43,7 +54,7 @@ describe("Sheet", () => {
     expect(screen.getByText("Visible")).toBeDefined();
   });
 
-  it("shows close button by default", () => {
+  it("shows close button by default, named from the catalogue", () => {
     render(
       <Sheet defaultOpen>
         <SheetContent>
@@ -51,7 +62,7 @@ describe("Sheet", () => {
         </SheetContent>
       </Sheet>,
     );
-    expect(screen.getByText("Close")).toBeDefined();
+    expect(screen.getByRole("button", { name: "common.close" })).toBeDefined();
   });
 
   it("hides close button when showCloseButton=false", () => {
@@ -62,7 +73,7 @@ describe("Sheet", () => {
         </SheetContent>
       </Sheet>,
     );
-    expect(screen.queryByText("Close")).toBeNull();
+    expect(screen.queryByRole("button", { name: "common.close" })).toBeNull();
   });
 });
 

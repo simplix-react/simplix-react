@@ -1,7 +1,18 @@
 // @vitest-environment jsdom
 import { createRef } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+// The close and maximize labels resolve through the ui catalogue; with the hook mocked to echo
+// its key, an assertion on "common.close" proves the label came from the catalogue and is not a
+// hardcoded English string.
+vi.mock("@simplix-react/i18n/react", () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+    locale: "en",
+    exists: () => true,
+  }),
+}));
 
 import {
   Dialog,
@@ -43,7 +54,7 @@ describe("Dialog", () => {
     expect(screen.getByText("Visible")).toBeDefined();
   });
 
-  it("shows close button by default", () => {
+  it("shows close button by default, named from the catalogue", () => {
     render(
       <Dialog defaultOpen>
         <DialogContent>
@@ -52,7 +63,7 @@ describe("Dialog", () => {
         </DialogContent>
       </Dialog>,
     );
-    expect(screen.getByText("Close")).toBeDefined();
+    expect(screen.getByRole("button", { name: "common.close" })).toBeDefined();
   });
 
   it("hides close button when showCloseButton=false", () => {
@@ -64,7 +75,21 @@ describe("Dialog", () => {
         </DialogContent>
       </Dialog>,
     );
-    expect(screen.queryByText("Close")).toBeNull();
+    expect(screen.queryByRole("button", { name: "common.close" })).toBeNull();
+  });
+});
+
+describe("DialogContent maximize toggle", () => {
+  it("names the toggle from the catalogue and swaps the name once maximized", () => {
+    render(
+      <Dialog defaultOpen>
+        <DialogContent maximizable>
+          <DialogTitle>T</DialogTitle>
+        </DialogContent>
+      </Dialog>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "common.maximize" }));
+    expect(screen.getByRole("button", { name: "common.restore" })).toBeDefined();
   });
 });
 

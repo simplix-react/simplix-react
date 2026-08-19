@@ -294,13 +294,13 @@ export interface CrudDetailDefaultActionsProps {
   onEdit?: () => void;
   /** When true, disables Edit and Delete action buttons. */
   isPending?: boolean;
-  /** Label for the close button (defaults to `"Close"`). */
+  /** Overrides the close button label (defaults to the translated `common.close`). */
   closeLabel?: string;
-  /** Label for the back button (defaults to `"Back"`). */
+  /** Overrides the back button label (defaults to the translated `common.back`). */
   backLabel?: string;
-  /** Label for the edit button (defaults to `"Edit"`). */
+  /** Overrides the edit button label (defaults to the translated `common.edit`). */
   editLabel?: string;
-  /** Label for the delete button (defaults to `"Delete"`). */
+  /** Overrides the delete button label (defaults to the translated `common.delete`). */
   deleteLabel?: string;
   className?: string;
   /** Extra action buttons rendered in the right-side group, before Edit. */

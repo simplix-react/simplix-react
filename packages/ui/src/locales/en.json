@@ -30,7 +30,12 @@
     "select": "Select",
     "duplicate": "Duplicate",
     "increase": "Increase",
-    "decrease": "Decrease"
+    "decrease": "Decrease",
+    "maximize": "Maximize",
+    "restore": "Restore",
+    "detail": "Detail",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
   },
   "list": {
     "searchPlaceholder": "Search...",

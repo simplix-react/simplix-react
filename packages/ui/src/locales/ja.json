@@ -30,7 +30,12 @@
     "select": "選択",
     "duplicate": "複製",
     "increase": "増やす",
-    "decrease": "減らす"
+    "decrease": "減らす",
+    "maximize": "最大化",
+    "restore": "元のサイズに戻す",
+    "detail": "詳細",
+    "showPassword": "パスワードを表示",
+    "hidePassword": "パスワードを非表示"
   },
   "list": {
     "searchPlaceholder": "検索...",

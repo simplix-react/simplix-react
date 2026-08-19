@@ -2,6 +2,19 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+// The password toggle's accessible name resolves through the ui catalogue; with the hook stubbed to
+// echo its key, an assertion on "common.showPassword" proves the name came from the catalogue and
+// is not a hardcoded English string. Partial, because ColorField in this same file reads
+// `useLocale` from the module.
+vi.mock(import("@simplix-react/i18n/react"), async (importOriginal) => ({
+  ...(await importOriginal()),
+  useTranslation: () => ({
+    t: (key: string) => key,
+    locale: "en" as const,
+    exists: () => true,
+  }),
+}));
+
 import { TextField } from "../../fields/form/text-field";
 
 afterEach(cleanup);
@@ -320,13 +333,13 @@ describe("PasswordField", () => {
     render(
       <PasswordField label="Password" value="secret" onChange={vi.fn()} />,
     );
-    const toggleBtn = screen.getByLabelText("Show password");
+    const toggleBtn = screen.getByLabelText("common.showPassword");
     fireEvent.click(toggleBtn);
 
     const input = screen.getByTestId("form-field-password").querySelector("input");
     expect(input?.getAttribute("type")).toBe("text");
 
-    const hideBtn = screen.getByLabelText("Hide password");
+    const hideBtn = screen.getByLabelText("common.hidePassword");
     fireEvent.click(hideBtn);
     expect(input?.getAttribute("type")).toBe("password");
   });

@@ -10,6 +10,8 @@ import {
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 
+import { useTranslation } from "@simplix-react/i18n/react";
+
 import { SheetContent } from "../../base/overlay/sheet";
 import { useUIDefaults } from "../../provider/ui-defaults-context";
 import { cn } from "../../utils/cn";
@@ -382,6 +384,7 @@ ListPanel.displayName = "ListDetail.List";
 
 const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }, ref) => {
   const { variant, activePanel, dialogHeight } = useListDetail();
+  const { t } = useTranslation("simplix/ui");
 
   if (variant === "drawer") {
     // **The drawer sits over the list and what is under it is covered — including, on a wide
@@ -422,7 +425,7 @@ const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }
         // a phone is the right answer and 768 is not; this caps it everywhere above.
         style={{ maxWidth: DETAIL_PANEL_WIDTH }}
       >
-        <DialogPrimitive.Title className="sr-only">Detail</DialogPrimitive.Title>
+        <DialogPrimitive.Title className="sr-only">{t("common.detail")}</DialogPrimitive.Title>
         {children}
       </SheetContent>
     );
@@ -459,7 +462,7 @@ const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }
           )}
           style={{ maxWidth: DETAIL_PANEL_WIDTH, ...(dialogHeight ? { height: dialogHeight } : {}) }}
         >
-          <DialogPrimitive.Title className="sr-only">Detail</DialogPrimitive.Title>
+          <DialogPrimitive.Title className="sr-only">{t("common.detail")}</DialogPrimitive.Title>
           {children}
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
