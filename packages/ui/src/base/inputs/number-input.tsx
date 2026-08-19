@@ -8,6 +8,15 @@ export interface NumberInputProps extends Omit<ComponentPropsWithRef<"input">, "
   onChange?: (value: number) => void;
   /** Unit suffix displayed between the number and the spinner (e.g. "sec", "px", "kg"). */
   suffix?: string;
+  /**
+   * How many characters the longest value takes, which is what decides the control's width.
+   *
+   * <p>Left out, the control fills the width it is given — right for a cell it has to fill, wrong
+   * for a form, where a box the width of a sentence asks for a sentence. {@link NumberField}
+   * works this out from the bounds it was given and passes it, so a form field carries the
+   * measure without every screen stating one.
+   */
+  digits?: number;
 }
 
 /**
@@ -19,7 +28,7 @@ export interface NumberInputProps extends Omit<ComponentPropsWithRef<"input">, "
  * time picker uses. Keyboard stepping (ArrowUp/ArrowDown) still works.
  */
 export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
-  ({ className, min, max, step, onChange, disabled, suffix, ...rest }, ref) => {
+  ({ className, min, max, step, onChange, disabled, suffix, digits, ...rest }, ref) => {
     const innerRef = useRef<HTMLInputElement | null>(null);
     const { t } = useTranslation("simplix/ui");
 
@@ -43,10 +52,20 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
       onChange?.(next);
     };
 
+    // The chrome around the digits: the input's own side padding, the spinner column with its
+    // divider, and the suffix when there is one. Held in `ch` and `rem` rather than a Tailwind
+    // class because the count is only known at render — a class name assembled from a number
+    // reaches no stylesheet.
+    const width = digits === undefined
+      ? undefined
+      : `calc(${digits + (suffix?.length ?? 0)}ch + 2.75rem)`;
+
     return (
       <div
+        style={width ? { width } : undefined}
         className={cn(
-          "flex h-8 w-full items-stretch overflow-hidden rounded-md border border-input bg-background text-sm",
+          "flex h-8 items-stretch overflow-hidden rounded-md border border-input bg-background text-sm",
+          width === undefined && "w-full",
           "focus-within:border-foreground has-[[aria-invalid=true]]:border-destructive",
           disabled && "cursor-not-allowed opacity-50",
           className,

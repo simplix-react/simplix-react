@@ -504,6 +504,7 @@ export {
   AdvancedSelectFilter,
   ToggleFilter,
   ChipFilter,
+  chipFilterValues,
   FilterActions,
   FilterBar,
 } from "./crud/filters";

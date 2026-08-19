@@ -258,6 +258,31 @@ describe("TextareaField", () => {
 // ── NumberField ──
 
 describe("NumberField", () => {
+  it("takes its width from the bounds it was given", () => {
+    render(<NumberField label="Age" value={25} onChange={vi.fn()} min={0} max={150} />);
+    const wrapper = screen.getByRole("spinbutton").parentElement as HTMLElement;
+    expect(wrapper.style.width).toBe("calc(3ch + 2.75rem)");
+  });
+
+  it("counts the sign and the decimals the step declares", () => {
+    render(<NumberField label="Offset" value={0} onChange={vi.fn()} min={-12} max={14} step={0.25} />);
+    const wrapper = screen.getByRole("spinbutton").parentElement as HTMLElement;
+    // two integer digits, one for the sign, three for ".25"
+    expect(wrapper.style.width).toBe("calc(6ch + 2.75rem)");
+  });
+
+  it("falls back to a form-sized measure when nothing bounds it", () => {
+    render(<NumberField label="Count" value={null} onChange={vi.fn()} />);
+    const wrapper = screen.getByRole("spinbutton").parentElement as HTMLElement;
+    expect(wrapper.style.width).toBe("calc(8ch + 2.75rem)");
+  });
+
+  it("lets a caller state the measure the bounds cannot imply", () => {
+    render(<NumberField label="Year" value={2026} onChange={vi.fn()} digits={4} />);
+    const wrapper = screen.getByRole("spinbutton").parentElement as HTMLElement;
+    expect(wrapper.style.width).toBe("calc(4ch + 2.75rem)");
+  });
+
   it("renders with label and value", () => {
     render(<NumberField label="Age" value={25} onChange={vi.fn()} />);
     expect(screen.getByText("Age")).toBeDefined();

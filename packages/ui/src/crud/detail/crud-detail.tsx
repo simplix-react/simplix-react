@@ -120,7 +120,11 @@ function DetailRoot({ isLoading, onClose, header, footer, variant = "default", a
           {onClose && (
             // Icon-only: without this the button has no accessible name at all, and a screen
             // reader announces the one way out of the panel as an unlabelled button.
-            <Button type="button" variant="ghost" size="icon-xs" aria-label={t("common.close")} onClick={onClose}>
+            //
+            // Outlined rather than ghost. Closing the panel is the only way back out of this
+            // screen, and a control the reader has to hunt for by hovering is not a way out —
+            // a ghost glyph in a corner reads as decoration until it responds.
+            <Button type="button" variant="outline" size="icon-xs" aria-label={t("common.close")} onClick={onClose}>
               <XIcon className="h-3 w-3" aria-hidden />
             </Button>
           )}
@@ -326,17 +330,18 @@ function useStandardDetailActions({ onClose, onBack, onDelete, onEdit, isPending
   const { t } = useTranslation("simplix/ui");
   const hasLeft = Boolean(onBack || onClose);
 
-  // Close and Back leave the record; every other button in the footer does something to it. The
-  // tone says so on its own, rather than leaving the reader to infer it from which end the button
-  // sits at — every detail footer the wireframe board draws puts Close in this tone and none puts
-  // it in another.
+  // Close and Back leave the record, and they are the only way back out of the panel — so they
+  // are drawn as ordinary buttons, with a border the reader can find without hovering. A ghost
+  // tone would separate them from the domain actions beside them at the cost of the one thing
+  // they have to be: visible. What separates them here is the end of the row they sit at, and
+  // in `ActionFooter` the rule above them.
   const leftButton = onBack ? (
-    <Button type="button" size="sm" variant="ghost" onClick={onBack}>
+    <Button type="button" size="sm" variant="outline" onClick={onBack}>
       <ArrowLeftIcon className="h-4 w-4" />
       {backLabel ?? t("common.back")}
     </Button>
   ) : onClose ? (
-    <Button type="button" size="sm" variant="ghost" onClick={onClose}>
+    <Button type="button" size="sm" variant="outline" onClick={onClose}>
       {closeLabel ?? t("common.close")}
     </Button>
   ) : null;
