@@ -124,7 +124,12 @@ export function NumberField({
           aria-invalid={!!error}
           aria-label={variantProps.layout === "hidden" ? label : undefined}
           {...inputProps}
-          className={cn("h-9", error && "border-destructive", inputProps?.className)}
+          // No height of its own: `Input`, `SelectTrigger` and this control are one row of
+          // fields and read as one only if they are the same height. `h-9` here made the
+          // number box four pixels taller than the select beside it — enough to see and not
+          // enough to name, so it reads as the screen being slightly wrong rather than as a
+          // control being wrong.
+          className={cn(error && "border-destructive", inputProps?.className)}
         />
       )}
     </FieldWrapper>

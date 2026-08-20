@@ -337,7 +337,10 @@ export function DatePicker({
           disabled={disabled}
           data-empty={!value}
           className={cn(
-            "inline-flex h-9 w-full items-center justify-start gap-2 rounded-md border border-input bg-background pl-3 text-sm font-normal",
+            // `h-8`, which is what `Input`, `SelectTrigger`, `NumberInput` and the time
+            // picker are. A row of fields reads as one row only if they are one height, and
+            // four pixels is enough to see and not enough to name.
+            "inline-flex h-8 w-full items-center justify-start gap-2 rounded-md border border-input bg-background pl-3 text-sm font-normal",
             "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
             "disabled:cursor-not-allowed disabled:opacity-50",
             "data-[empty=true]:text-muted-foreground",
