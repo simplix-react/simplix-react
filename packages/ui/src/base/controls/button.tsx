@@ -6,8 +6,17 @@ import { type ComponentPropsWithRef, type ReactNode, forwardRef } from "react";
 import { cn } from "../../utils/cn";
 import { createSelfResolving } from "../../provider/self-resolving";
 
+// `disabled:pointer-events-none` is deliberately absent. A disabled button is exactly the one a
+// reader needs an explanation for, and both of this framework's ways of giving them one are hover
+// mechanisms: `title` on the button (`CrudDetail.DefaultActions`'s `editDisabledReason` /
+// `deleteDisabledReason`) and a Radix tooltip wrapping it (`RowActions`'s icon variant). Taken out
+// of hit-testing the button never reports a hover, so neither fires — the reason is written, the
+// prop is passed, and nothing appears. A greyed pencil then says only 「no」, never 「why」.
+// Nothing is lost by allowing the hover: `disabled` on a real `<button>` already suppresses
+// activation, and the pointer never reached the button before either — the click fell through to
+// whatever is under it, and still does. `disabled:cursor-not-allowed` keeps the pointer saying so.
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0",
   {
     variants: {
       variant: {
