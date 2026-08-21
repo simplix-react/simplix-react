@@ -15,8 +15,11 @@ export type AlertTone = StatusTone;
 /**
  * Visual density of {@link AlertBanner}.
  *
- * - `default` — comfortable padding, `size-5` icon, `text-sm font-semibold` title.
- * - `sm` — tighter padding, `size-4` icon, `text-sm` body.
+ * - `default` — comfortable padding, `size-5` icon.
+ * - `sm` — tighter padding, `size-4` icon.
+ *
+ * <p>Both carry the same type scale: a `text-sm font-medium` title over a `text-xs` muted
+ * subtitle. The density decides the room, never the size of the words.
  * - `hint` — compact, borderless, `size-3.5` icon, `text-xs` body.
  */
 export type AlertDensity = "default" | "sm" | "hint";
@@ -35,12 +38,17 @@ interface DensityToken {
   borderless: boolean;
 }
 
+// One type scale across `default` and `sm`, which differ in the room they take and not in what a
+// title is. Given its own scale, `default` read 14/600 over a 14px body while every `sm` banner —
+// and every notice card, which is one — read 14/500 over 12px muted: the same box at two sizes
+// depending on which file drew it, and a product split 79 to 77 between them. `hint` keeps its
+// smaller title; it is the one density that means "smaller", rather than "roomier".
 const DENSITY_TOKENS: Record<AlertDensity, DensityToken> = {
   default: {
     container: "px-4 py-3",
     icon: "size-5",
-    title: "text-sm font-semibold",
-    subtitle: "text-sm text-muted-foreground",
+    title: "text-sm font-medium",
+    subtitle: "text-xs text-muted-foreground",
     borderless: false,
   },
   sm: {
