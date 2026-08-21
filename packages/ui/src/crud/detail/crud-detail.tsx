@@ -252,6 +252,15 @@ function DetailSection({ layout = "single-column", ...props }: CrudDetailSection
 
 /** Props for the CrudDetail.Actions sub-component. */
 export interface CrudDetailActionsProps {
+  /**
+   * Push the first action away from the rest.
+   *
+   * <p>The way out of a panel and the thing that ends the record are opposed, and three screens
+   * were expressing that with a `<span className="flex-1" />` between them — a spacer element in a
+   * row whose layout is this component's business. `CrudForm.Actions` already took this prop; the
+   * detail's did not, so the callers wrote the gap by hand.
+   */
+  spread?: boolean;
   className?: string;
   children?: ReactNode;
 }
@@ -269,9 +278,9 @@ export interface CrudDetailActionsProps {
 // label is what this tier exists to avoid.
 const ACTION_TIER_FILL = "flex-wrap [&>*]:min-w-fit [&>*]:flex-1";
 
-function DetailActions({ className, children }: CrudDetailActionsProps) {
+function DetailActions({ spread, className, children }: CrudDetailActionsProps) {
   return (
-    <Flex gap="sm" className={cn("border-t pt-2", className)}>
+    <Flex gap="sm" justify={spread ? "between" : "start"} className={cn("border-t pt-2", className)}>
       {children}
     </Flex>
   );

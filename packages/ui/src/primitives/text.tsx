@@ -34,6 +34,15 @@ const textVariants = cva("font-normal", {
       muted: "text-muted-foreground",
       primary: "text-primary",
       destructive: "text-destructive",
+      /**
+       * Something the reader should notice and can proceed past.
+       *
+       * <p>The step between `muted` and `destructive`, and the one that was missing: a caps-lock
+       * hint and a 「저장되었지만 아직 적용되지 않았다」 are neither ignorable nor a refusal, and
+       * without a name for that the screens wrote `text-amber-700 dark:text-amber-300` by hand —
+       * which is a colour rather than a meaning, and does not move when the palette does.
+       */
+      warning: "text-warning",
     },
     font: {
       sans: "font-sans",
@@ -49,6 +58,13 @@ const textVariants = cva("font-normal", {
      * `className="font-medium"`, which reaches past the primitive to the stylesheet and stops
      * moving when the type scale does.
      */
+    /** How the text sits in its line box, for the places a caption is centred under something. */
+    align: {
+      inherit: "",
+      start: "text-left",
+      center: "text-center",
+      end: "text-right",
+    },
     weight: {
       inherit: "",
       normal: "font-normal",
@@ -57,7 +73,7 @@ const textVariants = cva("font-normal", {
       bold: "font-bold",
     },
   },
-  defaultVariants: { size: "inherit", tone: "default", weight: "inherit" },
+  defaultVariants: { size: "inherit", tone: "default", weight: "inherit", align: "inherit" },
 });
 
 /** Variant props extracted from {@link textVariants}. */

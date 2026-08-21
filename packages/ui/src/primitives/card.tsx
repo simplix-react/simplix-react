@@ -29,12 +29,15 @@ const cardVariants = cva(
         md: "px-6 py-4",
         lg: "px-8 py-6",
       },
+      /** Take the whole width of whatever holds it — a card that IS the column it sits in. */
+      fill: { true: "w-full", false: "" },
+
       interactive: {
         true: "cursor-pointer hover:border-primary/30 hover:shadow-md transition-all",
         false: "",
       },
     },
-    defaultVariants: { padding: "md", interactive: false },
+    defaultVariants: { padding: "md", interactive: false, fill: false },
   },
 );
 

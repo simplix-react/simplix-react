@@ -16,7 +16,7 @@ import { createSelfResolving } from "../../provider/self-resolving";
 // activation, and the pointer never reached the button before either — the click fell through to
 // whatever is under it, and still does. `disabled:cursor-not-allowed` keeps the pointer saying so.
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0",
+  "inline-flex items-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0",
   {
     variants: {
       variant: {
@@ -32,6 +32,28 @@ const buttonVariants = cva(
           "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
       },
+      /**
+       * How the label sits in the button's width.
+       *
+       * <p>Centred by default, which is what a button is. `start` is for the case where buttons
+       * are a LIST rather than a row of actions — a tree of choices, a menu drawn as buttons —
+       * and a centred label there makes a column of ragged text that reads as broken alignment
+       * rather than as a list.
+       */
+      /**
+       * Take the whole width of whatever holds it.
+       *
+       * <p>For a button that is the ONLY thing on its line and means it — a sign-in submit, a
+       * single primary in a narrow dialog. A row of actions never uses it: several full-width
+       * buttons stack into a wall in which nothing is primary.
+       */
+      fill: { true: "w-full", false: "" },
+
+      justify: {
+        center: "justify-center",
+        start: "justify-start",
+      },
+
       size: {
         default: "h-9 px-4 py-2",
         xs: "h-7 px-2.5 text-xs",
@@ -45,6 +67,8 @@ const buttonVariants = cva(
     defaultVariants: {
       variant: "default",
       size: "default",
+      justify: "center",
+      fill: false,
     },
   },
 );
