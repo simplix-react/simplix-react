@@ -85,10 +85,26 @@ const ACTION_ICONS: Record<ActionType, ReactNode> = {
   select: <CheckIcon className="size-4" />,
 };
 
-/** Column width the action cluster needs for the given variant. */
+/**
+ * Column width the action cluster needs for the given variant.
+ *
+ * <p><b>The labelled variants scale with the action count, same as the icon one.</b> A flat width
+ * held for every count is right only at one count: two labelled buttons measure 157px of content
+ * before the cell's own padding, so a column fixed at the one-button width puts the second button
+ * past the cell and the reader finds it by scrolling a table that gives no sign of scrolling. The
+ * numbers are measured off a `size="xs"` button carrying an icon and a two-to-four syllable label,
+ * which is what a console row draws.
+ *
+ * <p><b>The one-button case keeps the old width as a floor</b>, because a single long label is
+ * wider than the average this is built from and there is nothing beside it to reveal the clip.
+ *
+ * @param actions every action declared for the row, including the ones a given row hides
+ * @param variant how the cluster renders — bare glyphs, or buttons carrying their labels
+ * @returns the column width in px
+ */
 export function getActionColumnWidth(actions: RowActionDef<unknown>[], variant: ActionVariant): number {
   if (variant === "icon") return actions.length * 30 + 4;
-  return 120;
+  return Math.max(120, actions.length * 78 + (actions.length - 1) * 8 + 24);
 }
 
 /** Per-row action cluster shared by the list and tree tables. */
