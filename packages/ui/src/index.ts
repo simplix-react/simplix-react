@@ -433,6 +433,11 @@ export type {
   GroupedToggleOtherInfo,
 } from "./fields/form";
 
+// A row's actions, drawn the one way — for a bounded table, which has no `actions` prop of its own
+// and would otherwise assemble the buttons in the cell. The lists and the tree already use this;
+// not exporting it is what left every hand-built table to invent the column again.
+export { RowActionCell, getActionColumnWidth } from "./crud/shared/row-actions";
+
 // Icon picker primitive
 export { IconPicker, Icon } from "./base/inputs/icon-picker";
 export type {

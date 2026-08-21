@@ -1,4 +1,5 @@
 import { useTranslation } from "@simplix-react/i18n/react";
+import { MenuLink } from "../../menu/menu-link";
 import { type MouseEvent, type ReactNode } from "react";
 
 import { useFlatUIComponents } from "../../provider/ui-provider";
@@ -31,6 +32,31 @@ export interface RowActionDef<T> {
   icon?: ReactNode | ((row: T) => ReactNode);
   when?: (row: T) => boolean;
   disabled?: (row: T) => boolean;
+  /**
+   * Why this row cannot take the action, when it cannot.
+   *
+   * <p><b>A disabled control that does not say why is a dead end.</b> The reader presses, nothing
+   * happens, and they have no way to tell whether the record is in the wrong state, whether they
+   * lack the permission, or whether the product is broken — and the three call for three different
+   * next moves. Returning a sentence puts it in the tooltip, on the same control they pressed.
+   *
+   * <p>Read only when `disabled` says so, so a row that can act carries no tooltip it does not
+   * need. Where the reason is the same for every row, a constant string is what the function
+   * returns.
+   */
+  disabledReason?: (row: T) => string | undefined;
+  /**
+   * Where the action takes the reader, when it is a destination rather than a change.
+   *
+   * <p><b>A row that says 「가서 보기」 is still a row action.</b> Given `onClick` alone it is a
+   * button that navigates, which reads to the browser as a press — no middle-click, no open in a
+   * new tab, no address on hover. Given this it is a link wearing the action's shape, so the
+   * column stays one thing and the reader keeps what a link gives them.
+   *
+   * <p>`onClick` is still called where both are given, for a screen that has to record the
+   * departure. A disabled action never navigates.
+   */
+  href?: (row: T) => string | undefined;
 }
 
 const ACTION_LABEL_KEYS: Record<ActionType, string> = {
@@ -131,25 +157,44 @@ export function RowActionCell<T>({
 
   // outline / ghost variant
   return (
-    <Flex gap="xs" justify="end">
-      {visible.map((action, i) => {
-        const label = action.label ?? t(ACTION_LABEL_KEYS[action.type]);
-        const resolvedIcon = typeof action.icon === "function" ? action.icon(row) : action.icon;
-        const icon = resolvedIcon ?? ACTION_ICONS[action.type];
-        const isDisabled = action.disabled?.(row) ?? false;
-        return (
-          <Button
-            key={`${action.type}-${i}`}
-            size={size}
-            variant={variant}
-            onClick={(e) => handleClick(e, action)}
-            disabled={isDisabled}
-          >
-            {icon}
-            {label}
-          </Button>
-        );
-      })}
-    </Flex>
+    <TooltipProvider>
+      <Flex gap="xs" justify="end">
+        {visible.map((action, i) => {
+          const label = action.label ?? t(ACTION_LABEL_KEYS[action.type]);
+          const resolvedIcon = typeof action.icon === "function" ? action.icon(row) : action.icon;
+          const icon = resolvedIcon ?? ACTION_ICONS[action.type];
+          const isDisabled = action.disabled?.(row) ?? false;
+          const reason = isDisabled ? action.disabledReason?.(row) : undefined;
+          const button = (
+            <Button
+              key={`${action.type}-${i}`}
+              size={size}
+              variant={variant}
+              onClick={(e) => handleClick(e, action)}
+              disabled={isDisabled}
+            >
+              {icon}
+              {label}
+            </Button>
+          );
+          // A destination is a link wearing the action's shape, so the reader keeps middle-click
+          // and the address on hover — which a button that navigates takes from them.
+          const href = isDisabled ? undefined : action.href?.(row);
+          const control = href ? <MenuLink href={href}>{button}</MenuLink> : button;
+          if (!reason) return control;
+          // The disabled button swallows pointer events, so the tooltip hangs off a span around it
+          // rather than off the button — without that wrapper the reason is unreachable, which is
+          // the whole failure it exists to avoid.
+          return (
+            <Tooltip key={`${action.type}-${i}`}>
+              <TooltipTrigger asChild>
+                <span className="inline-flex cursor-default">{control}</span>
+              </TooltipTrigger>
+              <TooltipContent>{reason}</TooltipContent>
+            </Tooltip>
+          );
+        })}
+      </Flex>
+    </TooltipProvider>
   );
 }
