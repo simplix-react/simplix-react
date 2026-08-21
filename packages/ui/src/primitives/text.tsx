@@ -40,8 +40,24 @@ const textVariants = cva("font-normal", {
       display: "font-display",
       mono: "font-mono",
     },
+    /**
+     * How heavy the text is.
+     *
+     * <p>Inherits by default, for the reason `size` does: a primitive that imposes a weight cannot
+     * sit inside a heading or a cell that already set one. Named here because a caller who wants
+     * emphasis has nowhere else to say it — two dozen screens of one product were writing
+     * `className="font-medium"`, which reaches past the primitive to the stylesheet and stops
+     * moving when the type scale does.
+     */
+    weight: {
+      inherit: "",
+      normal: "font-normal",
+      medium: "font-medium",
+      semibold: "font-semibold",
+      bold: "font-bold",
+    },
   },
-  defaultVariants: { size: "inherit", tone: "default" },
+  defaultVariants: { size: "inherit", tone: "default", weight: "inherit" },
 });
 
 /** Variant props extracted from {@link textVariants}. */
