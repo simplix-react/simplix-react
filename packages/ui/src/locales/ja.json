@@ -148,7 +148,8 @@
     "switchToLanguage": "{{language}} に切り替え",
     "clearSignature": "署名をクリア",
     "latitude": "緯度",
-    "longitude": "経度"
+    "longitude": "経度",
+    "noSelection": "選択しない"
   },
   "unit": {
     "minutes": "分",

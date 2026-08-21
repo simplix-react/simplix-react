@@ -1,3 +1,5 @@
+import { useTranslation } from "@simplix-react/i18n/react";
+
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
@@ -33,7 +35,38 @@ export interface SelectFieldProps<T extends string = string>
    * the non-compact path already passes `className` to the wrapper.
    */
   fill?: boolean;
+  /**
+   * Offer an entry that returns the field to unset.
+   *
+   * @remarks
+   * A select can only ever move from one option to another, so a field the form declares optional
+   * becomes permanent the moment somebody picks a value — the rank they set by mistake cannot be
+   * taken off again, and the only way back is a column the screen does not offer. Pass this on
+   * every select whose value the DTO accepts as absent.
+   *
+   * The entry sits at the top of the list, labelled with {@link clearLabel} or the framework's own
+   * word for an empty choice, and hands `""` to `onChange`. Radix refuses an item whose value is
+   * the empty string, so a sentinel carries it and is translated back before the caller sees it.
+   */
+  clearable?: boolean;
+  /**
+   * What the clearing entry reads as.
+   *
+   * @remarks
+   * Defaults to `placeholder` — the field has already had to name its own empty state for the
+   * trigger, and reading 「선택 안 함」 in the list and 「직위 없음」 on the trigger a moment later
+   * is two words for one state on one control. Only where neither is given does the framework's
+   * generic word stand in.
+   */
+  clearLabel?: string;
 }
+
+/**
+ * What the clearing entry carries, since Radix refuses an item valued at the empty string.
+ *
+ * <p>Long and bracketed so it cannot collide with a real option's value.
+ */
+const CLEARED = "__simplix_select_cleared__";
 
 /**
  * Dropdown select field built on Radix Select primitives.
@@ -88,6 +121,8 @@ export function SelectField<T extends string = string>({
   placeholder,
   compact = false,
   fill = false,
+  clearable = false,
+  clearLabel,
   label,
   labelKey,
   error,
@@ -98,13 +133,19 @@ export function SelectField<T extends string = string>({
   ...variantProps
 }: SelectFieldProps<T>) {
   const { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } = useFlatUIComponents();
+  const { t } = useTranslation("simplix/ui");
+
+  // A required field has no empty state to return to, so the entry is withheld there however the
+  // caller asked — offering it would put a value in the list the form then refuses to submit.
+  const offersClearing = clearable && !required;
+  const clearText = clearLabel ?? placeholder ?? t("field.noSelection");
 
   // `id` lands on the trigger button — the labelable element the wrapper's
   // label points at. Compact mode has no wrapper and so no id.
   const renderSelect = (id?: string) => (
     <Select
       value={value}
-      onValueChange={(v) => onChange(v as T)}
+      onValueChange={(v) => onChange((v === CLEARED ? "" : v) as T)}
       disabled={disabled}
     >
       <SelectTrigger
@@ -117,6 +158,11 @@ export function SelectField<T extends string = string>({
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
+        {offersClearing && (
+          <SelectItem value={CLEARED}>
+            <span className="text-muted-foreground">{clearText}</span>
+          </SelectItem>
+        )}
         {options.map((opt) => (
           <SelectItem
             key={opt.value}
@@ -176,6 +222,7 @@ export function SelectField<T extends string = string>({
           tabIndex={-1}
         >
           {placeholder && <option>{placeholder}</option>}
+          {offersClearing && <option>{clearText}</option>}
           {options.map((opt) => (
             <option key={opt.value}>{opt.label}</option>
           ))}

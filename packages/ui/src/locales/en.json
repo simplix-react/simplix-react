@@ -148,7 +148,8 @@
     "switchToLanguage": "Switch to {{language}}",
     "clearSignature": "Clear signature",
     "latitude": "Latitude",
-    "longitude": "Longitude"
+    "longitude": "Longitude",
+    "noSelection": "None"
   },
   "unit": {
     "minutes": "min",
