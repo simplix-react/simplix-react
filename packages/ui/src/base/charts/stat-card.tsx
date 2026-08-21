@@ -69,7 +69,12 @@ export function StatCard({
         // the header and the rows, and every row of padding there is a row of the list pushed off
         // the fold. The sides keep the full step — that is the gutter between the border and the
         // first character, and narrowing it makes the text look pressed against the edge.
-        "rounded-lg border px-4 py-3 text-card-foreground shadow-sm",
+        // Full height of whatever row it is in, because that is what every caller wants and each
+        // one was writing `className="h-full"` to get it — the shared tile row of one product
+        // included. A row of four with one two-line basis otherwise draws three cards floating
+        // above a taller neighbour. In a parent that does not stretch, `h-full` resolves to auto
+        // and nothing changes, so this costs a lone tile nothing.
+        "h-full rounded-lg border px-4 py-3 text-card-foreground shadow-sm",
         highlighted && tone ? tones[tone].surface : "bg-card",
         className,
       )}
