@@ -5,7 +5,7 @@
   "presetColors": {
     "red": "빨강",
     "orange": "주황",
-    "amber": "황색",
+    "amber": "앰버",
     "yellow": "노랑",
     "lime": "라임",
     "green": "초록",
@@ -16,7 +16,7 @@
     "violet": "보라",
     "purple": "자주",
     "pink": "분홍",
-    "rose": "장미",
+    "rose": "로즈",
     "slate": "슬레이트",
     "stone": "스톤"
   }
