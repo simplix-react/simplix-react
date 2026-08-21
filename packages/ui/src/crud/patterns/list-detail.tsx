@@ -230,9 +230,16 @@ export function ListDetailRoot({ variant: variantProp, activePanel: activePanelP
   const isDetailOpen = activePanel === "detail";
   const listCol = effectiveListWidth != null ? `${effectiveListWidth}px` : "1fr";
   const detailCol = effectiveListWidth != null ? "1fr" : `${effectiveDetailWidth}px`;
+  // The closed state is the same grid with its two other tracks at zero width, never a fallback to
+  // block flow. Laid out as a block, the list column is a `h-full` box with `overflow: visible`
+  // content taller than itself: it spills past the section, the page scrolls in place of the list,
+  // and the reader who scrolls to the last row finds it flush against the window while the same
+  // list beside an open detail ends 72px short. One layout in both states is what makes that
+  // distance the same, and it is what puts the scroll on the list where the panel chrome expects
+  // it. Zero-width tracks also give the close the same animation the open has.
   const gridCols = isDetailOpen
     ? `${listCol} ${DIVIDER_TRACK}px ${detailCol}`
-    : undefined;
+    : "1fr 0px 0px";
 
   return (
     <ListDetailContext.Provider value={contextValue}>
@@ -240,8 +247,8 @@ export function ListDetailRoot({ variant: variantProp, activePanel: activePanelP
         ref={sectionRef}
         className={cn(
           "h-full flex-1 min-h-0",
-          isDetailOpen && "overflow-hidden md:grid md:grid-rows-1",
-          isDetailOpen && !isDragging && "md:transition-[grid-template-columns] md:duration-300 md:ease-in-out",
+          "overflow-hidden md:grid md:grid-rows-1",
+          !isDragging && "md:transition-[grid-template-columns] md:duration-300 md:ease-in-out",
           "max-md:flex max-md:flex-col",
           className,
         )}
