@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import { resolveEmptyReason, type ListHook, type ListHookResult } from "@simplix-react/headless";
 
@@ -22,6 +22,21 @@ export interface UseCrudListOptions {
   defaultPageSize?: number;
   /** Initial filter values. */
   defaultFilters?: Record<string, unknown>;
+  /**
+   * What the list is narrowed to from outside — a tab, a chip row, a parent record.
+   *
+   * <p><b>Pass this whenever something other than the list's own filters decides which records it
+   * asks for.</b> The page index is state the list keeps, and a narrowing that arrives from
+   * outside changes how many pages there are without touching it: a reader on page 5 of 활성 who
+   * presses 정지 asks the server for page 5 of three rows and is given nothing. The total in the
+   * toolbar comes from the same response and is right, so the screen states a count over an empty
+   * table — the one shape a reader reads as a broken list rather than as an empty one.
+   *
+   * <p>Changing it returns the list to the first page and clears the selection, which is about the
+   * rows that were there rather than the ones now. Any stable string will do: the tab's key, or
+   * the forced parameters serialised.
+   */
+  scopeKey?: string;
 }
 
 /** Filter state returned by {@link useCrudList}. */
@@ -147,6 +162,7 @@ export function useCrudList<T>(
     defaultSort,
     defaultPageSize = 10,
     defaultFilters,
+    scopeKey,
   } = options ?? {};
 
   const isImmediate = filterMode === "immediate";
@@ -242,6 +258,19 @@ export function useCrudList<T>(
 
   // ── Selection state ──
   const [selected, setSelected] = useState<Set<number>>(new Set());
+
+  // The page belongs to the scope it was turned to. Kept across a change of scope it addresses a
+  // page of a different result set: the request comes back empty and the total that comes back
+  // with it is correct, so the screen states a count over no rows and nothing contradicts it.
+  // Done during the render that sees the new scope rather than in an effect, so the request never
+  // goes out with the stale page — an effect would fetch the empty page first and correct after.
+  const scopeSeen = useRef(scopeKey);
+  if (scopeSeen.current !== scopeKey) {
+    scopeSeen.current = scopeKey;
+    if (page !== 1) setPage(1);
+    // The selection is a set of row indices, which name different records under a new narrowing.
+    if (selected.size > 0) setSelected(new Set());
+  }
 
   const toggleSelection = useCallback((index: number) => {
     setSelected((prev) => {
