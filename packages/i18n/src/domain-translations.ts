@@ -73,10 +73,39 @@ export function onDomainTranslationsRegistered(
 export function registerDomainTranslations(
   config: DomainTranslationConfig,
 ): void {
-  registry.set(config.domain, config);
+  registry.set(registryKeyFor(config), config);
   for (const listener of domainListeners) {
     listener(config);
   }
+}
+
+/**
+ * Where this registration is filed, keeping two packages that spell the same domain name apart.
+ *
+ * @remarks
+ * A domain name belongs to whoever spells it, and two packages legitimately spell the same one —
+ * an extension shipping `auth` and the application's own generated `auth` domain. Filed under the
+ * name alone the second registration replaces the first, whose entire catalogue is then never
+ * loaded: every field it names renders as `fields.<name>` on screen while both packages' code is
+ * correct and nothing throws. So a name already held by a DIFFERENT registration gets a key of its
+ * own and both catalogues load; the namespaces come from each JSON's own top-level keys, so two
+ * registrations under one name contribute different namespaces rather than fighting over one.
+ *
+ * Re-registering the same object — a module evaluated twice — still replaces, which is what the
+ * name-keying was for.
+ *
+ * @param config - The registration being filed
+ * @returns The key to store it under
+ */
+function registryKeyFor(config: DomainTranslationConfig): string {
+  const held = registry.get(config.domain);
+  if (!held || held === config) return config.domain;
+  for (const [key, existing] of registry) {
+    if (existing === config) return key;
+  }
+  let suffix = 2;
+  while (registry.has(`${config.domain}#${suffix}`)) suffix += 1;
+  return `${config.domain}#${suffix}`;
 }
 
 /**
