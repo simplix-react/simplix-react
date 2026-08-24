@@ -301,6 +301,43 @@ describe("SelectField", () => {
     expect(hiddenSelect?.getAttribute("aria-hidden")).toBe("true");
   });
 
+  it("renders the error message in compact mode", () => {
+    render(
+      <SelectField
+        compact
+        value="admin"
+        onChange={vi.fn()}
+        options={options}
+        error="Schedule is required"
+      />,
+    );
+    expect(screen.getByText("Schedule is required")).toBeTruthy();
+  });
+
+  it("keeps the measuring grid outermost when compact has no message", () => {
+    const { container } = render(
+      <SelectField compact value="admin" onChange={vi.fn()} options={options} />,
+    );
+    expect(container.firstElementChild?.className).toContain("inline-grid");
+  });
+
+  it("sets aria-required in compact mode", () => {
+    render(
+      <SelectField compact value="admin" onChange={vi.fn()} options={options} required />,
+    );
+    expect(screen.getByRole("combobox").getAttribute("aria-required")).toBe("true");
+  });
+
+  it("keeps its original element and classes when compact+fill has no message", () => {
+    const { container } = render(
+      <SelectField compact fill value="admin" onChange={vi.fn()} options={options} />,
+    );
+    expect(container.firstElementChild?.tagName).toBe("SPAN");
+    expect(container.firstElementChild?.className).toContain("block");
+    expect(container.firstElementChild?.className).toContain("w-full");
+    expect(container.firstElementChild?.className).not.toContain("flex-col");
+  });
+
   it("renders compact mode with options in hidden select", () => {
     const { container } = render(
       <SelectField

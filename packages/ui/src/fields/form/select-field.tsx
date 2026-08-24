@@ -1,6 +1,7 @@
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
+import { FieldMessage } from "../shared/field-message";
 import { FieldWrapper } from "../shared/field-wrapper";
 
 /** Props for the {@link SelectField} form component. */
@@ -17,6 +18,12 @@ export interface SelectFieldProps<T extends string = string>
    * Compact mode: renders without FieldWrapper, and sizes itself to its longest option label
    * using a hidden native `<select>`. That measurement also means `className` never reaches the
    * rendered element — pass `fill` when the parent has to own the width.
+   *
+   * `error` and `description` still render, below the trigger, so a compact field placed in a
+   * table cell reports why a save was refused. `label` becomes the trigger's accessible name;
+   * `required` draws no visible marker here, because compact mode has no label row to draw one
+   * in. A compact field that has to show a required marker gets it from whatever names the
+   * column (`List.Column`'s `required`).
    */
   compact?: boolean;
   /**
@@ -38,6 +45,9 @@ export interface SelectFieldProps<T extends string = string>
  * a hidden native `<select>` carrying every label does the measuring, so the field is as wide
  * as its widest option and `className` is dropped on the floor. Pass `fill` alongside `compact`
  * to take that measurement out and let the parent set the width.
+ *
+ * `required` maps to `aria-required` in every mode, and draws a visible marker only where there
+ * is a label row to draw it in.
  *
  * @example
  * ```tsx
@@ -100,6 +110,7 @@ export function SelectField<T extends string = string>({
       <SelectTrigger
         id={id}
         aria-invalid={!!error}
+        aria-required={required || undefined}
         aria-label={compact ? label ?? placeholder : variantProps.layout === "hidden" ? label : undefined}
         className={compact ? "h-8 text-sm" : undefined}
       >
@@ -129,13 +140,34 @@ export function SelectField<T extends string = string>({
     </Select>
   );
 
+  // Compact mode has no label row, but a field whose save was refused still has to say why —
+  // otherwise the only trace of the rejection is the save button's error COUNT, and the cell the
+  // count is about looks untouched. The messages sit under the control, exactly where
+  // FieldWrapper puts them, so a compact field and a labelled one report a failure the same way.
+  const compactMessages = (description || error) ? (
+    <>
+      {description && <FieldMessage variant="description">{description}</FieldMessage>}
+      {error && <FieldMessage variant="error">{error}</FieldMessage>}
+    </>
+  ) : null;
+
   if (compact && fill) {
     // No measuring select: the trigger is `w-full`, so the width is whatever the parent gives.
-    return <span className={cn("block w-full", className)}>{renderSelect()}</span>;
+    if (!compactMessages) {
+      return <span className={cn("block w-full", className)}>{renderSelect()}</span>;
+    }
+    // Wrapped only when there is something to say: without a message the field keeps the exact
+    // box it had before, so the trigger stays the outermost element.
+    return (
+      <div className={cn("flex w-full flex-col gap-1", className)}>
+        {renderSelect()}
+        {compactMessages}
+      </div>
+    );
   }
 
   if (compact) {
-    return (
+    const sized = (
       <span className="inline-grid items-center">
         {/* Hidden native select: browser auto-sizes to longest option label */}
         <select
@@ -151,6 +183,14 @@ export function SelectField<T extends string = string>({
         <span className="col-start-1 row-start-1">{renderSelect()}</span>
       </span>
     );
+    // Wrapped only when there is something to say: without a message the field keeps the exact
+    // box it had before, so the measuring grid stays the outermost element.
+    return compactMessages ? (
+      <div className="inline-flex flex-col gap-1">
+        {sized}
+        {compactMessages}
+      </div>
+    ) : sized;
   }
 
   return (
