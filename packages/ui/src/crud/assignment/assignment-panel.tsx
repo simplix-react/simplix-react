@@ -27,6 +27,11 @@ interface AssignmentPanelProps {
   title: string;
   /** Count badge displayed next to the title. */
   count: number;
+  /**
+   * Marks the title with the required asterisk, for a panel whose table must not be left empty.
+   * The rows are added by the panel's own action, so there is no field label to carry the mark.
+   */
+  required?: boolean;
   /** Action slot rendered on the right side of the header (e.g. SearchPopover). */
   action?: ReactNode;
   /** Body content: use AssignmentPanel.Table or AssignmentPanel.Chips. */
@@ -83,13 +88,20 @@ export interface AssignmentChipProps {
 
 // ── Components ──
 
-function AssignmentPanelRoot({ title, count, action, children }: AssignmentPanelProps) {
+function AssignmentPanelRoot({ title, count, required, action, children }: AssignmentPanelProps) {
   const { Badge } = useFlatUIComponents();
   return (
     <Card padding="none" className="overflow-hidden [&_div.rounded-lg.border]:border-0 [&_div.rounded-lg.border]:rounded-none">
       <Flex justify="between" align="center" className="border-b bg-muted/50 px-4 py-2">
         <Flex gap="sm" align="center">
-          <Text size="sm" className="font-semibold">{title}</Text>
+          <Text size="sm" className="font-semibold">
+            {title}
+            {required && (
+              <span className="text-destructive ml-0.5" aria-hidden="true">
+                *
+              </span>
+            )}
+          </Text>
           <Badge variant="secondary">{count}</Badge>
         </Flex>
         {action}

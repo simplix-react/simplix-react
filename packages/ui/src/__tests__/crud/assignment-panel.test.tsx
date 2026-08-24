@@ -96,6 +96,15 @@ describe("AssignmentPanel", () => {
     );
     expect(screen.getByText("Custom Content")).toBeTruthy();
   });
+
+  it("marks a required panel title", () => {
+    const { container } = render(
+      <AssignmentPanel title="Access Levels" count={0} required>
+        <div>Body</div>
+      </AssignmentPanel>,
+    );
+    expect(container.querySelector(".text-destructive")?.textContent).toBe("*");
+  });
 });
 
 describe("AssignmentPanel.Chips", () => {
@@ -204,5 +213,28 @@ describe("AssignmentPanel.Table", () => {
       </AssignmentPanel>,
     );
     expect(screen.getByText("No levels")).toBeTruthy();
+  });
+
+  it("marks a required column header", () => {
+    const { container } = render(
+      <AssignmentPanel title="Levels" count={2}>
+        <AssignmentPanel.Table data={testData} rowId={(r) => r.id}>
+          <AssignmentPanel.Column<TestItem> field="name" header="Entry schedule" required />
+        </AssignmentPanel.Table>
+      </AssignmentPanel>,
+    );
+    const mark = container.querySelector("th .text-destructive");
+    expect(mark?.textContent).toBe("*");
+  });
+
+  it("leaves an unmarked column header without the marker", () => {
+    const { container } = render(
+      <AssignmentPanel title="Levels" count={2}>
+        <AssignmentPanel.Table data={testData} rowId={(r) => r.id}>
+          <AssignmentPanel.Column<TestItem> field="name" header="Name" />
+        </AssignmentPanel.Table>
+      </AssignmentPanel>,
+    );
+    expect(container.querySelector("th .text-destructive")).toBeNull();
   });
 });

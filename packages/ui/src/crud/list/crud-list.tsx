@@ -264,6 +264,16 @@ function SortIcon({ direction }: { direction: "asc" | "desc" | null }) {
 export interface ListColumnProps<T> {
   field?: keyof T & string;
   header?: string;
+  /**
+   * Marks the header with the required asterisk, for an editable column whose cells the user
+   * has to fill before the row can be saved.
+   *
+   * The cells of such a column are edited in place — usually by a `compact` field, which has no
+   * label row of its own — so the column header is the only place the requirement can be stated.
+   * Setting this does not validate anything: the form still decides what a missing value means,
+   * and the cell's own `error` reports it.
+   */
+  required?: boolean;
   sortable?: boolean;
   /**
    * Column content width in pixels. Also sizes the header box, so a header
@@ -1170,6 +1180,20 @@ function ListTable<T>({
           const isSorted = colDef.field ? sort?.field === colDef.field : false;
           const dir = isSorted ? sort!.direction : null;
           const label = colDef.header ?? "";
+          // The marker rides the rendered label, never the `label` string: that string is also
+          // the tooltip's full text and the Columns dropdown's entry, and an asterisk belongs in
+          // neither. Same glyph and same colour as FieldWrapper's, so a required column and a
+          // required field read as one thing.
+          const labelNode = colDef.required ? (
+            <>
+              {label}
+              <span className="text-destructive ml-0.5" aria-hidden="true">
+                *
+              </span>
+            </>
+          ) : (
+            label
+          );
           // A declared width gives the header box a definite size, which caps the
           // column's intrinsic width in the auto table layout — otherwise the
           // nowrap label keeps the column as wide as its longest header. The label
@@ -1197,15 +1221,15 @@ function ListTable<T>({
                 )}
                 style={headerStyle}
               >
-                <span className="truncate">{label}</span>
+                <span className="truncate">{labelNode}</span>
                 <SortIcon direction={dir} />
               </button>
             ) : declaredWidth ? (
               <span className="block truncate" style={headerStyle}>
-                {label}
+                {labelNode}
               </span>
             ) : (
-              label
+              labelNode
             );
 
           // A width-constrained header can ellipsize, so its full text stays
