@@ -58,4 +58,25 @@ describe("Checkbox", () => {
     fireEvent.click(cb);
     expect(cb.getAttribute("data-state")).toBe("checked");
   });
+
+  it("draws the dash glyph and not the check glyph when indeterminate", () => {
+    render(<Checkbox aria-label="partial" checked="indeterminate" />);
+    const cb = screen.getByRole("checkbox");
+    expect(cb.getAttribute("data-state")).toBe("indeterminate");
+    expect(cb.querySelector("[data-glyph='dash']")).not.toBeNull();
+    expect(cb.querySelector("[data-glyph='check']")).toBeNull();
+  });
+
+  it("draws the check glyph when fully checked", () => {
+    render(<Checkbox aria-label="full" checked />);
+    const cb = screen.getByRole("checkbox");
+    expect(cb.querySelector("[data-glyph='check']")).not.toBeNull();
+    expect(cb.querySelector("[data-glyph='dash']")).toBeNull();
+  });
+
+  it("fills the box in the indeterminate state as it does when checked", () => {
+    render(<Checkbox aria-label="partial" checked="indeterminate" />);
+    expect(screen.getByRole("checkbox").className)
+      .toContain("data-[state=indeterminate]:bg-primary");
+  });
 });
