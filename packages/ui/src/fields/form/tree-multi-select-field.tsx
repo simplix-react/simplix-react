@@ -57,6 +57,73 @@ function RemoveIcon() {
   );
 }
 
+// ── Tree walking ──
+
+/** How much of a branch is selected. A leaf is only ever "none" or "all". */
+type BranchState = "none" | "some" | "all";
+
+/** Ids of every leaf under `item` — the item itself when it has no children. */
+function leavesOf<T>(item: T, idField: string, childrenField: string): string[] {
+  const children = ((item as Record<string, unknown>)[childrenField] as T[] | undefined) ?? [];
+  if (children.length === 0) return [String((item as Record<string, unknown>)[idField])];
+  return children.flatMap((child) => leavesOf(child, idField, childrenField));
+}
+
+/** Whether none, some, or all of `leaves` are selected. */
+function branchState(leaves: string[], selected: Set<string>): BranchState {
+  const on = leaves.filter((leaf) => selected.has(leaf)).length;
+  if (on === 0) return "none";
+  return on === leaves.length ? "all" : "some";
+}
+
+/** The node carrying `id`, or null when the tree does not hold it. */
+function findNode<T>(items: T[], id: string, idField: string, childrenField: string): T | null {
+  for (const item of items) {
+    if (String((item as Record<string, unknown>)[idField]) === id) return item;
+    const children = ((item as Record<string, unknown>)[childrenField] as T[] | undefined) ?? [];
+    const hit = findNode(children, id, idField, childrenField);
+    if (hit) return hit;
+  }
+  return null;
+}
+
+/** One chip in the field box. `ids` is what removing it clears. */
+interface TreeChip {
+  key: string;
+  label: ReactNode;
+  ids: string[];
+}
+
+/**
+ * One chip per selected leaf — except that a branch whose leaves are ALL selected collapses into
+ * a single chip carrying every one of them. Picking a building of twelve floors then costs one
+ * chip instead of twelve, and removing that chip clears all twelve.
+ */
+function chipsOf<T>(
+  items: T[],
+  selected: Set<string>,
+  idField: string,
+  childrenField: string,
+  label: (item: T) => string | ReactNode,
+): TreeChip[] {
+  const out: TreeChip[] = [];
+  for (const item of items) {
+    const id = String((item as Record<string, unknown>)[idField]);
+    const children = ((item as Record<string, unknown>)[childrenField] as T[] | undefined) ?? [];
+    if (children.length === 0) {
+      if (selected.has(id)) out.push({ key: id, label: label(item), ids: [id] });
+      continue;
+    }
+    const leaves = leavesOf(item, idField, childrenField);
+    if (branchState(leaves, selected) === "all") {
+      out.push({ key: id, label: label(item), ids: leaves });
+    } else {
+      out.push(...chipsOf(children, selected, idField, childrenField, label));
+    }
+  }
+  return out;
+}
+
 // ── Recursive tree item ──
 
 interface TreeMultiSelectItemProps<T> {
@@ -67,6 +134,8 @@ interface TreeMultiSelectItemProps<T> {
   getDisplayName: (item: T) => string | ReactNode;
   selectedIds: Set<string>;
   expandedIds: Set<string>;
+  selectionMode: "node" | "leaf-cascade";
+  Checkbox: ReturnType<typeof useFlatUIComponents>["Checkbox"];
   onToggleSelect: (id: string) => void;
   onToggleExpand: (id: string) => void;
 }
@@ -79,6 +148,8 @@ function TreeMultiSelectItem<T>({
   getDisplayName,
   selectedIds,
   expandedIds,
+  selectionMode,
+  Checkbox,
   onToggleSelect,
   onToggleExpand,
 }: TreeMultiSelectItemProps<T>) {
@@ -86,7 +157,14 @@ function TreeMultiSelectItem<T>({
   const children = ((item as Record<string, unknown>)[childrenField] as T[] | undefined) ?? [];
   const hasChildren = children.length > 0;
   const isExpanded = expandedIds.has(id);
-  const isSelected = selectedIds.has(id);
+  const cascade = selectionMode === "leaf-cascade";
+  const state: BranchState = cascade
+    ? branchState(leavesOf(item, idField, childrenField), selectedIds)
+    : selectedIds.has(id) ? "all" : "none";
+  // In cascade mode a branch that is only partly selected must not read as picked, so the row
+  // highlight follows the full state rather than mere membership.
+  const isSelected = state === "all";
+  const displayName = getDisplayName(item);
 
   return (
     <>
@@ -117,20 +195,31 @@ function TreeMultiSelectItem<T>({
         >
           {hasChildren ? (isExpanded ? <ChevronDownIcon /> : <ChevronRightIcon />) : null}
         </button>
-        <button
-          type="button"
-          onClick={() => onToggleSelect(id)}
-          className={cn(
-            "flex min-w-0 flex-1 items-center gap-1 rounded-sm text-start",
-            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-          )}
-        >
-          <FolderIcon />
-          <span className="ml-0.5 truncate">{getDisplayName(item)}</span>
-          {isSelected && (
-            <span className="ml-auto shrink-0"><CheckIcon /></span>
-          )}
-        </button>
+        {cascade ? (
+          <span className="flex min-w-0 flex-1 items-center gap-2">
+            <Checkbox
+              checked={state === "all" ? true : state === "some" ? "indeterminate" : false}
+              onCheckedChange={() => onToggleSelect(id)}
+              aria-label={typeof displayName === "string" ? displayName : undefined}
+            />
+            <span className="truncate">{displayName}</span>
+          </span>
+        ) : (
+          <button
+            type="button"
+            onClick={() => onToggleSelect(id)}
+            className={cn(
+              "flex min-w-0 flex-1 items-center gap-1 rounded-sm text-start",
+              "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+            )}
+          >
+            <FolderIcon />
+            <span className="ml-0.5 truncate">{displayName}</span>
+            {isSelected && (
+              <span className="ml-auto shrink-0"><CheckIcon /></span>
+            )}
+          </button>
+        )}
       </span>
       {hasChildren && isExpanded && children.map((child) => (
         <TreeMultiSelectItem
@@ -142,6 +231,8 @@ function TreeMultiSelectItem<T>({
           getDisplayName={getDisplayName}
           selectedIds={selectedIds}
           expandedIds={expandedIds}
+          selectionMode={selectionMode}
+          Checkbox={Checkbox}
           onToggleSelect={onToggleSelect}
           onToggleExpand={onToggleExpand}
         />
@@ -164,6 +255,23 @@ export interface TreeMultiSelectFieldProps<T> extends CommonFieldProps {
   placeholder?: string;
   /** Maximum number of selections allowed. */
   maxCount?: number;
+  /**
+   * Selection mode.
+   *
+   * `"node"` (default) — every node selects on its own and its id enters `value`.
+   *
+   * `"leaf-cascade"` — only leaf ids enter `value`; a branch renders a tri-state checkbox
+   * computed from the leaves beneath it, and toggling it selects or clears all of them. Use it
+   * where the branch level is a grouping the caller does not store — a building over its floors,
+   * a category over its items.
+   */
+  selectionMode?: "node" | "leaf-cascade";
+  /**
+   * Label for a selected item's chip, when it must differ from its row label. A leaf row sitting
+   * inside its branch can be named `1층`, while the chip that stands alone outside the tree needs
+   * `본관 1층` to stay unambiguous. Defaults to `getDisplayName`.
+   */
+  getChipLabel?: (item: T) => string | ReactNode;
 }
 
 /**
@@ -191,8 +299,10 @@ export function TreeMultiSelectField<T>({
   isLoading,
   config,
   getDisplayName: getDisplayNameProp,
+  getChipLabel: getChipLabelProp,
   placeholder,
   maxCount,
+  selectionMode = "node",
   label,
   labelKey,
   error,
@@ -202,7 +312,7 @@ export function TreeMultiSelectField<T>({
   className,
   ...variantProps
 }: TreeMultiSelectFieldProps<T>) {
-  const { Badge, Input, Popover, PopoverAnchor, PopoverTrigger, PopoverContent } = useFlatUIComponents();
+  const { Badge, Checkbox, Input, Popover, PopoverAnchor, PopoverTrigger, PopoverContent } = useFlatUIComponents();
   const boxRef = useRef<HTMLSpanElement>(null);
   const { t } = useTranslation("simplix/ui");
   const [open, setOpen] = useState(false);
@@ -270,21 +380,48 @@ export function TreeMultiSelectField<T>({
 
   const toggleSelect = useCallback(
     (id: string) => {
-      if (selectedIds.has(id)) {
-        onChange(value.filter((v) => v !== id));
-      } else {
-        if (maxCount != null && value.length >= maxCount) return;
-        onChange([...value, id]);
+      if (selectionMode !== "leaf-cascade") {
+        if (selectedIds.has(id)) {
+          onChange(value.filter((v) => v !== id));
+        } else {
+          if (maxCount != null && value.length >= maxCount) return;
+          onChange([...value, id]);
+        }
+        return;
       }
+      const node = findNode(treeData, id, idField, childrenField);
+      if (!node) return;
+      const leaves = leavesOf(node, idField, childrenField);
+      if (branchState(leaves, selectedIds) === "all") {
+        // Clearing a branch touches only its own leaves — the same leaf reached through another
+        // branch keeps standing.
+        const drop = new Set(leaves);
+        onChange(value.filter((v) => !drop.has(v)));
+        return;
+      }
+      const next = [...value, ...leaves.filter((leaf) => !selectedIds.has(leaf))];
+      // All or nothing: a branch that would overrun the cap applies none of its leaves, because
+      // a half-applied branch reads as a press that did not register.
+      if (maxCount != null && next.length > maxCount) return;
+      onChange(next);
     },
-    [value, selectedIds, onChange, maxCount],
+    [value, selectedIds, onChange, maxCount, selectionMode, treeData, idField, childrenField],
   );
 
   const removeSelected = useCallback(
-    (id: string) => {
-      onChange(value.filter((v) => v !== id));
+    (ids: string[]) => {
+      const drop = new Set(ids);
+      onChange(value.filter((v) => !drop.has(v)));
     },
     [value, onChange],
+  );
+
+  const chipLabel = getChipLabelProp ?? getDisplayName;
+  const chips = useMemo<TreeChip[]>(
+    () => (selectionMode === "leaf-cascade"
+      ? chipsOf(treeData, selectedIds, idField, childrenField, chipLabel)
+      : value.map((id) => ({ key: id, label: labelById.get(id) ?? id, ids: [id] }))),
+    [selectionMode, treeData, selectedIds, idField, childrenField, chipLabel, value, labelById],
   );
 
   return (
@@ -322,25 +459,26 @@ export function TreeMultiSelectField<T>({
               }}
             >
               <span className="flex flex-1 flex-wrap items-center gap-1 overflow-hidden">
-                {value.length === 0 && (
+                {chips.length === 0 && (
                   <span className="truncate text-muted-foreground">
                     {placeholder ?? t("tree.searchPlaceholder")}
                   </span>
                 )}
-                {value.map((id) => (
+                {chips.map((chip) => (
                   <Badge
-                    key={id}
+                    key={chip.key}
+                    data-testid="tree-chip"
                     variant="secondary"
                     className="shrink-0 gap-0.5 pr-0.5 text-[11px] py-0 h-5"
                   >
-                    {labelById.get(id) ?? id}
+                    {chip.label}
                     {!disabled && (
                       <button
                         type="button"
-                        onClick={() => removeSelected(id)}
+                        onClick={() => removeSelected(chip.ids)}
                         className="ml-0.5 rounded-sm hover:bg-muted"
                         aria-label={t("field.removeOption", {
-                          label: String(labelById.get(id) ?? id),
+                          label: String(chip.label),
                         })}
                       >
                         <RemoveIcon />
@@ -403,6 +541,8 @@ export function TreeMultiSelectField<T>({
                       getDisplayName={getDisplayName}
                       selectedIds={selectedIds}
                       expandedIds={expandedIds}
+                      selectionMode={selectionMode}
+                      Checkbox={Checkbox}
                       onToggleSelect={toggleSelect}
                       onToggleExpand={toggleExpand}
                     />
