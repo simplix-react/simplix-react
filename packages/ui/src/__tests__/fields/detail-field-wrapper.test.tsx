@@ -108,4 +108,33 @@ describe("DetailFieldWrapper", () => {
     const wrapper = screen.getByTestId("detail-field-name");
     expect(wrapper.className).toContain("custom-cls");
   });
+  // ── Which layout spreads, and which does not ──
+  //
+  // The two are one decision read from opposite ends, so they are asserted together: a change
+  // that gives `inline` the spread back would have to delete one of these, which is a thing
+  // somebody notices.
+
+  it("does not spread inline — the value sits immediately after its label", () => {
+    render(
+      <DetailFieldWrapper label="Run by" layout="inline">
+        <span data-testid="val">Kim</span>
+      </DetailFieldWrapper>,
+    );
+    const wrapper = screen.getByTestId("detail-field-run-by");
+    // Inside a two-column detail section a cell is about 270px, and spreading put a short value
+    // two hundred pixels from its label and hard against the edge — read as a missing value.
+    expect(wrapper.className).not.toContain("justify-between");
+    expect(wrapper.className).toContain("items-start");
+  });
+
+  it("spreads trailing, with the spacer that does it", () => {
+    const { container } = render(
+      <DetailFieldWrapper label="Auto lock" layout="trailing">
+        <span data-testid="val">On</span>
+      </DetailFieldWrapper>,
+    );
+    // The spread is a rendered spacer rather than a justify rule, which is what keeps it here and
+    // out of every other layout.
+    expect(container.querySelector('[aria-hidden="true"].flex-1')).not.toBeNull();
+  });
 });

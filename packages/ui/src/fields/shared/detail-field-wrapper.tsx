@@ -10,11 +10,21 @@ const detailFieldWrapperVariants = cva("py-0.5", {
     layout: {
       top: "flex flex-col gap-1",
       left: "grid grid-cols-[auto_1fr] items-baseline gap-x-3",
-      // Center, not baseline: a row whose value carries an avatar or a badge is
-      // taller than its label, and baseline alignment drops the label out of line.
-      inline: "flex items-start justify-between gap-3",
-      // Settings-row style: the label stays left and the value is pushed to the
-      // right edge of the row by a blank gap — no leader rule between them.
+      // Label and value on one line, the value immediately after the label.
+      //
+      // **No spread.** It carried `justify-between` and that is `trailing`'s job, done twice by
+      // two mechanisms: inside a two-column detail section each cell is about 270px, so a short
+      // value landed two hundred pixels from its label and hard against the cell's right edge —
+      // which reads as a label with nothing after it, and does so exactly where the value is
+      // shortest and most easily missed. Measured on a running panel: 실행자's label ended at
+      // x1167 and its value began at x1369.
+      //
+      // Start, not baseline: a row whose value carries an avatar or a badge is taller than its
+      // label, and baseline alignment drops the label out of line.
+      inline: "flex items-start gap-3",
+      // Settings-row style: the label stays left and the value is pushed to the right edge of the
+      // row by a blank gap — no leader rule between them. The gap is the spacer this component
+      // renders for this layout, which is what keeps the spread here and only here.
       trailing: "flex items-baseline gap-3",
       hidden: "flex flex-col",
     },
