@@ -176,7 +176,16 @@ export const AlertBanner = forwardRef<HTMLDivElement, AlertBannerProps>(
               </>
             )}
           </Flex>
-          {trailing != null ? <div className="shrink-0">{trailing}</div> : null}
+          {/* A row rather than a box. The slot is documented for a badge and is handed two
+              buttons as often — a fragment of siblings in a bare `div` sits flush, so the
+              controls read as one wide control with a line down the middle. The gap belongs
+              here rather than in each caller's own wrapper: a slot that needs a wrapper to
+              look right is a slot that will be wrong wherever somebody forgets one. */}
+          {trailing != null ? (
+            <Flex align="center" gap="sm" wrap className="shrink-0">
+              {trailing}
+            </Flex>
+          ) : null}
         </Flex>
       </div>
     );
