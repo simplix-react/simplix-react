@@ -272,6 +272,12 @@ export function ListDetailRoot({ variant: variantProp, activePanel: activePanelP
           // content and collapses in a section with no height of its own.
           isDetailOpen ? "md:grid-rows-1" : "md:grid-rows-[auto]",
           !isDragging && "md:transition-[grid-template-columns] md:duration-300 md:ease-in-out",
+          // A drag that crosses the list and the panel selects every word it passes over, and
+          // the selection is left standing when the pointer comes up. `preventDefault` on the
+          // handle stops the selection from starting; this stops one that was already in
+          // progress from extending, and covers the case where the press landed on a word
+          // rather than on the handle itself.
+          isDragging && "select-none",
           "max-md:flex max-md:flex-col",
           className,
         )}
@@ -310,6 +316,15 @@ function Divider({ onDrag, onDragStart, onDragEnd }: DividerProps) {
 
   const handlePointerDown = useCallback(
     (e: React.PointerEvent) => {
+      // What a `pointerdown` does by default is begin a text selection, and a divider dragged
+      // across two panels of text then paints every word between where it started and where it
+      // stopped — still selected once the pointer is released. `setPointerCapture` routes the
+      // events here and says nothing about selection, so this is the line that stops it.
+      //
+      // It also suppresses the focus the press would have given, and this element is a keyboard
+      // control (arrow keys resize it), so the focus is taken by hand.
+      e.preventDefault();
+      (e.currentTarget as HTMLElement).focus();
       dragging.current = true;
       startX.current = e.clientX;
       const section = (e.currentTarget as HTMLElement).closest("section");
@@ -340,7 +355,7 @@ function Divider({ onDrag, onDragStart, onDragEnd }: DividerProps) {
       aria-orientation="vertical"
       tabIndex={collapsed ? -1 : 0}
       className={cn(
-        "md:order-2 box-content cursor-col-resize self-stretch",
+        "md:order-2 box-content cursor-col-resize select-none self-stretch",
         "bg-border bg-clip-content hover:bg-primary/30 active:bg-primary/50",
         "max-md:hidden",
         "transition-[padding,opacity] duration-300 ease-in-out",

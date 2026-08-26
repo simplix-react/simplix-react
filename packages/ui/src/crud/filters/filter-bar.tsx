@@ -484,7 +484,11 @@ export function FilterBar({ filters, state, leading, trailing, maxBadges, onPrev
           )}
         </Flex>
       )}
-      <Flex gap="xs" align="center" wrap>
+      {/* `ml-auto` rather than the row's `justify`: `justify-between` only reaches the first line,
+          so once the row wraps this group lands at the START of the second one — the search button
+          slides under the count instead of staying at the end of the toolbar. An auto margin moves
+          it to the far edge of whichever line it is on. */}
+      <Flex gap="xs" align="center" wrap className="ml-auto">
       {visibleDefs.map((def) => {
         const BadgeIcon = getBadgeIcon(def);
         return (

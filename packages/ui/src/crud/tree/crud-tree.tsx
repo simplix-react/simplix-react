@@ -155,10 +155,19 @@ export interface TreeToolbarProps {
    * row wearing two shapes, and nothing about the screen says why.
    */
   count?: ReactNode;
+  /**
+   * What narrows the rows, drawn immediately after the count it changes.
+   *
+   * <p>Separate from `children`, which is the control group at the far end — the search box, the
+   * expand toggles. A chip filter belongs beside the figure rather than beside those: it is the
+   * other half of what the number is counting, and the row breaks between the two groups, so a
+   * chip left among the controls goes below the count the moment the tree is narrowed.
+   */
+  leading?: ReactNode;
   children?: ReactNode;
 }
 
-function TreeToolbar({ className, count, children }: TreeToolbarProps) {
+function TreeToolbar({ className, count, leading, children }: TreeToolbarProps) {
   // The count is the figure the row is about; everything after it is a control on that figure.
   // Given `count` every child is a control, so the split is skipped rather than eating the first.
   const given = count !== undefined;
@@ -173,6 +182,7 @@ function TreeToolbar({ className, count, children }: TreeToolbarProps) {
       {given
         ? <ListTotalBadge>{typeof count === "number" ? undefined : count}</ListTotalBadge>
         : lead}
+      {leading}
       {/*
         The controls are one element rather than several, so the row can only break in one place:
         between the count and the whole group. Left flat, each control wrapped on its own and the
