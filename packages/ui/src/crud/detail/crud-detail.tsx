@@ -259,6 +259,12 @@ export interface CrudDetailActionsProps {
    * were expressing that with a `<span className="flex-1" />` between them — a spacer element in a
    * row whose layout is this component's business. `CrudForm.Actions` already took this prop; the
    * detail's did not, so the callers wrote the gap by hand.
+   *
+   * <p><b>The rest stay a group however many they are</b>, which is why this is an auto margin on
+   * the first child rather than `justify-between`. Between divides the whole row evenly, so a
+   * third action does not join the group on the right — it lands in the middle of the panel,
+   * equidistant from both ends and reading as a thing of its own. Five footers in one console had
+   * drifted there, each with a destructive verb marooned mid-row between Close and the primary.
    */
   spread?: boolean;
   className?: string;
@@ -280,7 +286,11 @@ const ACTION_TIER_FILL = "flex-wrap [&>*]:min-w-fit [&>*]:flex-1";
 
 function DetailActions({ spread, className, children }: CrudDetailActionsProps) {
   return (
-    <Flex gap="sm" justify={spread ? "between" : "start"} className={cn("border-t pt-2", className)}>
+    <Flex
+      gap="sm"
+      justify="start"
+      className={cn("border-t pt-2", spread && "[&>*:first-child]:mr-auto", className)}
+    >
       {children}
     </Flex>
   );
