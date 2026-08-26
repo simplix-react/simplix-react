@@ -23,8 +23,9 @@ import {
   type ColumnWidths,
   readColumnWidths,
   sizedCellProps,
-  sizedHeaderStyle,
   writeColumnWidths,
+  type ColumnSizing,
+  headerWidthStyle,
 } from "./column-widths";
 import {useFlatUIComponents} from "../../provider/ui-provider";
 import {useUIDefaults} from "../../provider/ui-defaults-context";
@@ -695,13 +696,11 @@ function ReorderableTable<T>({
               <TableHead
                 key={header.id}
                 className={cn("truncate", sizable && "relative")}
-                style={
-                  readerWidth !== undefined
-                    ? sizedHeaderStyle(readerWidth)
-                    : header.column.getSize() !== 150
-                      ? { width: header.column.getSize() }
-                      : undefined
-                }
+                style={headerWidthStyle(
+                  readerWidth,
+                  header.column.getSize(),
+                  header.column.columnDef.meta as ColumnSizing | undefined,
+                )}
               >
                 {header.isPlaceholder
                   ? null
@@ -1159,6 +1158,7 @@ function ListTable<T>({
           />
         ),
         size: 40,
+        meta: { fixed: true } satisfies ColumnSizing,
       });
     }
 
@@ -1288,7 +1288,7 @@ function ListTable<T>({
           return formatCellValue(value, colDef.format, locale, cellZone);
         },
         size: declaredWidth,
-        meta: { flexible },
+        meta: { flexible, fixed: colDef.width !== undefined } satisfies ColumnSizing,
       });
     }
 
@@ -1307,6 +1307,7 @@ function ListTable<T>({
             <RowActionCell row={row.original} actions={actions!} variant={actionVariant} />
           ),
         size: colWidth,
+        meta: { fixed: true } satisfies ColumnSizing,
       });
     }
 
@@ -1529,13 +1530,11 @@ function ListTable<T>({
                         <TableHead
                           key={header.id}
                           className={cn("truncate", sizable && "relative")}
-                          style={
-                            readerWidth !== undefined
-                              ? sizedHeaderStyle(readerWidth)
-                              : header.column.getSize() !== 150
-                                ? { width: header.column.getSize() }
-                                : undefined
-                          }
+                          style={headerWidthStyle(
+                            readerWidth,
+                            header.column.getSize(),
+                            header.column.columnDef.meta as ColumnSizing | undefined,
+                          )}
                         >
                           {header.isPlaceholder
                             ? null
@@ -1593,7 +1592,7 @@ function ListTable<T>({
                                 {...sizedCellProps(
                                   cell.column.id,
                                   columnWidths,
-                                  cell.column.columnDef.meta as { flexible?: boolean } | undefined,
+                                  cell.column.columnDef.meta as ColumnSizing | undefined,
                                 )}
                               >
                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}

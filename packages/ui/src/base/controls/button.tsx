@@ -33,6 +33,18 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
       },
       /**
+       * How loudly the label is coloured.
+       *
+       * <p>`muted` is for a control that is on the row without claiming it — a breadcrumb above a
+       * title, a way back out of a screen reached from somewhere else. It is a tone rather than a
+       * variant because it composes: a quiet link and a quiet ghost are both wanted, and a variant
+       * per pairing doubles the list for one axis.
+       */
+      tone: {
+        default: "",
+        muted: "text-muted-foreground hover:text-foreground",
+      },
+      /**
        * How the label sits in the button's width.
        *
        * <p>Centred by default, which is what a button is. `start` is for the case where buttons
@@ -62,11 +74,20 @@ const buttonVariants = cva(
         icon: "size-9",
         "icon-sm": "size-8",
         "icon-xs": "size-7",
+        /**
+         * A link's metrics rather than a button's: no box, so no height and no padding.
+         *
+         * <p>`variant="link"` takes the box away visually and the size variants put it back in
+         * space — an xs link still reserves 28px of height and 10px either side, so a breadcrumb
+         * sits low and indented under a title it is supposed to head. Pair this with that variant.
+         */
+        link: "h-auto p-0 text-xs",
       },
     },
     defaultVariants: {
       variant: "default",
       size: "default",
+      tone: "default",
       justify: "center",
       fill: false,
     },

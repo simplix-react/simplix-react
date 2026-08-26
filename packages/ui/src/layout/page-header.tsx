@@ -10,6 +10,16 @@ import {
 
 export interface PageHeaderState {
   title?: ReactNode;
+  /**
+   * The way back to the screen this one was opened from, above the title.
+   *
+   * <p>For a screen that has no entry of its own in the menu — a policy reached from the
+   * explanation on another screen, a step opened from a list — where without it the only way back
+   * is the browser's. It reads as a breadcrumb rather than as a verb: small, quiet, and on its own
+   * line above the title, so it is not mistaken for something this screen does. A screen the menu
+   * can reach directly does not need one.
+   */
+  back?: ReactNode;
   description?: ReactNode;
   metadata?: ReactNode;
   /** Stable primitive key to trigger header updates when metadata changes */
@@ -70,6 +80,7 @@ function createPageHeaderStore(): PageHeaderStore {
  */
 function same(a: PageHeaderState, b: PageHeaderState): boolean {
   return a.title === b.title
+    && a.back === b.back
     && a.description === b.description
     && a.metadata === b.metadata
     && a.metadataKey === b.metadataKey
