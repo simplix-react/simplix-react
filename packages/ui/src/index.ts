@@ -712,6 +712,26 @@ export {
   parseRfc3339,
 } from "./utils/rfc3339-date";
 export { sanitizeHtml } from "./utils/sanitize";
+// **Everything `utils/` holds, not the subset that happened to be listed.** Each file here exists
+// so this package's own components can reach a headless helper from one place, and a consumer
+// wanting the same helper has no other door — `@simplix-react/headless` is not a dependency an
+// application declares. Three of them were written, used internally, and never reached this line,
+// so a screen that needed one either hand-rolled it or reached past the package.
+export { formatBytes } from "./utils/format-bytes";
+export { generateLocalId } from "./utils/local-id";
+export {
+  to12Hour,
+  to24Hour,
+  wrapValue,
+  withTime,
+  isHourDisabled,
+  isMinuteDisabled,
+  clampToRange,
+  padTimeUnit,
+  isHourOutOfRange,
+  isMinuteOutOfRange,
+  clampTimeValue,
+} from "./utils/time-select";
 export { countryFromTimezone } from "./utils/timezone-country-map";
 export { useCountryOptions } from "./utils/use-country-options";
 export type { CountryOption } from "./utils/use-country-options";
