@@ -491,6 +491,7 @@ export function FilterBar({ filters, state, leading, trailing, maxBadges, onPrev
       <Flex gap="xs" align="center" wrap className="ml-auto">
       {visibleDefs.map((def) => {
         const BadgeIcon = getBadgeIcon(def);
+        const badgeText = getBadgeText(def);
         return (
           <Badge
             key={def.field}
@@ -499,7 +500,12 @@ export function FilterBar({ filters, state, leading, trailing, maxBadges, onPrev
           >
             <span className="shrink-0 text-muted-foreground">{def.label}:</span>
             {BadgeIcon && <BadgeIcon className="h-3 w-3 shrink-0 text-muted-foreground" />}
-            <span className="truncate">{getBadgeText(def)}</span>
+            {/* The chip is capped at 12rem, so a long value is clipped. `title` is what
+                the clipped tail is read from — without it a truncated range names a
+                period nothing on the screen can spell out. */}
+            <span className="truncate" title={badgeText}>
+              {badgeText}
+            </span>
             <button
               type="button"
               onClick={() => removeFilter(def)}
