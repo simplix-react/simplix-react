@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { createRef } from "react";
 import { cleanup, render, screen } from "@testing-library/react";
-import { AlertTriangleIcon } from "lucide-react";
+import { AlertTriangleIcon, InfoIcon } from "lucide-react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { AlertBanner } from "../../../base";
@@ -92,6 +92,50 @@ describe("AlertBanner", () => {
     expect(banner.className).toContain("border-transparent");
     expect(banner.className).toContain("bg-transparent");
     expect(banner.className).not.toContain("bg-blue-50/50");
+  });
+
+  it("draws a glyph for every tone that carries a tint, with no caller passing one", () => {
+    // The contract this defaults for: colour on its own does not reach a reader who cannot
+    // separate two tints. A tinted banner therefore has a shape whether or not anybody remembered.
+    for (const tone of ["danger", "warning", "success", "info", "pending", "processing"] as const) {
+      const { container, unmount } = render(<AlertBanner tone={tone} title={tone} />);
+      expect(container.querySelector("svg"), `${tone} drew no glyph`).not.toBeNull();
+      unmount();
+    }
+  });
+
+  it("draws the same glyph for danger and warning, told apart by the tint", () => {
+    const { container: danger } = render(<AlertBanner tone="danger" title="Danger" />);
+    const { container: warning } = render(<AlertBanner tone="warning" title="Warning" />);
+    const shape = (c: HTMLElement) => c.querySelector("svg")?.innerHTML;
+    expect(shape(danger)).toBe(shape(warning));
+    expect(danger.querySelector("svg")?.getAttribute("class")).toContain("text-red-500");
+    expect(warning.querySelector("svg")?.getAttribute("class")).toContain("text-amber-500");
+  });
+
+  it("draws no glyph for the neutral tone, which is the only way out of one", () => {
+    // Neutral is the muted ground rather than a tint, so nothing is standing alone for a shape to
+    // accompany. This is the escape, and taking it means changing what colour the banner is.
+    const { container } = render(<AlertBanner tone="neutral" title="Neutral" />);
+    expect(container.querySelector("svg")).toBeNull();
+  });
+
+  it("lets a caller's icon override the tone's own", () => {
+    const { container } = render(
+      <AlertBanner tone="danger" icon={InfoIcon} title="Subject glyph" />,
+    );
+    const { container: defaulted } = render(<AlertBanner tone="danger" title="Tone glyph" />);
+    expect(container.querySelector("svg")?.innerHTML).not.toBe(
+      defaulted.querySelector("svg")?.innerHTML,
+    );
+  });
+
+  it("colours and sizes the tone's own glyph exactly as a caller's", () => {
+    const { container } = render(<AlertBanner tone="success" density="hint" title="Hint" />);
+    const svg = container.querySelector("svg");
+    // STATUS_TONES.success.icon, and the hint density's own size.
+    expect(svg?.getAttribute("class")).toContain("text-emerald-500");
+    expect(svg?.getAttribute("class")).toContain("size-3.5");
   });
 
   it("renders the caller-supplied icon with tone color and density size", () => {
