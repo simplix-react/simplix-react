@@ -433,7 +433,13 @@ describe("generateEndpointFiles writes the request half", () => {
     const disagreed = tags.filter(
       (tag) =>
         entityNameOf(tag) !==
-        simplixBootNaming.resolveEntityName({ tag, paths: [], operations: [] }),
+        simplixBootNaming.resolveEntityName({
+          tag,
+          paths: [],
+          operations: [],
+          schemaNames: [],
+          extensions: {},
+        }),
     );
     expect(disagreed).toEqual([]);
   });
