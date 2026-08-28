@@ -1060,8 +1060,24 @@ repointed.
   | `schemaNames` | the type names in `request.body`, `request.searchDto` and `response` |
   | `extensions` | **not in the IR** — it reads `x-*` off the OpenAPI tag object. Pass `{}` and say so in your report; if a naming strategy ever depends on it, that is a backend IR change, not something to invent here. |
 
-  Build the rest of the `OperationContext` (`operationId`, `method`, `path`, `tag`, `summary`)
-  from the IR operation directly. Names come from route and verb in almost every
+  **`OperationContext` has eleven members, not six, and three of them are required.** Omitting
+  `pathParams`, `queryParams` or `extensions` is a TypeScript error; the rest are optional but feed
+  the naming strategy. Every one maps from the IR:
+
+  | Member | Required | From the IR |
+  | --- | :---: | --- |
+  | `operationId` | ✔ | `operation.id` |
+  | `method` | ✔ | `operation.method` |
+  | `path` | ✔ | `operation.path` — **already in `{param}` form**, all 306 of them; the orval path's `:param` → `{param}` conversion is not needed |
+  | `entityName` | ✔ | `resolveEntityName` over the group (above) |
+  | `pathParams` | ✔ | `request.path[].name` |
+  | `queryParams` | ✔ | `request.query[].name` |
+  | `extensions` | ✔ | `{}` — **the orval path passes `{}` too** (`resolveEntityHookNames`, `openapi.ts:645`), so this is parity, not a shortfall |
+  | `tag` | | `operation.tag` |
+  | `summary` | | `operation.summary` |
+  | `description` | | absent from the IR — pass `undefined` |
+  | `responseType` | | the innermost `ref` name inside `operation.response` |
+  | `requestType` | | the `ref` name inside `request.body` (a `TypeRef` after Task 0) | Names come from route and verb in almost every
   case; `operationId` is only the last-resort fallback (`naming.ts:340`), which is why the IR's
   `id` must equal the OpenAPI `operationId` — the backend derives it with the same
   controller-name strip order as `OperationIdCustomizer`, so `EquipmentInspectionRestController`
@@ -1494,7 +1510,7 @@ precedent to follow.
 
   | Artifact | Keyed by | References `generated/` |
   | --- | --- | --- |
-  | `crud.config.ts` | entity → hook name (`organization`, `orgType`) | no |
+  | `crud.config.ts` | entity → hook name (`organization`, `orgType`) | no — and it is written **only when absent or under `--force`** (`openapi.ts:334`), so it never drifts on its own |
   | `src/locales/{ko,en,ja}.json` | entity, plus a top-level `enums` | no |
   | ↑ **the IR does not build this** — see below | | |
   | `src/translations.ts` | the domain name and the three locale files | no |
