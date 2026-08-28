@@ -2436,7 +2436,7 @@ from the IR instead of from text.
 (`:253`) and the peek row renders `String(row.x)` (`:203`), so the operator reads
 `2026-08-28T00:00:00Z` in a table cell. That is the frontend handbook's invariant #36 —
 "instants formatted with `format=\"datetime\"`" — broken by the generator, on the 682 `instant`,
-202 `date` and 10 `time` fields the IR distinguishes. Map `instant`→`datetime`, `date`→`date`,
+200 `date` and 10 `time` fields the IR distinguishes. Map `instant`→`datetime`, `date`→`date`,
 `time`→`time`.
 
 **The batch operations reach no screen at all — report the gap rather than closing it here.**
@@ -2485,6 +2485,13 @@ those four names, so both fall to the positional rule and both land wrong:
 first. The IR settles it without a new heuristic: **a field with an `…I18n` sibling is the
 human-facing text by construction** — that rule yields `orgName` and `areaName` respectively. Try
 the four common names, then the i18n-paired field, then the positional fallback.
+
+**Run the pairing over the inherited closure, not over own fields.** `AreaZoneCreateDTO` declares
+no i18n pair of its own — `areaName` and `areaNameI18n` are both inherited from `AreaCreateDTO` —
+so an own-fields test finds nothing and falls straight back to the positional rule that picks
+`siteId`, the foreign key identical on every node. Over the closure it yields `areaName`. Where the
+closure holds more than one pair, take the first in parent-then-own order: `OrganizationUpdateDTO`
+pairs both `orgName` and `description`, and `orgName` is the one the tree should show.
 
 **The same rule governs `displayNameField`, which is not tree-specific and reaches further.**
 `scaffold-crud.ts:1778` derives it for **every** entity by the same four-names-then-first-string
