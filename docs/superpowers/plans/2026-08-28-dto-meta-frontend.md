@@ -2064,6 +2064,21 @@ git commit -m "feat(cli): let scaffolding read fields from the IR"
   three temporal components Task 13 deliberately changes (`DateTimeField` / `DateField` /
   `TimeField` where the orval path emitted `DateField` or a text input).
 
+  **Report, do not fix — the foreign-key heuristic emits members that do not exist.**
+  `isForeignKey` is `tsType === "string" && name.endsWith("Id") && name !== "id"`
+  (`scaffold-crud.ts:342`, `:471`), and `detail.hbs:131` renders the result as
+  `displayData.{{fkEntityField}}?.name ?? String(displayData.{{name}})`. Measured over the IR:
+  **802 fields match the heuristic and only 6 of them have the member it names** —
+  `LinearAssetDetailDTO.linearAssetId` produces `displayData.linearAsset?.name`, and no
+  `linearAsset` member exists. The entity's own primary key matches too (`siteId` alone, 122
+  times), so it is filed as a relation rather than an identifier; both are hidden from lists, so
+  that part is invisible.
+
+  A greenfield meta domain is where this bites, because scaffolding skips files that already exist
+  (Step 4 above) and every domain in this application already has hand-written detail widgets. A
+  freshly scaffolded detail view would not typecheck. This is pre-existing scaffold behaviour, not
+  something the meta path introduces — surface it with the count and let the user decide.
+
   **Report, do not fix:** `ensureSubjectsFile` (`:947`) writes
   `modules/<name>/src/shared/auth/subjects.ts`, and **no module in this application has that
   file** — the permission-subject map lives at `packages/console-ui/src/identity/subjects.ts`
