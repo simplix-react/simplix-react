@@ -269,7 +269,7 @@ Query의 `data`는 본문이다. 봉투 스키마는 mock 핸들러에서만 쓴
 | 라벨 붙은 열거형은 `LabeledEnumValue<T>`로 낸다 | 원시 문자열과 비교하면 컴파일이 실패해야 한다 |
 | 컨테이너는 상위 패키지에서 가져다 쓴다 | §4.1 |
 | 필터의 연산자는 IR의 `searchable.operators`에서 온다 | 값 모양을 보고 연산자를 추측하지 않는다 |
-| IR 연산자 이름을 프런트엔드 `SearchOperator`로 옮기는 표를 두고, 열거형 전체를 빠짐없이 덮는다 | 두 이름이 늘 같지는 않다 — IR의 `GREATER_THAN_OR_EQUAL_TO`는 열거형 키 `GREATER_THAN_OR_EQUAL`에 해당한다. 이름으로 바로 찾으면 `undefined`가 조용히 나온다 |
+| IR 연산자 이름을 프론트엔드 `SearchOperator`로 옮기는 표를 두고, 열거형 전체를 빠짐없이 덮는다 | 두 이름이 늘 같지는 않다 — IR의 `GREATER_THAN_OR_EQUAL_TO`는 열거형 키 `GREATER_THAN_OR_EQUAL`에 해당한다. 이름으로 바로 찾으면 `undefined`가 조용히 나온다 |
 | 시각 필드는 `instant` · `date` · `time` 종류를 구분해 낸다 | 세 가지가 서로 다른 입력 컴포넌트를 쓴다 |
 | 필수 여부는 선언에서만 온다 — 필드 이름으로 추론하지 않는다 | §12의 필수 판정 근거 둘 |
 | `expression` 권한은 게이트를 생성하지 않고 사람이 정하도록 남긴다 | 아래 |
