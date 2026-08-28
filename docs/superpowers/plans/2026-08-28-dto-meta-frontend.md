@@ -116,10 +116,15 @@ payload contract — was gone. **49 of the 231 body-carrying operations in the c
 were affected**: every `PATCH /<resource>` multi-update (38, `Set<XUpdateDTO>`) and every
 `PATCH /<resource>/order` reorder (11, `List<XOrderDTO>`).
 
-The backend is fixed — `RequestMeta.body` is a `TypeRef` and the builder maps it the way it
-already mapped the response (`02c49ac` on `feat/dto-meta-endpoint` in the simplix repository,
-with a regression test that pins a `Set<T>` body to `container("List", [ref T])`). `ir-types.ts`
-and spec §4 follow it. **The committed fixture predates all of that**, so its 49 bodies are still
+A second defect of the same family was found beside it: a `MultipartFile` parameter set
+`contentType: "multipart"` and was then discarded, so an upload operation named no part and
+`{ kind: "file" }` — declared in spec §4 and §12 — was never produced at all. A client had nothing
+to append the file under.
+
+Both are fixed on `feat/dto-meta-endpoint` in the simplix repository, each with a regression test:
+`02c49ac` maps the body the way the response was already mapped (pinning a `Set<T>` body to
+`container("List", [ref T])`), and `a7c392b` records the part as a named `query` entry typed
+`file`. `ir-types.ts` and spec §4 follow the first. **The committed fixture predates all of that**, so its 49 bodies are still
 bare strings and every generator test written against it would encode the erased shape.
 
 - [ ] **Step 1: Re-capture.** Run the smart-safety backend with the meta endpoint enabled and
@@ -140,7 +145,9 @@ it("every request body is a TypeRef, not a bare type name", () => {
 ```
 
   Then assert a known multi-update: `PATCH /api/v1/admin/org`'s body is
-  `{ kind: "container", name: "List", args: [{ kind: "ref", name: "OrganizationUpdateDTO" }] }`.
+  `{ kind: "container", name: "List", args: [{ kind: "ref", name: "OrganizationUpdateDTO" }] }`,
+  and a known upload: `POST /api/v1/admin/user/account/{userId}/avatar` carries a `query` entry
+  named `file` typed `{ kind: "file" }`. Both are absent from the old capture.
   A `Set` normalises to `List` because `TypeRefMapper` treats every `Collection` alike — which is
   also why Task 4's "four containers and no others" stays true after this change.
 
@@ -957,7 +964,24 @@ repointed.
 
   Query keys: the first element is the request URL string and a list key carries the params object, because `useInvalidateEntity` invalidates by URL prefix on `queryKey[0]` (spec §5.1). A different key shape breaks cache invalidation with no error.
 
-- [ ] **Step 2: Test against the real fixture.** Assert: a generated hook's name equals what `simplixBootNaming` yields for the same operation; a query key's first element is the URL; a list hook's key carries params; a `Void` response produces a hook with no data type; a multipart operation sends `FormData`; a `binary` response produces a function returning `Blob` rather than a hook.
+- [ ] **Step 2: Test against the real fixture.** Assert:
+
+  - **the entity grouping**, first and by name — `org.Organization`'s 12 operations must land in
+    the entity set `splitIntoEntities` produces, and the hook file names must follow. Tasks 9, 10
+    and 13 all inherit this partition, so it is the one thing here that must not be left to a
+    downstream test.
+  - a generated hook's name equals what `simplixBootNaming` yields for the same operation
+  - a query key's first element is the URL; a list hook's key carries params
+  - a `Void` response produces a hook with no data type — 3 operations in the fixture have no
+    `response` key at all
+  - a **`binary` response** produces a function returning `Blob` rather than a hook. Three of the
+    five reach a real domain: `/api/v1/system/exports/{exportJobId}/download` (`system`) and the
+    two `public.user.Avatar` routes (`user`); the other two are in unmatched tags
+  - a **multipart operation** sends `FormData` **with the part appended under its IR name**. The
+    fixture's `POST /api/v1/admin/user/account/{userId}/avatar` (`user`) carries no body — the file
+    arrives as a `query` entry named `file` typed `{ kind: "file" }`, which is what Task 0's second
+    backend fix put there. A generator that only reads `contentType` knows to send FormData but not
+    what to call the part.
 
 - [ ] **Step 3: Run, then commit**
 
