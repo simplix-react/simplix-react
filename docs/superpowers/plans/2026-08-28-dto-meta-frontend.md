@@ -646,12 +646,56 @@ git commit -m "feat(cli): generate request functions and React Query hooks from 
 
 **Files:**
 - Create: `packages/cli/src/meta/generation/search-gen.ts`
+- Modify: `packages/cli/src/commands/scaffold-crud.ts` — complete `SUFFIX_TO_ENUM_KEY`
 - Create: `packages/cli/src/meta/generation/access-gen.ts`
 - Test: `packages/cli/src/__tests__/meta-search-access-gen.test.ts`
 
 1118 fields carry `searchable` and 86 operations name a `searchDto`. Today the frontend re-derives filter operators by matching parameter-name suffixes with a regex; the IR states them.
 
-- [ ] **Step 1: `search-gen`.** For each operation with a `searchDto`, emit that DTO's fields as filter definitions: the operator list from `searchable.operators`, `sortable` for the column, and the label from `labelKey`. Follow the project's filter rules — boolean fields become `type: "toggle"` never a two-option facet, enum and FK fields become `type: "faceted"`, and the emitted `FilterBar` config carries `maxBadges: 3`.
+- [ ] **Step 1: `search-gen` — filter metadata only.** For each operation with a `searchDto`, emit
+  that DTO's fields as filter definitions: the operator list from `searchable.operators`,
+  `sortable` for the column, and the label from `labelKey`.
+
+  **This generator does not decide presentation.** `maxBadges={3}` lives in
+  `templates/ui/list.hbs:78` and the `toggle` / `faceted` choice in
+  `scaffold-crud.ts:1746-1749` — both are scaffold output in the app's module code, not domain
+  package output. Emit the metadata those two already consume (Task 13) and change neither rule.
+
+- [ ] **Step 1b: Translate the operator vocabulary — the two sides do not use the same names.**
+
+  The IR reports searchable-jpa's own operator names. The frontend's `SearchOperator`
+  (`packages/headless/src/filter-types.ts:2`) has keys that are mostly but **not always** the same
+  string, and `scaffold-crud.ts`'s `SUFFIX_TO_ENUM_KEY` (`:1273`) covers only part of the set. An
+  identity lookup silently yields `undefined`. Measured over the fixture:
+
+  | IR operator | pairs | framework enum key | `SUFFIX_TO_ENUM_KEY` |
+  | --- | ---: | --- | --- |
+  | `EQUALS` | 851 | `EQUALS` | ✔ |
+  | `CONTAINS` | 352 | `CONTAINS` | ✔ |
+  | `IN` | 300 | `IN` | ✔ |
+  | `BETWEEN` | 198 | `BETWEEN` | ✖ absent |
+  | `GREATER_THAN` | 194 | `GREATER_THAN` | ✔ |
+  | `LESS_THAN` | 194 | `LESS_THAN` | ✔ |
+  | `GREATER_THAN_OR_EQUAL_TO` | 127 | **`GREATER_THAN_OR_EQUAL`** — no `_TO` | ✖ absent |
+  | `LESS_THAN_OR_EQUAL_TO` | 127 | **`LESS_THAN_OR_EQUAL`** — no `_TO` | ✖ absent |
+  | `IS_NULL` | 11 | `IS_NULL` | ✖ absent |
+  | `IS_NOT_NULL` | 10 | `IS_NOT_NULL` | ✖ absent |
+  | `NOT_IN` | 3 | `NOT_IN` | ✖ absent |
+
+  Two consequences, both of which have to be handled here:
+
+  1. **254 pairs would resolve to `undefined`** under an identity lookup — and they are the range
+     bounds, so date and number range filters are exactly what breaks. Write an explicit IR-name →
+     `SearchOperator` table and make it **exhaustive over the enum**, so a searchable-jpa operator
+     this fixture does not contain fails loudly at generation rather than emitting `undefined`.
+  2. **222 pairs name operators the suffix-matching path could never recover** (`BETWEEN`,
+     `IS_NULL`, `IS_NOT_NULL`, `NOT_IN`). This is the gain the IR exists for. `SUFFIX_TO_ENUM_KEY`
+     needs the four entries — `between`, `isNull`, `isNotNull`, `notIn` — or the scaffold discards
+     what the generator just recovered.
+
+  Adding those four is a change to the shared orval path, so run the existing CLI suite and
+  confirm an orval domain's filters are unchanged: the map is consulted by suffix, and the four
+  new keys are suffixes that path never produced.
 
 - [ ] **Step 2: `access-gen`.** For each operation, emit a permission constant from `AccessMeta`.
 
@@ -675,7 +719,12 @@ git commit -m "feat(cli): generate request functions and React Query hooks from 
   **Do not rewrite `SUBJECTS` or any screen.** This task emits constants; adopting them in module
   code is a separate decision the user has not made.
 
-- [ ] **Step 3: Test against the real fixture.** Assert the operator lists match the IR rather than being re-derived; a boolean searchable field yields a toggle; the 5 `expression` operations yield a comment and no gate; every `permission` operation yields a group and an action.
+- [ ] **Step 3: Test against the real fixture.** Assert that every operator name appearing in the
+  fixture resolves to a `SearchOperator` member and none resolves to `undefined`; that
+  `GREATER_THAN_OR_EQUAL_TO` maps to `SearchOperator.GREATER_THAN_OR_EQUAL`; that an unknown
+  operator name throws rather than being emitted; that the operator lists come from the IR rather
+  than being re-derived from parameter names; that the 5 `expression` operations yield a comment
+  and no gate; and that every `permission` operation yields a group and an action.
 
 - [ ] **Step 4: Run, then commit**
 
