@@ -562,8 +562,18 @@ git commit -m "feat(cli): resolve the IR into per-domain type closures"
 - [ ] **Step 1: Write it.** For one domain, emit:
   - `model/<entity>.ts` — one `export interface` per type, `extends` where the IR says so, **own fields only**
   - `model/_enums.ts` — the exact declaration-merge shape orval emits, so a module that imports
-    the name as a **value** keeps working. Verified against
-    `generated/model/siteOnboardingStepKey.ts`:
+    the name as a **value** keeps working.
+
+    **Eleven of the fixture's 133 enums are not labeled** — `SessionState`, `InboxTab`,
+    `LawScreenMapNarrowing`, `UserAccountStanding`, `DayOfWeek`, `TransportType`,
+    `AdminCommandType`, `AdminCommandStatus`, `SchedulerState`, `MessageButtonGrade`,
+    `MfaUnavailableReason` — and 14 DTO fields use them, `UserAccountDetailDTO.standing`,
+    `UserAccountListDTO.standing` and `SiteDetailDTO.weekStartDay` among them. Those arrive as
+    bare strings. Emit the `…Labeled` alias **only when `labeled` is true**; emitting it for all
+    133 puts a `{value,label}` type on 14 fields that carry a string, which is precisely the
+    silent falsehood this project exists to remove.
+
+    Verified against `generated/model/siteOnboardingStepKey.ts`:
 
     ```ts
     import type { LabeledEnumValue } from "@simplix-react-ext/simplix-boot-utils";
@@ -581,11 +591,11 @@ git commit -m "feat(cli): resolve the IR into per-domain type closures"
     assumption that the two are interchangeable.
   - no envelope type — `SimpliXApiResponse` is `unwrap: true`, so it does not appear in client types
 
-  Field typing rules, from the measured kinds: `string`→`string`; `number`→`number`; `boolean`→`boolean`; `instant`/`date`→`string`; `time`→`string`; `enum`→ the value union in a request DTO and the `…Labeled` alias in a response DTO (spec §9); `ref`→ the interface name; `container`→ the plugin's mapping; `unknown`→`unknown`; `param`→ the type parameter; `pick`→ `Pick<Of, "a" | "b">`.
+  Field typing rules, from the measured kinds: `string`→`string`; `number`→`number`; `boolean`→`boolean`; `instant`/`date`→`string`; `time`→`string`; `enum`→ **gated on `EnumMeta.labeled`**: when true, the value union in a request DTO and the `…Labeled` alias in a response DTO (spec §9); when false, the value union in **both** directions and no `…Labeled` alias at all; `ref`→ the interface name; `container`→ the plugin's mapping; `unknown`→`unknown`; `param`→ the type parameter; `pick`→ `Pick<Of, "a" | "b">`.
 
   A field is optional (`?`) exactly when `required` is false.
 
-- [ ] **Step 2: Test against the real fixture.** Generate for a domain and assert: an `extends` type emits only its own fields; a response enum field is the `Labeled` alias while the same enum in a request DTO is the union; no `SimpliXApiResponse` appears anywhere in the output; every one of the 11 field kinds present in the fixture produces valid TypeScript. **Prove the output is well-formed TypeScript, not merely that it contains the right substrings.**
+- [ ] **Step 2: Test against the real fixture.** Generate for a domain and assert: an `extends` type emits only its own fields; a **labeled** response enum field is the `Labeled` alias while the same enum in a request DTO is the union; an **unlabeled** enum is the plain union in the response too — assert `UserAccountDetailDTO.standing` by name and that no `UserAccountStandingLabeled` is emitted anywhere; no `SimpliXApiResponse` appears anywhere in the output; every one of the 11 field kinds present in the fixture produces valid TypeScript. **Prove the output is well-formed TypeScript, not merely that it contains the right substrings.**
 
   Use `ts.transpileModule(text, { reportDiagnostics: true })` and assert `diagnostics` is empty.
   That is a **syntax** check and it is the right one here: it catches a malformed emit — an
@@ -635,8 +645,9 @@ This is where the project's original complaint is answered: 440 `maxLength` and 
   **Base type by `TypeRef.kind`:** `string`→`z.string()`; `number`→`z.number()`, and
   `z.int()` when `integral` is true; `boolean`→`z.boolean()`; `instant`→`z.iso.datetime()`;
   `date`→`z.iso.date()`; `time`→`z.string().regex(...)` built from the IR's `pattern` when
-  present, else the `HH:mm` shape (spec §12); `enum`→`z.enum([...])` for a request field and the
-  labeled object shape for a response field (spec §9); `ref`→ the referenced schema constant;
+  present, else the `HH:mm` shape (spec §12); `enum`→ **gated on
+  `EnumMeta.labeled`**: `z.enum([...])` for a request field, and for a response field the labeled
+  object shape only when `labeled` is true — otherwise `z.enum([...])` there too (spec §12); `ref`→ the referenced schema constant;
   `container`→ the plugin's `zod` factory (`pageOf` for `Page`, `z.array` for `List`,
   `z.record` for `Map`, and nothing for the unwrapped envelope); `unknown`→`z.unknown()`.
 
