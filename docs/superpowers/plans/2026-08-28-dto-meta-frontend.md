@@ -1153,6 +1153,40 @@ operator table (Step 1b) is wrong, and the diff will say which member moved.
   confirm an orval domain's filters are unchanged: the map is consulted by suffix, and the four
   new keys are suffixes that path never produced.
 
+- [ ] **Step 1c: Build range filters from the IR kind, not from the field's name.**
+
+  `parseFilterParams` decides a date field with
+  `format === "date-time" || baseField.endsWith("At") || endsWith("Date") || endsWith("Time")`
+  (`scaffold-crud.ts:1393`) and then pairs `greaterThanOrEqualTo` with `lessThanOrEqualTo` into a
+  `DateRangeFilter`. Both halves are worth replacing, and the fixture says why:
+
+  | Measured | |
+  | --- | ---: |
+  | fields carrying **both** `gte` and `lte` | 127 |
+  | fields carrying `gte`/`lte` **without** `BETWEEN` | **0** |
+  | fields carrying **only** `BETWEEN` | **71** |
+  | temporal fields the name-suffix test **misses** | **40** |
+
+  Under the existing rule 71 range-capable fields get no range filter at all, and 40 temporal
+  fields — `latestAmendmentOn`, `separatedSince`, `installedOn`, `nextInspectionDueOn`,
+  `lockedUntil` among them — are not recognised as dates because their names end in neither `At`,
+  `Date` nor `Time`. Spec §5.1 #7 already forbids inferring required-ness from a field's name; the
+  same reasoning applies here, and the IR carries the kind.
+
+  - **Decide by `TypeRef.kind ∈ {instant, date}`.** One `number` field also carries range
+    operators, so a range filter is not automatically temporal.
+  - **Prefer the `gte`/`lte` pair** where both exist — the 127-field case, which keeps the existing
+    `DateRangeFilter` and its `pairedKey` shape unchanged.
+  - **Where only `BETWEEN` exists**, the value is a **comma-joined string**, not an array. The
+    generated param is `'occurredAt.between'?: string` ("Enter two values separated by comma") and
+    the application already writes it by hand in 8 places as `` `${from},${to}` ``. An array
+    reaches the server verbatim — `buildSearchableParams` passes non-empty arrays through
+    untouched — and filters nothing, with no error.
+  - **Do not route this through `transformFilters`.** It exists for exactly this and the
+    application deliberately avoids it: all four references are comments explaining why, and
+    `packages/console-ui/src/entity/forced-list.ts:7` records that it runs only when a `filters`
+    object already exists.
+
 - [ ] **Step 2: `access-gen`.** For each operation, emit a permission constant from `AccessMeta`.
 
   **The consumer, measured:** screens call `useCan(action, subject)` — imported from
@@ -1180,7 +1214,10 @@ operator table (Step 1b) is wrong, and the diff will say which member moved.
   50 members, set-equal, which is the single check that proves the operator table and the suffix
   form at once; that every operator name appearing in the fixture resolves to a `SearchOperator`
   member and none resolves to `undefined`; that
-  `GREATER_THAN_OR_EQUAL_TO` maps to `SearchOperator.GREATER_THAN_OR_EQUAL`; that an unknown
+  `GREATER_THAN_OR_EQUAL_TO` maps to `SearchOperator.GREATER_THAN_OR_EQUAL`; that a field carrying
+  only `BETWEEN` still yields a range filter whose value is a comma-joined string; that a temporal
+  field whose name ends in none of `At`/`Date`/`Time` — assert
+  `EquipmentInspectionDutySearchDTO.installedOn` by name — is still recognised as a date; that an unknown
   operator name throws rather than being emitted; that the operator lists come from the IR rather
   than being re-derived from parameter names; that the 5 `expression` operations yield a comment
   and no gate; and that every `permission` operation yields a group and an action.
