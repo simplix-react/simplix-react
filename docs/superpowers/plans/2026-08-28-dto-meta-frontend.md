@@ -1267,6 +1267,25 @@ operator table (Step 1b) is wrong, and the diff will say which member moved.
   confirm an orval domain's filters are unchanged: the map is consulted by suffix, and the four
   new keys are suffixes that path never produced.
 
+- [ ] **Step 1bb: The filter's *kind* comes from the field's type, which is a second input the
+  plan has not named.** `parseFilterParams(queryParams, entityFields)` (`scaffold-crud.ts:1294`)
+  takes two lists, and the operators decide only the operator; **the component is chosen from
+  `entityField`** in five places:
+
+  | Decision | orval reads | IR carries |
+  | --- | --- | --- |
+  | toggle (`:1333`) | `entityField.type === "boolean"` | `kind === "boolean"` |
+  | faceted options (`:1386`, `:1464`) | `entityField.enum` (a `string[]`) | `enums[TypeRef.name].values[].name` |
+  | date range (`:1394`) | `format === "date-time"` / `"date"` | `kind ∈ {instant, date, time}` — Step 1c |
+  | number (`:1419`) | `type`/`format` numeric | `kind === "number"` |
+
+  So the IR source must hand the scaffold a type-carrying field list for the **`searchDto`**, not
+  just the operator lists. Measured across the fixture's 57 distinct search DTOs, their searchable
+  fields are `string` 613, `instant` 162, `number` 112, `enum` 96, `boolean` 90, `date` 38,
+  `container` 7 — and **every one of the 96 enum references resolves in `enums`**, so the faceted
+  options are always available. Map each enum's values to `values.map(v => v.name)` to match the
+  `string[]` shape `entityField.enum` has.
+
 - [ ] **Step 1c: Build range filters from the IR kind, not from the field's name.**
 
   `parseFilterParams` decides a date field with
