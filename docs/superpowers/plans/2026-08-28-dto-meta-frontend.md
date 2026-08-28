@@ -1077,7 +1077,34 @@ git commit -m "feat(cli): generate request functions and React Query hooks from 
 - Test: `packages/cli/src/__tests__/meta-search-access-gen.test.ts`
 
 **Output:** `generated-meta/search/<entity>.ts` and `generated-meta/access/<entity>.ts`, one file
-each per entity, plus their directory barrels (spec §9).
+each per entity, plus their directory barrels (spec §9). The `<Name>Params` type for each list
+operation goes into `generated-meta/model/` beside the DTOs, where orval puts it.
+
+**The search params are not in the IR — they are derived, and the derivation was verified.**
+The 86 `searchDto`-bearing operations carry an **empty** `query` list (only 4 dotted query params
+exist in the whole fixture). The flat params come from the named DTO's `searchable` fields crossed
+with their operators, and the suffix is the `SearchOperator` **value**, not its key:
+`CONTAINS` → `SearchOperator.CONTAINS` → `"contains"` → `'orgName.contains'`. Emitting
+`orgName.CONTAINS` would be sent verbatim by `buildSearchableParams`, filter nothing, and raise no
+error.
+
+Measured against `OrganizationSearchDTO`: the IR derives **50** params and orval's
+`ListOrganizationsParams` has **53** — the same 50, plus `page`, `size` and `sort`, which the IR
+does not carry as searchable fields. So append them:
+
+```ts
+export type ListOrganizationsParams = {
+  'orgId.equals'?: string;
+  'orgName.contains'?: string;
+  // …the 50 derived members, every one optional and quoted…
+  page?: number;
+  size?: number;
+  sort?: string[];
+};
+```
+
+Assert that exact set-equality against the fixture: a derived set that is not orval's 50 means the
+operator table (Step 1b) is wrong, and the diff will say which member moved.
 
 1118 fields carry `searchable` and 86 operations name a `searchDto`. Today the frontend re-derives filter operators by matching parameter-name suffixes with a regex; the IR states them.
 
@@ -1148,8 +1175,11 @@ each per entity, plus their directory barrels (spec §9).
   **Do not rewrite `SUBJECTS` or any screen.** This task emits constants; adopting them in module
   code is a separate decision the user has not made.
 
-- [ ] **Step 3: Test against the real fixture.** Assert that every operator name appearing in the
-  fixture resolves to a `SearchOperator` member and none resolves to `undefined`; that
+- [ ] **Step 3: Test against the real fixture.** Assert that the params derived from
+  `OrganizationSearchDTO` equal orval's `ListOrganizationsParams` minus `page`/`size`/`sort` —
+  50 members, set-equal, which is the single check that proves the operator table and the suffix
+  form at once; that every operator name appearing in the fixture resolves to a `SearchOperator`
+  member and none resolves to `undefined`; that
   `GREATER_THAN_OR_EQUAL_TO` maps to `SearchOperator.GREATER_THAN_OR_EQUAL`; that an unknown
   operator name throws rather than being emitted; that the operator lists come from the IR rather
   than being re-derived from parameter names; that the 5 `expression` operations yield a comment
