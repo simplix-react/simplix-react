@@ -1605,6 +1605,17 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
      regenerated. Seed `List` as `[]` and omit `Map`, matching what the orval path does today.
      `generateArrayValue`'s name heuristics (`tag`, `url`, `image`, `photo`) fire on **0** of the
      fixture's container fields, so nothing depends on reproducing them.
+  1b. **Fourteen roles read or write the store; everything else gets an empty-body stub.** The
+     generator switches on the role (`mock-generator.ts:376`) for `list`, `getAll`, `get`,
+     `getForEdit`, `create`, `update`, `delete`, `multiUpdate`, `batchUpdate`, `batchDelete`,
+     `search`, `order`, `tree`, `subtree`, and its `default` emits
+     `http.<method>(pattern, () => HttpResponse.json(<empty>))`. Measured, **171 of the fixture's
+     694 operations resolve to a role outside those 14** — a quarter of them, the custom actions
+     (`escalate`, `revoke`, `dismiss`, …). Emit a handler for **every** operation: the 14 against
+     the store, the rest as the enveloped empty body. A generator that covered only the CRUD roles
+     would leave 171 routes unhandled, and MSW answers an unhandled route by passing it through to
+     a server that is not running.
+
   2. **Nothing hand-builds a page.** `store.listPaged(page, size, sort)` returns the Spring page
      shape. Do not assemble `totalElements`/`numberOfElements` in generated code, and do not reach
      for `pageOf` here — that is the zod builder Task 7 uses, not a runtime factory.
