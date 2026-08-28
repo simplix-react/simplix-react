@@ -420,7 +420,7 @@ IR의 `operations[].tag`가 그 패턴에 걸린다.
 
 | 부속물 | 처리 |
 | --- | --- |
-| 로케일 JSON (`src/locales/*.json`) | IR의 `labelKey` · `label`로 만든다. 서버 i18n 내려받기는 그대로 |
+| 로케일 JSON (`src/locales/*.json`) | **지금처럼 서버 i18n 내려받기로 만든다** — IR의 `labelKey`는 키일 뿐 번역문이 없다. IR은 대신 엔터티 키 대조를 이름 추측에서 데이터로 바꾼다(아래) |
 | CRUD 설정 (`crud.config.ts`) | 오퍼레이션의 역할 추론 대신 IR의 오퍼레이션 목록으로 만든다 |
 | `.http` 파일 | IR의 오퍼레이션에서 만든다 — 생성 모듈 재사용 |
 | `constants.ts` · `translations.ts` | 지금 모듈 재사용 |
@@ -431,7 +431,7 @@ IR의 `operations[].tag`가 그 패턴에 걸린다.
 | 공유물 | 규칙 |
 | --- | --- |
 | `src/mutator.ts` | 메타 쪽 요청 함수도 `getMutator("boot")`를 거친다. 응답 봉투를 한 곳에서만 벗겨야 두 경로의 `data`가 같은 모양이다 |
-| `src/locales/*.json` | IR의 `labelKey`가 있으면 그 키를 쓰고, 없으면 지금처럼 필드 이름에서 만든다. 서버 i18n 내려받기(`i18nDownloader`)는 그대로 둔다 |
+| `src/locales/*.json` | 서버 i18n 내려받기(`i18nDownloader`)가 유일한 출처다. `transformToLocaleData`가 `entityKeyMap`에 없는 엔터티를 조용히 건너뛰는데, 그 맵을 지금은 파생 엔터티 이름으로 만든다 — IR의 `labelKey`가 필드마다 서버 키를 말하므로 맵을 데이터로 만들어 그 침묵을 없앤다 |
 | `src/mock/seeds.ts` | 재생성 사이에 보존한다. 메타 쪽 핸들러도 같은 시드를 읽는다 |
 
 ## 9 · 생성물 레이아웃

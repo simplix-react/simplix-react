@@ -1454,6 +1454,7 @@ precedent to follow.
   | --- | --- | --- |
   | `crud.config.ts` | entity → hook name (`organization`, `orgType`) | no |
   | `src/locales/{ko,en,ja}.json` | entity, plus a top-level `enums` | no |
+  | ↑ **the IR does not build this** — see below | | |
   | `src/translations.ts` | the domain name and the three locale files | no |
   | `http/<entity>.http` | one file per entity | no |
 
@@ -1465,6 +1466,27 @@ precedent to follow.
 
   Generate them from the IR only for a domain that never had an orval run — the greenfield case
   Task 13's scaffolding covers.
+
+  **The locale files are not built from the IR, and spec §8 says so twice in conflicting ways.**
+  The IR's `labelKey` is a message *key* (`entities.HolidayCalendar.country`); it has no
+  translations. Those come from the i18n endpoint, whose payload is already structured as
+  `entities.<PascalKey>.fields.<field>.translations.<locale>`, and `transformToLocaleData`
+  (`cli-plugin/src/i18n.ts:98`) turns that into `{ <entityName>: { fields: { … } } }`. That path
+  stays exactly as it is.
+
+  **What the IR does contribute is the key that path currently guesses.**
+  `buildEntityKeyMap` (`:82`) maps `entity.pascalName → entity.name` from the *derived* entity
+  names, and `transformToLocaleData` does `if (!entityName) continue` — so when a derived name does
+  not equal the Java entity's simple name, that entity's translations are dropped in silence.
+  Measured: **24 server entity keys the IR names have no matching entry in any locale file,
+  covering 122 fields** — `ApprovalAttachment`, `EquipmentInspectionDuty`, `FloorPlan`,
+  `FloorPlanPlacement`, `ComplianceCheckItem` among them. Some belong to unconfigured domains, but
+  not all.
+
+  The IR states the server key per field, so build `entityKeyMap` from `labelKey` instead of from
+  name equality, and report any server key that still finds no home. `label` (the direct-literal
+  mode) occurs twice in the whole capture, both on `ValidationTestRequest` in an unmatched tag —
+  handle it as a fallback and do not build anything around it.
 
   **Write the profile's extension files last.** After the generators run, call
   `profile.metaExtensions?.(meta)` and write each entry of `files` under `generated-meta/`. A path
