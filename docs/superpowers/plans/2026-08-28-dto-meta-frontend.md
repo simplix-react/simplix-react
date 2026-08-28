@@ -1676,6 +1676,17 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
      record, just not the one that was asked for. The IR types every path parameter, so read the
      kind rather than guessing from a field lookup that can fail.
 
+     **A sub-resource handler filters by a field the DTO may not have, and hides the miss the same
+     way.** `generateReadByFieldHandler` (`:505`) emits
+     `store.filter((item) => String(item.<param>) === String(params.<param>))[0] ?? store.list()[0]`
+     for a route whose parameter is not at the end — `/emergency-contact/{id}/on-call`. Measured
+     over such GETs: the response DTO declares a field named after the parameter in **59** cases
+     and **not in 24** — `OnCallCellDTO` has no `emergencyContactId`, `ApprovalStepRowDTO` no
+     `approvalRequestId`, `AuditLogListDTO` no `auditLogId`. There the filter matches nothing and
+     the same `?? list()[0]` returns the first row, so a child list shows one arbitrary item
+     regardless of its parent. The IR carries both sides — the parameter and the DTO's field
+     list — so **check before emitting** and return the whole list rather than a single wrong row.
+
 - [ ] **Step 2: Test** that a handler returns an enveloped body; that a search handler's paged
   branch delegates to `store.listPaged` rather than constructing a page; that a `<field>.equals`
   query parameter takes the filter branch; and that the generator writes only
