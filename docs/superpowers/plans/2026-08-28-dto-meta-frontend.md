@@ -1091,6 +1091,31 @@ repointed.
     domains: their `crud.config.ts` files hold 122 role kinds and every one is a camelCase name
     derived from route and verb, none a raw id.
 
+  **The whole strategy was run over the fixture and it holds.** Feeding all 694 operations through
+  `simplixBootNaming.resolveOperation` with contexts built as the table above prescribes:
+  **694 named, 151 distinct roles, 0 fallbacks.** The IR reproduces the naming path completely.
+
+  **Eight hook names collide, and only one reaches a configured domain.** Seven are in unmatched
+  tags (`dev.test.*`, `dev.permissions`, the stream controllers, `CurrentUserRestController`,
+  `OAuth2 Social Login` — whose derived entity even contains spaces, so sanitise the identifier or
+  fail loudly rather than emitting one). The eighth is `getAllAvatars`, from the two routes
+  `/public/user/{userId}-avatar.{ext}` and `/public/user/{userId}-avatar-{size}.{ext}` in the
+  `user` domain.
+
+  **That one is not a defect to fix — it is orval being wrong, and `meta-diff` will say so.**
+  `PublicUserAvatarRestController` carries exactly one class-level
+  `@Tag(name = "public.user.Avatar")` and no method-level tag, so both operations belong to one
+  entity and the IR says so. springdoc split them into `public.user.Avatar` and
+  `public.user.AvatarThumbnail`, and orval's output is already broken as a result: the
+  `public-user-avatar` directory exports `useGetAllAvatarThumbnails`, and `crud.config.ts` names
+  `avatar.getAll: "getAllAvatars"` — **a hook that exists nowhere in the generated code**.
+
+  Comparing every tag: **126 of orval's 129 endpoint directories match an IR tag exactly.** The
+  three that do not are this avatar split and two from `CurrentUserRestController`, which declares
+  no `@Tag` at all — the IR falls back to the class name, springdoc invents `common.user.CurrentUser`.
+  In all three the IR reflects the source and orval does not. Report them as expected differences
+  in Task 14 and do not chase parity there.
+
   So an id mismatch will not move a hook name here. It still matters for `meta-diff`, which pairs
   operations by id, and the backend derives it with the same controller-name strip order as
   `OperationIdCustomizer` (`EquipmentInspectionRestController` → `EquipmentInspectionRest_override`
@@ -1752,6 +1777,7 @@ The reason parallel generation was chosen: a domain is only switched once the tw
 | Finding | Level |
 | --- | --- |
 | a public name present in only one — type, hook, request function, **`get<Name>QueryKey`**, const map, params type, and the mock handler factory `createXHandlers` (spec §11). Zod constants are excluded; see the info row | error |
+| a name difference traceable to one of the **three tags where springdoc and the IR disagree** — the `public.user.Avatar` split and the two `CurrentUserRestController` operations | info — the IR follows the `@Tag` annotation and orval does not; matching orval would reproduce a hook name that exists nowhere (Task 8) |
 | a `get<Name>QueryKey` returning a different **shape** | error — module code spreads the result (`[...getGetNoticeQueryKey(id), language]`), so the arity and element order are contract, not just the name |
 | a field present in only one | error |
 | a field type mismatch | error |
