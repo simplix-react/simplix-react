@@ -4,7 +4,7 @@
 
 **Goal:** `@simplix-react/cli` reads the backend's DTO metadata IR and generates TypeScript types, zod schemas, request functions, React Query hooks, MSW handlers, filter/permission configuration — in parallel with the existing orval output, so a domain can be moved across one at a time and moved back by reverting one config line.
 
-**Architecture:** A new `packages/cli/src/meta/` reads the IR (from the dev endpoint or a committed snapshot), resolves it, and hands a shared shape to per-concern generators that write into `src/generated-meta/`. The existing `packages/cli/src/openapi/` is not touched. A `meta-diff` command compares the two outputs so a domain is only switched once they agree.
+**Architecture:** A new `packages/cli/src/meta/` reads the IR (from the dev endpoint or a committed snapshot), resolves it, and hands a shared shape to per-concern generators that write into `src/generated-meta/`. The existing orval path keeps behaving exactly as it does — four tasks add to `packages/cli/src/openapi/`, none change what it emits (see "Facts that bind every task"). A `meta-diff` command compares the two outputs so a domain is only switched once they agree.
 
 **Tech Stack:** TypeScript, Node 22+, the existing CLI plugin registry, zod v4, TanStack Query, MSW.
 
@@ -24,17 +24,25 @@ The backend half of this project is finished and a real IR was captured from the
 | --- | --- |
 | operations | 694 |
 | types | 637 (104 of them carry `extends`) |
-| enums | 133 (122 labeled, every value carrying a `labelKey`) |
+| enums | 133 (122 labeled, 11 not — see Task 6) |
+| enum values | 540, of which 498 carry a `labelKey`. **`labeled` and `labelKey` coincide exactly**: the 11 enums whose values lack a `labelKey` are the same 11 that are unlabeled, and no labeled enum is missing one. Generators may rely on that. |
 | containers in use | `SimpliXApiResponse` 648 · `List` 356 · `Page` 93 · `Map` 74 |
-| field kinds | `string` 3110 · `number` 936 · `instant` 682 · `boolean` 593 · `enum` 541 · `container` 279 · `date` 202 · `ref` 134 · `time` 10 · `unknown` 8 · `param` 6 |
-| constraints | `maxLength` 440 · `notBlank` 221 · `notEmpty` 11 · `pattern` 10 · `email` 7 · `min` 7 · `minLength` 5 · `max` 4 |
+| field kinds — **counting every `TypeRef` node**, container arguments included (6,501) | `string` 3110 · `number` 936 · `instant` 682 · `boolean` 593 · `enum` 541 · `container` 279 · `date` 202 · `ref` 134 · `time` 10 · `unknown` 8 · `param` 6 |
+| field kinds — **one per field** (6,222) | `string` 2962 · `number` 935 · `instant` 682 · `boolean` 593 · `enum` 523 · `container` 278 · `date` 200 · `ref` 38 · `time` 10 · `param` 1 |
+| constraints (709 on 550 fields) | `maxLength` 440 · `notBlank` 221 · `notEmpty` 11 · `pattern` 10 · `email` 7 · `min` 7 · `minLength` 5 · `max` 4 · `nonnegative` 2 · `positive` 1 · `maxItems` 1 · **`custom` 0** |
 | access kinds | `permission` 566 · `authenticated` 94 · `public` 29 · `expression` 5 |
 | `searchDto`-bearing operations | 86 |
 | fields with `searchable` | 1118 |
 | fields with `labelKey` | 2082 |
 | distinct tags | 139 |
 
-Those numbers are the yardstick. A generator that silently drops a field kind will show up as a count that does not match.
+Those numbers are the yardstick. A generator that silently drops a field kind will show up as a
+count that does not match — **use the row that matches what you are counting**: a test walking
+fields asserts against 6,222, one walking every `TypeRef` against 6,501. `unknown` and `param`
+never appear at the top level of a field, only inside a container argument.
+
+**Every number here was measured against the capture that predates Task 0.** Re-run them after the
+re-capture; the request bodies change shape and the counts may move with them.
 
 ## Facts that bind every task
 
