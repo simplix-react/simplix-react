@@ -1562,11 +1562,20 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
   Four things follow from that, and three of them contradict how this task read before it was
   measured:
 
-  1. **The generator emits no seeds.** `src/mock/seeds.ts` and `src/mock/index.ts` are
-     hand-written and preserved: `index.ts` builds each store with
+  1. **Seeds are generated once, then preserved.** `generateMockFiles` writes
+     `src/mock/seeds.ts` **only when it does not already exist** (`mock-generator.ts:43`) — so a
+     greenfield meta domain needs the meta path to produce it, while a migrated domain keeps the
+     file it has. `src/mock/index.ts` is hand-written throughout: it builds each store with
      `createMockEntityStore<T>(seeds, "<idField>")` and spreads the generated factories into
-     `handlers`. The generator writes `generated-meta/mock/handlers.ts` and nothing else
+     `handlers`. Into `generated-meta/` the generator writes `mock/handlers.ts` and nothing else
      (spec §8).
+
+     Seeding needs the entity's `modelType` (item 5 below) and its field list, and the orval path
+     filters out entities whose model does not exist via `readGeneratedModelNames`
+     (`:99`) — **a sixth read of `src/generated/model/<camelCase>.ts` by path**, alongside
+     `findSchemaFile`, `readListDtoFieldNames`, `findMutationPathParam`, `resolveKnownModelTypes`
+     and `pruneUnusedModels`. The one-file-per-type layout Task 6 adopts is what keeps all six
+     working; assert that a meta domain with `src/generated/` removed still seeds.
   2. **Nothing hand-builds a page.** `store.listPaged(page, size, sort)` returns the Spring page
      shape. Do not assemble `totalElements`/`numberOfElements` in generated code, and do not reach
      for `pageOf` here — that is the zod builder Task 7 uses, not a runtime factory.
