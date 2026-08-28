@@ -1894,12 +1894,22 @@ precedent to follow.
   `newHeader`, `detailHeader`, `title`, `description`, `editor`, `editorPlaceholder`,
   `editDescription`, `yes`, `no`.
 
-  `scaffold-crud.ts:1015` only ensures the module's `locales/index.ts` mapping exists; it writes no
-  keys. Verified in the application: `modules/org/src/locales/widgets/ko.json` has an
-  `organization` entry containing **zero** keys. A freshly scaffolded screen therefore renders
-  `organization.deleteOrganizationTitle` as its dialog title and `organization.emptyTitle` in its
-  empty state. Emit a stub catalogue for the 25 alongside the field labels — the same
-  `camelToLabel`-grade placeholder, so the screen reads in English until somebody translates it. `label` (the direct-literal
+  **`updateLocaleJsons` (`scaffold-crud.ts:1055`) does write them**, gated on `EntityOperations` —
+  the delete trio only when `hasDelete`, `<x>Detail`/`notFound`/`detailHeader` only when `hasGet`,
+  and so on. Two guards make it skip silently, and both matter here:
+
+  - `:1065` — it writes only into a `locales/widgets/<locale>.json` that **already exists**. A
+    module scaffolded fresh has none, so nothing is written.
+  - `:1071` — `if (json[entityName]) continue`. An **empty** entity object is truthy, so once
+    `"organization": {}` is in the file no later run ever fills it. That is exactly the state of
+    `modules/org/src/locales/widgets/ko.json` in this application today: the key is present and
+    holds zero of the 25.
+
+  So the catalogue is generated but its gates depend on `crud.config.ts` being right (Task 11) and
+  on the module's locale files existing. Assert after scaffolding that the entity's key holds the
+  keys its `EntityOperations` imply — an entity with `hasDelete` must have
+  `delete<X>Title`, `delete<X>Desc` and `delete<X>DescSimple`, or the confirmation dialog renders
+  its own key as its title. `label` (the direct-literal
   mode) occurs twice in the whole capture, both on `ValidationTestRequest` in an unmatched tag —
   handle it as a fallback and do not build anything around it.
 
