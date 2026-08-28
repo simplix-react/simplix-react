@@ -38,16 +38,23 @@ The backend half of this project is finished and a real IR was captured from the
 
 ### What the fixture cannot test
 
-Four declared shapes never occur in it, so a test written against the fixture proves nothing about
+Three declared shapes never occur in it, so a test written against the fixture proves nothing about
 them. Implement each anyway — the IR declares them and a later capture will carry them — and build
 the case by hand, saying in your report that the fixture does not cover it:
 
 | Shape | In the fixture | Why |
 | --- | ---: | --- |
-| `{ kind: "file" }` | 0 | a `MultipartFile` parameter sets `contentType: "multipart"` and never becomes a `TypeRef`; the 2 multipart operations carry **no body at all** |
 | `{ kind: "pick", of, fields }` | 0 | `@JsonIncludeProperties` sits only on entities, and no DTO field is typed by an entity (spec §12) |
-| `ref` carrying `args` | 0 of 663 | there are no generic DTOs — every `typeParams` is empty |
+| `ref` carrying `args` | 0 of 663 | no DTO *reference* is generic — but three types **declare** type parameters, so see below |
 | `{ kind: "binary" }` **as a field** | 0 | it occurs 5 times, all in responses (`…/download`, the avatar and content routes) |
+
+`{ kind: "file" }` was a fourth until Task 0: the re-captured fixture carries **2**, both `query`
+entries named `file` on the avatar and content upload routes.
+
+**Three types are generic and must be emitted as such** — `SimpliXBaseEntity<K>`, `BaseEntity<K>`
+(which extends it) and `Comparable<T>`. `SimpliXBaseEntity` and `BaseEntity` are the two most
+widely shared types in the capture, reachable from 7 tags each, so a model generator that ignores
+`typeParams` flattens the key type out of every entity that inherits from them.
 
 `custom` constraints are a fifth such case — see Task 7.
 
@@ -128,8 +135,10 @@ to append the file under.
 Both are fixed on `feat/dto-meta-endpoint` in the simplix repository, each with a regression test:
 `02c49ac` maps the body the way the response was already mapped (pinning a `Set<T>` body to
 `container("List", [ref T])`), and `a7c392b` records the part as a named `query` entry typed
-`file`. `ir-types.ts` and spec §4 follow the first. **The committed fixture predates all of that**, so its 49 bodies are still
-bare strings and every generator test written against it would encode the erased shape.
+`file`. `ir-types.ts` and spec §4 follow the first. **Task 0 below re-captured the fixture against a
+backend carrying both fixes**, so the committed fixture now holds 231 `TypeRef` bodies — 49 of
+them containers — and 2 `file`-typed parts. The paragraphs below describe the capture that step
+replaced; they are kept because the tests they specify are what keep the staleness loud.
 
 - [ ] **Step 1: Re-capture.** Run the smart-safety backend with the meta endpoint enabled and
   save `GET /dev/meta/dto` over the fixture. The backend fix must be on the classpath — build the
@@ -151,7 +160,8 @@ it("every request body is a TypeRef, not a bare type name", () => {
   Then assert a known multi-update: `PATCH /api/v1/admin/org`'s body is
   `{ kind: "container", name: "List", args: [{ kind: "ref", name: "OrganizationUpdateDTO" }] }`,
   and a known upload: `POST /api/v1/admin/user/account/{userId}/avatar` carries a `query` entry
-  named `file` typed `{ kind: "file" }`. Both are absent from the old capture.
+  named `file` typed `{ kind: "file" }`. Both were absent from the old capture and are present
+  in the committed one — these assertions are the regression guard, not a pending change.
   A `Set` normalises to `List` because `TypeRefMapper` treats every `Collection` alike — which is
   also why Task 4's "four containers and no others" stays true after this change.
 
@@ -763,13 +773,14 @@ git commit -m "feat(cli): resolve the IR into per-domain type closures"
   operation responses, and **none of them reaches a domain** — every one is in an unmatched tag
   (`dev.test.*`, `dev.permissions`, `Auth Token`, the stream admin routes).
 
-  **A `param` whose name is not among the owning type's `typeParams` is unresolvable — emit
-  `unknown` and report it.** Measured, all six occurrences are of that kind:
+  **A `param` whose name IS among the owning type's `typeParams` is the type parameter — emit it,
+  and declare the interface generic. Only an unresolvable one becomes `unknown`.** The two cases
+  are five and one, not six and none:
 
-  | Where | Cause |
-  | --- | --- |
-  | `ObligationApplicabilitySearchDTO.appliedRules` · `.excludedRules`, `PreAssignmentGateSearchDTO.notifyRoleCodes`, `RegulationDutySearchDTO.additionalArticleRefs`, `PolicyParameterSearchDTO.usedByScreenKeys` | the Java field is a **raw** `private List appliedRules;` with no type argument, so the container's argument resolves to the collection's own variable `E` |
-  | `SimpliXBaseEntity.id` | the entity base class's generic key `K` |
+  | Where | `typeParams` | Emit |
+  | --- | --- | --- |
+  | `ObligationApplicabilitySearchDTO.appliedRules` · `.excludedRules`, `PreAssignmentGateSearchDTO.notifyRoleCodes`, `RegulationDutySearchDTO.additionalArticleRefs`, `PolicyParameterSearchDTO.usedByScreenKeys` | `[]` — `E` is unbound | `unknown[]`, and report it. The Java field is a **raw** `private List appliedRules;` with no type argument, so the container's argument resolves to the collection's own variable `E` |
+  | `SimpliXBaseEntity.id` | `["K"]` — `K` is bound | `interface SimpliXBaseEntity<K> { id?: K }`. Emitting `unknown` here would type the id of every entity inheriting this base — 7 tags' worth — as `unknown`, which is the erasure this project exists to remove |
 
   Emitting `appliedRules?: E[]` puts an unbound identifier in the output, and Task 11 Step 4b's
   no-`@ts-nocheck` rule leaves nowhere to hide it. `unknown[]` compiles and is honest. **Report the
