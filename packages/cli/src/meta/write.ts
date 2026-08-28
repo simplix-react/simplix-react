@@ -154,6 +154,59 @@ export function metaIndexContent(importTranslations: boolean): string {
  * The `src/schemas.ts` of a domain whose public surface is the meta output, with whatever
  * hand-written overrides the file already carries kept below the marker.
  */
+/** The meta output as `src/mock/` addresses it, one level below the package's own barrel. */
+const MOCK_META_MODULE = `../${META_DIR.slice(META_DIR.lastIndexOf("/") + 1)}`;
+
+/**
+ * Point the mock entry at the meta output.
+ *
+ * `src/mock/index.ts` is written by the Orval half, which names `../generated/model` and
+ * `../generated/mock/handlers`, and `src/mock/seeds.ts` is written once and never overwritten. On
+ * a swapped domain the seeds resolve through the meta barrel while the entry still wires Orval's
+ * handlers, so the two halves are the same DTO from two declarations and nothing assignable
+ * between them — the package stops building rather than answering wrongly.
+ *
+ * Only the two import paths move; the stores, their id fields and any custom handler the developer
+ * added are the entry's own content and are left alone.
+ */
+export async function repointMockEntry(targetDir: string): Promise<boolean> {
+  const entryPath = join(targetDir, "src/mock/index.ts");
+  if (!(await pathExists(entryPath))) return false;
+
+  const existing = await readFile(entryPath, "utf-8");
+  // Seen from `src/mock/`, which is one level deeper than the barrel `META_MODULE` addresses.
+  const repointed = existing
+    .replace(/(["'])\.\.\/generated\/model\1/g, `$1${MOCK_META_MODULE}/model$1`)
+    .replace(
+      /(["'])\.\.\/generated\/mock\/handlers\1/g,
+      `$1${MOCK_META_MODULE}/mock/handlers$1`,
+    );
+  if (repointed === existing) return false;
+
+  await writeFileWithDir(entryPath, repointed);
+  return true;
+}
+
+/**
+ * Point the seed module at the meta output, for the same reason and with the same caveat: the file
+ * is generated once and preserved, so a domain that switches keeps whatever import it was born
+ * with unless this moves it.
+ */
+export async function repointMockSeeds(targetDir: string): Promise<boolean> {
+  const seedsPath = join(targetDir, "src/mock/seeds.ts");
+  if (!(await pathExists(seedsPath))) return false;
+
+  const existing = await readFile(seedsPath, "utf-8");
+  const repointed = existing.replace(
+    /(["'])\.\.\/generated\/model\1/g,
+    `$1${MOCK_META_MODULE}/model$1`,
+  );
+  if (repointed === existing) return false;
+
+  await writeFileWithDir(seedsPath, repointed);
+  return true;
+}
+
 export async function writeMetaSchemasProxy(targetDir: string): Promise<void> {
   const schemasPath = join(targetDir, "src/schemas.ts");
   const existing = (await pathExists(schemasPath)) ? await readFile(schemasPath, "utf-8") : "";

@@ -9,6 +9,7 @@ import type { ContainerMapping } from "../openapi/orchestration/spec-profile.js"
 import type { ExtractedEntity, OpenAPISnapshot } from "../openapi/types.js";
 import type { DtoMeta } from "../meta/ir-types.js";
 import { resolveMeta } from "../meta/resolve.js";
+import { writeFileWithDir } from "../utils/fs.js";
 import type { ResolvedDomain } from "../meta/resolve.js";
 import { smartSafetyDomains } from "../meta/__fixtures__/smart-safety-domains.js";
 import {
@@ -17,6 +18,8 @@ import {
   metaIndexContent,
   writeMetaOutput,
   writeMetaSchemasProxy,
+  repointMockEntry,
+  repointMockSeeds,
 } from "../meta/write.js";
 import {
   cleanGeneratedDirs,
@@ -183,6 +186,42 @@ describe("the meta output lands in src/generated-meta/", () => {
     expect(barrel).not.toContain('export * from "./search";');
     expect(barrel).toContain('export * from "./access";');
     expect(await exists(bare, `${META_DIR}/search/index.ts`)).toBe(false);
+  });
+
+  it("moves the mock's two files onto the meta output when a domain is swapped", async () => {
+    // Both are written by the Orval half and preserved thereafter, so a swapped domain keeps them
+    // naming `../generated/` — the seeds then resolve through one declaration of a DTO and the
+    // entry through another, and nothing is assignable between them.
+    const dir = await mkdtemp(join(tmpdir(), "meta-mock-"));
+    await writeFileWithDir(
+      join(dir, "src/mock/index.ts"),
+      [
+        'import type { PetDTO } from "../generated/model";',
+        'import { createPetHandlers } from "../generated/mock/handlers";',
+        "export const handlers = [...createPetHandlers(store)];",
+      ].join("\n"),
+    );
+    await writeFileWithDir(
+      join(dir, "src/mock/seeds.ts"),
+      'import type { PetDTO } from "../generated/model";\nexport const petSeeds: PetDTO[] = [];\n',
+    );
+
+    expect(await repointMockEntry(dir)).toBe(true);
+    expect(await repointMockSeeds(dir)).toBe(true);
+
+    const entry = await readFile(join(dir, "src/mock/index.ts"), "utf-8");
+    expect(entry).toContain('from "../generated-meta/model"');
+    expect(entry).toContain('from "../generated-meta/mock/handlers"');
+    // The stores and any hand-added handler are the entry's own content.
+    expect(entry).toContain("export const handlers = [...createPetHandlers(store)];");
+    expect(await readFile(join(dir, "src/mock/seeds.ts"), "utf-8")).toContain(
+      'from "../generated-meta/model"',
+    );
+
+    // Idempotent: a second run finds nothing left to move.
+    expect(await repointMockEntry(dir)).toBe(false);
+    expect(await repointMockSeeds(dir)).toBe(false);
+    await rm(dir, { recursive: true, force: true });
   });
 
   it("exports the params types the search generator writes beside the DTOs", async () => {
