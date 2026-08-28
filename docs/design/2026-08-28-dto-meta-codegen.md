@@ -319,9 +319,17 @@ interface SpecProfile {
   metaDownloader?: (serverOrigin: string) => Promise<DtoMeta | undefined>;
   metaExtensions?: (meta: DtoMeta) => MetaExtensionOutput | undefined;
 }
+
+/** `metaExtensions`가 내는 것. 백엔드 기여자가 `extensions`에 넣은 데이터를 프로파일이 파일로 옮긴다 */
+interface MetaExtensionOutput {
+  /** `generated-meta/` 기준 상대 경로 → 파일 내용. 기존 생성 파일 경로와 겹치면 오류로 멈춘다 */
+  files: Record<string, string>;
+}
 ```
 
 `@simplix-react-ext/simplix-boot-cli-plugin`이 `simplix-boot` 프로파일에 이 셋을 등록한다.
+`simplix-boot` 프로파일은 지금 기여자를 쓰지 않으므로 `metaExtensions`를 등록하지 않는다 —
+확장점은 열려 있고 기본 동작은 없다.
 
 ## 7 · 앱 자산의 프레임워크 이관
 

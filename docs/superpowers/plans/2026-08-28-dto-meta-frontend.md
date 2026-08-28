@@ -470,7 +470,26 @@ export const bootContainerTypes: Record<string, ContainerMapping> = {
 
 `SpringPage`, `pageOf` and `springPageSchema` already exist in `@simplix-react-ext/simplix-boot-auth` — do not redefine them.
 
-- [ ] **Step 2: Extend `SpecProfile`** with `metaEndpoint?: string`, `metaDownloader?`, and `containerTypes?: Record<string, ContainerMapping>`, all optional so existing profiles are unaffected. Register the boot values in the plugin's `registerPlugin` call, endpoint `/api/v1/dev/meta/dto`.
+- [ ] **Step 2: Extend `SpecProfile`** with **four** optional members, so existing profiles are
+  unaffected: `metaEndpoint?: string`, `metaDownloader?`,
+  `containerTypes?: Record<string, ContainerMapping>`, and
+  `metaExtensions?: (meta: DtoMeta) => MetaExtensionOutput | undefined`.
+
+  `metaExtensions` is the frontend half of the backend's `SimpliXMetaContributor` SPI (spec §6) —
+  a contributor puts arbitrary data into the IR's `extensions`, and this turns it into files:
+
+  ```ts
+  interface MetaExtensionOutput {
+    /** Path relative to `generated-meta/` → file content. */
+    files: Record<string, string>;
+  }
+  ```
+
+  Register the boot values in the plugin's `registerPlugin` call, endpoint
+  `/api/v1/dev/meta/dto`. **Do not register a `metaExtensions` implementation** — the boot profile
+  has no contributor, and the captured IR's `extensions` is absent. The point of this step is that
+  the seam exists and is typed; inventing a default behaviour for it would be the speculative
+  code this project's rules forbid.
 
 - [ ] **Step 3: Test** that every container name appearing in the real fixture has a mapping — this is the assertion that catches a backend adding a container the plugin does not know:
 
@@ -994,6 +1013,12 @@ meta?: {
   `schema/` is deliberately absent: `schemas.ts` re-exports zod constants separately and
   `export *` from both would collide on names (the existing type-name-conflict rule). `mock/` is
   absent because `src/mock/index.ts` imports the handler factories by path.
+
+  **Write the profile's extension files last.** After the generators run, call
+  `profile.metaExtensions?.(meta)` and write each entry of `files` under `generated-meta/`. A path
+  that collides with a file a generator already wrote is an error, not an overwrite — the profile
+  is adding to the output, not editing it. When the profile has no `metaExtensions`, nothing
+  happens and nothing is written; that is the boot profile's case today.
 
   Emit a per-directory `index.ts` in `model/`, `endpoints/`, `hooks/`, `search/` and `access/`,
   each re-exporting that directory's entity files. `model/index.ts` makes `export * from "./model"`
