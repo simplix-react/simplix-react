@@ -595,6 +595,30 @@ The generators need the IR sliced by domain and indexed. This task does that onc
   A run that reports far fewer than 117 means a tag pattern started matching something it should
   not.
 
+- [ ] **Step 1b: Assign each type one owner, and keep the closure clean.**
+
+  **Spec §5.1 requires that a type is never declared twice**, and the layout is one file per
+  entity, so a type reachable from two entities in the same domain would be written into both and
+  collide at `export *`. Measured: **33 of the 637 types are reachable from more than one tag** —
+  `SimpliXBaseEntity` and `BaseEntity` from 7 each, `JobPosition` 4, `UserAccount` and
+  `Organization` 3. Resolve must therefore return, per domain, a **type → owning entity** map, and
+  every generator writes a type only into its owner's file. Put a shared type in the entity that
+  reaches it first in a deterministic order, so two runs agree.
+
+  **The closure also picks up types that are not DTOs.** The fixture holds 12 whose `javaClass` is
+  JDK or Spring — reached because the walker's fallback is "anything else is a DTO":
+
+  | Type | Reaches a real domain | Note |
+  | --- | --- | --- |
+  | `Set`, `List` (0 fields) | 9 domains | artefacts of the erased request body; **Task 0's backend fix removes them** |
+  | `Comparable` (0 fields) | `user` | real and remains — `Organization.sortKey` is typed `Comparable<?>` |
+  | `ApplicationContext`, `AutowireCapableBeanFactory`, `ApplicationObjectSupport`, `WebApplicationObjectSupport`, `AbstractView`, `AbstractUrlBasedView`, `RedirectView`, `SseEmitter`, `ResponseBodyEmitter` | **none** | reachable only from unmatched tags, via `RedirectView` → `AbstractView` → `ApplicationObjectSupport` → `ApplicationContext` |
+
+  So assert that no domain closure contains a type whose `javaClass` starts with `java.`,
+  `javax.`, `jakarta.` or `org.springframework.` — with `Comparable` as the one accepted exception,
+  reported rather than silently emitted. A new one appearing means a controller started returning a
+  framework type and the walker followed it.
+
 - [ ] **Step 2: Test against the real fixture.** Assert that resolving with a single catch-all domain reaches all 637 types; that a domain's closure never contains a type none of its operations reach; that `extends` chains resolve (the fixture has 104); and that a type whose parent is outside the domain still pulls the parent in.
 
 - [ ] **Step 3: Run, then commit**
@@ -614,7 +638,10 @@ git commit -m "feat(cli): resolve the IR into per-domain type closures"
 - Test: `packages/cli/src/__tests__/meta-model-gen.test.ts`
 
 - [ ] **Step 1: Write it.** For one domain, emit:
-  - `model/<entity>.ts` — one `export interface` per type, `extends` where the IR says so, **own fields only**
+  - `model/<entity>.ts` — one `export interface` per type, `extends` where the IR says so, **own
+    fields only**. A type reachable from two entities is written into its **owner's** file alone
+    (Task 5) — spec §5.1 forbids declaring the same type twice, and `export *` from the directory
+    barrel would collide on the 33 shared types
   - `model/_enums.ts` — the exact declaration-merge shape orval emits, so a module that imports
     the name as a **value** keeps working.
 
@@ -649,7 +676,9 @@ git commit -m "feat(cli): resolve the IR into per-domain type closures"
 
   A field is optional (`?`) exactly when `required` is false.
 
-- [ ] **Step 2: Test against the real fixture.** Generate for a domain and assert: an `extends` type emits only its own fields; a **labeled** response enum field is the `Labeled` alias while the same enum in a request DTO is the union; an **unlabeled** enum is the plain union in the response too — assert `UserAccountDetailDTO.standing` by name and that no `UserAccountStandingLabeled` is emitted anywhere; no `SimpliXApiResponse` appears anywhere in the output; every one of the 11 field kinds present in the fixture produces valid TypeScript. **Prove the output is well-formed TypeScript, not merely that it contains the right substrings.**
+- [ ] **Step 2: Test against the real fixture.** Generate for a domain and assert: an `extends` type emits only its own fields; a **labeled** response enum field is the `Labeled` alias while the same enum in a request DTO is the union; an **unlabeled** enum is the plain union in the response too — assert `UserAccountDetailDTO.standing` by name and that no `UserAccountStandingLabeled` is emitted anywhere; no `SimpliXApiResponse` appears anywhere in the output; **no exported name appears in two files
+of one domain** — walk the emitted `model/` directory and assert the set of exported interface
+names has no duplicate, which is the only thing that catches a shared type written twice; every one of the 11 field kinds present in the fixture produces valid TypeScript. **Prove the output is well-formed TypeScript, not merely that it contains the right substrings.**
 
   Use `ts.transpileModule(text, { reportDiagnostics: true })` and assert `diagnostics` is empty.
   That is a **syntax** check and it is the right one here: it catches a malformed emit — an
@@ -725,6 +754,27 @@ This is where the project's original complaint is answered: 440 `maxLength` and 
 
   A non-required field gets `.optional()`.
 
+  **A self-referential type needs `z.lazy()` (spec §5.1).** An `interface` may reference itself,
+  but a zod const is bound by declaration order — `const X = z.object({ parent: X })` reads `X`
+  before it exists. Measured, the fixture holds **five self-referential types and no mutual
+  cycles**: `OrganizationListDTO`, `LawScreenMapNodeDTO`, `AreaNodeDTO`, `Organization`, and
+  `ApplicationContext` (which no domain closure reaches — see Task 5).
+
+  **`OrganizationListDTO` is in `org`, the pilot domain**, so Task 14 meets this on the first
+  domain moved. Detect the cycle while resolving rather than at emit time, and wrap only the
+  self-referencing member:
+
+  ```ts
+  const OrganizationListDTO: z.ZodType<OrganizationListDTOType> = z.object({
+    orgId: z.string(),
+    children: z.array(z.lazy(() => OrganizationListDTO)).optional(),
+  });
+  ```
+
+  The explicit type annotation is required — TypeScript cannot infer a recursive schema's type and
+  reports `implicitly has type 'any' because it does not have a type annotation`, which Task 11's
+  no-`@ts-nocheck` rule leaves nowhere to hide.
+
   **The kind vocabulary is closed and matches the backend exactly.** `ConstraintExtractor.extract`
   emits only: `notBlank`, `notEmpty`, `minLength`, `maxLength`, `minItems`, `maxItems`, `min`,
   `max`, `positive`, `nonnegative`, `negative`, `nonpositive`, `pattern`, `email`, `assertTrue`,
@@ -785,6 +835,9 @@ This is where the project's original complaint is answered: 440 `maxLength` and 
     it, do not merely grep the text; the one-argument form throws at construction, which a
     substring assertion would never notice
   - an `extends` type's schema validates a field declared on the parent
+  - **`OrganizationListDTO` builds and validates a two-level nested value** — the recursive case,
+    from the pilot domain. A schema that referenced itself directly would throw or be `undefined`
+    at construction, so build it and parse, do not grep for `z.lazy`
   - no emitted call is one v4 deprecates — grep the generated text for `.email(`, `.url(`,
     `.uuid(` used as methods and assert none appear
 
