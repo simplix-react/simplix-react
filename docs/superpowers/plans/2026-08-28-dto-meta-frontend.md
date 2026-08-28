@@ -665,9 +665,59 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
 - Create: `packages/cli/src/meta/generation/mock-gen.ts`
 - Test: `packages/cli/src/__tests__/meta-mock-gen.test.ts`
 
-- [ ] **Step 1: Write it.** Emit MSW handlers per operation and seeds per entity, wrapping responses in the envelope with `wrapEnvelope` from `@simplix-react-ext/simplix-boot-auth`. **`src/mock/seeds.ts` is preserved across regenerations** — the existing rule, unchanged (spec §8).
+- [ ] **Step 1: Write it — matching the measured layout, which is not one handler per operation.**
 
-- [ ] **Step 2: Test** that a handler returns an enveloped body, that a `Page` response is shaped like `SpringPage`, and that regenerating does not overwrite an existing seeds file.
+  Read `packages/domain-<name>/src/generated/mock/handlers.ts` in a real domain before writing
+  anything. The orval path emits **one file for the whole domain**, exporting one factory per
+  entity:
+
+  ```ts
+  import { http, HttpResponse } from "msw";
+  import { wrapEnvelope } from "@simplix-react-ext/simplix-boot-auth"
+  import type { MockEntityStore } from "@simplix-react/mock";
+  import { buildEmbeddedTree } from "@simplix-react/mock";
+
+  export function createWorkPointHandlers(store: MockEntityStore<WorkPointDetailDTO>) {
+    return [
+      http.post("*/api/v1/admin/work-point/create", async ({ request }) =>
+        HttpResponse.json(wrapEnvelope(store.create(await request.json() as WorkPointDetailDTO)))),
+      http.get("*/api/v1/admin/work-point/search", ({ request }) => {
+        const url = new URL(request.url);
+        const workPointId_equals = url.searchParams.get("workPointId.equals");
+        if (workPointId_equals)
+          return HttpResponse.json(wrapEnvelope(store.filter((i) => i.workPointId === workPointId_equals)));
+        const page = Number(url.searchParams.get("page") ?? "0");
+        const size = Number(url.searchParams.get("size") ?? "10");
+        const sort = url.searchParams.get("sort") ?? undefined;
+        return HttpResponse.json(wrapEnvelope(store.listPaged(page, size, sort)));
+      }),
+      // …
+    ];
+  }
+  ```
+
+  Four things follow from that, and three of them contradict how this task read before it was
+  measured:
+
+  1. **The generator emits no seeds.** `src/mock/seeds.ts` and `src/mock/index.ts` are
+     hand-written and preserved: `index.ts` builds each store with
+     `createMockEntityStore<T>(seeds, "<idField>")` and spreads the generated factories into
+     `handlers`. The generator writes `generated-meta/mock/handlers.ts` and nothing else
+     (spec §8).
+  2. **Nothing hand-builds a page.** `store.listPaged(page, size, sort)` returns the Spring page
+     shape. Do not assemble `totalElements`/`numberOfElements` in generated code, and do not reach
+     for `pageOf` here — that is the zod builder Task 7 uses, not a runtime factory.
+  3. **A tree operation uses `buildEmbeddedTree`** from `@simplix-react/mock`.
+  4. **The IR has no entities, so the grouping has to be derived.** The factory name, the DTO type
+     parameter and the store's id-field argument all come from an entity notion the IR does not
+     carry — it has operations, tags and types. Derive the grouping the same way the endpoint and
+     hook generators do (Task 8), and where an operation cannot be attributed to an entity, emit
+     it into the domain's factory rather than dropping it. Say in your report how you grouped.
+
+- [ ] **Step 2: Test** that a handler returns an enveloped body; that a search handler's paged
+  branch delegates to `store.listPaged` rather than constructing a page; that a `<field>.equals`
+  query parameter takes the filter branch; and that the generator writes only
+  `mock/handlers.ts`, leaving an existing `src/mock/seeds.ts` and `src/mock/index.ts` untouched.
 
 - [ ] **Step 3: Run, then commit**
 
