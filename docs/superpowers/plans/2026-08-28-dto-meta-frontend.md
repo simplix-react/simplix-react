@@ -1286,6 +1286,25 @@ operator table (Step 1b) is wrong, and the diff will say which member moved.
   options are always available. Map each enum's values to `values.map(v => v.name)` to match the
   `string[]` shape `entityField.enum` has.
 
+- [ ] **Step 1bc: A faceted filter with no options is worse than a text filter — the IR can tell
+  them apart.** `parseFilterParams`'s Rule 2c (`scaffold-crud.ts:1378`) makes **any** field with an
+  `.in` parameter a `FacetedFilter` and fills `options` from `entityField?.enum`, which is
+  `undefined` unless the field is an enum. The rule fires before the enum check of Rule 6, so the
+  type is never consulted.
+
+  Measured over the fixture's search DTOs: **300 searchable fields carry `IN`, and 205 of them are
+  not enums** — `EquipmentSearchDTO.siteId`, `.areaId`, `.equipmentId`, `.managingOrgId` and their
+  kind. Each becomes a facet the operator can open to find nothing inside.
+
+  Emit `faceted` only when options exist; otherwise let the field fall through to the text or
+  number rule for its kind. This diverges from the orval path deliberately, and safely — filter
+  definitions live in scaffolded module code, not in the domain package, so they are outside
+  `meta-diff`'s public-name comparison. Say in your report how many fields this rerouted.
+
+  The two name-keyed special cases stay as they are: `/(?:country|countryCode)$/i` with `.in` gives
+  a `CountryFilter` (3 fields in the fixture) and `/(?:timezone|timeZone)$/i` gives a
+  `TimezoneFilter` (1). Both are `FilterDef` variants (Step 1c) and neither needs the IR.
+
 - [ ] **Step 1c: Build range filters from the IR kind, not from the field's name.**
 
   `parseFilterParams` decides a date field with
