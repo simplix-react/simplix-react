@@ -1960,10 +1960,22 @@ so `getDefaultValue` keeps returning `new Date()`.
 is a scaffold-internal signal feeding `getDefaultValue` and the component choice, and there the
 orval path uses `Date`. Keep them different on purpose, and say so in your report.
 
-**One helper is not reusable:** `detectI18nFieldPairs` (`:265`) is not exported. The `xxxI18n`
-map pairing it performs is keyed on field NAMES, so it works the same on IR-derived fields — but
-you cannot call it. Export it, or reproduce it; do not skip it, or a meta domain loses its
-multilingual field pairing while an orval domain keeps it. Say which you did.
+**One helper is not reusable:** `detectI18nFieldPairs` (`:265`) is not exported. Export it, or
+reproduce it; do not skip it, or a meta domain loses its multilingual field pairing while an orval
+domain keeps it. Say which you did.
+
+**It is not keyed on names alone**, whatever spec §12 says. The condition is
+`name.endsWith("I18n") && tsType === "Record<string, string>"` — **both**, and the second is an
+exact string comparison. Measured: the fixture holds **33** `…I18n` fields, every one of them a
+`Map` container over `string`, and every one has its base field present, so all 33 should pair. A
+generator that renders the `Map` mapping as `Record<string,string>` — the same type, one space
+short — pairs **none** of them, silently: the multilingual editor degrades to a raw map field and
+nothing reports it. Emit `Record<string, string>` exactly, and assert one pairing by name in the
+test.
+
+`SYSTEM_FIELDS` (`:56` — `id`, `displayOrder`, `sortOrder`) *is* purely name-based and carries over
+unchanged; all three occur in the IR (`sortOrder` 36, `displayOrder` 22, `id` 12). So do the audit
+regexes (`:82`, `:83`).
 
 Filter operators come from `searchable.operators` — never from parameter-name suffixes, which is
 what the orval path has to do. Labels come from `labelKey`.
