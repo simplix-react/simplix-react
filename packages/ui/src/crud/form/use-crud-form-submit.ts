@@ -13,8 +13,17 @@ export type { CrudMutation } from "@simplix-react/headless";
 export interface UseCrudFormSubmitOptions<T, TId = unknown> {
   /** Entity ID for edit mode. When nullish, create mode is used. */
   entityId?: TId;
-  /** Create mutation hook result. */
-  create: CrudMutation<T>;
+  /**
+   * Create mutation hook result. Omit it on a form that only ever edits.
+   *
+   * @remarks
+   * A form reached from a record — an edit panel, a settings pane — has no create path, and
+   * demanding one here meant registering a mutation the screen never calls. That is what sent
+   * those forms to a raw `mutateAsync` with a toast instead, which throws away the per-field
+   * detail the server sends with a refusal. One of `create` and `update` has to be there for the
+   * mode the form is in.
+   */
+  create?: CrudMutation<T>;
   /** Update mutation hook result. Required for edit mode. */
   update?: CrudMutation<{ id: TId; dto: T }>;
   /**
@@ -27,8 +36,16 @@ export interface UseCrudFormSubmitOptions<T, TId = unknown> {
    * Required when `i18nFields` is provided.
    */
   locales?: ReadonlyArray<{ value: string }>;
-  /** Called after a successful create or update. */
-  onSuccess?: () => void;
+  /**
+   * Called after a successful create or update, with whatever the mutation answered.
+   *
+   * @remarks
+   * A create form that navigates to the record it just made needs the new id, and the answer is
+   * the only place it exists. The argument is `unknown` because create and update answer with
+   * different shapes; narrow it the way the rest of the screen reads a response. Callers that do
+   * not need it ignore it, as they always have.
+   */
+  onSuccess?: (result: unknown) => void;
   /**
    * Optional client-side validator. Runs on submit BEFORE the server
    * mutation. Receives the raw form values (pre-i18n-fallback) and must
@@ -166,13 +183,25 @@ export function useCrudFormSubmit<T, TId = unknown>(
         prepared = next as T;
       }
 
+      // Edit takes the update path when there is one; everything else is the create path, which
+      // is what makes an upsert endpoint work with `update` omitted. A mode with neither mutation
+      // is a wiring mistake rather than anything the reader did, so it says so rather than
+      // failing quietly at the press.
       const doMutate =
         isEdit && update
           ? () => update.mutateAsync({ id: entityId, dto: prepared })
-          : () => create.mutateAsync(prepared);
+          : create
+            ? () => create.mutateAsync(prepared)
+            : null;
+      if (!doMutate) {
+        throw new Error(
+          "useCrudFormSubmit: no mutation for this mode — "
+            + (isEdit ? "edit mode needs `update` or `create`" : "create mode needs `create`"),
+        );
+      }
 
       doMutate()
-        .then(() => onSuccess?.())
+        .then((result) => onSuccess?.(result))
         .catch((error: unknown) => {
           const errors = getValidationErrors(error);
           if (errors) {
@@ -184,7 +213,7 @@ export function useCrudFormSubmit<T, TId = unknown>(
     [isEdit, entityId, create, update, onSuccess, i18nFields, locales, validator],
   );
 
-  const isPending = isEdit ? (update?.isPending ?? false) : create.isPending;
+  const isPending = isEdit ? (update?.isPending ?? false) : (create?.isPending ?? false);
 
   return { isEdit, handleSubmit, isPending, fieldErrors, fieldLabels };
 }
