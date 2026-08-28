@@ -168,7 +168,13 @@ export function dedupeByName(targets: EndpointTarget[]): EndpointTarget[] {
  */
 export function entityNameOf(tag: string): string {
   const last = tag.slice(tag.lastIndexOf(".") + 1);
-  return last.charAt(0).toLowerCase() + last.slice(1);
+  // A controller that declares no `@Tag` is tagged with its class name, and the suffix would reach
+  // the entity and every hook of it — `useUpdateLocaleCurrentUserRestController`. `RestController`
+  // goes first: taking `Controller` off `CurrentUserRestController` would leave `CurrentUserRest`.
+  // `simplixBootNaming.resolveEntityName` strips the same two in the same order, and a test holds
+  // the two derivations against each other over every tag the capture states.
+  const named = last.replace(/RestController$/, "").replace(/Controller$/, "");
+  return named.charAt(0).toLowerCase() + named.slice(1);
 }
 
 /**

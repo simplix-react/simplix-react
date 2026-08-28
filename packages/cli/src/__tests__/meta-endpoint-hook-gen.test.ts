@@ -10,7 +10,7 @@ import type {
 import type { ContainerMapping } from "../openapi/orchestration/spec-profile.js";
 import { resolveMeta } from "../meta/resolve.js";
 import type { ResolvedDomain } from "../meta/resolve.js";
-import { generateEndpointFiles, resolveEndpoints } from "../meta/generation/endpoint-gen.js";
+import { generateEndpointFiles, resolveEndpoints, entityNameOf } from "../meta/generation/endpoint-gen.js";
 import { generateHookFiles } from "../meta/generation/hook-gen.js";
 import { smartSafetyDomains } from "../meta/__fixtures__/smart-safety-domains.js";
 
@@ -423,6 +423,19 @@ describe("generateEndpointFiles writes the request half", () => {
 
     const clash = avatars.duplicateExports.find((one) => one.name === "getAllAvatars");
     expect(clash?.operations.length).toBeGreaterThan(1);
+  });
+
+  it("names an entity the way the profile's strategy does, for every tag in the capture", () => {
+    // Two derivations of one name drift apart in silence: the generators call `entityNameOf` and
+    // the scaffolder resolves through the strategy, so a tag they disagree on produces hooks under
+    // one name and a crud.config.ts pointing at another.
+    const tags = [...new Set(meta.operations.map((operation) => operation.tag))];
+    const disagreed = tags.filter(
+      (tag) =>
+        entityNameOf(tag) !==
+        simplixBootNaming.resolveEntityName({ tag, paths: [], operations: [] }),
+    );
+    expect(disagreed).toEqual([]);
   });
 
   it("keeps every route in the mock, where a name is not what identifies a handler", () => {
