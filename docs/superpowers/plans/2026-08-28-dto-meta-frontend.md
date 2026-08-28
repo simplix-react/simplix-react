@@ -1605,6 +1605,14 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
      regenerated. Seed `List` as `[]` and omit `Map`, matching what the orval path does today.
      `generateArrayValue`'s name heuristics (`tag`, `url`, `image`, `photo`) fire on **0** of the
      fixture's container fields, so nothing depends on reproducing them.
+  1a. **Convert `{param}` to `:param` for the route pattern — the opposite of what Task 8 says.**
+     `toMswPattern` only prefixes a `*` (`mock-generator.ts:737`); the `:param` form in the
+     measured handler comes from `ExtractedOperation.path`, which the orval pipeline already
+     converted. **The IR's paths are in `{param}` form** — all 306 of them — so the mock generator
+     must convert, while Task 8's `OperationContext` wants them left alone. Do not carry one
+     decision into the other: an MSW pattern containing `{workPointId}` matches nothing, and every
+     mocked request falls through to a server that is not running.
+
   1b. **Fourteen roles read or write the store; everything else gets an empty-body stub.** The
      generator switches on the role (`mock-generator.ts:376`) for `list`, `getAll`, `get`,
      `getForEdit`, `create`, `update`, `delete`, `multiUpdate`, `batchUpdate`, `batchDelete`,
