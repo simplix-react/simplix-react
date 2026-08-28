@@ -989,7 +989,34 @@ git commit -m "feat(cli): generate the meta output alongside orval and switch by
 
 The reason parallel generation was chosen: a domain is only switched once the two outputs agree.
 
-- [ ] **Step 1: Write it.** `simplix meta-diff <domain>` compares the public names each output exports and reports (spec §11):
+- [ ] **Step 1: Write it.** `simplix meta-diff <domain>` compares the public names each output
+  exports and reports (spec §11).
+
+  **Where the two sides come from — this is the whole design of the command.** Both outputs exist
+  only as TypeScript on disk (`src/generated/` and `src/generated-meta/`); there is no shared
+  intermediate to compare. So the command reads both trees with the compiler's parser and compares
+  the declarations it finds:
+
+  ```ts
+  import ts from "typescript";
+
+  const sf = ts.createSourceFile(path, text, ts.ScriptTarget.Latest, true);
+  ```
+
+  Walk the top-level statements and collect, per file: exported `interface` names with each
+  member's name, type text (`member.type.getText(sf)`) and whether it carries a `?`; exported
+  `type` aliases; exported `const` names; and exported function/arrow names. Compare those two
+  maps. Use the parser rather than a regex — an optional marker and a generic argument are exactly
+  what a regex gets wrong, and getting them wrong turns this command from a gate into noise.
+
+  Do not type-check: `createSourceFile` parses one file with no module resolution, which is what is
+  wanted here and is why Task 6 also avoids `ts.createProgram`.
+
+  Registration follows the existing shape — `export const metaDiffCommand = new Command("meta-diff")`
+  in `commands/meta-diff.ts`, added in `bin.ts` with `program.addCommand(metaDiffCommand)` beside
+  the other nine.
+
+  Findings:
 
 | Finding | Level |
 | --- | --- |
