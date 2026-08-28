@@ -1686,6 +1686,16 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
      the same `?? list()[0]` returns the first row, so a child list shows one arbitrary item
      regardless of its parent. The IR carries both sides — the parameter and the DTO's field
      list — so **check before emitting** and return the whole list rather than a single wrong row.
+     The precedent is in the same file: the list handler's filter is guarded by
+     `entity.fields.some((f) => f.name === sanitizeFieldName(qp.name))` (`:457`), whose comment
+     says why — "a filter on a non-field would reference a property that does not exist on the
+     DTO". Apply that guard to the sub-resource handler too.
+
+     **The list handler's filter parameter has to be derived, because the IR has none.** It takes
+     the first query parameter that is a string *and* names a field the DTO declares, then emits a
+     shortcut branch before the paged fallback. The IR's search operations carry an **empty**
+     `query` (Task 9), so build the candidate list from the `searchDto`'s searchable fields the way
+     Task 9 derives the params type, then apply the same DTO-declares-it guard.
 
 - [ ] **Step 2: Test** that a handler returns an enveloped body; that a search handler's paged
   branch delegates to `store.listPaged` rather than constructing a page; that a `<field>.equals`
