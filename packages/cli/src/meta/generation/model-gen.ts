@@ -183,6 +183,14 @@ class ModelEmitter {
     const declared = [...this.domain.enums.values()];
     const lines = [HEADER, ""];
 
+    // A domain whose closure reaches no enum still gets the module, because the barrel re-exports
+    // it unconditionally and a file holding only a comment is not a module — TypeScript rejects
+    // the re-export with TS2306 rather than ignoring it, and the domain package stops compiling.
+    if (declared.length === 0) {
+      lines.push("export {};", "");
+      return lines.join("\n");
+    }
+
     if (this.labeledEnum && declared.some((entry) => entry.meta.labeled)) {
       lines.push(
         `import type { ${this.labeledEnum.ts} } from '${this.labeledEnum.import}';`,

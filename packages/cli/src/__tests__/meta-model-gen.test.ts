@@ -113,6 +113,16 @@ describe("generateModelFiles and the labeled enum", () => {
     expect(file("AreaSearchDTO")).toContain("import type { AreaKind, AreaStatus }");
   });
 
+  it("makes the enum module a module even when the domain reaches no enum", () => {
+    // The barrel re-exports `_enums` unconditionally, and a file holding only a comment is not a
+    // module: TypeScript answers the re-export with TS2306 and the domain package stops compiling.
+    const bare = resolveMeta(meta, { domains: { org: ["org.OrgType"] }, containerTypes });
+    const files = generateModelFiles(bare.domains.get("org")!).files;
+    const enums = files.get("model/_enums.ts") ?? "";
+    expect(enums).toContain("export {};");
+    expect(ts.transpileModule(enums, { reportDiagnostics: true }).diagnostics ?? []).toEqual([]);
+  });
+
   it("keeps the type and the const under one name, so the name works in both positions", () => {
     const enums = everything.files.get("model/_enums.ts") ?? "";
     expect(enums).toContain(
