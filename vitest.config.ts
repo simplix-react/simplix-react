@@ -1,4 +1,5 @@
 import { readFileSync, mkdirSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
 // Ensure coverage temp directory exists (workaround for vitest v8 race condition)
@@ -24,7 +25,12 @@ export default defineConfig({
         extends: true,
         test: {
           name: "cli",
-          root: "./packages/cli",
+          // Absolute, resolved from this file. A relative root is resolved against the invocation
+          // cwd, so `pnpm --filter @simplix-react/cli test` — which runs with cwd already inside
+          // the package — looked for `packages/cli/packages/cli`, matched nothing, and reported
+          // "No test files found" while exiting 0. Every other project is a glob and carries no
+          // root, which is why only this one was affected.
+          root: fileURLToPath(new URL("./packages/cli", import.meta.url)),
           include: ["src/__tests__/**/*.test.ts"],
         },
       },
