@@ -2301,6 +2301,21 @@ All three framework components exist:
 | `date` | `DateField` | `Date` | `Date` | 202 |
 | `time` | `TimeField` | **`Date`** | `Date` | 10 |
 
+**The form template must gain branches for the two new `formComponent` values, or this change is
+a regression.** `form.hbs:174` reads a temporal default with
+`{{else if (eq this.formComponent "DateField")}} {{name}}: parseDate(defaultValues?.{{name}}) ?? …`
+and everything else falls to a raw pass-through. Today all 884 `instant` and `date` fields carry
+`formComponent: "DateField"` and so all take that branch; renaming `instant` to `DateTimeField`
+**takes 682 fields out of it**, handing a raw ISO string to a component that expects a `Date`.
+
+Match all three. `parseDate` (`packages/headless/src/parse-date.ts:49`) already tells `instant` from
+`date` on its own — its date-only branch parses a local calendar date and runs it through
+`asPlainDate`, which redefines `toJSON` on the instance so `JSON.stringify` emits `yyyy-MM-dd`
+rather than a UTC timestamp. That is the whole round trip, and it is why the submit path needs no
+serializer of its own. `time` is the exception: a `TimeField` takes a `TimeValue`, converted through
+the shared `TimeValue ⇄ "HH:mm"` helper pair the frontend handbook's invariant #37 names, so give it
+its own branch rather than routing it through `parseDate`.
+
 **`component` stays `"Date"` for all three, including `time`** — only `formComponent` distinguishes
 them. `component` is a coarse classification two other mechanisms read, and neither knows a
 `"Time"` value: `categorizeField` (`scaffold-crud.ts:102`) files a field as `schedule` on
