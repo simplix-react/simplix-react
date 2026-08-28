@@ -1585,9 +1585,19 @@ precedent to follow.
      `export *` declarations exporting the same name by **exporting neither** — so the barrel
      silently loses every colliding type instead of reporting a conflict.
 
-  So the `export` list has to reach **this call site**: pass the resolved path into the template
-  render at `:387` (Task 13 makes it a variable) and let `writeFileWithDir` overwrite, rather than
-  rewriting the file afterwards. `enableOrval` is a boolean today and a meta domain is a third
+  **`schemas.ts` has the same problem in a different function.** `generateSchemasProxy`
+  (`orval-runner.ts:599`) runs at step 11 of every domain build, lists
+  `src/generated/endpoints/*.zod.ts`, and rewrites the file as one `export *` per zod file —
+  preserving only what follows the marker `// Custom schema overrides and additions:`. So a
+  hand-repointed `schemas.ts` is reverted on the next run, exactly like `index.ts`. And once
+  `src/generated/` is deleted it takes the other branch —
+  `if (!(await pathExists(endpointsDir))) return;` — leaving the file **untouched and still naming
+  deleted paths**. That failure is at least loud, unlike the enum filter's.
+
+  So the `export` list has to reach **both call sites**: pass the resolved path into the template
+  render at `openapi.ts:387` (Task 13 makes it a variable) and let `writeFileWithDir` overwrite,
+  and give `generateSchemasProxy` the meta layout — `generated-meta/schema/index.ts` is the single
+  path it re-exports there, in place of one line per zod file. Rewrite neither file afterwards. `enableOrval` is a boolean today and a meta domain is a third
   case, so widen it there too. Assert both directions: switching a domain into `export` and running
   codegen twice leaves one export line, and taking it back out leaves the orval line alone.
 
@@ -1598,7 +1608,7 @@ precedent to follow.
   | `index.ts` | no | 0 of 13 differ from the 3-line template | regenerate |
   | `hooks/<entity>.ts` | no | each is exactly one `export *` line | regenerate |
   | `hooks/index.ts` | no | one `export *` per stub | regenerate |
-  | `schemas.ts` | yes — a comment invites overrides | **0 of 13 carry one** | keep every non-`export *` line, regenerate the block |
+  | `schemas.ts` | yes — everything after `// Custom schema overrides and additions:` | **0 of 13 carry one** | `generateSchemasProxy` regenerates it every run; teach it the meta layout |
   | `mock/index.ts` | yes — a custom-handler slot | **0 of 13 use it** | substitute import paths only |
   | `mock/seeds.ts` | yes — the seed data | all of them | substitute import paths only |
 
