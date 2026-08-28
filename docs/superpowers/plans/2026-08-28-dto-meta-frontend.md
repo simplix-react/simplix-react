@@ -1894,6 +1894,23 @@ inverts the answer. Measured:
 Two of three flip. Task 5 already computes the inherited closure — use that list for the
 comparison, and the same list for the fields themselves.
 
+**Concatenate parent fields first, own fields last — the column order depends on it.**
+`orderAndCategorizeFields` sorts by category rank and then by **the input index**
+(`scaffold-crud.ts:112`), so whatever order the field list arrives in survives inside each
+category. Verified against orval's flattened bodies: `OrganizationUpdateDTO`'s closure in
+parent-then-own order is `orgCode … deletedTimestamp, orgId` — **all 21 names in the same order as
+`OrganizationRestUpdateBody`**, with the one own field `orgId` last. `AreaZoneUpdateDTO`'s 13 match
+`AreaZoneRestUpdateBody` likewise. Own-then-parent would reorder every column of the 104 types that
+carry `extends`.
+
+The category ranks themselves are fixed and need no derivation:
+`identifier → relation → type → text → description → attribute → metric → schedule → audit`
+(`:65`), with `identifier`, `relation` and `audit` hidden from lists by default (`:79`).
+
+**Compare like with like when checking this.** `XUpdateFormDTO` is the `getForEdit` **response**,
+not a request body — `AreaZoneUpdateFormDTO` carries four audit fields that `AreaZoneUpdateDTO` does
+not, and holding it against `AreaZoneRestUpdateBody` shows a difference that is not there.
+
 **The entity's `modelType` is derived separately and from the response** (Task 10), so a form's
 fields and the mock store's type legitimately come from different DTOs. That is what the orval path
 does too; do not try to reconcile them.
