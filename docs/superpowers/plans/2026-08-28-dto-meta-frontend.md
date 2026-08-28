@@ -1571,6 +1571,10 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
      imports by hand during the swap is wasted work; the generator has to know the meta layout, the
      way `index.ts` (Task 11 Step 3) and `schemas.ts` do.
 
+     Emit **both marker comments** while you are there — `canRegenerateMockEntry` (`:131`) returns
+     `false` when either is missing, so a file written without them is frozen at its first version
+     and never picks up a new entity again.
+
   1. **Seeds are generated once, then preserved.** `generateMockFiles` writes
      `src/mock/seeds.ts` **only when it does not already exist** (`mock-generator.ts:43`) — so a
      greenfield meta domain needs the meta path to produce it, while a migrated domain keeps the
