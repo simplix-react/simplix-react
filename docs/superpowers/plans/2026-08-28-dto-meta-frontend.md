@@ -63,9 +63,9 @@ re-capture; the request bodies change shape and the counts may move with them.
 
 - **Repository:** `/Users/taehwan/Workspace/accesscore/simplix-react`, branch `feat/dto-meta-codegen`. Two files under `packages/ui/src/base/charts/` were dirty before this work began — they belong to somebody else; never stage them.
 - **The orval path must keep working for every domain not yet moved.** That is the rule; "never
-  open `packages/cli/src/openapi/`" is not, and four tasks legitimately reach into it — Task 4
-  registers container types on `spec-profile.ts`, Task 8 exports the private path-grouping helpers
-  from `entity-extractor.ts`, Task 9 completes `SUFFIX_TO_ENUM_KEY` in `scaffold-crud.ts`, and
+  open `packages/cli/src/openapi/`" is not, and three tasks legitimately reach into it — Task 4
+  registers container types on `spec-profile.ts`, Task 9 completes `SUFFIX_TO_ENUM_KEY` in
+  `scaffold-crud.ts`, and
   Task 13 makes the barrel templates' model path a variable.
 
   What each of those must satisfy: the change is **additive**, and the task proves the orval path
@@ -946,7 +946,6 @@ git commit -m "feat(cli): generate zod schemas carrying the server's constraints
 
 **Files:**
 - Create: `packages/cli/src/meta/generation/endpoint-gen.ts`
-- Modify: `packages/cli/src/openapi/pipeline/entity-extractor.ts` — export the path-grouping helpers
 - Create: `packages/cli/src/meta/generation/hook-gen.ts`
 - Test: `packages/cli/src/__tests__/meta-endpoint-hook-gen.test.ts`
 
@@ -1032,33 +1031,33 @@ repointed.
   resolves a role to a name and the scaffold then imports it, so a renamed hook breaks scaffolding
   in a way `pnpm typecheck` on the domain package alone will not catch.
 
-  **`entityName` is the hard member, and Tasks 9 and 10 depend on the same answer.** The strategy
-  takes an `OperationContext` whose `entityName` comes from `resolveEntityName(EntityNameContext)`,
-  and the grouping that decides which operations share one entity is **path-based, not tag-based**:
-  `extractEntities` (`entity-extractor.ts:29`) loops over tags, and inside each tag
-  `splitIntoEntities` groups by base path (`/pet/{petId}` and `/pet/findByStatus` both reduce to
-  `/pet`) and then merges related paths. That is why one domain package emits six mock factories
-  under far fewer tags.
+  **`entityName` is settled by the tag alone — group by tag.** `simplixBootNaming.resolveEntityName`
+  (`cli-plugin/src/naming.ts:179`) reads **only** `context.tag`: it takes the last dot-segment and
+  lowercases its first letter, so `site.AreaZone` → `areaZone`. Nothing else in `EntityNameContext`
+  is consulted.
 
-  **Every input that grouping needs is in the IR** — `method`, `path`, `tag` — but **none of the
-  code is reachable.** `splitIntoEntities`, `buildEntityNameContext`, `extractBasePath`,
-  `mergeRelatedPaths` and `extractResourceName` are all private to `entity-extractor.ts`, and the
-  one exported entry point takes an `OpenAPISpec`, which the meta path does not have.
+  The path-based `splitIntoEntities` in `entity-extractor.ts` does split a tag's operations by base
+  path, but `buildEntityFromOps` (`:337`) then names **every** sub-group with the same
+  `resolvedName`, and `deduplicateEntities` (`:886`) merges same-named entities and their
+  operations. The split therefore collapses whenever a naming strategy is present, which it always
+  is on this profile. Verified across the application: in **all 12 configured domains the tag count,
+  the `crud.config.ts` key count and the hook-stub count are identical** — 118 tags, 118 entities,
+  no exceptions.
 
-  Export the path-grouping helpers and call them. Do not reproduce the logic: a meta domain that
-  groups routes even slightly differently from its orval twin emits different factory names and
-  different hook names, and Task 11's barrel swap then stops being a swap.
+  So the whole derivation is:
 
-  `EntityNameContext` maps from the IR field by field:
+  ```ts
+  const entityName = (tag: string) => {
+    const last = tag.split(".").pop()!;
+    return last.charAt(0).toLowerCase() + last.slice(1);
+  };
+  ```
 
-  | Member | From the IR |
-  | --- | --- |
-  | `tag` | `operation.tag` |
-  | `paths` | deduplicated `operation.path` in the group |
-  | `operations[].operationId / method / path / summary` | the same members |
-  | `operations[].queryParams` | `request.query[].name` |
-  | `schemaNames` | the type names in `request.body`, `request.searchDto` and `response` |
-  | `extensions` | **not in the IR** — it reads `x-*` off the OpenAPI tag object. Pass `{}` and say so in your report; if a naming strategy ever depends on it, that is a backend IR change, not something to invent here. |
+  Group `operations` by `operation.tag` and name each group with that. Do not export the private
+  path-grouping helpers and do not build an `EntityNameContext` — both would reproduce machinery
+  that this profile's strategy never reads. If a future profile's `resolveEntityName` reads more,
+  that is the moment to build the context, and it is a change to this task, not a hidden
+  requirement of it.
 
   **`OperationContext` has eleven members, not six, and three of them are required.** Omitting
   `pathParams`, `queryParams` or `extensions` is a TypeScript error; the rest are optional but feed
@@ -1123,10 +1122,10 @@ repointed.
 
 - [ ] **Step 2: Test against the real fixture.** Assert:
 
-  - **the entity grouping**, first and by name — `org.Organization`'s 12 operations must land in
-    the entity set `splitIntoEntities` produces, and the hook file names must follow. Tasks 9, 10
-    and 13 all inherit this partition, so it is the one thing here that must not be left to a
-    downstream test.
+  - **the entity grouping**, first and by name — `org.Organization`'s 12 operations all land in one
+    entity `organization`, and `org.OrgType`'s single operation in `orgType`, giving two entities
+    for the domain and two hook files. Tasks 9, 10 and 13 all inherit this partition, so it is the
+    one thing here that must not be left to a downstream test.
   - a generated hook's name equals what `simplixBootNaming` yields for the same operation
   - `getGetOrganizationQueryKey("x")` returns exactly `["/api/v1/admin/org/x"]`, and
     `getListOrganizationsQueryKey({page:0})` returns `["/api/v1/admin/org/search", {page:0}]` —
@@ -1386,10 +1385,9 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
      shape. Do not assemble `totalElements`/`numberOfElements` in generated code, and do not reach
      for `pageOf` here — that is the zod builder Task 7 uses, not a runtime factory.
   3. **A tree operation uses `buildEmbeddedTree`** from `@simplix-react/mock`.
-  4. **The grouping is the one Task 8 settles, and it is path-based.** The factory name and the
-     DTO type parameter follow the entity that `splitIntoEntities` produces — not the tag — so
-     call the helpers Task 8 exports rather than grouping by tag here. The store's id-field
-     argument is not generated at all: `src/mock/index.ts` passes it by hand.
+  4. **The grouping is the one Task 8 settles: group by `operation.tag`.** The factory name and
+     the DTO type parameter follow that entity. The store's id-field argument is not generated at
+     all — `src/mock/index.ts` passes it by hand.
 
 - [ ] **Step 2: Test** that a handler returns an enveloped body; that a search handler's paged
   branch delegates to `store.listPaged` rather than constructing a page; that a `<field>.equals`
@@ -1654,13 +1652,13 @@ precedent to follow.
   alone it survives the swap and breaks at Step 5, when `src/generated/` is deleted — long after
   the change that caused it.
 
-  **The partitions differ, so this is not a path substitution.** Orval writes **one file per tag**
-  holding the request functions *and* the hooks together
-  (`generated/endpoints/site-areazone/site-areazone.ts`, with a `.zod.ts` sibling), and each
-  `hooks/<entity>.ts` stub re-exports that one file. The meta layout is **per entity, split in
-  two** — `generated-meta/endpoints/<entity>.ts` and `generated-meta/hooks/<entity>.ts` (spec §9)
-  — and the entity partition comes from `splitIntoEntities`, which is path-based and can yield
-  several entities from one tag.
+  **The split differs, so this is not a path substitution.** An entity is one tag either way
+  (Task 8), but orval writes **one file per tag holding the request functions *and* the hooks
+  together** (`generated/endpoints/site-areazone/site-areazone.ts`, with a `.zod.ts` sibling) and
+  each `hooks/<entity>.ts` stub re-exports that single file, while the meta layout puts the two
+  halves in **separate files** — `generated-meta/endpoints/<entity>.ts` and
+  `generated-meta/hooks/<entity>.ts` (spec §9). One stub line has to become two, and the directory
+  names differ (`site-areazone` against `areaZone`).
 
   So a stub cannot be repointed by rewriting its path. Emit `endpoints/index.ts` and
   `hooks/index.ts` barrels inside `generated-meta/` and regenerate the stub layer against them;
