@@ -36,6 +36,21 @@ The backend half of this project is finished and a real IR was captured from the
 | fields with `labelKey` | 2082 |
 | distinct tags | 139 |
 
+### What the fixture cannot test
+
+Four declared shapes never occur in it, so a test written against the fixture proves nothing about
+them. Implement each anyway — the IR declares them and a later capture will carry them — and build
+the case by hand, saying in your report that the fixture does not cover it:
+
+| Shape | In the fixture | Why |
+| --- | ---: | --- |
+| `{ kind: "file" }` | 0 | a `MultipartFile` parameter sets `contentType: "multipart"` and never becomes a `TypeRef`; the 2 multipart operations carry **no body at all** |
+| `{ kind: "pick", of, fields }` | 0 | `@JsonIncludeProperties` sits only on entities, and no DTO field is typed by an entity (spec §12) |
+| `ref` carrying `args` | 0 of 663 | there are no generic DTOs — every `typeParams` is empty |
+| `{ kind: "binary" }` **as a field** | 0 | it occurs 5 times, all in responses (`…/download`, the avatar and content routes) |
+
+`custom` constraints are a fifth such case — see Task 7.
+
 Those numbers are the yardstick. A generator that silently drops a field kind will show up as a
 count that does not match — **use the row that matches what you are counting**: a test walking
 fields asserts against 6,222, one walking every `TypeRef` against 6,501. `unknown` and `param`
