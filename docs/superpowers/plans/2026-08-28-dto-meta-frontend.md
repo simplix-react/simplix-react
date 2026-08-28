@@ -1167,7 +1167,7 @@ git commit -m "feat(cli): generate MSW handlers and seeds from the IR"
 
 **Files:**
 - Modify: `packages/cli/src/config/types.ts` — the `meta` block on `OpenAPISpecConfig`
-- Modify: `packages/cli/src/commands/openapi.ts` — run the meta pipeline alongside orval
+- Modify: `packages/cli/src/commands/openapi.ts` — run the meta pipeline alongside orval, and add `--offline`
 - Create: `packages/cli/src/meta/write.ts` — the layout writer
 - Test: `packages/cli/src/__tests__/meta-parallel.test.ts`
 
@@ -1215,6 +1215,20 @@ precedent to follow.
   `schema/` is deliberately absent: `schemas.ts` re-exports zod constants separately and
   `export *` from both would collide on names (the existing type-name-conflict rule). `mock/` is
   absent because `src/mock/index.ts` imports the handler factories by path.
+
+- [ ] **Step 1b: Add the `--offline` flag — nothing can set it today.**
+
+  Task 2's `FetchMetaOptions` carries `offline?: boolean` and spec §12 settles that `meta.snapshot`
+  "지정하면 `--offline`으로 서버 없이 재생성한다", but no task adds the flag, so the parameter is
+  unreachable from the command line. `openapiCommand` currently declares `-d/--domain`,
+  `-e/--entities`, `-o/--output`, `-f/--force`, `--no-http`, `-y/--yes` (`openapi.ts:73`). Add:
+
+  ```ts
+  .option("--offline", "Read the IR from meta.snapshot instead of the server")
+  ```
+
+  Fail with a message naming the snapshot path when `--offline` is passed and `meta.snapshot` is
+  unset — silently falling back to the network is the opposite of what the flag asks for.
 
 - [ ] **Step 2b: The four side artifacts — verify, do not regenerate.**
 
