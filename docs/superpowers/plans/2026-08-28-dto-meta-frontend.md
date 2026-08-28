@@ -1341,12 +1341,32 @@ git commit -m "feat(cli): add meta-diff to compare the orval and meta outputs"
 `FieldInfo` (`scaffold-crud.ts:29`), `EntityOperations` (`:632`), `FilterFieldInfo` (`:1243`) —
 from the IR instead of from text.
 
-**Only half of `FieldInfo` is data; the other half is presentation, and the IR does not carry
-it.** From the IR: `name`, `tsType`, `label` (via `labelKey`), `options` (enum values),
-required-ness, and everything `FilterFieldInfo` needs. NOT from the IR: `formComponent`,
-`inputType`, `component`, `defaultValue`, `capitalizedName`, `isForeignKey`, `fkEntityField`,
-`isSystemField`, `isI18nPair`, `baseFieldName`, `category`, `hideInList` — those are decisions
-the scaffold already makes.
+**One presentation decision must come from the IR: the temporal component.** Spec §5.1 requires
+that `instant`, `date` and `time` stay distinguishable *because the three use different input
+components*, and §1 names their collapse as one of the eight defects this project exists to remove.
+Measured, the orval path collapses them — `parseZodType` (`scaffold-crud.ts:160`) maps
+`zod.iso.datetime(` to `DateField`, and `entityFieldsToFieldInfo` (`:327`) maps **both**
+`format === "date-time"` and `format === "date"` to `DateField`; neither knows `time` at all.
+All three framework components exist:
+`packages/ui/src/fields/form/{date-field,time-field,datetime-field}.tsx`.
+
+| IR kind | `formComponent` | `component` | n in fixture |
+| --- | --- | --- | ---: |
+| `instant` | `DateTimeField` | `Date` | 682 |
+| `date` | `DateField` | `Date` | 202 |
+| `time` | `TimeField` | `Time` | 10 |
+
+Deferring these to the scaffold is not a neutral reuse: its branch decides from `format`, which
+the IR source does not supply, so every temporal field falls through to a plain text input. For
+`time` that is a defect by the frontend handbook's invariant #37, which requires `TimeField` and
+forbids a `type="time"` text input.
+
+**The rest of `FieldInfo` is half data, half presentation, and the IR does not carry the
+presentation half.** From the IR: `name`, `tsType`, `label` (via `labelKey`), `options` (enum
+values), required-ness, and everything `FilterFieldInfo` needs. NOT from the IR: `inputType`,
+`defaultValue`, `capitalizedName`, `isForeignKey`, `fkEntityField`, `isSystemField`, `isI18nPair`,
+`baseFieldName`, `category`, `hideInList` — those are decisions the scaffold already makes, as are
+`formComponent` and `component` for every kind but the three above.
 
 **Reuse the existing derivations rather than re-deriving them**, or a meta domain and an orval
 domain will scaffold differently for the same field:
@@ -1391,7 +1411,7 @@ what the orval path has to do. Labels come from `labelKey`.
   variable form. The UI templates need no change — they import from the package barrel by name,
   never from `generated/` (verified).
 
-- [ ] **Step 4: Test** that scaffolding a meta domain produces the same `FieldInfo` set as the IR describes, including inherited fields; that a filter's operators come from the IR; that an orval domain still scaffolds identically to before.
+- [ ] **Step 4: Test** that scaffolding a meta domain produces the same `FieldInfo` set as the IR describes, including inherited fields; that a filter's operators come from the IR; that an `instant` field yields `DateTimeField`, a `date` field `DateField` and a `time` field `TimeField`, none of them a text input; and that an orval domain still scaffolds identically to before.
 
 - [ ] **Step 5: Run the full suite, then commit**
 
