@@ -463,10 +463,15 @@ export const bootContainerTypes: Record<string, ContainerMapping> = {
     zod: "pageOf",
     import: "@simplix-react-ext/simplix-boot-auth",
   },
-  List: { ts: "Array" },
-  Map: { ts: "Record", keyType: "string" },
+  List: { ts: "Array", zod: "z.array" },
+  Map: { ts: "Record", zod: "z.record", keyType: "string" },
 };
 ```
+
+**`keyType` is not decoration.** The IR's `Map` container carries **one** argument — the value —
+because `TypeRefMapper` maps `resolvable.getGeneric(1)` and drops the key. TypeScript needs
+`Record<string, V>` and zod v4 needs `z.record(z.string(), V)`; see Task 7 for what happens
+without it.
 
 `SpringPage`, `pageOf` and `springPageSchema` already exist in `@simplix-react-ext/simplix-boot-auth` — do not redefine them.
 
@@ -651,6 +656,13 @@ This is where the project's original complaint is answered: 440 `maxLength` and 
   `container`→ the plugin's `zod` factory (`pageOf` for `Page`, `z.array` for `List`,
   `z.record` for `Map`, and nothing for the unwrapped envelope); `unknown`→`z.unknown()`.
 
+  **`z.record` takes two arguments in zod v4 and the IR supplies only one.** The `Map` container
+  carries the value type alone, so emit `z.record(z.string(), <value>)` using the mapping's
+  `keyType`. Measured on the installed `zod@4.3.6`: the one-argument form does not fail to
+  validate, it **throws while the schema is being constructed** —
+  `Cannot read properties of undefined (reading '_zod')` — so every domain holding one of the
+  fixture's 74 `Map` fields would crash on import rather than produce a bad type.
+
   **Constraint mapping** (spec §5), applied on top of the base type: `notBlank`→`.trim().min(1)`;
   `notEmpty`→`.min(1)`; `minLength`/`maxLength`→`.min()`/`.max()`; `minItems`/`maxItems`→
   `.min()`/`.max()` on the array; `min`/`max`→`.min()`/`.max()` — **coercing the value, because
@@ -714,6 +726,9 @@ This is where the project's original complaint is answered: 440 `maxLength` and 
     orval-parity check; a plain `z.string()` would pass both and the test would catch it
   - a `date` field accepts `2026-08-28` and rejects a full timestamp
   - a `custom` constraint emits a comment and no call
+  - a `Map` field's schema is `z.record(z.string(), …)` and **constructs without throwing** — build
+    it, do not merely grep the text; the one-argument form throws at construction, which a
+    substring assertion would never notice
   - an `extends` type's schema validates a field declared on the parent
   - no emitted call is one v4 deprecates — grep the generated text for `.email(`, `.url(`,
     `.uuid(` used as methods and assert none appear
