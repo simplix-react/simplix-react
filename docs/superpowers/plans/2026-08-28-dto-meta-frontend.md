@@ -2136,6 +2136,26 @@ every generated list falls back to the raw constant, silently, across all **122 
 The IR names the enum directly in the field's `TypeRef`, so take `enumTypeName` from there and
 never from the rendered type. That also survives `listDtoFields` being unavailable.
 
+**The mutation path parameters are a fifth read of `src/generated/`, and both fail badly without
+it.** `findMutationPathParam` (`scaffold-crud.ts:1176`) scans
+`packages/*/src/generated/endpoints` for `get<Op>MutationOptions` to learn which path parameter a
+mutation takes. `updatePathParam` is `null` when it finds nothing, and `deletePathParam` falls back
+to `` `${entity}Id` `` (`:1675`). Both reach the templates directly:
+
+```jsx
+deleteMutation: adaptOrvalDelete(useDeleteX(), "{{deletePathParam}}", { onSettled: invalidate })
+{{#if updatePathParam}}update: adaptOrvalUpdate(_update, "{{updatePathParam}}", …){{/if}}
+```
+
+Measured: of the 36 entities with a `delete` role, the fallback names the right parameter for
+**24** and the wrong one for **12** — `authRolePermission` takes `rolePermissionId` not
+`authRolePermissionId`, `jobPosition` takes `positionId`, `userRole` takes `roleId`. A wrong name
+sends the id under a key the URL builder does not use. And `updatePathParam` being `null` removes
+the update mutation from the form entirely, because the template guards on it.
+
+The IR states both directly: the `delete`- and `update`-role operations' `request.path` entries.
+Take the last one, as the naming strategy does.
+
 **`entityPath` is a fourth snapshot read, and its fallback is wrong for every entity but one.**
 `scaffold-crud.ts:1879` sets `entityPath: extractedEntity?.path ?? \`/api/v1/${entity}\``, and the
 generated form spends it on `useInvalidateEntity("{{entityPath}}")` (`form.hbs:95`) — the prefix
