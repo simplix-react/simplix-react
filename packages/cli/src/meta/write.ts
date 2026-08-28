@@ -182,6 +182,11 @@ interface SeedArray {
 
 const SEED_ARRAY = /export const (\w+): (\w+)\[\] = \[[\s\S]*?\n\];\n/g;
 
+/** The fields a generated array writes as `{ value, label }`, which is a labeled enum's shape. */
+function labelledFieldsOf(text: string): string[] {
+  return [...text.matchAll(/(\w+): \{ value: "[^"]*", label: "[^"]*" \}/g)].map((one) => one[1]);
+}
+
 function seedArraysOf(source: string): SeedArray[] {
   return [...source.matchAll(SEED_ARRAY)].map((one) => ({
     name: one[1],
@@ -206,9 +211,15 @@ function seedArraysOf(source: string): SeedArray[] {
 export async function repointMockSeeds(
   targetDir: string,
   generated: string,
-): Promise<{ moved: boolean; added: string[]; retyped: Array<{ name: string; from: string; to: string }> }> {
+): Promise<{
+  moved: boolean;
+  added: string[];
+  retyped: Array<{ name: string; from: string; to: string }>;
+  /** Rows whose enum members took the `{ value, label }` shape a labeled enum reaches a response as. */
+  wrapped: string[];
+}> {
   const seedsPath = join(targetDir, "src/mock/seeds.ts");
-  const unchanged = { moved: false, added: [], retyped: [] };
+  const unchanged = { moved: false, added: [], retyped: [], wrapped: [] };
   if (!(await pathExists(seedsPath))) return unchanged;
 
   const existing = await readFile(seedsPath, "utf-8");
@@ -228,6 +239,21 @@ export async function repointMockSeeds(
     );
   }
 
+  // A labeled enum reaches a response as `{ value, label }`, and the OpenAPI half seeded the bare
+  // value. Only the shape moves: the value written there is kept and becomes both members, so the
+  // rows keep saying what somebody meant them to say.
+  const wrapped: string[] = [];
+  for (const one of held) {
+    const target = wanted.get(one.name);
+    if (target === undefined) continue;
+    for (const field of labelledFieldsOf(target.text)) {
+      const bare = new RegExp(`(\\b${field}: )"([^"]*)",`, "g");
+      const before = body;
+      body = body.replace(bare, '$1{ value: "$2", label: "$2" },');
+      if (body !== before) wrapped.push(`${one.name}.${field}`);
+    }
+  }
+
   const missing = [...wanted.values()].filter((one) => !heldNames.has(one.name));
   if (missing.length > 0) {
     body = `${body.trimEnd()}\n\n${missing.map((one) => one.text).join("\n")}`;
@@ -242,7 +268,7 @@ export async function repointMockSeeds(
 
   if (body === existing) return unchanged;
   await writeFileWithDir(seedsPath, body);
-  return { moved: true, added: missing.map((one) => one.name), retyped };
+  return { moved: true, added: missing.map((one) => one.name), retyped, wrapped };
 }
 
 export async function writeMetaSchemasProxy(targetDir: string): Promise<void> {

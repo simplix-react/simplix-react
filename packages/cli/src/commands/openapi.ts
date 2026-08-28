@@ -735,6 +735,12 @@ async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
       for (const name of seeds.added) {
         log.info(`DTO meta: seeded ${name} in src/mock/seeds.ts, which the entry now wires.`);
       }
+      if (seeds.wrapped.length > 0) {
+        log.info(
+          `DTO meta: ${seeds.wrapped.length} seed field(s) now carry the { value, label } shape a ` +
+            "labeled enum reaches a response as; the values written there are kept.",
+        );
+      }
       for (const one of seeds.retyped) {
         log.warn(
           `DTO meta: ${one.name} is typed ${one.to} rather than ${one.from} — the rows under it ` +

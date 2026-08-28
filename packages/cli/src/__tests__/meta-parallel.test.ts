@@ -216,6 +216,48 @@ describe("the meta output lands in src/generated-meta/", () => {
     await rm(dir, { recursive: true, force: true });
   });
 
+  it("takes a preserved enum row into the shape a response carries, keeping its value", async () => {
+    // The OpenAPI half seeded the bare value and the meta model declares LabeledEnumValue, so the
+    // preserved rows stop compiling. Only the shape moves: what somebody wrote there becomes both
+    // members rather than being replaced.
+    const dir = await mkdtemp(join(tmpdir(), "meta-seed-enum-"));
+    await writeFileWithDir(
+      join(dir, "src/mock/seeds.ts"),
+      [
+        'import type { PetDTO } from "../generated/model";',
+        "",
+        "export const petSeeds: PetDTO[] = [",
+        "  {",
+        '    petId: "1",',
+        '    status: "RETIRED",',
+        "  },",
+        "];",
+        "",
+      ].join("\n"),
+    );
+
+    const generated = [
+      'import type { PetDTO } from "../generated-meta/model";',
+      "",
+      "export const petSeeds: PetDTO[] = [",
+      "  {",
+      '    petId: "1",',
+      '    status: { value: "ACTIVE", label: "ACTIVE" },',
+      "  },",
+      "];",
+      "",
+    ].join("\n");
+
+    const result = await repointMockSeeds(dir, generated);
+    const seeds = await readFile(join(dir, "src/mock/seeds.ts"), "utf-8");
+
+    expect(seeds).toContain('status: { value: "RETIRED", label: "RETIRED" },');
+    expect(result.wrapped).toContain("petSeeds.status");
+    // A field the generated array leaves alone is left alone.
+    expect(seeds).toContain('petId: "1",');
+    await rm(dir, { recursive: true, force: true });
+  });
+
   it("exports the params types the search generator writes beside the DTOs", async () => {
     const barrel = await read(dir, `${META_DIR}/model/index.ts`);
     const params = (await readdir(join(dir, META_DIR, "model")))
