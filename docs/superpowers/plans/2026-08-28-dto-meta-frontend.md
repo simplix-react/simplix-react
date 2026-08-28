@@ -1038,6 +1038,22 @@ repointed.
   ): UseMutationResult<…, { data: BodyType<OrganizationCreateDTO> }, TContext>
   ```
 
+  **A mutation's variable type carries the path parameter beside `data`**, not inside it:
+  `{ orgId: string; data: BodyType<OrganizationUpdateDTO> }` for an update,
+  `{ data: BodyType<OrganizationCreateDTO> }` for a create, `{ orgId: string }` for a delete. That
+  is what the three adapters build (`packages/headless/src/adapt-orval-mutation.ts`):
+
+  | Adapter | sends |
+  | --- | --- |
+  | `adaptOrvalCreate` | `{ data: values }` |
+  | `adaptOrvalUpdate(m, pathParam)` | `{ [pathParam]: id, data: { ...dto, [pathParam]: id } }` — the id goes in **both** places |
+  | `adaptOrvalDelete(m, pathParam)` | `{ [pathParam]: id }` |
+
+  The update adapter writing the id **into the body as well** is why an update DTO declares the id
+  as its own field on top of what it inherits (`OrganizationUpdateDTO` adds exactly `orgId`). It is
+  also why a wrong `pathParam` (Task 13) is worse than it looks: the body gets a bogus key and the
+  real id field is left unset, so the server updates nothing.
+
   `form.hbs:75` relies on the query shape directly —
   `useGetXForEdit(id, { query: { gcTime: 0 } })` — so a hook that takes its options anywhere else
   silently ignores them and the edit form serves a cached record. The mutation's
