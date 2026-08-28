@@ -132,7 +132,9 @@ interface OperationMeta {
   tag: string;
   summary?: string;
   request: {
-    body?: string;
+    /** 컨테이너를 감싼 그대로 싣는다. 다중 수정은 `Set<XUpdateDTO>`, 재정렬은 `List<XOrderDTO>`라
+     *  이름만 실으면 원소 타입이 사라진다 */
+    body?: TypeRef;
     contentType?: "json" | "multipart";
     query: ParamMeta[];
     path: ParamMeta[];

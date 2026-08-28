@@ -110,9 +110,13 @@ export interface ParamMeta {
 /**
  * Request side of an operation. `searchDto` names the DTO whose `@SearchableField`s define
  * this operation's flattened search params.
+ *
+ * `body` is a `TypeRef` rather than a type name because a body is frequently a generic container —
+ * `Set<XUpdateDTO>` for a multi-update, `List<XOrderDTO>` for a reorder. A bare name erases the
+ * element type, leaving nothing to emit.
  */
 export interface RequestMeta {
-  body?: string;
+  body?: TypeRef;
   contentType?: string;
   query: ParamMeta[];
   path: ParamMeta[];

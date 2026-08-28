@@ -80,6 +80,63 @@ Those numbers are the yardstick. A generator that silently drops a field kind wi
 
 ---
 
+### Task 0: Re-capture the fixture — the committed one is stale
+
+**Files:**
+- Replace: `packages/cli/src/meta/__fixtures__/smart-safety-meta.json`
+- Modify: `packages/cli/src/__tests__/meta-ir-types.test.ts` — assert the fixture matches the types
+
+`RequestMeta.body` was a type name, and `DtoMetaBuilder` filled it with
+`registry.register(resolvable.resolve())`. `resolve()` on `Set<OrganizationUpdateDTO>` yields the
+raw `java.util.Set`, so the body arrived as the string `"Set"` and the element type — the entire
+payload contract — was gone. **49 of the 231 body-carrying operations in the captured document
+were affected**: every `PATCH /<resource>` multi-update (38, `Set<XUpdateDTO>`) and every
+`PATCH /<resource>/order` reorder (11, `List<XOrderDTO>`).
+
+The backend is fixed — `RequestMeta.body` is a `TypeRef` and the builder maps it the way it
+already mapped the response (`02c49ac` on `feat/dto-meta-endpoint` in the simplix repository,
+with a regression test that pins a `Set<T>` body to `container("List", [ref T])`). `ir-types.ts`
+and spec §4 follow it. **The committed fixture predates all of that**, so its 49 bodies are still
+bare strings and every generator test written against it would encode the erased shape.
+
+- [ ] **Step 1: Re-capture.** Run the smart-safety backend with the meta endpoint enabled and
+  save `GET /dev/meta/dto` over the fixture. The backend fix must be on the classpath — build the
+  starter from `feat/dto-meta-endpoint` first, or the capture reproduces the defect.
+
+- [ ] **Step 2: Make staleness loud.** The existing test walks the fixture but never reads
+  `body`, which is why nothing failed when the shape changed. Add:
+
+```ts
+it("every request body is a TypeRef, not a bare type name", () => {
+  const bodies = meta.operations
+    .map((o) => o.request.body)
+    .filter((b): b is NonNullable<typeof b> => b !== undefined);
+  expect(bodies.length).toBeGreaterThan(0);
+  expect(bodies.filter((b) => typeof b !== "object" || !("kind" in b))).toEqual([]);
+});
+```
+
+  Then assert a known multi-update: `PATCH /api/v1/admin/org`'s body is
+  `{ kind: "container", name: "List", args: [{ kind: "ref", name: "OrganizationUpdateDTO" }] }`.
+  A `Set` normalises to `List` because `TypeRefMapper` treats every `Collection` alike — which is
+  also why Task 4's "four containers and no others" stays true after this change.
+
+- [ ] **Step 3: Re-run every count this plan quotes.** The operation, type, enum, constraint and
+  container figures below were measured against the old capture. Re-measure and correct any that
+  moved; a plan quoting a number the fixture no longer contains sends an implementer looking for
+  a defect that is not there.
+
+- [ ] **Step 4: Commit**
+
+```bash
+npx vitest run --project cli
+git add packages/cli/src/meta/__fixtures__/smart-safety-meta.json \
+        packages/cli/src/__tests__/meta-ir-types.test.ts
+git commit -m "test(cli): re-capture the IR fixture with typed request bodies"
+```
+
+---
+
 ### Task 1: IR types, mirrored from the committed Java records
 
 **Files:**
@@ -669,7 +726,10 @@ git commit -m "feat(cli): generate zod schemas carrying the server's constraints
   ```
 
   A body-carrying call adds `headers: { "Content-Type": "application/json", ...options?.headers }`
-  and `body: JSON.stringify(dto)`. A URL builder (`getGetLinearAssetUrl`) is emitted alongside,
+  and `body: JSON.stringify(dto)`. **The body parameter's type comes from `request.body`, which is
+  a `TypeRef`** — 49 of the fixture's 231 bodies are containers, so a multi-update takes
+  `OrganizationUpdateDTO[]` and not a single DTO. Map it through the same container rules the
+  response uses; treating `request.body` as a type name is the defect Task 0 exists to remove. A URL builder (`getGetLinearAssetUrl`) is emitted alongside,
   because the hook's query key uses it — see below.
 
   Hooks use the profile's naming strategy (`simplixBootNaming`) so the exported names match what
