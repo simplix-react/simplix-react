@@ -66,6 +66,11 @@ OpenAPI 문서는 Java DTO의 정보를 일부만 담는다. springdoc이 스키
 
 ## 4 · IR 명세
 
+**`@JsonInclude(NON_NULL)`이 이 명세를 읽는 법을 정한다.** 값이 `null`인 멤버는 키째로 사라지고,
+언박싱 원시 타입과 빈 컬렉션은 절대 사라지지 않는다. 그래서 `?`가 붙은 것은 **키가 없는 것**이지
+`null`이 오는 것이 아니고, `required` · `nullable` · `sortable` · `labeled` · `version` ·
+`typeParams`는 언제나 있다. 이것을 거꾸로 읽으면 전송 내용을 두고 거짓말하는 타입이 나온다.
+
 ```ts
 interface DtoMeta {
   version: 1;
@@ -83,8 +88,8 @@ interface EnumMeta {
 
 interface TypeMeta {
   javaClass: string;
-  /** 상위 타입 이름. 필드는 자기 것만 싣는다 */
-  extends: string | null;
+  /** 상위 타입 이름. 필드는 자기 것만 싣는다. 상위가 없으면 키 자체가 없다 — null이 아니다 */
+  extends?: string;
   /** 타입 파라미터 이름. 제네릭 DTO가 없으면 빈 배열이다 */
   typeParams: string[];
   description?: string;
@@ -102,11 +107,13 @@ interface FieldMeta {
   labelKey?: string;
   /** @FieldLabel의 직접 라벨 모드 — 키가 아닌 문자열 그대로 */
   label?: string;
-  constraints: Constraint[];
+  /** 제약이 하나도 없으면 키 자체가 없다. 수집한 IR에서 6,222개 필드 중 550개만 갖는다 */
+  constraints?: Constraint[];
   searchable?: {
     operators: string[];
     sortable: boolean;
     entityField?: string;
+    /** 정렬 대상 컬럼이 검색 대상과 다를 때만 온다. 대상 앱에서는 한 번도 채워지지 않는다 */
     sortField?: string;
   };
 }
@@ -141,8 +148,8 @@ interface OperationMeta {
     /** 검색 파라미터의 원본 DTO. @SearchableParams(X.class)와 SearchCondition<X> 양쪽에서 뽑는다 */
     searchDto?: string;
   };
-  /** 컨테이너를 감싼 그대로 싣는다. null = Void */
-  response: TypeRef | null;
+  /** 컨테이너를 감싼 그대로 싣는다. Void면 키 자체가 없다 — null이 아니다 */
+  response?: TypeRef;
   access: AccessMeta;
 }
 
