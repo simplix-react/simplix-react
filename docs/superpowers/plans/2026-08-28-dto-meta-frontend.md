@@ -2219,6 +2219,16 @@ from the IR instead of from text.
 202 `date` and 10 `time` fields the IR distinguishes. Map `instant`→`datetime`, `date`→`date`,
 `time`→`time`.
 
+**A boolean column needs `display="boolean"` for the same reason.** The column section has three
+branches — the two i18n ones, `Select` with `display="badge"`, and a bare `{{else}}` — so a boolean
+field falls through and the table prints `true` / `false`. `CrudList.Column` offers
+`display: "badge" | "boolean" | "country" | "phone"` (`crud-list.tsx:324`) and the frontend
+handbook's invariant #21 requires a `Badge` for a new boolean column. The IR marks all **593**
+of them unambiguously. `country` and `phone` have no IR signal — leave those to the screen author.
+
+`variants` needs nothing: the template gives every enum value `"default"`, and since `EnumMeta`
+carries no tone information that is the honest default rather than a gap.
+
 **Carry `searchable.sortable` onto the column — the template marks every column sortable.**
 `list.hbs` emits a bare `sortable` on its `CrudList.Column`s (`:228`, `:235`, `:246`, `:257`) with
 no condition, because the orval path has no way to know. Measured, **280 of the fixture's 1,118
