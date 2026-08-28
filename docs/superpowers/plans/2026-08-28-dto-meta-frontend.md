@@ -2078,6 +2078,25 @@ them loudly costs nothing.
 `FieldInfo` (`scaffold-crud.ts:29`), `EntityOperations` (`:632`), `FilterFieldInfo` (`:1243`) —
 from the IR instead of from text.
 
+**Pick the tree's display field from the i18n pairing, not from field order.** A tree node's label
+comes from `treeDisplayNameField` (`scaffold-crud.ts:1793`): a field literally named `name`,
+`title`, `label` or `displayName`, else **the first string field** that is not the row id or the
+parent id, else the literal `"name"`. Neither tree entity in the fixture has a field with one of
+those four names, so both fall to the positional rule and both land wrong:
+
+| Entity | picked today | should be |
+| --- | --- | --- |
+| `organization` | `orgCode` | `orgName` |
+| `areaZone` | **`siteId`** — a foreign key, identical on every node | `areaName` |
+
+`org` is the pilot domain and its tree is its main screen, so Task 14's browser pass meets this
+first. The IR settles it without a new heuristic: **a field with an `…I18n` sibling is the
+human-facing text by construction** — that rule yields `orgName` and `areaName` respectively. Try
+the four common names, then the i18n-paired field, then the positional fallback. The parent-id
+detection above it needs no change: `parentOrgId` and `parentAreaId` both match its
+contains-`parent`-and-ends-`id` test, and all three tree DTOs name their child collection
+`children`, so the templates' hardcoded `childrenField` holds.
+
 **Set `enumTypeName` from the IR, not from the emitted TypeScript.** An enum column shows a
 translated badge only when it can name its enum: `list.hbs:248` emits
 `enumName="{{enumTypeName}}"`, and `enumLabel(enumName, value)` resolves
