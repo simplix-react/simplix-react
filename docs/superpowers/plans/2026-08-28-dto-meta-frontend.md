@@ -1666,6 +1666,16 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
      `hasDeclaredIdField` (`:756`) stays as it is — a singleton settings DTO declares no id at all,
      and emitting `body.id` against one does not compile.
 
+     **Take the id's type from the IR too, and never default it to numeric.**
+     `isIdFieldNumeric` (`:761`) looks the id field up and **returns `true` when it cannot find
+     it**, which drives `Number(params.x)` instead of `String(params.x)` in the read, update and
+     delete handlers (`:497`). Measured, **310 of the fixture's 311 path parameters are `string`**
+     and exactly one is a number, so that default is wrong nearly always — and the failure hides:
+     `Number("ORG-001")` is `NaN`, `store.getById(NaN)` misses, and the handler's
+     `?? store.list()[0]` then returns **the first row for every id**. A detail screen shows a
+     record, just not the one that was asked for. The IR types every path parameter, so read the
+     kind rather than guessing from a field lookup that can fail.
+
 - [ ] **Step 2: Test** that a handler returns an enveloped body; that a search handler's paged
   branch delegates to `store.listPaged` rather than constructing a page; that a `<field>.equals`
   query parameter takes the filter branch; and that the generator writes only
