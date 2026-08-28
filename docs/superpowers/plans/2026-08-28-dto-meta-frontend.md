@@ -2136,6 +2136,17 @@ every generated list falls back to the raw constant, silently, across all **122 
 The IR names the enum directly in the field's `TypeRef`, so take `enumTypeName` from there and
 never from the rendered type. That also survives `listDtoFields` being unavailable.
 
+**`entityPath` is a fourth snapshot read, and its fallback is wrong for every entity but one.**
+`scaffold-crud.ts:1879` sets `entityPath: extractedEntity?.path ?? \`/api/v1/${entity}\``, and the
+generated form spends it on `useInvalidateEntity("{{entityPath}}")` (`form.hbs:95`) — the prefix
+matched against `queryKey[0]` (Task 8). Measured, the common path of an entity's operations equals
+`/api/v1/<entity>` for **1 of the fixture's 139**: the real ones are
+`/api/v1/admin/worker`, `/api/v1/admin/system/holiday-calendar`,
+`/api/v1/admin/auth/role-permission`. With the snapshot absent — a greenfield meta domain — the
+fallback fires and the prefix matches nothing, so **every mutation stops invalidating its list and
+the screen keeps showing stale rows**, with no error. Derive it from the IR as the common
+non-parameter prefix of the entity's operation paths.
+
 **There are three call sites, not one, and they read from two different files.** Replace all three
 or the meta output is generated and never consumed:
 
