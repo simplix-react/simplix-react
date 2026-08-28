@@ -2475,6 +2475,14 @@ git commit -m "feat(cli): let scaffolding read fields from the IR"
   freshly scaffolded detail view would not typecheck. This is pre-existing scaffold behaviour, not
   something the meta path introduces — surface it with the count and let the user decide.
 
+  **The same template hardcodes the audit fields.** `detail.hbs:67` emits
+  `auditData={{ id: displayData.<rowIdField>, createdAt: displayData.createdAt, updatedAt: displayData.updatedAt }}`
+  with no guard. Measured: **55 of the fixture's 59 `…DetailDTO` types carry both, and 4 carry
+  neither** — `ExportLedgerDetailDTO`, `ExportJobDetailDTO`, `SiteSettingsDetailDTO`,
+  `MasterDataHistoryDetailDTO`. Those four do not compile. Unlike the foreign-key case the IR can
+  settle this cheaply: pass a `hasAuditFields` flag from the resolved field set and guard the
+  `auditData` prop with it.
+
   **Report, do not fix:** `ensureSubjectsFile` (`:947`) writes
   `modules/<name>/src/shared/auth/subjects.ts`, and **no module in this application has that
   file** — the permission-subject map lives at `packages/console-ui/src/identity/subjects.ts`
