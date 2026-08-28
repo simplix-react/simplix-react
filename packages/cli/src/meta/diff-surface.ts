@@ -269,6 +269,14 @@ function isPlumbing(name: string): boolean {
   if (/^[a-z]/.test(name) && /Response(\d{3}|Success|Error)?$/.test(name)) return true;
   if (/(Query|Mutation)(Result|Error|Options|Body)$/.test(name)) return true;
   if (/^get[A-Z]\w*(QueryOptions|MutationOptions)$/.test(name)) return true;
+  // The body of the successful response is not plumbing: it is the page a list screen names, and
+  // module code imports it. Measured across the application, 12 files import a `…200Body` from a
+  // domain package — `ListOrganizations200Body`, `ListUserAccounts200Body` and their kind — so
+  // excluding it would let the migration turn each of those imports into `any` in silence, which
+  // is the failure this command exists to prevent. Anything deeper under it, and every other
+  // status, is the error shape nothing reads.
+  if (/(^|[a-z])200Body$/.test(name)) return false;
+
   // A three-digit HTTP status standing as its own name segment — `GetOrganization401`,
   // `ListOrganizations200BodyPageable`. Anchored on the segment boundary so a domain type that
   // merely contains digits keeps its place in the comparison.

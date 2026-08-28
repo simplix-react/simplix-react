@@ -459,6 +459,34 @@ export const useGetAvatarThumbnail = () => useQuery();
 });
 
 describe("meta-diff surface collection", () => {
+  it("keeps the successful response body, which module code imports by name", async () => {
+    // Measured across the application, 12 files import a `…200Body` from a domain package. Left
+    // among the excluded names, the migration turns each of those imports into `any` in silence.
+    const findings = await diff(
+      {
+        ...IDENTICAL_ORVAL,
+        "model/listNotices200Body.ts": "export interface ListNotices200Body { content: string[] }\n",
+      },
+      IDENTICAL_META,
+    );
+
+    expect(subjects(errors(findings))).toContain("ListNotices200Body");
+  });
+
+  it("excludes the error shapes under a status, which nothing reads", async () => {
+    const findings = await diff(
+      {
+        ...IDENTICAL_ORVAL,
+        "model/listNotices401.ts": "export interface ListNotices401 { message: string }\n",
+        "model/listNotices200BodyPageable.ts":
+          "export interface ListNotices200BodyPageable { page: number }\n",
+      },
+      IDENTICAL_META,
+    );
+
+    expect(subjects(errors(findings))).toEqual([]);
+  });
+
   it("excludes orval's per-operation plumbing rather than reporting it", async () => {
     const surface = await collectSurface(
       await writeTree("generated", {
