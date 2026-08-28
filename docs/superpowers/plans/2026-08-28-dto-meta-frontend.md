@@ -777,8 +777,22 @@ This is where the project's original complaint is answered: 440 `maxLength` and 
   One entity's 12 operations produce 32 constants. The IR's `types` map is keyed by DTO simple
   name, so "one const per type, named as orval named it" is not a thing that can be built.
 
+  **Name the files `<entity>.schema.ts`, not `<entity>.ts`.** The scaffold finds an entity's schema
+  by scanning every package for a file whose **name** is `schemas.ts`, `contract.ts`, `*.schema.ts`
+  or `*.zod.ts` (`searchDir`, `scaffold-crud.ts:492`) and whose content matches
+  `\w*<entity>\w*[Ss]chema\s*=\s*z.object` or an orval `…Body`/`…Response` constant
+  (`findSchemaFile`, `:569`). A plain `schema/<entity>.ts` matches **none of the four names**, and
+  the repointed `schemas.ts` is an `export *` barrel with no `z.object(` in it — so after the swap
+  `findSchemaFile` returns `null`, the scaffold takes its `else` branch (`:1631`) and generates the
+  widget set from `PLACEHOLDER_FIELDS`, **with a spinner message and no warning**. `simplix scaffold`
+  would appear to succeed on every migrated domain while emitting an `id`/`name` form.
+
+  Emitting `generated-meta/schema/<entity>.schema.ts` makes the output discoverable under the rule
+  that already exists, with no change to the shared search. Spec §9's layout line is updated to
+  match.
+
   **The decision, and what makes it safe:** emit one const per type, named `<TypeName>Schema`
-  (`OrganizationCreateDTOSchema`). A schema belongs to a DTO, not to an operation, and the same
+  (`OrganizationCreateDTOSchema`), which is what pattern 1 of `findSchemaFile` looks for. A schema belongs to a DTO, not to an operation, and the same
   DTO is a body on one route and a response on another. This departs from orval's names, and
   **nothing in the application imports them** — grepped across the whole frontend outside
   `generated/`: **0 references**, and no module imports `schemas.ts` at all. The constants exist

@@ -448,7 +448,10 @@ packages/domain-<name>/src/
   generated-meta/
     model/<entity>.ts           Create · Update · Detail · List 인터페이스
     model/_enums.ts             이 도메인 열거형의 별칭과 값 목록
-    schema/<entity>.ts          zod 스키마 — 타입마다 <TypeName>Schema, 상속은 .extend()
+    schema/<entity>.schema.ts   zod 스키마 — 타입마다 <TypeName>Schema, 상속은 .extend().
+                                파일 이름의 `.schema.ts`는 스캐폴드의 탐색 규칙이 찾는 네 이름
+                                가운데 하나다 — 다른 이름으로 내면 스캐폴드가 스키마를 못 찾고
+                                경고 없이 자리표시자 필드로 위젯을 만든다
     endpoints/<entity>.ts       요청 함수
     hooks/<entity>.ts           React Query 훅
     search/<entity>.ts          필터·정렬 설정
