@@ -2218,6 +2218,21 @@ never from the rendered type. That also survives `listDtoFields` being unavailab
    DTO assembly — with #53 naming the detail row as its own trap. Emit
    `resolveBootEnum(row.status)` wherever a labeled enum's value is read.
 
+   **All four contexts are wrong today, and the fourth is a write.** Traced through the templates:
+
+   | Context | What the template does | Result for a labeled enum |
+   | --- | --- | --- |
+   | list column | `String(row.status)` (`list.hbs:199`) | `[object Object]` |
+   | detail display | `displayData.status` into `enumLabel` (`detail.hbs:125`) | key `enums.X.[object Object]` |
+   | form default | `defaultValues={isEdit ? data : undefined}` (`form.hbs:138`), then `values.status` into `SelectField` (`:309`) | the object never equals any `options[].value`, so the select is **blank in edit mode** |
+   | DTO assembly | `useCrudFormSubmit` passes `values` through unchanged | the form **submits `{ value, label }`** where `LabeledEnumDeserializer` expects the bare string (spec §12) |
+
+   The third and fourth compound: an operator opens an edit form, the enum shows blank, and saving
+   writes the malformed object back. `resolveBootEnum` on read is half the fix; the submit path
+   must send `values.status` as the value string. The `SelectField` branch also uses the
+   concatenated key (`enumLabel("{{entity}}{{capitalizedName}}", …)`, `form.hbs:315`), so it is the
+   third site needing the IR's enum name.
+
 **The mutation path parameters are a fifth read of `src/generated/`, and both fail badly without
 it.** `findMutationPathParam` (`scaffold-crud.ts:1176`) scans
 `packages/*/src/generated/endpoints` for `get<Op>MutationOptions` to learn which path parameter a
