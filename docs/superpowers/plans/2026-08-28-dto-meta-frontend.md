@@ -1354,10 +1354,14 @@ operator table (Step 1b) is wrong, and the diff will say which member moved.
 
   Two consequences, both of which have to be handled here:
 
-  1. **254 pairs would resolve to `undefined`** under an identity lookup — and they are the range
-     bounds, so date and number range filters are exactly what breaks. Write an explicit IR-name →
-     `SearchOperator` table and make it **exhaustive over the enum**, so a searchable-jpa operator
-     this fixture does not contain fails loudly at generation rather than emitting `undefined`.
+  1. **254 pairs miss, and the miss is silently substituted rather than left empty.** They are the
+     range bounds, so date and number range filters are what breaks. The lookup that consumes the
+     result already has a fallback — `SUFFIX_TO_ENUM_KEY[f.operator] ?? "GREATER_THAN_OR_EQUAL"`
+     (`scaffold-crud.ts:1741`) — so a wrong name does not produce `undefined` or a compile error:
+     it produces **`greaterThanOrEqualTo` for every unmatched operator**, and a `lessThanOrEqualTo`
+     filter silently queries the other direction. Write an explicit IR-name → `SearchOperator`
+     table, make it **exhaustive over the enum**, and **throw** on an unmatched name rather than
+     falling through to that default.
   2. **222 pairs name operators the suffix-matching path could never recover** (`BETWEEN`,
      `IS_NULL`, `IS_NOT_NULL`, `NOT_IN`). This is the gain the IR exists for. `SUFFIX_TO_ENUM_KEY`
      needs the four entries — `between`, `isNull`, `isNotNull`, `notIn` — or the scaffold discards
