@@ -560,6 +560,7 @@ git commit -m "feat(cli): generate zod schemas carrying the server's constraints
 
 **Files:**
 - Create: `packages/cli/src/meta/generation/endpoint-gen.ts`
+- Modify: `packages/cli/src/openapi/pipeline/entity-extractor.ts` — export the path-grouping helpers
 - Create: `packages/cli/src/meta/generation/hook-gen.ts`
 - Test: `packages/cli/src/__tests__/meta-endpoint-hook-gen.test.ts`
 
@@ -590,8 +591,36 @@ git commit -m "feat(cli): generate zod schemas carrying the server's constraints
   orval produced. **This is not cosmetic** — the migration switches a barrel, and module code
   imports hooks by name (spec §11).
 
-  Build the `OperationContext` the strategy takes (`operationId`, `method`, `path`, `tag`,
-  `entityName`, `summary`) from the IR operation. Names come from route and verb in almost every
+  **`entityName` is the hard member, and Tasks 9 and 10 depend on the same answer.** The strategy
+  takes an `OperationContext` whose `entityName` comes from `resolveEntityName(EntityNameContext)`,
+  and the grouping that decides which operations share one entity is **path-based, not tag-based**:
+  `extractEntities` (`entity-extractor.ts:29`) loops over tags, and inside each tag
+  `splitIntoEntities` groups by base path (`/pet/{petId}` and `/pet/findByStatus` both reduce to
+  `/pet`) and then merges related paths. That is why one domain package emits six mock factories
+  under far fewer tags.
+
+  **Every input that grouping needs is in the IR** — `method`, `path`, `tag` — but **none of the
+  code is reachable.** `splitIntoEntities`, `buildEntityNameContext`, `extractBasePath`,
+  `mergeRelatedPaths` and `extractResourceName` are all private to `entity-extractor.ts`, and the
+  one exported entry point takes an `OpenAPISpec`, which the meta path does not have.
+
+  Export the path-grouping helpers and call them. Do not reproduce the logic: a meta domain that
+  groups routes even slightly differently from its orval twin emits different factory names and
+  different hook names, and Task 11's barrel swap then stops being a swap.
+
+  `EntityNameContext` maps from the IR field by field:
+
+  | Member | From the IR |
+  | --- | --- |
+  | `tag` | `operation.tag` |
+  | `paths` | deduplicated `operation.path` in the group |
+  | `operations[].operationId / method / path / summary` | the same members |
+  | `operations[].queryParams` | `request.query[].name` |
+  | `schemaNames` | the type names in `request.body`, `request.searchDto` and `response` |
+  | `extensions` | **not in the IR** — it reads `x-*` off the OpenAPI tag object. Pass `{}` and say so in your report; if a naming strategy ever depends on it, that is a backend IR change, not something to invent here. |
+
+  Build the rest of the `OperationContext` (`operationId`, `method`, `path`, `tag`, `summary`)
+  from the IR operation directly. Names come from route and verb in almost every
   case; `operationId` is only the last-resort fallback (`naming.ts:340`), which is why the IR's
   `id` must equal the OpenAPI `operationId` — the backend derives it with the same
   controller-name strip order as `OperationIdCustomizer`, so `EquipmentInspectionRestController`
@@ -708,11 +737,10 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
      shape. Do not assemble `totalElements`/`numberOfElements` in generated code, and do not reach
      for `pageOf` here — that is the zod builder Task 7 uses, not a runtime factory.
   3. **A tree operation uses `buildEmbeddedTree`** from `@simplix-react/mock`.
-  4. **The IR has no entities, so the grouping has to be derived.** The factory name, the DTO type
-     parameter and the store's id-field argument all come from an entity notion the IR does not
-     carry — it has operations, tags and types. Derive the grouping the same way the endpoint and
-     hook generators do (Task 8), and where an operation cannot be attributed to an entity, emit
-     it into the domain's factory rather than dropping it. Say in your report how you grouped.
+  4. **The grouping is the one Task 8 settles, and it is path-based.** The factory name and the
+     DTO type parameter follow the entity that `splitIntoEntities` produces — not the tag — so
+     call the helpers Task 8 exports rather than grouping by tag here. The store's id-field
+     argument is not generated at all: `src/mock/index.ts` passes it by hand.
 
 - [ ] **Step 2: Test** that a handler returns an enveloped body; that a search handler's paged
   branch delegates to `store.listPaged` rather than constructing a page; that a `<field>.equals`
