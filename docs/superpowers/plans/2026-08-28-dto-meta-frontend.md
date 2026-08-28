@@ -1691,6 +1691,17 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
      says why — "a filter on a non-field would reference a property that does not exist on the
      DTO". Apply that guard to the sub-resource handler too.
 
+     **Store-backed handlers exist only when `seeds.ts` does — one missing link and every handler
+     becomes a stub.** The generator computes
+     `hasStores = storeEntities.length > 0 && hasSeedsFile` (`:65`), where `storeEntities` are
+     those with an operation in the 13 `CRUD_STORE_ROLES` (`:113` — the 14 from item 1b minus
+     `order`). With `hasStores` false, `generateHandlerEntry`'s `if (!hasStore || !role)` guard
+     (`:361`) sends **every** operation to the empty-body branch. So the chain is: the model files
+     are readable → `validEntities` is non-empty → `seeds.ts` is written → stores exist → handlers
+     read and write them. Break any link — and the first is the `src/generated/model` path read
+     (item 1) — and the mock answers every route with `{}` while compiling cleanly. Assert that a
+     generated `handlers.ts` contains at least one `store.` reference.
+
      **The reorder handler writes a field name it guesses, and `as never` hides a wrong guess.**
      `generateOrderHandler` emits
      `store.update(item.<id>, { <orderField>: item.<orderField> } as never)`, and `findOrderField`
