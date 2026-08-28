@@ -1873,6 +1873,31 @@ git commit -m "feat(cli): add meta-diff to compare the orval and meta outputs"
 
 `scaffold-crud.ts` learns a domain's fields by regex-matching orval's emitted zod text (`X…Body = zod.object(`) and by reading `src/generated/model/<file>.ts`. Neither exists in a meta domain, and `.extend()` would not match the regex anyway — inherited fields would silently vanish from a generated form (spec §9.1).
 
+**Which DTO's fields, exactly.** The rule is in `scaffold-crud.ts:378-401` and is not obvious:
+among the zod constants matching `\w*<EntityPascal>\w*Body`, take the one with the **most
+fields**; skip `Search\w*Body` (those are query parameters, not entity fields); and never read a
+`…Response` constant, because it carries the envelope's six members instead of the entity's. A
+field whose expression is `z.object(` or `z.array(z.object(` is skipped as well (`:468`) — nested
+objects are not rendered as scalar fields, while `z.array(z.string())` and
+`z.record(z.string(), z.string())` are kept.
+
+**Count inherited fields when comparing, or you will pick the wrong DTO.** Orval's `…Body`
+constants are flattened, the IR's `fields` are own-fields-only, and choosing by the own count
+inverts the answer. Measured:
+
+| Entity | own-field winner | with inheritance resolved | orval's choice |
+| --- | --- | --- | --- |
+| `org.Organization` | `OrganizationCreateDTO` (20) | **`OrganizationUpdateDTO` (21)** | Update |
+| `site.WorkPoint` | `WorkPointCreateDTO` (11) | **`WorkPointUpdateDTO` (12)** | Update |
+| `site.AreaZone` | `AreaZoneUpdateDTO` (1) | `AreaZoneUpdateDTO` (13) | Update |
+
+Two of three flip. Task 5 already computes the inherited closure — use that list for the
+comparison, and the same list for the fields themselves.
+
+**The entity's `modelType` is derived separately and from the response** (Task 10), so a form's
+fields and the mock store's type legitimately come from different DTOs. That is what the orval path
+does too; do not try to reconcile them.
+
 - [ ] **Step 1: Write the IR source.** Fill the same contracts the scaffold already uses —
 `FieldInfo` (`scaffold-crud.ts:29`), `EntityOperations` (`:632`), `FilterFieldInfo` (`:1243`) —
 from the IR instead of from text.
