@@ -1412,6 +1412,14 @@ precedent to follow.
   `schema/`, `endpoints/`, `hooks/`, `search/`, `access/`, `mock/`, `index.ts` (spec §9). Leave
   `src/generated/` alone.
 
+  **Empty `generated-meta/` before writing it.** The orval path prunes — `pruneUnusedModels`
+  (`openapi.ts:370`) deletes model files no endpoint references — and the meta path has no
+  equivalent, so an entity or DTO that leaves the backend leaves its file behind forever. A stale
+  `model/oldThing.ts` still exports a type the directory barrel still re-exports, so it compiles
+  and nothing reports it. The output is wholly generated and holds no hand-edited region (unlike
+  `mock/seeds.ts`), so delete the directory and rewrite it rather than adding a pruner. Assert that
+  a file present before a regeneration and absent from the new IR is gone afterwards.
+
   **`generated-meta/index.ts` is the barrel both swaps point at, and its contents have to be
   decided here** — Task 13's template variable takes this path, and Step 3 below re-exports
   through it. Emit:
@@ -1485,6 +1493,12 @@ precedent to follow.
   every enum in **one** file, so the names come from its exported declarations rather than from
   filenames. Assert that a meta domain with `generated/` removed still filters to the same enum set
   it had before.
+
+  **The damage is permanent, which is why this cannot be left to be noticed later.** The locale
+  files are merged, never pruned: `deepMerge(existing, overlay)` lets the overlay win and keeps
+  every key the overlay lacks, and nothing anywhere deletes a locale key (`pruneUnusedModels`
+  covers generated models only). So one unfiltered run writes all 145 enums in, and a later run
+  with the filter repaired **will not take them back out** — they have to be removed by hand.
 
   **Otherwise the locale files are not built from the IR, and spec §8 says so twice in conflicting
   ways.**
