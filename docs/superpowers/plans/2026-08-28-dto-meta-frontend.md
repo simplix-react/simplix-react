@@ -1972,6 +1972,26 @@ not, and holding it against `AreaZoneRestUpdateBody` shows a difference that is 
 fields and the mock store's type legitimately come from different DTOs. That is what the orval path
 does too; do not try to reconcile them.
 
+**A request body is not always there — 54 of the fixture's 139 entities have none.** They are the
+read-only ones (`auditLog`, `auditEvent`, `obligationApplicability`, `consoleNotification`, the
+census entities). The orval path covers them with its documented fallback, taking fields from the
+detail GET response (`entityFieldsToFieldInfo`, reached at `:1622` "covers read-only entities with
+no Body schema"), and that response is the same DTO `modelType` already names (Task 10). So:
+
+| Source | Entities | Rule |
+| --- | ---: | --- |
+| request-body DTO, most fields with inheritance resolved | 85 | above |
+| the non-array GET response — the `modelType` DTO | 54 | when no body DTO exists |
+| neither | **8** | report; do not emit placeholders silently |
+
+The last row matters because of what happens otherwise: with an empty field list the scaffold
+substitutes `PLACEHOLDER_FIELDS` — an `id`/`name` pair — and one of its two call sites
+(`scaffold-crud.ts:1632`) does it with a spinner message and **no warning at all**. A widget set
+built on two invented fields looks like a successful scaffold. The eight are `exportDownload`,
+`avatar`, `content`, `userPermission`, `passwordWebController`, `simpliXAuthLoginController`,
+`scalarController` and `backoffice` — binary or dev surfaces, most in unmatched tags — so refusing
+them loudly costs nothing.
+
 - [ ] **Step 1: Write the IR source.** Fill the same contracts the scaffold already uses —
 `FieldInfo` (`scaffold-crud.ts:29`), `EntityOperations` (`:632`), `FilterFieldInfo` (`:1243`) —
 from the IR instead of from text.
