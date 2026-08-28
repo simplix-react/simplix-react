@@ -1345,8 +1345,19 @@ and the one nothing imports would drift unnoticed. The `<Name>Params` type for e
 operation goes into `generated-meta/model/` beside the DTOs, where orval puts it.
 
 **The search params are not in the IR — they are derived, and the derivation was verified.**
-The 86 `searchDto`-bearing operations carry an **empty** `query` list (only 4 dotted query params
-exist in the whole fixture). The flat params come from the named DTO's `searchable` fields crossed
+Seventy-eight of the 86 `searchDto`-bearing operations carry an empty `query` list, and only 4
+dotted query params exist in the whole fixture (`title.contains`, `targetLabel.contains`,
+`entityLabel.contains`, `status.in`).
+
+**The other eight carry ordinary query params that must be emitted beside the derived ones**, so
+a generator that reads `searchDto` and stops has dropped them: `from`, `to`, `buckets` on six
+census reads (`BulkOperationRest_counts`, `ImportJobRest_counts`, `NotificationCentreRest_counts`,
+`AuditLogRest_counts`, `AuditEventRest_counts`, `NotificationRest_counts`), `siteId` on
+`PolicyParameterRest_simpleSearch`, and `tab` on `ApprovalInboxRest_search`. Losing them takes the
+period and the bucketing off every census screen, and the tab off the approval inbox — with the
+list still rendering.
+
+The flat params come from the named DTO's `searchable` fields crossed
 with their operators, and the suffix is the `SearchOperator` **value**, not its key:
 `CONTAINS` → `SearchOperator.CONTAINS` → `"contains"` → `'orgName.contains'`. Emitting
 `orgName.CONTAINS` would be sent verbatim by `buildSearchableParams`, filter nothing, and raise no
