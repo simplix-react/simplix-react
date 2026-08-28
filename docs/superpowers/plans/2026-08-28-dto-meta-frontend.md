@@ -2042,6 +2042,21 @@ them loudly costs nothing.
 `FieldInfo` (`scaffold-crud.ts:29`), `EntityOperations` (`:632`), `FilterFieldInfo` (`:1243`) —
 from the IR instead of from text.
 
+**Set `enumTypeName` from the IR, not from the emitted TypeScript.** An enum column shows a
+translated badge only when it can name its enum: `list.hbs:248` emits
+`enumName="{{enumTypeName}}"`, and `enumLabel(enumName, value)` resolves
+`enums.<enumName>.<value>` (`use-entity-translation.ts:51`). The scaffold fills `enumTypeName` by
+reading the **declared type text** out of the list DTO's model file and keeping it only if it looks
+like a bare PascalCase identifier (`withEnumType`, `scaffold-crud.ts:1851`).
+
+That breaks on the meta output. A labeled enum's response field is typed `AreaKindLabeled`, not
+`AreaKind` (Task 6), so the declared text yields `enumName="AreaKindLabeled"`, the lookup asks for
+`enums.AreaKindLabeled.AREA`, and the locale files hold `enums.AreaKind.AREA` — every enum badge in
+every generated list falls back to the raw constant, silently, across all **122 labeled enums**.
+
+The IR names the enum directly in the field's `TypeRef`, so take `enumTypeName` from there and
+never from the rendered type. That also survives `listDtoFields` being unavailable.
+
 **There are three call sites, not one, and they read from two different files.** Replace all three
 or the meta output is generated and never consumed:
 
