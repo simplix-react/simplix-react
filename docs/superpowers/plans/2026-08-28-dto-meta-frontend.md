@@ -1193,7 +1193,23 @@ git commit -m "feat(cli): let scaffolding read fields from the IR"
   `dashboard` 1, `org` 13, `audit` 15, `worker` 16, `approval` 31, `site` 32, `auth` 39,
   `space` 46, `system` 64, `regulation` 81, `user` 100, `notification` 139. `dashboard` is the
   smallest but exercises almost nothing — one operation, no CRUD shape. `org` is the pilot:
-  small enough to read end to end, large enough to contain a real create/update/list/detail set.
+  small enough to read end to end, and its 13 operations are measured to cover more than a plain
+  CRUD set. **It is a tree domain**, and that is deliberate — a pilot that skipped the hard shapes
+  would prove nothing about the rest:
+
+  | Shape | Operations |
+  | --- | --- |
+  | create / list / detail / edit-form / update / delete | `POST /create`, `GET /search`, `GET /{orgId}`, `GET /{orgId}/edit`, `PUT /{orgId}`, `DELETE /{orgId}` |
+  | **tree** | `GET /tree`, `GET /tree/{orgId}` — exercises `buildEmbeddedTree` in the mock |
+  | **reorder** | `PATCH /order` — a `List<XOrderDTO>` body, one of the 49 Task 0 repairs |
+  | **multi-update** | `PATCH` — a `Set<XUpdateDTO>` body, likewise |
+  | **batch** | `PATCH /batch`, `DELETE /batch` |
+  | second entity | `GET /org-type` under `org.OrgType` |
+
+  Also measured: one `searchDto` (`OrganizationSearchDTO`), every operation gated by a
+  `permission` access with no `expression` case, and the app already has screens at
+  `modules/org/src/pages/organization` for Step 5 to drive. Verify each row above rather than
+  stopping once create and list work.
   Drive the diff to zero errors and record every info-level difference in the task report.
 - [ ] **Step 3** — add that domain to `export`. Run `pnpm typecheck` and `pnpm build`.
 - [ ] **Step 4** — run `simplix scaffold` for one entity in that domain and confirm the widget set is unchanged from what the orval path produced.
