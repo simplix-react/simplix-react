@@ -662,7 +662,35 @@ meta?: {
 
 - [ ] **Step 3: The re-export layer.** For a domain listed in `export`, rewrite `index.ts`, `hooks/*.ts`, `schemas.ts` and `mock/index.ts` to point at the meta output. `schemas.ts` and `mock/index.ts` carry hand-edited regions — preserve them and change only the relative import paths (spec §10). Reverting is removing the domain from `export`, which is why `src/generated/` is deleted last.
 
-- [ ] **Step 4: Test** that a domain not in `export` keeps its orval barrel byte-for-byte; that a domain in `export` has all four re-export files repointed; that a hand-edited region in `schemas.ts` survives.
+- [ ] **Step 4: Test** that a domain not in `export` keeps its orval barrel byte-for-byte; that a
+  domain in `export` has all four re-export files repointed; that a hand-edited region in
+  `schemas.ts` survives.
+
+- [ ] **Step 4b: Prove the generated output survives typecheck and lint — the requirement nobody
+  has verified yet.**
+
+  Spec §5.1 requires that no generated file carries `@ts-nocheck`. Orval's output carries it on
+  every endpoint file precisely because it does not compile clean, and neither
+  `.oxlintrc.json` nor the CLI's tsconfig excludes generated directories — so meta output is
+  linted and typechecked like hand-written code. A generator that emits `@ts-nocheck` to get
+  green has reproduced the defect this project exists to remove.
+
+  Run, against a real domain package with the meta output written into it:
+
+  ```bash
+  pnpm typecheck
+  pnpm lint
+  ```
+
+  Both must pass with **no `@ts-nocheck` anywhere in `generated-meta/`**:
+
+  ```bash
+  grep -rn "@ts-nocheck" packages/domain-*/src/generated-meta/ && echo "VIOLATION" || echo "clean"
+  ```
+
+  If a diagnostic is genuinely unavoidable — a Jackson shape TypeScript cannot express — report
+  it with the exact message rather than suppressing it. Suppression is the one outcome this step
+  exists to prevent.
 
 - [ ] **Step 5: Run the full CLI suite, then commit**
 
