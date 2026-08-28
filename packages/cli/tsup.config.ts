@@ -105,6 +105,10 @@ const sharedConfig: import("tsup").Options = {
     /^ora/,
     /^prompts/,
     /^picocolors/,
+    // The meta-diff command parses both generated trees with the compiler API. Bundled, it
+    // adds ten megabytes to the binary, so it is resolved from node_modules like every other
+    // runtime dependency.
+    /^typescript$/,
     /^yaml/,
     /^@simplix-react-ext\//,
   ],
