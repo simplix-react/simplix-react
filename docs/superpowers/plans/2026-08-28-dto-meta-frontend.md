@@ -1116,7 +1116,7 @@ The reason parallel generation was chosen: a domain is only switched once the tw
 
 | Finding | Level |
 | --- | --- |
-| a public name (type, hook, const map, params, schema) present in only one | error |
+| a public name present in only one — type, hook, request function, const map, params type, zod schema, **and the mock handler factory `createXHandlers`** (spec §11) | error |
 | a field present in only one | error |
 | a field type mismatch | error |
 | a required-ness difference not on the intended list | error |
@@ -1127,7 +1127,11 @@ The reason parallel generation was chosen: a domain is only switched once the tw
 
   Both outputs must come from the same run against the same server, or the diff reports whatever the backend did in between.
 
-- [ ] **Step 2: Test** that an identical pair reports nothing; that a removed field is an error; that an enum shape change is info; that a hook-name difference is an error.
+- [ ] **Step 2: Test** that an identical pair reports nothing; that a removed field is an error;
+  that an enum shape change is info; that a hook-name difference is an error; and that a renamed
+  `createXHandlers` factory is an error — `src/mock/index.ts` imports those by name and a silent
+  rename breaks every mocked screen in the domain while typecheck of the domain package alone
+  still passes.
 
 - [ ] **Step 3: Run, then commit**
 
