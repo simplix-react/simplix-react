@@ -2106,7 +2106,17 @@ those four names, so both fall to the positional rule and both land wrong:
 `org` is the pilot domain and its tree is its main screen, so Task 14's browser pass meets this
 first. The IR settles it without a new heuristic: **a field with an `…I18n` sibling is the
 human-facing text by construction** — that rule yields `orgName` and `areaName` respectively. Try
-the four common names, then the i18n-paired field, then the positional fallback. The parent-id
+the four common names, then the i18n-paired field, then the positional fallback.
+
+**The same rule governs `displayNameField`, which is not tree-specific and reaches further.**
+`scaffold-crud.ts:1765` derives it for **every** entity by the same four-names-then-first-string
+test, excluding only the row id, and `crud-page.hbs:167` spends it on the delete confirmation:
+`requestDelete({ id: row.<rowIdField>, name: String(row.<displayNameField> ?? "") })`. Measured
+over the DTOs that carry an i18n pair: **28 of 41 pick something other than the paired field** —
+`WorkPointCreateDTO` picks `siteId`, `JobPositionCreateDTO` `positionCode`,
+`HolidayUpdateDTO` `holidayCalendarId`. A foreign key is identical on every row, so the dialog asks
+the operator to confirm deleting a record it has named wrongly, or named the same as the last one.
+Apply the i18n-paired rule here too. The parent-id
 detection above it needs no change: `parentOrgId` and `parentAreaId` both match its
 contains-`parent`-and-ends-`id` test, and all three tree DTOs name their child collection
 `children`, so the templates' hardcoded `childrenField` holds.
