@@ -2200,6 +2200,24 @@ every generated list falls back to the raw constant, silently, across all **122 
 The IR names the enum directly in the field's `TypeRef`, so take `enumTypeName` from there and
 never from the rendered type. That also survives `listDtoFields` being unavailable.
 
+**Two further defects sit in the same templates, and the second is §1's headline enum problem.**
+
+1. **Three enum key schemes coexist.** `list.hbs:248` (the column) passes
+   `enumName="{{enumTypeName}}"`, but `list.hbs:199` (the peek row) and `detail.hbs:125` both build
+   the key as `"{{entity}}{{capitalizedName}}"` — `areaZoneAreaKind` against `AreaKind`.
+   `buildLocaleJson` writes `field.enumTypeName ?? enumName(entity, field)` — **one** of the two.
+   So the moment `enumTypeName` is set (which the fix above requires), the column resolves and the
+   peek row and the detail badge stop resolving. Use the IR's enum name in all three places.
+
+2. **Neither template calls `resolveBootEnum` — it appears 0 times in both.** `list.hbs:199` does
+   `String(row.status)` and `detail.hbs:125` passes `displayData.status` straight into `enumLabel`.
+   A labeled enum arrives as `{ value, label }` (spec §4.1, 122 of 133 enums), so the generated
+   screens render `[object Object]` and look up `enums.X.[object Object]`. This is §1's first
+   defect reproduced by the generator itself, and the frontend handbook's invariant #10 requires
+   `resolveBootEnum` in exactly these four contexts — list column, form default, detail display,
+   DTO assembly — with #53 naming the detail row as its own trap. Emit
+   `resolveBootEnum(row.status)` wherever a labeled enum's value is read.
+
 **The mutation path parameters are a fifth read of `src/generated/`, and both fail badly without
 it.** `findMutationPathParam` (`scaffold-crud.ts:1176`) scans
 `packages/*/src/generated/endpoints` for `get<Op>MutationOptions` to learn which path parameter a
