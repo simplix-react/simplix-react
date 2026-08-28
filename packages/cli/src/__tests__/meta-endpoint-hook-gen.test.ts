@@ -409,12 +409,28 @@ describe("generateEndpointFiles writes the request half", () => {
     const avatars = generateEndpointFiles(user!, { naming: simplixBootNaming });
     const module = avatars.files.get("endpoints/avatar.ts") ?? "";
 
-    const declared = [...module.matchAll(/^export const (\w+)/gm)].map((one) => one[1]);
-    expect(declared.length).toBe(new Set(declared).size);
-    expect(ts.transpileModule(module, { reportDiagnostics: true }).diagnostics ?? []).toEqual([]);
+    const hooks = generateHookFiles(user!, { naming: simplixBootNaming });
+
+    // Both halves, because they are emitted separately: the first fix reached the endpoints and
+    // left the hooks declaring `useGetAllAvatars` twice.
+    for (const emitted of [module, hooks.files.get("hooks/avatar.ts") ?? ""]) {
+      const declared = [...emitted.matchAll(/^export (?:const|function) (\w+)/gm)].map(
+        (one) => one[1],
+      );
+      expect(declared.length).toBe(new Set(declared).size);
+      expect(ts.transpileModule(emitted, { reportDiagnostics: true }).diagnostics ?? []).toEqual([]);
+    }
 
     const clash = avatars.duplicateExports.find((one) => one.name === "getAllAvatars");
     expect(clash?.operations.length).toBeGreaterThan(1);
+  });
+
+  it("keeps every route in the mock, where a name is not what identifies a handler", () => {
+    // A handler is an array entry rather than a named export, and a route without one falls
+    // through to a server that is not running — so the deduplication must not reach this far.
+    const user = resolved.domains.get("user")!;
+    const routes = resolveEndpoints(user, simplixBootNaming).flatMap((one) => one.targets);
+    expect(routes.length).toBe(user.operations.length);
   });
 
   it("exports every entity module from the barrel", () => {

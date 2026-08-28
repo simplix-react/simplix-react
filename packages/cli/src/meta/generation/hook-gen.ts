@@ -132,7 +132,7 @@ class HookEmitter {
     if (entity.targets.some((target) => !target.isQuery && target.body !== undefined)) {
       mutator.add("BodyType");
     }
-    const bodies = entity.targets.map((target) =>
+    const bodies = dedupeByName(entity.targets).map((target) =>
       target.isQuery
         ? this.queryHook(target, imports, query, endpoints)
         : this.mutationHook(target, imports, query, endpoints),
