@@ -485,7 +485,24 @@ git commit -m "feat(cli): resolve the IR into per-domain type closures"
 
 - [ ] **Step 1: Write it.** For one domain, emit:
   - `model/<entity>.ts` — one `export interface` per type, `extends` where the IR says so, **own fields only**
-  - `model/_enums.ts` — for each enum: a value union plus a const map named as orval named it (so `SiteOnboardingStepKey` keeps working as a value import), and for a labeled enum an additional `…Labeled` alias over `LabeledEnumValue`
+  - `model/_enums.ts` — the exact declaration-merge shape orval emits, so a module that imports
+    the name as a **value** keeps working. Verified against
+    `generated/model/siteOnboardingStepKey.ts`:
+
+    ```ts
+    import type { LabeledEnumValue } from "@simplix-react-ext/simplix-boot-utils";
+
+    export type AreaKind = (typeof AreaKind)[keyof typeof AreaKind];
+    export const AreaKind = { AREA: "AREA", ZONE: "ZONE" } as const;
+
+    /** Only for a labeled enum: the shape a response field actually carries. */
+    export type AreaKindLabeled = LabeledEnumValue<AreaKind>;
+    ```
+
+    The type and the const share one name — that is what makes `SiteOnboardingStepKey` usable in
+    both positions. Emitting `export type X = "A" | "B"` beside the const instead loses nothing
+    structurally but stops matching what orval produced, and Task 11 swaps barrels on the
+    assumption that the two are interchangeable.
   - no envelope type — `SimpliXApiResponse` is `unwrap: true`, so it does not appear in client types
 
   Field typing rules, from the measured kinds: `string`→`string`; `number`→`number`; `boolean`→`boolean`; `instant`/`date`→`string`; `time`→`string`; `enum`→ the value union in a request DTO and the `…Labeled` alias in a response DTO (spec §9); `ref`→ the interface name; `container`→ the plugin's mapping; `unknown`→`unknown`; `param`→ the type parameter; `pick`→ `Pick<Of, "a" | "b">`.
@@ -861,7 +878,28 @@ meta?: {
 };
 ```
 
-- [ ] **Step 2: Layout.** Write into `packages/domain-<name>/src/generated-meta/` — `model/`, `schema/`, `endpoints/`, `hooks/`, `search/`, `access/`, `mock/`, `index.ts`. Leave `src/generated/` alone.
+- [ ] **Step 2: Layout.** Write into `packages/domain-<name>/src/generated-meta/` — `model/`,
+  `schema/`, `endpoints/`, `hooks/`, `search/`, `access/`, `mock/`, `index.ts` (spec §9). Leave
+  `src/generated/` alone.
+
+  **`generated-meta/index.ts` is the barrel both swaps point at, and its contents have to be
+  decided here** — Task 13's template variable takes this path, and Step 3 below re-exports
+  through it. Emit:
+
+  ```ts
+  export * from "./model";
+  export * from "./model/_enums";
+  export * from "./endpoints";
+  export * from "./hooks";
+  export * from "./search";
+  export * from "./access";
+  ```
+
+  `schema/` is deliberately absent: `schemas.ts` re-exports zod constants separately and
+  `export *` from both would collide on names (the existing type-name-conflict rule). `mock/` is
+  absent because `src/mock/index.ts` imports the handler factories by path. Emit a
+  `model/index.ts` re-exporting each entity file, so `export * from "./model"` resolves the way
+  orval's `generated/model/index.ts` does.
 
 - [ ] **Step 3: The re-export layer.** For a domain listed in `export`, rewrite `index.ts`, `hooks/*.ts`, `schemas.ts` and `mock/index.ts` to point at the meta output. `schemas.ts` and `mock/index.ts` carry hand-edited regions — preserve them and change only the relative import paths (spec §10). Reverting is removing the domain from `export`, which is why `src/generated/` is deleted last.
 
@@ -997,9 +1035,12 @@ what the orval path has to do. Labels come from `labelKey`.
   | `templates/openapi/user-index-ts.hbs` | `simplix openapi` | unconditional |
   | `templates/domain/index-ts.hbs` | `simplix add-domain` | inside `{{#if enableOrval}}`; the `{{else}}` branch exports `./schemas` and `./contract` |
 
-  Make the model path a variable in both. A meta domain matches neither existing branch of
-  `domain/index-ts.hbs` — it has no `generated/model` and no hand-written `contract.ts` — so that
-  template needs the meta shape as its own case, not a reuse of `{{else}}`.
+  Make the model path a variable in both; for a meta domain it takes `"./generated-meta"`, the
+  barrel Task 11 Step 2 emits, not `"./generated-meta/model"` — the barrel already carries the
+  enums, endpoints, hooks, search and access alongside the models. A meta domain matches neither
+  existing branch of `domain/index-ts.hbs` — it has no `generated/model` and no hand-written
+  `contract.ts` — so that template needs the meta shape as its own case, not a reuse of
+  `{{else}}`.
 
   Verify with `grep -rn "generated/model" packages/cli/src/templates/` returning nothing but the
   variable form. The UI templates need no change — they import from the package barrel by name,
