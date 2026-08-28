@@ -1691,6 +1691,18 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
      says why — "a filter on a non-field would reference a property that does not exist on the
      DTO". Apply that guard to the sub-resource handler too.
 
+     **The reorder handler writes a field name it guesses, and `as never` hides a wrong guess.**
+     `generateOrderHandler` emits
+     `store.update(item.<id>, { <orderField>: item.<orderField> } as never)`, and `findOrderField`
+     (`:782`) takes the first non-`id` property of the **order DTO's body**, else a field named
+     `displayOrder` / `sortOrder` / `orderIndex` on the entity, else the literal `"displayOrder"`.
+     Task 0 restores the first path — the order DTOs are absent from `types` until the re-capture
+     (they were the erased body elements) — and the second covers **10 of the 11** reorder
+     entities. The eleventh, `authRolePermission`, declares none of the three, so it takes the
+     literal and the handler writes a property the DTO does not have; `as never` means that
+     compiles. After the re-capture, read the field from the order DTO and **report** an entity
+     where neither path resolves rather than emitting the literal.
+
      **The list handler's filter parameter has to be derived, because the IR has none.** It takes
      the first query parameter that is a string *and* names a field the DTO declares, then emits a
      shortcut branch before the paged fallback. The IR's search operations carry an **empty**
