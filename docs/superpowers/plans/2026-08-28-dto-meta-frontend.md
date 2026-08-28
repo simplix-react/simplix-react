@@ -34,7 +34,7 @@ The backend half of this project is finished and a real IR was captured from the
 | `searchDto`-bearing operations | 86 |
 | fields with `searchable` | 1118 |
 | fields with `labelKey` | 2082 |
-| distinct tags | 139 |
+| distinct tags | 139 — **and 139 entities**, since an entity is one tag (Task 8). Counts elsewhere that say **118** are the *configured* domains only: 139 minus the 21 tags no `domains` pattern claims. Quote 139 for "what the IR contains" and 118 for "what a codegen run produces". |
 
 ### What the fixture cannot test
 
