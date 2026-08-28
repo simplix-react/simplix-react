@@ -575,6 +575,38 @@ This is where the project's original complaint is answered: 440 `maxLength` and 
 
   A non-required field gets `.optional()`.
 
+  **The kind vocabulary is closed and matches the backend exactly.** `ConstraintExtractor.extract`
+  emits only: `notBlank`, `notEmpty`, `minLength`, `maxLength`, `minItems`, `maxItems`, `min`,
+  `max`, `positive`, `nonnegative`, `negative`, `nonpositive`, `pattern`, `email`, `assertTrue`,
+  `assertFalse`, `custom` — the list above. `@NotNull` produces no entry; it feeds `required`.
+  Handle every kind and throw on an unrecognised one rather than skipping it.
+
+  **Eleven of the seventeen appear in the fixture**, and these are the ones the tests can reach:
+
+  | kind | n | note |
+  | --- | ---: | --- |
+  | `maxLength` | 440 | |
+  | `notBlank` | 221 | **140 of them pair with a length bound** |
+  | `notEmpty` | 11 | always on a `List`, never a string — `.min(1)` on the array |
+  | `pattern` | 10 | |
+  | `email` | 7 | **5 also carry `maxLength`, 4 also `notBlank`** |
+  | `min` | 7 | |
+  | `minLength` | 5 | |
+  | `max` | 4 | |
+  | `nonnegative` | 2 | on an integral number |
+  | `positive` | 1 | |
+  | `maxItems` | 1 | on a `List`, so `.max()` on the array |
+
+  Both collection bounds in the fixture land on `List`, never on `Map` — a `Map` field carrying
+  `@Size` would produce `minItems`/`maxItems` over a `z.record`, which has no such method. Throw
+  there rather than emitting a call that does not exist.
+
+  **These chains were run against the installed `zod@4.3.6` and behave as prescribed:**
+  `z.email().trim().min(1).max(N)` enforces the length; `z.string().min(1).min(10)` — what a
+  `notBlank` + `minLength` field produces — rejects a 5-character string, so the redundant
+  `.min(1)` is harmless and needs no deduplication; `z.int().nonnegative()` rejects `-1`;
+  `z.iso.datetime()` rejects `"not a date"`; `z.iso.date()` rejects a full timestamp.
+
   **Check the installed zod before emitting any call you have not seen in orval's output.** The
   v4 surface deprecated several v3 methods; read
   `node_modules/.pnpm/zod@4*/node_modules/zod/v4/classic/schemas.d.cts` rather than writing from
@@ -586,7 +618,11 @@ This is where the project's original complaint is answered: 440 `maxLength` and 
 
   - a `notBlank` field rejects `""` — **the exact defect the project exists to fix**, so prove it
   - a `maxLength` field rejects an over-long string (the fixture has 440 of these)
-  - a `@DecimalMin`-sourced string bound produces a working numeric `.min()`
+  - a `@DecimalMin`-sourced **string** bound produces a working numeric `.min()`. The fixture has
+    exactly two such fields — `FloorPlanPlacementUpdateDTO.horizontalRatio` and `.verticalRatio`,
+    both carrying `{"kind":"min","value":"0.0"}` and `{"kind":"max","value":"100.0"}` on a
+    non-integral number. Assert the emitted schema rejects `101`; a generator that passed the
+    string straight to `.min()` would build a schema that never rejects anything.
   - an `instant` field accepts an ISO timestamp and rejects `"not a date"` — this is the
     orval-parity check; a plain `z.string()` would pass both and the test would catch it
   - a `date` field accepts `2026-08-28` and rejects a full timestamp
