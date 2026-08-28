@@ -1928,11 +1928,20 @@ Measured, the orval path collapses them — `parseZodType` (`scaffold-crud.ts:16
 All three framework components exist:
 `packages/ui/src/fields/form/{date-field,time-field,datetime-field}.tsx`.
 
-| IR kind | `formComponent` | `component` | n in fixture |
-| --- | --- | --- | ---: |
-| `instant` | `DateTimeField` | `Date` | 682 |
-| `date` | `DateField` | `Date` | 202 |
-| `time` | `TimeField` | `Time` | 10 |
+| IR kind | `formComponent` | `component` | `tsType` | n in fixture |
+| --- | --- | --- | --- | ---: |
+| `instant` | `DateTimeField` | `Date` | `Date` | 682 |
+| `date` | `DateField` | `Date` | `Date` | 202 |
+| `time` | `TimeField` | **`Date`** | `Date` | 10 |
+
+**`component` stays `"Date"` for all three, including `time`** — only `formComponent` distinguishes
+them. `component` is a coarse classification two other mechanisms read, and neither knows a
+`"Time"` value: `categorizeField` (`scaffold-crud.ts:102`) files a field as `schedule` on
+`component === "Date" || tsType === "Date" || /(At|Date|Time)$/.test(name)`, and `:1667` sets the
+template's `hasDateFields` flag from `component === "Date"`. Measured: **4 of the fixture's 10
+`time` fields would fall through both** — `ShiftUpdateDTO.nightWindowStart`, `.nightWindowEnd` and
+their `ShiftDTO` twins end in neither `At`, `Date` nor `Time`, so with `component: "Time"` they land
+in the `text` column category and a shift entity reports no date fields at all.
 
 Deferring these to the scaffold is not a neutral reuse: its branch decides from `format`, which
 the IR source does not supply, so every temporal field falls through to a plain text input. For
