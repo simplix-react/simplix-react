@@ -1776,7 +1776,22 @@ precedent to follow.
 
   The failure this prevents is the one `domain-translations.ts:89` describes in its own words:
   every field renders as `fields.<name>` on screen while both packages' code is correct and nothing
-  throws. `label` (the direct-literal
+  throws.
+
+  **A greenfield meta domain also needs the placeholder pass that runs before the overlay.**
+  Step 13 calls `generateLocaleFiles(targetDir, entities, locales)`, whose `buildLocaleJson`
+  (`openapi.ts:535`) writes `fields[name] = camelToLabel(name)` for **every** field of every entity
+  and a `camelToLabel` entry for every enum value, into every locale. Step 13b then overlays the
+  server's real translations on top, and `deepMerge` lets the overlay win — so the placeholder is
+  what a field falls back to when the server has no message for it. Measured, **66% of the IR's
+  fields (4,138 of 6,222) carry neither `labelKey` nor `label`**, so the fallback is not a rare
+  path.
+
+  Those entities come from the OpenAPI parse, so during coexistence they exist. A domain that never
+  had an orval run has none, no locale file is written, and every label on the screen renders as
+  the raw `fields.<name>`. Reproduce the pass from the IR: it needs only the field names per
+  entity, the enum values, and `camelToLabel` — a pure function. Use the IR's enum name (Task 13's
+  `enumTypeName`) where `buildLocaleJson` uses `field.enumTypeName ?? enumName(entity, field)`. `label` (the direct-literal
   mode) occurs twice in the whole capture, both on `ValidationTestRequest` in an unmatched tag —
   handle it as a fallback and do not build anything around it.
 
