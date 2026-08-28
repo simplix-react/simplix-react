@@ -2316,6 +2316,15 @@ naming strategy labelled `get`, so fall back to the last path parameter of any i
 falling back to `"id"`. This diverges from the orval path for those entities, in scaffolded module
 code that `meta-diff` does not compare — say how many it changed.
 
+**What the `"id"` fallback actually costs.** `crud-page.hbs` spends `rowIdField` in seven places —
+`onRowClick={(row) => showDetail(String(row.<rowIdField>))}`, the view / edit / delete row actions,
+and the card-list variants. A list renders a `…ListDTO`, and **no list DTO in the fixture has a
+field named `id`**: the twelve types that do are entity classes (`Organization`, `UserAccount`,
+`UserRole`, `SimpliXBaseEntity` …), not the projections a list shows. So on those 74 screens
+`row.id` is `undefined`, every row click navigates to the string `"undefined"`, and the delete
+action requests deletion of nothing. It is not a cosmetic identity problem; the screen does not
+work.
+
 **One presentation decision must come from the IR: the temporal component.** Spec §5.1 requires
 that `instant`, `date` and `time` stay distinguishable *because the three use different input
 components*, and §1 names their collapse as one of the eight defects this project exists to remove.
