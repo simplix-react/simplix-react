@@ -1613,6 +1613,14 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
      decision into the other: an MSW pattern containing `{workPointId}` matches nothing, and every
      mocked request falls through to a server that is not running.
 
+     **Convert before sorting, not after.** MSW matches in registration order, first match wins, so
+     the generator registers parameterless routes first — `sortOps` (`mock-generator.ts:172`) sorts
+     on `path.includes(":")`, the colon form. Convert after that sort and the key never matches:
+     every path compares equal, the stable sort preserves the IR's own order, and for
+     `org.Organization` that order puts `GET /api/v1/admin/org/{orgId}` **before**
+     `GET /api/v1/admin/org/tree`, so the detail handler answers the tree request. Sort on whichever
+     form is in hand, but sort by *has a path parameter*, not by a literal `":"`.
+
   1b. **Fourteen roles read or write the store; everything else gets an empty-body stub.** The
      generator switches on the role (`mock-generator.ts:376`) for `list`, `getAll`, `get`,
      `getForEdit`, `create`, `update`, `delete`, `multiUpdate`, `batchUpdate`, `batchDelete`,
