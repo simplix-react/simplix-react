@@ -1596,6 +1596,15 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
      `"HH:mm"` seed. Where the orval path guesses an email from the field's name
      (`fieldName.includes("email")`, `:121`), the IR states it as a constraint on 7 fields — use
      that instead.
+
+     **`List` and `Map` are one IR kind and must not seed alike.** OpenAPI splits them — an array
+     takes `generateArrayValue` (which defaults to `[]`, `:181`) and a map is `type: "object"` and
+     is **omitted from the seed entirely** (`:81`). The IR calls both `container`, so a generator
+     that seeds every container as `[]` writes `[]` into the **74 `Map` fields**, 33 of them the
+     i18n maps, against a declared `Record<string, string>` — a type error in a file that is never
+     regenerated. Seed `List` as `[]` and omit `Map`, matching what the orval path does today.
+     `generateArrayValue`'s name heuristics (`tag`, `url`, `image`, `photo`) fire on **0** of the
+     fixture's container fields, so nothing depends on reproducing them.
   2. **Nothing hand-builds a page.** `store.listPaged(page, size, sort)` returns the Spring page
      shape. Do not assemble `totalElements`/`numberOfElements` in generated code, and do not reach
      for `pageOf` here — that is the zod builder Task 7 uses, not a runtime factory.
