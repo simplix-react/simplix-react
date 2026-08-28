@@ -687,6 +687,12 @@ git commit -m "feat(cli): resolve the IR into per-domain type closures"
   Field typing rules, from the measured kinds: `string`→`string`; `number`→`number`; `boolean`→`boolean`; `instant`/`date`→`string`; `time`→`string`; `enum`→ **gated on `EnumMeta.labeled`**: when true, the value union in a request DTO and the `…Labeled` alias in a response DTO (spec §9); when false, the value union in **both** directions and no `…Labeled` alias at all; `ref`→ the interface name; `container`→ the plugin's mapping; `unknown`→`unknown`; `pick`→ `Pick<Of, "a" | "b">`; `param`→ **see below, it is not simply the
   type parameter**.
 
+  `unknown` needs no special handling and was verified: all 8 field-level occurrences are the value
+  of a `Map<String, Object>` (`SchedulerInfo.params`, `Organization.eventPayloadData`, …), giving
+  `Record<string, unknown>` and `z.record(z.string(), z.unknown())`. The 27 further occurrences are
+  operation responses, and **none of them reaches a domain** — every one is in an unmatched tag
+  (`dev.test.*`, `dev.permissions`, `Auth Token`, the stream admin routes).
+
   **A `param` whose name is not among the owning type's `typeParams` is unresolvable — emit
   `unknown` and report it.** Measured, all six occurrences are of that kind:
 
