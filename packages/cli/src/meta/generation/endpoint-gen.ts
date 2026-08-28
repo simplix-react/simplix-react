@@ -201,11 +201,19 @@ function requestHelpers(): string {
   return `${HEADER}
 
 /** The query string of a request, with an array parameter written once per member. */
+/**
+ * Parameters repeated once per member instead of joined. Only \`sort\` is: searchable-jpa reads a
+ * multi-value filter as one comma-separated field — its own parameter documentation says "Enter
+ * multiple values separated by comma" — so exploding \`orgId.in\` into \`orgId.in=A&orgId.in=B\`
+ * sends a shape the server does not read, and the filter comes back unapplied rather than failing.
+ */
+const EXPLODED_PARAMS = new Set(['sort']);
+
 export function toQueryString(params: Record<string, unknown> | undefined): string {
   const search = new URLSearchParams();
   for (const [name, value] of Object.entries(params ?? {})) {
     if (value === undefined) continue;
-    if (Array.isArray(value)) {
+    if (Array.isArray(value) && EXPLODED_PARAMS.has(name)) {
       for (const member of value) search.append(name, String(member));
       continue;
     }

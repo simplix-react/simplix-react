@@ -368,12 +368,36 @@ describe("generateEndpointFiles writes the request half", () => {
     );
   });
 
-  it("writes an array parameter once per member, which is how the binder reads it", () => {
+  it("joins a multi-value filter and repeats only sort, which is how the binder reads each", () => {
     const helpers = orgEndpoints.files.get("endpoints/_request.ts") ?? "";
-    expect(helpers).toContain("for (const member of value) search.append(name, String(member));");
+    expect(helpers).toContain("const EXPLODED_PARAMS = new Set(['sort']);");
+    expect(helpers).toContain("if (Array.isArray(value) && EXPLODED_PARAMS.has(name))");
     expect(endpointFile("organization")).toContain(
       "import { toQueryString } from './_request';",
     );
+  });
+
+  it("serialises the two shapes the way the orval builder does", () => {
+    // searchable-jpa reads a multi-value filter as one comma-separated field — the parameter's own
+    // documentation says "Enter multiple values separated by comma" — and orval explodes only
+    // `sort`. Repeating `orgId.in` instead sends a shape the server does not read, so the filter
+    // comes back unapplied rather than failing.
+    const helpers = orgEndpoints.files.get("endpoints/_request.ts") ?? "";
+    const body = helpers
+      .slice(helpers.indexOf("const EXPLODED_PARAMS"), helpers.indexOf("/** The form body"))
+      .replace(/^export /gm, "")
+      .replace(/: [^=)]+\)/g, ")")
+      .replace(/\): string \{/g, ") {");
+    const toQueryString = new Function(`${body}; return toQueryString;`)() as (
+      params: Record<string, unknown> | undefined,
+    ) => string;
+
+    expect(toQueryString({ "orgId.in": ["A", "B"] })).toBe("orgId.in=A%2CB");
+    expect(toQueryString({ sort: ["orgName.asc", "orgCode.desc"] })).toBe(
+      "sort=orgName.asc&sort=orgCode.desc",
+    );
+    expect(toQueryString({ page: 0, size: 20 })).toBe("page=0&size=20");
+    expect(toQueryString(undefined)).toBe("");
   });
 
   it("exports every entity module from the barrel", () => {
