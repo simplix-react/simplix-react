@@ -2219,6 +2219,18 @@ from the IR instead of from text.
 202 `date` and 10 `time` fields the IR distinguishes. Map `instant`→`datetime`, `date`→`date`,
 `time`→`time`.
 
+**The batch operations reach no screen at all — report the gap rather than closing it here.**
+`selectable`, `batchDelete`, `batchUpdate` and `multiUpdate` appear **0 times** across every UI
+template, though `crud.config.ts` records all three roles and `CrudList` offers `selectable` and
+`rowActions` to drive them. Measured, **38 of the fixture's 139 entities carry at least one** —
+`batchUpdate` 38, `multiUpdate` 34, `batchDelete` 28, `order` 11. The frontend handbook's
+invariant #33 is explicit that every entity-scoped action endpoint must be reachable from the UI,
+so those endpoints are unreachable by construction today.
+
+Building the multi-select toolbar is a new screen feature, not a codegen parity task, and the user
+has not asked for it. **Report it in Task 14 with these counts** — the IR is what makes the gap
+visible, and naming it is this project's contribution; closing it is a separate decision.
+
 **A boolean column needs `display="boolean"` for the same reason.** The column section has three
 branches — the two i18n ones, `Select` with `display="badge"`, and a bare `{{else}}` — so a boolean
 field falls through and the table prints `true` / `false`. `CrudList.Column` offers
