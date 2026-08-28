@@ -689,12 +689,15 @@ smart-safety에 실제로 한 건 있다(DTO 선언 633개, 고유 단순명 632
 3. smart-safety의 import를 교체하고(`FieldLabel` 2,161곳 · `LabeledEnum` 140곳 · 리졸버 51곳)
    백엔드 제너레이터 템플릿을 갱신한 뒤, 앱 사본과 `common-dev`의 i18n 구현을 삭제한다.
 4. CLI에 `meta/fetch.ts`와 `ir-types.ts`를 만들어 IR을 받아 오고, 받은 IR 표본을 픽스처로
-   커밋해 이후 생성기들의 골든 테스트 기반으로 쓴다.
+   커밋해 이후 생성기들의 골든 테스트 기반으로 쓴다. **픽스처는 IR 모양이 바뀔 때마다 다시
+   수집한다** — 뒤따르는 생성기 시험이 전부 이 파일 하나에 기대므로, 낡은 픽스처는 낡은 모양을
+   시험에 새겨 넣고 아무것도 실패시키지 않는다.
 5. 모델과 zod 생성기를 만든다.
 6. 요청 함수와 훅 생성기를 만든다.
 7. 검색·권한·mock 생성기를 만든다.
 8. 병렬 생성과 배럴 전환을 `simplix.config.ts`에 연결한다.
-9. scaffold의 필드 소스를 IR로 넓히고 `user-index-ts.hbs`의 재수출 경로를 변수로 뺀다.
+9. scaffold의 필드 소스를 IR로 넓히고 배럴 템플릿 **둘**(`openapi/user-index-ts.hbs` ·
+   `domain/index-ts.hbs`)의 재수출 경로를 변수로 뺀다.
 10. `meta-diff` 명령을 만든다.
 11. smart-safety의 도메인을 하나씩 옮기고, 옮긴 도메인에서 `simplix scaffold`를 실행해
     위젯이 같은 모양으로 나오는지 확인한다.
