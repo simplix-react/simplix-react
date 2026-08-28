@@ -1869,7 +1869,23 @@ precedent to follow.
   had an orval run has none, no locale file is written, and every label on the screen renders as
   the raw `fields.<name>`. Reproduce the pass from the IR: it needs only the field names per
   entity, the enum values, and `camelToLabel` — a pure function. Use the IR's enum name (Task 13's
-  `enumTypeName`) where `buildLocaleJson` uses `field.enumTypeName ?? enumName(entity, field)`. `label` (the direct-literal
+  `enumTypeName`) where `buildLocaleJson` uses `field.enumTypeName ?? enumName(entity, field)`.
+
+  **The screen chrome is a second, separate catalogue that nothing writes at all.** The widgets
+  read it from a **module** namespace — `useTranslation("<moduleNamespace>/widgets")`
+  (`crud-page.hbs:30`, `detail.hbs:25`) — not from the domain package, and they reference **25
+  distinct keys per entity**: `delete<X>Title`, `delete<X>Desc`, `delete<X>DescSimple`,
+  `addNew<X>`, `edit<X>`, `new<X>`, `save<X>`, `<x>Detail`, `<xs>`, `<xs>Description`,
+  `emptyTitle`, `emptyDescription`, `searchPlaceholder`, `notFound`, `sectionTitle`, `editHeader`,
+  `newHeader`, `detailHeader`, `title`, `description`, `editor`, `editorPlaceholder`,
+  `editDescription`, `yes`, `no`.
+
+  `scaffold-crud.ts:1015` only ensures the module's `locales/index.ts` mapping exists; it writes no
+  keys. Verified in the application: `modules/org/src/locales/widgets/ko.json` has an
+  `organization` entry containing **zero** keys. A freshly scaffolded screen therefore renders
+  `organization.deleteOrganizationTitle` as its dialog title and `organization.emptyTitle` in its
+  empty state. Emit a stub catalogue for the 25 alongside the field labels — the same
+  `camelToLabel`-grade placeholder, so the screen reads in English until somebody translates it. `label` (the direct-literal
   mode) occurs twice in the whole capture, both on `ValidationTestRequest` in an unmatched tag —
   handle it as a fallback and do not build anything around it.
 
