@@ -2191,9 +2191,22 @@ domain keeps it. Say which you did.
 exact string comparison. Measured: the fixture holds **33** `…I18n` fields, every one of them a
 `Map` container over `string`, and every one has its base field present, so all 33 should pair. A
 generator that renders the `Map` mapping as `Record<string,string>` — the same type, one space
-short — pairs **none** of them, silently: the multilingual editor degrades to a raw map field and
-nothing reports it. Emit `Record<string, string>` exactly, and assert one pairing by name in the
-test.
+short — pairs **none** of them, silently. Emit `Record<string, string>` exactly, and assert one
+pairing by name in the test.
+
+**What a failed pairing actually costs, traced through the form.** `detectI18nFieldPairs` sets
+`baseFieldName` on the map field and `isI18nPair` on the plain one, and both drive `form.hbs`:
+
+- `scaffold-crud.ts:1918` collects `i18nFieldPairs` from `baseFieldName` and `:1921` sets
+  `hasI18nFields`. The template then emits `i18nFields: { orgNameI18n: "orgName" }` into
+  `useCrudFormSubmit` (`form.hbs:124`), which is what populates the plain field before submit —
+  `applyI18nFallback(values.orgNameI18n, locales)`, the first non-empty locale value, else `""`.
+  With no pairs the option is never emitted, so **the plain field goes to the server empty**.
+- `form.hbs:235` guards the plain field's own input with `{{#unless this.isI18nPair}}`. Unpaired,
+  that guard opens and **the operator sees `orgName` and `orgNameI18n` as two separate inputs**.
+
+So the one-space difference is not a degraded editor: it is a duplicated field on screen and an
+empty value on the wire, for all 33 pairs.
 
 `SYSTEM_FIELDS` (`:56` — `id`, `displayOrder`, `sortOrder`) *is* purely name-based and carries over
 unchanged; all three occur in the IR (`sortOrder` 36, `displayOrder` 22, `id` 12). So do the audit
