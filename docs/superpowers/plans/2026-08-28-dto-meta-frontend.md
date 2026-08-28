@@ -1576,6 +1576,15 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
      `findSchemaFile`, `readListDtoFieldNames`, `findMutationPathParam`, `resolveKnownModelTypes`
      and `pruneUnusedModels`. The one-file-per-type layout Task 6 adopts is what keeps all six
      working; assert that a meta domain with `src/generated/` removed still seeds.
+
+     **A seed row is type-annotated, so a labeled enum breaks it.** `generateOrvalSeedFile` emits
+     `export const workPointSeeds: WorkPointDetailDTO[] = [ … ]` (`seed-generator.ts:233`) and fills
+     an enum field by cycling the values as a **bare string** — `status: "ACTIVE"` (`:64`). Under
+     Task 6 that field's type is `XLabeled`, i.e. `{ value, label }`, so every seed row for each of
+     the 122 labeled enums fails to typecheck. Emit `{ value: "ACTIVE", label: "ACTIVE" }` there.
+     The file's import is hardcoded to `"../generated/model"` (`:213`) and the file is never
+     overwritten, so point it at the meta barrel when generating it fresh — a wrong path written
+     once stays wrong.
   2. **Nothing hand-builds a page.** `store.listPaged(page, size, sort)` returns the Spring page
      shape. Do not assemble `totalElements`/`numberOfElements` in generated code, and do not reach
      for `pageOf` here — that is the zod builder Task 7 uses, not a runtime factory.
