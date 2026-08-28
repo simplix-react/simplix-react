@@ -1562,6 +1562,15 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
   Four things follow from that, and three of them contradict how this task read before it was
   measured:
 
+  0. **`src/mock/index.ts` is regenerated, not hand-written.** `generateMockFiles` rewrites it
+     whenever the developer has added no custom handler override —
+     `!pathExists(entryPath) || canRegenerateMockEntry(...)` (`mock-generator.ts:82`) — and the
+     override slot is empty in **all 13** of this application's domains, so in practice it is
+     rewritten every run. It emits `createXMock(): MockDomainConfig`, the
+     `createMockEntityStore<T>(seeds, "<idField>")` lines and the factory spreads. Repointing its
+     imports by hand during the swap is wasted work; the generator has to know the meta layout, the
+     way `index.ts` (Task 11 Step 3) and `schemas.ts` do.
+
   1. **Seeds are generated once, then preserved.** `generateMockFiles` writes
      `src/mock/seeds.ts` **only when it does not already exist** (`mock-generator.ts:43`) — so a
      greenfield meta domain needs the meta path to produce it, while a migrated domain keeps the
@@ -2123,7 +2132,7 @@ precedent to follow.
   | `hooks/<entity>.ts` | no | each is exactly one `export *` line | regenerate |
   | `hooks/index.ts` | no | one `export *` per stub | regenerate |
   | `schemas.ts` | yes — everything after `// Custom schema overrides and additions:` | **0 of 13 carry one** | `generateSchemasProxy` regenerates it every run; teach it the meta layout |
-  | `mock/index.ts` | yes — a custom-handler slot | **0 of 13 use it** | substitute import paths only |
+  | `mock/index.ts` | yes — a custom-handler slot | **0 of 13 use it**, so it is **regenerated on every run** | teach the generator the meta layout; editing it is pointless |
   | `mock/seeds.ts` | yes — the seed data | all of them | substitute import paths only |
 
   **`mock/seeds.ts` was missing from this list and imports `../generated/model` at line 8.** Left
