@@ -923,8 +923,31 @@ repointed.
   because the hook's query key uses it — see below.
 
   Hooks use the profile's naming strategy (`simplixBootNaming`) so the exported names match what
-  orval produced. **This is not cosmetic** — the migration switches a barrel, and module code
-  imports hooks by name (spec §11).
+  orval produced. **This is not cosmetic** — the migration switches a barrel, module code imports
+  hooks by name (spec §11), and `crud.config.ts` drives the scaffold off those same names.
+
+  **The measured contract, from `domain-org`.** `crud.config.ts` stores each role's hook name
+  **without the `use` prefix**, and the generated export is `use` + that value:
+
+  | `crud.config.ts` | generated export | form |
+  | --- | --- | --- |
+  | `list: "listOrganizations"` | `useListOrganizations` | `export function` (query) |
+  | `get: "getOrganization"` | `useGetOrganization` | `export function` |
+  | `getForEdit: "getOrganizationForEdit"` | `useGetOrganizationForEdit` | `export function` |
+  | `tree: "getOrganizationTree"` | `useGetOrganizationTree` | `export function` |
+  | `subtree: "getOrganizationSubtree"` | `useGetOrganizationSubtree` | `export function` |
+  | `create: "createOrganization"` | `useCreateOrganization` | `export const` (mutation) |
+  | `update: "updateOrganization"` | `useUpdateOrganization` | `export const` |
+  | `delete: "deleteOrganization"` | `useDeleteOrganization` | `export const` |
+  | `batchUpdate: "batchUpdateOrganizations"` | `useBatchUpdateOrganizations` | `export const` |
+  | `batchDelete: "batchDeleteOrganizations"` | `useBatchDeleteOrganizations` | `export const` |
+  | `order: "orderOrganization"` | `useOrderOrganization` | `export const` |
+  | `org: "orgOrganization"` | `useOrgOrganization` | `export const` |
+
+  All twelve correspond exactly. Queries are emitted as `export function` (orval overloads them),
+  mutations as `export const`. Match both the names and the declaration forms — `findCrudConfigForEntity`
+  resolves a role to a name and the scaffold then imports it, so a renamed hook breaks scaffolding
+  in a way `pnpm typecheck` on the domain package alone will not catch.
 
   **`entityName` is the hard member, and Tasks 9 and 10 depend on the same answer.** The strategy
   takes an `OperationContext` whose `entityName` comes from `resolveEntityName(EntityNameContext)`,
