@@ -81,6 +81,37 @@ export function memberName(name: string): string {
   return /^[A-Za-z_$][\w$]*$/.test(name) ? name : JSON.stringify(name);
 }
 
+/**
+ * The body a response carries, with the containers the mutator strips taken off.
+ *
+ * Which containers those are is the spec profile's decision, carried on the resolved domain — a
+ * name compared here by hand would be one backend's envelope written into a generator.
+ */
+export function payloadOf(ref: TypeRef | undefined, domain: ResolvedDomain): TypeRef | undefined {
+  if (ref?.kind === "container" && domain.containers.get(ref.name)?.unwrap === true) {
+    return payloadOf(ref.args[0], domain);
+  }
+  return ref;
+}
+
+/** The reference a type carries, inside however many containers hold it. */
+export function innermostRef(ref: TypeRef | undefined): TypeRef | undefined {
+  if (!ref) return undefined;
+  if (ref.kind === "container") {
+    for (const arg of ref.args) {
+      const found = innermostRef(arg);
+      if (found) return found;
+    }
+    return undefined;
+  }
+  return ref;
+}
+
+/** The name of the declaration a reference points at, or nothing when it points at no type. */
+export function refNameOf(ref: TypeRef | undefined): string | undefined {
+  return ref?.kind === "ref" ? ref.name : undefined;
+}
+
 /** Every type reference an operation of the domain returns. */
 export function responseRefs(domain: ResolvedDomain): TypeRef[] {
   return domain.operations

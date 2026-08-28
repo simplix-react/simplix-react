@@ -225,14 +225,18 @@ export function {{EntityPascal}}List({ list: externalList, activeRowId, actions,
         <CrudList.Column<{{../EntityPascal}}>
           field="{{this.name}}"
           header={fieldLabel("{{#if this.baseFieldName}}{{this.baseFieldName}}{{else}}{{this.name}}{{/if}}")}
+{{#if (neq this.sortable false)}}
           sortable
+{{/if}}
           render={(value) => <I18nText value={value as unknown as Record<string, string> | undefined} />}
         />
 {{else if (eq this.component "I18nTextarea")}}
         <CrudList.Column<{{../EntityPascal}}>
           field="{{this.name}}"
           header={fieldLabel("{{#if this.baseFieldName}}{{this.baseFieldName}}{{else}}{{this.name}}{{/if}}")}
+{{#if (neq this.sortable false)}}
           sortable
+{{/if}}
           render={(value) => <I18nText value={value as unknown as Record<string, string> | undefined} />}
         />
 {{else if (eq this.component "Select")}}
@@ -243,18 +247,42 @@ export function {{EntityPascal}}List({ list: externalList, activeRowId, actions,
           header={fieldLabel("{{this.name}}")}
           display="badge"
           width={120}
+{{#if (neq this.sortable false)}}
           sortable
+{{/if}}
 {{#if this.enumTypeName}}
           enumName="{{this.enumTypeName}}"
           enumLabel={enumLabel}
 {{/if}}
           variants={{ldb}} {{#each this.options}}"{{this}}": "default"{{#unless @last}}, {{/unless}}{{/each}} {{rdb}}
         />
+{{else if this.columnFormat}}
+        {{!-- A moment arrives as ISO text. Without the format the cell prints it back at the
+              operator, timezone offset and all. --}}
+        <CrudList.Column<{{../EntityPascal}}>
+          field="{{this.name}}"
+          header={fieldLabel("{{this.name}}")}
+          format="{{this.columnFormat}}"
+{{#if (neq this.sortable false)}}
+          sortable
+{{/if}}
+        />
+{{else if this.columnDisplay}}
+        <CrudList.Column<{{../EntityPascal}}>
+          field="{{this.name}}"
+          header={fieldLabel("{{this.name}}")}
+          display="{{this.columnDisplay}}"
+{{#if (neq this.sortable false)}}
+          sortable
+{{/if}}
+        />
 {{else}}
         <CrudList.Column<{{../EntityPascal}}>
           field="{{this.name}}"
           header={fieldLabel("{{this.name}}")}
+{{#if (neq this.sortable false)}}
           sortable
+{{/if}}
         />
 {{/if}}
 {{/unless}}  {{!-- hideInList --}}

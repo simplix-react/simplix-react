@@ -3,7 +3,7 @@ import type { OpenApiNamingStrategy } from "../../openapi/naming/naming-strategy
 import { readSearchFields, type SearchField } from "../filter-source.js";
 import type { FieldMeta, ParamMeta, TypeRef } from "../ir-types.js";
 import type { ResolvedDomain, ResolvedType } from "../resolve.js";
-import { HEADER, reachableFrom, responseRefs } from "./emit.js";
+import { HEADER, innermostRef, payloadOf, reachableFrom, refNameOf, responseRefs } from "./emit.js";
 import { entityNameOf, resolveEndpoints, type EndpointTarget } from "./endpoint-gen.js";
 
 /** Directory the handler module lands in, relative to a generated package's meta output root. */
@@ -292,7 +292,7 @@ class MockEntity {
 
   private firstInnermost(refs: (TypeRef | undefined)[]): ResolvedType | undefined {
     for (const ref of refs) {
-      const found = this.typeNamed(refNameOf(innermostOf(ref)));
+      const found = this.typeNamed(refNameOf(innermostRef(ref)));
       if (found) return found;
     }
     return undefined;
@@ -346,41 +346,11 @@ function sortByRouteShape(targets: EndpointTarget[]): EndpointTarget[] {
   });
 }
 
-/**
- * The body a response carries, with the containers the mutator strips taken off.
- *
- * Which containers those are is the spec profile's decision, carried on the resolved domain — a
- * name compared here by hand would be one backend's envelope written into the generator.
- */
-function payloadOf(ref: TypeRef | undefined, domain: ResolvedDomain): TypeRef | undefined {
-  if (ref?.kind === "container" && domain.containers.get(ref.name)?.unwrap === true) {
-    return payloadOf(ref.args[0], domain);
-  }
-  return ref;
-}
-
 /** Whether a response is a collection, which decides between one row and the whole list. */
 function isCollection(ref: TypeRef | undefined, domain: ResolvedDomain): boolean {
   const payload = payloadOf(ref, domain);
   // A `Map` is a keyed object rather than a sequence, and nothing indexes it by a row.
   return payload?.kind === "container" && payload.name !== "Map";
-}
-
-/** The name of the type a reference resolves to, inside however many containers hold it. */
-function innermostOf(ref: TypeRef | undefined): TypeRef | undefined {
-  if (!ref) return undefined;
-  if (ref.kind === "container") {
-    for (const arg of ref.args) {
-      const found = innermostOf(arg);
-      if (found) return found;
-    }
-    return undefined;
-  }
-  return ref;
-}
-
-function refNameOf(ref: TypeRef | undefined): string | undefined {
-  return ref?.kind === "ref" ? ref.name : undefined;
 }
 
 function isNumericParam(param: ParamMeta): boolean {
@@ -640,7 +610,7 @@ ${entries.join("\n")}
    * guess compile is what hides it.
    */
   private orderHandler(entity: MockEntity, target: EndpointTarget, open: string): string {
-    const inner = innermostOf(target.operation.request.body);
+    const inner = innermostRef(target.operation.request.body);
     const dto = this.domain.types.get(refNameOf(inner) ?? "");
     const key = dto?.allFields.find((field) => isIdName(field.name));
     const field = dto?.allFields.find((one) => !isIdName(one.name));
