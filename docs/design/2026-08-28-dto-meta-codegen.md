@@ -495,10 +495,20 @@ openapi: [{
 ```
 
 `meta`가 있으면 두 벌을 생성하고, `export`에 든 도메인만 메타 쪽을 내보낸다. 내보내는 층은
-`index.ts` 하나가 아니라 재수출 층 전체다 — `index.ts` · `hooks/*.ts` · `schemas.ts` ·
-`mock/index.ts`가 함께 메타 산출물을 가리키도록 다시 쓴다. `mock/index.ts`와 `mock/seeds.ts`는 손편집
-내용을 가진 파일이라 본문을 보존하며 `../generated/` 상대 import 줄만 바꾼다. 도메인
-하나를 옮기는 절차는 다음과 같다.
+`index.ts` 하나가 아니라 재수출 층 전체다 — `index.ts` · `hooks/<entity>.ts` · `hooks/index.ts` ·
+`schemas.ts` · `mock/index.ts` · `mock/seeds.ts` 여섯 자리가 함께 메타 산출물을 가리켜야 한다.
+`mock/seeds.ts`도 `../generated/model`을 import하므로 여기 든다.
+
+앞의 셋은 보존할 내용이 없어 다시 생성하고, `schemas.ts` · `mock/index.ts` · `mock/seeds.ts`는
+손편집 내용을 보존하며 `../generated/` 상대 import 줄만 바꾼다.
+
+**두 산출물의 분할 기준이 다르므로 경로 치환으로는 바꿀 수 없다.** orval은 태그마다 파일 하나에
+요청 함수와 훅을 함께 담고(`generated/endpoints/<tag-slug>/<tag-slug>.ts`), 메타 산출물은 엔티티마다
+`endpoints/`와 `hooks/` 둘로 나눈다(§9). 엔티티 분할은 경로 기준이라 태그 하나가 엔티티 여럿을 낼 수
+있다. 그래서 `generated-meta/`가 `endpoints/index.ts`와 `hooks/index.ts` 배럴을 함께 내고, 재수출
+층은 그 배럴을 가리키도록 다시 생성한다.
+
+도메인 하나를 옮기는 절차는 다음과 같다.
 
 1. `meta.source`를 설정하고 `simplix openapi`를 실행해 두 벌을 생성한다.
 2. `simplix meta-diff <domain>`을 0건까지 맞춘다.

@@ -993,11 +993,47 @@ meta?: {
 
   `schema/` is deliberately absent: `schemas.ts` re-exports zod constants separately and
   `export *` from both would collide on names (the existing type-name-conflict rule). `mock/` is
-  absent because `src/mock/index.ts` imports the handler factories by path. Emit a
-  `model/index.ts` re-exporting each entity file, so `export * from "./model"` resolves the way
-  orval's `generated/model/index.ts` does.
+  absent because `src/mock/index.ts` imports the handler factories by path.
 
-- [ ] **Step 3: The re-export layer.** For a domain listed in `export`, rewrite `index.ts`, `hooks/*.ts`, `schemas.ts` and `mock/index.ts` to point at the meta output. `schemas.ts` and `mock/index.ts` carry hand-edited regions — preserve them and change only the relative import paths (spec §10). Reverting is removing the domain from `export`, which is why `src/generated/` is deleted last.
+  Emit a per-directory `index.ts` in `model/`, `endpoints/`, `hooks/`, `search/` and `access/`,
+  each re-exporting that directory's entity files. `model/index.ts` makes `export * from "./model"`
+  resolve the way orval's `generated/model/index.ts` does; `endpoints/index.ts` and
+  `hooks/index.ts` are what Step 3's stub layer points at, since the entity partition does not
+  match orval's per-tag one. Emit `schema/index.ts` too — `schemas.ts` needs a single path to
+  re-export.
+
+- [ ] **Step 3: The re-export layer — six files, and the two partitions do not line up.**
+
+  **Measured across all 13 domain packages of the target application:**
+
+  | File | Designed for hand edits | Actually hand-edited | Rewrite |
+  | --- | --- | --- | --- |
+  | `index.ts` | no | 0 of 13 differ from the 3-line template | regenerate |
+  | `hooks/<entity>.ts` | no | each is exactly one `export *` line | regenerate |
+  | `hooks/index.ts` | no | one `export *` per stub | regenerate |
+  | `schemas.ts` | yes — a comment invites overrides | **0 of 13 carry one** | keep every non-`export *` line, regenerate the block |
+  | `mock/index.ts` | yes — a custom-handler slot | **0 of 13 use it** | substitute import paths only |
+  | `mock/seeds.ts` | yes — the seed data | all of them | substitute import paths only |
+
+  **`mock/seeds.ts` was missing from this list and imports `../generated/model` at line 8.** Left
+  alone it survives the swap and breaks at Step 5, when `src/generated/` is deleted — long after
+  the change that caused it.
+
+  **The partitions differ, so this is not a path substitution.** Orval writes **one file per tag**
+  holding the request functions *and* the hooks together
+  (`generated/endpoints/site-areazone/site-areazone.ts`, with a `.zod.ts` sibling), and each
+  `hooks/<entity>.ts` stub re-exports that one file. The meta layout is **per entity, split in
+  two** — `generated-meta/endpoints/<entity>.ts` and `generated-meta/hooks/<entity>.ts` (spec §9)
+  — and the entity partition comes from `splitIntoEntities`, which is path-based and can yield
+  several entities from one tag.
+
+  So a stub cannot be repointed by rewriting its path. Emit `endpoints/index.ts` and
+  `hooks/index.ts` barrels inside `generated-meta/` and regenerate the stub layer against them;
+  the stubs and `hooks/index.ts` hold nothing worth preserving, which is what the table above
+  establishes. Only `schemas.ts`, `mock/index.ts` and `mock/seeds.ts` are edited in place.
+
+  Reverting is removing the domain from `export`, which regenerates the same layer against
+  `generated/` — and is why `src/generated/` is deleted last.
 
 - [ ] **Step 4: Test** that a domain not in `export` keeps its orval barrel byte-for-byte; that a
   domain in `export` has all four re-export files repointed; that a hand-edited region in
