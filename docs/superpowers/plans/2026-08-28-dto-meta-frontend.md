@@ -603,7 +603,27 @@ git commit -m "feat(cli): generate request functions and React Query hooks from 
 
 - [ ] **Step 1: `search-gen`.** For each operation with a `searchDto`, emit that DTO's fields as filter definitions: the operator list from `searchable.operators`, `sortable` for the column, and the label from `labelKey`. Follow the project's filter rules — boolean fields become `type: "toggle"` never a two-option facet, enum and FK fields become `type: "faceted"`, and the emitted `FilterBar` config carries `maxBadges: 3`.
 
-- [ ] **Step 2: `access-gen`.** For each operation, emit a permission constant from `AccessMeta`. `permission` becomes the group/action pair the `useCan` gate takes. `authenticated` and `public` need no gate. **`expression` emits no gate at all** — it emits a comment carrying the raw SpEL, so the person building that screen decides (spec §5.1). The fixture has 5 of these; a generator that treated them as "no permission required" would hide those screens' buttons or expose them wrongly.
+- [ ] **Step 2: `access-gen`.** For each operation, emit a permission constant from `AccessMeta`.
+
+  **The consumer, measured:** screens call `useCan(action, subject)` — imported from
+  `@simplix-react/access/react` (the subpath, not the package root), signature
+  `useCan(action: string, subject: string)`, action FIRST. The subject comes from a hand-maintained
+  `SUBJECTS` map, in this application at
+  `packages/console-ui/src/identity/subjects.ts`. Read that file before writing the generator: its
+  own doc comment states the problem this task automates — the screen names a group and the server
+  names a group in `@PreAuthorize("hasPermission('<GROUP>','<action>')")`, and a literal copied to
+  the call site goes stale unnoticed. The IR now carries the server's side, so the generated
+  constants are the authority the map was standing in for.
+
+  Emit, per operation: the `group` and `action` from a `permission` access, so a screen can write
+  `useCan(ACCESS.orgUpdate.action, ACCESS.orgUpdate.group)` without a hand-copied literal.
+  `authenticated` and `public` need no gate. **`expression` emits no gate at all** — it emits a
+  comment carrying the raw SpEL, so the person building that screen decides (spec §5.1). The
+  fixture has 5 of these; a generator that treated them as "no permission required" would expose
+  buttons the server refuses.
+
+  **Do not rewrite `SUBJECTS` or any screen.** This task emits constants; adopting them in module
+  code is a separate decision the user has not made.
 
 - [ ] **Step 3: Test against the real fixture.** Assert the operator lists match the IR rather than being re-derived; a boolean searchable field yields a toggle; the 5 `expression` operations yield a comment and no gate; every `permission` operation yields a group and an action.
 
