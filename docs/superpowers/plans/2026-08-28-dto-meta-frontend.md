@@ -1755,7 +1755,28 @@ precedent to follow.
   not all.
 
   The IR states the server key per field, so build `entityKeyMap` from `labelKey` instead of from
-  name equality, and report any server key that still finds no home. `label` (the direct-literal
+  name equality, and report any server key that still finds no home.
+
+  **Name equality could never have bridged these — the two sides use different words.** Tracing
+  each server key back through the DTOs its fields belong to, and those DTOs back to the tag that
+  references them: `FloorPlan`'s labels belong to the entity the scaffold calls **`drawing`**,
+  `EquipmentInspectionDuty`'s to **`equipmentInspection`**, `ComplianceCheckItem`'s to
+  **`complianceRun`**. The Java entity and the API resource are named independently, so only the
+  IR's per-field `labelKey` connects them.
+
+  Two consequences for the writer:
+
+  - **The destination key is the scaffold's entity name**, not the server's.
+    `useEntityTranslation(entity)` reads namespace `entity/<entity>`, and
+    `create-i18n-config.ts:165` builds that namespace from the locale JSON's top-level key. Write
+    `drawing`, not `FloorPlan`, or the labels load into a namespace nothing asks for.
+  - **Merge, do not overwrite.** Seven of the 80 label-bearing entities draw from more than one
+    server entity — `drawing` from `FloorPlan` and `FloorPlanPlacement`, `importRun` from
+    `ImportColumnMapping`, `ImportJob` and `ImportRow`, `safetyZonePolicy` from three.
+
+  The failure this prevents is the one `domain-translations.ts:89` describes in its own words:
+  every field renders as `fields.<name>` on screen while both packages' code is correct and nothing
+  throws. `label` (the direct-literal
   mode) occurs twice in the whole capture, both on `ValidationTestRequest` in an unmatched tag —
   handle it as a fallback and do not build anything around it.
 
