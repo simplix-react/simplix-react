@@ -2209,6 +2209,16 @@ them loudly costs nothing.
 `FieldInfo` (`scaffold-crud.ts:29`), `EntityOperations` (`:632`), `FilterFieldInfo` (`:1243`) —
 from the IR instead of from text.
 
+**Carry the temporal kind onto the column as `format` — the template never sets it.**
+`CrudList.Column` accepts `format?: "date" | "datetime" | "time" | "relative"`
+(`crud-list.tsx:325`), three of whose values are exactly the IR's temporal kinds. The string
+`format=` appears **0 times** in `list.hbs`: a temporal column falls to the bare `{{else}}` branch
+(`:253`) and the peek row renders `String(row.x)` (`:203`), so the operator reads
+`2026-08-28T00:00:00Z` in a table cell. That is the frontend handbook's invariant #36 —
+"instants formatted with `format=\"datetime\"`" — broken by the generator, on the 682 `instant`,
+202 `date` and 10 `time` fields the IR distinguishes. Map `instant`→`datetime`, `date`→`date`,
+`time`→`time`.
+
 **Carry `searchable.sortable` onto the column — the template marks every column sortable.**
 `list.hbs` emits a bare `sortable` on its `CrudList.Column`s (`:228`, `:235`, `:246`, `:257`) with
 no condition, because the orval path has no way to know. Measured, **280 of the fixture's 1,118
