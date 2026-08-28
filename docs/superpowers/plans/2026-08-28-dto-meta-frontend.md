@@ -563,7 +563,28 @@ git commit -m "feat(cli): generate zod schemas carrying the server's constraints
 - Create: `packages/cli/src/meta/generation/hook-gen.ts`
 - Test: `packages/cli/src/__tests__/meta-endpoint-hook-gen.test.ts`
 
-- [ ] **Step 1: Write them.** Request functions go through `src/mutator.ts`'s `getMutator("boot")` — the same mutator the orval path uses, so the envelope is unwrapped in one place and `data` has the same shape on both paths (spec §8).
+- [ ] **Step 1: Write them.** Request functions go through the domain package's own
+  `src/mutator.ts`, which is the same file the orval path uses, so the envelope is unwrapped in one
+  place and `data` has the same shape on both paths (spec §8).
+
+  **The measured contract** — `src/mutator.ts` exports
+  `customFetch<T>(url: string, options: RequestInit): Promise<T>`, which delegates to
+  `getMutator("boot")`. Call `customFetch`, not `getMutator` directly. Match orval's emitted shape:
+
+  ```ts
+  export const getLinearAsset = async (
+    linearAssetId: string,
+    options?: Parameters<typeof customFetch>[1],
+  ): Promise<GetLinearAssetResponse> =>
+    customFetch<GetLinearAssetResponse>(getGetLinearAssetUrl(linearAssetId), {
+      ...options,
+      method: "GET",
+    });
+  ```
+
+  A body-carrying call adds `headers: { "Content-Type": "application/json", ...options?.headers }`
+  and `body: JSON.stringify(dto)`. A URL builder (`getGetLinearAssetUrl`) is emitted alongside,
+  because the hook's query key uses it — see below.
 
   Hooks use the profile's naming strategy (`simplixBootNaming`) so the exported names match what
   orval produced. **This is not cosmetic** — the migration switches a barrel, and module code
