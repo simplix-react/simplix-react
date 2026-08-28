@@ -601,7 +601,15 @@ smart-safety 코드에서 확인한 사실과 그에 따른 결정이다.
 `@JsonManagedReference`는 전부 엔티티에 있고 **DTO 필드에 엔티티 타입이 오는 곳이 없다**. IR에
 `pick` 표현은 두되 이번 적용에서는 쓰이지 않는다.
 
-**제네릭** — 사용자 정의 제네릭 DTO가 없다(`TypeMeta.typeParams`는 전부 빈 배열이다). 응답
+**제네릭** — 사용자 정의 제네릭 DTO는 없지만 `typeParams`가 전부 빈 배열은 아니다. 수집한 IR에서
+다섯 타입이 이를 싣는다 — `Set<E>` · `List<E>`(요청 본문 소거의 잔재로, §13의 픽스처 재수집이
+없앤다) · `Comparable<T>` · `BaseEntity<K>` · `SimpliXBaseEntity<K>`. 뒤의 둘은 엔티티 기반
+클래스이고 실제 도메인에서 참조된다.
+
+**raw 컬렉션 다섯 곳이 `param`으로 온다.** `regulation` 모듈의 SearchDTO 다섯 필드가
+`private List appliedRules;`처럼 타입 인자 없이 선언되어, 컨테이너의 인자가 컬렉션 자신의 변수
+`E`로 해석된다. IR은 사실을 정확히 싣는 것이고, 생성기는 소유 타입의 `typeParams`에 없는 `param`을
+`unknown`으로 내고 보고한다 — 그 이름을 그대로 쓰면 스코프에 없는 식별자가 생성물에 들어간다. 응답
 컨테이너는 `SimpliXApiResponse`, `Page`(93곳), `List`(83곳), `Map`(16곳) 넷이고 `Slice`는 쓰지
 않는다(0곳). IR은 이것을 `container`로 감싼 그대로 싣고, TypeScript 이름은 플러그인의
 `containerTypes`가 정한다.

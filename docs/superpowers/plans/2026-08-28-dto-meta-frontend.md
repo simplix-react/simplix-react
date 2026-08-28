@@ -684,7 +684,22 @@ git commit -m "feat(cli): resolve the IR into per-domain type closures"
     assumption that the two are interchangeable.
   - no envelope type — `SimpliXApiResponse` is `unwrap: true`, so it does not appear in client types
 
-  Field typing rules, from the measured kinds: `string`→`string`; `number`→`number`; `boolean`→`boolean`; `instant`/`date`→`string`; `time`→`string`; `enum`→ **gated on `EnumMeta.labeled`**: when true, the value union in a request DTO and the `…Labeled` alias in a response DTO (spec §9); when false, the value union in **both** directions and no `…Labeled` alias at all; `ref`→ the interface name; `container`→ the plugin's mapping; `unknown`→`unknown`; `param`→ the type parameter; `pick`→ `Pick<Of, "a" | "b">`.
+  Field typing rules, from the measured kinds: `string`→`string`; `number`→`number`; `boolean`→`boolean`; `instant`/`date`→`string`; `time`→`string`; `enum`→ **gated on `EnumMeta.labeled`**: when true, the value union in a request DTO and the `…Labeled` alias in a response DTO (spec §9); when false, the value union in **both** directions and no `…Labeled` alias at all; `ref`→ the interface name; `container`→ the plugin's mapping; `unknown`→`unknown`; `pick`→ `Pick<Of, "a" | "b">`; `param`→ **see below, it is not simply the
+  type parameter**.
+
+  **A `param` whose name is not among the owning type's `typeParams` is unresolvable — emit
+  `unknown` and report it.** Measured, all six occurrences are of that kind:
+
+  | Where | Cause |
+  | --- | --- |
+  | `ObligationApplicabilitySearchDTO.appliedRules` · `.excludedRules`, `PreAssignmentGateSearchDTO.notifyRoleCodes`, `RegulationDutySearchDTO.additionalArticleRefs`, `PolicyParameterSearchDTO.usedByScreenKeys` | the Java field is a **raw** `private List appliedRules;` with no type argument, so the container's argument resolves to the collection's own variable `E` |
+  | `SimpliXBaseEntity.id` | the entity base class's generic key `K` |
+
+  Emitting `appliedRules?: E[]` puts an unbound identifier in the output, and Task 11 Step 4b's
+  no-`@ts-nocheck` rule leaves nowhere to hide it. `unknown[]` compiles and is honest. **Report the
+  five by name** — they are five raw declarations in one backend module (`regulation`), the IR is
+  reporting them correctly, and fixing them there is what makes the generated type useful. Do not
+  fix them yourself; that is a backend change outside this plan.
 
   A field is optional (`?`) exactly when `required` is false.
 
