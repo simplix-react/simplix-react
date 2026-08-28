@@ -39,7 +39,16 @@ Those numbers are the yardstick. A generator that silently drops a field kind wi
 ## Facts that bind every task
 
 - **Repository:** `/Users/taehwan/Workspace/accesscore/simplix-react`, branch `feat/dto-meta-codegen`. Two files under `packages/ui/src/base/charts/` were dirty before this work began — they belong to somebody else; never stage them.
-- **Never touch `packages/cli/src/openapi/`.** The orval path must keep working for every domain not yet moved.
+- **The orval path must keep working for every domain not yet moved.** That is the rule; "never
+  open `packages/cli/src/openapi/`" is not, and four tasks legitimately reach into it — Task 4
+  registers container types on `spec-profile.ts`, Task 8 exports the private path-grouping helpers
+  from `entity-extractor.ts`, Task 9 completes `SUFFIX_TO_ENUM_KEY` in `scaffold-crud.ts`, and
+  Task 13 makes the barrel templates' model path a variable.
+
+  What each of those must satisfy: the change is **additive**, and the task proves the orval path
+  is unchanged by running the full CLI suite and, where the change touches generation, by
+  regenerating a domain and confirming the output is byte-identical. A change that alters what the
+  orval path emits is out of scope no matter how much better it looks.
 - Commit messages: English conventional commits, **no AI attribution of any kind**.
 - **Run tests from the workspace root with `npx vitest run --project cli`.** Measured: the
   package script `pnpm --filter @simplix-react/cli test -- <name>` prints `No test files found`
@@ -52,7 +61,21 @@ Those numbers are the yardstick. A generator that silently drops a field kind wi
   `vitest run --passWithNoTests` — so a test placed anywhere else is never collected and the run
   still reports success. After adding a test, confirm the runner names your file and reports a
   non-zero test count; a green run that collected nothing looks identical to a passing one.
-- `pnpm` workspace. Tests: `npx vitest run --project cli`. Typecheck: `pnpm typecheck`. Lint: `pnpm lint`.
+- **`--project cli` runs only `packages/cli`.** Three of these tasks put tests in the boot
+  extension, where that flag collects nothing and still exits 0. Match the project to the package,
+  from the workspace root:
+
+  | Test lives in | Run |
+  | --- | --- |
+  | `packages/cli/src/__tests__/` | `npx vitest run --project cli` |
+  | `extensions/simplix-boot/packages/utils/` | `npx vitest run --project @simplix-react-ext/simplix-boot-utils` |
+  | `extensions/simplix-boot/packages/cli-plugin/` | `npx vitest run --project @simplix-react-ext/simplix-boot-cli-plugin` |
+  | everything, before a task's final commit | `npx vitest run` |
+
+  All three were verified to collect and pass. `npx vitest list` prints every collected test with
+  its project in brackets — use it to confirm a new file is picked up.
+
+- `pnpm` workspace. Typecheck: `pnpm typecheck`. Lint: `pnpm lint`.
 - Comments and TSDoc in English (repo rule); the design spec is Korean and is not a template for code comments.
 
 ---
@@ -335,9 +358,12 @@ export interface LabeledEnumValue<T extends string = string> {
 
 Export it from the package barrel next to `resolveBootEnum`.
 
-- [ ] **Step 2: Test** that `resolveBootEnum` accepts a `LabeledEnumValue` and returns its `value`, and that a plain string still round-trips. Then commit:
+- [ ] **Step 2: Test** that `resolveBootEnum` accepts a `LabeledEnumValue` and returns its `value`, and that a plain string still round-trips.
+
+- [ ] **Step 3: Run this package's project, then commit**
 
 ```bash
+npx vitest run --project @simplix-react-ext/simplix-boot-utils
 git add extensions/simplix-boot/packages/utils/src/labeled-enum-value.ts \
         extensions/simplix-boot/packages/utils/src/index.ts \
         extensions/simplix-boot/packages/utils/src/__tests__/labeled-enum-value.test.ts
@@ -397,9 +423,12 @@ const used = new Set<string>();
 expect([...used].filter((n) => !(n in bootContainerTypes))).toEqual([]);
 ```
 
-- [ ] **Step 4: Run `npx vitest run --project cli`, `pnpm typecheck`, then commit**
+- [ ] **Step 4: Run both projects this task touches, then commit**
 
 ```bash
+npx vitest run --project @simplix-react-ext/simplix-boot-cli-plugin
+npx vitest run --project cli
+pnpm typecheck
 git add packages/cli/src/openapi/orchestration/spec-profile.ts \
         extensions/simplix-boot/packages/cli-plugin/src/container-types.ts \
         extensions/simplix-boot/packages/cli-plugin/src/index.ts \
@@ -441,6 +470,7 @@ The generators need the IR sliced by domain and indexed. This task does that onc
 - [ ] **Step 3: Run, then commit**
 
 ```bash
+npx vitest run --project cli
 git add packages/cli/src/meta/resolve.ts packages/cli/src/__tests__/meta-resolve.test.ts
 git commit -m "feat(cli): resolve the IR into per-domain type closures"
 ```
@@ -481,6 +511,7 @@ git commit -m "feat(cli): resolve the IR into per-domain type closures"
 - [ ] **Step 3: Run, then commit**
 
 ```bash
+npx vitest run --project cli
 git add packages/cli/src/meta/generation/model-gen.ts packages/cli/src/__tests__/meta-model-gen.test.ts
 git commit -m "feat(cli): generate TypeScript models from the IR"
 ```
@@ -550,6 +581,7 @@ This is where the project's original complaint is answered: 440 `maxLength` and 
 - [ ] **Step 3: Run, then commit**
 
 ```bash
+npx vitest run --project cli
 git add packages/cli/src/meta/generation/schema-gen.ts packages/cli/src/__tests__/meta-schema-gen.test.ts
 git commit -m "feat(cli): generate zod schemas carrying the server's constraints"
 ```
@@ -634,6 +666,7 @@ git commit -m "feat(cli): generate zod schemas carrying the server's constraints
 - [ ] **Step 3: Run, then commit**
 
 ```bash
+npx vitest run --project cli
 git add packages/cli/src/meta/generation/endpoint-gen.ts \
         packages/cli/src/meta/generation/hook-gen.ts \
         packages/cli/src/__tests__/meta-endpoint-hook-gen.test.ts
@@ -729,6 +762,7 @@ git commit -m "feat(cli): generate request functions and React Query hooks from 
 - [ ] **Step 4: Run, then commit**
 
 ```bash
+npx vitest run --project cli
 git add packages/cli/src/meta/generation/search-gen.ts \
         packages/cli/src/meta/generation/access-gen.ts \
         packages/cli/src/__tests__/meta-search-access-gen.test.ts
@@ -799,6 +833,7 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
 - [ ] **Step 3: Run, then commit**
 
 ```bash
+npx vitest run --project cli
 git add packages/cli/src/meta/generation/mock-gen.ts packages/cli/src/__tests__/meta-mock-gen.test.ts
 git commit -m "feat(cli): generate MSW handlers and seeds from the IR"
 ```
@@ -900,6 +935,7 @@ The reason parallel generation was chosen: a domain is only switched once the tw
 - [ ] **Step 3: Run, then commit**
 
 ```bash
+npx vitest run --project cli
 git add packages/cli/src/commands/meta-diff.ts packages/cli/src/bin.ts \
         packages/cli/src/__tests__/meta-diff.test.ts
 git commit -m "feat(cli): add meta-diff to compare the orval and meta outputs"
