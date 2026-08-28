@@ -553,12 +553,23 @@ The generators need the IR sliced by domain and indexed. This task does that onc
 
   Report an operation whose `tag` matches no domain rather than dropping it silently.
 
-  **Expect 117 unmatched out of 694** against the smart-safety config, across 24 tags — measured.
-  They are not a defect: framework-owned endpoints (`StreamAdminController` 16,
-  `SseStreamController` 6, `CurrentUserRestController` 8), the app's dev test controllers
-  (`dev.test.*` 30), and `data-io.*` tags (36) that the config does not name because those
-  screens are not built yet. The report should list them so the count can be checked against this
-  number; a run that reports far fewer means a tag pattern started matching something it should
+  **Expect 117 unmatched out of 694** against the smart-safety config, across 24 tags. The
+  matched side is 577 and splits exactly as Task 14's table says. The unmatched side, counted:
+
+  | Group | n | Tags |
+  | --- | ---: | --- |
+  | `data-io.*` — screens not built yet | 44 | `ImportRun` 16, `ExportLedger` 10, `DuplicateMerge` 4, `BulkOperation` 3, `ImportJob` 3, `DuplicateCandidate` 2, `BulkReversal` 2, `ExportCensus` · `DuplicateCensus` · `BulkCensus` · `ImportCensus` 1 each |
+  | `dev.test.*` — the app's own test controllers | 30 | `UserPermission` 11, `Error` 10, `Response` 9 |
+  | framework-owned, tagged by class name | 30 | `StreamAdminController` 16, `CurrentUserRestController` 8, `SseStreamController` 6 |
+  | **auth surfaces the `auth` domain does not claim** | 9 | `Auth Token` 3, `OAuth2 Social Login` 3, `PasswordWebController` 2, `SimpliXAuthLoginController` 1 |
+  | other | 4 | `ScalarController` 2, `public.file.Content` 1, `dev.backoffice` 1 |
+
+  The first three groups are expected. **The fourth is worth raising rather than accepting** — the
+  `auth` domain's seven patterns are all `common.auth.*` / `public.auth.SignInOption`, so sign-in,
+  token and password endpoints fall outside it. Report it; whether they should join `auth` is the
+  user's call, not the generator's.
+
+  A run that reports far fewer than 117 means a tag pattern started matching something it should
   not.
 
 - [ ] **Step 2: Test against the real fixture.** Assert that resolving with a single catch-all domain reaches all 637 types; that a domain's closure never contains a type none of its operations reach; that `extends` chains resolve (the fixture has 104); and that a type whose parent is outside the domain still pulls the parent in.
