@@ -370,12 +370,27 @@ Fill in the four helpers:
 
 - `readSource` — an `http://`/`https://` source is fetched; anything else is read from disk. A non-2xx response throws with the status AND the response body, because the backend answers a duplicate type name with a 409 whose body names both classes; swallowing it would leave the operator guessing.
 - `readSnapshot` — throws a clear error naming the path when `snapshot` is unset or missing.
-- `unwrap` — the endpoint wraps the IR in the SimpliX envelope (`{type, message, body, …}`). Return `body` when the payload looks like an envelope, the payload itself otherwise, so a hand-saved snapshot of either shape works.
+- `unwrap` — **do not sniff the envelope's shape.** Spec §5.1 settles that an envelope is judged
+  by name, not by field shape, because a shape test misreads a response whose body is empty. There
+  is no TypeRef here, so use what each source guarantees instead:
+
+  - **An HTTP source always carries an envelope.** `SimpliXMetaDevController.dto()` returns
+    `SimpliXApiResponse<DtoMeta>` (fields `type`, `message`, `body`, `timestamp`, `errorCode`,
+    `errorDetail`). Take `body` unconditionally, and throw naming the `type` and `message` when it
+    is absent — that is an error envelope, not an IR.
+  - **A snapshot file may be either**, since a person may have saved the whole response or just
+    the document. Decide on the IR's own guaranteed member: `version` is an unboxed `int`, so
+    `@JsonInclude(NON_NULL)` never drops it and a bare IR always has it at the top level. Present
+    ⇒ the payload is the IR; absent ⇒ take `body`, and throw if that has no `version` either.
 - `assertVersion` — refuse a `version` greater than `SUPPORTED_IR_VERSION` with a message telling the operator to upgrade the CLI. A newer document may carry members this CLI would silently drop (spec §5.1).
 
 - [ ] **Step 2: Test it**
 
-Cover: reading the real fixture from disk; unwrapping an enveloped payload; unwrapping a bare payload; refusing `version: 2`; a missing snapshot path producing an error that names the path; and a non-2xx HTTP response surfacing the body text. Stub `fetch` rather than opening a socket.
+Cover: reading the real fixture from disk; an HTTP response unwrapping to `body`; an HTTP
+response whose `body` is absent throwing with the envelope's `type` and `message`; a snapshot saved
+as the whole response and one saved bare, both resolving to the same document; refusing
+`version: 2`; a missing snapshot path producing an error that names the path; and a non-2xx HTTP
+response surfacing the body text. Stub `fetch` rather than opening a socket.
 
 - [ ] **Step 3: Run, then commit**
 
