@@ -1099,6 +1099,9 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 4.1.0(@types/node@25.5.0)(jsdom@29.0.0)(msw@2.12.12(@types/node@25.5.0)(typescript@5.9.3))(vite@8.0.0(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.49.0)(yaml@2.8.2))
+      zod:
+        specifier: 'catalog:'
+        version: 4.3.6
 
   packages/config-typescript: {}
 
@@ -10191,7 +10194,9 @@ snapshots:
       metro-runtime: 0.84.4
     transitivePeerDependencies:
       - '@babel/core'
+      - bufferutil
       - supports-color
+      - utf-8-validate
 
   '@react-native/normalize-colors@0.81.5': {}
 
