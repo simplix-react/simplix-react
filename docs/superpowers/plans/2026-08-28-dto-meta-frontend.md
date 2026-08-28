@@ -1585,6 +1585,17 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
      The file's import is hardcoded to `"../generated/model"` (`:213`) and the file is never
      overwritten, so point it at the meta barrel when generating it fresh — a wrong path written
      once stays wrong.
+
+     **Map the IR kinds onto what the seed switch expects, and add the case it lacks.**
+     `generateFieldValue` branches on OpenAPI's `field.type` and `field.format`
+     (`seed-generator.ts:70`): `integer`/`number` → numeric, `boolean` → alternating, `string` →
+     `generateStringValue`, `array`/`object` → skipped. The temporal split lives in the format —
+     `format === "date"` seeds `"2026-08-28"` and `"date-time"` a full ISO string (`:115-119`). So
+     `instant` → `date-time`, `date` → `date`. **`time` matches neither** and falls to the generic
+     `"<entity>-<field>-<n>"`, which a `TimeField` cannot parse; give the 10 `time` fields an
+     `"HH:mm"` seed. Where the orval path guesses an email from the field's name
+     (`fieldName.includes("email")`, `:121`), the IR states it as a constraint on 7 fields — use
+     that instead.
   2. **Nothing hand-builds a page.** `store.listPaged(page, size, sort)` returns the Spring page
      shape. Do not assemble `totalElements`/`numberOfElements` in generated code, and do not reach
      for `pageOf` here — that is the zod builder Task 7 uses, not a runtime factory.
