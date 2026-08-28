@@ -1410,9 +1410,31 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
      shape. Do not assemble `totalElements`/`numberOfElements` in generated code, and do not reach
      for `pageOf` here — that is the zod builder Task 7 uses, not a runtime factory.
   3. **A tree operation uses `buildEmbeddedTree`** from `@simplix-react/mock`.
-  4. **The grouping is the one Task 8 settles: group by `operation.tag`.** The factory name and
-     the DTO type parameter follow that entity. The store's id-field argument is not generated at
-     all — `src/mock/index.ts` passes it by hand.
+  4. **The grouping is the one Task 8 settles: group by `operation.tag`.** The factory name follows
+     that entity. The store's id-field argument is not generated at all — `src/mock/index.ts`
+     passes it by hand.
+
+  5. **The DTO type parameter is the entity's `modelType`, and it has its own derivation.** An
+     entity owns several DTOs (`Create`, `Update`, `Detail`, `List`, `Search`); the store is typed
+     with one of them — `MockEntityStore<WorkPointDetailDTO>`. The orval path computes it in
+     `deriveModelType` (`entity-extractor.ts:1090`) as **the innermost response type of the
+     entity's non-array GET**, envelope already stripped, with two fallbacks: request-body names
+     with the DTO suffix stripped, then the list response's element type.
+
+     Reproduced from the IR — take the first GET whose response's innermost member is a `ref`
+     rather than a `List`/`Page` — that rule alone resolves **115 of the fixture's 139 entities**,
+     and five of `domain-site`'s six factories land exactly on the type the app uses today
+     (`WorkPointDetailDTO`, `LinearAssetDetailDTO`, `EquipmentInspectionDTO`, `AreaZoneDetailDTO`,
+     `SiteOnboardingDTO`).
+
+     **Do not key it on the CRUD role.** `safetyZonePolicy` — the sixth — has no `get` role at all,
+     because its detail is an owned singleton at `/safety-zone/{id}/policy` and the naming strategy
+     gives it a custom role; its GET still returns `SafetyZonePolicyDTO`, which is the type the app
+     uses. The response is the signal, not the role.
+
+     Report the entities where all three fallbacks come up empty rather than typing a store
+     `unknown`: `src/mock/seeds.ts` is hand-written against that type and would stop
+     type-checking.
 
 - [ ] **Step 2: Test** that a handler returns an enveloped body; that a search handler's paged
   branch delegates to `store.listPaged` rather than constructing a page; that a `<field>.equals`
