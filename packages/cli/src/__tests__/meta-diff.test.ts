@@ -233,11 +233,27 @@ describe("meta-diff", () => {
       ),
     });
 
-    expect(subjects(errors(findings)).sort()).toEqual([
-      "createNoticeBoardHandlers",
-      "createNoticeHandlers",
-    ]);
+    // The breakage is the name that went missing: `src/mock/index.ts` imports the factory by name,
+    // so losing `createNoticeHandlers` breaks every mocked screen of that entity while the domain
+    // package still typechecks. The name that appeared is reported as a note — the meta pipeline
+    // emits a factory for every entity and orval skips one whose model it could not read, so a
+    // meta-only factory is extra coverage rather than drift.
+    expect(subjects(errors(findings))).toEqual(["createNoticeHandlers"]);
     expect(errors(findings).every((one) => one.message.includes("handlers"))).toBe(true);
+    expect(subjects(notes(findings))).toContain("createNoticeBoardHandlers");
+  });
+
+  it("reports a factory the meta output adds as a note, since orval skips an unreadable model", async () => {
+    const findings = await diff(IDENTICAL_ORVAL, {
+      ...IDENTICAL_META,
+      "mock/orgType.handlers.ts": META_HANDLERS.replace(
+        "createNoticeHandlers",
+        "createOrgTypeHandlers",
+      ),
+    });
+
+    expect(errors(findings)).toEqual([]);
+    expect(subjects(notes(findings))).toContain("createOrgTypeHandlers");
   });
 
   it("reports a zod constant present in only one output as a note", async () => {

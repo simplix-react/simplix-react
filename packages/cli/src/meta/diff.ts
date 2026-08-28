@@ -124,11 +124,27 @@ export function compareSurfaces(
       const decl = left ?? right;
       if (decl === undefined) continue;
       const side = left === undefined ? "meta" : "orval";
-      // Orval names a zod constant per operation and role and the meta pipeline names one per
-      // type, so one entity's constants are renamed wholesale. Nothing outside the generated
-      // directories imports them, so reporting the renames as errors would bury the drift this
-      // command exists to find.
-      const level: Level = decl.category === "zod" || ignored.has(name) ? "info" : "error";
+      // Three kinds of name are reported without being counted as drift, because reporting them
+      // as errors would bury the drift this command exists to find.
+      //
+      // `zod` — orval names a constant per operation and role and the meta pipeline names one per
+      // type, so one entity's constants are renamed wholesale.
+      // `internal` — the access and filter metadata the IR path adds, which the OpenAPI path has
+      // no notion of, and each side's own name for a response or a mutation's variables.
+      // `handlers` present only on the meta side — the IR path emits a factory for every entity,
+      // where orval skips one whose model it could not read (`org.OrgType` is such a case). A
+      // factory missing from the meta side stays an error: `src/mock/index.ts` imports these by
+      // name, and losing one breaks every mocked screen of that entity while the domain package
+      // still typechecks.
+      //
+      // None of the three is imported anywhere outside the generated trees — grepped across the
+      // application's modules and apps: 0 references.
+      const quiet =
+        decl.category === "zod" ||
+        decl.category === "internal" ||
+        (decl.category === "handlers" && left === undefined) ||
+        ignored.has(name);
+      const level: Level = quiet ? "info" : "error";
       findings.push({
         level,
         subject: name,
@@ -158,6 +174,19 @@ function compareQueryKey(name: string, left: Decl, right: Decl): Finding[] {
         "meta output; module code spreads the result, so its arity and element order are contract",
     },
   ];
+}
+
+/**
+ * A filter parameter whose operator takes more than one value, typed as one string by springdoc
+ * and as the array the caller actually passes by the IR.
+ *
+ * `buildSearchableParams` hands a faceted filter's value straight through, and that value is an
+ * array; springdoc describes the query parameter as a string because that is what reaches the wire
+ * after joining. The IR's typing is the one a caller can satisfy, so the widening is the fix rather
+ * than the drift — the serialiser joins it exactly as the orval builder does.
+ */
+function isMultiValueFilter(field: string, before: string, after: string): boolean {
+  return /\.(in|notIn|between|notBetween)$/.test(field) && `${before}[]` === after;
 }
 
 function compareMembers(
@@ -192,6 +221,12 @@ function compareMembers(
               level: "info",
               subject,
               message: `carries its label in the meta output: ${before.type} → ${after.type}`,
+            }
+          : isMultiValueFilter(field, before.type, after.type)
+          ? {
+              level: "info",
+              subject,
+              message: `takes the several values its operator accepts: ${before.type} → ${after.type}`,
             }
           : {
               level: "error",

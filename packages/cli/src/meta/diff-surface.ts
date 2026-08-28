@@ -6,7 +6,7 @@
 // program built over them would report those as errors of its own.
 
 import { readdir, readFile } from "node:fs/promises";
-import { join, relative } from "node:path";
+import { join, relative, basename } from "node:path";
 import ts from "typescript";
 
 /**
@@ -26,7 +26,13 @@ export type Category =
   | "queryKey"
   | "hook"
   | "handlers"
-  | "zod";
+  | "zod"
+  /**
+   * A declaration only one pipeline has any notion of, and that nothing outside the generated
+   * tree imports: the meta path's access and filter metadata, and each side's own names for a
+   * request's response and a mutation's variables. Reported, never counted as drift.
+   */
+  | "internal";
 
 /** One member of a declared object shape. */
 export interface MemberInfo {
@@ -46,6 +52,10 @@ export interface Decl {
   members?: Map<string, MemberInfo>;
   /** For a query key: one entry per element of the returned array, `"value"` or `"spread"`. */
   queryKeyShape?: string[];
+  /** Names this interface extends, before {@link resolveInheritance} folds their members in. */
+  heritage?: string[];
+  /** `Record<K, V>` when the declaration is nothing but an index signature. */
+  indexSignature?: string;
 }
 
 /** Everything one output tree exports, by name. */
@@ -68,7 +78,85 @@ export async function collectSurface(root: string): Promise<Surface> {
     surface.files++;
     collectFile(surface, relative(root, path), text);
   }
+  resolveInheritance(surface);
+  normaliseIndexSignatureAliases(surface);
   return surface;
+}
+
+/**
+ * Replace a name that stands for nothing but an index signature with the shape it stands for.
+ *
+ * Orval gives `Map<String, String>` a declaration of its own — `interface StringMap { [key:
+ * string]: string }` — while the IR path writes `Record<string, string>` inline. The two are the
+ * same type under two spellings, and comparing the spellings reports one difference per i18n field
+ * plus the alias itself. Rewriting each occurrence to the structural form lets the comparison see
+ * what a caller sees.
+ *
+ * Only an interface whose sole member is an index signature qualifies; anything with a named
+ * member is a shape in its own right and is compared as one.
+ */
+function normaliseIndexSignatureAliases(surface: Surface): void {
+  const structural = new Map<string, string>();
+  for (const [name, decl] of surface.declarations) {
+    if (decl.indexSignature === undefined || (decl.members?.size ?? 0) > 0) continue;
+    structural.set(name, decl.indexSignature);
+    surface.declarations.delete(name);
+  }
+  if (structural.size === 0) return;
+
+  const rewrite = (type: string): string => {
+    let out = type;
+    for (const [name, shape] of structural) {
+      out = out.replace(new RegExp(`\\b${name}\\b`, "g"), shape);
+    }
+    return out;
+  };
+
+  for (const decl of surface.declarations.values()) {
+    if (!decl.members) continue;
+    for (const [field, info] of decl.members) {
+      const rewritten = rewrite(info.type);
+      if (rewritten !== info.type) decl.members.set(field, { ...info, type: rewritten });
+    }
+  }
+}
+
+/**
+ * Fold each declaration's inherited members into its own, so the two trees are compared as the
+ * shapes a caller sees rather than as the text each generator wrote.
+ *
+ * Orval flattens a Java hierarchy — `OrganizationRestUpdateBody` lists all 21 members — while the
+ * IR path preserves it, emitting `interface OrganizationUpdateDTO extends OrganizationCreateDTO`
+ * with the one member the child adds. Comparing own members against flattened ones reports every
+ * inherited field as missing: 40 errors on one entity, all of them the feature this project
+ * exists to add.
+ *
+ * A parent outside the surface leaves the child as it stands; the missing name is already
+ * reported on its own.
+ */
+function resolveInheritance(surface: Surface): void {
+  const resolved = new Set<string>();
+
+  const resolve = (name: string, seen: Set<string>): void => {
+    if (resolved.has(name) || seen.has(name)) return;
+    seen.add(name);
+    const decl = surface.declarations.get(name);
+    if (!decl) return;
+
+    for (const parentName of decl.heritage ?? []) {
+      resolve(parentName, seen);
+      const parent = surface.declarations.get(parentName);
+      if (!parent?.members) continue;
+      if (!decl.members) decl.members = new Map();
+      // Parent first, so a child that re-declares a member keeps its own reading of it.
+      const merged = new Map(parent.members);
+      for (const [member, info] of decl.members) merged.set(member, info);
+      decl.members = merged;
+    }
+    resolved.add(name);
+  };
+
+  for (const name of surface.declarations.keys()) resolve(name, new Set());
 }
 
 /** Every `.ts` file under a tree, declaration files excluded. */
@@ -118,7 +206,19 @@ function declarationsOf(
   if (ts.isInterfaceDeclaration(statement)) {
     const name = statement.name.text;
     const category = classifyType(name, file);
-    return [category && { name, category, file, members: membersOf(statement.members, sf) }];
+    const heritage = (statement.heritageClauses ?? [])
+      .filter((clause) => clause.token === ts.SyntaxKind.ExtendsKeyword)
+      .flatMap((clause) => clause.types.map((one) => one.expression.getText(sf)));
+    return [
+      category && {
+        name,
+        category,
+        file,
+        members: membersOf(statement.members, sf),
+        heritage: heritage.length > 0 ? heritage : undefined,
+        indexSignature: indexSignatureOf(statement.members, sf),
+      },
+    ];
   }
 
   if (ts.isTypeAliasDeclaration(statement)) {
@@ -180,14 +280,60 @@ function isSchemaFile(file: string): boolean {
   return file.endsWith(".zod.ts") || file.split(/[\\/]/).includes("schema");
 }
 
+/**
+ * The metadata surfaces the IR path adds, which the OpenAPI path has no notion of: the structured
+ * `@PreAuthorize` constants and the filter definitions. A name here is an addition rather than a
+ * difference, so it is reported without being counted as drift.
+ */
+function isAddedSurface(file: string): boolean {
+  const parts = file.split(/[\\/]/);
+  return parts.includes("access") || parts.includes("search") || basename(file) === "_request.ts";
+}
+
+/**
+ * The envelope, which the two pipelines carry differently by design.
+ *
+ * Orval declares `SimpliXApiResponse…` and the loose bodies it wraps, because springdoc describes
+ * the wrapper as part of every response. The IR path maps the container `unwrap: true` — the
+ * mutator strips it before React Query sees it — so the type has no client representation. Its
+ * absence from the meta side is the design, not a loss.
+ */
+function isEnvelope(name: string): boolean {
+  return /^SimpliXApiResponse/.test(name) || name === "BodyObject" || name === "ErrorDetail";
+}
+
+/**
+ * The DTO an operation names as its search shape.
+ *
+ * Orval flattens it into the params type and declares it nowhere — measured across all thirteen of
+ * the application's domains, its model directories hold zero of them. The IR path reaches it
+ * through `request.searchDto` and emits it, which is an addition rather than a difference.
+ */
+function isSearchShape(name: string): boolean {
+  return /SearchDTO$/.test(name);
+}
+
+/**
+ * A name each pipeline invents for the same internal shape. Orval writes a request's response type
+ * inline and the IR path names it; neither is imported anywhere outside the generated tree —
+ * grepped across the application's modules and apps: 0 references.
+ */
+function isGeneratedAlias(name: string): boolean {
+  return /(?:Response|Variables)$/.test(name);
+}
+
 function classifyType(name: string, file: string): Category | undefined {
   if (isSchemaFile(file)) return "zod";
   if (isPlumbing(name)) return undefined;
+  if (isAddedSurface(file) || isGeneratedAlias(name) || isEnvelope(name) || isSearchShape(name)) {
+    return "internal";
+  }
   return /Params$/.test(name) ? "params" : "type";
 }
 
 function classifyValue(name: string, file: string, initializer: string): Category | undefined {
   if (/^create[A-Z]\w*Handlers$/.test(name)) return "handlers";
+  if (isAddedSurface(file)) return "internal";
   if (/^use[A-Z]/.test(name)) return "hook";
   if (/^get[A-Z]\w*QueryKey$/.test(name)) return "queryKey";
   if (/^get[A-Z]\w*Url$/.test(name)) return "url";
@@ -198,6 +344,19 @@ function classifyValue(name: string, file: string, initializer: string): Categor
 }
 
 // ── Shapes ────────────────────────────────────────────────────────────────────
+
+/** The `Record<K, V>` an index signature stands for, when the shape declares one. */
+function indexSignatureOf(
+  members: ts.NodeArray<ts.TypeElement>,
+  sf: ts.SourceFile,
+): string | undefined {
+  for (const member of members) {
+    if (!ts.isIndexSignatureDeclaration(member) || !member.type) continue;
+    const key = member.parameters[0]?.type?.getText(sf) ?? "string";
+    return `Record<${key}, ${normalizeType(member.type.getText(sf))}>`;
+  }
+  return undefined;
+}
 
 function membersOf(
   members: ts.NodeArray<ts.TypeElement>,
