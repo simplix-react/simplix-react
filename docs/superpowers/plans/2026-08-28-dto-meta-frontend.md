@@ -1714,6 +1714,17 @@ precedent to follow.
   have no delete endpoint, and `detail.hbs` imports `CrudDelete` and `useCrudDeleteDetail` to serve
   it. Generate the file before scaffolding, and assert the six booleans against the resolved roles.
 
+  **And the list screen fails silently rather than loudly.** Every hook identifier comes from this
+  file (`toHookName(crudConfig.list)` and its siblings, `:1644-1662`). With `hookList` null,
+  `list.hbs:28` takes its `{{#unless hookList}}` branch and defines
+  `useMockList()` — a `useMemo<T[]>(() => [], [])`. The screen renders a table that calls no API and
+  shows **zero rows, forever**, and it compiles. Combined with a missing schema file (Task 7's
+  `.schema.ts` naming) the cascade is complete: placeholder `id`/`name` fields, no package imports
+  (`{{#if packageName}}` guards them), a locally declared row interface, and a mock list.
+
+  So Task 13's tests must assert the negative: the generated list imports its hook from the domain
+  package and contains **no** `useMockList`.
+
   Note also that the app configures **no** `crud:` block in `simplix.config.ts`, so
   `CrudEndpointPattern` and `matchCrudRole` never run and `ExtractedOperation.role` is undefined
   before step 5. Do not build anything on that path.
