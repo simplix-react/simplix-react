@@ -416,11 +416,6 @@ Fill in the four helpers:
 
 - `readSource` — an `http://`/`https://` source is fetched; anything else is read from disk. A non-2xx response throws with the status AND the response body, because the backend answers a duplicate type name with a 409 whose body names both classes; swallowing it would leave the operator guessing.
 - `readSnapshot` — throws a clear error naming the path when `snapshot` is unset or missing.
-- **Tag patterns are exact by default.** `createTagMatcher` treats a plain string as an exact
-  match and only `/…/` as a regular expression, so `"site.*"` looks for a tag literally named
-  `site.*` and matches nothing. Measured: all 130 patterns in the target application are exact
-  strings and none uses a wildcard. If a domain resolves to zero operations, this is the first
-  thing to check (spec §10).
 - `unwrap` — **do not sniff the envelope's shape.** Spec §5.1 settles that an envelope is judged
   by name, not by field shape, because a shape test misreads a response whose body is empty. There
   is no TypeRef here, so use what each source guarantees instead:
@@ -598,6 +593,11 @@ The generators need the IR sliced by domain and indexed. This task does that onc
     `createTagMatcher` from `packages/cli/src/openapi/pipeline/domain-splitter.ts`** — it is
     exported and already implements the exact-string / `/regex/` rule. Re-implementing it is how
     the two paths drift into disagreeing about which domain owns a tag.
+
+    **The rule is exact-match by default**: a plain string matches a tag literally and only
+    `/…/` is a regular expression, so `"site.*"` looks for a tag named `site.*` and matches
+    nothing. All 130 patterns in the target application are exact strings; none uses a wildcard.
+    A domain resolving to zero operations is the first symptom (spec §10).
   - the transitive closure of types those operations reach, by walking `request.body`, `request.searchDto`, `response`, and each type's `extends` and `ref`/`pick` fields
   - the enums reached the same way
   - for each type, its full field list including inherited ones, computed by following `extends` — **kept separate from the own-field list**, because the generated `interface X extends Y` must emit only own fields while a zod schema built with `.extend()` needs to know the parent
