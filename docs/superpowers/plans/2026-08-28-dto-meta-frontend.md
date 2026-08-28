@@ -1327,8 +1327,27 @@ operator table (Step 1b) is wrong, and the diff will say which member moved.
 
   - **Decide by `TypeRef.kind ∈ {instant, date}`.** One `number` field also carries range
     operators, so a range filter is not automatically temporal.
+  **`parseFilterParams` has seven rules and no fallback** (`scaffold-crud.ts:1477` ends the loop),
+  so a field matching none of them yields **no filter at all**. Measured over the fixture's 1,118
+  searchable fields, **104 fall through**:
+
+  | Operator set | n | |
+  | --- | ---: | --- |
+  | `between` + `greaterThan` + `lessThan` | 68 | temporal — `AuthSessionSearchDTO.startedAt`, `.lastSeenAt`, `.expiresAt`, `EmergencyContactSearchDTO.lastVerifiedOn` … |
+  | *(empty — sortable only)* | 32 | `RegulationDutySearchDTO.titleSortEn`, `SiteSearchDTO.siteNameSortEn` … |
+  | `greaterThan` + `lessThan` | 3 | |
+  | `between` + comparisons + null checks | 1 | |
+
+  **The 32 with no operators are correctly dropped** — they are sort keys, not filters — but they
+  must still reach the column list as sortable, which `searchable.sortable` states. The other
+  **72 are a defect**: comparison-capable fields that today produce nothing.
+
   - **Prefer the `gte`/`lte` pair** where both exist — the 127-field case, which keeps the existing
     `DateRangeFilter` and its `pairedKey` shape unchanged.
+  - **Otherwise take whatever comparison the field has.** The common real combination is
+    `between` + `greaterThan` + `lessThan` (68 fields), not `between` alone; three fields have only
+    `greaterThan` + `lessThan`. Build the range from `between` when present, else from the
+    comparison pair that is.
   - **Where only `BETWEEN` exists**, the value is a **comma-joined string**, not an array. The
     generated param is `'occurredAt.between'?: string` ("Enter two values separated by comma") and
     the application already writes it by hand in 8 places as `` `${from},${to}` ``. An array
