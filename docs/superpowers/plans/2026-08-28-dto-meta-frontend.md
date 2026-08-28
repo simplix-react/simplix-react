@@ -919,7 +919,13 @@ repointed.
   and `body: JSON.stringify(dto)`. **The body parameter's type comes from `request.body`, which is
   a `TypeRef`** — 49 of the fixture's 231 bodies are containers, so a multi-update takes
   `OrganizationUpdateDTO[]` and not a single DTO. Map it through the same container rules the
-  response uses; treating `request.body` as a type name is the defect Task 0 exists to remove. A URL builder (`getGetLinearAssetUrl`) is emitted alongside,
+  response uses; treating `request.body` as a type name is the defect Task 0 exists to remove.
+
+  **Emit a `get<Name>QueryKey` function per query operation — it is a public export module code
+  imports.** Measured: `modules/notification/src/widgets/notice/detail.tsx:172` writes
+  `queryKey: [...getGetNoticeQueryKey(noticeId), language]`, so both the name and the returned
+  shape are part of the contract, and `modules/system/src/widgets/notice/notice-dismissals.tsx`
+  imports another. Add them to Task 12's parity list. A URL builder (`getGetLinearAssetUrl`) is emitted alongside,
   because the hook's query key uses it — see below.
 
   Hooks use the profile's naming strategy (`simplixBootNaming`) so the exported names match what
@@ -985,7 +991,28 @@ repointed.
   yields `EquipmentInspectionRest_override` on both sides. If you find an id that does not match
   the OpenAPI document, report it rather than papering over it in the naming call.
 
-  Query keys: the first element is the request URL string and a list key carries the params object, because `useInvalidateEntity` invalidates by URL prefix on `queryKey[0]` (spec §5.1). A different key shape breaks cache invalidation with no error.
+  **Query keys — measured, and NOT built from the URL builder.** Orval emits a separate key
+  function whose first element is the **bare path with no query string**, with the params object
+  appended only when present:
+
+  ```ts
+  export const getGetOrganizationQueryKey = (orgId: string) =>
+    [`/api/v1/admin/org/${orgId}`] as const;
+
+  export const getListOrganizationsQueryKey = (params?: ListOrganizationsParams) =>
+    [`/api/v1/admin/org/search`, ...(params ? [params] : [])] as const;
+  ```
+
+  `getListOrganizationsUrl` builds a `URLSearchParams` and returns path **plus** query string —
+  that is the fetch URL, not the key. Using it for the key would put `?page=0&size=10` into
+  `queryKey[0]`, making every parameter combination a different cache entry and rendering
+  `queryKey[1]` meaningless.
+
+  This matters more than any other shape in the plan: `useInvalidateEntity`
+  (`packages/ui/src/crud/form/use-invalidate-entity.ts:18`) invalidates with
+  `typeof query.queryKey[0] === "string" && query.queryKey[0].startsWith(apiPrefix)`, and the
+  application calls it in **137 places**. A different key shape breaks cache invalidation across
+  the whole product with no error anywhere (spec §5.1).
 
 - [ ] **Step 2: Test against the real fixture.** Assert:
 
@@ -994,7 +1021,9 @@ repointed.
     and 13 all inherit this partition, so it is the one thing here that must not be left to a
     downstream test.
   - a generated hook's name equals what `simplixBootNaming` yields for the same operation
-  - a query key's first element is the URL; a list hook's key carries params
+  - `getGetOrganizationQueryKey("x")` returns exactly `["/api/v1/admin/org/x"]`, and
+    `getListOrganizationsQueryKey({page:0})` returns `["/api/v1/admin/org/search", {page:0}]` —
+    **no query string in element 0**, and no params element when params are absent
   - a `Void` response produces a hook with no data type — 3 operations in the fixture have no
     `response` key at all
   - a **`binary` response** produces a function returning `Blob` rather than a hook. Three of the
@@ -1403,7 +1432,8 @@ The reason parallel generation was chosen: a domain is only switched once the tw
 
 | Finding | Level |
 | --- | --- |
-| a public name present in only one — type, hook, request function, const map, params type, **and the mock handler factory `createXHandlers`** (spec §11). Zod constants are excluded; see the info row | error |
+| a public name present in only one — type, hook, request function, **`get<Name>QueryKey`**, const map, params type, and the mock handler factory `createXHandlers` (spec §11). Zod constants are excluded; see the info row | error |
+| a `get<Name>QueryKey` returning a different **shape** | error — module code spreads the result (`[...getGetNoticeQueryKey(id), language]`), so the arity and element order are contract, not just the name |
 | a field present in only one | error |
 | a field type mismatch | error |
 | a required-ness difference not on the intended list | error |
