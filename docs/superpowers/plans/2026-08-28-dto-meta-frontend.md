@@ -2204,6 +2204,29 @@ what the orval path has to do. Labels come from `labelKey`.
 
 - [ ] **Step 2: Choose per domain.** If `generated-meta/` exists for the domain, use the IR source; otherwise the existing text-parsing source, unchanged.
 
+- [ ] **Step 2b: Wire the schema into the form, or the constraints reach nothing.**
+
+  §1's second defect is that the client lets an empty string and an over-long value through, and
+  Task 7 fixes it by carrying 440 `maxLength` and 221 `notBlank` constraints into zod. **Nothing
+  consults those schemas today.** `form.hbs` renders fields and mutations and contains no
+  `required`, no schema reference and no validator; `CrudForm` has no schema prop; and
+  `zodToFieldErrors` — the function built for exactly this — is imported **0 times** across the
+  application.
+
+  The seam is already there and documented in its own code. `useCrudFormSubmit` takes a
+  `validator` (`use-crud-form-submit.ts:156`) whose doc comment gives the wiring verbatim
+  (`:69-75`):
+
+  ```ts
+  import { zodToFieldErrors } from "@simplix-react/form";
+  validator: (v) => zodToFieldErrors(OrganizationUpdateDTOSchema, v),
+  ```
+
+  A failing validator sets `fieldErrors`, skips the mutation and keeps the form on screen — the
+  behaviour the generated form needs. Emit that line into `form.hbs`, naming the schema of the DTO
+  the fields came from (Step 1). Without it every constraint this project recovers stops at a file
+  nothing imports, and §1's headline problem survives the whole migration.
+
 - [ ] **Step 3: Templates — BOTH of them.** The line `export * from "./generated/model";` appears
   in two barrel templates, and changing one leaves the other emitting the orval path:
 
