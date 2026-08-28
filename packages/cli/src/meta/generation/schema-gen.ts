@@ -1,6 +1,13 @@
 import type { ConstraintMeta, FieldMeta, TypeRef } from "../ir-types.js";
 import type { ResolvedDomain, ResolvedType } from "../resolve.js";
-import { HEADER, reachableFrom, responseRefs } from "./emit.js";
+import {
+  camelJoin,
+  entityModuleBase,
+  HEADER,
+  memberName,
+  reachableFrom,
+  responseRefs,
+} from "./emit.js";
 import { modelFileBase, type LabeledEnumMapping } from "./model-gen.js";
 
 /** Directory the schema files land in, relative to a generated package's `src/generated/`. */
@@ -30,7 +37,7 @@ export function schemaConstName(typeName: string): string {
  * `<entity>.ts` produces a scaffold that reports success and generates an `id`/`name` form.
  */
 export function schemaFileBase(tag: string): string {
-  return camelJoin(tag.slice(tag.lastIndexOf(".") + 1));
+  return entityModuleBase(tag);
 }
 
 /** A schema that defers a reference through `z.lazy`, and the fields the deferral is on. */
@@ -310,23 +317,6 @@ function entityFileBases(domain: ResolvedDomain): Map<string, string> {
     owners.set(base, tag);
   }
   return bases;
-}
-
-/**
- * One identifier out of however a tag is spelled. A tag is free text — the capture holds
- * `Auth Token` and `OAuth2 Social Login` beside the dotted ones — and a space in the name would
- * write a module no import specifier can reach.
- */
-function camelJoin(tag: string): string {
-  return tag
-    .split(/[^A-Za-z0-9]+/)
-    .filter((part) => part !== "")
-    .map((part, at) =>
-      at === 0
-        ? part.charAt(0).toLowerCase() + part.slice(1)
-        : part.charAt(0).toUpperCase() + part.slice(1),
-    )
-    .join("");
 }
 
 function edgeKey(owner: string, dependency: string): string {
@@ -614,11 +604,6 @@ class SchemaEmitter {
 
 function byModule(left: [string, unknown], right: [string, unknown]): number {
   return left[0] < right[0] ? -1 : left[0] > right[0] ? 1 : 0;
-}
-
-/** A wire name Jackson produced is usually an identifier, and is quoted when it is not. */
-function memberName(name: string): string {
-  return /^[A-Za-z_$][\w$]*$/.test(name) ? name : JSON.stringify(name);
 }
 
 /** The key schema of a mapped `Map`, spelled from the TypeScript key type the profile names. */

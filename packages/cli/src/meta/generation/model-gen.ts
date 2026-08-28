@@ -1,28 +1,17 @@
 import type { TypeRef } from "../ir-types.js";
 import type { ResolvedDomain, ResolvedType } from "../resolve.js";
-import { HEADER, reachableFrom, requestRefs, responseRefs } from "./emit.js";
+import {
+  containerTypeExpression,
+  ENUM_MODULE,
+  HEADER,
+  PRIMITIVES,
+  reachableFrom,
+  requestRefs,
+  responseRefs,
+} from "./emit.js";
 
 /** Directory the model files land in, relative to a generated package's `src/generated/`. */
 const MODEL_DIR = "model";
-
-/** Base name of the module every enum declaration is written into. */
-const ENUM_MODULE = "_enums";
-
-/** What a `TypeRef` of that kind is on the wire, once JSON has flattened it. */
-const PRIMITIVES: Record<
-  "string" | "boolean" | "unknown" | "instant" | "date" | "time" | "file" | "binary",
-  string
-> = {
-  string: "string",
-  boolean: "boolean",
-  unknown: "unknown",
-  // A moment, a day and a clock time all arrive as their ISO text.
-  instant: "string",
-  date: "string",
-  time: "string",
-  file: "Blob",
-  binary: "Blob",
-};
 
 /** How a labeled enum's `{ value, label }` response shape is spelled, and where that type lives. */
 export interface LabeledEnumMapping {
@@ -297,20 +286,13 @@ class ModelEmitter {
     const rendered = args.map((arg) => this.render(arg, at));
     // An unmapped container is reported by the resolver; it has no client type to name.
     if (!mapping) return "unknown";
-    if (mapping.unwrap) return rendered[0] ?? "unknown";
-    if (!mapping.ts) return rendered[0] ?? "unknown";
 
-    if (mapping.import) {
-      const names = at.imports.external.get(mapping.import) ?? new Set<string>();
-      names.add(mapping.ts);
-      at.imports.external.set(mapping.import, names);
-    }
-
-    // `Array` is written in its shorthand, which is the form the rest of the generated client and
-    // every hand-written consumer of it uses.
-    if (mapping.ts === "Array" && rendered.length === 1) return `${rendered[0]}[]`;
-    if (mapping.keyType) return `${mapping.ts}<${mapping.keyType}, ${rendered.join(", ")}>`;
-    return rendered.length === 0 ? mapping.ts : `${mapping.ts}<${rendered.join(", ")}>`;
+    const external = (module: string, ts: string): void => {
+      const names = at.imports.external.get(module) ?? new Set<string>();
+      names.add(ts);
+      at.imports.external.set(module, names);
+    };
+    return containerTypeExpression(mapping, rendered, external) ?? rendered[0] ?? "unknown";
   }
 
   private renderParam(name: string, at: RenderSite): string {

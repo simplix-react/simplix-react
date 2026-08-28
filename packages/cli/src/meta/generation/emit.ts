@@ -1,3 +1,4 @@
+import type { ContainerMapping } from "../../openapi/orchestration/spec-profile.js";
 import type { TypeRef } from "../ir-types.js";
 import type { ResolvedDomain } from "../resolve.js";
 
@@ -5,6 +6,80 @@ import type { ResolvedDomain } from "../resolve.js";
 export const HEADER = `/**
  * Generated from the DTO meta IR. Do not edit manually.
  */`;
+
+/** Base name of the module every enum declaration is written into, inside the model directory. */
+export const ENUM_MODULE = "_enums";
+
+/** What a `TypeRef` of that kind is on the wire, once JSON has flattened it. */
+export const PRIMITIVES: Record<
+  "string" | "boolean" | "unknown" | "instant" | "date" | "time" | "file" | "binary",
+  string
+> = {
+  string: "string",
+  boolean: "boolean",
+  unknown: "unknown",
+  // A moment, a day and a clock time all arrive as their ISO text.
+  instant: "string",
+  date: "string",
+  time: "string",
+  file: "Blob",
+  binary: "Blob",
+};
+
+/**
+ * How a mapped container is spelled in TypeScript, given its arguments already rendered.
+ *
+ * `undefined` means the container carries no type of its own — it is unwrapped before the client
+ * sees it, or the profile maps it to nothing — and the caller decides what stands in its place:
+ * the argument it held, or the empty type at a position that has one.
+ */
+export function containerTypeExpression(
+  mapping: ContainerMapping,
+  rendered: string[],
+  importExternal: (module: string, name: string) => void,
+): string | undefined {
+  if (mapping.unwrap || !mapping.ts) return undefined;
+  if (mapping.import) importExternal(mapping.import, mapping.ts);
+
+  // `Array` is written in its shorthand, which is the form the rest of the generated client and
+  // every hand-written consumer of it uses.
+  if (mapping.ts === "Array" && rendered.length === 1) return `${rendered[0]}[]`;
+  // `Record` takes the key type as well, and the IR carries only the value: a Java `Map` has
+  // string keys once JSON has serialized it, which is what the profile's `keyType` says.
+  if (mapping.keyType) return `${mapping.ts}<${mapping.keyType}, ${rendered.join(", ")}>`;
+  return rendered.length === 0 ? mapping.ts : `${mapping.ts}<${rendered.join(", ")}>`;
+}
+
+/**
+ * One identifier out of however a tag is spelled. A tag is free text — the capture holds
+ * `Auth Token` and `OAuth2 Social Login` beside the dotted ones — and a space in the name would
+ * write a module no import specifier can reach.
+ */
+export function camelJoin(text: string): string {
+  return text
+    .split(/[^A-Za-z0-9]+/)
+    .filter((part) => part !== "")
+    .map((part, at) =>
+      at === 0
+        ? part.charAt(0).toLowerCase() + part.slice(1)
+        : part.charAt(0).toUpperCase() + part.slice(1),
+    )
+    .join("");
+}
+
+/**
+ * The module one entity is written into, from its tag: the last dot-segment as an identifier.
+ * Every generator that writes a file per entity uses it, so one entity's model, schema, endpoints
+ * and hooks are found under the same name.
+ */
+export function entityModuleBase(tag: string): string {
+  return camelJoin(tag.slice(tag.lastIndexOf(".") + 1));
+}
+
+/** A wire name Jackson produced is usually an identifier, and is quoted when it is not. */
+export function memberName(name: string): string {
+  return /^[A-Za-z_$][\w$]*$/.test(name) ? name : JSON.stringify(name);
+}
 
 /** Every type reference an operation of the domain returns. */
 export function responseRefs(domain: ResolvedDomain): TypeRef[] {
