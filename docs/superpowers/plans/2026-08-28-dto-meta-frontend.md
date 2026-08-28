@@ -1467,7 +1467,27 @@ precedent to follow.
   Generate them from the IR only for a domain that never had an orval run — the greenfield case
   Task 13's scaffolding covers.
 
-  **The locale files are not built from the IR, and spec §8 says so twice in conflicting ways.**
+  **One of the four does break on the swap, and only at the last step.** The enum half of the
+  locale overlay is filtered by `resolveKnownModelTypes` (`openapi.ts:837`), which lists
+  `src/generated/model/*.ts` and derives a type name from **each filename**:
+
+  ```ts
+  const modelDir = join(targetDir, "src/generated/model");
+  if (!await pathExists(modelDir)) return undefined;   // ← no filtering at all
+  ```
+
+  A meta domain keeps `generated/` until Task 14 Step 6 deletes it, so the filter works through the
+  entire migration and then stops. With `undefined` returned, nothing is filtered and **all 145
+  server enums land in that domain's locale file** — where `org` had 2 and `site` had 26. Nothing
+  errors; the file just grows.
+
+  Teach it the meta layout in this task, not in Task 14: `generated-meta/model/_enums.ts` holds
+  every enum in **one** file, so the names come from its exported declarations rather than from
+  filenames. Assert that a meta domain with `generated/` removed still filters to the same enum set
+  it had before.
+
+  **Otherwise the locale files are not built from the IR, and spec §8 says so twice in conflicting
+  ways.**
   The IR's `labelKey` is a message *key* (`entities.HolidayCalendar.country`); it has no
   translations. Those come from the i18n endpoint, whose payload is already structured as
   `entities.<PascalKey>.fields.<field>.translations.<locale>`, and `transformToLocaleData`
@@ -1832,4 +1852,7 @@ git commit -m "feat(cli): let scaffolding read fields from the IR"
   pre-existing divergence between the CLI's convention and the app's, not something this project
   introduced; surface it and let the user decide.
 - [ ] **Step 5** — drive the screens in a browser under the `simplix:frontend-e2e` skill. A green typecheck is not evidence a screen works.
-- [ ] **Step 6** — report: which domain, the info-level differences, what the browser pass found. **Do not delete `src/generated/` yet** — that is the last step after the domain has been exercised, and it is what makes the move irreversible.
+- [ ] **Step 6** — report: which domain, the info-level differences, what the browser pass found.
+  **After deleting `src/generated/`, re-run codegen once and diff `src/locales/*.json`** — the enum
+  filter reads that directory and silently stops filtering without it (Task 11 Step 2b). The file
+  must hold the same enum set as before, not all 145. **Do not delete `src/generated/` yet** — that is the last step after the domain has been exercised, and it is what makes the move irreversible.
