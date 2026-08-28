@@ -133,7 +133,7 @@ export function resolveEndpoints(
     const targets = resolved.operations.map((operation) =>
       target(domain, operation, entity, naming),
     );
-    entities.push({ tag: resolved.tag, entity, file, targets: dedupeByName(targets) });
+    entities.push({ tag: resolved.tag, entity, file, targets });
   }
 
   return entities;
@@ -144,12 +144,16 @@ export function resolveEndpoints(
  *
  * Two operations can resolve to one name — `user.Avatar` serves the same read at
  * `/{userId}-avatar-{size}.{ext}` and `/{userId}-avatar.{ext}`, and the strategy names both
- * `getAllAvatars`. Emitting each would declare the constant twice and the module would not
- * compile, so the later ones are dropped here and reported through `duplicateExports`: the name
- * that survives is a decision for whoever owns the routes, and a package that does not build
- * hides it.
+ * `getAllAvatars`. Emitting each declares the constant twice and the module does not compile, so
+ * the later ones are dropped where declarations are written and reported through
+ * `duplicateExports`: the name that survives is a decision for whoever owns the routes, and a
+ * package that does not build hides it.
+ *
+ * **Only the declaration emitters use this.** A mock handler is an array entry rather than a
+ * named export, and every route needs one: dropping a handler leaves that route to fall through
+ * to a server that is not running.
  */
-function dedupeByName(targets: EndpointTarget[]): EndpointTarget[] {
+export function dedupeByName(targets: EndpointTarget[]): EndpointTarget[] {
   const seen = new Set<string>();
   return targets.filter((one) => {
     if (seen.has(one.name)) return false;
@@ -462,10 +466,10 @@ class EndpointEmitter {
   /** One entity's module: its params and response types, then a request function per operation. */
   entityFile(entity: EndpointEntity): string {
     const imports = newImports();
-    for (const one of entity.targets) {
+    for (const one of dedupeByName(entity.targets)) {
       if (one.paramsType && !one.paramsDeclared) imports.models.add(one.paramsType);
     }
-    const bodies = entity.targets.map((one) => this.operation(one, imports));
+    const bodies = dedupeByName(entity.targets).map((one) => this.operation(one, imports));
     // A searchable route states no query parameter of its own and still sends a query string:
     // what it sends is the search DTO's, and the params type it is handed carries all of it.
     const helpers = new Set<string>();

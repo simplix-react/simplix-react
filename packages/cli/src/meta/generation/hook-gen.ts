@@ -12,6 +12,7 @@ import {
   type EndpointEntity,
   type EndpointTarget,
   type FileImports,
+  dedupeByName,
 } from "./endpoint-gen.js";
 
 /** Directory the hook modules land in, relative to a generated package's meta output. */
@@ -82,7 +83,7 @@ function barrel(entities: EndpointEntity[]): string {
  */
 function rolesOf(entity: EndpointEntity): EntityHooks {
   const roles: Record<string, string> = {};
-  for (const target of entity.targets) {
+  for (const target of dedupeByName(entity.targets)) {
     if (roles[target.role] === undefined) roles[target.role] = target.name;
   }
   return { tag: entity.tag, entity: entity.entity, roles };
