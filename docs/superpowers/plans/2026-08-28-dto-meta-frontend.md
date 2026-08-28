@@ -1019,6 +1019,32 @@ repointed.
   `OrganizationUpdateDTO[]` and not a single DTO. Map it through the same container rules the
   response uses; treating `request.body` as a type name is the defect Task 0 exists to remove.
 
+  **Both hook shapes, measured from `domain-org`.** Match them exactly — the generated widgets
+  call them positionally and `adaptOrval*` unwraps their results:
+
+  ```ts
+  // query — path params first, then options, then an optional client
+  export function useGetOrganization<TData, TError>(
+    orgId: string,
+    options?: { query?: Partial<UseQueryOptions<…>>, request?: SecondParameter<typeof customFetch> },
+    queryClient?: QueryClient,
+  ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+  // mutation — options only, variables carry the body under `data`
+  export const useCreateOrganization = <TError, TContext>(
+    options?: { mutation?: UseMutationOptions<…, { data: BodyType<OrganizationCreateDTO> }, TContext>,
+                request?: SecondParameter<typeof customFetch> },
+    queryClient?: QueryClient,
+  ): UseMutationResult<…, { data: BodyType<OrganizationCreateDTO> }, TContext>
+  ```
+
+  `form.hbs:75` relies on the query shape directly —
+  `useGetXForEdit(id, { query: { gcTime: 0 } })` — so a hook that takes its options anywhere else
+  silently ignores them and the edit form serves a cached record. The mutation's
+  `{ data: … }` wrapper is what `adaptOrvalCreate`/`adaptOrvalUpdate` build. The `queryKey`
+  property on the query result is orval's and **no application code reads it** (0 references), so
+  reproducing it is optional; the parameter positions are not.
+
   **A list hook has a second contract, enforced by nobody at compile time.** `adaptOrvalList`
   (`packages/headless/src/adapt-orval-list.ts:63`) is what every generated list screen wraps its
   hook in, and it does exactly this:
