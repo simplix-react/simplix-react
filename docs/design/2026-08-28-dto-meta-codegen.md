@@ -40,8 +40,15 @@ OpenAPI 문서는 Java DTO의 정보를 일부만 담는다. springdoc이 스키
 
 ## 3 · 백엔드 메타 엔드포인트
 
-`spring-boot-starter-simplix`가 `SimpliXMetaAutoConfiguration`으로
-`GET /api/v1/dev/meta/dto`를 등록한다. 지금 앱의 `common-dev` 모듈에 있는
+`spring-boot-starter-simplix`가 `SimpliXDevMetaAutoConfiguration`으로
+`SimpliXMetaDevController`를 등록하고, 그 컨트롤러가 `@RequestMapping("/dev/meta")` ·
+`@GetMapping("/dto")`로 응답한다. 반환형은 `SimpliXApiResponse<DtoMeta>`라 **IR이 응답 봉투에
+싸여 온다** — CLI가 벗겨서 읽는다.
+
+**`/api/v1` 접두는 프레임워크가 아니라 애플리케이션이 정한다**(smart-safety의
+`api.version.prefix`). CLI 플러그인이 완전 경로를 상수로 쥐는 것은 i18n 엔드포인트가 이미 그렇게
+하는 기존 방식과 같다(`I18N_ENDPOINT = "/api/v1/dev/i18n/messages"`). 접두가 다른 앱에서는 두
+엔드포인트가 함께 어긋나므로, 새로 생긴 결합이 아니라 이미 있던 조건이다. 지금 앱의 `common-dev` 모듈에 있는
 `/api/v1/dev/i18n/messages`도 §7에서 프레임워크로 올라오므로, **두 dev 엔드포인트가 같은
 자동 구성 아래 나란히 선다** — CLI 플러그인이 전제하던 i18n 경로 규약이 앱의 관례에서
 프레임워크의 보증으로 바뀐다. 앱의 보안 설정이 개발 프로파일에서 `/api/v1/dev/**`를 허용하는
