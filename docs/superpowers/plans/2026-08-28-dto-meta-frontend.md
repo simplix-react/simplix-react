@@ -1077,12 +1077,26 @@ repointed.
   | `summary` | | `operation.summary` |
   | `description` | | absent from the IR — pass `undefined` |
   | `responseType` | | the innermost `ref` name inside `operation.response` |
-  | `requestType` | | the `ref` name inside `request.body` (a `TypeRef` after Task 0) | Names come from route and verb in almost every
-  case; `operationId` is only the last-resort fallback (`naming.ts:340`), which is why the IR's
-  `id` must equal the OpenAPI `operationId` — the backend derives it with the same
-  controller-name strip order as `OperationIdCustomizer`, so `EquipmentInspectionRestController`
-  yields `EquipmentInspectionRest_override` on both sides. If you find an id that does not match
-  the OpenAPI document, report it rather than papering over it in the naming call.
+  | `requestType` | | the `ref` name inside `request.body` (a `TypeRef` after Task 0) | **Measured, `simplixBootNaming.resolveOperation` reads exactly six members** — `tag`,
+  `pathParams`, `operationId`, `path`, `method`, `entityName` — and all six come from the IR.
+
+  Two of those were verified against the fixture, because hook-name parity is an error-level
+  requirement (spec §11) and these are what actually decide it:
+
+  - **`pathParams` is used only for its length** (`naming.ts:195`, `:293` — `.length > 0` and
+    `.length === 1` decide `delete` against a sub-resource action). The IR's `request.path` matches
+    the `{param}` occurrences in the path string for **all 694 operations**, none missing, none
+    extra — so the count the strategy branches on is reproduced exactly.
+  - **`operationId` is the final fallback and nothing else** (`naming.ts:340`, one branch, reached
+    only when every route pattern misses). It fires **zero times** across the application's 13
+    domains: their `crud.config.ts` files hold 122 role kinds and every one is a camelCase name
+    derived from route and verb, none a raw id.
+
+  So an id mismatch will not move a hook name here. It still matters for `meta-diff`, which pairs
+  operations by id, and the backend derives it with the same controller-name strip order as
+  `OperationIdCustomizer` (`EquipmentInspectionRestController` → `EquipmentInspectionRest_override`
+  on both sides). Report a mismatch; do not go looking there first when a hook name is wrong —
+  check `path`, `method` and the entity grouping, which is what the strategy actually reads.
 
   **Query keys — measured, and NOT built from the URL builder.** Orval emits a separate key
   function whose first element is the **bare path with no query string**, with the params object
