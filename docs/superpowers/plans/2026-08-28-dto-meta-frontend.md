@@ -493,14 +493,22 @@ git commit -m "feat(boot-utils): type the labeled enum wire shape"
 ### Task 4: Container mapping in the boot CLI plugin
 
 **Files:**
-- Modify: `packages/cli/src/openapi/orchestration/spec-profile.ts` — add the meta fields to `SpecProfile`
+- Modify: `packages/cli/src/openapi/orchestration/spec-profile.ts` — add the meta fields to `SpecProfile`, and the `ContainerMapping` / `MetaExtensionOutput` interfaces themselves
+- Modify: `packages/cli/src/index.ts` — re-export both types from the barrel
 - Modify: `extensions/simplix-boot/packages/cli-plugin/src/index.ts` — register them
-- Create: `extensions/simplix-boot/packages/cli-plugin/src/container-types.ts`
+- Create: `extensions/simplix-boot/packages/cli-plugin/src/container-types.ts` — the boot values only
 - Test: `extensions/simplix-boot/packages/cli-plugin/src/__tests__/container-types.test.ts`
+
+**The interfaces live in the CLI, the values in the plugin.** The plugin depends on
+`@simplix-react/cli`, so a type `SpecProfile` references cannot be declared in the plugin — the
+dependency runs the other way. `spec-profile.ts` already sets the precedent with `I18nEntityInfo`
+and `I18nDownloader`: declared there, re-exported from the barrel, imported by the plugin.
 
 The IR names containers by their JAVA names; which TypeScript type each becomes is the profile's decision (spec §4.1). Measured usage: `SimpliXApiResponse` 648, `List` 405, `Page` 93, `Map` 74 — those four and no others.
 
 - [ ] **Step 1: Write the mapping**
+
+Declared in `spec-profile.ts` (see above), not in the plugin:
 
 ```ts
 export interface ContainerMapping {
@@ -515,7 +523,11 @@ export interface ContainerMapping {
   /** For `Map`: the key type, which the IR does not carry. */
   keyType?: string;
 }
+```
 
+And in the plugin's `container-types.ts`, importing that type from `@simplix-react/cli`:
+
+```ts
 export const bootContainerTypes: Record<string, ContainerMapping> = {
   // src/mutator.ts unwraps the envelope, so React Query's `data` is already the body.
   SimpliXApiResponse: { unwrap: true },
