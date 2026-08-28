@@ -222,6 +222,10 @@ export const openapiCommand = new Command("openapi")
       }
     }
 
+    /** What the meta half would seed, for merging into a preserved seed module below. */
+
+
+
     // 7. Prepare the DTO meta pipeline, which runs beside Orval for every domain below
     let meta: MetaContext | undefined;
     try {
@@ -237,6 +241,10 @@ export const openapiCommand = new Command("openapi")
       log.error(err instanceof Error ? err.message : String(err));
       process.exit(1);
     }
+
+    /** What the meta half would seed, for merging into the preserved seed module below. */
+
+
 
     if (meta) {
       reportMetaResolution(meta.resolved);
@@ -680,6 +688,9 @@ async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
     // 10. Generate mock files (with optional responseAdapter for envelope wrapping)
     await generateMockFiles(targetDir, domainName, entities, responseAdapter);
 
+    /** What the meta half would seed, for merging into the preserved seed module below. */
+    let metaSeeds = "";
+
     // 10b. Generate the DTO meta output beside the Orval one
     const metaExported =
       opts.meta !== undefined && metaDomain !== undefined && opts.meta.exportDomains.has(domainName);
@@ -705,14 +716,24 @@ async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
 
       for (const warning of written.warnings) log.warn(`DTO meta: ${warning}`);
       log.info(`${domainPkgName}: wrote ${written.written.length} file(s) to ${META_DIR}/.`);
+      metaSeeds = written.seeds;
     }
 
     // 11. Generate or update schemas proxy (preserve custom overrides)
     if (metaExported) {
       await writeMetaSchemasProxy(targetDir);
-      // The seed module is written once and never overwritten, so a swapped domain keeps it
-      // naming `../generated/`. The entry beside it is rewritten from the meta output.
-      await repointMockSeeds(targetDir);
+      // The seed module is written once and never overwritten, so a swapped domain keeps the
+      // arrays the OpenAPI half generated while the entry beside it wires the meta stores.
+      const seeds = await repointMockSeeds(targetDir, metaSeeds);
+      for (const name of seeds.added) {
+        log.info(`DTO meta: seeded ${name} in src/mock/seeds.ts, which the entry now wires.`);
+      }
+      for (const one of seeds.retyped) {
+        log.warn(
+          `DTO meta: ${one.name} is typed ${one.to} rather than ${one.from} — the rows under it ` +
+            "were written against the other shape.",
+        );
+      }
     } else {
       await generateSchemasProxy(targetDir);
     }

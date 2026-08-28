@@ -61,6 +61,8 @@ export interface WriteMetaResult {
   written: string[];
   /** Role → hook name per entity, which is the shape `crud.config.ts` is keyed by. */
   entities: EntityHooks[];
+  /** What a seed module would hold if it were written fresh, for merging into a preserved one. */
+  seeds: string;
   /** What a generator could not answer, for the caller to report. */
   warnings: string[];
 }
@@ -137,6 +139,8 @@ export async function writeMetaOutput(options: WriteMetaOptions): Promise<WriteM
   return {
     written,
     entities: hooks.entities,
+    /** What a seed module would hold if it were written fresh, for merging into a preserved one. */
+    seeds: mock.seeds,
     warnings: collectWarnings({ model, schema, endpoints, search, access, mock }),
   };
 }
@@ -165,24 +169,76 @@ export function metaIndexContent(importTranslations: boolean): string {
 /** The meta output as `src/mock/` addresses it, one level below the package's own barrel. */
 const MOCK_META_MODULE = `../${META_DIR.slice(META_DIR.lastIndexOf("/") + 1)}`;
 
+/** One `export const <name>: <Type>[] = […];` of a seed module. */
+interface SeedArray {
+  name: string;
+  type: string;
+  text: string;
+}
+
+const SEED_ARRAY = /export const (\w+): (\w+)\[\] = \[[\s\S]*?\n\];\n/g;
+
+function seedArraysOf(source: string): SeedArray[] {
+  return [...source.matchAll(SEED_ARRAY)].map((one) => ({
+    name: one[1],
+    type: one[2],
+    text: one[0],
+  }));
+}
+
 /**
- * Point the seed module at the meta output, for the same reason and with the same caveat: the file
- * is generated once and preserved, so a domain that switches keeps whatever import it was born
- * with unless this moves it.
+ * Bring a preserved seed module up to what the meta entry wires, without discarding what somebody
+ * typed into it.
+ *
+ * The file is written once and never overwritten, so a domain that switches keeps the arrays the
+ * OpenAPI half generated — and the meta entry names stores that half never had. It also keeps that
+ * half's reading of which DTO a store carries, which is not always the same one.
+ *
+ * So: every existing array is kept, retyped where the two halves name different DTOs; every array
+ * the entry needs and the file lacks is appended with generated data; and the import moves to the
+ * meta model barrel. A retype is returned rather than applied silently — the rows underneath it
+ * were written against the other shape.
  */
-export async function repointMockSeeds(targetDir: string): Promise<boolean> {
+export async function repointMockSeeds(
+  targetDir: string,
+  generated: string,
+): Promise<{ moved: boolean; added: string[]; retyped: Array<{ name: string; from: string; to: string }> }> {
   const seedsPath = join(targetDir, "src/mock/seeds.ts");
-  if (!(await pathExists(seedsPath))) return false;
+  const unchanged = { moved: false, added: [], retyped: [] };
+  if (!(await pathExists(seedsPath))) return unchanged;
 
   const existing = await readFile(seedsPath, "utf-8");
-  const repointed = existing.replace(
-    /(["'])\.\.\/generated\/model\1/g,
-    `$1${MOCK_META_MODULE}/model$1`,
-  );
-  if (repointed === existing) return false;
+  const wanted = new Map(seedArraysOf(generated).map((one) => [one.name, one]));
+  const held = seedArraysOf(existing);
+  const heldNames = new Set(held.map((one) => one.name));
 
-  await writeFileWithDir(seedsPath, repointed);
-  return true;
+  const retyped: Array<{ name: string; from: string; to: string }> = [];
+  let body = existing;
+  for (const one of held) {
+    const target = wanted.get(one.name);
+    if (target === undefined || target.type === one.type) continue;
+    retyped.push({ name: one.name, from: one.type, to: target.type });
+    body = body.replace(
+      `export const ${one.name}: ${one.type}[] = [`,
+      `export const ${one.name}: ${target.type}[] = [`,
+    );
+  }
+
+  const missing = [...wanted.values()].filter((one) => !heldNames.has(one.name));
+  if (missing.length > 0) {
+    body = `${body.trimEnd()}\n\n${missing.map((one) => one.text).join("\n")}`;
+  }
+
+  // Whatever the arrays now name, taken from the meta barrel.
+  const types = [...new Set(seedArraysOf(body).map((one) => one.type))].sort();
+  body = body.replace(
+    /import type \{[^}]*\} from ["'][^"']*\/model["'];/,
+    `import type { ${types.join(", ")} } from "${MOCK_META_MODULE}/model";`,
+  );
+
+  if (body === existing) return unchanged;
+  await writeFileWithDir(seedsPath, body);
+  return { moved: true, added: missing.map((one) => one.name), retyped };
 }
 
 export async function writeMetaSchemasProxy(targetDir: string): Promise<void> {

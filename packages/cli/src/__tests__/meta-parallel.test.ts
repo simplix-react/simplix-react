@@ -205,14 +205,14 @@ describe("the meta output lands in src/generated-meta/", () => {
       'import type { PetDTO } from "../generated/model";\nexport const petSeeds: PetDTO[] = [];\n',
     );
 
-    expect(await repointMockSeeds(dir)).toBe(true);
+    expect((await repointMockSeeds(dir, "")).moved).toBe(true);
 
     expect(await readFile(join(dir, "src/mock/seeds.ts"), "utf-8")).toContain(
       'from "../generated-meta/model"',
     );
 
     // Idempotent: a second run finds nothing left to move.
-    expect(await repointMockSeeds(dir)).toBe(false);
+    expect((await repointMockSeeds(dir, "")).moved).toBe(false);
     await rm(dir, { recursive: true, force: true });
   });
 
