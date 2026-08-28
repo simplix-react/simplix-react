@@ -174,9 +174,9 @@ it("every request body is a TypeRef, not a bare type name", () => {
   the two junk entries `List` and `Set` that `registry.register(raw)` had filed as DTOs.
 
   That absence has a consumer. `orderField` — the property a reorder writes — is read from the
-  order operation's request body element (`scaffold-crud.ts:1694`,
+  order operation's request body element (`scaffold-crud.ts:1707`,
   `bodySchema.items.properties`, taking the first key that is neither `id` nor the row id), and
-  `treeSortOrderField` falls back to it (`:1789`). With the element type missing, none of the 11
+  `treeSortOrderField` falls back to it (`:1802`). With the element type missing, none of the 11
   reorder-capable entities can derive it. After the re-capture, assert that
   `PATCH /api/v1/admin/org/order`'s body resolves to a `List` of a named DTO and that the DTO is in
   `types`.
@@ -737,7 +737,7 @@ git commit -m "feat(cli): resolve the IR into per-domain type closures"
     projection returns, and `:1856` reads the result: `listDtoFields ? fields.filter(...) : fields`.
     Return `null` and **every field of the form DTO becomes a list column**, including ones the
     list response never carries — columns that render `undefined` forever. Enum badges lose their
-    type name at the same time (`:1851`). One file per type, named the way that function looks for
+    type name at the same time (`:1864`). One file per type, named the way that function looks for
     it, keeps this working; a `model/<entity>.ts` holding several interfaces does not.
 
     One type per file also makes the single-owner rule (Task 5) trivial: a type reachable from two
@@ -857,7 +857,7 @@ This is where the project's original complaint is answered: 440 `maxLength` and 
   `\w*<entity>\w*[Ss]chema\s*=\s*z.object` or an orval `…Body`/`…Response` constant
   (`findSchemaFile`, `:569`). A plain `schema/<entity>.ts` matches **none of the four names**, and
   the repointed `schemas.ts` is an `export *` barrel with no `z.object(` in it — so after the swap
-  `findSchemaFile` returns `null`, the scaffold takes its `else` branch (`:1631`) and generates the
+  `findSchemaFile` returns `null`, the scaffold takes its `else` branch (`:1644`) and generates the
   widget set from `PLACEHOLDER_FIELDS`, **with a spinner message and no warning**. `simplix scaffold`
   would appear to succeed on every migrated domain while emitting an `id`/`name` form.
 
@@ -1336,7 +1336,7 @@ each per entity, plus their directory barrels (spec §9).
 already declared unconsumed below (the constants exist; adopting them is the user's call). `search/`
 is the same kind of artifact: metadata exported through the barrel for a hand-written screen to
 import. The **scaffold** gets its filters from the IR source in Task 13, at
-`parseFilterParams`'s call site (`scaffold-crud.ts:1685`), not from this file.
+`parseFilterParams`'s call site (`scaffold-crud.ts:1698`), not from this file.
 
 So implement the operator translation, the range rules, the field-type-driven component choice and
 the empty-facet reroute **once**, in the shared IR source Task 13 builds, and have `search-gen`
@@ -1389,14 +1389,14 @@ operator table (Step 1b) is wrong, and the diff will say which member moved.
 
   **This generator does not decide presentation.** `maxBadges={3}` lives in
   `templates/ui/list.hbs:78` and the `toggle` / `faceted` choice in
-  `scaffold-crud.ts:1746-1749` — both are scaffold output in the app's module code, not domain
+  `scaffold-crud.ts:1759-1749` — both are scaffold output in the app's module code, not domain
   package output. Emit the metadata those two already consume (Task 13) and change neither rule.
 
 - [ ] **Step 1b: Translate the operator vocabulary — the two sides do not use the same names.**
 
   The IR reports searchable-jpa's own operator names. The frontend's `SearchOperator`
   (`packages/headless/src/filter-types.ts:2`) has keys that are mostly but **not always** the same
-  string, and `scaffold-crud.ts`'s `SUFFIX_TO_ENUM_KEY` (`:1273`) covers only part of the set. An
+  string, and `scaffold-crud.ts`'s `SUFFIX_TO_ENUM_KEY` (`:1286`) covers only part of the set. An
   identity lookup silently yields `undefined`. Measured over the fixture:
 
   | IR operator | pairs | framework enum key | `SUFFIX_TO_ENUM_KEY` |
@@ -1418,7 +1418,7 @@ operator table (Step 1b) is wrong, and the diff will say which member moved.
   1. **254 pairs miss, and the miss is silently substituted rather than left empty.** They are the
      range bounds, so date and number range filters are what breaks. The lookup that consumes the
      result already has a fallback — `SUFFIX_TO_ENUM_KEY[f.operator] ?? "GREATER_THAN_OR_EQUAL"`
-     (`scaffold-crud.ts:1741`) — so a wrong name does not produce `undefined` or a compile error:
+     (`scaffold-crud.ts:1754`) — so a wrong name does not produce `undefined` or a compile error:
      it produces **`greaterThanOrEqualTo` for every unmatched operator**, and a `lessThanOrEqualTo`
      filter silently queries the other direction. Write an explicit IR-name → `SearchOperator`
      table, make it **exhaustive over the enum**, and **throw** on an unmatched name rather than
@@ -1433,16 +1433,16 @@ operator table (Step 1b) is wrong, and the diff will say which member moved.
   new keys are suffixes that path never produced.
 
 - [ ] **Step 1bb: The filter's *kind* comes from the field's type, which is a second input the
-  plan has not named.** `parseFilterParams(queryParams, entityFields)` (`scaffold-crud.ts:1294`)
+  plan has not named.** `parseFilterParams(queryParams, entityFields)` (`scaffold-crud.ts:1307`)
   takes two lists, and the operators decide only the operator; **the component is chosen from
   `entityField`** in five places:
 
   | Decision | orval reads | IR carries |
   | --- | --- | --- |
-  | toggle (`:1333`) | `entityField.type === "boolean"` | `kind === "boolean"` |
-  | faceted options (`:1386`, `:1464`) | `entityField.enum` (a `string[]`) | `enums[TypeRef.name].values[].name` |
-  | date range (`:1394`) | `format === "date-time"` / `"date"` | `kind ∈ {instant, date, time}` — Step 1c |
-  | number (`:1419`) | `type`/`format` numeric | `kind === "number"` |
+  | toggle (`:1346`) | `entityField.type === "boolean"` | `kind === "boolean"` |
+  | faceted options (`:1399`, `:1464`) | `entityField.enum` (a `string[]`) | `enums[TypeRef.name].values[].name` |
+  | date range (`:1407`) | `format === "date-time"` / `"date"` | `kind ∈ {instant, date, time}` — Step 1c |
+  | number (`:1432`) | `type`/`format` numeric | `kind === "number"` |
 
   So the IR source must hand the scaffold a type-carrying field list for the **`searchDto`**, not
   just the operator lists. Measured across the fixture's 57 distinct search DTOs, their searchable
@@ -1452,7 +1452,7 @@ operator table (Step 1b) is wrong, and the diff will say which member moved.
   `string[]` shape `entityField.enum` has.
 
 - [ ] **Step 1bc: A faceted filter with no options is worse than a text filter — the IR can tell
-  them apart.** `parseFilterParams`'s Rule 2c (`scaffold-crud.ts:1378`) makes **any** field with an
+  them apart.** `parseFilterParams`'s Rule 2c (`scaffold-crud.ts:1391`) makes **any** field with an
   `.in` parameter a `FacetedFilter` and fills `options` from `entityField?.enum`, which is
   `undefined` unless the field is an enum. The rule fires before the enum check of Rule 6, so the
   type is never consulted.
@@ -1474,7 +1474,7 @@ operator table (Step 1b) is wrong, and the diff will say which member moved.
 
   `parseFilterParams` decides a date field with
   `format === "date-time" || baseField.endsWith("At") || endsWith("Date") || endsWith("Time")`
-  (`scaffold-crud.ts:1393`) and then pairs `greaterThanOrEqualTo` with `lessThanOrEqualTo` into a
+  (`scaffold-crud.ts:1406`) and then pairs `greaterThanOrEqualTo` with `lessThanOrEqualTo` into a
   `DateRangeFilter`. Both halves are worth replacing, and the fixture says why:
 
   | Measured | |
@@ -1492,7 +1492,7 @@ operator table (Step 1b) is wrong, and the diff will say which member moved.
 
   - **Decide by `TypeRef.kind ∈ {instant, date}`.** One `number` field also carries range
     operators, so a range filter is not automatically temporal.
-  **`parseFilterParams` has seven rules and no fallback** (`scaffold-crud.ts:1477` ends the loop),
+  **`parseFilterParams` has seven rules and no fallback** (`scaffold-crud.ts:1490` ends the loop),
   so a field matching none of them yields **no filter at all**. Measured over the fixture's 1,118
   searchable fields, **104 fall through**:
 
@@ -1979,7 +1979,7 @@ precedent to follow.
 
   **It decides the widget's shape, not just its hook names, and its absence fails open.**
   `EntityOperations` — the six booleans that gate the generated create button, edit affordance,
-  delete action and tree view — is built straight from the file (`scaffold-crud.ts:707`:
+  delete action and tree view — is built straight from the file (`scaffold-crud.ts:720`:
   `hasList: !!crudConfig.list`, and so on). With no `crud.config.ts` the scaffold substitutes
   **all true except `hasTree`** (`:695`). Measured against the fixture, that default is wrong for
   most entities:
@@ -2124,7 +2124,7 @@ precedent to follow.
   `newHeader`, `detailHeader`, `title`, `description`, `editor`, `editorPlaceholder`,
   `editDescription`, `yes`, `no`.
 
-  **`updateLocaleJsons` (`scaffold-crud.ts:1055`) does write them**, gated on `EntityOperations` —
+  **`updateLocaleJsons` (`scaffold-crud.ts:1068`) does write them**, gated on `EntityOperations` —
   the delete trio only when `hasDelete`, `<x>Detail`/`notFound`/`detailHeader` only when `hasGet`,
   and so on. Two guards make it skip silently, and both matter here:
 
@@ -2419,14 +2419,14 @@ no Body schema"), and that response is the same DTO `modelType` already names (T
 
 The last row matters because of what happens otherwise: with an empty field list the scaffold
 substitutes `PLACEHOLDER_FIELDS` — an `id`/`name` pair — and one of its two call sites
-(`scaffold-crud.ts:1632`) does it with a spinner message and **no warning at all**. A widget set
+(`scaffold-crud.ts:1645`) does it with a spinner message and **no warning at all**. A widget set
 built on two invented fields looks like a successful scaffold. The eight are `exportDownload`,
 `avatar`, `content`, `userPermission`, `passwordWebController`, `simpliXAuthLoginController`,
 `scalarController` and `backoffice` — binary or dev surfaces, most in unmatched tags — so refusing
 them loudly costs nothing.
 
 - [ ] **Step 1: Write the IR source.** Fill the same contracts the scaffold already uses —
-`FieldInfo` (`scaffold-crud.ts:29`), `EntityOperations` (`:632`), `FilterFieldInfo` (`:1243`) —
+`FieldInfo` (`scaffold-crud.ts:29`), `EntityOperations` (`:632`), `FilterFieldInfo` (`:1256`) —
 from the IR instead of from text.
 
 **Carry the temporal kind onto the column as `format` — the template never sets it.**
@@ -2471,7 +2471,7 @@ the flag through and emit `sortable` only when it is true. (This is also what ke
 operator-less sort keys from Step 1c useful: they filter nothing but they do sort.)
 
 **Pick the tree's display field from the i18n pairing, not from field order.** A tree node's label
-comes from `treeDisplayNameField` (`scaffold-crud.ts:1793`): a field literally named `name`,
+comes from `treeDisplayNameField` (`scaffold-crud.ts:1806`): a field literally named `name`,
 `title`, `label` or `displayName`, else **the first string field** that is not the row id or the
 parent id, else the literal `"name"`. Neither tree entity in the fixture has a field with one of
 those four names, so both fall to the positional rule and both land wrong:
@@ -2487,7 +2487,7 @@ human-facing text by construction** — that rule yields `orgName` and `areaName
 the four common names, then the i18n-paired field, then the positional fallback.
 
 **The same rule governs `displayNameField`, which is not tree-specific and reaches further.**
-`scaffold-crud.ts:1765` derives it for **every** entity by the same four-names-then-first-string
+`scaffold-crud.ts:1778` derives it for **every** entity by the same four-names-then-first-string
 test, excluding only the row id, and `crud-page.hbs:167` spends it on the delete confirmation:
 `requestDelete({ id: row.<rowIdField>, name: String(row.<displayNameField> ?? "") })`. Measured
 over the DTOs that carry an i18n pair: **28 of 41 pick something other than the paired field** —
@@ -2504,7 +2504,7 @@ translated badge only when it can name its enum: `list.hbs:248` emits
 `enumName="{{enumTypeName}}"`, and `enumLabel(enumName, value)` resolves
 `enums.<enumName>.<value>` (`use-entity-translation.ts:51`). The scaffold fills `enumTypeName` by
 reading the **declared type text** out of the list DTO's model file and keeping it only if it looks
-like a bare PascalCase identifier (`withEnumType`, `scaffold-crud.ts:1851`).
+like a bare PascalCase identifier (`withEnumType`, `scaffold-crud.ts:1864`).
 
 That breaks on the meta output. A labeled enum's response field is typed `AreaKindLabeled`, not
 `AreaKind` (Task 6), so the declared text yields `enumName="AreaKindLabeled"`, the lookup asks for
@@ -2548,10 +2548,10 @@ never from the rendered type. That also survives `listDtoFields` being unavailab
    third site needing the IR's enum name.
 
 **The mutation path parameters are a fifth read of `src/generated/`, and both fail badly without
-it.** `findMutationPathParam` (`scaffold-crud.ts:1176`) scans
+it.** `findMutationPathParam` (`scaffold-crud.ts:1189`) scans
 `packages/*/src/generated/endpoints` for `get<Op>MutationOptions` to learn which path parameter a
 mutation takes. `updatePathParam` is `null` when it finds nothing, and `deletePathParam` falls back
-to `` `${entity}Id` `` (`:1675`). Both reach the templates directly:
+to `` `${entity}Id` `` (`:1688`). Both reach the templates directly:
 
 ```jsx
 deleteMutation: adaptOrvalDelete(useDeleteX(), "{{deletePathParam}}", { onSettled: invalidate })
@@ -2568,7 +2568,7 @@ The IR states both directly: the `delete`- and `update`-role operations' `reques
 Take the last one, as the naming strategy does.
 
 **`entityPath` is a fourth snapshot read, and its fallback is wrong for every entity but one.**
-`scaffold-crud.ts:1879` sets `entityPath: extractedEntity?.path ?? \`/api/v1/${entity}\``, and the
+`scaffold-crud.ts:1892` sets `entityPath: extractedEntity?.path ?? \`/api/v1/${entity}\``, and the
 generated form spends it on `useInvalidateEntity("{{entityPath}}")` (`form.hbs:95`) — the prefix
 matched against `queryKey[0]` (Task 8). Measured, the common path of an entity's operations equals
 `/api/v1/<entity>` for **1 of the fixture's 139**: the real ones are
@@ -2583,9 +2583,9 @@ or the meta output is generated and never consumed:
 
 | Call site | Reads today | Feeds |
 | --- | --- | --- |
-| `findSchemaFile` (`:1608`) | a `*.zod.ts` / `schemas.ts` file's text | the form's `FieldInfo` |
-| `parseFilterParams(extractedEntity.queryParams, extractedEntity.fields)` (`:1685`) | `.openapi-snapshot.json` | every filter |
-| `extractedEntity.operations.find(o => o.role === "get")` (`:1681`) | `.openapi-snapshot.json` | **`rowIdField`** |
+| `findSchemaFile` (`:1621`) | a `*.zod.ts` / `schemas.ts` file's text | the form's `FieldInfo` |
+| `parseFilterParams(extractedEntity.queryParams, extractedEntity.fields)` (`:1698`) | `.openapi-snapshot.json` | every filter |
+| `extractedEntity.operations.find(o => o.role === "get")` (`:1694`) | `.openapi-snapshot.json` | **`rowIdField`** |
 
 The second is why Task 9's search generator does nothing on its own: the scaffold takes its filters
 from the OpenAPI snapshot, so unless this call is repointed the IR's operator lists are written and
@@ -2706,7 +2706,7 @@ pairing by name in the test.
 **What a failed pairing actually costs, traced through the form.** `detectI18nFieldPairs` sets
 `baseFieldName` on the map field and `isI18nPair` on the plain one, and both drive `form.hbs`:
 
-- `scaffold-crud.ts:1918` collects `i18nFieldPairs` from `baseFieldName` and `:1921` sets
+- `scaffold-crud.ts:1931` collects `i18nFieldPairs` from `baseFieldName` and `:1921` sets
   `hasI18nFields`. The template then emits `i18nFields: { orgNameI18n: "orgName" }` into
   `useCrudFormSubmit` (`form.hbs:124`), which is what populates the plain field before submit —
   `applyI18nFallback(values.orgNameI18n, locales)`, the first non-empty locale value, else `""`.
