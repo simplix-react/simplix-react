@@ -666,10 +666,21 @@ git commit -m "feat(cli): resolve the IR into per-domain type closures"
 - Test: `packages/cli/src/__tests__/meta-model-gen.test.ts`
 
 - [ ] **Step 1: Write it.** For one domain, emit:
-  - `model/<entity>.ts` — one `export interface` per type, `extends` where the IR says so, **own
-    fields only**. A type reachable from two entities is written into its **owner's** file alone
-    (Task 5) — spec §5.1 forbids declaring the same type twice, and `export *` from the directory
-    barrel would collide on the 33 shared types
+  - `model/<typeName>.ts` — **one file per type, camelCase, exactly as orval names them**
+    (`organizationListDTO.ts`); one `export interface` in each, `extends` where the IR says so,
+    **own fields only**.
+
+    **The file name is load-bearing.** `readListDtoFieldNames` (`scaffold-crud.ts:541`) opens
+    `src/generated/model/<camelCase type>.ts` by that exact path to learn which fields the list
+    projection returns, and `:1856` reads the result: `listDtoFields ? fields.filter(...) : fields`.
+    Return `null` and **every field of the form DTO becomes a list column**, including ones the
+    list response never carries — columns that render `undefined` forever. Enum badges lose their
+    type name at the same time (`:1851`). One file per type, named the way that function looks for
+    it, keeps this working; a `model/<entity>.ts` holding several interfaces does not.
+
+    One type per file also makes the single-owner rule (Task 5) trivial: a type reachable from two
+    entities has exactly one file, so `export *` from the directory barrel cannot collide on the
+    33 shared types
   - `model/_enums.ts` — the exact declaration-merge shape orval emits, so a module that imports
     the name as a **value** keeps working.
 
@@ -1755,7 +1766,8 @@ precedent to follow.
   happens and nothing is written; that is the boot profile's case today.
 
   Emit a per-directory `index.ts` in `model/`, `endpoints/`, `hooks/`, `search/` and `access/`,
-  each re-exporting that directory's entity files. `model/index.ts` makes `export * from "./model"`
+  each re-exporting that directory's files — `model/index.ts` re-exports one line per type, the
+  others one per entity. `model/index.ts` makes `export * from "./model"`
   resolve the way orval's `generated/model/index.ts` does; `endpoints/index.ts` and
   `hooks/index.ts` are what Step 3's stub layer points at, since the entity partition does not
   match orval's per-tag one. Emit `schema/index.ts` too — `schemas.ts` needs a single path to

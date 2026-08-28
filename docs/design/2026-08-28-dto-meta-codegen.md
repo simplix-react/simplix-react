@@ -446,7 +446,10 @@ IR의 `operations[].tag`가 그 패턴에 걸린다.
 packages/domain-<name>/src/
   generated/                    orval 산출물 — 변경하지 않는다
   generated-meta/
-    model/<entity>.ts           Create · Update · Detail · List 인터페이스
+    model/<typeName>.ts         타입마다 파일 하나, orval과 같은 camelCase 이름.
+                                스캐폴드가 `src/generated/model/<camelCase>.ts` 경로로 목록 DTO의
+                                필드를 읽어 컬럼을 제한하므로, 한 파일에 여러 인터페이스를 담으면
+                                그 제한이 풀려 폼의 모든 필드가 컬럼이 된다
     model/_enums.ts             이 도메인 열거형의 별칭과 값 목록
     schema/<entity>.schema.ts   zod 스키마 — 타입마다 <TypeName>Schema, 상속은 .extend().
                                 파일 이름의 `.schema.ts`는 스캐폴드의 탐색 규칙이 찾는 네 이름
