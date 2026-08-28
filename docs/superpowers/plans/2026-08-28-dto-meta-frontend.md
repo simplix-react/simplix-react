@@ -27,7 +27,7 @@ The backend half of this project is finished and a real IR was captured from the
 | enums | 133 (122 labeled, 11 not — see Task 6) |
 | enum values | 540, of which 498 carry a `labelKey`. **`labeled` and `labelKey` coincide exactly**: the 11 enums whose values lack a `labelKey` are the same 11 that are unlabeled, and no labeled enum is missing one. Generators may rely on that. |
 | containers in use | `SimpliXApiResponse` 648 · `List` 405 · `Page` 93 · `Map` 74 |
-| field kinds — **counting every `TypeRef` node**, container arguments included (6,501) | `string` 3110 · `number` 936 · `instant` 682 · `boolean` 593 · `enum` 541 · `container` 279 · `date` 202 · `ref` 134 · `time` 10 · `unknown` 8 · `param` 6 |
+| field kinds — **counting every `TypeRef` node** of a field, container arguments included (6,523) | `string` 3121 · `number` 947 · `instant` 682 · `boolean` 593 · `enum` 541 · `container` 279 · `date` 202 · `ref` 134 · `time` 10 · `unknown` 8 · `param` 6 |
 | field kinds — **one per field** (6,244) | `string` 2973 · `number` 946 · `instant` 682 · `boolean` 593 · `enum` 523 · `container` 278 · `date` 200 · `ref` 38 · `time` 10 · `param` 1 |
 | constraints (720 on 561 fields) | `maxLength` 440 · `notBlank` 232 · `notEmpty` 11 · `pattern` 10 · `email` 7 · `min` 7 · `minLength` 5 · `max` 4 · `nonnegative` 2 · `positive` 1 · `maxItems` 1 · **`custom` 0** |
 | access kinds | `permission` 566 · `authenticated` 94 · `public` 29 · `expression` 5 |
@@ -53,8 +53,12 @@ the case by hand, saying in your report that the fixture does not cover it:
 
 Those numbers are the yardstick. A generator that silently drops a field kind will show up as a
 count that does not match — **use the row that matches what you are counting**: a test walking
-fields asserts against 6,222, one walking every `TypeRef` against 6,501. `unknown` and `param`
-never appear at the top level of a field, only inside a container argument.
+fields asserts against 6,244, one walking every `TypeRef` of a field against 6,523. Both rows
+count fields only; a walk that also visits `response`, `request.body` and the params reaches
+8,729 nodes and matches neither row. `unknown` never appears at the top level of a field, only
+inside a container argument; `param` does once — `SimpliXBaseEntity.id`, the generic id every
+entity inherits — so a generator must handle a bare type parameter in field position rather than
+assume it only ever shows up nested.
 
 **Every number here was measured against the capture that predates Task 0.** Re-run them after the
 re-capture; the request bodies change shape and the counts may move with them.
@@ -650,7 +654,7 @@ The generators need the IR sliced by domain and indexed. This task does that onc
 
   **Spec §5.1 requires that a type is never declared twice**, and the layout is one file per
   entity, so a type reachable from two entities in the same domain would be written into both and
-  collide at `export *`. Measured: **33 of the 646 types are reachable from more than one tag** —
+  collide at `export *`. Measured: **31 of the 646 types are reachable from more than one tag** —
   `SimpliXBaseEntity` and `BaseEntity` from 7 each, `JobPosition` 4, `UserAccount` and
   `Organization` 3. Resolve must therefore return, per domain, a **type → owning entity** map, and
   every generator writes a type only into its owner's file. Put a shared type in the entity that
@@ -719,7 +723,7 @@ git commit -m "feat(cli): resolve the IR into per-domain type closures"
 
     One type per file also makes the single-owner rule (Task 5) trivial: a type reachable from two
     entities has exactly one file, so `export *` from the directory barrel cannot collide on the
-    33 shared types
+    31 shared types
   - `model/_enums.ts` — the exact declaration-merge shape orval emits, so a module that imports
     the name as a **value** keeps working.
 
@@ -775,12 +779,12 @@ git commit -m "feat(cli): resolve the IR into per-domain type closures"
 
   A field is optional (`?`) exactly when `required` is false.
 
-  **Ignore `nullable` — it carries no information.** Measured over all 6,222 fields, the only two
-  combinations that occur are `(required: true, nullable: false)` 615 and
-  `(required: false, nullable: true)` 5,607. There is no `(true, true)` and no `(false, false)`, so
+  **Ignore `nullable` — it carries no information.** Measured over all 6,244 fields, the only two
+  combinations that occur are `(required: true, nullable: false)` 628 and
+  `(required: false, nullable: true)` 5,616. There is no `(true, true)` and no `(false, false)`, so
   `nullable === !required` everywhere. Emitting `| null` alongside `?` would give
   `field?: string | null` where orval gave `field?: string`, and `meta-diff` would report a field
-  type mismatch on 5,607 fields.
+  type mismatch on 5,616 fields.
 
 - [ ] **Step 2: Test against the real fixture.** Generate for a domain and assert: an `extends` type emits only its own fields; a **labeled** response enum field is the `Labeled` alias while the same enum in a request DTO is the union; an **unlabeled** enum is the plain union in the response too — assert `UserAccountDetailDTO.standing` by name and that no `UserAccountStandingLabeled` is emitted anywhere; no `SimpliXApiResponse` appears anywhere in the output; **no exported name appears in two files
 of one domain** — walk the emitted `model/` directory and assert the set of exported interface
@@ -816,7 +820,7 @@ git commit -m "feat(cli): generate TypeScript models from the IR"
 - Create: `packages/cli/src/meta/generation/schema-gen.ts`
 - Test: `packages/cli/src/__tests__/meta-schema-gen.test.ts`
 
-This is where the project's original complaint is answered: 440 `maxLength` and 221 `notBlank` constraints reach the client.
+This is where the project's original complaint is answered: 440 `maxLength` and 232 `notBlank` constraints reach the client.
 
 - [ ] **Step 1: Write it — one const per TYPE, and orval's names cannot be reproduced.**
 
@@ -894,7 +898,7 @@ This is where the project's original complaint is answered: 440 `maxLength` and 
   `keyType`. Measured on the installed `zod@4.3.6`: the one-argument form does not fail to
   validate, it **throws while the schema is being constructed** —
   `Cannot read properties of undefined (reading '_zod')` — so every domain holding one of the
-  fixture's 74 `Map` fields would crash on import rather than produce a bad type.
+  fixture's 48 `Map` fields would crash on import rather than produce a bad type.
 
   **Constraint mapping** (spec §5), applied on top of the base type: `notBlank`→`.trim().min(1)`;
   `notEmpty`→`.min(1)`; `minLength`/`maxLength`→`.min()`/`.max()`; `minItems`/`maxItems`→
@@ -981,7 +985,7 @@ This is where the project's original complaint is answered: 440 `maxLength` and 
   - an `instant` field accepts an ISO timestamp and rejects `"not a date"` — this is the
     orval-parity check; a plain `z.string()` would pass both and the test would catch it
   - a `date` field accepts `2026-08-28` and rejects a full timestamp
-  - **`custom` cannot be exercised against this fixture** — it holds 709 constraints and zero
+  - **`custom` cannot be exercised against this fixture** — it holds 720 constraints and zero
     `custom`, because the only custom validators in the application (`@UniqueFields` 3,
     `@ValidateWith` 1) sit on the DTO *class* and `ConstraintExtractor` reads properties.
     Test the branch with a hand-built `FieldMeta`, and say in your report that the fixture does
@@ -1182,7 +1186,7 @@ repointed.
   | --- | :---: | --- |
   | `operationId` | ✔ | `operation.id` |
   | `method` | ✔ | `operation.method` |
-  | `path` | ✔ | `operation.path` — **already in `{param}` form**, all 306 of them; the orval path's `:param` → `{param}` conversion is not needed |
+  | `path` | ✔ | `operation.path` — **already in `{param}` form**, all 311 of them; the orval path's `:param` → `{param}` conversion is not needed |
   | `entityName` | ✔ | `resolveEntityName` over the group (above) |
   | `pathParams` | ✔ | `request.path[].name` |
   | `queryParams` | ✔ | `request.query[].name` |
@@ -1639,7 +1643,7 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
      **`List` and `Map` are one IR kind and must not seed alike.** OpenAPI splits them — an array
      takes `generateArrayValue` (which defaults to `[]`, `:181`) and a map is `type: "object"` and
      is **omitted from the seed entirely** (`:81`). The IR calls both `container`, so a generator
-     that seeds every container as `[]` writes `[]` into the **74 `Map` fields**, 33 of them the
+     that seeds every container as `[]` writes `[]` into the **48 `Map` fields**, 38 of them the
      i18n maps, against a declared `Record<string, string>` — a type error in a file that is never
      regenerated. Seed `List` as `[]` and omit `Map`, matching what the orval path does today.
      `generateArrayValue`'s name heuristics (`tag`, `url`, `image`, `photo`) fire on **0** of the
@@ -1647,7 +1651,7 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
   1a. **Convert `{param}` to `:param` for the route pattern — the opposite of what Task 8 says.**
      `toMswPattern` only prefixes a `*` (`mock-generator.ts:737`); the `:param` form in the
      measured handler comes from `ExtractedOperation.path`, which the orval pipeline already
-     converted. **The IR's paths are in `{param}` form** — all 306 of them — so the mock generator
+     converted. **The IR's paths are in `{param}` form** — all 311 of them — so the mock generator
      must convert, while Task 8's `OperationContext` wants them left alone. Do not carry one
      decision into the other: an MSW pattern containing `{workPointId}` matches nothing, and every
      mocked request falls through to a server that is not running.
@@ -2071,7 +2075,7 @@ precedent to follow.
   and a `camelToLabel` entry for every enum value, into every locale. Step 13b then overlays the
   server's real translations on top, and `deepMerge` lets the overlay win — so the placeholder is
   what a field falls back to when the server has no message for it. Measured, **66% of the IR's
-  fields (4,138 of 6,222) carry neither `labelKey` nor `label`**, so the fallback is not a rare
+  fields (4,138 of 6,244) carry neither `labelKey` nor `label`**, so the fallback is not a rare
   path.
 
   Those entities come from the OpenAPI parse, so during coexistence they exist. A domain that never
@@ -2694,7 +2698,7 @@ what the orval path has to do. Labels come from `labelKey`.
 - [ ] **Step 2b: Wire the schema into the form, or the constraints reach nothing.**
 
   §1's second defect is that the client lets an empty string and an over-long value through, and
-  Task 7 fixes it by carrying 440 `maxLength` and 221 `notBlank` constraints into zod. **Nothing
+  Task 7 fixes it by carrying 440 `maxLength` and 232 `notBlank` constraints into zod. **Nothing
   consults those schemas today.** `form.hbs` renders fields and mutations and contains no
   `required`, no schema reference and no validator; `CrudForm` has no schema prop; and
   `zodToFieldErrors` — the function built for exactly this — is imported **0 times** across the
