@@ -44,6 +44,13 @@ const { simplixBootNaming } = (await import(namingModule)) as {
 /** What the profile's response adapter wraps a mock body in. */
 const envelope = { wrap: "wrapEnvelope", import: "@simplix-react-ext/simplix-boot-auth" };
 
+/** What the boot profile contributes: without it the model declares every enum as its value union,
+ *  and a seed row annotated with that type must carry the value rather than the object. */
+const LABELED_ENUM = {
+  ts: "LabeledEnumValue",
+  import: "@simplix-react-ext/simplix-boot-utils",
+};
+
 const resolved = resolveMeta(meta, { domains: smartSafetyDomains, containerTypes });
 
 function domainOf(name: string): ResolvedDomain {
@@ -56,7 +63,7 @@ function domainOf(name: string): ResolvedDomain {
 const generated = new Map<string, MockGenResult>(
   [...resolved.domains].map(([name, domain]) => [
     name,
-    generateMockFiles(domain, { naming: simplixBootNaming, envelope }),
+    generateMockFiles(domain, { naming: simplixBootNaming, envelope, labeledEnum: LABELED_ENUM }),
   ]),
 );
 
@@ -306,6 +313,7 @@ describe("the identifier and its type are read from the IR, never guessed from a
   it("reads a numeric parameter as a number when the IR says so", () => {
     const numbered = generateMockFiles(handBuiltDomain("shop"), {
       naming: simplixBootNaming,
+      labeledEnum: LABELED_ENUM,
       envelope,
     });
     expect(numbered.files.get("mock/handlers.ts")).toContain("Number(params.ticketId)");
@@ -424,6 +432,7 @@ describe("a reorder writes the field its own body declares", () => {
   it("reports a reorder body that names no field, rather than writing a literal", () => {
     const result = generateMockFiles(handBuiltDomain("shop"), {
       naming: simplixBootNaming,
+      labeledEnum: LABELED_ENUM,
       envelope,
     });
     expect(result.unresolvedOrderFields).toEqual([
@@ -517,6 +526,17 @@ describe("a seed row carries the shape the type it is annotated with declares", 
     expect(lists).toBeGreaterThan(0);
   });
 
+  it("carries the bare value when no profile states a wrapper, as the model then declares it", () => {
+    // The model spells a labeled enum with the profile's wrapper and falls back to the value union
+    // without it. A seed row is annotated with that type, so both halves take the same gate — one
+    // reading `labeled` while the other read the profile is how the pair stopped compiling.
+    const bare = generateMockFiles(handBuiltDomain("shop"), {
+      naming: simplixBootNaming,
+      envelope,
+    });
+    expect(bare.seeds).not.toMatch(/\{ value: "[A-Z_]+", label: "[A-Z_]+" \}/);
+  });
+
   it("writes a labeled enum as the object a response carries", () => {
     const seeds = generated.get("space")?.seeds ?? "";
     const first = seedArrayOf(seeds, "area").split("\n  },")[0];
@@ -535,6 +555,7 @@ describe("a seed row carries the shape the type it is annotated with declares", 
 
     const handBuilt = generateMockFiles(handBuiltDomain("shop"), {
       naming: simplixBootNaming,
+      labeledEnum: LABELED_ENUM,
       envelope,
     });
     expect(handBuilt.seeds).toMatch(/openedOn: "\d{4}-\d{2}-\d{2}"/);
@@ -565,6 +586,7 @@ describe("a seed row carries the shape the type it is annotated with declares", 
     // in for are held against a document that does require them.
     const handBuilt = generateMockFiles(handBuiltDomain("shop"), {
       naming: simplixBootNaming,
+      labeledEnum: LABELED_ENUM,
       envelope,
     });
     expect(handBuilt.seeds).toContain("badge: new Blob([])");

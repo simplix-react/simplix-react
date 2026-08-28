@@ -42,6 +42,13 @@ registerPlugin({
       },
       metaEndpoint: META_ENDPOINT,
       containerTypes: bootContainerTypes,
+      // A `LabeledEnum` serializes as `{value, label}`, so a response field holding one carries the
+      // object rather than the bare value. Without this every enum is its value union in both
+      // directions, which is what a backend that does not label them produces.
+      labeledEnum: {
+        ts: "LabeledEnumValue",
+        import: "@simplix-react-ext/simplix-boot-utils",
+      },
     },
   },
   responseAdapters: {

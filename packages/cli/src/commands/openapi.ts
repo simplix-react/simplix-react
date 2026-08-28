@@ -34,7 +34,10 @@ import {
 } from "../openapi/orchestration/orval-runner.js";
 import { resolveSpecConfig } from "../openapi/orchestration/resolve-spec-config.js";
 import type { ResponseAdapterConfig } from "../openapi/adaptation/response-adapter.js";
-import type { MetaExtensionOutput } from "../openapi/orchestration/spec-profile.js";
+import type {
+  LabeledEnumMapping,
+  MetaExtensionOutput,
+} from "../openapi/orchestration/spec-profile.js";
 import { getResponseAdapterPreset } from "../openapi/plugin-registry.js";
 import type { OperationContext } from "../openapi/naming/naming-strategy.js";
 import type { OpenApiNamingStrategy } from "../openapi/naming/naming-strategy.js";
@@ -294,6 +297,8 @@ export interface MetaContext {
   snapshotPath?: string;
   /** Domains whose barrel exports the meta output instead of the Orval output. */
   exportDomains: Set<string>;
+  /** The generic a labeled enum's wire shape is spelled with, when the profile states one. */
+  labeledEnum?: LabeledEnumMapping;
   naming: OpenApiNamingStrategy;
   envelope?: EnvelopeMapping;
   extensions?: MetaExtensionOutput;
@@ -378,6 +383,7 @@ export async function prepareMetaContext(
     exportDomains: new Set(metaConfig.export ?? []),
     naming,
     envelope: resolveEnvelope(options.responseAdapter),
+    labeledEnum: profile?.labeledEnum,
     extensions: profile?.metaExtensions?.(document),
   };
 }
@@ -701,6 +707,7 @@ async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
         domain: metaDomain,
         naming: opts.meta.naming,
         envelope: opts.meta.envelope,
+        labeledEnum: opts.meta.labeledEnum,
         extensions: opts.meta.extensions,
       });
 

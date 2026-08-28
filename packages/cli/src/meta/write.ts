@@ -85,7 +85,11 @@ export async function writeMetaOutput(options: WriteMetaOptions): Promise<WriteM
   const hooks = generateHookFiles(domain, { naming });
   const search = generateSearchFiles(domain, { naming });
   const access = generateAccessFiles(domain, { naming });
-  const mock = generateMockFiles(domain, { naming, envelope: options.envelope });
+  const mock = generateMockFiles(domain, {
+    naming,
+    envelope: options.envelope,
+    labeledEnum: options.labeledEnum,
+  });
 
   const files = new Map<string, string>();
   for (const emitted of [

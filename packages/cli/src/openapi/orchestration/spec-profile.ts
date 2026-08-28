@@ -26,6 +26,14 @@ export interface ContainerMapping {
 /**
  * Files a profile contributes from the IR's `extensions` payload.
  */
+/** The generic a labeled enum's wire shape is spelled with. */
+export interface LabeledEnumMapping {
+  /** The type's name. */
+  ts: string;
+  /** Module it is imported from. */
+  import: string;
+}
+
 export interface MetaExtensionOutput {
   /** Path relative to `generated-meta/` → file content. */
   files: Record<string, string>;
@@ -88,6 +96,12 @@ export interface SpecProfile {
   metaDownloader?: (serverOrigin: string) => Promise<DtoMeta | undefined>;
   /** Java container name → the TypeScript type and zod factory it becomes. */
   containerTypes?: Record<string, ContainerMapping>;
+  /**
+   * The generic that wraps an enum value with its label, which a backend serializing a labeled
+   * enum as an object needs. Absent, every enum is its bare value union in both directions — the
+   * honest reading for a backend that does not label them.
+   */
+  labeledEnum?: LabeledEnumMapping;
   /** Turns a contributor's `extensions` payload into generated files. */
   metaExtensions?: (meta: DtoMeta) => MetaExtensionOutput | undefined;
 }

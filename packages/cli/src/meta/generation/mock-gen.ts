@@ -5,6 +5,7 @@ import type { FieldMeta, ParamMeta, TypeRef } from "../ir-types.js";
 import type { ResolvedDomain, ResolvedType } from "../resolve.js";
 import { HEADER, innermostRef, payloadOf, reachableFrom, refNameOf, responseRefs } from "./emit.js";
 import { entityNameOf, resolveEndpoints, type EndpointTarget } from "./endpoint-gen.js";
+import type { LabeledEnumMapping } from "./model-gen.js";
 
 /** Directory the handler module lands in, relative to a generated package's meta output root. */
 export const MOCK_DIR = "mock";
@@ -72,6 +73,8 @@ export interface EnvelopeMapping {
 }
 
 export interface MockGenOptions {
+  /** The wrapper the model spells a labeled enum with; absent, a seed carries the bare value. */
+  labeledEnum?: LabeledEnumMapping;
   /** Contributed by the spec profile, and the same one the endpoints were generated with. */
   naming: OpenApiNamingStrategy;
   /**
@@ -141,7 +144,7 @@ export interface MockGenResult {
  * has never been written generates exactly what a migrated one does.
  */
 export function generateMockFiles(domain: ResolvedDomain, options: MockGenOptions): MockGenResult {
-  const model = new ModelIndex(domain);
+  const model = new ModelIndex(domain, options.labeledEnum);
   const entities = resolveEndpoints(domain, options.naming).map(
     (resolved) => new MockEntity(resolved.tag, resolved.targets, domain, model),
   );
@@ -173,7 +176,15 @@ class ModelIndex {
   /** The types a response of the domain reaches, which is where a labeled enum is an object. */
   private readonly responseTypes: ReadonlySet<string>;
 
-  constructor(private readonly domain: ResolvedDomain) {
+  constructor(
+    private readonly domain: ResolvedDomain,
+    /**
+     * Absent when the profile states no wrapper, which is when the model declares every enum as
+     * its bare value union. A row annotated with that type must carry the value, so the two halves
+     * take the same gate rather than one reading `labeled` and the other the profile.
+     */
+    private readonly labeledEnum: LabeledEnumMapping | undefined,
+  ) {
     this.responseTypes = reachableFrom(domain, responseRefs(domain));
   }
 
@@ -184,6 +195,7 @@ class ModelIndex {
    */
   labeledAt(carrier: ResolvedType, field: FieldMeta): boolean {
     if (field.type.kind !== "enum") return false;
+    if (this.labeledEnum === undefined) return false;
     if (this.domain.enums.get(field.type.name)?.meta.labeled !== true) return false;
     return this.responseTypes.has(this.declaringType(carrier, field.name));
   }
