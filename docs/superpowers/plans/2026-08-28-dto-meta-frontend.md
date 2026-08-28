@@ -393,6 +393,11 @@ Fill in the four helpers:
 
 - `readSource` — an `http://`/`https://` source is fetched; anything else is read from disk. A non-2xx response throws with the status AND the response body, because the backend answers a duplicate type name with a 409 whose body names both classes; swallowing it would leave the operator guessing.
 - `readSnapshot` — throws a clear error naming the path when `snapshot` is unset or missing.
+- **Tag patterns are exact by default.** `createTagMatcher` treats a plain string as an exact
+  match and only `/…/` as a regular expression, so `"site.*"` looks for a tag literally named
+  `site.*` and matches nothing. Measured: all 130 patterns in the target application are exact
+  strings and none uses a wildcard. If a domain resolves to zero operations, this is the first
+  thing to check (spec §10).
 - `unwrap` — **do not sniff the envelope's shape.** Spec §5.1 settles that an envelope is judged
   by name, not by field shape, because a shape test misreads a response whose body is empty. There
   is no TypeRef here, so use what each source guarantees instead:
@@ -1146,14 +1151,25 @@ git commit -m "feat(cli): generate MSW handlers and seeds from the IR"
 
 ```ts
 meta?: {
-  /** Endpoint URL or snapshot path. */
-  source: string;
+  /**
+   * Endpoint URL or snapshot path. Omit it and the source is built the way the i18n download
+   * already builds its own: the origin of `spec` plus the profile's `metaEndpoint`.
+   */
+  source?: string;
   /** Where a fetched IR is written for offline regeneration. */
   snapshot?: string;
   /** Domains whose barrel exports the meta output instead of the orval output. */
   export?: string[];
 };
 ```
+
+**`source` is optional on purpose.** Task 4 puts `metaEndpoint: "/api/v1/dev/meta/dto"` on the boot
+profile, and a required `source` would mean every configuration repeats it — leaving `metaEndpoint`
+declared and never read. Resolve in this order: `meta.source` when given; otherwise
+`new URL(profile.metaEndpoint, spec).href` when `spec` is a URL and the profile carries one;
+otherwise fail with a message naming both, because a silently skipped meta pipeline looks exactly
+like one that ran and found nothing. `downloadI18nMessages(serverOrigin, I18N_ENDPOINT)` is the
+precedent to follow.
 
 - [ ] **Step 2: Layout.** Write into `packages/domain-<name>/src/generated-meta/` — `model/`,
   `schema/`, `endpoints/`, `hooks/`, `search/`, `access/`, `mock/`, `index.ts` (spec §9). Leave

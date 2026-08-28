@@ -515,11 +515,16 @@ openapi: [{
   spec: "http://localhost:8082/api-docs/all-apis",
   profile: "simplix-boot",
   meta: {
-    source: "http://localhost:8082/api/v1/dev/meta/dto",
+    // 생략하면 spec URL의 origin에 프로파일의 metaEndpoint를 붙여 만든다
     snapshot: "openapi/meta.json",   // 선택 — 지정하면 받은 IR을 여기 쓴다
     export: ["site"],                // 배럴이 메타 산출물을 내보내는 도메인
   },
-  domains: { site: ["site.*"], worker: ["worker.*"] },
+  domains: {
+    // 태그 패턴은 기본이 정확히 일치다. 접두사로 묶으려면 /정규식/ 형태를 쓴다 —
+    // "site.*"는 와일드카드가 아니라 리터럴 태그 `site.*`를 찾으므로 아무것도 걸리지 않는다.
+    site: ["site.Area", "site.WorkPoint"],
+    worker: ["/^worker\\./"],
+  },
 }]
 ```
 
