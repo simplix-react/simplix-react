@@ -23,17 +23,17 @@ The backend half of this project is finished and a real IR was captured from the
 | | |
 | --- | --- |
 | operations | 694 |
-| types | 637 (104 of them carry `extends`) |
+| types | 646 (104 of them carry `extends`) |
 | enums | 133 (122 labeled, 11 not — see Task 6) |
 | enum values | 540, of which 498 carry a `labelKey`. **`labeled` and `labelKey` coincide exactly**: the 11 enums whose values lack a `labelKey` are the same 11 that are unlabeled, and no labeled enum is missing one. Generators may rely on that. |
-| containers in use | `SimpliXApiResponse` 648 · `List` 356 · `Page` 93 · `Map` 74 |
+| containers in use | `SimpliXApiResponse` 648 · `List` 405 · `Page` 93 · `Map` 74 |
 | field kinds — **counting every `TypeRef` node**, container arguments included (6,501) | `string` 3110 · `number` 936 · `instant` 682 · `boolean` 593 · `enum` 541 · `container` 279 · `date` 202 · `ref` 134 · `time` 10 · `unknown` 8 · `param` 6 |
-| field kinds — **one per field** (6,222) | `string` 2962 · `number` 935 · `instant` 682 · `boolean` 593 · `enum` 523 · `container` 278 · `date` 200 · `ref` 38 · `time` 10 · `param` 1 |
-| constraints (709 on 550 fields) | `maxLength` 440 · `notBlank` 221 · `notEmpty` 11 · `pattern` 10 · `email` 7 · `min` 7 · `minLength` 5 · `max` 4 · `nonnegative` 2 · `positive` 1 · `maxItems` 1 · **`custom` 0** |
+| field kinds — **one per field** (6,244) | `string` 2973 · `number` 946 · `instant` 682 · `boolean` 593 · `enum` 523 · `container` 278 · `date` 200 · `ref` 38 · `time` 10 · `param` 1 |
+| constraints (720 on 561 fields) | `maxLength` 440 · `notBlank` 232 · `notEmpty` 11 · `pattern` 10 · `email` 7 · `min` 7 · `minLength` 5 · `max` 4 · `nonnegative` 2 · `positive` 1 · `maxItems` 1 · **`custom` 0** |
 | access kinds | `permission` 566 · `authenticated` 94 · `public` 29 · `expression` 5 |
 | `searchDto`-bearing operations | 86 |
 | fields with `searchable` | 1118 |
-| fields with `labelKey` | 2082 |
+| fields with `labelKey` | 2104 |
 | distinct tags | 139 — **and 139 entities**, since an entity is one tag (Task 8). Counts elsewhere that say **118** are the *configured* domains only: 139 minus the 21 tags no `domains` pattern claims. Quote 139 for "what the IR contains" and 118 for "what a codegen run produces". |
 
 ### What the fixture cannot test
@@ -155,7 +155,9 @@ it("every request body is a TypeRef, not a bare type name", () => {
   `registry.register(java.util.List)` filed `List` and never walked into the element, so an element
   type reachable from nothing else is **absent from `types` altogether**. Measured on the stale
   capture: **11 `/order` operations and zero `…Order`/`…OrderDTO` types** in the map. The plan's
-  "637 types" therefore undercounts by at least those 11.
+  "637 types" undercounted by exactly those 11. **The re-capture is done**: the fixture now holds
+  646 types — the 11 `…OrderUpdateDTO` element types the erasure had swallowed, plus the removal of
+  the two junk entries `List` and `Set` that `registry.register(raw)` had filed as DTOs.
 
   That absence has a consumer. `orderField` — the property a reorder writes — is read from the
   order operation's request body element (`scaffold-crud.ts:1694`,
@@ -315,7 +317,7 @@ const ir: DtoMeta = JSON.parse(
 describe("ir-types", () => {
   it("types the captured IR without a cast", () => {
     expect(ir.version).toBe(1);
-    expect(Object.keys(ir.types)).toHaveLength(637);
+    expect(Object.keys(ir.types)).toHaveLength(646);
     expect(Object.keys(ir.enums)).toHaveLength(133);
     expect(ir.operations).toHaveLength(694);
   });
@@ -501,7 +503,7 @@ git commit -m "feat(boot-utils): type the labeled enum wire shape"
 - Create: `extensions/simplix-boot/packages/cli-plugin/src/container-types.ts`
 - Test: `extensions/simplix-boot/packages/cli-plugin/src/__tests__/container-types.test.ts`
 
-The IR names containers by their JAVA names; which TypeScript type each becomes is the profile's decision (spec §4.1). Measured usage: `SimpliXApiResponse` 648, `List` 356, `Page` 93, `Map` 74 — those four and no others.
+The IR names containers by their JAVA names; which TypeScript type each becomes is the profile's decision (spec §4.1). Measured usage: `SimpliXApiResponse` 648, `List` 405, `Page` 93, `Map` 74 — those four and no others.
 
 - [ ] **Step 1: Write the mapping**
 
@@ -625,7 +627,7 @@ The generators need the IR sliced by domain and indexed. This task does that onc
 
   **Spec §5.1 requires that a type is never declared twice**, and the layout is one file per
   entity, so a type reachable from two entities in the same domain would be written into both and
-  collide at `export *`. Measured: **33 of the 637 types are reachable from more than one tag** —
+  collide at `export *`. Measured: **33 of the 646 types are reachable from more than one tag** —
   `SimpliXBaseEntity` and `BaseEntity` from 7 each, `JobPosition` 4, `UserAccount` and
   `Organization` 3. Resolve must therefore return, per domain, a **type → owning entity** map, and
   every generator writes a type only into its owner's file. Put a shared type in the entity that
@@ -661,7 +663,7 @@ The generators need the IR sliced by domain and indexed. This task does that onc
   reported rather than silently emitted. A new one appearing means a controller started returning a
   framework type and the walker followed it.
 
-- [ ] **Step 2: Test against the real fixture.** Assert that resolving with a single catch-all domain reaches all 637 types; that a domain's closure never contains a type none of its operations reach; that `extends` chains resolve (the fixture has 104); and that a type whose parent is outside the domain still pulls the parent in.
+- [ ] **Step 2: Test against the real fixture.** Assert that resolving with a single catch-all domain reaches all 646 types; that a domain's closure never contains a type none of its operations reach; that `extends` chains resolve (the fixture has 104); and that a type whose parent is outside the domain still pulls the parent in.
 
 - [ ] **Step 3: Run, then commit**
 
@@ -916,7 +918,7 @@ This is where the project's original complaint is answered: 440 `maxLength` and 
   | kind | n | note |
   | --- | ---: | --- |
   | `maxLength` | 440 | |
-  | `notBlank` | 221 | **140 of them pair with a length bound** |
+  | `notBlank` | 232 | **140 of them pair with a length bound** |
   | `notEmpty` | 11 | always on a `List`, never a string — `.min(1)` on the array |
   | `pattern` | 10 | |
   | `email` | 7 | **5 also carry `maxLength`, 4 also `notBlank`** |
