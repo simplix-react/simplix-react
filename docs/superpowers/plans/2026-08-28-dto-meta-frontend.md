@@ -2010,6 +2010,28 @@ them loudly costs nothing.
 `FieldInfo` (`scaffold-crud.ts:29`), `EntityOperations` (`:632`), `FilterFieldInfo` (`:1243`) —
 from the IR instead of from text.
 
+**There are three call sites, not one, and they read from two different files.** Replace all three
+or the meta output is generated and never consumed:
+
+| Call site | Reads today | Feeds |
+| --- | --- | --- |
+| `findSchemaFile` (`:1608`) | a `*.zod.ts` / `schemas.ts` file's text | the form's `FieldInfo` |
+| `parseFilterParams(extractedEntity.queryParams, extractedEntity.fields)` (`:1685`) | `.openapi-snapshot.json` | every filter |
+| `extractedEntity.operations.find(o => o.role === "get")` (`:1681`) | `.openapi-snapshot.json` | **`rowIdField`** |
+
+The second is why Task 9's search generator does nothing on its own: the scaffold takes its filters
+from the OpenAPI snapshot, so unless this call is repointed the IR's operator lists are written and
+ignored.
+
+**The third is not mentioned anywhere else in this plan.** `rowIdField` is the list's row identity,
+taken from the last path parameter of the `get`-role operation and defaulting to `"id"`. Measured:
+**74 of the fixture's 139 entities have no `get` role**, so they all take that default — and for
+many a real candidate exists (`streamAdminController` → `sessionId`, `importRun` → `importJobId`,
+`drawing` → `floorPlanId`). The IR knows the path parameters of every GET, not just the one the
+naming strategy labelled `get`, so fall back to the last path parameter of any item GET before
+falling back to `"id"`. This diverges from the orval path for those entities, in scaffolded module
+code that `meta-diff` does not compare — say how many it changed.
+
 **One presentation decision must come from the IR: the temporal component.** Spec §5.1 requires
 that `instant`, `date` and `time` stay distinguishable *because the three use different input
 components*, and §1 names their collapse as one of the eight defects this project exists to remove.
