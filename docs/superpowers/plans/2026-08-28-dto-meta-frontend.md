@@ -1078,6 +1078,14 @@ repointed.
   **compiles cleanly and renders an empty list with no error** — `page?.content` is simply
   `undefined`. Task 14's browser pass is the only thing that would catch it.
 
+  **Return a real `UseQueryResult`, not a reshaped subset.** `useCrudList` reads `isPaused` and
+  `failureCount` off the hook's result to tell an unreachable server from an empty table:
+  `resolveEmptyReason` returns `"unavailable"` on either, `"no-search"` / `"no-filter"` when one is
+  active, and `"no-data"` otherwise (`resolve-empty-reason.ts:50`). The read is
+  `queryResult.isPaused ?? false` (`use-crud-list.ts:396`), so a hook that omits them does not
+  fail — it reports **"no data" while the network is down**, telling the operator the table is
+  empty. TanStack Query supplies both on `UseQueryResult`; pass the result through untouched.
+
   **Emit a `get<Name>QueryKey` function per query operation — it is a public export module code
   imports.** Measured: `modules/notification/src/widgets/notice/detail.tsx:172` writes
   `queryKey: [...getGetNoticeQueryKey(noticeId), language]`, so both the name and the returned
