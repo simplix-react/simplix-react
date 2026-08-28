@@ -9,7 +9,11 @@ import { HEADER } from "./generation/emit.js";
 import { generateAccessFiles } from "./generation/access-gen.js";
 import { generateEndpointFiles } from "./generation/endpoint-gen.js";
 import { generateHookFiles, type EntityHooks } from "./generation/hook-gen.js";
-import { generateMockFiles, type EnvelopeMapping } from "./generation/mock-gen.js";
+import {
+  canRegenerateMockEntry,
+  generateMockFiles,
+  type EnvelopeMapping,
+} from "./generation/mock-gen.js";
 import { generateModelFiles, type LabeledEnumMapping } from "./generation/model-gen.js";
 import { generateSchemaFiles } from "./generation/schema-gen.js";
 import { generateSearchFiles } from "./generation/search-gen.js";
@@ -111,19 +115,23 @@ export async function writeMetaOutput(options: WriteMetaOptions): Promise<WriteM
     written.push(join(META_DIR, path));
   }
 
-  // `src/mock/` belongs to whichever pipeline generated the entry that wires the stores. While
-  // the OpenAPI half still writes one, the meta handlers are emitted and left unwired: an entry
-  // and its seed arrays are a matched pair, and rewriting one of the two produces a mock layer
-  // that imports names the other never exported.
+  // `src/mock/` belongs to whichever pipeline the domain is exported from. An entry and its seed
+  // arrays are a matched pair — the entry names each store's DTO and the seeds declare arrays of
+  // it — so a domain that switches takes both or neither. Repointing the OpenAPI entry's imports
+  // alone leaves the pair naming one DTO through two declarations, which is not assignable.
+  //
+  // The entry is rewritten unless the developer put a handler override in it; the seeds are
+  // written only when absent, because they hold data somebody typed.
   const entryPath = join(options.targetDir, "src/mock/index.ts");
-  if (!(await pathExists(entryPath))) {
+  const existingEntry = (await pathExists(entryPath)) ? await readFile(entryPath, "utf-8") : "";
+  if (existingEntry === "" || canRegenerateMockEntry(existingEntry)) {
     await writeFileWithDir(entryPath, mock.entry);
     written.push("src/mock/index.ts");
-    const seedsPath = join(options.targetDir, "src/mock/seeds.ts");
-    if (!(await pathExists(seedsPath))) {
-      await writeFileWithDir(seedsPath, mock.seeds);
-      written.push("src/mock/seeds.ts");
-    }
+  }
+  const seedsPath = join(options.targetDir, "src/mock/seeds.ts");
+  if (!(await pathExists(seedsPath))) {
+    await writeFileWithDir(seedsPath, mock.seeds);
+    written.push("src/mock/seeds.ts");
   }
 
   return {
@@ -156,36 +164,6 @@ export function metaIndexContent(importTranslations: boolean): string {
  */
 /** The meta output as `src/mock/` addresses it, one level below the package's own barrel. */
 const MOCK_META_MODULE = `../${META_DIR.slice(META_DIR.lastIndexOf("/") + 1)}`;
-
-/**
- * Point the mock entry at the meta output.
- *
- * `src/mock/index.ts` is written by the Orval half, which names `../generated/model` and
- * `../generated/mock/handlers`, and `src/mock/seeds.ts` is written once and never overwritten. On
- * a swapped domain the seeds resolve through the meta barrel while the entry still wires Orval's
- * handlers, so the two halves are the same DTO from two declarations and nothing assignable
- * between them — the package stops building rather than answering wrongly.
- *
- * Only the two import paths move; the stores, their id fields and any custom handler the developer
- * added are the entry's own content and are left alone.
- */
-export async function repointMockEntry(targetDir: string): Promise<boolean> {
-  const entryPath = join(targetDir, "src/mock/index.ts");
-  if (!(await pathExists(entryPath))) return false;
-
-  const existing = await readFile(entryPath, "utf-8");
-  // Seen from `src/mock/`, which is one level deeper than the barrel `META_MODULE` addresses.
-  const repointed = existing
-    .replace(/(["'])\.\.\/generated\/model\1/g, `$1${MOCK_META_MODULE}/model$1`)
-    .replace(
-      /(["'])\.\.\/generated\/mock\/handlers\1/g,
-      `$1${MOCK_META_MODULE}/mock/handlers$1`,
-    );
-  if (repointed === existing) return false;
-
-  await writeFileWithDir(entryPath, repointed);
-  return true;
-}
 
 /**
  * Point the seed module at the meta output, for the same reason and with the same caveat: the file

@@ -52,7 +52,6 @@ import {
   metaIndexContent,
   writeMetaOutput,
   writeMetaSchemasProxy,
-  repointMockEntry,
   repointMockSeeds,
 } from "../meta/write.js";
 import { domainIndexTs } from "../templates/domain/index.js";
@@ -711,9 +710,8 @@ async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
     // 11. Generate or update schemas proxy (preserve custom overrides)
     if (metaExported) {
       await writeMetaSchemasProxy(targetDir);
-      // The mock's two files are written by the Orval half and preserved thereafter, so a swapped
-      // domain keeps them pointing at `src/generated/` until this moves them.
-      await repointMockEntry(targetDir);
+      // The seed module is written once and never overwritten, so a swapped domain keeps it
+      // naming `../generated/`. The entry beside it is rewritten from the meta output.
       await repointMockSeeds(targetDir);
     } else {
       await generateSchemasProxy(targetDir);
