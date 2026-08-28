@@ -921,6 +921,23 @@ repointed.
   `OrganizationUpdateDTO[]` and not a single DTO. Map it through the same container rules the
   response uses; treating `request.body` as a type name is the defect Task 0 exists to remove.
 
+  **A list hook has a second contract, enforced by nobody at compile time.** `adaptOrvalList`
+  (`packages/headless/src/adapt-orval-list.ts:63`) is what every generated list screen wraps its
+  hook in, and it does exactly this:
+
+  ```ts
+  const query = useApiHook(apiParams, { query: queryOpts });
+  const page = query.data as any;
+  return { data: page?.content, total: page?.totalElements, isLoading: query.isLoading, ... };
+  ```
+
+  So a list hook must take **two positional arguments** — params, then an options object with a
+  `query` member — and its `data` must be the Spring page itself, carrying `content` and
+  `totalElements`, because the mutator has already stripped the envelope. `OrvalListHookLike`
+  types both parameters as `any`, so a hook with a different arity or a `data` shaped otherwise
+  **compiles cleanly and renders an empty list with no error** — `page?.content` is simply
+  `undefined`. Task 14's browser pass is the only thing that would catch it.
+
   **Emit a `get<Name>QueryKey` function per query operation — it is a public export module code
   imports.** Measured: `modules/notification/src/widgets/notice/detail.tsx:172` writes
   `queryKey: [...getGetNoticeQueryKey(noticeId), language]`, so both the name and the returned
@@ -1026,6 +1043,10 @@ repointed.
     **no query string in element 0**, and no params element when params are absent
   - a `Void` response produces a hook with no data type — 3 operations in the fixture have no
     `response` key at all
+  - **a list hook survives `adaptOrvalList`**: call the generated `useListOrganizations` through it
+    with a stubbed query client returning a Spring page, and assert `data` and `total` come back
+    populated. Asserting on the emitted text cannot catch an arity mismatch here, because
+    `OrvalListHookLike` types both parameters as `any`
   - a **`binary` response** produces a function returning `Blob` rather than a hook. Three of the
     five reach a real domain: `/api/v1/system/exports/{exportJobId}/download` (`system`) and the
     two `public.user.Avatar` routes (`user`); the other two are in unmatched tags
