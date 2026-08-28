@@ -1778,6 +1778,20 @@ precedent to follow.
   So Task 13's tests must assert the negative: the generated list imports its hook from the domain
   package and contains **no** `useMockList`.
 
+  **The delete path is worse than absent — it is a working dialog over a no-op.** With
+  `hasDelete` true (the default) and `hookDelete` null (no config), `crud-page.hbs:50` takes its
+  `{{else}}` branch and emits
+
+  ```ts
+  // TODO: Wire up delete mutation from your domain package
+  deleteMutation: { mutate: (() => {}) as (...args: unknown[]) => void, isPending: false } as any,
+  ```
+
+  wired into a real `useCrudDeleteWired`. The row action appears, the confirmation dialog opens,
+  the operator confirms, and **nothing happens** — no request, no error, no message. That is a
+  write command that changes no state, which this repository's own rules forbid shipping. Assert
+  the negative here too: no `TODO: Wire up delete mutation` in the generated output.
+
   Note also that the app configures **no** `crud:` block in `simplix.config.ts`, so
   `CrudEndpointPattern` and `matchCrudRole` never run and `ExtractedOperation.role` is undefined
   before step 5. Do not build anything on that path.
