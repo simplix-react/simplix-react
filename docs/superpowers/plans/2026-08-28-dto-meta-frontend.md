@@ -1654,6 +1654,18 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
      `unknown`: `src/mock/seeds.ts` is hand-written against that type and would stop
      type-checking.
 
+     **The handler's own id lookup is a separate heuristic — take it from the IR instead.**
+     `findIdField` (`mock-generator.ts:741`) tries an exact `id`, then **the first field whose name
+     ends in `Id`**, then `"id"`; the handlers read `params.<that>` and call `store.getById`. With
+     the model DTO chosen as Task 10 prescribes, it agrees with the real key for **59 of the
+     fixture's 63** entities that have both — the four that differ are `auditLog`
+     (picks `auditEventId`, key is `auditLogId`), `masterDataHistory` (same shape),
+     `messagePreview` (`id` against `messageKey`) and one unmatched tag. The IR states the key
+     exactly: the `delete`- or `get`-role operation's last `request.path` entry, which Task 13
+     already derives as `rowIdField`. Use it and the heuristic's four misses disappear.
+     `hasDeclaredIdField` (`:756`) stays as it is — a singleton settings DTO declares no id at all,
+     and emitting `body.id` against one does not compile.
+
 - [ ] **Step 2: Test** that a handler returns an enveloped body; that a search handler's paged
   branch delegates to `store.listPaged` rather than constructing a page; that a `<field>.equals`
   query parameter takes the filter branch; and that the generator writes only
