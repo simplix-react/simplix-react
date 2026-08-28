@@ -725,6 +725,13 @@ git commit -m "feat(cli): resolve the IR into per-domain type closures"
 
   A field is optional (`?`) exactly when `required` is false.
 
+  **Ignore `nullable` — it carries no information.** Measured over all 6,222 fields, the only two
+  combinations that occur are `(required: true, nullable: false)` 615 and
+  `(required: false, nullable: true)` 5,607. There is no `(true, true)` and no `(false, false)`, so
+  `nullable === !required` everywhere. Emitting `| null` alongside `?` would give
+  `field?: string | null` where orval gave `field?: string`, and `meta-diff` would report a field
+  type mismatch on 5,607 fields.
+
 - [ ] **Step 2: Test against the real fixture.** Generate for a domain and assert: an `extends` type emits only its own fields; a **labeled** response enum field is the `Labeled` alias while the same enum in a request DTO is the union; an **unlabeled** enum is the plain union in the response too — assert `UserAccountDetailDTO.standing` by name and that no `UserAccountStandingLabeled` is emitted anywhere; no `SimpliXApiResponse` appears anywhere in the output; **no exported name appears in two files
 of one domain** — walk the emitted `model/` directory and assert the set of exported interface
 names has no duplicate, which is the only thing that catches a shared type written twice; every one of the 11 field kinds present in the fixture produces valid TypeScript. **Prove the output is well-formed TypeScript, not merely that it contains the right substrings.**
@@ -1595,7 +1602,22 @@ The reason parallel generation was chosen: a domain is only switched once the tw
 | a constraint present only on the meta side | info — OpenAPI lost it, which is the point |
 | a **zod constant** name present in only one | info — orval names them per operation and role (32 for one entity), the meta path per type, and **nothing imports them**: 0 references anywhere in the application outside `generated/`. Reporting 32 renames per entity as errors would bury the drift this command exists to find |
 
-  **Intended differences are info, not errors:** a response enum field moving from a value union to `LabeledEnumValue`; a field becoming required through a primitive type or `@Schema(requiredMode = REQUIRED)`; added request constraints. Reporting those as errors would bury real drift in noise.
+  **Intended differences are info, not errors:** a response enum field moving from a value union to
+  `LabeledEnumValue`; a field becoming required through a primitive type or
+  `@Schema(requiredMode = REQUIRED)`; added request constraints. Reporting those as errors would
+  bury real drift in noise.
+
+  **Calibrate the required-ness rule against what was measured, or it will hide drift.** No
+  `DetailDTO` and no `ListDTO` in the fixture carries a **single** required field. Required fields
+  live on `CreateDTO` (285 across 50 types), plain `…DTO` (204/66), `UpdateDTO` (75/56) and
+  non-DTO types (45/20) — that is, on request shapes and on entities, where `@NotNull` and Java
+  primitives put them. §12's second ground exists in the codebase (`requiredMode` appears 17
+  times) but not on a response DTO.
+
+  So a response DTO gaining a required field is **not** the expected case this rule was written
+  for: treat it as info only when the field's Java type is an unboxed primitive or the IR shows
+  `@Schema(requiredMode)`, and report anything else as an error. A blanket info classification
+  would silence exactly the drift `meta-diff` exists to catch.
 
   Both outputs must come from the same run against the same server, or the diff reports whatever the backend did in between.
 
