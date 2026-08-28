@@ -34,7 +34,7 @@ The backend half of this project is finished and a real IR was captured from the
 | `searchDto`-bearing operations | 86 |
 | fields with `searchable` | 1118 |
 | fields with `labelKey` | 2104 |
-| distinct tags | 139 — **and 139 entities**, since an entity is one tag (Task 8). Counts elsewhere that say **118** are the *configured* domains only: 139 minus the 21 tags no `domains` pattern claims. Quote 139 for "what the IR contains" and 118 for "what a codegen run produces". |
+| distinct tags | 139 — **and 139 entities**, since an entity is one tag (Task 8). Counts elsewhere that say **126** are the *configured* domains only: 139 minus the 13 tags no `domains` pattern claims. Quote 139 for "what the IR contains" and 126 for "what a codegen run produces from this capture". The config declares **129** patterns across **13** domains; the other 3 match no tag in this capture (see Task 5). |
 
 ### What the fixture cannot test
 
@@ -608,7 +608,7 @@ The generators need the IR sliced by domain and indexed. This task does that onc
 
     **The rule is exact-match by default**: a plain string matches a tag literally and only
     `/…/` is a regular expression, so `"site.*"` looks for a tag named `site.*` and matches
-    nothing. All 130 patterns in the target application are exact strings; none uses a wildcard.
+    nothing. All 129 patterns in the target application are exact strings; none uses a wildcard.
     A domain resolving to zero operations is the first symptom (spec §10).
   - the transitive closure of types those operations reach, by walking `request.body`, `request.searchDto`, `response`, and each type's `extends` and `ref`/`pick` fields
   - the enums reached the same way
@@ -616,24 +616,35 @@ The generators need the IR sliced by domain and indexed. This task does that onc
 
   Report an operation whose `tag` matches no domain rather than dropping it silently.
 
-  **Expect 117 unmatched out of 694** against the smart-safety config, across 24 tags. The
-  matched side is 577 and splits exactly as Task 14's table says. The unmatched side, counted:
+  **Expect 73 unmatched out of 694** against the smart-safety config, across 13 tags. The matched
+  side is 621, spread over **13 domains** — `data-io` included; its key is quoted (`"data-io":`)
+  in the config, and a measurement whose parser only accepts bare identifiers drops that domain
+  and reports its 44 operations as unmatched. The unmatched side, counted:
 
   | Group | n | Tags |
   | --- | ---: | --- |
-  | `data-io.*` — screens not built yet | 44 | `ImportRun` 16, `ExportLedger` 10, `DuplicateMerge` 4, `BulkOperation` 3, `ImportJob` 3, `DuplicateCandidate` 2, `BulkReversal` 2, `ExportCensus` · `DuplicateCensus` · `BulkCensus` · `ImportCensus` 1 each |
   | `dev.test.*` — the app's own test controllers | 30 | `UserPermission` 11, `Error` 10, `Response` 9 |
   | framework-owned, tagged by class name | 30 | `StreamAdminController` 16, `CurrentUserRestController` 8, `SseStreamController` 6 |
   | **auth surfaces the `auth` domain does not claim** | 9 | `Auth Token` 3, `OAuth2 Social Login` 3, `PasswordWebController` 2, `SimpliXAuthLoginController` 1 |
   | other | 4 | `ScalarController` 2, `public.file.Content` 1, `dev.backoffice` 1 |
 
-  The first three groups are expected. **The fourth is worth raising rather than accepting** — the
+  The first two groups are expected. **The third is worth raising rather than accepting** — the
   `auth` domain's seven patterns are all `common.auth.*` / `public.auth.SignInOption`, so sign-in,
   token and password endpoints fall outside it. Report it; whether they should join `auth` is the
   user's call, not the generator's.
 
-  A run that reports far fewer than 117 means a tag pattern started matching something it should
-  not.
+  A run that reports far fewer than 73 means a tag pattern started matching something it should
+  not; far more means a configured domain was dropped, and the quoted-key trap above is the first
+  place to look.
+
+  **Report the reverse direction too: a configured pattern that matches no tag.** Three do —
+  `common.user.CurrentUser`, `common.user.CurrentUserAvatar` and `public.user.AvatarThumbnail`,
+  all in `user`. Each produces an entity with no operations: a package that builds, exports and
+  reads exactly like a working one while answering nothing. The existing generated packages carry
+  129 entities against 129 patterns, so all three were live when that code was generated and the
+  backend has since renamed them — `CurrentUserRestController` sits in the unmatched list above.
+  A silent empty entity is the failure this check exists to prevent, so name the pattern, the
+  domain and the fact that it matched nothing.
 
 - [ ] **Step 1b: Assign each type one owner, and keep the closure clean.**
 
@@ -1143,9 +1154,10 @@ repointed.
   path, but `buildEntityFromOps` (`:337`) then names **every** sub-group with the same
   `resolvedName`, and `deduplicateEntities` (`:886`) merges same-named entities and their
   operations. The split therefore collapses whenever a naming strategy is present, which it always
-  is on this profile. Verified across the application: in **all 12 configured domains the tag count,
-  the `crud.config.ts` key count and the hook-stub count are identical** — 118 tags, 118 entities,
-  no exceptions.
+  is on this profile. Verified across the application: in **all 13 configured domains the tag count,
+  the `crud.config.ts` key count and the hook-stub count are identical** — 129 patterns, 129
+  entities, no exceptions. (Three of those entities are backed by no tag in the current capture;
+  Task 5 covers them.)
 
   So the whole derivation is:
 
@@ -2743,7 +2755,8 @@ git commit -m "feat(cli): let scaffolding read fields from the IR"
   `simplix.config.ts` pointing at it, and leave `export` empty. Run codegen; both outputs exist.
 - [ ] **Step 2** — run `simplix meta-diff` on **`org`**. Measured operation counts per domain:
   `dashboard` 1, `org` 13, `audit` 15, `worker` 16, `approval` 31, `site` 32, `auth` 39,
-  `space` 46, `system` 64, `regulation` 81, `user` 100, `notification` 139. `dashboard` is the
+  `data-io` 44, `space` 46, `system` 64, `regulation` 81, `user` 100, `notification` 139 —
+  thirteen domains summing to the 621 matched operations. `dashboard` is the
   smallest but exercises almost nothing — one operation, no CRUD shape. `org` is the pilot:
   small enough to read end to end, and its 13 operations are measured to cover more than a plain
   CRUD set. **It is a tree domain**, and that is deliberate — a pilot that skipped the hard shapes
