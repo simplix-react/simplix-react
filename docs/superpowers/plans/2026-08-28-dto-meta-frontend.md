@@ -1456,14 +1456,31 @@ domain will scaffold differently for the same field:
 
 | Need | Reuse |
 | --- | --- |
-| category and column order | `orderAndCategorizeFields` (exported) |
-| `defaultValue` from a TS type | `getDefaultValue` (exported) |
-| the whole data-field → `FieldInfo` shape | `entityFieldsToFieldInfo` (exported) — **read this first** |
+| category and column order | `orderAndCategorizeFields(FieldInfo[]): FieldInfo[]` (exported) |
+| `defaultValue` from a TS type | `getDefaultValue(tsType: string): string` (exported) |
+| the field → `FieldInfo` shape | **`parseZodType`, not `entityFieldsToFieldInfo`** — see below |
 
-`entityFieldsToFieldInfo(EntityField[])` already converts a snapshot's data fields into complete
-`FieldInfo`s, filling exactly the presentation members the IR lacks. It is the precedent to
-follow: either map `FieldMeta` → the `EntityField` shape it takes and call it, or mirror its
-logic field for field. Say in your report which you chose and why.
+**The precedent is `parseZodType`, and the plan previously named the wrong one.** There are two
+field sources in `scaffold-crud.ts` and they are not equivalent: `parseZodType` (`:130`, called at
+`:470`) is the primary path that reads orval's zod text, and `entityFieldsToFieldInfo` (`:286`,
+called at `:1622`) is a **documented fallback** — its own comment says "when Zod schema parsing
+fails (e.g. read-only entities with no Body schema)". They disagree:
+
+| | `parseZodType` (primary) | `entityFieldsToFieldInfo` (fallback) |
+| --- | --- | --- |
+| a temporal field's `tsType` | `"Date"` (from `zod.iso.datetime(`) | `"string"` (from `format`) |
+| `defaultValue` that follows | `new Date()` | `""` |
+| an `object` / `array` field | typed (`string` for a string array, `Record<string, string>` for an i18n map) | **dropped**, unless the name ends `I18n` |
+
+Following the fallback would silently change every date field's initial value and drop the 278
+container and 38 `ref` fields the IR carries. Mirror `parseZodType`'s decisions instead, mapping
+from `TypeRef.kind` rather than from zod text, and keep `tsType: "Date"` for `instant` and `date`
+so `getDefaultValue` keeps returning `new Date()`.
+
+**`FieldInfo.tsType` is not the model interface's type.** Task 6 emits `string` for `instant` and
+`date` in `model/<entity>.ts`, which is correct — the wire carries an ISO string. `FieldInfo.tsType`
+is a scaffold-internal signal feeding `getDefaultValue` and the component choice, and there the
+orval path uses `Date`. Keep them different on purpose, and say so in your report.
 
 **One helper is not reusable:** `detectI18nFieldPairs` (`:265`) is not exported. The `xxxI18n`
 map pairing it performs is keyed on field NAMES, so it works the same on IR-derived fields — but
