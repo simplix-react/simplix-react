@@ -617,6 +617,22 @@ The generators need the IR sliced by domain and indexed. This task does that onc
   every generator writes a type only into its owner's file. Put a shared type in the entity that
   reaches it first in a deterministic order, so two runs agree.
 
+  **Fourteen of the 104 inheritance edges cross a domain boundary, and the parent must be
+  duplicated.** `AreaZoneUpdateFormDTO` (`site`) extends `AreaUpdateFormDTO` → `AreaUpdateDTO` →
+  `AreaCreateDTO`, all three of which belong to `space`. Measured, all three already land in both
+  domains' closures.
+
+  There is no import path available: **no domain package depends on another** — checked across all
+  13, and `domain-site`'s dependencies are the framework packages only. Adding one would make the
+  domain graph a graph rather than a fan, which is a change the user has not asked for. So pull the
+  parent in and declare it in both packages, and say in your report which types this affected.
+
+  **Note what this costs and why it is still right.** Orval avoids the duplication by flattening
+  inheritance — `AreaZoneUpdateFormDTO` in `domain-site` carries the parent's fields copied inline
+  and never names `AreaUpdateFormDTO`. That flattening is the first defect §1 lists. Preserving the
+  chain is the point of this project; two structurally identical declarations in two packages is
+  the price, and TypeScript's structural typing means a value crosses between them freely.
+
   **The closure also picks up types that are not DTOs.** The fixture holds 12 whose `javaClass` is
   JDK or Spring — reached because the walker's fallback is "anything else is a DTO":
 
@@ -765,6 +781,22 @@ This is where the project's original complaint is answered: 440 `maxLength` and 
   `schemas.ts` re-exports with `export *`, so it keeps resolving whatever names exist.
 
   A type with `extends` is built as `parentSchema.extend({ …own fields… })`.
+
+  **Emit in dependency order — a zod const cannot reference one declared later.** Unlike an
+  `interface`, `parentSchema.extend(…)` evaluates at module load. The fixture has chains four deep:
+  `AreaZoneUpdateFormDTO → AreaUpdateFormDTO → AreaUpdateDTO → AreaCreateDTO`, and 51 types are two
+  deep, 2 are three, 1 is four. Topologically sort the domain's types by `extends` before writing,
+  and **order the files as well as the declarations inside them** — with one file per entity the
+  parent frequently lands in a different file, and `schema/index.ts` re-exporting in the wrong
+  order gives `undefined` at evaluation, not a type error.
+
+  Every parent is present: 0 of the 104 name a type absent from `types`.
+
+  One child re-declares a parent field — `Organization.eventPayloadData` over
+  `BaseEntity.eventPayloadData` — and the two are **identical** in type and required-ness, so
+  `interface Organization extends BaseEntity` with that member repeated is legal. No de-duplication
+  is needed; if a future capture has them differing, that is a TypeScript error worth reporting
+  rather than silently dropping one.
 
 **Target zod v4** — the workspace resolves `zod@4.3.6` and orval's existing output already uses
   the v4 surface (`zod.iso.datetime()`, `zod.iso.date()`, `zod.int()`). Two consequences the
