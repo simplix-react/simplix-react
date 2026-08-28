@@ -2451,6 +2451,13 @@ Building the multi-select toolbar is a new screen feature, not a codegen parity 
 has not asked for it. **Report it in Task 14 with these counts** — the IR is what makes the gap
 visible, and naming it is this project's contribution; closing it is a separate decision.
 
+**A tree column can carry neither, and that is a framework gap rather than a template one.**
+`CrudTree.Column` declares no `format` and no `display` prop — only `CrudList.Column` does — so a
+tree screen's temporal columns print their ISO text whatever the source hands over. `organization`
+is a tree entity and `deletedTimestamp` and `lastSyncedAt` are both instants, so the pilot domain
+meets this on its main screen. Adding the two props to `CrudTree.Column` is a framework change
+outside this plan: report it with the field names rather than working around it in the template.
+
 **A boolean column needs `display="boolean"` for the same reason.** The column section has three
 branches — the two i18n ones, `Select` with `display="badge"`, and a bare `{{else}}` — so a boolean
 field falls through and the table prints `true` / `false`. `CrudList.Column` offers
