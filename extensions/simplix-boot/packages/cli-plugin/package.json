@@ -27,6 +27,7 @@
     "@simplix-react/cli": "workspace:*",
     "@simplix-react/contract": "workspace:*",
     "@simplix-react/config-typescript": "workspace:*",
+    "@types/node": "catalog:",
     "tsup": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

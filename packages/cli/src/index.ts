@@ -28,6 +28,8 @@ export type {
   SpecProfile,
   I18nEntityInfo,
   I18nDownloader,
+  ContainerMapping,
+  MetaExtensionOutput,
 } from "./openapi/orchestration/spec-profile.js";
 
 // Plugin registry
