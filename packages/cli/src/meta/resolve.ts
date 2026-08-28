@@ -90,6 +90,17 @@ export interface DeadPattern {
   pattern: string;
 }
 
+/**
+ * A tag more than one domain's patterns claim. The first domain in configuration order takes it
+ * and the others are left without it, which is the same silent loss a dead pattern causes, seen
+ * from the other side — the second domain generates an entity that answers nothing.
+ */
+export interface ContestedTag {
+  tag: string;
+  /** Every domain whose patterns match, in configuration order. The first one owns the tag. */
+  domains: string[];
+}
+
 /** A platform type that entered a domain closure. */
 export interface FrameworkTypeUse {
   name: string;
@@ -109,6 +120,7 @@ export interface ResolvedMeta {
   domains: Map<string, ResolvedDomain>;
   unmatched: UnmatchedTag[];
   deadPatterns: DeadPattern[];
+  contestedTags: ContestedTag[];
   frameworkTypes: FrameworkTypeUse[];
   sharedDeclarations: SharedDeclaration[];
   /** Type names a closure referenced that the IR does not declare. */
@@ -128,9 +140,9 @@ export interface ResolvedMeta {
  * literally and only a `/…/` pattern is a regular expression, so `site.*` looks for a tag named
  * `site.*`.
  *
- * Nothing is dropped quietly. An operation no domain claims, a pattern no tag answers, a
- * reference the IR does not declare and a container the profile does not map all come back on
- * {@link ResolvedMeta} for the caller to act on.
+ * Nothing is dropped quietly. An operation no domain claims, a tag two domains claim, a pattern
+ * no tag answers, a reference the IR does not declare and a container the profile does not map
+ * all come back on {@link ResolvedMeta} for the caller to act on.
  */
 export function resolveMeta(meta: DtoMeta, options: ResolveMetaOptions): ResolvedMeta {
   const index = new InheritanceIndex(meta.types);
@@ -179,6 +191,7 @@ export function resolveMeta(meta: DtoMeta, options: ResolveMetaOptions): Resolve
     domains,
     unmatched: collectUnmatched(operationsByTag, tagOwner),
     deadPatterns: collectDeadPatterns(domainEntries, [...operationsByTag.keys()]),
+    contestedTags: collectContestedTags(domainEntries, [...operationsByTag.keys()]),
     frameworkTypes: collectFrameworkTypes(domains),
     sharedDeclarations: collectSharedDeclarations(domains),
     missingTypes: [...missingTypes].sort(),
@@ -239,6 +252,22 @@ function collectDeadPatterns(
     }
   }
   return dead;
+}
+
+function collectContestedTags(
+  domainEntries: [string, string[]][],
+  tags: string[],
+): ContestedTag[] {
+  const contested: ContestedTag[] = [];
+  for (const tag of tags) {
+    const claiming = domainEntries
+      .filter(([, patterns]) => patterns.some((pattern) => createTagMatcher(pattern)(tag)))
+      .map(([domain]) => domain);
+    if (claiming.length > 1) {
+      contested.push({ tag, domains: claiming });
+    }
+  }
+  return contested;
 }
 
 function collectFrameworkTypes(domains: Map<string, ResolvedDomain>): FrameworkTypeUse[] {

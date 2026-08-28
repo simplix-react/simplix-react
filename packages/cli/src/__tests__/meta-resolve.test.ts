@@ -383,6 +383,10 @@ describe("resolveMeta against the smart-safety capture", () => {
     ]);
   });
 
+  it("finds no contested tag: every configured tag belongs to exactly one domain", () => {
+    expect(resolved.contestedTags).toEqual([]);
+  });
+
   it("lets no framework type into a closure but Comparable", () => {
     expect(resolved.frameworkTypes).toEqual([
       { name: "Comparable", javaClass: "java.lang.Comparable", domain: "user" },
@@ -515,6 +519,22 @@ describe("resolveMeta mechanics", () => {
     expect(shop?.enums.get("Colour")?.owner).toBe("shop.A");
     expect(shop?.enums.get("Size")?.owner).toBe("shop.B");
     expect(shop?.entities.map((entity) => entity.patterns)).toEqual([["shop.A"], ["shop.B"]]);
+  });
+
+  it("names a tag two domains claim, and hands it to the first", () => {
+    const resolvedTiny = resolveMeta(tinyMeta(), {
+      domains: { shop: ["shop.A", "shop.B"], outlet: ["shop.B"] },
+      containerTypes,
+    });
+
+    expect(resolvedTiny.contestedTags).toEqual([{ tag: "shop.B", domains: ["shop", "outlet"] }]);
+    expect(resolvedTiny.domains.get("shop")?.entities.map((entity) => entity.tag)).toEqual([
+      "shop.A",
+      "shop.B",
+    ]);
+    // The loser keeps the pattern and loses the tag, which is why it needs reporting: on its own
+    // the empty entity list is indistinguishable from a domain whose endpoints do not exist yet.
+    expect(resolvedTiny.domains.get("outlet")?.entities).toEqual([]);
   });
 
   it("follows a pick to the type it subsets, and a searchDto to its DTO", () => {
