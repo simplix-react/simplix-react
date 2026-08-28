@@ -375,7 +375,11 @@ import 교체(`LabeledEnum` 140곳 · `EntityMessageResolver` 38곳 · `EnumMess
 
 ## 8 · CLI 파이프라인
 
-`packages/cli/src/meta/`를 새로 만든다. 기존 `packages/cli/src/openapi/`는 변경하지 않는다.
+`packages/cli/src/meta/`를 새로 만든다. 기존 `packages/cli/src/openapi/`의 **동작은 바뀌지 않는다**.
+파일을 열지 않는다는 뜻은 아니다 — 컨테이너 타입 등록(`spec-profile.ts`), 경로 기준 엔티티 묶기
+함수의 공개(`entity-extractor.ts`), `SUFFIX_TO_ENUM_KEY` 보강(`scaffold-crud.ts`), 배럴 템플릿의
+모델 경로 변수화가 모두 여기 있고 전부 덧붙이는 변경이다. orval 산출물이 한 바이트라도 달라지는
+변경은 범위 밖이다.
 
 ```
 meta/
@@ -387,7 +391,7 @@ meta/
     schema-gen.ts      zod + .extend()
     endpoint-gen.ts    요청 함수
     hook-gen.ts        React Query 훅
-    mock-gen.ts        MSW 핸들러와 시드
+    mock-gen.ts        MSW 핸들러 — 시드는 만들지 않는다(아래 표)
     search-gen.ts      @SearchableField → 필터·정렬 설정
     access-gen.ts      AccessMeta → useCan 게이트용 화면 키·동작 상수
 ```

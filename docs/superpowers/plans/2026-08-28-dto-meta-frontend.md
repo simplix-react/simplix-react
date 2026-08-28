@@ -1014,6 +1014,29 @@ meta?: {
   `export *` from both would collide on names (the existing type-name-conflict rule). `mock/` is
   absent because `src/mock/index.ts` imports the handler factories by path.
 
+- [ ] **Step 2b: The four side artifacts — verify, do not regenerate.**
+
+  Spec §8 requires the meta path to produce what the `openapi` command produces besides code, or
+  scaffolding and validation break on a moved domain. Measured against `domain-org`, none of them
+  needs regenerating, because **none references a generated path and all are keyed by entity
+  name**:
+
+  | Artifact | Keyed by | References `generated/` |
+  | --- | --- | --- |
+  | `crud.config.ts` | entity → hook name (`organization`, `orgType`) | no |
+  | `src/locales/{ko,en,ja}.json` | entity, plus a top-level `enums` | no |
+  | `src/translations.ts` | the domain name and the three locale files | no |
+  | `http/<entity>.http` | one file per entity | no |
+
+  So they survive the swap **exactly when the entity partition and the hook names match** — which
+  is what Task 8 and spec §11 already demand. That makes this a test rather than a generator:
+  after Step 3 repoints the barrels, assert that all four files are byte-identical to what they
+  were before, and that `crud.config.ts`'s keys still resolve to exported hooks. A drift here is
+  the loudest available signal that the entity partition diverged.
+
+  Generate them from the IR only for a domain that never had an orval run — the greenfield case
+  Task 13's scaffolding covers.
+
   **Write the profile's extension files last.** After the generators run, call
   `profile.metaExtensions?.(meta)` and write each entry of `files` under `generated-meta/`. A path
   that collides with a file a generator already wrote is an error, not an overwrite — the profile
