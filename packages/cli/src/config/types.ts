@@ -115,6 +115,26 @@ export interface SimplixConfig {
   openapi?: OpenAPISpecConfig[];
 }
 
+/**
+ * DTO metadata generation for one spec.
+ *
+ * @remarks
+ * The IR is served by the backend and carries what an OpenAPI document loses — validation
+ * constraints, search operators, `@PreAuthorize` and labeled enums. It is generated into
+ * `src/generated-meta/` of every domain package the spec produces.
+ */
+export interface OpenAPIMetaConfig {
+  /**
+   * Endpoint URL or snapshot path. Omit it and the source is built the way the i18n download
+   * already builds its own: the origin of `spec` plus the profile's `metaEndpoint`.
+   */
+  source?: string;
+  /** Where a fetched IR is written for offline regeneration. */
+  snapshot?: string;
+  /** Domains whose barrel exports the meta output instead of the orval output. */
+  export?: string[];
+}
+
 /** Per-spec OpenAPI configuration */
 export interface OpenAPISpecConfig {
   /** OpenAPI spec file path (relative to project root) or URL */
@@ -129,6 +149,8 @@ export interface OpenAPISpecConfig {
   domains: Record<string, string[]>;
   /** CRUD role detection patterns. When omitted, no CRUD roles are assigned. */
   crud?: Partial<Record<CrudRole, CrudEndpointPattern>>;
+  /** DTO metadata generation. Omit the block and the meta pipeline does not run for this spec. */
+  meta?: OpenAPIMetaConfig;
 }
 
 /** Find the spec config that contains the given domain name */

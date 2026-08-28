@@ -3,6 +3,7 @@ export { defineCrudMap } from "./config/define-crud-map.js";
 export type {
   SimplixConfig,
   OpenAPISpecConfig,
+  OpenAPIMetaConfig,
   CrudEndpointPattern,
   CrudEntityConfig,
   CrudMap,
