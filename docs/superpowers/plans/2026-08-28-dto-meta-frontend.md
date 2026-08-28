@@ -1509,6 +1509,14 @@ precedent to follow.
   Generate them from the IR only for a domain that never had an orval run — the greenfield case
   Task 13's scaffolding covers.
 
+  **`spec:` stays in the config after the last domain moves.** Deleting a domain's `generated/` and
+  removing the OpenAPI spec are different acts, and only the first is in scope. Seven steps of the
+  `openapi` command are fed by the spec-derived entities — the change gate (`:278`),
+  `crud.config.ts` (`:335`), hook generation (`:377`), mock generation (`:380`), the locale files
+  (`:423`), the i18n downloader's entity list (`:801`) and `saveSnapshot` (`:452`) — and the meta
+  path replaces only two of them. `.http` generation reads the same entities. Say this in the Task
+  14 report so nobody reads "the domain is moved" as "the spec can go".
+
   **One of the four does break on the swap, and only at the last step.** The enum half of the
   locale overlay is filtered by `resolveKnownModelTypes` (`openapi.ts:837`), which lists
   `src/generated/model/*.ts` and derives a type name from **each filename**:
