@@ -1747,6 +1747,19 @@ precedent to follow.
   shape — the 13 standard roles first, active or commented out, then the extra roles. Write it only
   when absent or under `--force`, matching `openapi.ts:334`.
 
+  **Everything the scaffold emits hangs off this one file — 26 references in `scaffold-crud.ts`.**
+  Its absence is the single largest failure mode in the greenfield path, and the consequences are
+  spread across four places in this plan; together they are:
+
+  | Consumer | Without `crud.config.ts` |
+  | --- | --- |
+  | `EntityOperations` → widget shape (below) | all six booleans default **true** except `hasTree` |
+  | hook identifiers (`toHookName`, Task 13) | `hookList` null → the list renders `useMockList()`, an empty array |
+  | the delete wiring (`crud-page.hbs:50`) | a working dialog over `mutate: () => {}` |
+  | the chrome catalogue (`updateLocaleJsons`, Task 11) | gated on the same booleans, so the wrong keys are written |
+
+  Generate it first, and let the rest of Task 13 assume it.
+
   **It decides the widget's shape, not just its hook names, and its absence fails open.**
   `EntityOperations` — the six booleans that gate the generated create button, edit affordance,
   delete action and tree view — is built straight from the file (`scaffold-crud.ts:707`:
