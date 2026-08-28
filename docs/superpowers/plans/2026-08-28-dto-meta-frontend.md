@@ -1560,7 +1560,25 @@ precedent to follow.
   the loudest available signal that the entity partition diverged.
 
   Generate them from the IR only for a domain that never had an orval run — the greenfield case
-  Task 13's scaffolding covers.
+  Task 13's scaffolding covers. **`crud.config.ts` is the one that must actually be generated
+  there**, and no task says how. `findCrudConfigForEntity` returns `null` when the file is absent
+  (`crud-config-loader.ts:31`), so `simplix scaffold` on a greenfield meta domain resolves no hook
+  names at all.
+
+  The existing generator needs nothing new from the IR beyond what Task 8 already computes.
+  `generateCrudConfigContent` reads `op.role` — which `resolveEntityHookNames` fills from
+  `simplixBootNaming.resolveOperation` at `openapi.ts:656`, one step earlier — and falls back to
+  `inferCrudRole` (`:665`) only for an operation with no `operationId`. **Every IR operation has an
+  `id`**, so that fallback never fires on this path and the roles come wholly from the strategy,
+  which is why the application's files hold 122 role kinds where `inferCrudRole`'s table has 12.
+
+  So: emit `crud.config.ts` from the same `{ role, hookName }` pairs Task 8 resolves, in the same
+  shape — the 13 standard roles first, active or commented out, then the extra roles. Write it only
+  when absent or under `--force`, matching `openapi.ts:334`.
+
+  Note also that the app configures **no** `crud:` block in `simplix.config.ts`, so
+  `CrudEndpointPattern` and `matchCrudRole` never run and `ExtractedOperation.role` is undefined
+  before step 5. Do not build anything on that path.
 
   **`spec:` stays in the config after the last domain moves.** Deleting a domain's `generated/` and
   removing the OpenAPI spec are different acts, and only the first is in scope. Seven steps of the
