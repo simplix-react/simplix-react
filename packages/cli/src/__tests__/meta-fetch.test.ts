@@ -156,6 +156,34 @@ describe("fetchMeta", () => {
     await expect(fetchMeta({ source: junk })).rejects.toThrow(/no `version`.*no `body`/s);
   });
 
+  it("calls a top-level array the wrong kind of document, not a broken envelope", async () => {
+    const path = join(tempDir, "array.json");
+    await writeFile(path, "[1, 2, 3]", "utf-8");
+    await expect(fetchMeta({ source: path })).rejects.toThrow(/is not a JSON object \(got an array\)/);
+  });
+
+  it("names the endpoint and the dev-meta flag when the backend cannot be reached", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockRejectedValue(new TypeError("fetch failed")),
+    );
+    await expect(fetchMeta({ source: "http://localhost:8082/api/v1/dev/meta/dto" })).rejects.toThrow(
+      /Cannot reach the DTO meta endpoint at http:\/\/localhost:8082\/api\/v1\/dev\/meta\/dto.*simplix\.dev\.meta\.enabled=true/s,
+    );
+  });
+
+  it("points a 404 at the dev-meta flag, since that is what leaves the endpoint unregistered", async () => {
+    stubFetch({
+      ok: false,
+      status: 404,
+      statusText: "Not Found",
+      text: () => Promise.resolve(""),
+    });
+    await expect(fetchMeta({ source: "http://localhost:8082/api/v1/dev/meta/dto" })).rejects.toThrow(
+      /simplix\.dev\.meta\.enabled=true/,
+    );
+  });
+
   it("names the file when its content is not valid JSON", async () => {
     const broken = join(tempDir, "broken.json");
     await writeFile(broken, "{ not json", "utf-8");

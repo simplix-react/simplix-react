@@ -39,6 +39,11 @@ interface RawPayload {
   value: unknown;
 }
 
+/** Both failure modes below are usually this one setting, so they say so in the same words. */
+const ENABLE_HINT =
+  "Check that the backend is running and was started with `simplix.dev.meta.enabled=true` — " +
+  "the endpoint is not registered otherwise.";
+
 function isHttpSource(source: string): boolean {
   return /^https?:\/\//i.test(source);
 }
@@ -48,14 +53,27 @@ async function readSource(source: string): Promise<RawPayload> {
     return { origin: "file", location: source, value: await readJsonFile(source) };
   }
 
-  const response = await fetch(source);
+  let response: Response;
+  try {
+    response = await fetch(source);
+  } catch (cause) {
+    // `fetch` rejects with a bare "fetch failed" that names neither the URL nor a cause, and a
+    // stopped backend is the most common way this command fails.
+    throw new Error(
+      `Cannot reach the DTO meta endpoint at ${source}: ${describeError(cause)}. ${ENABLE_HINT}`,
+      { cause },
+    );
+  }
   if (!response.ok) {
     // The backend answers a duplicate DTO simple name with a 409 whose body names both Java
     // classes. Dropping that body leaves the operator with a status code and nothing to act on.
     const detail = await readResponseText(response);
     throw new Error(
       `DTO meta request to ${source} failed with ${describeStatus(response)}` +
-        (detail ? `: ${detail}` : ""),
+        (detail ? `: ${detail}` : "") +
+        // The endpoint is registered only under the dev-meta flag, so a 404 is far more often a
+        // configuration the operator can fix than a wrong URL.
+        (response.status === 404 ? ` ${ENABLE_HINT}` : ""),
     );
   }
   return { origin: "http", location: source, value: parseJson(await response.text(), source) };
@@ -131,7 +149,10 @@ function assertVersion(meta: DtoMeta): void {
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
+  // Arrays are excluded deliberately: `typeof [] === "object"`, so without this an array payload
+  // reaches the envelope check, finds no `body`, and is reported as a malformed envelope instead
+  // of as the wrong kind of document.
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 /**
