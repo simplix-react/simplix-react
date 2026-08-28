@@ -1669,6 +1669,26 @@ precedent to follow.
   shape — the 13 standard roles first, active or commented out, then the extra roles. Write it only
   when absent or under `--force`, matching `openapi.ts:334`.
 
+  **It decides the widget's shape, not just its hook names, and its absence fails open.**
+  `EntityOperations` — the six booleans that gate the generated create button, edit affordance,
+  delete action and tree view — is built straight from the file (`scaffold-crud.ts:707`:
+  `hasList: !!crudConfig.list`, and so on). With no `crud.config.ts` the scaffold substitutes
+  **all true except `hasTree`** (`:695`). Measured against the fixture, that default is wrong for
+  most entities:
+
+  | Role | entities that have it | that do not |
+  | --- | ---: | ---: |
+  | `list` | 60 | 79 |
+  | `get` | 65 | 74 |
+  | `create` | 54 | 85 |
+  | `update` | 48 | 91 |
+  | `delete` | 36 | **103** |
+  | `tree` | 2 | 137 |
+
+  A greenfield meta domain scaffolded without the file emits a delete action for 103 entities that
+  have no delete endpoint, and `detail.hbs` imports `CrudDelete` and `useCrudDeleteDetail` to serve
+  it. Generate the file before scaffolding, and assert the six booleans against the resolved roles.
+
   Note also that the app configures **no** `crud:` block in `simplix.config.ts`, so
   `CrudEndpointPattern` and `matchCrudRole` never run and `ExtractedOperation.role` is undefined
   before step 5. Do not build anything on that path.
