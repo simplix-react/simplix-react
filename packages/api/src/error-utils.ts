@@ -13,6 +13,16 @@ export interface ValidationFieldError {
   field: string;
   /** Human-readable validation message for the field. */
   message: string;
+  /**
+   * What the server calls that field, already in the request's locale.
+   *
+   * @remarks
+   * Sent by SimpliX backends from the DTO's `@FieldLabel`. It is the only readable name a client
+   * has for a field its own form does not draw — a refusal naming `originalApproverName` is a
+   * string the reader can do nothing with, and this is the same field called 「원 결재자」.
+   * Optional because other server shapes (Rails-style `errors`) carry no label.
+   */
+  label?: string;
 }
 
 /**

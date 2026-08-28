@@ -77,6 +77,17 @@ export interface UseCrudFormSubmitResult<T> {
   isPending: boolean;
   /** Server validation errors keyed by field name. Empty when no errors. */
   fieldErrors: Record<string, string>;
+  /**
+   * What the server calls each refused field, keyed by field name. Empty when no errors, and
+   * missing entries for fields the server labelled nothing.
+   *
+   * @remarks
+   * A form can only name the fields it draws. When the server refuses one it does not — a field it
+   * fills in itself, or one added to the DTO since — a summary that resolves names out of the
+   * form's own catalogue has nothing to resolve and prints the lookup key at the reader. These are
+   * the server's own names, already localized, so that case has something readable to fall back to.
+   */
+  fieldLabels: Record<string, string>;
 }
 
 /**
@@ -128,10 +139,12 @@ export function useCrudFormSubmit<T, TId = unknown>(
   const { entityId, create, update, onSuccess, i18nFields, locales, validator } = options;
   const isEdit = entityId != null && entityId !== "";
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [fieldLabels, setFieldLabels] = useState<Record<string, string>>({});
 
   const handleSubmit = useCallback(
     (values: T) => {
       setFieldErrors({});
+      setFieldLabels({});
 
       // ── client-side validation gate ──
       // Validator receives the raw form values (pre-i18n-fallback) so the
@@ -164,6 +177,7 @@ export function useCrudFormSubmit<T, TId = unknown>(
           const errors = getValidationErrors(error);
           if (errors) {
             setFieldErrors(groupByField(errors));
+            setFieldLabels(labelsByField(errors));
           }
         });
     },
@@ -172,7 +186,23 @@ export function useCrudFormSubmit<T, TId = unknown>(
 
   const isPending = isEdit ? (update?.isPending ?? false) : create.isPending;
 
-  return { isEdit, handleSubmit, isPending, fieldErrors };
+  return { isEdit, handleSubmit, isPending, fieldErrors, fieldLabels };
+}
+
+/**
+ * What the server calls each refused field, for the fields it labelled.
+ *
+ * @param errors - Field errors as the server sent them.
+ * @returns Server-supplied labels keyed by field name; fields with no label are absent.
+ */
+function labelsByField(
+  errors: ValidationFieldError[],
+): Record<string, string> {
+  const labels: Record<string, string> = {};
+  for (const err of errors) {
+    if (err.label && !labels[err.field]) labels[err.field] = err.label;
+  }
+  return labels;
 }
 
 function groupByField(
