@@ -151,6 +151,20 @@ it("every request body is a TypeRef, not a bare type name", () => {
   A `Set` normalises to `List` because `TypeRefMapper` treats every `Collection` alike — which is
   also why Task 4's "four containers and no others" stays true after this change.
 
+- [ ] **Step 2b: Expect the type count to grow — the erasure removed types, not just references.**
+  `registry.register(java.util.List)` filed `List` and never walked into the element, so an element
+  type reachable from nothing else is **absent from `types` altogether**. Measured on the stale
+  capture: **11 `/order` operations and zero `…Order`/`…OrderDTO` types** in the map. The plan's
+  "637 types" therefore undercounts by at least those 11.
+
+  That absence has a consumer. `orderField` — the property a reorder writes — is read from the
+  order operation's request body element (`scaffold-crud.ts:1694`,
+  `bodySchema.items.properties`, taking the first key that is neither `id` nor the row id), and
+  `treeSortOrderField` falls back to it (`:1789`). With the element type missing, none of the 11
+  reorder-capable entities can derive it. After the re-capture, assert that
+  `PATCH /api/v1/admin/org/order`'s body resolves to a `List` of a named DTO and that the DTO is in
+  `types`.
+
 - [ ] **Step 3: Re-run every count this plan quotes.** The operation, type, enum, constraint and
   container figures below were measured against the old capture. Re-measure and correct any that
   moved; a plan quoting a number the fixture no longer contains sends an implementer looking for
