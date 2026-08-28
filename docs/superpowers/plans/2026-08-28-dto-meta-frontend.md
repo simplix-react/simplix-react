@@ -1186,6 +1186,19 @@ operator table (Step 1b) is wrong, and the diff will say which member moved.
     application deliberately avoids it: all four references are comments explaining why, and
     `packages/console-ui/src/entity/forced-list.ts:7` records that it runs only when a `filters`
     object already exists.
+  - **Set `dateOnly: true` for a `date` field and leave it unset for an `instant` one.**
+    `DateRangeFilterDef.dateOnly` (`packages/ui/src/crud/filters/filter-bar.tsx`) serializes the
+    boundaries as zone-neutral `yyyy-MM-dd` instead of a UTC ISO timestamp, "so date filtering
+    matches the stored calendar date regardless of the browser timezone". Of the fields carrying
+    range operators, **159 are `instant` and 38 are `date`**; getting those 38 wrong makes a filter
+    return different rows in different browsers, with nothing to see. This is the same failure §12
+    describes for `LocalDateTime`, and the IR's kind is what settles it — the orval path could only
+    guess from `format`. Leave `displayZone` alone: it is a per-screen decision about a
+    site-scoped column and takes precedence over `dateOnly`.
+
+  **The vocabulary is fixed**: `FilterDef` is a seven-member union — `text`, `number`, `faceted`,
+  `toggle`, `dateRange`, `country`, `timezone`. Emit one of those seven; the last two are
+  special-purpose and are chosen by the screen author, not derived.
 
 - [ ] **Step 2: `access-gen`.** For each operation, emit a permission constant from `AccessMeta`.
 
