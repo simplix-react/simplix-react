@@ -577,8 +577,21 @@ export async function findSchemaFile(
   // \w* infixes support Boot-style naming (AdminUserAccountRestUpdateBody)
   const EntityPascal = entityName.charAt(0).toUpperCase() + entityName.slice(1);
   const patterns = [
-    // simplix-react: petSchema = z.object(
-    new RegExp(`\\w*${entityName}\\w*[Ss]chema\\s*=\\s*(?:z|zod)\\.object`, "i"),
+    // simplix-react: petSchema = z.object(, and petSchema = parentSchema.extend(
+    //
+    // The `.extend(` alternative is what makes an inherited DTO discoverable. The IR-driven
+    // generator preserves the Java inheritance chain, so a type with a parent is emitted as
+    // `ChildSchema = ParentSchema.extend({ ...own fields... })` and never writes `z.object` under
+    // its own name. Without this, an entity whose every DTO extends another — 27 of the capture's
+    // 139 — is found by nothing here, and the scaffold falls back to its placeholder field set
+    // with no warning, reporting success while emitting an id/name form.
+    //
+    // Orval's own zod output inlines inheritance and contains no `.extend(` at all, so the
+    // alternative cannot change which file is found on the existing path.
+    new RegExp(
+      `\\w*${entityName}\\w*[Ss]chema\\s*=\\s*(?:(?:z|zod)\\.object|\\w+[Ss]chema\\.extend)`,
+      "i",
+    ),
     // Orval Body: UpdatePetBody / AdminUserAccountRestUpdateBody = zod.object(
     new RegExp(`\\w*${EntityPascal}\\w*Body\\s*=\\s*(?:z|zod)\\.object`, "i"),
     // Orval Body|Response: GetPetByIdResponse / AdminUserAccountRestGetResponse = zod.object(
