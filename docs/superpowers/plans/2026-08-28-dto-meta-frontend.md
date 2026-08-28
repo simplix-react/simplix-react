@@ -1578,8 +1578,8 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
   1. **Seeds are generated once, then preserved.** `generateMockFiles` writes
      `src/mock/seeds.ts` **only when it does not already exist** (`mock-generator.ts:43`) — so a
      greenfield meta domain needs the meta path to produce it, while a migrated domain keeps the
-     file it has. `src/mock/index.ts` is hand-written throughout: it builds each store with
-     `createMockEntityStore<T>(seeds, "<idField>")` and spreads the generated factories into
+     file it has. `src/mock/index.ts` is the regenerated file item 0 describes — it builds each store
+     with `createMockEntityStore<T>(seeds, "<idField>")` and spreads the generated factories into
      `handlers`. Into `generated-meta/` the generator writes `mock/handlers.ts` and nothing else
      (spec §8).
 
@@ -2162,8 +2162,11 @@ precedent to follow.
   drops names silently looks identical to one that works until a screen imports the missing type.
 
 - [ ] **Step 4: Test** that a domain not in `export` keeps its orval barrel byte-for-byte; that a
-  domain in `export` has all four re-export files repointed; that a hand-edited region in
-  `schemas.ts` survives.
+  domain in `export` has **all six** re-export files pointing at the meta output — `index.ts`,
+  `hooks/<entity>.ts`, `hooks/index.ts`, `schemas.ts`, `mock/index.ts` and `mock/seeds.ts`
+  (Step 3); that content after `schemas.ts`'s `// Custom schema overrides and additions:` marker
+  survives; and that **running codegen twice leaves all six unchanged** — four of them are
+  regenerated every run, so a swap the generator does not know about is undone silently.
 
 - [ ] **Step 4b: Prove the generated output survives typecheck and lint — the requirement nobody
   has verified yet.**
