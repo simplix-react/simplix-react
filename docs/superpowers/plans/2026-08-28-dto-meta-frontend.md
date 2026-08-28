@@ -41,12 +41,18 @@ Those numbers are the yardstick. A generator that silently drops a field kind wi
 - **Repository:** `/Users/taehwan/Workspace/accesscore/simplix-react`, branch `feat/dto-meta-codegen`. Two files under `packages/ui/src/base/charts/` were dirty before this work began — they belong to somebody else; never stage them.
 - **Never touch `packages/cli/src/openapi/`.** The orval path must keep working for every domain not yet moved.
 - Commit messages: English conventional commits, **no AI attribution of any kind**.
+- **Run tests from the workspace root with `npx vitest run --project cli`.** Measured: the
+  package script `pnpm --filter @simplix-react/cli test -- <name>` prints `No test files found`
+  and **exits 0**, and `cd packages/cli && npx vitest run <path>` finds nothing either — the
+  project's `root` is declared relative to the workspace, so invoking from the package directory
+  resolves it wrongly. From the root it collects 67 files / 970 tests. Add `--reporter=verbose`
+  and grep for your file when you need to prove yours ran.
 - **Every CLI test lives in `packages/cli/src/__tests__/`, flat.** The root `vitest.config.ts`
   pins the CLI project to `include: ["src/__tests__/**/*.test.ts"]`, and the package script is
   `vitest run --passWithNoTests` — so a test placed anywhere else is never collected and the run
   still reports success. After adding a test, confirm the runner names your file and reports a
   non-zero test count; a green run that collected nothing looks identical to a passing one.
-- `pnpm` workspace. Tests: `pnpm --filter @simplix-react/cli test`. Typecheck: `pnpm typecheck`. Lint: `pnpm lint`.
+- `pnpm` workspace. Tests: `npx vitest run --project cli`. Typecheck: `pnpm typecheck`. Lint: `pnpm lint`.
 - Comments and TSDoc in English (repo rule); the design spec is Korean and is not a template for code comments.
 
 ---
@@ -230,7 +236,7 @@ describe("ir-types", () => {
 
 - [ ] **Step 3: Run it**
 
-`pnpm --filter @simplix-react/cli test -- meta-ir-types`
+`npx vitest run --project cli`
 Expected: all green. A count mismatch means the fixture was regenerated against a different backend — stop and report rather than editing the numbers.
 
 - [ ] **Step 4: Commit**
@@ -294,7 +300,7 @@ Cover: reading the real fixture from disk; unwrapping an enveloped payload; unwr
 - [ ] **Step 3: Run, then commit**
 
 ```bash
-pnpm --filter @simplix-react/cli test -- meta-fetch
+npx vitest run --project cli
 git add packages/cli/src/meta/fetch.ts packages/cli/src/__tests__/meta-fetch.test.ts
 git commit -m "feat(cli): read the DTO meta IR from an endpoint or a snapshot"
 ```
@@ -391,7 +397,7 @@ const used = new Set<string>();
 expect([...used].filter((n) => !(n in bootContainerTypes))).toEqual([]);
 ```
 
-- [ ] **Step 4: Run `pnpm --filter @simplix-react/cli test`, `pnpm typecheck`, then commit**
+- [ ] **Step 4: Run `npx vitest run --project cli`, `pnpm typecheck`, then commit**
 
 ```bash
 git add packages/cli/src/openapi/orchestration/spec-profile.ts \
@@ -661,7 +667,7 @@ meta?: {
 - [ ] **Step 5: Run the full CLI suite, then commit**
 
 ```bash
-pnpm --filter @simplix-react/cli test
+npx vitest run --project cli
 git add packages/cli/src/config/types.ts packages/cli/src/commands/openapi.ts \
         packages/cli/src/meta/write.ts packages/cli/src/__tests__/meta-parallel.test.ts
 git commit -m "feat(cli): generate the meta output alongside orval and switch by config"
@@ -757,7 +763,7 @@ what the orval path has to do. Labels come from `labelKey`.
 - [ ] **Step 5: Run the full suite, then commit**
 
 ```bash
-pnpm --filter @simplix-react/cli test && pnpm typecheck
+npx vitest run --project cli && pnpm typecheck
 git add packages/cli/src/meta/scaffold-source.ts packages/cli/src/commands/scaffold-crud.ts \
         packages/cli/src/templates/openapi/user-index-ts.hbs \
         packages/cli/src/__tests__/scaffold-meta-source.test.ts
