@@ -1272,7 +1272,18 @@ git commit -m "feat(cli): generate request functions and React Query hooks from 
 - Test: `packages/cli/src/__tests__/meta-search-access-gen.test.ts`
 
 **Output:** `generated-meta/search/<entity>.ts` and `generated-meta/access/<entity>.ts`, one file
-each per entity, plus their directory barrels (spec §9). The `<Name>Params` type for each list
+each per entity, plus their directory barrels (spec §9).
+
+**Neither file is read by the scaffold — say so, and put the rules in one place.** `access/` is
+already declared unconsumed below (the constants exist; adopting them is the user's call). `search/`
+is the same kind of artifact: metadata exported through the barrel for a hand-written screen to
+import. The **scaffold** gets its filters from the IR source in Task 13, at
+`parseFilterParams`'s call site (`scaffold-crud.ts:1685`), not from this file.
+
+So implement the operator translation, the range rules, the field-type-driven component choice and
+the empty-facet reroute **once**, in the shared IR source Task 13 builds, and have `search-gen`
+serialise the same `FilterFieldInfo[]` it produces. Two implementations of these rules would drift,
+and the one nothing imports would drift unnoticed. The `<Name>Params` type for each list
 operation goes into `generated-meta/model/` beside the DTOs, where orval puts it.
 
 **The search params are not in the IR — they are derived, and the derivation was verified.**
