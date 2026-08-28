@@ -1537,6 +1537,31 @@ git commit -m "feat(cli): let scaffolding read fields from the IR"
   stopping once create and list work.
   Drive the diff to zero errors and record every info-level difference in the task report.
 - [ ] **Step 3** — add that domain to `export`. Run `pnpm typecheck` and `pnpm build`.
-- [ ] **Step 4** — run `simplix scaffold` for one entity in that domain and confirm the widget set is unchanged from what the orval path produced.
+- [ ] **Step 4** — scaffold into a scratch directory and diff, **not into the module.**
+
+  `scaffold-crud.ts` skips every file that already exists (`:929`, `:1945`), and
+  `modules/org/src/widgets/organization/` already holds eight hand-written files —
+  `tree.tsx`, `accounts-tab.tsx`, `scope-reference.tsx`, `use-organization-saved.ts` among them.
+  Run against the module, the command writes nothing and there is no output to compare, so the
+  check silently passes while proving nothing. Use the explicit output instead, which bypasses the
+  module path entirely:
+
+  ```bash
+  simplix scaffold organization --output /tmp/meta-scaffold/org-meta
+  git stash   # or point the config at the orval path
+  simplix scaffold organization --output /tmp/meta-scaffold/org-orval
+  diff -ru /tmp/meta-scaffold/org-orval /tmp/meta-scaffold/org-meta
+  ```
+
+  Read the diff. Field order, component choice and filter definitions must match, except for the
+  three temporal components Task 13 deliberately changes (`DateTimeField` / `DateField` /
+  `TimeField` where the orval path emitted `DateField` or a text input).
+
+  **Report, do not fix:** `ensureSubjectsFile` (`:947`) writes
+  `modules/<name>/src/shared/auth/subjects.ts`, and **no module in this application has that
+  file** — the permission-subject map lives at `packages/console-ui/src/identity/subjects.ts`
+  instead. A scaffold run into a real module would create a second map nothing imports. That is a
+  pre-existing divergence between the CLI's convention and the app's, not something this project
+  introduced; surface it and let the user decide.
 - [ ] **Step 5** — drive the screens in a browser under the `simplix:frontend-e2e` skill. A green typecheck is not evidence a screen works.
 - [ ] **Step 6** — report: which domain, the info-level differences, what the browser pass found. **Do not delete `src/generated/` yet** — that is the last step after the domain has been exercised, and it is what makes the move irreversible.
