@@ -180,13 +180,16 @@ function compareQueryKey(name: string, left: Decl, right: Decl): Finding[] {
  * A filter parameter whose operator takes more than one value, typed as one string by springdoc
  * and as the array the caller actually passes by the IR.
  *
- * `buildSearchableParams` hands a faceted filter's value straight through, and that value is an
- * array; springdoc describes the query parameter as a string because that is what reaches the wire
- * after joining. The IR's typing is the one a caller can satisfy, so the widening is the fix rather
- * than the drift — the serialiser joins it exactly as the orval builder does.
+ * Several values reach the wire as one comma-separated field. `buildSearchableParams` hands a
+ * faceted filter's committed value — an array — straight through, while hand-written code joins it
+ * itself; the serialiser turns either into the same query string, exactly as the orval builder
+ * does. So the IR names both shapes where springdoc named only the joined one, and the widening is
+ * the fix rather than the drift.
  */
 function isMultiValueFilter(field: string, before: string, after: string): boolean {
-  return /\.(in|notIn|between|notBetween)$/.test(field) && `${before}[]` === after;
+  return (
+    /\.(in|notIn|between|notBetween)$/.test(field) && after === `${before} | ${before}[]`
+  );
 }
 
 function compareMembers(

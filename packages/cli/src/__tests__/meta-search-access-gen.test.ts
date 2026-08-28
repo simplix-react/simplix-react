@@ -305,8 +305,11 @@ describe("a searchable route's params are its filters, its own query and the pag
   it("types a member by what the operator asks of the field", () => {
     const params = fileOf(orgSearch.files, "model/listOrganizationsParams.ts");
     expect(params).toContain(`  "orgName.contains"?: string;`);
-    // A membership test takes a list of the field's own values, sent one occurrence per member.
-    expect(params).toContain(`  "orgTypeId.in"?: string[];`);
+    // Several values reach the wire as one comma-separated field. Both shapes serialise to it —
+    // the filter bar commits an array, hand-written code joins it — so naming only the array
+    // rejects what module code written against the OpenAPI path already passes.
+    expect(params).toContain(`  "orgTypeId.in"?: string | string[];`);
+    expect(params).toContain(`  "createdAt.between"?: string | string[];`);
     expect(params).toContain(`  "sortOrder.greaterThan"?: number;`);
     expect(params).toContain(`  "isActive.equals"?: boolean;`);
     // A moment arrives as its ISO text, whichever bound it is on.

@@ -367,8 +367,11 @@ ${derived.filters.map(filterFieldLiteral).join("\n")}
       case "NOT_IN":
       case "BETWEEN":
       case "NOT_BETWEEN":
-        // Sent as one occurrence of the parameter per member, which is how the binder reads it.
-        return `${scalar}[]`;
+        // Several values reach the wire as one comma-separated field, and both shapes serialise to
+        // it: the filter bar commits an array and `buildSearchableParams` hands it through, while
+        // hand-written code joins it itself. Naming only the array rejects the second, which is
+        // what module code already written against the OpenAPI path passes.
+        return `${scalar} | ${scalar}[]`;
       case "CONTAINS":
       case "NOT_CONTAINS":
       case "STARTS_WITH":
