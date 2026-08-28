@@ -400,6 +400,23 @@ describe("generateEndpointFiles writes the request half", () => {
     expect(toQueryString(undefined)).toBe("");
   });
 
+  it("declares a name once where two operations resolve to it, and reports both", () => {
+    // `user.Avatar` serves the same read at `/{userId}-avatar-{size}.{ext}` and
+    // `/{userId}-avatar.{ext}`, and the strategy names both `getAllAvatars`. Emitting each
+    // declares the constant twice and the package stops compiling, so the later one is dropped
+    // and the report names every operation that wanted it.
+    const user = resolved.domains.get("user");
+    const avatars = generateEndpointFiles(user!, { naming: simplixBootNaming });
+    const module = avatars.files.get("endpoints/avatar.ts") ?? "";
+
+    const declared = [...module.matchAll(/^export const (\w+)/gm)].map((one) => one[1]);
+    expect(declared.length).toBe(new Set(declared).size);
+    expect(ts.transpileModule(module, { reportDiagnostics: true }).diagnostics ?? []).toEqual([]);
+
+    const clash = avatars.duplicateExports.find((one) => one.name === "getAllAvatars");
+    expect(clash?.operations.length).toBeGreaterThan(1);
+  });
+
   it("exports every entity module from the barrel", () => {
     expect(orgEndpoints.files.get("endpoints/index.ts")).toBe(
       [

@@ -130,15 +130,32 @@ export function resolveEndpoints(
     }
     owners.set(file, resolved.tag);
 
-    entities.push({
-      tag: resolved.tag,
-      entity,
-      file,
-      targets: resolved.operations.map((operation) => target(domain, operation, entity, naming)),
-    });
+    const targets = resolved.operations.map((operation) =>
+      target(domain, operation, entity, naming),
+    );
+    entities.push({ tag: resolved.tag, entity, file, targets: dedupeByName(targets) });
   }
 
   return entities;
+}
+
+/**
+ * The first target of each name, in the order the document states them.
+ *
+ * Two operations can resolve to one name — `user.Avatar` serves the same read at
+ * `/{userId}-avatar-{size}.{ext}` and `/{userId}-avatar.{ext}`, and the strategy names both
+ * `getAllAvatars`. Emitting each would declare the constant twice and the module would not
+ * compile, so the later ones are dropped here and reported through `duplicateExports`: the name
+ * that survives is a decision for whoever owns the routes, and a package that does not build
+ * hides it.
+ */
+function dedupeByName(targets: EndpointTarget[]): EndpointTarget[] {
+  const seen = new Set<string>();
+  return targets.filter((one) => {
+    if (seen.has(one.name)) return false;
+    seen.add(one.name);
+    return true;
+  });
 }
 
 /**
@@ -176,7 +193,7 @@ export function generateEndpointFiles(
 
   return {
     files,
-    duplicateExports: collectDuplicateExports(entities),
+    duplicateExports: collectDuplicateExports(domain, options.naming),
     multipartOperations: entities
       .flatMap((entity) => entity.targets)
       .filter((one) => one.multipart)
@@ -309,10 +326,17 @@ function innermostRef(ref: TypeRef | undefined): string | undefined {
  * Names two entities of one domain both export. A star-exported name declared twice is dropped
  * from the barrel rather than reported, so the package compiles and the hook is simply missing.
  */
-function collectDuplicateExports(entities: EndpointEntity[]): DuplicateExport[] {
+function collectDuplicateExports(
+  domain: ResolvedDomain,
+  naming: OpenApiNamingStrategy,
+): DuplicateExport[] {
   const byName = new Map<string, string[]>();
-  for (const entity of entities) {
-    for (const one of entity.targets) {
+  // Resolved again without the deduplication, so the report names every operation that wanted the
+  // name rather than only the one that kept it.
+  for (const resolved of domain.entities) {
+    const entity = entityNameOf(resolved.tag);
+    for (const operation of resolved.operations) {
+      const one = target(domain, operation, entity, naming);
       const held = byName.get(one.name);
       if (held) held.push(one.operation.id);
       else byName.set(one.name, [one.operation.id]);
