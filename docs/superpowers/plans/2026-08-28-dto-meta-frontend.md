@@ -786,6 +786,7 @@ git commit -m "feat(cli): add meta-diff to compare the orval and meta outputs"
 - Create: `packages/cli/src/meta/scaffold-source.ts`
 - Modify: `packages/cli/src/commands/scaffold-crud.ts` — choose the source
 - Modify: `packages/cli/src/templates/openapi/user-index-ts.hbs` — variable re-export path
+- Modify: `packages/cli/src/templates/domain/index-ts.hbs` — the same line, in the `add-domain` template
 - Test: `packages/cli/src/__tests__/scaffold-meta-source.test.ts`
 
 `scaffold-crud.ts` learns a domain's fields by regex-matching orval's emitted zod text (`X…Body = zod.object(`) and by reading `src/generated/model/<file>.ts`. Neither exists in a meta domain, and `.extend()` would not match the regex anyway — inherited fields would silently vanish from a generated form (spec §9.1).
@@ -825,7 +826,21 @@ what the orval path has to do. Labels come from `labelKey`.
 
 - [ ] **Step 2: Choose per domain.** If `generated-meta/` exists for the domain, use the IR source; otherwise the existing text-parsing source, unchanged.
 
-- [ ] **Step 3: Template.** `user-index-ts.hbs` hard-codes `export * from "./generated/model"`. Make the path a variable so one template serves both. The UI templates need no change — they import from the package barrel by name, never from `generated/` (verified).
+- [ ] **Step 3: Templates — BOTH of them.** The line `export * from "./generated/model";` appears
+  in two barrel templates, and changing one leaves the other emitting the orval path:
+
+  | Template | Emitted by | Shape |
+  | --- | --- | --- |
+  | `templates/openapi/user-index-ts.hbs` | `simplix openapi` | unconditional |
+  | `templates/domain/index-ts.hbs` | `simplix add-domain` | inside `{{#if enableOrval}}`; the `{{else}}` branch exports `./schemas` and `./contract` |
+
+  Make the model path a variable in both. A meta domain matches neither existing branch of
+  `domain/index-ts.hbs` — it has no `generated/model` and no hand-written `contract.ts` — so that
+  template needs the meta shape as its own case, not a reuse of `{{else}}`.
+
+  Verify with `grep -rn "generated/model" packages/cli/src/templates/` returning nothing but the
+  variable form. The UI templates need no change — they import from the package barrel by name,
+  never from `generated/` (verified).
 
 - [ ] **Step 4: Test** that scaffolding a meta domain produces the same `FieldInfo` set as the IR describes, including inherited fields; that a filter's operators come from the IR; that an orval domain still scaffolds identically to before.
 
