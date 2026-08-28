@@ -859,6 +859,12 @@ git commit -m "feat(cli): generate zod schemas carrying the server's constraints
 - Create: `packages/cli/src/meta/generation/hook-gen.ts`
 - Test: `packages/cli/src/__tests__/meta-endpoint-hook-gen.test.ts`
 
+**Output:** `generated-meta/endpoints/<entity>.ts` (request functions and URL builders) and
+`generated-meta/hooks/<entity>.ts` (the React Query hooks), one file each per entity, plus the two
+directory barrels Task 11 Step 2 requires. Orval put both halves in one per-tag file; this layout
+splits them per entity (spec §9), which is why Task 11's stub layer is regenerated rather than
+repointed.
+
 - [ ] **Step 1: Write them.** Request functions go through the domain package's own
   `src/mutator.ts`, which is the same file the orval path uses, so the envelope is unwrapped in one
   place and `data` has the same shape on both paths (spec §8).
@@ -948,6 +954,9 @@ git commit -m "feat(cli): generate request functions and React Query hooks from 
 - Modify: `packages/cli/src/commands/scaffold-crud.ts` — complete `SUFFIX_TO_ENUM_KEY`
 - Create: `packages/cli/src/meta/generation/access-gen.ts`
 - Test: `packages/cli/src/__tests__/meta-search-access-gen.test.ts`
+
+**Output:** `generated-meta/search/<entity>.ts` and `generated-meta/access/<entity>.ts`, one file
+each per entity, plus their directory barrels (spec §9).
 
 1118 fields carry `searchable` and 86 operations name a `searchDto`. Today the frontend re-derives filter operators by matching parameter-name suffixes with a regex; the IR states them.
 

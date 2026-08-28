@@ -446,11 +446,14 @@ packages/domain-<name>/src/
     search/<entity>.ts          필터·정렬 설정
     access/<entity>.ts          권한 상수
     mock/handlers.ts
-    index.ts
+    <각 디렉터리>/index.ts       model · schema · endpoints · hooks · search · access 배럴
+    index.ts                    generated-meta 전체 배럴
   index.ts                      어느 쪽을 내보낼지 고르는 배럴
 ```
 
-파일 수는 엔티티당 6개에 도메인당 공용 3개다.
+파일 수는 엔티티당 6개에 도메인당 공용 9개다 — `model/_enums.ts` · `mock/handlers.ts` ·
+`index.ts`와 디렉터리 배럴 6개. 배럴이 필요한 까닭은 §10에 있다: orval은 태그마다 파일 하나이고
+메타 산출물은 엔티티마다 둘이라, 재수출 층이 개별 파일이 아니라 배럴을 가리켜야 한다.
 
 라벨 붙은 열거형은 방향에 따라 타입이 다르다 — **서버는 `{ value, label }` 객체로 보내고,
 클라이언트는 `"AREA"` 같은 값 문자열로 보낸다**(`LabeledEnumDeserializer`가 문자열을 받는다).
