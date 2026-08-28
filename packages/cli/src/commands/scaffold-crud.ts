@@ -1284,7 +1284,10 @@ export interface TextFilterFieldInfo {
 // Operator suffixes that are valid for text search
 const TEXT_OPERATOR_SUFFIXES = ["contains", "notContains", "equals", "notEquals", "startsWith", "endsWith"];
 
-// Map operator suffix to SearchOperator enum key
+// Map operator suffix to SearchOperator enum key.
+// Every suffix a filter can carry needs an entry: a miss is substituted downstream rather than
+// left empty (the NumberFilter branch falls back to GREATER_THAN_OR_EQUAL), so an absent operator
+// queries the other direction while compiling and reporting nothing.
 const SUFFIX_TO_ENUM_KEY: Record<string, string> = {
   contains: "CONTAINS",
   notContains: "NOT_CONTAINS",
@@ -1297,6 +1300,11 @@ const SUFFIX_TO_ENUM_KEY: Record<string, string> = {
   greaterThanOrEqualTo: "GREATER_THAN_OR_EQUAL",
   lessThanOrEqualTo: "LESS_THAN_OR_EQUAL",
   in: "IN",
+  notIn: "NOT_IN",
+  between: "BETWEEN",
+  notBetween: "NOT_BETWEEN",
+  isNull: "IS_NULL",
+  isNotNull: "IS_NOT_NULL",
 };
 
 // System params to exclude from filter generation
