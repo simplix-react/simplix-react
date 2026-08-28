@@ -2209,6 +2209,15 @@ them loudly costs nothing.
 `FieldInfo` (`scaffold-crud.ts:29`), `EntityOperations` (`:632`), `FilterFieldInfo` (`:1243`) —
 from the IR instead of from text.
 
+**Carry `searchable.sortable` onto the column — the template marks every column sortable.**
+`list.hbs` emits a bare `sortable` on its `CrudList.Column`s (`:228`, `:235`, `:246`, `:257`) with
+no condition, because the orval path has no way to know. Measured, **280 of the fixture's 1,118
+searchable fields declare `sortable: false`** — a third of them. A column offering a sort the
+backend does not implement sends `sort=field.asc` for a field `@SearchableField` never marked
+sortable; the server ignores it and the operator sees the arrow move while the rows do not. Pass
+the flag through and emit `sortable` only when it is true. (This is also what keeps the 32
+operator-less sort keys from Step 1c useful: they filter nothing but they do sort.)
+
 **Pick the tree's display field from the i18n pairing, not from field order.** A tree node's label
 comes from `treeDisplayNameField` (`scaffold-crud.ts:1793`): a field literally named `name`,
 `title`, `label` or `displayName`, else **the first string field** that is not the row id or the
