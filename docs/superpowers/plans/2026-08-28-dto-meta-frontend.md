@@ -1537,6 +1537,26 @@ precedent to follow.
 
 - [ ] **Step 3: The re-export layer — six files, and the two partitions do not line up.**
 
+  **`index.ts` is not yours to write — it is re-rendered on every run.** `openapi.ts:387` renders
+  `domain/index-ts.hbs` with `enableOrval: true` hardcoded, then calls
+  `mergeIndexWithCustomExports(newContent, existingContent)` (`:882`), which **preserves any
+  `export ` line in the existing file that is absent from the freshly rendered one**. Two
+  consequences, and both are silent:
+
+  1. **A swap written here is undone by the next codegen run**, because the template renders the
+     orval path again.
+  2. **The revert is worse than a no-op.** Spec §10 says reverting is removing the domain from
+     `export`; the template then renders `export * from "./generated/model"`, and the merge
+     *preserves* the stale `export * from "./generated-meta"` beside it. TypeScript resolves two
+     `export *` declarations exporting the same name by **exporting neither** — so the barrel
+     silently loses every colliding type instead of reporting a conflict.
+
+  So the `export` list has to reach **this call site**: pass the resolved path into the template
+  render at `:387` (Task 13 makes it a variable) and let `writeFileWithDir` overwrite, rather than
+  rewriting the file afterwards. `enableOrval` is a boolean today and a meta domain is a third
+  case, so widen it there too. Assert both directions: switching a domain into `export` and running
+  codegen twice leaves one export line, and taking it back out leaves the orval line alone.
+
   **Measured across all 13 domain packages of the target application:**
 
   | File | Designed for hand edits | Actually hand-edited | Rewrite |
@@ -1566,7 +1586,9 @@ precedent to follow.
   establishes. Only `schemas.ts`, `mock/index.ts` and `mock/seeds.ts` are edited in place.
 
   Reverting is removing the domain from `export`, which regenerates the same layer against
-  `generated/` — and is why `src/generated/` is deleted last.
+  `generated/` — and is why `src/generated/` is deleted last. **Verify the revert by running it**,
+  not by reasoning about it: the index merge above makes a stale line survive, and a barrel that
+  drops names silently looks identical to one that works until a screen imports the missing type.
 
 - [ ] **Step 4: Test** that a domain not in `export` keeps its orval barrel byte-for-byte; that a
   domain in `export` has all four re-export files repointed; that a hand-edited region in
