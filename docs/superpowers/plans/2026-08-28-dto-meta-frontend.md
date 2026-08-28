@@ -41,6 +41,11 @@ Those numbers are the yardstick. A generator that silently drops a field kind wi
 - **Repository:** `/Users/taehwan/Workspace/accesscore/simplix-react`, branch `feat/dto-meta-codegen`. Two files under `packages/ui/src/base/charts/` were dirty before this work began — they belong to somebody else; never stage them.
 - **Never touch `packages/cli/src/openapi/`.** The orval path must keep working for every domain not yet moved.
 - Commit messages: English conventional commits, **no AI attribution of any kind**.
+- **Every CLI test lives in `packages/cli/src/__tests__/`, flat.** The root `vitest.config.ts`
+  pins the CLI project to `include: ["src/__tests__/**/*.test.ts"]`, and the package script is
+  `vitest run --passWithNoTests` — so a test placed anywhere else is never collected and the run
+  still reports success. After adding a test, confirm the runner names your file and reports a
+  non-zero test count; a green run that collected nothing looks identical to a passing one.
 - `pnpm` workspace. Tests: `pnpm --filter @simplix-react/cli test`. Typecheck: `pnpm typecheck`. Lint: `pnpm lint`.
 - Comments and TSDoc in English (repo rule); the design spec is Korean and is not a template for code comments.
 
@@ -50,7 +55,7 @@ Those numbers are the yardstick. A generator that silently drops a field kind wi
 
 **Files:**
 - Create: `packages/cli/src/meta/ir-types.ts`
-- Test: `packages/cli/src/meta/__tests__/ir-types.test.ts`
+- Test: `packages/cli/src/__tests__/meta-ir-types.test.ts`
 
 The Java records are committed at
 `/Users/taehwan/Workspace/simplix/simplix/spring-boot-starter-simplix/src/main/java/dev/simplecore/simplix/web/meta/model/`.
@@ -225,13 +230,13 @@ describe("ir-types", () => {
 
 - [ ] **Step 3: Run it**
 
-`pnpm --filter @simplix-react/cli test -- ir-types`
+`pnpm --filter @simplix-react/cli test -- meta-ir-types`
 Expected: all green. A count mismatch means the fixture was regenerated against a different backend — stop and report rather than editing the numbers.
 
 - [ ] **Step 4: Commit**
 
 ```bash
-git add packages/cli/src/meta/ir-types.ts packages/cli/src/meta/__tests__/ir-types.test.ts \
+git add packages/cli/src/meta/ir-types.ts packages/cli/src/__tests__/meta-ir-types.test.ts \
         packages/cli/src/meta/__fixtures__/smart-safety-meta.json
 git commit -m "feat(cli): mirror the DTO meta IR as TypeScript types"
 ```
@@ -242,7 +247,7 @@ git commit -m "feat(cli): mirror the DTO meta IR as TypeScript types"
 
 **Files:**
 - Create: `packages/cli/src/meta/fetch.ts`
-- Test: `packages/cli/src/meta/__tests__/fetch.test.ts`
+- Test: `packages/cli/src/__tests__/meta-fetch.test.ts`
 
 - [ ] **Step 1: Write it**
 
@@ -289,8 +294,8 @@ Cover: reading the real fixture from disk; unwrapping an enveloped payload; unwr
 - [ ] **Step 3: Run, then commit**
 
 ```bash
-pnpm --filter @simplix-react/cli test -- fetch
-git add packages/cli/src/meta/fetch.ts packages/cli/src/meta/__tests__/fetch.test.ts
+pnpm --filter @simplix-react/cli test -- meta-fetch
+git add packages/cli/src/meta/fetch.ts packages/cli/src/__tests__/meta-fetch.test.ts
 git commit -m "feat(cli): read the DTO meta IR from an endpoint or a snapshot"
 ```
 
@@ -402,24 +407,35 @@ git commit -m "feat(boot-plugin): map IR container names to TypeScript types"
 
 **Files:**
 - Create: `packages/cli/src/meta/resolve.ts`
-- Test: `packages/cli/src/meta/__tests__/resolve.test.ts`
+- Test: `packages/cli/src/__tests__/meta-resolve.test.ts`
 
 The generators need the IR sliced by domain and indexed. This task does that once so no generator re-walks the document.
 
 - [ ] **Step 1: Write it.** `resolveMeta(meta, { domains, containerTypes })` returns, per domain name:
-  - the operations whose `tag` matches that domain's tag patterns (same matching rule the orval path uses — exact string or `/regex/`)
+  - the operations whose `tag` matches that domain's tag patterns. **Reuse
+    `createTagMatcher` from `packages/cli/src/openapi/pipeline/domain-splitter.ts`** — it is
+    exported and already implements the exact-string / `/regex/` rule. Re-implementing it is how
+    the two paths drift into disagreeing about which domain owns a tag.
   - the transitive closure of types those operations reach, by walking `request.body`, `request.searchDto`, `response`, and each type's `extends` and `ref`/`pick` fields
   - the enums reached the same way
   - for each type, its full field list including inherited ones, computed by following `extends` — **kept separate from the own-field list**, because the generated `interface X extends Y` must emit only own fields while a zod schema built with `.extend()` needs to know the parent
 
   Report an operation whose `tag` matches no domain rather than dropping it silently.
 
+  **Expect 117 unmatched out of 694** against the smart-safety config, across 24 tags — measured.
+  They are not a defect: framework-owned endpoints (`StreamAdminController` 16,
+  `SseStreamController` 6, `CurrentUserRestController` 8), the app's dev test controllers
+  (`dev.test.*` 30), and `data-io.*` tags (36) that the config does not name because those
+  screens are not built yet. The report should list them so the count can be checked against this
+  number; a run that reports far fewer means a tag pattern started matching something it should
+  not.
+
 - [ ] **Step 2: Test against the real fixture.** Assert that resolving with a single catch-all domain reaches all 637 types; that a domain's closure never contains a type none of its operations reach; that `extends` chains resolve (the fixture has 104); and that a type whose parent is outside the domain still pulls the parent in.
 
 - [ ] **Step 3: Run, then commit**
 
 ```bash
-git add packages/cli/src/meta/resolve.ts packages/cli/src/meta/__tests__/resolve.test.ts
+git add packages/cli/src/meta/resolve.ts packages/cli/src/__tests__/meta-resolve.test.ts
 git commit -m "feat(cli): resolve the IR into per-domain type closures"
 ```
 
@@ -429,7 +445,7 @@ git commit -m "feat(cli): resolve the IR into per-domain type closures"
 
 **Files:**
 - Create: `packages/cli/src/meta/generation/model-gen.ts`
-- Test: `packages/cli/src/meta/__tests__/model-gen.test.ts`
+- Test: `packages/cli/src/__tests__/meta-model-gen.test.ts`
 
 - [ ] **Step 1: Write it.** For one domain, emit:
   - `model/<entity>.ts` — one `export interface` per type, `extends` where the IR says so, **own fields only**
@@ -440,12 +456,26 @@ git commit -m "feat(cli): resolve the IR into per-domain type closures"
 
   A field is optional (`?`) exactly when `required` is false.
 
-- [ ] **Step 2: Test against the real fixture.** Generate for a domain and assert: an `extends` type emits only its own fields; a response enum field is the `Labeled` alias while the same enum in a request DTO is the union; no `SimpliXApiResponse` appears anywhere in the output; every one of the 11 field kinds present in the fixture produces valid TypeScript. Compile the generated text with the TypeScript compiler API and assert zero diagnostics — that is the assertion that actually proves the output is usable.
+- [ ] **Step 2: Test against the real fixture.** Generate for a domain and assert: an `extends` type emits only its own fields; a response enum field is the `Labeled` alias while the same enum in a request DTO is the union; no `SimpliXApiResponse` appears anywhere in the output; every one of the 11 field kinds present in the fixture produces valid TypeScript. **Prove the output is well-formed TypeScript, not merely that it contains the right substrings.**
+
+  Use `ts.transpileModule(text, { reportDiagnostics: true })` and assert `diagnostics` is empty.
+  That is a **syntax** check and it is the right one here: it catches a malformed emit — an
+  unbalanced brace, a stray comma, a broken generic — without needing module resolution.
+
+  **Do not reach for `ts.createProgram`.** The generated model imports `LabeledEnumValue` from a
+  workspace package, so a standalone program reports `cannot find module` diagnostics that are
+  artefacts of the harness rather than defects in the output, and the assertion then has to be
+  weakened until it proves nothing. Full type resolution against the workspace happens for real
+  after Task 11 wires the output into a domain package, where `pnpm typecheck` does it properly.
+
+  There is no precedent for the compiler API in `packages/cli`, so import it as
+  `import ts from "typescript";` (available via the workspace catalog) and keep the usage to that
+  one call.
 
 - [ ] **Step 3: Run, then commit**
 
 ```bash
-git add packages/cli/src/meta/generation/model-gen.ts packages/cli/src/meta/__tests__/model-gen.test.ts
+git add packages/cli/src/meta/generation/model-gen.ts packages/cli/src/__tests__/meta-model-gen.test.ts
 git commit -m "feat(cli): generate TypeScript models from the IR"
 ```
 
@@ -455,22 +485,66 @@ git commit -m "feat(cli): generate TypeScript models from the IR"
 
 **Files:**
 - Create: `packages/cli/src/meta/generation/schema-gen.ts`
-- Test: `packages/cli/src/meta/__tests__/schema-gen.test.ts`
+- Test: `packages/cli/src/__tests__/meta-schema-gen.test.ts`
 
 This is where the project's original complaint is answered: 440 `maxLength` and 221 `notBlank` constraints reach the client.
 
 - [ ] **Step 1: Write it.** Emit `schema/<entity>.ts`, one const per type, named as orval named it (`XRestCreateBody`) so `schemas.ts` keeps resolving. A type with `extends` is built as `parentSchema.extend({ …own fields… })`.
 
-  Constraint mapping (spec §5): `notBlank`→`.trim().min(1)`; `notEmpty`→`.min(1)`; `minLength`/`maxLength`→`.min()`/`.max()`; `minItems`/`maxItems`→`.min()`/`.max()` on the array; `min`/`max`→`.min()`/`.max()` — **coercing the value, because `@DecimalMin` sends a JSON string while `@Min` sends a number** (spec §5); `positive`/`nonnegative`/`negative`/`nonpositive`→ the matching zod call; `pattern`→`.regex(new RegExp(...))`; `email`→`.email()`; `assertTrue`/`assertFalse`→`z.literal(true)`/`z.literal(false)`; `custom`→ **no zod call**, emit a comment naming it as a server-only check.
+**Target zod v4** — the workspace resolves `zod@4.3.6` and orval's existing output already uses
+  the v4 surface (`zod.iso.datetime()`, `zod.iso.date()`, `zod.int()`). Two consequences the
+  first draft of this plan got wrong:
+
+  - `z.string().email()` is **deprecated in v4** (`@deprecated Use z.email() instead` in
+    `zod/v4/classic/schemas.d.cts:110`). Emit the top-level `z.email()`.
+  - The base type of a temporal field is **not** a bare `z.string()`. Orval emits
+    `zod.iso.datetime()` for an instant and `zod.iso.date()` for a date; emitting a plain string
+    would drop format validation the orval path already had — a regression, and one `meta-diff`
+    would report as a field-type mismatch.
+
+  **Base type by `TypeRef.kind`:** `string`→`z.string()`; `number`→`z.number()`, and
+  `z.int()` when `integral` is true; `boolean`→`z.boolean()`; `instant`→`z.iso.datetime()`;
+  `date`→`z.iso.date()`; `time`→`z.string().regex(...)` built from the IR's `pattern` when
+  present, else the `HH:mm` shape (spec §12); `enum`→`z.enum([...])` for a request field and the
+  labeled object shape for a response field (spec §9); `ref`→ the referenced schema constant;
+  `container`→ the plugin's `zod` factory (`pageOf` for `Page`, `z.array` for `List`,
+  `z.record` for `Map`, and nothing for the unwrapped envelope); `unknown`→`z.unknown()`.
+
+  **Constraint mapping** (spec §5), applied on top of the base type: `notBlank`→`.trim().min(1)`;
+  `notEmpty`→`.min(1)`; `minLength`/`maxLength`→`.min()`/`.max()`; `minItems`/`maxItems`→
+  `.min()`/`.max()` on the array; `min`/`max`→`.min()`/`.max()` — **coercing the value, because
+  `@DecimalMin` sends a JSON string while `@Min` sends a number** (spec §5);
+  `positive`/`nonnegative`/`negative`/`nonpositive`→ the matching zod call;
+  `pattern`→`.regex(new RegExp(...))`; `email`→ `z.email()` as the base type rather than a
+  method on a string; `assertTrue`/`assertFalse`→`z.literal(true)`/`z.literal(false)`;
+  `custom`→ **no zod call**, emit a comment naming it as a server-only check.
 
   A non-required field gets `.optional()`.
 
-- [ ] **Step 2: Test against the real fixture.** Assert: a `notBlank` field rejects `""` at runtime (build the schema with `new Function` or import the emitted module) — this is the exact defect the project exists to fix, so prove it rather than asserting on generated text; a `maxLength` field rejects an over-long string; a `@DecimalMin`-sourced string bound produces a working numeric `.min()`; a `custom` constraint emits a comment and no call; an `extends` type's schema validates a parent field.
+  **Check the installed zod before emitting any call you have not seen in orval's output.** The
+  v4 surface deprecated several v3 methods; read
+  `node_modules/.pnpm/zod@4*/node_modules/zod/v4/classic/schemas.d.cts` rather than writing from
+  memory of v3.
+
+- [ ] **Step 2: Test against the real fixture.** Build the emitted schemas and exercise them at
+  runtime rather than asserting on generated text — the point is that they validate, not that
+  they contain a substring. Assert:
+
+  - a `notBlank` field rejects `""` — **the exact defect the project exists to fix**, so prove it
+  - a `maxLength` field rejects an over-long string (the fixture has 440 of these)
+  - a `@DecimalMin`-sourced string bound produces a working numeric `.min()`
+  - an `instant` field accepts an ISO timestamp and rejects `"not a date"` — this is the
+    orval-parity check; a plain `z.string()` would pass both and the test would catch it
+  - a `date` field accepts `2026-08-28` and rejects a full timestamp
+  - a `custom` constraint emits a comment and no call
+  - an `extends` type's schema validates a field declared on the parent
+  - no emitted call is one v4 deprecates — grep the generated text for `.email(`, `.url(`,
+    `.uuid(` used as methods and assert none appear
 
 - [ ] **Step 3: Run, then commit**
 
 ```bash
-git add packages/cli/src/meta/generation/schema-gen.ts packages/cli/src/meta/__tests__/schema-gen.test.ts
+git add packages/cli/src/meta/generation/schema-gen.ts packages/cli/src/__tests__/meta-schema-gen.test.ts
 git commit -m "feat(cli): generate zod schemas carrying the server's constraints"
 ```
 
@@ -481,11 +555,21 @@ git commit -m "feat(cli): generate zod schemas carrying the server's constraints
 **Files:**
 - Create: `packages/cli/src/meta/generation/endpoint-gen.ts`
 - Create: `packages/cli/src/meta/generation/hook-gen.ts`
-- Test: `packages/cli/src/meta/__tests__/endpoint-hook-gen.test.ts`
+- Test: `packages/cli/src/__tests__/meta-endpoint-hook-gen.test.ts`
 
 - [ ] **Step 1: Write them.** Request functions go through `src/mutator.ts`'s `getMutator("boot")` — the same mutator the orval path uses, so the envelope is unwrapped in one place and `data` has the same shape on both paths (spec §8).
 
-  Hooks use the profile's naming strategy (`simplixBootNaming`) so the exported names match what orval produced. **This is not cosmetic** — the migration switches a barrel, and module code imports hooks by name (spec §11).
+  Hooks use the profile's naming strategy (`simplixBootNaming`) so the exported names match what
+  orval produced. **This is not cosmetic** — the migration switches a barrel, and module code
+  imports hooks by name (spec §11).
+
+  Build the `OperationContext` the strategy takes (`operationId`, `method`, `path`, `tag`,
+  `entityName`, `summary`) from the IR operation. Names come from route and verb in almost every
+  case; `operationId` is only the last-resort fallback (`naming.ts:340`), which is why the IR's
+  `id` must equal the OpenAPI `operationId` — the backend derives it with the same
+  controller-name strip order as `OperationIdCustomizer`, so `EquipmentInspectionRestController`
+  yields `EquipmentInspectionRest_override` on both sides. If you find an id that does not match
+  the OpenAPI document, report it rather than papering over it in the naming call.
 
   Query keys: the first element is the request URL string and a list key carries the params object, because `useInvalidateEntity` invalidates by URL prefix on `queryKey[0]` (spec §5.1). A different key shape breaks cache invalidation with no error.
 
@@ -496,7 +580,7 @@ git commit -m "feat(cli): generate zod schemas carrying the server's constraints
 ```bash
 git add packages/cli/src/meta/generation/endpoint-gen.ts \
         packages/cli/src/meta/generation/hook-gen.ts \
-        packages/cli/src/meta/__tests__/endpoint-hook-gen.test.ts
+        packages/cli/src/__tests__/meta-endpoint-hook-gen.test.ts
 git commit -m "feat(cli): generate request functions and React Query hooks from the IR"
 ```
 
@@ -507,7 +591,7 @@ git commit -m "feat(cli): generate request functions and React Query hooks from 
 **Files:**
 - Create: `packages/cli/src/meta/generation/search-gen.ts`
 - Create: `packages/cli/src/meta/generation/access-gen.ts`
-- Test: `packages/cli/src/meta/__tests__/search-access-gen.test.ts`
+- Test: `packages/cli/src/__tests__/meta-search-access-gen.test.ts`
 
 1118 fields carry `searchable` and 86 operations name a `searchDto`. Today the frontend re-derives filter operators by matching parameter-name suffixes with a regex; the IR states them.
 
@@ -522,7 +606,7 @@ git commit -m "feat(cli): generate request functions and React Query hooks from 
 ```bash
 git add packages/cli/src/meta/generation/search-gen.ts \
         packages/cli/src/meta/generation/access-gen.ts \
-        packages/cli/src/meta/__tests__/search-access-gen.test.ts
+        packages/cli/src/__tests__/meta-search-access-gen.test.ts
 git commit -m "feat(cli): generate filter and permission configuration from the IR"
 ```
 
@@ -532,7 +616,7 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
 
 **Files:**
 - Create: `packages/cli/src/meta/generation/mock-gen.ts`
-- Test: `packages/cli/src/meta/__tests__/mock-gen.test.ts`
+- Test: `packages/cli/src/__tests__/meta-mock-gen.test.ts`
 
 - [ ] **Step 1: Write it.** Emit MSW handlers per operation and seeds per entity, wrapping responses in the envelope with `wrapEnvelope` from `@simplix-react-ext/simplix-boot-auth`. **`src/mock/seeds.ts` is preserved across regenerations** — the existing rule, unchanged (spec §8).
 
@@ -541,7 +625,7 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
 - [ ] **Step 3: Run, then commit**
 
 ```bash
-git add packages/cli/src/meta/generation/mock-gen.ts packages/cli/src/meta/__tests__/mock-gen.test.ts
+git add packages/cli/src/meta/generation/mock-gen.ts packages/cli/src/__tests__/meta-mock-gen.test.ts
 git commit -m "feat(cli): generate MSW handlers and seeds from the IR"
 ```
 
@@ -631,7 +715,38 @@ git commit -m "feat(cli): add meta-diff to compare the orval and meta outputs"
 
 `scaffold-crud.ts` learns a domain's fields by regex-matching orval's emitted zod text (`X…Body = zod.object(`) and by reading `src/generated/model/<file>.ts`. Neither exists in a meta domain, and `.extend()` would not match the regex anyway — inherited fields would silently vanish from a generated form (spec §9.1).
 
-- [ ] **Step 1: Write the IR source.** Fill the same contracts the scaffold already uses — `FieldInfo`, `FilterFieldInfo`, `EntityOperations` — from the IR instead of from text. Required-ness comes from `required`, filter operators from `searchable.operators` (no suffix guessing), labels from `labelKey`.
+- [ ] **Step 1: Write the IR source.** Fill the same contracts the scaffold already uses —
+`FieldInfo` (`scaffold-crud.ts:29`), `EntityOperations` (`:632`), `FilterFieldInfo` (`:1243`) —
+from the IR instead of from text.
+
+**Only half of `FieldInfo` is data; the other half is presentation, and the IR does not carry
+it.** From the IR: `name`, `tsType`, `label` (via `labelKey`), `options` (enum values),
+required-ness, and everything `FilterFieldInfo` needs. NOT from the IR: `formComponent`,
+`inputType`, `component`, `defaultValue`, `capitalizedName`, `isForeignKey`, `fkEntityField`,
+`isSystemField`, `isI18nPair`, `baseFieldName`, `category`, `hideInList` — those are decisions
+the scaffold already makes.
+
+**Reuse the existing derivations rather than re-deriving them**, or a meta domain and an orval
+domain will scaffold differently for the same field:
+
+| Need | Reuse |
+| --- | --- |
+| category and column order | `orderAndCategorizeFields` (exported) |
+| `defaultValue` from a TS type | `getDefaultValue` (exported) |
+| the whole data-field → `FieldInfo` shape | `entityFieldsToFieldInfo` (exported) — **read this first** |
+
+`entityFieldsToFieldInfo(EntityField[])` already converts a snapshot's data fields into complete
+`FieldInfo`s, filling exactly the presentation members the IR lacks. It is the precedent to
+follow: either map `FieldMeta` → the `EntityField` shape it takes and call it, or mirror its
+logic field for field. Say in your report which you chose and why.
+
+**One helper is not reusable:** `detectI18nFieldPairs` (`:265`) is not exported. The `xxxI18n`
+map pairing it performs is keyed on field NAMES, so it works the same on IR-derived fields — but
+you cannot call it. Export it, or reproduce it; do not skip it, or a meta domain loses its
+multilingual field pairing while an orval domain keeps it. Say which you did.
+
+Filter operators come from `searchable.operators` — never from parameter-name suffixes, which is
+what the orval path has to do. Labels come from `labelKey`.
 
 - [ ] **Step 2: Choose per domain.** If `generated-meta/` exists for the domain, use the IR source; otherwise the existing text-parsing source, unchanged.
 
@@ -653,8 +768,16 @@ git commit -m "feat(cli): let scaffolding read fields from the IR"
 
 ### Task 14: Move one domain end to end
 
-- [ ] **Step 1** — in the smart-safety frontend's `simplix.config.ts`, add the `meta` block pointing at `openapi/meta.json` (the captured snapshot, already committed there) and leave `export` empty. Run codegen; both outputs exist.
-- [ ] **Step 2** — `simplix meta-diff <domain>` for the smallest domain. Drive it to zero errors; record every info-level difference in the task report.
+- [ ] **Step 1** — the captured IR is at `smart-safety-frontend/openapi/meta.json` (2.7 MB) but
+  is **untracked**; decide with the user whether to commit it before relying on it, since the
+  repository is shared with another session. Add the `meta` block to that project's
+  `simplix.config.ts` pointing at it, and leave `export` empty. Run codegen; both outputs exist.
+- [ ] **Step 2** — run `simplix meta-diff` on **`org`**. Measured operation counts per domain:
+  `dashboard` 1, `org` 13, `audit` 15, `worker` 16, `approval` 31, `site` 32, `auth` 39,
+  `space` 46, `system` 64, `regulation` 81, `user` 100, `notification` 139. `dashboard` is the
+  smallest but exercises almost nothing — one operation, no CRUD shape. `org` is the pilot:
+  small enough to read end to end, large enough to contain a real create/update/list/detail set.
+  Drive the diff to zero errors and record every info-level difference in the task report.
 - [ ] **Step 3** — add that domain to `export`. Run `pnpm typecheck` and `pnpm build`.
 - [ ] **Step 4** — run `simplix scaffold` for one entity in that domain and confirm the widget set is unchanged from what the orval path produced.
 - [ ] **Step 5** — drive the screens in a browser under the `simplix:frontend-e2e` skill. A green typecheck is not evidence a screen works.
