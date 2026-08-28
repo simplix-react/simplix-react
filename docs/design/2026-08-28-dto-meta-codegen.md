@@ -440,7 +440,7 @@ packages/domain-<name>/src/
   generated-meta/
     model/<entity>.ts           Create · Update · Detail · List 인터페이스
     model/_enums.ts             이 도메인 열거형의 별칭과 값 목록
-    schema/<entity>.ts          zod 스키마 — 상수 이름은 orval 이름(XRestCreateBody)을 따르고 상속은 .extend()
+    schema/<entity>.ts          zod 스키마 — 타입마다 <TypeName>Schema, 상속은 .extend()
     endpoints/<entity>.ts       요청 함수
     hooks/<entity>.ts           React Query 훅
     search/<entity>.ts          필터·정렬 설정
@@ -558,8 +558,13 @@ openapi: [{
 사이 백엔드가 움직인 만큼이 어느 생성기의 잘못도 아닌 차이로 나온다.
 
 배럴 교체가 드롭인이려면 모듈 코드가 import하는 공개 이름 — 훅, DTO 타입, 열거형 상수 맵,
-params 타입, zod 스키마, mock 핸들러 팩토리(`createXHandlers`) — 가 전부 같아야 한다. 그래서 메타 훅 생성기는 프로파일의 이름
-규칙(`simplixBootNaming`)을 그대로 쓰고, 이름 차이는 경고가 아니라 오류다.
+params 타입, mock 핸들러 팩토리(`createXHandlers`) — 가 전부 같아야 한다. 그래서 메타 훅 생성기는
+프로파일의 이름 규칙(`simplixBootNaming`)을 그대로 쓰고, 이름 차이는 경고가 아니라 오류다.
+
+**zod 상수는 이 목록에 들지 않는다.** orval은 연산×역할마다 이름을 짓고(엔티티 하나에 32개)
+메타 산출물은 타입마다 하나를 내므로 이름이 대응하지 않는데, 애플리케이션 전체에서
+`generated/` 바깥의 참조가 0곳이고 `schemas.ts`를 import하는 모듈도 없다. 이름 차이를 정보로
+보고한다.
 
 | 검사 | 보고 수준 |
 | --- | --- |

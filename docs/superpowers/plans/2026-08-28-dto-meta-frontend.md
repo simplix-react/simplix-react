@@ -712,7 +712,26 @@ git commit -m "feat(cli): generate TypeScript models from the IR"
 
 This is where the project's original complaint is answered: 440 `maxLength` and 221 `notBlank` constraints reach the client.
 
-- [ ] **Step 1: Write it.** Emit `schema/<entity>.ts`, one const per type, named as orval named it (`XRestCreateBody`) so `schemas.ts` keeps resolving. A type with `extends` is built as `parentSchema.extend({ …own fields… })`.
+- [ ] **Step 1: Write it — one const per TYPE, and orval's names cannot be reproduced.**
+
+  **Measured:** orval names zod constants **per operation and role**, not per type —
+  `OrganizationRestCreateBody`, `OrganizationRestGetResponse`, `OrganizationRestUpdateParams`,
+  `OrganizationRestUpdateTreeOrderQueryParams`, and for a collection body the pair
+  `OrganizationRestMultiUpdateBodyItem` + `OrganizationRestMultiUpdateBody = zod.array(…Item)`.
+  One entity's 12 operations produce 32 constants. The IR's `types` map is keyed by DTO simple
+  name, so "one const per type, named as orval named it" is not a thing that can be built.
+
+  **The decision, and what makes it safe:** emit one const per type, named `<TypeName>Schema`
+  (`OrganizationCreateDTOSchema`). A schema belongs to a DTO, not to an operation, and the same
+  DTO is a body on one route and a response on another. This departs from orval's names, and
+  **nothing in the application imports them** — grepped across the whole frontend outside
+  `generated/`: **0 references**, and no module imports `schemas.ts` at all. The constants exist
+  only in the barrel. Task 12 therefore classifies a zod-constant name difference as **info**;
+  see there.
+
+  `schemas.ts` re-exports with `export *`, so it keeps resolving whatever names exist.
+
+  A type with `extends` is built as `parentSchema.extend({ …own fields… })`.
 
 **Target zod v4** — the workspace resolves `zod@4.3.6` and orval's existing output already uses
   the v4 surface (`zod.iso.datetime()`, `zod.iso.date()`, `zod.int()`). Two consequences the
@@ -1307,12 +1326,13 @@ The reason parallel generation was chosen: a domain is only switched once the tw
 
 | Finding | Level |
 | --- | --- |
-| a public name present in only one — type, hook, request function, const map, params type, zod schema, **and the mock handler factory `createXHandlers`** (spec §11) | error |
+| a public name present in only one — type, hook, request function, const map, params type, **and the mock handler factory `createXHandlers`** (spec §11). Zod constants are excluded; see the info row | error |
 | a field present in only one | error |
 | a field type mismatch | error |
 | a required-ness difference not on the intended list | error |
 | a missing operation | error |
 | a constraint present only on the meta side | info — OpenAPI lost it, which is the point |
+| a **zod constant** name present in only one | info — orval names them per operation and role (32 for one entity), the meta path per type, and **nothing imports them**: 0 references anywhere in the application outside `generated/`. Reporting 32 renames per entity as errors would bury the drift this command exists to find |
 
   **Intended differences are info, not errors:** a response enum field moving from a value union to `LabeledEnumValue`; a field becoming required through a primitive type or `@Schema(requiredMode = REQUIRED)`; added request constraints. Reporting those as errors would bury real drift in noise.
 
