@@ -670,7 +670,9 @@ This is where the project's original complaint is answered: 440 `maxLength` and 
   `positive`/`nonnegative`/`negative`/`nonpositive`→ the matching zod call;
   `pattern`→`.regex(new RegExp(...))`; `email`→ `z.email()` as the base type rather than a
   method on a string; `assertTrue`/`assertFalse`→`z.literal(true)`/`z.literal(false)`;
-  `custom`→ **no zod call**, emit a comment naming it as a server-only check.
+  `custom`→ **no zod call**, emit a comment naming it as a server-only check. The captured IR
+  contains none (spec §12), so this branch is reached only by a future field-level custom
+  constraint — implement it, and do not assume the fixture proves it works.
 
   A non-required field gets `.optional()`.
 
@@ -725,7 +727,11 @@ This is where the project's original complaint is answered: 440 `maxLength` and 
   - an `instant` field accepts an ISO timestamp and rejects `"not a date"` — this is the
     orval-parity check; a plain `z.string()` would pass both and the test would catch it
   - a `date` field accepts `2026-08-28` and rejects a full timestamp
-  - a `custom` constraint emits a comment and no call
+  - **`custom` cannot be exercised against this fixture** — it holds 709 constraints and zero
+    `custom`, because the only custom validators in the application (`@UniqueFields` 3,
+    `@ValidateWith` 1) sit on the DTO *class* and `ConstraintExtractor` reads properties.
+    Test the branch with a hand-built `FieldMeta`, and say in your report that the fixture does
+    not cover it
   - a `Map` field's schema is `z.record(z.string(), …)` and **constructs without throwing** — build
     it, do not merely grep the text; the one-argument form throws at construction, which a
     substring assertion would never notice

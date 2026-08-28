@@ -246,11 +246,11 @@ Query의 `data`는 본문이다. 봉투 스키마는 mock 핸들러에서만 쓴
 | `@NotNull` | 필수 필드 — 타입에 `?`를 붙이지 않는다 |
 | `@NotBlank` | `.trim().min(1)` |
 | `@NotEmpty` | `.min(1)` — 문자열과 배열 |
-| `@Size(min,max)` · `@Length(max)` | `.min()` · `.max()` |
+| `@Size(min,max)` · `@Length(max)` | `.min()` · `.max()` — 문자열이면 `minLength`/`maxLength`, 컬렉션이면 `minItems`/`maxItems`로 실린다 |
 | `@Min` · `@Max` · `@DecimalMin` · `@DecimalMax` | `.min()` · `.max()` — **값 타입이 갈린다**, 아래 |
 | `@Positive` · `@PositiveOrZero` · `@Negative` · `@NegativeOrZero` | `.positive()` · `.nonnegative()` · `.negative()` · `.nonpositive()` |
 | `@Pattern(regexp)` | `.regex()` |
-| `@Email` | `.email()` |
+| `@Email` | `z.email()` — v4에서 `.email()` 메서드는 폐기됐다. 다른 제약과 함께 오면 `z.email().trim().min(1).max(N)`으로 잇는다 |
 | `@AssertTrue` · `@AssertFalse` | `z.literal(true)` · `z.literal(false)` |
 | `@Valid` | 중첩 타입의 스키마 참조 |
 | 그 밖의 커스텀 제약 | IR에 `{ kind: "custom", name }`으로 싣고 zod에서는 생략한다. 생성물 주석에 서버 전용 검증임을 남긴다 |
@@ -584,10 +584,16 @@ smart-safety 코드에서 확인한 사실과 그에 따른 결정이다.
 않는다(0곳). IR은 이것을 `container`로 감싼 그대로 싣고, TypeScript 이름은 플러그인의
 `containerTypes`가 정한다.
 
-**커스텀 검증기** — 앱이 만든 `ConstraintValidator` 구현체는 없지만, **프레임워크가 제공하는
-제약은 쓰인다** — `@Unique` 64곳, `@ValidateWith` 1곳. 전부 DB를 읽어야 판정되는 서버 전용
-검사라 zod로 옮길 수 없고 옮겨서도 안 된다. IR에 `{ kind: "custom", name }`으로 싣고 생성기는
-주석으로 서버 전용임을 남긴다.
+**커스텀 검증기는 전부 클래스 수준이라 IR이 싣지 않는다.** 앱이 만든 `ConstraintValidator`
+구현체는 없고, 프레임워크가 제공하는 것은 `@UniqueFields` 3곳(항목 `@UniqueField` 6개)과
+`@ValidateWith` 1곳인데 **셋 다 DTO 클래스에 붙는다.** 필드 수준 `@Unique` 사용은 0곳이다.
+`ConstraintExtractor.extract`는 프로퍼티마다 불리므로 클래스 애노테이션을 구조적으로 볼 수 없고,
+수집한 IR의 제약 709개 가운데 `custom`은 **0개**다.
+
+전부 DB를 읽어야 판정되는 서버 전용 검사라 zod로 옮길 수 없고 옮겨서도 안 되므로 지금은 이대로
+둔다. `{ kind: "custom", name }` 표현은 IR에 남겨 두되 **필드 수준 커스텀 제약이 생길 때를 위한
+것**이고, 클래스 수준 제약을 화면에 알리려면 `TypeMeta`에 타입 수준 제약 목록을 더하는 별도
+변경이 필요하다 — 이번 범위 밖이다.
 
 **`@I18nTrans` 97곳** — 직렬화 시점에 로케일을 골라 넣는 프레임워크 Jackson 애노테이션이다.
 붙은 String 필드는 이미 번역된 값으로 오므로 IR에서는 평범한 문자열이고, 짝이 되는
