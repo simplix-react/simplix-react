@@ -561,6 +561,12 @@ params 타입, zod 스키마, mock 핸들러 팩토리(`createXHandlers`) — �
 
 smart-safety 코드에서 확인한 사실과 그에 따른 결정이다.
 
+**이 절의 수치는 소스 훑기로 센 것이고, 계획서의 수치는 수집한 IR에서 잰 것이다.** 두 계측기는
+같은 것을 세지 않는다 — 소스 훑기는 선언을 세고, IR은 컨트롤러에서 도달 가능한 것만 싣는다. 그래서
+`expression` 표현식이 소스에는 15곳이고 IR에는 5곳이며, 권한 표현식이 723곳이지만 IR의 오퍼레이션은
+694개다. **생성기가 상대하는 것은 IR이므로 구현은 IR 수치를 쓴다.** 아래에서 IR로 다시 잰 값은
+그렇게 표시했다.
+
 **Jackson 규칙** — `@JsonView`는 쓰지 않는다(0곳). `@JsonIgnore`는 DTO 안에 64곳 있고 Jackson의
 프로퍼티 목록이 이미 제외하므로 별도 처리가 없다. `@JsonIncludeProperties`와
 `@JsonManagedReference`는 전부 엔티티에 있고 **DTO 필드에 엔티티 타입이 오는 곳이 없다**. IR에
@@ -617,12 +623,23 @@ smart-safety에 실제로 한 건 있다(DTO 선언 633개, 고유 단순명 632
 전제를 따르고, `meta.snapshot`은 선택이다. 지정하면 `--offline`으로 서버 없이 재생성한다.
 
 **열거형 표현** — `LabeledEnum`이 `@JsonProperty("value")`와 `@JsonFormat(shape = OBJECT)`를
-쓰므로 응답 값은 `{ value, label }`로 오고, 역직렬화기는 값 문자열을 받는다. 138개 열거형이 모두
-이 모양이라 §9의 방향별 타입 규칙이 전부에 적용되고, §7의 이관 뒤에는 이 전송 모양이 앱의
-관례가 아니라 프레임워크의 계약이다.
+쓰므로 응답 값은 `{ value, label }`로 오고, 역직렬화기는 값 문자열을 받는다. §7의 이관 뒤에는 이
+전송 모양이 앱의 관례가 아니라 프레임워크의 계약이다.
 
-**`expression`으로 남는 15곳** — `hasAuthority`·`hasRole` 3곳과 `and`·`or`가 든 복합 표현식
-12곳은 구조로 풀리지 않아 `expression`으로 온다. 이중 따옴표는 0곳이라 문제가 없고,
+**모든 열거형이 이 모양은 아니다 — `labeled`가 판정한다.** 수집한 IR의 열거형 133개 가운데 122개가
+라벨 붙은 것이고 **11개는 `LabeledEnum`을 구현하지 않아 평범한 문자열로 온다**: `SessionState` ·
+`InboxTab` · `LawScreenMapNarrowing` · `UserAccountStanding` · `DayOfWeek` · `TransportType` ·
+`AdminCommandType` · `AdminCommandStatus` · `SchedulerState` · `MessageButtonGrade` ·
+`MfaUnavailableReason`. 이 열한 개를 쓰는 DTO 필드가 14곳 있고 `UserAccountDetailDTO.standing` ·
+`UserAccountListDTO.standing` · `SiteDetailDTO.weekStartDay`가 여기 든다.
+
+**그래서 §9의 방향별 타입 규칙은 `EnumMeta.labeled`가 참일 때만 적용한다.** 라벨 없는 열거형은
+요청과 응답 양쪽에서 값 유니언이고 `…Labeled` 별칭을 내지 않는다. 전부에 적용하면 문자열로 오는
+14곳에 `{ value, label }` 타입이 붙어, 이 설계가 없애려는 조용한 거짓이 그대로 재현된다.
+
+**`expression`으로 남는 15곳(IR에서는 5곳)** — `hasAuthority`·`hasRole` 3곳과 `and`·`or`가 든
+복합 표현식 12곳은 구조로 풀리지 않아 `expression`으로 온다. 그 가운데 IR에 실제로 실리는 것은
+5개다 — 나머지는 등록된 핸들러에 걸리지 않는다. 이중 따옴표는 0곳이라 문제가 없고,
 단일 따옴표 604곳은 전부 `permission`으로 풀린다.
 
 **생성기는 `expression`을 「권한 없음」으로 읽지 않는다.** 그렇게 읽으면 그 15곳의 버튼이
