@@ -670,10 +670,19 @@ The generators need the IR sliced by domain and indexed. This task does that onc
   every generator writes a type only into its owner's file. Put a shared type in the entity that
   reaches it first in a deterministic order, so two runs agree.
 
-  **Fourteen of the 104 inheritance edges cross a domain boundary, and the parent must be
-  duplicated.** `AreaZoneUpdateFormDTO` (`site`) extends `AreaUpdateFormDTO` → `AreaUpdateDTO` →
-  `AreaCreateDTO`, all three of which belong to `space`. Measured, all three already land in both
-  domains' closures.
+  **Fourteen declarations land in two domains' closures, and each must be written into both.**
+  `AreaZoneUpdateFormDTO` (`site` only) extends `AreaUpdateFormDTO` → `AreaUpdateDTO` →
+  `AreaCreateDTO`, and all three ancestors belong to `space` as well — measured, all three land in
+  both closures. The fourteen are 7 DTOs (`AreaCreateDTO`, `AreaUpdateDTO`, `AreaUpdateFormDTO`,
+  `AreaDetailDTO`, `EquipmentListDTO`, `BaseEntity`, `SimpliXBaseEntity`) and 7 enums
+  (`AreaKind`, `AreaStatus`, `PolicySource`, `EquipmentInstallationForm`, `EquipmentStatus`,
+  `ExportFormat`, `ExportStatus`), spanning three pairs: `space`/`site`, `user`/`notification`
+  and `system`/`data-io`.
+
+  **Count declarations, not edges.** No inheritance edge crosses a boundary once the closure is
+  built, because the walk that follows `extends` pulls the parent into the child's domain — so a
+  check written as "edges whose parent is outside this domain" measures 0 and proves nothing. The
+  quantity that matters is how many declarations two packages both have to emit.
 
   There is no import path available: **no domain package depends on another** — checked across all
   13, and `domain-site`'s dependencies are the framework packages only. Adding one would make the
