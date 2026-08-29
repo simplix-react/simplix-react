@@ -299,3 +299,139 @@ describe("a page the templates render as nothing is reported, not written", () =
   });
 });
 
+describe("what the snapshot feeds a list survives either spelling", () => {
+  /**
+   * A domain package as the Orval path leaves one: a snapshot stating the entity's real path, its
+   * filterable query params, and the operations. Everything the list widget draws beyond its
+   * columns is read from here, and the lookup is by the entity's name.
+   *
+   * @returns the module the scaffold writes into
+   */
+  async function writeSnapshotProject(): Promise<string> {
+    const modDir = await writeModule();
+    const pkgDir = join(tempDir, "packages/acme-domain-audit");
+    await mkdir(join(pkgDir, "src"), { recursive: true });
+    await writeFile(
+      join(pkgDir, "package.json"),
+      JSON.stringify({ name: "@acme/domain-audit" }),
+    );
+    await writeFile(
+      join(pkgDir, "crud.config.ts"),
+      `export default {
+  eventLog: {
+    list: "searchEventLogs",
+    get: "getEventLog",
+    create: "createEventLog",
+    update: "updateEventLog",
+    delete: "deleteEventLog",
+  },
+};
+`,
+    );
+    await writeFile(
+      join(pkgDir, "src/schemas.ts"),
+      `export const eventLogSchema = z.object({
+        id: z.string(),
+        name: z.string(),
+        status: z.enum(["open", "closed"]),
+        enabled: z.boolean(),
+      });`,
+    );
+    await writeFile(
+      join(pkgDir, ".openapi-snapshot.json"),
+      JSON.stringify({
+        version: 2,
+        generatedAt: "2026-01-01",
+        specSource: "api.json",
+        entities: [{
+          name: "eventLog",
+          pascalName: "EventLog",
+          pluralName: "eventLogs",
+          path: "/event-logs",
+          fields: [
+            { name: "id", snakeName: "id", type: "string", required: true, nullable: false, zodType: "" },
+            { name: "name", snakeName: "name", type: "string", required: true, nullable: false, zodType: "" },
+            { name: "status", snakeName: "status", type: "string", enum: ["open", "closed"], required: true, nullable: false, zodType: "" },
+            { name: "enabled", snakeName: "enabled", type: "boolean", required: true, nullable: false, zodType: "" },
+          ],
+          queryParams: [
+            { name: "name.contains", type: "string" },
+            { name: "status.in", type: "string" },
+            { name: "enabled.equals", type: "string" },
+          ],
+          operations: [
+            { name: "list", method: "GET", path: "/event-logs/search", role: "list", hasInput: true, operationId: "searchEventLogs", queryParams: [] },
+            { name: "get", method: "GET", path: "/event-logs/:id", role: "get", hasInput: false, operationId: "getEventLog", queryParams: [] },
+            { name: "create", method: "POST", path: "/event-logs", role: "create", hasInput: true, operationId: "createEventLog", queryParams: [] },
+            { name: "update", method: "PUT", path: "/event-logs/:id", role: "update", hasInput: true, operationId: "updateEventLog", queryParams: [] },
+          ],
+          tags: [],
+        }],
+      }),
+    );
+    return modDir;
+  }
+
+  /**
+   * Scaffolds one spelling against that project.
+   *
+   * @param spelling the entity argument, as a person types it
+   * @returns the list and form widgets it wrote
+   */
+  async function scaffoldSnapshot(spelling: string): Promise<{ list: string; form: string }> {
+    const { scaffoldCrudCommand } = await import("../commands/scaffold-crud.js");
+    const modDir = await writeSnapshotProject();
+    await scaffoldCrudCommand.parseAsync([
+      "node", "simplix", spelling, "--module", "integration",
+    ]);
+    const widgets = join(modDir, "src/widgets/event-log");
+    return {
+      list: await readFile(join(widgets, "list.tsx"), "utf-8"),
+      form: await readFile(join(widgets, "form.tsx"), "utf-8"),
+    };
+  }
+
+  for (const spelling of ["EventLog", "eventLog"]) {
+    it(`draws the filter bar from the snapshot's query params for ${spelling}`, async () => {
+      const { list } = await scaffoldSnapshot(spelling);
+
+      expect(list).toContain("<CrudList.FilterBar");
+      expect(list).toContain('{ type: "text", field: "name"');
+      expect(list).toContain('{ type: "faceted", field: "status"');
+      expect(list).toContain('{ type: "toggle", field: "enabled"');
+      expect(list).not.toContain("<CrudList.Search");
+    });
+
+    it(`invalidates the entity's real path for ${spelling}`, async () => {
+      // The fallback is `/api/v1/<entity>`, which names no route the client ever queries, so a
+      // created record leaves the list showing what it showed before. It compiles and it is
+      // silent.
+      const { form } = await scaffoldSnapshot(spelling);
+
+      expect(form).toContain('useInvalidateEntity("/event-logs")');
+      expect(form).not.toContain("/api/v1/");
+    });
+
+    it(`keys the translations by the canonical entity name for ${spelling}`, async () => {
+      // The locale bundles are written under the same name, so a capitalised key matches nothing
+      // any other module ships and every label on the screen falls back to the raw key.
+      const { list } = await scaffoldSnapshot(spelling);
+
+      expect(list).toContain('useEntityTranslation("eventLog")');
+      expect(list).toContain('t("eventLog.emptyTitle")');
+      expect(list).not.toContain('"EventLog.');
+    });
+  }
+
+  it("names the form's id prop the way a caller spells it, from either spelling", async () => {
+    const pascal = await scaffoldSnapshot("EventLog");
+    await rm(join(tempDir, "modules"), { recursive: true, force: true });
+    await rm(join(tempDir, "packages"), { recursive: true, force: true });
+    const camel = await scaffoldSnapshot("eventLog");
+
+    expect(pascal.form).toContain("eventLogId?: EntityId");
+    expect(pascal.form).not.toContain("EventLogId?: EntityId");
+    expect(camel.form).toBe(pascal.form);
+    expect(camel.list).toBe(pascal.list);
+  });
+});

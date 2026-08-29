@@ -624,8 +624,43 @@ describe("scaffoldCrudCommand action", () => {
 
     const widgetsDir = join(modDir, "src/widgets/event");
     const listContent = await readFile(join(widgetsDir, "list.tsx"), "utf-8");
-    // Should contain filter-related code
-    expect(listContent).toContain("Event");
+
+    // The filter bar itself, not merely "the file mentions the entity". A list whose filters
+    // resolve to nothing still renders — the template falls back to a bare toolbar holding one
+    // search box — so it type-checks, builds, and looks like a screen. Only an assertion on the
+    // component reaches that: this fixture already existed and asserted the entity's name, and a
+    // console shipped ten lists with the filter row silently replaced by that fallback.
+    expect(listContent).toContain("<CrudList.FilterBar");
+    expect(listContent).toContain("SearchOperator");
+    expect(listContent).toContain('{ type: "text", field: "name"');
+    expect(listContent).toContain('{ type: "faceted", field: "status"');
+    expect(listContent).toContain('{ type: "toggle", field: "enabled"');
+    expect(listContent).toContain("count={list.pagination.total}");
+    expect(listContent).not.toContain("<CrudList.Search");
+  });
+
+  it("falls back to a search-only toolbar for an entity with no filterable params", async () => {
+    // The negative that keeps the assertion above meaningful: the fallback is a real branch and
+    // is correct here, so its absence there is a fact about the filters rather than the template.
+    const { scaffoldCrudCommand } = await import("../commands/scaffold-crud.js");
+
+    const modDir = join(tempDir, "modules/mymod");
+    await mkdir(join(modDir, "src/widgets"), { recursive: true });
+    await writeFile(
+      join(modDir, "package.json"),
+      JSON.stringify({ name: "@test/mymod", dependencies: {} }),
+    );
+    await writeFile(join(modDir, "src/widgets/index.ts"), "export {};\n");
+    await mkdir(join(tempDir, "packages"), { recursive: true });
+
+    await scaffoldCrudCommand.parseAsync(["node", "simplix", "product"]);
+
+    const listContent = await readFile(
+      join(modDir, "src/widgets/product/list.tsx"),
+      "utf-8",
+    );
+    expect(listContent).toContain("<CrudList.Search");
+    expect(listContent).not.toContain("<CrudList.FilterBar");
   });
 
   it("does not duplicate exports in widgets/index.ts on second run", async () => {
