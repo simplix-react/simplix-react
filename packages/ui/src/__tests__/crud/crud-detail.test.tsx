@@ -131,6 +131,49 @@ describe("CrudDetail.Section", () => {
     expect(container.querySelectorAll("[class*=border-l]").length).toBe(0);
   });
 
+  // ── The label column belongs to the section, not to the field ──
+
+  it("draws a single-column section as a label track and a value track", () => {
+    const { container } = render(
+      <CrudDetail.Section title="Basic Info">
+        <div>Field A</div>
+      </CrudDetail.Section>,
+    );
+    const body = container.querySelector("[class*='grid-cols-']");
+    expect(body?.className).toContain("grid-cols-[auto_minmax(0,1fr)]");
+  });
+
+  it("doubles a two-column section's tracks, one pair per column", () => {
+    const { container } = render(
+      <CrudDetail.Section title="Basic Info" layout="two-column">
+        <div>Field A</div>
+        <div>Field B</div>
+      </CrudDetail.Section>,
+    );
+    const body = container.querySelector("[class*='grid-cols-']");
+    // The pair a field subgrids into is the section's, so a column's labels share one track. The
+    // column count `Grid` would have drawn has to lose to the doubled list, or the tracks are two
+    // where the fields expect four.
+    expect(body?.className).toContain(
+      "@sm:grid-cols-[auto_minmax(0,1fr)_auto_minmax(0,1fr)]",
+    );
+    expect(body?.className).not.toContain("@sm:grid-cols-2");
+  });
+
+  it("hands the pair to the inline fields and the cell to everything else", () => {
+    const { container } = render(
+      <CrudDetail.Section title="Basic Info" layout="two-column">
+        <div>Field A</div>
+      </CrudDetail.Section>,
+    );
+    const body = container.querySelector("[class*='grid-cols-']");
+    // Only a field whose label sits in the first track subgrids; a chart, a table or a block in
+    // the same section takes the pair as one cell and lays out inside it as it always did.
+    expect(body?.className).toContain(
+      "[&>[data-field-layout=inline]]:grid-cols-subgrid",
+    );
+    expect(body?.className).toContain("[&>*:not(.col-span-full)]:col-span-2");
+  });
 });
 
 describe("CrudDetail.Actions", () => {

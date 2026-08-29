@@ -127,6 +127,69 @@ describe("DetailFieldWrapper", () => {
     expect(wrapper.className).toContain("items-start");
   });
 
+  // ── Where the label sits, and who decides it ──
+
+  it("gives inline's label a track of its own, so a container can share one across its fields", () => {
+    render(
+      <DetailFieldWrapper label="Run by" layout="inline">
+        <span data-testid="val">Kim</span>
+      </DetailFieldWrapper>,
+    );
+    const wrapper = screen.getByTestId("detail-field-run-by");
+    // Two tracks, label then value. A flex row cannot be shared: the label would take its own
+    // width in every row and the values would start at as many x positions as there are labels.
+    expect(wrapper.className).toContain("grid");
+    expect(wrapper.className).toContain("grid-cols-[auto_minmax(0,1fr)]");
+  });
+
+  it("names its layout on the element, which is what a section aligns by", () => {
+    render(
+      <DetailFieldWrapper label="Run by" layout="inline">
+        value
+      </DetailFieldWrapper>,
+    );
+    expect(
+      screen.getByTestId("detail-field-run-by").getAttribute("data-field-layout"),
+    ).toBe("inline");
+  });
+
+  it("hands the whole pair to a value with no label, so it is never measured as one", () => {
+    // Left in the first track, a label-less value would set the width of the column every other
+    // row draws its label in.
+    const { container } = render(
+      <DetailFieldWrapper layout="inline">
+        <span data-testid="val">Kim</span>
+      </DetailFieldWrapper>,
+    );
+    const value = container.querySelector(".field-value");
+    expect(value?.className).toContain("col-span-2");
+  });
+
+  it("keeps a labelled value out of the label's track without spanning it", () => {
+    const { container } = render(
+      <DetailFieldWrapper label="Run by" layout="inline">
+        value
+      </DetailFieldWrapper>,
+    );
+    expect(container.querySelector(".field-value")?.className).not.toContain("col-span-2");
+  });
+
+  it("leaves the layouts that carry no label column as flex rows", () => {
+    // `top` stacks, `trailing` spreads with a spacer, `hidden` draws no label at all — none of
+    // them has a label column to share, so none of them becomes a grid.
+    for (const layout of ["top", "trailing", "hidden"] as const) {
+      const { container } = render(
+        <DetailFieldWrapper label="Auto lock" layout={layout}>
+          value
+        </DetailFieldWrapper>,
+      );
+      const wrapper = container.querySelector("[data-field-layout]");
+      expect(wrapper?.className).toContain("flex");
+      expect(wrapper?.className).not.toContain("grid");
+      cleanup();
+    }
+  });
+
   it("spreads trailing, with the spacer that does it", () => {
     const { container } = render(
       <DetailFieldWrapper label="Auto lock" layout="trailing">

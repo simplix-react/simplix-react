@@ -173,10 +173,10 @@ function DetailRoot({ isLoading, onClose, header, footer, variant = "default", a
 // │ ┌───────────────────────────┐   │
 // │ │ title          [trailing] │   │
 // │ ├───────────────────────────┤   │
-// │ │ Stack (gap-sm)            │   │
+// │ │ grid (label track, value) │   │
 // │ │  {children}               │   │
-// │ │   ├─ field row            │   │
-// │ │   ├─ field row            │   │
+// │ │   ├─ Email   │ a@b.test   │   │
+// │ │   ├─ Team    │ HQ  ▷      │   │
 // │ │   └─ ...                  │   │
 // │ └───────────────────────────┘   │
 // └─────────────────────────────────┘
@@ -212,6 +212,35 @@ const detailLayoutColumns = {
   "three-column": 3,
 } as const;
 
+// Each column of a section body is two tracks — the labels, then the values — because a shared
+// label column is the only thing that makes the values of a column start at one x. A field cannot
+// decide it alone: its own `auto` track is its own label's width, so a panel of them draws as many
+// label columns as it has rows, and the reader gets no column to run an eye down.
+//
+// Written out per layout rather than assembled: the CSS compiler only emits classes it can read in
+// the source, so a name built at runtime resolves to no rule at all. Each string doubles the track
+// list `Grid` would have drawn at that breakpoint, so a section still collapses to one column at
+// the width it always did.
+const detailLayoutTracks: Record<keyof typeof detailLayoutColumns, string> = {
+  "single-column": "grid-cols-[auto_minmax(0,1fr)]",
+  "two-column":
+    "grid-cols-[auto_minmax(0,1fr)] @sm:grid-cols-[auto_minmax(0,1fr)_auto_minmax(0,1fr)]",
+  "three-column":
+    "grid-cols-[auto_minmax(0,1fr)] @sm:grid-cols-[auto_minmax(0,1fr)_auto_minmax(0,1fr)] @2xl:grid-cols-[auto_minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)]",
+};
+
+// A pair of tracks is one cell of the section as the caller counts them, so everything the section
+// holds takes the pair and lays out inside it exactly as it did inside a single track — a child
+// that claims the whole row still claims the whole row. Only a field whose label sits in the first
+// track subgrids into the pair, which is what puts its label in the column its neighbours use; a
+// field nested under some other element is not this container's child and keeps its own tracks.
+//
+// An item that spans a flexible track contributes nothing to an intrinsic one, so the label track
+// is measured by the labels alone — a wide table or a long block in the same section cannot widen
+// it, and a section holding no such field has no label track at all.
+const DETAIL_FIELD_PAIR =
+  "[&>*:not(.col-span-full)]:col-span-2 [&>[data-field-layout=inline]]:grid-cols-subgrid";
+
 export interface CrudDetailSectionProps extends SectionShellProps {
   /**
    * Field arrangement inside the section body. `"single-column"` (default)
@@ -228,14 +257,19 @@ export interface CrudDetailSectionProps extends SectionShellProps {
 function DetailSection({ layout = "single-column", ...props }: CrudDetailSectionProps) {
   const { SectionShell } = useFlatUIComponents();
   const columns = detailLayoutColumns[layout];
+  const body = cn("pl-2", detailLayoutTracks[layout], DETAIL_FIELD_PAIR);
   return (
     <SectionShell {...props}>
       {columns === 1 ? (
-        <Stack gap="xs" className="pl-2">
-          {props.children}
-        </Stack>
+        // Rows keep the tight rhythm a stacked section reads at. The column gap is the one a
+        // field draws between its own label and value, so the two agree and the tracks measure to
+        // the labels exactly.
+        <div className={cn("grid gap-x-3 gap-y-1", body)}>{props.children}</div>
       ) : (
-        <Grid columns={columns} gapX="lg" gapY="xs" divider className="pl-2">
+        // The wide gutter stays between the section's columns: a field overrides it with its own
+        // narrower one across the pair it holds, so a label sits close to its value while the
+        // columns stay far apart.
+        <Grid columns={columns} gapX="lg" gapY="xs" divider className={body}>
           {props.children}
         </Grid>
       )}

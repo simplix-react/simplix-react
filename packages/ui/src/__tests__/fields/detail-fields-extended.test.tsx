@@ -305,7 +305,9 @@ describe("DetailDateField (extended)", () => {
       />,
     );
     const wrapper = screen.getByTestId("detail-field-created");
-    expect(wrapper.className).toContain("flex");
+    // Label and value on one row, in two tracks, so a section can share the first one across
+    // every field it holds.
+    expect(wrapper.className).toContain("grid-cols-[auto_minmax(0,1fr)]");
     // The label and its value stay together; spreading them is `trailing`'s layout, not this one.
     expect(wrapper.className).not.toContain("justify-between");
   });
