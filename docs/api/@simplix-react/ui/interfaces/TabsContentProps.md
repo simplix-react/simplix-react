@@ -6,7 +6,7 @@
 
 # Interface: TabsContentProps
 
-Defined in: [packages/ui/src/base/navigation/tabs.tsx:110](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/tabs.tsx#L110)
+Defined in: [packages/ui/src/base/navigation/tabs.tsx:133](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/tabs.tsx#L133)
 
 ## Extends
 
@@ -3378,7 +3378,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **padded**: `boolean`
 
-Defined in: [packages/ui/src/base/navigation/tabs.tsx:124](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/tabs.tsx#L124)
+Defined in: [packages/ui/src/base/navigation/tabs.tsx:147](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/tabs.tsx#L147)
 
 Insets the panel from the strip above it and from whatever follows.
 

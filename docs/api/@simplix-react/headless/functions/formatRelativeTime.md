@@ -8,7 +8,7 @@
 
 > **formatRelativeTime**(`date`, `locale?`): `string`
 
-Defined in: [format-date.ts:101](https://github.com/simplix-react/simplix-react/blob/main/format-date.ts#L101)
+Defined in: [format-date.ts:134](https://github.com/simplix-react/simplix-react/blob/main/format-date.ts#L134)
 
 Locale-aware relative time — e.g. "3 days ago", localized.
 

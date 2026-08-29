@@ -8,7 +8,7 @@
 
 > **DialogContentProps** = `ComponentPropsWithRef`\<*typeof* `DialogPrimitive.Content`\> & `object`
 
-Defined in: [packages/ui/src/base/overlay/dialog.tsx:61](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/dialog.tsx#L61)
+Defined in: [packages/ui/src/base/overlay/dialog.tsx:63](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/dialog.tsx#L63)
 
 ## Type Declaration
 

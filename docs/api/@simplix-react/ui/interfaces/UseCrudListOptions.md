@@ -62,6 +62,27 @@ Maximum number of rows to display.
 
 ***
 
+### scopeKey?
+
+> `optional` **scopeKey**: `string`
+
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:39](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L39)
+
+What the list is narrowed to from outside — a tab, a chip row, a parent record.
+
+<p><b>Pass this whenever something other than the list's own filters decides which records it
+asks for.</b> The page index is state the list keeps, and a narrowing that arrives from
+outside changes how many pages there are without touching it: a reader on page 5 of 활성 who
+presses 정지 asks the server for page 5 of three rows and is given nothing. The total in the
+toolbar comes from the same response and is right, so the screen states a count over an empty
+table — the one shape a reader reads as a broken list rather than as an empty one.
+
+<p>Changing it returns the list to the first page and clears the selection, which is about the
+rows that were there rather than the ones now. Any stable string will do: the tab's key, or
+the forced parameters serialised.
+
+***
+
 ### stateMode?
 
 > `optional` **stateMode**: `"server"` \| `"client"`

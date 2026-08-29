@@ -6,7 +6,7 @@
 
 # Interface: PasswordFieldProps
 
-Defined in: [packages/ui/src/fields/form/password-field.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/password-field.tsx#L9)
+Defined in: [packages/ui/src/fields/form/password-field.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/password-field.tsx#L11)
 
 Props for the [PasswordField](../functions/PasswordField.md) form component.
 
@@ -68,7 +68,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:32](https://github.com/simplix
 
 > `optional` **inputProps**: `DetailedHTMLProps`\<`InputHTMLAttributes`\<`HTMLInputElement`\>, `HTMLInputElement`\>
 
-Defined in: [packages/ui/src/fields/form/password-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/password-field.tsx#L17)
+Defined in: [packages/ui/src/fields/form/password-field.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/password-field.tsx#L19)
 
 Additional props forwarded to the underlying input element.
 
@@ -120,7 +120,7 @@ label for screen readers only.
 
 > `optional` **maxLength**: `number`
 
-Defined in: [packages/ui/src/fields/form/password-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/password-field.tsx#L15)
+Defined in: [packages/ui/src/fields/form/password-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/password-field.tsx#L17)
 
 ***
 
@@ -128,7 +128,7 @@ Defined in: [packages/ui/src/fields/form/password-field.tsx:15](https://github.c
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/fields/form/password-field.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/password-field.tsx#L13)
+Defined in: [packages/ui/src/fields/form/password-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/password-field.tsx#L15)
 
 Called when the value changes.
 
@@ -148,7 +148,7 @@ Called when the value changes.
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/fields/form/password-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/password-field.tsx#L14)
+Defined in: [packages/ui/src/fields/form/password-field.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/password-field.tsx#L16)
 
 ***
 
@@ -212,7 +212,7 @@ below at full width.
 
 > **value**: `string`
 
-Defined in: [packages/ui/src/fields/form/password-field.tsx:11](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/password-field.tsx#L11)
+Defined in: [packages/ui/src/fields/form/password-field.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/password-field.tsx#L13)
 
 Current input value.
 

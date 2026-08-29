@@ -1,0 +1,2882 @@
+# DTO Meta Codegen — Frontend Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** `@simplix-react/cli` reads the backend's SimpliX Meta and generates TypeScript types, zod schemas, request functions, React Query hooks, MSW handlers, filter/permission configuration — in parallel with the existing orval output, so a domain can be moved across one at a time and moved back by reverting one config line.
+
+**Architecture:** A new `packages/cli/src/meta/` reads SimpliX Meta (from the dev endpoint or a committed snapshot), resolves it, and hands a shared shape to per-concern generators that write into `src/generated-meta/`. The existing orval path keeps behaving exactly as it does — four tasks add to `packages/cli/src/openapi/`, none change what it emits (see "Facts that bind every task"). A `meta-diff` command compares the two outputs so a domain is only switched once they agree.
+
+**Tech Stack:** TypeScript, Node 22+, the existing CLI plugin registry, zod v4, TanStack Query, MSW.
+
+**Spec:** `docs/design/2026-08-28-dto-meta-codegen.md` (Korean). Sections referenced below by number.
+
+---
+
+## SimpliX Meta is real — do not invent fixtures
+
+The backend half of this project is finished and a real SimpliX Meta was captured from the smart-safety application. It lives at:
+
+`packages/cli/src/meta/__fixtures__/smart-safety-meta.json` (2.7 MB)
+
+**Every generator test in this plan runs against that file.** Measured contents:
+
+| | |
+| --- | --- |
+| operations | 694 |
+| types | 646 (104 of them carry `extends`) |
+| enums | 133 (122 labeled, 11 not — see Task 6) |
+| enum values | 540, of which 498 carry a `labelKey`. **`labeled` and `labelKey` coincide exactly**: the 11 enums whose values lack a `labelKey` are the same 11 that are unlabeled, and no labeled enum is missing one. Generators may rely on that. |
+| containers in use | `SimpliXApiResponse` 648 · `List` 405 · `Page` 93 · `Map` 74 |
+| field kinds — **counting every `TypeRef` node** of a field, container arguments included (6,523) | `string` 3121 · `number` 947 · `instant` 682 · `boolean` 593 · `enum` 541 · `container` 279 · `date` 202 · `ref` 134 · `time` 10 · `unknown` 8 · `param` 6 |
+| field kinds — **one per field** (6,244) | `string` 2973 · `number` 946 · `instant` 682 · `boolean` 593 · `enum` 523 · `container` 278 · `date` 200 · `ref` 38 · `time` 10 · `param` 1 |
+| constraints (720 on 561 fields) | `maxLength` 440 · `notBlank` 232 · `notEmpty` 11 · `pattern` 10 · `email` 7 · `min` 7 · `minLength` 5 · `max` 4 · `nonnegative` 2 · `positive` 1 · `maxItems` 1 · **`custom` 0** |
+| access kinds | `permission` 566 · `authenticated` 94 · `public` 29 · `expression` 5 |
+| `searchDto`-bearing operations | 86 |
+| fields with `searchable` | 1118 |
+| fields with `labelKey` | 2104 |
+| distinct tags | 139 — **and 139 entities**, since an entity is one tag (Task 8). Counts elsewhere that say **126** are the *configured* domains only: 139 minus the 13 tags no `domains` pattern claims. Quote 139 for "what SimpliX Meta contains" and 126 for "what a codegen run produces from this capture". The config declares **129** patterns across **13** domains; the other 3 match no tag in this capture (see Task 5). |
+
+### What the fixture cannot test
+
+Three declared shapes never occur in it, so a test written against the fixture proves nothing about
+them. Implement each anyway — SimpliX Meta declares them and a later capture will carry them — and build
+the case by hand, saying in your report that the fixture does not cover it:
+
+| Shape | In the fixture | Why |
+| --- | ---: | --- |
+| `{ kind: "pick", of, fields }` | 0 | `@JsonIncludeProperties` sits only on entities, and no DTO field is typed by an entity (spec §12) |
+| `ref` carrying `args` | 0 of 663 | no DTO *reference* is generic — but three types **declare** type parameters, so see below |
+| `{ kind: "binary" }` **as a field** | 0 | it occurs 5 times, all in responses (`…/download`, the avatar and content routes) |
+
+`{ kind: "file" }` was a fourth until Task 0: the re-captured fixture carries **2**, both `query`
+entries named `file` on the avatar and content upload routes.
+
+**Three types are generic and must be emitted as such** — `SimpliXBaseEntity<K>`, `BaseEntity<K>`
+(which extends it) and `Comparable<T>`. `SimpliXBaseEntity` and `BaseEntity` are the two most
+widely shared types in the capture, reachable from 7 tags each, so a model generator that ignores
+`typeParams` flattens the key type out of every entity that inherits from them.
+
+`custom` constraints are a fifth such case — see Task 7.
+
+Those numbers are the yardstick. A generator that silently drops a field kind will show up as a
+count that does not match — **use the row that matches what you are counting**: a test walking
+fields asserts against 6,244, one walking every `TypeRef` of a field against 6,523. Both rows
+count fields only; a walk that also visits `response`, `request.body` and the params reaches
+8,729 nodes and matches neither row. `unknown` never appears at the top level of a field, only
+inside a container argument; `param` does once — `SimpliXBaseEntity.id`, the generic id every
+entity inherits — so a generator must handle a bare type parameter in field position rather than
+assume it only ever shows up nested.
+
+**Every number here was measured against the capture that predates Task 0.** Re-run them after the
+re-capture; the request bodies change shape and the counts may move with them.
+
+## Facts that bind every task
+
+- **Repository:** `/Users/taehwan/Workspace/accesscore/simplix-react`, branch `feat/dto-meta-codegen`. Two files under `packages/ui/src/base/charts/` were dirty before this work began — they belong to somebody else; never stage them.
+- **The orval path must keep working for every domain not yet moved.** That is the rule; "never
+  open `packages/cli/src/openapi/`" is not, and three tasks legitimately reach into it — Task 4
+  registers container types on `spec-profile.ts`, Task 9 completes `SUFFIX_TO_ENUM_KEY` in
+  `scaffold-crud.ts`, and
+  Task 13 makes the barrel templates' model path a variable.
+
+  What each of those must satisfy: the change is **additive**, and the task proves the orval path
+  is unchanged by running the full CLI suite and, where the change touches generation, by
+  regenerating a domain and confirming the output is byte-identical. A change that alters what the
+  orval path emits is out of scope no matter how much better it looks.
+- Commit messages: English conventional commits, **no AI attribution of any kind**.
+- **Run tests from the workspace root with `npx vitest run --project cli`.** Measured: the
+  package script `pnpm --filter @simplix-react/cli test -- <name>` prints `No test files found`
+  and **exits 0**, and `cd packages/cli && npx vitest run <path>` finds nothing either — the
+  project's `root` is declared relative to the workspace, so invoking from the package directory
+  resolves it wrongly. From the root it collects 67 files / 970 tests. Add `--reporter=verbose`
+  and grep for your file when you need to prove yours ran.
+- **Every CLI test lives in `packages/cli/src/__tests__/`, flat.** The root `vitest.config.ts`
+  pins the CLI project to `include: ["src/__tests__/**/*.test.ts"]`, and the package script is
+  `vitest run --passWithNoTests` — so a test placed anywhere else is never collected and the run
+  still reports success. After adding a test, confirm the runner names your file and reports a
+  non-zero test count; a green run that collected nothing looks identical to a passing one.
+- **`--project cli` runs only `packages/cli`.** Three of these tasks put tests in the boot
+  extension, where that flag collects nothing and still exits 0. Match the project to the package,
+  from the workspace root:
+
+  | Test lives in | Run |
+  | --- | --- |
+  | `packages/cli/src/__tests__/` | `npx vitest run --project cli` |
+  | `extensions/simplix-boot/packages/utils/` | `npx vitest run --project @simplix-react-ext/simplix-boot-utils` |
+  | `extensions/simplix-boot/packages/cli-plugin/` | `npx vitest run --project @simplix-react-ext/simplix-boot-cli-plugin` |
+  | everything, before a task's final commit | `npx vitest run` |
+
+  All three were verified to collect and pass. `npx vitest list` prints every collected test with
+  its project in brackets — use it to confirm a new file is picked up.
+
+- `pnpm` workspace. Typecheck: `pnpm typecheck`. Lint: `pnpm lint`.
+- Comments and TSDoc in English (repo rule); the design spec is Korean and is not a template for code comments.
+
+---
+
+### Task 0: Re-capture the fixture — the committed one is stale
+
+**Files:**
+- Replace: `packages/cli/src/meta/__fixtures__/smart-safety-meta.json`
+- Modify: `packages/cli/src/__tests__/meta-types.test.ts` — assert the fixture matches the types
+
+`RequestMeta.body` was a type name, and `DtoMetaBuilder` filled it with
+`registry.register(resolvable.resolve())`. `resolve()` on `Set<OrganizationUpdateDTO>` yields the
+raw `java.util.Set`, so the body arrived as the string `"Set"` and the element type — the entire
+payload contract — was gone. **49 of the 231 body-carrying operations in the captured document
+were affected**: every `PATCH /<resource>` multi-update (38, `Set<XUpdateDTO>`) and every
+`PATCH /<resource>/order` reorder (11, `List<XOrderDTO>`).
+
+A second defect of the same family was found beside it: a `MultipartFile` parameter set
+`contentType: "multipart"` and was then discarded, so an upload operation named no part and
+`{ kind: "file" }` — declared in spec §4 and §12 — was never produced at all. A client had nothing
+to append the file under.
+
+Both are fixed on `feat/dto-meta-endpoint` in the simplix repository, each with a regression test:
+`02c49ac` maps the body the way the response was already mapped (pinning a `Set<T>` body to
+`container("List", [ref T])`), and `a7c392b` records the part as a named `query` entry typed
+`file`. `types.ts` and spec §4 follow the first. **Task 0 below re-captured the fixture against a
+backend carrying both fixes**, so the committed fixture now holds 231 `TypeRef` bodies — 49 of
+them containers — and 2 `file`-typed parts. The paragraphs below describe the capture that step
+replaced; they are kept because the tests they specify are what keep the staleness loud.
+
+- [ ] **Step 1: Re-capture.** Run the smart-safety backend with the meta endpoint enabled and
+  save `GET /dev/meta/dto` over the fixture. The backend fix must be on the classpath — build the
+  starter from `feat/dto-meta-endpoint` first, or the capture reproduces the defect.
+
+- [ ] **Step 2: Make staleness loud.** The existing test walks the fixture but never reads
+  `body`, which is why nothing failed when the shape changed. Add:
+
+```ts
+it("every request body is a TypeRef, not a bare type name", () => {
+  const bodies = meta.operations
+    .map((o) => o.request.body)
+    .filter((b): b is NonNullable<typeof b> => b !== undefined);
+  expect(bodies.length).toBeGreaterThan(0);
+  expect(bodies.filter((b) => typeof b !== "object" || !("kind" in b))).toEqual([]);
+});
+```
+
+  Then assert a known multi-update: `PATCH /api/v1/admin/org`'s body is
+  `{ kind: "container", name: "List", args: [{ kind: "ref", name: "OrganizationUpdateDTO" }] }`,
+  and a known upload: `POST /api/v1/admin/user/account/{userId}/avatar` carries a `query` entry
+  named `file` typed `{ kind: "file" }`. Both were absent from the old capture and are present
+  in the committed one — these assertions are the regression guard, not a pending change.
+  A `Set` normalises to `List` because `TypeRefMapper` treats every `Collection` alike — which is
+  also why Task 4's "four containers and no others" stays true after this change.
+
+- [ ] **Step 2b: Expect the type count to grow — the erasure removed types, not just references.**
+  `registry.register(java.util.List)` filed `List` and never walked into the element, so an element
+  type reachable from nothing else is **absent from `types` altogether**. Measured on the stale
+  capture: **11 `/order` operations and zero `…Order`/`…OrderDTO` types** in the map. The plan's
+  "637 types" undercounted by exactly those 11. **The re-capture is done**: the fixture now holds
+  646 types — the 11 `…OrderUpdateDTO` element types the erasure had swallowed, plus the removal of
+  the two junk entries `List` and `Set` that `registry.register(raw)` had filed as DTOs.
+
+  That absence has a consumer. `orderField` — the property a reorder writes — is read from the
+  order operation's request body element (`scaffold-crud.ts:1707`,
+  `bodySchema.items.properties`, taking the first key that is neither `id` nor the row id), and
+  `treeSortOrderField` falls back to it (`:1802`). With the element type missing, none of the 11
+  reorder-capable entities can derive it. After the re-capture, assert that
+  `PATCH /api/v1/admin/org/order`'s body resolves to a `List` of a named DTO and that the DTO is in
+  `types`.
+
+- [ ] **Step 3: Re-run every count this plan quotes.** The operation, type, enum, constraint and
+  container figures below were measured against the old capture. Re-measure and correct any that
+  moved; a plan quoting a number the fixture no longer contains sends an implementer looking for
+  a defect that is not there.
+
+- [ ] **Step 4: Commit**
+
+```bash
+npx vitest run --project cli
+git add packages/cli/src/meta/__fixtures__/smart-safety-meta.json \
+        packages/cli/src/__tests__/meta-types.test.ts
+git commit -m "test(cli): re-capture the SimpliX Meta fixture with typed request bodies"
+```
+
+---
+
+### Task 1: SimpliX Meta types, mirrored from the committed Java records
+
+**Files:**
+- Create: `packages/cli/src/meta/types.ts`
+- Test: `packages/cli/src/__tests__/meta-types.test.ts`
+
+The Java records are committed at
+`/Users/taehwan/Workspace/simplix/simplix/spring-boot-starter-simplix/src/main/java/dev/simplecore/simplix/web/meta/model/`.
+Mirror them exactly — component names, optionality, and the `extends` rename.
+
+- [ ] **Step 1: Write the types**
+
+```ts
+/** One entry of the discriminated type reference. `kind` selects which members are present. */
+export type TypeRef =
+  | { kind: "string" | "boolean" | "unknown" | "instant" | "date" | "file" | "binary" }
+  | { kind: "number"; integral: boolean }
+  | { kind: "time"; pattern?: string }
+  | { kind: "enum"; name: string }
+  | { kind: "ref"; name: string; args?: TypeRef[] }
+  | { kind: "param"; name: string }
+  | { kind: "container"; name: string; args: TypeRef[] }
+  | { kind: "pick"; of: string; fields: string[] };
+
+/** A validation constraint. `value` is a JSON number for `@Min`/`@Max` and a JSON string for
+ *  `@DecimalMin`/`@DecimalMax` — both land on the same `min`/`max` kind, so read the runtime type. */
+export interface ConstraintMeta {
+  kind: string;
+  value?: number | string;
+  name?: string;
+}
+
+export interface SearchableMeta {
+  operators: string[];
+  sortable: boolean;
+  entityField?: string;
+  sortField?: string;
+}
+
+export interface FieldMeta {
+  name: string;
+  type: TypeRef;
+  /** Always present — an unboxed Java boolean, so `false` is emitted rather than omitted. */
+  required: boolean;
+  /** Always present, same reason. */
+  nullable: boolean;
+  description?: string;
+  labelKey?: string;
+  label?: string;
+  constraints?: ConstraintMeta[];
+  searchable?: SearchableMeta;
+}
+
+export interface TypeMeta {
+  javaClass: string;
+  /** Parent type name. This type carries ONLY its own fields; the parent carries the rest. */
+  extends?: string;
+  /** Always present; empty for a non-generic DTO. */
+  typeParams: string[];
+  description?: string;
+  fields: FieldMeta[];
+}
+
+export interface EnumValueMeta {
+  name: string;
+  labelKey?: string;
+}
+
+export interface EnumMeta {
+  /** Always present. `true` means the wire shape is `{"value":"…","label":"…"}`. */
+  labeled: boolean;
+  values: EnumValueMeta[];
+}
+
+export type AccessMeta =
+  | { kind: "permission"; group: string; action: string }
+  | { kind: "authenticated" }
+  | { kind: "public" }
+  | { kind: "expression"; raw: string };
+
+export interface ParamMeta {
+  name: string;
+  type: TypeRef;
+  required: boolean;
+  description?: string;
+}
+
+export interface RequestMeta {
+  body?: string;
+  contentType?: string;
+  query: ParamMeta[];
+  path: ParamMeta[];
+  /** The DTO whose `@SearchableField`s define this operation's flattened search params. */
+  searchDto?: string;
+}
+
+export interface OperationMeta {
+  id: string;
+  method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  path: string;
+  tag: string;
+  summary?: string;
+  request: RequestMeta;
+  /** Container-wrapped. Absent for a Void response. */
+  response?: TypeRef;
+  access: AccessMeta;
+}
+
+export interface DtoMeta {
+  version: number;
+  enums: Record<string, EnumMeta>;
+  types: Record<string, TypeMeta>;
+  operations: OperationMeta[];
+  extensions?: Record<string, unknown>;
+}
+```
+
+**Why some members are optional and others are not:** the Java records carry `@JsonInclude(NON_NULL)`, which drops a `null` member entirely but never drops an unboxed primitive and never drops an empty collection. So `required`, `nullable`, `sortable`, `labeled`, `version` and `typeParams` are always present, while `description`, `labelKey`, `extends`, `summary`, `response` and `extensions` vanish when absent. Getting this backwards produces types that lie about the payload (spec §4).
+
+- [ ] **Step 2: Write the test — it reads the real SimpliX Meta**
+
+```ts
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { describe, expect, it } from "vitest";
+import type { DtoMeta } from "../types.js";
+
+const ir: DtoMeta = JSON.parse(
+  readFileSync(join(__dirname, "../__fixtures__/smart-safety-meta.json"), "utf-8"),
+);
+
+describe("meta types", () => {
+  it("types the captured SimpliX Meta without a cast", () => {
+    expect(ir.version).toBe(1);
+    expect(Object.keys(ir.types)).toHaveLength(646);
+    expect(Object.keys(ir.enums)).toHaveLength(133);
+    expect(ir.operations).toHaveLength(694);
+  });
+
+  it("every field carries required and nullable", () => {
+    const missing = Object.values(ir.types).flatMap((t) =>
+      t.fields.filter((f) => typeof f.required !== "boolean" || typeof f.nullable !== "boolean"),
+    );
+    expect(missing).toEqual([]);
+  });
+
+  it("every type carries typeParams even when empty", () => {
+    const missing = Object.values(ir.types).filter((t) => !Array.isArray(t.typeParams));
+    expect(missing).toEqual([]);
+  });
+
+  it("104 types carry extends and each lists only its own fields", () => {
+    const derived = Object.values(ir.types).filter((t) => t.extends);
+    expect(derived).toHaveLength(104);
+  });
+
+  it("every labeled enum value carries a labelKey", () => {
+    const labeled = Object.values(ir.enums).filter((e) => e.labeled);
+    expect(labeled.length).toBeGreaterThan(100);
+    expect(labeled.every((e) => e.values.every((v) => v.labelKey))).toBe(true);
+  });
+
+  it("only the four known containers appear", () => {
+    const names = new Set<string>();
+    const walk = (t?: TypeRefLike) => {
+      if (!t) return;
+      if (t.kind === "container") names.add(t.name);
+      t.args?.forEach(walk);
+    };
+    type TypeRefLike = { kind: string; name?: string; args?: TypeRefLike[] };
+    for (const op of ir.operations) walk(op.response as TypeRefLike | undefined);
+    for (const t of Object.values(ir.types)) for (const f of t.fields) walk(f.type as TypeRefLike);
+    expect([...names].sort()).toEqual(["List", "Map", "Page", "SimpliXApiResponse"]);
+  });
+});
+```
+
+- [ ] **Step 3: Run it**
+
+`npx vitest run --project cli`
+Expected: all green. A count mismatch means the fixture was regenerated against a different backend — stop and report rather than editing the numbers.
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add packages/cli/src/meta/types.ts packages/cli/src/__tests__/meta-types.test.ts \
+        packages/cli/src/meta/__fixtures__/smart-safety-meta.json
+git commit -m "feat(cli): mirror SimpliX Meta as TypeScript types"
+```
+
+---
+
+### Task 2: Fetch SimpliX Meta from an endpoint or a snapshot
+
+**Files:**
+- Create: `packages/cli/src/meta/fetch.ts`
+- Test: `packages/cli/src/__tests__/meta-fetch.test.ts`
+
+- [ ] **Step 1: Write it**
+
+```ts
+import { readFile, writeFile } from "node:fs/promises";
+import type { DtoMeta } from "./types.js";
+
+/** The SimpliX Meta version this CLI understands. A newer document is refused rather than read partially. */
+export const SUPPORTED_IR_VERSION = 1;
+
+export interface FetchMetaOptions {
+  /** Endpoint URL, or a path to a committed snapshot. */
+  source: string;
+  /** When set, a fetched SimpliX Meta is written here so a later run can work offline. */
+  snapshot?: string;
+  /** Read `snapshot` instead of `source`. */
+  offline?: boolean;
+}
+
+export async function fetchMeta(options: FetchMetaOptions): Promise<DtoMeta> {
+  const raw = options.offline
+    ? await readSnapshot(options)
+    : await readSource(options.source);
+  const meta = unwrap(raw);
+  assertVersion(meta);
+  if (options.snapshot && !options.offline) {
+    await writeFile(options.snapshot, JSON.stringify(meta, null, 2), "utf-8");
+  }
+  return meta;
+}
+```
+
+Fill in the four helpers:
+
+- `readSource` — an `http://`/`https://` source is fetched; anything else is read from disk. A non-2xx response throws with the status AND the response body, because the backend answers a duplicate type name with a 409 whose body names both classes; swallowing it would leave the operator guessing.
+- `readSnapshot` — throws a clear error naming the path when `snapshot` is unset or missing.
+- `unwrap` — **do not sniff the envelope's shape.** Spec §5.1 settles that an envelope is judged
+  by name, not by field shape, because a shape test misreads a response whose body is empty. There
+  is no TypeRef here, so use what each source guarantees instead:
+
+  - **An HTTP source always carries an envelope.** `SimpliXMetaDevController.dto()` returns
+    `SimpliXApiResponse<DtoMeta>` (fields `type`, `message`, `body`, `timestamp`, `errorCode`,
+    `errorDetail`). Take `body` unconditionally, and throw naming the `type` and `message` when it
+    is absent — that is an error envelope, not a SimpliX Meta document.
+  - **A snapshot file may be either**, since a person may have saved the whole response or just
+    the document. Decide on SimpliX Meta's own guaranteed member: `version` is an unboxed `int`, so
+    `@JsonInclude(NON_NULL)` never drops it and a bare SimpliX Meta always has it at the top level. Present
+    ⇒ the payload is SimpliX Meta; absent ⇒ take `body`, and throw if that has no `version` either.
+- `assertVersion` — refuse a `version` greater than `SUPPORTED_IR_VERSION` with a message telling the operator to upgrade the CLI. A newer document may carry members this CLI would silently drop (spec §5.1).
+
+- [ ] **Step 2: Test it**
+
+Cover: reading the real fixture from disk; an HTTP response unwrapping to `body`; an HTTP
+response whose `body` is absent throwing with the envelope's `type` and `message`; a snapshot saved
+as the whole response and one saved bare, both resolving to the same document; refusing
+`version: 2`; a missing snapshot path producing an error that names the path; and a non-2xx HTTP
+response surfacing the body text. Stub `fetch` rather than opening a socket.
+
+- [ ] **Step 3: Run, then commit**
+
+```bash
+npx vitest run --project cli
+git add packages/cli/src/meta/fetch.ts packages/cli/src/__tests__/meta-fetch.test.ts
+git commit -m "feat(cli): read SimpliX Meta from an endpoint or a snapshot"
+```
+
+---
+
+### Task 3: `LabeledEnumValue<T>` in the boot extension
+
+**Files:**
+- Create: `extensions/simplix-boot/packages/utils/src/labeled-enum-value.ts`
+- Modify: `extensions/simplix-boot/packages/utils/src/index.ts`
+- Test: `extensions/simplix-boot/packages/utils/src/__tests__/labeled-enum-value.test.ts`
+
+`resolveBootEnum` already lives in this package and takes `unknown`, because nothing described the wire shape. SimpliX Meta does now: a labeled enum serializes as `{"value":"ACTIVE","label":"활성"}` (spec §4.1).
+
+- [ ] **Step 1: Write it**
+
+```ts
+/**
+ * A labeled enum value as the Boot backend sends it.
+ *
+ * The server serializes an enum implementing `LabeledEnum` as an object, not a bare string, so
+ * a response field holding one is `LabeledEnumValue<"ACTIVE" | "RETIRED">` rather than the union
+ * itself. Comparing such a field to a bare string is a type error — which is the point: it was
+ * previously a silent runtime falsehood.
+ */
+export interface LabeledEnumValue<T extends string = string> {
+  value: T;
+  label: string;
+}
+```
+
+Export it from the package barrel next to `resolveBootEnum`.
+
+- [ ] **Step 2: Test** that `resolveBootEnum` accepts a `LabeledEnumValue` and returns its `value`, and that a plain string still round-trips.
+
+- [ ] **Step 3: Run this package's project, then commit**
+
+```bash
+npx vitest run --project @simplix-react-ext/simplix-boot-utils
+git add extensions/simplix-boot/packages/utils/src/labeled-enum-value.ts \
+        extensions/simplix-boot/packages/utils/src/index.ts \
+        extensions/simplix-boot/packages/utils/src/__tests__/labeled-enum-value.test.ts
+git commit -m "feat(boot-utils): type the labeled enum wire shape"
+```
+
+---
+
+### Task 4: Container mapping in the boot CLI plugin
+
+**Files:**
+- Modify: `packages/cli/src/openapi/orchestration/spec-profile.ts` — add the meta fields to `SpecProfile`, and the `ContainerMapping` / `MetaExtensionOutput` interfaces themselves
+- Modify: `packages/cli/src/index.ts` — re-export both types from the barrel
+- Modify: `extensions/simplix-boot/packages/cli-plugin/src/index.ts` — register them
+- Create: `extensions/simplix-boot/packages/cli-plugin/src/container-types.ts` — the boot values only
+- Test: `extensions/simplix-boot/packages/cli-plugin/src/__tests__/container-types.test.ts`
+
+**The interfaces live in the CLI, the values in the plugin.** The plugin depends on
+`@simplix-react/cli`, so a type `SpecProfile` references cannot be declared in the plugin — the
+dependency runs the other way. `spec-profile.ts` already sets the precedent with `I18nEntityInfo`
+and `I18nDownloader`: declared there, re-exported from the barrel, imported by the plugin.
+
+SimpliX Meta names containers by their JAVA names; which TypeScript type each becomes is the profile's decision (spec §4.1). Measured usage: `SimpliXApiResponse` 648, `List` 405, `Page` 93, `Map` 74 — those four and no others.
+
+- [ ] **Step 1: Write the mapping**
+
+Declared in `spec-profile.ts` (see above), not in the plugin:
+
+```ts
+export interface ContainerMapping {
+  /** The TypeScript type name, or absent when the container disappears from client types. */
+  ts?: string;
+  /** The zod factory that wraps the inner schema. */
+  zod?: string;
+  /** Module the TS type and zod factory are imported from. */
+  import?: string;
+  /** The mutator strips this container before React Query sees it, so it has no client type. */
+  unwrap?: boolean;
+  /** For `Map`: the key type, which SimpliX Meta does not carry. */
+  keyType?: string;
+}
+```
+
+And in the plugin's `container-types.ts`, importing that type from `@simplix-react/cli`:
+
+```ts
+export const bootContainerTypes: Record<string, ContainerMapping> = {
+  // src/mutator.ts unwraps the envelope, so React Query's `data` is already the body.
+  SimpliXApiResponse: { unwrap: true },
+  Page: {
+    ts: "SpringPage",
+    zod: "pageOf",
+    import: "@simplix-react-ext/simplix-boot-auth",
+  },
+  List: { ts: "Array", zod: "z.array" },
+  Map: { ts: "Record", zod: "z.record", keyType: "string" },
+};
+```
+
+**`keyType` is not decoration.** SimpliX Meta's `Map` container carries **one** argument — the value —
+because `TypeRefMapper` maps `resolvable.getGeneric(1)` and drops the key. TypeScript needs
+`Record<string, V>` and zod v4 needs `z.record(z.string(), V)`; see Task 7 for what happens
+without it.
+
+`SpringPage`, `pageOf` and `springPageSchema` already exist in `@simplix-react-ext/simplix-boot-auth` — do not redefine them.
+
+- [ ] **Step 2: Extend `SpecProfile`** with **four** optional members, so existing profiles are
+  unaffected: `metaEndpoint?: string`, `metaDownloader?`,
+  `containerTypes?: Record<string, ContainerMapping>`, and
+  `metaExtensions?: (meta: DtoMeta) => MetaExtensionOutput | undefined`.
+
+  `metaExtensions` is the frontend half of the backend's `SimpliXMetaContributor` SPI (spec §6) —
+  a contributor puts arbitrary data into SimpliX Meta's `extensions`, and this turns it into files:
+
+  ```ts
+  interface MetaExtensionOutput {
+    /** Path relative to `generated-meta/` → file content. */
+    files: Record<string, string>;
+  }
+  ```
+
+  Register the boot values in the plugin's `registerPlugin` call, endpoint
+  `/api/v1/dev/meta/dto`. **Do not register a `metaExtensions` implementation** — the boot profile
+  has no contributor, and the captured SimpliX Meta's `extensions` is absent. The point of this step is that
+  the seam exists and is typed; inventing a default behaviour for it would be the speculative
+  code this project's rules forbid.
+
+- [ ] **Step 3: Test** that every container name appearing in the real fixture has a mapping — this is the assertion that catches a backend adding a container the plugin does not know:
+
+```ts
+const used = new Set<string>();
+// walk the fixture as in Task 1's test
+expect([...used].filter((n) => !(n in bootContainerTypes))).toEqual([]);
+```
+
+- [ ] **Step 4: Run both projects this task touches, then commit**
+
+```bash
+npx vitest run --project @simplix-react-ext/simplix-boot-cli-plugin
+npx vitest run --project cli
+pnpm typecheck
+git add packages/cli/src/openapi/orchestration/spec-profile.ts \
+        extensions/simplix-boot/packages/cli-plugin/src/container-types.ts \
+        extensions/simplix-boot/packages/cli-plugin/src/index.ts \
+        extensions/simplix-boot/packages/cli-plugin/src/__tests__/container-types.test.ts
+git commit -m "feat(boot-plugin): map SimpliX Meta container names to TypeScript types"
+```
+
+---
+
+### Task 5: Resolve SimpliX Meta into a per-domain shape
+
+**Files:**
+- Create: `packages/cli/src/meta/resolve.ts`
+- Test: `packages/cli/src/__tests__/meta-resolve.test.ts`
+
+The generators need SimpliX Meta sliced by domain and indexed. This task does that once so no generator re-walks the document.
+
+- [ ] **Step 1: Write it.** `resolveMeta(meta, { domains, containerTypes })` returns, per domain name:
+  - the operations whose `tag` matches that domain's tag patterns. **Reuse
+    `createTagMatcher` from `packages/cli/src/openapi/pipeline/domain-splitter.ts`** — it is
+    exported and already implements the exact-string / `/regex/` rule. Re-implementing it is how
+    the two paths drift into disagreeing about which domain owns a tag.
+
+    **The rule is exact-match by default**: a plain string matches a tag literally and only
+    `/…/` is a regular expression, so `"site.*"` looks for a tag named `site.*` and matches
+    nothing. All 129 patterns in the target application are exact strings; none uses a wildcard.
+    A domain resolving to zero operations is the first symptom (spec §10).
+  - the transitive closure of types those operations reach, by walking `request.body`, `request.searchDto`, `response`, and each type's `extends` and `ref`/`pick` fields
+  - the enums reached the same way
+  - for each type, its full field list including inherited ones, computed by following `extends` — **kept separate from the own-field list**, because the generated `interface X extends Y` must emit only own fields while a zod schema built with `.extend()` needs to know the parent
+
+  Report an operation whose `tag` matches no domain rather than dropping it silently.
+
+  **Expect 73 unmatched out of 694** against the smart-safety config, across 13 tags. The matched
+  side is 621, spread over **13 domains** — `data-io` included; its key is quoted (`"data-io":`)
+  in the config, and a measurement whose parser only accepts bare identifiers drops that domain
+  and reports its 44 operations as unmatched. The unmatched side, counted:
+
+  | Group | n | Tags |
+  | --- | ---: | --- |
+  | `dev.test.*` — the app's own test controllers | 30 | `UserPermission` 11, `Error` 10, `Response` 9 |
+  | framework-owned, tagged by class name | 30 | `StreamAdminController` 16, `CurrentUserRestController` 8, `SseStreamController` 6 |
+  | **auth surfaces the `auth` domain does not claim** | 9 | `Auth Token` 3, `OAuth2 Social Login` 3, `PasswordWebController` 2, `SimpliXAuthLoginController` 1 |
+  | other | 4 | `ScalarController` 2, `public.file.Content` 1, `dev.backoffice` 1 |
+
+  The first two groups are expected. **The third is worth raising rather than accepting** — the
+  `auth` domain's seven patterns are all `common.auth.*` / `public.auth.SignInOption`, so sign-in,
+  token and password endpoints fall outside it. Report it; whether they should join `auth` is the
+  user's call, not the generator's.
+
+  A run that reports far fewer than 73 means a tag pattern started matching something it should
+  not; far more means a configured domain was dropped, and the quoted-key trap above is the first
+  place to look.
+
+  **Report the reverse direction too: a configured pattern that matches no tag.** Three do —
+  `common.user.CurrentUser`, `common.user.CurrentUserAvatar` and `public.user.AvatarThumbnail`,
+  all in `user`. Each produces an entity with no operations: a package that builds, exports and
+  reads exactly like a working one while answering nothing. The existing generated packages carry
+  129 entities against 129 patterns, so all three were live when that code was generated and the
+  backend has since renamed them — `CurrentUserRestController` sits in the unmatched list above.
+  A silent empty entity is the failure this check exists to prevent, so name the pattern, the
+  domain and the fact that it matched nothing.
+
+- [ ] **Step 1b: Assign each type one owner, and keep the closure clean.**
+
+  **Spec §5.1 requires that a type is never declared twice**, and the layout is one file per
+  entity, so a type reachable from two entities in the same domain would be written into both and
+  collide at `export *`. Measured: **31 of the 646 types are reachable from more than one tag** —
+  `SimpliXBaseEntity` and `BaseEntity` from 7 each, `JobPosition` 4, `UserAccount` and
+  `Organization` 3. Resolve must therefore return, per domain, a **type → owning entity** map, and
+  every generator writes a type only into its owner's file. Put a shared type in the entity that
+  reaches it first in a deterministic order, so two runs agree.
+
+  **Fourteen declarations land in two domains' closures, and each must be written into both.**
+  `AreaZoneUpdateFormDTO` (`site` only) extends `AreaUpdateFormDTO` → `AreaUpdateDTO` →
+  `AreaCreateDTO`, and all three ancestors belong to `space` as well — measured, all three land in
+  both closures. The fourteen are 7 DTOs (`AreaCreateDTO`, `AreaUpdateDTO`, `AreaUpdateFormDTO`,
+  `AreaDetailDTO`, `EquipmentListDTO`, `BaseEntity`, `SimpliXBaseEntity`) and 7 enums
+  (`AreaKind`, `AreaStatus`, `PolicySource`, `EquipmentInstallationForm`, `EquipmentStatus`,
+  `ExportFormat`, `ExportStatus`), spanning three pairs: `space`/`site`, `user`/`notification`
+  and `system`/`data-io`.
+
+  **Count declarations, not edges.** No inheritance edge crosses a boundary once the closure is
+  built, because the walk that follows `extends` pulls the parent into the child's domain — so a
+  check written as "edges whose parent is outside this domain" measures 0 and proves nothing. The
+  quantity that matters is how many declarations two packages both have to emit.
+
+  There is no import path available: **no domain package depends on another** — checked across all
+  13, and `domain-site`'s dependencies are the framework packages only. Adding one would make the
+  domain graph a graph rather than a fan, which is a change the user has not asked for. So pull the
+  parent in and declare it in both packages, and say in your report which types this affected.
+
+  **Note what this costs and why it is still right.** Orval avoids the duplication by flattening
+  inheritance — `AreaZoneUpdateFormDTO` in `domain-site` carries the parent's fields copied inline
+  and never names `AreaUpdateFormDTO`. That flattening is the first defect §1 lists. Preserving the
+  chain is the point of this project; two structurally identical declarations in two packages is
+  the price, and TypeScript's structural typing means a value crosses between them freely.
+
+  **The closure also picks up types that are not DTOs.** The fixture holds 12 whose `javaClass` is
+  JDK or Spring — reached because the walker's fallback is "anything else is a DTO":
+
+  | Type | Reaches a real domain | Note |
+  | --- | --- | --- |
+  | `Set`, `List` (0 fields) | 9 domains | artefacts of the erased request body; **Task 0's backend fix removes them** |
+  | `Comparable` (0 fields) | `user` | real and remains — `Organization.sortKey` is typed `Comparable<?>` |
+  | `ApplicationContext`, `AutowireCapableBeanFactory`, `ApplicationObjectSupport`, `WebApplicationObjectSupport`, `AbstractView`, `AbstractUrlBasedView`, `RedirectView`, `SseEmitter`, `ResponseBodyEmitter` | **none** | reachable only from unmatched tags, via `RedirectView` → `AbstractView` → `ApplicationObjectSupport` → `ApplicationContext` |
+
+  So assert that no domain closure contains a type whose `javaClass` starts with `java.`,
+  `javax.`, `jakarta.` or `org.springframework.` — with `Comparable` as the one accepted exception,
+  reported rather than silently emitted. A new one appearing means a controller started returning a
+  framework type and the walker followed it.
+
+- [ ] **Step 2: Test against the real fixture.** Assert that resolving with a single catch-all domain reaches all 646 types; that a domain's closure never contains a type none of its operations reach; that `extends` chains resolve (the fixture has 104); and that a type whose parent is outside the domain still pulls the parent in.
+
+- [ ] **Step 3: Run, then commit**
+
+```bash
+npx vitest run --project cli
+git add packages/cli/src/meta/resolve.ts packages/cli/src/__tests__/meta-resolve.test.ts
+git commit -m "feat(cli): resolve SimpliX Meta into per-domain type closures"
+```
+
+---
+
+### Task 6: Model generator — interfaces, enums, envelope-free
+
+**Files:**
+- Create: `packages/cli/src/meta/generation/model-gen.ts`
+- Test: `packages/cli/src/__tests__/meta-model-gen.test.ts`
+
+- [ ] **Step 1: Write it.** For one domain, emit:
+  - `model/<typeName>.ts` — **one file per type, camelCase, exactly as orval names them**
+    (`organizationListDTO.ts`); one `export interface` in each, `extends` where SimpliX Meta says so,
+    **own fields only**.
+
+    **The file name is load-bearing.** `readListDtoFieldNames` (`scaffold-crud.ts:541`) opens
+    `src/generated/model/<camelCase type>.ts` by that exact path to learn which fields the list
+    projection returns, and `:1856` reads the result: `listDtoFields ? fields.filter(...) : fields`.
+    Return `null` and **every field of the form DTO becomes a list column**, including ones the
+    list response never carries — columns that render `undefined` forever. Enum badges lose their
+    type name at the same time (`:1864`). One file per type, named the way that function looks for
+    it, keeps this working; a `model/<entity>.ts` holding several interfaces does not.
+
+    One type per file also makes the single-owner rule (Task 5) trivial: a type reachable from two
+    entities has exactly one file, so `export *` from the directory barrel cannot collide on the
+    31 shared types
+  - `model/_enums.ts` — the exact declaration-merge shape orval emits, so a module that imports
+    the name as a **value** keeps working.
+
+    **Eleven of the fixture's 133 enums are not labeled** — `SessionState`, `InboxTab`,
+    `LawScreenMapNarrowing`, `UserAccountStanding`, `DayOfWeek`, `TransportType`,
+    `AdminCommandType`, `AdminCommandStatus`, `SchedulerState`, `MessageButtonGrade`,
+    `MfaUnavailableReason` — and 14 DTO fields use them, `UserAccountDetailDTO.standing`,
+    `UserAccountListDTO.standing` and `SiteDetailDTO.weekStartDay` among them. Those arrive as
+    bare strings. Emit the `…Labeled` alias **only when `labeled` is true**; emitting it for all
+    133 puts a `{value,label}` type on 14 fields that carry a string, which is precisely the
+    silent falsehood this project exists to remove.
+
+    Verified against `generated/model/siteOnboardingStepKey.ts`:
+
+    ```ts
+    import type { LabeledEnumValue } from "@simplix-react-ext/simplix-boot-utils";
+
+    export type AreaKind = (typeof AreaKind)[keyof typeof AreaKind];
+    export const AreaKind = { AREA: "AREA", ZONE: "ZONE" } as const;
+
+    /** Only for a labeled enum: the shape a response field actually carries. */
+    export type AreaKindLabeled = LabeledEnumValue<AreaKind>;
+    ```
+
+    The type and the const share one name — that is what makes `SiteOnboardingStepKey` usable in
+    both positions. Emitting `export type X = "A" | "B"` beside the const instead loses nothing
+    structurally but stops matching what orval produced, and Task 11 swaps barrels on the
+    assumption that the two are interchangeable.
+  - no envelope type — `SimpliXApiResponse` is `unwrap: true`, so it does not appear in client types
+
+  Field typing rules, from the measured kinds: `string`→`string`; `number`→`number`; `boolean`→`boolean`; `instant`/`date`→`string`; `time`→`string`; `enum`→ **gated on `EnumMeta.labeled`**: when true, the value union in a request DTO and the `…Labeled` alias in a response DTO (spec §9); when false, the value union in **both** directions and no `…Labeled` alias at all; `ref`→ the interface name; `container`→ the plugin's mapping; `unknown`→`unknown`; `pick`→ `Pick<Of, "a" | "b">`; `param`→ **see below, it is not simply the
+  type parameter**.
+
+  `unknown` needs no special handling and was verified: all 8 field-level occurrences are the value
+  of a `Map<String, Object>` (`SchedulerInfo.params`, `Organization.eventPayloadData`, …), giving
+  `Record<string, unknown>` and `z.record(z.string(), z.unknown())`. The 27 further occurrences are
+  operation responses, and **none of them reaches a domain** — every one is in an unmatched tag
+  (`dev.test.*`, `dev.permissions`, `Auth Token`, the stream admin routes).
+
+  **A `param` whose name IS among the owning type's `typeParams` is the type parameter — emit it,
+  and declare the interface generic. Only an unresolvable one becomes `unknown`.** The two cases
+  are five and one, not six and none:
+
+  | Where | `typeParams` | Emit |
+  | --- | --- | --- |
+  | `ObligationApplicabilitySearchDTO.appliedRules` · `.excludedRules`, `PreAssignmentGateSearchDTO.notifyRoleCodes`, `RegulationDutySearchDTO.additionalArticleRefs`, `PolicyParameterSearchDTO.usedByScreenKeys` | `[]` — `E` is unbound | `unknown[]`, and report it. The Java field is a **raw** `private List appliedRules;` with no type argument, so the container's argument resolves to the collection's own variable `E` |
+  | `SimpliXBaseEntity.id` | `["K"]` — `K` is bound | `interface SimpliXBaseEntity<K> { id?: K }`. Emitting `unknown` here would type the id of every entity inheriting this base — 7 tags' worth — as `unknown`, which is the erasure this project exists to remove |
+
+  Emitting `appliedRules?: E[]` puts an unbound identifier in the output, and Task 11 Step 4b's
+  no-`@ts-nocheck` rule leaves nowhere to hide it. `unknown[]` compiles and is honest. **Report the
+  five by name** — they are five raw declarations in one backend module (`regulation`), SimpliX Meta is
+  reporting them correctly, and fixing them there is what makes the generated type useful. Do not
+  fix them yourself; that is a backend change outside this plan.
+
+  A field is optional (`?`) exactly when `required` is false.
+
+  **Ignore `nullable` — it carries no information.** Measured over all 6,244 fields, the only two
+  combinations that occur are `(required: true, nullable: false)` 628 and
+  `(required: false, nullable: true)` 5,616. There is no `(true, true)` and no `(false, false)`, so
+  `nullable === !required` everywhere. Emitting `| null` alongside `?` would give
+  `field?: string | null` where orval gave `field?: string`, and `meta-diff` would report a field
+  type mismatch on 5,616 fields.
+
+- [ ] **Step 2: Test against the real fixture.** Generate for a domain and assert: an `extends` type emits only its own fields; a **labeled** response enum field is the `Labeled` alias while the same enum in a request DTO is the union; an **unlabeled** enum is the plain union in the response too — assert `UserAccountDetailDTO.standing` by name and that no `UserAccountStandingLabeled` is emitted anywhere; no `SimpliXApiResponse` appears anywhere in the output; **no exported name appears in two files
+of one domain** — walk the emitted `model/` directory and assert the set of exported interface
+names has no duplicate, which is the only thing that catches a shared type written twice; every one of the 11 field kinds present in the fixture produces valid TypeScript. **Prove the output is well-formed TypeScript, not merely that it contains the right substrings.**
+
+  Use `ts.transpileModule(text, { reportDiagnostics: true })` and assert `diagnostics` is empty.
+  That is a **syntax** check and it is the right one here: it catches a malformed emit — an
+  unbalanced brace, a stray comma, a broken generic — without needing module resolution.
+
+  **Do not reach for `ts.createProgram`.** The generated model imports `LabeledEnumValue` from a
+  workspace package, so a standalone program reports `cannot find module` diagnostics that are
+  artefacts of the harness rather than defects in the output, and the assertion then has to be
+  weakened until it proves nothing. Full type resolution against the workspace happens for real
+  after Task 11 wires the output into a domain package, where `pnpm typecheck` does it properly.
+
+  There is no precedent for the compiler API in `packages/cli`, so import it as
+  `import ts from "typescript";` (available via the workspace catalog) and keep the usage to that
+  one call.
+
+- [ ] **Step 3: Run, then commit**
+
+```bash
+npx vitest run --project cli
+git add packages/cli/src/meta/generation/model-gen.ts packages/cli/src/__tests__/meta-model-gen.test.ts
+git commit -m "feat(cli): generate TypeScript models from SimpliX Meta"
+```
+
+---
+
+### Task 7: Schema generator — zod with inheritance and constraints
+
+**Files:**
+- Create: `packages/cli/src/meta/generation/schema-gen.ts`
+- Test: `packages/cli/src/__tests__/meta-schema-gen.test.ts`
+
+This is where the project's original complaint is answered: 440 `maxLength` and 232 `notBlank` constraints reach the client.
+
+- [ ] **Step 1: Write it — one const per TYPE, and orval's names cannot be reproduced.**
+
+  **Measured:** orval names zod constants **per operation and role**, not per type —
+  `OrganizationRestCreateBody`, `OrganizationRestGetResponse`, `OrganizationRestUpdateParams`,
+  `OrganizationRestUpdateTreeOrderQueryParams`, and for a collection body the pair
+  `OrganizationRestMultiUpdateBodyItem` + `OrganizationRestMultiUpdateBody = zod.array(…Item)`.
+  One entity's 12 operations produce 32 constants. SimpliX Meta's `types` map is keyed by DTO simple
+  name, so "one const per type, named as orval named it" is not a thing that can be built.
+
+  **Name the files `<entity>.schema.ts`, not `<entity>.ts`.** The scaffold finds an entity's schema
+  by scanning every package for a file whose **name** is `schemas.ts`, `contract.ts`, `*.schema.ts`
+  or `*.zod.ts` (`searchDir`, `scaffold-crud.ts:492`) and whose content matches
+  `\w*<entity>\w*[Ss]chema\s*=\s*z.object` or an orval `…Body`/`…Response` constant
+  (`findSchemaFile`, `:569`). A plain `schema/<entity>.ts` matches **none of the four names**, and
+  the repointed `schemas.ts` is an `export *` barrel with no `z.object(` in it — so after the swap
+  `findSchemaFile` returns `null`, the scaffold takes its `else` branch (`:1644`) and generates the
+  widget set from `PLACEHOLDER_FIELDS`, **with a spinner message and no warning**. `simplix scaffold`
+  would appear to succeed on every migrated domain while emitting an `id`/`name` form.
+
+  Emitting `generated-meta/schema/<entity>.schema.ts` makes the output discoverable under the rule
+  that already exists, with no change to the shared search. Spec §9's layout line is updated to
+  match.
+
+  **The decision, and what makes it safe:** emit one const per type, named `<TypeName>Schema`
+  (`OrganizationCreateDTOSchema`), which is what pattern 1 of `findSchemaFile` looks for. A schema belongs to a DTO, not to an operation, and the same
+  DTO is a body on one route and a response on another. This departs from orval's names, and
+  **nothing in the application imports them** — grepped across the whole frontend outside
+  `generated/`: **0 references**, and no module imports `schemas.ts` at all. The constants exist
+  only in the barrel. Task 12 therefore classifies a zod-constant name difference as **info**;
+  see there.
+
+  `schemas.ts` re-exports with `export *`, so it keeps resolving whatever names exist.
+
+  A type with `extends` is built as `parentSchema.extend({ …own fields… })`.
+
+  **Emit in dependency order — a zod const cannot reference one declared later.** Unlike an
+  `interface`, `parentSchema.extend(…)` evaluates at module load. The fixture has chains four deep:
+  `AreaZoneUpdateFormDTO → AreaUpdateFormDTO → AreaUpdateDTO → AreaCreateDTO`, and 51 types are two
+  deep, 2 are three, 1 is four. Topologically sort the domain's types by `extends` before writing,
+  and **order the files as well as the declarations inside them** — with one file per entity the
+  parent frequently lands in a different file, and `schema/index.ts` re-exporting in the wrong
+  order gives `undefined` at evaluation, not a type error.
+
+  Every parent is present: 0 of the 104 name a type absent from `types`.
+
+  One child re-declares a parent field — `Organization.eventPayloadData` over
+  `BaseEntity.eventPayloadData` — and the two are **identical** in type and required-ness, so
+  `interface Organization extends BaseEntity` with that member repeated is legal. No de-duplication
+  is needed; if a future capture has them differing, that is a TypeScript error worth reporting
+  rather than silently dropping one.
+
+**Target zod v4** — the workspace resolves `zod@4.3.6` and orval's existing output already uses
+  the v4 surface (`zod.iso.datetime()`, `zod.iso.date()`, `zod.int()`). Two consequences the
+  first draft of this plan got wrong:
+
+  - `z.string().email()` is **deprecated in v4** (`@deprecated Use z.email() instead` in
+    `zod/v4/classic/schemas.d.cts:110`). Emit the top-level `z.email()`.
+  - The base type of a temporal field is **not** a bare `z.string()`. Orval emits
+    `zod.iso.datetime()` for an instant and `zod.iso.date()` for a date; emitting a plain string
+    would drop format validation the orval path already had — a regression, and one `meta-diff`
+    would report as a field-type mismatch.
+
+  **Base type by `TypeRef.kind`:** `string`→`z.string()`; `number`→`z.number()`, and
+  `z.int()` when `integral` is true; `boolean`→`z.boolean()`; `instant`→`z.iso.datetime()`;
+  `date`→`z.iso.date()`; `time`→`z.string().regex(...)` built from SimpliX Meta's `pattern` when
+  present, else the `HH:mm` shape (spec §12); `enum`→ **gated on
+  `EnumMeta.labeled`**: `z.enum([...])` for a request field, and for a response field the labeled
+  object shape only when `labeled` is true — otherwise `z.enum([...])` there too (spec §12); `ref`→ the referenced schema constant;
+  `container`→ the plugin's `zod` factory (`pageOf` for `Page`, `z.array` for `List`,
+  `z.record` for `Map`, and nothing for the unwrapped envelope); `unknown`→`z.unknown()`.
+
+  **`z.record` takes two arguments in zod v4 and SimpliX Meta supplies only one.** The `Map` container
+  carries the value type alone, so emit `z.record(z.string(), <value>)` using the mapping's
+  `keyType`. Measured on the installed `zod@4.3.6`: the one-argument form does not fail to
+  validate, it **throws while the schema is being constructed** —
+  `Cannot read properties of undefined (reading '_zod')` — so every domain holding one of the
+  fixture's 48 `Map` fields would crash on import rather than produce a bad type.
+
+  **Constraint mapping** (spec §5), applied on top of the base type: `notBlank`→`.trim().min(1)`;
+  `notEmpty`→`.min(1)`; `minLength`/`maxLength`→`.min()`/`.max()`; `minItems`/`maxItems`→
+  `.min()`/`.max()` on the array; `min`/`max`→`.min()`/`.max()` — **coercing the value, because
+  `@DecimalMin` sends a JSON string while `@Min` sends a number** (spec §5);
+  `positive`/`nonnegative`/`negative`/`nonpositive`→ the matching zod call;
+  `pattern`→`.regex(new RegExp(...))`; `email`→ `z.email()` as the base type rather than a
+  method on a string; `assertTrue`/`assertFalse`→`z.literal(true)`/`z.literal(false)`;
+  `custom`→ **no zod call**, emit a comment naming it as a server-only check. The captured SimpliX Meta
+  contains none (spec §12), so this branch is reached only by a future field-level custom
+  constraint — implement it, and do not assume the fixture proves it works.
+
+  A non-required field gets `.optional()`.
+
+  **A self-referential type needs `z.lazy()` (spec §5.1).** An `interface` may reference itself,
+  but a zod const is bound by declaration order — `const X = z.object({ parent: X })` reads `X`
+  before it exists. Measured, the fixture holds **five self-referential types and no mutual
+  cycles**: `OrganizationListDTO`, `LawScreenMapNodeDTO`, `AreaNodeDTO`, `Organization`, and
+  `ApplicationContext` (which no domain closure reaches — see Task 5).
+
+  **`OrganizationListDTO` is in `org`, the pilot domain**, so Task 14 meets this on the first
+  domain moved. Detect the cycle while resolving rather than at emit time, and wrap only the
+  self-referencing member:
+
+  ```ts
+  const OrganizationListDTO: z.ZodType<OrganizationListDTOType> = z.object({
+    orgId: z.string(),
+    children: z.array(z.lazy(() => OrganizationListDTO)).optional(),
+  });
+  ```
+
+  The explicit type annotation is required — TypeScript cannot infer a recursive schema's type and
+  reports `implicitly has type 'any' because it does not have a type annotation`, which Task 11's
+  no-`@ts-nocheck` rule leaves nowhere to hide.
+
+  **The kind vocabulary is closed and matches the backend exactly.** `ConstraintExtractor.extract`
+  emits only: `notBlank`, `notEmpty`, `minLength`, `maxLength`, `minItems`, `maxItems`, `min`,
+  `max`, `positive`, `nonnegative`, `negative`, `nonpositive`, `pattern`, `email`, `assertTrue`,
+  `assertFalse`, `custom` — the list above. `@NotNull` produces no entry; it feeds `required`.
+  Handle every kind and throw on an unrecognised one rather than skipping it.
+
+  **Eleven of the seventeen appear in the fixture**, and these are the ones the tests can reach:
+
+  | kind | n | note |
+  | --- | ---: | --- |
+  | `maxLength` | 440 | |
+  | `notBlank` | 232 | **140 of them pair with a length bound** |
+  | `notEmpty` | 11 | always on a `List`, never a string — `.min(1)` on the array |
+  | `pattern` | 10 | |
+  | `email` | 7 | **5 also carry `maxLength`, 4 also `notBlank`** |
+  | `min` | 7 | |
+  | `minLength` | 5 | |
+  | `max` | 4 | |
+  | `nonnegative` | 2 | on an integral number |
+  | `positive` | 1 | |
+  | `maxItems` | 1 | on a `List`, so `.max()` on the array |
+
+  Both collection bounds in the fixture land on `List`, never on `Map` — a `Map` field carrying
+  `@Size` would produce `minItems`/`maxItems` over a `z.record`, which has no such method. Throw
+  there rather than emitting a call that does not exist.
+
+  **These chains were run against the installed `zod@4.3.6` and behave as prescribed:**
+  `z.email().trim().min(1).max(N)` enforces the length; `z.string().min(1).min(10)` — what a
+  `notBlank` + `minLength` field produces — rejects a 5-character string, so the redundant
+  `.min(1)` is harmless and needs no deduplication; `z.int().nonnegative()` rejects `-1`;
+  `z.iso.datetime()` rejects `"not a date"`; `z.iso.date()` rejects a full timestamp.
+
+  **Check the installed zod before emitting any call you have not seen in orval's output.** The
+  v4 surface deprecated several v3 methods; read
+  `node_modules/.pnpm/zod@4*/node_modules/zod/v4/classic/schemas.d.cts` rather than writing from
+  memory of v3.
+
+- [ ] **Step 2: Test against the real fixture.** Build the emitted schemas and exercise them at
+  runtime rather than asserting on generated text — the point is that they validate, not that
+  they contain a substring. Assert:
+
+  - a `notBlank` field rejects `""` — **the exact defect the project exists to fix**, so prove it
+  - a `maxLength` field rejects an over-long string (the fixture has 440 of these)
+  - a `@DecimalMin`-sourced **string** bound produces a working numeric `.min()`. The fixture has
+    exactly two such fields — `FloorPlanPlacementUpdateDTO.horizontalRatio` and `.verticalRatio`,
+    both carrying `{"kind":"min","value":"0.0"}` and `{"kind":"max","value":"100.0"}` on a
+    non-integral number. Assert the emitted schema rejects `101`; a generator that passed the
+    string straight to `.min()` would build a schema that never rejects anything.
+  - an `instant` field accepts an ISO timestamp and rejects `"not a date"` — this is the
+    orval-parity check; a plain `z.string()` would pass both and the test would catch it
+  - a `date` field accepts `2026-08-28` and rejects a full timestamp
+  - **`custom` cannot be exercised against this fixture** — it holds 720 constraints and zero
+    `custom`, because the only custom validators in the application (`@UniqueFields` 3,
+    `@ValidateWith` 1) sit on the DTO *class* and `ConstraintExtractor` reads properties.
+    Test the branch with a hand-built `FieldMeta`, and say in your report that the fixture does
+    not cover it
+  - a `Map` field's schema is `z.record(z.string(), …)` and **constructs without throwing** — build
+    it, do not merely grep the text; the one-argument form throws at construction, which a
+    substring assertion would never notice
+  - an `extends` type's schema validates a field declared on the parent
+  - **`OrganizationListDTO` builds and validates a two-level nested value** — the recursive case,
+    from the pilot domain. A schema that referenced itself directly would throw or be `undefined`
+    at construction, so build it and parse, do not grep for `z.lazy`
+  - no emitted call is one v4 deprecates — grep the generated text for `.email(`, `.url(`,
+    `.uuid(` used as methods and assert none appear
+
+- [ ] **Step 3: Run, then commit**
+
+```bash
+npx vitest run --project cli
+git add packages/cli/src/meta/generation/schema-gen.ts packages/cli/src/__tests__/meta-schema-gen.test.ts
+git commit -m "feat(cli): generate zod schemas carrying the server's constraints"
+```
+
+---
+
+### Task 8: Endpoint and hook generators
+
+**Files:**
+- Create: `packages/cli/src/meta/generation/endpoint-gen.ts`
+- Create: `packages/cli/src/meta/generation/hook-gen.ts`
+- Test: `packages/cli/src/__tests__/meta-endpoint-hook-gen.test.ts`
+
+**Output:** `generated-meta/endpoints/<entity>.ts` (request functions and URL builders) and
+`generated-meta/hooks/<entity>.ts` (the React Query hooks), one file each per entity, plus the two
+directory barrels Task 11 Step 2 requires. Orval put both halves in one per-tag file; this layout
+splits them per entity (spec §9), which is why Task 11's stub layer is regenerated rather than
+repointed.
+
+- [ ] **Step 1: Write them.** Request functions go through the domain package's own
+  `src/mutator.ts`, which is the same file the orval path uses, so the envelope is unwrapped in one
+  place and `data` has the same shape on both paths (spec §8).
+
+  **The measured contract** — `src/mutator.ts` exports
+  `customFetch<T>(url: string, options: RequestInit): Promise<T>`, which delegates to
+  `getMutator("boot")`. Call `customFetch`, not `getMutator` directly. Match orval's emitted shape:
+
+  ```ts
+  export const getLinearAsset = async (
+    linearAssetId: string,
+    options?: Parameters<typeof customFetch>[1],
+  ): Promise<GetLinearAssetResponse> =>
+    customFetch<GetLinearAssetResponse>(getGetLinearAssetUrl(linearAssetId), {
+      ...options,
+      method: "GET",
+    });
+  ```
+
+  A body-carrying call adds `headers: { "Content-Type": "application/json", ...options?.headers }`
+  and `body: JSON.stringify(dto)`. **The body parameter's type comes from `request.body`, which is
+  a `TypeRef`** — 49 of the fixture's 231 bodies are containers, so a multi-update takes
+  `OrganizationUpdateDTO[]` and not a single DTO. Map it through the same container rules the
+  response uses; treating `request.body` as a type name is the defect Task 0 exists to remove.
+
+  **Both hook shapes, measured from `domain-org`.** Match them exactly — the generated widgets
+  call them positionally and `adaptOrval*` unwraps their results:
+
+  ```ts
+  // query — path params first, then options, then an optional client
+  export function useGetOrganization<TData, TError>(
+    orgId: string,
+    options?: { query?: Partial<UseQueryOptions<…>>, request?: SecondParameter<typeof customFetch> },
+    queryClient?: QueryClient,
+  ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+  // mutation — options only, variables carry the body under `data`
+  export const useCreateOrganization = <TError, TContext>(
+    options?: { mutation?: UseMutationOptions<…, { data: BodyType<OrganizationCreateDTO> }, TContext>,
+                request?: SecondParameter<typeof customFetch> },
+    queryClient?: QueryClient,
+  ): UseMutationResult<…, { data: BodyType<OrganizationCreateDTO> }, TContext>
+  ```
+
+  **A mutation's variable type carries the path parameter beside `data`**, not inside it:
+  `{ orgId: string; data: BodyType<OrganizationUpdateDTO> }` for an update,
+  `{ data: BodyType<OrganizationCreateDTO> }` for a create, `{ orgId: string }` for a delete. That
+  is what the three adapters build (`packages/headless/src/adapt-orval-mutation.ts`):
+
+  | Adapter | sends |
+  | --- | --- |
+  | `adaptOrvalCreate` | `{ data: values }` |
+  | `adaptOrvalUpdate(m, pathParam)` | `{ [pathParam]: id, data: { ...dto, [pathParam]: id } }` — the id goes in **both** places |
+  | `adaptOrvalDelete(m, pathParam)` | `{ [pathParam]: id }` |
+
+  The update adapter writing the id **into the body as well** is why an update DTO declares the id
+  as its own field on top of what it inherits (`OrganizationUpdateDTO` adds exactly `orgId`). It is
+  also why a wrong `pathParam` (Task 13) is worse than it looks: the body gets a bogus key and the
+  real id field is left unset, so the server updates nothing.
+
+  `form.hbs:75` relies on the query shape directly —
+  `useGetXForEdit(id, { query: { gcTime: 0 } })` — so a hook that takes its options anywhere else
+  silently ignores them and the edit form serves a cached record. The mutation's
+  `{ data: … }` wrapper is what `adaptOrvalCreate`/`adaptOrvalUpdate` build. The `queryKey`
+  property on the query result is orval's and **no application code reads it** (0 references), so
+  reproducing it is optional; the parameter positions are not.
+
+  **A list hook has a second contract, enforced by nobody at compile time.** `adaptOrvalList`
+  (`packages/headless/src/adapt-orval-list.ts:63`) is what every generated list screen wraps its
+  hook in, and it does exactly this:
+
+  ```ts
+  const query = useApiHook(apiParams, { query: queryOpts });
+  const page = query.data as any;
+  return { data: page?.content, total: page?.totalElements, isLoading: query.isLoading, ... };
+  ```
+
+  So a list hook must take **two positional arguments** — params, then an options object with a
+  `query` member — and its `data` must be the Spring page itself, carrying `content` and
+  `totalElements`, because the mutator has already stripped the envelope. `OrvalListHookLike`
+  types both parameters as `any`, so a hook with a different arity or a `data` shaped otherwise
+  **compiles cleanly and renders an empty list with no error** — `page?.content` is simply
+  `undefined`. Task 14's browser pass is the only thing that would catch it.
+
+  **Return a real `UseQueryResult`, not a reshaped subset.** `useCrudList` reads `isPaused` and
+  `failureCount` off the hook's result to tell an unreachable server from an empty table:
+  `resolveEmptyReason` returns `"unavailable"` on either, `"no-search"` / `"no-filter"` when one is
+  active, and `"no-data"` otherwise (`resolve-empty-reason.ts:50`). The read is
+  `queryResult.isPaused ?? false` (`use-crud-list.ts:396`), so a hook that omits them does not
+  fail — it reports **"no data" while the network is down**, telling the operator the table is
+  empty. TanStack Query supplies both on `UseQueryResult`; pass the result through untouched.
+
+  **Emit a `get<Name>QueryKey` function per query operation — it is a public export module code
+  imports.** Measured: `modules/notification/src/widgets/notice/detail.tsx:172` writes
+  `queryKey: [...getGetNoticeQueryKey(noticeId), language]`, so both the name and the returned
+  shape are part of the contract, and `modules/system/src/widgets/notice/notice-dismissals.tsx`
+  imports another. Add them to Task 12's parity list. A URL builder (`getGetLinearAssetUrl`) is emitted alongside,
+  because the hook's query key uses it — see below.
+
+  Hooks use the profile's naming strategy (`simplixBootNaming`) so the exported names match what
+  orval produced. **This is not cosmetic** — the migration switches a barrel, module code imports
+  hooks by name (spec §11), and `crud.config.ts` drives the scaffold off those same names.
+
+  **The measured contract, from `domain-org`.** `crud.config.ts` stores each role's hook name
+  **without the `use` prefix**, and the generated export is `use` + that value:
+
+  | `crud.config.ts` | generated export | form |
+  | --- | --- | --- |
+  | `list: "listOrganizations"` | `useListOrganizations` | `export function` (query) |
+  | `get: "getOrganization"` | `useGetOrganization` | `export function` |
+  | `getForEdit: "getOrganizationForEdit"` | `useGetOrganizationForEdit` | `export function` |
+  | `tree: "getOrganizationTree"` | `useGetOrganizationTree` | `export function` |
+  | `subtree: "getOrganizationSubtree"` | `useGetOrganizationSubtree` | `export function` |
+  | `create: "createOrganization"` | `useCreateOrganization` | `export const` (mutation) |
+  | `update: "updateOrganization"` | `useUpdateOrganization` | `export const` |
+  | `delete: "deleteOrganization"` | `useDeleteOrganization` | `export const` |
+  | `batchUpdate: "batchUpdateOrganizations"` | `useBatchUpdateOrganizations` | `export const` |
+  | `batchDelete: "batchDeleteOrganizations"` | `useBatchDeleteOrganizations` | `export const` |
+  | `order: "orderOrganization"` | `useOrderOrganization` | `export const` |
+  | `org: "orgOrganization"` | `useOrgOrganization` | `export const` |
+
+  All twelve correspond exactly. Queries are emitted as `export function` (orval overloads them),
+  mutations as `export const`. Match both the names and the declaration forms — `findCrudConfigForEntity`
+  resolves a role to a name and the scaffold then imports it, so a renamed hook breaks scaffolding
+  in a way `pnpm typecheck` on the domain package alone will not catch.
+
+  **`entityName` is settled by the tag alone — group by tag.** `simplixBootNaming.resolveEntityName`
+  (`cli-plugin/src/naming.ts:179`) reads **only** `context.tag`: it takes the last dot-segment and
+  lowercases its first letter, so `site.AreaZone` → `areaZone`. Nothing else in `EntityNameContext`
+  is consulted.
+
+  The path-based `splitIntoEntities` in `entity-extractor.ts` does split a tag's operations by base
+  path, but `buildEntityFromOps` (`:337`) then names **every** sub-group with the same
+  `resolvedName`, and `deduplicateEntities` (`:886`) merges same-named entities and their
+  operations. The split therefore collapses whenever a naming strategy is present, which it always
+  is on this profile. Verified across the application: in **all 13 configured domains the tag count,
+  the `crud.config.ts` key count and the hook-stub count are identical** — 129 patterns, 129
+  entities, no exceptions. (Three of those entities are backed by no tag in the current capture;
+  Task 5 covers them.)
+
+  So the whole derivation is:
+
+  ```ts
+  const entityName = (tag: string) => {
+    const last = tag.split(".").pop()!;
+    return last.charAt(0).toLowerCase() + last.slice(1);
+  };
+  ```
+
+  Group `operations` by `operation.tag` and name each group with that. Do not export the private
+  path-grouping helpers and do not build an `EntityNameContext` — both would reproduce machinery
+  that this profile's strategy never reads. If a future profile's `resolveEntityName` reads more,
+  that is the moment to build the context, and it is a change to this task, not a hidden
+  requirement of it.
+
+  **`OperationContext` has eleven members, not six, and three of them are required.** Omitting
+  `pathParams`, `queryParams` or `extensions` is a TypeScript error; the rest are optional but feed
+  the naming strategy. Every one maps from SimpliX Meta:
+
+  | Member | Required | From SimpliX Meta |
+  | --- | :---: | --- |
+  | `operationId` | ✔ | `operation.id` |
+  | `method` | ✔ | `operation.method` |
+  | `path` | ✔ | `operation.path` — **already in `{param}` form**, all 311 of them; the orval path's `:param` → `{param}` conversion is not needed |
+  | `entityName` | ✔ | `resolveEntityName` over the group (above) |
+  | `pathParams` | ✔ | `request.path[].name` |
+  | `queryParams` | ✔ | `request.query[].name` |
+  | `extensions` | ✔ | `{}` — **the orval path passes `{}` too** (`resolveEntityHookNames`, `openapi.ts:645`), so this is parity, not a shortfall |
+  | `tag` | | `operation.tag` |
+  | `summary` | | `operation.summary` |
+  | `description` | | absent from SimpliX Meta — pass `undefined` |
+  | `responseType` | | the innermost `ref` name inside `operation.response` |
+  | `requestType` | | the `ref` name inside `request.body` (a `TypeRef` after Task 0) | **Measured, `simplixBootNaming.resolveOperation` reads exactly six members** — `tag`,
+  `pathParams`, `operationId`, `path`, `method`, `entityName` — and all six come from SimpliX Meta.
+
+  Two of those were verified against the fixture, because hook-name parity is an error-level
+  requirement (spec §11) and these are what actually decide it:
+
+  - **`pathParams` is used only for its length** (`naming.ts:195`, `:293` — `.length > 0` and
+    `.length === 1` decide `delete` against a sub-resource action). SimpliX Meta's `request.path` matches
+    the `{param}` occurrences in the path string for **all 694 operations**, none missing, none
+    extra — so the count the strategy branches on is reproduced exactly.
+  - **`operationId` is the final fallback and nothing else** (`naming.ts:340`, one branch, reached
+    only when every route pattern misses). It fires **zero times** across the application's 13
+    domains: their `crud.config.ts` files hold 122 role kinds and every one is a camelCase name
+    derived from route and verb, none a raw id.
+
+  **The whole strategy was run over the fixture and it holds.** Feeding all 694 operations through
+  `simplixBootNaming.resolveOperation` with contexts built as the table above prescribes:
+  **694 named, 151 distinct roles, 0 fallbacks.** SimpliX Meta reproduces the naming path completely.
+
+  **Eight hook names collide, and only one reaches a configured domain.** Seven are in unmatched
+  tags (`dev.test.*`, `dev.permissions`, the stream controllers, `CurrentUserRestController`,
+  `OAuth2 Social Login` — whose derived entity even contains spaces, so sanitise the identifier or
+  fail loudly rather than emitting one). The eighth is `getAllAvatars`, from the two routes
+  `/public/user/{userId}-avatar.{ext}` and `/public/user/{userId}-avatar-{size}.{ext}` in the
+  `user` domain.
+
+  **That one is not a defect to fix — it is orval being wrong, and `meta-diff` will say so.**
+  `PublicUserAvatarRestController` carries exactly one class-level
+  `@Tag(name = "public.user.Avatar")` and no method-level tag, so both operations belong to one
+  entity and SimpliX Meta says so. springdoc split them into `public.user.Avatar` and
+  `public.user.AvatarThumbnail`, and orval's output is already broken as a result: the
+  `public-user-avatar` directory exports `useGetAllAvatarThumbnails`, and `crud.config.ts` names
+  `avatar.getAll: "getAllAvatars"` — **a hook that exists nowhere in the generated code**.
+
+  Comparing every tag: **126 of orval's 129 endpoint directories match a SimpliX Meta document tag exactly.** The
+  three that do not are this avatar split and two from `CurrentUserRestController`, which declares
+  no `@Tag` at all — SimpliX Meta falls back to the class name, springdoc invents `common.user.CurrentUser`.
+  In all three SimpliX Meta reflects the source and orval does not. Report them as expected differences
+  in Task 14 and do not chase parity there.
+
+  So an id mismatch will not move a hook name here. It still matters for `meta-diff`, which pairs
+  operations by id, and the backend derives it with the same controller-name strip order as
+  `OperationIdCustomizer` (`EquipmentInspectionRestController` → `EquipmentInspectionRest_override`
+  on both sides). Report a mismatch; do not go looking there first when a hook name is wrong —
+  check `path`, `method` and the entity grouping, which is what the strategy actually reads.
+
+  **Query keys — measured, and NOT built from the URL builder.** Orval emits a separate key
+  function whose first element is the **bare path with no query string**, with the params object
+  appended only when present:
+
+  ```ts
+  export const getGetOrganizationQueryKey = (orgId: string) =>
+    [`/api/v1/admin/org/${orgId}`] as const;
+
+  export const getListOrganizationsQueryKey = (params?: ListOrganizationsParams) =>
+    [`/api/v1/admin/org/search`, ...(params ? [params] : [])] as const;
+  ```
+
+  `getListOrganizationsUrl` builds a `URLSearchParams` and returns path **plus** query string —
+  that is the fetch URL, not the key. Using it for the key would put `?page=0&size=10` into
+  `queryKey[0]`, making every parameter combination a different cache entry and rendering
+  `queryKey[1]` meaningless.
+
+  This matters more than any other shape in the plan: `useInvalidateEntity`
+  (`packages/ui/src/crud/form/use-invalidate-entity.ts:18`) invalidates with
+  `typeof query.queryKey[0] === "string" && query.queryKey[0].startsWith(apiPrefix)`, and the
+  application calls it in **137 places**. A different key shape breaks cache invalidation across
+  the whole product with no error anywhere (spec §5.1).
+
+- [ ] **Step 2: Test against the real fixture.** Assert:
+
+  - **the entity grouping**, first and by name — `org.Organization`'s 12 operations all land in one
+    entity `organization`, and `org.OrgType`'s single operation in `orgType`, giving two entities
+    for the domain and two hook files. Tasks 9, 10 and 13 all inherit this partition, so it is the
+    one thing here that must not be left to a downstream test.
+  - a generated hook's name equals what `simplixBootNaming` yields for the same operation
+  - `getGetOrganizationQueryKey("x")` returns exactly `["/api/v1/admin/org/x"]`, and
+    `getListOrganizationsQueryKey({page:0})` returns `["/api/v1/admin/org/search", {page:0}]` —
+    **no query string in element 0**, and no params element when params are absent
+  - a `Void` response produces a hook with no data type — 3 operations in the fixture have no
+    `response` key at all
+  - **a list hook survives `adaptOrvalList`**: call the generated `useListOrganizations` through it
+    with a stubbed query client returning a Spring page, and assert `data` and `total` come back
+    populated. Asserting on the emitted text cannot catch an arity mismatch here, because
+    `OrvalListHookLike` types both parameters as `any`
+  - a **`binary` response** produces a function returning `Blob` rather than a hook. Three of the
+    five reach a real domain: `/api/v1/system/exports/{exportJobId}/download` (`system`) and the
+    two `public.user.Avatar` routes (`user`); the other two are in unmatched tags
+  - a **multipart operation** sends `FormData` **with the part appended under its SimpliX Meta name**. The
+    fixture's `POST /api/v1/admin/user/account/{userId}/avatar` (`user`) carries no body — the file
+    arrives as a `query` entry named `file` typed `{ kind: "file" }`, which is what Task 0's second
+    backend fix put there. A generator that only reads `contentType` knows to send FormData but not
+    what to call the part.
+
+- [ ] **Step 3: Run, then commit**
+
+```bash
+npx vitest run --project cli
+git add packages/cli/src/meta/generation/endpoint-gen.ts \
+        packages/cli/src/meta/generation/hook-gen.ts \
+        packages/cli/src/__tests__/meta-endpoint-hook-gen.test.ts
+git commit -m "feat(cli): generate request functions and React Query hooks from SimpliX Meta"
+```
+
+---
+
+### Task 9: Search and access generators
+
+**Files:**
+- Create: `packages/cli/src/meta/generation/search-gen.ts`
+- Modify: `packages/cli/src/commands/scaffold-crud.ts` — complete `SUFFIX_TO_ENUM_KEY`
+- Create: `packages/cli/src/meta/generation/access-gen.ts`
+- Test: `packages/cli/src/__tests__/meta-search-access-gen.test.ts`
+
+**Output:** `generated-meta/search/<entity>.ts` and `generated-meta/access/<entity>.ts`, one file
+each per entity, plus their directory barrels (spec §9).
+
+**Neither file is read by the scaffold — say so, and put the rules in one place.** `access/` is
+already declared unconsumed below (the constants exist; adopting them is the user's call). `search/`
+is the same kind of artifact: metadata exported through the barrel for a hand-written screen to
+import. The **scaffold** gets its filters from SimpliX Meta source in Task 13, at
+`parseFilterParams`'s call site (`scaffold-crud.ts:1698`), not from this file.
+
+So implement the operator translation, the range rules, the field-type-driven component choice and
+the empty-facet reroute **once**, in the shared SimpliX Meta source Task 13 builds, and have `search-gen`
+serialise the same `FilterFieldInfo[]` it produces. Two implementations of these rules would drift,
+and the one nothing imports would drift unnoticed. The `<Name>Params` type for each list
+operation goes into `generated-meta/model/` beside the DTOs, where orval puts it.
+
+**The search params are not in SimpliX Meta — they are derived, and the derivation was verified.**
+Seventy-eight of the 86 `searchDto`-bearing operations carry an empty `query` list, and only 4
+dotted query params exist in the whole fixture (`title.contains`, `targetLabel.contains`,
+`entityLabel.contains`, `status.in`).
+
+**The other eight carry ordinary query params that must be emitted beside the derived ones**, so
+a generator that reads `searchDto` and stops has dropped them: `from`, `to`, `buckets` on six
+census reads (`BulkOperationRest_counts`, `ImportJobRest_counts`, `NotificationCentreRest_counts`,
+`AuditLogRest_counts`, `AuditEventRest_counts`, `NotificationRest_counts`), `siteId` on
+`PolicyParameterRest_simpleSearch`, and `tab` on `ApprovalInboxRest_search`. Losing them takes the
+period and the bucketing off every census screen, and the tab off the approval inbox — with the
+list still rendering.
+
+The flat params come from the named DTO's `searchable` fields crossed
+with their operators, and the suffix is the `SearchOperator` **value**, not its key:
+`CONTAINS` → `SearchOperator.CONTAINS` → `"contains"` → `'orgName.contains'`. Emitting
+`orgName.CONTAINS` would be sent verbatim by `buildSearchableParams`, filter nothing, and raise no
+error.
+
+Measured against `OrganizationSearchDTO`: SimpliX Meta derives **50** params and orval's
+`ListOrganizationsParams` has **53** — the same 50, plus `page`, `size` and `sort`, which SimpliX Meta
+does not carry as searchable fields. So append them:
+
+```ts
+export type ListOrganizationsParams = {
+  'orgId.equals'?: string;
+  'orgName.contains'?: string;
+  // …the 50 derived members, every one optional and quoted…
+  page?: number;
+  size?: number;
+  sort?: string[];
+};
+```
+
+Assert that exact set-equality against the fixture: a derived set that is not orval's 50 means the
+operator table (Step 1b) is wrong, and the diff will say which member moved.
+
+1118 fields carry `searchable` and 86 operations name a `searchDto`. Today the frontend re-derives filter operators by matching parameter-name suffixes with a regex; SimpliX Meta states them.
+
+- [ ] **Step 1: `search-gen` — filter metadata only.** For each operation with a `searchDto`, emit
+  that DTO's fields as filter definitions: the operator list from `searchable.operators`,
+  `sortable` for the column, and the label from `labelKey`.
+
+  **This generator does not decide presentation.** `maxBadges={3}` lives in
+  `templates/ui/list.hbs:78` and the `toggle` / `faceted` choice in
+  `scaffold-crud.ts:1759-1749` — both are scaffold output in the app's module code, not domain
+  package output. Emit the metadata those two already consume (Task 13) and change neither rule.
+
+- [ ] **Step 1b: Translate the operator vocabulary — the two sides do not use the same names.**
+
+  SimpliX Meta reports searchable-jpa's own operator names. The frontend's `SearchOperator`
+  (`packages/headless/src/filter-types.ts:2`) has keys that are mostly but **not always** the same
+  string, and `scaffold-crud.ts`'s `SUFFIX_TO_ENUM_KEY` (`:1286`) covers only part of the set. An
+  identity lookup silently yields `undefined`. Measured over the fixture:
+
+  | SimpliX Meta operator | pairs | framework enum key | `SUFFIX_TO_ENUM_KEY` |
+  | --- | ---: | --- | --- |
+  | `EQUALS` | 851 | `EQUALS` | ✔ |
+  | `CONTAINS` | 352 | `CONTAINS` | ✔ |
+  | `IN` | 300 | `IN` | ✔ |
+  | `BETWEEN` | 198 | `BETWEEN` | ✖ absent |
+  | `GREATER_THAN` | 194 | `GREATER_THAN` | ✔ |
+  | `LESS_THAN` | 194 | `LESS_THAN` | ✔ |
+  | `GREATER_THAN_OR_EQUAL_TO` | 127 | **`GREATER_THAN_OR_EQUAL`** — no `_TO` | ✖ absent |
+  | `LESS_THAN_OR_EQUAL_TO` | 127 | **`LESS_THAN_OR_EQUAL`** — no `_TO` | ✖ absent |
+  | `IS_NULL` | 11 | `IS_NULL` | ✖ absent |
+  | `IS_NOT_NULL` | 10 | `IS_NOT_NULL` | ✖ absent |
+  | `NOT_IN` | 3 | `NOT_IN` | ✖ absent |
+
+  Two consequences, both of which have to be handled here:
+
+  1. **254 pairs miss, and the miss is silently substituted rather than left empty.** They are the
+     range bounds, so date and number range filters are what breaks. The lookup that consumes the
+     result already has a fallback — `SUFFIX_TO_ENUM_KEY[f.operator] ?? "GREATER_THAN_OR_EQUAL"`
+     (`scaffold-crud.ts:1754`) — so a wrong name does not produce `undefined` or a compile error:
+     it produces **`greaterThanOrEqualTo` for every unmatched operator**, and a `lessThanOrEqualTo`
+     filter silently queries the other direction. Write an explicit SimpliX Meta-name → `SearchOperator`
+     table, make it **exhaustive over the enum**, and **throw** on an unmatched name rather than
+     falling through to that default.
+  2. **222 pairs name operators the suffix-matching path could never recover** (`BETWEEN`,
+     `IS_NULL`, `IS_NOT_NULL`, `NOT_IN`). This is the gain SimpliX Meta exists for. `SUFFIX_TO_ENUM_KEY`
+     needs the four entries — `between`, `isNull`, `isNotNull`, `notIn` — or the scaffold discards
+     what the generator just recovered.
+
+  Adding those four is a change to the shared orval path, so run the existing CLI suite and
+  confirm an orval domain's filters are unchanged: the map is consulted by suffix, and the four
+  new keys are suffixes that path never produced.
+
+- [ ] **Step 1bb: The filter's *kind* comes from the field's type, which is a second input the
+  plan has not named.** `parseFilterParams(queryParams, entityFields)` (`scaffold-crud.ts:1307`)
+  takes two lists, and the operators decide only the operator; **the component is chosen from
+  `entityField`** in five places:
+
+  | Decision | orval reads | SimpliX Meta carries |
+  | --- | --- | --- |
+  | toggle (`:1346`) | `entityField.type === "boolean"` | `kind === "boolean"` |
+  | faceted options (`:1399`, `:1464`) | `entityField.enum` (a `string[]`) | `enums[TypeRef.name].values[].name` |
+  | date range (`:1407`) | `format === "date-time"` / `"date"` | `kind ∈ {instant, date, time}` — Step 1c |
+  | number (`:1432`) | `type`/`format` numeric | `kind === "number"` |
+
+  So SimpliX Meta source must hand the scaffold a type-carrying field list for the **`searchDto`**, not
+  just the operator lists. Measured across the fixture's 57 distinct search DTOs, their searchable
+  fields are `string` 613, `instant` 162, `number` 112, `enum` 96, `boolean` 90, `date` 38,
+  `container` 7 — and **every one of the 96 enum references resolves in `enums`**, so the faceted
+  options are always available. Map each enum's values to `values.map(v => v.name)` to match the
+  `string[]` shape `entityField.enum` has.
+
+- [ ] **Step 1bc: A faceted filter with no options is worse than a text filter — SimpliX Meta can tell
+  them apart.** `parseFilterParams`'s Rule 2c (`scaffold-crud.ts:1391`) makes **any** field with an
+  `.in` parameter a `FacetedFilter` and fills `options` from `entityField?.enum`, which is
+  `undefined` unless the field is an enum. The rule fires before the enum check of Rule 6, so the
+  type is never consulted.
+
+  Measured over the fixture's search DTOs: **300 searchable fields carry `IN`, and 205 of them are
+  not enums** — `EquipmentSearchDTO.siteId`, `.areaId`, `.equipmentId`, `.managingOrgId` and their
+  kind. Each becomes a facet the operator can open to find nothing inside.
+
+  Emit `faceted` only when options exist; otherwise let the field fall through to the text or
+  number rule for its kind. This diverges from the orval path deliberately, and safely — filter
+  definitions live in scaffolded module code, not in the domain package, so they are outside
+  `meta-diff`'s public-name comparison. Say in your report how many fields this rerouted.
+
+  The two name-keyed special cases stay as they are: `/(?:country|countryCode)$/i` with `.in` gives
+  a `CountryFilter` (3 fields in the fixture) and `/(?:timezone|timeZone)$/i` gives a
+  `TimezoneFilter` (1). Both are `FilterDef` variants (Step 1c) and neither needs SimpliX Meta.
+
+- [ ] **Step 1c: Build range filters from SimpliX Meta kind, not from the field's name.**
+
+  `parseFilterParams` decides a date field with
+  `format === "date-time" || baseField.endsWith("At") || endsWith("Date") || endsWith("Time")`
+  (`scaffold-crud.ts:1406`) and then pairs `greaterThanOrEqualTo` with `lessThanOrEqualTo` into a
+  `DateRangeFilter`. Both halves are worth replacing, and the fixture says why:
+
+  | Measured | |
+  | --- | ---: |
+  | fields carrying **both** `gte` and `lte` | 127 |
+  | fields carrying `gte`/`lte` **without** `BETWEEN` | **0** |
+  | fields carrying **only** `BETWEEN` | **71** |
+  | temporal fields the name-suffix test **misses** | **40** |
+
+  Under the existing rule 71 range-capable fields get no range filter at all, and 40 temporal
+  fields — `latestAmendmentOn`, `separatedSince`, `installedOn`, `nextInspectionDueOn`,
+  `lockedUntil` among them — are not recognised as dates because their names end in neither `At`,
+  `Date` nor `Time`. Spec §5.1 #7 already forbids inferring required-ness from a field's name; the
+  same reasoning applies here, and SimpliX Meta carries the kind.
+
+  - **Decide by `TypeRef.kind ∈ {instant, date}`.** One `number` field also carries range
+    operators, so a range filter is not automatically temporal.
+  **`parseFilterParams` has seven rules and no fallback** (`scaffold-crud.ts:1490` ends the loop),
+  so a field matching none of them yields **no filter at all**. Measured over the fixture's 1,118
+  searchable fields, **104 fall through**:
+
+  | Operator set | n | |
+  | --- | ---: | --- |
+  | `between` + `greaterThan` + `lessThan` | 68 | temporal — `AuthSessionSearchDTO.startedAt`, `.lastSeenAt`, `.expiresAt`, `EmergencyContactSearchDTO.lastVerifiedOn` … |
+  | *(empty — sortable only)* | 32 | `RegulationDutySearchDTO.titleSortEn`, `SiteSearchDTO.siteNameSortEn` … |
+  | `greaterThan` + `lessThan` | 3 | |
+  | `between` + comparisons + null checks | 1 | |
+
+  **The 32 with no operators are correctly dropped** — they are sort keys, not filters — but they
+  must still reach the column list as sortable, which `searchable.sortable` states. The other
+  **72 are a defect**: comparison-capable fields that today produce nothing.
+
+  - **Prefer the `gte`/`lte` pair** where both exist — the 127-field case, which keeps the existing
+    `DateRangeFilter` and its `pairedKey` shape unchanged.
+  - **Otherwise take whatever comparison the field has.** The common real combination is
+    `between` + `greaterThan` + `lessThan` (68 fields), not `between` alone; three fields have only
+    `greaterThan` + `lessThan`. Build the range from `between` when present, else from the
+    comparison pair that is.
+  - **Where only `BETWEEN` exists**, the value is a **comma-joined string**, not an array. The
+    generated param is `'occurredAt.between'?: string` ("Enter two values separated by comma") and
+    the application already writes it by hand in 8 places as `` `${from},${to}` ``. An array
+    reaches the server verbatim — `buildSearchableParams` passes non-empty arrays through
+    untouched — and filters nothing, with no error.
+  - **Do not route this through `transformFilters`.** It exists for exactly this and the
+    application deliberately avoids it: all four references are comments explaining why, and
+    `packages/console-ui/src/entity/forced-list.ts:7` records that it runs only when a `filters`
+    object already exists.
+  - **Set `dateOnly: true` for a `date` field and leave it unset for an `instant` one.**
+    `DateRangeFilterDef.dateOnly` (`packages/ui/src/crud/filters/filter-bar.tsx`) serializes the
+    boundaries as zone-neutral `yyyy-MM-dd` instead of a UTC ISO timestamp, "so date filtering
+    matches the stored calendar date regardless of the browser timezone". Of the fields carrying
+    range operators, **159 are `instant` and 38 are `date`**; getting those 38 wrong makes a filter
+    return different rows in different browsers, with nothing to see. This is the same failure §12
+    describes for `LocalDateTime`, and SimpliX Meta's kind is what settles it — the orval path could only
+    guess from `format`. Leave `displayZone` alone: it is a per-screen decision about a
+    site-scoped column and takes precedence over `dateOnly`.
+
+  **The vocabulary is fixed**: `FilterDef` is a seven-member union — `text`, `number`, `faceted`,
+  `toggle`, `dateRange`, `country`, `timezone`. Emit one of those seven; the last two are
+  special-purpose and are chosen by the screen author, not derived.
+
+- [ ] **Step 2: `access-gen`.** For each operation, emit a permission constant from `AccessMeta`.
+
+  **The consumer, measured:** screens call `useCan(action, subject)` — imported from
+  `@simplix-react/access/react` (the subpath, not the package root), signature
+  `useCan(action: string, subject: string)`, action FIRST. The subject comes from a hand-maintained
+  `SUBJECTS` map, in this application at
+  `packages/console-ui/src/identity/subjects.ts`. Read that file before writing the generator: its
+  own doc comment states the problem this task automates — the screen names a group and the server
+  names a group in `@PreAuthorize("hasPermission('<GROUP>','<action>')")`, and a literal copied to
+  the call site goes stale unnoticed. SimpliX Meta now carries the server's side, so the generated
+  constants are the authority the map was standing in for.
+
+  Emit, per operation: the `group` and `action` from a `permission` access, so a screen can write
+  `useCan(ACCESS.orgUpdate.action, ACCESS.orgUpdate.group)` without a hand-copied literal.
+  `authenticated` and `public` need no gate. **`expression` emits no gate at all** — it emits a
+  comment carrying the raw SpEL, so the person building that screen decides (spec §5.1). The
+  fixture has 5 of these; a generator that treated them as "no permission required" would expose
+  buttons the server refuses.
+
+  **Do not rewrite `SUBJECTS` or any screen.** This task emits constants; adopting them in module
+  code is a separate decision the user has not made.
+
+- [ ] **Step 3: Test against the real fixture.** Assert that the params derived from
+  `OrganizationSearchDTO` equal orval's `ListOrganizationsParams` minus `page`/`size`/`sort` —
+  50 members, set-equal, which is the single check that proves the operator table and the suffix
+  form at once; that every operator name appearing in the fixture resolves to a `SearchOperator`
+  member and none resolves to `undefined`; that
+  `GREATER_THAN_OR_EQUAL_TO` maps to `SearchOperator.GREATER_THAN_OR_EQUAL`; that a field carrying
+  only `BETWEEN` still yields a range filter whose value is a comma-joined string; that a temporal
+  field whose name ends in none of `At`/`Date`/`Time` — assert
+  `EquipmentInspectionDutySearchDTO.installedOn` by name — is still recognised as a date; that an unknown
+  operator name throws rather than being emitted; that the operator lists come from SimpliX Meta rather
+  than being re-derived from parameter names; that the 5 `expression` operations yield a comment
+  and no gate; and that every `permission` operation yields a group and an action.
+
+- [ ] **Step 4: Run, then commit**
+
+```bash
+npx vitest run --project cli
+git add packages/cli/src/meta/generation/search-gen.ts \
+        packages/cli/src/meta/generation/access-gen.ts \
+        packages/cli/src/__tests__/meta-search-access-gen.test.ts
+git commit -m "feat(cli): generate filter and permission configuration from SimpliX Meta"
+```
+
+---
+
+### Task 10: Mock generator
+
+**Files:**
+- Create: `packages/cli/src/meta/generation/mock-gen.ts`
+- Test: `packages/cli/src/__tests__/meta-mock-gen.test.ts`
+
+- [ ] **Step 1: Write it — matching the measured layout, which is not one handler per operation.**
+
+  Read `packages/domain-<name>/src/generated/mock/handlers.ts` in a real domain before writing
+  anything. The orval path emits **one file for the whole domain**, exporting one factory per
+  entity:
+
+  ```ts
+  import { http, HttpResponse } from "msw";
+  import { wrapEnvelope } from "@simplix-react-ext/simplix-boot-auth"
+  import type { MockEntityStore } from "@simplix-react/mock";
+  import { buildEmbeddedTree } from "@simplix-react/mock";
+
+  export function createWorkPointHandlers(store: MockEntityStore<WorkPointDetailDTO>) {
+    return [
+      http.post("*/api/v1/admin/work-point/create", async ({ request }) =>
+        HttpResponse.json(wrapEnvelope(store.create(await request.json() as WorkPointDetailDTO)))),
+      http.get("*/api/v1/admin/work-point/search", ({ request }) => {
+        const url = new URL(request.url);
+        const workPointId_equals = url.searchParams.get("workPointId.equals");
+        if (workPointId_equals)
+          return HttpResponse.json(wrapEnvelope(store.filter((i) => i.workPointId === workPointId_equals)));
+        const page = Number(url.searchParams.get("page") ?? "0");
+        const size = Number(url.searchParams.get("size") ?? "10");
+        const sort = url.searchParams.get("sort") ?? undefined;
+        return HttpResponse.json(wrapEnvelope(store.listPaged(page, size, sort)));
+      }),
+      // …
+    ];
+  }
+  ```
+
+  Four things follow from that, and three of them contradict how this task read before it was
+  measured:
+
+  0. **`src/mock/index.ts` is regenerated, not hand-written.** `generateMockFiles` rewrites it
+     whenever the developer has added no custom handler override —
+     `!pathExists(entryPath) || canRegenerateMockEntry(...)` (`mock-generator.ts:82`) — and the
+     override slot is empty in **all 13** of this application's domains, so in practice it is
+     rewritten every run. It emits `createXMock(): MockDomainConfig`, the
+     `createMockEntityStore<T>(seeds, "<idField>")` lines and the factory spreads. Repointing its
+     imports by hand during the swap is wasted work; the generator has to know the meta layout, the
+     way `index.ts` (Task 11 Step 3) and `schemas.ts` do.
+
+     Emit **both marker comments** while you are there — `canRegenerateMockEntry` (`:131`) returns
+     `false` when either is missing, so a file written without them is frozen at its first version
+     and never picks up a new entity again.
+
+  1. **Seeds are generated once, then preserved.** `generateMockFiles` writes
+     `src/mock/seeds.ts` **only when it does not already exist** (`mock-generator.ts:43`) — so a
+     greenfield meta domain needs the meta path to produce it, while a migrated domain keeps the
+     file it has. `src/mock/index.ts` is the regenerated file item 0 describes — it builds each store
+     with `createMockEntityStore<T>(seeds, "<idField>")` and spreads the generated factories into
+     `handlers`. Into `generated-meta/` the generator writes `mock/handlers.ts` and nothing else
+     (spec §8).
+
+     Seeding needs the entity's `modelType` (item 5 below) and its field list, and the orval path
+     filters out entities whose model does not exist via `readGeneratedModelNames`
+     (`:99`) — **a sixth read of `src/generated/model/<camelCase>.ts` by path**, alongside
+     `findSchemaFile`, `readListDtoFieldNames`, `findMutationPathParam`, `resolveKnownModelTypes`
+     and `pruneUnusedModels`. The one-file-per-type layout Task 6 adopts is what keeps all six
+     working; assert that a meta domain with `src/generated/` removed still seeds.
+
+     **A seed row is type-annotated, so a labeled enum breaks it.** `generateOrvalSeedFile` emits
+     `export const workPointSeeds: WorkPointDetailDTO[] = [ … ]` (`seed-generator.ts:233`) and fills
+     an enum field by cycling the values as a **bare string** — `status: "ACTIVE"` (`:64`). Under
+     Task 6 that field's type is `XLabeled`, i.e. `{ value, label }`, so every seed row for each of
+     the 122 labeled enums fails to typecheck. Emit `{ value: "ACTIVE", label: "ACTIVE" }` there.
+     The file's import is hardcoded to `"../generated/model"` (`:213`) and the file is never
+     overwritten, so point it at the meta barrel when generating it fresh — a wrong path written
+     once stays wrong.
+
+     **Map SimpliX Meta kinds onto what the seed switch expects, and add the case it lacks.**
+     `generateFieldValue` branches on OpenAPI's `field.type` and `field.format`
+     (`seed-generator.ts:70`): `integer`/`number` → numeric, `boolean` → alternating, `string` →
+     `generateStringValue`, `array`/`object` → skipped. The temporal split lives in the format —
+     `format === "date"` seeds `"2026-08-28"` and `"date-time"` a full ISO string (`:115-119`). So
+     `instant` → `date-time`, `date` → `date`. **`time` matches neither** and falls to the generic
+     `"<entity>-<field>-<n>"`, which a `TimeField` cannot parse; give the 10 `time` fields an
+     `"HH:mm"` seed. Where the orval path guesses an email from the field's name
+     (`fieldName.includes("email")`, `:121`), SimpliX Meta states it as a constraint on 7 fields — use
+     that instead.
+
+     **`List` and `Map` are one SimpliX Meta kind and must not seed alike.** OpenAPI splits them — an array
+     takes `generateArrayValue` (which defaults to `[]`, `:181`) and a map is `type: "object"` and
+     is **omitted from the seed entirely** (`:81`). SimpliX Meta calls both `container`, so a generator
+     that seeds every container as `[]` writes `[]` into the **48 `Map` fields**, 38 of them the
+     i18n maps, against a declared `Record<string, string>` — a type error in a file that is never
+     regenerated. Seed `List` as `[]` and omit `Map`, matching what the orval path does today.
+     `generateArrayValue`'s name heuristics (`tag`, `url`, `image`, `photo`) fire on **0** of the
+     fixture's container fields, so nothing depends on reproducing them.
+  1a. **Convert `{param}` to `:param` for the route pattern — the opposite of what Task 8 says.**
+     `toMswPattern` only prefixes a `*` (`mock-generator.ts:737`); the `:param` form in the
+     measured handler comes from `ExtractedOperation.path`, which the orval pipeline already
+     converted. **SimpliX Meta's paths are in `{param}` form** — all 311 of them — so the mock generator
+     must convert, while Task 8's `OperationContext` wants them left alone. Do not carry one
+     decision into the other: an MSW pattern containing `{workPointId}` matches nothing, and every
+     mocked request falls through to a server that is not running.
+
+     **Convert before sorting, not after.** MSW matches in registration order, first match wins, so
+     the generator registers parameterless routes first — `sortOps` (`mock-generator.ts:172`) sorts
+     on `path.includes(":")`, the colon form. Convert after that sort and the key never matches:
+     every path compares equal, the stable sort preserves SimpliX Meta's own order, and for
+     `org.Organization` that order puts `GET /api/v1/admin/org/{orgId}` **before**
+     `GET /api/v1/admin/org/tree`, so the detail handler answers the tree request. Sort on whichever
+     form is in hand, but sort by *has a path parameter*, not by a literal `":"`.
+
+  1b. **Fourteen roles read or write the store; everything else gets an empty-body stub.** The
+     generator switches on the role (`mock-generator.ts:376`) for `list`, `getAll`, `get`,
+     `getForEdit`, `create`, `update`, `delete`, `multiUpdate`, `batchUpdate`, `batchDelete`,
+     `search`, `order`, `tree`, `subtree`, and its `default` emits
+     `http.<method>(pattern, () => HttpResponse.json(<empty>))`. Measured, **171 of the fixture's
+     694 operations resolve to a role outside those 14** — a quarter of them, the custom actions
+     (`escalate`, `revoke`, `dismiss`, …). Emit a handler for **every** operation: the 14 against
+     the store, the rest as the enveloped empty body. A generator that covered only the CRUD roles
+     would leave 171 routes unhandled, and MSW answers an unhandled route by passing it through to
+     a server that is not running.
+
+  2. **Nothing hand-builds a page.** `store.listPaged(page, size, sort)` returns the Spring page
+     shape. Do not assemble `totalElements`/`numberOfElements` in generated code, and do not reach
+     for `pageOf` here — that is the zod builder Task 7 uses, not a runtime factory.
+  3. **A tree operation uses `buildEmbeddedTree`** from `@simplix-react/mock`.
+  4. **The grouping is the one Task 8 settles: group by `operation.tag`.** The factory name follows
+     that entity. The store's id-field argument is not generated at all — `src/mock/index.ts`
+     passes it by hand.
+
+  5. **The DTO type parameter is the entity's `modelType`, and it has its own derivation.** An
+     entity owns several DTOs (`Create`, `Update`, `Detail`, `List`, `Search`); the store is typed
+     with one of them — `MockEntityStore<WorkPointDetailDTO>`. The orval path computes it in
+     `deriveModelType` (`entity-extractor.ts:1090`) as **the innermost response type of the
+     entity's non-array GET**, envelope already stripped, with two fallbacks: request-body names
+     with the DTO suffix stripped, then the list response's element type.
+
+     Reproduced from SimpliX Meta — take the first GET whose response's innermost member is a `ref`
+     rather than a `List`/`Page` — that rule alone resolves **115 of the fixture's 139 entities**,
+     and five of `domain-site`'s six factories land exactly on the type the app uses today
+     (`WorkPointDetailDTO`, `LinearAssetDetailDTO`, `EquipmentInspectionDTO`, `AreaZoneDetailDTO`,
+     `SiteOnboardingDTO`).
+
+     **Do not key it on the CRUD role.** `safetyZonePolicy` — the sixth — has no `get` role at all,
+     because its detail is an owned singleton at `/safety-zone/{id}/policy` and the naming strategy
+     gives it a custom role; its GET still returns `SafetyZonePolicyDTO`, which is the type the app
+     uses. The response is the signal, not the role.
+
+     Report the entities where all three fallbacks come up empty rather than typing a store
+     `unknown`: `src/mock/seeds.ts` is hand-written against that type and would stop
+     type-checking.
+
+     **The handler's own id lookup is a separate heuristic — take it from SimpliX Meta instead.**
+     `findIdField` (`mock-generator.ts:741`) tries an exact `id`, then **the first field whose name
+     ends in `Id`**, then `"id"`; the handlers read `params.<that>` and call `store.getById`. With
+     the model DTO chosen as Task 10 prescribes, it agrees with the real key for **59 of the
+     fixture's 63** entities that have both — the four that differ are `auditLog`
+     (picks `auditEventId`, key is `auditLogId`), `masterDataHistory` (same shape),
+     `messagePreview` (`id` against `messageKey`) and one unmatched tag. SimpliX Meta states the key
+     exactly: the `delete`- or `get`-role operation's last `request.path` entry, which Task 13
+     already derives as `rowIdField`. Use it and the heuristic's four misses disappear.
+     `hasDeclaredIdField` (`:756`) stays as it is — a singleton settings DTO declares no id at all,
+     and emitting `body.id` against one does not compile.
+
+     **Take the id's type from SimpliX Meta too, and never default it to numeric.**
+     `isIdFieldNumeric` (`:761`) looks the id field up and **returns `true` when it cannot find
+     it**, which drives `Number(params.x)` instead of `String(params.x)` in the read, update and
+     delete handlers (`:497`). Measured, **310 of the fixture's 311 path parameters are `string`**
+     and exactly one is a number, so that default is wrong nearly always — and the failure hides:
+     `Number("ORG-001")` is `NaN`, `store.getById(NaN)` misses, and the handler's
+     `?? store.list()[0]` then returns **the first row for every id**. A detail screen shows a
+     record, just not the one that was asked for. SimpliX Meta types every path parameter, so read the
+     kind rather than guessing from a field lookup that can fail.
+
+     **A sub-resource handler filters by a field the DTO may not have, and hides the miss the same
+     way.** `generateReadByFieldHandler` (`:505`) emits
+     `store.filter((item) => String(item.<param>) === String(params.<param>))[0] ?? store.list()[0]`
+     for a route whose parameter is not at the end — `/emergency-contact/{id}/on-call`. Measured
+     over such GETs: the response DTO declares a field named after the parameter in **59** cases
+     and **not in 24** — `OnCallCellDTO` has no `emergencyContactId`, `ApprovalStepRowDTO` no
+     `approvalRequestId`, `AuditLogListDTO` no `auditLogId`. There the filter matches nothing and
+     the same `?? list()[0]` returns the first row, so a child list shows one arbitrary item
+     regardless of its parent. SimpliX Meta carries both sides — the parameter and the DTO's field
+     list — so **check before emitting** and return the whole list rather than a single wrong row.
+     The precedent is in the same file: the list handler's filter is guarded by
+     `entity.fields.some((f) => f.name === sanitizeFieldName(qp.name))` (`:457`), whose comment
+     says why — "a filter on a non-field would reference a property that does not exist on the
+     DTO". Apply that guard to the sub-resource handler too.
+
+     **Store-backed handlers exist only when `seeds.ts` does — one missing link and every handler
+     becomes a stub.** The generator computes
+     `hasStores = storeEntities.length > 0 && hasSeedsFile` (`:65`), where `storeEntities` are
+     those with an operation in the 13 `CRUD_STORE_ROLES` (`:113` — the 14 from item 1b minus
+     `order`). With `hasStores` false, `generateHandlerEntry`'s `if (!hasStore || !role)` guard
+     (`:361`) sends **every** operation to the empty-body branch. So the chain is: the model files
+     are readable → `validEntities` is non-empty → `seeds.ts` is written → stores exist → handlers
+     read and write them. Break any link — and the first is the `src/generated/model` path read
+     (item 1) — and the mock answers every route with `{}` while compiling cleanly. Assert that a
+     generated `handlers.ts` contains at least one `store.` reference.
+
+     **The reorder handler writes a field name it guesses, and `as never` hides a wrong guess.**
+     `generateOrderHandler` emits
+     `store.update(item.<id>, { <orderField>: item.<orderField> } as never)`, and `findOrderField`
+     (`:782`) takes the first non-`id` property of the **order DTO's body**, else a field named
+     `displayOrder` / `sortOrder` / `orderIndex` on the entity, else the literal `"displayOrder"`.
+     Task 0 restores the first path — the order DTOs are absent from `types` until the re-capture
+     (they were the erased body elements) — and the second covers **10 of the 11** reorder
+     entities. The eleventh, `authRolePermission`, declares none of the three, so it takes the
+     literal and the handler writes a property the DTO does not have; `as never` means that
+     compiles. After the re-capture, read the field from the order DTO and **report** an entity
+     where neither path resolves rather than emitting the literal.
+
+     **The list handler's filter parameter has to be derived, because SimpliX Meta has none.** It takes
+     the first query parameter that is a string *and* names a field the DTO declares, then emits a
+     shortcut branch before the paged fallback. SimpliX Meta's search operations carry an **empty**
+     `query` (Task 9), so build the candidate list from the `searchDto`'s searchable fields the way
+     Task 9 derives the params type, then apply the same DTO-declares-it guard.
+
+- [ ] **Step 2: Test** that a handler returns an enveloped body; that a search handler's paged
+  branch delegates to `store.listPaged` rather than constructing a page; that a `<field>.equals`
+  query parameter takes the filter branch; and that the generator writes only
+  `mock/handlers.ts`, leaving an existing `src/mock/seeds.ts` and `src/mock/index.ts` untouched.
+
+- [ ] **Step 3: Run, then commit**
+
+```bash
+npx vitest run --project cli
+git add packages/cli/src/meta/generation/mock-gen.ts packages/cli/src/__tests__/meta-mock-gen.test.ts
+git commit -m "feat(cli): generate MSW handlers and seeds from SimpliX Meta"
+```
+
+---
+
+### Task 11: Wire parallel generation into the CLI
+
+**Files:**
+- Modify: `packages/cli/src/config/types.ts` — the `meta` block on `OpenAPISpecConfig`
+- Modify: `packages/cli/src/commands/openapi.ts` — run the meta pipeline alongside orval, and add `--offline`
+- Create: `packages/cli/src/meta/write.ts` — the layout writer
+- Test: `packages/cli/src/__tests__/meta-parallel.test.ts`
+
+- [ ] **Step 1: Config.** Add to `OpenAPISpecConfig`:
+
+```ts
+meta?: {
+  /**
+   * Endpoint URL or snapshot path. Omit it and the source is built the way the i18n download
+   * already builds its own: the origin of `spec` plus the profile's `metaEndpoint`.
+   */
+  source?: string;
+  /** Where a fetched SimpliX Meta is written for offline regeneration. */
+  snapshot?: string;
+  /** Domains whose barrel exports the meta output instead of the orval output. */
+  export?: string[];
+};
+```
+
+**`source` is optional on purpose.** Task 4 puts `metaEndpoint: "/api/v1/dev/meta/dto"` on the boot
+profile, and a required `source` would mean every configuration repeats it — leaving `metaEndpoint`
+declared and never read. Resolve in this order: `meta.source` when given; otherwise
+`new URL(profile.metaEndpoint, spec).href` when `spec` is a URL and the profile carries one;
+otherwise fail with a message naming both, because a silently skipped meta pipeline looks exactly
+like one that ran and found nothing. `downloadI18nMessages(serverOrigin, I18N_ENDPOINT)` is the
+precedent to follow.
+
+- [ ] **Step 2: Layout.** Write into `packages/domain-<name>/src/generated-meta/` — `model/`,
+  `schema/`, `endpoints/`, `hooks/`, `search/`, `access/`, `mock/`, `index.ts` (spec §9). Leave
+  `src/generated/` alone.
+
+  **Empty `generated-meta/` before writing it, in `cleanGeneratedDirs`.** That function
+  (`openapi.ts:465`) already does exactly this for the orval half —
+  `rm("src/generated")` and `rm("src/hooks")`, recursive and forced — so add
+  `rm("src/generated-meta")` beside them rather than inventing a second cleanup path. It also
+  settles Task 11 Step 3's other question: **`src/hooks/` is deleted and re-rendered on every run**,
+  so the stub layer is regenerated by definition and nothing there can be preserved by hand.
+
+  Without it, the meta path has no pruning at all — the orval half gets `pruneUnusedModels`
+  (`:370`) removing models no endpoint references — so an entity or DTO that leaves the backend
+  leaves its file behind forever. A stale
+  `model/oldThing.ts` still exports a type the directory barrel still re-exports, so it compiles
+  and nothing reports it. The output is wholly generated and holds no hand-edited region (unlike
+  `mock/seeds.ts`), so delete the directory and rewrite it rather than adding a pruner. Assert that
+  a file present before a regeneration and absent from the new SimpliX Meta is gone afterwards.
+
+  **`generated-meta/index.ts` is the barrel both swaps point at, and its contents have to be
+  decided here** — Task 13's template variable takes this path, and Step 3 below re-exports
+  through it. Emit:
+
+  ```ts
+  export * from "./model";
+  export * from "./model/_enums";
+  export * from "./endpoints";
+  export * from "./hooks";
+  export * from "./search";
+  export * from "./access";
+  ```
+
+  `schema/` is deliberately absent: `schemas.ts` re-exports zod constants separately and
+  `export *` from both would collide on names (the existing type-name-conflict rule). `mock/` is
+  absent because `src/mock/index.ts` imports the handler factories by path.
+
+- [ ] **Step 1a: The change gate is computed from OpenAPI, and it will skip the meta half.**
+
+  `runDomain` returns early at step 2 (`openapi.ts:279`):
+
+  ```ts
+  const diff = computeDiff(previous, entities);   // entities came from the OpenAPI spec
+  if (!diff.hasChanges) {
+    log.success(`${domainPkgName}: No changes detected. Package is up-to-date.`);
+    return;                                        // nothing after this runs
+  }
+  ```
+
+  **Every change this project exists to capture is invisible to that diff.** A `@Length(max)` added,
+  a `@SearchableField` operator changed, a `@PreAuthorize` rewritten, an enum gaining
+  `LabeledEnum`, a class hierarchy refactored — none of them moves the OpenAPI document, so
+  `hasChanges` is false and the command reports "up-to-date" while the meta output stays stale.
+  The gate is computed from precisely the information SimpliX Meta was introduced because OpenAPI loses.
+
+  Give the meta half its own gate: compare the freshly fetched SimpliX Meta against the committed
+  `meta.snapshot` and treat a difference as a change, alongside the OpenAPI diff. Save SimpliX Meta in
+  step 15 next to `.openapi-snapshot.json` so the next run has something to compare. Where
+  `meta.snapshot` is unset there is nothing to compare, so run the meta half unconditionally rather
+  than skipping it — a needless regeneration is cheap and a skipped one is silent.
+
+  Assert it: a fixture whose OpenAPI-derived entities are byte-identical but whose SimpliX Meta gained one
+  constraint must still regenerate.
+
+- [ ] **Step 1b: Add the `--offline` flag — nothing can set it today.**
+
+  Task 2's `FetchMetaOptions` carries `offline?: boolean` and spec §12 settles that `meta.snapshot`
+  "지정하면 `--offline`으로 서버 없이 재생성한다", but no task adds the flag, so the parameter is
+  unreachable from the command line. `openapiCommand` currently declares `-d/--domain`,
+  `-e/--entities`, `-o/--output`, `-f/--force`, `--no-http`, `-y/--yes` (`openapi.ts:73`). Add:
+
+  ```ts
+  .option("--offline", "Read SimpliX Meta from meta.snapshot instead of the server")
+  ```
+
+  Fail with a message naming the snapshot path when `--offline` is passed and `meta.snapshot` is
+  unset — silently falling back to the network is the opposite of what the flag asks for.
+
+- [ ] **Step 2b: The four side artifacts — verify, do not regenerate.**
+
+  Spec §8 requires the meta path to produce what the `openapi` command produces besides code, or
+  scaffolding and validation break on a moved domain. Measured against `domain-org`, none of them
+  needs regenerating, because **none references a generated path and all are keyed by entity
+  name**:
+
+  | Artifact | Keyed by | References `generated/` |
+  | --- | --- | --- |
+  | `crud.config.ts` | entity → hook name (`organization`, `orgType`) | no — and it is written **only when absent or under `--force`** (`openapi.ts:334`), so it never drifts on its own |
+  | `src/locales/{ko,en,ja}.json` | entity, plus a top-level `enums` | no |
+  | ↑ **SimpliX Meta does not build this** — see below | | |
+  | `src/translations.ts` | the domain name and the three locale files | no |
+  | `http/<entity>.http` | one file per entity | no |
+
+  So they survive the swap **exactly when the entity partition and the hook names match** — which
+  is what Task 8 and spec §11 already demand. That makes this a test rather than a generator:
+  after Step 3 repoints the barrels, assert that all four files are byte-identical to what they
+  were before, and that `crud.config.ts`'s keys still resolve to exported hooks. A drift here is
+  the loudest available signal that the entity partition diverged.
+
+  Generate them from SimpliX Meta only for a domain that never had an orval run — the greenfield case
+  Task 13's scaffolding covers. **`crud.config.ts` is the one that must actually be generated
+  there**, and no task says how. `findCrudConfigForEntity` returns `null` when the file is absent
+  (`crud-config-loader.ts:31`), so `simplix scaffold` on a greenfield meta domain resolves no hook
+  names at all.
+
+  The existing generator needs nothing new from SimpliX Meta beyond what Task 8 already computes.
+  `generateCrudConfigContent` reads `op.role` — which `resolveEntityHookNames` fills from
+  `simplixBootNaming.resolveOperation` at `openapi.ts:656`, one step earlier — and falls back to
+  `inferCrudRole` (`:665`) only for an operation with no `operationId`. **Every SimpliX Meta operation has an
+  `id`**, so that fallback never fires on this path and the roles come wholly from the strategy,
+  which is why the application's files hold 122 role kinds where `inferCrudRole`'s table has 12.
+
+  So: emit `crud.config.ts` from the same `{ role, hookName }` pairs Task 8 resolves, in the same
+  shape — the 13 standard roles first, active or commented out, then the extra roles. Write it only
+  when absent or under `--force`, matching `openapi.ts:334`.
+
+  **Everything the scaffold emits hangs off this one file — 26 references in `scaffold-crud.ts`.**
+  Its absence is the single largest failure mode in the greenfield path, and the consequences are
+  spread across four places in this plan; together they are:
+
+  | Consumer | Without `crud.config.ts` |
+  | --- | --- |
+  | `EntityOperations` → widget shape (below) | all six booleans default **true** except `hasTree` |
+  | hook identifiers (`toHookName`, Task 13) | `hookList` null → the list renders `useMockList()`, an empty array |
+  | the delete wiring (`crud-page.hbs:50`) | a working dialog over `mutate: () => {}` |
+  | the chrome catalogue (`updateLocaleJsons`, Task 11) | gated on the same booleans, so the wrong keys are written |
+
+  Generate it first, and let the rest of Task 13 assume it.
+
+  **It decides the widget's shape, not just its hook names, and its absence fails open.**
+  `EntityOperations` — the six booleans that gate the generated create button, edit affordance,
+  delete action and tree view — is built straight from the file (`scaffold-crud.ts:720`:
+  `hasList: !!crudConfig.list`, and so on). With no `crud.config.ts` the scaffold substitutes
+  **all true except `hasTree`** (`:695`). Measured against the fixture, that default is wrong for
+  most entities:
+
+  | Role | entities that have it | that do not |
+  | --- | ---: | ---: |
+  | `list` | 60 | 79 |
+  | `get` | 65 | 74 |
+  | `create` | 54 | 85 |
+  | `update` | 48 | 91 |
+  | `delete` | 36 | **103** |
+  | `tree` | 2 | 137 |
+
+  A greenfield meta domain scaffolded without the file emits a delete action for 103 entities that
+  have no delete endpoint, and `detail.hbs` imports `CrudDelete` and `useCrudDeleteDetail` to serve
+  it. Generate the file before scaffolding, and assert the six booleans against the resolved roles.
+
+  **And the list screen fails silently rather than loudly.** Every hook identifier comes from this
+  file (`toHookName(crudConfig.list)` and its siblings, `:1644-1662`). With `hookList` null,
+  `list.hbs:28` takes its `{{#unless hookList}}` branch and defines
+  `useMockList()` — a `useMemo<T[]>(() => [], [])`. The screen renders a table that calls no API and
+  shows **zero rows, forever**, and it compiles. Combined with a missing schema file (Task 7's
+  `.schema.ts` naming) the cascade is complete: placeholder `id`/`name` fields, no package imports
+  (`{{#if packageName}}` guards them), a locally declared row interface, and a mock list.
+
+  So Task 13's tests must assert the negative: the generated list imports its hook from the domain
+  package and contains **no** `useMockList`.
+
+  **The delete path is worse than absent — it is a working dialog over a no-op.** With
+  `hasDelete` true (the default) and `hookDelete` null (no config), `crud-page.hbs:50` takes its
+  `{{else}}` branch and emits
+
+  ```ts
+  // TODO: Wire up delete mutation from your domain package
+  deleteMutation: { mutate: (() => {}) as (...args: unknown[]) => void, isPending: false } as any,
+  ```
+
+  wired into a real `useCrudDeleteWired`. The row action appears, the confirmation dialog opens,
+  the operator confirms, and **nothing happens** — no request, no error, no message. That is a
+  write command that changes no state, which this repository's own rules forbid shipping. Assert
+  the negative here too: no `TODO: Wire up delete mutation` in the generated output.
+
+  Note also that the app configures **no** `crud:` block in `simplix.config.ts`, so
+  `CrudEndpointPattern` and `matchCrudRole` never run and `ExtractedOperation.role` is undefined
+  before step 5. Do not build anything on that path.
+
+  **`spec:` stays in the config after the last domain moves.** Deleting a domain's `generated/` and
+  removing the OpenAPI spec are different acts, and only the first is in scope. Seven steps of the
+  `openapi` command are fed by the spec-derived entities — the change gate (`:278`),
+  `crud.config.ts` (`:335`), hook generation (`:377`), mock generation (`:380`), the locale files
+  (`:423`), the i18n downloader's entity list (`:801`) and `saveSnapshot` (`:452`) — and the meta
+  path replaces only two of them. `.http` generation reads the same entities. Say this in the Task
+  14 report so nobody reads "the domain is moved" as "the spec can go".
+
+  **One of the four does break on the swap, and only at the last step.** The enum half of the
+  locale overlay is filtered by `resolveKnownModelTypes` (`openapi.ts:837`), which lists
+  `src/generated/model/*.ts` and derives a type name from **each filename**:
+
+  ```ts
+  const modelDir = join(targetDir, "src/generated/model");
+  if (!await pathExists(modelDir)) return undefined;   // ← no filtering at all
+  ```
+
+  A meta domain keeps `generated/` until Task 14 Step 6 deletes it, so the filter works through the
+  entire migration and then stops. With `undefined` returned, nothing is filtered and **all 145
+  server enums land in that domain's locale file** — where `org` had 2 and `site` had 26. Nothing
+  errors; the file just grows.
+
+  Teach it the meta layout in this task, not in Task 14: `generated-meta/model/_enums.ts` holds
+  every enum in **one** file, so the names come from its exported declarations rather than from
+  filenames. Assert that a meta domain with `generated/` removed still filters to the same enum set
+  it had before.
+
+  **The damage is permanent, which is why this cannot be left to be noticed later.** The locale
+  files are merged, never pruned: `deepMerge(existing, overlay)` lets the overlay win and keeps
+  every key the overlay lacks, and nothing anywhere deletes a locale key (`pruneUnusedModels`
+  covers generated models only). So one unfiltered run writes all 145 enums in, and a later run
+  with the filter repaired **will not take them back out** — they have to be removed by hand.
+
+  **Otherwise the locale files are not built from SimpliX Meta, and spec §8 says so twice in conflicting
+  ways.**
+  SimpliX Meta's `labelKey` is a message *key* (`entities.HolidayCalendar.country`); it has no
+  translations. Those come from the i18n endpoint, whose payload is already structured as
+  `entities.<PascalKey>.fields.<field>.translations.<locale>`, and `transformToLocaleData`
+  (`cli-plugin/src/i18n.ts:98`) turns that into `{ <entityName>: { fields: { … } } }`. That path
+  stays exactly as it is.
+
+  **What SimpliX Meta does contribute is the key that path currently guesses.**
+  `buildEntityKeyMap` (`:82`) maps `entity.pascalName → entity.name` from the *derived* entity
+  names, and `transformToLocaleData` does `if (!entityName) continue` — so when a derived name does
+  not equal the Java entity's simple name, that entity's translations are dropped in silence.
+  Measured: **24 server entity keys SimpliX Meta names have no matching entry in any locale file,
+  covering 122 fields** — `ApprovalAttachment`, `EquipmentInspectionDuty`, `FloorPlan`,
+  `FloorPlanPlacement`, `ComplianceCheckItem` among them. Some belong to unconfigured domains, but
+  not all.
+
+  SimpliX Meta states the server key per field, so build `entityKeyMap` from `labelKey` instead of from
+  name equality, and report any server key that still finds no home.
+
+  **Name equality could never have bridged these — the two sides use different words.** Tracing
+  each server key back through the DTOs its fields belong to, and those DTOs back to the tag that
+  references them: `FloorPlan`'s labels belong to the entity the scaffold calls **`drawing`**,
+  `EquipmentInspectionDuty`'s to **`equipmentInspection`**, `ComplianceCheckItem`'s to
+  **`complianceRun`**. The Java entity and the API resource are named independently, so only the
+  SimpliX Meta's per-field `labelKey` connects them.
+
+  Two consequences for the writer:
+
+  - **The destination key is the scaffold's entity name**, not the server's.
+    `useEntityTranslation(entity)` reads namespace `entity/<entity>`, and
+    `create-i18n-config.ts:165` builds that namespace from the locale JSON's top-level key. Write
+    `drawing`, not `FloorPlan`, or the labels load into a namespace nothing asks for.
+  - **Merge, do not overwrite.** Seven of the 80 label-bearing entities draw from more than one
+    server entity — `drawing` from `FloorPlan` and `FloorPlanPlacement`, `importRun` from
+    `ImportColumnMapping`, `ImportJob` and `ImportRow`, `safetyZonePolicy` from three.
+
+  The failure this prevents is the one `domain-translations.ts:89` describes in its own words:
+  every field renders as `fields.<name>` on screen while both packages' code is correct and nothing
+  throws.
+
+  **A greenfield meta domain also needs the placeholder pass that runs before the overlay.**
+  Step 13 calls `generateLocaleFiles(targetDir, entities, locales)`, whose `buildLocaleJson`
+  (`openapi.ts:535`) writes `fields[name] = camelToLabel(name)` for **every** field of every entity
+  and a `camelToLabel` entry for every enum value, into every locale. Step 13b then overlays the
+  server's real translations on top, and `deepMerge` lets the overlay win — so the placeholder is
+  what a field falls back to when the server has no message for it. Measured, **66% of SimpliX Meta's
+  fields (4,138 of 6,244) carry neither `labelKey` nor `label`**, so the fallback is not a rare
+  path.
+
+  Those entities come from the OpenAPI parse, so during coexistence they exist. A domain that never
+  had an orval run has none, no locale file is written, and every label on the screen renders as
+  the raw `fields.<name>`. Reproduce the pass from SimpliX Meta: it needs only the field names per
+  entity, the enum values, and `camelToLabel` — a pure function. Use SimpliX Meta's enum name (Task 13's
+  `enumTypeName`) where `buildLocaleJson` uses `field.enumTypeName ?? enumName(entity, field)`.
+
+  **The screen chrome is a second, separate catalogue that nothing writes at all.** The widgets
+  read it from a **module** namespace — `useTranslation("<moduleNamespace>/widgets")`
+  (`crud-page.hbs:30`, `detail.hbs:25`) — not from the domain package, and they reference **25
+  distinct keys per entity**: `delete<X>Title`, `delete<X>Desc`, `delete<X>DescSimple`,
+  `addNew<X>`, `edit<X>`, `new<X>`, `save<X>`, `<x>Detail`, `<xs>`, `<xs>Description`,
+  `emptyTitle`, `emptyDescription`, `searchPlaceholder`, `notFound`, `sectionTitle`, `editHeader`,
+  `newHeader`, `detailHeader`, `title`, `description`, `editor`, `editorPlaceholder`,
+  `editDescription`, `yes`, `no`.
+
+  **`updateLocaleJsons` (`scaffold-crud.ts:1068`) does write them**, gated on `EntityOperations` —
+  the delete trio only when `hasDelete`, `<x>Detail`/`notFound`/`detailHeader` only when `hasGet`,
+  and so on. Two guards make it skip silently, and both matter here:
+
+  - `:1065` — it writes only into a `locales/widgets/<locale>.json` that **already exists**. A
+    module scaffolded fresh has none, so nothing is written.
+  - `:1071` — `if (json[entityName]) continue`. An **empty** entity object is truthy, so once
+    `"organization": {}` is in the file no later run ever fills it. That is exactly the state of
+    `modules/org/src/locales/widgets/ko.json` in this application today: the key is present and
+    holds zero of the 25.
+
+  So the catalogue is generated but its gates depend on `crud.config.ts` being right (Task 11) and
+  on the module's locale files existing. Assert after scaffolding that the entity's key holds the
+  keys its `EntityOperations` imply — an entity with `hasDelete` must have
+  `delete<X>Title`, `delete<X>Desc` and `delete<X>DescSimple`, or the confirmation dialog renders
+  its own key as its title. `label` (the direct-literal
+  mode) occurs twice in the whole capture, both on `ValidationTestRequest` in an unmatched tag —
+  handle it as a fallback and do not build anything around it.
+
+  **Write the profile's extension files last.** After the generators run, call
+  `profile.metaExtensions?.(meta)` and write each entry of `files` under `generated-meta/`. A path
+  that collides with a file a generator already wrote is an error, not an overwrite — the profile
+  is adding to the output, not editing it. When the profile has no `metaExtensions`, nothing
+  happens and nothing is written; that is the boot profile's case today.
+
+  Emit a per-directory `index.ts` in `model/`, `endpoints/`, `hooks/`, `search/` and `access/`,
+  each re-exporting that directory's files — `model/index.ts` re-exports one line per type, the
+  others one per entity. `model/index.ts` makes `export * from "./model"`
+  resolve the way orval's `generated/model/index.ts` does; `endpoints/index.ts` and
+  `hooks/index.ts` are what Step 3's stub layer points at, since the entity partition does not
+  match orval's per-tag one. Emit `schema/index.ts` too — `schemas.ts` needs a single path to
+  re-export.
+
+- [ ] **Step 3: The re-export layer — six files, and the two partitions do not line up.**
+
+  **`index.ts` is not yours to write — it is re-rendered on every run.** `openapi.ts:387` renders
+  `domain/index-ts.hbs` with `enableOrval: true` hardcoded, then calls
+  `mergeIndexWithCustomExports(newContent, existingContent)` (`:882`), which **preserves any
+  `export ` line in the existing file that is absent from the freshly rendered one**. Two
+  consequences, and both are silent:
+
+  1. **A swap written here is undone by the next codegen run**, because the template renders the
+     orval path again.
+  2. **The revert is worse than a no-op.** Spec §10 says reverting is removing the domain from
+     `export`; the template then renders `export * from "./generated/model"`, and the merge
+     *preserves* the stale `export * from "./generated-meta"` beside it. TypeScript resolves two
+     `export *` declarations exporting the same name by **exporting neither** — so the barrel
+     silently loses every colliding type instead of reporting a conflict.
+
+  **`schemas.ts` has the same problem in a different function.** `generateSchemasProxy`
+  (`orval-runner.ts:599`) runs at step 11 of every domain build, lists
+  `src/generated/endpoints/*.zod.ts`, and rewrites the file as one `export *` per zod file —
+  preserving only what follows the marker `// Custom schema overrides and additions:`. So a
+  hand-repointed `schemas.ts` is reverted on the next run, exactly like `index.ts`. And once
+  `src/generated/` is deleted it takes the other branch —
+  `if (!(await pathExists(endpointsDir))) return;` — leaving the file **untouched and still naming
+  deleted paths**. That failure is at least loud, unlike the enum filter's.
+
+  So the `export` list has to reach **both call sites**: pass the resolved path into the template
+  render at `openapi.ts:387` (Task 13 makes it a variable) and let `writeFileWithDir` overwrite,
+  and give `generateSchemasProxy` the meta layout — `generated-meta/schema/index.ts` is the single
+  path it re-exports there, in place of one line per zod file. Rewrite neither file afterwards. `enableOrval` is a boolean today and a meta domain is a third
+  case, so widen it there too. Assert both directions: switching a domain into `export` and running
+  codegen twice leaves one export line, and taking it back out leaves the orval line alone.
+
+  **Measured across all 13 domain packages of the target application:**
+
+  | File | Designed for hand edits | Actually hand-edited | Rewrite |
+  | --- | --- | --- | --- |
+  | `index.ts` | no | 0 of 13 differ from the 3-line template | regenerate |
+  | `hooks/<entity>.ts` | no | each is exactly one `export *` line | regenerate |
+  | `hooks/index.ts` | no | one `export *` per stub | regenerate |
+  | `schemas.ts` | yes — everything after `// Custom schema overrides and additions:` | **0 of 13 carry one** | `generateSchemasProxy` regenerates it every run; teach it the meta layout |
+  | `mock/index.ts` | yes — a custom-handler slot | **0 of 13 use it**, so it is **regenerated on every run** | teach the generator the meta layout; editing it is pointless |
+  | `mock/seeds.ts` | yes — the seed data | all of them | substitute import paths only |
+
+  **`mock/seeds.ts` was missing from this list and imports `../generated/model` at line 8.** Left
+  alone it survives the swap and breaks at Step 5, when `src/generated/` is deleted — long after
+  the change that caused it.
+
+  **The split differs, so this is not a path substitution.** An entity is one tag either way
+  (Task 8), but orval writes **one file per tag holding the request functions *and* the hooks
+  together** (`generated/endpoints/site-areazone/site-areazone.ts`, with a `.zod.ts` sibling) and
+  each `hooks/<entity>.ts` stub re-exports that single file, while the meta layout puts the two
+  halves in **separate files** — `generated-meta/endpoints/<entity>.ts` and
+  `generated-meta/hooks/<entity>.ts` (spec §9). One stub line has to become two, and the directory
+  names differ (`site-areazone` against `areaZone`).
+
+  So a stub cannot be repointed by rewriting its path. Emit `endpoints/index.ts` and
+  `hooks/index.ts` barrels inside `generated-meta/` and regenerate the stub layer against them;
+  the stubs and `hooks/index.ts` hold nothing worth preserving, which is what the table above
+  establishes. Only `schemas.ts`, `mock/index.ts` and `mock/seeds.ts` are edited in place.
+
+  Reverting is removing the domain from `export`, which regenerates the same layer against
+  `generated/` — and is why `src/generated/` is deleted last. **Verify the revert by running it**,
+  not by reasoning about it: the index merge above makes a stale line survive, and a barrel that
+  drops names silently looks identical to one that works until a screen imports the missing type.
+
+- [ ] **Step 4: Test** that a domain not in `export` keeps its orval barrel byte-for-byte; that a
+  domain in `export` has **all six** re-export files pointing at the meta output — `index.ts`,
+  `hooks/<entity>.ts`, `hooks/index.ts`, `schemas.ts`, `mock/index.ts` and `mock/seeds.ts`
+  (Step 3); that content after `schemas.ts`'s `// Custom schema overrides and additions:` marker
+  survives; and that **running codegen twice leaves all six unchanged** — four of them are
+  regenerated every run, so a swap the generator does not know about is undone silently.
+
+- [ ] **Step 4b: Prove the generated output survives typecheck and lint — the requirement nobody
+  has verified yet.**
+
+  Spec §5.1 requires that no generated file carries `@ts-nocheck`. Orval's output carries it on
+  every endpoint file precisely because it does not compile clean, and neither
+  `.oxlintrc.json` nor the CLI's tsconfig excludes generated directories — so meta output is
+  linted and typechecked like hand-written code. A generator that emits `@ts-nocheck` to get
+  green has reproduced the defect this project exists to remove.
+
+  Run, against a real domain package with the meta output written into it:
+
+  ```bash
+  pnpm typecheck
+  pnpm lint
+  ```
+
+  Both must pass with **no `@ts-nocheck` anywhere in `generated-meta/`**:
+
+  ```bash
+  grep -rn "@ts-nocheck" packages/domain-*/src/generated-meta/ && echo "VIOLATION" || echo "clean"
+  ```
+
+  If a diagnostic is genuinely unavoidable — a Jackson shape TypeScript cannot express — report
+  it with the exact message rather than suppressing it. Suppression is the one outcome this step
+  exists to prevent.
+
+- [ ] **Step 5: Run the full CLI suite, then commit**
+
+```bash
+npx vitest run --project cli
+git add packages/cli/src/config/types.ts packages/cli/src/commands/openapi.ts \
+        packages/cli/src/meta/write.ts packages/cli/src/__tests__/meta-parallel.test.ts
+git commit -m "feat(cli): generate the meta output alongside orval and switch by config"
+```
+
+---
+
+### Task 12: `meta-diff`
+
+**Files:**
+- Create: `packages/cli/src/commands/meta-diff.ts`
+- Modify: `packages/cli/src/bin.ts` — register the command
+- Test: `packages/cli/src/__tests__/meta-diff.test.ts`
+
+The reason parallel generation was chosen: a domain is only switched once the two outputs agree.
+
+- [ ] **Step 1: Write it.** `simplix meta-diff <domain>` compares the public names each output
+  exports and reports (spec §11).
+
+  **Where the two sides come from — this is the whole design of the command.** Both outputs exist
+  only as TypeScript on disk (`src/generated/` and `src/generated-meta/`); there is no shared
+  intermediate to compare. So the command reads both trees with the compiler's parser and compares
+  the declarations it finds:
+
+  ```ts
+  import ts from "typescript";
+
+  const sf = ts.createSourceFile(path, text, ts.ScriptTarget.Latest, true);
+  ```
+
+  Walk the top-level statements and collect, per file: exported `interface` names with each
+  member's name, type text (`member.type.getText(sf)`) and whether it carries a `?`; exported
+  `type` aliases; exported `const` names; and exported function/arrow names. Compare those two
+  maps. Use the parser rather than a regex — an optional marker and a generic argument are exactly
+  what a regex gets wrong, and getting them wrong turns this command from a gate into noise.
+
+  Do not type-check: `createSourceFile` parses one file with no module resolution, which is what is
+  wanted here and is why Task 6 also avoids `ts.createProgram`.
+
+  Registration follows the existing shape — `export const metaDiffCommand = new Command("meta-diff")`
+  in `commands/meta-diff.ts`, added in `bin.ts` with `program.addCommand(metaDiffCommand)` beside
+  the other nine.
+
+  Findings:
+
+| Finding | Level |
+| --- | --- |
+| a public name present in only one — type, hook, request function, **`get<Name>QueryKey`**, const map, params type, and the mock handler factory `createXHandlers` (spec §11). Zod constants are excluded; see the info row | error |
+| a name difference traceable to one of the **three tags where springdoc and SimpliX Meta disagree** — the `public.user.Avatar` split and the two `CurrentUserRestController` operations | info — SimpliX Meta follows the `@Tag` annotation and orval does not; matching orval would reproduce a hook name that exists nowhere (Task 8) |
+| a `get<Name>QueryKey` returning a different **shape** | error — module code spreads the result (`[...getGetNoticeQueryKey(id), language]`), so the arity and element order are contract, not just the name |
+| a field present in only one | error |
+| a field type mismatch | error |
+| a required-ness difference not on the intended list | error |
+| a missing operation | error |
+| a constraint present only on the meta side | info — OpenAPI lost it, which is the point |
+| a **zod constant** name present in only one | info — orval names them per operation and role (32 for one entity), the meta path per type, and **nothing imports them**: 0 references anywhere in the application outside `generated/`. Reporting 32 renames per entity as errors would bury the drift this command exists to find |
+
+  **Intended differences are info, not errors:** a response enum field moving from a value union to
+  `LabeledEnumValue`; a field becoming required through a primitive type or
+  `@Schema(requiredMode = REQUIRED)`; added request constraints. Reporting those as errors would
+  bury real drift in noise.
+
+  **Calibrate the required-ness rule against what was measured, or it will hide drift.** No
+  `DetailDTO` and no `ListDTO` in the fixture carries a **single** required field. Required fields
+  live on `CreateDTO` (285 across 50 types), plain `…DTO` (204/66), `UpdateDTO` (75/56) and
+  non-DTO types (45/20) — that is, on request shapes and on entities, where `@NotNull` and Java
+  primitives put them. §12's second ground exists in the codebase (`requiredMode` appears 17
+  times) but not on a response DTO.
+
+  So a response DTO gaining a required field is **not** the expected case this rule was written
+  for: treat it as info only when the field's Java type is an unboxed primitive or SimpliX Meta shows
+  `@Schema(requiredMode)`, and report anything else as an error. A blanket info classification
+  would silence exactly the drift `meta-diff` exists to catch.
+
+  Both outputs must come from the same run against the same server, or the diff reports whatever the backend did in between.
+
+- [ ] **Step 2: Test** that an identical pair reports nothing; that a removed field is an error;
+  that an enum shape change is info; that a hook-name difference is an error; and that a renamed
+  `createXHandlers` factory is an error — `src/mock/index.ts` imports those by name and a silent
+  rename breaks every mocked screen in the domain while typecheck of the domain package alone
+  still passes.
+
+- [ ] **Step 3: Run, then commit**
+
+```bash
+npx vitest run --project cli
+git add packages/cli/src/commands/meta-diff.ts packages/cli/src/bin.ts \
+        packages/cli/src/__tests__/meta-diff.test.ts
+git commit -m "feat(cli): add meta-diff to compare the orval and meta outputs"
+```
+
+---
+
+### Task 13: Scaffold reads SimpliX Meta
+
+**Files:**
+- Create: `packages/cli/src/meta/scaffold-source.ts`
+- Modify: `packages/cli/src/commands/scaffold-crud.ts` — choose the source
+- Modify: `packages/cli/src/templates/openapi/user-index-ts.hbs` — variable re-export path
+- Modify: `packages/cli/src/templates/domain/index-ts.hbs` — the same line, in the `add-domain` template
+- Test: `packages/cli/src/__tests__/scaffold-meta-source.test.ts`
+
+`scaffold-crud.ts` learns a domain's fields by regex-matching orval's emitted zod text (`X…Body = zod.object(`) and by reading `src/generated/model/<file>.ts`. Neither exists in a meta domain, and `.extend()` would not match the regex anyway — inherited fields would silently vanish from a generated form (spec §9.1).
+
+**Which DTO's fields, exactly.** The rule is in `scaffold-crud.ts:378-401` and is not obvious:
+among the zod constants matching `\w*<EntityPascal>\w*Body`, take the one with the **most
+fields**; skip `Search\w*Body` (those are query parameters, not entity fields); and never read a
+`…Response` constant, because it carries the envelope's six members instead of the entity's. A
+field whose expression is `z.object(` or `z.array(z.object(` is skipped as well (`:468`) — nested
+objects are not rendered as scalar fields, while `z.array(z.string())` and
+`z.record(z.string(), z.string())` are kept.
+
+**Count inherited fields when comparing, or you will pick the wrong DTO.** Orval's `…Body`
+constants are flattened, SimpliX Meta's `fields` are own-fields-only, and choosing by the own count
+inverts the answer. Measured:
+
+| Entity | own-field winner | with inheritance resolved | orval's choice |
+| --- | --- | --- | --- |
+| `org.Organization` | `OrganizationCreateDTO` (20) | **`OrganizationUpdateDTO` (21)** | Update |
+| `site.WorkPoint` | `WorkPointCreateDTO` (11) | **`WorkPointUpdateDTO` (12)** | Update |
+| `site.AreaZone` | `AreaZoneUpdateDTO` (1) | `AreaZoneUpdateDTO` (13) | Update |
+
+Two of three flip. Task 5 already computes the inherited closure — use that list for the
+comparison, and the same list for the fields themselves.
+
+**Concatenate parent fields first, own fields last — the column order depends on it.**
+`orderAndCategorizeFields` sorts by category rank and then by **the input index**
+(`scaffold-crud.ts:112`), so whatever order the field list arrives in survives inside each
+category. Verified against orval's flattened bodies: `OrganizationUpdateDTO`'s closure in
+parent-then-own order is `orgCode … deletedTimestamp, orgId` — **all 21 names in the same order as
+`OrganizationRestUpdateBody`**, with the one own field `orgId` last. `AreaZoneUpdateDTO`'s 13 match
+`AreaZoneRestUpdateBody` likewise. Own-then-parent would reorder every column of the 104 types that
+carry `extends`.
+
+The category ranks themselves are fixed and need no derivation:
+`identifier → relation → type → text → description → attribute → metric → schedule → audit`
+(`:65`), with `identifier`, `relation` and `audit` hidden from lists by default (`:79`).
+
+**Compare like with like when checking this.** `XUpdateFormDTO` is the `getForEdit` **response**,
+not a request body — `AreaZoneUpdateFormDTO` carries four audit fields that `AreaZoneUpdateDTO` does
+not, and holding it against `AreaZoneRestUpdateBody` shows a difference that is not there.
+
+**The entity's `modelType` is derived separately and from the response** (Task 10), so a form's
+fields and the mock store's type legitimately come from different DTOs. That is what the orval path
+does too; do not try to reconcile them.
+
+**A request body is not always there — 54 of the fixture's 139 entities have none.** They are the
+read-only ones (`auditLog`, `auditEvent`, `obligationApplicability`, `consoleNotification`, the
+census entities). The orval path covers them with its documented fallback, taking fields from the
+detail GET response (`entityFieldsToFieldInfo`, reached at `:1622` "covers read-only entities with
+no Body schema"), and that response is the same DTO `modelType` already names (Task 10). So:
+
+| Source | Entities | Rule |
+| --- | ---: | --- |
+| request-body DTO, most fields with inheritance resolved | 85 | above |
+| the non-array GET response — the `modelType` DTO | 54 | when no body DTO exists |
+| neither | **8** | report; do not emit placeholders silently |
+
+The last row matters because of what happens otherwise: with an empty field list the scaffold
+substitutes `PLACEHOLDER_FIELDS` — an `id`/`name` pair — and one of its two call sites
+(`scaffold-crud.ts:1645`) does it with a spinner message and **no warning at all**. A widget set
+built on two invented fields looks like a successful scaffold. The eight are `exportDownload`,
+`avatar`, `content`, `userPermission`, `passwordWebController`, `simpliXAuthLoginController`,
+`scalarController` and `backoffice` — binary or dev surfaces, most in unmatched tags — so refusing
+them loudly costs nothing.
+
+- [ ] **Step 1: Write SimpliX Meta source.** Fill the same contracts the scaffold already uses —
+`FieldInfo` (`scaffold-crud.ts:29`), `EntityOperations` (`:632`), `FilterFieldInfo` (`:1256`) —
+from SimpliX Meta instead of from text.
+
+**Carry the temporal kind onto the column as `format` — the template never sets it.**
+`CrudList.Column` accepts `format?: "date" | "datetime" | "time" | "relative"`
+(`crud-list.tsx:325`), three of whose values are exactly SimpliX Meta's temporal kinds. The string
+`format=` appears **0 times** in `list.hbs`: a temporal column falls to the bare `{{else}}` branch
+(`:253`) and the peek row renders `String(row.x)` (`:203`), so the operator reads
+`2026-08-28T00:00:00Z` in a table cell. That is the frontend handbook's invariant #36 —
+"instants formatted with `format=\"datetime\"`" — broken by the generator, on the 682 `instant`,
+200 `date` and 10 `time` fields SimpliX Meta distinguishes. Map `instant`→`datetime`, `date`→`date`,
+`time`→`time`.
+
+**The batch operations reach no screen at all — report the gap rather than closing it here.**
+`selectable`, `batchDelete`, `batchUpdate` and `multiUpdate` appear **0 times** across every UI
+template, though `crud.config.ts` records all three roles and `CrudList` offers `selectable` and
+`rowActions` to drive them. Measured, **38 of the fixture's 139 entities carry at least one** —
+`batchUpdate` 38, `multiUpdate` 34, `batchDelete` 28, `order` 11. The frontend handbook's
+invariant #33 is explicit that every entity-scoped action endpoint must be reachable from the UI,
+so those endpoints are unreachable by construction today.
+
+Building the multi-select toolbar is a new screen feature, not a codegen parity task, and the user
+has not asked for it. **Report it in Task 14 with these counts** — SimpliX Meta is what makes the gap
+visible, and naming it is this project's contribution; closing it is a separate decision.
+
+**A tree column can carry neither, and that is a framework gap rather than a template one.**
+`CrudTree.Column` declares no `format` and no `display` prop — only `CrudList.Column` does — so a
+tree screen's temporal columns print their ISO text whatever the source hands over. `organization`
+is a tree entity and `deletedTimestamp` and `lastSyncedAt` are both instants, so the pilot domain
+meets this on its main screen. Adding the two props to `CrudTree.Column` is a framework change
+outside this plan: report it with the field names rather than working around it in the template.
+
+**A boolean column needs `display="boolean"` for the same reason.** The column section has three
+branches — the two i18n ones, `Select` with `display="badge"`, and a bare `{{else}}` — so a boolean
+field falls through and the table prints `true` / `false`. `CrudList.Column` offers
+`display: "badge" | "boolean" | "country" | "phone"` (`crud-list.tsx:324`) and the frontend
+handbook's invariant #21 requires a `Badge` for a new boolean column. SimpliX Meta marks all **593**
+of them unambiguously. `country` and `phone` have no SimpliX Meta signal — leave those to the screen author.
+
+`variants` needs nothing: the template gives every enum value `"default"`, and since `EnumMeta`
+carries no tone information that is the honest default rather than a gap.
+
+**Carry `searchable.sortable` onto the column — the template marks every column sortable.**
+`list.hbs` emits a bare `sortable` on its `CrudList.Column`s (`:228`, `:235`, `:246`, `:257`) with
+no condition, because the orval path has no way to know. Measured, **280 of the fixture's 1,118
+searchable fields declare `sortable: false`** — a third of them. A column offering a sort the
+backend does not implement sends `sort=field.asc` for a field `@SearchableField` never marked
+sortable; the server ignores it and the operator sees the arrow move while the rows do not. Pass
+the flag through and emit `sortable` only when it is true. (This is also what keeps the 32
+operator-less sort keys from Step 1c useful: they filter nothing but they do sort.)
+
+**Pick the tree's display field from the i18n pairing, not from field order.** A tree node's label
+comes from `treeDisplayNameField` (`scaffold-crud.ts:1806`): a field literally named `name`,
+`title`, `label` or `displayName`, else **the first string field** that is not the row id or the
+parent id, else the literal `"name"`. Neither tree entity in the fixture has a field with one of
+those four names, so both fall to the positional rule and both land wrong:
+
+| Entity | picked today | should be |
+| --- | --- | --- |
+| `organization` | `orgCode` | `orgName` |
+| `areaZone` | **`siteId`** — a foreign key, identical on every node | `areaName` |
+
+`org` is the pilot domain and its tree is its main screen, so Task 14's browser pass meets this
+first. SimpliX Meta settles it without a new heuristic: **a field with an `…I18n` sibling is the
+human-facing text by construction** — that rule yields `orgName` and `areaName` respectively. Try
+the four common names, then the i18n-paired field, then the positional fallback.
+
+**Run the pairing over the inherited closure, not over own fields.** `AreaZoneCreateDTO` declares
+no i18n pair of its own — `areaName` and `areaNameI18n` are both inherited from `AreaCreateDTO` —
+so an own-fields test finds nothing and falls straight back to the positional rule that picks
+`siteId`, the foreign key identical on every node. Over the closure it yields `areaName`. Where the
+closure holds more than one pair, take the first in parent-then-own order: `OrganizationUpdateDTO`
+pairs both `orgName` and `description`, and `orgName` is the one the tree should show.
+
+**The same rule governs `displayNameField`, which is not tree-specific and reaches further.**
+`scaffold-crud.ts:1778` derives it for **every** entity by the same four-names-then-first-string
+test, excluding only the row id, and `crud-page.hbs:167` spends it on the delete confirmation:
+`requestDelete({ id: row.<rowIdField>, name: String(row.<displayNameField> ?? "") })`. Measured
+over the DTOs that carry an i18n pair: **28 of 41 pick something other than the paired field** —
+`WorkPointCreateDTO` picks `siteId`, `JobPositionCreateDTO` `positionCode`,
+`HolidayUpdateDTO` `holidayCalendarId`. A foreign key is identical on every row, so the dialog asks
+the operator to confirm deleting a record it has named wrongly, or named the same as the last one.
+Apply the i18n-paired rule here too. The parent-id
+detection above it needs no change: `parentOrgId` and `parentAreaId` both match its
+contains-`parent`-and-ends-`id` test, and all three tree DTOs name their child collection
+`children`, so the templates' hardcoded `childrenField` holds.
+
+**Set `enumTypeName` from SimpliX Meta, not from the emitted TypeScript.** An enum column shows a
+translated badge only when it can name its enum: `list.hbs:248` emits
+`enumName="{{enumTypeName}}"`, and `enumLabel(enumName, value)` resolves
+`enums.<enumName>.<value>` (`use-entity-translation.ts:51`). The scaffold fills `enumTypeName` by
+reading the **declared type text** out of the list DTO's model file and keeping it only if it looks
+like a bare PascalCase identifier (`withEnumType`, `scaffold-crud.ts:1864`).
+
+That breaks on the meta output. A labeled enum's response field is typed `AreaKindLabeled`, not
+`AreaKind` (Task 6), so the declared text yields `enumName="AreaKindLabeled"`, the lookup asks for
+`enums.AreaKindLabeled.AREA`, and the locale files hold `enums.AreaKind.AREA` — every enum badge in
+every generated list falls back to the raw constant, silently, across all **122 labeled enums**.
+
+SimpliX Meta names the enum directly in the field's `TypeRef`, so take `enumTypeName` from there and
+never from the rendered type. That also survives `listDtoFields` being unavailable.
+
+**Two further defects sit in the same templates, and the second is §1's headline enum problem.**
+
+1. **Three enum key schemes coexist.** `list.hbs:248` (the column) passes
+   `enumName="{{enumTypeName}}"`, but `list.hbs:199` (the peek row) and `detail.hbs:125` both build
+   the key as `"{{entity}}{{capitalizedName}}"` — `areaZoneAreaKind` against `AreaKind`.
+   `buildLocaleJson` writes `field.enumTypeName ?? enumName(entity, field)` — **one** of the two.
+   So the moment `enumTypeName` is set (which the fix above requires), the column resolves and the
+   peek row and the detail badge stop resolving. Use SimpliX Meta's enum name in all three places.
+
+2. **Neither template calls `resolveBootEnum` — it appears 0 times in both.** `list.hbs:199` does
+   `String(row.status)` and `detail.hbs:125` passes `displayData.status` straight into `enumLabel`.
+   A labeled enum arrives as `{ value, label }` (spec §4.1, 122 of 133 enums), so the generated
+   screens render `[object Object]` and look up `enums.X.[object Object]`. This is §1's first
+   defect reproduced by the generator itself, and the frontend handbook's invariant #10 requires
+   `resolveBootEnum` in exactly these four contexts — list column, form default, detail display,
+   DTO assembly — with #53 naming the detail row as its own trap. Emit
+   `resolveBootEnum(row.status)` wherever a labeled enum's value is read.
+
+   **All four contexts are wrong today, and the fourth is a write.** Traced through the templates:
+
+   | Context | What the template does | Result for a labeled enum |
+   | --- | --- | --- |
+   | list column | `String(row.status)` (`list.hbs:199`) | `[object Object]` |
+   | detail display | `displayData.status` into `enumLabel` (`detail.hbs:125`) | key `enums.X.[object Object]` |
+   | form default | `defaultValues={isEdit ? data : undefined}` (`form.hbs:138`), then `values.status` into `SelectField` (`:309`) | the object never equals any `options[].value`, so the select is **blank in edit mode** |
+   | DTO assembly | `useCrudFormSubmit` passes `values` through unchanged | the form **submits `{ value, label }`** where `LabeledEnumDeserializer` expects the bare string (spec §12) |
+
+   The third and fourth compound: an operator opens an edit form, the enum shows blank, and saving
+   writes the malformed object back. `resolveBootEnum` on read is half the fix; the submit path
+   must send `values.status` as the value string. The `SelectField` branch also uses the
+   concatenated key (`enumLabel("{{entity}}{{capitalizedName}}", …)`, `form.hbs:315`), so it is the
+   third site needing SimpliX Meta's enum name.
+
+**The mutation path parameters are a fifth read of `src/generated/`, and both fail badly without
+it.** `findMutationPathParam` (`scaffold-crud.ts:1189`) scans
+`packages/*/src/generated/endpoints` for `get<Op>MutationOptions` to learn which path parameter a
+mutation takes. `updatePathParam` is `null` when it finds nothing, and `deletePathParam` falls back
+to `` `${entity}Id` `` (`:1688`). Both reach the templates directly:
+
+```jsx
+deleteMutation: adaptOrvalDelete(useDeleteX(), "{{deletePathParam}}", { onSettled: invalidate })
+{{#if updatePathParam}}update: adaptOrvalUpdate(_update, "{{updatePathParam}}", …){{/if}}
+```
+
+Measured: of the 36 entities with a `delete` role, the fallback names the right parameter for
+**24** and the wrong one for **12** — `authRolePermission` takes `rolePermissionId` not
+`authRolePermissionId`, `jobPosition` takes `positionId`, `userRole` takes `roleId`. A wrong name
+sends the id under a key the URL builder does not use. And `updatePathParam` being `null` removes
+the update mutation from the form entirely, because the template guards on it.
+
+SimpliX Meta states both directly: the `delete`- and `update`-role operations' `request.path` entries.
+Take the last one, as the naming strategy does.
+
+**`entityPath` is a fourth snapshot read, and its fallback is wrong for every entity but one.**
+`scaffold-crud.ts:1892` sets `entityPath: extractedEntity?.path ?? \`/api/v1/${entity}\``, and the
+generated form spends it on `useInvalidateEntity("{{entityPath}}")` (`form.hbs:95`) — the prefix
+matched against `queryKey[0]` (Task 8). Measured, the common path of an entity's operations equals
+`/api/v1/<entity>` for **1 of the fixture's 139**: the real ones are
+`/api/v1/admin/worker`, `/api/v1/admin/system/holiday-calendar`,
+`/api/v1/admin/auth/role-permission`. With the snapshot absent — a greenfield meta domain — the
+fallback fires and the prefix matches nothing, so **every mutation stops invalidating its list and
+the screen keeps showing stale rows**, with no error. Derive it from SimpliX Meta as the common
+non-parameter prefix of the entity's operation paths.
+
+**There are three call sites, not one, and they read from two different files.** Replace all three
+or the meta output is generated and never consumed:
+
+| Call site | Reads today | Feeds |
+| --- | --- | --- |
+| `findSchemaFile` (`:1621`) | a `*.zod.ts` / `schemas.ts` file's text | the form's `FieldInfo` |
+| `parseFilterParams(extractedEntity.queryParams, extractedEntity.fields)` (`:1698`) | `.openapi-snapshot.json` | every filter |
+| `extractedEntity.operations.find(o => o.role === "get")` (`:1694`) | `.openapi-snapshot.json` | **`rowIdField`** |
+
+The second is why Task 9's search generator does nothing on its own: the scaffold takes its filters
+from the OpenAPI snapshot, so unless this call is repointed SimpliX Meta's operator lists are written and
+ignored.
+
+**The third is not mentioned anywhere else in this plan.** `rowIdField` is the list's row identity,
+taken from the last path parameter of the `get`-role operation and defaulting to `"id"`. Measured:
+**74 of the fixture's 139 entities have no `get` role**, so they all take that default — and for
+many a real candidate exists (`streamAdminController` → `sessionId`, `importRun` → `importJobId`,
+`drawing` → `floorPlanId`). SimpliX Meta knows the path parameters of every GET, not just the one the
+naming strategy labelled `get`, so fall back to the last path parameter of any item GET before
+falling back to `"id"`. This diverges from the orval path for those entities, in scaffolded module
+code that `meta-diff` does not compare — say how many it changed.
+
+**What the `"id"` fallback actually costs.** `crud-page.hbs` spends `rowIdField` in seven places —
+`onRowClick={(row) => showDetail(String(row.<rowIdField>))}`, the view / edit / delete row actions,
+and the card-list variants. A list renders a `…ListDTO`, and **no list DTO in the fixture has a
+field named `id`**: the twelve types that do are entity classes (`Organization`, `UserAccount`,
+`UserRole`, `SimpliXBaseEntity` …), not the projections a list shows. So on those 74 screens
+`row.id` is `undefined`, every row click navigates to the string `"undefined"`, and the delete
+action requests deletion of nothing. It is not a cosmetic identity problem; the screen does not
+work.
+
+**One presentation decision must come from SimpliX Meta: the temporal component.** Spec §5.1 requires
+that `instant`, `date` and `time` stay distinguishable *because the three use different input
+components*, and §1 names their collapse as one of the eight defects this project exists to remove.
+Measured, the orval path collapses them — `parseZodType` (`scaffold-crud.ts:160`) maps
+`zod.iso.datetime(` to `DateField`, and `entityFieldsToFieldInfo` (`:327`) maps **both**
+`format === "date-time"` and `format === "date"` to `DateField`; neither knows `time` at all.
+All three framework components exist:
+`packages/ui/src/fields/form/{date-field,time-field,datetime-field}.tsx`.
+
+| SimpliX Meta kind | `formComponent` | `component` | `tsType` | n in fixture |
+| --- | --- | --- | --- | ---: |
+| `instant` | `DateTimeField` | `Date` | `Date` | 682 |
+| `date` | `DateField` | `Date` | `Date` | 202 |
+| `time` | `TimeField` | **`Date`** | `Date` | 10 |
+
+**The form template must gain branches for the two new `formComponent` values, or this change is
+a regression.** `form.hbs:174` reads a temporal default with
+`{{else if (eq this.formComponent "DateField")}} {{name}}: parseDate(defaultValues?.{{name}}) ?? …`
+and everything else falls to a raw pass-through. Today all 884 `instant` and `date` fields carry
+`formComponent: "DateField"` and so all take that branch; renaming `instant` to `DateTimeField`
+**takes 682 fields out of it**, handing a raw ISO string to a component that expects a `Date`.
+
+Match all three. `parseDate` (`packages/headless/src/parse-date.ts:49`) already tells `instant` from
+`date` on its own — its date-only branch parses a local calendar date and runs it through
+`asPlainDate`, which redefines `toJSON` on the instance so `JSON.stringify` emits `yyyy-MM-dd`
+rather than a UTC timestamp. That is the whole round trip, and it is why the submit path needs no
+serializer of its own. `time` is the exception: a `TimeField` takes a `TimeValue`, converted through
+the shared `TimeValue ⇄ "HH:mm"` helper pair the frontend handbook's invariant #37 names, so give it
+its own branch rather than routing it through `parseDate`.
+
+**`component` stays `"Date"` for all three, including `time`** — only `formComponent` distinguishes
+them. `component` is a coarse classification two other mechanisms read, and neither knows a
+`"Time"` value: `categorizeField` (`scaffold-crud.ts:102`) files a field as `schedule` on
+`component === "Date" || tsType === "Date" || /(At|Date|Time)$/.test(name)`, and `:1667` sets the
+template's `hasDateFields` flag from `component === "Date"`. Measured: **4 of the fixture's 10
+`time` fields would fall through both** — `ShiftUpdateDTO.nightWindowStart`, `.nightWindowEnd` and
+their `ShiftDTO` twins end in neither `At`, `Date` nor `Time`, so with `component: "Time"` they land
+in the `text` column category and a shift entity reports no date fields at all.
+
+Deferring these to the scaffold is not a neutral reuse: its branch decides from `format`, which
+SimpliX Meta source does not supply, so every temporal field falls through to a plain text input. For
+`time` that is a defect by the frontend handbook's invariant #37, which requires `TimeField` and
+forbids a `type="time"` text input.
+
+**The rest of `FieldInfo` is half data, half presentation, and SimpliX Meta does not carry the
+presentation half.** From SimpliX Meta: `name`, `tsType`, `label` (via `labelKey`), `options` (enum
+values), required-ness, and everything `FilterFieldInfo` needs. NOT from SimpliX Meta: `inputType`,
+`defaultValue`, `capitalizedName`, `isForeignKey`, `fkEntityField`, `isSystemField`, `isI18nPair`,
+`baseFieldName`, `category`, `hideInList` — those are decisions the scaffold already makes, as are
+`formComponent` and `component` for every kind but the three above.
+
+**Reuse the existing derivations rather than re-deriving them**, or a meta domain and an orval
+domain will scaffold differently for the same field:
+
+| Need | Reuse |
+| --- | --- |
+| category and column order | `orderAndCategorizeFields(FieldInfo[]): FieldInfo[]` (exported) |
+| `defaultValue` from a TS type | `getDefaultValue(tsType: string): string` (exported) |
+| the field → `FieldInfo` shape | **`parseZodType`, not `entityFieldsToFieldInfo`** — see below |
+
+**The precedent is `parseZodType`, and the plan previously named the wrong one.** There are two
+field sources in `scaffold-crud.ts` and they are not equivalent: `parseZodType` (`:130`, called at
+`:470`) is the primary path that reads orval's zod text, and `entityFieldsToFieldInfo` (`:286`,
+called at `:1622`) is a **documented fallback** — its own comment says "when Zod schema parsing
+fails (e.g. read-only entities with no Body schema)". They disagree:
+
+| | `parseZodType` (primary) | `entityFieldsToFieldInfo` (fallback) |
+| --- | --- | --- |
+| a temporal field's `tsType` | `"Date"` (from `zod.iso.datetime(`) | `"string"` (from `format`) |
+| `defaultValue` that follows | `new Date()` | `""` |
+| an `object` / `array` field | typed (`string` for a string array, `Record<string, string>` for an i18n map) | **dropped**, unless the name ends `I18n` |
+
+Following the fallback would silently change every date field's initial value and drop the 278
+container and 38 `ref` fields SimpliX Meta carries. Mirror `parseZodType`'s decisions instead, mapping
+from `TypeRef.kind` rather than from zod text, and keep `tsType: "Date"` for `instant` and `date`
+so `getDefaultValue` keeps returning `new Date()`.
+
+**`FieldInfo.tsType` is not the model interface's type.** Task 6 emits `string` for `instant` and
+`date` in `model/<entity>.ts`, which is correct — the wire carries an ISO string. `FieldInfo.tsType`
+is a scaffold-internal signal feeding `getDefaultValue` and the component choice, and there the
+orval path uses `Date`. Keep them different on purpose, and say so in your report.
+
+**One helper is not reusable:** `detectI18nFieldPairs` (`:265`) is not exported. Export it, or
+reproduce it; do not skip it, or a meta domain loses its multilingual field pairing while an orval
+domain keeps it. Say which you did.
+
+**It is not keyed on names alone**, whatever spec §12 says. The condition is
+`name.endsWith("I18n") && tsType === "Record<string, string>"` — **both**, and the second is an
+exact string comparison. Measured: the fixture holds **33** `…I18n` fields, every one of them a
+`Map` container over `string`, and every one has its base field present, so all 33 should pair. A
+generator that renders the `Map` mapping as `Record<string,string>` — the same type, one space
+short — pairs **none** of them, silently. Emit `Record<string, string>` exactly, and assert one
+pairing by name in the test.
+
+**What a failed pairing actually costs, traced through the form.** `detectI18nFieldPairs` sets
+`baseFieldName` on the map field and `isI18nPair` on the plain one, and both drive `form.hbs`:
+
+- `scaffold-crud.ts:1931` collects `i18nFieldPairs` from `baseFieldName` and `:1921` sets
+  `hasI18nFields`. The template then emits `i18nFields: { orgNameI18n: "orgName" }` into
+  `useCrudFormSubmit` (`form.hbs:124`), which is what populates the plain field before submit —
+  `applyI18nFallback(values.orgNameI18n, locales)`, the first non-empty locale value, else `""`.
+  With no pairs the option is never emitted, so **the plain field goes to the server empty**.
+- `form.hbs:235` guards the plain field's own input with `{{#unless this.isI18nPair}}`. Unpaired,
+  that guard opens and **the operator sees `orgName` and `orgNameI18n` as two separate inputs**.
+
+So the one-space difference is not a degraded editor: it is a duplicated field on screen and an
+empty value on the wire, for all 33 pairs.
+
+`SYSTEM_FIELDS` (`:56` — `id`, `displayOrder`, `sortOrder`) *is* purely name-based and carries over
+unchanged; all three occur in SimpliX Meta (`sortOrder` 36, `displayOrder` 22, `id` 12). So do the audit
+regexes (`:82`, `:83`).
+
+Filter operators come from `searchable.operators` — never from parameter-name suffixes, which is
+what the orval path has to do. Labels come from `labelKey`.
+
+- [ ] **Step 2: Choose per domain.** If `generated-meta/` exists for the domain, use SimpliX Meta source; otherwise the existing text-parsing source, unchanged.
+
+- [ ] **Step 2b: Wire the schema into the form, or the constraints reach nothing.**
+
+  §1's second defect is that the client lets an empty string and an over-long value through, and
+  Task 7 fixes it by carrying 440 `maxLength` and 232 `notBlank` constraints into zod. **Nothing
+  consults those schemas today.** `form.hbs` renders fields and mutations and contains no
+  `required`, no schema reference and no validator; `CrudForm` has no schema prop; and
+  `zodToFieldErrors` — the function built for exactly this — is imported **0 times** across the
+  application.
+
+  The seam is already there and documented in its own code. `useCrudFormSubmit` takes a
+  `validator` (`use-crud-form-submit.ts:156`) whose doc comment gives the wiring verbatim
+  (`:69-75`):
+
+  ```ts
+  import { zodToFieldErrors } from "@simplix-react/form";
+  validator: (v) => zodToFieldErrors(OrganizationUpdateDTOSchema, v),
+  ```
+
+  A failing validator sets `fieldErrors`, skips the mutation and keeps the form on screen — the
+  behaviour the generated form needs. Emit that line into `form.hbs`, naming the schema of the DTO
+  the fields came from (Step 1). Without it every constraint this project recovers stops at a file
+  nothing imports, and §1's headline problem survives the whole migration.
+
+- [ ] **Step 3: Templates — BOTH of them.** The line `export * from "./generated/model";` appears
+  in two barrel templates, and changing one leaves the other emitting the orval path:
+
+  | Template | Emitted by | Shape |
+  | --- | --- | --- |
+  | `templates/openapi/user-index-ts.hbs` | `simplix openapi` | unconditional |
+  | `templates/domain/index-ts.hbs` | `simplix add-domain` | inside `{{#if enableOrval}}`; the `{{else}}` branch exports `./schemas` and `./contract` |
+
+  Make the model path a variable in both; for a meta domain it takes `"./generated-meta"`, the
+  barrel Task 11 Step 2 emits, not `"./generated-meta/model"` — the barrel already carries the
+  enums, endpoints, hooks, search and access alongside the models. A meta domain matches neither
+  existing branch of `domain/index-ts.hbs` — it has no `generated/model` and no hand-written
+  `contract.ts` — so that template needs the meta shape as its own case, not a reuse of
+  `{{else}}`.
+
+  Verify with `grep -rn "generated/model" packages/cli/src/templates/` returning nothing but the
+  variable form. The UI templates need no change — they import from the package barrel by name,
+  never from `generated/` (verified).
+
+- [ ] **Step 4: Test** that scaffolding a meta domain produces the same `FieldInfo` set as SimpliX Meta describes, including inherited fields; that a filter's operators come from SimpliX Meta; that an `instant` field yields `DateTimeField`, a `date` field `DateField` and a `time` field `TimeField`, none of them a text input; and that an orval domain still scaffolds identically to before.
+
+- [ ] **Step 5: Run the full suite, then commit**
+
+```bash
+npx vitest run --project cli && pnpm typecheck
+git add packages/cli/src/meta/scaffold-source.ts packages/cli/src/commands/scaffold-crud.ts \
+        packages/cli/src/templates/openapi/user-index-ts.hbs \
+        packages/cli/src/__tests__/scaffold-meta-source.test.ts
+git commit -m "feat(cli): let scaffolding read fields from SimpliX Meta"
+```
+
+---
+
+### Task 14: Move one domain end to end
+
+- [ ] **Step 1** — the captured SimpliX Meta is at `smart-safety-frontend/openapi/meta.json` (2.7 MB) but
+  is **untracked**; decide with the user whether to commit it before relying on it, since the
+  repository is shared with another session. Add the `meta` block to that project's
+  `simplix.config.ts` pointing at it, and leave `export` empty. Run codegen; both outputs exist.
+- [ ] **Step 2** — run `simplix meta-diff` on **`org`**. Measured operation counts per domain:
+  `dashboard` 1, `org` 13, `audit` 15, `worker` 16, `approval` 31, `site` 32, `auth` 39,
+  `data-io` 44, `space` 46, `system` 64, `regulation` 81, `user` 100, `notification` 139 —
+  thirteen domains summing to the 621 matched operations. `dashboard` is the
+  smallest but exercises almost nothing — one operation, no CRUD shape. `org` is the pilot:
+  small enough to read end to end, and its 13 operations are measured to cover more than a plain
+  CRUD set. **It is a tree domain**, and that is deliberate — a pilot that skipped the hard shapes
+  would prove nothing about the rest:
+
+  | Shape | Operations |
+  | --- | --- |
+  | create / list / detail / edit-form / update / delete | `POST /create`, `GET /search`, `GET /{orgId}`, `GET /{orgId}/edit`, `PUT /{orgId}`, `DELETE /{orgId}` |
+  | **tree** | `GET /tree`, `GET /tree/{orgId}` — exercises `buildEmbeddedTree` in the mock |
+  | **reorder** | `PATCH /order` — a `List<XOrderDTO>` body, one of the 49 Task 0 repairs |
+  | **multi-update** | `PATCH` — a `Set<XUpdateDTO>` body, likewise |
+  | **batch** | `PATCH /batch`, `DELETE /batch` |
+  | second entity | `GET /org-type` under `org.OrgType` |
+
+  Also measured: one `searchDto` (`OrganizationSearchDTO`), every operation gated by a
+  `permission` access with no `expression` case, and the app already has screens at
+  `modules/org/src/pages/organization` for Step 5 to drive. Verify each row above rather than
+  stopping once create and list work.
+  Drive the diff to zero errors and record every info-level difference in the task report.
+- [ ] **Step 3** — add that domain to `export`. Run `pnpm typecheck` and `pnpm build`.
+- [ ] **Step 4** — scaffold into a scratch directory and diff, **not into the module.**
+
+  `scaffold-crud.ts` skips every file that already exists (`:929`, `:1945`), and
+  `modules/org/src/widgets/organization/` already holds eight hand-written files —
+  `tree.tsx`, `accounts-tab.tsx`, `scope-reference.tsx`, `use-organization-saved.ts` among them.
+  Run against the module, the command writes nothing and there is no output to compare, so the
+  check silently passes while proving nothing. Use the explicit output instead, which bypasses the
+  module path entirely:
+
+  ```bash
+  simplix scaffold organization --output /tmp/meta-scaffold/org-meta
+  git stash   # or point the config at the orval path
+  simplix scaffold organization --output /tmp/meta-scaffold/org-orval
+  diff -ru /tmp/meta-scaffold/org-orval /tmp/meta-scaffold/org-meta
+  ```
+
+  Read the diff. Field order, component choice and filter definitions must match, except for the
+  three temporal components Task 13 deliberately changes (`DateTimeField` / `DateField` /
+  `TimeField` where the orval path emitted `DateField` or a text input).
+
+  **Report, do not fix — the foreign-key heuristic emits members that do not exist.**
+  `isForeignKey` is `tsType === "string" && name.endsWith("Id") && name !== "id"`
+  (`scaffold-crud.ts:342`, `:471`), and `detail.hbs:131` renders the result as
+  `displayData.{{fkEntityField}}?.name ?? String(displayData.{{name}})`. Measured over SimpliX Meta:
+  **802 fields match the heuristic and only 6 of them have the member it names** —
+  `LinearAssetDetailDTO.linearAssetId` produces `displayData.linearAsset?.name`, and no
+  `linearAsset` member exists. The entity's own primary key matches too (`siteId` alone, 122
+  times), so it is filed as a relation rather than an identifier; both are hidden from lists, so
+  that part is invisible.
+
+  A greenfield meta domain is where this bites, because scaffolding skips files that already exist
+  (Step 4 above) and every domain in this application already has hand-written detail widgets. A
+  freshly scaffolded detail view would not typecheck. This is pre-existing scaffold behaviour, not
+  something the meta path introduces — surface it with the count and let the user decide.
+
+  **The same template hardcodes the audit fields.** `detail.hbs:67` emits
+  `auditData={{ id: displayData.<rowIdField>, createdAt: displayData.createdAt, updatedAt: displayData.updatedAt }}`
+  with no guard. Measured: **55 of the fixture's 59 `…DetailDTO` types carry both, and 4 carry
+  neither** — `ExportLedgerDetailDTO`, `ExportJobDetailDTO`, `SiteSettingsDetailDTO`,
+  `MasterDataHistoryDetailDTO`. Those four do not compile. Unlike the foreign-key case SimpliX Meta can
+  settle this cheaply: pass a `hasAuditFields` flag from the resolved field set and guard the
+  `auditData` prop with it.
+
+  **Report, do not fix:** `ensureSubjectsFile` (`:947`) writes
+  `modules/<name>/src/shared/auth/subjects.ts`, and **no module in this application has that
+  file** — the permission-subject map lives at `packages/console-ui/src/identity/subjects.ts`
+  instead. A scaffold run into a real module would create a second map nothing imports. That is a
+  pre-existing divergence between the CLI's convention and the app's, not something this project
+  introduced; surface it and let the user decide.
+- [ ] **Step 5** — drive the screens in a browser under the `simplix:frontend-e2e` skill. A green typecheck is not evidence a screen works.
+- [ ] **Step 6** — report: which domain, the info-level differences, what the browser pass found.
+  **After deleting `src/generated/`, re-run codegen once and diff `src/locales/*.json`** — the enum
+  filter reads that directory and silently stops filtering without it (Task 11 Step 2b). The file
+  must hold the same enum set as before, not all 145. **Do not delete `src/generated/` yet** — that is the last step after the domain has been exercised, and it is what makes the move irreversible.

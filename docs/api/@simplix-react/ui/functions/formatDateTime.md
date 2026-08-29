@@ -8,7 +8,7 @@
 
 > **formatDateTime**(`date`, `locale?`, `timeZone?`): `string`
 
-Defined in: [packages/headless/dist/index.d.ts:471](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L471)
+Defined in: [packages/headless/dist/index.d.ts:479](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L479)
 
 Medium date + short time — e.g. "Mar 3, 2026, 2:30 PM".
 

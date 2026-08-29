@@ -39,6 +39,21 @@ describe("simplixBootNaming", () => {
       const result = simplixBootNaming.resolveEntityName({ ...baseEntityCtx });
       expect(result).toBe("");
     });
+  it("drops a controller suffix, which a class-name tag carries into every hook", () => {
+    // A controller that declares no @Tag is tagged with its class name. Left in place the suffix
+    // reaches the entity and each of its hooks — `useUpdateLocaleCurrentUserRestController`.
+    expect(simplixBootNaming.resolveEntityName({ ...baseEntityCtx, tag: "CurrentUserRestController" })).toBe(
+      "currentUser",
+    );
+    expect(simplixBootNaming.resolveEntityName({ ...baseEntityCtx, tag: "SiteController" })).toBe("site");
+    // `RestController` is taken first: stripping `Controller` alone would leave `CurrentUserRest`.
+    expect(simplixBootNaming.resolveEntityName({ ...baseEntityCtx, tag: "StreamAdminController" })).toBe(
+      "streamAdmin",
+    );
+    // A dotted tag is untouched.
+    expect(simplixBootNaming.resolveEntityName({ ...baseEntityCtx, tag: "org.Organization" })).toBe("organization");
+  });
+
   });
 
   describe("resolveOperation", () => {

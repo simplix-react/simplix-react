@@ -484,6 +484,20 @@ describe("formTemplate", () => {
 });
 
 describe("detailTemplate", () => {
+  it("names the audit stamps only where the record declares them", () => {
+    // Four of the application's detail DTOs declare neither `createdAt` nor `updatedAt`, and the
+    // panel naming them there does not compile.
+    const withStamps = renderTemplate(detailTemplate, { ...baseCtx, hasAuditFields: true });
+    expect(withStamps).toContain("auditData=");
+    expect(withStamps).toContain("displayData.createdAt");
+
+    const without = renderTemplate(detailTemplate, { ...baseCtx, hasAuditFields: false });
+    expect(without).not.toContain("auditData=");
+    expect(without).not.toContain("displayData.createdAt");
+    // The panel itself still renders; only the stamps go.
+    expect(without).toContain("<CrudDetail");
+  });
+
   it("renders with correct imports", () => {
     const result = renderTemplate(detailTemplate, baseCtx);
     expect(result).toContain("QueryFallback");

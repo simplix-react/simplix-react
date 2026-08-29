@@ -181,7 +181,13 @@ export const simplixBootNaming: OpenApiNamingStrategy = {
 
     // Boot tag convention: "scope.crud.EntityName" or "scope.EntityName"
     const segments = context.tag.split(".");
-    const entitySegment = segments[segments.length - 1];
+    let entitySegment = segments[segments.length - 1];
+
+    // A controller that declares no @Tag is tagged with its class name, so the suffix reaches the
+    // entity and every hook of it — `useUpdateLocaleCurrentUserRestController`. The backend strips
+    // the same suffixes when it derives an operation id, and `RestController` goes first: taking
+    // `Controller` off `CurrentUserRestController` would leave `CurrentUserRest`.
+    entitySegment = entitySegment.replace(/RestController$/, "").replace(/Controller$/, "");
 
     // PascalCase → camelCase
     return entitySegment.charAt(0).toLowerCase() + entitySegment.slice(1);

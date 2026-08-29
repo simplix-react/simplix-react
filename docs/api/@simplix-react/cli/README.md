@@ -346,6 +346,7 @@ simplix openapi <spec> [options]
 | `--dry-run` | Preview files without writing | `false` |
 | `-f, --force` | Force regeneration even if no changes | `false` |
 | `--no-http` | Skip `.http` file generation | - |
+| `--offline` | Read SimpliX Meta from `meta.snapshot` instead of the server | `false` |
 | `--no-mock` | Skip mock layer generation | - |
 | `--header` | Add auto-generated header comment | `true` |
 | `--no-header` | Skip auto-generated header comment | - |
@@ -463,6 +464,81 @@ simplix openapi ./spec.yaml --dry-run
 #   ...
 # Dry run — myapp-domain-store/
 #   ...
+```
+
+### simplix meta-diff
+
+Compare a domain package's two generated outputs — `src/generated/` from orval and
+`src/generated-meta/` from SimpliX Meta — and report where their public names, fields and
+query keys disagree. A domain is switched to the meta output only once this command is quiet.
+
+```bash
+simplix meta-diff <domain> [options]
+```
+
+**Arguments:**
+
+| Argument | Description |
+| --- | --- |
+| `<domain>` | Domain name, as it is spelled in the `openapi` config |
+
+**Options:**
+
+| Flag | Description |
+| --- | --- |
+| `--root <dir>` | Project root (default: discovered from the working directory) |
+| `--package <dir>` | The domain package directory, when it is not under `packages/` |
+| `--expect <file>` | JSON file of renames, required-ness grounds and one-sided names |
+| `--json` | Print the findings as JSON |
+
+Both trees must come from the **same** `simplix openapi` run against the same server. A diff taken
+across two runs reports whatever the backend changed in between.
+
+Findings come at two levels, and the command exits non-zero when there is an error.
+
+| Finding | Level |
+| --- | --- |
+| A type, hook, request function, URL builder, `get<Name>QueryKey`, `as const` map, params type or `create<Name>Handlers` factory present in only one output | error |
+| A `get<Name>QueryKey` whose returned array changed arity or element order | error |
+| A field present in only one output, or whose type changed | error |
+| A field required in the orval output and optional in the meta output | error |
+| A field required in the meta output with no primitive type and no declared ground | error |
+| An enum field moving from a value union to the labeled `{ value, label }` shape | note |
+| A field required in the meta output whose type is `boolean` or `number` | note |
+| A zod constant present in only one output | note |
+| A name difference, required-ness difference or one-sided name declared in `--expect` | note |
+
+Orval's per-operation plumbing — a type per HTTP status, the query-options and mutation-options
+builders, the result and error aliases — has no counterpart in the meta output and is excluded
+rather than reported. How many declarations were excluded is printed with each tree.
+
+**Expectation file:**
+
+Neither output records why a field is required or why a tag was named the way it was, so what the
+project knows is declared rather than guessed.
+
+```json
+{
+  "renames": [
+    {
+      "orval": "useGetAvatar",
+      "meta": ["useGetPublicUserAvatar", "useGetPublicUserAvatarThumbnail"],
+      "reason": "SimpliX Meta follows the @Tag annotation and springdoc does not"
+    }
+  ],
+  "requiredFields": ["UserAccountCreateDTO.email"],
+  "ignore": ["BodyObject", "ErrorDetail"]
+}
+```
+
+A `renames` entry folds into one note only when every name on its `orval` side is present in the
+orval output alone and every name on its `meta` side in the meta output alone; a half-true
+expectation silences nothing.
+
+**Example:**
+
+```bash
+simplix meta-diff org --expect openapi/meta-diff.json
 ```
 
 ### simplix init-ui
@@ -634,6 +710,9 @@ export default {
 | `mock.maxLimit` | Maximum pagination limit for mock handlers | `100` |
 | `codegen.header` | Prepend auto-generated header comment to generated files | `true` |
 | `openapi.domains` | Tag-based domain splitting map: domain name → tag patterns (exact or `/regex/`) | `undefined` (single domain) |
+| `openapi.meta.source` | SimpliX Meta endpoint URL or snapshot path | The spec's origin plus the profile's `metaEndpoint` |
+| `openapi.meta.snapshot` | Where the fetched SimpliX Meta is committed, for `--offline` and for the change gate | `undefined` (the meta half runs every time) |
+| `openapi.meta.export` | Domains whose barrel exports `src/generated-meta/` instead of the Orval output | `[]` |
 
 The config file is loaded using [jiti](https://github.com/unjs/jiti), so TypeScript syntax is supported without compilation.
 
@@ -812,10 +891,13 @@ pnpm add simplix-react
 ## Interfaces
 
 - [CliPlugin](interfaces/CliPlugin.md)
+- [ContainerMapping](interfaces/ContainerMapping.md)
 - [CrudEndpointPattern](interfaces/CrudEndpointPattern.md)
 - [CrudEntityConfig](interfaces/CrudEntityConfig.md)
 - [EntityNameContext](interfaces/EntityNameContext.md)
 - [I18nEntityInfo](interfaces/I18nEntityInfo.md)
+- [MetaExtensionOutput](interfaces/MetaExtensionOutput.md)
+- [OpenAPIMetaConfig](interfaces/OpenAPIMetaConfig.md)
 - [OpenApiNamingStrategy](interfaces/OpenApiNamingStrategy.md)
 - [OpenAPISpecConfig](interfaces/OpenAPISpecConfig.md)
 - [OperationContext](interfaces/OperationContext.md)

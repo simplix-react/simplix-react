@@ -2,5 +2,9 @@
 import "./translations";
 {{/if}}
 export { configure{{PascalName}}Mutator } from "./mutator";
+{{#if generatedModule}}
+export * from "{{generatedModule}}";
+{{else}}
 export * from "./hooks";
 export * from "./generated/model";
+{{/if}}

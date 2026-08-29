@@ -1,20 +1,17 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { createElement, type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { useStreamSubscription } from "../use-stream-subscription";
 import { StreamProvider } from "../stream-provider";
 
 function createMockWrapper(generators?: Record<string, () => unknown>, intervalMs?: number) {
   return function Wrapper({ children }: { children: ReactNode }) {
-    return createElement(
-      StreamProvider,
-      {
-        mock: { enabled: true, generators, intervalMs },
-        subscriptionSync: false,
-        children,
-      },
+    return (
+      <StreamProvider mock={{ enabled: true, generators, intervalMs }} subscriptionSync={false}>
+        {children}
+      </StreamProvider>
     );
   };
 }

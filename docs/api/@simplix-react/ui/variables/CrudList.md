@@ -8,7 +8,7 @@
 
 > `const` **CrudList**: (`__namedParameters`) => `Element` & `object`
 
-Defined in: [packages/ui/src/crud/list/crud-list.tsx:1904](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1904)
+Defined in: [packages/ui/src/crud/list/crud-list.tsx:1849](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/crud-list.tsx#L1849)
 
 Compound component for building CRUD list views with toolbar, table,
 pagination, selection, and bulk actions.
@@ -96,7 +96,11 @@ BulkActions, BulkAction, Empty, and 10+ filter types.
 
 Toggle chips that integrate with [CrudListFilters](../interfaces/CrudListFilters.md) for server-side filtering.
 
-Single-select toggle: clicking an active chip deselects it (shows all).
+<p><b>Several at once.</b> A chip narrows the set rather than choosing from it, so pressing a
+second chip widens the narrowing instead of replacing it, and pressing a lit chip drops that
+value. With every chip off the field carries nothing and the set is unnarrowed. A row where
+only one chip can be lit is a tab strip wearing pills — the reader cannot tell the two apart,
+and the one that answers to a press differently from how it looks is the one that misleads.
 
 <p>The chips flow from the left at their label's width and wrap onto another line when the row
 runs out. They are deliberately NOT stretched to divide the row evenly: an option's width would
@@ -125,7 +129,7 @@ inside it.
 
 ```tsx
 <CrudList.ChipFilter
-  field="status.equals"
+  field="status.in"
   state={list.filters}
   options={[
     { value: "active", label: "Active", icon: <StatusDot color="green" /> },

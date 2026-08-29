@@ -6,7 +6,7 @@
 
 # Interface: TextProps
 
-Defined in: [packages/ui/src/primitives/text.tsx:53](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/text.tsx#L53)
+Defined in: [packages/ui/src/primitives/text.tsx:85](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/text.tsx#L85)
 
 Props for the [Text](../variables/Text.md) component.
 
@@ -37,6 +37,20 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 #### Inherited from
 
 [`CardProps`](CardProps.md).[`accessKey`](CardProps.md#accesskey)
+
+***
+
+### align?
+
+> `optional` **align**: `"inherit"` \| `"center"` \| `"end"` \| `"start"` \| `null`
+
+Defined in: [packages/ui/src/primitives/text.tsx:62](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/text.tsx#L62)
+
+How the text sits in its line box, for the places a caption is centred under something.
+
+#### Inherited from
+
+`TextVariants.align`
 
 ***
 
@@ -921,7 +935,7 @@ Defines the human readable text alternative of aria-valuenow for a range widget.
 
 > `optional` **as**: [`TextTag`](../type-aliases/TextTag.md)
 
-Defined in: [packages/ui/src/primitives/text.tsx:57](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/text.tsx#L57)
+Defined in: [packages/ui/src/primitives/text.tsx:89](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/text.tsx#L89)
 
 Override the rendered HTML tag (default: "p", "code" when font="mono").
 
@@ -1155,7 +1169,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **font**: `"display"` \| `"sans"` \| `"mono"` \| `null`
 
-Defined in: [packages/ui/src/primitives/text.tsx:38](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/text.tsx#L38)
+Defined in: [packages/ui/src/primitives/text.tsx:47](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/text.tsx#L47)
 
 #### Inherited from
 
@@ -3649,7 +3663,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 ### tone?
 
-> `optional` **tone**: `"default"` \| `"primary"` \| `"destructive"` \| `"muted"` \| `null`
+> `optional` **tone**: `"default"` \| `"warning"` \| `"primary"` \| `"destructive"` \| `"muted"` \| `null`
 
 Defined in: [packages/ui/src/primitives/text.tsx:32](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/text.tsx#L32)
 
@@ -3704,3 +3718,15 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 #### Inherited from
 
 [`CardProps`](CardProps.md).[`vocab`](CardProps.md#vocab)
+
+***
+
+### weight?
+
+> `optional` **weight**: `"bold"` \| `"inherit"` \| `"normal"` \| `"medium"` \| `"semibold"` \| `null`
+
+Defined in: [packages/ui/src/primitives/text.tsx:68](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/text.tsx#L68)
+
+#### Inherited from
+
+`TextVariants.weight`

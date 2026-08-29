@@ -8,7 +8,7 @@
 
 > **EmptyState**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/crud/shared/empty-state.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/empty-state.tsx#L18)
+Defined in: [packages/ui/src/crud/shared/empty-state.tsx:32](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/empty-state.tsx#L32)
 
 ## Parameters
 

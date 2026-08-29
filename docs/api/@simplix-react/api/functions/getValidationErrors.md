@@ -8,7 +8,7 @@
 
 > **getValidationErrors**(`error`): [`ValidationFieldError`](../interfaces/ValidationFieldError.md)[] \| `null`
 
-Defined in: [packages/api/src/error-utils.ts:144](https://github.com/simplix-react/simplix-react/blob/main/packages/api/src/error-utils.ts#L144)
+Defined in: [packages/api/src/error-utils.ts:154](https://github.com/simplix-react/simplix-react/blob/main/packages/api/src/error-utils.ts#L154)
 
 Extract validation field errors from any error shape using duck typing.
 

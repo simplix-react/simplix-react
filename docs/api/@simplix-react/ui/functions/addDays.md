@@ -8,7 +8,7 @@
 
 > **addDays**(`d`, `n`): `Date`
 
-Defined in: [packages/headless/dist/index.d.ts:496](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L496)
+Defined in: [packages/headless/dist/index.d.ts:510](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L510)
 
 ## Parameters
 

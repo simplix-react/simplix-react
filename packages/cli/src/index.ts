@@ -3,6 +3,7 @@ export { defineCrudMap } from "./config/define-crud-map.js";
 export type {
   SimplixConfig,
   OpenAPISpecConfig,
+  OpenAPIMetaConfig,
   CrudEndpointPattern,
   CrudEntityConfig,
   CrudMap,
@@ -28,6 +29,8 @@ export type {
   SpecProfile,
   I18nEntityInfo,
   I18nDownloader,
+  ContainerMapping,
+  MetaExtensionOutput,
 } from "./openapi/orchestration/spec-profile.js";
 
 // Plugin registry

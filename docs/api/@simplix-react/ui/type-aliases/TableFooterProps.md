@@ -8,4 +8,4 @@
 
 > **TableFooterProps** = `ComponentPropsWithRef`\<`"tfoot"`\>
 
-Defined in: [packages/ui/src/base/display/table.tsx:254](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/table.tsx#L254)
+Defined in: [packages/ui/src/base/display/table.tsx:266](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/table.tsx#L266)

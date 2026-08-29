@@ -6,7 +6,7 @@
 
 # Interface: TabsListProps
 
-Defined in: [packages/ui/src/base/navigation/tabs.tsx:32](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/tabs.tsx#L32)
+Defined in: [packages/ui/src/base/navigation/tabs.tsx:43](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/tabs.tsx#L43)
 
 ## Extends
 
@@ -3675,7 +3675,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **variant**: `TabsVariant`
 
-Defined in: [packages/ui/src/base/navigation/tabs.tsx:44](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/tabs.tsx#L44)
+Defined in: [packages/ui/src/base/navigation/tabs.tsx:60](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/navigation/tabs.tsx#L60)
 
 Visual style variant. Triggers adapt automatically via context.
 - `"default"` — inline segmented control, auto-width.
@@ -3683,6 +3683,11 @@ Visual style variant. Triggers adapt automatically via context.
 - `"bookmark"` — folder-style tabs sitting on a bottom line. The line is an
   inset shadow (not a border) so the active tab's `bg-card` covers it without
   relying on overflow — the cutout survives `overflow-x-auto` horizontal scroll.
+- `"underline"` — a quiet second level: no track, no fill, the chosen tab marked
+  by a rule under its own label. For tabs nested inside a surface that already
+  carries tabs — a detail panel or a form under a page's own strip — where a
+  second segmented control at the same weight leaves the reader unable to tell
+  which of the two they are inside.
 
 #### Default
 

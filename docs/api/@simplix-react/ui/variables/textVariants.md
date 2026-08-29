@@ -16,7 +16,7 @@ CVA variants for the Text component body typography scale.
 
 ### props?
 
-ConfigVariants\<\{ size: \{ lg: string; base: string; sm: string; caption: string; inherit: string; \}; tone: \{ default: string; muted: string; primary: string; destructive: string; \}; font: \{ sans: string; display: string; mono: string; \}; \}\> & ClassProp
+ConfigVariants\<\{ size: \{ lg: string; base: string; sm: string; caption: string; inherit: string; \}; tone: \{ default: string; muted: string; primary: string; destructive: string; warning: string; \}; font: \{ sans: string; display: string; mono: string; \}; align: \{ ...; \}; weight: \{ ...; \}; \}\> & ClassProp
 
 ## Returns
 

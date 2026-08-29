@@ -16,7 +16,7 @@ CVA variants for the Card component visual configuration.
 
 ### props?
 
-ConfigVariants\<\{ padding: \{ none: string; sm: string; md: string; lg: string; \}; interactive: \{ true: string; false: string; \}; \}\> & ClassProp
+ConfigVariants\<\{ padding: \{ none: string; sm: string; md: string; lg: string; \}; fill: \{ true: string; false: string; \}; interactive: \{ true: string; false: string; \}; \}\> & ClassProp
 
 ## Returns
 

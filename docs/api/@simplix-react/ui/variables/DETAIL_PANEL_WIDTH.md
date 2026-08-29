@@ -8,7 +8,7 @@
 
 > `const` **DETAIL\_PANEL\_WIDTH**: `768` = `768`
 
-Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:145](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L145)
+Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:147](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L147)
 
 How much room the detail gets when the framework is the one deciding, in px.
 

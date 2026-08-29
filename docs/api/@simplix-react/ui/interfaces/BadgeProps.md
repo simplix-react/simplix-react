@@ -6,7 +6,7 @@
 
 # Interface: BadgeProps
 
-Defined in: [packages/ui/src/base/display/badge.tsx:79](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L79)
+Defined in: [packages/ui/src/base/display/badge.tsx:88](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L88)
 
 ## Extends
 
@@ -919,7 +919,7 @@ Defines the human readable text alternative of aria-valuenow for a range widget.
 
 > `optional` **asChild**: `boolean`
 
-Defined in: [packages/ui/src/base/display/badge.tsx:86](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L86)
+Defined in: [packages/ui/src/base/display/badge.tsx:95](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L95)
 
 Render the single child element instead of a `<span>`, merging the badge
 styling onto it (e.g. wrap an `<a>`).
@@ -1217,6 +1217,24 @@ Hints at the type of data that might be entered by the user while editing the el
 #### Inherited from
 
 [`CardProps`](CardProps.md).[`inputMode`](CardProps.md#inputmode)
+
+***
+
+### interactive?
+
+> `optional` **interactive**: `boolean` \| `null`
+
+Defined in: [packages/ui/src/base/display/badge.tsx:31](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L31)
+
+The badge is something the reader presses.
+
+<p>A badge that opens a dialog is still a badge — the shape is what tells them what kind
+of value it is — but a reader has no way to know it is pressable, so the cursor has to say
+so. Written as a class by one screen, which is a rule about pointers living in a screen.
+
+#### Inherited from
+
+`BadgeVariants.interactive`
 
 ***
 
@@ -3686,7 +3704,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **variant**: `"default"` \| `"success"` \| `"warning"` \| `"outline"` \| `"blue"` \| `"cyan"` \| `"fuchsia"` \| `"green"` \| `"indigo"` \| `"lime"` \| `"orange"` \| `"pink"` \| `"purple"` \| `"red"` \| `"teal"` \| `"violet"` \| `"yellow"` \| `"destructive"` \| `"secondary"` \| `"slate"` \| `"amber"` \| `"emerald"` \| `"sky"` \| `"rose"` \| `null`
 
-Defined in: [packages/ui/src/base/display/badge.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L24)
+Defined in: [packages/ui/src/base/display/badge.tsx:33](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/badge.tsx#L33)
 
 #### Inherited from
 

@@ -8,7 +8,7 @@
 
 > **usePageHeader**(`header`): `void`
 
-Defined in: [packages/ui/src/layout/page-header.tsx:98](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L98)
+Defined in: [packages/ui/src/layout/page-header.tsx:109](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L109)
 
 Registers what the page header shows, for as long as the caller is mounted.
 

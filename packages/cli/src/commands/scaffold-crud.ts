@@ -50,10 +50,22 @@ export interface FieldInfo {
    * only on enum fields the row type declares; a badge without it shows the raw constant.
    */
   enumTypeName?: string;
+  /**
+   * Whether the backend can order a list by this field, as `@SearchableField(sortable)` states.
+   *
+   * Absent means nothing states it — an OpenAPI document carries no such flag — and the column
+   * goes on offering the sort it has always offered. `false` is a statement: the column offers
+   * none, because a sort the backend does not implement moves the arrow and leaves the rows.
+   */
+  sortable?: boolean;
+  /** `CrudList.Column`'s `format`, for a field SimpliX Meta types as a moment, a day or a time. */
+  columnFormat?: "date" | "datetime" | "time";
+  /** `CrudList.Column`'s `display`, for a field whose rendering SimpliX Meta settles. */
+  columnDisplay?: "boolean";
 }
 
 /** Fields that exist in the data model but should not be displayed or edited by users. */
-const SYSTEM_FIELDS = ["id", "displayOrder", "sortOrder"];
+export const SYSTEM_FIELDS = ["id", "displayOrder", "sortOrder"];
 
 // ── Mandated list-column ordering (INV#18) ──
 
@@ -262,7 +274,7 @@ export function getDefaultValue(tsType: string): string {
  * Mutates fields in place: marks plain fields with isI18nPair=true,
  * sets baseFieldName on i18n fields, and inherits textarea component.
  */
-function detectI18nFieldPairs(fields: FieldInfo[]): void {
+export function detectI18nFieldPairs(fields: FieldInfo[]): void {
   for (const field of fields) {
     if (field.name.endsWith("I18n") && field.tsType === "Record<string, string>") {
       const baseName = field.name.slice(0, -4);
@@ -577,8 +589,21 @@ export async function findSchemaFile(
   // \w* infixes support Boot-style naming (AdminUserAccountRestUpdateBody)
   const EntityPascal = entityName.charAt(0).toUpperCase() + entityName.slice(1);
   const patterns = [
-    // simplix-react: petSchema = z.object(
-    new RegExp(`\\w*${entityName}\\w*[Ss]chema\\s*=\\s*(?:z|zod)\\.object`, "i"),
+    // simplix-react: petSchema = z.object(, and petSchema = parentSchema.extend(
+    //
+    // The `.extend(` alternative is what makes an inherited DTO discoverable. SimpliX Meta-driven
+    // generator preserves the Java inheritance chain, so a type with a parent is emitted as
+    // `ChildSchema = ParentSchema.extend({ ...own fields... })` and never writes `z.object` under
+    // its own name. Without this, an entity whose every DTO extends another — 27 of the capture's
+    // 139 — is found by nothing here, and the scaffold falls back to its placeholder field set
+    // with no warning, reporting success while emitting an id/name form.
+    //
+    // Orval's own zod output inlines inheritance and contains no `.extend(` at all, so the
+    // alternative cannot change which file is found on the existing path.
+    new RegExp(
+      `\\w*${entityName}\\w*[Ss]chema\\s*=\\s*(?:(?:z|zod)\\.object|\\w+[Ss]chema\\.extend)`,
+      "i",
+    ),
     // Orval Body: UpdatePetBody / AdminUserAccountRestUpdateBody = zod.object(
     new RegExp(`\\w*${EntityPascal}\\w*Body\\s*=\\s*(?:z|zod)\\.object`, "i"),
     // Orval Body|Response: GetPetByIdResponse / AdminUserAccountRestGetResponse = zod.object(
@@ -1271,7 +1296,10 @@ export interface TextFilterFieldInfo {
 // Operator suffixes that are valid for text search
 const TEXT_OPERATOR_SUFFIXES = ["contains", "notContains", "equals", "notEquals", "startsWith", "endsWith"];
 
-// Map operator suffix to SearchOperator enum key
+// Map operator suffix to SearchOperator enum key.
+// Every suffix a filter can carry needs an entry: a miss is substituted downstream rather than
+// left empty (the NumberFilter branch falls back to GREATER_THAN_OR_EQUAL), so an absent operator
+// queries the other direction while compiling and reporting nothing.
 const SUFFIX_TO_ENUM_KEY: Record<string, string> = {
   contains: "CONTAINS",
   notContains: "NOT_CONTAINS",
@@ -1284,6 +1312,11 @@ const SUFFIX_TO_ENUM_KEY: Record<string, string> = {
   greaterThanOrEqualTo: "GREATER_THAN_OR_EQUAL",
   lessThanOrEqualTo: "LESS_THAN_OR_EQUAL",
   in: "IN",
+  notIn: "NOT_IN",
+  between: "BETWEEN",
+  notBetween: "NOT_BETWEEN",
+  isNull: "IS_NULL",
+  isNotNull: "IS_NOT_NULL",
 };
 
 // System params to exclude from filter generation
@@ -1605,6 +1638,13 @@ export const scaffoldCrudCommand = new Command("scaffold")
     const spinner = ora(`Searching for ${entity} schema...`).start();
 
     try {
+      // A domain whose package exports the DTO meta output is read from SimpliX Meta, which states what
+      // the emitted zod text cannot: which DTO a form is, what a parent contributes to it, and
+      // whether the backend can order a list by a column. The dynamic import keeps the module
+      // graph acyclic — the source is written against the contracts declared here.
+      const { loadMetaScaffoldSource } = await import("../meta/scaffold-source.js");
+      const metaSource = await loadMetaScaffoldSource(rootDir, entity);
+
       const schemaResult = await findSchemaFile(rootDir, entity);
 
       // Load snapshot early so it can serve as field fallback
@@ -1612,7 +1652,25 @@ export const scaffoldCrudCommand = new Command("scaffold")
 
       let fields: FieldInfo[];
       let packageName: string | null = null;
-      if (schemaResult) {
+      if (metaSource) {
+        spinner.text = `Read ${entity} from SimpliX Meta (${metaSource.domain})`;
+        fields = metaSource.fields;
+        packageName = schemaResult?.packageName ?? null;
+
+        if (fields.length === 0) {
+          // A placeholder id/name pair here would be a widget set built on two invented fields,
+          // reported as a successful scaffold. SimpliX Meta states what the entity holds, and for these
+          // it states nothing a screen can render.
+          spinner.fail(`No renderable fields for ${entity}`);
+          log.error(
+            `SimpliX Meta states no scalar field for "${entity}" (${metaSource.tag}): it ` +
+            "carries no request body and answers with no record. Write the screen by hand, or " +
+            "add the DTO the entity is read and written as.",
+          );
+          process.exit(1);
+          return;
+        }
+      } else if (schemaResult) {
         spinner.text = `Found schema at ${schemaResult.path}`;
         fields = parseSchemaFields(schemaResult.content, entity);
         packageName = schemaResult.packageName;
@@ -1637,29 +1695,35 @@ export const scaffoldCrudCommand = new Command("scaffold")
       // category/hideInList tags are available everywhere.
       fields = orderAndCategorizeFields(fields);
 
-      const ops = await parseEntityOperations(rootDir, entity);
-
-      // Resolve actual hook names from crud.config.ts
+      // Resolve actual hook names from crud.config.ts, and from SimpliX Meta for a meta domain that
+      // has none: a hand-written entry states an intent SimpliX Meta cannot, so it wins where it exists.
       const crudConfig = await findCrudConfigForEntity(rootDir, entity);
+      const roles = crudConfig ?? metaSource?.roles ?? null;
+
+      const ops =
+        !crudConfig && metaSource
+          ? metaSource.operations
+          : await parseEntityOperations(rootDir, entity);
+
       const toHookName = (opId: string) =>
         `use${opId.charAt(0).toUpperCase()}${opId.slice(1)}`;
-      const hookList = crudConfig?.list ? toHookName(crudConfig.list) : null;
-      const hookGet = crudConfig?.get ? toHookName(crudConfig.get) : null;
-      const hookGetForEdit = crudConfig?.getForEdit ? toHookName(crudConfig.getForEdit) : null;
-      const hookCreate = crudConfig?.create
-        ? toHookName(crudConfig.create)
+      const hookList = roles?.list ? toHookName(roles.list) : null;
+      const hookGet = roles?.get ? toHookName(roles.get) : null;
+      const hookGetForEdit = roles?.getForEdit ? toHookName(roles.getForEdit) : null;
+      const hookCreate = roles?.create
+        ? toHookName(roles.create)
         : null;
-      const hookUpdate = crudConfig?.update
-        ? toHookName(crudConfig.update)
+      const hookUpdate = roles?.update
+        ? toHookName(roles.update)
         : null;
-      const hookDelete = crudConfig?.delete
-        ? toHookName(crudConfig.delete)
+      const hookDelete = roles?.delete
+        ? toHookName(roles.delete)
         : null;
-      const hookOrder = crudConfig?.order
-        ? toHookName(crudConfig.order as string)
+      const hookOrder = roles?.order
+        ? toHookName(roles.order as string)
         : null;
-      const hookTree = crudConfig?.tree
-        ? toHookName(crudConfig.tree)
+      const hookTree = roles?.tree
+        ? toHookName(roles.tree)
         : null;
 
       const fieldNameList = fields.map((f) => f.name).join(", ");
@@ -1668,26 +1732,33 @@ export const scaffoldCrudCommand = new Command("scaffold")
       const hasBooleanFields = fields.some((f) => f.component === "Boolean");
       const hasTextareaFields = fields.some((f) => f.component === "Textarea");
 
-      // Detect path param names for update/delete mutations (Orval-specific)
-      const updatePathParam = crudConfig?.update
-        ? await findMutationPathParam(rootDir, crudConfig.update)
-        : null;
-      const deletePathParam = crudConfig?.delete
-        ? await findMutationPathParam(rootDir, crudConfig.delete)
-        : `${entity}Id`;
+      // Detect path param names for update/delete mutations. SimpliX Meta states them outright; the
+      // Orval path reads them back out of the generated mutation.
+      const updatePathParam = metaSource
+        ? metaSource.updatePathParam ?? null
+        : crudConfig?.update
+          ? await findMutationPathParam(rootDir, crudConfig.update)
+          : null;
+      const deletePathParam = metaSource
+        ? metaSource.deletePathParam ?? `${entity}Id`
+        : crudConfig?.delete
+          ? await findMutationPathParam(rootDir, crudConfig.delete)
+          : `${entity}Id`;
 
       // Resolve row ID field from the entity's get operation path param.
       // e.g. "/sites/:id" → "id", "/users/:username" → "username"
       const getOp = extractedEntity?.operations.find((o) => o.role === "get");
       const pathParamMatch = getOp?.path.match(/:(\w+)(?:\/|$)/);
-      const rowIdField = pathParamMatch?.[1] ?? "id";
-      const filterFields = extractedEntity
-        ? parseFilterParams(extractedEntity.queryParams, extractedEntity.fields)
-        : [];
+      const rowIdField = metaSource?.rowIdField ?? pathParamMatch?.[1] ?? "id";
+      const filterFields = metaSource
+        ? metaSource.filters
+        : extractedEntity
+          ? parseFilterParams(extractedEntity.queryParams, extractedEntity.fields)
+          : [];
 
-      // Detect orderField from the order operation's bodySchema in the snapshot
-      let orderField: string | null = null;
-      if (hookOrder && extractedEntity) {
+      // Detect orderField from the order operation's own body
+      let orderField: string | null = metaSource?.orderField ?? null;
+      if (!orderField && hookOrder && extractedEntity) {
         const orderOp = extractedEntity.operations.find(
           (o) => o.role === "order",
         );
@@ -1761,10 +1832,14 @@ export const scaffoldCrudCommand = new Command("scaffold")
       }
 
       // ── Display name field detection (for all entities) ──
+      // The delete confirmation names the record with it, so a positional guess puts a foreign
+      // key — identical on every row — into the dialog. A field SimpliX Meta pairs with an `…I18n`
+      // sibling is the human-facing text by construction, and the meta source answers with it.
       const commonNameFields = ["name", "title", "label", "displayName"];
-      const displayNameField = fields.find((f) =>
-        commonNameFields.includes(f.name) && f.tsType === "string",
-      )?.name
+      const displayNameField = metaSource?.displayNameField
+        ?? fields.find((f) =>
+          commonNameFields.includes(f.name) && f.tsType === "string",
+        )?.name
         ?? fields.find((f) =>
           f.tsType === "string" && f.name !== rowIdField,
         )?.name
@@ -1790,11 +1865,13 @@ export const scaffoldCrudCommand = new Command("scaffold")
           ?? fields.find((f) => ["sortOrder", "displayOrder", "orderIndex"].includes(f.name))?.name
           ?? "sortOrder";
 
-        // Display name field: prefer common name fields, then fall back to first string field
+        // Display name field: prefer common name fields, then the field SimpliX Meta pairs with an
+        // `…I18n` sibling, and fall back to the first string field only when neither answers.
         const commonNameFields = ["name", "title", "label", "displayName"];
-        treeDisplayNameField = fields.find((f) =>
-          commonNameFields.includes(f.name) && f.tsType === "string",
-        )?.name
+        treeDisplayNameField = metaSource?.displayNameField
+          ?? fields.find((f) =>
+            commonNameFields.includes(f.name) && f.tsType === "string",
+          )?.name
           ?? fields.find((f) =>
             f.tsType === "string" && f.name !== rowIdField && f.name !== treeParentIdField,
           )?.name
@@ -1834,17 +1911,23 @@ export const scaffoldCrudCommand = new Command("scaffold")
         extractedEntity?.operations?.find((o) => o.role === "list") ??
         extractedEntity?.operations?.find((o) => o.role === "search");
       const treeOp = extractedEntity?.operations?.find((o) => o.role === "tree");
-      const listRowType =
-        packageName && listOp?.responseEntityType ? listOp.responseEntityType : null;
-      const treeRowType =
-        packageName && (treeOp?.responseEntityType ?? listOp?.responseEntityType)
+      const metaListRowType = metaSource?.listRowType ?? null;
+      const metaTreeRowType = metaSource?.treeRowType ?? null;
+      const listRowType = metaSource
+        ? (packageName && metaListRowType ? metaListRowType : null)
+        : packageName && listOp?.responseEntityType ? listOp.responseEntityType : null;
+      const treeRowType = metaSource
+        ? (packageName && metaTreeRowType ? metaTreeRowType : null)
+        : packageName && (treeOp?.responseEntityType ?? listOp?.responseEntityType)
           ? (treeOp?.responseEntityType ?? listOp?.responseEntityType)
           : null;
 
       const entityPlural = `${entity}s`;
       // Columns and card lines render the list row, so they are limited to what the list
       // projection returns; the full set stays available to the form and detail templates.
-      const listDtoFields = await readListDtoFieldNames(rootDir, listRowType);
+      const listDtoFields = metaSource
+        ? metaSource.rowProperties ?? null
+        : await readListDtoFieldNames(rootDir, listRowType);
       // An enum column shows a translated label only if it can name its enum, and the row type
       // is where that name is written. Fields the row type does not declare keep no name, so
       // their badge falls back to the constant rather than asking for a key nothing defines.
@@ -1853,7 +1936,17 @@ export const scaffoldCrudCommand = new Command("scaffold")
         const declared = listDtoFields?.get(f.name)?.replace(/\[\]|\s|\|\s*null|\|\s*undefined/g, "");
         return declared && /^[A-Z]\w*$/.test(declared) ? { ...f, enumTypeName: declared } : f;
       };
-      const listFields = (listDtoFields ? fields.filter((f) => listDtoFields.has(f.name)) : fields).map(withEnumType);
+      // A plain field is left out of the columns because its `…I18n` twin renders it. A list
+      // projection that returns the resolved text and not the map leaves neither, so the row loses
+      // the column it is named by — and the table then shows everything about a record except
+      // which record it is.
+      const projected = listDtoFields
+        ? fields.filter((f) => listDtoFields.has(f.name))
+        : fields;
+      const projectedNames = new Set(projected.map((f) => f.name));
+      const listFields = projected
+        .map((f) => (f.isI18nPair && !projectedNames.has(`${f.name}I18n`) ? { ...f, isI18nPair: false } : f))
+        .map(withEnumType);
       const ctx = {
         EntityPascal,
         entityKebab,
@@ -1876,9 +1969,14 @@ export const scaffoldCrudCommand = new Command("scaffold")
         updatePathParam,
         updateMutationKey,
         deletePathParam,
-        entityPath: extractedEntity?.path ?? `/api/v1/${entity}`,
+        entityPath: metaSource?.entityPath ?? extractedEntity?.path ?? `/api/v1/${entity}`,
         fieldNameList,
         rowIdField,
+        // The detail panel names the two stamps outright, and a record that declares neither does
+        // not compile with them. Four of this application's detail DTOs are such records.
+        hasAuditFields:
+          fields.some((f) => f.name === "createdAt") &&
+          fields.some((f) => f.name === "updatedAt"),
         hasList: ops.hasList,
         hasForm: ops.hasCreate || ops.hasUpdate,
         hasDetail: ops.hasGet,
@@ -1984,6 +2082,15 @@ export const scaffoldCrudCommand = new Command("scaffold")
         .filter(([, v]) => v)
         .map(([k]) => k.replace("has", "").toLowerCase());
       log.info(`Operations: ${activeOps.join(", ")}`);
+
+      if (metaSource && metaSource.unreachableRoles.length > 0) {
+        // No generated screen offers a multi-select, so nothing sends these requests. They are
+        // named here rather than left to be discovered as endpoints nobody calls.
+        log.warn(
+          `${entity}: the backend offers ${metaSource.unreachableRoles.join(", ")}, which no ` +
+          "generated screen reaches — a multi-select toolbar is written by hand.",
+        );
+      }
 
       const skipped: string[] = [];
       if (!ops.hasList) skipped.push("list (no list operation)");

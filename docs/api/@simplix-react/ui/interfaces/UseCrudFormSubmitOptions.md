@@ -22,13 +22,21 @@ Options for the [useCrudFormSubmit](../functions/useCrudFormSubmit.md) hook.
 
 ## Properties
 
-### create
+### create?
 
-> **create**: [`CrudMutation`](CrudMutation.md)\<`T`\>
+> `optional` **create**: [`CrudMutation`](CrudMutation.md)\<`T`\>
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L17)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L26)
 
-Create mutation hook result.
+Create mutation hook result. Omit it on a form that only ever edits.
+
+#### Remarks
+
+A form reached from a record — an edit panel, a settings pane — has no create path, and
+demanding one here meant registering a mutation the screen never calls. That is what sent
+those forms to a raw `mutateAsync` with a toast instead, which throws away the per-field
+detail the server sends with a refusal. One of `create` and `update` has to be there for the
+mode the form is in.
 
 ***
 
@@ -46,7 +54,7 @@ Entity ID for edit mode. When nullish, create mode is used.
 
 > `optional` **i18nFields**: `Record`\<`string`, `string`\>
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L24)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:33](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L33)
 
 Map of i18n field name → plain field name. Before submit, each plain
 field is populated from `applyI18nFallback(values[i18nField], locales)`.
@@ -57,7 +65,7 @@ field is populated from `applyI18nFallback(values[i18nField], locales)`.
 
 > `optional` **locales**: readonly `object`[]
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L29)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:38](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L38)
 
 Locale config order for fallback (typically `useLocalePicker().locales`).
 Required when `i18nFields` is provided.
@@ -66,15 +74,28 @@ Required when `i18nFields` is provided.
 
 ### onSuccess()?
 
-> `optional` **onSuccess**: () => `void`
+> `optional` **onSuccess**: (`result`) => `void`
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:31](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L31)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:48](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L48)
 
-Called after a successful create or update.
+Called after a successful create or update, with whatever the mutation answered.
+
+#### Parameters
+
+##### result
+
+`unknown`
 
 #### Returns
 
 `void`
+
+#### Remarks
+
+A create form that navigates to the record it just made needs the new id, and the answer is
+the only place it exists. The argument is `unknown` because create and update answer with
+different shapes; narrow it the way the rest of the screen reads a response. Callers that do
+not need it ignore it, as they always have.
 
 ***
 
@@ -82,7 +103,7 @@ Called after a successful create or update.
 
 > `optional` **update**: [`CrudMutation`](CrudMutation.md)\<\{ `dto`: `T`; `id`: `TId`; \}\>
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L19)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L28)
 
 Update mutation hook result. Required for edit mode.
 
@@ -92,7 +113,7 @@ Update mutation hook result. Required for edit mode.
 
 > `optional` **validator**: (`values`) => `Record`\<`string`, `string`\> \| `null`
 
-Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:67](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L67)
+Defined in: [packages/ui/src/crud/form/use-crud-form-submit.ts:84](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/form/use-crud-form-submit.ts#L84)
 
 Optional client-side validator. Runs on submit BEFORE the server
 mutation. Receives the raw form values (pre-i18n-fallback) and must

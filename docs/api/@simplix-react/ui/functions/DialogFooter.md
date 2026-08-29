@@ -8,7 +8,7 @@
 
 > **DialogFooter**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/base/overlay/dialog.tsx:170](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/dialog.tsx#L170)
+Defined in: [packages/ui/src/base/overlay/dialog.tsx:173](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/dialog.tsx#L173)
 
 ## Parameters
 

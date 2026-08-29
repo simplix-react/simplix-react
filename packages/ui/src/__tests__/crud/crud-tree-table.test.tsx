@@ -42,6 +42,74 @@ const treeData: TreeNode[] = [
   },
 ];
 
+interface StampedNode {
+  id: string;
+  name: string;
+  status: string;
+  updatedAt: string;
+  children: StampedNode[];
+}
+
+const stamped: StampedNode[] = [
+  {
+    id: "1",
+    name: "Category A",
+    status: "active",
+    updatedAt: "2026-07-06T09:30:00Z",
+    children: [],
+  },
+];
+
+describe("CrudTree.Column display and format", () => {
+  // A tree cell renders through the same function a list cell does, so a column declaring
+  // `format` or `display` means the same thing in either table.
+  it("formats a temporal column instead of printing the instant", () => {
+    render(
+      <CrudTree>
+        <CrudTree.Table data={stamped}>
+          <CrudTree.Column<StampedNode> field="name" header="Name" />
+          <CrudTree.Column<StampedNode> field="updatedAt" header="Updated" format="date" />
+        </CrudTree.Table>
+      </CrudTree>,
+    );
+    expect(screen.queryByText("2026-07-06T09:30:00Z")).toBeNull();
+    expect(screen.getByText(/Jul/)).toBeTruthy();
+  });
+
+  it("renders a badge column with its translated label", () => {
+    render(
+      <CrudTree>
+        <CrudTree.Table data={stamped}>
+          <CrudTree.Column<StampedNode> field="name" header="Name" />
+          <CrudTree.Column<StampedNode>
+            field="status"
+            header="Status"
+            display="badge"
+            variants={{ active: "default" }}
+            enumName="Status"
+            enumLabel={(_enumName, value) => (value === "active" ? "In use" : value)}
+          />
+        </CrudTree.Table>
+      </CrudTree>,
+    );
+    expect(screen.getByText("In use")).toBeTruthy();
+  });
+
+  it("still hands the render prop the raw value", () => {
+    render(
+      <CrudTree>
+        <CrudTree.Table data={stamped}>
+          <CrudTree.Column<StampedNode> field="name" header="Name" />
+          <CrudTree.Column<StampedNode> field="updatedAt" header="Updated" format="date">
+            {({ value }) => <span>raw:{String(value)}</span>}
+          </CrudTree.Column>
+        </CrudTree.Table>
+      </CrudTree>,
+    );
+    expect(screen.getByText("raw:2026-07-06T09:30:00Z")).toBeTruthy();
+  });
+});
+
 describe("CrudTree.Table", () => {
   it("renders tree data with column headers", () => {
     render(

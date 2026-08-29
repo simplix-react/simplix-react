@@ -306,7 +306,8 @@ describe("DetailDateField (extended)", () => {
     );
     const wrapper = screen.getByTestId("detail-field-created");
     expect(wrapper.className).toContain("flex");
-    expect(wrapper.className).toContain("justify-between");
+    // The label and its value stay together; spreading them is `trailing`'s layout, not this one.
+    expect(wrapper.className).not.toContain("justify-between");
   });
 });
 

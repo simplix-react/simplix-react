@@ -8,4 +8,4 @@
 
 > **SheetTitleProps** = `ComponentPropsWithRef`\<*typeof* `DialogPrimitive.Title`\>
 
-Defined in: [packages/ui/src/base/overlay/sheet.tsx:139](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/sheet.tsx#L139)
+Defined in: [packages/ui/src/base/overlay/sheet.tsx:145](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/sheet.tsx#L145)

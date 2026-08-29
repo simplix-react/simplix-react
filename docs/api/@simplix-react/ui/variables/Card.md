@@ -8,4 +8,4 @@
 
 > `const` **Card**: `ComponentType`\<`Omit`\<[`CardProps`](../interfaces/CardProps.md), `"ref"`\> & `RefAttributes`\<`HTMLElement`\>\>
 
-Defined in: [packages/ui/src/primitives/card.tsx:85](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/card.tsx#L85)
+Defined in: [packages/ui/src/primitives/card.tsx:88](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/card.tsx#L88)

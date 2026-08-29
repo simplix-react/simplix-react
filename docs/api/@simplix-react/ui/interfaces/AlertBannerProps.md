@@ -6,7 +6,7 @@
 
 # Interface: AlertBannerProps
 
-Defined in: [packages/ui/src/base/feedback/alert-banner.tsx:69](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/alert-banner.tsx#L69)
+Defined in: [packages/ui/src/base/feedback/alert-banner.tsx:122](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/alert-banner.tsx#L122)
 
 Props for [AlertBanner](../variables/AlertBanner.md).
 
@@ -973,7 +973,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **bordered**: `boolean`
 
-Defined in: [packages/ui/src/base/feedback/alert-banner.tsx:81](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/alert-banner.tsx#L81)
+Defined in: [packages/ui/src/base/feedback/alert-banner.tsx:139](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/alert-banner.tsx#L139)
 
 Render the tinted border. Defaults to `true`; `"hint"` density forces `false`.
 
@@ -983,7 +983,7 @@ Render the tinted border. Defaults to `true`; `"hint"` density forces `false`.
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/base/feedback/alert-banner.tsx:85](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/alert-banner.tsx#L85)
+Defined in: [packages/ui/src/base/feedback/alert-banner.tsx:143](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/alert-banner.tsx#L143)
 
 Free-form body. When present, replaces `title`/`subtitle`.
 
@@ -997,7 +997,7 @@ Free-form body. When present, replaces `title`/`subtitle`.
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/base/feedback/alert-banner.tsx:87](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/alert-banner.tsx#L87)
+Defined in: [packages/ui/src/base/feedback/alert-banner.tsx:145](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/alert-banner.tsx#L145)
 
 Extra classes merged onto the outer container.
 
@@ -1111,7 +1111,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **density**: [`AlertDensity`](../type-aliases/AlertDensity.md)
 
-Defined in: [packages/ui/src/base/feedback/alert-banner.tsx:79](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/alert-banner.tsx#L79)
+Defined in: [packages/ui/src/base/feedback/alert-banner.tsx:137](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/alert-banner.tsx#L137)
 
 Visual density. Defaults to `"default"`. The `"hint"` density implies borderless.
 
@@ -1185,9 +1185,12 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **icon**: [`IconComponent`](../type-aliases/IconComponent.md)
 
-Defined in: [packages/ui/src/base/feedback/alert-banner.tsx:73](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/alert-banner.tsx#L73)
+Defined in: [packages/ui/src/base/feedback/alert-banner.tsx:131](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/alert-banner.tsx#L131)
 
-Caller-supplied icon component rendered in the leading slot.
+Icon component rendered in the leading slot. Defaults to the glyph the tone carries — see
+TONE\_GLYPH, which is where a tinted banner gets its shape without any caller
+remembering to. Pass one only to say something the tone does not: the subject of the banner
+rather than its severity.
 
 ***
 
@@ -3607,7 +3610,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **subtitle**: `ReactNode`
 
-Defined in: [packages/ui/src/base/feedback/alert-banner.tsx:77](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/alert-banner.tsx#L77)
+Defined in: [packages/ui/src/base/feedback/alert-banner.tsx:135](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/alert-banner.tsx#L135)
 
 Secondary line (already translated). Ignored when `children` is provided.
 
@@ -3653,7 +3656,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **title**: `ReactNode`
 
-Defined in: [packages/ui/src/base/feedback/alert-banner.tsx:75](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/alert-banner.tsx#L75)
+Defined in: [packages/ui/src/base/feedback/alert-banner.tsx:133](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/alert-banner.tsx#L133)
 
 Primary line (already translated). Ignored when `children` is provided.
 
@@ -3663,7 +3666,7 @@ Primary line (already translated). Ignored when `children` is provided.
 
 > `optional` **tone**: [`StatusTone`](../type-aliases/StatusTone.md)
 
-Defined in: [packages/ui/src/base/feedback/alert-banner.tsx:71](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/alert-banner.tsx#L71)
+Defined in: [packages/ui/src/base/feedback/alert-banner.tsx:124](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/alert-banner.tsx#L124)
 
 Status tone driving the surface tint and icon color. Defaults to `"info"`.
 
@@ -3673,7 +3676,7 @@ Status tone driving the surface tint and icon color. Defaults to `"info"`.
 
 > `optional` **trailing**: `ReactNode`
 
-Defined in: [packages/ui/src/base/feedback/alert-banner.tsx:83](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/alert-banner.tsx#L83)
+Defined in: [packages/ui/src/base/feedback/alert-banner.tsx:141](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/feedback/alert-banner.tsx#L141)
 
 Trailing slot rendered at the right edge (e.g. a `Badge`).
 

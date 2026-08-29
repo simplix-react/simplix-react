@@ -8,13 +8,13 @@
 
 > `const` **buttonVariants**: (`props?`) => `string`
 
-Defined in: [packages/ui/src/base/controls/button.tsx:9](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L9)
+Defined in: [packages/ui/src/base/controls/button.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L18)
 
 ## Parameters
 
 ### props?
 
-ConfigVariants\<\{ variant: \{ default: string; primary: string; destructive: string; outline: string; secondary: string; ghost: string; link: string; \}; size: \{ default: string; xs: string; sm: string; lg: string; icon: string; "icon-sm": string; "icon-xs": string; \}; \}\> & ClassProp
+ConfigVariants\<\{ variant: \{ default: string; primary: string; destructive: string; outline: string; secondary: string; ghost: string; link: string; \}; tone: \{ default: string; muted: string; \}; fill: \{ true: string; false: string; \}; justify: \{ ...; \}; size: \{ ...; \}; \}\> & ClassProp
 
 ## Returns
 
