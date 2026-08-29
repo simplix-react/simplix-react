@@ -11,7 +11,6 @@ import {createElement, Fragment, type ReactNode, type Ref, useCallback, useEffec
 
 import {
   type BadgeVariants,
-  BooleanBadge,
   type TableProps,
   Tooltip,
   TooltipContent,
@@ -31,9 +30,6 @@ import {useFlatUIComponents} from "../../provider/ui-provider";
 import {useUIDefaults} from "../../provider/ui-defaults-context";
 import {Flex, Stack} from "../../primitives";
 import {cn} from "../../utils/cn";
-import {formatDateMedium, formatDateTime, formatRelativeTime} from "../../utils/format-date";
-import {formatWallClockTime} from "../../utils/rfc3339-date";
-import {parseDate} from "../../utils/parse-date";
 import type {ColumnInfo, EmptyReason, SortState} from "../shared";
 import {
   CrudListColumnContext,
@@ -46,7 +42,7 @@ import {
 import type {CrudListViewMode} from "../shared";
 import {EmptyState} from "../shared/empty-state";
 import {TableCardFrame, useTableCardFrame} from "../shared/table-card-frame";
-import { CountryCell, PhoneCell } from "./cells";
+import { renderCellContent } from "../shared/cell-content";
 import {AlertTriangleIcon, CloudOffIcon, FunnelIcon, MagnifyingGlassIcon} from "../shared/icons";
 import {getActionColumnWidth, RowActionCell, type ActionVariant, type RowActionDef} from "../shared/row-actions";
 import {
@@ -353,47 +349,6 @@ function ListColumn<T>(_props: ListColumnProps<T>): ReactNode {
 }
 
 // ── Format helpers ──
-
-/**
- * Resolve enum-like objects to their plain value.
- * Boot API returns enums as `{ type, value, label }` objects.
- * This extracts `.value` so rendering/formatting works correctly.
- */
-function resolveValue(value: unknown): unknown {
-  if (typeof value === "object" && value !== null && "value" in value && "type" in value) {
-    return (value as { value: unknown }).value;
-  }
-  return value;
-}
-
-function formatCellValue(
-  value: unknown,
-  format?: "date" | "datetime" | "time" | "relative",
-  locale?: string,
-  timeZone?: string,
-): string {
-  if (value == null) return "";
-  if (!format) return String(value);
-
-  // Wall-clock columns (format="time") hold an HH:mm[:ss] LocalTime string with no
-  // calendar day, so they never go through Date parsing.
-  if (format === "time") return formatWallClockTime(String(value), locale) ?? String(value);
-
-  // Date-only columns (format="date") parse the LocalDate string as a local
-  // calendar date (parseDate), avoiding new Date("2026-07-06")'s UTC-midnight
-  // shift that renders the previous day west of UTC. datetime/relative keep
-  // UTC/offset-aware parsing for real timestamps.
-  const date =
-    format === "date"
-      ? (value instanceof Date ? value : parseDate(String(value)))
-      : (value instanceof Date ? value : new Date(String(value)));
-  if (!date || Number.isNaN(date.getTime())) return String(value);
-
-  if (format === "date") return formatDateMedium(date, locale);
-  // timeZone applies to absolute instants only; date/time/relative are zone-neutral.
-  if (format === "datetime") return formatDateTime(date, locale, timeZone);
-  return formatRelativeTime(date, locale);
-}
 
 // ── Action types ──
 
@@ -1248,45 +1203,12 @@ function ListTable<T>({
           }
           return content;
         },
-        cell: ({ getValue, row }) => {
-          const raw = getValue();
-          const value = resolveValue(raw);
-
-          // Custom render prop (pass raw for full access)
-          if (colDef.children) {
-            return colDef.children({ value: raw, row: row.original });
-          }
-
-          // Badge display
-          if (colDef.display === "badge" && colDef.variants) {
-            const strVal = String(value ?? "");
-            const variant = colDef.variants[strVal] ?? "default";
-            const label = colDef.enumName && colDef.enumLabel ? colDef.enumLabel(colDef.enumName, strVal) : strVal;
-            return <Badge variant={variant}>{label}</Badge>;
-          }
-
-          // Boolean display
-          if (colDef.display === "boolean") {
-            return <BooleanBadge value={!!value} />;
-          }
-
-          // Country display
-          if (colDef.display === "country") {
-            return <CountryCell value={String(value ?? "")} />;
-          }
-
-          // Phone display
-          if (colDef.display === "phone") {
-            return <PhoneCell value={String(value ?? "")} />;
-          }
-
-          // Format
-          const cellZone =
-            (typeof colDef.displayZone === "function"
-              ? colDef.displayZone(row.original)
-              : colDef.displayZone) ?? defaultDisplayZone;
-          return formatCellValue(value, colDef.format, locale, cellZone);
-        },
+        cell: ({ getValue, row }) =>
+          renderCellContent(colDef, getValue(), row.original, {
+            Badge,
+            locale,
+            defaultDisplayZone,
+          }),
         size: declaredWidth,
         meta: { flexible, fixed: colDef.width !== undefined } satisfies ColumnSizing,
       });
