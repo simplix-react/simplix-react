@@ -154,19 +154,6 @@ function resolveGapClasses(gap: string, gapX?: string | null, gapY?: string | nu
   );
 }
 
-/** Gap sizes as CSS lengths, used to position column divider lines. */
-const gapSizeMap: Record<string, string> = {
-  none: "0rem",
-  px: "1px",
-  xs: "0.25rem",
-  sm: "0.5rem",
-  md: "1rem",
-  lg: "1.5rem",
-  xl: "2rem",
-};
-
-
-/** Half of each gap, as the Tailwind spacing step used to centre a cell border in the gutter. */
 /**
  * The column rule, per horizontal gap, for a grid whose column count is fixed and for one that
  * collapses to a single column at narrow widths.
