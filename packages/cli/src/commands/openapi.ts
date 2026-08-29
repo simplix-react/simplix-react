@@ -774,7 +774,7 @@ async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
       ? metaIndexContent(hasTranslations)
       : renderTemplate(domainIndexTs, {
           enableI18n: hasTranslations,
-          enableOrval: true,
+          enableCodegen: true,
           PascalName: toPascalCase(domainName),
         });
     const indexPath = join(targetDir, "src/index.ts");

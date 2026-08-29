@@ -165,7 +165,7 @@ export async function writeMetaOutput(options: WriteMetaOptions): Promise<WriteM
 export function metaIndexContent(importTranslations: boolean): string {
   return renderTemplate(domainIndexTs, {
     enableI18n: importTranslations,
-    enableOrval: true,
+    enableCodegen: true,
     generatedModule: META_MODULE,
   });
 }

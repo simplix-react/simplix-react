@@ -64,7 +64,10 @@ export function {{EntityPascal}}Detail({ {{entity}}Id, onClose, onBack{{#if hasU
 
   return (
     <>
-      <CrudDetail isLoading={isLoading} header={header} onClose={onClose} auditData={{ldb}} id: displayData.{{rowIdField}}, createdAt: displayData.createdAt, updatedAt: displayData.updatedAt {{rdb}} footer={
+      {{!-- The stamps are rendered only where the record carries them: four of this
+           application's detail DTOs declare neither, and naming them there does not
+           compile. --}}
+      <CrudDetail isLoading={isLoading} header={header} onClose={onClose}{{#if hasAuditFields}} auditData={{ldb}} id: displayData.{{rowIdField}}, createdAt: displayData.createdAt, updatedAt: displayData.updatedAt {{rdb}}{{/if}} footer={
         <CrudDetail.DefaultActions
           onClose={onClose}
           onBack={onBack}

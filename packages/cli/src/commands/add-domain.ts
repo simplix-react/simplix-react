@@ -147,9 +147,10 @@ export const addDomainCommand = new Command("add-domain")
         projectName: baseName,
         scope,
         enableI18n,
-        // The barrel points at whichever half generates this domain. `simplix meta` rewrites
-        // it on the first run, but a package that builds before then should already resolve.
-        enableOrval: useOrval || useMeta,
+        // A generator owns this package's surface, whichever one it is; `generatedModule`
+        // below says where that surface lives. `simplix meta` rewrites the barrel on its first
+        // run, but a package that builds before then should already resolve.
+        enableCodegen: useOrval || useMeta,
         ...(useMeta ? { generatedModule: "./generated-meta" } : {}),
         locales,
         apiBasePath: `${apiBaseUrl}/${name}`,

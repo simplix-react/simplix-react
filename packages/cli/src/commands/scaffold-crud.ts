@@ -1972,6 +1972,11 @@ export const scaffoldCrudCommand = new Command("scaffold")
         entityPath: metaSource?.entityPath ?? extractedEntity?.path ?? `/api/v1/${entity}`,
         fieldNameList,
         rowIdField,
+        // The detail panel names the two stamps outright, and a record that declares neither does
+        // not compile with them. Four of this application's detail DTOs are such records.
+        hasAuditFields:
+          fields.some((f) => f.name === "createdAt") &&
+          fields.some((f) => f.name === "updatedAt"),
         hasList: ops.hasList,
         hasForm: ops.hasCreate || ops.hasUpdate,
         hasDetail: ops.hasGet,
