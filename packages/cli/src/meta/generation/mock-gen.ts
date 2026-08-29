@@ -312,12 +312,29 @@ class MockEntity {
         refNameOf(payloadOf(one.operation.response, this.domain)) !== undefined,
     );
     const identified = singleGets.find((one) => /\{\w+\}$/.test(one.operation.path));
-    const chosen = identified ?? singleGets[0];
-    if (chosen) return this.typeNamed(refNameOf(payloadOf(chosen.operation.response, this.domain)));
+    if (identified) {
+      return this.typeNamed(refNameOf(payloadOf(identified.operation.response, this.domain)));
+    }
 
-    // Nothing returns one record, so the element of whatever a list returns is the next best
-    // reading of what this entity holds, and a request body the last.
+    // No route addresses one record. What a list answers with is what this entity holds; another
+    // GET returning a bare reference is a sub-resource or a census — a different shape under the
+    // same tag. `notification.NotificationCentre` has both, and reading the first bare reference
+    // typed its store by the census while its rows are notifications.
     const gets = this.targets.filter((one) => one.operation.method === "GET");
+    // After the envelope, which wraps every response and would otherwise make each one a
+    // container. What remains is a container only where the route answers with several records.
+    const listed = this.firstInnermost(
+      gets
+        .filter(
+          (one) => payloadOf(one.operation.response, this.domain)?.kind === "container",
+        )
+        .map((one) => one.operation.response),
+    );
+    if (listed) return listed;
+
+    if (singleGets[0]) {
+      return this.typeNamed(refNameOf(payloadOf(singleGets[0].operation.response, this.domain)));
+    }
     return (
       this.firstInnermost(gets.map((one) => one.operation.response)) ??
       this.firstInnermost(this.targets.map((one) => one.operation.response)) ??

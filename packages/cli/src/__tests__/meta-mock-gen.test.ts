@@ -298,7 +298,7 @@ describe("the identifier and its type are read from the IR, never guessed from a
     expect(entry).not.toContain('auditLogSeeds, "auditEventId"');
   });
 
-  it("reads a string parameter as text — all 203 of them, and none as a number", () => {
+  it("reads a string parameter as text — all 210 of them, and none as a number", () => {
     let asText = 0;
     for (const [name] of generated) {
       const content = handlersOf(name);
@@ -307,7 +307,7 @@ describe("the identifier and its type are read from the IR, never guessed from a
       // the lookup misses and the fallback answers with the first row for every id.
       expect(content, name).not.toContain("Number(params.");
     }
-    expect(asText).toBe(203);
+    expect(asText).toBe(210);
   });
 
   it("reads a numeric parameter as a number when the IR says so", () => {
@@ -338,7 +338,7 @@ describe("the identifier and its type are read from the IR, never guessed from a
 });
 
 describe("a handler filters by a path parameter only when the store's DTO declares it", () => {
-  it("names no property the store's own type is missing — all 115 references", () => {
+  it("names no property the store's own type is missing — all 123 references", () => {
     let references = 0;
     for (const [name] of generated) {
       for (const [entity, body] of factoriesOf(handlersOf(name))) {
@@ -353,7 +353,7 @@ describe("a handler filters by a path parameter only when the store's DTO declar
         }
       }
     }
-    expect(references).toBe(115);
+    expect(references).toBe(123);
   });
 
   it("answers with the whole list where the parameter names no field of the store", () => {
@@ -367,7 +367,7 @@ describe("a handler filters by a path parameter only when the store's DTO declar
     expect(sameTarget).not.toContain("item.auditLogId");
 
     const reported = [...generated.values()].flatMap((one) => one.unmatchableParameters);
-    expect(reported).toHaveLength(13);
+    expect(reported).toHaveLength(6);
     expect(reported).toContainEqual({
       tag: "audit.AuditLog",
       operation: "AuditLogRest_sameTarget",
@@ -448,6 +448,14 @@ describe("a reorder writes the field its own body declares", () => {
 });
 
 describe("the store's DTO is derived from what a response carries", () => {
+  it("holds what a list answers with where no route addresses one record", () => {
+    // `notification.NotificationCentre` has no `/{id}` read. Its other bare-reference GETs are a
+    // sub-resource and a census — different shapes under the same tag — so reading the first of
+    // them typed the store by the census while its rows are notifications.
+    const factory = factoryOf("notification", "NotificationCentre");
+    expect(/MockEntityStore<(\w+)>/.exec(factory)?.[1]).toBe("NotificationListDTO");
+  });
+
   it("lands on the six types the application's own site package uses", () => {
     const site = factoriesOf(handlersOf("site"));
     const typeOf = (entity: string): string | undefined =>
