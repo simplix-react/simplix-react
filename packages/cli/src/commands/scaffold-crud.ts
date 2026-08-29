@@ -18,7 +18,7 @@ import {
   treeTemplate,
 } from "../templates/ui/index.js";
 import type { EntityField, ExtractedEntity, OpenAPISnapshot, QueryParam } from "../openapi/types.js";
-import { toKebabCase, toPascalCase } from "../utils/case.js";
+import { toEntityName, toKebabCase, toPascalCase } from "../utils/case.js";
 import { pathExists, readJsonFile, writeFileWithDir, findProjectRoot } from "../utils/fs.js";
 import {
   GENERATED_PAGE_MARKER,
@@ -930,15 +930,31 @@ async function updateWidgetsIndex(
 
 // ── Pages generation ──
 
+/** What one entity's pages run left behind. */
+interface GeneratedPages {
+  /** Page files written by this run. */
+  written: string[];
+  /**
+   * Page files whose template rendered to nothing.
+   *
+   * A page with no content is not a page, and writing one is how a scaffold reports success over
+   * an entity it generated no screen for: the module gets a zero-byte barrel nothing imports, the
+   * run prints a file count, and the first thing to notice is a dev server failing to resolve it.
+   * These are named to the caller instead, which fails the run.
+   */
+  empty: string[];
+}
+
 async function generatePages(
   moduleDir: string,
   entityKebab: string,
   ctx: Record<string, unknown>,
   /** What the project has taken over; empty where it has taken nothing over. */
   templates: ProjectTemplates = new Map(),
-): Promise<string[]> {
+): Promise<GeneratedPages> {
   const pagesDir = join(moduleDir, "src", "pages", entityKebab);
   const generated: string[] = [];
+  const empty: string[] = [];
 
   if (ctx.hasCreate) {
     await ensureSubjectsFile(moduleDir);
@@ -978,6 +994,10 @@ async function generatePages(
   for (const [fileName, content] of Object.entries(pageFiles)) {
     const filePath = join(pagesDir, fileName);
     const stamped = content.includes(GENERATED_PAGE_MARKER) ? stampFingerprint(content) : content;
+    if (stamped.trim().length === 0) {
+      empty.push(fileName);
+      continue;
+    }
     if (await pathExists(filePath)) {
       const held = await readFile(filePath, "utf-8");
       // A page is scaffolded and then written on, so carrying the marker proves only where the
@@ -1001,7 +1021,7 @@ async function generatePages(
     generated.push(fileName);
   }
 
-  return generated;
+  return { written: generated, empty };
 }
 
 /**
@@ -1626,7 +1646,12 @@ export const scaffoldCrudCommand = new Command("scaffold")
     "--app <dir>",
     "Target Expo app under apps/ for route files (with --native)",
   )
-  .action(async (entity: string, options: { module?: string; output?: string; native?: boolean; app?: string }) => {
+  .action(async (entityArg: string, options: { module?: string; output?: string; native?: boolean; app?: string }) => {
+    // Every source below is keyed by the entity's canonical spelling — the crud config's key, the
+    // contract's key, the snapshot's `name`, the tag the meta source resolves. Normalising here is
+    // what makes the argument's case a matter of taste rather than a matter of which half of the
+    // output comes out wired.
+    const entity = toEntityName(entityArg);
     if (options.native) {
       // Dynamic import keeps the module graph acyclic (scaffold-native reuses
       // the metadata pipeline exported from this file).
@@ -2108,9 +2133,28 @@ export const scaffoldCrudCommand = new Command("scaffold")
         // What the console draws around a generated page is the project's decision, so the
         // project's own templates win where it has written any.
         const projectTemplates = await loadProjectTemplates(rootDir);
-        const pageFiles = await generatePages(moduleDir, entityKebab, fullCtx, projectTemplates);
-        if (pageFiles.length > 0) {
-          log.info(`Generated ${pageFiles.length} page files`);
+        const pages = await generatePages(moduleDir, entityKebab, fullCtx, projectTemplates);
+        if (pages.written.length > 0) {
+          log.info(`Generated ${pages.written.length} page files`);
+        }
+        if (pages.empty.length > 0) {
+          // The widgets are on disk and are what they should be; what does not exist is a screen
+          // to reach them through. Saying so here is the difference between a scaffold a person
+          // finishes by hand and one they discover when the dev server cannot resolve the import.
+          const active = Object.entries(ops)
+            .filter(([, on]) => on)
+            .map(([role]) => role.replace("has", "").toLowerCase());
+          spinner.fail(`No page generated for ${EntityPascal}`);
+          log.error(
+            `${pages.empty.map((one) => `pages/${entityKebab}/${one}`).join(", ")} rendered ` +
+            `empty and was not written. A generated page is a list with a detail panel or a ` +
+            `creation hub, and ${entity} offers neither: its operations are ` +
+            `${active.length > 0 ? active.join(", ") : "none"}. The widgets in ` +
+            `${relativeOutput} are generated — write the page against them by hand, or give the ` +
+            `entity the get operation its detail panel reads.`,
+          );
+          process.exit(1);
+          return;
         }
 
         // Module-level updates

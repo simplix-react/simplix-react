@@ -1121,7 +1121,11 @@ function crudRolesFromEntities(entities: ExtractedEntity[]): CrudEntityRoles[] {
  */
 export function crudRolesFromHooks(entities: EntityHooks[]): CrudEntityRoles[] {
   return entities.map((entity) => ({
-    name: entity.entity.charAt(0).toUpperCase() + entity.entity.slice(1),
+    // The name the endpoint generator resolved, unaltered. Capitalising it here keyed the map by a
+    // spelling nothing else uses: the contract, the snapshot and the scaffolder's own argument all
+    // name an entity with a leading lowercase letter, so a scaffold run found the roles under one
+    // spelling and the operations under the other.
+    name: entity.entity,
     roles: new Map(Object.entries(entity.roles)),
   }));
 }

@@ -695,8 +695,12 @@ describe("crud.config.ts generated from SimpliX Meta", () => {
     });
 
     const content = generateCrudConfigContent(crudRolesFromHooks(written.entities));
-    expect(content).toContain("  Organization: {");
-    expect(content).toContain("  OrgType: {");
+    // The spelling the endpoint generator resolved, which is the one the contract, the snapshot
+    // and the scaffolder's own argument all use. Keyed any other way the map is found by one
+    // spelling of an entity while its operations are found by another, and a scaffold run comes
+    // out with either the hooks wired or the pages written, never both.
+    expect(content).toContain("  organization: {");
+    expect(content).toContain("  orgType: {");
   });
 });
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { toPascalCase, toCamelCase, toKebabCase } from "../utils/case.js";
+import { toPascalCase, toCamelCase, toKebabCase, toEntityName } from "../utils/case.js";
 
 describe("toPascalCase", () => {
   it("converts kebab-case to PascalCase", () => {
@@ -84,5 +84,33 @@ describe("toKebabCase", () => {
 
   it("handles empty string", () => {
     expect(toKebabCase("")).toBe("");
+  });
+});
+
+describe("toEntityName", () => {
+  it("lowers a PascalCase argument to the spelling every lookup is keyed by", () => {
+    expect(toEntityName("ApiClient")).toBe("apiClient");
+    expect(toEntityName("Product")).toBe("product");
+  });
+
+  it("leaves a camelCase argument alone", () => {
+    expect(toEntityName("apiClient")).toBe("apiClient");
+    expect(toEntityName("product")).toBe("product");
+  });
+
+  it("converts kebab-case and snake_case", () => {
+    expect(toEntityName("api-client")).toBe("apiClient");
+    expect(toEntityName("api_client")).toBe("apiClient");
+  });
+
+  it("keeps every letter of a name carrying digits or an acronym", () => {
+    // Routing this through toCamelCase would lowercase the C of Control, and the entity would be
+    // looked up under a name no source spells.
+    expect(toEntityName("iso27001Control")).toBe("iso27001Control");
+    expect(toEntityName("Iso27001Control")).toBe("iso27001Control");
+  });
+
+  it("handles empty string", () => {
+    expect(toEntityName("")).toBe("");
   });
 });

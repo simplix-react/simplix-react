@@ -11,6 +11,13 @@ const CLI_ENTRY = join(__dirname, "index.js");
 /**
  * Search all packages for a crud.config.ts that defines the given entity,
  * and return its CrudEntityConfig if found.
+ *
+ * The key is matched exactly first and then without regard to case. A map written before the
+ * generator settled on one spelling records `ApiClient` where every other source says `apiClient`,
+ * and an exact-only lookup answers `null` for it — which is not "this entity has no roles" but
+ * "this entity's roles are in a file I declined to read", and the scaffolded form comes out with
+ * its hooks stubbed. Two keys of one map differing only in case would name one entity twice, so
+ * there is nothing for the loose match to pick wrongly between.
  */
 export async function findCrudConfigForEntity(
   rootDir: string,
@@ -26,7 +33,12 @@ export async function findCrudConfigForEntity(
     if (!(await pathExists(configPath))) continue;
 
     const map = await loadCrudMap(configPath);
-    if (map && entityName in map) return map[entityName];
+    if (!map) continue;
+    if (entityName in map) return map[entityName];
+
+    const folded = entityName.toLowerCase();
+    const key = Object.keys(map).find((one) => one.toLowerCase() === folded);
+    if (key !== undefined) return map[key];
   }
   return null;
 }
