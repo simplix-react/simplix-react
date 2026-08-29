@@ -22,6 +22,19 @@ Defined in: [packages/ui/src/base/display/table.tsx:133](https://github.com/simp
 
 Fills a height-bounded flex parent (`flex-1 min-h-0`) instead of using `maxHeight`.
 
+### layout?
+
+> `optional` **layout**: `"auto"` \| `"fixed"`
+
+How the columns take their widths.
+
+<p>`"auto"` — the default — sizes each column to its content, which is right for a table with
+room to spread. `"fixed"` divides the declared widths and gives the rest to the columns that
+declared none, which is what a column of free text needs: under `auto` a long value has no
+bound to be cut to, so a truncating cell never truncates and the table widens instead. In a
+panel that shows as a sideways scrollbar with the row's actions past the right edge, and a
+short label in a squeezed neighbour broken one character to a line.
+
 ### maxHeight?
 
 > `optional` **maxHeight**: `number` \| `string`

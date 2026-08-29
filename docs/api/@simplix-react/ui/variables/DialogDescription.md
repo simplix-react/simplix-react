@@ -8,4 +8,4 @@
 
 > `const` **DialogDescription**: `ForwardRefExoticComponent`\<`Omit`\<`DialogDescriptionProps` & `RefAttributes`\<`HTMLParagraphElement`\>, `"ref"`\> & `RefAttributes`\<`HTMLParagraphElement`\>\>
 
-Defined in: [packages/ui/src/base/overlay/dialog.tsx:204](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/dialog.tsx#L204)
+Defined in: [packages/ui/src/base/overlay/dialog.tsx:207](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/dialog.tsx#L207)

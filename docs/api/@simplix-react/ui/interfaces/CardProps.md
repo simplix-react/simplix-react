@@ -6,7 +6,7 @@
 
 # Interface: CardProps
 
-Defined in: [packages/ui/src/primitives/card.tsx:47](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/card.tsx#L47)
+Defined in: [packages/ui/src/primitives/card.tsx:50](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/card.tsx#L50)
 
 Props for the [Card](../variables/Card.md) component.
 
@@ -921,7 +921,7 @@ Defines the human readable text alternative of aria-valuenow for a range widget.
 
 > `optional` **as**: [`CardTag`](../type-aliases/CardTag.md)
 
-Defined in: [packages/ui/src/primitives/card.tsx:51](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/card.tsx#L51)
+Defined in: [packages/ui/src/primitives/card.tsx:54](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/card.tsx#L54)
 
 Override the rendered HTML tag (default: "div", "button" when interactive).
 
@@ -979,7 +979,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/primitives/card.tsx:52](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/card.tsx#L52)
+Defined in: [packages/ui/src/primitives/card.tsx:55](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/card.tsx#L55)
 
 #### Overrides
 
@@ -1151,6 +1151,20 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 ***
 
+### fill?
+
+> `optional` **fill**: `boolean` \| `null`
+
+Defined in: [packages/ui/src/primitives/card.tsx:33](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/card.tsx#L33)
+
+Take the whole width of whatever holds it — a card that IS the column it sits in.
+
+#### Inherited from
+
+`CardVariants.fill`
+
+***
+
 ### hidden?
 
 > `optional` **hidden**: `boolean`
@@ -1225,7 +1239,7 @@ Hints at the type of data that might be entered by the user while editing the el
 
 > `optional` **interactive**: `boolean` \| `null`
 
-Defined in: [packages/ui/src/primitives/card.tsx:32](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/card.tsx#L32)
+Defined in: [packages/ui/src/primitives/card.tsx:35](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/card.tsx#L35)
 
 #### Inherited from
 

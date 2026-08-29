@@ -8,7 +8,7 @@
 
 > `const` **NumberInput**: `ForwardRefExoticComponent`\<`Omit`\<[`NumberInputProps`](../interfaces/NumberInputProps.md), `"ref"`\> & `RefAttributes`\<`HTMLInputElement`\>\>
 
-Defined in: [packages/ui/src/base/inputs/number-input.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/number-input.tsx#L21)
+Defined in: [packages/ui/src/base/inputs/number-input.tsx:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/number-input.tsx#L30)
 
 Numeric input with always-visible spinner buttons.
 

@@ -8,7 +8,7 @@
 
 > **SelectField**\<`T`\>(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/form/select-field.tsx:74](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L74)
+Defined in: [packages/ui/src/fields/form/select-field.tsx:117](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L117)
 
 Dropdown select field built on Radix Select primitives.
 
@@ -36,6 +36,9 @@ reaching that wrapper. `compact` instead measures itself against its longest opt
 a hidden native `<select>` carrying every label does the measuring, so the field is as wide
 as its widest option and `className` is dropped on the floor. Pass `fill` alongside `compact`
 to take that measurement out and let the parent set the width.
+
+`required` maps to `aria-required` in every mode, and draws a visible marker only where there
+is a label row to draw it in.
 
 ## Example
 

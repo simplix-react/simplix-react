@@ -6,7 +6,7 @@
 
 # Interface: ButtonProps
 
-Defined in: [packages/ui/src/base/controls/button.tsx:45](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L45)
+Defined in: [packages/ui/src/base/controls/button.tsx:99](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L99)
 
 ## Extends
 
@@ -919,7 +919,7 @@ Defines the human readable text alternative of aria-valuenow for a range widget.
 
 > `optional` **asChild**: `boolean`
 
-Defined in: [packages/ui/src/base/controls/button.tsx:63](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L63)
+Defined in: [packages/ui/src/base/controls/button.tsx:117](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L117)
 
 Render the single child element instead of a `<button>`, merging the
 button styling and behavior onto it (e.g. wrap a router `<Link>`). The
@@ -1139,7 +1139,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **dropdown**: `boolean`
 
-Defined in: [packages/ui/src/base/controls/button.tsx:57](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L57)
+Defined in: [packages/ui/src/base/controls/button.tsx:111](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L111)
 
 Append a trailing chevron-down caret so the button reads as a menu/dropdown
 trigger. Use on a `DropdownMenuTrigger` button. Suppressed while loading and
@@ -1172,6 +1172,24 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 #### Inherited from
 
 `ComponentPropsWithRef.exportparts`
+
+***
+
+### fill?
+
+> `optional` **fill**: `boolean` \| `null`
+
+Defined in: [packages/ui/src/base/controls/button.tsx:62](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L62)
+
+Take the whole width of whatever holds it.
+
+<p>For a button that is the ONLY thing on its line and means it — a sign-in submit, a
+single primary in a narrow dialog. A row of actions never uses it: several full-width
+buttons stack into a wall in which nothing is primary.
+
+#### Inherited from
+
+`ButtonVariants.fill`
 
 ***
 
@@ -1395,6 +1413,18 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 ***
 
+### justify?
+
+> `optional` **justify**: `"center"` \| `"start"` \| `null`
+
+Defined in: [packages/ui/src/base/controls/button.tsx:64](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L64)
+
+#### Inherited from
+
+`ButtonVariants.justify`
+
+***
+
 ### key?
 
 > `optional` **key**: `Key` \| `null`
@@ -1423,7 +1453,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **loading**: `boolean`
 
-Defined in: [packages/ui/src/base/controls/button.tsx:49](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L49)
+Defined in: [packages/ui/src/base/controls/button.tsx:103](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L103)
 
 Show loading spinner and disable button.
 
@@ -1433,7 +1463,7 @@ Show loading spinner and disable button.
 
 > `optional` **loadingText**: `ReactNode`
 
-Defined in: [packages/ui/src/base/controls/button.tsx:51](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L51)
+Defined in: [packages/ui/src/base/controls/button.tsx:105](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L105)
 
 Text to show while loading. Replaces children if provided.
 
@@ -3669,9 +3699,9 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 ### size?
 
-> `optional` **size**: `"default"` \| `"icon"` \| `"xs"` \| `"sm"` \| `"lg"` \| `"icon-sm"` \| `"icon-xs"` \| `null`
+> `optional` **size**: `"default"` \| `"icon"` \| `"link"` \| `"xs"` \| `"sm"` \| `"lg"` \| `"icon-sm"` \| `"icon-xs"` \| `null`
 
-Defined in: [packages/ui/src/base/controls/button.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L26)
+Defined in: [packages/ui/src/base/controls/button.tsx:69](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L69)
 
 #### Inherited from
 
@@ -3763,6 +3793,25 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 ***
 
+### tone?
+
+> `optional` **tone**: `"default"` \| `"muted"` \| `null`
+
+Defined in: [packages/ui/src/base/controls/button.tsx:43](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L43)
+
+How loudly the label is coloured.
+
+<p>`muted` is for a control that is on the row without claiming it — a breadcrumb above a
+title, a way back out of a screen reached from somewhere else. It is a tone rather than a
+variant because it composes: a quiet link and a quiet ghost are both wanted, and a variant
+per pairing doubles the list for one axis.
+
+#### Inherited from
+
+`ButtonVariants.tone`
+
+***
+
 ### translate?
 
 > `optional` **translate**: `"yes"` \| `"no"`
@@ -3827,7 +3876,7 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 > `optional` **variant**: `"default"` \| `"outline"` \| `"link"` \| `"primary"` \| `"destructive"` \| `"secondary"` \| `"ghost"` \| `null`
 
-Defined in: [packages/ui/src/base/controls/button.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L13)
+Defined in: [packages/ui/src/base/controls/button.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/controls/button.tsx#L22)
 
 #### Inherited from
 

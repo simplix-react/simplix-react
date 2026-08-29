@@ -8,7 +8,7 @@
 
 > **DetailFieldWrapper**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/shared/detail-field-wrapper.tsx:49](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/detail-field-wrapper.tsx#L49)
+Defined in: [packages/ui/src/fields/shared/detail-field-wrapper.tsx:59](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/shared/detail-field-wrapper.tsx#L59)
 
 Wraps a read-only detail value with label display.
 Used by all `DetailFields.*` components.

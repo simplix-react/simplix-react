@@ -6,7 +6,7 @@
 
 # Interface: SelectFieldProps\<T\>
 
-Defined in: [packages/ui/src/fields/form/select-field.tsx:7](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L7)
+Defined in: [packages/ui/src/fields/form/select-field.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L10)
 
 Props for the [SelectField](../functions/SelectField.md) form component.
 
@@ -34,15 +34,59 @@ Defined in: [packages/ui/src/crud/shared/types.ts:49](https://github.com/simplix
 
 ***
 
+### clearable?
+
+> `optional` **clearable**: `boolean`
+
+Defined in: [packages/ui/src/fields/form/select-field.tsx:51](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L51)
+
+Offer an entry that returns the field to unset.
+
+#### Remarks
+
+A select can only ever move from one option to another, so a field the form declares optional
+becomes permanent the moment somebody picks a value — the rank they set by mistake cannot be
+taken off again, and the only way back is a column the screen does not offer. Pass this on
+every select whose value the DTO accepts as absent.
+
+The entry sits at the top of the list, labelled with [clearLabel](#clearlabel) or the framework's own
+word for an empty choice, and hands `""` to `onChange`. Radix refuses an item whose value is
+the empty string, so a sentinel carries it and is translated back before the caller sees it.
+
+***
+
+### clearLabel?
+
+> `optional` **clearLabel**: `string`
+
+Defined in: [packages/ui/src/fields/form/select-field.tsx:61](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L61)
+
+What the clearing entry reads as.
+
+#### Remarks
+
+Defaults to `placeholder` — the field has already had to name its own empty state for the
+trigger, and reading 「선택 안 함」 in the list and 「직위 없음」 on the trigger a moment later
+is two words for one state on one control. Only where neither is given does the framework's
+generic word stand in.
+
+***
+
 ### compact?
 
 > `optional` **compact**: `boolean`
 
-Defined in: [packages/ui/src/fields/form/select-field.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L21)
+Defined in: [packages/ui/src/fields/form/select-field.tsx:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L30)
 
 Compact mode: renders without FieldWrapper, and sizes itself to its longest option label
 using a hidden native `<select>`. That measurement also means `className` never reaches the
 rendered element — pass `fill` when the parent has to own the width.
+
+`error` and `description` still render, below the trigger, so a compact field placed in a
+table cell reports why a save was refused. `label` becomes the trigger's accessible name;
+`required` draws no visible marker here, because compact mode has no label row to draw one
+in. A compact field that has to show a required marker gets it from whatever names the
+column (`List.Column`'s `required`).
 
 ***
 
@@ -86,7 +130,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:32](https://github.com/simplix
 
 > `optional` **fill**: `boolean`
 
-Defined in: [packages/ui/src/fields/form/select-field.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L28)
+Defined in: [packages/ui/src/fields/form/select-field.tsx:37](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L37)
 
 Compact mode only: give the width back to the parent. The hidden measuring `<select>` is
 dropped, the field fills its container, and `className` lands on the wrapper — so a grid or
@@ -141,7 +185,7 @@ label for screen readers only.
 
 > **onChange**: (`value`) => `void`
 
-Defined in: [packages/ui/src/fields/form/select-field.tsx:12](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L12)
+Defined in: [packages/ui/src/fields/form/select-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L15)
 
 Called when the selection changes.
 
@@ -161,7 +205,7 @@ Called when the selection changes.
 
 > **options**: `object`[]
 
-Defined in: [packages/ui/src/fields/form/select-field.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L14)
+Defined in: [packages/ui/src/fields/form/select-field.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L17)
 
 Available options with label/value pairs.
 
@@ -191,7 +235,7 @@ Available options with label/value pairs.
 
 > `optional` **placeholder**: `string`
 
-Defined in: [packages/ui/src/fields/form/select-field.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L15)
+Defined in: [packages/ui/src/fields/form/select-field.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L18)
 
 ***
 
@@ -255,7 +299,7 @@ below at full width.
 
 > **value**: `T`
 
-Defined in: [packages/ui/src/fields/form/select-field.tsx:10](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L10)
+Defined in: [packages/ui/src/fields/form/select-field.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/select-field.tsx#L13)
 
 Currently selected value.
 

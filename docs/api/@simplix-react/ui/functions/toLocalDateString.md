@@ -8,7 +8,7 @@
 
 > **toLocalDateString**(`date`): `string`
 
-Defined in: [packages/headless/dist/index.d.ts:464](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L464)
+Defined in: [packages/headless/dist/index.d.ts:472](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L472)
 
 Format a Date as a zone-neutral calendar date string `yyyy-MM-dd` using the
 LOCAL calendar fields (never UTC). This is the single source for the

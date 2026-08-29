@@ -8,7 +8,7 @@
 
 > **PasswordField**(`__namedParameters`): `Element`
 
-Defined in: [packages/ui/src/fields/form/password-field.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/password-field.tsx#L28)
+Defined in: [packages/ui/src/fields/form/password-field.tsx:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/password-field.tsx#L30)
 
 Password input field with visibility toggle button.
 

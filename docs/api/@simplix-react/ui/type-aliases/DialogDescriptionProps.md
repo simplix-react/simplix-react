@@ -8,4 +8,4 @@
 
 > **DialogDescriptionProps** = `ComponentPropsWithRef`\<*typeof* `DialogPrimitive.Description`\>
 
-Defined in: [packages/ui/src/base/overlay/dialog.tsx:200](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/dialog.tsx#L200)
+Defined in: [packages/ui/src/base/overlay/dialog.tsx:203](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/dialog.tsx#L203)

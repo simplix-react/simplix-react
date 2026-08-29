@@ -6,16 +6,25 @@
 
 # Function: ConfirmDialog()
 
-> **ConfirmDialog**(`__namedParameters`): `Element`
+> **ConfirmDialog**(`props`): `Element`
 
-Defined in: [packages/ui/src/crud/shared/confirm-dialog.tsx:21](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/confirm-dialog.tsx#L21)
+Defined in: [packages/ui/src/crud/shared/confirm-dialog.tsx:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/confirm-dialog.tsx#L30)
+
+Confirmation dialog: a title, an optional description, and a footer that commits or cancels.
 
 ## Parameters
 
-### \_\_namedParameters
+### props
 
 [`ConfirmDialogProps`](../interfaces/ConfirmDialogProps.md)
+
+[ConfirmDialogProps](../interfaces/ConfirmDialogProps.md)
 
 ## Returns
 
 `Element`
+
+## Remarks
+
+Drawn in AlertPanel, so a long description scrolls inside the panel and the footer
+stays reachable at any window height.

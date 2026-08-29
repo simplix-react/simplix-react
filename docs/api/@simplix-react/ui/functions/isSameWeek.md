@@ -8,7 +8,7 @@
 
 > **isSameWeek**(`a`, `b`): `boolean`
 
-Defined in: [packages/headless/dist/index.d.ts:499](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L499)
+Defined in: [packages/headless/dist/index.d.ts:513](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L513)
 
 ## Parameters
 

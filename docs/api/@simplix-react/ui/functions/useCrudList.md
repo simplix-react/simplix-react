@@ -8,7 +8,7 @@
 
 > **useCrudList**\<`T`\>(`useList`, `options?`): [`UseCrudListResult`](../interfaces/UseCrudListResult.md)\<`T`\>
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:140](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L140)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:155](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L155)
 
 State management hook for CRUD list views.
 

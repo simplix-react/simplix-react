@@ -8,7 +8,7 @@
 
 > **serializeRfc3339Local**(`date`): `string` \| `undefined`
 
-Defined in: [packages/headless/dist/index.d.ts:613](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L613)
+Defined in: [packages/headless/dist/index.d.ts:627](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L627)
 
 Legacy name preserved (browser offset). Alias of the zone-less
 [serializeInstant](serializeInstant.md) path.

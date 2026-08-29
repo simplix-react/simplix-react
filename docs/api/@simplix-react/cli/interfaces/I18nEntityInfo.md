@@ -6,7 +6,7 @@
 
 # Interface: I18nEntityInfo
 
-Defined in: [openapi/orchestration/spec-profile.ts:7](https://github.com/simplix-react/simplix-react/blob/main/openapi/orchestration/spec-profile.ts#L7)
+Defined in: [openapi/orchestration/spec-profile.ts:45](https://github.com/simplix-react/simplix-react/blob/main/openapi/orchestration/spec-profile.ts#L45)
 
 Entity info for i18n key mapping.
 
@@ -16,7 +16,7 @@ Entity info for i18n key mapping.
 
 > **name**: `string`
 
-Defined in: [openapi/orchestration/spec-profile.ts:9](https://github.com/simplix-react/simplix-react/blob/main/openapi/orchestration/spec-profile.ts#L9)
+Defined in: [openapi/orchestration/spec-profile.ts:47](https://github.com/simplix-react/simplix-react/blob/main/openapi/orchestration/spec-profile.ts#L47)
 
 ***
 
@@ -24,4 +24,4 @@ Defined in: [openapi/orchestration/spec-profile.ts:9](https://github.com/simplix
 
 > **pascalName**: `string`
 
-Defined in: [openapi/orchestration/spec-profile.ts:8](https://github.com/simplix-react/simplix-react/blob/main/openapi/orchestration/spec-profile.ts#L8)
+Defined in: [openapi/orchestration/spec-profile.ts:46](https://github.com/simplix-react/simplix-react/blob/main/openapi/orchestration/spec-profile.ts#L46)

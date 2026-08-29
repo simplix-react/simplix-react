@@ -22,7 +22,7 @@ Defined in: [packages/ui/src/crud/shared/empty-state.tsx:8](https://github.com/s
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/shared/empty-state.tsx:15](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/empty-state.tsx#L15)
+Defined in: [packages/ui/src/crud/shared/empty-state.tsx:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/empty-state.tsx#L29)
 
 ***
 
@@ -34,11 +34,37 @@ Defined in: [packages/ui/src/crud/shared/empty-state.tsx:7](https://github.com/s
 
 ***
 
+### footer?
+
+> `optional` **footer**: `ReactNode`
+
+Defined in: [packages/ui/src/crud/shared/empty-state.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/empty-state.tsx#L28)
+
+A quiet line under the actions — a status number, a correlation id, whatever support reads and
+the operator does not act on.
+
+***
+
 ### icon?
 
 > `optional` **icon**: `ReactNode`
 
 Defined in: [packages/ui/src/crud/shared/empty-state.tsx:5](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/empty-state.tsx#L5)
+
+***
+
+### iconClassName?
+
+> `optional` **iconClassName**: `string`
+
+Defined in: [packages/ui/src/crud/shared/empty-state.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/shared/empty-state.tsx#L23)
+
+The tint the icon's badge is painted with, where the KIND of state has a colour.
+
+<p>A caller wanting one used to wrap the icon in a badge of its own, which landed inside the
+badge this already draws — two nested circles, the inner one an inline element that a
+`rounded-full` stretches into an oval. The tint belongs to the badge that exists rather than
+to a second one.
 
 ***
 

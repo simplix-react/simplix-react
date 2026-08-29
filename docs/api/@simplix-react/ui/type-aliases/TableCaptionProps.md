@@ -8,4 +8,4 @@
 
 > **TableCaptionProps** = `ComponentPropsWithRef`\<`"caption"`\>
 
-Defined in: [packages/ui/src/base/display/table.tsx:378](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/table.tsx#L378)
+Defined in: [packages/ui/src/base/display/table.tsx:390](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/table.tsx#L390)

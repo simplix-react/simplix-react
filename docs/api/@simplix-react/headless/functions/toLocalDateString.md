@@ -8,7 +8,7 @@
 
 > **toLocalDateString**(`date`): `string`
 
-Defined in: [format-date.ts:79](https://github.com/simplix-react/simplix-react/blob/main/format-date.ts#L79)
+Defined in: [format-date.ts:112](https://github.com/simplix-react/simplix-react/blob/main/format-date.ts#L112)
 
 Format a Date as a zone-neutral calendar date string `yyyy-MM-dd` using the
 LOCAL calendar fields (never UTC). This is the single source for the

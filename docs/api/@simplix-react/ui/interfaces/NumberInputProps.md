@@ -1147,6 +1147,21 @@ Defined in: [node\_modules/.pnpm/@types+react@19.2.14/node\_modules/@types/react
 
 ***
 
+### digits?
+
+> `optional` **digits**: `number`
+
+Defined in: [packages/ui/src/base/inputs/number-input.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/inputs/number-input.tsx#L19)
+
+How many characters the longest value takes, which is what decides the control's width.
+
+<p>Left out, the control fills the width it is given — right for a cell it has to fill, wrong
+for a form, where a box the width of a sentence asks for a sentence. NumberField
+works this out from the bounds it was given and passes it, so a form field carries the
+measure without every screen stating one.
+
+***
+
 ### dir?
 
 > `optional` **dir**: `string`

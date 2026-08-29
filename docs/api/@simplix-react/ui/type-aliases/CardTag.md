@@ -8,4 +8,4 @@
 
 > **CardTag** = `"div"` \| `"button"` \| `"article"`
 
-Defined in: [packages/ui/src/primitives/card.tsx:44](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/card.tsx#L44)
+Defined in: [packages/ui/src/primitives/card.tsx:47](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/card.tsx#L47)

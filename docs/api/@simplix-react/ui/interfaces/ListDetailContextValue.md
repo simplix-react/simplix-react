@@ -6,7 +6,7 @@
 
 # Interface: ListDetailContextValue
 
-Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L30)
+Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:32](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L32)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:30](https://github.co
 
 > **activePanel**: `"list"` \| `"detail"`
 
-Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:32](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L32)
+Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:34](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L34)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:32](https://github.co
 
 > `optional` **dialogHeight**: `string`
 
-Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:34](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L34)
+Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:36](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L36)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:34](https://github.co
 
 > **setActivePanel**: (`panel`) => `void`
 
-Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:33](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L33)
+Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:35](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L35)
 
 #### Parameters
 
@@ -48,4 +48,4 @@ Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:33](https://github.co
 
 > **variant**: [`ListDetailVariant`](../type-aliases/ListDetailVariant.md)
 
-Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:31](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L31)
+Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:33](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L33)

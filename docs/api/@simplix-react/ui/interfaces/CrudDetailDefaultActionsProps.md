@@ -6,7 +6,7 @@
 
 # Interface: CrudDetailDefaultActionsProps
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:289](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L289)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:312](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L312)
 
 Props for the CrudDetail.DefaultActions sub-component, shared with CrudDetail.ActionFooter.
 
@@ -20,9 +20,9 @@ Props for the CrudDetail.DefaultActions sub-component, shared with CrudDetail.Ac
 
 > `optional` **backLabel**: `string`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:300](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L300)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:323](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L323)
 
-Label for the back button (defaults to `"Back"`).
+Overrides the back button label (defaults to the translated `common.back`).
 
 ***
 
@@ -30,7 +30,7 @@ Label for the back button (defaults to `"Back"`).
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:307](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L307)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:330](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L330)
 
 Extra action buttons rendered in the right-side group, before Edit.
 
@@ -40,7 +40,7 @@ Extra action buttons rendered in the right-side group, before Edit.
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:305](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L305)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:328](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L328)
 
 ***
 
@@ -48,9 +48,9 @@ Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:305](https://github.com
 
 > `optional` **closeLabel**: `string`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:298](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L298)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:321](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L321)
 
-Label for the close button (defaults to `"Close"`).
+Overrides the close button label (defaults to the translated `common.close`).
 
 ***
 
@@ -58,7 +58,7 @@ Label for the close button (defaults to `"Close"`).
 
 > `optional` **deleteDisabled**: `boolean`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:313](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L313)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:336](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L336)
 
 Disables Delete on its own (independent of `isPending`); pair with `deleteDisabledReason`.
 
@@ -68,7 +68,7 @@ Disables Delete on its own (independent of `isPending`); pair with `deleteDisabl
 
 > `optional` **deleteDisabledReason**: `string`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:315](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L315)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:338](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L338)
 
 Native tooltip explaining why Delete is disabled.
 
@@ -78,9 +78,9 @@ Native tooltip explaining why Delete is disabled.
 
 > `optional` **deleteLabel**: `string`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:304](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L304)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:327](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L327)
 
-Label for the delete button (defaults to `"Delete"`).
+Overrides the delete button label (defaults to the translated `common.delete`).
 
 ***
 
@@ -88,7 +88,7 @@ Label for the delete button (defaults to `"Delete"`).
 
 > `optional` **editDisabled**: `boolean`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:309](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L309)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:332](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L332)
 
 Disables Edit on its own (independent of `isPending`); pair with `editDisabledReason`.
 
@@ -98,7 +98,7 @@ Disables Edit on its own (independent of `isPending`); pair with `editDisabledRe
 
 > `optional` **editDisabledReason**: `string`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:311](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L311)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:334](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L334)
 
 Native tooltip explaining why Edit is disabled.
 
@@ -108,9 +108,9 @@ Native tooltip explaining why Edit is disabled.
 
 > `optional` **editLabel**: `string`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:302](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L302)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:325](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L325)
 
-Label for the edit button (defaults to `"Edit"`).
+Overrides the edit button label (defaults to the translated `common.edit`).
 
 ***
 
@@ -118,7 +118,7 @@ Label for the edit button (defaults to `"Edit"`).
 
 > `optional` **isPending**: `boolean`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:296](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L296)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:319](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L319)
 
 When true, disables Edit and Delete action buttons.
 
@@ -128,7 +128,7 @@ When true, disables Edit and Delete action buttons.
 
 > `optional` **onBack**: () => `void`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:292](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L292)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:315](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L315)
 
 Renders a "← Back" button instead of "Close". Mutually exclusive with `onClose`.
 
@@ -142,7 +142,7 @@ Renders a "← Back" button instead of "Close". Mutually exclusive with `onClose
 
 > `optional` **onClose**: () => `void`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:290](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L290)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:313](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L313)
 
 #### Returns
 
@@ -154,7 +154,7 @@ Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:290](https://github.com
 
 > `optional` **onDelete**: () => `void`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:293](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L293)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:316](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L316)
 
 #### Returns
 
@@ -166,7 +166,7 @@ Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:293](https://github.com
 
 > `optional` **onEdit**: () => `void`
 
-Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:294](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L294)
+Defined in: [packages/ui/src/crud/detail/crud-detail.tsx:317](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/detail/crud-detail.tsx#L317)
 
 #### Returns
 

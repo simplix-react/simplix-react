@@ -8,4 +8,4 @@
 
 > **TableHeaderProps** = `ComponentPropsWithRef`\<`"thead"`\>
 
-Defined in: [packages/ui/src/base/display/table.tsx:199](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/table.tsx#L199)
+Defined in: [packages/ui/src/base/display/table.tsx:211](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/table.tsx#L211)
