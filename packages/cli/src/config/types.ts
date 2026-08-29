@@ -119,7 +119,7 @@ export interface SimplixConfig {
  * DTO metadata generation for one spec.
  *
  * @remarks
- * The IR is served by the backend and carries what an OpenAPI document loses — validation
+ * SimpliX Meta is served by the backend and carries what an OpenAPI document loses — validation
  * constraints, search operators, `@PreAuthorize` and labeled enums. It is generated into
  * `src/generated-meta/` of every domain package the spec produces.
  */
@@ -129,7 +129,7 @@ export interface OpenAPIMetaConfig {
    * already builds its own: the origin of `spec` plus the profile's `metaEndpoint`.
    */
   source?: string;
-  /** Where a fetched IR is written for offline regeneration. */
+  /** Where a fetched SimpliX Meta is written for offline regeneration. */
   snapshot?: string;
   /** Domains whose barrel exports the meta output instead of the orval output. */
   export?: string[];

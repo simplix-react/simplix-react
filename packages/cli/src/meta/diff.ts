@@ -28,7 +28,7 @@ export interface RenameExpectation {
  *
  * None of it is built in. A tag the backend annotates differently from the way springdoc reads
  * it, and a field made required by `@Schema(requiredMode = REQUIRED)`, are facts about one
- * backend; the IR carries neither downstream, so the only honest place for them is a file the
+ * backend; SimpliX Meta carries neither downstream, so the only honest place for them is a file the
  * project owns and passes with `--expect`.
  */
 export interface Expectations {
@@ -129,9 +129,9 @@ export function compareSurfaces(
       //
       // `zod` — orval names a constant per operation and role and the meta pipeline names one per
       // type, so one entity's constants are renamed wholesale.
-      // `internal` — the access and filter metadata the IR path adds, which the OpenAPI path has
+      // `internal` — the access and filter metadata the SimpliX Meta path adds, which the OpenAPI path has
       // no notion of, and each side's own name for a response or a mutation's variables.
-      // `handlers` present only on the meta side — the IR path emits a factory for every entity,
+      // `handlers` present only on the meta side — the SimpliX Meta path emits a factory for every entity,
       // where orval skips one whose model it could not read (`org.OrgType` is such a case). A
       // factory missing from the meta side stays an error: `src/mock/index.ts` imports these by
       // name, and losing one breaks every mocked screen of that entity while the domain package
@@ -178,12 +178,12 @@ function compareQueryKey(name: string, left: Decl, right: Decl): Finding[] {
 
 /**
  * A filter parameter whose operator takes more than one value, typed as one string by springdoc
- * and as the array the caller actually passes by the IR.
+ * and as the array the caller actually passes by SimpliX Meta.
  *
  * Several values reach the wire as one comma-separated field. `buildSearchableParams` hands a
  * faceted filter's committed value — an array — straight through, while hand-written code joins it
  * itself; the serialiser turns either into the same query string, exactly as the orval builder
- * does. So the IR names both shapes where springdoc named only the joined one, and the widening is
+ * does. So SimpliX Meta names both shapes where springdoc named only the joined one, and the widening is
  * the fix rather than the drift.
  */
 function isMultiValueFilter(field: string, before: string, after: string): boolean {

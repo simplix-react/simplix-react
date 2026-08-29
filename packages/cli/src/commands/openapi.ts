@@ -44,7 +44,7 @@ import type { OpenApiNamingStrategy } from "../openapi/naming/naming-strategy.js
 import type { DiffResult, ExtractedEntity, ExtractedOperation, DomainGroup, OpenAPISnapshot, OpenAPISpec } from "../openapi/types.js";
 import { fetchMeta } from "../meta/fetch.js";
 import { ENUM_MODULE } from "../meta/generation/emit.js";
-import type { DtoMeta } from "../meta/ir-types.js";
+import type { DtoMeta } from "../meta/types.js";
 import { resolveMeta } from "../meta/resolve.js";
 import type { ResolvedDomain, ResolvedMeta } from "../meta/resolve.js";
 import type { EnvelopeMapping } from "../meta/generation/mock-gen.js";
@@ -103,7 +103,7 @@ export const openapiCommand = new Command("openapi")
   .option("-o, --output <dir>", "Output directory (defaults to packages/)")
   .option("-f, --force", "Force regeneration even if no changes detected")
   .option("--no-http", "Skip .http file generation")
-  .option("--offline", "Read the IR from meta.snapshot instead of the server")
+  .option("--offline", "Read SimpliX Meta from meta.snapshot instead of the server")
   .option("-y, --yes", "Auto-confirm without prompts")
   .action(async (specSource: string, flags: OpenAPIFlags) => {
     const rootDir = await findProjectRoot(process.cwd());
@@ -274,7 +274,7 @@ export const openapiCommand = new Command("openapi")
       });
     }
 
-    // The IR snapshot is written once every domain has been generated. Writing it per domain
+    // The SimpliX Meta snapshot is written once every domain has been generated. Writing it per domain
     // makes the first domain's write the second domain's comparison, so a run that regenerates
     // one package reports every later one as up-to-date.
     if (meta?.snapshotPath && !flags.offline) {
@@ -287,13 +287,13 @@ export const openapiCommand = new Command("openapi")
 
 /** Everything the meta half of a run needs, resolved once for the whole command. */
 export interface MetaContext {
-  /** The IR as the server describes it now. */
+  /** SimpliX Meta as the server describes it now. */
   document: DtoMeta;
-  /** That IR sliced into one closure per configured domain. */
+  /** That SimpliX Meta sliced into one closure per configured domain. */
   resolved: ResolvedMeta;
-  /** The committed IR sliced the same way, or absent when there is nothing to compare against. */
+  /** The committed SimpliX Meta sliced the same way, or absent when there is nothing to compare against. */
   previous?: ResolvedMeta;
-  /** Where the fetched IR is written once every domain has been generated. */
+  /** Where the fetched SimpliX Meta is written once every domain has been generated. */
   snapshotPath?: string;
   /** Domains whose barrel exports the meta output instead of the Orval output. */
   exportDomains: Set<string>;
@@ -314,7 +314,7 @@ interface PrepareMetaOptions {
 }
 
 /**
- * Fetch the DTO meta IR and slice it per domain, or answer `undefined` when the spec declares no
+ * Fetch SimpliX Meta and slice it per domain, or answer `undefined` when the spec declares no
  * `meta` block and the meta half therefore does not run.
  *
  * Throws rather than returning `undefined` on a configuration that asks for the pipeline and
@@ -330,7 +330,7 @@ export async function prepareMetaContext(
   if (!metaConfig) {
     if (offline) {
       throw new Error(
-        `--offline reads the DTO meta IR from a snapshot, and no \`meta\` block is configured ` +
+        `--offline reads SimpliX Meta from a snapshot, and no \`meta\` block is configured ` +
           `for "${specSource}" in simplix.config.ts. Add \`meta: { snapshot: "..." }\` to it.`,
       );
     }
@@ -343,7 +343,7 @@ export async function prepareMetaContext(
 
   if (offline && !snapshotPath) {
     throw new Error(
-      `--offline reads the DTO meta IR from \`meta.snapshot\`, which is unset for ` +
+      `--offline reads SimpliX Meta from \`meta.snapshot\`, which is unset for ` +
         `"${specSource}". Set it in simplix.config.ts, or drop --offline to read the server.`,
     );
   }
@@ -362,7 +362,7 @@ export async function prepareMetaContext(
     );
   }
 
-  // The committed IR is read before the fresh one so the change gate compares the two, and it is
+  // The committed SimpliX Meta is read before the fresh one so the change gate compares the two, and it is
   // read once for the whole run rather than per domain.
   const previousDocument = snapshotPath ? await readSnapshotDocument(snapshotPath) : undefined;
 
@@ -389,7 +389,7 @@ export async function prepareMetaContext(
 }
 
 /**
- * Where the IR is read from: what the configuration states, else the origin of an HTTP spec with
+ * Where SimpliX Meta is read from: what the configuration states, else the origin of an HTTP spec with
  * the profile's endpoint path on it.
  */
 export function resolveMetaSource(
@@ -402,7 +402,7 @@ export function resolveMetaSource(
     return new URL(metaEndpoint, specSource).href;
   }
   throw new Error(
-    `The DTO meta IR has no source: \`meta.source\` is unset for "${specSource}", and it cannot ` +
+    `SimpliX Meta has no source: \`meta.source\` is unset for "${specSource}", and it cannot ` +
       `be derived — deriving it needs a spec served over HTTP and a profile carrying ` +
       `\`metaEndpoint\`` +
       (metaEndpoint ? "" : ", which this spec's profile does not") +
@@ -416,7 +416,7 @@ async function readSnapshotDocument(snapshotPath: string): Promise<DtoMeta | und
   const document = await readJsonFile<DtoMeta>(snapshotPath).catch(() => null);
   if (!document || typeof document.version !== "number") {
     log.warn(
-      `Ignoring the DTO meta snapshot at ${relative(process.cwd(), snapshotPath)}: it carries no IR.`,
+      `Ignoring the DTO meta snapshot at ${relative(process.cwd(), snapshotPath)}: it carries no SimpliX Meta.`,
     );
     return undefined;
   }
@@ -445,7 +445,7 @@ function resolveEnvelope(adapter: ResponseAdapterConfig | undefined): EnvelopeMa
   return { wrap, import: from[1] };
 }
 
-/** What the IR and the domain configuration disagree about, said once for the whole run. */
+/** What SimpliX Meta and the domain configuration disagree about, said once for the whole run. */
 function reportMetaResolution(resolved: ResolvedMeta): void {
   if (resolved.unmatched.length > 0) {
     const operations = resolved.unmatched.reduce((sum, one) => sum + one.operations.length, 0);
@@ -487,9 +487,9 @@ export interface ChangeGateInput {
   entities: ExtractedEntity[];
   /** Whether the meta pipeline runs for this spec at all. */
   metaEnabled: boolean;
-  /** The domain's closure as the IR describes it now. */
+  /** The domain's closure as SimpliX Meta describes it now. */
   meta?: ResolvedDomain;
-  /** The same closure as the committed IR snapshot described it. */
+  /** The same closure as the committed SimpliX Meta snapshot described it. */
   previousMeta?: ResolvedDomain;
 }
 
@@ -505,8 +505,8 @@ export interface ChangeGate {
  *
  * The OpenAPI diff cannot answer for the meta half: a `@Length` bound added, a `@SearchableField`
  * operator changed, a `@PreAuthorize` rewritten and an enum gaining its labels all leave the
- * OpenAPI document byte-identical, and the IR exists precisely because the document loses them.
- * With no committed IR to compare against there is nothing to judge, so the domain regenerates —
+ * OpenAPI document byte-identical, and SimpliX Meta exists precisely because the document loses them.
+ * With no committed SimpliX Meta to compare against there is nothing to judge, so the domain regenerates —
  * a needless regeneration is cheap and a skipped one is silent.
  */
 export function computeChangeGate(input: ChangeGateInput): ChangeGate {
@@ -687,20 +687,27 @@ async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
       log.info(`Pruned ${pruned} unused model files.`);
     }
 
-    // 9. Build hook import map and generate hooks (with optional responseAdapter)
-    const importMap = await buildHookImportMap(targetDir);
-    await generateHookFiles(targetDir, entities, importMap, responseAdapter);
+    // Whether this domain's barrel exports the meta output. The two halves are generated side by
+    // side, but only one of them is consumed: a swapped domain takes its hooks and its mock from
+    // `generated-meta/`, so writing the Orval stub layer beside them would leave modules importing
+    // `src/generated/` — which is what the last step of a migration deletes.
+    const metaExported =
+      opts.meta !== undefined && metaDomain !== undefined && opts.meta.exportDomains.has(domainName);
 
-    // 10. Generate mock files (with optional responseAdapter for envelope wrapping)
-    await generateMockFiles(targetDir, domainName, entities, responseAdapter);
+    // 9. Build hook import map and generate hooks (with optional responseAdapter)
+    if (!metaExported) {
+      const importMap = await buildHookImportMap(targetDir);
+      await generateHookFiles(targetDir, entities, importMap, responseAdapter);
+
+      // 10. Generate mock files (with optional responseAdapter for envelope wrapping)
+      await generateMockFiles(targetDir, domainName, entities, responseAdapter);
+    }
 
     /** What the meta half would seed, for merging into the preserved seed module below. */
     let metaSeeds = "";
     let metaLabeledSeedFields: ReadonlyMap<string, string[]> = new Map();
 
     // 10b. Generate the DTO meta output beside the Orval one
-    const metaExported =
-      opts.meta !== undefined && metaDomain !== undefined && opts.meta.exportDomains.has(domainName);
     if (opts.meta && metaDomain) {
       spinner.text = `Generating DTO meta code for: ${domainPkgName}`;
       const written = await writeMetaOutput({
@@ -830,7 +837,7 @@ async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
     await saveSnapshot(targetDir, specSource, entities);
 
     spinner.succeed(`Generated code for: ${domainPkgName}`);
-    printSummary(dirName, domainPkgName, entities, metaDomain !== undefined);
+    printSummary(dirName, domainPkgName, entities, metaDomain !== undefined, metaExported);
   } catch (err) {
     spinner.fail("Failed to generate domain code");
     log.error(String(err));
@@ -875,12 +882,18 @@ function printSummary(
   domainPkgName: string,
   entities: ExtractedEntity[],
   hasMeta: boolean,
+  exported: boolean,
 ): void {
   log.info("");
   log.step(`Location: packages/${dirName}/`);
   log.step(`Entities: ${entities.map((e) => e.name).join(", ")}`);
+  // Only what this run actually wrote: a swapped domain takes its hooks and its mock from the
+  // meta output, so naming the Orval layer would point the reader at directories that are not
+  // there.
   log.step(
-    "Generated: src/generated/, src/hooks/, src/mock/" + (hasMeta ? `, ${META_DIR}/` : ""),
+    exported
+      ? `Generated: src/generated/, ${META_DIR}/`
+      : "Generated: src/generated/, src/hooks/, src/mock/" + (hasMeta ? `, ${META_DIR}/` : ""),
   );
   log.info("");
 }
@@ -1095,7 +1108,7 @@ function crudRolesFromEntities(entities: ExtractedEntity[]): CrudEntityRoles[] {
 
 /**
  * The roles the meta pipeline resolved, which are the ones its endpoint and hook generators
- * emitted: every IR operation carries an id, so the naming strategy answers all of them and
+ * emitted: every SimpliX Meta operation carries an id, so the naming strategy answers all of them and
  * nothing falls through to path inference.
  */
 export function crudRolesFromHooks(entities: EntityHooks[]): CrudEntityRoles[] {

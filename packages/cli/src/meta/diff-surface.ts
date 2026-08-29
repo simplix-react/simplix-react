@@ -87,7 +87,7 @@ export async function collectSurface(root: string): Promise<Surface> {
  * Replace a name that stands for nothing but an index signature with the shape it stands for.
  *
  * Orval gives `Map<String, String>` a declaration of its own — `interface StringMap { [key:
- * string]: string }` — while the IR path writes `Record<string, string>` inline. The two are the
+ * string]: string }` — while the SimpliX Meta path writes `Record<string, string>` inline. The two are the
  * same type under two spellings, and comparing the spellings reports one difference per i18n field
  * plus the alias itself. Rewriting each occurrence to the structural form lets the comparison see
  * what a caller sees.
@@ -126,7 +126,7 @@ function normaliseIndexSignatureAliases(surface: Surface): void {
  * shapes a caller sees rather than as the text each generator wrote.
  *
  * Orval flattens a Java hierarchy — `OrganizationRestUpdateBody` lists all 21 members — while the
- * IR path preserves it, emitting `interface OrganizationUpdateDTO extends OrganizationCreateDTO`
+ * SimpliX Meta path preserves it, emitting `interface OrganizationUpdateDTO extends OrganizationCreateDTO`
  * with the one member the child adds. Comparing own members against flattened ones reports every
  * inherited field as missing: 40 errors on one entity, all of them the feature this project
  * exists to add.
@@ -289,7 +289,7 @@ function isSchemaFile(file: string): boolean {
 }
 
 /**
- * The metadata surfaces the IR path adds, which the OpenAPI path has no notion of: the structured
+ * The metadata surfaces the SimpliX Meta path adds, which the OpenAPI path has no notion of: the structured
  * `@PreAuthorize` constants and the filter definitions. A name here is an addition rather than a
  * difference, so it is reported without being counted as drift.
  */
@@ -302,7 +302,7 @@ function isAddedSurface(file: string): boolean {
  * The envelope, which the two pipelines carry differently by design.
  *
  * Orval declares `SimpliXApiResponse…` and the loose bodies it wraps, because springdoc describes
- * the wrapper as part of every response. The IR path maps the container `unwrap: true` — the
+ * the wrapper as part of every response. The SimpliX Meta path maps the container `unwrap: true` — the
  * mutator strips it before React Query sees it — so the type has no client representation. Its
  * absence from the meta side is the design, not a loss.
  */
@@ -314,7 +314,7 @@ function isEnvelope(name: string): boolean {
  * The DTO an operation names as its search shape.
  *
  * Orval flattens it into the params type and declares it nowhere — measured across all thirteen of
- * the application's domains, its model directories hold zero of them. The IR path reaches it
+ * the application's domains, its model directories hold zero of them. The SimpliX Meta path reaches it
  * through `request.searchDto` and emits it, which is an addition rather than a difference.
  */
 function isSearchShape(name: string): boolean {
@@ -323,7 +323,7 @@ function isSearchShape(name: string): boolean {
 
 /**
  * A name each pipeline invents for the same internal shape. Orval writes a request's response type
- * inline and the IR path names it; neither is imported anywhere outside the generated tree —
+ * inline and the SimpliX Meta path names it; neither is imported anywhere outside the generated tree —
  * grepped across the application's modules and apps: 0 references.
  */
 function isGeneratedAlias(name: string): boolean {

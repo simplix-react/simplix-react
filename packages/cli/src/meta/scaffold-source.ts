@@ -23,7 +23,7 @@ import {
   resolveEndpoints,
   type EndpointTarget,
 } from "./generation/endpoint-gen.js";
-import type { DtoMeta, FieldMeta, TypeRef } from "./ir-types.js";
+import type { DtoMeta, FieldMeta, TypeRef } from "./types.js";
 import { resolveMeta, type ResolvedDomain, type ResolvedType } from "./resolve.js";
 
 /**
@@ -38,10 +38,10 @@ export interface FieldSource {
 }
 
 /**
- * Everything the CRUD scaffolder reads out of one entity's slice of the DTO meta IR.
+ * Everything the CRUD scaffolder reads out of one entity's slice of SimpliX Meta.
  *
  * The OpenAPI path learns the same things by matching regular expressions against orval's emitted
- * zod text and by reading its model files. Neither exists in a domain generated from the IR, and
+ * zod text and by reading its model files. Neither exists in a domain generated from SimpliX Meta, and
  * the text would not carry the answers anyway: an inherited DTO is emitted as
  * `Child = Parent.extend({ … })`, whose own fields are the only ones a `z.object(` pattern can
  * see, so every field a parent contributes disappears from the form without a word.
@@ -50,7 +50,7 @@ export interface MetaScaffoldSource {
   domain: string;
   tag: string;
   entity: string;
-  /** The DTO the fields were read from, or absent when the IR states none for this entity. */
+  /** The DTO the fields were read from, or absent when SimpliX Meta states none for this entity. */
   fieldSource?: FieldSource;
   /** Inherited fields first, own fields last — the order a generated column list follows. */
   fields: FieldInfo[];
@@ -76,7 +76,7 @@ export interface MetaScaffoldSource {
   updatePathParam?: string;
   deletePathParam?: string;
   filters: FilterFieldInfo[];
-  /** Roles the IR states that no generated screen reaches, reported rather than generated. */
+  /** Roles SimpliX Meta states that no generated screen reaches, reported rather than generated. */
   unreachableRoles: string[];
 }
 
@@ -90,13 +90,13 @@ const COMMON_NAME_FIELDS = ["name", "title", "label", "displayName"];
 const TEXTAREA_MIN_LENGTH = 100;
 
 /**
- * Read one entity out of the committed DTO meta IR, or `null` when nothing states it.
+ * Read one entity out of the committed SimpliX Meta, or `null` when nothing states it.
  *
- * Only a domain the spec lists under `meta.export` is read from the IR: that list is what decides
+ * Only a domain the spec lists under `meta.export` is read from SimpliX Meta: that list is what decides
  * whether the domain package's barrel carries the meta output or orval's, so it is also what
  * decides which of the two the scaffolded screen is written against.
  *
- * The IR is read from disk and never from the network — a scaffold run has no backend to ask, and
+ * SimpliX Meta is read from disk and never from the network — a scaffold run has no backend to ask, and
  * the committed snapshot is what the domain package was generated from.
  */
 export async function loadMetaScaffoldSource(
@@ -133,7 +133,7 @@ export async function loadMetaScaffoldSource(
 }
 
 /**
- * The IR a spec was last generated from, read from the snapshot it is committed as.
+ * SimpliX Meta a spec was last generated from, read from the snapshot it is committed as.
  *
  * A `source` that is a URL is left alone: the endpoint answers only while the backend is running,
  * and a scaffold that reached for it would generate one thing on a developer's machine and
@@ -153,7 +153,7 @@ async function readCommittedMeta(
 
 export interface BuildMetaScaffoldSourceOptions {
   domain: ResolvedDomain;
-  /** The tag the entity is, which is the whole of its identity in the IR. */
+  /** The tag the entity is, which is the whole of its identity in SimpliX Meta. */
   tag: string;
   /** Contributed by the spec profile, and the same one the domain package was generated with. */
   naming: OpenApiNamingStrategy;
@@ -163,7 +163,7 @@ export interface BuildMetaScaffoldSourceOptions {
  * Resolve one tag's operations into everything the scaffolder's templates are rendered from.
  *
  * Nothing here reads the filesystem: the fields, the row type, the identifier and the filters are
- * all stated by the IR, so a screen scaffolded before a package has ever been generated carries
+ * all stated by SimpliX Meta, so a screen scaffolded before a package has ever been generated carries
  * the same columns as one scaffolded after.
  */
 export function buildMetaScaffoldSource(
@@ -232,14 +232,14 @@ export function buildMetaScaffoldSource(
  * A request body states what may be written, so it is the form, and the widest one is the record:
  * an entity's create and update bodies differ by the identifier the update addresses, and its
  * custom actions carry narrower bodies still. The comparison counts inherited fields, because the
- * IR's `fields` are a type's own and a child that adds one field to a parent's twenty is the
+ * SimpliX Meta's `fields` are a type's own and a child that adds one field to a parent's twenty is the
  * widest body an entity has while declaring the fewest.
  *
  * An entity with no body at all is read-only, and the record its routes answer with is the whole
  * of what a screen can show. That is the same DTO the mock store is typed with, resolved the same
  * way, so a scaffolded screen and the handlers it is developed against agree about the shape.
  *
- * A search DTO is never a body: the IR carries it on `request.searchDto`, which is what makes the
+ * A search DTO is never a body: SimpliX Meta carries it on `request.searchDto`, which is what makes the
  * filters of a route rather than the fields of a record.
  */
 function chooseFieldType(
@@ -386,7 +386,7 @@ interface FieldShape {
   columnDisplay?: "boolean";
 }
 
-/** Plain text, which is what a field the IR says nothing more specific about is written in. */
+/** Plain text, which is what a field SimpliX Meta says nothing more specific about is written in. */
 function textShape(): FieldShape {
   return {
     tsType: "string",
@@ -400,7 +400,7 @@ function textShape(): FieldShape {
 /**
  * The control a field's declared type asks for.
  *
- * A field the IR types as another DTO is left out: a nested record is not a scalar the form has a
+ * A field SimpliX Meta types as another DTO is left out: a nested record is not a scalar the form has a
  * control for, which is the same decision the OpenAPI path makes by skipping a `z.object(`.
  */
 function shapeOf(

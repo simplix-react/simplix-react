@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
 import { describe, it, expect } from "vitest";
-import type { DtoMeta } from "../meta/ir-types.js";
+import type { DtoMeta } from "../meta/types.js";
 import type { ContainerMapping } from "../openapi/orchestration/spec-profile.js";
 import { resolveMeta } from "../meta/resolve.js";
 import type { ResolvedDomain } from "../meta/resolve.js";
@@ -81,7 +81,7 @@ describe("generateModelFiles emits one file per type", () => {
     expect(file("AreaZoneUpdateFormDTO")).not.toContain("areaCode");
   });
 
-  it("marks a field optional exactly when the IR says it is not required", () => {
+  it("marks a field optional exactly when SimpliX Meta says it is not required", () => {
     const create = fieldsOf("AreaCreateDTO");
     expect(create).toContain("siteId: string;");
     expect(create).toContain("areaName: string;");
@@ -195,7 +195,7 @@ describe("generateModelFiles and the labeled enum", () => {
   });
 });
 
-describe("generateModelFiles and the generics the IR leaves open", () => {
+describe("generateModelFiles and the generics SimpliX Meta leaves open", () => {
   it("declares the base entity generic and keeps its id on the type parameter", () => {
     expect(file("SimpliXBaseEntity")).toContain("export interface SimpliXBaseEntity<K> {");
     expect(fieldsOf("SimpliXBaseEntity")).toEqual(["id?: K;"]);
@@ -219,7 +219,7 @@ describe("generateModelFiles and the generics the IR leaves open", () => {
     }
   });
 
-  it("fills a type argument the IR does not carry, and says where it did", () => {
+  it("fills a type argument SimpliX Meta does not carry, and says where it did", () => {
     // A `TypeMeta` has nowhere to put the argument an `extends` clause supplies, so ten sites
     // name a generic type with nothing to bind its parameter to.
     expect(everything.filledTypeArguments.map((entry) => entry.site)).toEqual([

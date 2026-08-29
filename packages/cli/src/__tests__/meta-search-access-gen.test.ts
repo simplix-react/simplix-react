@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import type { AccessMeta, DtoMeta, FieldMeta } from "../meta/ir-types.js";
+import type { AccessMeta, DtoMeta, FieldMeta } from "../meta/types.js";
 import type { OpenApiNamingStrategy } from "../openapi/naming/naming-strategy.js";
 import type { ContainerMapping } from "../openapi/orchestration/spec-profile.js";
 import { resolveMeta } from "../meta/resolve.js";
@@ -105,7 +105,7 @@ function membersOf(content: string): string[] {
 /**
  * Every searchable field of a DTO, inherited ones included and in declaration order — read from
  * the document here rather than through the resolver, so the assertions below are held against
- * the IR itself.
+ * SimpliX Meta itself.
  */
 function searchableFieldsOf(dto: string): FieldMeta[] {
   return allFieldsOf(dto).filter((field) => field.searchable);
@@ -221,9 +221,9 @@ describe("the two operator vocabularies are translated, never matched by suffix"
 });
 
 describe("a searchable route's params are its filters, its own query and the page window", () => {
-  it("derives the fifty members orval derives, and adds the three the IR does not carry", () => {
+  it("derives the fifty members orval derives, and adds the three SimpliX Meta does not carry", () => {
     // Orval's `ListOrganizationsParams`, read off the application's own `domain-org` package. The
-    // IR states neither the page window nor the sort, which the backend binds on the controller,
+    // SimpliX Meta states neither the page window nor the sort, which the backend binds on the controller,
     // so a params type built from the filters alone would be missing all three.
     const orval = [
       "orgId.equals",
@@ -343,7 +343,7 @@ describe("a searchable route's params are its filters, its own query and the pag
       expect(members.length, path).toBeGreaterThan(own.length + 3);
     }
 
-    // Requiredness is the IR's: seven of the eight state theirs as required, and the enum-typed
+    // Requiredness is SimpliX Meta's: seven of the eight state theirs as required, and the enum-typed
     // one is imported rather than widened to a string.
     expect(fileOf(
       generateSearchFiles(domainOf("audit"), { naming: simplixBootNaming }).files,
@@ -378,12 +378,12 @@ describe("a searchable route's params are its filters, its own query and the pag
   });
 });
 
-describe("a filter's control comes from the field's type, which the IR states", () => {
+describe("a filter's control comes from the field's type, which SimpliX Meta states", () => {
   it("does not open a facet on a field with nothing to put in it", () => {
     // Rule 2c of the OpenAPI path makes any field with an `.in` parameter a faceted filter and
     // fills its options from the entity field's enum, which is undefined unless the field is one.
     // It fires before the type has been looked at, so the operator opens a panel and finds it
-    // empty. The IR can tell the two apart.
+    // empty. SimpliX Meta can tell the two apart.
     const equipment = readSearchFields(searchableFieldsOf("EquipmentSearchDTO"), () => undefined);
     const derived = deriveFilterFields(equipment.fields);
     for (const name of ["siteId", "areaId", "equipmentId", "managingOrgId"]) {
@@ -399,7 +399,7 @@ describe("a filter's control comes from the field's type, which the IR states", 
     }
   });
 
-  it("fills a facet from the enum registry the IR carries", () => {
+  it("fills a facet from the enum registry SimpliX Meta carries", () => {
     const approval = domainOf("approval");
     const fields = readSearchFields(searchableFieldsOf("ApprovalRequestSearchDTO"), (name) =>
       approval.enums.get(name)?.meta.values.map((value) => value.name),
@@ -492,7 +492,7 @@ describe("a filter's control comes from the field's type, which the IR states", 
   });
 });
 
-describe("SUFFIX_TO_ENUM_KEY carries the operators the IR recovers", () => {
+describe("SUFFIX_TO_ENUM_KEY carries the operators SimpliX Meta recovers", () => {
   let tempDir: string;
   let originalCwd: string;
   let originalExit: typeof process.exit;
@@ -661,7 +661,7 @@ describe("both generators produce well-formed TypeScript", () => {
     expect(emitted).toBe(321);
   });
 
-  it("names no type the IR does not declare, and no operator it cannot translate", () => {
+  it("names no type SimpliX Meta does not declare, and no operator it cannot translate", () => {
     for (const domain of resolved.domains.values()) {
       const search = generateSearchFiles(domain, { naming: simplixBootNaming });
       expect(search.unsupportedOperators, domain.name).toEqual([]);
@@ -671,7 +671,7 @@ describe("both generators produce well-formed TypeScript", () => {
     }
   });
 
-  it("sends a value the IR names no type for as the text a query string carries", () => {
+  it("sends a value SimpliX Meta names no type for as the text a query string carries", () => {
     // Five fields are a raw Java `List` whose element resolves to the collection's own variable,
     // so nothing in the document says what is inside them.
     const erased = new Set<string>();

@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import ts from "typescript";
 import { describe, it, expect } from "vitest";
 import { z } from "zod";
-import type { DtoMeta } from "../meta/ir-types.js";
+import type { DtoMeta } from "../meta/types.js";
 import type { ContainerMapping } from "../openapi/orchestration/spec-profile.js";
 import { resolveMeta } from "../meta/resolve.js";
 import type { ResolvedDomain } from "../meta/resolve.js";
@@ -210,7 +210,7 @@ describe("generateSchemaFiles types a field the way the wire carries it", () => 
     expect(members("FloorPlanPlacementUpdateDTO")).toContain("verticalRatio: z.number().min(0).max(100),");
   });
 
-  it("gives z.record the key schema the IR does not carry", () => {
+  it("gives z.record the key schema SimpliX Meta does not carry", () => {
     // The one-argument call throws while the schema is built, so a module holding one of the 48
     // Map fields would not load at all.
     expect(members("AreaCreateDTO")).toContain(
@@ -221,7 +221,7 @@ describe("generateSchemaFiles types a field the way the wire carries it", () => 
     }
   });
 
-  it("marks a field optional exactly when the IR says it is not required", () => {
+  it("marks a field optional exactly when SimpliX Meta says it is not required", () => {
     expect(members("AreaCreateDTO")).toContain("areaKind: z.object({ value: z.enum(['AREA', 'ZONE']), label: z.string() }),");
     expect(members("AreaCreateDTO")).toContain("concurrentWorkerLimit: z.int().optional(),");
     // `nullable` carries nothing: the capture has no field where it differs from `!required`.
@@ -421,7 +421,7 @@ describe("generateSchemaFiles produces well-formed TypeScript that runs", () => 
 
     expect(schemas.ShiftDTOSchema.safeParse({ startTime: "09:30" }).success).toBe(true);
     expect(schemas.ShiftDTOSchema.safeParse({ startTime: "24:30" }).success).toBe(false);
-    // The format the IR carries is a Java time format, not a regular expression.
+    // The format SimpliX Meta carries is a Java time format, not a regular expression.
     expect(schemas.ShiftDTOSchema.safeParse({ startTime: "HH:mm" }).success).toBe(false);
   });
 

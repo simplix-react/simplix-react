@@ -1,4 +1,4 @@
-// TypeScript mirror of the DTO meta IR served by `GET /dev/meta/dto`.
+// TypeScript mirror of SimpliX Meta served by `GET /dev/meta/dto`.
 //
 // This file has no logic — it is a structural mirror of the Java records under
 // `dev.simplecore.simplix.web.meta.model` in spring-boot-starter-simplix. Every record there
@@ -135,7 +135,7 @@ export interface OperationMeta {
   request: RequestMeta;
 }
 
-/** Root IR document served by `GET /dev/meta/dto`. */
+/** Root SimpliX Meta document served by `GET /dev/meta/dto`. */
 export interface DtoMeta {
   version: number;
   enums: Record<string, EnumMeta>;

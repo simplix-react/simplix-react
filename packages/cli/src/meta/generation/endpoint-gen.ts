@@ -1,5 +1,5 @@
 import type { OpenApiNamingStrategy } from "../../openapi/naming/naming-strategy.js";
-import type { OperationMeta, ParamMeta, TypeRef } from "../ir-types.js";
+import type { OperationMeta, ParamMeta, TypeRef } from "../types.js";
 import type { ResolvedDomain } from "../resolve.js";
 import {
   containerTypeExpression,
@@ -48,7 +48,7 @@ export interface EndpointGenResult {
   files: Map<string, string>;
   duplicateExports: DuplicateExport[];
   /**
-   * Operations whose file parts the IR carries as query parameters. They are sent as a form body
+   * Operations whose file parts SimpliX Meta carries as query parameters. They are sent as a form body
    * instead, because a `Blob` in a query string is the file's `[object Blob]` spelling.
    */
   multipartOperations: string[];
@@ -57,7 +57,7 @@ export interface EndpointGenResult {
 /**
  * One operation, resolved into the names and the shapes both generated halves are written from.
  *
- * The hooks are generated from the same resolution rather than from a second walk of the IR: a
+ * The hooks are generated from the same resolution rather than from a second walk of SimpliX Meta: a
  * hook that disagrees with its request function about a parameter's position compiles and sends
  * the wrong argument.
  */
@@ -74,13 +74,13 @@ export interface EndpointTarget {
   /** A GET is read through `useQuery`; every other method is a mutation. */
   isQuery: boolean;
   pathParams: ParamMeta[];
-  /** The query parameters the IR states, which a searchable route leaves to its search DTO. */
+  /** The query parameters SimpliX Meta states, which a searchable route leaves to its search DTO. */
   queryParams: ParamMeta[];
   /** Name of the params type, absent when the operation takes no query parameters at all. */
   paramsType?: string;
   /**
    * Whether this generator declares that type. A searchable route's parameters are the filters
-   * its DTO defines rather than anything the IR states about the route, so the search generator
+   * its DTO defines rather than anything SimpliX Meta states about the route, so the search generator
    * declares them in the model directory and both halves import the name from there.
    */
   paramsDeclared: boolean;
@@ -108,7 +108,7 @@ export interface EndpointEntity {
  * write, grouped by the tag that owns them.
  *
  * The entity name is the tag's last dot-segment with its initial lowered, which is what the
- * profile's `resolveEntityName` answers from the tag alone. Nothing else the IR carries takes
+ * profile's `resolveEntityName` answers from the tag alone. Nothing else SimpliX Meta carries takes
  * part in it, so a tag is the whole of an entity's identity here.
  */
 export function resolveEndpoints(
@@ -276,12 +276,12 @@ function target(
   const resolved = naming.resolveOperation({
     operationId: operation.id,
     method: operation.method,
-    // The IR already spells a path parameter `{name}`, which is the form the strategy reads.
+    // SimpliX Meta already spells a path parameter `{name}`, which is the form the strategy reads.
     path: operation.path,
     tag: operation.tag,
     entityName: entity,
     summary: operation.summary,
-    // The IR carries no description, and no `x-` extensions; the OpenAPI path passes `{}` too.
+    // SimpliX Meta carries no description, and no `x-` extensions; the OpenAPI path passes `{}` too.
     description: undefined,
     responseType: innermostRef(operation.response),
     requestType: innermostRef(operation.request.body),
@@ -293,7 +293,7 @@ function target(
   const pascal = resolved.hookName.charAt(0).toUpperCase() + resolved.hookName.slice(1);
   const body = operation.request.body;
   // A searchable route's parameters are the filters its DTO defines, which the search generator
-  // writes into the model directory beside the DTOs; this one declares only what the IR states.
+  // writes into the model directory beside the DTOs; this one declares only what SimpliX Meta states.
   const searchable = operation.request.searchDto !== undefined;
   return {
     operation,
@@ -445,7 +445,7 @@ export class TypeWriter {
   }
 
   private renderEnum(name: string, imports: FileImports): string {
-    // A name the IR does not declare is already reported by the resolver; importing it here would
+    // A name SimpliX Meta does not declare is already reported by the resolver; importing it here would
     // point at a module no generator writes. A request carries the value rather than its label,
     // so the union is the shape on this side of the wire.
     if (!this.domain.enums.has(name)) return "unknown";
@@ -506,7 +506,7 @@ class EndpointEmitter {
     return parts.join("\n");
   }
 
-  /** The query parameters as one type, whose members carry the requiredness the IR states. */
+  /** The query parameters as one type, whose members carry the requiredness SimpliX Meta states. */
   private paramsType(target: EndpointTarget, imports: FileImports): string {
     const members = target.queryParams.map((param) => {
       const optional = param.required ? "" : "?";
@@ -615,7 +615,7 @@ ${init.join("\n")}
 `;
   }
 
-  /** The path parameters as declared arguments, typed as the IR carries them. */
+  /** The path parameters as declared arguments, typed as SimpliX Meta carries them. */
   private pathArguments(target: EndpointTarget, imports: FileImports): string[] {
     return target.pathParams.map(
       (param) => `${param.name}: ${this.types.value(param.type, imports)}`,

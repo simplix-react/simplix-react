@@ -3,14 +3,14 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
-import { fetchMeta, SUPPORTED_IR_VERSION } from "../meta/fetch.js";
-import type { DtoMeta } from "../meta/ir-types.js";
+import { fetchMeta, SUPPORTED_META_VERSION } from "../meta/fetch.js";
+import type { DtoMeta } from "../meta/types.js";
 
 const fixturePath = fileURLToPath(
   new URL("../meta/__fixtures__/smart-safety-meta.json", import.meta.url),
 );
 
-/** A minimal but structurally valid IR, so a test never depends on the 2.7 MB fixture. */
+/** A minimal but structurally valid SimpliX Meta, so a test never depends on the 2.7 MB fixture. */
 const tinyIr: DtoMeta = {
   version: 1,
   enums: {},
@@ -20,7 +20,7 @@ const tinyIr: DtoMeta = {
   operations: [],
 };
 
-/** The SimpliX envelope the endpoint returns, wrapping the IR in `body`. */
+/** The SimpliX envelope the endpoint returns, wrapping SimpliX Meta in `body`. */
 function envelope(body: unknown): Record<string, unknown> {
   return {
     type: "SUCCESS",
@@ -53,8 +53,8 @@ afterEach(() => {
 });
 
 describe("fetchMeta", () => {
-  it("supports IR version 1", () => {
-    expect(SUPPORTED_IR_VERSION).toBe(1);
+  it("supports SimpliX Meta version 1", () => {
+    expect(SUPPORTED_META_VERSION).toBe(1);
   });
 
   it("reads the committed fixture from disk", async () => {
@@ -117,7 +117,7 @@ describe("fetchMeta", () => {
     expect(fromBare).toEqual(fromEnveloped);
   });
 
-  it("writes the bare IR to the snapshot path after a fetch", async () => {
+  it("writes the bare SimpliX Meta to the snapshot path after a fetch", async () => {
     const snapshot = join(tempDir, "written.json");
     stubFetch(okResponse(envelope(tinyIr)));
 
@@ -126,7 +126,7 @@ describe("fetchMeta", () => {
     expect(JSON.parse(await readFile(snapshot, "utf-8"))).toEqual(tinyIr);
   });
 
-  it("refuses an IR newer than this CLI, telling the operator to upgrade", async () => {
+  it("refuses a SimpliX Meta document newer than this CLI, telling the operator to upgrade", async () => {
     const future = join(tempDir, "future.json");
     await writeFile(future, JSON.stringify({ ...tinyIr, version: 2 }), "utf-8");
 
@@ -149,7 +149,7 @@ describe("fetchMeta", () => {
     ).rejects.toThrow(/snapshot/i);
   });
 
-  it("rejects a snapshot that is neither an IR nor an envelope", async () => {
+  it("rejects a snapshot that is neither a SimpliX Meta document nor an envelope", async () => {
     const junk = join(tempDir, "junk.json");
     await writeFile(junk, JSON.stringify({ types: {}, operations: [] }), "utf-8");
 

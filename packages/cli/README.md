@@ -340,7 +340,7 @@ simplix openapi <spec> [options]
 | `--dry-run` | Preview files without writing | `false` |
 | `-f, --force` | Force regeneration even if no changes | `false` |
 | `--no-http` | Skip `.http` file generation | - |
-| `--offline` | Read the DTO meta IR from `meta.snapshot` instead of the server | `false` |
+| `--offline` | Read SimpliX Meta from `meta.snapshot` instead of the server | `false` |
 | `--no-mock` | Skip mock layer generation | - |
 | `--header` | Add auto-generated header comment | `true` |
 | `--no-header` | Skip auto-generated header comment | - |
@@ -463,7 +463,7 @@ simplix openapi ./spec.yaml --dry-run
 ### simplix meta-diff
 
 Compare a domain package's two generated outputs — `src/generated/` from orval and
-`src/generated-meta/` from the DTO metadata IR — and report where their public names, fields and
+`src/generated-meta/` from SimpliX Meta — and report where their public names, fields and
 query keys disagree. A domain is switched to the meta output only once this command is quiet.
 
 ```bash
@@ -517,7 +517,7 @@ project knows is declared rather than guessed.
     {
       "orval": "useGetAvatar",
       "meta": ["useGetPublicUserAvatar", "useGetPublicUserAvatarThumbnail"],
-      "reason": "the IR follows the @Tag annotation and springdoc does not"
+      "reason": "SimpliX Meta follows the @Tag annotation and springdoc does not"
     }
   ],
   "requiredFields": ["UserAccountCreateDTO.email"],
@@ -704,8 +704,8 @@ export default {
 | `mock.maxLimit` | Maximum pagination limit for mock handlers | `100` |
 | `codegen.header` | Prepend auto-generated header comment to generated files | `true` |
 | `openapi.domains` | Tag-based domain splitting map: domain name → tag patterns (exact or `/regex/`) | `undefined` (single domain) |
-| `openapi.meta.source` | DTO meta IR endpoint URL or snapshot path | The spec's origin plus the profile's `metaEndpoint` |
-| `openapi.meta.snapshot` | Where the fetched IR is committed, for `--offline` and for the change gate | `undefined` (the meta half runs every time) |
+| `openapi.meta.source` | SimpliX Meta endpoint URL or snapshot path | The spec's origin plus the profile's `metaEndpoint` |
+| `openapi.meta.snapshot` | Where the fetched SimpliX Meta is committed, for `--offline` and for the change gate | `undefined` (the meta half runs every time) |
 | `openapi.meta.export` | Domains whose barrel exports `src/generated-meta/` instead of the Orval output | `[]` |
 
 The config file is loaded using [jiti](https://github.com/unjs/jiti), so TypeScript syntax is supported without compilation.

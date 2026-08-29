@@ -8,7 +8,7 @@ import {
   type SearchField,
   type SearchOperatorKey,
 } from "../filter-source.js";
-import type { FieldMeta, ParamMeta, TypeRef } from "../ir-types.js";
+import type { FieldMeta, ParamMeta, TypeRef } from "../types.js";
 import type { ResolvedDomain } from "../resolve.js";
 import { ENUM_MODULE, HEADER, memberName, PRIMITIVES } from "./emit.js";
 import {
@@ -30,7 +30,7 @@ const FILTER_MODULE = "_filters";
 
 /**
  * The page window every searchable route accepts. The backend binds it on the controller rather
- * than on the DTO, so the IR states none of it and a params type built from the filters alone
+ * than on the DTO, so SimpliX Meta states none of it and a params type built from the filters alone
  * would be missing its paging.
  */
 const PAGE_PARAMS = [
@@ -49,7 +49,7 @@ export interface UnsupportedOperator {
   /** The search DTO the field is declared on. */
   type: string;
   field: string;
-  /** The operator as the IR names it. */
+  /** The operator as SimpliX Meta names it. */
   operator: string;
 }
 
@@ -63,7 +63,7 @@ export interface UnfacetedField {
   field: string;
 }
 
-/** A member the IR names no type for, sent as text because a query string carries text. */
+/** A member SimpliX Meta names no type for, sent as text because a query string carries text. */
 export interface ErasedFilterType {
   /** The search DTO the field is declared on, or the operation the parameter belongs to. */
   site: string;
@@ -85,7 +85,7 @@ export interface SearchGenResult {
 }
 
 /**
- * One route whose parameters are the filters a search DTO defines, with the two names the IR
+ * One route whose parameters are the filters a search DTO defines, with the two names SimpliX Meta
  * leaves optional resolved: a route the endpoint generator declares no params for is one this
  * generator declares them for, and it has a search DTO exactly then.
  */
@@ -336,11 +336,11 @@ ${derived.filters.map(filterFieldLiteral).join("\n")}
 
   /** The searchable fields of a DTO, inherited ones included and in declaration order. */
   private searchableFields(name: string): FieldMeta[] {
-    // A DTO the IR does not declare is already reported by the resolver.
+    // A DTO SimpliX Meta does not declare is already reported by the resolver.
     return (this.domain.types.get(name)?.allFields ?? []).filter((field) => field.searchable);
   }
 
-  /** A parameter the route states of its own, carrying the requiredness the IR states. */
+  /** A parameter the route states of its own, carrying the requiredness SimpliX Meta states. */
   private ownParam(param: ParamMeta, imports: EnumImports, site: string): string {
     const type = this.scalarType(param.type, imports, site, param.name);
     const doc = param.description ? `  ${jsDoc(param.description)}\n` : "";
@@ -393,7 +393,7 @@ ${derived.filters.map(filterFieldLiteral).join("\n")}
         return "number";
       case "enum":
         // A request carries the enum's value rather than its label, which is the union's shape. A
-        // name the IR does not declare is already reported by the resolver.
+        // name SimpliX Meta does not declare is already reported by the resolver.
         if (!this.domain.enums.has(ref.name)) return this.erased(site, field);
         imports.enums.add(ref.name);
         return ref.name;
@@ -411,7 +411,7 @@ ${derived.filters.map(filterFieldLiteral).join("\n")}
     }
   }
 
-  /** A value the IR names no type for. It travels as text, which is what a query string is. */
+  /** A value SimpliX Meta names no type for. It travels as text, which is what a query string is. */
   private erased(site: string, field: string): string {
     this.erasedFilterTypes.push({ site, field });
     return "string";

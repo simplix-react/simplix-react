@@ -1,5 +1,5 @@
 import type { OpenApiNamingStrategy } from "../../openapi/naming/naming-strategy.js";
-import type { AccessMeta } from "../ir-types.js";
+import type { AccessMeta } from "../types.js";
 import type { ResolvedDomain } from "../resolve.js";
 import { HEADER } from "./emit.js";
 import {
@@ -21,7 +21,7 @@ export interface AccessGenOptions {
 }
 
 /**
- * An operation guarded by a SpEL expression. The IR carries it as written, because there is no
+ * An operation guarded by a SpEL expression. SimpliX Meta carries it as written, because there is no
  * structure left in it to carry: the expression calls a bean, or joins two permissions with a
  * word. Nothing on this side can evaluate it, so a screen that reads one asks the server.
  */
@@ -42,7 +42,7 @@ export interface AccessGenResult {
  * Emit one module per entity holding what each of its operations requires of the caller, and the
  * barrel over them.
  *
- * The IR carries `@PreAuthorize` already taken apart, so nothing here parses SpEL: a permission
+ * SimpliX Meta carries `@PreAuthorize` already taken apart, so nothing here parses SpEL: a permission
  * arrives as the group and the action it names, and only an expression the annotation built out of
  * several of them arrives as text. Nothing generated reads these constants — whether a screen
  * hides a control it may not use, or shows it and lets the server refuse, is the application's
@@ -141,7 +141,7 @@ function literal(target: EndpointTarget): string {
   }
 }
 
-/** The shapes the emitted constants are typed against, mirroring the IR's own `AccessMeta`. */
+/** The shapes the emitted constants are typed against, mirroring SimpliX Meta's own `AccessMeta`. */
 function accessTypes(): string {
   return `${HEADER}
 

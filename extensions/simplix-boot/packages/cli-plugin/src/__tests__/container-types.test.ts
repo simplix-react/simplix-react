@@ -13,7 +13,7 @@ const fixturePath = fileURLToPath(
 );
 
 /**
- * Structural subset of the IR's `TypeRef` this walk needs: the discriminator, the container's
+ * Structural subset of SimpliX Meta's `TypeRef` this walk needs: the discriminator, the container's
  * name, and the generic arguments both `container` and `ref` can carry.
  */
 interface TypeRefNode {
@@ -69,7 +69,7 @@ function countContainers(): Map<string, number> {
 describe("bootContainerTypes", () => {
   const used = countContainers();
 
-  it("covers every container the captured IR actually uses", () => {
+  it("covers every container the captured SimpliX Meta actually uses", () => {
     const missing = [...used.keys()].filter((name) => !(name in bootContainerTypes));
     expect(missing).toEqual([]);
   });
@@ -99,7 +99,7 @@ describe("bootContainerTypes", () => {
     expect(bootContainerTypes.List).toEqual({ ts: "Array", zod: "z.array" });
   });
 
-  it("restores the map key the IR drops", () => {
+  it("restores the map key SimpliX Meta drops", () => {
     expect(bootContainerTypes.Map).toEqual({
       ts: "Record",
       zod: "z.record",

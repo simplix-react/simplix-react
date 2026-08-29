@@ -1,10 +1,10 @@
 import type { ContainerMapping } from "../../openapi/orchestration/spec-profile.js";
-import type { TypeRef } from "../ir-types.js";
+import type { TypeRef } from "../types.js";
 import type { ResolvedDomain } from "../resolve.js";
 
 /** The banner every generated module of a domain package opens with. */
 export const HEADER = `/**
- * Generated from the DTO meta IR. Do not edit manually.
+ * Generated from SimpliX Meta. Do not edit manually.
  */`;
 
 /** Base name of the module every enum declaration is written into, inside the model directory. */
@@ -44,7 +44,7 @@ export function containerTypeExpression(
   // `Array` is written in its shorthand, which is the form the rest of the generated client and
   // every hand-written consumer of it uses.
   if (mapping.ts === "Array" && rendered.length === 1) return `${rendered[0]}[]`;
-  // `Record` takes the key type as well, and the IR carries only the value: a Java `Map` has
+  // `Record` takes the key type as well, and SimpliX Meta carries only the value: a Java `Map` has
   // string keys once JSON has serialized it, which is what the profile's `keyType` says.
   if (mapping.keyType) return `${mapping.ts}<${mapping.keyType}, ${rendered.join(", ")}>`;
   return rendered.length === 0 ? mapping.ts : `${mapping.ts}<${rendered.join(", ")}>`;

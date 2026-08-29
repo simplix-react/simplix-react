@@ -7,7 +7,7 @@ import type {
   OperationMeta,
   TypeMeta,
   TypeRef,
-} from "./ir-types.js";
+} from "./types.js";
 
 /**
  * Java packages whose types belong to the platform rather than to the application. A closure
@@ -42,7 +42,7 @@ export interface ResolvedEntity {
 /** One DTO type inside a domain's closure, with its inheritance already followed. */
 export interface ResolvedType {
   name: string;
-  /** The IR declaration. `meta.fields` is the own-field list; `meta.typeParams` its generics. */
+  /** SimpliX Meta declaration. `meta.fields` is the own-field list; `meta.typeParams` its generics. */
   meta: TypeMeta;
   /** The `extends` chain, nearest parent first. */
   ancestors: string[];
@@ -68,7 +68,7 @@ export interface ResolvedDomain {
   name: string;
   /** Entities sorted by tag, which is also the order ownership was assigned in. */
   entities: ResolvedEntity[];
-  /** Every matched operation of the domain, in IR order. */
+  /** Every matched operation of the domain, in SimpliX Meta order. */
   operations: OperationMeta[];
   /** The transitive type closure, keyed and ordered by name. */
   types: Map<string, ResolvedType>;
@@ -123,16 +123,16 @@ export interface ResolvedMeta {
   contestedTags: ContestedTag[];
   frameworkTypes: FrameworkTypeUse[];
   sharedDeclarations: SharedDeclaration[];
-  /** Type names a closure referenced that the IR does not declare. */
+  /** Type names a closure referenced that SimpliX Meta does not declare. */
   missingTypes: string[];
-  /** Enum names a closure referenced that the IR does not declare. */
+  /** Enum names a closure referenced that SimpliX Meta does not declare. */
   missingEnums: string[];
   /** Container names a closure reached that `containerTypes` does not map. */
   unmappedContainers: string[];
 }
 
 /**
- * Slice the IR into one closure per domain and index it once, so no generator walks the document
+ * Slice SimpliX Meta into one closure per domain and index it once, so no generator walks the document
  * again.
  *
  * A tag belongs to the first domain whose patterns match it, mirroring the OpenAPI pipeline's
@@ -141,7 +141,7 @@ export interface ResolvedMeta {
  * `site.*`.
  *
  * Nothing is dropped quietly. An operation no domain claims, a tag two domains claim, a pattern
- * no tag answers, a reference the IR does not declare and a container the profile does not map
+ * no tag answers, a reference SimpliX Meta does not declare and a container the profile does not map
  * all come back on {@link ResolvedMeta} for the caller to act on.
  */
 export function resolveMeta(meta: DtoMeta, options: ResolveMetaOptions): ResolvedMeta {
@@ -360,7 +360,7 @@ class InheritanceIndex {
   private enter(name: string): void {
     if (this.inProgress.includes(name)) {
       throw new Error(
-        `Circular extends chain in the DTO meta IR: ${[...this.inProgress, name].join(" → ")}`,
+        `Circular extends chain in SimpliX Meta: ${[...this.inProgress, name].join(" → ")}`,
       );
     }
     this.inProgress.push(name);

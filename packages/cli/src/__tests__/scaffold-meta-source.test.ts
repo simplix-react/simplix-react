@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { parseSchemaFields } from "../commands/scaffold-crud.js";
-import type { DtoMeta } from "../meta/ir-types.js";
+import type { DtoMeta } from "../meta/types.js";
 import type { OpenApiNamingStrategy } from "../openapi/naming/naming-strategy.js";
 import type { ContainerMapping } from "../openapi/orchestration/spec-profile.js";
 import { registerSpecProfile } from "../openapi/plugin-registry.js";
@@ -157,7 +157,7 @@ describe("the DTO an entity's screens are built from", () => {
       else neither.push(source.entity);
     }
     expect(byOrigin).toEqual({ request: 74, response: 50 });
-    // Both are binary surfaces: an avatar and a download are bytes, and the IR states no field a
+    // Both are binary surfaces: an avatar and a download are bytes, and SimpliX Meta states no field a
     // screen could render. They are refused rather than given an invented id/name pair.
     expect(neither.sort()).toEqual(["avatar", "exportDownload"]);
     for (const source of sources) {
@@ -167,7 +167,7 @@ describe("the DTO an entity's screens are built from", () => {
   });
 });
 
-describe("what a template cannot know and the IR states", () => {
+describe("what a template cannot know and SimpliX Meta states", () => {
   const holiday = () => sourceOf("system", "common.main.system.Holiday");
 
   it("gives a temporal column the format its kind decides", () => {
@@ -196,7 +196,7 @@ describe("what a template cannot know and the IR states", () => {
     const excluded = holiday().fields.find((one) => one.name === "businessDayExcluded");
     expect(excluded).toMatchObject({ component: "Boolean", columnDisplay: "boolean" });
     // Only a boolean carries it: `country` and `phone` are the column's other two displays and
-    // the IR states nothing that tells either apart from any other string.
+    // SimpliX Meta states nothing that tells either apart from any other string.
     for (const source of everySource()) {
       for (const field of source.fields) {
         if (field.columnDisplay !== undefined) expect(field.tsType, field.name).toBe("boolean");
@@ -372,7 +372,7 @@ const HOLIDAY_SCHEMA = [
   "",
 ].join("\n");
 
-describe("a screen scaffolded from the IR", () => {
+describe("a screen scaffolded from SimpliX Meta", () => {
   let tempDir: string;
   let originalCwd: string;
   let originalExit: typeof process.exit;
@@ -483,7 +483,7 @@ describe("a screen scaffolded from the IR", () => {
     expect(sourceOf("system", "common.main.system.Holiday").fields).toHaveLength(11);
   });
 
-  it("refuses an entity the IR states nothing renderable for", async () => {
+  it("refuses an entity SimpliX Meta states nothing renderable for", async () => {
     const { scaffoldCrudCommand } = await import("../commands/scaffold-crud.js");
     const { log } = await import("../utils/logger.js");
 

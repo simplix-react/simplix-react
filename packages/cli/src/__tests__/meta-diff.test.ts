@@ -397,7 +397,7 @@ describe("meta-diff", () => {
           {
             orval: "useGetNotice",
             meta: "useGetPublicUserAvatar",
-            reason: "the IR follows the @Tag annotation and orval does not",
+            reason: "SimpliX Meta follows the @Tag annotation and orval does not",
           },
         ],
       },

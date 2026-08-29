@@ -7,7 +7,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { OpenApiNamingStrategy } from "../openapi/naming/naming-strategy.js";
 import type { ContainerMapping } from "../openapi/orchestration/spec-profile.js";
 import type { ExtractedEntity, OpenAPISnapshot } from "../openapi/types.js";
-import type { DtoMeta } from "../meta/ir-types.js";
+import type { DtoMeta } from "../meta/types.js";
 import { resolveMeta } from "../meta/resolve.js";
 import { writeFileWithDir } from "../utils/fs.js";
 import type { ResolvedDomain } from "../meta/resolve.js";
@@ -272,7 +272,7 @@ describe("the meta output lands in src/generated-meta/", () => {
 
 // ── 2. A stale file does not survive a regeneration ──────────
 
-describe("a declaration the IR no longer carries leaves the package", () => {
+describe("a declaration SimpliX Meta no longer carries leaves the package", () => {
   it("is gone after cleanGeneratedDirs and a rewrite", async () => {
     const dir = await packageWithMeta();
     const stale = `${META_DIR}/model/oldThing.ts`;
@@ -286,7 +286,7 @@ describe("a declaration the IR no longer carries leaves the package", () => {
     expect(await exists(dir, `${META_DIR}/index.ts`)).toBe(true);
   });
 
-  it("goes for a type the IR dropped between two runs", async () => {
+  it("goes for a type SimpliX Meta dropped between two runs", async () => {
     const dir = await mkdtemp(join(tmpdir(), "simplix-meta-"));
     created.push(dir);
 
@@ -323,7 +323,7 @@ describe("the change gate sees what the OpenAPI diff cannot", () => {
   ];
   const previous: OpenAPISnapshot = { version: 2, specSource: "spec.json", entities };
 
-  it("regenerates when the IR gained one constraint and the entities did not move", () => {
+  it("regenerates when SimpliX Meta gained one constraint and the entities did not move", () => {
     const before = tinyDomain(tinyMeta());
     const constrained = tinyMeta();
     constrained.types["ShopItemDTO"].fields[0].constraints = [{ kind: "max", value: 40 }];
@@ -377,7 +377,7 @@ describe("the change gate sees what the OpenAPI diff cannot", () => {
     expect(gate.changed).toBe(false);
   });
 
-  it("runs the meta half unconditionally when there is no committed IR to compare", () => {
+  it("runs the meta half unconditionally when there is no committed SimpliX Meta to compare", () => {
     const gate = computeChangeGate({
       previous,
       entities,
@@ -431,7 +431,7 @@ describe("--offline", () => {
     ).rejects.toThrow(/snapshot/);
   });
 
-  it("reads the IR from the snapshot rather than the server", async () => {
+  it("reads SimpliX Meta from the snapshot rather than the server", async () => {
     const dir = await mkdtemp(join(tmpdir(), "simplix-meta-"));
     created.push(dir);
     await writeFile(join(dir, "ir.json"), JSON.stringify(tinyMeta()), "utf-8");
@@ -454,7 +454,7 @@ describe("--offline", () => {
   });
 });
 
-// ── 5. Where the IR is read from ─────────────────────────────
+// ── 5. Where SimpliX Meta is read from ─────────────────────────────
 
 describe("the meta source", () => {
   it("is the profile's endpoint on the spec's origin when the config states none", () => {
@@ -595,9 +595,9 @@ describe("the artifacts keyed by entity name rather than by generated path", () 
   });
 });
 
-// ── 8. crud.config.ts from the IR ────────────────────────────
+// ── 8. crud.config.ts from SimpliX Meta ────────────────────────────
 
-describe("crud.config.ts generated from the IR", () => {
+describe("crud.config.ts generated from SimpliX Meta", () => {
   it("resolves every role it records to a hook the meta output exports", async () => {
     const dir = await mkdtemp(join(tmpdir(), "simplix-meta-"));
     created.push(dir);
@@ -666,7 +666,7 @@ describe("the swap", () => {
   });
 });
 
-// ── A hand-built IR, small enough to read ────────────────────
+// ── A hand-built SimpliX Meta, small enough to read ────────────────────
 
 /** One entity, one DTO it carries, one enum on it — everything a fingerprint reads. */
 function tinyMeta(): DtoMeta {
@@ -711,6 +711,6 @@ function tinyMeta(): DtoMeta {
 function tinyDomain(document: DtoMeta): ResolvedDomain {
   const built = resolveMeta(document, { domains: { shop: ["shop.Item"] }, containerTypes });
   const domain = built.domains.get("shop");
-  if (!domain) throw new Error("the hand-built IR resolved into no shop domain");
+  if (!domain) throw new Error("the hand-built SimpliX Meta resolved into no shop domain");
   return domain;
 }

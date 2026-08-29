@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { generateSchemaFiles } from "../meta/generation/schema-gen.js";
 import { resolveMeta } from "../meta/resolve.js";
-import type { DtoMeta } from "../meta/ir-types.js";
+import type { DtoMeta } from "../meta/types.js";
 import { smartSafetyDomains } from "../meta/__fixtures__/smart-safety-domains.js";
 
 /**

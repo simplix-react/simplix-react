@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
 import { describe, it, expect } from "vitest";
-import type { DtoMeta } from "../meta/ir-types.js";
+import type { DtoMeta } from "../meta/types.js";
 import type {
   OpenApiNamingStrategy,
   OperationContext,
@@ -251,7 +251,7 @@ describe("generateEndpointFiles writes the request half", () => {
     );
   });
 
-  it("interpolates a path parameter the IR already spells in braces", () => {
+  it("interpolates a path parameter SimpliX Meta already spells in braces", () => {
     // All 311 path parameters arrive as `{name}`, which is also the form the naming strategy
     // reads, so nothing here converts a path.
     const paths: string[] = [];
@@ -319,7 +319,7 @@ describe("generateEndpointFiles writes the request half", () => {
   });
 
   it("imports a searchable route's parameters rather than declaring them", () => {
-    // The filters are the search DTO's, not the route's: the IR states no query parameter for
+    // The filters are the search DTO's, not the route's: SimpliX Meta states no query parameter for
     // them, and the search generator writes the type into the model directory beside the DTOs.
     const organization = endpointFile("organization");
     expect(organization).toContain(
@@ -330,7 +330,7 @@ describe("generateEndpointFiles writes the request half", () => {
       "export const listOrganizations = async (\n  params?: ListOrganizationsParams,",
     );
     // The URL builder hands the whole object to the query string, so a member added there — a
-    // filter, or the page window the IR does not carry — is sent without this generator knowing.
+    // filter, or the page window SimpliX Meta does not carry — is sent without this generator knowing.
     expect(organization).toContain("  const query = toQueryString(params);");
     expect(hookFile("organization")).toContain(
       "import type { ListOrganizationsParams } from '../model/listOrganizationsParams';",
@@ -355,7 +355,7 @@ describe("generateEndpointFiles writes the request half", () => {
     );
   });
 
-  it("declares a query parameter as required exactly when the IR says it is", () => {
+  it("declares a query parameter as required exactly when SimpliX Meta says it is", () => {
     const organization = endpointFile("organization");
     expect(organization).toContain(
       ["export type GetOrganizationTreeParams = {", "  fullTree: boolean;", "};"].join("\n"),
@@ -456,7 +456,7 @@ describe("generateEndpointFiles writes the request half", () => {
     expect(orgEndpoints.files.get("endpoints/index.ts")).toBe(
       [
         "/**",
-        " * Generated from the DTO meta IR. Do not edit manually.",
+        " * Generated from SimpliX Meta. Do not edit manually.",
         " */",
         "",
         "export * from './orgType';",
@@ -486,7 +486,7 @@ describe("generateEndpointFiles says what it could not name once", () => {
   });
 
   it("sends a file as a form body rather than as text in the query string", () => {
-    // The IR carries a multipart part as a query parameter, and `String(blob)` is `[object Blob]`.
+    // SimpliX Meta carries a multipart part as a query parameter, and `String(blob)` is `[object Blob]`.
     const user = generateEndpointFiles(domainOf("user"), { naming: simplixBootNaming });
     expect(user.multipartOperations).toEqual(["AdminUserAvatarRest_upload"]);
     const avatar = user.files.get("endpoints/userAvatar.ts") ?? "";

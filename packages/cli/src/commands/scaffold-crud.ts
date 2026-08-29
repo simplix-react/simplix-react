@@ -58,9 +58,9 @@ export interface FieldInfo {
    * none, because a sort the backend does not implement moves the arrow and leaves the rows.
    */
   sortable?: boolean;
-  /** `CrudList.Column`'s `format`, for a field the IR types as a moment, a day or a time. */
+  /** `CrudList.Column`'s `format`, for a field SimpliX Meta types as a moment, a day or a time. */
   columnFormat?: "date" | "datetime" | "time";
-  /** `CrudList.Column`'s `display`, for a field whose rendering the IR settles. */
+  /** `CrudList.Column`'s `display`, for a field whose rendering SimpliX Meta settles. */
   columnDisplay?: "boolean";
 }
 
@@ -591,7 +591,7 @@ export async function findSchemaFile(
   const patterns = [
     // simplix-react: petSchema = z.object(, and petSchema = parentSchema.extend(
     //
-    // The `.extend(` alternative is what makes an inherited DTO discoverable. The IR-driven
+    // The `.extend(` alternative is what makes an inherited DTO discoverable. SimpliX Meta-driven
     // generator preserves the Java inheritance chain, so a type with a parent is emitted as
     // `ChildSchema = ParentSchema.extend({ ...own fields... })` and never writes `z.object` under
     // its own name. Without this, an entity whose every DTO extends another — 27 of the capture's
@@ -1638,7 +1638,7 @@ export const scaffoldCrudCommand = new Command("scaffold")
     const spinner = ora(`Searching for ${entity} schema...`).start();
 
     try {
-      // A domain whose package exports the DTO meta output is read from the IR, which states what
+      // A domain whose package exports the DTO meta output is read from SimpliX Meta, which states what
       // the emitted zod text cannot: which DTO a form is, what a parent contributes to it, and
       // whether the backend can order a list by a column. The dynamic import keeps the module
       // graph acyclic — the source is written against the contracts declared here.
@@ -1653,17 +1653,17 @@ export const scaffoldCrudCommand = new Command("scaffold")
       let fields: FieldInfo[];
       let packageName: string | null = null;
       if (metaSource) {
-        spinner.text = `Read ${entity} from the DTO meta IR (${metaSource.domain})`;
+        spinner.text = `Read ${entity} from SimpliX Meta (${metaSource.domain})`;
         fields = metaSource.fields;
         packageName = schemaResult?.packageName ?? null;
 
         if (fields.length === 0) {
           // A placeholder id/name pair here would be a widget set built on two invented fields,
-          // reported as a successful scaffold. The IR states what the entity holds, and for these
+          // reported as a successful scaffold. SimpliX Meta states what the entity holds, and for these
           // it states nothing a screen can render.
           spinner.fail(`No renderable fields for ${entity}`);
           log.error(
-            `The DTO meta IR states no scalar field for "${entity}" (${metaSource.tag}): it ` +
+            `SimpliX Meta states no scalar field for "${entity}" (${metaSource.tag}): it ` +
             "carries no request body and answers with no record. Write the screen by hand, or " +
             "add the DTO the entity is read and written as.",
           );
@@ -1695,8 +1695,8 @@ export const scaffoldCrudCommand = new Command("scaffold")
       // category/hideInList tags are available everywhere.
       fields = orderAndCategorizeFields(fields);
 
-      // Resolve actual hook names from crud.config.ts, and from the IR for a meta domain that
-      // has none: a hand-written entry states an intent the IR cannot, so it wins where it exists.
+      // Resolve actual hook names from crud.config.ts, and from SimpliX Meta for a meta domain that
+      // has none: a hand-written entry states an intent SimpliX Meta cannot, so it wins where it exists.
       const crudConfig = await findCrudConfigForEntity(rootDir, entity);
       const roles = crudConfig ?? metaSource?.roles ?? null;
 
@@ -1732,7 +1732,7 @@ export const scaffoldCrudCommand = new Command("scaffold")
       const hasBooleanFields = fields.some((f) => f.component === "Boolean");
       const hasTextareaFields = fields.some((f) => f.component === "Textarea");
 
-      // Detect path param names for update/delete mutations. The IR states them outright; the
+      // Detect path param names for update/delete mutations. SimpliX Meta states them outright; the
       // Orval path reads them back out of the generated mutation.
       const updatePathParam = metaSource
         ? metaSource.updatePathParam ?? null
@@ -1833,7 +1833,7 @@ export const scaffoldCrudCommand = new Command("scaffold")
 
       // ── Display name field detection (for all entities) ──
       // The delete confirmation names the record with it, so a positional guess puts a foreign
-      // key — identical on every row — into the dialog. A field the IR pairs with an `…I18n`
+      // key — identical on every row — into the dialog. A field SimpliX Meta pairs with an `…I18n`
       // sibling is the human-facing text by construction, and the meta source answers with it.
       const commonNameFields = ["name", "title", "label", "displayName"];
       const displayNameField = metaSource?.displayNameField
@@ -1865,7 +1865,7 @@ export const scaffoldCrudCommand = new Command("scaffold")
           ?? fields.find((f) => ["sortOrder", "displayOrder", "orderIndex"].includes(f.name))?.name
           ?? "sortOrder";
 
-        // Display name field: prefer common name fields, then the field the IR pairs with an
+        // Display name field: prefer common name fields, then the field SimpliX Meta pairs with an
         // `…I18n` sibling, and fall back to the first string field only when neither answers.
         const commonNameFields = ["name", "title", "label", "displayName"];
         treeDisplayNameField = metaSource?.displayNameField

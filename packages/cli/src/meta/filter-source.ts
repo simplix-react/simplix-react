@@ -1,5 +1,5 @@
 import type { FilterFieldInfo } from "../commands/scaffold-crud.js";
-import type { FieldMeta, TypeRef } from "./ir-types.js";
+import type { FieldMeta, TypeRef } from "./types.js";
 
 /**
  * Every member of the framework's `SearchOperator` (`@simplix-react/headless`), key → the suffix
@@ -74,15 +74,15 @@ export const SEARCH_OPERATOR_BY_IR_NAME: Record<string, SearchOperatorKey | null
 };
 
 /**
- * The framework member an IR operator name is, or `null` when the framework has none for it.
+ * The framework member a SimpliX Meta document operator name is, or `null` when the framework has none for it.
  *
- * A name the table does not carry throws: the IR states what the backend will accept, and a
+ * A name the table does not carry throws: SimpliX Meta states what the backend will accept, and a
  * silent fallback there sends a filter the server reads as a different question.
  */
 export function searchOperatorOf(irName: string): SearchOperatorKey | null {
   if (!Object.hasOwn(SEARCH_OPERATOR_BY_IR_NAME, irName)) {
     throw new Error(
-      `The DTO meta IR names the search operator '${irName}', which is not one of ` +
+      `SimpliX Meta names the search operator '${irName}', which is not one of ` +
         `searchable-jpa's. Add it to SEARCH_OPERATOR_BY_IR_NAME with the framework member it ` +
         "is, or with null when the framework has none.",
     );
@@ -92,7 +92,7 @@ export function searchOperatorOf(irName: string): SearchOperatorKey | null {
 
 /**
  * What a searchable field is, which is what decides the control its filter is rendered with. The
- * OpenAPI path reads this from a schema's `type` and `format`; the IR states it outright.
+ * OpenAPI path reads this from a schema's `type` and `format`; SimpliX Meta states it outright.
  */
 export type FilterValueKind = "string" | "number" | "boolean" | "date" | "enum" | "unknown";
 
@@ -114,7 +114,7 @@ export interface SearchField {
 /** An operator searchable-jpa supports that the framework enum has no member for. */
 export interface UnsupportedOperator {
   field: string;
-  /** The operator as the IR names it. */
+  /** The operator as SimpliX Meta names it. */
   operator: string;
 }
 
@@ -126,7 +126,7 @@ export interface SearchFieldsResult {
 /**
  * Read a search DTO's searchable fields into {@link SearchField}s.
  *
- * `enumValues` answers the IR's enum registry: an `enum` field whose values are not found keeps
+ * `enumValues` answers SimpliX Meta's enum registry: an `enum` field whose values are not found keeps
  * its kind and loses its options, which the faceted rule then treats as it treats any field with
  * nothing to offer.
  */
@@ -237,7 +237,7 @@ export interface DerivedFilters {
  * The filter controls a DTO's searchable fields resolve to.
  *
  * The rules are the OpenAPI path's, with the two decisions it could only guess at answered from
- * the IR instead. A faceted control fills its options from the field's enum and writes `.in`, so
+ * SimpliX Meta instead. A faceted control fills its options from the field's enum and writes `.in`, so
  * a field with an `IN` operator and no enum behind it opens a panel with nothing in it — the
  * OpenAPI path makes one anyway, because its rule fires before anything has looked at the type.
  * Here such a field falls through to the text and equality rules, which give the operator

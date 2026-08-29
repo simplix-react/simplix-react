@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, it, expect } from "vitest";
-import type { DtoMeta, OperationMeta, TypeRef } from "../meta/ir-types.js";
+import type { DtoMeta, OperationMeta, TypeRef } from "../meta/types.js";
 import type { ContainerMapping } from "../openapi/orchestration/spec-profile.js";
 import { resolveMeta, FRAMEWORK_PACKAGE_PREFIXES } from "../meta/resolve.js";
 import { smartSafetyDomains } from "../meta/__fixtures__/smart-safety-domains.js";
@@ -71,7 +71,7 @@ function sorted(values: Iterable<string>): string[] {
   return [...values].sort();
 }
 
-/** A hand-built IR, small enough that every assertion about it can be read off the literal. */
+/** A hand-built SimpliX Meta, small enough that every assertion about it can be read off the literal. */
 function tinyMeta(): DtoMeta {
   return {
     version: 1,
@@ -343,8 +343,8 @@ describe("resolveMeta mechanics", () => {
     expect(regex.deadPatterns).toEqual([]);
   });
 
-  it("assigns a shared type to the alphabetically first entity, not the first in the IR", () => {
-    // The IR lists shop.B first and both entities reach Item — through the list response for B
+  it("assigns a shared type to the alphabetically first entity, not the first in SimpliX Meta", () => {
+    // SimpliX Meta lists shop.B first and both entities reach Item — through the list response for B
     // and through Summary's `pick` for A. Ownership follows the sorted tag order.
     const resolvedTiny = resolveMeta(tinyMeta(), {
       domains: { shop: ["shop.A", "shop.B"] },
@@ -390,7 +390,7 @@ describe("resolveMeta mechanics", () => {
     ]);
   });
 
-  it("reports a reference the IR does not declare rather than dropping it", () => {
+  it("reports a reference SimpliX Meta does not declare rather than dropping it", () => {
     const broken = tinyMeta();
     broken.operations[1].response = { kind: "ref", name: "Nowhere" };
     broken.types["Item"].fields.push({

@@ -1,7 +1,7 @@
 import { toPascalCase } from "../../utils/case.js";
 import type { OpenApiNamingStrategy } from "../../openapi/naming/naming-strategy.js";
 import { readSearchFields, type SearchField } from "../filter-source.js";
-import type { FieldMeta, ParamMeta, TypeRef } from "../ir-types.js";
+import type { FieldMeta, ParamMeta, TypeRef } from "../types.js";
 import type { ResolvedDomain, ResolvedType } from "../resolve.js";
 import { HEADER, innermostRef, payloadOf, reachableFrom, refNameOf, responseRefs } from "./emit.js";
 import { entityNameOf, resolveEndpoints, type EndpointTarget } from "./endpoint-gen.js";
@@ -86,7 +86,7 @@ export interface MockGenOptions {
   metaRoot?: string;
 }
 
-/** An entity that answers from a store, and the DTO no rule in the IR named for it. */
+/** An entity that answers from a store, and the DTO no rule in SimpliX Meta named for it. */
 export interface UnresolvedStoreType {
   tag: string;
   /** The roles that would have read the store, which is why the entity needed a type at all. */
@@ -150,7 +150,7 @@ export interface MockGenResult {
  * store it answers with an empty body.
  *
  * Nothing here reads the filesystem. Which DTO a store carries, which field identifies a record
- * and whether that field is a number are all read from the IR, so a domain whose `src/generated/`
+ * and whether that field is a number are all read from SimpliX Meta, so a domain whose `src/generated/`
  * has never been written generates exactly what a migrated one does.
  */
 export function generateMockFiles(domain: ResolvedDomain, options: MockGenOptions): MockGenResult {
@@ -189,7 +189,7 @@ export function generateMockFiles(domain: ResolvedDomain, options: MockGenOption
   };
 }
 
-// ── Reading the IR ───────────────────────────────────────────
+// ── Reading SimpliX Meta ───────────────────────────────────────────
 
 /**
  * What the model generator decided about the domain's declarations, asked here so a seed row
@@ -239,7 +239,7 @@ class MockEntity {
   readonly targets: EndpointTarget[];
   readonly storeType: ResolvedType | undefined;
   readonly storeRoles: string[];
-  /** The field a record is identified by, as the IR's own path parameters name it. */
+  /** The field a record is identified by, as SimpliX Meta's own path parameters name it. */
   readonly idField: string;
   /** Whether that field arrives as a number, which decides `Number(…)` against `String(…)`. */
   readonly idNumeric: boolean;
@@ -385,7 +385,7 @@ class MockEntity {
  * own request. MSW matches in registration order and the first match wins, so a detail route
  * registered first swallows every sibling of the collection it belongs to.
  *
- * The test is what the IR states about the operation rather than anything spelled in the path: a
+ * The test is what SimpliX Meta states about the operation rather than anything spelled in the path: a
  * sort keyed on the `:` of an MSW pattern reads every `{param}` path as parameterless, compares
  * them all equal, and leaves the document's own order in place.
  */
@@ -762,7 +762,7 @@ ${entries.join("\n")}
     const types = [...new Set(backed.map((one) => one.storeTypeName))].sort();
     const lines = [
       "/**",
-      " * Mock seed data, generated from the DTO meta IR.",
+      " * Mock seed data, generated from SimpliX Meta.",
       " *",
       " * Written once and never overwritten: the rows here are the domain's to replace with data",
       " * that reads like the real thing.",
@@ -912,7 +912,7 @@ ${entries.join("\n")}
 
 /** The pattern MSW matches a route by: any origin, and its parameters in MSW's own spelling. */
 export function mswPattern(path: string): string {
-  // The IR spells a path parameter `{name}`, which MSW reads as a literal segment: a pattern
+  // SimpliX Meta spells a path parameter `{name}`, which MSW reads as a literal segment: a pattern
   // holding one matches no request at all, and every call falls through to a server that is not
   // running.
   return `*${path.replace(/\{(\w+)\}/g, ":$1")}`;

@@ -1,14 +1,14 @@
 import type { OpenApiNamingStrategy } from "../naming/naming-strategy.js";
 import type { ResponseAdapterConfig } from "../adaptation/response-adapter.js";
-import type { DtoMeta } from "../../meta/ir-types.js";
+import type { DtoMeta } from "../../meta/types.js";
 
 /**
- * What a Java container name from the DTO meta IR becomes on the TypeScript side.
+ * What a Java container name from SimpliX Meta becomes on the TypeScript side.
  *
  * @remarks
- * The IR names a container as the backend spells it (`List`, `Map`, `Page`,
+ * SimpliX Meta names a container as the backend spells it (`List`, `Map`, `Page`,
  * `SimpliXApiResponse`); which TypeScript type and zod factory it turns into is a decision
- * belonging to the spec profile, not to the IR.
+ * belonging to the spec profile, not to SimpliX Meta.
  */
 export interface ContainerMapping {
   /** The TypeScript type name, or absent when the container disappears from client types. */
@@ -19,12 +19,12 @@ export interface ContainerMapping {
   import?: string;
   /** The mutator strips this container before React Query sees it, so it has no client type. */
   unwrap?: boolean;
-  /** For `Map`: the key type, which the IR does not carry. */
+  /** For `Map`: the key type, which SimpliX Meta does not carry. */
   keyType?: string;
 }
 
 /**
- * Files a profile contributes from the IR's `extensions` payload.
+ * Files a profile contributes from SimpliX Meta's `extensions` payload.
  */
 /** The generic a labeled enum's wire shape is spelled with. */
 export interface LabeledEnumMapping {
@@ -92,7 +92,7 @@ export interface SpecProfile {
   i18nDownloader?: I18nDownloader;
   /** Server-relative path of the DTO meta endpoint. */
   metaEndpoint?: string;
-  /** Callback for downloading the DTO meta IR from a server. */
+  /** Callback for downloading SimpliX Meta from a server. */
   metaDownloader?: (serverOrigin: string) => Promise<DtoMeta | undefined>;
   /** Java container name → the TypeScript type and zod factory it becomes. */
   containerTypes?: Record<string, ContainerMapping>;

@@ -2,13 +2,13 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** The SimpliX framework serves `GET /api/v1/dev/meta/dto` returning the DTO metadata IR (structure, inheritance, jakarta validation, `@SearchableField`, `@PreAuthorize`, labels, enums), and smart-safety serves it live with its app-level assets (FieldLabel, message resolvers, LabeledEnum family, i18n dev endpoint) migrated into the framework.
+**Goal:** The SimpliX framework serves `GET /api/v1/dev/meta/dto` returning SimpliX Meta (structure, inheritance, jakarta validation, `@SearchableField`, `@PreAuthorize`, labels, enums), and smart-safety serves it live with its app-level assets (FieldLabel, message resolvers, LabeledEnum family, i18n dev endpoint) migrated into the framework.
 
-**Architecture:** A new `web/meta` package in `spring-boot-starter-simplix` builds the IR by walking `RequestMappingHandlerMapping` handler methods (like the existing `DtoSchemaAutoRegistrar`), reading serialization truth from the application's `ObjectMapper` bean and declaration truth (constraints, labels, searchable, access) from reflection. App-generic assets move from smart-safety into `simplix-core`. Everything is gated behind `simplix.dev.meta.enabled` and never registers under a production profile.
+**Architecture:** A new `web/meta` package in `spring-boot-starter-simplix` builds SimpliX Meta by walking `RequestMappingHandlerMapping` handler methods (like the existing `DtoSchemaAutoRegistrar`), reading serialization truth from the application's `ObjectMapper` bean and declaration truth (constraints, labels, searchable, access) from reflection. App-generic assets move from smart-safety into `simplix-core`. Everything is gated behind `simplix.dev.meta.enabled` and never registers under a production profile.
 
 **Tech Stack:** Java 17 (records), Spring Boot 3.5.7, springdoc conventions already in the starter, JUnit 5 + Mockito + AssertJ (existing starter test style).
 
-**Spec:** `docs/design/2026-08-28-dto-meta-codegen.md` (Korean). This plan implements spec §13 steps 1–3 plus the IR capture that unblocks the frontend plan.
+**Spec:** `docs/design/2026-08-28-dto-meta-codegen.md` (Korean). This plan implements spec §13 steps 1–3 plus the SimpliX Meta capture that unblocks the frontend plan.
 
 **Repositories:**
 
@@ -111,7 +111,7 @@ import java.lang.annotation.Target;
  * </ol>
  *
  * <p>Consumed by validation error enhancement and by the dev meta endpoint
- * (message-key mode becomes {@code labelKey}, direct mode becomes {@code label} in the IR).
+ * (message-key mode becomes {@code labelKey}, direct mode becomes {@code label} in SimpliX Meta).
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -352,7 +352,7 @@ git commit -m "feat(core): add LabeledEnum with value/label wire contract"
 
 ---
 
-### Task 4: IR model records (starter `web/meta/model`)
+### Task 4: SimpliX Meta model records (starter `web/meta/model`)
 
 **Files:**
 - Create: `FRAMEWORK/spring-boot-starter-simplix/src/main/java/dev/simplecore/simplix/web/meta/model/TypeRef.java`
@@ -671,7 +671,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 import java.util.Map;
 
-/** Root IR document served by {@code GET /dev/meta/dto} (spec §4). */
+/** Root SimpliX Meta document served by {@code GET /dev/meta/dto} (spec §4). */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record DtoMeta(
         int version,
@@ -692,7 +692,7 @@ Expected: PASS
 cd FRAMEWORK
 git add spring-boot-starter-simplix/src/main/java/dev/simplecore/simplix/web/meta/model \
         spring-boot-starter-simplix/src/test/java/dev/simplecore/simplix/web/meta/model
-git commit -m "feat(starter): add DTO meta IR model records"
+git commit -m "feat(starter): add SimpliX Meta model records"
 ```
 
 ---
@@ -819,7 +819,7 @@ git commit -m "feat(starter): parse PreAuthorize expressions into structured acc
 
 ---
 
-### Task 6: Constraint extractor (jakarta annotations → IR constraints)
+### Task 6: Constraint extractor (jakarta annotations → SimpliX Meta constraints)
 
 **Files:**
 - Create: `FRAMEWORK/spring-boot-starter-simplix/src/main/java/dev/simplecore/simplix/web/meta/ConstraintExtractor.java`
@@ -946,7 +946,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Maps jakarta/hibernate validation annotations to IR constraints (spec §5).
+ * Maps jakarta/hibernate validation annotations to SimpliX Meta constraints (spec §5).
  *
  * <p>{@code @NotNull} is deliberately NOT emitted here — it feeds the {@code required} flag.
  * Unknown {@code @Constraint}-meta-annotated annotations become {@code custom} entries, which
@@ -1005,7 +1005,7 @@ Expected: PASS
 cd FRAMEWORK
 git add spring-boot-starter-simplix/src/main/java/dev/simplecore/simplix/web/meta/ConstraintExtractor.java \
         spring-boot-starter-simplix/src/test/java/dev/simplecore/simplix/web/meta/ConstraintExtractorTest.java
-git commit -m "feat(starter): extract jakarta validation constraints into IR"
+git commit -m "feat(starter): extract jakarta validation constraints into SimpliX Meta"
 ```
 
 ---
@@ -1144,7 +1144,7 @@ public class MetaTypeRegistry {
     private final Deque<Class<?>> pending = new ArrayDeque<>();
     private final Map<Class<?>, String> enums = new LinkedHashMap<>();
 
-    /** Registers a DTO class (idempotent) and returns its IR type name. */
+    /** Registers a DTO class (idempotent) and returns its SimpliX Meta type name. */
     public String register(Class<?> type) {
         if (seen.add(type)) {
             pending.add(type);
@@ -1152,7 +1152,7 @@ public class MetaTypeRegistry {
         return typeName(type);
     }
 
-    /** Registers an enum (idempotent) and returns its IR name. */
+    /** Registers an enum (idempotent) and returns its SimpliX Meta name. */
     public String registerEnum(Class<?> enumType) {
         return enums.computeIfAbsent(enumType, MetaTypeRegistry::typeName);
     }
@@ -1196,7 +1196,7 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Maps a {@link ResolvableType} to an IR {@link TypeRef} (spec §4). Container names are the
+ * Maps a {@link ResolvableType} to a SimpliX Meta document {@link TypeRef} (spec §4). Container names are the
  * JAVA names — the CLI profile owns the TypeScript mapping (spec §4.1).
  */
 public class TypeRefMapper {
@@ -1297,7 +1297,7 @@ cd FRAMEWORK
 git add spring-boot-starter-simplix/src/main/java/dev/simplecore/simplix/web/meta/MetaTypeRegistry.java \
         spring-boot-starter-simplix/src/main/java/dev/simplecore/simplix/web/meta/TypeRefMapper.java \
         spring-boot-starter-simplix/src/test/java/dev/simplecore/simplix/web/meta/TypeRefMapperTest.java
-git commit -m "feat(starter): map Java types to IR type references"
+git commit -m "feat(starter): map Java types to SimpliX Meta type references"
 ```
 
 ---
@@ -1607,10 +1607,10 @@ git commit -m "feat(starter): build type meta with inheritance, labels and searc
 
 `DtoMeta` is unchanged in this task. Duplicate DTO simple names are rejected by
 `MetaTypeRegistry` with an `IllegalStateException` (Task 7), so a colliding application fails the
-endpoint call outright rather than serving an IR with one type silently overwritten.
+endpoint call outright rather than serving a SimpliX Meta document with one type silently overwritten.
 
 SPI note: spec §6 sketches builder-style signatures; the binding behavior it states is
-"an app `@Component` adds its data to the IR's `extensions`". The SPI below delivers exactly that
+"an app `@Component` adds its data to SimpliX Meta's `extensions`". The SPI below delivers exactly that
 capability with the built records passed read-only — record this divergence from the sketch in
 the task's completion report so the spec's §6 example can be aligned afterwards.
 
@@ -1764,9 +1764,9 @@ import org.springframework.web.method.HandlerMethod;
 import java.util.Map;
 
 /**
- * Extension point for applications to add their own annotation data to the IR (spec §6).
+ * Extension point for applications to add their own annotation data to SimpliX Meta (spec §6).
  * Implementations register as Spring beans; whatever they put into {@code extensions} is served
- * under the IR's top-level {@code extensions} object.
+ * under SimpliX Meta's top-level {@code extensions} object.
  */
 public interface SimpliXMetaContributor {
 
@@ -1816,7 +1816,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Assembles the whole IR (spec §4): walks handler methods for operations, drains the type
+ * Assembles the whole SimpliX Meta (spec §4): walks handler methods for operations, drains the type
  * registry for DTOs, registers enums, and lets contributors extend the result.
  */
 public class DtoMetaBuilder {
@@ -1869,7 +1869,7 @@ public class DtoMetaBuilder {
                 extensions.isEmpty() ? null : extensions);
     }
 
-    /** The framework's own dev controllers and infrastructure endpoints stay out of the IR.
+    /** The framework's own dev controllers and infrastructure endpoints stay out of SimpliX Meta.
      * Matched by exact class, not by package — test fixtures live in the same package. */
     private boolean skip(HandlerMethod handler) {
         Class<?> beanType = handler.getBeanType();
@@ -2002,7 +2002,7 @@ cd FRAMEWORK
 git add spring-boot-starter-simplix/src/main/java/dev/simplecore/simplix/web/meta/SimpliXMetaContributor.java \
         spring-boot-starter-simplix/src/main/java/dev/simplecore/simplix/web/meta/DtoMetaBuilder.java \
         spring-boot-starter-simplix/src/test/java/dev/simplecore/simplix/web/meta/DtoMetaBuilderTest.java
-git commit -m "feat(starter): build DTO meta IR from handler mappings with contributor SPI"
+git commit -m "feat(starter): build SimpliX Meta from handler mappings with contributor SPI"
 ```
 
 ---
@@ -2098,7 +2098,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Serves the DTO metadata IR for frontend code generation (spec §3). Registered only by
+ * Serves SimpliX Meta for frontend code generation (spec §3). Registered only by
  * {@code SimpliXDevMetaAutoConfiguration} — property-gated, never under a production profile.
  * The mapped path sits under the same {@code /dev/**} convention as the i18n dev endpoint, so an
  * application's existing dev-profile permit rule covers it.
@@ -2284,7 +2284,7 @@ git add spring-boot-starter-simplix/src/main/java/dev/simplecore/simplix/web/met
         spring-boot-starter-simplix/src/main/java/dev/simplecore/simplix/springboot/autoconfigure/SimpliXDevMetaAutoConfiguration.java \
         spring-boot-starter-simplix/src/main/resources/META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports \
         spring-boot-starter-simplix/src/test/java/dev/simplecore/simplix/springboot/autoconfigure/SimpliXDevMetaAutoConfigurationTest.java
-git commit -m "feat(starter): serve DTO meta IR at /dev/meta/dto behind property gates"
+git commit -m "feat(starter): serve SimpliX Meta at /dev/meta/dto behind property gates"
 ```
 
 ---
@@ -2509,7 +2509,7 @@ rather than restoring the copies.
 
 - [ ] **Step 2.5: Rename the colliding DTO**
 
-Two distinct DTOs share the simple name `AuthSessionSearchDTO`, so the IR's name-keyed `types`
+Two distinct DTOs share the simple name `AuthSessionSearchDTO`, so SimpliX Meta's name-keyed `types`
 map cannot hold both — one silently overwrites the other, and both are `@SearchableParams`
 targets, so one of the two screens gets the wrong filter set. Measured: 633 DTO declarations,
 632 distinct simple names. Enums are clean (139, all distinct).
@@ -2632,7 +2632,7 @@ git commit -m "feat: emit framework FieldLabel import and required-mode on detai
 
 ---
 
-### Task 14: Boot, capture, and verify the IR
+### Task 14: Boot, capture, and verify SimpliX Meta
 
 - [ ] **Step 1: Start the backend with the dev profile**
 
@@ -2640,14 +2640,14 @@ Use the app's own run script/README command (check `APP/README.md` or `APP/build
 `./gradlew :apps:<app>:bootRun` with the dev profile). Read the actual port from startup logs
 (expected 8082 — the frontend config points at `http://localhost:8082`).
 
-- [ ] **Step 2: Capture the IR**
+- [ ] **Step 2: Capture SimpliX Meta**
 
 ```bash
 curl -sf "http://localhost:8082/api/v1/dev/meta/dto" -o /tmp/meta-envelope.json
 python3 -c "import json;d=json.load(open('/tmp/meta-envelope.json'));json.dump(d['body'],open('/tmp/meta.json','w'),ensure_ascii=False,indent=2)"
 ```
 
-(The response arrives wrapped in `SimpliXApiResponse`; the IR is its `body`.)
+(The response arrives wrapped in `SimpliXApiResponse`; SimpliX Meta is its `body`.)
 
 - [ ] **Step 3: Assert the four claims the whole design rests on**
 
@@ -2675,15 +2675,15 @@ assert len(labeled) > 100, f'labeled enums suspicious: {len(labeled)}'
 assert all(v.get('labelKey') for e in labeled for v in e['values'])
 
 print('operations', len(ir['operations']), '| types', len(ir['types']), '| enums', len(ir['enums']))
-print('IR OK')
+print('SimpliX Meta OK')
 EOF
 ```
 
-Expected: `IR OK` with plausible counts (≥ 500 operations, ≥ 400 types, ≥ 130 enums). If an
+Expected: `SimpliX Meta OK` with plausible counts (≥ 500 operations, ≥ 400 types, ≥ 130 enums). If an
 assertion fails, the corresponding builder piece (Task 8/9) missed a case — fix it there, rebuild,
 republish (Task 12), restart, recapture. Do not weaken the assertion.
 
-- [ ] **Step 4: Save the IR where the frontend plan expects it**
+- [ ] **Step 4: Save SimpliX Meta where the frontend plan expects it**
 
 ```bash
 cp /tmp/meta.json /Users/taehwan/Workspace/accesscore/accesscore-smart-safety/smart-safety-frontend/openapi/meta.json
@@ -2695,4 +2695,4 @@ Do not commit it yet — the frontend plan owns that decision. Stop the dev serv
 
 The task result must state: operation/type/enum counts, every deviation taken (version mismatch,
 SPI signature divergence noted in Task 9, any compile fixes in Task 13), and the path of the
-captured IR. The frontend implementation plan is written against this capture.
+captured SimpliX Meta. The frontend implementation plan is written against this capture.

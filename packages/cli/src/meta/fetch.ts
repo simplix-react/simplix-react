@@ -1,13 +1,13 @@
 import { readFile, writeFile } from "node:fs/promises";
-import type { DtoMeta } from "./ir-types.js";
+import type { DtoMeta } from "./types.js";
 
-/** The IR version this CLI understands. A newer document is refused rather than read partially. */
-export const SUPPORTED_IR_VERSION = 1;
+/** The SimpliX Meta version this CLI understands. A newer document is refused rather than read partially. */
+export const SUPPORTED_META_VERSION = 1;
 
 export interface FetchMetaOptions {
   /** Endpoint URL, or a path to a committed snapshot. */
   source: string;
-  /** When set, a fetched IR is written here so a later run can work offline. */
+  /** When set, a fetched SimpliX Meta is written here so a later run can work offline. */
   snapshot?: string;
   /** Read `snapshot` instead of `source`. */
   offline?: boolean;
@@ -93,13 +93,13 @@ async function readSnapshot(options: FetchMetaOptions): Promise<RawPayload> {
 }
 
 /**
- * Take the IR out of whatever the source handed over, judging by what that source guarantees
+ * Take SimpliX Meta out of whatever the source handed over, judging by what that source guarantees
  * rather than by the payload's shape.
  *
  * An HTTP source always carries the SimpliX envelope, because the endpoint returns
  * `SimpliXApiResponse<DtoMeta>` — so `body` is taken without asking. A file may hold either the
  * whole response or the bare document, and `version` settles which: it is an unboxed Java `int`,
- * so `@JsonInclude(NON_NULL)` never drops it and a bare IR always carries it at the top level.
+ * so `@JsonInclude(NON_NULL)` never drops it and a bare SimpliX Meta always carries it at the top level.
  */
 function unwrap(raw: RawPayload): DtoMeta {
   if (raw.origin === "file" && isIrDocument(raw.value)) {
@@ -118,7 +118,7 @@ function unwrap(raw: RawPayload): DtoMeta {
   }
   if (!isIrDocument(body)) {
     throw new Error(
-      `The response envelope at ${raw.location} carries no DTO meta IR: its \`body\` has no numeric \`version\`.`,
+      `The response envelope at ${raw.location} carries no SimpliX Meta: its \`body\` has no numeric \`version\`.`,
     );
   }
   return body;
@@ -127,22 +127,22 @@ function unwrap(raw: RawPayload): DtoMeta {
 function errorEnvelopeMessage(raw: RawPayload): string {
   if (raw.origin === "file") {
     return (
-      `The snapshot at ${raw.location} is neither a DTO meta IR (no \`version\`) ` +
+      `The snapshot at ${raw.location} is neither SimpliX Meta (no \`version\`) ` +
       `nor a response envelope (no \`body\`).`
     );
   }
   const envelope = isRecord(raw.value) ? raw.value : {};
   return (
-    `The DTO meta endpoint at ${raw.location} returned an error envelope rather than an IR: ` +
+    `The DTO meta endpoint at ${raw.location} returned an error envelope rather than a SimpliX Meta document: ` +
     `type=${describeValue(envelope["type"])}, message=${describeValue(envelope["message"])}`
   );
 }
 
 function assertVersion(meta: DtoMeta): void {
-  if (meta.version > SUPPORTED_IR_VERSION) {
+  if (meta.version > SUPPORTED_META_VERSION) {
     throw new Error(
-      `DTO meta IR version ${meta.version} is newer than this CLI understands ` +
-        `(supported: ${SUPPORTED_IR_VERSION}). Upgrade @simplix-react/cli to read it — ` +
+      `SimpliX Meta version ${meta.version} is newer than this CLI understands ` +
+        `(supported: ${SUPPORTED_META_VERSION}). Upgrade @simplix-react/cli to read it — ` +
         `generating from it now would silently drop whatever the newer version added.`,
     );
   }
@@ -156,9 +156,9 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 /**
- * `version` is the IR's only guaranteed top-level member, and the envelope has no member of that
+ * `version` is SimpliX Meta's only guaranteed top-level member, and the envelope has no member of that
  * name, so its presence is what separates the two payload shapes on disk. Nothing else about the
- * document is inspected here — a malformed IR is the generator's problem to report, not this one's.
+ * document is inspected here — a malformed SimpliX Meta is the generator's problem to report, not this one's.
  */
 function isIrDocument(value: unknown): value is DtoMeta {
   return isRecord(value) && typeof value["version"] === "number";

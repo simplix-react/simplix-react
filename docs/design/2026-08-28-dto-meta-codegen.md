@@ -1,6 +1,6 @@
 # DTO 메타데이터 기반 코드 생성
 
-백엔드가 DTO 구조·검증·검색·권한을 중간 표현(IR)으로 제공하고, `@simplix-react/cli`가 그 IR로
+백엔드가 DTO 구조·검증·검색·권한을 SimpliX Meta로 제공하고, `@simplix-react/cli`가 이를 읽어
 타입·zod 스키마·요청 함수·훅·mock·필터 설정을 생성한다. 기존 OpenAPI + orval 경로는 그대로
 동작하며, 두 경로는 도메인 패키지 안에서 나란히 생성되고 배럴이 어느 쪽을 내보낼지 고른다.
 
@@ -30,7 +30,7 @@ OpenAPI 문서는 Java DTO의 정보를 일부만 담는다. springdoc이 스키
 
 | 저장소 | 산출물 |
 | --- | --- |
-| `simplix` (백엔드 프레임워크) | 메타 엔드포인트, IR 직렬화, `SimpliXMetaContributor` SPI, `FieldLabel` 애노테이션, 메시지 리졸버·`LabeledEnum` 가족·i18n dev 엔드포인트 이관 |
+| `simplix` (백엔드 프레임워크) | 메타 엔드포인트, SimpliX Meta 직렬화, `SimpliXMetaContributor` SPI, `FieldLabel` 애노테이션, 메시지 리졸버·`LabeledEnum` 가족·i18n dev 엔드포인트 이관 |
 | `accesscore-smart-safety/smart-safety-backend` | `FieldLabel`·`LabeledEnum`·리졸버 import 교체와 앱 사본 삭제, `common-dev`의 i18n 구현 삭제, `.simplix/templates/dto` 템플릿 갱신 |
 | `simplix-generator` | 견본 DTO 템플릿의 `FieldLabel` import 교체, `@Schema(requiredMode)` 규약 반영 |
 | `simplix-react` | `packages/cli/src/meta/` 생성기, 병렬 생성, 배럴 전환, `meta-diff` 명령, scaffold 필드 소스 확장, `simplix-boot-utils`의 `LabeledEnumValue<T>` |
@@ -42,7 +42,7 @@ OpenAPI 문서는 Java DTO의 정보를 일부만 담는다. springdoc이 스키
 
 `spring-boot-starter-simplix`가 `SimpliXDevMetaAutoConfiguration`으로
 `SimpliXMetaDevController`를 등록하고, 그 컨트롤러가 `@RequestMapping("/dev/meta")` ·
-`@GetMapping("/dto")`로 응답한다. 반환형은 `SimpliXApiResponse<DtoMeta>`라 **IR이 응답 봉투에
+`@GetMapping("/dto")`로 응답한다. 반환형은 `SimpliXApiResponse<DtoMeta>`라 **SimpliX Meta가 응답 봉투에
 싸여 온다** — CLI가 벗겨서 읽는다.
 
 **`/api/v1` 접두는 프레임워크가 아니라 애플리케이션이 정한다**(smart-safety의
@@ -66,12 +66,12 @@ OpenAPI 문서는 Java DTO의 정보를 일부만 담는다. springdoc이 스키
   `boolean isMultiOccupancy` 필드의 전송 이름이 `isMultiOccupancy`인지 `multiOccupancy`인지는
   빈 이름 규칙과 매퍼 설정만이 안다. `@JsonIgnore`, `@JsonProperty` 이름 변경,
   `@JsonFormat`, 커스텀 시리얼라이저가 이 목록에 이미 반영되어 있다.
-- 두 결과를 합쳐 IR을 만든다. 리플렉션에는 있으나 Jackson 프로퍼티 목록에 없는 필드는
-  직렬화되지 않으므로 IR에서 제외한다.
+- 두 결과를 합쳐 SimpliX Meta를 만든다. 리플렉션에는 있으나 Jackson 프로퍼티 목록에 없는 필드는
+  직렬화되지 않으므로 SimpliX Meta에서 제외한다.
 - `@SearchableField`는 별도 라이브러리(searchable-jpa)의 애노테이션이므로 클래스 이름으로
   선택적으로 읽는다 — 그 라이브러리를 쓰지 않는 앱에서도 메타 엔드포인트가 동작해야 한다.
 
-## 4 · IR 명세
+## 4 · SimpliX Meta 명세
 
 **`@JsonInclude(NON_NULL)`이 이 명세를 읽는 법을 정한다.** 값이 `null`인 멤버는 키째로 사라지고,
 언박싱 원시 타입과 빈 컬렉션은 절대 사라지지 않는다. 그래서 `?`가 붙은 것은 **키가 없는 것**이지
@@ -114,7 +114,7 @@ interface FieldMeta {
   labelKey?: string;
   /** @FieldLabel의 직접 라벨 모드 — 키가 아닌 문자열 그대로 */
   label?: string;
-  /** 제약이 하나도 없으면 키 자체가 없다. 수집한 IR에서 6,222개 필드 중 550개만 갖는다 */
+  /** 제약이 하나도 없으면 키 자체가 없다. 수집한 SimpliX Meta에서 6,222개 필드 중 550개만 갖는다 */
   constraints?: Constraint[];
   searchable?: {
     operators: string[];
@@ -177,7 +177,7 @@ type AccessMeta =
 
 검색 오퍼레이션은 두 모양으로 온다 — `@SearchableParams(XSearchDTO.class)`가 평탄화한 쿼리
 매개변수(`name.contains=…`)와 `@RequestBody SearchCondition<XSearchDTO>`. 어느 쪽이든 매개변수
-이름만으로는 필터를 생성할 수 없으므로, IR이 `request.searchDto`로 원본 DTO를 가리키고 필터
+이름만으로는 필터를 생성할 수 없으므로, SimpliX Meta가 `request.searchDto`로 원본 DTO를 가리키고 필터
 생성기는 그 DTO의 `searchable`을 읽는다.
 
 `Page<SiteListDTO>`를 반환하는 오퍼레이션의 `response`는 다음과 같다.
@@ -188,7 +188,7 @@ type AccessMeta =
              "args": [{ "kind": "ref", "name": "SiteListDTO" }] }] }
 ```
 
-### IR JSON에서 무엇이 항상 오는가
+### SimpliX Meta JSON에서 무엇이 항상 오는가
 
 생성기가 「없는 것」과 「비어 있는 것」을 가르려면 이 세 줄이 필요하다. 직렬화기는 모든 레코드에
 `@JsonInclude(NON_NULL)`을 걸지만, 그 설정이 지우는 것은 `null`뿐이다.
@@ -227,7 +227,7 @@ export interface LabeledEnumValue<T extends string> {
 
 **이름을 TypeScript로 옮기는 규칙은 CLI 플러그인이 갖는다.** 백엔드는 컨테이너의 Java 이름만
 말하고, 그 이름을 어떤 타입·스키마·import로 쓸지는 프로파일이 정한다. 백엔드가 나중에 다른
-컨테이너를 쓰더라도 IR 명세는 그대로이고 매핑 한 줄만 는다.
+컨테이너를 쓰더라도 SimpliX Meta 명세는 그대로이고 매핑 한 줄만 는다.
 
 ```ts
 // simplix-boot CLI 플러그인
@@ -260,7 +260,7 @@ Query의 `data`는 본문이다. 봉투 스키마는 mock 핸들러에서만 쓴
 | `@Email` | `z.email()` — v4에서 `.email()` 메서드는 폐기됐다. 다른 제약과 함께 오면 `z.email().trim().min(1).max(N)`으로 잇는다 |
 | `@AssertTrue` · `@AssertFalse` | `z.literal(true)` · `z.literal(false)` |
 | `@Valid` | 중첩 타입의 스키마 참조 |
-| 그 밖의 커스텀 제약 | IR에 `{ kind: "custom", name }`으로 싣고 zod에서는 생략한다. 생성물 주석에 서버 전용 검증임을 남긴다 |
+| 그 밖의 커스텀 제약 | SimpliX Meta에 `{ kind: "custom", name }`으로 싣고 zod에서는 생략한다. 생성물 주석에 서버 전용 검증임을 남긴다 |
 | 반복 제약 컨테이너 (`@Pattern.List`) | 같은 `custom`으로 싣는다 — 아래 |
 
 **`min`·`max`의 값은 숫자일 수도 문자열일 수도 있다.** `@Min`·`@Max`는 `long`을 돌려주어 JSON
@@ -277,15 +277,15 @@ Query의 `data`는 본문이다. 봉투 스키마는 mock 핸들러에서만 쓴
 
 ## 5.1 · 생성물 요건
 
-생성기가 지켜야 하는 것이다. 각 항목은 IR이 실어 오는 정보로 기계가 판정한다.
+생성기가 지켜야 하는 것이다. 각 항목은 SimpliX Meta가 실어 오는 정보로 기계가 판정한다.
 
 | 요건 | 근거 |
 | --- | --- |
 | 모든 생성 파일이 타입 검사를 받는다 — `@ts-nocheck`를 붙이지 않는다 | 검사에서 빠진 코드는 틀려도 빌드가 통과한다 |
 | 라벨 붙은 열거형은 `LabeledEnumValue<T>`로 낸다 | 원시 문자열과 비교하면 컴파일이 실패해야 한다 |
 | 컨테이너는 상위 패키지에서 가져다 쓴다 | §4.1 |
-| 필터의 연산자는 IR의 `searchable.operators`에서 온다 | 값 모양을 보고 연산자를 추측하지 않는다 |
-| IR 연산자 이름을 프론트엔드 `SearchOperator`로 옮기는 표를 두고, 열거형 전체를 빠짐없이 덮는다 | 두 이름이 늘 같지는 않다 — IR의 `GREATER_THAN_OR_EQUAL_TO`는 열거형 키 `GREATER_THAN_OR_EQUAL`에 해당한다. 이름으로 바로 찾으면 `undefined`가 조용히 나온다 |
+| 필터의 연산자는 SimpliX Meta의 `searchable.operators`에서 온다 | 값 모양을 보고 연산자를 추측하지 않는다 |
+| SimpliX Meta 연산자 이름을 프론트엔드 `SearchOperator`로 옮기는 표를 두고, 열거형 전체를 빠짐없이 덮는다 | 두 이름이 늘 같지는 않다 — SimpliX Meta의 `GREATER_THAN_OR_EQUAL_TO`는 열거형 키 `GREATER_THAN_OR_EQUAL`에 해당한다. 이름으로 바로 찾으면 `undefined`가 조용히 나온다 |
 | 시각 필드는 `instant` · `date` · `time` 종류를 구분해 낸다 | 세 가지가 서로 다른 입력 컴포넌트를 쓴다 — `DateTimeField` · `DateField` · `TimeField` |
 | `date` 필드의 범위 필터에만 `dateOnly`를 세운다 | `yyyy-MM-dd`로 직렬화해야 브라우저 시간대와 무관하게 같은 날짜를 거른다. 안 세우면 UTC 변환이 걸려 조용히 다른 행이 나온다 |
 | 범위 필터의 대상 여부는 `TypeRef.kind`로 정한다 — 필드 이름으로 추론하지 않는다 | 이름 접미사 판정이 대상 앱에서 시각 필드 40곳을 놓친다 |
@@ -293,14 +293,14 @@ Query의 `data`는 본문이다. 봉투 스키마는 mock 핸들러에서만 쓴
 | `expression` 권한은 게이트를 생성하지 않고 사람이 정하도록 남긴다 | 아래 |
 | dev 엔드포인트는 컴포넌트 스캔 범위 밖에 두거나 스캔에서 제외한다 | 아래 |
 | 순환 참조 타입의 zod는 `z.lazy()`로 낸다 | interface는 순환을 허용하지만 zod 상수는 선언 순서에 묶인다 |
-| CLI는 자기가 아는 것보다 새 IR `version`을 거절한다 | 모르는 필드를 조용히 버리면 생성물이 조용히 얕아진다 |
+| CLI는 자기가 아는 것보다 새 SimpliX Meta `version`을 거절한다 | 모르는 필드를 조용히 버리면 생성물이 조용히 얕아진다 |
 | 쿼리 키의 첫 요소는 요청 URL 문자열이고, 목록 키는 params 객체를 함께 싣는다 | `useInvalidateEntity`가 `queryKey[0]`의 URL 접두사로 무효화한다 — 키 모양이 다르면 오류 없이 무효화만 멎어 화면이 낡은 데이터를 보여 준다 |
 | 응답 봉투는 이름으로 판정한다 | 필드 모양으로 봉투를 알아보면 본문이 빈 응답을 놓친다 |
 | 같은 타입을 두 번 선언하지 않는다 | 중복을 지우는 후처리가 필요 없어야 한다 |
 | 생성한 zod 스키마를 폼의 `validator`로 잇는다 | 잇지 않으면 되찾은 제약이 아무도 import하지 않는 파일에서 멈추고, §1의 두 번째 결함이 그대로 남는다 |
 | 라벨 붙은 열거형의 값을 읽는 자리는 모두 `resolveBootEnum`을 거친다 | 목록 컬럼 · 폼 기본값 · 상세 표시 · DTO 조립 넷 모두다. 하나라도 빠지면 화면에 `[object Object]`가 뜨거나 편집 폼이 빈 선택을 보이고 잘못된 객체를 되쓴다 |
-| 열거형 번역 키는 IR의 열거형 이름 하나로 통일한다 | 컬럼 · peek 행 · 상세 배지 · 폼 선택지가 서로 다른 키를 쓰면 한쪽을 고칠 때 다른 쪽이 조용히 깨진다 |
-| 생성 화면이 참조하는 멤버가 실제로 있는지 IR로 확인한다 | 감사 필드와 외래키 표시 이름을 템플릿이 무조건 참조하는데, 없는 DTO에서는 타입 검사가 실패한다 |
+| 열거형 번역 키는 SimpliX Meta의 열거형 이름 하나로 통일한다 | 컬럼 · peek 행 · 상세 배지 · 폼 선택지가 서로 다른 키를 쓰면 한쪽을 고칠 때 다른 쪽이 조용히 깨진다 |
+| 생성 화면이 참조하는 멤버가 실제로 있는지 SimpliX Meta로 확인한다 | 감사 필드와 외래키 표시 이름을 템플릿이 무조건 참조하는데, 없는 DTO에서는 타입 검사가 실패한다 |
 
 ### 게이트는 등록 경로가 하나일 때만 게이트다
 
@@ -316,7 +316,7 @@ Query의 `data`는 본문이다. 봉투 스키마는 mock 핸들러에서만 쓴
 
 ## 6 · 확장점
 
-애플리케이션이 자기 애노테이션을 IR에 더할 수 있어야 한다. 프레임워크는 앱의 애노테이션을 알지
+애플리케이션이 자기 애노테이션을 SimpliX Meta에 더할 수 있어야 한다. 프레임워크는 앱의 애노테이션을 알지
 못하므로 SPI로 받는다.
 
 ```java
@@ -328,7 +328,7 @@ public interface SimpliXMetaContributor {
 ```
 
 프레임워크가 `ObjectProvider<List<SimpliXMetaContributor>>`로 구현체를 수집한다. 앱은 `@Component`
-하나를 등록해 IR의 `extensions`에 자기 데이터를 넣는다.
+하나를 등록해 SimpliX Meta의 `extensions`에 자기 데이터를 넣는다.
 
 프론트엔드도 짝이 되는 확장점을 갖는다. `SpecProfile`에 다음을 더한다.
 
@@ -372,7 +372,7 @@ interface MetaExtensionOutput {
 `DomainBasePackage` 마커를 쓴다. 프레임워크 판은 마커 대신 속성(`simplix.dev.base-packages`,
 비우면 자동 구성 패키지)으로 받는다.
 
-`FieldLabel` 이관 절차는 다음이다. 앱 의존성이 없는 값 하나짜리 애노테이션이라 IR이 라벨 키를
+`FieldLabel` 이관 절차는 다음이다. 앱 의존성이 없는 값 하나짜리 애노테이션이라 SimpliX Meta가 라벨 키를
 실을 수 있게 하는 전제다.
 
 1. `simplix-core`에 `dev.simplecore.simplix.core.annotation.FieldLabel`을 추가한다.
@@ -390,7 +390,7 @@ import 교체(`LabeledEnum` 140곳 · `EntityMessageResolver` 38곳 · `EnumMess
 `common-dev`의 i18n 컨트롤러·서비스·DTO와 `domain-core`의 사본 삭제. 제너레이터 템플릿은
 `LabeledEnum`을 참조하지 않으므로 추가 수정이 없다.
 
-별칭이나 `@Deprecated`는 두지 않는다. 애노테이션이 없는 필드는 IR의 `labelKey`가 비고, 생성기는
+별칭이나 `@Deprecated`는 두지 않는다. 애노테이션이 없는 필드는 SimpliX Meta의 `labelKey`가 비고, 생성기는
 필드 이름을 그대로 쓴다.
 
 ## 8 · CLI 파이프라인
@@ -403,8 +403,8 @@ import 교체(`LabeledEnum` 140곳 · `EntityMessageResolver` 38곳 · `EnumMess
 
 ```
 meta/
-  fetch.ts             엔드포인트 또는 스냅샷 파일에서 IR을 읽는다
-  ir-types.ts          IR 타입 정의
+  fetch.ts             엔드포인트 또는 스냅샷 파일에서 SimpliX Meta를 읽는다
+  types.ts             SimpliX Meta 타입 정의
   resolve.ts           상속 해석, 타입 참조 정리, 도메인 분할
   generation/
     model-gen.ts       interface + extends
@@ -417,12 +417,12 @@ meta/
 ```
 
 도메인 분할은 기존과 같은 규칙을 쓴다 — `simplix.config.ts`의 `domains`가 태그 패턴으로 나누고,
-IR의 `operations[].tag`가 그 패턴에 걸린다.
+SimpliX Meta의 `operations[].tag`가 그 패턴에 걸린다.
 
-**변경 감지는 IR로도 해야 한다.** `openapi` 명령은 도메인마다 `.openapi-snapshot.json`과 새로
+**변경 감지는 SimpliX Meta로도 해야 한다.** `openapi` 명령은 도메인마다 `.openapi-snapshot.json`과 새로
 뽑은 엔티티를 비교해 차이가 없으면 그 도메인을 통째로 건너뛴다. 그 비교의 재료가 OpenAPI에서 나온
 것이므로, **이 설계가 되찾으려는 변경은 전부 그 게이트에 보이지 않는다** — 제약 추가, 검색 연산자
-변경, 권한 표현식 변경, 열거형의 라벨 여부, 상속 구조 변경. 메타 파이프라인은 받아 온 IR을
+변경, 권한 표현식 변경, 열거형의 라벨 여부, 상속 구조 변경. 메타 파이프라인은 받아 온 SimpliX Meta를
 `meta.snapshot`과 대조해 자기 게이트를 갖고, 스냅샷이 없으면 건너뛰지 말고 실행한다.
 
 기존 `openapi` 명령은 코드 외의 부속물도 만든다. 메타 경로가 같은 부속물을 만들지 않으면 도메인을
@@ -430,9 +430,9 @@ IR의 `operations[].tag`가 그 패턴에 걸린다.
 
 | 부속물 | 처리 |
 | --- | --- |
-| 로케일 JSON (`src/locales/*.json`) | **지금처럼 서버 i18n 내려받기로 만든다** — IR의 `labelKey`는 키일 뿐 번역문이 없다. IR은 대신 엔터티 키 대조를 이름 추측에서 데이터로 바꾼다(아래) |
-| CRUD 설정 (`crud.config.ts`) | 오퍼레이션의 역할 추론 대신 IR의 오퍼레이션 목록으로 만든다 |
-| `.http` 파일 | IR의 오퍼레이션에서 만든다 — 생성 모듈 재사용 |
+| 로케일 JSON (`src/locales/*.json`) | **지금처럼 서버 i18n 내려받기로 만든다** — SimpliX Meta의 `labelKey`는 키일 뿐 번역문이 없다. SimpliX Meta는 대신 엔터티 키 대조를 이름 추측에서 데이터로 바꾼다(아래) |
+| CRUD 설정 (`crud.config.ts`) | 오퍼레이션의 역할 추론 대신 SimpliX Meta의 오퍼레이션 목록으로 만든다 |
+| `.http` 파일 | SimpliX Meta의 오퍼레이션에서 만든다 — 생성 모듈 재사용 |
 | `constants.ts` · `translations.ts` | 지금 모듈 재사용 |
 | mock 시드 (`src/mock/seeds.ts`) | 재생성 사이에 보존 — 기존 규칙 그대로 |
 
@@ -441,7 +441,7 @@ IR의 `operations[].tag`가 그 패턴에 걸린다.
 | 공유물 | 규칙 |
 | --- | --- |
 | `src/mutator.ts` | 메타 쪽 요청 함수도 `getMutator("boot")`를 거친다. 응답 봉투를 한 곳에서만 벗겨야 두 경로의 `data`가 같은 모양이다 |
-| `src/locales/*.json` | 서버 i18n 내려받기(`i18nDownloader`)가 유일한 출처다. `transformToLocaleData`가 `entityKeyMap`에 없는 엔터티를 조용히 건너뛰는데, 그 맵을 지금은 파생 엔터티 이름으로 만든다 — IR의 `labelKey`가 필드마다 서버 키를 말하므로 맵을 데이터로 만들어 그 침묵을 없앤다 |
+| `src/locales/*.json` | 서버 i18n 내려받기(`i18nDownloader`)가 유일한 출처다. `transformToLocaleData`가 `entityKeyMap`에 없는 엔터티를 조용히 건너뛰는데, 그 맵을 지금은 파생 엔터티 이름으로 만든다 — SimpliX Meta의 `labelKey`가 필드마다 서버 키를 말하므로 맵을 데이터로 만들어 그 침묵을 없앤다 |
 | `src/mock/seeds.ts` | 재생성 사이에 보존한다. 메타 쪽 핸들러도 같은 시드를 읽는다 |
 
 ## 9 · 생성물 레이아웃
@@ -512,17 +512,17 @@ export type AreaKindLabeled = LabeledEnumValue<AreaKind>;
 | `findSchemaFile` | `X…Body = zod.object(` 정규식 | `.extend()`로 선언한 Update 스키마가 매칭에서 빠진다 — 상속 필드가 폼에서 조용히 사라진다 |
 | `parseSchemaFields` | 인라인 `zod.object({...})` 본문 텍스트 파싱 | 상속받은 필드가 보이지 않는다 |
 | `readListDtoFieldNames` | `src/generated/model/<파일>.ts` 경로, 파일당 인터페이스 하나 | 메타는 `generated-meta/model/<entity>.ts`에 여러 인터페이스를 둔다 |
-| `parseFilterParams` | 스냅샷 queryParams의 `field.operator` 접미사를 파싱해 연산자를 추측 | IR이 `searchable.operators`를 직접 싣는다 — 추측이 필요 없다 |
+| `parseFilterParams` | 스냅샷 queryParams의 `field.operator` 접미사를 파싱해 연산자를 추측 | SimpliX Meta가 `searchable.operators`를 직접 싣는다 — 추측이 필요 없다 |
 | 스냅샷 fallback | orval이 갱신하는 `.openapi-snapshot.json` | 도메인이 메타로 넘어가면 갱신이 멎어 낡은 채 읽힌다 |
 
 고치는 방법은 필드 소스의 이원화다. 스캐폴드의 데이터 계약(`FieldInfo` · `FilterFieldInfo` ·
 `EntityOperations`)은 그대로 두고, 그 값을 채우는 소스를 둘 둔다.
 
-- **IR 소스**(`meta/scaffold-source.ts`) — 도메인에 메타 산출물이 있으면 IR에서 직접 채운다.
+- **SimpliX Meta 소스**(`meta/scaffold-source.ts`) — 도메인에 메타 산출물이 있으면 SimpliX Meta에서 직접 채운다.
   필수 여부는 선언에서, 필터 연산자는 `searchable.operators`에서, 라벨은 `labelKey`에서 온다.
 - **기존 소스** — orval 도메인은 지금의 zod 텍스트 파싱 그대로. 변경하지 않는다.
 
-두 소스가 같은 계약을 채우므로 템플릿과 렌더링 코드는 하나다. IR 소스에서는 연산자 추측이
+두 소스가 같은 계약을 채우므로 템플릿과 렌더링 코드는 하나다. SimpliX Meta 소스에서는 연산자 추측이
 사라지므로, 필터 설계 뒤 백엔드 DTO를 사람이 확인하던 절차가 생성 시점에 자동으로 끝난다.
 
 ## 10 · 공존과 전환
@@ -534,7 +534,7 @@ openapi: [{
   profile: "simplix-boot",
   meta: {
     // 생략하면 spec URL의 origin에 프로파일의 metaEndpoint를 붙여 만든다
-    snapshot: "openapi/meta.json",   // 선택 — 지정하면 받은 IR을 여기 쓴다
+    snapshot: "openapi/meta.json",   // 선택 — 지정하면 받은 SimpliX Meta를 여기 쓴다
     export: ["site"],                // 배럴이 메타 산출물을 내보내는 도메인
   },
   domains: {
@@ -581,7 +581,7 @@ i18n 내려받기의 엔티티 목록, 스냅샷 저장, `.http` 파일. 이 가
 만든다.
 
 그래서 **`spec`을 언제 뺄 수 있는지는 이 설계의 범위 밖이고**, 빼려면 나머지 다섯 단계의 재료를
-IR에서 얻도록 옮겨야 한다. 그 전까지 `spec`과 `meta`는 함께 설정에 남는다.
+SimpliX Meta에서 얻도록 옮겨야 한다. 그 전까지 `spec`과 `meta`는 함께 설정에 남는다.
 
 ## 11 · 대조 검증
 
@@ -615,60 +615,60 @@ params 타입, mock 핸들러 팩토리(`createXHandlers`) — 가 전부 같아
 
 smart-safety 코드에서 확인한 사실과 그에 따른 결정이다.
 
-**이 절의 수치는 소스 훑기로 센 것이고, 계획서의 수치는 수집한 IR에서 잰 것이다.** 두 계측기는
-같은 것을 세지 않는다 — 소스 훑기는 선언을 세고, IR은 컨트롤러에서 도달 가능한 것만 싣는다. 그래서
-`expression` 표현식이 소스에는 15곳이고 IR에는 5곳이며, 권한 표현식이 723곳이지만 IR의 오퍼레이션은
-694개다. **생성기가 상대하는 것은 IR이므로 구현은 IR 수치를 쓴다.** 아래에서 IR로 다시 잰 값은
+**이 절의 수치는 소스 훑기로 센 것이고, 계획서의 수치는 수집한 SimpliX Meta에서 잰 것이다.** 두 계측기는
+같은 것을 세지 않는다 — 소스 훑기는 선언을 세고, SimpliX Meta는 컨트롤러에서 도달 가능한 것만 싣는다. 그래서
+`expression` 표현식이 소스에는 15곳이고 SimpliX Meta에는 5곳이며, 권한 표현식이 723곳이지만 SimpliX Meta의 오퍼레이션은
+694개다. **생성기가 상대하는 것은 SimpliX Meta이므로 구현은 그 수치를 쓴다.** 아래에서 다시 잰 값은
 그렇게 표시했다.
 
 **Jackson 규칙** — `@JsonView`는 쓰지 않는다(0곳). `@JsonIgnore`는 DTO 안에 64곳 있고 Jackson의
 프로퍼티 목록이 이미 제외하므로 별도 처리가 없다. `@JsonIncludeProperties`와
-`@JsonManagedReference`는 전부 엔티티에 있고 **DTO 필드에 엔티티 타입이 오는 곳이 없다**. IR에
+`@JsonManagedReference`는 전부 엔티티에 있고 **DTO 필드에 엔티티 타입이 오는 곳이 없다**. SimpliX Meta에
 `pick` 표현은 두되 이번 적용에서는 쓰이지 않는다.
 
-**제네릭** — 사용자 정의 제네릭 DTO는 없지만 `typeParams`가 전부 빈 배열은 아니다. 수집한 IR에서
+**제네릭** — 사용자 정의 제네릭 DTO는 없지만 `typeParams`가 전부 빈 배열은 아니다. 수집한 SimpliX Meta에서
 다섯 타입이 이를 싣는다 — `Set<E>` · `List<E>`(요청 본문 소거의 잔재로, §13의 픽스처 재수집이
 없앤다) · `Comparable<T>` · `BaseEntity<K>` · `SimpliXBaseEntity<K>`. 뒤의 둘은 엔티티 기반
 클래스이고 실제 도메인에서 참조된다.
 
 **raw 컬렉션 다섯 곳이 `param`으로 온다.** `regulation` 모듈의 SearchDTO 다섯 필드가
 `private List appliedRules;`처럼 타입 인자 없이 선언되어, 컨테이너의 인자가 컬렉션 자신의 변수
-`E`로 해석된다. IR은 사실을 정확히 싣는 것이고, 생성기는 소유 타입의 `typeParams`에 없는 `param`을
+`E`로 해석된다. SimpliX Meta는 사실을 정확히 싣는 것이고, 생성기는 소유 타입의 `typeParams`에 없는 `param`을
 `unknown`으로 내고 보고한다 — 그 이름을 그대로 쓰면 스코프에 없는 식별자가 생성물에 들어간다. 응답
 컨테이너는 `SimpliXApiResponse`, `Page`(93곳), `List`(83곳), `Map`(16곳) 넷이고 `Slice`는 쓰지
-않는다(0곳). IR은 이것을 `container`로 감싼 그대로 싣고, TypeScript 이름은 플러그인의
+않는다(0곳). SimpliX Meta는 이것을 `container`로 감싼 그대로 싣고, TypeScript 이름은 플러그인의
 `containerTypes`가 정한다.
 
-**커스텀 검증기는 전부 클래스 수준이라 IR이 싣지 않는다.** 앱이 만든 `ConstraintValidator`
+**커스텀 검증기는 전부 클래스 수준이라 SimpliX Meta가 싣지 않는다.** 앱이 만든 `ConstraintValidator`
 구현체는 없고, 프레임워크가 제공하는 것은 `@UniqueFields` 3곳(항목 `@UniqueField` 6개)과
 `@ValidateWith` 1곳인데 **셋 다 DTO 클래스에 붙는다.** 필드 수준 `@Unique` 사용은 0곳이다.
 `ConstraintExtractor.extract`는 프로퍼티마다 불리므로 클래스 애노테이션을 구조적으로 볼 수 없고,
-수집한 IR의 제약 709개 가운데 `custom`은 **0개**다.
+수집한 SimpliX Meta의 제약 709개 가운데 `custom`은 **0개**다.
 
 전부 DB를 읽어야 판정되는 서버 전용 검사라 zod로 옮길 수 없고 옮겨서도 안 되므로 지금은 이대로
-둔다. `{ kind: "custom", name }` 표현은 IR에 남겨 두되 **필드 수준 커스텀 제약이 생길 때를 위한
+둔다. `{ kind: "custom", name }` 표현은 SimpliX Meta에 남겨 두되 **필드 수준 커스텀 제약이 생길 때를 위한
 것**이고, 클래스 수준 제약을 화면에 알리려면 `TypeMeta`에 타입 수준 제약 목록을 더하는 별도
 변경이 필요하다 — 이번 범위 밖이다.
 
 **`@I18nTrans` 97곳** — 직렬화 시점에 로케일을 골라 넣는 프레임워크 Jackson 애노테이션이다.
-붙은 String 필드는 이미 번역된 값으로 오므로 IR에서는 평범한 문자열이고, 짝이 되는
+붙은 String 필드는 이미 번역된 값으로 오므로 SimpliX Meta에서는 평범한 문자열이고, 짝이 되는
 `xxxI18n` Map 필드는 Jackson 가시성을 그대로 따른다(요청 DTO에서는 `map` 컨테이너로 실려
-다국어 편집 폼이 된다). 별도 IR 종류가 필요 없다. 다만 스캐폴드의 i18n 필드 짝 감지는 **이름만으로 동작하지 않는다** —
+다국어 편집 폼이 된다). 별도 SimpliX Meta 종류가 필요 없다. 다만 스캐폴드의 i18n 필드 짝 감지는 **이름만으로 동작하지 않는다** —
 `name.endsWith("I18n")`와 `tsType === "Record<string, string>"`을 함께 요구하므로, 생성기가 `Map`
-컨테이너를 정확히 그 문자열로 내야 짝이 맺힌다. 수집한 IR의 `…I18n` 필드 33개가 모두 `Map<string>`
+컨테이너를 정확히 그 문자열로 내야 짝이 맺힌다. 수집한 SimpliX Meta의 `…I18n` 필드 33개가 모두 `Map<string>`
 이고 짝이 되는 필드도 모두 있으므로, 표기만 어긋나지 않으면 33개 전부 성립한다.
 
 **Spring Boot 버전** — 프레임워크가 Boot 3.5.x · jakarta 단일이다. javax 이중 지원이 없으므로
 메타 모듈은 jakarta만 상대한다.
 
-**타입 이름은 단순명이고, 겹치면 IR이 한쪽을 잃는다** — `types`가 이름을 키로 쓰는 맵이라
+**타입 이름은 단순명이고, 겹치면 SimpliX Meta가 한쪽을 잃는다** — `types`가 이름을 키로 쓰는 맵이라
 서로 다른 두 DTO가 같은 단순명을 내면 나중 것이 앞엣것을 덮어쓴다. 패키지를 나눠도 해결되지
 않는다 — 이름을 만드는 규칙이 `getSimpleName()`이고, 그 메서드는 정의상 패키지를 버린다.
 smart-safety에 실제로 한 건 있다(DTO 선언 633개, 고유 단순명 632개). 열거형은 139개가 모두
 고유하다.
 
 **엔드포인트는 호출될 때 실패한다.** 레지스트리가 충돌을 발견하면 두 클래스의 완전 수식명을 담은
-예외를 던진다. 틀린 IR이 나가는 경로가 사라지고, 개발자는 개명해야 할 두 클래스를 바로 본다.
+예외를 던진다. 틀린 SimpliX Meta가 나가는 경로가 사라지고, 개발자는 개명해야 할 두 클래스를 바로 본다.
 이름을 자동으로 수식하지는 않는다 — 632개를 짧게 유지하고 §11의 공개 이름 동일성을 지키기
 위해서다. 겹친 쪽은 서버에서 개명한다.
 
@@ -696,7 +696,7 @@ smart-safety에 실제로 한 건 있다(DTO 선언 633개, 고유 단순명 632
 쓰므로 응답 값은 `{ value, label }`로 오고, 역직렬화기는 값 문자열을 받는다. §7의 이관 뒤에는 이
 전송 모양이 앱의 관례가 아니라 프레임워크의 계약이다.
 
-**모든 열거형이 이 모양은 아니다 — `labeled`가 판정한다.** 수집한 IR의 열거형 133개 가운데 122개가
+**모든 열거형이 이 모양은 아니다 — `labeled`가 판정한다.** 수집한 SimpliX Meta의 열거형 133개 가운데 122개가
 라벨 붙은 것이고 **11개는 `LabeledEnum`을 구현하지 않아 평범한 문자열로 온다**: `SessionState` ·
 `InboxTab` · `LawScreenMapNarrowing` · `UserAccountStanding` · `DayOfWeek` · `TransportType` ·
 `AdminCommandType` · `AdminCommandStatus` · `SchedulerState` · `MessageButtonGrade` ·
@@ -707,8 +707,8 @@ smart-safety에 실제로 한 건 있다(DTO 선언 633개, 고유 단순명 632
 요청과 응답 양쪽에서 값 유니언이고 `…Labeled` 별칭을 내지 않는다. 전부에 적용하면 문자열로 오는
 14곳에 `{ value, label }` 타입이 붙어, 이 설계가 없애려는 조용한 거짓이 그대로 재현된다.
 
-**`expression`으로 남는 15곳(IR에서는 5곳)** — `hasAuthority`·`hasRole` 3곳과 `and`·`or`가 든
-복합 표현식 12곳은 구조로 풀리지 않아 `expression`으로 온다. 그 가운데 IR에 실제로 실리는 것은
+**`expression`으로 남는 15곳(SimpliX Meta에서는 5곳)** — `hasAuthority`·`hasRole` 3곳과 `and`·`or`가 든
+복합 표현식 12곳은 구조로 풀리지 않아 `expression`으로 온다. 그 가운데 SimpliX Meta에 실제로 실리는 것은
 5개다 — 나머지는 등록된 핸들러에 걸리지 않는다. 이중 따옴표는 0곳이라 문제가 없고,
 단일 따옴표 604곳은 전부 `permission`으로 풀린다.
 
@@ -722,7 +722,7 @@ smart-safety에 실제로 한 건 있다(DTO 선언 633개, 고유 단순명 632
 대응하므로, 파싱되지 않는 SpEL은 `expression`으로 원문을 실어 프론트엔드가 「권한 없음」으로
 잘못 읽지 않게 한다.
 
-**검증 그룹** — `groups =`를 쓰는 제약이 0곳이다. IR은 그룹을 싣지 않고, 생기면 판올림한다.
+**검증 그룹** — `groups =`를 쓰는 제약이 0곳이다. SimpliX Meta는 그룹을 싣지 않고, 생기면 판올림한다.
 
 **`simplix-boot-utils` 의존성** — `_enums.ts`가 `LabeledEnumValue`를 import하므로 프로파일의
 `dependencies`에 `@simplix-react-ext/simplix-boot-utils`를 더한다. 지금은 `simplix-boot-auth`
@@ -731,9 +731,9 @@ smart-safety에 실제로 한 건 있다(DTO 선언 633개, 고유 단순명 632
 **multipart와 바이너리** — `MultipartFile` 필드가 16곳, `Resource`·`byte[]` 응답이 9곳 있다.
 파일 필드는 `{ kind: "file" }`로 실어 TS `File`과 `z.instanceof(File)`로 내고, 바이너리 응답은
 `{ kind: "binary" }`로 실어 React Query 훅 대신 `Blob`을 주는 내려받기 함수를 낸다. SSE와 WebSocket은 0곳이라
-이번 범위에 없다 — 뒤에 생기면 IR에 종류를 더한다.
+이번 범위에 없다 — 뒤에 생기면 SimpliX Meta에 종류를 더한다.
 
-**시각 필드** — `@JsonFormat(pattern = "HH:mm")`이 붙은 `LocalTime`은 IR의 `time` 종류로 싣고,
+**시각 필드** — `@JsonFormat(pattern = "HH:mm")`이 붙은 `LocalTime`은 SimpliX Meta의 `time` 종류로 싣고,
 생성기가 `string` + `.regex(/^\d{2}:\d{2}$/)`로 낸다.
 
 **응답 DTO의 필수 여부** — 요청 DTO는 `@NotNull` · `@NotBlank`가 판정한다. 응답 DTO에는 그런
@@ -753,20 +753,20 @@ smart-safety에 실제로 한 건 있다(DTO 선언 633개, 고유 단순명 632
 끝까지 통과시키는 세로 절단을 먼저 한다 — 사양 검토가 못 보는 문제는 구현에서만 드러나므로,
 그 문제를 가장 싼 지점에서 만난다.
 
-1. 프레임워크에 `FieldLabel` · 메시지 리졸버 · `LabeledEnum` 가족을 추가하고 IR 타입과
+1. 프레임워크에 `FieldLabel` · 메시지 리졸버 · `LabeledEnum` 가족을 추가하고 SimpliX Meta 타입과
    직렬화기를 만든다.
 2. 메타 엔드포인트 · i18n dev 엔드포인트와 `SimpliXMetaContributor` SPI를 등록한다.
 3. smart-safety의 import를 교체하고(`FieldLabel` 2,161곳 · `LabeledEnum` 140곳 · 리졸버 51곳)
    백엔드 제너레이터 템플릿을 갱신한 뒤, 앱 사본과 `common-dev`의 i18n 구현을 삭제한다.
-4. CLI에 `meta/fetch.ts`와 `ir-types.ts`를 만들어 IR을 받아 오고, 받은 IR 표본을 픽스처로
-   커밋해 이후 생성기들의 골든 테스트 기반으로 쓴다. **픽스처는 IR 모양이 바뀔 때마다 다시
+4. CLI에 `meta/fetch.ts`와 `meta/types.ts`를 만들어 SimpliX Meta를 받아 오고, 받은 표본을 픽스처로
+   커밋해 이후 생성기들의 골든 테스트 기반으로 쓴다. **픽스처는 SimpliX Meta 모양이 바뀔 때마다 다시
    수집한다** — 뒤따르는 생성기 시험이 전부 이 파일 하나에 기대므로, 낡은 픽스처는 낡은 모양을
    시험에 새겨 넣고 아무것도 실패시키지 않는다.
 5. 모델과 zod 생성기를 만든다.
 6. 요청 함수와 훅 생성기를 만든다.
 7. 검색·권한·mock 생성기를 만든다.
 8. 병렬 생성과 배럴 전환을 `simplix.config.ts`에 연결한다.
-9. scaffold의 필드 소스를 IR로 넓히고 배럴 템플릿 **둘**(`openapi/user-index-ts.hbs` ·
+9. scaffold의 필드 소스를 SimpliX Meta로 넓히고 배럴 템플릿 **둘**(`openapi/user-index-ts.hbs` ·
    `domain/index-ts.hbs`)의 재수출 경로를 변수로 뺀다.
 10. `meta-diff` 명령을 만든다.
 11. smart-safety의 도메인을 하나씩 옮기고, 옮긴 도메인에서 `simplix scaffold`를 실행해

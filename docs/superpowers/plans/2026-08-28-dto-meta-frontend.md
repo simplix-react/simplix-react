@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** `@simplix-react/cli` reads the backend's DTO metadata IR and generates TypeScript types, zod schemas, request functions, React Query hooks, MSW handlers, filter/permission configuration — in parallel with the existing orval output, so a domain can be moved across one at a time and moved back by reverting one config line.
+**Goal:** `@simplix-react/cli` reads the backend's SimpliX Meta and generates TypeScript types, zod schemas, request functions, React Query hooks, MSW handlers, filter/permission configuration — in parallel with the existing orval output, so a domain can be moved across one at a time and moved back by reverting one config line.
 
-**Architecture:** A new `packages/cli/src/meta/` reads the IR (from the dev endpoint or a committed snapshot), resolves it, and hands a shared shape to per-concern generators that write into `src/generated-meta/`. The existing orval path keeps behaving exactly as it does — four tasks add to `packages/cli/src/openapi/`, none change what it emits (see "Facts that bind every task"). A `meta-diff` command compares the two outputs so a domain is only switched once they agree.
+**Architecture:** A new `packages/cli/src/meta/` reads SimpliX Meta (from the dev endpoint or a committed snapshot), resolves it, and hands a shared shape to per-concern generators that write into `src/generated-meta/`. The existing orval path keeps behaving exactly as it does — four tasks add to `packages/cli/src/openapi/`, none change what it emits (see "Facts that bind every task"). A `meta-diff` command compares the two outputs so a domain is only switched once they agree.
 
 **Tech Stack:** TypeScript, Node 22+, the existing CLI plugin registry, zod v4, TanStack Query, MSW.
 
@@ -12,9 +12,9 @@
 
 ---
 
-## The IR is real — do not invent fixtures
+## SimpliX Meta is real — do not invent fixtures
 
-The backend half of this project is finished and a real IR was captured from the smart-safety application. It lives at:
+The backend half of this project is finished and a real SimpliX Meta was captured from the smart-safety application. It lives at:
 
 `packages/cli/src/meta/__fixtures__/smart-safety-meta.json` (2.7 MB)
 
@@ -34,12 +34,12 @@ The backend half of this project is finished and a real IR was captured from the
 | `searchDto`-bearing operations | 86 |
 | fields with `searchable` | 1118 |
 | fields with `labelKey` | 2104 |
-| distinct tags | 139 — **and 139 entities**, since an entity is one tag (Task 8). Counts elsewhere that say **126** are the *configured* domains only: 139 minus the 13 tags no `domains` pattern claims. Quote 139 for "what the IR contains" and 126 for "what a codegen run produces from this capture". The config declares **129** patterns across **13** domains; the other 3 match no tag in this capture (see Task 5). |
+| distinct tags | 139 — **and 139 entities**, since an entity is one tag (Task 8). Counts elsewhere that say **126** are the *configured* domains only: 139 minus the 13 tags no `domains` pattern claims. Quote 139 for "what SimpliX Meta contains" and 126 for "what a codegen run produces from this capture". The config declares **129** patterns across **13** domains; the other 3 match no tag in this capture (see Task 5). |
 
 ### What the fixture cannot test
 
 Three declared shapes never occur in it, so a test written against the fixture proves nothing about
-them. Implement each anyway — the IR declares them and a later capture will carry them — and build
+them. Implement each anyway — SimpliX Meta declares them and a later capture will carry them — and build
 the case by hand, saying in your report that the fixture does not cover it:
 
 | Shape | In the fixture | Why |
@@ -118,7 +118,7 @@ re-capture; the request bodies change shape and the counts may move with them.
 
 **Files:**
 - Replace: `packages/cli/src/meta/__fixtures__/smart-safety-meta.json`
-- Modify: `packages/cli/src/__tests__/meta-ir-types.test.ts` — assert the fixture matches the types
+- Modify: `packages/cli/src/__tests__/meta-types.test.ts` — assert the fixture matches the types
 
 `RequestMeta.body` was a type name, and `DtoMetaBuilder` filled it with
 `registry.register(resolvable.resolve())`. `resolve()` on `Set<OrganizationUpdateDTO>` yields the
@@ -135,7 +135,7 @@ to append the file under.
 Both are fixed on `feat/dto-meta-endpoint` in the simplix repository, each with a regression test:
 `02c49ac` maps the body the way the response was already mapped (pinning a `Set<T>` body to
 `container("List", [ref T])`), and `a7c392b` records the part as a named `query` entry typed
-`file`. `ir-types.ts` and spec §4 follow the first. **Task 0 below re-captured the fixture against a
+`file`. `types.ts` and spec §4 follow the first. **Task 0 below re-captured the fixture against a
 backend carrying both fixes**, so the committed fixture now holds 231 `TypeRef` bodies — 49 of
 them containers — and 2 `file`-typed parts. The paragraphs below describe the capture that step
 replaced; they are kept because the tests they specify are what keep the staleness loud.
@@ -191,17 +191,17 @@ it("every request body is a TypeRef, not a bare type name", () => {
 ```bash
 npx vitest run --project cli
 git add packages/cli/src/meta/__fixtures__/smart-safety-meta.json \
-        packages/cli/src/__tests__/meta-ir-types.test.ts
-git commit -m "test(cli): re-capture the IR fixture with typed request bodies"
+        packages/cli/src/__tests__/meta-types.test.ts
+git commit -m "test(cli): re-capture the SimpliX Meta fixture with typed request bodies"
 ```
 
 ---
 
-### Task 1: IR types, mirrored from the committed Java records
+### Task 1: SimpliX Meta types, mirrored from the committed Java records
 
 **Files:**
-- Create: `packages/cli/src/meta/ir-types.ts`
-- Test: `packages/cli/src/__tests__/meta-ir-types.test.ts`
+- Create: `packages/cli/src/meta/types.ts`
+- Test: `packages/cli/src/__tests__/meta-types.test.ts`
 
 The Java records are committed at
 `/Users/taehwan/Workspace/simplix/simplix/spring-boot-starter-simplix/src/main/java/dev/simplecore/simplix/web/meta/model/`.
@@ -316,20 +316,20 @@ export interface DtoMeta {
 
 **Why some members are optional and others are not:** the Java records carry `@JsonInclude(NON_NULL)`, which drops a `null` member entirely but never drops an unboxed primitive and never drops an empty collection. So `required`, `nullable`, `sortable`, `labeled`, `version` and `typeParams` are always present, while `description`, `labelKey`, `extends`, `summary`, `response` and `extensions` vanish when absent. Getting this backwards produces types that lie about the payload (spec §4).
 
-- [ ] **Step 2: Write the test — it reads the real IR**
+- [ ] **Step 2: Write the test — it reads the real SimpliX Meta**
 
 ```ts
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import type { DtoMeta } from "../ir-types.js";
+import type { DtoMeta } from "../types.js";
 
 const ir: DtoMeta = JSON.parse(
   readFileSync(join(__dirname, "../__fixtures__/smart-safety-meta.json"), "utf-8"),
 );
 
-describe("ir-types", () => {
-  it("types the captured IR without a cast", () => {
+describe("meta types", () => {
+  it("types the captured SimpliX Meta without a cast", () => {
     expect(ir.version).toBe(1);
     expect(Object.keys(ir.types)).toHaveLength(646);
     expect(Object.keys(ir.enums)).toHaveLength(133);
@@ -382,14 +382,14 @@ Expected: all green. A count mismatch means the fixture was regenerated against 
 - [ ] **Step 4: Commit**
 
 ```bash
-git add packages/cli/src/meta/ir-types.ts packages/cli/src/__tests__/meta-ir-types.test.ts \
+git add packages/cli/src/meta/types.ts packages/cli/src/__tests__/meta-types.test.ts \
         packages/cli/src/meta/__fixtures__/smart-safety-meta.json
-git commit -m "feat(cli): mirror the DTO meta IR as TypeScript types"
+git commit -m "feat(cli): mirror SimpliX Meta as TypeScript types"
 ```
 
 ---
 
-### Task 2: Fetch the IR from an endpoint or a snapshot
+### Task 2: Fetch SimpliX Meta from an endpoint or a snapshot
 
 **Files:**
 - Create: `packages/cli/src/meta/fetch.ts`
@@ -399,15 +399,15 @@ git commit -m "feat(cli): mirror the DTO meta IR as TypeScript types"
 
 ```ts
 import { readFile, writeFile } from "node:fs/promises";
-import type { DtoMeta } from "./ir-types.js";
+import type { DtoMeta } from "./types.js";
 
-/** The IR version this CLI understands. A newer document is refused rather than read partially. */
+/** The SimpliX Meta version this CLI understands. A newer document is refused rather than read partially. */
 export const SUPPORTED_IR_VERSION = 1;
 
 export interface FetchMetaOptions {
   /** Endpoint URL, or a path to a committed snapshot. */
   source: string;
-  /** When set, a fetched IR is written here so a later run can work offline. */
+  /** When set, a fetched SimpliX Meta is written here so a later run can work offline. */
   snapshot?: string;
   /** Read `snapshot` instead of `source`. */
   offline?: boolean;
@@ -437,11 +437,11 @@ Fill in the four helpers:
   - **An HTTP source always carries an envelope.** `SimpliXMetaDevController.dto()` returns
     `SimpliXApiResponse<DtoMeta>` (fields `type`, `message`, `body`, `timestamp`, `errorCode`,
     `errorDetail`). Take `body` unconditionally, and throw naming the `type` and `message` when it
-    is absent — that is an error envelope, not an IR.
+    is absent — that is an error envelope, not a SimpliX Meta document.
   - **A snapshot file may be either**, since a person may have saved the whole response or just
-    the document. Decide on the IR's own guaranteed member: `version` is an unboxed `int`, so
-    `@JsonInclude(NON_NULL)` never drops it and a bare IR always has it at the top level. Present
-    ⇒ the payload is the IR; absent ⇒ take `body`, and throw if that has no `version` either.
+    the document. Decide on SimpliX Meta's own guaranteed member: `version` is an unboxed `int`, so
+    `@JsonInclude(NON_NULL)` never drops it and a bare SimpliX Meta always has it at the top level. Present
+    ⇒ the payload is SimpliX Meta; absent ⇒ take `body`, and throw if that has no `version` either.
 - `assertVersion` — refuse a `version` greater than `SUPPORTED_IR_VERSION` with a message telling the operator to upgrade the CLI. A newer document may carry members this CLI would silently drop (spec §5.1).
 
 - [ ] **Step 2: Test it**
@@ -457,7 +457,7 @@ response surfacing the body text. Stub `fetch` rather than opening a socket.
 ```bash
 npx vitest run --project cli
 git add packages/cli/src/meta/fetch.ts packages/cli/src/__tests__/meta-fetch.test.ts
-git commit -m "feat(cli): read the DTO meta IR from an endpoint or a snapshot"
+git commit -m "feat(cli): read SimpliX Meta from an endpoint or a snapshot"
 ```
 
 ---
@@ -469,7 +469,7 @@ git commit -m "feat(cli): read the DTO meta IR from an endpoint or a snapshot"
 - Modify: `extensions/simplix-boot/packages/utils/src/index.ts`
 - Test: `extensions/simplix-boot/packages/utils/src/__tests__/labeled-enum-value.test.ts`
 
-`resolveBootEnum` already lives in this package and takes `unknown`, because nothing described the wire shape. The IR does now: a labeled enum serializes as `{"value":"ACTIVE","label":"활성"}` (spec §4.1).
+`resolveBootEnum` already lives in this package and takes `unknown`, because nothing described the wire shape. SimpliX Meta does now: a labeled enum serializes as `{"value":"ACTIVE","label":"활성"}` (spec §4.1).
 
 - [ ] **Step 1: Write it**
 
@@ -518,7 +518,7 @@ git commit -m "feat(boot-utils): type the labeled enum wire shape"
 dependency runs the other way. `spec-profile.ts` already sets the precedent with `I18nEntityInfo`
 and `I18nDownloader`: declared there, re-exported from the barrel, imported by the plugin.
 
-The IR names containers by their JAVA names; which TypeScript type each becomes is the profile's decision (spec §4.1). Measured usage: `SimpliXApiResponse` 648, `List` 405, `Page` 93, `Map` 74 — those four and no others.
+SimpliX Meta names containers by their JAVA names; which TypeScript type each becomes is the profile's decision (spec §4.1). Measured usage: `SimpliXApiResponse` 648, `List` 405, `Page` 93, `Map` 74 — those four and no others.
 
 - [ ] **Step 1: Write the mapping**
 
@@ -534,7 +534,7 @@ export interface ContainerMapping {
   import?: string;
   /** The mutator strips this container before React Query sees it, so it has no client type. */
   unwrap?: boolean;
-  /** For `Map`: the key type, which the IR does not carry. */
+  /** For `Map`: the key type, which SimpliX Meta does not carry. */
   keyType?: string;
 }
 ```
@@ -555,7 +555,7 @@ export const bootContainerTypes: Record<string, ContainerMapping> = {
 };
 ```
 
-**`keyType` is not decoration.** The IR's `Map` container carries **one** argument — the value —
+**`keyType` is not decoration.** SimpliX Meta's `Map` container carries **one** argument — the value —
 because `TypeRefMapper` maps `resolvable.getGeneric(1)` and drops the key. TypeScript needs
 `Record<string, V>` and zod v4 needs `z.record(z.string(), V)`; see Task 7 for what happens
 without it.
@@ -568,7 +568,7 @@ without it.
   `metaExtensions?: (meta: DtoMeta) => MetaExtensionOutput | undefined`.
 
   `metaExtensions` is the frontend half of the backend's `SimpliXMetaContributor` SPI (spec §6) —
-  a contributor puts arbitrary data into the IR's `extensions`, and this turns it into files:
+  a contributor puts arbitrary data into SimpliX Meta's `extensions`, and this turns it into files:
 
   ```ts
   interface MetaExtensionOutput {
@@ -579,7 +579,7 @@ without it.
 
   Register the boot values in the plugin's `registerPlugin` call, endpoint
   `/api/v1/dev/meta/dto`. **Do not register a `metaExtensions` implementation** — the boot profile
-  has no contributor, and the captured IR's `extensions` is absent. The point of this step is that
+  has no contributor, and the captured SimpliX Meta's `extensions` is absent. The point of this step is that
   the seam exists and is typed; inventing a default behaviour for it would be the speculative
   code this project's rules forbid.
 
@@ -601,18 +601,18 @@ git add packages/cli/src/openapi/orchestration/spec-profile.ts \
         extensions/simplix-boot/packages/cli-plugin/src/container-types.ts \
         extensions/simplix-boot/packages/cli-plugin/src/index.ts \
         extensions/simplix-boot/packages/cli-plugin/src/__tests__/container-types.test.ts
-git commit -m "feat(boot-plugin): map IR container names to TypeScript types"
+git commit -m "feat(boot-plugin): map SimpliX Meta container names to TypeScript types"
 ```
 
 ---
 
-### Task 5: Resolve the IR into a per-domain shape
+### Task 5: Resolve SimpliX Meta into a per-domain shape
 
 **Files:**
 - Create: `packages/cli/src/meta/resolve.ts`
 - Test: `packages/cli/src/__tests__/meta-resolve.test.ts`
 
-The generators need the IR sliced by domain and indexed. This task does that once so no generator re-walks the document.
+The generators need SimpliX Meta sliced by domain and indexed. This task does that once so no generator re-walks the document.
 
 - [ ] **Step 1: Write it.** `resolveMeta(meta, { domains, containerTypes })` returns, per domain name:
   - the operations whose `tag` matches that domain's tag patterns. **Reuse
@@ -716,7 +716,7 @@ The generators need the IR sliced by domain and indexed. This task does that onc
 ```bash
 npx vitest run --project cli
 git add packages/cli/src/meta/resolve.ts packages/cli/src/__tests__/meta-resolve.test.ts
-git commit -m "feat(cli): resolve the IR into per-domain type closures"
+git commit -m "feat(cli): resolve SimpliX Meta into per-domain type closures"
 ```
 
 ---
@@ -729,7 +729,7 @@ git commit -m "feat(cli): resolve the IR into per-domain type closures"
 
 - [ ] **Step 1: Write it.** For one domain, emit:
   - `model/<typeName>.ts` — **one file per type, camelCase, exactly as orval names them**
-    (`organizationListDTO.ts`); one `export interface` in each, `extends` where the IR says so,
+    (`organizationListDTO.ts`); one `export interface` in each, `extends` where SimpliX Meta says so,
     **own fields only**.
 
     **The file name is load-bearing.** `readListDtoFieldNames` (`scaffold-crud.ts:541`) opens
@@ -793,7 +793,7 @@ git commit -m "feat(cli): resolve the IR into per-domain type closures"
 
   Emitting `appliedRules?: E[]` puts an unbound identifier in the output, and Task 11 Step 4b's
   no-`@ts-nocheck` rule leaves nowhere to hide it. `unknown[]` compiles and is honest. **Report the
-  five by name** — they are five raw declarations in one backend module (`regulation`), the IR is
+  five by name** — they are five raw declarations in one backend module (`regulation`), SimpliX Meta is
   reporting them correctly, and fixing them there is what makes the generated type useful. Do not
   fix them yourself; that is a backend change outside this plan.
 
@@ -829,7 +829,7 @@ names has no duplicate, which is the only thing that catches a shared type writt
 ```bash
 npx vitest run --project cli
 git add packages/cli/src/meta/generation/model-gen.ts packages/cli/src/__tests__/meta-model-gen.test.ts
-git commit -m "feat(cli): generate TypeScript models from the IR"
+git commit -m "feat(cli): generate TypeScript models from SimpliX Meta"
 ```
 
 ---
@@ -848,7 +848,7 @@ This is where the project's original complaint is answered: 440 `maxLength` and 
   `OrganizationRestCreateBody`, `OrganizationRestGetResponse`, `OrganizationRestUpdateParams`,
   `OrganizationRestUpdateTreeOrderQueryParams`, and for a collection body the pair
   `OrganizationRestMultiUpdateBodyItem` + `OrganizationRestMultiUpdateBody = zod.array(…Item)`.
-  One entity's 12 operations produce 32 constants. The IR's `types` map is keyed by DTO simple
+  One entity's 12 operations produce 32 constants. SimpliX Meta's `types` map is keyed by DTO simple
   name, so "one const per type, named as orval named it" is not a thing that can be built.
 
   **Name the files `<entity>.schema.ts`, not `<entity>.ts`.** The scaffold finds an entity's schema
@@ -906,14 +906,14 @@ This is where the project's original complaint is answered: 440 `maxLength` and 
 
   **Base type by `TypeRef.kind`:** `string`→`z.string()`; `number`→`z.number()`, and
   `z.int()` when `integral` is true; `boolean`→`z.boolean()`; `instant`→`z.iso.datetime()`;
-  `date`→`z.iso.date()`; `time`→`z.string().regex(...)` built from the IR's `pattern` when
+  `date`→`z.iso.date()`; `time`→`z.string().regex(...)` built from SimpliX Meta's `pattern` when
   present, else the `HH:mm` shape (spec §12); `enum`→ **gated on
   `EnumMeta.labeled`**: `z.enum([...])` for a request field, and for a response field the labeled
   object shape only when `labeled` is true — otherwise `z.enum([...])` there too (spec §12); `ref`→ the referenced schema constant;
   `container`→ the plugin's `zod` factory (`pageOf` for `Page`, `z.array` for `List`,
   `z.record` for `Map`, and nothing for the unwrapped envelope); `unknown`→`z.unknown()`.
 
-  **`z.record` takes two arguments in zod v4 and the IR supplies only one.** The `Map` container
+  **`z.record` takes two arguments in zod v4 and SimpliX Meta supplies only one.** The `Map` container
   carries the value type alone, so emit `z.record(z.string(), <value>)` using the mapping's
   `keyType`. Measured on the installed `zod@4.3.6`: the one-argument form does not fail to
   validate, it **throws while the schema is being constructed** —
@@ -927,7 +927,7 @@ This is where the project's original complaint is answered: 440 `maxLength` and 
   `positive`/`nonnegative`/`negative`/`nonpositive`→ the matching zod call;
   `pattern`→`.regex(new RegExp(...))`; `email`→ `z.email()` as the base type rather than a
   method on a string; `assertTrue`/`assertFalse`→`z.literal(true)`/`z.literal(false)`;
-  `custom`→ **no zod call**, emit a comment naming it as a server-only check. The captured IR
+  `custom`→ **no zod call**, emit a comment naming it as a server-only check. The captured SimpliX Meta
   contains none (spec §12), so this branch is reached only by a future field-level custom
   constraint — implement it, and do not assume the fixture proves it works.
 
@@ -1200,9 +1200,9 @@ repointed.
 
   **`OperationContext` has eleven members, not six, and three of them are required.** Omitting
   `pathParams`, `queryParams` or `extensions` is a TypeScript error; the rest are optional but feed
-  the naming strategy. Every one maps from the IR:
+  the naming strategy. Every one maps from SimpliX Meta:
 
-  | Member | Required | From the IR |
+  | Member | Required | From SimpliX Meta |
   | --- | :---: | --- |
   | `operationId` | ✔ | `operation.id` |
   | `method` | ✔ | `operation.method` |
@@ -1213,16 +1213,16 @@ repointed.
   | `extensions` | ✔ | `{}` — **the orval path passes `{}` too** (`resolveEntityHookNames`, `openapi.ts:645`), so this is parity, not a shortfall |
   | `tag` | | `operation.tag` |
   | `summary` | | `operation.summary` |
-  | `description` | | absent from the IR — pass `undefined` |
+  | `description` | | absent from SimpliX Meta — pass `undefined` |
   | `responseType` | | the innermost `ref` name inside `operation.response` |
   | `requestType` | | the `ref` name inside `request.body` (a `TypeRef` after Task 0) | **Measured, `simplixBootNaming.resolveOperation` reads exactly six members** — `tag`,
-  `pathParams`, `operationId`, `path`, `method`, `entityName` — and all six come from the IR.
+  `pathParams`, `operationId`, `path`, `method`, `entityName` — and all six come from SimpliX Meta.
 
   Two of those were verified against the fixture, because hook-name parity is an error-level
   requirement (spec §11) and these are what actually decide it:
 
   - **`pathParams` is used only for its length** (`naming.ts:195`, `:293` — `.length > 0` and
-    `.length === 1` decide `delete` against a sub-resource action). The IR's `request.path` matches
+    `.length === 1` decide `delete` against a sub-resource action). SimpliX Meta's `request.path` matches
     the `{param}` occurrences in the path string for **all 694 operations**, none missing, none
     extra — so the count the strategy branches on is reproduced exactly.
   - **`operationId` is the final fallback and nothing else** (`naming.ts:340`, one branch, reached
@@ -1232,7 +1232,7 @@ repointed.
 
   **The whole strategy was run over the fixture and it holds.** Feeding all 694 operations through
   `simplixBootNaming.resolveOperation` with contexts built as the table above prescribes:
-  **694 named, 151 distinct roles, 0 fallbacks.** The IR reproduces the naming path completely.
+  **694 named, 151 distinct roles, 0 fallbacks.** SimpliX Meta reproduces the naming path completely.
 
   **Eight hook names collide, and only one reaches a configured domain.** Seven are in unmatched
   tags (`dev.test.*`, `dev.permissions`, the stream controllers, `CurrentUserRestController`,
@@ -1244,15 +1244,15 @@ repointed.
   **That one is not a defect to fix — it is orval being wrong, and `meta-diff` will say so.**
   `PublicUserAvatarRestController` carries exactly one class-level
   `@Tag(name = "public.user.Avatar")` and no method-level tag, so both operations belong to one
-  entity and the IR says so. springdoc split them into `public.user.Avatar` and
+  entity and SimpliX Meta says so. springdoc split them into `public.user.Avatar` and
   `public.user.AvatarThumbnail`, and orval's output is already broken as a result: the
   `public-user-avatar` directory exports `useGetAllAvatarThumbnails`, and `crud.config.ts` names
   `avatar.getAll: "getAllAvatars"` — **a hook that exists nowhere in the generated code**.
 
-  Comparing every tag: **126 of orval's 129 endpoint directories match an IR tag exactly.** The
+  Comparing every tag: **126 of orval's 129 endpoint directories match a SimpliX Meta document tag exactly.** The
   three that do not are this avatar split and two from `CurrentUserRestController`, which declares
-  no `@Tag` at all — the IR falls back to the class name, springdoc invents `common.user.CurrentUser`.
-  In all three the IR reflects the source and orval does not. Report them as expected differences
+  no `@Tag` at all — SimpliX Meta falls back to the class name, springdoc invents `common.user.CurrentUser`.
+  In all three SimpliX Meta reflects the source and orval does not. Report them as expected differences
   in Task 14 and do not chase parity there.
 
   So an id mismatch will not move a hook name here. It still matters for `meta-diff`, which pairs
@@ -1303,7 +1303,7 @@ repointed.
   - a **`binary` response** produces a function returning `Blob` rather than a hook. Three of the
     five reach a real domain: `/api/v1/system/exports/{exportJobId}/download` (`system`) and the
     two `public.user.Avatar` routes (`user`); the other two are in unmatched tags
-  - a **multipart operation** sends `FormData` **with the part appended under its IR name**. The
+  - a **multipart operation** sends `FormData` **with the part appended under its SimpliX Meta name**. The
     fixture's `POST /api/v1/admin/user/account/{userId}/avatar` (`user`) carries no body — the file
     arrives as a `query` entry named `file` typed `{ kind: "file" }`, which is what Task 0's second
     backend fix put there. A generator that only reads `contentType` knows to send FormData but not
@@ -1316,7 +1316,7 @@ npx vitest run --project cli
 git add packages/cli/src/meta/generation/endpoint-gen.ts \
         packages/cli/src/meta/generation/hook-gen.ts \
         packages/cli/src/__tests__/meta-endpoint-hook-gen.test.ts
-git commit -m "feat(cli): generate request functions and React Query hooks from the IR"
+git commit -m "feat(cli): generate request functions and React Query hooks from SimpliX Meta"
 ```
 
 ---
@@ -1335,16 +1335,16 @@ each per entity, plus their directory barrels (spec §9).
 **Neither file is read by the scaffold — say so, and put the rules in one place.** `access/` is
 already declared unconsumed below (the constants exist; adopting them is the user's call). `search/`
 is the same kind of artifact: metadata exported through the barrel for a hand-written screen to
-import. The **scaffold** gets its filters from the IR source in Task 13, at
+import. The **scaffold** gets its filters from SimpliX Meta source in Task 13, at
 `parseFilterParams`'s call site (`scaffold-crud.ts:1698`), not from this file.
 
 So implement the operator translation, the range rules, the field-type-driven component choice and
-the empty-facet reroute **once**, in the shared IR source Task 13 builds, and have `search-gen`
+the empty-facet reroute **once**, in the shared SimpliX Meta source Task 13 builds, and have `search-gen`
 serialise the same `FilterFieldInfo[]` it produces. Two implementations of these rules would drift,
 and the one nothing imports would drift unnoticed. The `<Name>Params` type for each list
 operation goes into `generated-meta/model/` beside the DTOs, where orval puts it.
 
-**The search params are not in the IR — they are derived, and the derivation was verified.**
+**The search params are not in SimpliX Meta — they are derived, and the derivation was verified.**
 Seventy-eight of the 86 `searchDto`-bearing operations carry an empty `query` list, and only 4
 dotted query params exist in the whole fixture (`title.contains`, `targetLabel.contains`,
 `entityLabel.contains`, `status.in`).
@@ -1363,8 +1363,8 @@ with their operators, and the suffix is the `SearchOperator` **value**, not its 
 `orgName.CONTAINS` would be sent verbatim by `buildSearchableParams`, filter nothing, and raise no
 error.
 
-Measured against `OrganizationSearchDTO`: the IR derives **50** params and orval's
-`ListOrganizationsParams` has **53** — the same 50, plus `page`, `size` and `sort`, which the IR
+Measured against `OrganizationSearchDTO`: SimpliX Meta derives **50** params and orval's
+`ListOrganizationsParams` has **53** — the same 50, plus `page`, `size` and `sort`, which SimpliX Meta
 does not carry as searchable fields. So append them:
 
 ```ts
@@ -1381,7 +1381,7 @@ export type ListOrganizationsParams = {
 Assert that exact set-equality against the fixture: a derived set that is not orval's 50 means the
 operator table (Step 1b) is wrong, and the diff will say which member moved.
 
-1118 fields carry `searchable` and 86 operations name a `searchDto`. Today the frontend re-derives filter operators by matching parameter-name suffixes with a regex; the IR states them.
+1118 fields carry `searchable` and 86 operations name a `searchDto`. Today the frontend re-derives filter operators by matching parameter-name suffixes with a regex; SimpliX Meta states them.
 
 - [ ] **Step 1: `search-gen` — filter metadata only.** For each operation with a `searchDto`, emit
   that DTO's fields as filter definitions: the operator list from `searchable.operators`,
@@ -1394,12 +1394,12 @@ operator table (Step 1b) is wrong, and the diff will say which member moved.
 
 - [ ] **Step 1b: Translate the operator vocabulary — the two sides do not use the same names.**
 
-  The IR reports searchable-jpa's own operator names. The frontend's `SearchOperator`
+  SimpliX Meta reports searchable-jpa's own operator names. The frontend's `SearchOperator`
   (`packages/headless/src/filter-types.ts:2`) has keys that are mostly but **not always** the same
   string, and `scaffold-crud.ts`'s `SUFFIX_TO_ENUM_KEY` (`:1286`) covers only part of the set. An
   identity lookup silently yields `undefined`. Measured over the fixture:
 
-  | IR operator | pairs | framework enum key | `SUFFIX_TO_ENUM_KEY` |
+  | SimpliX Meta operator | pairs | framework enum key | `SUFFIX_TO_ENUM_KEY` |
   | --- | ---: | --- | --- |
   | `EQUALS` | 851 | `EQUALS` | ✔ |
   | `CONTAINS` | 352 | `CONTAINS` | ✔ |
@@ -1420,11 +1420,11 @@ operator table (Step 1b) is wrong, and the diff will say which member moved.
      result already has a fallback — `SUFFIX_TO_ENUM_KEY[f.operator] ?? "GREATER_THAN_OR_EQUAL"`
      (`scaffold-crud.ts:1754`) — so a wrong name does not produce `undefined` or a compile error:
      it produces **`greaterThanOrEqualTo` for every unmatched operator**, and a `lessThanOrEqualTo`
-     filter silently queries the other direction. Write an explicit IR-name → `SearchOperator`
+     filter silently queries the other direction. Write an explicit SimpliX Meta-name → `SearchOperator`
      table, make it **exhaustive over the enum**, and **throw** on an unmatched name rather than
      falling through to that default.
   2. **222 pairs name operators the suffix-matching path could never recover** (`BETWEEN`,
-     `IS_NULL`, `IS_NOT_NULL`, `NOT_IN`). This is the gain the IR exists for. `SUFFIX_TO_ENUM_KEY`
+     `IS_NULL`, `IS_NOT_NULL`, `NOT_IN`). This is the gain SimpliX Meta exists for. `SUFFIX_TO_ENUM_KEY`
      needs the four entries — `between`, `isNull`, `isNotNull`, `notIn` — or the scaffold discards
      what the generator just recovered.
 
@@ -1437,21 +1437,21 @@ operator table (Step 1b) is wrong, and the diff will say which member moved.
   takes two lists, and the operators decide only the operator; **the component is chosen from
   `entityField`** in five places:
 
-  | Decision | orval reads | IR carries |
+  | Decision | orval reads | SimpliX Meta carries |
   | --- | --- | --- |
   | toggle (`:1346`) | `entityField.type === "boolean"` | `kind === "boolean"` |
   | faceted options (`:1399`, `:1464`) | `entityField.enum` (a `string[]`) | `enums[TypeRef.name].values[].name` |
   | date range (`:1407`) | `format === "date-time"` / `"date"` | `kind ∈ {instant, date, time}` — Step 1c |
   | number (`:1432`) | `type`/`format` numeric | `kind === "number"` |
 
-  So the IR source must hand the scaffold a type-carrying field list for the **`searchDto`**, not
+  So SimpliX Meta source must hand the scaffold a type-carrying field list for the **`searchDto`**, not
   just the operator lists. Measured across the fixture's 57 distinct search DTOs, their searchable
   fields are `string` 613, `instant` 162, `number` 112, `enum` 96, `boolean` 90, `date` 38,
   `container` 7 — and **every one of the 96 enum references resolves in `enums`**, so the faceted
   options are always available. Map each enum's values to `values.map(v => v.name)` to match the
   `string[]` shape `entityField.enum` has.
 
-- [ ] **Step 1bc: A faceted filter with no options is worse than a text filter — the IR can tell
+- [ ] **Step 1bc: A faceted filter with no options is worse than a text filter — SimpliX Meta can tell
   them apart.** `parseFilterParams`'s Rule 2c (`scaffold-crud.ts:1391`) makes **any** field with an
   `.in` parameter a `FacetedFilter` and fills `options` from `entityField?.enum`, which is
   `undefined` unless the field is an enum. The rule fires before the enum check of Rule 6, so the
@@ -1468,9 +1468,9 @@ operator table (Step 1b) is wrong, and the diff will say which member moved.
 
   The two name-keyed special cases stay as they are: `/(?:country|countryCode)$/i` with `.in` gives
   a `CountryFilter` (3 fields in the fixture) and `/(?:timezone|timeZone)$/i` gives a
-  `TimezoneFilter` (1). Both are `FilterDef` variants (Step 1c) and neither needs the IR.
+  `TimezoneFilter` (1). Both are `FilterDef` variants (Step 1c) and neither needs SimpliX Meta.
 
-- [ ] **Step 1c: Build range filters from the IR kind, not from the field's name.**
+- [ ] **Step 1c: Build range filters from SimpliX Meta kind, not from the field's name.**
 
   `parseFilterParams` decides a date field with
   `format === "date-time" || baseField.endsWith("At") || endsWith("Date") || endsWith("Time")`
@@ -1488,7 +1488,7 @@ operator table (Step 1b) is wrong, and the diff will say which member moved.
   fields — `latestAmendmentOn`, `separatedSince`, `installedOn`, `nextInspectionDueOn`,
   `lockedUntil` among them — are not recognised as dates because their names end in neither `At`,
   `Date` nor `Time`. Spec §5.1 #7 already forbids inferring required-ness from a field's name; the
-  same reasoning applies here, and the IR carries the kind.
+  same reasoning applies here, and SimpliX Meta carries the kind.
 
   - **Decide by `TypeRef.kind ∈ {instant, date}`.** One `number` field also carries range
     operators, so a range filter is not automatically temporal.
@@ -1528,7 +1528,7 @@ operator table (Step 1b) is wrong, and the diff will say which member moved.
     matches the stored calendar date regardless of the browser timezone". Of the fields carrying
     range operators, **159 are `instant` and 38 are `date`**; getting those 38 wrong makes a filter
     return different rows in different browsers, with nothing to see. This is the same failure §12
-    describes for `LocalDateTime`, and the IR's kind is what settles it — the orval path could only
+    describes for `LocalDateTime`, and SimpliX Meta's kind is what settles it — the orval path could only
     guess from `format`. Leave `displayZone` alone: it is a per-screen decision about a
     site-scoped column and takes precedence over `dateOnly`.
 
@@ -1545,7 +1545,7 @@ operator table (Step 1b) is wrong, and the diff will say which member moved.
   `packages/console-ui/src/identity/subjects.ts`. Read that file before writing the generator: its
   own doc comment states the problem this task automates — the screen names a group and the server
   names a group in `@PreAuthorize("hasPermission('<GROUP>','<action>')")`, and a literal copied to
-  the call site goes stale unnoticed. The IR now carries the server's side, so the generated
+  the call site goes stale unnoticed. SimpliX Meta now carries the server's side, so the generated
   constants are the authority the map was standing in for.
 
   Emit, per operation: the `group` and `action` from a `permission` access, so a screen can write
@@ -1567,7 +1567,7 @@ operator table (Step 1b) is wrong, and the diff will say which member moved.
   only `BETWEEN` still yields a range filter whose value is a comma-joined string; that a temporal
   field whose name ends in none of `At`/`Date`/`Time` — assert
   `EquipmentInspectionDutySearchDTO.installedOn` by name — is still recognised as a date; that an unknown
-  operator name throws rather than being emitted; that the operator lists come from the IR rather
+  operator name throws rather than being emitted; that the operator lists come from SimpliX Meta rather
   than being re-derived from parameter names; that the 5 `expression` operations yield a comment
   and no gate; and that every `permission` operation yields a group and an action.
 
@@ -1578,7 +1578,7 @@ npx vitest run --project cli
 git add packages/cli/src/meta/generation/search-gen.ts \
         packages/cli/src/meta/generation/access-gen.ts \
         packages/cli/src/__tests__/meta-search-access-gen.test.ts
-git commit -m "feat(cli): generate filter and permission configuration from the IR"
+git commit -m "feat(cli): generate filter and permission configuration from SimpliX Meta"
 ```
 
 ---
@@ -1660,7 +1660,7 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
      overwritten, so point it at the meta barrel when generating it fresh — a wrong path written
      once stays wrong.
 
-     **Map the IR kinds onto what the seed switch expects, and add the case it lacks.**
+     **Map SimpliX Meta kinds onto what the seed switch expects, and add the case it lacks.**
      `generateFieldValue` branches on OpenAPI's `field.type` and `field.format`
      (`seed-generator.ts:70`): `integer`/`number` → numeric, `boolean` → alternating, `string` →
      `generateStringValue`, `array`/`object` → skipped. The temporal split lives in the format —
@@ -1668,12 +1668,12 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
      `instant` → `date-time`, `date` → `date`. **`time` matches neither** and falls to the generic
      `"<entity>-<field>-<n>"`, which a `TimeField` cannot parse; give the 10 `time` fields an
      `"HH:mm"` seed. Where the orval path guesses an email from the field's name
-     (`fieldName.includes("email")`, `:121`), the IR states it as a constraint on 7 fields — use
+     (`fieldName.includes("email")`, `:121`), SimpliX Meta states it as a constraint on 7 fields — use
      that instead.
 
-     **`List` and `Map` are one IR kind and must not seed alike.** OpenAPI splits them — an array
+     **`List` and `Map` are one SimpliX Meta kind and must not seed alike.** OpenAPI splits them — an array
      takes `generateArrayValue` (which defaults to `[]`, `:181`) and a map is `type: "object"` and
-     is **omitted from the seed entirely** (`:81`). The IR calls both `container`, so a generator
+     is **omitted from the seed entirely** (`:81`). SimpliX Meta calls both `container`, so a generator
      that seeds every container as `[]` writes `[]` into the **48 `Map` fields**, 38 of them the
      i18n maps, against a declared `Record<string, string>` — a type error in a file that is never
      regenerated. Seed `List` as `[]` and omit `Map`, matching what the orval path does today.
@@ -1682,7 +1682,7 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
   1a. **Convert `{param}` to `:param` for the route pattern — the opposite of what Task 8 says.**
      `toMswPattern` only prefixes a `*` (`mock-generator.ts:737`); the `:param` form in the
      measured handler comes from `ExtractedOperation.path`, which the orval pipeline already
-     converted. **The IR's paths are in `{param}` form** — all 311 of them — so the mock generator
+     converted. **SimpliX Meta's paths are in `{param}` form** — all 311 of them — so the mock generator
      must convert, while Task 8's `OperationContext` wants them left alone. Do not carry one
      decision into the other: an MSW pattern containing `{workPointId}` matches nothing, and every
      mocked request falls through to a server that is not running.
@@ -1690,7 +1690,7 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
      **Convert before sorting, not after.** MSW matches in registration order, first match wins, so
      the generator registers parameterless routes first — `sortOps` (`mock-generator.ts:172`) sorts
      on `path.includes(":")`, the colon form. Convert after that sort and the key never matches:
-     every path compares equal, the stable sort preserves the IR's own order, and for
+     every path compares equal, the stable sort preserves SimpliX Meta's own order, and for
      `org.Organization` that order puts `GET /api/v1/admin/org/{orgId}` **before**
      `GET /api/v1/admin/org/tree`, so the detail handler answers the tree request. Sort on whichever
      form is in hand, but sort by *has a path parameter*, not by a literal `":"`.
@@ -1721,7 +1721,7 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
      entity's non-array GET**, envelope already stripped, with two fallbacks: request-body names
      with the DTO suffix stripped, then the list response's element type.
 
-     Reproduced from the IR — take the first GET whose response's innermost member is a `ref`
+     Reproduced from SimpliX Meta — take the first GET whose response's innermost member is a `ref`
      rather than a `List`/`Page` — that rule alone resolves **115 of the fixture's 139 entities**,
      and five of `domain-site`'s six factories land exactly on the type the app uses today
      (`WorkPointDetailDTO`, `LinearAssetDetailDTO`, `EquipmentInspectionDTO`, `AreaZoneDetailDTO`,
@@ -1736,26 +1736,26 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
      `unknown`: `src/mock/seeds.ts` is hand-written against that type and would stop
      type-checking.
 
-     **The handler's own id lookup is a separate heuristic — take it from the IR instead.**
+     **The handler's own id lookup is a separate heuristic — take it from SimpliX Meta instead.**
      `findIdField` (`mock-generator.ts:741`) tries an exact `id`, then **the first field whose name
      ends in `Id`**, then `"id"`; the handlers read `params.<that>` and call `store.getById`. With
      the model DTO chosen as Task 10 prescribes, it agrees with the real key for **59 of the
      fixture's 63** entities that have both — the four that differ are `auditLog`
      (picks `auditEventId`, key is `auditLogId`), `masterDataHistory` (same shape),
-     `messagePreview` (`id` against `messageKey`) and one unmatched tag. The IR states the key
+     `messagePreview` (`id` against `messageKey`) and one unmatched tag. SimpliX Meta states the key
      exactly: the `delete`- or `get`-role operation's last `request.path` entry, which Task 13
      already derives as `rowIdField`. Use it and the heuristic's four misses disappear.
      `hasDeclaredIdField` (`:756`) stays as it is — a singleton settings DTO declares no id at all,
      and emitting `body.id` against one does not compile.
 
-     **Take the id's type from the IR too, and never default it to numeric.**
+     **Take the id's type from SimpliX Meta too, and never default it to numeric.**
      `isIdFieldNumeric` (`:761`) looks the id field up and **returns `true` when it cannot find
      it**, which drives `Number(params.x)` instead of `String(params.x)` in the read, update and
      delete handlers (`:497`). Measured, **310 of the fixture's 311 path parameters are `string`**
      and exactly one is a number, so that default is wrong nearly always — and the failure hides:
      `Number("ORG-001")` is `NaN`, `store.getById(NaN)` misses, and the handler's
      `?? store.list()[0]` then returns **the first row for every id**. A detail screen shows a
-     record, just not the one that was asked for. The IR types every path parameter, so read the
+     record, just not the one that was asked for. SimpliX Meta types every path parameter, so read the
      kind rather than guessing from a field lookup that can fail.
 
      **A sub-resource handler filters by a field the DTO may not have, and hides the miss the same
@@ -1766,7 +1766,7 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
      and **not in 24** — `OnCallCellDTO` has no `emergencyContactId`, `ApprovalStepRowDTO` no
      `approvalRequestId`, `AuditLogListDTO` no `auditLogId`. There the filter matches nothing and
      the same `?? list()[0]` returns the first row, so a child list shows one arbitrary item
-     regardless of its parent. The IR carries both sides — the parameter and the DTO's field
+     regardless of its parent. SimpliX Meta carries both sides — the parameter and the DTO's field
      list — so **check before emitting** and return the whole list rather than a single wrong row.
      The precedent is in the same file: the list handler's filter is guarded by
      `entity.fields.some((f) => f.name === sanitizeFieldName(qp.name))` (`:457`), whose comment
@@ -1796,9 +1796,9 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
      compiles. After the re-capture, read the field from the order DTO and **report** an entity
      where neither path resolves rather than emitting the literal.
 
-     **The list handler's filter parameter has to be derived, because the IR has none.** It takes
+     **The list handler's filter parameter has to be derived, because SimpliX Meta has none.** It takes
      the first query parameter that is a string *and* names a field the DTO declares, then emits a
-     shortcut branch before the paged fallback. The IR's search operations carry an **empty**
+     shortcut branch before the paged fallback. SimpliX Meta's search operations carry an **empty**
      `query` (Task 9), so build the candidate list from the `searchDto`'s searchable fields the way
      Task 9 derives the params type, then apply the same DTO-declares-it guard.
 
@@ -1812,7 +1812,7 @@ git commit -m "feat(cli): generate filter and permission configuration from the 
 ```bash
 npx vitest run --project cli
 git add packages/cli/src/meta/generation/mock-gen.ts packages/cli/src/__tests__/meta-mock-gen.test.ts
-git commit -m "feat(cli): generate MSW handlers and seeds from the IR"
+git commit -m "feat(cli): generate MSW handlers and seeds from SimpliX Meta"
 ```
 
 ---
@@ -1834,7 +1834,7 @@ meta?: {
    * already builds its own: the origin of `spec` plus the profile's `metaEndpoint`.
    */
   source?: string;
-  /** Where a fetched IR is written for offline regeneration. */
+  /** Where a fetched SimpliX Meta is written for offline regeneration. */
   snapshot?: string;
   /** Domains whose barrel exports the meta output instead of the orval output. */
   export?: string[];
@@ -1866,7 +1866,7 @@ precedent to follow.
   `model/oldThing.ts` still exports a type the directory barrel still re-exports, so it compiles
   and nothing reports it. The output is wholly generated and holds no hand-edited region (unlike
   `mock/seeds.ts`), so delete the directory and rewrite it rather than adding a pruner. Assert that
-  a file present before a regeneration and absent from the new IR is gone afterwards.
+  a file present before a regeneration and absent from the new SimpliX Meta is gone afterwards.
 
   **`generated-meta/index.ts` is the barrel both swaps point at, and its contents have to be
   decided here** — Task 13's template variable takes this path, and Step 3 below re-exports
@@ -1901,15 +1901,15 @@ precedent to follow.
   a `@SearchableField` operator changed, a `@PreAuthorize` rewritten, an enum gaining
   `LabeledEnum`, a class hierarchy refactored — none of them moves the OpenAPI document, so
   `hasChanges` is false and the command reports "up-to-date" while the meta output stays stale.
-  The gate is computed from precisely the information the IR was introduced because OpenAPI loses.
+  The gate is computed from precisely the information SimpliX Meta was introduced because OpenAPI loses.
 
-  Give the meta half its own gate: compare the freshly fetched IR against the committed
-  `meta.snapshot` and treat a difference as a change, alongside the OpenAPI diff. Save the IR in
+  Give the meta half its own gate: compare the freshly fetched SimpliX Meta against the committed
+  `meta.snapshot` and treat a difference as a change, alongside the OpenAPI diff. Save SimpliX Meta in
   step 15 next to `.openapi-snapshot.json` so the next run has something to compare. Where
   `meta.snapshot` is unset there is nothing to compare, so run the meta half unconditionally rather
   than skipping it — a needless regeneration is cheap and a skipped one is silent.
 
-  Assert it: a fixture whose OpenAPI-derived entities are byte-identical but whose IR gained one
+  Assert it: a fixture whose OpenAPI-derived entities are byte-identical but whose SimpliX Meta gained one
   constraint must still regenerate.
 
 - [ ] **Step 1b: Add the `--offline` flag — nothing can set it today.**
@@ -1920,7 +1920,7 @@ precedent to follow.
   `-e/--entities`, `-o/--output`, `-f/--force`, `--no-http`, `-y/--yes` (`openapi.ts:73`). Add:
 
   ```ts
-  .option("--offline", "Read the IR from meta.snapshot instead of the server")
+  .option("--offline", "Read SimpliX Meta from meta.snapshot instead of the server")
   ```
 
   Fail with a message naming the snapshot path when `--offline` is passed and `meta.snapshot` is
@@ -1937,7 +1937,7 @@ precedent to follow.
   | --- | --- | --- |
   | `crud.config.ts` | entity → hook name (`organization`, `orgType`) | no — and it is written **only when absent or under `--force`** (`openapi.ts:334`), so it never drifts on its own |
   | `src/locales/{ko,en,ja}.json` | entity, plus a top-level `enums` | no |
-  | ↑ **the IR does not build this** — see below | | |
+  | ↑ **SimpliX Meta does not build this** — see below | | |
   | `src/translations.ts` | the domain name and the three locale files | no |
   | `http/<entity>.http` | one file per entity | no |
 
@@ -1947,16 +1947,16 @@ precedent to follow.
   were before, and that `crud.config.ts`'s keys still resolve to exported hooks. A drift here is
   the loudest available signal that the entity partition diverged.
 
-  Generate them from the IR only for a domain that never had an orval run — the greenfield case
+  Generate them from SimpliX Meta only for a domain that never had an orval run — the greenfield case
   Task 13's scaffolding covers. **`crud.config.ts` is the one that must actually be generated
   there**, and no task says how. `findCrudConfigForEntity` returns `null` when the file is absent
   (`crud-config-loader.ts:31`), so `simplix scaffold` on a greenfield meta domain resolves no hook
   names at all.
 
-  The existing generator needs nothing new from the IR beyond what Task 8 already computes.
+  The existing generator needs nothing new from SimpliX Meta beyond what Task 8 already computes.
   `generateCrudConfigContent` reads `op.role` — which `resolveEntityHookNames` fills from
   `simplixBootNaming.resolveOperation` at `openapi.ts:656`, one step earlier — and falls back to
-  `inferCrudRole` (`:665`) only for an operation with no `operationId`. **Every IR operation has an
+  `inferCrudRole` (`:665`) only for an operation with no `operationId`. **Every SimpliX Meta operation has an
   `id`**, so that fallback never fires on this path and the roles come wholly from the strategy,
   which is why the application's files hold 122 role kinds where `inferCrudRole`'s table has 12.
 
@@ -2059,24 +2059,24 @@ precedent to follow.
   covers generated models only). So one unfiltered run writes all 145 enums in, and a later run
   with the filter repaired **will not take them back out** — they have to be removed by hand.
 
-  **Otherwise the locale files are not built from the IR, and spec §8 says so twice in conflicting
+  **Otherwise the locale files are not built from SimpliX Meta, and spec §8 says so twice in conflicting
   ways.**
-  The IR's `labelKey` is a message *key* (`entities.HolidayCalendar.country`); it has no
+  SimpliX Meta's `labelKey` is a message *key* (`entities.HolidayCalendar.country`); it has no
   translations. Those come from the i18n endpoint, whose payload is already structured as
   `entities.<PascalKey>.fields.<field>.translations.<locale>`, and `transformToLocaleData`
   (`cli-plugin/src/i18n.ts:98`) turns that into `{ <entityName>: { fields: { … } } }`. That path
   stays exactly as it is.
 
-  **What the IR does contribute is the key that path currently guesses.**
+  **What SimpliX Meta does contribute is the key that path currently guesses.**
   `buildEntityKeyMap` (`:82`) maps `entity.pascalName → entity.name` from the *derived* entity
   names, and `transformToLocaleData` does `if (!entityName) continue` — so when a derived name does
   not equal the Java entity's simple name, that entity's translations are dropped in silence.
-  Measured: **24 server entity keys the IR names have no matching entry in any locale file,
+  Measured: **24 server entity keys SimpliX Meta names have no matching entry in any locale file,
   covering 122 fields** — `ApprovalAttachment`, `EquipmentInspectionDuty`, `FloorPlan`,
   `FloorPlanPlacement`, `ComplianceCheckItem` among them. Some belong to unconfigured domains, but
   not all.
 
-  The IR states the server key per field, so build `entityKeyMap` from `labelKey` instead of from
+  SimpliX Meta states the server key per field, so build `entityKeyMap` from `labelKey` instead of from
   name equality, and report any server key that still finds no home.
 
   **Name equality could never have bridged these — the two sides use different words.** Tracing
@@ -2084,7 +2084,7 @@ precedent to follow.
   references them: `FloorPlan`'s labels belong to the entity the scaffold calls **`drawing`**,
   `EquipmentInspectionDuty`'s to **`equipmentInspection`**, `ComplianceCheckItem`'s to
   **`complianceRun`**. The Java entity and the API resource are named independently, so only the
-  IR's per-field `labelKey` connects them.
+  SimpliX Meta's per-field `labelKey` connects them.
 
   Two consequences for the writer:
 
@@ -2105,14 +2105,14 @@ precedent to follow.
   (`openapi.ts:535`) writes `fields[name] = camelToLabel(name)` for **every** field of every entity
   and a `camelToLabel` entry for every enum value, into every locale. Step 13b then overlays the
   server's real translations on top, and `deepMerge` lets the overlay win — so the placeholder is
-  what a field falls back to when the server has no message for it. Measured, **66% of the IR's
+  what a field falls back to when the server has no message for it. Measured, **66% of SimpliX Meta's
   fields (4,138 of 6,244) carry neither `labelKey` nor `label`**, so the fallback is not a rare
   path.
 
   Those entities come from the OpenAPI parse, so during coexistence they exist. A domain that never
   had an orval run has none, no locale file is written, and every label on the screen renders as
-  the raw `fields.<name>`. Reproduce the pass from the IR: it needs only the field names per
-  entity, the enum values, and `camelToLabel` — a pure function. Use the IR's enum name (Task 13's
+  the raw `fields.<name>`. Reproduce the pass from SimpliX Meta: it needs only the field names per
+  entity, the enum values, and `camelToLabel` — a pure function. Use SimpliX Meta's enum name (Task 13's
   `enumTypeName`) where `buildLocaleJson` uses `field.enumTypeName ?? enumName(entity, field)`.
 
   **The screen chrome is a second, separate catalogue that nothing writes at all.** The widgets
@@ -2307,7 +2307,7 @@ The reason parallel generation was chosen: a domain is only switched once the tw
 | Finding | Level |
 | --- | --- |
 | a public name present in only one — type, hook, request function, **`get<Name>QueryKey`**, const map, params type, and the mock handler factory `createXHandlers` (spec §11). Zod constants are excluded; see the info row | error |
-| a name difference traceable to one of the **three tags where springdoc and the IR disagree** — the `public.user.Avatar` split and the two `CurrentUserRestController` operations | info — the IR follows the `@Tag` annotation and orval does not; matching orval would reproduce a hook name that exists nowhere (Task 8) |
+| a name difference traceable to one of the **three tags where springdoc and SimpliX Meta disagree** — the `public.user.Avatar` split and the two `CurrentUserRestController` operations | info — SimpliX Meta follows the `@Tag` annotation and orval does not; matching orval would reproduce a hook name that exists nowhere (Task 8) |
 | a `get<Name>QueryKey` returning a different **shape** | error — module code spreads the result (`[...getGetNoticeQueryKey(id), language]`), so the arity and element order are contract, not just the name |
 | a field present in only one | error |
 | a field type mismatch | error |
@@ -2329,7 +2329,7 @@ The reason parallel generation was chosen: a domain is only switched once the tw
   times) but not on a response DTO.
 
   So a response DTO gaining a required field is **not** the expected case this rule was written
-  for: treat it as info only when the field's Java type is an unboxed primitive or the IR shows
+  for: treat it as info only when the field's Java type is an unboxed primitive or SimpliX Meta shows
   `@Schema(requiredMode)`, and report anything else as an error. A blanket info classification
   would silence exactly the drift `meta-diff` exists to catch.
 
@@ -2352,7 +2352,7 @@ git commit -m "feat(cli): add meta-diff to compare the orval and meta outputs"
 
 ---
 
-### Task 13: Scaffold reads the IR
+### Task 13: Scaffold reads SimpliX Meta
 
 **Files:**
 - Create: `packages/cli/src/meta/scaffold-source.ts`
@@ -2372,7 +2372,7 @@ objects are not rendered as scalar fields, while `z.array(z.string())` and
 `z.record(z.string(), z.string())` are kept.
 
 **Count inherited fields when comparing, or you will pick the wrong DTO.** Orval's `…Body`
-constants are flattened, the IR's `fields` are own-fields-only, and choosing by the own count
+constants are flattened, SimpliX Meta's `fields` are own-fields-only, and choosing by the own count
 inverts the answer. Measured:
 
 | Entity | own-field winner | with inheritance resolved | orval's choice |
@@ -2425,18 +2425,18 @@ built on two invented fields looks like a successful scaffold. The eight are `ex
 `scalarController` and `backoffice` — binary or dev surfaces, most in unmatched tags — so refusing
 them loudly costs nothing.
 
-- [ ] **Step 1: Write the IR source.** Fill the same contracts the scaffold already uses —
+- [ ] **Step 1: Write SimpliX Meta source.** Fill the same contracts the scaffold already uses —
 `FieldInfo` (`scaffold-crud.ts:29`), `EntityOperations` (`:632`), `FilterFieldInfo` (`:1256`) —
-from the IR instead of from text.
+from SimpliX Meta instead of from text.
 
 **Carry the temporal kind onto the column as `format` — the template never sets it.**
 `CrudList.Column` accepts `format?: "date" | "datetime" | "time" | "relative"`
-(`crud-list.tsx:325`), three of whose values are exactly the IR's temporal kinds. The string
+(`crud-list.tsx:325`), three of whose values are exactly SimpliX Meta's temporal kinds. The string
 `format=` appears **0 times** in `list.hbs`: a temporal column falls to the bare `{{else}}` branch
 (`:253`) and the peek row renders `String(row.x)` (`:203`), so the operator reads
 `2026-08-28T00:00:00Z` in a table cell. That is the frontend handbook's invariant #36 —
 "instants formatted with `format=\"datetime\"`" — broken by the generator, on the 682 `instant`,
-200 `date` and 10 `time` fields the IR distinguishes. Map `instant`→`datetime`, `date`→`date`,
+200 `date` and 10 `time` fields SimpliX Meta distinguishes. Map `instant`→`datetime`, `date`→`date`,
 `time`→`time`.
 
 **The batch operations reach no screen at all — report the gap rather than closing it here.**
@@ -2448,7 +2448,7 @@ invariant #33 is explicit that every entity-scoped action endpoint must be reach
 so those endpoints are unreachable by construction today.
 
 Building the multi-select toolbar is a new screen feature, not a codegen parity task, and the user
-has not asked for it. **Report it in Task 14 with these counts** — the IR is what makes the gap
+has not asked for it. **Report it in Task 14 with these counts** — SimpliX Meta is what makes the gap
 visible, and naming it is this project's contribution; closing it is a separate decision.
 
 **A tree column can carry neither, and that is a framework gap rather than a template one.**
@@ -2462,8 +2462,8 @@ outside this plan: report it with the field names rather than working around it 
 branches — the two i18n ones, `Select` with `display="badge"`, and a bare `{{else}}` — so a boolean
 field falls through and the table prints `true` / `false`. `CrudList.Column` offers
 `display: "badge" | "boolean" | "country" | "phone"` (`crud-list.tsx:324`) and the frontend
-handbook's invariant #21 requires a `Badge` for a new boolean column. The IR marks all **593**
-of them unambiguously. `country` and `phone` have no IR signal — leave those to the screen author.
+handbook's invariant #21 requires a `Badge` for a new boolean column. SimpliX Meta marks all **593**
+of them unambiguously. `country` and `phone` have no SimpliX Meta signal — leave those to the screen author.
 
 `variants` needs nothing: the template gives every enum value `"default"`, and since `EnumMeta`
 carries no tone information that is the honest default rather than a gap.
@@ -2489,7 +2489,7 @@ those four names, so both fall to the positional rule and both land wrong:
 | `areaZone` | **`siteId`** — a foreign key, identical on every node | `areaName` |
 
 `org` is the pilot domain and its tree is its main screen, so Task 14's browser pass meets this
-first. The IR settles it without a new heuristic: **a field with an `…I18n` sibling is the
+first. SimpliX Meta settles it without a new heuristic: **a field with an `…I18n` sibling is the
 human-facing text by construction** — that rule yields `orgName` and `areaName` respectively. Try
 the four common names, then the i18n-paired field, then the positional fallback.
 
@@ -2513,7 +2513,7 @@ detection above it needs no change: `parentOrgId` and `parentAreaId` both match 
 contains-`parent`-and-ends-`id` test, and all three tree DTOs name their child collection
 `children`, so the templates' hardcoded `childrenField` holds.
 
-**Set `enumTypeName` from the IR, not from the emitted TypeScript.** An enum column shows a
+**Set `enumTypeName` from SimpliX Meta, not from the emitted TypeScript.** An enum column shows a
 translated badge only when it can name its enum: `list.hbs:248` emits
 `enumName="{{enumTypeName}}"`, and `enumLabel(enumName, value)` resolves
 `enums.<enumName>.<value>` (`use-entity-translation.ts:51`). The scaffold fills `enumTypeName` by
@@ -2525,7 +2525,7 @@ That breaks on the meta output. A labeled enum's response field is typed `AreaKi
 `enums.AreaKindLabeled.AREA`, and the locale files hold `enums.AreaKind.AREA` — every enum badge in
 every generated list falls back to the raw constant, silently, across all **122 labeled enums**.
 
-The IR names the enum directly in the field's `TypeRef`, so take `enumTypeName` from there and
+SimpliX Meta names the enum directly in the field's `TypeRef`, so take `enumTypeName` from there and
 never from the rendered type. That also survives `listDtoFields` being unavailable.
 
 **Two further defects sit in the same templates, and the second is §1's headline enum problem.**
@@ -2535,7 +2535,7 @@ never from the rendered type. That also survives `listDtoFields` being unavailab
    the key as `"{{entity}}{{capitalizedName}}"` — `areaZoneAreaKind` against `AreaKind`.
    `buildLocaleJson` writes `field.enumTypeName ?? enumName(entity, field)` — **one** of the two.
    So the moment `enumTypeName` is set (which the fix above requires), the column resolves and the
-   peek row and the detail badge stop resolving. Use the IR's enum name in all three places.
+   peek row and the detail badge stop resolving. Use SimpliX Meta's enum name in all three places.
 
 2. **Neither template calls `resolveBootEnum` — it appears 0 times in both.** `list.hbs:199` does
    `String(row.status)` and `detail.hbs:125` passes `displayData.status` straight into `enumLabel`.
@@ -2559,7 +2559,7 @@ never from the rendered type. That also survives `listDtoFields` being unavailab
    writes the malformed object back. `resolveBootEnum` on read is half the fix; the submit path
    must send `values.status` as the value string. The `SelectField` branch also uses the
    concatenated key (`enumLabel("{{entity}}{{capitalizedName}}", …)`, `form.hbs:315`), so it is the
-   third site needing the IR's enum name.
+   third site needing SimpliX Meta's enum name.
 
 **The mutation path parameters are a fifth read of `src/generated/`, and both fail badly without
 it.** `findMutationPathParam` (`scaffold-crud.ts:1189`) scans
@@ -2578,7 +2578,7 @@ Measured: of the 36 entities with a `delete` role, the fallback names the right 
 sends the id under a key the URL builder does not use. And `updatePathParam` being `null` removes
 the update mutation from the form entirely, because the template guards on it.
 
-The IR states both directly: the `delete`- and `update`-role operations' `request.path` entries.
+SimpliX Meta states both directly: the `delete`- and `update`-role operations' `request.path` entries.
 Take the last one, as the naming strategy does.
 
 **`entityPath` is a fourth snapshot read, and its fallback is wrong for every entity but one.**
@@ -2589,7 +2589,7 @@ matched against `queryKey[0]` (Task 8). Measured, the common path of an entity's
 `/api/v1/admin/worker`, `/api/v1/admin/system/holiday-calendar`,
 `/api/v1/admin/auth/role-permission`. With the snapshot absent — a greenfield meta domain — the
 fallback fires and the prefix matches nothing, so **every mutation stops invalidating its list and
-the screen keeps showing stale rows**, with no error. Derive it from the IR as the common
+the screen keeps showing stale rows**, with no error. Derive it from SimpliX Meta as the common
 non-parameter prefix of the entity's operation paths.
 
 **There are three call sites, not one, and they read from two different files.** Replace all three
@@ -2602,14 +2602,14 @@ or the meta output is generated and never consumed:
 | `extractedEntity.operations.find(o => o.role === "get")` (`:1694`) | `.openapi-snapshot.json` | **`rowIdField`** |
 
 The second is why Task 9's search generator does nothing on its own: the scaffold takes its filters
-from the OpenAPI snapshot, so unless this call is repointed the IR's operator lists are written and
+from the OpenAPI snapshot, so unless this call is repointed SimpliX Meta's operator lists are written and
 ignored.
 
 **The third is not mentioned anywhere else in this plan.** `rowIdField` is the list's row identity,
 taken from the last path parameter of the `get`-role operation and defaulting to `"id"`. Measured:
 **74 of the fixture's 139 entities have no `get` role**, so they all take that default — and for
 many a real candidate exists (`streamAdminController` → `sessionId`, `importRun` → `importJobId`,
-`drawing` → `floorPlanId`). The IR knows the path parameters of every GET, not just the one the
+`drawing` → `floorPlanId`). SimpliX Meta knows the path parameters of every GET, not just the one the
 naming strategy labelled `get`, so fall back to the last path parameter of any item GET before
 falling back to `"id"`. This diverges from the orval path for those entities, in scaffolded module
 code that `meta-diff` does not compare — say how many it changed.
@@ -2623,7 +2623,7 @@ field named `id`**: the twelve types that do are entity classes (`Organization`,
 action requests deletion of nothing. It is not a cosmetic identity problem; the screen does not
 work.
 
-**One presentation decision must come from the IR: the temporal component.** Spec §5.1 requires
+**One presentation decision must come from SimpliX Meta: the temporal component.** Spec §5.1 requires
 that `instant`, `date` and `time` stay distinguishable *because the three use different input
 components*, and §1 names their collapse as one of the eight defects this project exists to remove.
 Measured, the orval path collapses them — `parseZodType` (`scaffold-crud.ts:160`) maps
@@ -2632,7 +2632,7 @@ Measured, the orval path collapses them — `parseZodType` (`scaffold-crud.ts:16
 All three framework components exist:
 `packages/ui/src/fields/form/{date-field,time-field,datetime-field}.tsx`.
 
-| IR kind | `formComponent` | `component` | `tsType` | n in fixture |
+| SimpliX Meta kind | `formComponent` | `component` | `tsType` | n in fixture |
 | --- | --- | --- | --- | ---: |
 | `instant` | `DateTimeField` | `Date` | `Date` | 682 |
 | `date` | `DateField` | `Date` | `Date` | 202 |
@@ -2663,13 +2663,13 @@ their `ShiftDTO` twins end in neither `At`, `Date` nor `Time`, so with `componen
 in the `text` column category and a shift entity reports no date fields at all.
 
 Deferring these to the scaffold is not a neutral reuse: its branch decides from `format`, which
-the IR source does not supply, so every temporal field falls through to a plain text input. For
+SimpliX Meta source does not supply, so every temporal field falls through to a plain text input. For
 `time` that is a defect by the frontend handbook's invariant #37, which requires `TimeField` and
 forbids a `type="time"` text input.
 
-**The rest of `FieldInfo` is half data, half presentation, and the IR does not carry the
-presentation half.** From the IR: `name`, `tsType`, `label` (via `labelKey`), `options` (enum
-values), required-ness, and everything `FilterFieldInfo` needs. NOT from the IR: `inputType`,
+**The rest of `FieldInfo` is half data, half presentation, and SimpliX Meta does not carry the
+presentation half.** From SimpliX Meta: `name`, `tsType`, `label` (via `labelKey`), `options` (enum
+values), required-ness, and everything `FilterFieldInfo` needs. NOT from SimpliX Meta: `inputType`,
 `defaultValue`, `capitalizedName`, `isForeignKey`, `fkEntityField`, `isSystemField`, `isI18nPair`,
 `baseFieldName`, `category`, `hideInList` — those are decisions the scaffold already makes, as are
 `formComponent` and `component` for every kind but the three above.
@@ -2696,7 +2696,7 @@ fails (e.g. read-only entities with no Body schema)". They disagree:
 | an `object` / `array` field | typed (`string` for a string array, `Record<string, string>` for an i18n map) | **dropped**, unless the name ends `I18n` |
 
 Following the fallback would silently change every date field's initial value and drop the 278
-container and 38 `ref` fields the IR carries. Mirror `parseZodType`'s decisions instead, mapping
+container and 38 `ref` fields SimpliX Meta carries. Mirror `parseZodType`'s decisions instead, mapping
 from `TypeRef.kind` rather than from zod text, and keep `tsType: "Date"` for `instant` and `date`
 so `getDefaultValue` keeps returning `new Date()`.
 
@@ -2732,13 +2732,13 @@ So the one-space difference is not a degraded editor: it is a duplicated field o
 empty value on the wire, for all 33 pairs.
 
 `SYSTEM_FIELDS` (`:56` — `id`, `displayOrder`, `sortOrder`) *is* purely name-based and carries over
-unchanged; all three occur in the IR (`sortOrder` 36, `displayOrder` 22, `id` 12). So do the audit
+unchanged; all three occur in SimpliX Meta (`sortOrder` 36, `displayOrder` 22, `id` 12). So do the audit
 regexes (`:82`, `:83`).
 
 Filter operators come from `searchable.operators` — never from parameter-name suffixes, which is
 what the orval path has to do. Labels come from `labelKey`.
 
-- [ ] **Step 2: Choose per domain.** If `generated-meta/` exists for the domain, use the IR source; otherwise the existing text-parsing source, unchanged.
+- [ ] **Step 2: Choose per domain.** If `generated-meta/` exists for the domain, use SimpliX Meta source; otherwise the existing text-parsing source, unchanged.
 
 - [ ] **Step 2b: Wire the schema into the form, or the constraints reach nothing.**
 
@@ -2782,7 +2782,7 @@ what the orval path has to do. Labels come from `labelKey`.
   variable form. The UI templates need no change — they import from the package barrel by name,
   never from `generated/` (verified).
 
-- [ ] **Step 4: Test** that scaffolding a meta domain produces the same `FieldInfo` set as the IR describes, including inherited fields; that a filter's operators come from the IR; that an `instant` field yields `DateTimeField`, a `date` field `DateField` and a `time` field `TimeField`, none of them a text input; and that an orval domain still scaffolds identically to before.
+- [ ] **Step 4: Test** that scaffolding a meta domain produces the same `FieldInfo` set as SimpliX Meta describes, including inherited fields; that a filter's operators come from SimpliX Meta; that an `instant` field yields `DateTimeField`, a `date` field `DateField` and a `time` field `TimeField`, none of them a text input; and that an orval domain still scaffolds identically to before.
 
 - [ ] **Step 5: Run the full suite, then commit**
 
@@ -2791,14 +2791,14 @@ npx vitest run --project cli && pnpm typecheck
 git add packages/cli/src/meta/scaffold-source.ts packages/cli/src/commands/scaffold-crud.ts \
         packages/cli/src/templates/openapi/user-index-ts.hbs \
         packages/cli/src/__tests__/scaffold-meta-source.test.ts
-git commit -m "feat(cli): let scaffolding read fields from the IR"
+git commit -m "feat(cli): let scaffolding read fields from SimpliX Meta"
 ```
 
 ---
 
 ### Task 14: Move one domain end to end
 
-- [ ] **Step 1** — the captured IR is at `smart-safety-frontend/openapi/meta.json` (2.7 MB) but
+- [ ] **Step 1** — the captured SimpliX Meta is at `smart-safety-frontend/openapi/meta.json` (2.7 MB) but
   is **untracked**; decide with the user whether to commit it before relying on it, since the
   repository is shared with another session. Add the `meta` block to that project's
   `simplix.config.ts` pointing at it, and leave `export` empty. Run codegen; both outputs exist.
@@ -2849,7 +2849,7 @@ git commit -m "feat(cli): let scaffolding read fields from the IR"
   **Report, do not fix — the foreign-key heuristic emits members that do not exist.**
   `isForeignKey` is `tsType === "string" && name.endsWith("Id") && name !== "id"`
   (`scaffold-crud.ts:342`, `:471`), and `detail.hbs:131` renders the result as
-  `displayData.{{fkEntityField}}?.name ?? String(displayData.{{name}})`. Measured over the IR:
+  `displayData.{{fkEntityField}}?.name ?? String(displayData.{{name}})`. Measured over SimpliX Meta:
   **802 fields match the heuristic and only 6 of them have the member it names** —
   `LinearAssetDetailDTO.linearAssetId` produces `displayData.linearAsset?.name`, and no
   `linearAsset` member exists. The entity's own primary key matches too (`siteId` alone, 122
@@ -2865,7 +2865,7 @@ git commit -m "feat(cli): let scaffolding read fields from the IR"
   `auditData={{ id: displayData.<rowIdField>, createdAt: displayData.createdAt, updatedAt: displayData.updatedAt }}`
   with no guard. Measured: **55 of the fixture's 59 `…DetailDTO` types carry both, and 4 carry
   neither** — `ExportLedgerDetailDTO`, `ExportJobDetailDTO`, `SiteSettingsDetailDTO`,
-  `MasterDataHistoryDetailDTO`. Those four do not compile. Unlike the foreign-key case the IR can
+  `MasterDataHistoryDetailDTO`. Those four do not compile. Unlike the foreign-key case SimpliX Meta can
   settle this cheaply: pass a `hasAuditFields` flag from the resolved field set and guard the
   `auditData` prop with it.
 

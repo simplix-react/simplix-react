@@ -5,7 +5,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
 import { describe, it, expect } from "vitest";
-import type { DtoMeta, FieldMeta, OperationMeta, TypeRef } from "../meta/ir-types.js";
+import type { DtoMeta, FieldMeta, OperationMeta, TypeRef } from "../meta/types.js";
 import type { OpenApiNamingStrategy } from "../openapi/naming/naming-strategy.js";
 import type { ContainerMapping } from "../openapi/orchestration/spec-profile.js";
 import { resolveMeta, type ResolvedDomain } from "../meta/resolve.js";
@@ -143,7 +143,7 @@ const HANDLED_ROLES = new Set([
   "order",
 ]);
 
-describe("the IR's `{param}` paths become MSW's `:param`, and the conversion precedes the sort", () => {
+describe("SimpliX Meta's `{param}` paths become MSW's `:param`, and the conversion precedes the sort", () => {
   it("states every one of the fixture's 311 path parameters in brace form", () => {
     const stated = meta.operations.flatMap((operation) =>
       operation.request.path.map((param) => operation.path.includes(`{${param.name}}`)),
@@ -279,7 +279,7 @@ describe("every operation of a domain gets a handler, not only the CRUD roles", 
   });
 });
 
-describe("the identifier and its type are read from the IR, never guessed from a field name", () => {
+describe("the identifier and its type are read from SimpliX Meta, never guessed from a field name", () => {
   it("stores an audit log under `auditLogId`, which the name heuristic misses", () => {
     // `AuditLogDetailDTO` declares `auditEventId` before `auditLogId`, so the first field ending
     // in `Id` is the wrong key — and a store keyed on it matches no request.
@@ -310,7 +310,7 @@ describe("the identifier and its type are read from the IR, never guessed from a
     expect(asText).toBe(210);
   });
 
-  it("reads a numeric parameter as a number when the IR says so", () => {
+  it("reads a numeric parameter as a number when SimpliX Meta says so", () => {
     const numbered = generateMockFiles(handBuiltDomain("shop"), {
       naming: simplixBootNaming,
       labeledEnum: LABELED_ENUM,
@@ -650,7 +650,7 @@ describe("the entry carries both markers, and is only rewritten while they are u
   });
 });
 
-describe("the handlers are written from the IR alone, never from what is on disk", () => {
+describe("the handlers are written from SimpliX Meta alone, never from what is on disk", () => {
   it("seeds a domain whose `src/generated/` was never written", async () => {
     const root = await mkdtemp(join(tmpdir(), "meta-mock-"));
     try {

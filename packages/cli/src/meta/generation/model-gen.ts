@@ -1,4 +1,4 @@
-import type { TypeRef } from "../ir-types.js";
+import type { TypeRef } from "../types.js";
 import type { ResolvedDomain, ResolvedType } from "../resolve.js";
 import {
   containerTypeExpression,
@@ -34,7 +34,7 @@ export interface ModelGenOptions {
 export interface UnboundTypeParam {
   type: string;
   field: string;
-  /** The variable as the IR spells it, which is the collection's own `E` for a raw Java `List`. */
+  /** The variable as SimpliX Meta spells it, which is the collection's own `E` for a raw Java `List`. */
   param: string;
 }
 
@@ -255,7 +255,7 @@ class ModelEmitter {
    */
   private renderEnum(name: string, at: RenderSite): string {
     const declared = this.domain.enums.get(name);
-    // A name the IR does not declare is already reported by the resolver; importing it here would
+    // A name SimpliX Meta does not declare is already reported by the resolver; importing it here would
     // point at a module this generator never writes.
     if (!declared) return "unknown";
 

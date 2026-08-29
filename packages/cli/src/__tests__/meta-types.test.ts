@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, it, expect } from "vitest";
-import type { DtoMeta, TypeRef } from "../meta/ir-types.js";
+import type { DtoMeta, TypeRef } from "../meta/types.js";
 
 const fixturePath = fileURLToPath(new URL("../meta/__fixtures__/smart-safety-meta.json", import.meta.url));
 
@@ -22,7 +22,7 @@ function collectContainerNames(type: TypeRef, seen: Set<string>): void {
   }
 }
 
-describe("DtoMeta IR fixture", () => {
+describe("DtoMeta SimpliX Meta fixture", () => {
   it("has version 1", () => {
     expect(meta.version).toBe(1);
   });

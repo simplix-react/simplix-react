@@ -1,4 +1,4 @@
-import type { ConstraintMeta, FieldMeta, TypeRef } from "../ir-types.js";
+import type { ConstraintMeta, FieldMeta, TypeRef } from "../types.js";
 import type { ResolvedDomain, ResolvedType } from "../resolve.js";
 import {
   camelJoin,
@@ -21,7 +21,7 @@ const MODEL_DIR = "../model";
  *
  * Orval names a constant per operation and role — `OrganizationRestCreateBody`,
  * `OrganizationRestGetResponse` — so one entity's twelve operations produce thirty-two of them.
- * The IR is keyed by DTO, and a DTO is a body on one route and a response on another, so the
+ * SimpliX Meta is keyed by DTO, and a DTO is a body on one route and a response on another, so the
  * declaration belongs to the type rather than to any one operation.
  */
 export function schemaConstName(typeName: string): string {
@@ -50,7 +50,7 @@ export interface RecursiveSchema {
 export interface ServerOnlyConstraint {
   type: string;
   field: string;
-  /** The annotation's simple name, as the IR carries it. */
+  /** The annotation's simple name, as SimpliX Meta carries it. */
   name: string;
 }
 
@@ -501,7 +501,7 @@ class SchemaEmitter {
    */
   private renderEnum(name: string, at: RenderSite): string {
     const declared = this.domain.enums.get(name);
-    // A name the IR does not declare is already reported by the resolver.
+    // A name SimpliX Meta does not declare is already reported by the resolver.
     if (!declared) return "z.unknown()";
 
     const values = declared.meta.values.map((value) => `'${value.name}'`).join(", ");
@@ -537,7 +537,7 @@ class SchemaEmitter {
       at.imports.external.set(mapping.import, names);
     }
 
-    // `z.record` takes the key schema as well, and the IR carries only the value: a Java `Map`
+    // `z.record` takes the key schema as well, and SimpliX Meta carries only the value: a Java `Map`
     // has string keys once JSON has serialized it, which is what the profile's `keyType` says.
     // The one-argument call does not merely skip validation — it throws while the schema is
     // being built, so a module holding one never loads at all.
@@ -579,7 +579,7 @@ class SchemaEmitter {
         return "";
       default:
         throw new Error(
-          `Unrecognised constraint kind '${constraint.kind}' on ${site}. The IR's vocabulary is ` +
+          `Unrecognised constraint kind '${constraint.kind}' on ${site}. SimpliX Meta's vocabulary is ` +
             "closed, so a new kind is a backend change that this generator has to be taught.",
         );
     }
@@ -653,7 +653,7 @@ const TIME_TOKENS: Record<string, string> = {
 /**
  * The regular expression a clock time is checked against.
  *
- * The IR carries a **format** here — `HH:mm` — not a pattern, so handing it to `RegExp` unchanged
+ * SimpliX Meta carries a **format** here — `HH:mm` — not a pattern, so handing it to `RegExp` unchanged
  * would build a schema that accepts only the literal text `HH:mm`.
  */
 function timeRegex(pattern: string | undefined, at: RenderSite): string {
