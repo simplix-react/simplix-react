@@ -201,8 +201,10 @@ describe("CrudForm.Actions", () => {
       </CrudForm.Actions>,
     );
     const wrapper = container.firstElementChild;
-    // justify-between should be present when spread
-    expect(wrapper?.className).toContain("justify-between");
+    // An auto margin on the first child pushes it away from the rest; the rest stay one group
+    // however many they are, which `justify-between` does not do past two.
+    expect(wrapper?.className).toContain("[&>*:first-child]:mr-auto");
+    expect(wrapper?.className).not.toContain("justify-between");
   });
 
   it("applies end layout by default", () => {
