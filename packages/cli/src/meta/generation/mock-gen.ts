@@ -393,8 +393,13 @@ function sortByRouteShape(targets: EndpointTarget[]): EndpointTarget[] {
   return [...targets].sort((left, right) => {
     const leftParams = left.operation.request.path.length > 0;
     const rightParams = right.operation.request.path.length > 0;
-    if (leftParams === rightParams) return 0;
-    return leftParams ? 1 : -1;
+    if (leftParams !== rightParams) return leftParams ? 1 : -1;
+    // Same shape, so MSW does not care which comes first — but everything downstream that takes
+    // the first match does. A backend hands its operations over in hash order, so returning 0
+    // here leaves that order in place and the same application generates a different store type
+    // after a restart. Path then method is a total order over a set that cannot hold duplicates.
+    const path = left.operation.path.localeCompare(right.operation.path);
+    return path !== 0 ? path : left.operation.method.localeCompare(right.operation.method);
   });
 }
 

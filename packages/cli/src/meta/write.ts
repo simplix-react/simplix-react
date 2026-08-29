@@ -133,7 +133,8 @@ export async function writeMetaOutput(options: WriteMetaOptions): Promise<WriteM
   // written only when absent, because they hold data somebody typed.
   const entryPath = join(options.targetDir, "src/mock/index.ts");
   const existingEntry = (await pathExists(entryPath)) ? await readFile(entryPath, "utf-8") : "";
-  if (existingEntry === "" || canRegenerateMockEntry(existingEntry)) {
+  const entryRewritten = existingEntry === "" || canRegenerateMockEntry(existingEntry);
+  if (entryRewritten) {
     await writeFileWithDir(entryPath, mock.entry);
     written.push("src/mock/index.ts");
   }
@@ -141,6 +142,17 @@ export async function writeMetaOutput(options: WriteMetaOptions): Promise<WriteM
   if (!(await pathExists(seedsPath))) {
     await writeFileWithDir(seedsPath, mock.seeds);
     written.push("src/mock/seeds.ts");
+  } else if (entryRewritten) {
+    // The entry above was rewritten from this run's store types; the seeds were not, because they
+    // hold rows somebody typed. Whichever DTO the entry now names, the arrays it is handed have to
+    // be declared as that DTO — an entity that owns two candidate types picks the other one as
+    // soon as anything about the document changes, and the pair stops compiling with no warning.
+    //
+    // Only where the entry moved: an entry held back by a handler override still names the DTOs of
+    // the run that wrote it, and repointing the seeds past it would break the same pair the other
+    // way round.
+    const repointed = await repointMockSeeds(options.targetDir, mock.seeds, mock.labeledSeedFields);
+    if (repointed.moved) written.push("src/mock/seeds.ts");
   }
 
   return {
@@ -215,10 +227,11 @@ function seedArraysOf(source: string): SeedArray[] {
  * OpenAPI half generated — and the meta entry names stores that half never had. It also keeps that
  * half's reading of which DTO a store carries, which is not always the same one.
  *
- * So: every existing array is kept, retyped where the two halves name different DTOs; every array
- * the entry needs and the file lacks is appended with generated data; and the import moves to the
- * meta model barrel. A retype is returned rather than applied silently — the rows underneath it
- * were written against the other shape.
+ * So: every existing array is kept whose DTO has not moved; an array whose store now carries a
+ * different DTO is replaced outright, rows included, because rows written against another shape do
+ * not fit this one; every array the entry needs and the file lacks is appended with generated
+ * data; and the import moves to the meta model barrel. Each replacement is returned, so the caller
+ * can say which arrays lost what somebody had typed into them.
  */
 export async function repointMockSeeds(
   targetDir: string,
@@ -247,10 +260,12 @@ export async function repointMockSeeds(
     const target = wanted.get(one.name);
     if (target === undefined || target.type === one.type) continue;
     retyped.push({ name: one.name, from: one.type, to: target.type });
-    body = body.replace(
-      `export const ${one.name}: ${one.type}[] = [`,
-      `export const ${one.name}: ${target.type}[] = [`,
-    );
+    // The whole array, rows and all. Rewriting the declaration alone leaves rows written against
+    // the DTO this store no longer carries: `space.Drawing` moved from FloorPlanRowDTO to
+    // FloorPlanTabDTO and its rows kept an `areaName` the new DTO does not declare, which is a
+    // compile error in a file nobody edited. A row shaped for another DTO is not data worth
+    // keeping, and the caller is told which arrays were replaced.
+    body = body.replace(one.text, target.text);
   }
 
   // A labeled enum reaches a response as `{ value, label }`, and the OpenAPI half seeded the bare

@@ -270,6 +270,62 @@ describe("the meta output lands in src/generated-meta/", () => {
   });
 });
 
+describe("the mock entry and its seeds stay a matched pair", () => {
+  // The entry is rewritten from every run's store types; the seeds are preserved because they hold
+  // rows somebody typed. An entity owning two candidate DTOs picks the other one as soon as
+  // anything about the document changes, and a seed array left declared as the old DTO is not
+  // assignable to the store the entry now builds — a package that stops compiling with no warning.
+  it("retypes a preserved seed array to the DTO the entry now names", async () => {
+    const dir = await packageWithMeta();
+    // The fixture ships a hand-written entry, which a handler override would hold back; this test
+    // is about the ordinary run, where the entry moves and the seeds have to follow it.
+    await write(dir, "src/mock/index.ts", "");
+    await writeMetaOutput({ targetDir: dir, domain: org, naming: simplixBootNaming });
+    const seeds = await readFile(join(dir, "src/mock/seeds.ts"), "utf-8");
+    const declared = /export const (\w+Seeds): (\w+)\[\] = \[/.exec(seeds);
+    expect(declared, "the fixture emitted no seed array to repoint").not.toBeNull();
+    const [, name, type] = declared!;
+
+    // Somebody's rows, typed as the DTO an earlier run chose.
+    await write(
+      dir,
+      "src/mock/seeds.ts",
+      seeds
+        .replace(`export const ${name}: ${type}[] = [`, `export const ${name}: StaleDTO[] = [`)
+        .replace(/= \[\n/, '= [\n  { aFieldTheNewDtoDoesNotDeclare: "x" },\n'),
+    );
+
+    await writeMetaOutput({ targetDir: dir, domain: org, naming: simplixBootNaming });
+
+    const after = await readFile(join(dir, "src/mock/seeds.ts"), "utf-8");
+    expect(after).toContain(`export const ${name}: ${type}[] = [`);
+    expect(after).not.toContain("StaleDTO");
+    // And the rows with it: a row written against the DTO the store no longer carries can name a
+    // field the new one does not declare, which is a compile error in a file nobody edited.
+    expect(after).not.toContain("aFieldTheNewDtoDoesNotDeclare");
+
+    const entry = await readFile(join(dir, "src/mock/index.ts"), "utf-8");
+    expect(entry).toContain(`createMockEntityStore<${type}>(${name}`);
+  });
+
+  it("leaves the seeds alone where a handler override holds the entry back", async () => {
+    const dir = await packageWithMeta();
+    const seeds = await readFile(join(dir, "src/mock/seeds.ts"), "utf-8");
+    const [, name, type] = /export const (\w+Seeds): (\w+)\[\] = \[/.exec(seeds)!;
+    const held = seeds.replace(
+      `export const ${name}: ${type}[] = [`,
+      `export const ${name}: StaleDTO[] = [`,
+    );
+    await write(dir, "src/mock/seeds.ts", held);
+    // The fixture's entry is hand-written, which is exactly what an override looks like.
+    await writeMetaOutput({ targetDir: dir, domain: org, naming: simplixBootNaming });
+
+    // That entry still names the DTOs of the run that wrote it, so moving the seeds past it would
+    // break the same pair from the other side.
+    expect(await readFile(join(dir, "src/mock/seeds.ts"), "utf-8")).toContain("StaleDTO");
+  });
+});
+
 // ── 2. A stale file does not survive a regeneration ──────────
 
 describe("a declaration SimpliX Meta no longer carries leaves the package", () => {

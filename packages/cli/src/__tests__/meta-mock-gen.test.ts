@@ -104,10 +104,16 @@ function routesOf(content: string): { method: string; pattern: string }[] {
   }));
 }
 
-/** The one line a route's handler is emitted on, or the block it opens. */
-function handlerFor(content: string, pattern: string): string {
-  const at = content.indexOf(`"${pattern}"`);
-  if (at === -1) throw new Error(`no handler answers ${pattern}`);
+/**
+ * The one line a route's handler is emitted on, or the block it opens.
+ *
+ * <p>Several methods share one path, so a pattern alone does not name a handler — pass `method`
+ * where the route has more than one.
+ */
+function handlerFor(content: string, pattern: string, method?: string): string {
+  const needle = method ? `http.${method.toLowerCase()}("${pattern}"` : `"${pattern}"`;
+  const at = content.indexOf(needle);
+  if (at === -1) throw new Error(`no handler answers ${method ?? ""} ${pattern}`.trim());
   const start = content.lastIndexOf("\n", at) + 1;
   const end = content.indexOf("\n    http.", at);
   return content.slice(start, end === -1 ? content.indexOf("\n  ];", at) : end);
@@ -392,6 +398,7 @@ describe("a handler filters by a path parameter only when the store's DTO declar
     const detail = handlerFor(
       factoryOf("site", "WorkPoint"),
       "*/api/v1/admin/work-point/:workPointId",
+      "get",
     );
     expect(detail).toContain("store.getById(String(params.workPointId)) ?? store.list()[0]");
   });
@@ -775,7 +782,35 @@ describe("generateMockFiles produces well-formed TypeScript", () => {
       expect(new Set(names).size, name).toBe(names.length);
     }
   });
+})
+
+describe("the same document in another order", () => {
+  // A SimpliX Boot backend walks its handler mappings out of a hash map, so the same application
+  // serves the same operations in a different order after every restart. Where an entity owns two
+  // candidate DTOs the generator then picked a different store type between runs, and
+  // `worker.WorkerCensus` typed its store as the roster census one day and the identity census
+  // the next — output that does not compile against the seeds preserved beside it.
+  const shuffled = resolveMeta(
+    { ...meta, operations: [...meta.operations].reverse() },
+    { domains: smartSafetyDomains, containerTypes },
+  );
+
+  it("generates byte-identical mock modules", () => {
+    for (const [name, domain] of shuffled.domains) {
+      const again = generateMockFiles(domain, {
+        naming: simplixBootNaming,
+        envelope,
+        labeledEnum: LABELED_ENUM,
+      });
+      const before = generated.get(name);
+      expect(before, `${name} was not generated the first time`).toBeDefined();
+      for (const [file, content] of again.files) {
+        expect(before!.files.get(file), `${name} ${file}`).toBe(content);
+      }
+    }
+  });
 });
+;
 
 // ── Helpers ──────────────────────────────────────────────────
 
