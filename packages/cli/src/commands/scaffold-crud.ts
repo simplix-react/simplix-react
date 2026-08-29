@@ -20,6 +20,15 @@ import {
 import type { EntityField, ExtractedEntity, OpenAPISnapshot, QueryParam } from "../openapi/types.js";
 import { toKebabCase, toPascalCase } from "../utils/case.js";
 import { pathExists, readJsonFile, writeFileWithDir, findProjectRoot } from "../utils/fs.js";
+import {
+  GENERATED_PAGE_MARKER,
+  isUntouchedRender,
+  stampFingerprint,
+  loadProjectTemplates,
+  PAGE_BLOCKS_TEMPLATE,
+  templateFor,
+  type ProjectTemplates,
+} from "../utils/project-templates.js";
 import { log } from "../utils/logger.js";
 import { renderTemplate } from "../utils/template.js";
 import { depVersion } from "../versions.js";
@@ -925,6 +934,8 @@ async function generatePages(
   moduleDir: string,
   entityKebab: string,
   ctx: Record<string, unknown>,
+  /** What the project has taken over; empty where it has taken nothing over. */
+  templates: ProjectTemplates = new Map(),
 ): Promise<string[]> {
   const pagesDir = join(moduleDir, "src", "pages", entityKebab);
   const generated: string[] = [];
@@ -937,24 +948,56 @@ async function generatePages(
 
   // CrudPage (list/tree + detail + new + edit in one component)
   if (ctx.hasTree && ctx.hasDetail) {
-    pageFiles["crud-page.tsx"] = renderTemplate(treeCrudPageTemplate, ctx);
+    pageFiles["crud-page.tsx"] = renderTemplate(templateFor(templates, "tree-crud-page", treeCrudPageTemplate), ctx);
   } else if (ctx.hasList && ctx.hasDetail) {
-    pageFiles["crud-page.tsx"] = renderTemplate(crudPageTemplate, ctx);
+    pageFiles["crud-page.tsx"] = renderTemplate(templateFor(templates, "crud-page", crudPageTemplate), ctx);
   } else if (!ctx.hasList && !ctx.hasTree && ctx.hasCreate) {
     // Hub page for creation-only entities (no list operation)
-    pageFiles["list-page.tsx"] = renderTemplate(hubPageTemplate, ctx);
+    pageFiles["list-page.tsx"] = renderTemplate(templateFor(templates, "hub-page", hubPageTemplate), ctx);
   }
 
   // Index barrel
-  pageFiles["index.ts"] = renderTemplate(pageIndexTemplate, ctx);
+  pageFiles["index.ts"] = renderTemplate(templateFor(templates, "page-index", pageIndexTemplate), ctx);
+
+  // A template a project supplies to hold the page's hand-written parts. Written once and never
+  // again: it is the file the author edits, and the whole point of it existing is that the
+  // generated page beside it can be rewritten without reading anything a person put there.
+  //
+  // <p><b>Refreshed, never created.</b> A page that departs from nothing has nothing to put in
+  // this file, and a scaffold that writes one anyway leaves an empty hook per page — fifty-eight
+  // of them in one console, each saying "this screen is different" while saying nothing. So the
+  // file is rendered only where the author already made one, and a page needing its first
+  // departure gets it by copying the template.
+  const blocks = templates.get(PAGE_BLOCKS_TEMPLATE);
+  const writeOnce = new Set<string>();
+  if (blocks !== undefined && (await pathExists(join(pagesDir, `${PAGE_BLOCKS_TEMPLATE}.tsx`)))) {
+    pageFiles[`${PAGE_BLOCKS_TEMPLATE}.tsx`] = renderTemplate(blocks, ctx);
+    writeOnce.add(`${PAGE_BLOCKS_TEMPLATE}.tsx`);
+  }
 
   for (const [fileName, content] of Object.entries(pageFiles)) {
     const filePath = join(pagesDir, fileName);
+    const stamped = content.includes(GENERATED_PAGE_MARKER) ? stampFingerprint(content) : content;
     if (await pathExists(filePath)) {
-      log.warn(`Skipping pages/${entityKebab}/${fileName} — file already exists`);
+      const held = await readFile(filePath, "utf-8");
+      // A page is scaffolded and then written on, so carrying the marker proves only where the
+      // file came from. What decides whether this run may discard it is the fingerprint: matching
+      // means nobody has touched the file since it was laid down, and rewriting it loses nothing.
+      // A page that has been edited — or that predates the stamp, and so can prove nothing — is
+      // somebody's work and is left alone.
+      if (!writeOnce.has(fileName) && isUntouchedRender(held)) {
+        await writeFileWithDir(filePath, stamped);
+        generated.push(fileName);
+        continue;
+      }
+      log.warn(
+        held.includes(GENERATED_PAGE_MARKER) && !writeOnce.has(fileName)
+          ? `Skipping pages/${entityKebab}/${fileName} — edited since it was generated`
+          : `Skipping pages/${entityKebab}/${fileName} — file already exists`,
+      );
       continue;
     }
-    await writeFileWithDir(filePath, content);
+    await writeFileWithDir(filePath, stamped);
     generated.push(fileName);
   }
 
@@ -2062,7 +2105,10 @@ export const scaffoldCrudCommand = new Command("scaffold")
         // Pages generation (reuse i18nLocales loaded above)
         const locales = i18nLocales;
 
-        const pageFiles = await generatePages(moduleDir, entityKebab, fullCtx);
+        // What the console draws around a generated page is the project's decision, so the
+        // project's own templates win where it has written any.
+        const projectTemplates = await loadProjectTemplates(rootDir);
+        const pageFiles = await generatePages(moduleDir, entityKebab, fullCtx, projectTemplates);
         if (pageFiles.length > 0) {
           log.info(`Generated ${pageFiles.length} page files`);
         }
