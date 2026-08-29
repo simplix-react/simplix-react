@@ -29,16 +29,24 @@ export interface UseCrudNavigationResult {
  * const { view, selectedId, showList, showDetail } = nav;
  * ```
  */
-export function useCrudNavigation(
-  search: CrudSearch,
-  onNavigate: (search: CrudSearch) => void,
+export function useCrudNavigation<S extends CrudSearch>(
+  search: S,
+  /**
+   * Where to go.
+   *
+   * <p>Typed in the caller's own search rather than in {@link CrudSearch}: a screen whose address
+   * carries more than the record — which explanation is open, which tab — hands over a handler
+   * that reads that wider shape, and a parameter fixed at the narrow one refuses it.
+   */
+  onNavigate: (search: S) => void,
 ): UseCrudNavigationResult {
   const { view, selectedId } = parseCrudSearch(search);
 
-  const showList = useCallback(() => onNavigate(buildCrudSearch("list")), [onNavigate]);
-  const showDetail = useCallback((id: string) => onNavigate(buildCrudSearch("detail", id)), [onNavigate]);
-  const showNew = useCallback(() => onNavigate(buildCrudSearch("new")), [onNavigate]);
-  const showEdit = useCallback((id: string) => onNavigate(buildCrudSearch("edit", id)), [onNavigate]);
+  const tab = search.tab;
+  const showList = useCallback(() => onNavigate(buildCrudSearch("list", undefined, tab) as S), [onNavigate, tab]);
+  const showDetail = useCallback((id: string) => onNavigate(buildCrudSearch("detail", id, tab) as S), [onNavigate, tab]);
+  const showNew = useCallback(() => onNavigate(buildCrudSearch("new", undefined, tab) as S), [onNavigate, tab]);
+  const showEdit = useCallback((id: string) => onNavigate(buildCrudSearch("edit", id, tab) as S), [onNavigate, tab]);
 
   return { view, selectedId, showList, showDetail, showNew, showEdit };
 }
