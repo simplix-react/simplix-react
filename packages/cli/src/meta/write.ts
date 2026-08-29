@@ -63,6 +63,8 @@ export interface WriteMetaResult {
   entities: EntityHooks[];
   /** What a seed module would hold if it were written fresh, for merging into a preserved one. */
   seeds: string;
+  /** Seed array name → the fields the model declares as a labeled enum. */
+  labeledSeedFields: Map<string, string[]>;
   /** What a generator could not answer, for the caller to report. */
   warnings: string[];
 }
@@ -145,6 +147,7 @@ export async function writeMetaOutput(options: WriteMetaOptions): Promise<WriteM
     entities: hooks.entities,
     /** What a seed module would hold if it were written fresh, for merging into a preserved one. */
     seeds: mock.seeds,
+    labeledSeedFields: mock.labeledSeedFields,
     warnings: collectWarnings({ model, schema, endpoints, search, access, mock }),
   };
 }
@@ -182,11 +185,6 @@ interface SeedArray {
 
 const SEED_ARRAY = /export const (\w+): (\w+)\[\] = \[[\s\S]*?\n\];\n/g;
 
-/** The fields a generated array writes as `{ value, label }`, which is a labeled enum's shape. */
-function labelledFieldsOf(text: string): string[] {
-  return [...text.matchAll(/(\w+): \{ value: "[^"]*", label: "[^"]*" \}/g)].map((one) => one[1]);
-}
-
 function seedArraysOf(source: string): SeedArray[] {
   return [...source.matchAll(SEED_ARRAY)].map((one) => ({
     name: one[1],
@@ -211,6 +209,8 @@ function seedArraysOf(source: string): SeedArray[] {
 export async function repointMockSeeds(
   targetDir: string,
   generated: string,
+  /** Seed array name → the fields the model declares as a labeled enum. */
+  labeledFields: ReadonlyMap<string, string[]> = new Map(),
 ): Promise<{
   moved: boolean;
   added: string[];
@@ -244,9 +244,7 @@ export async function repointMockSeeds(
   // rows keep saying what somebody meant them to say.
   const wrapped: string[] = [];
   for (const one of held) {
-    const target = wanted.get(one.name);
-    if (target === undefined) continue;
-    for (const field of labelledFieldsOf(target.text)) {
+    for (const field of labeledFields.get(one.name) ?? []) {
       const bare = new RegExp(`(\\b${field}: )"([^"]*)",`, "g");
       const before = body;
       body = body.replace(bare, '$1{ value: "$2", label: "$2" },');

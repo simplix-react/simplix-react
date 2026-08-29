@@ -248,7 +248,7 @@ describe("the meta output lands in src/generated-meta/", () => {
       "",
     ].join("\n");
 
-    const result = await repointMockSeeds(dir, generated);
+    const result = await repointMockSeeds(dir, generated, new Map([["petSeeds", ["status"]]]));
     const seeds = await readFile(join(dir, "src/mock/seeds.ts"), "utf-8");
 
     expect(seeds).toContain('status: { value: "RETIRED", label: "RETIRED" },');

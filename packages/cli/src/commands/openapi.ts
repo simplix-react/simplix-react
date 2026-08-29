@@ -696,6 +696,7 @@ async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
 
     /** What the meta half would seed, for merging into the preserved seed module below. */
     let metaSeeds = "";
+    let metaLabeledSeedFields: ReadonlyMap<string, string[]> = new Map();
 
     // 10b. Generate the DTO meta output beside the Orval one
     const metaExported =
@@ -724,6 +725,7 @@ async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
       for (const warning of written.warnings) log.warn(`DTO meta: ${warning}`);
       log.info(`${domainPkgName}: wrote ${written.written.length} file(s) to ${META_DIR}/.`);
       metaSeeds = written.seeds;
+      metaLabeledSeedFields = written.labeledSeedFields;
     }
 
     // 11. Generate or update schemas proxy (preserve custom overrides)
@@ -731,7 +733,7 @@ async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
       await writeMetaSchemasProxy(targetDir);
       // The seed module is written once and never overwritten, so a swapped domain keeps the
       // arrays the OpenAPI half generated while the entry beside it wires the meta stores.
-      const seeds = await repointMockSeeds(targetDir, metaSeeds);
+      const seeds = await repointMockSeeds(targetDir, metaSeeds, metaLabeledSeedFields);
       for (const name of seeds.added) {
         log.info(`DTO meta: seeded ${name} in src/mock/seeds.ts, which the entry now wires.`);
       }
