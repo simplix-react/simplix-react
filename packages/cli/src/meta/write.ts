@@ -63,7 +63,7 @@ export interface WriteMetaResult {
   entities: EntityHooks[];
   /** What a seed module would hold if it were written fresh, for merging into a preserved one. */
   seeds: string;
-  /** Seed array name → the fields the model declares as a labeled enum. */
+  /** DTO name → the fields the model declares as a labeled enum. */
   labeledSeedFields: Map<string, string[]>;
   /** What a generator could not answer, for the caller to report. */
   warnings: string[];
@@ -222,7 +222,7 @@ function seedArraysOf(source: string): SeedArray[] {
 export async function repointMockSeeds(
   targetDir: string,
   generated: string,
-  /** Seed array name → the fields the model declares as a labeled enum. */
+  /** DTO name → the fields the model declares as a labeled enum. */
   labeledFields: ReadonlyMap<string, string[]> = new Map(),
 ): Promise<{
   moved: boolean;
@@ -257,7 +257,7 @@ export async function repointMockSeeds(
   // rows keep saying what somebody meant them to say.
   const wrapped: string[] = [];
   for (const one of held) {
-    const fields = labeledFields.get(one.name) ?? [];
+    const fields = labeledFields.get(one.type) ?? [];
     if (fields.length === 0) continue;
 
     // Within this array's own text. A field name is not unique across the module — the same one

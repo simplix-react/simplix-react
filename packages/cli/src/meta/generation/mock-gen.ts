@@ -129,9 +129,13 @@ export interface MockGenResult {
   unresolvedOrderFields: UnresolvedOrderField[];
   unmatchableParameters: UnmatchableParameter[];
   /**
-   * Seed array name → the fields the model declares as a labeled enum, so a preserved array whose
-   * rows hold bare values can be taken into that shape. Read from the model rather than from the
-   * emitted text: a generated row omits an optional field, and the preserved one may still hold it.
+   * DTO name → the fields the model declares as a labeled enum, so a preserved array whose rows
+   * hold bare values can be taken into that shape.
+   *
+   * Keyed by the type rather than by the store that carries it: a preserved module holds arrays
+   * for entities the meta path does not back, and those rows are annotated with a DTO all the
+   * same. Read from the model rather than from the emitted text, since a generated row omits an
+   * optional field the preserved one may still hold.
    */
   labeledSeedFields: Map<string, string[]>;
 }
@@ -170,14 +174,17 @@ export function generateMockFiles(domain: ResolvedDomain, options: MockGenOption
     unresolvedOrderFields: emitter.unresolvedOrderFields,
     unmatchableParameters: emitter.unmatchableParameters,
     labeledSeedFields: new Map(
-      entities
-        .filter((entity) => entity.backed && entity.storeType !== undefined)
-        .map((entity) => [
-          `${entity.name}Seeds`,
-          (entity.storeType as ResolvedType).allFields
-            .filter((field) => model.labeledAt(entity.storeType as ResolvedType, field))
-            .map((field) => field.name),
-        ]),
+      [...domain.types.values()]
+        .map(
+          (type) =>
+            [
+              type.name,
+              type.allFields
+                .filter((field) => model.labeledAt(type, field))
+                .map((field) => field.name),
+            ] as const,
+        )
+        .filter(([, fields]) => fields.length > 0),
     ),
   };
 }
