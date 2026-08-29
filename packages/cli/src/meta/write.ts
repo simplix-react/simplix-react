@@ -257,12 +257,22 @@ export async function repointMockSeeds(
   // rows keep saying what somebody meant them to say.
   const wrapped: string[] = [];
   for (const one of held) {
-    for (const field of labeledFields.get(one.name) ?? []) {
+    const fields = labeledFields.get(one.name) ?? [];
+    if (fields.length === 0) continue;
+
+    // Within this array's own text. A field name is not unique across the module — the same one
+    // names a member of another store's rows, and of a nested object inside these — so replacing
+    // over the whole file wraps values the model declares as plain strings.
+    let text = body.slice(body.indexOf(one.text), body.indexOf(one.text) + one.text.length);
+    if (text === "") continue;
+    const original = text;
+    for (const field of fields) {
       const bare = new RegExp(`(\\b${field}: )"([^"]*)",`, "g");
-      const before = body;
-      body = body.replace(bare, '$1{ value: "$2", label: "$2" },');
-      if (body !== before) wrapped.push(`${one.name}.${field}`);
+      const before = text;
+      text = text.replace(bare, '$1{ value: "$2", label: "$2" },');
+      if (text !== before) wrapped.push(`${one.name}.${field}`);
     }
+    if (text !== original) body = body.replace(original, text);
   }
 
   const missing = [...wanted.values()].filter((one) => !heldNames.has(one.name));
