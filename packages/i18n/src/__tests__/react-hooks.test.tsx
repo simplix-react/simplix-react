@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { createElement, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { I18nProvider, useI18nAdapter } from "../react/i18n-provider.js";
 import { useTranslation, useI18n, useLocale } from "../react/use-translation.js";
 import { useLocalePicker } from "../react/use-locale-picker.js";
@@ -60,7 +60,7 @@ function createMockAdapter(overrides: Partial<II18nAdapter> = {}): II18nAdapter 
 
 function createWrapper(adapter: II18nAdapter) {
   return function Wrapper({ children }: { children: ReactNode }) {
-    return createElement(I18nProvider, { adapter, children });
+    return <I18nProvider adapter={adapter}>{children}</I18nProvider>;
   };
 }
 
