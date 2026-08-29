@@ -138,7 +138,12 @@ export interface OpenAPIMetaConfig {
 /** Per-spec OpenAPI configuration */
 export interface OpenAPISpecConfig {
   /** OpenAPI spec file path (relative to project root) or URL */
-  spec: string;
+  /**
+   * The OpenAPI document the Orval half reads. Optional: a project that has finished migrating
+   * runs `simplix meta`, which needs no document — it states `meta.source` instead. `simplix
+   * openapi` still requires one and says so.
+   */
+  spec?: string;
   /** Spec Profile preset name (bundles naming + responseAdapter) */
   profile?: string;
   /** NamingStrategy — overrides profile's naming if both are set */
@@ -168,6 +173,8 @@ export function findSpecBySource(
   rootDir: string,
 ): OpenAPISpecConfig | undefined {
   return specs?.find((s) => {
+    // A migrated project states no document at all, so it matches no source.
+    if (s.spec === undefined) return false;
     if (isUrlSpec(s.spec) || isUrlSpec(source)) {
       return s.spec === source;
     }

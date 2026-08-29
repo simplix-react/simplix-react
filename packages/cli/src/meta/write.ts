@@ -1,3 +1,4 @@
+import type { EntityField, ExtractedEntity } from "../openapi/types.js";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { domainIndexTs } from "../templates/domain/index.js";
@@ -7,7 +8,7 @@ import type { OpenApiNamingStrategy } from "../openapi/naming/naming-strategy.js
 import type { MetaExtensionOutput } from "../openapi/orchestration/spec-profile.js";
 import { HEADER } from "./generation/emit.js";
 import { generateAccessFiles } from "./generation/access-gen.js";
-import { generateEndpointFiles } from "./generation/endpoint-gen.js";
+import { generateEndpointFiles, entityNameOf } from "./generation/endpoint-gen.js";
 import { generateHookFiles, type EntityHooks } from "./generation/hook-gen.js";
 import {
   canRegenerateMockEntry,
@@ -439,4 +440,57 @@ function collectWarnings(results: GeneratorResults): string[] {
   }
 
   return warnings;
+}
+
+/**
+ * The entity shape the OpenAPI half's side artifacts are written from, built from SimpliX Meta.
+ *
+ * The locale overlay reads a name and a field list, the i18n download reads a name and its Pascal
+ * form, and the snapshot stores whatever it is handed. None of the three needs an operation or a
+ * path, so a domain that has no OpenAPI document behind it still gets all three — which is what
+ * lets a project drop Orval once every domain is exported.
+ *
+ * Fields come from the entity's own DTOs rather than from every type the closure reaches: a
+ * locale file names what a screen shows, and the closure holds the shapes those DTOs are built
+ * from as well.
+ */
+export function metaEntities(domain: ResolvedDomain): ExtractedEntity[] {
+  return domain.entities.map((entity) => {
+    const name = entityNameOf(entity.tag);
+    const owned = [...domain.types.values()].filter((type) => type.owner === entity.tag);
+    const seen = new Set<string>();
+    const fields: EntityField[] = [];
+
+    for (const type of owned) {
+      for (const field of type.allFields) {
+        if (seen.has(field.name)) continue;
+        seen.add(field.name);
+        const enumName = field.type.kind === "enum" ? field.type.name : undefined;
+        const enumValues =
+          enumName === undefined
+            ? undefined
+            : domain.enums.get(enumName)?.meta.values.map((one) => one.name);
+        fields.push({
+          name: field.name,
+          snakeName: field.name.replace(/[A-Z]/g, (one) => `_${one.toLowerCase()}`),
+          type: field.type.kind,
+          zodType: field.type.kind,
+          required: field.required,
+          nullable: field.nullable,
+          ...(enumValues && enumName ? { enum: enumValues, enumTypeName: enumName } : {}),
+        });
+      }
+    }
+
+    return {
+      name,
+      pascalName: name.charAt(0).toUpperCase() + name.slice(1),
+      pluralName: `${name}s`,
+      path: entity.operations[0]?.path ?? "",
+      fields,
+      queryParams: [],
+      operations: [],
+      tags: [entity.tag],
+    };
+  });
 }

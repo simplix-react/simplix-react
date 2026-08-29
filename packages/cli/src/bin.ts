@@ -9,6 +9,7 @@ import { addDomainCommand } from "./commands/add-domain.js";
 import { addModuleCommand } from "./commands/add-module.js";
 import { validateCommand } from "./commands/validate.js";
 import { i18nCodegenCommand } from "./commands/i18n-codegen.js";
+import { metaCommand } from "./commands/meta.js";
 import { metaDiffCommand } from "./commands/meta-diff.js";
 import { openapiCommand } from "./commands/openapi.js";
 import { scaffoldCrudCommand } from "./commands/scaffold-crud.js";
@@ -80,6 +81,7 @@ program.addCommand(i18nCodegenCommand);
 program.addCommand(openapiCommand);
 program.addCommand(initUiCommand);
 program.addCommand(scaffoldCrudCommand);
+program.addCommand(metaCommand);
 program.addCommand(metaDiffCommand);
 
 program.parse();

@@ -532,7 +532,8 @@ interface DomainPackageOpts {
   outputBase: string;
   prefix: string;
   scope: string;
-  specConfig: { spec: string; domains: Record<string, string[]> };
+  /** `spec` is absent on a migrated project, which reaches `simplix meta` rather than here. */
+  specConfig: { spec?: string; domains: Record<string, string[]> };
   resolvedSpecConfig?: ReturnType<typeof resolveSpecConfig>;
   /** The DTO meta pipeline, or absent when the spec declares no `meta` block. */
   meta?: MetaContext;
@@ -661,6 +662,13 @@ async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
     }
 
     // Compute spec relative path for programmatic Orval config
+    if (specConfig.spec === undefined) {
+      throw new Error(
+        "`simplix openapi` reads an OpenAPI document and this configuration states none. A " +
+          "project generating from SimpliX Meta alone runs `simplix meta`; one that still needs " +
+          "the Orval half states `spec` on its `openapi` entry.",
+      );
+    }
     const specRelativePath = isSpecUrl(specConfig.spec)
       ? specConfig.spec
       : relative(targetDir, resolve(rootDir, specConfig.spec));
@@ -997,7 +1005,7 @@ function mergeLocaleJson(
   return result;
 }
 
-async function generateLocaleFiles(
+export async function generateLocaleFiles(
   targetDir: string,
   entities: ExtractedEntity[],
   locales: string[],
@@ -1192,7 +1200,7 @@ export function generateCrudConfigContent(
  * 1. If spec source is an HTTP URL → use its origin
  * 2. Otherwise → use spec.servers[0].url from parsed spec
  */
-function resolveServerOrigin(
+export function resolveServerOrigin(
   specSource: string,
   spec: OpenAPISpec,
 ): string | undefined {
@@ -1212,7 +1220,7 @@ function resolveServerOrigin(
   return undefined;
 }
 
-async function overlayServerTranslations(
+export async function overlayServerTranslations(
   targetDir: string,
   entities: ExtractedEntity[],
   locales: string[],
