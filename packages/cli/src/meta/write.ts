@@ -183,7 +183,20 @@ interface SeedArray {
   text: string;
 }
 
-const SEED_ARRAY = /export const (\w+): (\w+)\[\] = \[[\s\S]*?\n\];\n/g;
+// The body is lazy and the closing bracket needs no line of its own, so an array written on one
+// line — `= [];`, which is how a deliberately empty fixture reads — is matched like any other.
+const SEED_ARRAY = /export const (\w+): (\w+)\[\] = \[[\s\S]*?\];\n?/g;
+
+/**
+ * Every name the module declares, whatever shape its body takes.
+ *
+ * Kept apart from {@link seedArraysOf} on purpose: a name this misses is appended a second time on
+ * the next run and the module stops compiling, so what decides "already here" is the simplest scan
+ * that can be written rather than the one that also has to read a body.
+ */
+function seedNamesOf(source: string): Set<string> {
+  return new Set([...source.matchAll(/export const (\w+):/g)].map((one) => one[1]));
+}
 
 function seedArraysOf(source: string): SeedArray[] {
   return [...source.matchAll(SEED_ARRAY)].map((one) => ({
@@ -225,7 +238,7 @@ export async function repointMockSeeds(
   const existing = await readFile(seedsPath, "utf-8");
   const wanted = new Map(seedArraysOf(generated).map((one) => [one.name, one]));
   const held = seedArraysOf(existing);
-  const heldNames = new Set(held.map((one) => one.name));
+  const heldNames = seedNamesOf(existing);
 
   const retyped: Array<{ name: string; from: string; to: string }> = [];
   let body = existing;
@@ -259,10 +272,33 @@ export async function repointMockSeeds(
 
   // Whatever the arrays now name, taken from the meta barrel.
   const types = [...new Set(seedArraysOf(body).map((one) => one.type))].sort();
+  // One import for all of them, taken from the meta barrel. Every import of the Orval output goes,
+  // deep ones included: a domain regenerated before carries a module per type as well, and leaving
+  // those in declares the same name twice.
   body = body.replace(
-    /import type \{[^}]*\} from ["'][^"']*\/model["'];/,
-    `import type { ${types.join(", ")} } from "${MOCK_META_MODULE}/model";`,
+    /^import type \{[^}]*\} from ["'][^"']*\/generated\/[^"']*["'];\n/gm,
+    "",
   );
+
+  const wantedImport = `import type { ${types.join(", ")} } from "${MOCK_META_MODULE}/model";`;
+  if (types.length > 0) {
+    const metaImport = new RegExp(
+      `^import type \\{[^}]*\\} from ["']${MOCK_META_MODULE}/model["'];$`,
+      "m",
+    );
+    if (metaImport.test(body)) {
+      // Already pointing here — rewrite it in place, so a second run over the same file changes
+      // nothing and `moved` stays false.
+      body = body.replace(metaImport, wantedImport);
+    } else {
+      const lines = body.split("\n");
+      const firstDeclaration = lines.findIndex((line) => line.startsWith("export const "));
+      if (firstDeclaration !== -1) {
+        lines.splice(firstDeclaration, 0, wantedImport, "");
+        body = lines.join("\n");
+      }
+    }
+  }
 
   if (body === existing) return unchanged;
   await writeFileWithDir(seedsPath, body);
