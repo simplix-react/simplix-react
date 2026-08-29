@@ -187,6 +187,58 @@ describe("simplixBootNaming", () => {
       expect(result).toEqual({ role: "get", hookName: "getPolicyVersion" });
     });
 
+    // --- GET where the entity's own leading word is also a segment of the API root.
+    //     `apiClient` splits to prefixes { "api" }, and every Boot path starts `/api/v1/…`, so
+    //     the prefix fallback matched the root and read the rest of the base path as an action.
+    //     The entity then had no `get` role at all: no detail widget, no CRUD page, and a page
+    //     barrel that rendered to nothing while the run reported success. ---
+
+    it("resolves GET /{id} as get when the entity's first word is also the API root segment", () => {
+      const result = simplixBootNaming.resolveOperation({
+        ...baseContext,
+        entityName: "apiClient",
+        method: "get",
+        path: "/api/v1/admin/service-account/{apiClientId}",
+        pathParams: ["apiClientId"],
+      });
+      expect(result).toEqual({ role: "get", hookName: "getApiClient" });
+    });
+
+    it("resolves the same for the longer entities sharing that first word", () => {
+      expect(
+        simplixBootNaming.resolveOperation({
+          ...baseContext,
+          entityName: "apiClientCall",
+          method: "get",
+          path: "/api/v1/admin/service-account-call/{apiClientCallId}",
+          pathParams: ["apiClientCallId"],
+        }),
+      ).toEqual({ role: "get", hookName: "getApiClientCall" });
+
+      expect(
+        simplixBootNaming.resolveOperation({
+          ...baseContext,
+          entityName: "apiClientSecretChange",
+          method: "get",
+          path: "/api/v1/admin/service-account-secret-change/{id}",
+          pathParams: ["id"],
+        }),
+      ).toEqual({ role: "get", hookName: "getApiClientSecretChange" });
+    });
+
+    it("still reads a genuine sub-path action for such an entity", () => {
+      // The guard removes the API root from the candidates, not the fallback itself: a real
+      // action after the entity's own segment is still an action.
+      const result = simplixBootNaming.resolveOperation({
+        ...baseContext,
+        entityName: "apiClient",
+        method: "get",
+        path: "/api/v1/admin/api-client/statistics",
+        pathParams: [],
+      });
+      expect(result).toEqual({ role: "statistics", hookName: "getApiClientStatistics" });
+    });
+
     it("resolves GET /policy/{policyId}/version as getAll for split compound entity policyVersion", () => {
       const result = simplixBootNaming.resolveOperation({
         ...baseContext,

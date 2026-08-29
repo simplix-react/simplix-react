@@ -36,6 +36,23 @@ function buildEntityPrefixes(entityKebab: string): Set<string> {
 }
 
 /**
+ * Whether a path segment is one the API's own root contributes rather than one naming a resource.
+ *
+ * Every Boot path opens `/api/v1/…`, so these segments are present under every entity and say
+ * nothing about which one. They have to be excluded wherever a segment is read as part of an
+ * entity's name: an entity whose own first word is one of them — `apiClient` splits to the prefix
+ * `api` — otherwise matches the root, and the rest of the base path is then read as an action on
+ * it. The operation loses its `get` role, which takes the detail widget, the CRUD page and the
+ * page barrel's only contents with it.
+ *
+ * @param segment the kebab-case path segment
+ * @returns whether the segment belongs to the API root
+ */
+function isApiRootSegment(segment: string): boolean {
+  return segment === "api" || /^v\d+$/.test(segment);
+}
+
+/**
  * Whether a path segment spells part of the entity's own name rather than an action.
  *
  * A path may spread the entity across segments — `userSecurityProfile` is served at
@@ -71,7 +88,7 @@ function findActionSuffix(segments: string[], entityName: string): string | unde
   for (let i = segments.length - 1; i >= 0; i--) {
     const seg = segments[i];
     if (seg.startsWith("{")) continue;
-    if (isEntityNameSegment(seg, entityKebab) || entityPrefixes.has(seg) || seg === "api" || /^v\d+$/.test(seg)) return undefined;
+    if (isEntityNameSegment(seg, entityKebab) || entityPrefixes.has(seg) || isApiRootSegment(seg)) return undefined;
     return toCamelCase(seg);
   }
   return undefined;
@@ -114,11 +131,16 @@ function findGetSubpath(segments: string[], entityName: string): string | undefi
     if (entityEndIdx >= 0) break;
   }
 
-  // Prefix fallback: when entity name from tag has a qualifier suffix
+  // Prefix fallback: when entity name from tag has a qualifier suffix.
+  //
+  // A segment the API root contributes is never the end of the entity's name, however exactly it
+  // spells one of its prefixes — see isApiRootSegment. Without that exclusion the fallback reads
+  // the root as the entity and everything after it as an action.
   if (entityEndIdx < 0) {
     const prefixes = buildEntityPrefixes(entityKebab);
     for (let i = segments.length - 1; i >= 0; i--) {
-      if (!segments[i].startsWith("{") && prefixes.has(segments[i])) {
+      const seg = segments[i];
+      if (!seg.startsWith("{") && !isApiRootSegment(seg) && prefixes.has(seg)) {
         entityEndIdx = i;
         break;
       }
