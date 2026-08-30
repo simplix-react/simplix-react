@@ -51,6 +51,18 @@ export interface BarChartProps extends BaseChartProps {
   categories: string[];
   horizontal?: boolean;
   stacked?: boolean;
+  /**
+   * Draws the legend even where there is only one series.
+   *
+   * <p>The renderer hides a legend for a single series by default, on the reasoning that the
+   * chart's own title already names what it draws. That holds where a caller wrote a title and
+   * not where the series name IS the only word saying what the bars count — a column of months
+   * with no legend leaves the reader to infer the unit. Pass this where the series carries the
+   * name and nothing above the chart repeats it.
+   *
+   * @defaultValue false
+   */
+  showLegend?: boolean;
 }
 
 export interface PieChartProps extends BaseChartProps {
