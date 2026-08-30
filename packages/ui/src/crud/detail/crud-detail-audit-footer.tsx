@@ -64,9 +64,12 @@ export function DetailAuditFooter({ auditData, displayZone }: CrudDetailAuditFoo
   // the record's name has the panel's title, its fields and its list row, and nowhere else to get
   // the UUID.
   //
-  // It has been replaced with a human-readable code twice, both times by someone applying that
-  // general rule to this line without asking what the line was for. Anyone about to do it a third
-  // time: the name belongs above, not here.
+  // **It has now been replaced with a human-readable code three times**, each by somebody applying
+  // that general rule to this line without asking what the line was for. The third added a `code`
+  // prop to do it and was reverted by the product's own designer within the hour, with the code
+  // already on the panel two rows above as its own field — which is the whole point. There is no
+  // shape of this change that is right. Anyone about to try a fourth: the name belongs above, not
+  // here, and so does the code.
   const shown = auditData?.id ? formatDisplayId(auditData.id) : "";
 
   const handleCopyId = useCallback(async () => {

@@ -37,14 +37,15 @@
     "ora": "catalog:",
     "picocolors": "catalog:",
     "prompts": "catalog:",
+    "typescript": "catalog:",
     "yaml": "catalog:"
   },
   "devDependencies": {
     "@simplix-react/config-typescript": "workspace:*",
     "@types/prompts": "catalog:",
     "tsup": "catalog:",
-    "typescript": "catalog:",
-    "vitest": "catalog:"
+    "vitest": "catalog:",
+    "zod": "catalog:"
   },
   "engines": {
     "node": ">=20.0.0"

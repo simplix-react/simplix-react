@@ -28,23 +28,44 @@ describe("registerDomainTranslations", () => {
     expect(registry.has("pet")).toBe(true);
   });
 
-  it("overwrites duplicate domain registrations", () => {
-    registerDomainTranslations({
+  it("re-registering the same config replaces rather than appends", () => {
+    const config = {
       domain: "pet",
       locales: {
-        en: () => Promise.resolve({ default: { pet: { fields: { name: "Old" } } } }),
+        en: () => Promise.resolve({ default: { pet: { fields: { name: "Name" } } } }),
       },
-    });
+    };
 
-    registerDomainTranslations({
-      domain: "pet",
-      locales: {
-        en: () => Promise.resolve({ default: { pet: { fields: { name: "New" } } } }),
-      },
-    });
+    registerDomainTranslations(config);
+    registerDomainTranslations(config);
 
     const registry = getDomainTranslationRegistry();
     expect(registry.size).toBe(1);
+    expect(registry.get("pet")).toBe(config);
+  });
+
+  it("keeps both catalogues when two packages claim one domain name", () => {
+    const extension = {
+      domain: "pet",
+      locales: {
+        en: () => Promise.resolve({ default: { pet: { fields: { name: "Name" } } } }),
+      },
+    };
+    const application = {
+      domain: "pet",
+      locales: {
+        en: () => Promise.resolve({ default: { visit: { fields: { at: "At" } } } }),
+      },
+    };
+
+    registerDomainTranslations(extension);
+    registerDomainTranslations(application);
+
+    const registry = getDomainTranslationRegistry();
+    expect(registry.size).toBe(2);
+    expect([...registry.values()]).toEqual(
+      expect.arrayContaining([extension, application]),
+    );
   });
 });
 

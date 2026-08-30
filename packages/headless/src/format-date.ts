@@ -40,17 +40,50 @@ export function generateYears(start: number, end: number, reverse = false): numb
 // ── Formatting functions ──
 
 /**
- * Short date without year — e.g. "Mar 3", localized.
+ * The Gregorian year a `Date` falls in, read in `timeZone` when one is given.
  *
- * Pass `timeZone` (IANA) to render an absolute `Date` in that zone instead of
- * the browser zone (site-scoped detail/display); omit it for zone-neutral use.
+ * Pinned to `en-US` so the comparison is calendar-stable: a display locale with
+ * a non-Gregorian calendar (`ja-JP-u-ca-japanese`) numbers its years by era,
+ * and two dates in one Gregorian year can carry different era years.
  */
-export function formatDateShort(date: Date, locale?: string, timeZone?: string): string {
+function yearOf(date: Date, timeZone?: string): string {
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    ...(timeZone ? { timeZone } : {}),
+  }).format(date);
+}
+
+/** Whether a date has to spell its year out — anything outside the current year does. */
+function isOutsideCurrentYear(date: Date, timeZone?: string): boolean {
+  return yearOf(date, timeZone) !== yearOf(new Date(), timeZone);
+}
+
+/** Short date, with or without the year — e.g. "Mar 3" or "Mar 3, 2024", localized. */
+function shortDate(date: Date, withYear: boolean, locale?: string, timeZone?: string): string {
   return new Intl.DateTimeFormat(locale, {
+    ...(withYear ? { year: "numeric" } : {}),
     month: "short",
     day: "numeric",
     ...(timeZone ? { timeZone } : {}),
   }).format(date);
+}
+
+/**
+ * Short date — e.g. "Mar 3" this year, "Mar 3, 2024" in any other, localized.
+ *
+ * @remarks
+ * The year is dropped only where the reader supplies it themselves. Inside the
+ * current year "Mar 3" is unambiguous and the year is noise; outside it the same
+ * string names the wrong day and nothing on the screen says so, so the year is
+ * written. {@link formatDateRange} carries the rule across both ends of a range.
+ *
+ * Pass `timeZone` (IANA) to render an absolute `Date` in that zone instead of
+ * the browser zone (site-scoped detail/display); omit it for zone-neutral use.
+ * The zone decides which year counts as current, so a date near a year boundary
+ * is judged in the same zone it is printed in.
+ */
+export function formatDateShort(date: Date, locale?: string, timeZone?: string): string {
+  return shortDate(date, isOutsideCurrentYear(date, timeZone), locale, timeZone);
 }
 
 /**
@@ -124,6 +157,12 @@ export function formatRelativeTime(date: Date, locale?: string): string {
 /**
  * Format a date range as a short string — e.g. "Mar 3 – Mar 27", localized.
  * Returns `null` when both `from` and `to` are undefined.
+ *
+ * @remarks
+ * Both ends carry the year or neither does, and neither only when both ends fall
+ * in the current year. Deciding each end on its own would write "Dec 20, 2025 –
+ * Jan 5" for a range that crosses new year, where the unmarked end reads as
+ * belonging to the year the marked one names.
  */
 export function formatDateRange(
   from: Date | undefined,
@@ -131,9 +170,12 @@ export function formatDateRange(
   locale?: string,
   timeZone?: string,
 ): string | null {
+  const withYear =
+    (from ? isOutsideCurrentYear(from, timeZone) : false) ||
+    (to ? isOutsideCurrentYear(to, timeZone) : false);
   if (from && to)
-    return `${formatDateShort(from, locale, timeZone)} \u2013 ${formatDateShort(to, locale, timeZone)}`;
-  if (from) return `${formatDateShort(from, locale, timeZone)} \u2013 ...`;
-  if (to) return `... \u2013 ${formatDateShort(to, locale, timeZone)}`;
+    return `${shortDate(from, withYear, locale, timeZone)} \u2013 ${shortDate(to, withYear, locale, timeZone)}`;
+  if (from) return `${shortDate(from, withYear, locale, timeZone)} \u2013 ...`;
+  if (to) return `... \u2013 ${shortDate(to, withYear, locale, timeZone)}`;
   return null;
 }

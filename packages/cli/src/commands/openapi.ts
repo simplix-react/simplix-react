@@ -9,7 +9,7 @@ import { toPascalCase } from "../utils/case.js";
 import { renderTemplate } from "../utils/template.js";
 import { loadConfig } from "../config/config-loader.js";
 import { findSpecBySource } from "../config/types.js";
-import type { SimplixConfig } from "../config/types.js";
+import type { OpenAPIMetaConfig, OpenAPISpecConfig, SimplixConfig } from "../config/types.js";
 import { loadOpenAPISpec, isSpecUrl } from "../openapi/pipeline/parser.js";
 import { resolveRefs } from "../openapi/pipeline/schema-resolver.js";
 import { extractEntities, enrichWithResponseInfo } from "../openapi/pipeline/entity-extractor.js";
@@ -33,9 +33,30 @@ import {
   pruneUnusedModels,
 } from "../openapi/orchestration/orval-runner.js";
 import { resolveSpecConfig } from "../openapi/orchestration/resolve-spec-config.js";
+import type { ResponseAdapterConfig } from "../openapi/adaptation/response-adapter.js";
+import type {
+  LabeledEnumMapping,
+  MetaExtensionOutput,
+} from "../openapi/orchestration/spec-profile.js";
+import { getResponseAdapterPreset } from "../openapi/plugin-registry.js";
 import type { OperationContext } from "../openapi/naming/naming-strategy.js";
 import type { OpenApiNamingStrategy } from "../openapi/naming/naming-strategy.js";
-import type { ExtractedEntity, ExtractedOperation, DomainGroup, OpenAPISnapshot, OpenAPISpec } from "../openapi/types.js";
+import type { DiffResult, ExtractedEntity, ExtractedOperation, DomainGroup, OpenAPISnapshot, OpenAPISpec } from "../openapi/types.js";
+import { fetchMeta } from "../meta/fetch.js";
+import { ENUM_MODULE } from "../meta/generation/emit.js";
+import type { DtoMeta } from "../meta/types.js";
+import { resolveMeta } from "../meta/resolve.js";
+import type { ResolvedDomain, ResolvedMeta } from "../meta/resolve.js";
+import type { EnvelopeMapping } from "../meta/generation/mock-gen.js";
+import type { EntityHooks } from "../meta/generation/hook-gen.js";
+import {
+  META_DIR,
+  metaFingerprint,
+  metaIndexContent,
+  writeMetaOutput,
+  writeMetaSchemasProxy,
+  repointMockSeeds,
+} from "../meta/write.js";
 import { domainIndexTs } from "../templates/domain/index.js";
 
 const SNAPSHOT_FILE = ".openapi-snapshot.json";
@@ -63,6 +84,7 @@ interface OpenAPIFlags {
   force?: boolean;
   http?: boolean;
   yes?: boolean;
+  offline?: boolean;
 }
 
 export const openapiCommand = new Command("openapi")
@@ -81,6 +103,7 @@ export const openapiCommand = new Command("openapi")
   .option("-o, --output <dir>", "Output directory (defaults to packages/)")
   .option("-f, --force", "Force regeneration even if no changes detected")
   .option("--no-http", "Skip .http file generation")
+  .option("--offline", "Read SimpliX Meta from meta.snapshot instead of the server")
   .option("-y, --yes", "Auto-confirm without prompts")
   .action(async (specSource: string, flags: OpenAPIFlags) => {
     const rootDir = await findProjectRoot(process.cwd());
@@ -202,6 +225,34 @@ export const openapiCommand = new Command("openapi")
       }
     }
 
+    /** What the meta half would seed, for merging into a preserved seed module below. */
+
+
+
+    // 7. Prepare the DTO meta pipeline, which runs beside Orval for every domain below
+    let meta: MetaContext | undefined;
+    try {
+      meta = await prepareMetaContext({
+        specConfig,
+        specSource,
+        rootDir,
+        offline: flags.offline === true,
+        naming: resolvedSpecConfig?.naming,
+        responseAdapter: resolvedSpecConfig?.responseAdapter,
+      });
+    } catch (err) {
+      log.error(err instanceof Error ? err.message : String(err));
+      process.exit(1);
+    }
+
+    /** What the meta half would seed, for merging into the preserved seed module below. */
+
+
+
+    if (meta) {
+      reportMetaResolution(meta.resolved);
+    }
+
     // Generate each domain package
     for (const group of domainGroups) {
       await generateDomainPackage({
@@ -219,9 +270,254 @@ export const openapiCommand = new Command("openapi")
           ? specConfig
           : { spec: specSource, domains: { [group.domainName]: group.entities[0]?.tags ?? [] } },
         resolvedSpecConfig,
+        meta,
       });
     }
+
+    // The SimpliX Meta snapshot is written once every domain has been generated. Writing it per domain
+    // makes the first domain's write the second domain's comparison, so a run that regenerates
+    // one package reports every later one as up-to-date.
+    if (meta?.snapshotPath && !flags.offline) {
+      await writeFileWithDir(meta.snapshotPath, JSON.stringify(meta.document, null, 2) + "\n");
+      log.step(`DTO meta snapshot: ${relative(process.cwd(), meta.snapshotPath)}`);
+    }
   });
+
+// ── DTO meta pipeline ────────────────────────────────────────
+
+/** Everything the meta half of a run needs, resolved once for the whole command. */
+export interface MetaContext {
+  /** SimpliX Meta as the server describes it now. */
+  document: DtoMeta;
+  /** That SimpliX Meta sliced into one closure per configured domain. */
+  resolved: ResolvedMeta;
+  /** The committed SimpliX Meta sliced the same way, or absent when there is nothing to compare against. */
+  previous?: ResolvedMeta;
+  /** Where the fetched SimpliX Meta is written once every domain has been generated. */
+  snapshotPath?: string;
+  /** Domains whose barrel exports the meta output instead of the Orval output. */
+  exportDomains: Set<string>;
+  /** The generic a labeled enum's wire shape is spelled with, when the profile states one. */
+  labeledEnum?: LabeledEnumMapping;
+  naming: OpenApiNamingStrategy;
+  envelope?: EnvelopeMapping;
+  extensions?: MetaExtensionOutput;
+}
+
+interface PrepareMetaOptions {
+  specConfig?: OpenAPISpecConfig;
+  specSource: string;
+  rootDir: string;
+  offline: boolean;
+  naming?: OpenApiNamingStrategy;
+  responseAdapter?: ResponseAdapterConfig;
+}
+
+/**
+ * Fetch SimpliX Meta and slice it per domain, or answer `undefined` when the spec declares no
+ * `meta` block and the meta half therefore does not run.
+ *
+ * Throws rather than returning `undefined` on a configuration that asks for the pipeline and
+ * cannot have it: a silently skipped meta pipeline looks exactly like one that ran and found
+ * nothing.
+ */
+export async function prepareMetaContext(
+  options: PrepareMetaOptions,
+): Promise<MetaContext | undefined> {
+  const { specConfig, specSource, rootDir, offline } = options;
+  const metaConfig = specConfig?.meta;
+
+  if (!metaConfig) {
+    if (offline) {
+      throw new Error(
+        `--offline reads SimpliX Meta from a snapshot, and no \`meta\` block is configured ` +
+          `for "${specSource}" in simplix.config.ts. Add \`meta: { snapshot: "..." }\` to it.`,
+      );
+    }
+    return undefined;
+  }
+
+  const snapshotPath = metaConfig.snapshot
+    ? resolve(rootDir, metaConfig.snapshot)
+    : undefined;
+
+  if (offline && !snapshotPath) {
+    throw new Error(
+      `--offline reads SimpliX Meta from \`meta.snapshot\`, which is unset for ` +
+        `"${specSource}". Set it in simplix.config.ts, or drop --offline to read the server.`,
+    );
+  }
+
+  const profile = specConfig.profile ? getSpecProfile(specConfig.profile) : undefined;
+  // A source that is not a URL is a document on disk, and the path in the configuration is
+  // written relative to the project root exactly as `spec` and `snapshot` are.
+  const stated = resolveMetaSource(metaConfig, specSource, profile?.metaEndpoint);
+  const source = isSpecUrl(stated) ? stated : resolve(rootDir, stated);
+
+  const naming = options.naming;
+  if (!naming) {
+    throw new Error(
+      `The DTO meta pipeline names every request function, hook and CRUD role through a naming ` +
+        `strategy, and "${specSource}" resolves none. Set \`profile\` or \`naming\` on the spec.`,
+    );
+  }
+
+  // The committed SimpliX Meta is read before the fresh one so the change gate compares the two, and it is
+  // read once for the whole run rather than per domain.
+  const previousDocument = snapshotPath ? await readSnapshotDocument(snapshotPath) : undefined;
+
+  const document = await fetchMeta(
+    offline && snapshotPath ? { source, snapshot: snapshotPath, offline: true } : { source },
+  );
+
+  const containerTypes = profile?.containerTypes ?? {};
+  const domains = specConfig.domains;
+
+  return {
+    document,
+    resolved: resolveMeta(document, { domains, containerTypes }),
+    previous: previousDocument
+      ? resolveMeta(previousDocument, { domains, containerTypes })
+      : undefined,
+    snapshotPath,
+    exportDomains: new Set(metaConfig.export ?? []),
+    naming,
+    envelope: resolveEnvelope(options.responseAdapter),
+    labeledEnum: profile?.labeledEnum,
+    extensions: profile?.metaExtensions?.(document),
+  };
+}
+
+/**
+ * Where SimpliX Meta is read from: what the configuration states, else the origin of an HTTP spec with
+ * the profile's endpoint path on it.
+ */
+export function resolveMetaSource(
+  metaConfig: OpenAPIMetaConfig,
+  specSource: string,
+  metaEndpoint: string | undefined,
+): string {
+  if (metaConfig.source) return metaConfig.source;
+  if (isSpecUrl(specSource) && metaEndpoint) {
+    return new URL(metaEndpoint, specSource).href;
+  }
+  throw new Error(
+    `SimpliX Meta has no source: \`meta.source\` is unset for "${specSource}", and it cannot ` +
+      `be derived — deriving it needs a spec served over HTTP and a profile carrying ` +
+      `\`metaEndpoint\`` +
+      (metaEndpoint ? "" : ", which this spec's profile does not") +
+      `. Set \`meta.source\` in simplix.config.ts.`,
+  );
+}
+
+/** A snapshot that cannot be read is no comparison rather than a failure — the run regenerates. */
+async function readSnapshotDocument(snapshotPath: string): Promise<DtoMeta | undefined> {
+  if (!(await pathExists(snapshotPath))) return undefined;
+  const document = await readJsonFile<DtoMeta>(snapshotPath).catch(() => null);
+  if (!document || typeof document.version !== "number") {
+    log.warn(
+      `Ignoring the DTO meta snapshot at ${relative(process.cwd(), snapshotPath)}: it carries no SimpliX Meta.`,
+    );
+    return undefined;
+  }
+  return document;
+}
+
+/**
+ * What wraps a mock response body, taken from the response adapter preset the profile registers.
+ * The preset carries a whole import statement, and the generator needs the module it names.
+ */
+function resolveEnvelope(adapter: ResponseAdapterConfig | undefined): EnvelopeMapping | undefined {
+  if (typeof adapter !== "string") return undefined;
+  const preset = getResponseAdapterPreset(adapter);
+  const wrap = preset?.mockResponseWrapper;
+  const statement = preset?.mockResponseWrapperImport;
+  if (!wrap || !statement) return undefined;
+
+  const from = statement.match(/from\s+["']([^"']+)["']/);
+  if (!from) {
+    log.warn(
+      `The "${adapter}" response adapter names the mock wrapper ${wrap} but its import ` +
+        `statement names no module; meta mock handlers answer with the bare body.`,
+    );
+    return undefined;
+  }
+  return { wrap, import: from[1] };
+}
+
+/** What SimpliX Meta and the domain configuration disagree about, said once for the whole run. */
+function reportMetaResolution(resolved: ResolvedMeta): void {
+  if (resolved.unmatched.length > 0) {
+    const operations = resolved.unmatched.reduce((sum, one) => sum + one.operations.length, 0);
+    log.warn(
+      `DTO meta: ${operations} operation(s) under ${resolved.unmatched.length} tag(s) match no ` +
+        `configured domain (${resolved.unmatched.map((one) => one.tag).join(", ")}).`,
+    );
+  }
+  for (const dead of resolved.deadPatterns) {
+    log.warn(`DTO meta: domain "${dead.domain}" pattern "${dead.pattern}" matches no tag.`);
+  }
+  for (const contested of resolved.contestedTags) {
+    log.warn(
+      `DTO meta: tag "${contested.tag}" is claimed by ${contested.domains.join(", ")}; ` +
+        `"${contested.domains[0]}" takes it.`,
+    );
+  }
+  if (resolved.missingTypes.length > 0) {
+    log.warn(`DTO meta: undeclared types referenced — ${resolved.missingTypes.join(", ")}.`);
+  }
+  if (resolved.missingEnums.length > 0) {
+    log.warn(`DTO meta: undeclared enums referenced — ${resolved.missingEnums.join(", ")}.`);
+  }
+  if (resolved.unmappedContainers.length > 0) {
+    log.warn(
+      `DTO meta: the profile maps no TypeScript type for ${resolved.unmappedContainers.join(", ")}.`,
+    );
+  }
+  for (const used of resolved.frameworkTypes) {
+    log.warn(`DTO meta: ${used.domain} reaches the platform type ${used.javaClass}.`);
+  }
+}
+
+// ── Change gate ──────────────────────────────────────────────
+
+export interface ChangeGateInput {
+  /** The committed OpenAPI snapshot, or `null` when it could not be read. */
+  previous: OpenAPISnapshot | null;
+  entities: ExtractedEntity[];
+  /** Whether the meta pipeline runs for this spec at all. */
+  metaEnabled: boolean;
+  /** The domain's closure as SimpliX Meta describes it now. */
+  meta?: ResolvedDomain;
+  /** The same closure as the committed SimpliX Meta snapshot described it. */
+  previousMeta?: ResolvedDomain;
+}
+
+export interface ChangeGate {
+  /** Whether anything has to be regenerated. */
+  changed: boolean;
+  diff: DiffResult | null;
+  metaChanged: boolean;
+}
+
+/**
+ * Whether a domain package is stale, judged from both halves.
+ *
+ * The OpenAPI diff cannot answer for the meta half: a `@Length` bound added, a `@SearchableField`
+ * operator changed, a `@PreAuthorize` rewritten and an enum gaining its labels all leave the
+ * OpenAPI document byte-identical, and SimpliX Meta exists precisely because the document loses them.
+ * With no committed SimpliX Meta to compare against there is nothing to judge, so the domain regenerates —
+ * a needless regeneration is cheap and a skipped one is silent.
+ */
+export function computeChangeGate(input: ChangeGateInput): ChangeGate {
+  const diff = input.previous ? computeDiff(input.previous, input.entities) : null;
+  const metaChanged =
+    input.metaEnabled &&
+    (input.previousMeta === undefined ||
+      metaFingerprint(input.previousMeta) !== metaFingerprint(input.meta));
+
+  return { changed: (diff?.hasChanges ?? true) || metaChanged, diff, metaChanged };
+}
 
 // ── Core generation ──────────────────────────────────────────
 
@@ -236,8 +532,11 @@ interface DomainPackageOpts {
   outputBase: string;
   prefix: string;
   scope: string;
-  specConfig: { spec: string; domains: Record<string, string[]> };
+  /** `spec` is absent on a migrated project, which reaches `simplix meta` rather than here. */
+  specConfig: { spec?: string; domains: Record<string, string[]> };
   resolvedSpecConfig?: ReturnType<typeof resolveSpecConfig>;
+  /** The DTO meta pipeline, or absent when the spec declares no `meta` block. */
+  meta?: MetaContext;
 }
 
 async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
@@ -267,7 +566,9 @@ async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
     process.exit(1);
   }
 
-  // 2. Diff check (snapshot comparison)
+  // 2. Diff check (snapshot comparison, over both halves)
+  const metaDomain = opts.meta?.resolved.domains.get(domainName);
+  const previousMetaDomain = opts.meta?.previous?.domains.get(domainName);
   const snapshotPath = join(targetDir, SNAPSHOT_FILE);
   const hasSnapshot = await pathExists(snapshotPath);
 
@@ -275,16 +576,28 @@ async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
     const previous = await readJsonFile<OpenAPISnapshot>(snapshotPath).catch(() => null);
 
     if (previous) {
-      const diff = computeDiff(previous, entities);
+      const gate = computeChangeGate({
+        previous,
+        entities,
+        metaEnabled: opts.meta !== undefined,
+        meta: metaDomain,
+        previousMeta: previousMetaDomain,
+      });
 
-      if (!diff.hasChanges) {
+      if (!gate.changed) {
         log.success(`${domainPkgName}: No changes detected. Package is up-to-date.`);
         return;
       }
 
-      console.log("");
-      console.log(formatDiff(diff));
-      console.log("");
+      if (gate.diff) {
+        console.log("");
+        console.log(formatDiff(gate.diff));
+        console.log("");
+      }
+
+      if (gate.metaChanged) {
+        log.step("DTO metadata changed since the committed snapshot.");
+      }
 
       if (!flags.yes) {
         const { proceed } = await prompts({
@@ -332,7 +645,10 @@ async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
     // 6. Ensure crud.config.ts exists (after hook name resolution for correct names)
     const crudConfigPath = join(targetDir, "crud.config.ts");
     if (flags.force || !(await pathExists(crudConfigPath))) {
-      await writeFileWithDir(crudConfigPath, generateCrudConfigContent(entities));
+      await writeFileWithDir(
+        crudConfigPath,
+        generateCrudConfigContent(crudRolesFromEntities(entities)),
+      );
     }
 
     // 7. Run Orval (with optional NamingStrategy override)
@@ -346,6 +662,13 @@ async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
     }
 
     // Compute spec relative path for programmatic Orval config
+    if (specConfig.spec === undefined) {
+      throw new Error(
+        "`simplix openapi` reads an OpenAPI document and this configuration states none. A " +
+          "project generating from SimpliX Meta alone runs `simplix meta`; one that still needs " +
+          "the Orval half states `spec` on its `openapi` entry.",
+      );
+    }
     const specRelativePath = isSpecUrl(specConfig.spec)
       ? specConfig.spec
       : relative(targetDir, resolve(rootDir, specConfig.spec));
@@ -372,26 +695,96 @@ async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
       log.info(`Pruned ${pruned} unused model files.`);
     }
 
-    // 9. Build hook import map and generate hooks (with optional responseAdapter)
-    const importMap = await buildHookImportMap(targetDir);
-    await generateHookFiles(targetDir, entities, importMap, responseAdapter);
+    // Whether this domain's barrel exports the meta output. The two halves are generated side by
+    // side, but only one of them is consumed: a swapped domain takes its hooks and its mock from
+    // `generated-meta/`, so writing the Orval stub layer beside them would leave modules importing
+    // `src/generated/` — which is what the last step of a migration deletes.
+    const metaExported =
+      opts.meta !== undefined && metaDomain !== undefined && opts.meta.exportDomains.has(domainName);
 
-    // 10. Generate mock files (with optional responseAdapter for envelope wrapping)
-    await generateMockFiles(targetDir, domainName, entities, responseAdapter);
+    // 9. Build hook import map and generate hooks (with optional responseAdapter)
+    if (!metaExported) {
+      const importMap = await buildHookImportMap(targetDir);
+      await generateHookFiles(targetDir, entities, importMap, responseAdapter);
+
+      // 10. Generate mock files (with optional responseAdapter for envelope wrapping)
+      await generateMockFiles(targetDir, domainName, entities, responseAdapter);
+    }
+
+    /** What the meta half would seed, for merging into the preserved seed module below. */
+    let metaSeeds = "";
+    let metaLabeledSeedFields: ReadonlyMap<string, string[]> = new Map();
+
+    // 10b. Generate the DTO meta output beside the Orval one
+    if (opts.meta && metaDomain) {
+      spinner.text = `Generating DTO meta code for: ${domainPkgName}`;
+      const written = await writeMetaOutput({
+        targetDir,
+        domain: metaDomain,
+        naming: opts.meta.naming,
+        envelope: opts.meta.envelope,
+        labeledEnum: opts.meta.labeledEnum,
+        extensions: opts.meta.extensions,
+      });
+
+      // A domain that never had an Orval run has no crud.config.ts, and `scaffold-crud` resolves
+      // no hook name at all without one: it substitutes every CRUD role as present, so a screen
+      // is scaffolded with a delete action for an entity that has no delete endpoint.
+      if (!(await pathExists(crudConfigPath))) {
+        await writeFileWithDir(
+          crudConfigPath,
+          generateCrudConfigContent(crudRolesFromHooks(written.entities)),
+        );
+      }
+
+      for (const warning of written.warnings) log.warn(`DTO meta: ${warning}`);
+      log.info(`${domainPkgName}: wrote ${written.written.length} file(s) to ${META_DIR}/.`);
+      metaSeeds = written.seeds;
+      metaLabeledSeedFields = written.labeledSeedFields;
+    }
 
     // 11. Generate or update schemas proxy (preserve custom overrides)
-    await generateSchemasProxy(targetDir);
+    if (metaExported) {
+      await writeMetaSchemasProxy(targetDir);
+      // The seed module is written once and never overwritten, so a swapped domain keeps the
+      // arrays the OpenAPI half generated while the entry beside it wires the meta stores.
+      const seeds = await repointMockSeeds(targetDir, metaSeeds, metaLabeledSeedFields);
+      for (const name of seeds.added) {
+        log.info(`DTO meta: seeded ${name} in src/mock/seeds.ts, which the entry now wires.`);
+      }
+      if (seeds.wrapped.length > 0) {
+        log.info(
+          `DTO meta: ${seeds.wrapped.length} seed field(s) now carry the { value, label } shape a ` +
+            "labeled enum reaches a response as; the values written there are kept.",
+        );
+      }
+      for (const one of seeds.retyped) {
+        log.warn(
+          `DTO meta: ${one.name} is typed ${one.to} rather than ${one.from} — the rows under it ` +
+            "were written against the other shape.",
+        );
+      }
+    } else {
+      await generateSchemasProxy(targetDir);
+    }
 
     // 12. Regenerate index.ts (preserve custom exports)
     const hasTranslations = await pathExists(join(targetDir, "src/translations.ts"));
-    const newIndexContent = renderTemplate(domainIndexTs, {
-      enableI18n: hasTranslations,
-      enableOrval: true,
-      PascalName: toPascalCase(domainName),
-    });
+    const newIndexContent = metaExported
+      ? metaIndexContent(hasTranslations)
+      : renderTemplate(domainIndexTs, {
+          enableI18n: hasTranslations,
+          enableCodegen: true,
+          PascalName: toPascalCase(domainName),
+        });
     const indexPath = join(targetDir, "src/index.ts");
     const existingIndex = (await pathExists(indexPath)) ? await readFile(indexPath, "utf-8") : "";
-    const mergedIndex = mergeIndexWithCustomExports(newIndexContent, existingIndex);
+    const mergedIndex = mergeIndexWithCustomExports(
+      newIndexContent,
+      // The two lines the Orval barrel is made of are not custom exports to be preserved — kept,
+      // they would leave the swapped package exporting both halves.
+      metaExported ? withoutOrvalExports(existingIndex) : existingIndex,
+    );
     await writeFileWithDir(indexPath, mergedIndex);
 
     // 12b. Ensure profile dependencies are in package.json
@@ -452,7 +845,7 @@ async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
     await saveSnapshot(targetDir, specSource, entities);
 
     spinner.succeed(`Generated code for: ${domainPkgName}`);
-    printSummary(dirName, domainPkgName, entities);
+    printSummary(dirName, domainPkgName, entities, metaDomain !== undefined, metaExported);
   } catch (err) {
     spinner.fail("Failed to generate domain code");
     log.error(String(err));
@@ -462,9 +855,18 @@ async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
 
 // ── Helpers ──────────────────────────────────────────────────
 
-async function cleanGeneratedDirs(targetDir: string): Promise<void> {
+/**
+ * Empty every directory a generator owns.
+ *
+ * The meta output is emptied here for the reason the Orval output is: it is wholly generated and
+ * holds no hand-edited region, so a DTO that leaves the backend has to leave the package with it.
+ * A stale `generated-meta/model/oldThing.ts` still exports a type the barrel still re-exports,
+ * which compiles and reports nothing.
+ */
+export async function cleanGeneratedDirs(targetDir: string): Promise<void> {
   await rm(join(targetDir, "src/generated"), { recursive: true, force: true });
   await rm(join(targetDir, "src/hooks"), { recursive: true, force: true });
+  await rm(join(targetDir, META_DIR), { recursive: true, force: true });
 }
 
 async function saveSnapshot(
@@ -487,11 +889,20 @@ function printSummary(
   dirName: string,
   domainPkgName: string,
   entities: ExtractedEntity[],
+  hasMeta: boolean,
+  exported: boolean,
 ): void {
   log.info("");
   log.step(`Location: packages/${dirName}/`);
   log.step(`Entities: ${entities.map((e) => e.name).join(", ")}`);
-  log.step("Generated: src/generated/, src/hooks/, src/mock/");
+  // Only what this run actually wrote: a swapped domain takes its hooks and its mock from the
+  // meta output, so naming the Orval layer would point the reader at directories that are not
+  // there.
+  log.step(
+    exported
+      ? `Generated: src/generated/, ${META_DIR}/`
+      : "Generated: src/generated/, src/hooks/, src/mock/" + (hasMeta ? `, ${META_DIR}/` : ""),
+  );
   log.info("");
 }
 
@@ -594,7 +1005,7 @@ function mergeLocaleJson(
   return result;
 }
 
-async function generateLocaleFiles(
+export async function generateLocaleFiles(
   targetDir: string,
   entities: ExtractedEntity[],
   locales: string[],
@@ -684,8 +1095,39 @@ function inferCrudRole(
   return null;
 }
 
-function generateCrudConfigContent(
-  entities: ExtractedEntity[],
+/** One entity's CRUD roles, whichever pipeline resolved them: role → hook name. */
+export interface CrudEntityRoles {
+  name: string;
+  roles: Map<string, string>;
+}
+
+/** The roles the OpenAPI pipeline infers, from the naming strategy or from method and path. */
+function crudRolesFromEntities(entities: ExtractedEntity[]): CrudEntityRoles[] {
+  return entities.map((entity) => {
+    const roles = new Map<string, string>();
+    for (const op of entity.operations) {
+      const hookId = resolveHookId(op);
+      const role = op.role ?? inferCrudRole(op.method, op.path, entity.path);
+      if (role && !roles.has(role)) roles.set(role, hookId);
+    }
+    return { name: entity.name, roles };
+  });
+}
+
+/**
+ * The roles the meta pipeline resolved, which are the ones its endpoint and hook generators
+ * emitted: every SimpliX Meta operation carries an id, so the naming strategy answers all of them and
+ * nothing falls through to path inference.
+ */
+export function crudRolesFromHooks(entities: EntityHooks[]): CrudEntityRoles[] {
+  return entities.map((entity) => ({
+    name: entity.entity.charAt(0).toUpperCase() + entity.entity.slice(1),
+    roles: new Map(Object.entries(entity.roles)),
+  }));
+}
+
+export function generateCrudConfigContent(
+  entities: CrudEntityRoles[],
 ): string {
   const STANDARD_ROLES = ["list", "getAll", "get", "create", "update", "delete", "getForEdit", "tree", "subtree", "multiUpdate", "batchUpdate", "batchDelete", "search"] as const;
 
@@ -720,16 +1162,7 @@ function generateCrudConfigContent(
   ];
 
   for (const entity of entities) {
-    const inferredRoles = new Map<string, string>();
-
-    for (const op of entity.operations) {
-      const hookId = resolveHookId(op);
-      const role = op.role ?? inferCrudRole(op.method, op.path, entity.path);
-
-      if (role && !inferredRoles.has(role)) {
-        inferredRoles.set(role, hookId);
-      }
-    }
+    const inferredRoles = entity.roles;
 
     lines.push(`  ${entity.name}: {`);
 
@@ -767,7 +1200,7 @@ function generateCrudConfigContent(
  * 1. If spec source is an HTTP URL → use its origin
  * 2. Otherwise → use spec.servers[0].url from parsed spec
  */
-function resolveServerOrigin(
+export function resolveServerOrigin(
   specSource: string,
   spec: OpenAPISpec,
 ): string | undefined {
@@ -787,7 +1220,7 @@ function resolveServerOrigin(
   return undefined;
 }
 
-async function overlayServerTranslations(
+export async function overlayServerTranslations(
   targetDir: string,
   entities: ExtractedEntity[],
   locales: string[],
@@ -831,21 +1264,73 @@ async function overlayServerTranslations(
 }
 
 /**
- * Scan generated model directory and return PascalCase type names.
- * Used to filter server enum translations to only domain-relevant ones.
+ * The type names a domain package declares, used to filter the server's enum translations down to
+ * the ones this domain has a declaration for.
+ *
+ * Both layouts are read, because a domain carries both while it is being migrated. The Orval half
+ * writes one file per declaration, so its names come from filenames; the meta half writes every
+ * enum into `model/_enums.ts`, so a filename walk over it finds one name and drops the rest — and
+ * an empty filter is not an error but the absence of one. Nothing is filtered then, all of the
+ * server's enums land in the domain's locale file, and the locale files are merged and never
+ * pruned, so the growth is permanent.
+ *
+ * `undefined` means neither layout is present, which is the only case where filtering has no
+ * ground to stand on.
  */
-async function resolveKnownModelTypes(targetDir: string): Promise<Set<string> | undefined> {
-  const modelDir = join(targetDir, "src/generated/model");
-  if (!await pathExists(modelDir)) return undefined;
+export async function resolveKnownModelTypes(targetDir: string): Promise<Set<string> | undefined> {
+  const orvalDir = join(targetDir, "src/generated/model");
+  const metaDir = join(targetDir, META_DIR, "model");
+  const hasOrval = await pathExists(orvalDir);
+  const hasMeta = await pathExists(metaDir);
+  if (!hasOrval && !hasMeta) return undefined;
 
-  const files = await readdir(modelDir);
   const types = new Set<string>();
+  if (hasOrval) {
+    for (const name of await typeNamesFromFilenames(orvalDir)) types.add(name);
+  }
+  if (hasMeta) {
+    for (const name of await typeNamesFromFilenames(metaDir)) types.add(name);
+    for (const name of await declaredNames(join(metaDir, `${ENUM_MODULE}.ts`))) types.add(name);
+  }
+  return types;
+}
+
+/** One declaration per file, named by the file: `siteStatus.ts` declares `SiteStatus`. */
+async function typeNamesFromFilenames(modelDir: string): Promise<string[]> {
+  const files = await readdir(modelDir);
+  const names: string[] = [];
   for (const file of files) {
     if (!file.endsWith(".ts") || file === "index.ts") continue;
     const base = file.slice(0, -3);
-    types.add(base.charAt(0).toUpperCase() + base.slice(1));
+    if (base.startsWith("_")) continue;
+    names.push(base.charAt(0).toUpperCase() + base.slice(1));
   }
-  return types;
+  return names;
+}
+
+/** Every name a module declares at its top level, read from its export statements. */
+async function declaredNames(modulePath: string): Promise<string[]> {
+  if (!(await pathExists(modulePath))) return [];
+  const content = await readFile(modulePath, "utf-8");
+  const names: string[] = [];
+  for (const match of content.matchAll(
+    /^export\s+(?:declare\s+)?(?:type|const|interface|enum|class|function)\s+([A-Za-z_$][\w$]*)/gm,
+  )) {
+    names.push(match[1]);
+  }
+  return names;
+}
+
+/**
+ * An `src/index.ts` without the two lines the Orval barrel is made of, so a swap to the meta
+ * output does not preserve them as custom exports.
+ */
+function withoutOrvalExports(content: string): string {
+  const orval = new Set(['export * from "./hooks";', 'export * from "./generated/model";']);
+  return content
+    .split("\n")
+    .filter((line) => !orval.has(line.trim()))
+    .join("\n");
 }
 
 function deepMerge(

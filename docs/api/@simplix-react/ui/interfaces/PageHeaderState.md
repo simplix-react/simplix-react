@@ -14,7 +14,23 @@ Defined in: [packages/ui/src/layout/page-header.tsx:11](https://github.com/simpl
 
 > `optional` **actions**: `ReactNode`
 
-Defined in: [packages/ui/src/layout/page-header.tsx:18](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L18)
+Defined in: [packages/ui/src/layout/page-header.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L28)
+
+***
+
+### back?
+
+> `optional` **back**: `ReactNode`
+
+Defined in: [packages/ui/src/layout/page-header.tsx:22](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L22)
+
+The way back to the screen this one was opened from, above the title.
+
+<p>For a screen that has no entry of its own in the menu — a policy reached from the
+explanation on another screen, a step opened from a list — where without it the only way back
+is the browser's. It reads as a breadcrumb rather than as a verb: small, quiet, and on its own
+line above the title, so it is not mistaken for something this screen does. A screen the menu
+can reach directly does not need one.
 
 ***
 
@@ -22,7 +38,7 @@ Defined in: [packages/ui/src/layout/page-header.tsx:18](https://github.com/simpl
 
 > `optional` **center**: `ReactNode`
 
-Defined in: [packages/ui/src/layout/page-header.tsx:17](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L17)
+Defined in: [packages/ui/src/layout/page-header.tsx:27](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L27)
 
 ***
 
@@ -30,7 +46,7 @@ Defined in: [packages/ui/src/layout/page-header.tsx:17](https://github.com/simpl
 
 > `optional` **description**: `ReactNode`
 
-Defined in: [packages/ui/src/layout/page-header.tsx:13](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L13)
+Defined in: [packages/ui/src/layout/page-header.tsx:23](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L23)
 
 ***
 
@@ -38,7 +54,7 @@ Defined in: [packages/ui/src/layout/page-header.tsx:13](https://github.com/simpl
 
 > `optional` **metadata**: `ReactNode`
 
-Defined in: [packages/ui/src/layout/page-header.tsx:14](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L14)
+Defined in: [packages/ui/src/layout/page-header.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L24)
 
 ***
 
@@ -46,7 +62,7 @@ Defined in: [packages/ui/src/layout/page-header.tsx:14](https://github.com/simpl
 
 > `optional` **metadataKey**: `string`
 
-Defined in: [packages/ui/src/layout/page-header.tsx:16](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L16)
+Defined in: [packages/ui/src/layout/page-header.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/layout/page-header.tsx#L26)
 
 Stable primitive key to trigger header updates when metadata changes
 

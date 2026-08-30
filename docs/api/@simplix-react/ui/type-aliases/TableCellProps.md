@@ -8,4 +8,4 @@
 
 > **TableCellProps** = `ComponentPropsWithRef`\<`"td"`\>
 
-Defined in: [packages/ui/src/base/display/table.tsx:342](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/table.tsx#L342)
+Defined in: [packages/ui/src/base/display/table.tsx:354](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/display/table.tsx#L354)

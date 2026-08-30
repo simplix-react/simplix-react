@@ -484,9 +484,14 @@ export function FilterBar({ filters, state, leading, trailing, maxBadges, onPrev
           )}
         </Flex>
       )}
-      <Flex gap="xs" align="center" wrap>
+      {/* `ml-auto` rather than the row's `justify`: `justify-between` only reaches the first line,
+          so once the row wraps this group lands at the START of the second one — the search button
+          slides under the count instead of staying at the end of the toolbar. An auto margin moves
+          it to the far edge of whichever line it is on. */}
+      <Flex gap="xs" align="center" wrap className="ml-auto">
       {visibleDefs.map((def) => {
         const BadgeIcon = getBadgeIcon(def);
+        const badgeText = getBadgeText(def);
         return (
           <Badge
             key={def.field}
@@ -495,7 +500,12 @@ export function FilterBar({ filters, state, leading, trailing, maxBadges, onPrev
           >
             <span className="shrink-0 text-muted-foreground">{def.label}:</span>
             {BadgeIcon && <BadgeIcon className="h-3 w-3 shrink-0 text-muted-foreground" />}
-            <span className="truncate">{getBadgeText(def)}</span>
+            {/* The chip is capped at 12rem, so a long value is clipped. `title` is what
+                the clipped tail is read from — without it a truncated range names a
+                period nothing on the screen can spell out. */}
+            <span className="truncate" title={badgeText}>
+              {badgeText}
+            </span>
             <button
               type="button"
               onClick={() => removeFilter(def)}

@@ -190,7 +190,11 @@ export interface CrudFormActionsProps {
 
 function FormActions({ spread, className, children }: CrudFormActionsProps) {
   return (
-    <Flex gap="sm" justify={spread ? "between" : "end"} className={cn("border-t pt-2", className)}>
+    <Flex
+      gap="sm"
+      justify={spread ? "start" : "end"}
+      className={cn("border-t pt-2", spread && "[&>*:first-child]:mr-auto", className)}
+    >
       {children}
     </Flex>
   );

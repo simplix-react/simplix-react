@@ -8,7 +8,7 @@
 
 > **I18nDownloader** = (`serverOrigin`, `entities`, `locales`) => `Promise`\<`Map`\<`string`, `Record`\<`string`, `unknown`\>\> \| `undefined`\>
 
-Defined in: [openapi/orchestration/spec-profile.ts:16](https://github.com/simplix-react/simplix-react/blob/main/openapi/orchestration/spec-profile.ts#L16)
+Defined in: [openapi/orchestration/spec-profile.ts:54](https://github.com/simplix-react/simplix-react/blob/main/openapi/orchestration/spec-profile.ts#L54)
 
 Callback that downloads and transforms i18n data from a server.
 Returns a Map of locale → domain-scoped JSON data to overlay.

@@ -68,7 +68,11 @@ export const addDomainCommand = new Command("add-domain")
     const specConfig = findSpecForDomain(config.openapi, name);
     const openapiSpec = specConfig?.spec;
     const domainTags = specConfig?.domains[name];
-    let useOrval = !!(openapiSpec && domainTags);
+    // A configuration with a `meta` block generates from SimpliX Meta. Scaffolding the Orval
+    // skeleton beside it would add a dependency the project has dropped and a codegen script that
+    // reads a document it no longer states.
+    const useMeta = !!(specConfig?.meta && domainTags);
+    let useOrval = !useMeta && !!(openapiSpec && domainTags);
 
     if (useOrval && !isSpecUrl(openapiSpec!)) {
       const absSpecPath = resolve(rootDir, openapiSpec!);
@@ -83,15 +87,17 @@ export const addDomainCommand = new Command("add-domain")
     // If package already exists, reject — updates go through `simplix openapi`
     if (await pathExists(targetDir)) {
       log.error(`Domain package "${dirName}" already exists.`);
-      if (useOrval) {
+      if (useMeta) {
+        log.step(`To regenerate code: simplix meta -d ${name}`);
+      } else if (useOrval) {
         log.step(`To regenerate code: simplix openapi ${openapiSpec}`);
       }
       process.exit(1);
     }
 
-    // Prompt for entities only in non-OpenAPI mode
+    // Prompt for entities only where nothing generates them
     let entities: Array<{ entityName: string; EntityPascal: string }> = [];
-    if (!useOrval) {
+    if (!useOrval && !useMeta) {
       let entitiesInput: string;
       if (flags.yes) {
         entitiesInput = name;
@@ -141,7 +147,11 @@ export const addDomainCommand = new Command("add-domain")
         projectName: baseName,
         scope,
         enableI18n,
-        enableOrval: useOrval,
+        // A generator owns this package's surface, whichever one it is; `generatedModule`
+        // below says where that surface lives. `simplix meta` rewrites the barrel on its first
+        // run, but a package that builds before then should already resolve.
+        enableCodegen: useOrval || useMeta,
+        ...(useMeta ? { generatedModule: "./generated-meta" } : {}),
         locales,
         apiBasePath: `${apiBaseUrl}/${name}`,
         entities,
@@ -156,7 +166,26 @@ export const addDomainCommand = new Command("add-domain")
         "src/index.ts": renderTemplate(domainIndexTs, ctx),
       };
 
-      if (useOrval) {
+      if (useMeta) {
+        // SimpliX Meta: the same mutator the generated request functions call, and a codegen
+        // script that reads no document. Nothing here names Orval.
+        files["src/mutator.ts"] = generateDomainMutatorContent(name);
+
+        const pkgJson = JSON.parse(files["package.json"]);
+        if (!pkgJson.dependencies) pkgJson.dependencies = {};
+        pkgJson.dependencies["@simplix-react/api"] = "catalog:";
+        pkgJson.devDependencies["@faker-js/faker"] = "^9.0.0";
+        pkgJson.scripts["codegen"] = `simplix meta -d ${name}`;
+
+        if (specConfig?.profile) {
+          const profile = getSpecProfile(specConfig.profile);
+          if (profile?.dependencies) {
+            Object.assign(pkgJson.dependencies, profile.dependencies);
+          }
+        }
+
+        files["package.json"] = JSON.stringify(pkgJson, null, 2) + "\n";
+      } else if (useOrval) {
         // OpenAPI mode: skeleton with mutator + orval config
         files["src/mutator.ts"] = generateDomainMutatorContent(name);
 
@@ -222,7 +251,7 @@ export const addDomainCommand = new Command("add-domain")
       spinner.succeed(`Domain package created: ${domainPkgName}`);
       log.info("");
       log.step(`Location: packages/${dirName}/`);
-      if (!useOrval) {
+      if (!useOrval && !useMeta) {
         log.step(
           `Entities: ${entities.map((e) => e.entityName).join(", ")}`,
         );
@@ -233,8 +262,12 @@ export const addDomainCommand = new Command("add-domain")
       log.info("");
       log.info("Next steps:");
       log.step("pnpm install");
-      if (useOrval) {
-        log.step(`simplix openapi ${openapiSpec}    ← Orval code generation`);
+      if (useMeta || useOrval) {
+        log.step(
+          useMeta
+            ? `simplix meta -d ${name}    ← SimpliX Meta code generation`
+            : `simplix openapi ${openapiSpec}    ← Orval code generation`,
+        );
       } else {
         log.step("pnpm build");
         log.step(

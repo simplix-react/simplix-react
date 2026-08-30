@@ -26,7 +26,9 @@ import { Flex, Stack } from "../../primitives";
 import { cn } from "../../utils/cn";
 import type { ColumnInfo, EmptyReason, SortState } from "../shared";
 import { ListTotalBadge } from "../shared/list-total-badge";
+import { useDefaultDisplayZone } from "../shared/display-zone-context";
 import { TableCardFrame, useTableCardFrame } from "../shared/table-card-frame";
+import { renderCellContent } from "../shared/cell-content";
 import type { ListColumnProps } from "../list/crud-list";
 import { getActionColumnWidth, RowActionCell, type ActionVariant, type RowActionDef } from "../shared/row-actions";
 import { ChevronsDownUpIcon, ChevronsUpDownIcon, MagnifyingGlassIcon, XIcon } from "../shared/icons";
@@ -155,10 +157,19 @@ export interface TreeToolbarProps {
    * row wearing two shapes, and nothing about the screen says why.
    */
   count?: ReactNode;
+  /**
+   * What narrows the rows, drawn immediately after the count it changes.
+   *
+   * <p>Separate from `children`, which is the control group at the far end — the search box, the
+   * expand toggles. A chip filter belongs beside the figure rather than beside those: it is the
+   * other half of what the number is counting, and the row breaks between the two groups, so a
+   * chip left among the controls goes below the count the moment the tree is narrowed.
+   */
+  leading?: ReactNode;
   children?: ReactNode;
 }
 
-function TreeToolbar({ className, count, children }: TreeToolbarProps) {
+function TreeToolbar({ className, count, leading, children }: TreeToolbarProps) {
   // The count is the figure the row is about; everything after it is a control on that figure.
   // Given `count` every child is a control, so the split is skipped rather than eating the first.
   const given = count !== undefined;
@@ -173,6 +184,7 @@ function TreeToolbar({ className, count, children }: TreeToolbarProps) {
       {given
         ? <ListTotalBadge>{typeof count === "number" ? undefined : count}</ListTotalBadge>
         : lead}
+      {leading}
       {/*
         The controls are one element rather than several, so the row can only break in one place:
         between the count and the whole group. Left flat, each control wrapped on its own and the
@@ -274,6 +286,11 @@ function TreeExpandToggle({ className }: { className?: string }) {
 
 // ── TreeColumn (declaration only) ──
 
+/**
+ * A tree column, declared with the same props a list column takes and rendered through the same
+ * cell function — so `display` and `format` mean here exactly what they mean in `CrudList.Column`,
+ * and a temporal column shows a formatted date rather than the instant the API sent.
+ */
 function TreeColumn<T>(_props: ListColumnProps<T>): ReactNode {
   return null;
 }
@@ -346,8 +363,11 @@ function TreeTable<T>({
   className,
   children,
 }: TreeTableProps<T>) {
-  useTranslation("simplix/ui");
-  const { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Skeleton } = useFlatUIComponents();
+  const { locale } = useTranslation("simplix/ui");
+  const { Badge, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Skeleton } = useFlatUIComponents();
+  // Ambient default for datetime cells whose column declares no displayZone — a tree cell reads
+  // the same zone a list cell does.
+  const defaultDisplayZone = useDefaultDisplayZone();
   // The console's own answer, the same one CrudList reads — a tree row's actions are the same
   // affordance as a list row's and must not read differently for being drawn by another table.
   const uiDefaults = useUIDefaults();
@@ -487,9 +507,11 @@ function TreeTable<T>({
           const value = getValue();
           const meta = row.original;
 
-          const cellContent = colDef.children
-            ? colDef.children({ value, row: row.original })
-            : String(value ?? "");
+          const cellContent = renderCellContent(colDef, value, row.original, {
+            Badge,
+            locale,
+            defaultDisplayZone,
+          });
 
           if (isFirstCol) {
             return (

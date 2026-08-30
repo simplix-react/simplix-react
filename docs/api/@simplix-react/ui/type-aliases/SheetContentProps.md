@@ -8,7 +8,7 @@
 
 > **SheetContentProps** = `ComponentPropsWithRef`\<*typeof* `DialogPrimitive.Content`\> & `object`
 
-Defined in: [packages/ui/src/base/overlay/sheet.tsx:33](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/sheet.tsx#L33)
+Defined in: [packages/ui/src/base/overlay/sheet.tsx:35](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/sheet.tsx#L35)
 
 ## Type Declaration
 

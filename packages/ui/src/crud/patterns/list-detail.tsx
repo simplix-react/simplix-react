@@ -10,6 +10,8 @@ import {
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 
+import { useTranslation } from "@simplix-react/i18n/react";
+
 import { SheetContent } from "../../base/overlay/sheet";
 import { useUIDefaults } from "../../provider/ui-defaults-context";
 import { cn } from "../../utils/cn";
@@ -215,7 +217,10 @@ export function ListDetailRoot({ variant: variantProp, activePanel: activePanelP
             if (!open) onClose?.();
           }}
         >
-          <section className={cn("h-full flex-1 min-h-0", className)}>
+          {/* The detail floats over the list here, so the list is full width in both states and
+              the page owns the scroll throughout — this variant has no counterpart to the panel's
+              capped state. */}
+          <section className={cn("flex-1", className)}>
             {children}
           </section>
         </DialogPrimitive.Root>
@@ -228,18 +233,51 @@ export function ListDetailRoot({ variant: variantProp, activePanel: activePanelP
   const isDetailOpen = activePanel === "detail";
   const listCol = effectiveListWidth != null ? `${effectiveListWidth}px` : "1fr";
   const detailCol = effectiveListWidth != null ? "1fr" : `${effectiveDetailWidth}px`;
+  // **Which box scrolls depends on whether the detail is open, and the two states are opposite.**
+  //
+  // Detail closed, the screen is a list: it is drawn whole and the page scrolls it. The section
+  // takes its height from its content, the scrolling ancestor overflows, and the single scrollbar
+  // is the page's own — so whatever a screen puts above the list (tiles, a tab strip, a period
+  // bar) travels with it.
+  //
+  // Detail open, the screen is a record: the page must not scroll, or the detail beside the list
+  // slides away with it. The section caps itself to the viewport again and each column scrolls
+  // inside its own track.
+  //
+  // **The tempting simplification is one layout in both states** — cap always, and the list ends
+  // the same distance from the bottom whether or not a detail is open. What that costs is a list
+  // scrolling inside itself while the rest of the page stands still: a reader working down a
+  // 1769px list through a 690px window has the screen frozen around a moving strip, and because
+  // every list in a console inherits it at once it reads as how the product is rather than as a
+  // mistake.
+  //
+  // The zero-width tracks stay in both states — they keep the close animating like the open, and
+  // keep the list one grid item rather than a block that reflows on every toggle.
   const gridCols = isDetailOpen
     ? `${listCol} ${DIVIDER_TRACK}px ${detailCol}`
-    : undefined;
+    : "1fr 0px 0px";
 
   return (
     <ListDetailContext.Provider value={contextValue}>
       <section
         ref={sectionRef}
         className={cn(
-          "h-full flex-1 min-h-0",
-          isDetailOpen && "overflow-hidden md:grid md:grid-rows-1",
-          isDetailOpen && !isDragging && "md:transition-[grid-template-columns] md:duration-300 md:ease-in-out",
+          "flex-1",
+          // Capped only while a detail stands beside it. `min-h-0` belongs to that state alone —
+          // it is the permission for a flex item to shrink below its own content, which is the
+          // whole mechanism being switched off when the list is on its own.
+          isDetailOpen && "h-full min-h-0 overflow-hidden",
+          "md:grid",
+          // `grid-rows-1` is `minmax(0, 1fr)`, which sizes to the track rather than to the row's
+          // content and collapses in a section with no height of its own.
+          isDetailOpen ? "md:grid-rows-1" : "md:grid-rows-[auto]",
+          !isDragging && "md:transition-[grid-template-columns] md:duration-300 md:ease-in-out",
+          // A drag that crosses the list and the panel selects every word it passes over, and
+          // the selection is left standing when the pointer comes up. `preventDefault` on the
+          // handle stops the selection from starting; this stops one that was already in
+          // progress from extending, and covers the case where the press landed on a word
+          // rather than on the handle itself.
+          isDragging && "select-none",
           "max-md:flex max-md:flex-col",
           className,
         )}
@@ -278,6 +316,15 @@ function Divider({ onDrag, onDragStart, onDragEnd }: DividerProps) {
 
   const handlePointerDown = useCallback(
     (e: React.PointerEvent) => {
+      // What a `pointerdown` does by default is begin a text selection, and a divider dragged
+      // across two panels of text then paints every word between where it started and where it
+      // stopped — still selected once the pointer is released. `setPointerCapture` routes the
+      // events here and says nothing about selection, so this is the line that stops it.
+      //
+      // It also suppresses the focus the press would have given, and this element is a keyboard
+      // control (arrow keys resize it), so the focus is taken by hand.
+      e.preventDefault();
+      (e.currentTarget as HTMLElement).focus();
       dragging.current = true;
       startX.current = e.clientX;
       const section = (e.currentTarget as HTMLElement).closest("section");
@@ -308,7 +355,7 @@ function Divider({ onDrag, onDragStart, onDragEnd }: DividerProps) {
       aria-orientation="vertical"
       tabIndex={collapsed ? -1 : 0}
       className={cn(
-        "md:order-2 box-content cursor-col-resize self-stretch",
+        "md:order-2 box-content cursor-col-resize select-none self-stretch",
         "bg-border bg-clip-content hover:bg-primary/30 active:bg-primary/50",
         "max-md:hidden",
         "transition-[padding,opacity] duration-300 ease-in-out",
@@ -333,7 +380,7 @@ function Divider({ onDrag, onDragStart, onDragEnd }: DividerProps) {
 // Panel mode:                    Dialog mode:
 // ┌───────────────────┐           ┌──────────────────────────┐
 // │ <article> order-1 │           │ <article>  (full width)  │
-// │ min-w-0, overflow │           │                          │
+// │ min-w-0, scrolls  │           │  no scroll of its own    │
 // │                   │           │                          │
 // │ {children}        │           │ {children}               │
 // └───────────────────┘           └──────────────────────────┘
@@ -352,8 +399,11 @@ const ListPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }, 
       ref={ref}
       data-panel="list"
       className={cn(
-        "flex flex-col gap-3 min-h-0 min-w-0 overflow-auto",
-        variant === "panel" && activePanel === "detail" && "md:pr-4",
+        "flex flex-col gap-3 min-w-0",
+        // The list scrolls inside itself only while it is a column beside an open detail. On its
+        // own it is drawn whole and the page scrolls it, so `min-h-0` is scoped to the same
+        // condition as the overflow it enables.
+        variant === "panel" && activePanel === "detail" && "min-h-0 overflow-auto md:pr-4",
         variant === "panel" && "md:order-1",
         // Panel mode mobile: hide when detail is active
         variant === "panel" && activePanel !== "list" && "max-md:hidden",
@@ -361,6 +411,17 @@ const ListPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }, 
       )}
     >
       {children}
+      {/* Room under the last row, for the state where the page is what scrolls.
+          **As padding it would not survive.** The expanded list is a flex item overflowing a
+          chain of `min-h-0` ancestors, and neither a scroll container's own bottom padding nor an
+          overflowing item's is counted in what there is to scroll \u2014 the last row ends flush
+          against the window and reads as cut off. An element is counted.
+          It takes no press: standing over the last row of a list that reaches the fold, it would
+          swallow the control there, and an element that is drawn, reads correctly and cannot be
+          clicked is the one defect a capture cannot show. */}
+      {variant === "panel" && activePanel === "detail" ? null : (
+        <div aria-hidden className="h-10 shrink-0 pointer-events-none" />
+      )}
     </article>
   );
 });
@@ -382,6 +443,7 @@ ListPanel.displayName = "ListDetail.List";
 
 const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }, ref) => {
   const { variant, activePanel, dialogHeight } = useListDetail();
+  const { t } = useTranslation("simplix/ui");
 
   if (variant === "drawer") {
     // **The drawer sits over the list and what is under it is covered — including, on a wide
@@ -422,7 +484,7 @@ const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }
         // a phone is the right answer and 768 is not; this caps it everywhere above.
         style={{ maxWidth: DETAIL_PANEL_WIDTH }}
       >
-        <DialogPrimitive.Title className="sr-only">Detail</DialogPrimitive.Title>
+        <DialogPrimitive.Title className="sr-only">{t("common.detail")}</DialogPrimitive.Title>
         {children}
       </SheetContent>
     );
@@ -459,7 +521,7 @@ const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }
           )}
           style={{ maxWidth: DETAIL_PANEL_WIDTH, ...(dialogHeight ? { height: dialogHeight } : {}) }}
         >
-          <DialogPrimitive.Title className="sr-only">Detail</DialogPrimitive.Title>
+          <DialogPrimitive.Title className="sr-only">{t("common.detail")}</DialogPrimitive.Title>
           {children}
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>

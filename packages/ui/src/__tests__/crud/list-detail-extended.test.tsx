@@ -43,7 +43,7 @@ describe("ListDetail (panel variant extended)", () => {
     expect(section?.style.gridTemplateColumns).toContain("px");
   });
 
-  it("does not render grid template when detail is closed", () => {
+  it("keeps the grid standing with the detail tracks at zero width when closed", () => {
     const { container } = render(
       <ListDetail activePanel="list">
         <ListDetail.List>List</ListDetail.List>
@@ -51,7 +51,9 @@ describe("ListDetail (panel variant extended)", () => {
       </ListDetail>,
     );
     const section = container.querySelector("section");
-    expect(section?.style.gridTemplateColumns).toBe("");
+    // The section is one layout in both states: closing collapses the divider and detail tracks
+    // rather than dropping the grid, so the list stays a grid item and the close animates.
+    expect(section?.style.gridTemplateColumns).toBe("1fr 0px 0px");
   });
 
   it("accepts custom detailWidth", () => {

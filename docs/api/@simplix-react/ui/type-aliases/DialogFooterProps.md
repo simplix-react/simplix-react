@@ -8,4 +8,4 @@
 
 > **DialogFooterProps** = `React.HTMLAttributes`\<`HTMLDivElement`\>
 
-Defined in: [packages/ui/src/base/overlay/dialog.tsx:168](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/dialog.tsx#L168)
+Defined in: [packages/ui/src/base/overlay/dialog.tsx:171](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/dialog.tsx#L171)

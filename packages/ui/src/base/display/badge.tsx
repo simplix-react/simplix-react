@@ -21,6 +21,15 @@ const badgeVariants = cva(
         default: "text-xs px-2.5 py-0.5",
         sm: "text-[0.625rem] leading-none px-1.5 py-0.5",
       },
+      /**
+       * The badge is something the reader presses.
+       *
+       * <p>A badge that opens a dialog is still a badge — the shape is what tells them what kind
+       * of value it is — but a reader has no way to know it is pressable, so the cursor has to say
+       * so. Written as a class by one screen, which is a rule about pointers living in a screen.
+       */
+      interactive: { true: "cursor-pointer", false: "" },
+
       variant: {
         default: "border-transparent bg-primary text-primary-foreground",
         secondary: "border-transparent bg-secondary text-secondary-foreground",
@@ -70,7 +79,7 @@ const badgeVariants = cva(
           "border-transparent bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-100",
       },
     },
-    defaultVariants: { variant: "default", rounded: "xl", size: "default" },
+    defaultVariants: { variant: "default", rounded: "xl", size: "default", interactive: false },
   },
 );
 

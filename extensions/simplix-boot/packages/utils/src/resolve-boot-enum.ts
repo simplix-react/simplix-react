@@ -1,6 +1,8 @@
 /**
  * Extract string value from Boot API enum objects.
- * Boot may return enums as plain strings or as { type, value, label } objects.
+ * Boot returns an enum either as a plain string or as a {@link LabeledEnumValue} — an object
+ * carrying `value` and `label`. Anything else is coerced, so a shape this function does not know
+ * still yields a string rather than throwing at a call site that only wanted to render it.
  */
 export function resolveBootEnum(v: unknown): string {
   if (v == null) return "";

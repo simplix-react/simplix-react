@@ -134,6 +134,15 @@ describe("FilterBar", () => {
     expect(screen.getByText("Name:")).toBeTruthy();
   });
 
+  it("carries the whole value in the badge's title, since the chip clips it", () => {
+    const long = "2024\uB144 3\uC6D4 3\uC77C \u2013 2024\uB144 3\uC6D4 27\uC77C";
+    const state = createMockState({ "name.contains": long }, { "name.contains": long });
+    render(<FilterBar filters={[textFilter]} state={state} />);
+    // The span is `truncate` under a 12rem cap, so what is on screen may be a
+    // prefix; `title` is the only place the tail can be read from.
+    expect(screen.getByText(long).getAttribute("title")).toBe(long);
+  });
+
   it("shows remove button on active filter badge", () => {
     const state = createMockState(
       { "name.contains": "hello" },

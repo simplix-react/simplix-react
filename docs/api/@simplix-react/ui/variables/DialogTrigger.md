@@ -8,4 +8,4 @@
 
 > `const` **DialogTrigger**: `ForwardRefExoticComponent`\<`DialogTriggerProps` & `RefAttributes`\<`HTMLButtonElement`\>\> = `DialogPrimitive.Trigger`
 
-Defined in: [packages/ui/src/base/overlay/dialog.tsx:32](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/dialog.tsx#L32)
+Defined in: [packages/ui/src/base/overlay/dialog.tsx:34](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/dialog.tsx#L34)

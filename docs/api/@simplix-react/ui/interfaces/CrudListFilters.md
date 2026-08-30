@@ -6,7 +6,7 @@
 
 # Interface: CrudListFilters
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L28)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:43](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L43)
 
 Filter state returned by [useCrudList](../functions/useCrudList.md).
 
@@ -16,7 +16,7 @@ Filter state returned by [useCrudList](../functions/useCrudList.md).
 
 > **apply**: () => `void`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:37](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L37)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:52](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L52)
 
 #### Returns
 
@@ -28,7 +28,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:37](https://github.com/s
 
 > **clear**: () => `void`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:36](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L36)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:51](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L51)
 
 #### Returns
 
@@ -40,7 +40,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:36](https://github.com/s
 
 > **committedValues**: `Record`\<`string`, `unknown`\>
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:48](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L48)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:63](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L63)
 
 Committed (applied) filter values — used by badges, URL sync, and queries.
 
@@ -50,7 +50,7 @@ Committed (applied) filter values — used by badges, URL sync, and queries.
 
 > **commitValue**: (`key`, `value`) => `void`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:50](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L50)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:65](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L65)
 
 Update a single filter in both pending and committed state, triggering a re-query.
 
@@ -74,7 +74,7 @@ Update a single filter in both pending and committed state, triggering a re-quer
 
 > **commitValues**: (`updates`) => `void`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:52](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L52)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:67](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L67)
 
 Update multiple filters in both pending and committed state, triggering a re-query.
 
@@ -94,7 +94,7 @@ Update multiple filters in both pending and committed state, triggering a re-que
 
 > `optional` **isLoading**: `boolean`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:46](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L46)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:61](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L61)
 
 Whether the list's first page is still in flight — no rows and no total
 have arrived yet. `CrudList.FilterBar` reads it to hold the total-count
@@ -108,7 +108,7 @@ has data, so paging does not blank a known count.
 
 > **isPending**: `boolean`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:38](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L38)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:53](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L53)
 
 ***
 
@@ -116,7 +116,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:38](https://github.com/s
 
 > **search**: `string`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:29](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L29)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:44](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L44)
 
 ***
 
@@ -124,7 +124,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:29](https://github.com/s
 
 > **setAll**: (`filters`) => `void`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:35](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L35)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:50](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L50)
 
 #### Parameters
 
@@ -148,7 +148,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:35](https://github.com/s
 
 > **setSearch**: (`value`) => `void`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L30)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:45](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L45)
 
 #### Parameters
 
@@ -166,7 +166,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:30](https://github.com/s
 
 > **setValue**: (`key`, `value`) => `void`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:33](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L33)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:48](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L48)
 
 #### Parameters
 
@@ -188,7 +188,7 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:33](https://github.com/s
 
 > **setValues**: (`updates`) => `void`
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:34](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L34)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:49](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L49)
 
 #### Parameters
 
@@ -206,6 +206,6 @@ Defined in: [packages/ui/src/crud/list/use-crud-list.ts:34](https://github.com/s
 
 > **values**: `Record`\<`string`, `unknown`\>
 
-Defined in: [packages/ui/src/crud/list/use-crud-list.ts:32](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L32)
+Defined in: [packages/ui/src/crud/list/use-crud-list.ts:47](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/list/use-crud-list.ts#L47)
 
 Pending (draft) filter values — used by popover form fields.

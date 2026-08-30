@@ -8,4 +8,4 @@
 
 > **DialogHeaderProps** = `React.HTMLAttributes`\<`HTMLDivElement`\>
 
-Defined in: [packages/ui/src/base/overlay/dialog.tsx:153](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/dialog.tsx#L153)
+Defined in: [packages/ui/src/base/overlay/dialog.tsx:156](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/dialog.tsx#L156)

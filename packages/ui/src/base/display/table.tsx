@@ -147,11 +147,22 @@ export type TableProps = ComponentPropsWithRef<"table"> & {
    * so the container keeps its own horizontal scrollbar.
    */
   stickyHeader?: boolean;
+  /**
+   * How the columns take their widths.
+   *
+   * <p>`"auto"` — the default — sizes each column to its content, which is right for a table with
+   * room to spread. `"fixed"` divides the declared widths and gives the rest to the columns that
+   * declared none, which is what a column of free text needs: under `auto` a long value has no
+   * bound to be cut to, so a truncating cell never truncates and the table widens instead. In a
+   * panel that shows as a sideways scrollbar with the row's actions past the right edge, and a
+   * short label in a squeezed neighbour broken one character to a line.
+   */
+  layout?: "auto" | "fixed";
 };
 
 export const Table = forwardRef<HTMLTableElement, TableProps>(
   (
-    { className, variant = "default", size = "md", density, rounded = "none", maxHeight, fill, stickyHeader, children, ...rest },
+    { className, variant = "default", size = "md", density, rounded = "none", maxHeight, fill, stickyHeader, layout, children, ...rest },
     ref,
   ) => {
     const scrolls = maxHeight != null || fill;
@@ -177,6 +188,7 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
           data-slot="table"
           className={cn(
             "w-full caption-bottom text-base",
+            layout === "fixed" && "table-fixed",
             variant === "bordered" && "border-separate border-spacing-0",
             className,
           )}

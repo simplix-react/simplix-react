@@ -5,6 +5,7 @@
     "edit": "Edit",
     "add": "Add",
     "delete": "Delete",
+    "download": "Download",
     "cancel": "Cancel",
     "clear": "Clear",
     "search": "Search",
@@ -30,7 +31,12 @@
     "select": "Select",
     "duplicate": "Duplicate",
     "increase": "Increase",
-    "decrease": "Decrease"
+    "decrease": "Decrease",
+    "maximize": "Maximize",
+    "restore": "Restore",
+    "detail": "Detail",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
   },
   "list": {
     "searchPlaceholder": "Search...",
@@ -143,7 +149,8 @@
     "switchToLanguage": "Switch to {{language}}",
     "clearSignature": "Clear signature",
     "latitude": "Latitude",
-    "longitude": "Longitude"
+    "longitude": "Longitude",
+    "noSelection": "None"
   },
   "unit": {
     "minutes": "min",

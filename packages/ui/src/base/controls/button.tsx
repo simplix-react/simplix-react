@@ -6,8 +6,17 @@ import { type ComponentPropsWithRef, type ReactNode, forwardRef } from "react";
 import { cn } from "../../utils/cn";
 import { createSelfResolving } from "../../provider/self-resolving";
 
+// `disabled:pointer-events-none` is deliberately absent. A disabled button is exactly the one a
+// reader needs an explanation for, and both of this framework's ways of giving them one are hover
+// mechanisms: `title` on the button (`CrudDetail.DefaultActions`'s `editDisabledReason` /
+// `deleteDisabledReason`) and a Radix tooltip wrapping it (`RowActions`'s icon variant). Taken out
+// of hit-testing the button never reports a hover, so neither fires — the reason is written, the
+// prop is passed, and nothing appears. A greyed pencil then says only 「no」, never 「why」.
+// Nothing is lost by allowing the hover: `disabled` on a real `<button>` already suppresses
+// activation, and the pointer never reached the button before either — the click fell through to
+// whatever is under it, and still does. `disabled:cursor-not-allowed` keeps the pointer saying so.
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0",
+  "inline-flex items-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0",
   {
     variants: {
       variant: {
@@ -23,6 +32,40 @@ const buttonVariants = cva(
           "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
       },
+      /**
+       * How loudly the label is coloured.
+       *
+       * <p>`muted` is for a control that is on the row without claiming it — a breadcrumb above a
+       * title, a way back out of a screen reached from somewhere else. It is a tone rather than a
+       * variant because it composes: a quiet link and a quiet ghost are both wanted, and a variant
+       * per pairing doubles the list for one axis.
+       */
+      tone: {
+        default: "",
+        muted: "text-muted-foreground hover:text-foreground",
+      },
+      /**
+       * How the label sits in the button's width.
+       *
+       * <p>Centred by default, which is what a button is. `start` is for the case where buttons
+       * are a LIST rather than a row of actions — a tree of choices, a menu drawn as buttons —
+       * and a centred label there makes a column of ragged text that reads as broken alignment
+       * rather than as a list.
+       */
+      /**
+       * Take the whole width of whatever holds it.
+       *
+       * <p>For a button that is the ONLY thing on its line and means it — a sign-in submit, a
+       * single primary in a narrow dialog. A row of actions never uses it: several full-width
+       * buttons stack into a wall in which nothing is primary.
+       */
+      fill: { true: "w-full", false: "" },
+
+      justify: {
+        center: "justify-center",
+        start: "justify-start",
+      },
+
       size: {
         default: "h-9 px-4 py-2",
         xs: "h-7 px-2.5 text-xs",
@@ -31,11 +74,22 @@ const buttonVariants = cva(
         icon: "size-9",
         "icon-sm": "size-8",
         "icon-xs": "size-7",
+        /**
+         * A link's metrics rather than a button's: no box, so no height and no padding.
+         *
+         * <p>`variant="link"` takes the box away visually and the size variants put it back in
+         * space — an xs link still reserves 28px of height and 10px either side, so a breadcrumb
+         * sits low and indented under a title it is supposed to head. Pair this with that variant.
+         */
+        link: "h-auto p-0 text-xs",
       },
     },
     defaultVariants: {
       variant: "default",
       size: "default",
+      tone: "default",
+      justify: "center",
+      fill: false,
     },
   },
 );

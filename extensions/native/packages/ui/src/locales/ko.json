@@ -16,8 +16,8 @@
     "retry": "다시 시도",
     "yes": "예",
     "no": "아니요",
-    "on": "켬",
-    "off": "끔",
+    "on": "켜짐",
+    "off": "꺼짐",
     "save": "저장",
     "notFound": "찾을 수 없습니다."
   },
@@ -30,7 +30,7 @@
     "errorTitle": "데이터를 불러오지 못했습니다",
     "unavailable": "목록을 불러오지 못했습니다.",
     "unavailableTitle": "목록을 불러오지 못했습니다",
-    "totalCount": "전체 {{count}}",
+    "totalCount": "전체 {{count}}건",
     "loadingMore": "더 불러오는 중...",
     "endOfList": "더 이상 항목이 없습니다.",
     "create": "생성"
@@ -55,11 +55,11 @@
     "chooseFile": "파일 선택",
     "removeFile": "파일 제거",
     "selectDate": "날짜 선택",
-    "selectTime": "시각 선택",
+    "selectTime": "시간 선택",
     "multiSelected": "{{count}}개 선택됨",
     "invalidPhone": "올바르지 않은 전화번호입니다",
-    "show": "표시",
-    "hide": "숨김",
+    "show": "보기",
+    "hide": "숨기기",
     "cameraPermissionDenied": "카메라 권한이 거부되었습니다."
   },
   "stepFlow": {

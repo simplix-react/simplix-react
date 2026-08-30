@@ -40,6 +40,19 @@ Defined in: [packages/ui/src/crud/shared/types.ts:34](https://github.com/simplix
 
 ***
 
+### digits?
+
+> `optional` **digits**: `number`
+
+Defined in: [packages/ui/src/fields/form/number-field.tsx:24](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/number-field.tsx#L24)
+
+How many characters the longest value takes, overriding what the bounds imply.
+
+<p>For a field whose range says nothing about how long the value reads — an unbounded count
+that is nevertheless always four digits, an identifier-shaped number.
+
+***
+
 ### disabled?
 
 > `optional` **disabled**: `boolean`
@@ -68,7 +81,7 @@ Defined in: [packages/ui/src/crud/shared/types.ts:32](https://github.com/simplix
 
 > `optional` **inputProps**: `Omit`\<`DetailedHTMLProps`\<`InputHTMLAttributes`\<`HTMLInputElement`\>, `HTMLInputElement`\>, `"value"` \| `"type"` \| `"onChange"`\>
 
-Defined in: [packages/ui/src/fields/form/number-field.tsx:19](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/number-field.tsx#L19)
+Defined in: [packages/ui/src/fields/form/number-field.tsx:26](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/fields/form/number-field.tsx#L26)
 
 Additional props forwarded to the underlying input element.
 

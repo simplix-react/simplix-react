@@ -153,4 +153,23 @@ describe("NumberInput", () => {
     fireEvent.change(screen.getByTestId("num"), { target: { value: "3" } });
     expect(onChange).toHaveBeenCalledWith(3);
   });
+  it("fills the row when no digit count is given", () => {
+    render(<NumberInput data-testid="num" />);
+    const wrapper = screen.getByTestId("num").parentElement as HTMLElement;
+    expect(wrapper.className).toContain("w-full");
+    expect(wrapper.style.width).toBe("");
+  });
+
+  it("takes its width from the digit count instead of the row", () => {
+    render(<NumberInput data-testid="num" digits={2} />);
+    const wrapper = screen.getByTestId("num").parentElement as HTMLElement;
+    expect(wrapper.className).not.toContain("w-full");
+    expect(wrapper.style.width).toBe("calc(2ch + 2.75rem)");
+  });
+
+  it("leaves room for the suffix inside the measured width", () => {
+    render(<NumberInput data-testid="num" digits={3} suffix="kg" />);
+    const wrapper = screen.getByTestId("num").parentElement as HTMLElement;
+    expect(wrapper.style.width).toBe("calc(5ch + 2.75rem)");
+  });
 });

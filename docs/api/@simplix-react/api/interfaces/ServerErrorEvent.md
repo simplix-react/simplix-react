@@ -6,7 +6,7 @@
 
 # Interface: ServerErrorEvent
 
-Defined in: [packages/api/src/error-utils.ts:42](https://github.com/simplix-react/simplix-react/blob/main/packages/api/src/error-utils.ts#L42)
+Defined in: [packages/api/src/error-utils.ts:52](https://github.com/simplix-react/simplix-react/blob/main/packages/api/src/error-utils.ts#L52)
 
 Structured error event produced by [classifyError](../functions/classifyError.md).
 
@@ -20,7 +20,7 @@ Consumed by the category-specific handlers in [createMutationErrorHandler](../fu
 
 > **category**: [`ErrorCategory`](../type-aliases/ErrorCategory.md)
 
-Defined in: [packages/api/src/error-utils.ts:44](https://github.com/simplix-react/simplix-react/blob/main/packages/api/src/error-utils.ts#L44)
+Defined in: [packages/api/src/error-utils.ts:54](https://github.com/simplix-react/simplix-react/blob/main/packages/api/src/error-utils.ts#L54)
 
 Classification category of the error.
 
@@ -30,7 +30,7 @@ Classification category of the error.
 
 > `optional` **errorCode**: `string`
 
-Defined in: [packages/api/src/error-utils.ts:48](https://github.com/simplix-react/simplix-react/blob/main/packages/api/src/error-utils.ts#L48)
+Defined in: [packages/api/src/error-utils.ts:58](https://github.com/simplix-react/simplix-react/blob/main/packages/api/src/error-utils.ts#L58)
 
 Application-specific error code (e.g. `"PET_NOT_FOUND"`).
 
@@ -40,7 +40,7 @@ Application-specific error code (e.g. `"PET_NOT_FOUND"`).
 
 > **message**: `string`
 
-Defined in: [packages/api/src/error-utils.ts:50](https://github.com/simplix-react/simplix-react/blob/main/packages/api/src/error-utils.ts#L50)
+Defined in: [packages/api/src/error-utils.ts:60](https://github.com/simplix-react/simplix-react/blob/main/packages/api/src/error-utils.ts#L60)
 
 Human-readable error message.
 
@@ -50,7 +50,7 @@ Human-readable error message.
 
 > **raw**: `unknown`
 
-Defined in: [packages/api/src/error-utils.ts:54](https://github.com/simplix-react/simplix-react/blob/main/packages/api/src/error-utils.ts#L54)
+Defined in: [packages/api/src/error-utils.ts:64](https://github.com/simplix-react/simplix-react/blob/main/packages/api/src/error-utils.ts#L64)
 
 Original error object for debugging.
 
@@ -60,7 +60,7 @@ Original error object for debugging.
 
 > `optional` **status**: `number`
 
-Defined in: [packages/api/src/error-utils.ts:46](https://github.com/simplix-react/simplix-react/blob/main/packages/api/src/error-utils.ts#L46)
+Defined in: [packages/api/src/error-utils.ts:56](https://github.com/simplix-react/simplix-react/blob/main/packages/api/src/error-utils.ts#L56)
 
 HTTP status code, if available.
 
@@ -70,6 +70,6 @@ HTTP status code, if available.
 
 > `optional` **validationErrors**: [`ValidationFieldError`](ValidationFieldError.md)[]
 
-Defined in: [packages/api/src/error-utils.ts:52](https://github.com/simplix-react/simplix-react/blob/main/packages/api/src/error-utils.ts#L52)
+Defined in: [packages/api/src/error-utils.ts:62](https://github.com/simplix-react/simplix-react/blob/main/packages/api/src/error-utils.ts#L62)
 
 Field-level validation errors, present only for `"validation"` category.

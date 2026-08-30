@@ -2,6 +2,15 @@
 export interface CrudSearch {
   id?: string;
   mode?: "new" | "edit";
+  /**
+   * Which tab of the page is open.
+   *
+   * <p>Addressable state like the record is: a reader who reloads, or who sends somebody the link,
+   * is looking at a tab and expects to still be looking at it. Held here rather than in the page's
+   * own `useState` — a page that keeps it locally loses it on every reload and shares a link that
+   * opens somewhere else.
+   */
+  tab?: string;
 }
 
 /**
@@ -20,6 +29,7 @@ export function validateCrudSearch(search: Record<string, unknown>): CrudSearch 
   return {
     id: typeof search.id === "string" ? search.id : undefined,
     mode: search.mode === "new" || search.mode === "edit" ? search.mode : undefined,
+    tab: typeof search.tab === "string" ? search.tab : undefined,
   };
 }
 
@@ -34,11 +44,18 @@ export function parseCrudSearch(search: CrudSearch): { view: CrudView; selectedI
   return { view: "list" };
 }
 
-/** @internal */
-export function buildCrudSearch(view: CrudView, id?: string): CrudSearch {
-  if (view === "list") return {};
-  if (view === "new") return { mode: "new" };
-  if (view === "edit" && id) return { id, mode: "edit" };
-  if (view === "detail" && id) return { id };
-  return {};
+/**
+ * The search a view is addressed by.
+ *
+ * <p>`tab` survives every transition: opening a record from the third tab and closing it again
+ * returns to the third tab, which is where the reader was.
+ *
+ * @internal
+ */
+export function buildCrudSearch(view: CrudView, id?: string, tab?: string): CrudSearch {
+  const at = tab === undefined ? {} : { tab };
+  if (view === "new") return { ...at, mode: "new" };
+  if (view === "edit" && id) return { ...at, id, mode: "edit" };
+  if (view === "detail" && id) return { ...at, id };
+  return at;
 }

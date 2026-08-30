@@ -125,8 +125,62 @@ export function sizedHeaderStyle(width: number): {
 export function sizedCellProps(
   columnId: string,
   widths: ColumnWidths,
-  meta: { flexible?: boolean } | undefined,
+  meta: ColumnSizing | undefined,
 ): { style?: { maxWidth: number }; "data-column-sized"?: string } {
   const sized = widths[columnId] !== undefined || meta?.flexible === true;
-  return sized ? { style: { maxWidth: 0 }, "data-column-sized": "" } : {};
+  if (sized) return { style: { maxWidth: 0 }, "data-column-sized": "" };
+  // A fixed column keeps its content out of the table's intrinsic width for the same reason, and
+  // it is the half that makes `width` mean what it says — a column declared at a width that its
+  // longest value can still stretch is a floor wearing another prop's name. The attribute does
+  // NOT come with it: releasing the caller's own caps is for a column whose width can change
+  // under the reader, and this one's cannot.
+  return meta?.fixed === true ? { style: { maxWidth: 0 } } : {};
+}
+
+/**
+ * How a column declared its width, as the header cell needs to know it.
+ *
+ * <p>Carried on the column rather than inferred from its size, because the size cannot answer it:
+ * TanStack's default is 150, so a column asking for exactly 150 and a column asking for nothing
+ * arrive at the header identical.
+ */
+export interface ColumnSizing {
+  /** A floor: the column holds open at its width and takes a share of whatever the table has spare. */
+  readonly flexible?: boolean;
+  /** A width: the column is that wide and neither its content nor the spare room moves it. */
+  readonly fixed?: boolean;
+}
+
+/**
+ * The style a header cell carries so its column ends up the width the screen asked for.
+ *
+ * <p>Three states, and the difference between the first two is the whole difference between the
+ * `width` and `minWidth` props. A column the reader has dragged and one declared with a fixed
+ * `width` are pinned — all three of width/min/max, because an auto table layout reads a bare
+ * `width` as a suggestion and spends the table's spare room on whichever column resists least. A
+ * column declared with a `minWidth` carries the floor alone, so that spare room lands there.
+ *
+ * <p><b>A column with neither gets no style, and that is the one the spare room goes to.</b> Which
+ * is why the fixed case may not be recognised by comparing the size against TanStack's default:
+ * `width={150}` would then be read as no width at all, and the column that asked to stay at 150
+ * becomes the one that absorbs the whole remainder — 423px of it in a detail panel, next to a
+ * column of unpredictable text that got none.
+ *
+ * @param readerWidth what this reader has dragged the column to, if anything
+ * @param size the column's declared size
+ * @param meta how the column declared it
+ * @returns the style for the header cell, or nothing where the column declared no width
+ */
+export function headerWidthStyle(
+  readerWidth: number | undefined,
+  size: number,
+  meta: ColumnSizing | undefined,
+):
+  | { width: number; minWidth: number; maxWidth: number }
+  | { width: number }
+  | undefined {
+  if (readerWidth !== undefined) return sizedHeaderStyle(readerWidth);
+  if (meta?.fixed === true) return sizedHeaderStyle(size);
+  if (meta?.flexible === true) return { width: size };
+  return undefined;
 }

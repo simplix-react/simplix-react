@@ -115,10 +115,35 @@ export interface SimplixConfig {
   openapi?: OpenAPISpecConfig[];
 }
 
+/**
+ * DTO metadata generation for one spec.
+ *
+ * @remarks
+ * SimpliX Meta is served by the backend and carries what an OpenAPI document loses — validation
+ * constraints, search operators, `@PreAuthorize` and labeled enums. It is generated into
+ * `src/generated-meta/` of every domain package the spec produces.
+ */
+export interface OpenAPIMetaConfig {
+  /**
+   * Endpoint URL or snapshot path. Omit it and the source is built the way the i18n download
+   * already builds its own: the origin of `spec` plus the profile's `metaEndpoint`.
+   */
+  source?: string;
+  /** Where a fetched SimpliX Meta is written for offline regeneration. */
+  snapshot?: string;
+  /** Domains whose barrel exports the meta output instead of the orval output. */
+  export?: string[];
+}
+
 /** Per-spec OpenAPI configuration */
 export interface OpenAPISpecConfig {
   /** OpenAPI spec file path (relative to project root) or URL */
-  spec: string;
+  /**
+   * The OpenAPI document the Orval half reads. Optional: a project that has finished migrating
+   * runs `simplix meta`, which needs no document — it states `meta.source` instead. `simplix
+   * openapi` still requires one and says so.
+   */
+  spec?: string;
   /** Spec Profile preset name (bundles naming + responseAdapter) */
   profile?: string;
   /** NamingStrategy — overrides profile's naming if both are set */
@@ -129,6 +154,8 @@ export interface OpenAPISpecConfig {
   domains: Record<string, string[]>;
   /** CRUD role detection patterns. When omitted, no CRUD roles are assigned. */
   crud?: Partial<Record<CrudRole, CrudEndpointPattern>>;
+  /** DTO metadata generation. Omit the block and the meta pipeline does not run for this spec. */
+  meta?: OpenAPIMetaConfig;
 }
 
 /** Find the spec config that contains the given domain name */
@@ -146,6 +173,8 @@ export function findSpecBySource(
   rootDir: string,
 ): OpenAPISpecConfig | undefined {
   return specs?.find((s) => {
+    // A migrated project states no document at all, so it matches no source.
+    if (s.spec === undefined) return false;
     if (isUrlSpec(s.spec) || isUrlSpec(source)) {
       return s.spec === source;
     }

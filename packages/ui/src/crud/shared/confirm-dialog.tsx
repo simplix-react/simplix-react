@@ -1,7 +1,7 @@
 import { useTranslation } from "@simplix-react/i18n/react";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
 
-import { cn } from "../../utils/cn";
+import { ALERT_ACTION_CLASS, ALERT_CANCEL_CLASS, AlertPanel } from "./alert-panel";
 
 export interface ConfirmDialogProps {
   open: boolean;
@@ -18,6 +18,15 @@ export interface ConfirmDialogProps {
   pendingLabel?: string;
 }
 
+/**
+ * Confirmation dialog: a title, an optional description, and a footer that commits or cancels.
+ *
+ * @remarks
+ * Drawn in {@link AlertPanel}, so a long description scrolls inside the panel and the footer
+ * stays reachable at any window height.
+ *
+ * @param props - {@link ConfirmDialogProps}
+ */
 export function ConfirmDialog({
   open,
   onOpenChange,
@@ -36,61 +45,30 @@ export function ConfirmDialog({
   const resolvedCancelLabel = cancelLabel ?? t("common.cancel");
 
   return (
-    <AlertDialog.Root open={open} onOpenChange={onOpenChange}>
-      <AlertDialog.Portal>
-        <AlertDialog.Overlay
-          className="fixed inset-0 z-50 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
-        />
-        <AlertDialog.Content
-          className={cn(
-            "fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2",
-            "rounded-lg border bg-background p-6 shadow-lg",
-            "data-[state=open]:animate-in data-[state=closed]:animate-out",
-            "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-            "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+    <AlertPanel
+      open={open}
+      onOpenChange={onOpenChange}
+      title={title}
+      description={description}
+      actions={
+        <>
+          {!hideCancel && (
+            <AlertDialog.Cancel className={ALERT_CANCEL_CLASS} disabled={isPending}>
+              {resolvedCancelLabel}
+            </AlertDialog.Cancel>
           )}
-        >
-          <AlertDialog.Title className="text-lg font-semibold">
-            {title}
-          </AlertDialog.Title>
-          {description && (
-            <AlertDialog.Description className="mt-2 text-sm text-muted-foreground">
-              {description}
-            </AlertDialog.Description>
-          )}
-          <footer className="mt-6 flex w-full justify-end gap-2">
-            {!hideCancel && (
-              <AlertDialog.Cancel
-                className={cn(
-                  "inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-medium",
-                  "border border-input bg-background transition-colors",
-                  "hover:bg-accent hover:text-accent-foreground",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                  "disabled:pointer-events-none disabled:opacity-50",
-                )}
-                disabled={isPending}
-              >
-                {resolvedCancelLabel}
-              </AlertDialog.Cancel>
-            )}
-            <AlertDialog.Action
-              onClick={(e) => {
-                e.preventDefault();
-                onConfirm();
-              }}
-              className={cn(
-                "inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-medium",
-                "transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                "disabled:pointer-events-none disabled:opacity-50",
-                "bg-primary text-primary-foreground hover:bg-primary/90",
-              )}
-              disabled={isPending}
-            >
-              {isPending ? (pendingLabel ?? resolvedConfirmLabel) : resolvedConfirmLabel}
-            </AlertDialog.Action>
-          </footer>
-        </AlertDialog.Content>
-      </AlertDialog.Portal>
-    </AlertDialog.Root>
+          <AlertDialog.Action
+            onClick={(e) => {
+              e.preventDefault();
+              onConfirm();
+            }}
+            className={ALERT_ACTION_CLASS}
+            disabled={isPending}
+          >
+            {isPending ? (pendingLabel ?? resolvedConfirmLabel) : resolvedConfirmLabel}
+          </AlertDialog.Action>
+        </>
+      }
+    />
   );
 }

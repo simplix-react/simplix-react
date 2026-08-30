@@ -8,7 +8,7 @@
 
 > **createMutationErrorHandler**(`config`): (`error`, `variables?`, `context?`) => `void`
 
-Defined in: [packages/api/src/error-utils.ts:339](https://github.com/simplix-react/simplix-react/blob/main/packages/api/src/error-utils.ts#L339)
+Defined in: [packages/api/src/error-utils.ts:349](https://github.com/simplix-react/simplix-react/blob/main/packages/api/src/error-utils.ts#L349)
 
 Create a React Query `onError` handler that routes errors to category-specific callbacks.
 

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { createElement, type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { useStaleDetection } from "../use-stale-detection";
 import { StreamProvider } from "../stream-provider";
@@ -63,10 +63,7 @@ class MockEventSource {
  */
 function createRealEsWrapper() {
   return function Wrapper({ children }: { children: ReactNode }) {
-    return createElement(
-      StreamProvider,
-      { heartbeatTimeoutMs: 999_999, children },
-    );
+    return <StreamProvider heartbeatTimeoutMs={999_999}>{children}</StreamProvider>;
   };
 }
 

@@ -6,7 +6,7 @@
 
 # Interface: TreeTableProps\<T\>
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:299](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L299)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:311](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L311)
 
 ## Type Parameters
 
@@ -20,7 +20,7 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:299](https://github.com/sim
 
 > `optional` **actions**: [`RowActionDef`](RowActionDef.md)\<`T`\>[]
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:307](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L307)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:319](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L319)
 
 ***
 
@@ -28,7 +28,7 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:307](https://github.com/sim
 
 > `optional` **actionVariant**: [`ActionVariant`](../type-aliases/ActionVariant.md)
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:308](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L308)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:320](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L320)
 
 ***
 
@@ -36,7 +36,7 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:308](https://github.com/sim
 
 > `optional` **activeRowId**: `string` \| `null`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:306](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L306)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:318](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L318)
 
 ***
 
@@ -44,7 +44,7 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:306](https://github.com/sim
 
 > `optional` **children**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:325](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L325)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:337](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L337)
 
 ***
 
@@ -52,7 +52,7 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:325](https://github.com/sim
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:324](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L324)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:336](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L336)
 
 ***
 
@@ -60,7 +60,7 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:324](https://github.com/sim
 
 > **data**: `T`[]
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:300](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L300)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:312](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L312)
 
 ***
 
@@ -68,7 +68,7 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:300](https://github.com/sim
 
 > `optional` **density**: `"default"` \| `"compact"` \| `"comfortable"`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:315](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L315)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:327](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L327)
 
 ***
 
@@ -76,7 +76,7 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:315](https://github.com/sim
 
 > `optional` **headerActions**: `ReactNode`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:309](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L309)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:321](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L321)
 
 ***
 
@@ -84,7 +84,7 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:309](https://github.com/sim
 
 > `optional` **isLoading**: `boolean`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:301](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L301)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:313](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L313)
 
 ***
 
@@ -92,7 +92,7 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:301](https://github.com/sim
 
 > `optional` **onRowClick**: (`row`) => `void`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:305](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L305)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:317](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L317)
 
 #### Parameters
 
@@ -110,7 +110,7 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:305](https://github.com/sim
 
 > `optional` **onSortChange**: (`sort`) => `void`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:304](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L304)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:316](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L316)
 
 #### Parameters
 
@@ -128,7 +128,7 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:304](https://github.com/sim
 
 > `optional` **rounded**: `"none"` \| `"sm"` \| `"lg"` \| `"md"`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:316](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L316)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:328](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L328)
 
 ***
 
@@ -136,7 +136,7 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:316](https://github.com/sim
 
 > `optional` **searchFields**: keyof `T` & `string`[]
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:310](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L310)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:322](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L322)
 
 ***
 
@@ -144,7 +144,7 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:310](https://github.com/sim
 
 > `optional` **searchPredicate**: (`row`, `query`) => `boolean`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:312](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L312)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:324](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L324)
 
 Callback-based search predicate. OR-combined with searchFields.
 
@@ -168,7 +168,7 @@ Callback-based search predicate. OR-combined with searchFields.
 
 > `optional` **size**: `"sm"` \| `"lg"` \| `"md"`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:314](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L314)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:326](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L326)
 
 ***
 
@@ -176,7 +176,7 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:314](https://github.com/sim
 
 > `optional` **sort**: [`SortState`](SortState.md) \| `null`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:303](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L303)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:315](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L315)
 
 ***
 
@@ -184,7 +184,7 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:303](https://github.com/sim
 
 > `optional` **stickyHeader**: `boolean`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:323](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L323)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:335](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L335)
 
 Sticks the header row to the top of the nearest scrollable ancestor
 (e.g. a page, dialog, or detail-pane body) once scrolling would hide it.
@@ -197,7 +197,7 @@ with its columns. Enabled by default; pass `false` to disable.
 
 > `optional` **tree**: [`TreeConfig`](TreeConfig.md)\<`T`\>
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:302](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L302)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:314](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L314)
 
 ***
 
@@ -205,4 +205,4 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:302](https://github.com/sim
 
 > `optional` **variant**: `"default"` \| `"striped"` \| `"bordered"`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:313](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L313)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:325](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L325)

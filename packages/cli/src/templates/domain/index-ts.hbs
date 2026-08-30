@@ -1,9 +1,13 @@
 {{#if enableI18n}}
 import "./translations";
 {{/if}}
-{{#if enableOrval}}
+{{#if enableCodegen}}
+{{#if generatedModule}}
+export * from "{{generatedModule}}";
+{{else}}
 export * from "./hooks";
 export * from "./generated/model";
+{{/if}}
 {{else}}
 export * from "./schemas";
 export * from "./contract";

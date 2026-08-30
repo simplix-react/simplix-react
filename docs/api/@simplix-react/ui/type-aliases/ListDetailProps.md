@@ -8,6 +8,6 @@
 
 > **ListDetailProps** = [`ListDetailBaseProps`](../interfaces/ListDetailBaseProps.md) & \{ `detailWidth?`: `number`; `listWidth?`: `never`; \} \| \{ `detailWidth?`: `never`; `listWidth?`: `number`; \}
 
-Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:112](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L112)
+Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:114](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L114)
 
 Props for the [ListDetail](../variables/ListDetail.md) compound component. Use either `detailWidth` or `listWidth`, not both.

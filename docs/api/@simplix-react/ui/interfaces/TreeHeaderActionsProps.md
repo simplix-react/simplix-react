@@ -6,7 +6,7 @@
 
 # Interface: TreeHeaderActionsProps
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:671](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L671)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:688](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L688)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:671](https://github.com/sim
 
 > `optional` **className**: `string`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:673](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L673)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:690](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L690)
 
 ***
 
@@ -22,4 +22,4 @@ Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:673](https://github.com/sim
 
 > `optional` **searchPlaceholder**: `string`
 
-Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:672](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L672)
+Defined in: [packages/ui/src/crud/tree/crud-tree.tsx:689](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/tree/crud-tree.tsx#L689)

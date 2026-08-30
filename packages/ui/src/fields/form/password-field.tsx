@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { useTranslation } from "@simplix-react/i18n/react";
+
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
@@ -41,6 +43,7 @@ export function PasswordField({
   ...variantProps
 }: PasswordFieldProps) {
   const { Input } = useFlatUIComponents();
+  const { t } = useTranslation("simplix/ui");
   const [visible, setVisible] = useState(false);
 
   return (
@@ -81,7 +84,7 @@ export function PasswordField({
             onClick={() => setVisible((v) => !v)}
             disabled={disabled}
             className="absolute right-2 flex h-6 w-6 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
-            aria-label={visible ? "Hide password" : "Show password"}
+            aria-label={visible ? t("common.hidePassword") : t("common.showPassword")}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

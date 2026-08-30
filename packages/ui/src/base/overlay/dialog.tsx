@@ -2,6 +2,8 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { type ComponentPropsWithRef, createContext, forwardRef, useContext, useEffect, useState } from "react";
 import { Maximize2, Minimize2 } from "lucide-react";
 
+import { useTranslation } from "@simplix-react/i18n/react";
+
 import { cn } from "../../utils/cn";
 
 /** True when the enclosing maximizable DialogContent is currently maximized. */
@@ -74,6 +76,7 @@ export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(
   ({ className, children, showCloseButton = true, maximizable = false, style, ...rest }, ref) => {
     const [maximized, setMaximized] = useState(false);
     const isMaximized = maximizable && maximized;
+    const { t } = useTranslation("simplix/ui");
     return (
       <DialogPortal>
         <DialogOverlay />
@@ -107,7 +110,7 @@ export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(
                   <button
                     type="button"
                     onClick={() => setMaximized((prev) => !prev)}
-                    aria-label={maximized ? "Restore" : "Maximize"}
+                    aria-label={maximized ? t("common.restore") : t("common.maximize")}
                     className={CORNER_BUTTON_CLASS}
                   >
                     {maximized ? <Minimize2 /> : <Maximize2 />}
@@ -135,7 +138,7 @@ export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(
                         clipRule="evenodd"
                       />
                     </svg>
-                    <span className="sr-only">Close</span>
+                    <span className="sr-only">{t("common.close")}</span>
                   </DialogPrimitive.Close>
                 )}
               </div>

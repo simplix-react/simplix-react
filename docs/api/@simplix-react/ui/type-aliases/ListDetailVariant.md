@@ -8,7 +8,7 @@
 
 > **ListDetailVariant** = `"panel"` \| `"dialog"` \| `"drawer"`
 
-Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L28)
+Defined in: [packages/ui/src/crud/patterns/list-detail.tsx:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/patterns/list-detail.tsx#L30)
 
 How the detail appears.
 

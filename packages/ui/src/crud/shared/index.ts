@@ -33,6 +33,9 @@ export type { ListTotalBadgeProps } from "./list-total-badge";
 export { SectionShell } from "./section-shell";
 export type { SectionShellProps } from "./section-shell";
 
+export { ALERT_ACTION_CLASS, ALERT_CANCEL_CLASS, AlertPanel } from "./alert-panel";
+export type { AlertPanelProps } from "./alert-panel";
+
 export { ConfirmDialog } from "./confirm-dialog";
 export type { ConfirmDialogProps } from "./confirm-dialog";
 

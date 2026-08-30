@@ -8,7 +8,7 @@
 
 > **startOfDay**(`d`): `Date`
 
-Defined in: [packages/headless/dist/index.d.ts:485](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L485)
+Defined in: [packages/headless/dist/index.d.ts:499](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L499)
 
 Pure date arithmetic helpers (no date-fns dependency).
 

@@ -22,9 +22,14 @@ Props for the [ChipFilter](../functions/ChipFilter.md) component.
 
 > **field**: `string`
 
-Defined in: [packages/ui/src/crud/filters/chip-filter.tsx:28](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/chip-filter.tsx#L28)
+Defined in: [packages/ui/src/crud/filters/chip-filter.tsx:35](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/chip-filter.tsx#L35)
 
-Server filter key (e.g. `"holidayType.equals"`).
+Server filter key.
+
+<p>A chip row narrows to several values at once, so the key is the membership operator —
+`"holidayType.in"` rather than `"holidayType.equals"`. The value written under it is an
+array; a request builder that stringifies it produces the comma-separated list the
+membership operator reads.
 
 ***
 
@@ -32,7 +37,7 @@ Server filter key (e.g. `"holidayType.equals"`).
 
 > `optional` **gap**: `"none"` \| `"xs"` \| `"sm"` \| `"lg"` \| `"md"`
 
-Defined in: [packages/ui/src/crud/filters/chip-filter.tsx:34](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/chip-filter.tsx#L34)
+Defined in: [packages/ui/src/crud/filters/chip-filter.tsx:41](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/chip-filter.tsx#L41)
 
 Space between chips.
 
@@ -48,7 +53,7 @@ Space between chips.
 
 > **options**: [`ChipFilterOption`](ChipFilterOption.md)\<`T`\>[]
 
-Defined in: [packages/ui/src/crud/filters/chip-filter.tsx:30](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/chip-filter.tsx#L30)
+Defined in: [packages/ui/src/crud/filters/chip-filter.tsx:37](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/chip-filter.tsx#L37)
 
 Available options.
 
@@ -58,6 +63,6 @@ Available options.
 
 > **state**: [`CrudListFilters`](CrudListFilters.md)
 
-Defined in: [packages/ui/src/crud/filters/chip-filter.tsx:32](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/chip-filter.tsx#L32)
+Defined in: [packages/ui/src/crud/filters/chip-filter.tsx:39](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/crud/filters/chip-filter.tsx#L39)
 
 CrudList filter state to read/write.

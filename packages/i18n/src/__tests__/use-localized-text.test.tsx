@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect } from "vitest";
 import { renderHook } from "@testing-library/react";
-import { createElement, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { I18nProvider } from "../react/i18n-provider.js";
 import { useLocalizedText } from "../react/use-localized-text.js";
 import type { II18nAdapter } from "../adapter.js";
@@ -38,8 +38,9 @@ function createMockAdapter(locale: string): II18nAdapter {
 }
 
 function makeWrapper(locale: string) {
-  return ({ children }: { children: ReactNode }) =>
-    createElement(I18nProvider, { adapter: createMockAdapter(locale), children });
+  return ({ children }: { children: ReactNode }) => (
+    <I18nProvider adapter={createMockAdapter(locale)}>{children}</I18nProvider>
+  );
 }
 
 describe("useLocalizedText", () => {

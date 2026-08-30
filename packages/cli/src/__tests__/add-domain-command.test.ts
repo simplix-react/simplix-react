@@ -22,7 +22,7 @@ function makeCtx(overrides: Record<string, unknown> = {}) {
     projectName: "test",
     scope: "@test",
     enableI18n: true,
-    enableOrval: false,
+    enableCodegen: false,
     locales: ["en", "ko"],
     apiBasePath: "/api/product",
     entities: [
@@ -53,17 +53,17 @@ describe("add-domain templates (non-OpenAPI mode)", () => {
   });
 
   it("renders domain index.ts with i18n export", () => {
-    const result = renderTemplate(domainIndexTs, makeCtx({ enableI18n: true, enableOrval: false }));
+    const result = renderTemplate(domainIndexTs, makeCtx({ enableI18n: true, enableCodegen: false }));
     expect(result).toContain("translations");
   });
 
   it("renders domain index.ts without i18n export", () => {
-    const result = renderTemplate(domainIndexTs, makeCtx({ enableI18n: false, enableOrval: false }));
+    const result = renderTemplate(domainIndexTs, makeCtx({ enableI18n: false, enableCodegen: false }));
     expect(result).not.toContain("translations");
   });
 
   it("renders domain index.ts with orval exports", () => {
-    const result = renderTemplate(domainIndexTs, makeCtx({ enableOrval: true }));
+    const result = renderTemplate(domainIndexTs, makeCtx({ enableCodegen: true }));
     expect(result).toContain("hooks");
     expect(result).toContain("generated/model");
   });

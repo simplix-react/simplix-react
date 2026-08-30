@@ -657,3 +657,133 @@ describe("scaffoldCrudCommand action", () => {
     expect(lineMatches?.length).toBe(1);
   });
 });
+
+describe("page.blocks.tsx is refreshed, never created", () => {
+  /**
+   * Sets up a project whose one module can be scaffolded, with the project's own page templates
+   * in place.
+   *
+   * @param blocksAlready what `page.blocks.tsx` already holds, or undefined to leave it absent
+   * @returns the directory the entity's pages land in
+   */
+  async function projectWithTemplates(blocksAlready?: string): Promise<string> {
+    const modDir = join(tempDir, "modules/myapp-editor");
+    await mkdir(join(modDir, "src/widgets"), { recursive: true });
+    await writeFile(
+      join(modDir, "package.json"),
+      JSON.stringify({ name: "@test/myapp-editor", dependencies: {} }),
+    );
+    await writeFile(join(modDir, "src/widgets/index.ts"), "export {};\n");
+    await mkdir(join(tempDir, "packages"), { recursive: true });
+
+    const templateDir = join(tempDir, ".simplix/templates");
+    await mkdir(templateDir, { recursive: true });
+    await writeFile(
+      join(templateDir, "crud-page.hbs"),
+      "// @simplix-generated page/console\nexport function {{EntityPascal}}CrudPage() {}\n",
+    );
+    await writeFile(join(templateDir, "page.blocks.hbs"), "// blocks for {{EntityPascal}}\n");
+
+    const pagesDir = join(modDir, "src/pages/product");
+    if (blocksAlready !== undefined) {
+      await mkdir(pagesDir, { recursive: true });
+      await writeFile(join(pagesDir, "page.blocks.tsx"), blocksAlready);
+    }
+    return pagesDir;
+  }
+
+  it("writes no blocks file for a page that departs from nothing", async () => {
+    const { scaffoldCrudCommand } = await import("../commands/scaffold-crud.js");
+    const pagesDir = await projectWithTemplates();
+
+    await scaffoldCrudCommand.parseAsync(["node", "simplix", "product"]);
+
+    expect(await pathExists(join(pagesDir, "page.blocks.tsx"))).toBe(false);
+  });
+
+  it("keeps what the author wrote in a blocks file that is already there", async () => {
+    const { scaffoldCrudCommand } = await import("../commands/scaffold-crud.js");
+    const pagesDir = await projectWithTemplates("// the author's own departure\n");
+
+    await scaffoldCrudCommand.parseAsync(["node", "simplix", "product"]);
+
+    expect(await readFile(join(pagesDir, "page.blocks.tsx"), "utf-8")).toBe(
+      "// the author's own departure\n",
+    );
+  });
+});
+
+describe("a generated page is rewritten only while nobody has touched it", () => {
+  /**
+   * Sets up a project whose one module can be scaffolded, with a page template in place.
+   *
+   * @param pageBody what the template renders under its marker
+   * @returns the path the entity's page lands at
+   */
+  async function projectWithPageTemplate(pageBody: string): Promise<string> {
+    const modDir = join(tempDir, "modules/myapp-editor");
+    await mkdir(join(modDir, "src/widgets"), { recursive: true });
+    await writeFile(
+      join(modDir, "package.json"),
+      JSON.stringify({ name: "@test/myapp-editor", dependencies: {} }),
+    );
+    await writeFile(join(modDir, "src/widgets/index.ts"), "export {};\n");
+    await mkdir(join(tempDir, "packages"), { recursive: true });
+
+    const templateDir = join(tempDir, ".simplix/templates");
+    await mkdir(templateDir, { recursive: true });
+    await writeFile(
+      join(templateDir, "crud-page.hbs"),
+      `/**\n * @simplix-generated page/console\n */\n${pageBody}`,
+    );
+    return join(modDir, "src/pages/product/crud-page.tsx");
+  }
+
+  it("stamps the render's fingerprint under the marker", async () => {
+    const { scaffoldCrudCommand } = await import("../commands/scaffold-crud.js");
+    const pagePath = await projectWithPageTemplate("export function X() {}\n");
+
+    await scaffoldCrudCommand.parseAsync(["node", "simplix", "product"]);
+
+    expect(await readFile(pagePath, "utf-8")).toMatch(/@simplix-render [0-9a-f]{12}/);
+  });
+
+  it("rewrites a page nobody has touched", async () => {
+    const { scaffoldCrudCommand } = await import("../commands/scaffold-crud.js");
+    const pagePath = await projectWithPageTemplate("export function X() {}\n");
+    await scaffoldCrudCommand.parseAsync(["node", "simplix", "product"]);
+
+    // The template moves on, and the untouched page follows it.
+    await writeFile(
+      join(tempDir, ".simplix/templates/crud-page.hbs"),
+      "/**\n * @simplix-generated page/console\n */\nexport function Y() {}\n",
+    );
+    await scaffoldCrudCommand.parseAsync(["node", "simplix", "product"]);
+
+    expect(await readFile(pagePath, "utf-8")).toContain("export function Y()");
+  });
+
+  it("leaves a page that has been edited since", async () => {
+    const { scaffoldCrudCommand } = await import("../commands/scaffold-crud.js");
+    const pagePath = await projectWithPageTemplate("export function X() {}\n");
+    await scaffoldCrudCommand.parseAsync(["node", "simplix", "product"]);
+
+    const edited = `${await readFile(pagePath, "utf-8")}\n// a week of somebody's work\n`;
+    await writeFile(pagePath, edited);
+    await scaffoldCrudCommand.parseAsync(["node", "simplix", "product"]);
+
+    expect(await readFile(pagePath, "utf-8")).toBe(edited);
+  });
+
+  it("leaves a marked page that predates the fingerprint, since it can prove nothing", async () => {
+    const { scaffoldCrudCommand } = await import("../commands/scaffold-crud.js");
+    const pagePath = await projectWithPageTemplate("export function X() {}\n");
+    const older = "/**\n * @simplix-generated page/console\n */\nexport function Older() {}\n";
+    await mkdir(join(pagePath, ".."), { recursive: true });
+    await writeFile(pagePath, older);
+
+    await scaffoldCrudCommand.parseAsync(["node", "simplix", "product"]);
+
+    expect(await readFile(pagePath, "utf-8")).toBe(older);
+  });
+});

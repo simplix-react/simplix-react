@@ -8,4 +8,4 @@
 
 > `const` **Text**: `ComponentType`\<`Omit`\<[`TextProps`](../interfaces/TextProps.md), `"ref"`\> & `RefAttributes`\<`HTMLParagraphElement`\>\>
 
-Defined in: [packages/ui/src/primitives/text.tsx:93](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/text.tsx#L93)
+Defined in: [packages/ui/src/primitives/text.tsx:125](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/primitives/text.tsx#L125)

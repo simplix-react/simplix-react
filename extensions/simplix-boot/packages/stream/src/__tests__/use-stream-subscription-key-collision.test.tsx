@@ -1,7 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, act } from "@testing-library/react";
-import { createElement } from "react";
 
 // Simulate the id collision produced by multiple React roots sharing one
 // provider (e.g. a react-konva stage bridges the stream context into its own
@@ -37,13 +36,10 @@ describe("subscription registry key collision", () => {
 
   it("keeps every subscription when useId values collide across hook instances", async () => {
     render(
-      createElement(StreamProvider, {
-        mock: { enabled: true },
-        children: [
-          createElement(Sub, { key: "health", resource: "middleware-health" }),
-          createElement(Sub, { key: "alarms", resource: "alarm-updates" }),
-        ],
-      }),
+      <StreamProvider mock={{ enabled: true }}>
+        <Sub key="health" resource="middleware-health" />
+        <Sub key="alarms" resource="alarm-updates" />
+      </StreamProvider>,
     );
 
     // Flush the debounced subscription sync (setTimeout 0).

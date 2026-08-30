@@ -2,6 +2,19 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+// The password toggle's accessible name resolves through the ui catalogue; with the hook stubbed to
+// echo its key, an assertion on "common.showPassword" proves the name came from the catalogue and
+// is not a hardcoded English string. Partial, because ColorField in this same file reads
+// `useLocale` from the module.
+vi.mock(import("@simplix-react/i18n/react"), async (importOriginal) => ({
+  ...(await importOriginal()),
+  useTranslation: () => ({
+    t: (key: string) => key,
+    locale: "en" as const,
+    exists: () => true,
+  }),
+}));
+
 import { TextField } from "../../fields/form/text-field";
 
 afterEach(cleanup);
@@ -245,6 +258,37 @@ describe("TextareaField", () => {
 // ── NumberField ──
 
 describe("NumberField", () => {
+  it("takes its width from the bounds it was given", () => {
+    render(<NumberField label="Age" value={25} onChange={vi.fn()} min={0} max={150} />);
+    const wrapper = screen.getByRole("spinbutton").parentElement as HTMLElement;
+    expect(wrapper.style.width).toBe("calc(3ch + 2.75rem)");
+  });
+
+  it("counts the sign and the decimals the step declares", () => {
+    render(<NumberField label="Offset" value={0} onChange={vi.fn()} min={-12} max={14} step={0.25} />);
+    const wrapper = screen.getByRole("spinbutton").parentElement as HTMLElement;
+    // two integer digits, one for the sign, three for ".25"
+    expect(wrapper.style.width).toBe("calc(6ch + 2.75rem)");
+  });
+
+  it("falls back to a form-sized measure when nothing bounds it", () => {
+    render(<NumberField label="Count" value={null} onChange={vi.fn()} />);
+    const wrapper = screen.getByRole("spinbutton").parentElement as HTMLElement;
+    expect(wrapper.style.width).toBe("calc(8ch + 2.75rem)");
+  });
+
+  it("reads a floor of zero as no measure at all, not as one digit", () => {
+    render(<NumberField label="Minimum length" value={8} onChange={vi.fn()} min={0} />);
+    const wrapper = screen.getByRole("spinbutton").parentElement as HTMLElement;
+    expect(wrapper.style.width).toBe("calc(8ch + 2.75rem)");
+  });
+
+  it("lets a caller state the measure the bounds cannot imply", () => {
+    render(<NumberField label="Year" value={2026} onChange={vi.fn()} digits={4} />);
+    const wrapper = screen.getByRole("spinbutton").parentElement as HTMLElement;
+    expect(wrapper.style.width).toBe("calc(4ch + 2.75rem)");
+  });
+
   it("renders with label and value", () => {
     render(<NumberField label="Age" value={25} onChange={vi.fn()} />);
     expect(screen.getByText("Age")).toBeDefined();
@@ -320,13 +364,13 @@ describe("PasswordField", () => {
     render(
       <PasswordField label="Password" value="secret" onChange={vi.fn()} />,
     );
-    const toggleBtn = screen.getByLabelText("Show password");
+    const toggleBtn = screen.getByLabelText("common.showPassword");
     fireEvent.click(toggleBtn);
 
     const input = screen.getByTestId("form-field-password").querySelector("input");
     expect(input?.getAttribute("type")).toBe("text");
 
-    const hideBtn = screen.getByLabelText("Hide password");
+    const hideBtn = screen.getByLabelText("common.hidePassword");
     fireEvent.click(hideBtn);
     expect(input?.getAttribute("type")).toBe("password");
   });

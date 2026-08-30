@@ -8,7 +8,7 @@
 
 > **formatDateMedium**(`date`, `locale?`, `timeZone?`): `string`
 
-Defined in: [format-date.ts:62](https://github.com/simplix-react/simplix-react/blob/main/format-date.ts#L62)
+Defined in: [format-date.ts:95](https://github.com/simplix-react/simplix-react/blob/main/format-date.ts#L95)
 
 Medium date with year — e.g. "Mar 3, 2026". Rendered in the given locale.
 

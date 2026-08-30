@@ -8,7 +8,7 @@
 
 > **isSameDay**(`a`, `b`): `boolean`
 
-Defined in: [packages/headless/dist/index.d.ts:497](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L497)
+Defined in: [packages/headless/dist/index.d.ts:511](https://github.com/simplix-react/simplix-react/blob/main/packages/headless/dist/index.d.ts#L511)
 
 ## Parameters
 

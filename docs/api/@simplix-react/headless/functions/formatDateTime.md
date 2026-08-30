@@ -8,7 +8,7 @@
 
 > **formatDateTime**(`date`, `locale?`, `timeZone?`): `string`
 
-Defined in: [format-date.ts:92](https://github.com/simplix-react/simplix-react/blob/main/format-date.ts#L92)
+Defined in: [format-date.ts:125](https://github.com/simplix-react/simplix-react/blob/main/format-date.ts#L125)
 
 Medium date + short time — e.g. "Mar 3, 2026, 2:30 PM".
 

@@ -2,7 +2,7 @@
   "user": {
     "fields": {
       "userId": "사용자 ID",
-      "username": "사용자명",
+      "username": "사용자 이름",
       "displayName": "표시 이름",
       "email": "이메일",
       "roles": "역할",

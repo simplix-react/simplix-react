@@ -8,4 +8,4 @@
 
 > **SheetFooterProps** = `React.HTMLAttributes`\<`HTMLDivElement`\>
 
-Defined in: [packages/ui/src/base/overlay/sheet.tsx:127](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/sheet.tsx#L127)
+Defined in: [packages/ui/src/base/overlay/sheet.tsx:133](https://github.com/simplix-react/simplix-react/blob/main/packages/ui/src/base/overlay/sheet.tsx#L133)
