@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { useTranslation } from "@simplix-react/i18n/react";
+import { useLocale, useTranslation } from "@simplix-react/i18n/react";
 import { resolveEmptyReason } from "@simplix-react/headless";
 import { Card, Flex, Text } from "../../primitives";
 import { useFlatUIComponents } from "../../provider/ui-provider";
@@ -89,6 +89,10 @@ export interface AssignmentChipProps {
 // ── Components ──
 
 function AssignmentPanelRoot({ title, count, required, action, children }: AssignmentPanelProps) {
+  // Grouped by the reader's locale. The count arrives as a number and is drawn as it arrives, so
+  // no catalogue string carries the format for it — and an ungrouped 3820 sitting beside a
+  // FilterBar total reading 3,820 is one quantity spelled two ways in one picture.
+  const locale = useLocale();
   const { Badge } = useFlatUIComponents();
   return (
     <Card padding="none" className="overflow-hidden [&_div.rounded-lg.border]:border-0 [&_div.rounded-lg.border]:rounded-none">
@@ -102,7 +106,7 @@ function AssignmentPanelRoot({ title, count, required, action, children }: Assig
               </span>
             )}
           </Text>
-          <Badge variant="secondary">{count}</Badge>
+          <Badge variant="secondary">{count.toLocaleString(locale)}</Badge>
         </Flex>
         {action}
       </Flex>
