@@ -51,7 +51,12 @@ export function buildSearchableParams(
     apiParams.size = pagination.limit;
   }
 
-  if (sort) {
+  // **A sort state with no field in it is not a sort.** The server's parser matches `field.asc` /
+  // `field.desc` and rejects anything else, so a state object that exists while its field is still
+  // undefined serialised as the literal `undefined.undefined` and every list holding one answered
+  // 400 the moment it loaded. Guarding on the object alone cannot see that — the object is there,
+  // and what is missing is inside it.
+  if (sort?.field && sort.direction) {
     apiParams.sort = [`${sort.field}.${sort.direction}`];
   }
 
