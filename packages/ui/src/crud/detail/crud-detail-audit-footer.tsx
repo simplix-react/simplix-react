@@ -124,14 +124,19 @@ export function DetailAuditFooter({ auditData, displayZone }: CrudDetailAuditFoo
       {/* Right: Dates (single row, right-aligned) */}
       {(hasCreated || hasUpdated) && (
         <div className="ml-auto flex items-center gap-3">
+          {/* **Each date says which one it is.** The icons are decorative and hidden from the
+              tree, so without a label a sighted reader tells the creation from the change by a
+              3.5-unit glyph and a screen reader is read two bare dates in a row with nothing
+              separating them. `audit.created` and `audit.modified` were already in every locale
+              and nothing drew them. */}
           {hasCreated && (
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1" title={t("audit.created")} aria-label={`${t("audit.created")}: ${formatAuditDate(auditData!.createdAt!, zone, locale) ?? auditData!.createdAt}`}>
               <CalendarIcon className="h-3.5 w-3.5 shrink-0" />
               {formatAuditDate(auditData!.createdAt!, zone, locale) ?? auditData!.createdAt}
             </span>
           )}
           {hasUpdated && (
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1" title={t("audit.modified")} aria-label={`${t("audit.modified")}: ${formatAuditDate(auditData!.updatedAt!, zone, locale) ?? auditData!.updatedAt}`}>
               <PencilIcon className="h-3.5 w-3.5 shrink-0" />
               {formatAuditDate(auditData!.updatedAt!, zone, locale) ?? auditData!.updatedAt}
             </span>

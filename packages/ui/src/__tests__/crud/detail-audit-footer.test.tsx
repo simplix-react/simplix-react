@@ -73,6 +73,26 @@ describe("DetailAuditFooter", () => {
     expect(screen.getByText(stamp("2026-02-01T00:00:00Z"))).toBeTruthy();
   });
 
+  // The two dates used to be told apart by their icons alone, and the icons are hidden from the
+  // accessibility tree — so a screen reader was read two bare dates in a row, and a sighted reader
+  // had a 3.5-unit glyph to go on. Each now says which one it is.
+  it("names which date is the creation and which is the change", () => {
+    render(
+      <DetailAuditFooter
+        auditData={{
+          createdAt: "2026-01-01T00:00:00Z",
+          updatedAt: "2026-02-01T00:00:00Z",
+        }}
+      />,
+    );
+    const created = screen.getByLabelText(new RegExp(stamp("2026-01-01T00:00:00Z")));
+    const updated = screen.getByLabelText(new RegExp(stamp("2026-02-01T00:00:00Z")));
+    expect(created.getAttribute("aria-label")).not.toEqual(updated.getAttribute("aria-label"));
+    expect(created.getAttribute("title")).toBeTruthy();
+    expect(updated.getAttribute("title")).toBeTruthy();
+    expect(created.getAttribute("title")).not.toEqual(updated.getAttribute("title"));
+  });
+
   it("copies ID to clipboard on click", async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, "clipboard", {
