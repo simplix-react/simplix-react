@@ -510,4 +510,77 @@ describe("useCrudFormSubmit", () => {
       });
     });
   });
+
+  describe("fields option (the transforms a submit handler used to do by hand)", () => {
+    it("passes every value through untouched when nothing is named", () => {
+      const create = createMutation<{ a: string; b: string }>();
+      const { result } = renderHook(() => useCrudFormSubmit({ create, fields: {} }));
+      act(() => result.current.handleSubmit({ a: "  x  ", b: "" }));
+      expect(create.mutateAsync).toHaveBeenCalledWith({ a: "  x  ", b: "" });
+    });
+
+    it("trims only the fields named", () => {
+      const create = createMutation<{ code: string; note: string }>();
+      const { result } = renderHook(() =>
+        useCrudFormSubmit({ create, fields: { trim: ["code"] } }));
+      act(() => result.current.handleSubmit({ code: "  A-1 ", note: "  kept  " }));
+      expect(create.mutateAsync).toHaveBeenCalledWith({ code: "A-1", note: "  kept  " });
+    });
+
+    // An empty box means「not given」on some fields and the empty string on others, which is why
+    // this is named per field rather than applied to every string.
+    it("turns an empty box into nothing where that is what empty means", () => {
+      const create = createMutation<{ note?: string; label: string }>();
+      const { result } = renderHook(() =>
+        useCrudFormSubmit({ create, fields: { emptyToUndefined: ["note"] } }));
+      act(() => result.current.handleSubmit({ note: "", label: "" }));
+      expect(create.mutateAsync).toHaveBeenCalledWith({ note: undefined, label: "" });
+    });
+
+    it("trims before deciding a box is empty, so spaces alone are not given either", () => {
+      const create = createMutation<{ note?: string }>();
+      const { result } = renderHook(() =>
+        useCrudFormSubmit({ create, fields: { trim: ["note"], emptyToUndefined: ["note"] } }));
+      act(() => result.current.handleSubmit({ note: "   " }));
+      expect(create.mutateAsync).toHaveBeenCalledWith({ note: undefined });
+    });
+
+    it("drops the form's own state, which is not a field of the record", () => {
+      const create = createMutation<{ name: string }>();
+      const { result } = renderHook(() =>
+        useCrudFormSubmit({ create, fields: { omit: ["openTab"] } }));
+      act(() => result.current.handleSubmit({ name: "x", openTab: "basics" } as never));
+      expect(create.mutateAsync).toHaveBeenCalledWith({ name: "x" });
+    });
+
+    // The base column is what every read projection resolves the reader's language out of, so a
+    // map carrying stray space would put that space in it.
+    it("derives the base column after trimming, not before", () => {
+      const create = createMutation<{ menuName: string; menuNameI18n: Record<string, string> }>();
+      const { result } = renderHook(() =>
+        useCrudFormSubmit({
+          create,
+          fields: { trim: ["menuNameI18n"] },
+          i18nFields: { menuNameI18n: "menuName" },
+          locales: [{ value: "ko" }],
+        }));
+      act(() => result.current.handleSubmit({ menuName: "", menuNameI18n: { ko: "홈" } }));
+      expect(create.mutateAsync).toHaveBeenCalledWith({
+        menuName: "홈",
+        menuNameI18n: { ko: "홈" },
+      });
+    });
+
+    it("gives prepare the last word, after every declared transform", () => {
+      const create = createMutation<{ code: string }>();
+      const { result } = renderHook(() =>
+        useCrudFormSubmit<{ code: string }>({
+          create,
+          fields: { trim: ["code"] },
+          prepare: (dto) => ({ ...dto, code: dto.code.toUpperCase() }),
+        }));
+      act(() => result.current.handleSubmit({ code: "  a-1  " }));
+      expect(create.mutateAsync).toHaveBeenCalledWith({ code: "A-1" });
+    });
+  });
 });

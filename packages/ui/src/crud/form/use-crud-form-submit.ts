@@ -37,6 +37,41 @@ export interface UseCrudFormSubmitOptions<T, TId = unknown> {
    */
   locales?: ReadonlyArray<{ value: string }>;
   /**
+   * How the form's values become the DTO, declared rather than assembled by hand.
+   *
+   * @remarks
+   * **A form that builds its own DTO in the submit handler is writing the field list twice.**
+   * Across one console, 168 such assignments did four mechanical things and 73 of them did
+   * nothing at all — `holidayName: values.holidayName`, a field copied across so that the object
+   * literal would be complete. What that costs is not the typing: a key left out of the literal
+   * is a value that silently never leaves the browser, and the request still answers 200. That is
+   * how a translation map came to be dropped on ten screens at once.
+   *
+   * Every value passes through untouched unless named here, so the copies disappear and what
+   * remains in the call is only what is actually being done to a field.
+   */
+  fields?: {
+    /** Text fields whose surrounding space is not part of the value. */
+    readonly trim?: readonly string[];
+    /**
+     * Fields where an empty box means「not given」rather than the empty string.
+     *
+     * Applied after `trim`, so a box holding only spaces is not given either.
+     */
+    readonly emptyToUndefined?: readonly string[];
+    /** Form-only state — a picker's open tab, a confirmation checkbox — that is not a DTO field. */
+    readonly omit?: readonly string[];
+  };
+  /**
+   * The last word, for what the four shapes above cannot say.
+   *
+   * @remarks
+   * Runs after every declared transform and after the i18n derivation, so it sees the DTO as it
+   * would have been sent. Kept deliberately narrow: a form reaching for this to do a trim has
+   * moved the field list back into its own body, which is what `fields` exists to end.
+   */
+  prepare?: (dto: T) => T;
+  /**
    * Called after a successful create or update, with whatever the mutation answered.
    *
    * @remarks
@@ -153,7 +188,7 @@ export interface UseCrudFormSubmitResult<T> {
 export function useCrudFormSubmit<T, TId = unknown>(
   options: UseCrudFormSubmitOptions<T, TId>,
 ): UseCrudFormSubmitResult<T> {
-  const { entityId, create, update, onSuccess, i18nFields, locales, validator } = options;
+  const { entityId, create, update, onSuccess, i18nFields, locales, validator, fields, prepare } = options;
   const isEdit = entityId != null && entityId !== "";
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [fieldLabels, setFieldLabels] = useState<Record<string, string>>({});
@@ -173,15 +208,30 @@ export function useCrudFormSubmit<T, TId = unknown>(
         return;
       }
 
+      // The order matters and is the order a reader would do it by hand: tidy each value, decide
+      // which empty boxes mean「not given」, derive the base columns from their maps, then drop the
+      // form's own state. The i18n derivation comes after trimming so a map whose entries carry
+      // stray space does not put that space in the column every read projection resolves from.
       let prepared: T = values;
-      if (i18nFields && locales) {
+      if (fields || i18nFields) {
         const next: Record<string, unknown> = { ...(values as Record<string, unknown>) };
-        for (const [i18nField, plainField] of Object.entries(i18nFields)) {
-          const i18nValue = next[i18nField] as Record<string, string> | null | undefined;
-          next[plainField] = applyI18nFallback(i18nValue, locales);
+        for (const name of fields?.trim ?? []) {
+          const value = next[name];
+          if (typeof value === "string") next[name] = value.trim();
         }
+        for (const name of fields?.emptyToUndefined ?? []) {
+          if (next[name] === "" || next[name] === null) next[name] = undefined;
+        }
+        if (i18nFields && locales) {
+          for (const [i18nField, plainField] of Object.entries(i18nFields)) {
+            const i18nValue = next[i18nField] as Record<string, string> | null | undefined;
+            next[plainField] = applyI18nFallback(i18nValue, locales);
+          }
+        }
+        for (const name of fields?.omit ?? []) delete next[name];
         prepared = next as T;
       }
+      if (prepare) prepared = prepare(prepared);
 
       // Edit takes the update path when there is one; everything else is the create path, which
       // is what makes an upsert endpoint work with `update` omitted. A mode with neither mutation
