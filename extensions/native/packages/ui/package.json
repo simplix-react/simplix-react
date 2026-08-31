@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react-native/ui",
-  "version": "0.3.9-SNAPSHOT",
+  "version": "0.3.9",
   "description": "Standard mobile UI kit for simplix-react on React Native: layout primitives, page skeletons, controls, sheet-first overlays, FormFields / DetailFields, EntityList + useEntityFeed, theme token sheet",
   "type": "module",
   "main": "./src/index.ts",

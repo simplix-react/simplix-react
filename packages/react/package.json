@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react/react",
-  "version": "0.3.9-SNAPSHOT",
+  "version": "0.3.9",
   "description": "React Query hooks derived from @simplix-react/contract",
   "type": "module",
   "sideEffects": false,
