@@ -50,8 +50,24 @@ export interface CalendarPlugins {
    * Replaces the month-view day-cell item badges with consumer-rendered content
    * (e.g. per-day aggregate chips). Receives the cell date and the items that
    * overlap it; the day number and highlight label still render above.
+   *
+   * Consumed by the month view only — the year view has its own slot,
+   * {@link CalendarPlugins.renderYearDayContent}.
    */
   renderDayContent?: (date: Date, items: CalendarItem[]) => ReactNode;
+  /**
+   * Replaces the year-view day-cell indicator dots with consumer-rendered
+   * content (e.g. one dot plus a `+N` count). Receives the cell date and the
+   * items that overlap it; the day number still renders above, and the returned
+   * node owns its own row layout, so a consumer that wants the dots aligned
+   * differently sets that here.
+   *
+   * Consumed by the year view only — the month view has its own slot,
+   * {@link CalendarPlugins.renderDayContent}. When it is absent, the year cell
+   * keeps its built-in rendering: one dot per item up to three, then a single
+   * dot in `items[0]`'s color followed by `+N`.
+   */
+  renderYearDayContent?: (date: Date, items: CalendarItem[]) => ReactNode;
   /**
    * Shows the item-count badge next to the header title. Defaults to true;
    * consumers whose data is not item-based (aggregate views) turn it off.
@@ -132,6 +148,7 @@ export function CalendarProvider({
   dayHighlights,
   renderDayBadge,
   renderDayContent,
+  renderYearDayContent,
   renderWeekDayHeader,
   renderItemOverlay,
   renderGanttRowExtra,
@@ -164,6 +181,7 @@ export function CalendarProvider({
       dayHighlights,
       renderDayBadge,
       renderDayContent,
+      renderYearDayContent,
       renderWeekDayHeader,
       renderItemOverlay,
       renderGanttRowExtra,
@@ -186,6 +204,7 @@ export function CalendarProvider({
       dayHighlights,
       renderDayBadge,
       renderDayContent,
+      renderYearDayContent,
       renderWeekDayHeader,
       renderItemOverlay,
       renderGanttRowExtra,
