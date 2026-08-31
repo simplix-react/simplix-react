@@ -5,7 +5,7 @@ import {
   type ValidationFieldError,
 } from "@simplix-react/api";
 import type { CrudMutation } from "@simplix-react/headless";
-import { applyI18nFallback } from "./i18n-submit-helper";
+import { prepareValues, type DeclaredFields } from "./prepare-values";
 
 export type { CrudMutation } from "@simplix-react/headless";
 
@@ -50,18 +50,7 @@ export interface UseCrudFormSubmitOptions<T, TId = unknown> {
    * Every value passes through untouched unless named here, so the copies disappear and what
    * remains in the call is only what is actually being done to a field.
    */
-  fields?: {
-    /** Text fields whose surrounding space is not part of the value. */
-    readonly trim?: readonly string[];
-    /**
-     * Fields where an empty box means「not given」rather than the empty string.
-     *
-     * Applied after `trim`, so a box holding only spaces is not given either.
-     */
-    readonly emptyToUndefined?: readonly string[];
-    /** Form-only state — a picker's open tab, a confirmation checkbox — that is not a DTO field. */
-    readonly omit?: readonly string[];
-  };
+  fields?: DeclaredFields;
   /**
    * The last word, for what the four shapes above cannot say.
    *
@@ -208,29 +197,10 @@ export function useCrudFormSubmit<T, TId = unknown>(
         return;
       }
 
-      // The order matters and is the order a reader would do it by hand: tidy each value, decide
-      // which empty boxes mean「not given」, derive the base columns from their maps, then drop the
-      // form's own state. The i18n derivation comes after trimming so a map whose entries carry
-      // stray space does not put that space in the column every read projection resolves from.
-      let prepared: T = values;
-      if (fields || i18nFields) {
-        const next: Record<string, unknown> = { ...(values as Record<string, unknown>) };
-        for (const name of fields?.trim ?? []) {
-          const value = next[name];
-          if (typeof value === "string") next[name] = value.trim();
-        }
-        for (const name of fields?.emptyToUndefined ?? []) {
-          if (next[name] === "" || next[name] === null) next[name] = undefined;
-        }
-        if (i18nFields && locales) {
-          for (const [i18nField, plainField] of Object.entries(i18nFields)) {
-            const i18nValue = next[i18nField] as Record<string, string> | null | undefined;
-            next[plainField] = applyI18nFallback(i18nValue, locales);
-          }
-        }
-        for (const name of fields?.omit ?? []) delete next[name];
-        prepared = next as T;
-      }
+      // One implementation of the transform, shared with the screens that submit without this
+      // hook. Two copies of it drift, and the copy that drifted is indistinguishable from the one
+      // that did not.
+      let prepared: T = prepareValues(values, { fields, i18nFields, locales });
       if (prepare) prepared = prepare(prepared);
 
       // Edit takes the update path when there is one; everything else is the create path, which

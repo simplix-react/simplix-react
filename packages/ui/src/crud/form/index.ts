@@ -15,6 +15,8 @@ export type {
 export { Wizard } from "./wizard";
 export type { WizardProps, WizardStepProps } from "./wizard";
 
+export { prepareValues } from "./prepare-values";
+export type { DeclaredFields, I18nFieldPairs } from "./prepare-values";
 export { useCrudFormSubmit } from "./use-crud-form-submit";
 export type {
   CrudMutation,
