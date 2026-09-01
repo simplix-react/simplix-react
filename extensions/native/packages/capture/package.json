@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react-native-ext/capture",
-  "version": "0.3.9-SNAPSHOT",
+  "version": "0.3.10-SNAPSHOT",
   "description": "Auto-capture session for simplix-react-native: camera preview, on-device face detection seam, composition judgement, countdown, retake, upload part",
   "type": "module",
   "main": "./src/index.ts",
