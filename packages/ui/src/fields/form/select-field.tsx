@@ -59,6 +59,26 @@ export interface SelectFieldProps<T extends string = string>
    * generic word stand in.
    */
   clearLabel?: string;
+  /**
+   * A control rendered to the LEFT of the trigger, on the trigger's own row.
+   *
+   * @remarks
+   * `TextField` has carried this pair since it needed an icon picker beside its input; a select
+   * needs it for the same reason and could not have it, so every screen that wanted a button
+   * beside a select built the row by hand — a grid for the width and a measured offset to put the
+   * button level with the trigger rather than with the field's outer box, which is where a plain
+   * flex row leaves it once an error line appears underneath.
+   *
+   * `FieldWrapper` owns that geometry: the control takes `flex-1 min-w-0` and the adornment sits
+   * beside it, so the trigger fills whatever the field is given instead of sizing to the option
+   * that happens to be selected.
+   *
+   * Non-compact only. `compact` measures itself against its longest option label and has no
+   * wrapper to hang an adornment on.
+   */
+  prefixControl?: React.ReactNode;
+  /** A control rendered to the RIGHT of the trigger, on the trigger's own row. See {@link SelectFieldProps.prefixControl}. */
+  suffixControl?: React.ReactNode;
 }
 
 /**
@@ -130,6 +150,8 @@ export function SelectField<T extends string = string>({
   required,
   disabled,
   className,
+  prefixControl,
+  suffixControl,
   ...variantProps
 }: SelectFieldProps<T>) {
   const { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } = useFlatUIComponents();
@@ -249,6 +271,8 @@ export function SelectField<T extends string = string>({
       required={required}
       disabled={disabled}
       className={className}
+      prefixControl={prefixControl}
+      suffixControl={suffixControl}
       {...variantProps}
     >
       {({ id }) => renderSelect(id)}
