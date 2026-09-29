@@ -566,6 +566,65 @@ describe("CrudList.Table", () => {
   });
 });
 
+// ── List.Table keeps its DOM across renders (regression: cells remounted on every render) ──
+
+describe("CrudList.Table keeps its cells in place across renders", () => {
+  interface Row {
+    id: number;
+    name: string;
+  }
+
+  const rows: Row[] = [
+    { id: 1, name: "Alice" },
+    { id: 2, name: "Bob" },
+  ];
+
+  // Every prop that a page usually rebuilds on each render is rebuilt here too: the column's
+  // render prop, the sort object, the actions array and the rowId function.
+  function draw(data: Row[]) {
+    return (
+      <CrudList>
+        <CrudList.Table
+          data={data}
+          rowId={(row) => String(row.id)}
+          sort={{ field: "name", direction: "asc" }}
+          onSortChange={() => {}}
+          actions={[{ type: "edit", onClick: () => {}, label: "Modify" }]}
+          actionVariant="outline"
+        >
+          <CrudList.Column<Row> field="name" header="Name" sortable>
+            {({ row }) => <span data-testid={`name-${row.id}`}>{row.name}</span>}
+          </CrudList.Column>
+        </CrudList.Table>
+      </CrudList>
+    );
+  }
+
+  it("a re-render with fresh column, sort and action identities keeps every cell, header and action node", () => {
+    const { rerender } = render(draw(rows));
+    const cell = screen.getByTestId("name-1");
+    const header = screen.getByText("Name").closest("button");
+    const action = screen.getAllByText("Modify")[0];
+
+    rerender(draw(rows));
+
+    expect(screen.getByTestId("name-1")).toBe(cell);
+    expect(screen.getByText("Name").closest("button")).toBe(header);
+    expect(screen.getAllByText("Modify")[0]).toBe(action);
+  });
+
+  it("a row prepended on top leaves the other rows' cells where they were", () => {
+    const { rerender } = render(draw(rows));
+    const alice = screen.getByTestId("name-1");
+    const bob = screen.getByTestId("name-2");
+
+    rerender(draw([{ id: 3, name: "Carol" }, ...rows]));
+
+    expect(screen.getByTestId("name-1")).toBe(alice);
+    expect(screen.getByTestId("name-2")).toBe(bob);
+  });
+});
+
 // ── List.Pagination ──
 
 describe("CrudList.Pagination", () => {

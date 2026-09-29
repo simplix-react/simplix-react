@@ -11,6 +11,11 @@ workflow stamps it with the released version and date, then opens a fresh
 
 ## [0.3.10] - Unreleased
 
+### Fixed
+
+- `CrudList.Table` updates its cells, headers, and row-action cells in place when it re-renders. Header and cell renderers were mounted through `flexRender` as components, and the table rebuilt them on every render, so each render handed React a new component type for every cell: every cell, header, and row action (with its tooltip) was unmounted and mounted again. A list whose page re-renders often — a live event list — spent seconds per render remounting its own table. Renderers are now called as functions, so a `CrudList.Column` render prop and `slots.rowActions` must not call hooks; return a component element for a cell that needs state
+- `CrudList.Table` keys its rows by `rowId` when one is given. Rows were keyed by index, so a row arriving at the top shifted every other row's key and re-created its cells
+
 ## [0.3.9] - 2026-08-31
 
 ## [0.3.8] - 2026-08-24
