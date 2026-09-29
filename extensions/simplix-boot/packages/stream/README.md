@@ -159,7 +159,7 @@ Provides the SSE connection to descendant hooks. Opens a single `EventSource`, d
 
 ### `useStreamContext()`
 
-Returns the current `StreamContextValue` from the nearest `StreamProvider`. Throws if called outside a provider.
+Returns the current `StreamContextValue` from the nearest `StreamProvider`. Throws if called outside a provider. It re-renders its caller on every heartbeat (it carries `lastHeartbeat`); prefer the two narrow hooks below when you do not read it.
 
 **Returns (`StreamContextValue`):**
 
@@ -171,6 +171,29 @@ Returns the current `StreamContextValue` from the nearest `StreamProvider`. Thro
 | `registerSubscription` | `(id: string, request: SubscriptionRequest) => void` | Register a subscription in the global registry |
 | `unregisterSubscription` | `(id: string) => void` | Remove a subscription from the registry |
 | `addEventListener` | `(resource: string, callback: (data: unknown) => void) => () => void` | Listen for a resource's data; returns an unsubscribe function |
+
+### `useStreamApi()`
+
+Returns the subscribe functions alone from the nearest `StreamProvider`; a heartbeat never re-renders the caller. The value keeps its reference for as long as the provider lives. Throws if called outside a provider.
+
+**Returns (`StreamApiValue`):**
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `registerSubscription` | `(id: string, request: SubscriptionRequest) => void` | Register a subscription in the global registry |
+| `unregisterSubscription` | `(id: string) => void` | Remove a subscription from the registry |
+| `addEventListener` | `(resource: string, callback: (data: unknown) => void) => () => void` | Listen for a resource's data; returns an unsubscribe function |
+
+### `useStreamStatus()`
+
+Returns `{ connectionStatus, sessionId }` from the nearest `StreamProvider`; the value changes only when they do, never on a heartbeat. Throws if called outside a provider.
+
+**Returns (`StreamStatusValue`):**
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `connectionStatus` | `ConnectionStatus` | Current connection state |
+| `sessionId` | `string \| null` | Server-assigned session ID, set after the connected event |
 
 ### `useStreamSubscription(resource, options?)`
 
