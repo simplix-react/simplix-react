@@ -310,6 +310,30 @@
   --animate-status-flash: status-flash 0.9s ease-out;
 }
 
+/* Status badge glow — StatusBadge `pulse` with a leading icon, which has no ring of its own. The
+   badge sets its tone's color for each scheme; the glow repeats for as long as the badge stands. */
+@theme {
+  --animate-status-glow: status-glow 1.2s ease-in-out infinite;
+}
+
+@keyframes status-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+  50% {
+    box-shadow: 0 0 8px 2px color-mix(in oklab, var(--status-glow-color) 45%, transparent);
+  }
+}
+
+.animate-status-glow {
+  --status-glow-color: var(--status-glow-light);
+}
+
+.dark .animate-status-glow {
+  --status-glow-color: var(--status-glow-dark);
+}
+
 @keyframes status-flash {
   0% {
     opacity: 0.75;

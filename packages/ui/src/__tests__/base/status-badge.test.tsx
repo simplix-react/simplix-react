@@ -105,6 +105,32 @@ describe("StatusBadge", () => {
     expect(container.querySelector(".animate-ping")).toBeNull();
   });
 
+  it("glows the whole badge in its tone when pulse is set with an icon", () => {
+    const { container } = render(
+      <StatusBadge tone="processing" label="Syncing" icon={CircleIcon} pulse />,
+    );
+    const pill = container.firstElementChild as HTMLElement;
+    expect(pill.className).toContain("animate-status-glow");
+    expect(pill.style.getPropertyValue("--status-glow-light")).toBe(STATUS_TONES.processing.chart);
+    expect(pill.style.getPropertyValue("--status-glow-dark")).toBe(STATUS_TONES.processing.chartDark);
+  });
+
+  it("does not glow an icon badge without the pulse prop", () => {
+    const { container } = render(
+      <StatusBadge tone="processing" label="Idle" icon={CircleIcon} />,
+    );
+    const pill = container.firstElementChild as HTMLElement;
+    expect(pill.className).not.toContain("animate-status-glow");
+    expect(pill.style.getPropertyValue("--status-glow-light")).toBe("");
+  });
+
+  it("keeps a dot badge's pulse on the dot, not the badge", () => {
+    const { container } = render(
+      <StatusBadge tone="processing" label="Syncing" showDot pulse />,
+    );
+    expect((container.firstElementChild as HTMLElement).className).not.toContain("animate-status-glow");
+  });
+
   it("merges custom className and forwards ref", () => {
     const ref = createRef<HTMLSpanElement>();
     const { container } = render(
