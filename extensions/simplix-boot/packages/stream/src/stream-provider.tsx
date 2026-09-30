@@ -72,12 +72,15 @@ const StreamContext = createContext<StreamContextValue | null>(null);
 const StreamApiContext = createContext<StreamApiValue | null>(null);
 const StreamStatusContext = createContext<StreamStatusValue | null>(null);
 
-const OUTSIDE_PROVIDER = "useStreamContext must be used within a StreamProvider";
+/** The error a stream hook throws outside a provider, naming the hook the caller called. */
+function outsideProvider(hook: string): Error {
+  return new Error(`${hook} must be used within a StreamProvider`);
+}
 
 export function useStreamContext(): StreamContextValue {
   const ctx = useContext(StreamContext);
   if (!ctx) {
-    throw new Error(OUTSIDE_PROVIDER);
+    throw outsideProvider("useStreamContext");
   }
   return ctx;
 }
@@ -88,14 +91,14 @@ export function useStreamContext(): StreamContextValue {
  */
 export function useStreamApi(): StreamApiValue {
   const ctx = useContext(StreamApiContext);
-  if (!ctx) throw new Error(OUTSIDE_PROVIDER);
+  if (!ctx) throw outsideProvider("useStreamApi");
   return ctx;
 }
 
 /** The connection status and session alone — changes only when they do, never on a heartbeat. */
 export function useStreamStatus(): StreamStatusValue {
   const ctx = useContext(StreamStatusContext);
-  if (!ctx) throw new Error(OUTSIDE_PROVIDER);
+  if (!ctx) throw outsideProvider("useStreamStatus");
   return ctx;
 }
 

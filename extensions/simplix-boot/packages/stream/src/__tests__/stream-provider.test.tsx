@@ -111,9 +111,9 @@ describe("StreamProvider", () => {
   });
 
   describe("narrow hooks", () => {
-    it("throw outside a StreamProvider with the context's own message", () => {
-      expect(() => renderHook(() => useStreamApi())).toThrow("useStreamContext must be used within a StreamProvider");
-      expect(() => renderHook(() => useStreamStatus())).toThrow("useStreamContext must be used within a StreamProvider");
+    it("throw outside a StreamProvider naming the hook that was called", () => {
+      expect(() => renderHook(() => useStreamApi())).toThrow("useStreamApi must be used within a StreamProvider");
+      expect(() => renderHook(() => useStreamStatus())).toThrow("useStreamStatus must be used within a StreamProvider");
     });
 
     it("do not re-render their caller on heartbeats, while useStreamContext still does", () => {

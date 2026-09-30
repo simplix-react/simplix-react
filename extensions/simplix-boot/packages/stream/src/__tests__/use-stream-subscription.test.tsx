@@ -161,7 +161,7 @@ describe("useStreamSubscription", () => {
   it("throws when used outside StreamProvider", () => {
     expect(() => {
       renderHook(() => useStreamSubscription("test"));
-    }).toThrow("useStreamContext must be used within a StreamProvider");
+    }).toThrow("useStreamApi must be used within a StreamProvider");
   });
 
   it("respects subscribe=false option (does not register subscription)", () => {
