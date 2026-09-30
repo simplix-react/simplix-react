@@ -29,6 +29,7 @@ import { ListTotalBadge } from "../shared/list-total-badge";
 import { useDefaultDisplayZone } from "../shared/display-zone-context";
 import { TableCardFrame, useTableCardFrame } from "../shared/table-card-frame";
 import { renderCellContent } from "../shared/cell-content";
+import { stabilizeColumnRenderers } from "../shared/stable-column-renderers";
 import type { ListColumnProps } from "../list/crud-list";
 import { getActionColumnWidth, RowActionCell, type ActionVariant, type RowActionDef } from "../shared/row-actions";
 import { ChevronsDownUpIcon, ChevronsUpDownIcon, MagnifyingGlassIcon, XIcon } from "../shared/icons";
@@ -574,7 +575,7 @@ function TreeTable<T>({
       });
     }
 
-    return cols;
+    return stabilizeColumnRenderers(cols);
   }, [columnDefs, sort, handleSortChange, actions, actionVariant, headerActions, idField, toggleExpand]);
 
   const table = useReactTable({

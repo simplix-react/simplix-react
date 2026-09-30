@@ -43,6 +43,7 @@ import type {CrudListViewMode} from "../shared";
 import {EmptyState} from "../shared/empty-state";
 import {TableCardFrame, useTableCardFrame} from "../shared/table-card-frame";
 import { renderCellContent } from "../shared/cell-content";
+import { stabilizeColumnRenderers } from "../shared/stable-column-renderers";
 import {AlertTriangleIcon, CloudOffIcon, FunnelIcon, MagnifyingGlassIcon} from "../shared/icons";
 import {getActionColumnWidth, RowActionCell, type ActionVariant, type RowActionDef} from "../shared/row-actions";
 import {
@@ -1233,7 +1234,7 @@ function ListTable<T>({
       });
     }
 
-    return cols;
+    return stabilizeColumnRenderers(cols);
   }, [
     columnDefs,
     selectable,
