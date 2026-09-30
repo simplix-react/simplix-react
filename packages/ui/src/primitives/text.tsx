@@ -58,19 +58,19 @@ const textVariants = cva("font-normal", {
      * `className="font-medium"`, which reaches past the primitive to the stylesheet and stops
      * moving when the type scale does.
      */
-    /** How the text sits in its line box, for the places a caption is centred under something. */
-    align: {
-      inherit: "",
-      start: "text-left",
-      center: "text-center",
-      end: "text-right",
-    },
     weight: {
       inherit: "",
       normal: "font-normal",
       medium: "font-medium",
       semibold: "font-semibold",
       bold: "font-bold",
+    },
+    /** How the text sits in its line box, for the places a caption is centred under something. */
+    align: {
+      inherit: "",
+      start: "text-left",
+      center: "text-center",
+      end: "text-right",
     },
   },
   defaultVariants: { size: "inherit", tone: "default", weight: "inherit", align: "inherit" },
@@ -107,12 +107,12 @@ export interface TextProps
  * ```
  */
 export const TextBase = forwardRef<HTMLParagraphElement, TextProps>(
-  ({ className, size, tone, font, as, children, ...rest }, ref) => {
+  ({ className, size, tone, font, weight, align, as, children, ...rest }, ref) => {
     const Tag = as ?? (font === "mono" ? "code" : "p");
     return (
       <Tag
         ref={ref as ComponentPropsWithRef<typeof Tag>["ref"]}
-        className={cn(textVariants({ size, tone, font }), className)}
+        className={cn(textVariants({ size, tone, font, weight, align }), className)}
         {...(rest as ComponentPropsWithRef<ElementType>)}
       >
         {children}

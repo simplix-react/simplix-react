@@ -96,6 +96,21 @@ describe("Text", () => {
     expect(screen.getByText("label text").tagName).toBe("LABEL");
   });
 
+  it("applies the weight it is given in place of the base weight", () => {
+    render(<Text data-testid="t" weight="semibold">heavy</Text>);
+    const el = screen.getByTestId("t");
+    expect(el.className).toContain("font-semibold");
+    expect(el.className).not.toContain("font-normal");
+    expect(el.hasAttribute("weight")).toBe(false);
+  });
+
+  it("applies the alignment it is given", () => {
+    render(<Text data-testid="t" align="center">centred</Text>);
+    const el = screen.getByTestId("t");
+    expect(el.className).toContain("text-center");
+    expect(el.hasAttribute("align")).toBe(false);
+  });
+
   it("merges custom className", () => {
     render(
       <Text data-testid="t" className="extra">
