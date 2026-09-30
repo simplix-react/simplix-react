@@ -38,13 +38,13 @@ Gate the connection on auth readiness with the `disabled` prop — keep it `true
 
 ### Consume the Connection
 
-Use `useStreamContext` to read the live connection state:
+Use `useStreamStatus` to read the live connection state. It re-renders only when the status or session changes, never on a heartbeat:
 
 ```tsx
-import { useStreamContext } from "@simplix-react-ext/simplix-boot-stream";
+import { useStreamStatus } from "@simplix-react-ext/simplix-boot-stream";
 
 function ConnectionBadge() {
-  const { connectionStatus, sessionId } = useStreamContext();
+  const { connectionStatus, sessionId } = useStreamStatus();
   return <span>{connectionStatus} ({sessionId ?? "no session"})</span>;
 }
 ```
