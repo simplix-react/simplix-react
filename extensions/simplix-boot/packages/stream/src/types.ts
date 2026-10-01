@@ -41,6 +41,19 @@ export interface StreamContextValue {
   addEventListener: (resource: string, callback: (data: unknown) => void) => () => void;
 }
 
+/** The stream's subscribe functions alone — the same reference for as long as the provider lives. */
+export interface StreamApiValue {
+  registerSubscription: StreamContextValue["registerSubscription"];
+  unregisterSubscription: StreamContextValue["unregisterSubscription"];
+  addEventListener: StreamContextValue["addEventListener"];
+}
+
+/** The connection alone — a new value only when the status or the session changes. */
+export interface StreamStatusValue {
+  connectionStatus: ConnectionStatus;
+  sessionId: string | null;
+}
+
 // Mock mode configuration
 export interface MockStreamConfig {
   enabled: boolean;

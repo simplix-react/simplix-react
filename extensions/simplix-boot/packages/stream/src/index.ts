@@ -1,4 +1,4 @@
-export { StreamProvider, useStreamContext } from "./stream-provider";
+export { StreamProvider, useStreamApi, useStreamContext, useStreamStatus } from "./stream-provider";
 export { useStreamSubscription } from "./use-stream-subscription";
 export { useStaleDetection } from "./use-stale-detection";
 export { useTimestampFreshness } from "./use-timestamp-freshness";
@@ -14,6 +14,8 @@ export type {
   SSEGapPayload,
   SubscriptionRequest,
   StreamContextValue,
+  StreamApiValue,
+  StreamStatusValue,
   MockStreamConfig,
   ParsedConnectedEvent,
   ParsedDataEvent,

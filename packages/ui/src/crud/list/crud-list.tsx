@@ -1,7 +1,6 @@
 import {useTranslation} from "@simplix-react/i18n/react";
 import {
   type ColumnDef,
-  flexRender,
   getCoreRowModel,
   type SortingState,
   useReactTable,
@@ -43,6 +42,7 @@ import type {CrudListViewMode} from "../shared";
 import {EmptyState} from "../shared/empty-state";
 import {TableCardFrame, useTableCardFrame} from "../shared/table-card-frame";
 import { renderCellContent } from "../shared/cell-content";
+import { renderColumnSlot } from "../shared/render-column-slot";
 import {AlertTriangleIcon, CloudOffIcon, FunnelIcon, MagnifyingGlassIcon} from "../shared/icons";
 import {getActionColumnWidth, RowActionCell, type ActionVariant, type RowActionDef} from "../shared/row-actions";
 import {
@@ -340,6 +340,11 @@ export interface ListColumnProps<T> {
    * which is a constant like `IN_TRANSIT` rather than anything an operator reads.
    */
   enumLabel?: (enumName: string, value: string) => string;
+  /**
+   * Renders the cell. Called as a plain function while the table renders, never mounted as a
+   * component, so the cell updates in place when the table re-renders — and so it must not call
+   * hooks. Return a component element for a cell that needs state of its own.
+   */
   children?: (props: { value: unknown; row: T }) => ReactNode;
 }
 
@@ -361,7 +366,10 @@ export type { ActionType, ActionVariant, RowActionDef } from "../shared/row-acti
  * default rendering for that seam; omitted slots keep the built-in behavior.
  */
 export interface ListTableSlots<T> {
-  /** Replace the per-row action cluster. Receives the row. */
+  /**
+   * Replace the per-row action cluster. Receives the row. Called as a plain function while the
+   * table renders, so it must not call hooks — return a component element for stateful actions.
+   */
   rowActions?: (ctx: { row: T }) => ReactNode;
   /** Replace the empty / filtered / error state body. Receives the reason. */
   empty?: (ctx: { reason: EmptyReason }) => ReactNode;
@@ -659,7 +667,7 @@ function ReorderableTable<T>({
               >
                 {header.isPlaceholder
                   ? null
-                  : flexRender(header.column.columnDef.header, header.getContext())}
+                  : renderColumnSlot(header.column.columnDef.header, header.getContext())}
                 {sizable && (
                   <ColumnResizeHandle
                     field={header.column.id}
@@ -1265,6 +1273,9 @@ function ListTable<T>({
     columns: tanstackColumns,
     state: { sorting, columnVisibility },
     getCoreRowModel: getCoreRowModel(),
+    // Keyed by the row's own id when the screen names one, so a row arriving on top does not shift
+    // every other row's key (and with it the cell ids) by one. Selection stays by `row.index`.
+    getRowId: rowId ? (row) => rowId(row) : undefined,
     manualSorting: true,
   });
 
@@ -1460,7 +1471,7 @@ function ListTable<T>({
                         >
                           {header.isPlaceholder
                             ? null
-                            : flexRender(header.column.columnDef.header, header.getContext())}
+                            : renderColumnSlot(header.column.columnDef.header, header.getContext())}
                           {sizable && (
                             <ColumnResizeHandle
                               field={header.column.id}
@@ -1517,7 +1528,7 @@ function ListTable<T>({
                                   cell.column.columnDef.meta as ColumnSizing | undefined,
                                 )}
                               >
-                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                {renderColumnSlot(cell.column.columnDef.cell, cell.getContext())}
                               </TableCell>
                             ))}
                           </TableRow>

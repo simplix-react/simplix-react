@@ -11,6 +11,20 @@ workflow stamps it with the released version and date, then opens a fresh
 
 ## [0.3.10] - Unreleased
 
+### Added
+
+- `useStreamApi()` and `useStreamStatus()` in `@simplix-react-ext/simplix-boot-stream`: the stream's subscribe functions, and its connection status and session, each on a context value that a heartbeat never replaces. `useStreamContext()` is unchanged and still carries `lastHeartbeat`
+
+### Changed
+
+- **Breaking:** `CrudList.Column` `children` and `slots.rowActions` now run inside the table's own render instead of inside a component of their own, so a hook called there crashes with "Rendered more/fewer hooks than during the previous render" as soon as the row count changes. Typecheck and lint do not catch it. Migration: move the hooks into a component and render that component from the render prop
+
+### Fixed
+
+- `CrudList.Table` updates its cells, headers, and row-action cells in place when it re-renders. Header and cell renderers were mounted through `flexRender` as components, and the table rebuilt them on every render, so each render handed React a new component type for every cell: every cell, header, and row action (with its tooltip) was unmounted and mounted again. A list whose page re-renders often — a live event list — spent seconds per render remounting its own table. Renderers are now called as functions — see Changed
+- `CrudList.Table` keys its rows by `rowId` when one is given. Rows were keyed by index, so a row arriving at the top shifted every other row's key and re-created its cells
+- `useStreamSubscription` no longer re-renders its caller on every stream heartbeat; it reads the subscribe functions through `useStreamApi()`
+
 ## [0.3.9] - 2026-08-31
 
 ## [0.3.8] - 2026-08-24

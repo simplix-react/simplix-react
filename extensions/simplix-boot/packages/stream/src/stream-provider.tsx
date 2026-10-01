@@ -5,6 +5,7 @@ import {
   useRef,
   useState,
   useCallback,
+  useMemo,
   type ReactNode,
 } from "react";
 import type {
@@ -13,9 +14,11 @@ import type {
   ParsedConnectedEvent,
   ParsedDataEvent,
   ParsedGapEvent,
+  StreamApiValue,
   StreamContextValue,
   StreamEventNames,
   StreamProtocol,
+  StreamStatusValue,
   SubscriptionRequest,
   SubscriptionSyncConfig,
 } from "./types";
@@ -66,12 +69,36 @@ const DEFAULT_MAX_CONSECUTIVE_RETRIES = 20;
 // ── Context ──
 
 const StreamContext = createContext<StreamContextValue | null>(null);
+const StreamApiContext = createContext<StreamApiValue | null>(null);
+const StreamStatusContext = createContext<StreamStatusValue | null>(null);
+
+/** The error a stream hook throws outside a provider, naming the hook the caller called. */
+function outsideProvider(hook: string): Error {
+  return new Error(`${hook} must be used within a StreamProvider`);
+}
 
 export function useStreamContext(): StreamContextValue {
   const ctx = useContext(StreamContext);
   if (!ctx) {
-    throw new Error("useStreamContext must be used within a StreamProvider");
+    throw outsideProvider("useStreamContext");
   }
+  return ctx;
+}
+
+/**
+ * The subscribe functions alone. Unlike {@link useStreamContext}, a heartbeat never re-renders the
+ * caller: the value is memoized on the three callbacks, which live as long as the provider.
+ */
+export function useStreamApi(): StreamApiValue {
+  const ctx = useContext(StreamApiContext);
+  if (!ctx) throw outsideProvider("useStreamApi");
+  return ctx;
+}
+
+/** The connection status and session alone — changes only when they do, never on a heartbeat. */
+export function useStreamStatus(): StreamStatusValue {
+  const ctx = useContext(StreamStatusContext);
+  if (!ctx) throw outsideProvider("useStreamStatus");
   return ctx;
 }
 
@@ -523,6 +550,14 @@ export function StreamProvider({
     };
   }, [url, mock, dispatch, heartbeatTimeoutMs, disabled, ticketUrl, requestTicket]);
 
+  const api = useMemo<StreamApiValue>(
+    () => ({ registerSubscription, unregisterSubscription, addEventListener }),
+    [registerSubscription, unregisterSubscription, addEventListener],
+  );
+  const status = useMemo<StreamStatusValue>(
+    () => ({ connectionStatus, sessionId }),
+    [connectionStatus, sessionId],
+  );
   const value: StreamContextValue = {
     sessionId,
     connectionStatus,
@@ -532,5 +567,11 @@ export function StreamProvider({
     addEventListener,
   };
 
-  return <StreamContext.Provider value={value}>{children}</StreamContext.Provider>;
+  return (
+    <StreamApiContext.Provider value={api}>
+      <StreamStatusContext.Provider value={status}>
+        <StreamContext.Provider value={value}>{children}</StreamContext.Provider>
+      </StreamStatusContext.Provider>
+    </StreamApiContext.Provider>
+  );
 }
