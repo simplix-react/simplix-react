@@ -1,5 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { flexRender } from "@tanstack/react-table";
 import type { Row } from "@tanstack/react-table";
 
 import { cn } from "../../utils/cn";
@@ -7,7 +8,6 @@ import { type ColumnWidths, sizedCellProps } from "../list/column-widths";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import type { ReorderConfig } from "../shared";
 import { rowClickHandler, rowClickIgnoreForColumn, rowClickIgnoreProps } from "../shared";
-import { renderColumnSlot } from "../shared/render-column-slot";
 import { DragHandleCell } from "./drag-handle";
 
 interface DraggableRowProps<T> {
@@ -83,7 +83,7 @@ export function DraggableRow<T>({
             cell.column.columnDef.meta as { flexible?: boolean } | undefined,
           )}
         >
-          {renderColumnSlot(cell.column.columnDef.cell, cell.getContext())}
+          {flexRender(cell.column.columnDef.cell, cell.getContext())}
         </TableCell>
       ))}
     </TableRow>

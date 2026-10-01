@@ -650,7 +650,7 @@ export { PanelHeader } from "./layout/panel-header";
 export type { PanelHeaderProps } from "./layout/panel-header";
 
 // Status tone tokens + tone-driven display primitives (commonization)
-export { STATUS_TONES, STATUS_TONE_NAMES, statusToneClass, StatusBadge, StatusDot, AlertBanner, DetailList, DetailListRow, LabeledField, EmptyValue, ColorDot } from "./base";
+export { STATUS_TONES, STATUS_TONE_NAMES, statusToneClass, StatusBadge, StatusDot, AlertBanner, DetailList, DetailListRow, LabeledField, EmptyValue, EmptyValueBadge, ColorDot } from "./base";
 export type {
   StatusTone,
   StatusToneToken,
@@ -663,6 +663,7 @@ export type {
   DetailListProps,
   DetailListRowProps,
   LabeledFieldProps,
+  EmptyValueBadgeProps,
 } from "./base";
 
 // Inline date/time display text — raw-text siblings of DetailDateField for cells, cards, captions

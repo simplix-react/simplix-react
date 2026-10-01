@@ -1,6 +1,7 @@
 import {useTranslation} from "@simplix-react/i18n/react";
 import {
   type ColumnDef,
+  flexRender,
   getCoreRowModel,
   type SortingState,
   useReactTable,
@@ -42,7 +43,7 @@ import type {CrudListViewMode} from "../shared";
 import {EmptyState} from "../shared/empty-state";
 import {TableCardFrame, useTableCardFrame} from "../shared/table-card-frame";
 import { renderCellContent } from "../shared/cell-content";
-import { renderColumnSlot } from "../shared/render-column-slot";
+import { stabilizeColumnRenderers } from "../shared/stable-column-renderers";
 import {AlertTriangleIcon, CloudOffIcon, FunnelIcon, MagnifyingGlassIcon} from "../shared/icons";
 import {getActionColumnWidth, RowActionCell, type ActionVariant, type RowActionDef} from "../shared/row-actions";
 import {
@@ -340,11 +341,6 @@ export interface ListColumnProps<T> {
    * which is a constant like `IN_TRANSIT` rather than anything an operator reads.
    */
   enumLabel?: (enumName: string, value: string) => string;
-  /**
-   * Renders the cell. Called as a plain function while the table renders, never mounted as a
-   * component, so the cell updates in place when the table re-renders — and so it must not call
-   * hooks. Return a component element for a cell that needs state of its own.
-   */
   children?: (props: { value: unknown; row: T }) => ReactNode;
 }
 
@@ -366,10 +362,7 @@ export type { ActionType, ActionVariant, RowActionDef } from "../shared/row-acti
  * default rendering for that seam; omitted slots keep the built-in behavior.
  */
 export interface ListTableSlots<T> {
-  /**
-   * Replace the per-row action cluster. Receives the row. Called as a plain function while the
-   * table renders, so it must not call hooks — return a component element for stateful actions.
-   */
+  /** Replace the per-row action cluster. Receives the row. */
   rowActions?: (ctx: { row: T }) => ReactNode;
   /** Replace the empty / filtered / error state body. Receives the reason. */
   empty?: (ctx: { reason: EmptyReason }) => ReactNode;
@@ -667,7 +660,7 @@ function ReorderableTable<T>({
               >
                 {header.isPlaceholder
                   ? null
-                  : renderColumnSlot(header.column.columnDef.header, header.getContext())}
+                  : flexRender(header.column.columnDef.header, header.getContext())}
                 {sizable && (
                   <ColumnResizeHandle
                     field={header.column.id}
@@ -1241,7 +1234,7 @@ function ListTable<T>({
       });
     }
 
-    return cols;
+    return stabilizeColumnRenderers(cols);
   }, [
     columnDefs,
     selectable,
@@ -1471,7 +1464,7 @@ function ListTable<T>({
                         >
                           {header.isPlaceholder
                             ? null
-                            : renderColumnSlot(header.column.columnDef.header, header.getContext())}
+                            : flexRender(header.column.columnDef.header, header.getContext())}
                           {sizable && (
                             <ColumnResizeHandle
                               field={header.column.id}
@@ -1528,7 +1521,7 @@ function ListTable<T>({
                                   cell.column.columnDef.meta as ColumnSizing | undefined,
                                 )}
                               >
-                                {renderColumnSlot(cell.column.columnDef.cell, cell.getContext())}
+                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
                               </TableCell>
                             ))}
                           </TableRow>

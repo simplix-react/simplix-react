@@ -86,6 +86,18 @@ describe("Badge", () => {
     expect(badge.className).toContain("rounded-none");
   });
 
+  it("shows a pressable cursor when interactive", () => {
+    render(<Badge interactive>Press</Badge>);
+    const badge = screen.getByText("Press");
+    expect(badge.className).toContain("cursor-pointer");
+    expect(badge.hasAttribute("interactive")).toBe(false);
+  });
+
+  it("is not interactive by default", () => {
+    render(<Badge>Still</Badge>);
+    expect(screen.getByText("Still").className).not.toContain("cursor-pointer");
+  });
+
   it("merges custom className", () => {
     render(<Badge className="my-badge">Custom</Badge>);
     const badge = screen.getByText("Custom");
