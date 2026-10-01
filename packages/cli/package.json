@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react/cli",
-  "version": "0.3.10-SNAPSHOT",
+  "version": "0.3.10",
   "description": "CLI for scaffolding and validating simplix-react projects",
   "type": "module",
   "sideEffects": [
