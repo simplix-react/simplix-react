@@ -313,6 +313,78 @@ export default defineConfig({
     expect(second.passes.some((p) => p.startsWith("Auto-fixed"))).toBe(false);
     expect(second.warnings).toHaveLength(0);
   });
+
+  describe("react as a peer dependency", () => {
+    const libraryPkg = [
+      "{",
+      '  "name": "@acme/runtime",',
+      '  "version": "0.0.1",',
+      '  "type": "module",',
+      '  "files": ["dist"],',
+      '  "exports": { ".": { "import": "./dist/index.js" } },',
+      '  "dependencies": {',
+      '    "react": "catalog:",',
+      '    "react-dom": "catalog:",',
+      '    "zod": "catalog:"',
+      "  },",
+      '  "devDependencies": {',
+      '    "tsup": "catalog:"',
+      "  }",
+      "}",
+      "",
+    ].join("\n");
+
+    it("warns when react sits in dependencies", async () => {
+      await writeFile(join(tempDir, "package.json"), libraryPkg);
+      const result = createResult(tempDir);
+      await validatePackageRules(tempDir, result);
+      expect(result.warnings.some((w) => w.includes("react, react-dom in dependencies"))).toBe(true);
+    });
+
+    it("moves react and react-dom to peer and dev dependencies, keeping the rest of the file", async () => {
+      await writeFile(join(tempDir, "package.json"), libraryPkg);
+      await validatePackageRules(tempDir, createResult(tempDir), { fix: true });
+
+      const text = await readFile(join(tempDir, "package.json"), "utf-8");
+      const pkg = JSON.parse(text);
+      expect(pkg.dependencies).toEqual({ zod: "catalog:" });
+      expect(pkg.devDependencies).toEqual({ tsup: "catalog:", react: "catalog:", "react-dom": "catalog:" });
+      expect(pkg.peerDependencies).toEqual({ react: ">=18.0.0", "react-dom": ">=18.0.0" });
+      expect(text).toContain('  "files": ["dist"],');
+      expect(text).toContain('  "exports": { ".": { "import": "./dist/index.js" } },');
+    });
+
+    it("drops an emptied dependencies object", async () => {
+      await writeFile(
+        join(tempDir, "package.json"),
+        '{\n  "name": "@acme/ui",\n  "type": "module",\n  "dependencies": {\n    "react": "^19.2.4"\n  }\n}\n',
+      );
+      await validatePackageRules(tempDir, createResult(tempDir), { fix: true });
+      const pkg = JSON.parse(await readFile(join(tempDir, "package.json"), "utf-8"));
+      expect(pkg.dependencies).toBeUndefined();
+      expect(pkg.devDependencies).toEqual({ react: "^19.2.4" });
+      expect(pkg.peerDependencies).toEqual({ react: ">=18.0.0" });
+    });
+
+    it("changes nothing on a second run", async () => {
+      await writeFile(join(tempDir, "package.json"), libraryPkg);
+      await validatePackageRules(tempDir, createResult(tempDir), { fix: true });
+      const once = await readFile(join(tempDir, "package.json"), "utf-8");
+      const result = createResult(tempDir);
+      await validatePackageRules(tempDir, result, { fix: true });
+      expect(await readFile(join(tempDir, "package.json"), "utf-8")).toBe(once);
+      expect(result.passes.some((p) => p.includes("peerDependencies"))).toBe(false);
+    });
+
+    it("adds type module without rewriting the file", async () => {
+      const text = '{\n  "name": "@acme/x",\n  "version": "0.0.1",\n  "files": ["dist"]\n}\n';
+      await writeFile(join(tempDir, "package.json"), text);
+      await validatePackageRules(tempDir, createResult(tempDir), { fix: true });
+      expect(await readFile(join(tempDir, "package.json"), "utf-8")).toBe(
+        '{\n  "name": "@acme/x",\n  "version": "0.0.1",\n  "type": "module",\n  "files": ["dist"]\n}\n',
+      );
+    });
+  });
 });
 
 describe("validateI18nRules", () => {

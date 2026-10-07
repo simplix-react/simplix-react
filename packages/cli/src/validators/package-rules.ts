@@ -7,7 +7,7 @@ import type { ValidationResult } from "../commands/validate.js";
  * Package Rules:
  * - All packages must have "exports" field in package.json
  * - tsup.config must exist and match exports
- * - React packages must have peerDependencies for react
+ * - React packages take react (and react-dom) as a peer dependency, not a dependency
  * - Every entry declares its source, and its types point at that source, so tsc and editors read
  *   a package without building it
  * - tsup emits no declarations
@@ -21,7 +21,6 @@ export async function validatePackageRules(
   if (!(await pathExists(pkgJsonPath))) return;
 
   const pkg = await readJsonFile<Record<string, unknown>>(pkgJsonPath);
-  let modified = false;
 
   // Check "exports" field
   if (pkg["exports"]) {
@@ -39,29 +38,38 @@ export async function validatePackageRules(
     result.warnings.push("Missing tsup.config.ts or tsup.config.js");
   }
 
-  // Check React peerDependencies
+  // React belongs to the app: a shared package declares it as a peer and keeps it for its own
+  // builds and tests only, so a consumer never ends up with a second copy.
+  let text = await readFile(pkgJsonPath, "utf-8");
+  const original = text;
   const deps = (pkg["dependencies"] ?? {}) as Record<string, string>;
   const devDeps = (pkg["devDependencies"] ?? {}) as Record<string, string>;
   const peerDeps = (pkg["peerDependencies"] ?? {}) as Record<string, string>;
 
-  const hasReactDep = "react" in deps || "react" in devDeps;
-  const hasReactPeer = "react" in peerDeps;
-
-  if (hasReactDep && !hasReactPeer) {
+  const moving = REACT_PACKAGES.filter((name) => name in deps);
+  const needsPeer = REACT_PACKAGES.filter(
+    (name) => (name in deps || (name === "react" && name in devDeps)) && !(name in peerDeps),
+  );
+  if (moving.length > 0 || needsPeer.length > 0) {
     if (options?.fix) {
-      if (!pkg["peerDependencies"]) {
-        pkg["peerDependencies"] = {};
+      for (const name of moving) {
+        text = removeField(text, "dependencies", name);
+        if (!(name in devDeps)) text = setField(text, "devDependencies", name, deps[name]);
       }
-      (pkg["peerDependencies"] as Record<string, string>)["react"] =
-        ">=18.0.0";
-      modified = true;
-      result.passes.push(
-        'Auto-fixed: added react to peerDependencies',
+      for (const name of needsPeer) {
+        text = setField(text, "peerDependencies", name, REACT_PEER_RANGE);
+      }
+      if (moving.length > 0) {
+        result.passes.push(`Auto-fixed: moved ${moving.join(", ")} to peerDependencies and devDependencies`);
+      } else {
+        result.passes.push(`Auto-fixed: added ${needsPeer.join(", ")} to peerDependencies`);
+      }
+    } else if (moving.length > 0) {
+      result.warnings.push(
+        `${moving.join(", ")} in dependencies; a shared package takes it as a peer dependency`,
       );
     } else {
-      result.warnings.push(
-        "Uses react but missing react in peerDependencies",
-      );
+      result.warnings.push("Uses react but missing react in peerDependencies");
     }
   }
 
@@ -70,16 +78,15 @@ export async function validatePackageRules(
     result.passes.push('"type": "module"');
   } else {
     if (options?.fix) {
-      pkg["type"] = "module";
-      modified = true;
+      text = setTopLevelType(text);
       result.passes.push('Auto-fixed: added "type": "module"');
     } else {
       result.warnings.push('Missing "type": "module" in package.json');
     }
   }
 
-  if (modified) {
-    await writeFile(pkgJsonPath, JSON.stringify(pkg, null, 2) + "\n", "utf-8");
+  if (text !== original) {
+    await writeFile(pkgJsonPath, text, "utf-8");
   }
 
   await validateEntrySources(pkgJsonPath, result, options);
@@ -266,6 +273,86 @@ function removeDtsSettings(text: string): string {
       : fixed.slice(0, start.index + start[1].length) + fixed.slice(at).replace(/^[ \t]*/, "");
   }
   return fixed;
+}
+
+const REACT_PACKAGES = ["react", "react-dom"] as const;
+// Wide on purpose: one shared package can serve a web app and a React Native app on different
+// React minors.
+const REACT_PEER_RANGE = ">=18.0.0";
+
+/** Where a top-level object field's braces sit in the text, and the indent of its key. */
+function findSection(
+  text: string,
+  section: string,
+): { start: number; open: number; close: number; indent: string } | undefined {
+  const head = new RegExp(`\\n([ \\t]+)${escapeRegExp(JSON.stringify(section))}\\s*:\\s*\\{`).exec(text);
+  if (!head) return undefined;
+  const open = head.index + head[0].length;
+  let depth = 0;
+  for (let at = open; at < text.length; at++) {
+    const char = text[at];
+    if (char === '"') {
+      for (at++; at < text.length && text[at] !== '"'; at++) if (text[at] === "\\") at++;
+    } else if (char === "{") {
+      depth++;
+    } else if (char === "}") {
+      if (depth === 0) return { start: head.index, open, close: at, indent: head[1] };
+      depth--;
+    }
+  }
+  return undefined;
+}
+
+/** Drops one string field from a top-level object, and the object itself once it is empty. */
+function removeField(text: string, section: string, name: string): string {
+  const found = findSection(text, section);
+  if (!found) return text;
+  const body = text
+    .slice(found.open, found.close)
+    .replace(new RegExp(`\\n[ \\t]*${escapeRegExp(JSON.stringify(name))}\\s*:\\s*"[^"]*",?`), "")
+    .replace(/,(\s*)$/, "$1");
+  if (body.trim() !== "") {
+    return text.slice(0, found.open) + body + text.slice(found.close);
+  }
+  // The emptied object goes with the comma that joined it to its neighbour.
+  const before = text.slice(0, found.start);
+  const after = text.slice(found.close + 1);
+  return before.endsWith(",") ? before.slice(0, -1) + after : before + after.replace(/^,/, "");
+}
+
+/** Adds one string field to a top-level object, creating the object after its siblings if needed. */
+function setField(text: string, section: string, name: string, value: string): string {
+  const field = `${JSON.stringify(name)}: ${JSON.stringify(value)}`;
+  const found = findSection(text, section);
+  if (found) {
+    const body = text.slice(found.open, found.close);
+    const inner = `${found.indent}${found.indent}`;
+    const content = body.trimEnd();
+    const added = content.trim() === "" ? `\n${inner}${field}` : `${content},\n${inner}${field}`;
+    return `${text.slice(0, found.open)}${added}\n${found.indent}${text.slice(found.close)}`;
+  }
+  const anchor = ["peerDependencies", "devDependencies", "dependencies"]
+    .map((name) => findSection(text, name))
+    .filter((s): s is NonNullable<typeof s> => s !== undefined)
+    .sort((a, b) => b.close - a.close)[0];
+  const indent = anchor?.indent ?? (/\n([ \t]+)"/.exec(text)?.[1] ?? "  ");
+  const block = `${indent}${JSON.stringify(section)}: {\n${indent}${indent}${field}\n${indent}}`;
+  if (anchor) {
+    return `${text.slice(0, anchor.close + 1)},\n${block}${text.slice(anchor.close + 1)}`;
+  }
+  const end = text.lastIndexOf("}");
+  const content = text.slice(0, end).trimEnd();
+  return `${content},\n${block}\n${text.slice(end)}`;
+}
+
+/** Adds "type": "module" after the version (or the name) line. */
+function setTopLevelType(text: string): string {
+  const line =
+    /\n([ \t]+)"version"\s*:\s*"[^"]*",?/.exec(text) ?? /\n([ \t]+)"name"\s*:\s*"[^"]*",?/.exec(text);
+  if (!line) return text.replace("{", '{\n  "type": "module",');
+  const end = line.index + line[0].length;
+  const comma = line[0].endsWith(",") ? "" : ",";
+  return `${text.slice(0, end)}${comma}\n${line[1]}"type": "module"${comma ? "" : ","}${text.slice(end)}`;
 }
 
 function escapeRegExp(value: string): string {
