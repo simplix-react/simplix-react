@@ -163,7 +163,7 @@ export default defineConfig((options): Options[] => [
     expect(fixed.exports["."].types).toBe("./src/core/index.ts");
   });
 
-  it("warns about an entry with types but no source and leaves it alone", async () => {
+  it("warns about an entry with no source and no src file, and leaves it alone", async () => {
     const pkg = builtTypesPkg.replace(
       '"./mock": {\n      "source": "./src/mock/index.ts",\n',
       '"./mock": {\n',
@@ -175,6 +175,86 @@ export default defineConfig((options): Options[] => [
 
     expect(result.warnings.some((w) => w.includes('"./mock"') && w.includes("source"))).toBe(true);
     expect(await readFile(join(tempDir, "package.json"), "utf-8")).toContain('"types": "./dist/mock.d.ts"');
+  });
+
+  // A module consumed as source by metro: every condition already points at src.
+  const srcOnlyPkg = `{
+  "name": "@test/kiosk",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./features": { "types": "./src/features/index.ts", "import": "./src/features/index.ts" }
+  },
+  "files": ["src"]
+}
+`;
+
+  it("adds the src path an entry already points at as its source", async () => {
+    await writeFile(join(tempDir, "package.json"), srcOnlyPkg);
+    await writeFile(join(tempDir, "tsup.config.ts"), "export default {}");
+
+    const warned = createResult(tempDir);
+    await validatePackageRules(tempDir, warned);
+    expect(warned.warnings.some((w) => w.includes("source") && w.includes('"./features"'))).toBe(true);
+    expect(await readFile(join(tempDir, "package.json"), "utf-8")).toBe(srcOnlyPkg);
+
+    const result = createResult(tempDir);
+    await validatePackageRules(tempDir, result, { fix: true });
+    expect(await readFile(join(tempDir, "package.json"), "utf-8")).toBe(
+      srcOnlyPkg
+        .replace('".": {\n      "types"', '".": {\n      "source": "./src/index.ts",\n      "types"')
+        .replace('"./features": { "types"', '"./features": { "source": "./src/features/index.ts", "types"'),
+    );
+    expect(result.warnings).toHaveLength(0);
+  });
+
+  // A module entry added by hand after the template, without a source and with dist types.
+  const distOnlyEntryPkg = builtTypesPkg
+    .replace("./dist/index.d.ts\",\n      \"import", "./src/index.ts\",\n      \"import")
+    .replace("./dist/mock.d.ts", "./src/mock/index.ts")
+    .replace('"types": "./dist/index.d.ts",\n  "exports"', '"types": "./src/index.ts",\n  "exports"')
+    .replace(
+      '"import": "./dist/mock.js"\n    }',
+      '"import": "./dist/mock.js"\n    },\n    "./pages": {\n      "types": "./dist/pages/index.d.ts",\n      "import": "./dist/pages/index.js"\n    }',
+    );
+
+  it.each(["ts", "tsx"])("finds the src/<path>/index.%s a dist entry was built from", async (ext) => {
+    await writeFile(join(tempDir, "package.json"), distOnlyEntryPkg);
+    await writeFile(join(tempDir, "tsup.config.ts"), "export default {}");
+    await mkdir(join(tempDir, "src/pages"), { recursive: true });
+    await writeFile(join(tempDir, `src/pages/index.${ext}`), "export {};\n");
+
+    const result = createResult(tempDir);
+    await validatePackageRules(tempDir, result, { fix: true });
+
+    expect(await readFile(join(tempDir, "package.json"), "utf-8")).toBe(
+      distOnlyEntryPkg.replace(
+        '"./pages": {\n      "types": "./dist/pages/index.d.ts"',
+        `"./pages": {\n      "source": "./src/pages/index.${ext}",\n      "types": "./src/pages/index.${ext}"`,
+      ),
+    );
+    expect(result.warnings).toHaveLength(0);
+
+    const second = createResult(tempDir);
+    await validatePackageRules(tempDir, second, { fix: true });
+    expect(second.passes.some((p) => p.startsWith("Auto-fixed"))).toBe(false);
+    expect(second.warnings).toHaveLength(0);
+  });
+
+  it("leaves a dist entry alone when its src file is missing", async () => {
+    await writeFile(join(tempDir, "package.json"), distOnlyEntryPkg);
+
+    const result = createResult(tempDir);
+    await validatePackageRules(tempDir, result, { fix: true });
+
+    expect(result.warnings.some((w) => w.includes('"./pages"') && w.includes("source"))).toBe(true);
+    expect(await readFile(join(tempDir, "package.json"), "utf-8")).toBe(distOnlyEntryPkg);
   });
 
   it("warns about and removes tsup declaration output", async () => {

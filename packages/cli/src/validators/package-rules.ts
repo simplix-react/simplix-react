@@ -1,4 +1,4 @@
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { readFile, writeFile } from "node:fs/promises";
 import { pathExists, readJsonFile } from "../utils/fs.js";
 import type { ValidationResult } from "../commands/validate.js";
@@ -8,7 +8,8 @@ import type { ValidationResult } from "../commands/validate.js";
  * - All packages must have "exports" field in package.json
  * - tsup.config must exist and match exports
  * - React packages must have peerDependencies for react
- * - Entry types point at the entry's source, so tsc and editors read a package without building it
+ * - Every entry declares its source, and its types point at that source, so tsc and editors read
+ *   a package without building it
  * - tsup emits no declarations
  */
 export async function validatePackageRules(
@@ -81,6 +82,7 @@ export async function validatePackageRules(
     await writeFile(pkgJsonPath, JSON.stringify(pkg, null, 2) + "\n", "utf-8");
   }
 
+  await validateEntrySources(pkgJsonPath, result, options);
   await validateSourceTypes(pkgJsonPath, result, options);
   if (await pathExists(tsupTs)) {
     await validateTsupDeclarations(tsupTs, result, options);
@@ -90,6 +92,74 @@ export async function validatePackageRules(
 interface EntryPoint {
   source?: string;
   types?: string;
+}
+
+/**
+ * An entry without a source gets one: the path it already points at when that is under src, or
+ * the src index that its dist output was built from. Its types then follow the source. An entry
+ * whose src file cannot be found is left for a person.
+ */
+async function validateEntrySources(
+  pkgJsonPath: string,
+  result: ValidationResult,
+  options?: { fix?: boolean },
+): Promise<void> {
+  const text = await readFile(pkgJsonPath, "utf-8");
+  const pkg = JSON.parse(text) as { exports?: unknown };
+  if (!pkg.exports || typeof pkg.exports !== "object") return;
+
+  // Script entries only: a stylesheet or a nested condition has no source of this kind.
+  const missing = Object.entries(pkg.exports as Record<string, unknown>).flatMap(([name, entry]) => {
+    if (typeof entry !== "object" || entry === null || "source" in entry) return [];
+    const { types, import: esm, default: fallback } = entry as Record<string, unknown>;
+    const target = types ?? esm ?? fallback;
+    return typeof target === "string" && /\.[cm]?[jt]sx?$/.test(target) ? [[name, target] as const] : [];
+  });
+  if (missing.length === 0) return;
+
+  const found: [string, string][] = [];
+  for (const [name, target] of missing) {
+    const source = await findEntrySource(dirname(pkgJsonPath), target);
+    if (source) {
+      found.push([name, source]);
+    } else {
+      result.warnings.push(`Entry "${name}" has no source and no src file to point it at`);
+    }
+  }
+  if (found.length === 0) return;
+
+  const names = found.map(([name]) => `"${name}"`).join(", ");
+  if (!options?.fix) {
+    result.warnings.push(`Entries without a source: ${names}`);
+    return;
+  }
+
+  // The source goes in front of the entry's first condition, with the same spacing.
+  const at = text.indexOf('"exports"');
+  let exportsText = text.slice(at);
+  for (const [name, source] of found) {
+    const entry = new RegExp(`(${escapeRegExp(JSON.stringify(name))}\\s*:\\s*\\{)(\\s*)"`);
+    exportsText = exportsText.replace(
+      entry,
+      (_, head: string, space: string) => `${head}${space}"source": ${JSON.stringify(source)},${space}"`,
+    );
+  }
+  await writeFile(pkgJsonPath, text.slice(0, at) + exportsText, "utf-8");
+  result.passes.push(`Auto-fixed: added source to ${names}`);
+}
+
+async function findEntrySource(pkgDir: string, target: string): Promise<string | undefined> {
+  if (target.startsWith("./src/")) return target;
+
+  // ./dist/pages/index.d.ts, ./dist/pages/index.js and ./dist/mock.d.ts come from src/<path>/index.ts.
+  const built = /^\.\/dist\/(.+?)(?:\.d)?\.[cm]?[jt]s$/.exec(target);
+  if (!built) return undefined;
+  const path = built[1].replace(/(^|\/)index$/, "");
+  for (const ext of ["ts", "tsx"]) {
+    const source = `./src/${path ? `${path}/` : ""}index.${ext}`;
+    if (await pathExists(join(pkgDir, source))) return source;
+  }
+  return undefined;
 }
 
 /**
@@ -108,12 +178,6 @@ async function validateSourceTypes(
   const entries = Object.entries(pkg.exports as Record<string, unknown>).filter(
     (e): e is [string, EntryPoint] => typeof e[1] === "object" && e[1] !== null,
   );
-
-  for (const [name, entry] of entries) {
-    if (entry.types && !entry.source) {
-      result.warnings.push(`Entry "${name}" declares types but no source`);
-    }
-  }
 
   const stale = entries.filter(([, e]) => e.source && e.types && e.types !== e.source);
   const rootSource = entries.find(([name]) => name === ".")?.[1].source;
@@ -165,4 +229,8 @@ async function validateTsupDeclarations(
   }
   await writeFile(tsupPath, fixed, "utf-8");
   result.passes.push("Auto-fixed: removed dts from tsup.config.ts");
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
