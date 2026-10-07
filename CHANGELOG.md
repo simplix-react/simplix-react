@@ -11,6 +11,16 @@ workflow stamps it with the released version and date, then opens a fresh
 
 ## [0.3.11] - Unreleased
 
+### Changed
+
+- `simplix init`, `add-domain`, `add-module` and `openapi` generate projects that develop from source. Every entry point declares `types` at its `source`, so `tsc` and editors read a workspace package without building it, and `tsup` no longer emits declarations. `pnpm dev` runs `turbo run dev:app` and starts only the apps, where it used to build every package first and rebuild them on each save through `turbo watch`; `pnpm build` runs `turbo run typecheck build`. In `turbo.json`, `dev:app` and `lint` depend on nothing, `typecheck` depends on `^typecheck`, and `concurrency` is `"4"`
+- Generated projects use TypeScript 7 and drop `baseUrl`, which TypeScript 7 removed. An Expo app stays on TypeScript `~5.9.3`, because the Expo CLI reads `tsconfig` paths through the compiler API that TypeScript 7 does not ship. The framework itself still builds with TypeScript 5.9, whose declarations TypeScript 7 reads
+- `simplix validate --fix` moves an existing project to this setup: entry `types` and the top-level `types` point at `source`, the `dts` line leaves `tsup.config.ts`, `turbo.json` and the known root `dev` and `build` script forms are rewritten, `"baseUrl": "."` leaves each `tsconfig.json`, the catalog TypeScript moves to 7 (run `pnpm install` afterwards), and an Expo app is pinned to the Expo TypeScript. Each fix edits only the value it changes and keeps the file's formatting. What it cannot rewrite safely is reported instead: other `turbo watch` scripts, scripts that start or export an Expo app without building its dependencies, an entry with `types` but no `source`, and a `baseUrl` other than `"."`
+
+### Fixed
+
+- The CLI writes real dependency versions into generated projects. Its version map was collected from the framework's `package.json` files as written, so 0.3.10 generated `"typescript": "catalog:"` and `"zod": "catalog:"` into projects whose catalog has no such entries, and `pnpm install` failed; the build now resolves each catalog reference
+
 ## [0.3.10] - 2026-10-01
 
 ### Added
