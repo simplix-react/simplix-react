@@ -9,7 +9,8 @@ import type { ValidationResult } from "../commands/validate.js";
  * Root Rules — the source-first dev setup:
  * - turbo.json: dev:app and lint build nothing first, typecheck chains through ^typecheck,
  *   concurrency is capped
- * - Root scripts: dev runs the apps only, build scripts typecheck alongside the build
+ * - Root scripts: dev runs the apps only, build scripts typecheck alongside the build, and a
+ *   script that runs an Expo app builds the packages it reads first
  * - The pnpm catalog carries TypeScript 7
  *
  * Every fix edits the file as text, one value at a time, so the rest of its formatting survives
@@ -101,7 +102,7 @@ async function validateRootScripts(
 
   const rewrites: [string, string, string][] = [];
   for (const [name, command] of Object.entries(scripts)) {
-    const rewritten = rewriteScript(name, command);
+    const rewritten = rewriteScript(name, command, expoApps);
     if (rewritten !== command) {
       rewrites.push([name, command, rewritten]);
       continue;
@@ -109,15 +110,6 @@ async function validateRootScripts(
 
     if (command.includes("turbo watch")) {
       result.warnings.push(`Script "${name}" uses turbo watch; run the apps with turbo run dev:app instead`);
-      continue;
-    }
-
-    const app = startedExpoApp(command, expoApps);
-    if (app && !command.includes("turbo run")) {
-      result.warnings.push(
-        `Script "${name}" runs Expo app ${app}, which reads workspace packages from dist; ` +
-          `build them first (turbo run build --filter=${app}^...)`,
-      );
     }
   }
 
@@ -125,7 +117,9 @@ async function validateRootScripts(
 
   const names = rewrites.map(([name]) => `"${name}"`).join(", ");
   if (!options?.fix) {
-    result.warnings.push(`Scripts build packages for dev or skip typecheck: ${names}`);
+    result.warnings.push(
+      `Scripts build packages for dev, skip typecheck, or run an Expo app on unbuilt packages: ${names}`,
+    );
     return;
   }
 
@@ -138,7 +132,21 @@ async function validateRootScripts(
   result.passes.push(`Auto-fixed: scripts ${names}`);
 }
 
-function rewriteScript(name: string, command: string): string {
+function rewriteScript(
+  name: string,
+  command: string,
+  expoApps: Map<string, Record<string, string>>,
+): string {
+  const expo = startedExpoApp(command, expoApps);
+  if (expo && !command.includes("turbo run")) {
+    // An Expo app reads workspace packages from dist, so their build comes first. An export is a
+    // release build and typechecks the app along with them.
+    const build = expo.exports
+      ? `turbo run typecheck build --force --concurrency=${TURBO_CONCURRENCY} --filter=${expo.app}...`
+      : `turbo run build --filter=${expo.app}^...`;
+    return `${build} && ${command}`;
+  }
+
   const buildThenWatch = BUILD_THEN_WATCH.exec(command);
   if (buildThenWatch) return `turbo run dev:app${buildThenWatch[1]}`;
 
@@ -157,10 +165,13 @@ function rewriteScript(name: string, command: string): string {
 }
 
 /** The Expo app a root script starts or exports through `pnpm --filter`, if any. */
-function startedExpoApp(command: string, expoApps: Map<string, Record<string, string>>): string | undefined {
+function startedExpoApp(
+  command: string,
+  expoApps: Map<string, Record<string, string>>,
+): { app: string; exports: boolean } | undefined {
   for (const match of command.matchAll(/pnpm\s+(?:--filter[= ]|-F\s*)(\S+)\s+(?:run\s+)?([\w:-]+)/g)) {
-    const scripts = expoApps.get(match[1]);
-    if (scripts?.[match[2]]?.includes("expo ")) return match[1];
+    const script = expoApps.get(match[1])?.[match[2]];
+    if (script && /\bexpo /.test(script)) return { app: match[1], exports: /\bexpo export\b/.test(script) };
   }
   return undefined;
 }

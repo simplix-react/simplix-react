@@ -182,24 +182,59 @@ describe("validateRootRules: scripts", () => {
     expect(result.warnings.some((w) => w.includes("dev:kiosk"))).toBe(false);
   });
 
-  it("warns about a script that starts or exports an Expo app", async () => {
-    await writeOldRoot();
+  async function writeExpoApp(): Promise<void> {
     await mkdir(join(tempDir, "apps/kiosk"), { recursive: true });
     await writeFile(
       join(tempDir, "apps/kiosk/package.json"),
       JSON.stringify({
         name: "@a/kiosk",
-        scripts: { start: "expo start" },
+        scripts: {
+          start: "expo start --port 3003",
+          android: "expo start --android --port 3003",
+          ios: "expo start --ios --port 3003",
+          export: "expo export --platform android --platform ios",
+        },
         dependencies: { expo: "^54.0.0" },
       }),
     );
-    const result = createResult(".");
-    await validateRootRules(tempDir, result, { fix: true });
+  }
 
-    expect(result.warnings.some((w) => w.includes('"dev:kiosk"'))).toBe(true);
-    expect(JSON.parse(await readFile(join(tempDir, "package.json"), "utf-8")).scripts["dev:kiosk"]).toBe(
-      "pnpm --filter @a/kiosk start",
+  const expoScripts: Record<string, string> = {
+    "dev:kiosk": "pnpm --filter @a/kiosk start",
+    "build:kiosk": "pnpm --filter @a/kiosk export",
+    "kiosk:android": "pnpm --filter @a/kiosk android",
+    "kiosk:ios": "pnpm --filter @a/kiosk ios",
+  };
+
+  it("warns about scripts that run an Expo app without building its packages", async () => {
+    await writeOldRoot(expoScripts);
+    await writeExpoApp();
+    const result = createResult(".");
+    await validateRootRules(tempDir, result);
+
+    expect(result.warnings.some((w) => w.includes('"dev:kiosk"') && w.includes('"kiosk:ios"'))).toBe(true);
+    expect(await readFile(join(tempDir, "package.json"), "utf-8")).toBe(rootPackageJson(expoScripts));
+  });
+
+  it("builds an Expo app's packages before starting it and typechecks before exporting it", async () => {
+    await writeOldRoot(expoScripts);
+    await writeExpoApp();
+    await validateRootRules(tempDir, createResult("."), { fix: true });
+
+    expect(await readFile(join(tempDir, "package.json"), "utf-8")).toBe(
+      rootPackageJson({
+        "dev:kiosk": "turbo run build --filter=@a/kiosk^... && pnpm --filter @a/kiosk start",
+        "build:kiosk":
+          "turbo run typecheck build --force --concurrency=4 --filter=@a/kiosk... && pnpm --filter @a/kiosk export",
+        "kiosk:android": "turbo run build --filter=@a/kiosk^... && pnpm --filter @a/kiosk android",
+        "kiosk:ios": "turbo run build --filter=@a/kiosk^... && pnpm --filter @a/kiosk ios",
+      }),
     );
+
+    const second = createResult(".");
+    await validateRootRules(tempDir, second, { fix: true });
+    expect(autoFixes(second)).toEqual([]);
+    expect(second.warnings).toEqual([]);
   });
 });
 
