@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { mkdtemp, writeFile, mkdir, rm } from "node:fs/promises";
+import { mkdtemp, writeFile, mkdir, rm, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import type { ValidationResult } from "../commands/validate.js";
@@ -82,6 +82,125 @@ describe("validatePackageRules", () => {
     const _hasFix = result.passes.some((p) => p.includes("Auto-fixed") || p.includes("type"));
     // It should not be an error anymore
     expect(result.errors).toHaveLength(0);
+  });
+
+  // The 0.3.10 package template: types pointed at dist and tsup emitted declarations,
+  // so neither tsc nor an editor saw a package until it was built.
+  const builtTypesPkg = `{
+  "name": "@test/domain-pet",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./mock": {
+      "source": "./src/mock/index.ts",
+      "types": "./dist/mock.d.ts",
+      "import": "./dist/mock.js"
+    }
+  },
+  "files": ["dist", "src"]
+}
+`;
+
+  const declaringTsup = `import { defineConfig, type Options } from "tsup";
+
+export default defineConfig((options): Options[] => [
+  {
+    entry: { index: "src/index.ts" },
+    format: ["esm"],
+    dts: !options.watch,
+    external: [/^@/],
+  },
+  {
+    entry: { mock: "src/mock/index.ts" },
+    format: ["esm"],
+    dts: !options.watch,
+    external: [/^@/, /^msw/],
+  },
+]);
+`;
+
+  it("warns when an entry's types do not point at its source", async () => {
+    await writeFile(join(tempDir, "package.json"), builtTypesPkg);
+    await writeFile(join(tempDir, "tsup.config.ts"), "export default {}");
+
+    const result = createResult(tempDir);
+    await validatePackageRules(tempDir, result);
+
+    expect(result.warnings.some((w) => w.includes("types"))).toBe(true);
+    expect(await readFile(join(tempDir, "package.json"), "utf-8")).toBe(builtTypesPkg);
+  });
+
+  it("points entry and top-level types at source and leaves the rest of the text alone", async () => {
+    await writeFile(join(tempDir, "package.json"), builtTypesPkg);
+    await writeFile(join(tempDir, "tsup.config.ts"), "export default {}");
+
+    const result = createResult(tempDir);
+    await validatePackageRules(tempDir, result, { fix: true });
+
+    expect(await readFile(join(tempDir, "package.json"), "utf-8")).toBe(
+      builtTypesPkg
+        .replace('"types": "./dist/index.d.ts",\n  "exports"', '"types": "./src/index.ts",\n  "exports"')
+        .replace('"types": "./dist/index.d.ts",\n      "import"', '"types": "./src/index.ts",\n      "import"')
+        .replace('"types": "./dist/mock.d.ts"', '"types": "./src/mock/index.ts"'),
+    );
+    expect(result.passes.some((p) => p.startsWith("Auto-fixed") && p.includes("types"))).toBe(true);
+  });
+
+  it("points top-level types at the source of the root entry", async () => {
+    const pkg = builtTypesPkg.replaceAll("./src/index.ts", "./src/core/index.ts");
+    await writeFile(join(tempDir, "package.json"), pkg);
+
+    await validatePackageRules(tempDir, createResult(tempDir), { fix: true });
+
+    const fixed = JSON.parse(await readFile(join(tempDir, "package.json"), "utf-8"));
+    expect(fixed.types).toBe("./src/core/index.ts");
+    expect(fixed.exports["."].types).toBe("./src/core/index.ts");
+  });
+
+  it("warns about an entry with types but no source and leaves it alone", async () => {
+    const pkg = builtTypesPkg.replace(
+      '"./mock": {\n      "source": "./src/mock/index.ts",\n',
+      '"./mock": {\n',
+    );
+    await writeFile(join(tempDir, "package.json"), pkg);
+
+    const result = createResult(tempDir);
+    await validatePackageRules(tempDir, result, { fix: true });
+
+    expect(result.warnings.some((w) => w.includes('"./mock"') && w.includes("source"))).toBe(true);
+    expect(await readFile(join(tempDir, "package.json"), "utf-8")).toContain('"types": "./dist/mock.d.ts"');
+  });
+
+  it("warns about and removes tsup declaration output", async () => {
+    await writeFile(join(tempDir, "package.json"), JSON.stringify({ name: "p", type: "module", exports: {} }));
+    await writeFile(join(tempDir, "tsup.config.ts"), declaringTsup);
+
+    const warned = createResult(tempDir);
+    await validatePackageRules(tempDir, warned);
+    expect(warned.warnings.some((w) => w.includes("dts"))).toBe(true);
+
+    await validatePackageRules(tempDir, createResult(tempDir), { fix: true });
+    expect(await readFile(join(tempDir, "tsup.config.ts"), "utf-8")).toBe(
+      declaringTsup.replaceAll("    dts: !options.watch,\n", ""),
+    );
+  });
+
+  it("finds nothing to fix on a second run", async () => {
+    await writeFile(join(tempDir, "package.json"), builtTypesPkg);
+    await writeFile(join(tempDir, "tsup.config.ts"), declaringTsup);
+    await validatePackageRules(tempDir, createResult(tempDir), { fix: true });
+
+    const second = createResult(tempDir);
+    await validatePackageRules(tempDir, second, { fix: true });
+
+    expect(second.passes.some((p) => p.startsWith("Auto-fixed"))).toBe(false);
+    expect(second.warnings).toHaveLength(0);
   });
 });
 
