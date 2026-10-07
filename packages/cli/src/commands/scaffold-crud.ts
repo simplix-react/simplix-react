@@ -1215,7 +1215,7 @@ async function ensurePackageJsonPagesExport(moduleDir: string): Promise<void> {
   // acquires exactly one entry that is wrong at the moment somebody scaffolds its first page.
   exports["./pages"] = {
     source: "./src/pages/index.ts",
-    types: "./dist/pages/index.d.ts",
+    types: "./src/pages/index.ts",
     import: "./dist/pages/index.js",
   };
   pkg.exports = exports;

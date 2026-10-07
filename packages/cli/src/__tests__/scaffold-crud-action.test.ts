@@ -415,7 +415,7 @@ describe("scaffoldCrudCommand action", () => {
     // one wrong entry survived: the other three come from the template with `source` on them.
     expect(pkgJson.exports["./pages"]).toEqual({
       source: "./src/pages/index.ts",
-      types: "./dist/pages/index.d.ts",
+      types: "./src/pages/index.ts",
       import: "./dist/pages/index.js",
     });
   });

@@ -9,8 +9,8 @@
     "pnpm": ">=9.0.0"
   },
   "scripts": {
-    "build": "turbo run clean && turbo run build",
-    "dev": "turbo run clean && turbo run build && turbo watch dev:app",
+    "build": "turbo run clean && turbo run typecheck build",
+    "dev": "turbo run dev:app",
     "lint": "turbo run lint",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",

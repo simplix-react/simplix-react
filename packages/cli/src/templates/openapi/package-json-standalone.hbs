@@ -4,16 +4,16 @@
   "description": "{{PascalName}} domain API and mock for {{projectName}} (OpenAPI-generated)",
   "type": "module",
   "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "./src/index.ts",
   "exports": {
     ".": {
       "source": "./src/index.ts",
-      "types": "./dist/index.d.ts",
+      "types": "./src/index.ts",
       "import": "./dist/index.js"
     },
     "./mock": {
       "source": "./src/mock/index.ts",
-      "types": "./dist/mock.d.ts",
+      "types": "./src/mock/index.ts",
       "import": "./dist/mock.js"
     }
   },

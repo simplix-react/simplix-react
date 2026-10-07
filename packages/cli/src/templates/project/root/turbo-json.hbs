@@ -1,5 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "concurrency": "4",
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -11,16 +12,16 @@
       "cache": false
     },
     "dev:app": {
-      "dependsOn": ["^build"],
+      "dependsOn": [],
       "cache": false,
       "persistent": true
     },
     "typecheck": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^typecheck"],
       "inputs": ["$TURBO_DEFAULT$", "tsconfig.json"]
     },
     "lint": {
-      "dependsOn": ["^build"],
+      "dependsOn": [],
       "inputs": ["$TURBO_DEFAULT$"]
     },
     "test": {
