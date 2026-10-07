@@ -320,11 +320,11 @@ describe("validateTsconfigBaseUrl", () => {
     expect(await readFile(join(tempDir, "tsconfig.json"), "utf-8")).toBe(tsconfig);
   });
 
-  it("warns instead of fixing when paths rely on baseUrl", async () => {
+  it("rewrites paths that lean on baseUrl relative to the tsconfig and drops it", async () => {
     const tsconfig = `{
   "compilerOptions": {
     "baseUrl": ".",
-    "paths": { "@/*": ["src/*"] }
+    "paths": { "@/*": ["src/*"], "~/*": ["./app/*"], "#/*": ["../shared/*"] }
   }
 }
 `;
@@ -332,8 +332,45 @@ describe("validateTsconfigBaseUrl", () => {
     const result = createResult(".");
     await validateTsconfigBaseUrl(tempDir, result, { fix: true });
 
-    expect(result.warnings.some((w) => w.includes("paths"))).toBe(true);
-    expect(await readFile(join(tempDir, "tsconfig.json"), "utf-8")).toBe(tsconfig);
+    expect(await readFile(join(tempDir, "tsconfig.json"), "utf-8")).toBe(`{
+  "compilerOptions": {
+    "paths": { "@/*": ["./src/*"], "~/*": ["./app/*"], "#/*": ["../shared/*"] }
+  }
+}
+`);
+    expect(autoFixes(result)).toHaveLength(1);
+
+    const second = createResult(".");
+    await validateTsconfigBaseUrl(tempDir, second, { fix: true });
+    expect(autoFixes(second)).toEqual([]);
+    expect(second.warnings).toEqual([]);
+  });
+
+  it("joins paths onto a baseUrl other than the directory itself", async () => {
+    const tsconfig = `{
+  "compilerOptions": {
+    "strict": true,
+    "baseUrl": "src",
+    "paths": {
+      "@/*": ["*"],
+      "@shared/*": ["../shared/*"]
+    }
+  }
+}
+`;
+    await writeFile(join(tempDir, "tsconfig.json"), tsconfig);
+    await validateTsconfigBaseUrl(tempDir, createResult("."), { fix: true });
+
+    expect(await readFile(join(tempDir, "tsconfig.json"), "utf-8")).toBe(`{
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "@/*": ["./src/*"],
+      "@shared/*": ["./shared/*"]
+    }
+  }
+}
+`);
   });
 });
 

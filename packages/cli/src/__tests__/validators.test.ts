@@ -271,6 +271,37 @@ export default defineConfig((options): Options[] => [
     );
   });
 
+  it("removes a dts setting that spans lines", async () => {
+    const tsup = `import { defineConfig } from "tsup";
+
+export default defineConfig({
+  entry: ["src/index.ts"],
+  dts: {
+    resolve: true,
+    compilerOptions: { composite: false },
+  },
+  format: ["esm"],
+  sourcemap: true,
+  dts: true
+});
+`;
+    await writeFile(join(tempDir, "package.json"), JSON.stringify({ name: "p", type: "module", exports: {} }));
+    await writeFile(join(tempDir, "tsup.config.ts"), tsup);
+
+    const result = createResult(tempDir);
+    await validatePackageRules(tempDir, result, { fix: true });
+
+    expect(await readFile(join(tempDir, "tsup.config.ts"), "utf-8")).toBe(`import { defineConfig } from "tsup";
+
+export default defineConfig({
+  entry: ["src/index.ts"],
+  format: ["esm"],
+  sourcemap: true,
+});
+`);
+    expect(result.warnings.some((w) => w.includes("dts"))).toBe(false);
+  });
+
   it("finds nothing to fix on a second run", async () => {
     await writeFile(join(tempDir, "package.json"), builtTypesPkg);
     await writeFile(join(tempDir, "tsup.config.ts"), declaringTsup);

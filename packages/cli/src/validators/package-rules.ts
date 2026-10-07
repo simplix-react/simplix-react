@@ -221,14 +221,51 @@ async function validateTsupDeclarations(
   const text = await readFile(tsupPath, "utf-8");
   if (!/^\s*dts\s*:/m.test(text)) return;
 
-  // A one-line setting only. A multi-line object is left for a person to remove.
-  const fixed = text.replace(/^[ \t]*dts[ \t]*:[^\n{]*,[ \t]*\n/gm, "");
+  const fixed = removeDtsSettings(text);
   if (!options?.fix || /^\s*dts\s*:/m.test(fixed)) {
     result.warnings.push("tsup.config.ts emits declarations (dts); types come from source");
     return;
   }
   await writeFile(tsupPath, fixed, "utf-8");
   result.passes.push("Auto-fixed: removed dts from tsup.config.ts");
+}
+
+/**
+ * Drops every `dts:` property that starts a line, a value spanning lines included: the value runs
+ * to the first comma, line end, or closing bracket outside its own brackets and strings.
+ */
+function removeDtsSettings(text: string): string {
+  let fixed = text;
+  const starts = [...text.matchAll(/^([ \t]*)dts[ \t]*:\s*/gm)].reverse();
+  for (const start of starts) {
+    let at = start.index + start[0].length;
+    let depth = 0;
+    let quote: string | undefined;
+    for (; at < fixed.length; at++) {
+      const char = fixed[at];
+      if (quote) {
+        if (char === "\\") at++;
+        else if (char === quote) quote = undefined;
+      } else if (char === '"' || char === "'" || char === "`") {
+        quote = char;
+      } else if ("{[(".includes(char)) {
+        depth++;
+      } else if ("}])".includes(char)) {
+        if (depth === 0) break;
+        depth--;
+      } else if (depth === 0 && (char === "," || char === "\n")) {
+        if (char === ",") at++;
+        break;
+      }
+    }
+
+    // The whole line goes when nothing else is left on it, otherwise just the property.
+    const rest = /^[ \t]*(\n|$)/.exec(fixed.slice(at));
+    fixed = rest
+      ? fixed.slice(0, start.index) + fixed.slice(at + rest[0].length)
+      : fixed.slice(0, start.index + start[1].length) + fixed.slice(at).replace(/^[ \t]*/, "");
+  }
+  return fixed;
 }
 
 function escapeRegExp(value: string): string {

@@ -1,4 +1,4 @@
-import { join } from "node:path";
+import { join, posix } from "node:path";
 import { readdir, readFile, writeFile } from "node:fs/promises";
 import { parse as parseYaml } from "yaml";
 import { pathExists } from "../utils/fs.js";
@@ -222,9 +222,10 @@ async function validateCatalogTypescript(
 }
 
 /**
- * `baseUrl` is gone in TypeScript 7. `"."` is dropped as it adds nothing; `paths` resolve
- * relative to the tsconfig without it. Any other value, or `paths` that are not relative,
- * are left for a person.
+ * `baseUrl` is gone in TypeScript 7. `paths` resolve relative to the tsconfig without it, so
+ * each target, which resolved against `baseUrl`, is rewritten relative to the tsconfig and
+ * `baseUrl` is dropped. A `baseUrl` other than `"."` with no `paths` is left for a person: bare
+ * imports may lean on it.
  */
 export async function validateTsconfigBaseUrl(
   dir: string,
@@ -238,17 +239,9 @@ export async function validateTsconfigBaseUrl(
   const baseUrl = /"baseUrl"\s*:\s*"([^"]*)"/.exec(text);
   if (!baseUrl) return;
 
-  if (baseUrl[1] !== ".") {
+  const paths = /("paths"\s*:\s*\{)([^}]*)\}/.exec(text);
+  if (baseUrl[1] !== "." && !paths) {
     result.warnings.push(`tsconfig.json sets "baseUrl": "${baseUrl[1]}", which TypeScript 7 removed`);
-    return;
-  }
-
-  const paths = /"paths"\s*:\s*\{([^}]*)\}/.exec(text);
-  const targets = paths ? [...paths[1].matchAll(/\[([^\]]*)\]/g)].flatMap((m) => [...m[1].matchAll(/"([^"]*)"/g)].map((t) => t[1])) : [];
-  if (targets.some((t) => !t.startsWith("./") && !t.startsWith("../"))) {
-    result.warnings.push(
-      'tsconfig.json sets "baseUrl", which TypeScript 7 removed; prefix its paths with "./" and drop it',
-    );
     return;
   }
 
@@ -257,9 +250,22 @@ export async function validateTsconfigBaseUrl(
     return;
   }
 
-  const fixed = text
-    .replace(/^[ \t]*"baseUrl"\s*:\s*"\.",[ \t]*\n/m, "")
-    .replace(/,([ \t]*\n)[ \t]*"baseUrl"\s*:\s*"\."[ \t]*\n/, "$1");
+  let fixed = text;
+  if (paths) {
+    const start = paths.index + paths[1].length;
+    const targets = paths[2].replace(/\[[^\]]*\]/g, (list) =>
+      list.replace(/"([^"]*)"/g, (whole, target: string) => {
+        if (posix.isAbsolute(target)) return whole;
+        const joined = posix.join(baseUrl[1], target);
+        return JSON.stringify(joined.startsWith("../") ? joined : `./${joined}`);
+      }),
+    );
+    fixed = fixed.slice(0, start) + targets + fixed.slice(start + paths[2].length);
+  }
+  fixed = fixed
+    .replace(/^[ \t]*"baseUrl"\s*:\s*"[^"]*",[ \t]*\n/m, "")
+    .replace(/,([ \t]*\n)[ \t]*"baseUrl"\s*:\s*"[^"]*"[ \t]*\n/, "$1")
+    .replace(/^[ \t]*"baseUrl"\s*:\s*"[^"]*"[ \t]*\n/m, "");
   await writeFile(tsconfigPath, fixed, "utf-8");
   result.passes.push('Auto-fixed: removed "baseUrl" from tsconfig.json');
 }
