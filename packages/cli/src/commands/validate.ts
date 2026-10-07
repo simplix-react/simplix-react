@@ -9,6 +9,9 @@ import {
   validatePackageRules,
   validateI18nRules,
   validateContractRules,
+  validateRootRules,
+  validateTsconfigBaseUrl,
+  validateExpoTypescript,
 } from "../validators/index.js";
 import pc from "picocolors";
 
@@ -45,6 +48,17 @@ export const validateCommand = new Command("validate")
     const modules = await discoverDirs(modulesDir);
     const apps = await discoverDirs(appsDir);
 
+    // Validate the workspace root (turbo.json, scripts, catalog, tsconfig)
+    const rootResult: ValidationResult = {
+      path: ".",
+      errors: [],
+      warnings: [],
+      passes: [],
+    };
+    await validateRootRules(rootDir, rootResult, { fix: flags.fix });
+    await validateTsconfigBaseUrl(rootDir, rootResult, { fix: flags.fix });
+    results.push(rootResult);
+
     // Validate each package
     for (const pkg of packages) {
       const result: ValidationResult = {
@@ -56,6 +70,7 @@ export const validateCommand = new Command("validate")
 
       await validatePackageRules(pkg, result, { fix: flags.fix });
       await validateContractRules(pkg, result, { fix: flags.fix });
+      await validateTsconfigBaseUrl(pkg, result, { fix: flags.fix });
       results.push(result);
     }
 
@@ -72,6 +87,7 @@ export const validateCommand = new Command("validate")
       await validateImportRules(mod, result, rootDir, { fix: flags.fix });
       await validateI18nRules(mod, result, { fix: flags.fix });
       await validatePackageRules(mod, result, { fix: flags.fix });
+      await validateTsconfigBaseUrl(mod, result, { fix: flags.fix });
       results.push(result);
     }
 
@@ -86,6 +102,8 @@ export const validateCommand = new Command("validate")
 
       await validateFsdRules(app, result, { fix: flags.fix, type: "app" });
       await validateImportRules(app, result, rootDir, { fix: flags.fix });
+      await validateTsconfigBaseUrl(app, result, { fix: flags.fix });
+      await validateExpoTypescript(app, result, { fix: flags.fix });
       results.push(result);
     }
 

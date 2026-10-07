@@ -3,3 +3,4 @@ export { validateImportRules } from "./import-rules.js";
 export { validatePackageRules } from "./package-rules.js";
 export { validateI18nRules } from "./i18n-rules.js";
 export { validateContractRules } from "./contract-rules.js";
+export { validateRootRules, validateTsconfigBaseUrl, validateExpoTypescript } from "./root-rules.js";
