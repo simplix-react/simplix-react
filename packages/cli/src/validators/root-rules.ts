@@ -1,4 +1,4 @@
-import { join, posix } from "node:path";
+import { join, posix, relative } from "node:path";
 import { readdir, readFile, writeFile } from "node:fs/promises";
 import { parse as parseYaml } from "yaml";
 import { pathExists } from "../utils/fs.js";
@@ -11,7 +11,7 @@ import type { ValidationResult } from "../commands/validate.js";
  *   concurrency is capped
  * - Root scripts: dev runs the apps only, build scripts typecheck alongside the build, and a
  *   script that runs an Expo app builds the packages it reads first
- * - The pnpm catalog carries TypeScript 7
+ * - The pnpm catalog, and any workspace package that pins TypeScript itself, carries TypeScript 7
  *
  * Every fix edits the file as text, one value at a time, so the rest of its formatting survives
  * and a second run finds nothing to fix.
@@ -24,6 +24,7 @@ export async function validateRootRules(
   await validateTurboJson(rootDir, result, options);
   await validateRootScripts(rootDir, result, options);
   await validateCatalogTypescript(rootDir, result, options);
+  await validateLiteralTypescript(rootDir, result, options);
 }
 
 const TURBO_CONCURRENCY = "4";
@@ -219,6 +220,54 @@ async function validateCatalogTypescript(
   const fixed = `${text.slice(0, start)}${line[1]}${target}${text.slice(start + line[0].length)}`;
   await writeFile(workspacePath, fixed, "utf-8");
   result.passes.push(`Auto-fixed: catalog TypeScript ${current} → ${target}; run pnpm install`);
+}
+
+const WORKSPACE_DIRS = ["packages", "modules", "apps", "config"];
+
+/**
+ * A workspace package that pins its own TypeScript below 7 moves to the version generated
+ * projects use. Expo apps are left to {@link validateExpoTypescript}.
+ */
+async function validateLiteralTypescript(
+  rootDir: string,
+  result: ValidationResult,
+  options?: { fix?: boolean },
+): Promise<void> {
+  const dirs = [rootDir];
+  for (const parent of WORKSPACE_DIRS) {
+    if (!(await pathExists(join(rootDir, parent)))) continue;
+    for (const entry of await readdir(join(rootDir, parent), { withFileTypes: true })) {
+      if (entry.isDirectory()) dirs.push(join(rootDir, parent, entry.name));
+    }
+  }
+
+  for (const dir of dirs) {
+    const pkgPath = join(dir, "package.json");
+    if (!(await pathExists(pkgPath))) continue;
+
+    const text = await readFile(pkgPath, "utf-8");
+    const pkg = JSON.parse(text) as PackageJson;
+    if (dependsOnExpo(pkg)) continue;
+
+    const stale = [pkg.dependencies?.["typescript"], pkg.devDependencies?.["typescript"]].filter(
+      (v): v is string => v !== undefined && majorOf(v) < 7,
+    );
+    if (stale.length === 0) continue;
+
+    const target = depVersion("typescript");
+    const where = relative(rootDir, pkgPath);
+    if (!options?.fix) {
+      result.warnings.push(`${where} pins TypeScript ${stale.join(", ")}; generated projects use ${target}`);
+      continue;
+    }
+
+    const fixed = text.replace(
+      /("(?:dependencies|devDependencies)"\s*:\s*\{[^}]*?"typescript"\s*:\s*)"([^"]*)"/g,
+      (whole, head: string, current: string) => (majorOf(current) < 7 ? `${head}${JSON.stringify(target)}` : whole),
+    );
+    await writeFile(pkgPath, fixed, "utf-8");
+    result.passes.push(`Auto-fixed: ${where} TypeScript ${stale.join(", ")} → ${target}; run pnpm install`);
+  }
 }
 
 /**

@@ -251,6 +251,64 @@ describe("validateRootRules: catalog TypeScript", () => {
   });
 });
 
+describe("validateRootRules: literal TypeScript versions", () => {
+  async function writePackage(dir: string, text: string): Promise<void> {
+    await mkdir(join(tempDir, dir), { recursive: true });
+    await writeFile(join(tempDir, dir, "package.json"), text);
+  }
+
+  const pinned = `{
+  "name": "@a/pinned",
+  "peerDependencies": {
+    "typescript": "^5.4.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^5.4.0"
+  }
+}
+`;
+
+  it("moves a package that pins TypeScript below 7 and asks for pnpm install", async () => {
+    await writeOldRoot();
+    await writePackage("packages/pinned", pinned);
+    await writePackage("config/typescript", pinned.replace("^5.4.0\"\n  }\n}", "5.9.3\"\n  }\n}"));
+
+    const warned = createResult(".");
+    await validateRootRules(tempDir, warned);
+    expect(warned.warnings.some((w) => w.includes("packages/pinned/package.json"))).toBe(true);
+    expect(await readFile(join(tempDir, "packages/pinned/package.json"), "utf-8")).toBe(pinned);
+
+    const result = createResult(".");
+    await validateRootRules(tempDir, result, { fix: true });
+
+    const fixed = pinned.replace('"tsup": "^8.5.1",\n    "typescript": "^5.4.0"', '"tsup": "^8.5.1",\n    "typescript": "^7.0.2"');
+    expect(await readFile(join(tempDir, "packages/pinned/package.json"), "utf-8")).toBe(fixed);
+    expect(await readFile(join(tempDir, "config/typescript/package.json"), "utf-8")).toBe(fixed);
+    expect(result.passes.some((p) => p.includes("packages/pinned") && p.includes("pnpm install"))).toBe(true);
+
+    const second = createResult(".");
+    await validateRootRules(tempDir, second, { fix: true });
+    expect(autoFixes(second)).toEqual([]);
+  });
+
+  it("leaves catalog references, TypeScript 7, and Expo apps alone", async () => {
+    await writeOldRoot();
+    const seven = pinned.replaceAll("^5.4.0", "^7.0.2");
+    const expo = pinned.replace('"tsup": "^8.5.1"', '"expo": "^54.0.0"').replaceAll("^5.4.0", "~5.9.3");
+    await writePackage("modules/seven", seven);
+    await writePackage("apps/kiosk", expo);
+
+    const result = createResult(".");
+    await validateRootRules(tempDir, result, { fix: true });
+
+    expect(await readFile(join(tempDir, "modules/seven/package.json"), "utf-8")).toBe(seven);
+    expect(await readFile(join(tempDir, "apps/kiosk/package.json"), "utf-8")).toBe(expo);
+    expect(await readFile(join(tempDir, "package.json"), "utf-8")).toContain('"typescript": "catalog:"');
+    expect(result.passes.some((p) => p.includes("modules/seven") || p.includes("apps/kiosk"))).toBe(false);
+  });
+});
+
 describe("validateRootRules: second run", () => {
   it("finds nothing to fix", async () => {
     await writeOldRoot();
