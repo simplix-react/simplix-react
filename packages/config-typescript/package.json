@@ -1,6 +1,6 @@
 {
   "name": "@simplix-react/config-typescript",
-  "version": "0.3.11",
+  "version": "0.3.12-SNAPSHOT",
   "private": true,
   "files": [
     "base.json",
