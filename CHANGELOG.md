@@ -21,6 +21,7 @@ workflow stamps it with the released version and date, then opens a fresh
 ### Fixed
 
 - The CLI writes real dependency versions into generated projects. Its version map was collected from the framework's `package.json` files as written, so 0.3.10 generated `"typescript": "catalog:"` and `"zod": "catalog:"` into projects whose catalog has no such entries, and `pnpm install` failed; the build now resolves each catalog reference
+- `simplix init` writes the demo app's `src/app/auth/index.ts` when auth is enabled, which it is by default. The app providers and the access policy import `auth` from it, but no template produced the file, so a new project failed to type check and its dev server could not load the providers
 
 ## [0.3.10] - 2026-10-01
 

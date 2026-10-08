@@ -133,6 +133,34 @@ describe("initCommand action (non-interactive)", () => {
     expect(await pathExists(join(appDir, "src/app/access/index.ts"))).toBe(true);
   });
 
+  it("creates the auth module that the providers and access policy import", async () => {
+    const { initCommand } = await import("../commands/init.js");
+
+    await initCommand.parseAsync(["node", "simplix", "auth-proj", "-y"]);
+
+    const appDir = join(tempDir, "auth-proj/apps/auth-proj-demo");
+    const auth = await readFile(join(appDir, "src/app/auth/index.ts"), "utf-8");
+    expect(auth).toContain("export const auth = createAuth(");
+    expect(auth).toContain('localStorageStore("auth-proj:")');
+
+    for (const importer of ["src/app/providers/app-providers.tsx", "src/app/access/index.ts"]) {
+      const source = await readFile(join(appDir, importer), "utf-8");
+      expect(source).toContain('import { auth } from "../auth/index.js";');
+    }
+  });
+
+  it("leaves auth out of the app when --no-auth is passed", async () => {
+    const { initCommand } = await import("../commands/init.js");
+
+    await initCommand.parseAsync(["node", "simplix", "no-auth-proj", "-y", "--no-auth"]);
+
+    const appDir = join(tempDir, "no-auth-proj/apps/no-auth-proj-demo");
+    expect(await pathExists(join(appDir, "src/app/auth/index.ts"))).toBe(false);
+    for (const file of ["src/app/providers/app-providers.tsx", "src/app/access/index.ts"]) {
+      expect(await readFile(join(appDir, file), "utf-8")).not.toContain("../auth/");
+    }
+  });
+
   it("creates modules/.gitkeep for FSD structure", async () => {
     const { initCommand } = await import("../commands/init.js");
 
@@ -214,7 +242,8 @@ describe("initCommand action (interactive)", () => {
     const appDir = join(tempDir, "no-i18n-proj/apps/no-i18n-proj-demo");
     // Should NOT create i18n files
     expect(await pathExists(join(appDir, "src/app/i18n/index.ts"))).toBe(false);
-    // Should NOT create access files
+    // Should NOT create auth or access files
+    expect(await pathExists(join(appDir, "src/app/auth/index.ts"))).toBe(false);
     expect(await pathExists(join(appDir, "src/app/access/index.ts"))).toBe(false);
   });
 });
