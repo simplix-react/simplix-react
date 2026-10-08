@@ -11,6 +11,17 @@ workflow stamps it with the released version and date, then opens a fresh
 
 ## [0.3.11] - Unreleased
 
+### Changed
+
+- `simplix init`, `add-domain`, `add-module` and `openapi` generate projects that develop from source. Every entry point declares `types` at its `source`, so `tsc` and editors read a workspace package without building it, and `tsup` no longer emits declarations. `pnpm dev` runs `turbo run dev:app` and starts only the apps, where it used to build every package first and rebuild them on each save through `turbo watch`; `pnpm build` runs `turbo run typecheck build`. In `turbo.json`, `dev:app` and `lint` depend on nothing, `typecheck` depends on `^typecheck`, and `concurrency` is `"4"`
+- Generated projects use TypeScript 7 and drop `baseUrl`, which TypeScript 7 removed. An Expo app stays on TypeScript `~5.9.3`, because the Expo CLI reads `tsconfig` paths through the compiler API that TypeScript 7 does not ship. The framework itself still builds with TypeScript 5.9, whose declarations TypeScript 7 reads
+- `simplix validate --fix` moves an existing project to this setup: an entry without a `source` gets one (the `src` path it already points at, or the `src/<path>/index.ts` or `.tsx` its `dist` output was built from), entry `types` and the top-level `types` point at `source`, the `dts` setting leaves `tsup.config.ts` even when it spans lines, `turbo.json` and the known root `dev` and `build` script forms are rewritten, a root script that starts an Expo app first builds the packages the app reads (`turbo run build --filter=<app>^...`) and one that exports it first runs the typechecked build of the app and its dependencies, `baseUrl` leaves each `tsconfig.json` with its `paths` rewritten relative to the `tsconfig`, the catalog TypeScript and any TypeScript below 7 that a workspace package pins itself move to 7 (run `pnpm install` afterwards), and an Expo app is pinned to the Expo TypeScript. Each fix edits only the value it changes and keeps the file's formatting, so a second run finds nothing. What the files give no basis to rewrite is reported instead: other `turbo watch` scripts, an entry whose `src` file cannot be found, and a `baseUrl` other than `"."` without `paths`, which bare imports may lean on
+- `simplix validate --fix` moves `react` and `react-dom` out of a shared package's `dependencies` into `devDependencies`, with a `>=18.0.0` peer dependency, instead of adding the peer next to the dependency. A package that installs its own React can load a second copy beside the app's, which breaks hooks and context. The wide peer range lets one package serve a web app and a React Native app on different React minors. The fix, and the `"type": "module"` fix, now edit `package.json` in place instead of rewriting the whole file
+
+### Fixed
+
+- The CLI writes real dependency versions into generated projects. Its version map was collected from the framework's `package.json` files as written, so 0.3.10 generated `"typescript": "catalog:"` and `"zod": "catalog:"` into projects whose catalog has no such entries, and `pnpm install` failed; the build now resolves each catalog reference
+
 ## [0.3.10] - 2026-10-01
 
 ### Added

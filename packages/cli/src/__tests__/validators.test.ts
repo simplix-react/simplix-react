@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { mkdtemp, writeFile, mkdir, rm } from "node:fs/promises";
+import { mkdtemp, writeFile, mkdir, rm, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import type { ValidationResult } from "../commands/validate.js";
@@ -82,6 +82,308 @@ describe("validatePackageRules", () => {
     const _hasFix = result.passes.some((p) => p.includes("Auto-fixed") || p.includes("type"));
     // It should not be an error anymore
     expect(result.errors).toHaveLength(0);
+  });
+
+  // The 0.3.10 package template: types pointed at dist and tsup emitted declarations,
+  // so neither tsc nor an editor saw a package until it was built.
+  const builtTypesPkg = `{
+  "name": "@test/domain-pet",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./mock": {
+      "source": "./src/mock/index.ts",
+      "types": "./dist/mock.d.ts",
+      "import": "./dist/mock.js"
+    }
+  },
+  "files": ["dist", "src"]
+}
+`;
+
+  const declaringTsup = `import { defineConfig, type Options } from "tsup";
+
+export default defineConfig((options): Options[] => [
+  {
+    entry: { index: "src/index.ts" },
+    format: ["esm"],
+    dts: !options.watch,
+    external: [/^@/],
+  },
+  {
+    entry: { mock: "src/mock/index.ts" },
+    format: ["esm"],
+    dts: !options.watch,
+    external: [/^@/, /^msw/],
+  },
+]);
+`;
+
+  it("warns when an entry's types do not point at its source", async () => {
+    await writeFile(join(tempDir, "package.json"), builtTypesPkg);
+    await writeFile(join(tempDir, "tsup.config.ts"), "export default {}");
+
+    const result = createResult(tempDir);
+    await validatePackageRules(tempDir, result);
+
+    expect(result.warnings.some((w) => w.includes("types"))).toBe(true);
+    expect(await readFile(join(tempDir, "package.json"), "utf-8")).toBe(builtTypesPkg);
+  });
+
+  it("points entry and top-level types at source and leaves the rest of the text alone", async () => {
+    await writeFile(join(tempDir, "package.json"), builtTypesPkg);
+    await writeFile(join(tempDir, "tsup.config.ts"), "export default {}");
+
+    const result = createResult(tempDir);
+    await validatePackageRules(tempDir, result, { fix: true });
+
+    expect(await readFile(join(tempDir, "package.json"), "utf-8")).toBe(
+      builtTypesPkg
+        .replace('"types": "./dist/index.d.ts",\n  "exports"', '"types": "./src/index.ts",\n  "exports"')
+        .replace('"types": "./dist/index.d.ts",\n      "import"', '"types": "./src/index.ts",\n      "import"')
+        .replace('"types": "./dist/mock.d.ts"', '"types": "./src/mock/index.ts"'),
+    );
+    expect(result.passes.some((p) => p.startsWith("Auto-fixed") && p.includes("types"))).toBe(true);
+  });
+
+  it("points top-level types at the source of the root entry", async () => {
+    const pkg = builtTypesPkg.replaceAll("./src/index.ts", "./src/core/index.ts");
+    await writeFile(join(tempDir, "package.json"), pkg);
+
+    await validatePackageRules(tempDir, createResult(tempDir), { fix: true });
+
+    const fixed = JSON.parse(await readFile(join(tempDir, "package.json"), "utf-8"));
+    expect(fixed.types).toBe("./src/core/index.ts");
+    expect(fixed.exports["."].types).toBe("./src/core/index.ts");
+  });
+
+  it("warns about an entry with no source and no src file, and leaves it alone", async () => {
+    const pkg = builtTypesPkg.replace(
+      '"./mock": {\n      "source": "./src/mock/index.ts",\n',
+      '"./mock": {\n',
+    );
+    await writeFile(join(tempDir, "package.json"), pkg);
+
+    const result = createResult(tempDir);
+    await validatePackageRules(tempDir, result, { fix: true });
+
+    expect(result.warnings.some((w) => w.includes('"./mock"') && w.includes("source"))).toBe(true);
+    expect(await readFile(join(tempDir, "package.json"), "utf-8")).toContain('"types": "./dist/mock.d.ts"');
+  });
+
+  // A module consumed as source by metro: every condition already points at src.
+  const srcOnlyPkg = `{
+  "name": "@test/kiosk",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./features": { "types": "./src/features/index.ts", "import": "./src/features/index.ts" }
+  },
+  "files": ["src"]
+}
+`;
+
+  it("adds the src path an entry already points at as its source", async () => {
+    await writeFile(join(tempDir, "package.json"), srcOnlyPkg);
+    await writeFile(join(tempDir, "tsup.config.ts"), "export default {}");
+
+    const warned = createResult(tempDir);
+    await validatePackageRules(tempDir, warned);
+    expect(warned.warnings.some((w) => w.includes("source") && w.includes('"./features"'))).toBe(true);
+    expect(await readFile(join(tempDir, "package.json"), "utf-8")).toBe(srcOnlyPkg);
+
+    const result = createResult(tempDir);
+    await validatePackageRules(tempDir, result, { fix: true });
+    expect(await readFile(join(tempDir, "package.json"), "utf-8")).toBe(
+      srcOnlyPkg
+        .replace('".": {\n      "types"', '".": {\n      "source": "./src/index.ts",\n      "types"')
+        .replace('"./features": { "types"', '"./features": { "source": "./src/features/index.ts", "types"'),
+    );
+    expect(result.warnings).toHaveLength(0);
+  });
+
+  // A module entry added by hand after the template, without a source and with dist types.
+  const distOnlyEntryPkg = builtTypesPkg
+    .replace("./dist/index.d.ts\",\n      \"import", "./src/index.ts\",\n      \"import")
+    .replace("./dist/mock.d.ts", "./src/mock/index.ts")
+    .replace('"types": "./dist/index.d.ts",\n  "exports"', '"types": "./src/index.ts",\n  "exports"')
+    .replace(
+      '"import": "./dist/mock.js"\n    }',
+      '"import": "./dist/mock.js"\n    },\n    "./pages": {\n      "types": "./dist/pages/index.d.ts",\n      "import": "./dist/pages/index.js"\n    }',
+    );
+
+  it.each(["ts", "tsx"])("finds the src/<path>/index.%s a dist entry was built from", async (ext) => {
+    await writeFile(join(tempDir, "package.json"), distOnlyEntryPkg);
+    await writeFile(join(tempDir, "tsup.config.ts"), "export default {}");
+    await mkdir(join(tempDir, "src/pages"), { recursive: true });
+    await writeFile(join(tempDir, `src/pages/index.${ext}`), "export {};\n");
+
+    const result = createResult(tempDir);
+    await validatePackageRules(tempDir, result, { fix: true });
+
+    expect(await readFile(join(tempDir, "package.json"), "utf-8")).toBe(
+      distOnlyEntryPkg.replace(
+        '"./pages": {\n      "types": "./dist/pages/index.d.ts"',
+        `"./pages": {\n      "source": "./src/pages/index.${ext}",\n      "types": "./src/pages/index.${ext}"`,
+      ),
+    );
+    expect(result.warnings).toHaveLength(0);
+
+    const second = createResult(tempDir);
+    await validatePackageRules(tempDir, second, { fix: true });
+    expect(second.passes.some((p) => p.startsWith("Auto-fixed"))).toBe(false);
+    expect(second.warnings).toHaveLength(0);
+  });
+
+  it("leaves a dist entry alone when its src file is missing", async () => {
+    await writeFile(join(tempDir, "package.json"), distOnlyEntryPkg);
+
+    const result = createResult(tempDir);
+    await validatePackageRules(tempDir, result, { fix: true });
+
+    expect(result.warnings.some((w) => w.includes('"./pages"') && w.includes("source"))).toBe(true);
+    expect(await readFile(join(tempDir, "package.json"), "utf-8")).toBe(distOnlyEntryPkg);
+  });
+
+  it("warns about and removes tsup declaration output", async () => {
+    await writeFile(join(tempDir, "package.json"), JSON.stringify({ name: "p", type: "module", exports: {} }));
+    await writeFile(join(tempDir, "tsup.config.ts"), declaringTsup);
+
+    const warned = createResult(tempDir);
+    await validatePackageRules(tempDir, warned);
+    expect(warned.warnings.some((w) => w.includes("dts"))).toBe(true);
+
+    await validatePackageRules(tempDir, createResult(tempDir), { fix: true });
+    expect(await readFile(join(tempDir, "tsup.config.ts"), "utf-8")).toBe(
+      declaringTsup.replaceAll("    dts: !options.watch,\n", ""),
+    );
+  });
+
+  it("removes a dts setting that spans lines", async () => {
+    const tsup = `import { defineConfig } from "tsup";
+
+export default defineConfig({
+  entry: ["src/index.ts"],
+  dts: {
+    resolve: true,
+    compilerOptions: { composite: false },
+  },
+  format: ["esm"],
+  sourcemap: true,
+  dts: true
+});
+`;
+    await writeFile(join(tempDir, "package.json"), JSON.stringify({ name: "p", type: "module", exports: {} }));
+    await writeFile(join(tempDir, "tsup.config.ts"), tsup);
+
+    const result = createResult(tempDir);
+    await validatePackageRules(tempDir, result, { fix: true });
+
+    expect(await readFile(join(tempDir, "tsup.config.ts"), "utf-8")).toBe(`import { defineConfig } from "tsup";
+
+export default defineConfig({
+  entry: ["src/index.ts"],
+  format: ["esm"],
+  sourcemap: true,
+});
+`);
+    expect(result.warnings.some((w) => w.includes("dts"))).toBe(false);
+  });
+
+  it("finds nothing to fix on a second run", async () => {
+    await writeFile(join(tempDir, "package.json"), builtTypesPkg);
+    await writeFile(join(tempDir, "tsup.config.ts"), declaringTsup);
+    await validatePackageRules(tempDir, createResult(tempDir), { fix: true });
+
+    const second = createResult(tempDir);
+    await validatePackageRules(tempDir, second, { fix: true });
+
+    expect(second.passes.some((p) => p.startsWith("Auto-fixed"))).toBe(false);
+    expect(second.warnings).toHaveLength(0);
+  });
+
+  describe("react as a peer dependency", () => {
+    const libraryPkg = [
+      "{",
+      '  "name": "@acme/runtime",',
+      '  "version": "0.0.1",',
+      '  "type": "module",',
+      '  "files": ["dist"],',
+      '  "exports": { ".": { "import": "./dist/index.js" } },',
+      '  "dependencies": {',
+      '    "react": "catalog:",',
+      '    "react-dom": "catalog:",',
+      '    "zod": "catalog:"',
+      "  },",
+      '  "devDependencies": {',
+      '    "tsup": "catalog:"',
+      "  }",
+      "}",
+      "",
+    ].join("\n");
+
+    it("warns when react sits in dependencies", async () => {
+      await writeFile(join(tempDir, "package.json"), libraryPkg);
+      const result = createResult(tempDir);
+      await validatePackageRules(tempDir, result);
+      expect(result.warnings.some((w) => w.includes("react, react-dom in dependencies"))).toBe(true);
+    });
+
+    it("moves react and react-dom to peer and dev dependencies, keeping the rest of the file", async () => {
+      await writeFile(join(tempDir, "package.json"), libraryPkg);
+      await validatePackageRules(tempDir, createResult(tempDir), { fix: true });
+
+      const text = await readFile(join(tempDir, "package.json"), "utf-8");
+      const pkg = JSON.parse(text);
+      expect(pkg.dependencies).toEqual({ zod: "catalog:" });
+      expect(pkg.devDependencies).toEqual({ tsup: "catalog:", react: "catalog:", "react-dom": "catalog:" });
+      expect(pkg.peerDependencies).toEqual({ react: ">=18.0.0", "react-dom": ">=18.0.0" });
+      expect(text).toContain('  "files": ["dist"],');
+      expect(text).toContain('  "exports": { ".": { "import": "./dist/index.js" } },');
+    });
+
+    it("drops an emptied dependencies object", async () => {
+      await writeFile(
+        join(tempDir, "package.json"),
+        '{\n  "name": "@acme/ui",\n  "type": "module",\n  "dependencies": {\n    "react": "^19.2.4"\n  }\n}\n',
+      );
+      await validatePackageRules(tempDir, createResult(tempDir), { fix: true });
+      const pkg = JSON.parse(await readFile(join(tempDir, "package.json"), "utf-8"));
+      expect(pkg.dependencies).toBeUndefined();
+      expect(pkg.devDependencies).toEqual({ react: "^19.2.4" });
+      expect(pkg.peerDependencies).toEqual({ react: ">=18.0.0" });
+    });
+
+    it("changes nothing on a second run", async () => {
+      await writeFile(join(tempDir, "package.json"), libraryPkg);
+      await validatePackageRules(tempDir, createResult(tempDir), { fix: true });
+      const once = await readFile(join(tempDir, "package.json"), "utf-8");
+      const result = createResult(tempDir);
+      await validatePackageRules(tempDir, result, { fix: true });
+      expect(await readFile(join(tempDir, "package.json"), "utf-8")).toBe(once);
+      expect(result.passes.some((p) => p.includes("peerDependencies"))).toBe(false);
+    });
+
+    it("adds type module without rewriting the file", async () => {
+      const text = '{\n  "name": "@acme/x",\n  "version": "0.0.1",\n  "files": ["dist"]\n}\n';
+      await writeFile(join(tempDir, "package.json"), text);
+      await validatePackageRules(tempDir, createResult(tempDir), { fix: true });
+      expect(await readFile(join(tempDir, "package.json"), "utf-8")).toBe(
+        '{\n  "name": "@acme/x",\n  "version": "0.0.1",\n  "type": "module",\n  "files": ["dist"]\n}\n',
+      );
+    });
   });
 });
 
