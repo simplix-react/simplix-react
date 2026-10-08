@@ -21,6 +21,9 @@ workflow stamps it with the released version and date, then opens a fresh
 ### Fixed
 
 - The CLI writes real dependency versions into generated projects. Its version map was collected from the framework's `package.json` files as written, so 0.3.10 generated `"typescript": "catalog:"` and `"zod": "catalog:"` into projects whose catalog has no such entries, and `pnpm install` failed; the build now resolves each catalog reference
+- `simplix init` writes the demo app's `src/app/auth/index.ts` when auth is enabled, which it is by default. The app providers and the access policy import `auth` from it, but no template produced the file, so a new project failed to type check and its dev server could not load the providers
+- `AccessProvider` accepts the policy `createAccessPolicy()` returns for the built-in adapters. Its `policy` prop asked for `AccessPolicy<DefaultActions>`, while the adapters and `createAccessPolicy()` default to `string` actions, so passing that policy failed with TS2322 and a generated app with access control did not type check. The prop now takes `AccessPolicy<string, string>`, the type the context and `useAccess()` already expose, and still accepts a policy narrowed to `DefaultActions`
+- The demo app that `simplix init` generates type checks before its route tree exists. `src/routeTree.gen.ts` is written by the TanStack Router Vite plugin, which `simplix init` does not run, so `pnpm typecheck` failed on a new project, and `pnpm build`, which type checks and builds in parallel, failed whenever the type check ran first. The app's `typecheck` script now runs `tsr generate && tsc --noEmit`, with `@tanstack/router-cli` on the same range as `@tanstack/router-plugin`
 
 ## [0.3.10] - 2026-10-01
 

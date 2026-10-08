@@ -57,6 +57,21 @@ describe("AccessProvider", () => {
     expect(screen.getByText("child content")).toBeDefined();
   });
 
+  it("accepts the policy createAccessPolicy infers from a built-in adapter", () => {
+    // Inferred as AccessPolicy<string, string>; this file's typecheck guards the prop type.
+    const policy = createAccessPolicy({
+      adapter: createStaticAdapter([{ action: "approve", subject: "Order" }]),
+    });
+
+    render(
+      <AccessProvider policy={policy}>
+        <span>inferred policy</span>
+      </AccessProvider>,
+    );
+
+    expect(screen.getByText("inferred policy")).toBeDefined();
+  });
+
   it("provides policy via context", () => {
     const policy = createPolicy(
       [{ action: "view", subject: "Pet" }],

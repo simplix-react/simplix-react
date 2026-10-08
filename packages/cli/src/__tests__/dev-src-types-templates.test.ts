@@ -25,6 +25,8 @@ import { describe, expect, it } from "vitest";
   react: "^19.2.4",
   "lucide-react": "^0.577.0",
   "@tanstack/react-query": "^5.90.21",
+  "@tanstack/router-cli": "^1.166.13",
+  "@tanstack/router-plugin": "^1.166.13",
   "@types/react": "^19.2.14",
 };
 
@@ -34,7 +36,7 @@ const { renderTemplate } = await import("../utils/template.js");
 const { rootPackageJson, turboJson, rootTsconfigJson } = await import(
   "../templates/project/root-files.js"
 );
-const { appTsconfigJson } = await import("../templates/project/app-files.js");
+const { appPackageJson, appTsconfigJson } = await import("../templates/project/app-files.js");
 const { domainPackageJson, domainTsupConfig } = await import("../templates/domain/index.js");
 const { modulePackageJson, moduleTsupConfig } = await import("../templates/module/index.js");
 const { openapiPackageJsonStandalone, openapiPackageJsonWithEslintConfig, openapiTsupConfig } =
@@ -93,6 +95,17 @@ describe("project root templates", () => {
       expect(json).not.toContain("baseUrl");
       expect(() => JSON.parse(json)).not.toThrow();
     }
+  });
+});
+
+describe("demo app template", () => {
+  it("generates the route tree before its type check", () => {
+    const pkg = JSON.parse(render(appPackageJson, { appPkgName: "@test/test-demo" }));
+    expect(pkg.scripts.typecheck).toBe("tsr generate && tsc --noEmit");
+    expect(pkg.devDependencies["@tanstack/router-cli"]).toBe("^1.166.13");
+    expect(pkg.devDependencies["@tanstack/router-cli"]).toBe(
+      pkg.devDependencies["@tanstack/router-plugin"],
+    );
   });
 });
 

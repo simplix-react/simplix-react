@@ -34,6 +34,7 @@ import {
   i18nConfigTs,
   getCommonTranslationJson,
 } from "../templates/project/i18n-files.js";
+import { authConfigTs } from "../templates/project/auth-files.js";
 import { accessConfigTs } from "../templates/project/access-files.js";
 
 export interface InitOptions {
@@ -368,6 +369,15 @@ function HomePage() {
             ] = getCommonTranslationJson(locale);
           }
           await writeFiles(targetDir, i18nFiles);
+        }
+
+        // auth files for app
+        if (options.enableAuth) {
+          spinner.text = "Creating auth files...";
+          await writeFiles(targetDir, {
+            [`apps/${ctx.projectName}-demo/src/app/auth/index.ts`]:
+              renderTemplate(authConfigTs, appCtx),
+          });
         }
 
         // access files for app
