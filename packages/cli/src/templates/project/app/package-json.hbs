@@ -6,7 +6,7 @@
   "scripts": {
     "dev:app": "vite",
     "build": "vite build",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsr generate && tsc --noEmit",
     "lint": "oxlint src",
     "test": "vitest run --passWithNoTests",
     "clean": "rm -rf dist .turbo"
@@ -21,6 +21,7 @@
     "react-dom": "{{deps.reactDom}}"
   },
   "devDependencies": {
+    "@tanstack/router-cli": "{{deps.tanstackRouterCli}}",
     "@tanstack/router-plugin": "{{deps.tanstackRouterPlugin}}",
     "@types/react": "{{deps.typesReact}}",
     "@types/react-dom": "{{deps.typesReactDom}}",

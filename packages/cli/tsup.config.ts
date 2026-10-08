@@ -49,6 +49,7 @@ const CONSUMER_DEPS: Record<string, string> = {
   "@tanstack/react-form": "^1.28.5",
   "@tanstack/react-query": "^5.90.21",
   "@tanstack/react-router": "^1.167.4",
+  "@tanstack/router-cli": "^1.166.13",
   "@tanstack/router-plugin": "^1.166.13",
   "@types/react": "^19.2.14",
   "@types/react-dom": "^19.2.3",
