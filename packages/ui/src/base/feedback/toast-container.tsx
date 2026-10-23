@@ -15,7 +15,7 @@ import { AlertTriangleIcon, CheckCircleIcon, InfoIcon, XCircleIcon, XIcon } from
 import { Button } from "../controls/button";
 import { Flex } from "../../primitives/flex";
 import { Stack } from "../../primitives/stack";
-import { useToastStore, removeToast, type Toast } from "./toast-store";
+import { useToastStore, removeToast, runToastAction, type Toast } from "./toast-store";
 
 const typeIcon: Record<Toast["type"], React.ReactNode> = {
   success: <CheckCircleIcon className="size-4 shrink-0" />,
@@ -55,14 +55,18 @@ function ToastItem({ toast }: { toast: Toast }) {
         </span>
         <Stack gap="xs" className="flex-1 min-w-0">
           <span {...slotAttributes(toastMessageStyle, {})}>{toast.message}</span>
-          {toast.action && (
-            <a
-              href={toast.action.href}
-              {...slotAttributes(toastActionStyle, {})}
-            >
-              {toast.action.label} {"\u2192"}
-            </a>
-          )}
+          {toast.action &&
+            ("href" in toast.action ? (
+              <a href={toast.action.href} {...slotAttributes(toastActionStyle, {})}>
+                {toast.action.label} {"\u2192"}
+              </a>
+            ) : (
+              // An action that runs on the spot (an undo) is a button; the store runs it once and
+              // closes the toast, so a second press cannot run it again.
+              <button type="button" onClick={() => runToastAction(toast.id)} {...slotAttributes(toastActionStyle, {})}>
+                {toast.action.label}
+              </button>
+            ))}
         </Stack>
         <div className="flex shrink-0" {...slotAttributes(toastDismissStyle, {})}>
           <Button

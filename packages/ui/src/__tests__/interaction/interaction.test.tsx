@@ -2,6 +2,8 @@
 import { act, cleanup, fireEvent, render, renderHook, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { ToastContainer } from "../../base/feedback/toast-container";
+import { addToast } from "../../base/feedback/toast-store";
 import { BulkActionBar, DigitRoll, LegendToggle, useSeriesVisibility } from "../../interaction";
 
 afterEach(cleanup);
@@ -70,5 +72,17 @@ describe("BulkActionBar", () => {
     expect(bar.getAttribute("data-open")).toBe("true");
     fireEvent.keyDown(bar, { key: "Escape" });
     expect(onClear).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("ToastContainer run action", () => {
+  it("draws a run action as a button that runs once and closes the toast", async () => {
+    const run = vi.fn();
+    render(<ToastContainer />);
+    act(() => addToast({ type: "success", message: "2건을 정지했습니다", action: { label: "실행 취소", run } }));
+    const undo = await screen.findByRole("button", { name: "실행 취소" });
+    fireEvent.click(undo);
+    expect(run).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole("button", { name: "실행 취소" })).toBeNull();
   });
 });
