@@ -5,8 +5,16 @@ export interface Toast {
   id: string;
   type: "success" | "warning" | "error" | "info";
   message: string;
-  action?: { label: string; href: string };
+  action?: ToastAction;
 }
+
+/**
+ * What the toast's one action does: go somewhere, or run something on the spot (an undo).
+ *
+ * <p>A `run` action closes the toast after it runs, so pressing 「실행 취소」 twice cannot undo
+ * twice.
+ */
+export type ToastAction = { label: string; href: string } | { label: string; run: () => void };
 
 const MAX_TOASTS = 5;
 const AUTO_DISMISS_MS: Record<Toast["type"], number | null> = {
@@ -74,6 +82,19 @@ export function removeToast(id: string) {
   }
   toasts = toasts.filter((t) => t.id !== id);
   emit();
+}
+
+/**
+ * Runs a toast's `run` action and closes the toast; a link action is followed by the container.
+ *
+ * @param id - the toast whose action was pressed
+ */
+export function runToastAction(id: string) {
+  const toast = toasts.find((t) => t.id === id);
+  if (toast?.action && "run" in toast.action) {
+    toast.action.run();
+    removeToast(id);
+  }
 }
 
 export function useToastStore() {

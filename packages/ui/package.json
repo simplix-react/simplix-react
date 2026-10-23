@@ -22,6 +22,11 @@
       "types": "./dist/design.d.ts",
       "import": "./dist/design.js"
     },
+    "./interaction": {
+      "source": "./src/interaction/index.ts",
+      "types": "./dist/interaction.d.ts",
+      "import": "./dist/interaction.js"
+    },
     "./plate-editor": {
       "source": "./src/fields/plate-editor/index.ts",
       "types": "./dist/plate-editor.d.ts",

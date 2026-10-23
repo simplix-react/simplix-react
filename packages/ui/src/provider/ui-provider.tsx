@@ -1,6 +1,7 @@
-import { type ReactNode, useContext, useMemo } from "react";
+import { type ReactNode, useContext, useLayoutEffect, useMemo } from "react";
 
 import { StatusToneContext, type StatusToneOverrides } from "../base/status-tone-context";
+import type { Design } from "../design/design";
 import { baseComponents } from "./base-components";
 import type { UIComponents } from "./types";
 import { UIComponentContext } from "./ui-component-context";
@@ -41,6 +42,13 @@ export interface UIProviderProps {
    * forgets, and the screens then disagree about something the product decided once.
    */
   defaults?: Partial<UIDefaults>;
+  /**
+   * The design every slot is drawn in; see {@link Design}. Set it on the root provider only:
+   * the provider writes `data-design` on the document element, so dialogs, popovers and toasts
+   * rendered into `document.body` are drawn in it too. The design's own defaults sit under
+   * {@link UIProviderProps.defaults}, which still win.
+   */
+  design?: Design;
   children: ReactNode;
 }
 
@@ -55,7 +63,7 @@ export interface UIProviderProps {
  * </UIProvider>
  * ```
  */
-export function UIProvider({ overrides, statusTones, defaults, children }: UIProviderProps) {
+export function UIProvider({ overrides, statusTones, defaults, design, children }: UIProviderProps) {
   const parent = useContext(UIComponentContext);
   const parentTones = useContext(StatusToneContext);
   const parentDefaults = useContext(UIDefaultsContext);
@@ -71,9 +79,21 @@ export function UIProvider({ overrides, statusTones, defaults, children }: UIPro
   );
 
   const mergedDefaults = useMemo(
-    () => (defaults ? { ...parentDefaults, ...defaults } : parentDefaults),
-    [parentDefaults, defaults],
+    () => (defaults || design?.defaults ? { ...parentDefaults, ...design?.defaults, ...defaults } : parentDefaults),
+    [parentDefaults, defaults, design],
   );
+
+  const designId = design?.id;
+  useLayoutEffect(() => {
+    if (!designId) return;
+    const root = document.documentElement;
+    const previous = root.getAttribute("data-design");
+    root.setAttribute("data-design", designId);
+    return () => {
+      if (previous === null) root.removeAttribute("data-design");
+      else root.setAttribute("data-design", previous);
+    };
+  }, [designId]);
 
   return (
     <UIComponentContext.Provider value={merged}>

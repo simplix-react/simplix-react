@@ -29,8 +29,8 @@ export type { DateRange } from "./filter-types";
 export { makeFilterKey, parseFilterKey, getFilterLayout, insertFilterSeparators } from "./filter-utils";
 
 // ── Toast store ──
-export { addToast, removeToast, useToastStore } from "./toast-store";
-export type { Toast } from "./toast-store";
+export { addToast, removeToast, runToastAction, useToastStore } from "./toast-store";
+export type { Toast, ToastAction } from "./toast-store";
 
 // ── Formatting utilities ──
 export { formatBytes } from "./format-bytes";

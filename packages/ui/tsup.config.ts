@@ -5,6 +5,8 @@ export default defineConfig((options) => ({
     index: "src/index.ts",
     // The slot helpers and the design list, for a kit that declares slots of its own.
     design: "src/design/index.ts",
+    // Interaction parts every design shares: rolling figures, legend toggles, the bulk bar.
+    interaction: "src/interaction/index.ts",
     "plate-editor": "src/fields/plate-editor/index.ts",
     // Viewer-only entry: read-only consumers import this instead of the full
     // plate-editor barrel, whose plugin re-exports carry the heavy runtime.

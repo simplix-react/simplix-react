@@ -3,7 +3,7 @@
 //   build-design-css [--root <package dir>] [--out <file>] [--check]
 // --root defaults to this package and --out to its src/theme/designs/classic.css; a kit passes its
 // own root and output. --check exits 1 when the file differs from what the declarations produce.
-import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, rmSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { createRequire } from "node:module";
@@ -61,10 +61,11 @@ const bundled = outputFiles[0].text;
 
 // class-variance-authority stays external, so the bundle is loaded from a file beside this
 // package's node_modules rather than from a data URL, which could not resolve it.
-const tmp = join(self, "node_modules/.cache/design-css-entry.mjs");
+const tmp = join(self, `node_modules/.cache/design-css-entry-${process.pid}.mjs`);
 mkdirSync(dirname(tmp), { recursive: true });
 writeFileSync(tmp, bundled);
-const modules = await import(`${pathToFileURL(tmp).href}?t=${Date.now()}`);
+const modules = await import(pathToFileURL(tmp).href);
+rmSync(tmp);
 const isSlotStyle = (v) => v && typeof v === "object" && typeof v.slot === "string" && typeof v.base === "string";
 const CLASSIC_SLOTS = files.flatMap((_, i) => Object.values(modules[`m${i}`]).filter(isSlotStyle));
 const seen = new Set();

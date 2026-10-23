@@ -40,12 +40,29 @@ export interface UIDefaults {
    * switch between a panel and a drawer never turns a working surface into an interruption.
    */
   detailPresentation: "panel" | "drawer";
+  /**
+   * How tightly tables and lists set their rows when the screen does not say.
+   *
+   * <p>An installation's choice for the same reason as {@link UIDefaults.detailPresentation}: it
+   * follows the operators' monitors and how much they read at once, and a design may bring its own
+   * default (a quieter design breathes more).
+   */
+  density: "compact" | "default" | "comfortable";
+  /**
+   * How a record list draws its rows when the screen does not say.
+   *
+   * <p>`"auto"` draws a table while its columns fit and cards once the list is narrower than its
+   * columns need; `"table"` and `"cards"` hold one shape at every width.
+   */
+  listPresentation: "auto" | "table" | "cards";
 }
 
 /** What a product gets when it declares nothing. */
 export const UI_DEFAULTS: UIDefaults = {
   actionVariant: "icon",
   detailPresentation: "panel",
+  density: "default",
+  listPresentation: "auto",
 };
 
 export const UIDefaultsContext = createContext<UIDefaults>(UI_DEFAULTS);
