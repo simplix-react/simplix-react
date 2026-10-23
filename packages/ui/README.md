@@ -46,13 +46,17 @@ typography, status indicator animations) consumed by the components. Apps may ov
 redefining it after the import. Projects scaffolded via `simplix init`
 wire this up automatically.
 
+Every component draws its look from slot declarations, so one app can switch between designs
+(`classic`, `clarity`) at run time while behaviour stays the same. See
+[Choose and add a design](../../docs/guides/designs.md).
+
 ## App Architecture (FSD)
 
-simplix-react apps follow **Feature-Sliced Design (FSD)** — UI code lives in **modules**, not in domain packages:
+simplix-react apps follow **Feature-Sliced Design (FSD)** - UI code lives in **modules**, not in domain packages:
 
 ```
 my-app/
-├── packages/                     Domain packages (generated) — NO UI code
+├── packages/                     Domain packages (generated) - NO UI code
 │   ├── user/
 │   │   ├── schemas.ts                Zod schemas
 │   │   ├── contract.ts               API contracts
@@ -61,12 +65,12 @@ my-app/
 │   └── product/
 │       └── ...
 │
-├── modules/                      FSD modules — compose domain packages + @simplix-react/ui
+├── modules/                      FSD modules - compose domain packages + @simplix-react/ui
 │   └── myapp-admin/
 │       └── src/
 │           ├── manifest.ts           Module manifest (navigation, capabilities)
 │           ├── index.ts              Root exports
-│           ├── features/             Feature layer — CRUD screens
+│           ├── features/             Feature layer - CRUD screens
 │           │   ├── user/                 uses @myapp/user hooks
 │           │   │   ├── user-list.tsx
 │           │   │   ├── user-form.tsx
@@ -74,7 +78,7 @@ my-app/
 │           │   │   └── index.ts
 │           │   └── product/              uses @myapp/product hooks
 │           │       └── ...
-│           ├── widgets/              Widget layer — compose multiple features
+│           ├── widgets/              Widget layer - compose multiple features
 │           │   └── dashboard/
 │           ├── shared/               Shared layer
 │           │   ├── ui/
@@ -82,7 +86,7 @@ my-app/
 │           │   └── config/
 │           └── locales/              i18n (optional)
 │
-└── app/                          Final app — composes modules only
+└── app/                          Final app - composes modules only
     └── src/
         ├── features/
         ├── widgets/
@@ -95,7 +99,7 @@ my-app/
 | --- | --- | --- |
 | `shared/` | external packages only | `features/`, `widgets/` |
 | `features/` | `shared/`, domain packages | `widgets/` |
-| `widgets/` | `shared/`, `features/`, domain packages | — |
+| `widgets/` | `shared/`, `features/`, domain packages | - |
 
 ### Module can compose multiple domain packages
 
@@ -126,7 +130,7 @@ simplix scaffold user --module myapp-admin
 Every field component requires explicit `value` and `onChange` props. There is no hidden form state, no automatic binding, and no implicit context dependencies.
 
 ```tsx
-// Explicit value/onChange — always
+// Explicit value/onChange - always
 <FormFields.TextField
   label="Name"
   value={name}
@@ -224,14 +228,14 @@ Unstyled Radix UI primitives with Tailwind CSS styling. Used internally by field
 
 ### Status & Display
 
-Tone-driven components sharing a single semantic color vocabulary. Each `StatusTone` (`success`, `warning`, `danger`, `info`, `neutral`, `pending`, `processing`) bundles every Tailwind class — badge, dot, ring, icon, surface — with its `dark:` variant, so adopting them keeps colors consistent across light/dark.
+Tone-driven components sharing a single semantic color vocabulary. Each `StatusTone` (`success`, `warning`, `danger`, `info`, `neutral`, `pending`, `processing`) bundles every Tailwind class - badge, dot, ring, icon, surface - with its `dark:` variant, so adopting them keeps colors consistent across light/dark.
 
-- `StatusBadge` — compact status pill (tone + label, optional leading dot/icon, `filled`/`outline` appearance)
-- `StatusDot` — small indicator dot with an optional `ping`/`flash` ring animation
-- `AlertBanner` — tinted status banner with icon, title/subtitle (or free-form children), trailing slot, and `default`/`sm`/`hint` density
-- `DetailList` / `DetailListRow` — bordered key-value rows, optionally interactive (`onClick` upgrades a row to button semantics)
-- `LabeledField` — label + description row paired with an arbitrary trailing control
-- `SettingSwitch` — labeled toggle row built on `LabeledField` + `Switch`
+- `StatusBadge` - compact status pill (tone + label, optional leading dot/icon, `filled`/`outline` appearance)
+- `StatusDot` - small indicator dot with an optional `ping`/`flash` ring animation
+- `AlertBanner` - tinted status banner with icon, title/subtitle (or free-form children), trailing slot, and `default`/`sm`/`hint` density
+- `DetailList` / `DetailListRow` - bordered key-value rows, optionally interactive (`onClick` upgrades a row to button semantics)
+- `LabeledField` - label + description row paired with an arbitrary trailing control
+- `SettingSwitch` - labeled toggle row built on `LabeledField` + `Switch`
 
 Tone tokens are exported directly for custom rendering: `STATUS_TONES`, `STATUS_TONE_NAMES`, `statusToneClass(tone, slot)`, plus the `StatusTone` / `StatusToneToken` / `IconComponent` types.
 
@@ -244,7 +248,7 @@ Tone tokens are exported directly for custom rendering: `STATUS_TONES`, `STATUS_
 
 All form fields follow the same pattern: `value` + `onChange` + common field props (label, error, description, required, disabled, className).
 
-Every field also accepts `prefixControl` / `suffixControl` — a control rendered on the same row as the input (e.g. an add button, IconPicker, ColorPicker). Use these instead of composing a button next to the field: the control stays aligned with the input while description and error render below at full width.
+Every field also accepts `prefixControl` / `suffixControl` - a control rendered on the same row as the input (e.g. an add button, IconPicker, ColorPicker). Use these instead of composing a button next to the field: the control stays aligned with the input while description and error render below at full width.
 
 ```tsx
 <FormFields.TextField
@@ -363,7 +367,7 @@ import { FieldVariantContext } from "@simplix-react/ui";
 ```
 
 Options:
-- `layout`: `"top"` (default) | `"left"` | `"inline"` | `"trailing"` (control right-aligned with a dashed leader line from the label — the `SwitchField` default) | `"hidden"` (sr-only for accessibility)
+- `layout`: `"top"` (default) | `"left"` | `"inline"` | `"trailing"` (control right-aligned with a dashed leader line from the label - the `SwitchField` default) | `"hidden"` (sr-only for accessibility)
 - `size`: `"sm"` | `"md"` (default) | `"lg"`
 
 ### CRUD Layout Components
@@ -424,7 +428,7 @@ const { data, filters, sort, pagination, selection, emptyReason } = useCrudList(
 
 Sub-components: `List.Toolbar`, `List.Search`, `List.Filter`, `List.Table`, `List.Column`, `List.RowActions`, `List.Action`, `List.Pagination`, `List.BulkActions`, `List.BulkAction`, `List.Empty`
 
-`List.Table` and `Tree.Table` render a sticky header by default — once scrolling an outer container (a page, dialog, or detail-pane body) would hide the header row, it sticks to the top of the nearest scrollable ancestor. Wide tables keep their own horizontal scrollbar, and the floating header scrolls with its columns. Pass `stickyHeader={false}` to disable. Inside a `List.TableCard` the table owns its scroll region and the header is always sticky.
+`List.Table` and `Tree.Table` render a sticky header by default - once scrolling an outer container (a page, dialog, or detail-pane body) would hide the header row, it sticks to the top of the nearest scrollable ancestor. Wide tables keep their own horizontal scrollbar, and the floating header scrolls with its columns. Pass `stickyHeader={false}` to disable. Inside a `List.TableCard` the table owns its scroll region and the header is always sticky.
 
 #### CardList
 
@@ -673,7 +677,7 @@ Returns: `{ isVisible, shouldRender }`
 
 #### useListDetailState
 
-State management for the ListDetail pattern — tracks selected item and panel toggle.
+State management for the ListDetail pattern - tracks selected item and panel toggle.
 
 ```tsx
 const { selectedId, select, deselect, isDetailOpen } = useListDetailState({
@@ -699,7 +703,7 @@ Returns: `{ data, isLoading, error, isPaused, failureCount, filters, sort, pagin
 
 `emptyReason` is `"no-data"`, `"no-filter"`, `"no-search"`, `"error"`,
 `"unavailable"`, or `null`. `"unavailable"` covers a query that is neither
-settled successfully nor settled with an error — paused (React Query
+settled successfully nor settled with an error - paused (React Query
 `fetchStatus === "paused"`, which happens while the document is hidden or the
 browser reports offline) or waiting to retry after a failed attempt. Such a
 query reports `isLoading: false` and `error: null`, so it is reported as "the
@@ -816,7 +820,7 @@ Panel variant features:
 - Responsive: collapses to single-panel on mobile
 - Draggable divider with keyboard support (ArrowLeft/Right)
 
-`ListDetailRoot` is the same component as `ListDetail` — exported as an alias for compound pattern composition.
+`ListDetailRoot` is the same component as `ListDetail` - exported as an alias for compound pattern composition.
 
 ### Router Adapters
 

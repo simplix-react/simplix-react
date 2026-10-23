@@ -19,6 +19,7 @@ Practical how-to guides for accomplishing specific tasks with simplix-react. Eac
 | [React Hooks Reference](./react-hooks-reference.md) | Derive and use type-safe React Query hooks (`useList`, `useGet`, `useCreate`, `useUpdate`, `useDelete`, `useInfiniteList`) with automatic cache invalidation, optimistic updates, and query key factories |
 | [Form Hooks](./form-hooks.md) | Derive TanStack Form hooks from contracts via `deriveEntityFormHooks()`, build create/update forms with automatic dirty-field tracking, default value handling, and server validation error mapping |
 | [UI Components](./ui-components.md) | Build CRUD interfaces using `CrudList`, `CrudForm`, `CrudDetail`, and `CrudTree` compound components with explicit field configuration, custom column rendering, and composable layout patterns |
+| [Designs](./designs.md) | Choose the design every component is drawn in (`classic`, `clarity`) on the root `UIProvider`, mark what a component draws with slot and part declarations, and add a design from a spec of class replacements and per-slot overrides |
 
 ### HTTP & Auth
 
