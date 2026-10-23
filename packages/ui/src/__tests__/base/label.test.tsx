@@ -4,6 +4,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { Label } from "../../base/controls/label";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -18,15 +19,15 @@ describe("Label", () => {
   it("applies base classes", () => {
     render(<Label>Name</Label>);
     const label = screen.getByText("Name");
-    expect(label.className).toContain("text-sm");
-    expect(label.className).toContain("font-medium");
+    expect(drawnClasses(label)).toContain("text-sm");
+    expect(drawnClasses(label)).toContain("font-medium");
   });
 
   it("merges custom className", () => {
     render(<Label className="my-label">Custom</Label>);
     const label = screen.getByText("Custom");
-    expect(label.className).toContain("my-label");
-    expect(label.className).toContain("text-sm");
+    expect(drawnClasses(label)).toContain("my-label");
+    expect(drawnClasses(label)).toContain("text-sm");
   });
 
   it("forwards ref", () => {

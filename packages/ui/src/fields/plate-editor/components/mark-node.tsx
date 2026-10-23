@@ -1,8 +1,8 @@
-
 import { forwardRef } from 'react'
 import type { PlateLeafProps } from 'platejs/react'
-import { cn } from '../../../utils/cn'
+import { slotAttributes } from '../../../design/slot-style'
 import { filterPlateProps } from '../lib/filter-plate-props'
+import { plateHighlightStyle, plateKbdStyle } from './mark-node.style'
 
 /**
  * Highlight leaf for highlighted text
@@ -13,8 +13,9 @@ export const HighlightLeaf = forwardRef<HTMLElement, PlateLeafProps>(
     return (
       <mark
         ref={ref}
-        className={cn('bg-yellow-200 dark:bg-yellow-800/50 px-0.5', className)}
+        className={className}
         {...domProps}
+        {...slotAttributes(plateHighlightStyle, {})}
       >
         {children}
       </mark>
@@ -30,14 +31,7 @@ export const KbdLeaf = forwardRef<HTMLElement, PlateLeafProps>(
   ({ className, children, ...props }, ref) => {
     const domProps = filterPlateProps(props)
     return (
-      <kbd
-        ref={ref}
-        className={cn(
-          'rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-xs shadow-sm',
-          className
-        )}
-        {...domProps}
-      >
+      <kbd ref={ref} className={className} {...domProps} {...slotAttributes(plateKbdStyle, {})}>
         {children}
       </kbd>
     )

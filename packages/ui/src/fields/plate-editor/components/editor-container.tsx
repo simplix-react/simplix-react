@@ -2,6 +2,8 @@
 import { forwardRef, type HTMLAttributes } from 'react'
 import { PlateContent, type PlateContentProps } from 'platejs/react'
 import { cn } from '../../../utils/cn'
+import { slotAttributes } from '../../../design/slot-style'
+import { plateEditorContainerStyle, plateEditorStyle, plateEditorWrapperStyle } from './editor-container.style'
 
 export interface EditorContainerProps extends HTMLAttributes<HTMLDivElement> {
   /** Default height of the editor (initial height) */
@@ -25,9 +27,9 @@ export const EditorContainer = forwardRef<HTMLDivElement, EditorContainerProps>(
       <div
         ref={ref}
         className={cn(
-          'relative w-full overflow-auto bg-background',
+          'relative w-full overflow-auto',
           resizable && 'resize-y',
-          disabled && 'cursor-not-allowed opacity-50',
+          disabled && 'cursor-not-allowed',
           className
         )}
         style={{
@@ -36,6 +38,7 @@ export const EditorContainer = forwardRef<HTMLDivElement, EditorContainerProps>(
           maxHeight: typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight,
         }}
         {...props}
+        {...slotAttributes(plateEditorContainerStyle, { disabled })}
       >
         {children}
       </div>
@@ -62,14 +65,12 @@ export const EditorWrapper = forwardRef<HTMLDivElement, EditorWrapperProps>(
       <div
         ref={ref}
         className={cn(
-          'relative w-full overflow-x-hidden rounded-md border bg-background transition-[color,box-shadow]',
-          error
-            ? 'border-destructive ring-destructive/20 dark:ring-destructive/40 ring-[3px]'
-            : 'border-input focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px]',
-          disabled && 'cursor-not-allowed opacity-50',
+          'relative w-full overflow-x-hidden',
+          disabled && 'cursor-not-allowed',
           className
         )}
         {...props}
+        {...slotAttributes(plateEditorWrapperStyle, { invalid: error, disabled })}
       >
         {children}
       </div>
@@ -81,24 +82,20 @@ EditorWrapper.displayName = 'EditorWrapper'
 export interface EditorProps extends PlateContentProps {
   /** Disabled state */
   disabled?: boolean
+  /** Padding around the content; `none` for content shown inside a panel that pads it. */
+  padding?: 'default' | 'none'
 }
 
 /**
  * The actual editable content area
  */
 export const Editor = forwardRef<HTMLDivElement, EditorProps>(
-  ({ className, disabled, readOnly, ...props }, ref) => {
+  ({ className, disabled, readOnly, padding, ...props }, ref) => {
     return (
       <PlateContent
         ref={ref}
         className={cn(
-          // Base body text matches the app-wide content size (text-sm, same as
-          // inputs and detail fields). Block/mark typography lives on the node
-          // components (heading-node, list-node, ...), not on this container.
-          // `outline-none` with nothing put back: this is the writing surface, where the caret
-          // is what says the keyboard is here. A ring around the page would frame the document.
-          'max-w-none w-full p-4 outline-none text-sm',
-          '[&_*::selection]:bg-primary/20',
+          'max-w-none w-full',
           // Prevent horizontal overflow from long content
           'break-words',
           '[&_table]:table-fixed [&_table]:w-full',
@@ -108,6 +105,7 @@ export const Editor = forwardRef<HTMLDivElement, EditorProps>(
         )}
         readOnly={readOnly || disabled}
         {...props}
+        {...slotAttributes(plateEditorStyle, { padding })}
       />
     )
   }

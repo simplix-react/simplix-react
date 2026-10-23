@@ -1,6 +1,5 @@
 import { useTranslation } from "@simplix-react/i18n/react";
 
-import { cn } from "../../utils/cn";
 import { Badge } from "./badge";
 
 /** Props for the {@link EmptyValueBadge} component. */
@@ -30,7 +29,8 @@ export function EmptyValueBadge({ label, className }: EmptyValueBadgeProps) {
     <Badge
       variant="outline"
       data-testid="empty-value-badge"
-      className={cn("border-dashed font-normal text-muted-foreground", className)}
+      empty
+      className={className}
     >
       {label ?? t("field.noValue")}
     </Badge>

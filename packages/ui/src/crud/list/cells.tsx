@@ -1,5 +1,7 @@
 import { useMemo } from "react";
 
+import { slotAttributes } from "../../design/slot-style";
+import { cellFlagRowStyle, cellFlagStyle } from "./cells.style";
 import { useCountryOptions } from "../../utils/use-country-options";
 import { useLibphonenumber } from "../../utils/use-libphonenumber";
 
@@ -16,8 +18,10 @@ export function CountryCell({ value }: { value: string }) {
 
   if (!value) return null;
   return option ? (
-    <span className="inline-flex items-center gap-1.5">
-      <option.Flag className="h-3 w-4.5 shrink-0 rounded-[1px]" />
+    <span className="inline-flex items-center" {...slotAttributes(cellFlagRowStyle, {})}>
+      <span className="inline-flex shrink-0" {...slotAttributes(cellFlagStyle, {})}>
+        <option.Flag className="h-3 w-4.5 shrink-0" />
+      </span>
       <span>{option.localName}</span>
     </span>
   ) : (
@@ -44,8 +48,12 @@ export function PhoneCell({ value }: { value: string }) {
 
   if (!value) return null;
   return parsed ? (
-    <span className="inline-flex items-center gap-1.5">
-      {option && <option.Flag className="h-3 w-4.5 shrink-0 rounded-[1px]" />}
+    <span className="inline-flex items-center" {...slotAttributes(cellFlagRowStyle, {})}>
+      {option && (
+        <span className="inline-flex shrink-0" {...slotAttributes(cellFlagStyle, {})}>
+          <option.Flag className="h-3 w-4.5 shrink-0" />
+        </span>
+      )}
       <span className="tabular-nums">
         {option ? parsed.formatNational() : parsed.formatInternational()}
       </span>

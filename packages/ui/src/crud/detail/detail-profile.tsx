@@ -1,7 +1,19 @@
 import type { ReactNode } from "react";
 
 import { useFlatUIComponents } from "../../provider/ui-provider";
+import { slotAttributes, partAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
+import {
+  detailProfileCodeStyle,
+  detailProfileDotStyle,
+  detailProfileFeatStyle,
+  detailProfileFeatsStyle,
+  detailProfileMarkStyle,
+  detailProfileMetaStyle,
+  detailProfileOverflowStyle,
+  detailProfileStyle,
+  detailProfileTitleStyle,
+} from "./detail-profile.style";
 
 // ── DetailProfile ──
 //
@@ -37,18 +49,20 @@ function DetailProfileRoot({ mark, title, feats, meta, className }: DetailProfil
   return (
     <section
       className={cn(
-        "grid shrink-0 grid-cols-[56px_minmax(0,1fr)_minmax(0,auto)] grid-rows-[auto_auto] items-start gap-x-4 gap-y-1 border-b border-border bg-surface-2 px-6 py-4 [container-type:inline-size]",
+        "grid shrink-0 grid-cols-[56px_minmax(0,1fr)_minmax(0,auto)] grid-rows-[auto_auto] items-start [container-type:inline-size]",
         "max-[720px]:grid-cols-[56px_minmax(0,1fr)] max-[720px]:grid-rows-[auto_auto_auto]",
         className,
       )}
+      {...slotAttributes(detailProfileStyle, {})}
     >
       <div
-        className="col-start-1 grid size-14 place-items-center self-center rounded-[12px] bg-primary text-primary-foreground [grid-row:1/span_2] [&>svg]:size-7 max-[720px]:[grid-row:1/span_3]"
+        className="col-start-1 grid size-14 place-items-center self-center [grid-row:1/span_2] [&>svg]:size-7 max-[720px]:[grid-row:1/span_3]"
+        {...slotAttributes(detailProfileMarkStyle, {})}
         aria-hidden="true"
       >
         {mark}
       </div>
-      <Heading level={5} className="col-start-2 m-0 min-w-0 [grid-row:1]">
+      <Heading level={5} className="col-start-2 min-w-0 [grid-row:1]" {...partAttributes(detailProfileTitleStyle, {})}>
         {title}
       </Heading>
       {feats}
@@ -82,14 +96,14 @@ function DetailProfileFeats({ items, max = 5, emptyLabel, overflowLabel }: Detai
   const visible = items.slice(0, max);
   const hidden = items.slice(max);
   return (
-    <div className="col-start-3 flex min-w-0 flex-nowrap items-center justify-end gap-1 justify-self-end self-center [grid-row:1] max-[720px]:col-start-2 max-[720px]:justify-start max-[720px]:justify-self-start max-[720px]:[grid-row:3]">
+    <div {...slotAttributes(detailProfileFeatsStyle, {})} className="col-start-3 flex min-w-0 flex-nowrap items-center justify-end justify-self-end self-center [grid-row:1] max-[720px]:col-start-2 max-[720px]:justify-start max-[720px]:justify-self-start max-[720px]:[grid-row:3]">
       {items.length === 0 && (
         <Text size="caption" tone="muted" className="italic">
           {emptyLabel}
         </Text>
       )}
       {visible.map((f) => (
-        <Badge key={f} variant="outline" className="shrink-0 border-primary/20 bg-primary/10 text-primary">
+        <Badge key={f} variant="outline" className="shrink-0" {...partAttributes(detailProfileFeatStyle, {})}>
           {f}
         </Badge>
       ))}
@@ -106,7 +120,7 @@ function DetailProfileFeats({ items, max = 5, emptyLabel, overflowLabel }: Detai
                 +{hidden.length}
               </Badge>
             </TooltipTrigger>
-            <TooltipContent className="z-[100] flex flex-col gap-1">
+            <TooltipContent className="z-[100] flex flex-col" {...partAttributes(detailProfileOverflowStyle, {})}>
               {hidden.map((f) => (
                 <span key={f}>{f}</span>
               ))}
@@ -134,15 +148,15 @@ export interface DetailProfileMetaProps {
 function DetailProfileMeta({ code, items = [] }: DetailProfileMetaProps) {
   const { Text } = useFlatUIComponents();
   return (
-    <div className="col-start-2 flex flex-wrap items-center gap-2.5 [grid-row:2]">
+    <div className="col-start-2 flex flex-wrap items-center [grid-row:2]" {...slotAttributes(detailProfileMetaStyle, {})}>
       {code != null && (
-        <code className="rounded-[3px] bg-surface-3 px-1.5 py-px font-mono text-xs text-fg-soft">{code}</code>
+        <code {...slotAttributes(detailProfileCodeStyle, {})}>{code}</code>
       )}
       {items.map((it, i) => (
         // eslint-disable-next-line react/no-array-index-key
         <span key={i} className="contents">
           {(code != null || i > 0) && (
-            <span className="inline-block size-[3px] shrink-0 rounded-full bg-muted-2" />
+            <span className="inline-block size-[3px] shrink-0" {...slotAttributes(detailProfileDotStyle, {})} />
           )}
           <Text size="caption" tone="muted" as="span">
             {it}

@@ -4,6 +4,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Textarea } from "../../base/inputs/textarea";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -17,16 +18,16 @@ describe("Textarea", () => {
   it("applies base classes", () => {
     render(<Textarea data-testid="ta" />);
     const ta = screen.getByTestId("ta");
-    expect(ta.className).toContain("flex");
-    expect(ta.className).toContain("rounded-md");
-    expect(ta.className).toContain("border-input");
+    expect(drawnClasses(ta)).toContain("flex");
+    expect(drawnClasses(ta)).toContain("rounded-md");
+    expect(drawnClasses(ta)).toContain("border-input");
   });
 
   it("merges custom className", () => {
     render(<Textarea data-testid="ta" className="my-textarea" />);
     const ta = screen.getByTestId("ta");
-    expect(ta.className).toContain("my-textarea");
-    expect(ta.className).toContain("border-input");
+    expect(drawnClasses(ta)).toContain("my-textarea");
+    expect(drawnClasses(ta)).toContain("border-input");
   });
 
   it("forwards ref", () => {

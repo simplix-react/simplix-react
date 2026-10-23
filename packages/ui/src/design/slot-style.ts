@@ -24,6 +24,11 @@ export interface SlotStyle<V extends SlotVariants = SlotVariants> {
   variants: V;
   /** The value an axis takes when the caller passes none. */
   defaultVariants: SlotDefaults<V>;
+  /**
+   * How elements carry the declaration: as their own slot (`slotAttributes`, the default) or as
+   * a part of another component (`partAttributes`).
+   */
+  as?: "slot" | "part";
 }
 
 /** Declares a slot's classic look; see {@link SlotStyle}. */
@@ -50,6 +55,32 @@ export function slotAttributes<V extends SlotVariants>(
     const given = props[axis as keyof V];
     const value = given ?? style.defaultVariants[axis as keyof V];
     if (value !== undefined && value !== null) attributes[`data-${axis}`] = String(value);
+  }
+  return attributes;
+}
+
+/**
+ * The attributes that mark an element as a part another component renders.
+ *
+ * <p>A component that renders a framework part (a `PopoverContent`, a `Badge`, a `Stack`) cannot
+ * give that element a slot of its own: the part writes its own `data-slot`, which is what its
+ * own look hangs on. It marks the element with `data-part` instead, and the design stylesheets
+ * draw the part rule on top of the part's own slot rule (a part rule carries one class worth of
+ * specificity, so it wins over the slot rules without depending on file order).
+ *
+ * @param style - the declaration of how the part looks in this place
+ * @param props - the caller's variant values; an absent one takes the declared default
+ * @returns `data-part` plus `data-part-<axis>` for every declared axis
+ */
+export function partAttributes<V extends SlotVariants>(
+  style: SlotStyle<V>,
+  props: { [K in keyof V]?: AxisValue },
+): Record<string, string> {
+  const attributes: Record<string, string> = { "data-part": style.slot };
+  for (const axis of Object.keys(style.variants)) {
+    const given = props[axis as keyof V];
+    const value = given ?? style.defaultVariants[axis as keyof V];
+    if (value !== undefined && value !== null) attributes[`data-part-${axis}`] = String(value);
   }
   return attributes;
 }

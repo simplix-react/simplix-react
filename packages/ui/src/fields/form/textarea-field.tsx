@@ -71,11 +71,7 @@ export function TextareaField({
           aria-invalid={!!error}
           aria-label={variantProps.layout === "hidden" ? label : undefined}
           {...textareaProps}
-          className={cn(
-            resizeClasses[resize],
-            error && "border-destructive",
-            textareaProps?.className,
-          )}
+          className={cn(resizeClasses[resize], textareaProps?.className)}
         />
       )}
     </FieldWrapper>

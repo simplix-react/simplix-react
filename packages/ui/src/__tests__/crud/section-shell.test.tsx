@@ -5,6 +5,7 @@ import { afterEach, describe, it, expect } from "vitest";
 afterEach(cleanup);
 
 import { SectionShell } from "../../crud/shared/section-shell";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 describe("SectionShell", () => {
   it("renders children", () => {
@@ -53,8 +54,8 @@ describe("SectionShell", () => {
       <SectionShell title="Card Section">Body</SectionShell>,
     );
     const section = container.querySelector("section");
-    expect(section?.className).toContain("border");
-    expect(section?.className).toContain("shadow");
+    expect(drawnClasses(section ?? null)).toContain("border");
+    expect(drawnClasses(section ?? null)).toContain("shadow");
   });
 
   it("renders with flat variant (no shadow)", () => {
@@ -64,7 +65,7 @@ describe("SectionShell", () => {
       </SectionShell>,
     );
     const section = container.querySelector("section");
-    expect(section?.className).not.toContain("shadow");
+    expect(drawnClasses(section ?? null)).not.toContain("shadow");
   });
 
   it("renders with lined variant (border-l)", () => {
@@ -74,8 +75,8 @@ describe("SectionShell", () => {
       </SectionShell>,
     );
     // The body div should have border-l
-    const body = container.querySelector(".border-l-2");
-    expect(body).toBeTruthy();
+    const body = container.querySelector("[data-slot='section-shell-body']");
+    expect(drawnClasses(body)).toContain("border-l-2");
   });
 
   it("renders collapsible toggle button when collapsible=true", () => {

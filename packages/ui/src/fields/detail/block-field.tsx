@@ -1,8 +1,10 @@
 import type { ReactNode } from "react";
 
 import type { CommonDetailFieldProps } from "../../crud/shared/types";
+import { slotAttributes } from "../../design/slot-style";
 import { detailFallback } from "../shared/detail-fallback";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
+import { detailBlockFieldContentStyle } from "./block-field.style";
 
 /** Props for the {@link DetailBlockField} component. */
 export interface DetailBlockFieldProps
@@ -19,8 +21,8 @@ export interface DetailBlockFieldProps
  * Read-only field for description or multi-line / multi-entry content, rendered
  * left-aligned inside a subtly shaded box below its label.
  *
- * Use this instead of an inline field when the value spans multiple lines — a
- * reason, a note, a list of requested changes — where an inline right-aligned
+ * Use this instead of an inline field when the value spans multiple lines - a
+ * reason, a note, a list of requested changes - where an inline right-aligned
  * layout reads as misaligned against the surrounding scalar fields.
  *
  * @example Plain multi-line text
@@ -73,7 +75,7 @@ export function DetailBlockField({
       size={size}
       className={className}
     >
-      <span className="block rounded-md bg-muted/50 px-3 py-2 text-left text-foreground">
+      <span className="block" {...slotAttributes(detailBlockFieldContentStyle, {})}>
         {children ?? <span className="whitespace-pre-wrap">{value}</span>}
       </span>
     </DetailFieldWrapper>

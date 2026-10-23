@@ -1,6 +1,13 @@
 import type { ReactNode } from "react";
 
-import { cn } from "../../utils/cn";
+import { slotAttributes } from "../../design/slot-style";
+import {
+  featureCardActionStyle,
+  featureCardBodyStyle,
+  featureCardHeaderStyle,
+  featureCardStyle,
+  featureCardTitleStyle,
+} from "./feature-card.style";
 
 /* ============================== FeatureCard ============================
  *
@@ -39,17 +46,17 @@ export interface FeatureCardProps {
 export function FeatureCard({ title, icon, action, children, className }: FeatureCardProps) {
   const hasHeader = title != null || action != null;
   return (
-    <section className={cn("rounded-lg border border-border bg-card", className)}>
+    <section className={className} {...slotAttributes(featureCardStyle, {})}>
       {hasHeader && (
-        <header className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
-          <div className="flex min-w-0 items-center gap-2 text-sm font-semibold text-foreground [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-muted-foreground">
+        <header className="flex items-center justify-between" {...slotAttributes(featureCardHeaderStyle, {})}>
+          <div className="flex min-w-0 items-center [&>svg]:size-4 [&>svg]:shrink-0" {...slotAttributes(featureCardTitleStyle, {})}>
             {icon}
             {title}
           </div>
-          {action != null && <div className="flex shrink-0 items-center gap-2">{action}</div>}
+          {action != null && <div className="flex shrink-0 items-center" {...slotAttributes(featureCardActionStyle, {})}>{action}</div>}
         </header>
       )}
-      <div className="p-4">{children}</div>
+      <div {...slotAttributes(featureCardBodyStyle, {})}>{children}</div>
     </section>
   );
 }

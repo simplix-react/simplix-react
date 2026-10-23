@@ -36,6 +36,7 @@ vi.mock("@tanstack/react-table", () => ({
 
 import React from "react";
 import { DraggableRow } from "../../crud/reorder/draggable-row";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 interface TestItem {
   id: string;
@@ -120,7 +121,7 @@ describe("DraggableRow", () => {
       </table>,
     );
     const tr = container.querySelector("tr");
-    expect(tr?.className).toContain("bg-muted/50");
+    expect(drawnClasses(tr!)).toContain("bg-muted/50");
   });
 
   it("applies selected style", () => {
@@ -139,7 +140,7 @@ describe("DraggableRow", () => {
       </table>,
     );
     const tr = container.querySelector("tr");
-    expect(tr?.className).toContain("bg-muted/30");
+    expect(drawnClasses(tr!)).toContain("bg-muted/30");
   });
 
   it("calls onRowClick when clicked", () => {

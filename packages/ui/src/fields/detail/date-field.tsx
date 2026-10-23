@@ -48,7 +48,7 @@ function formatDate(
 
 /**
  * Read-only date/time display field. Supports calendar `date`, absolute `datetime`,
- * wall-clock `time`, and `relative` formats — one component for every temporal kind.
+ * wall-clock `time`, and `relative` formats - one component for every temporal kind.
  *
  * @example
  * ```tsx

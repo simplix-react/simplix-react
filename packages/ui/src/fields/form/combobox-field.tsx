@@ -4,9 +4,23 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react"
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { Stack } from "../../primitives";
-import { cn } from "../../utils/cn";
+import { partAttributes, slotAttributes } from "../../design/slot-style";
+import { fieldClearButtonStyle } from "../shared/field-parts.style";
+import {
+  comboboxCheckStyle,
+  comboboxLabelStyle,
+  comboboxOptionStyle,
+  comboboxPanelStyle,
+  comboboxSearchStyle,
+  comboboxSpinnerArcStyle,
+  comboboxSpinnerStyle,
+  comboboxSpinnerTrackStyle,
+  comboboxStatusStyle,
+} from "./combobox-field.style";
+
 import { FieldWrapper } from "../shared/field-wrapper";
 import { SelectFieldTrigger } from "../shared/select-field-trigger";
+
 
 /** Props for the {@link ComboboxField} form component. */
 export interface ComboboxFieldProps<T extends string = string>
@@ -174,7 +188,8 @@ export function ComboboxField<T extends string = string>({
                 <button
                   type="button"
                   onClick={handleClear}
-                  className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
+                  className="flex h-5 w-5 shrink-0 items-center justify-center"
+                  {...slotAttributes(fieldClearButtonStyle, {})}
                   aria-label={t("field.clearSelection")}
                 >
                   <svg
@@ -200,7 +215,8 @@ export function ComboboxField<T extends string = string>({
                 <button
                   type="button"
                   onClick={onExpand}
-                  className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
+                  className="flex h-5 w-5 shrink-0 items-center justify-center"
+                  {...slotAttributes(fieldClearButtonStyle, {})}
                   aria-label={t("field.expandSearch")}
                   title={t("field.expandSearch")}
                 >
@@ -223,39 +239,47 @@ export function ComboboxField<T extends string = string>({
               ) : undefined
             }
           >
-            <span className={cn("flex flex-1 items-center gap-1.5 truncate", !value && "text-muted-foreground")}>
+            <span
+              className="flex flex-1 items-center truncate"
+              {...slotAttributes(comboboxLabelStyle, { empty: !value })}
+            >
               {selectedOption?.icon}
               {value ? selectedOption?.label ?? "" : selectPlaceholder}
             </span>
           </SelectFieldTrigger>
           <PopoverContent
-            className="w-[var(--radix-popover-trigger-width)] p-0"
+            flush
+            className="w-[var(--radix-popover-trigger-width)]"
             align="start"
             onOpenAutoFocus={(e) => e.preventDefault()}
           >
-            <Stack gap="none" className="p-2">
+            <Stack gap="none" {...partAttributes(comboboxPanelStyle, {})}>
               <Input
                 type="search"
                 value={query}
                 onChange={handleInputChange}
                 onKeyDown={handleInputKeyDown}
                 placeholder={searchPlaceholder}
-                className="mb-2"
+                {...partAttributes(comboboxSearchStyle, {})}
                 autoFocus
                 aria-controls={listboxId}
                 aria-activedescendant={filtered.length > 0 ? `${listboxId}-${highlighted}` : undefined}
               />
               <ul className="max-h-60 overflow-y-auto" role="listbox" id={listboxId} ref={listRef}>
                 {loading && (
-                  <li className="flex items-center justify-center py-4 text-sm text-muted-foreground">
+                  <li
+                    className="flex items-center justify-center"
+                    {...slotAttributes(comboboxStatusStyle, { kind: "loading" })}
+                  >
                     <svg
-                      className="mr-2 h-4 w-4 animate-spin"
+                      className="h-4 w-4"
+                      {...slotAttributes(comboboxSpinnerStyle, {})}
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
                     >
                       <circle
-                        className="opacity-25"
+                        {...slotAttributes(comboboxSpinnerTrackStyle, {})}
                         cx="12"
                         cy="12"
                         r="10"
@@ -263,7 +287,7 @@ export function ComboboxField<T extends string = string>({
                         strokeWidth="4"
                       />
                       <path
-                        className="opacity-75"
+                        {...slotAttributes(comboboxSpinnerArcStyle, {})}
                         fill="currentColor"
                         d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
                       />
@@ -272,7 +296,7 @@ export function ComboboxField<T extends string = string>({
                   </li>
                 )}
                 {!loading && filtered.length === 0 && (
-                  <li className="py-4 text-center text-sm text-muted-foreground">
+                  <li {...slotAttributes(comboboxStatusStyle, { kind: "empty" })}>
                     {noResultsMessage}
                   </li>
                 )}
@@ -284,17 +308,11 @@ export function ComboboxField<T extends string = string>({
                       role="option"
                       aria-selected={opt.value === value}
                       data-highlighted={index === highlighted || undefined}
-                      className={cn(
-                        // `outline-none` with nothing put back: the input keeps focus and the
-                        // cursor moves by `data-highlighted`, which the accent below paints.
-                        "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none",
-                        "hover:bg-accent hover:text-accent-foreground",
-                        // The accent background marks the CURSOR only; the selected
-                        // option is indicated by the trailing check + weight, so the
-                        // two states stay distinguishable while arrowing around.
-                        index === highlighted && "bg-accent text-accent-foreground",
-                        opt.value === value && "font-medium",
-                      )}
+                      className="relative flex cursor-pointer select-none items-center"
+                      {...slotAttributes(comboboxOptionStyle, {
+                        cursor: index === highlighted,
+                        chosen: opt.value === value,
+                      })}
                       onClick={() => handleSelect(opt.value)}
                       onMouseEnter={() => setHighlighted(index)}
                       onKeyDown={(e) => {
@@ -303,7 +321,10 @@ export function ComboboxField<T extends string = string>({
                         }
                       }}
                     >
-                      <span className="flex flex-1 items-center gap-1.5 truncate">
+                      <span
+                        className="flex flex-1 items-center truncate"
+                        {...slotAttributes(comboboxLabelStyle, {})}
+                      >
                         {opt.icon}
                         {opt.label}
                       </span>
@@ -315,7 +336,8 @@ export function ComboboxField<T extends string = string>({
                           viewBox="0 0 15 15"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
-                          className="ml-2 h-4 w-4 shrink-0"
+                          className="h-4 w-4 shrink-0"
+                          {...slotAttributes(comboboxCheckStyle, {})}
                         >
                           <path
                             d="M11.4669 3.72684C11.7558 3.91574 11.8369 4.30308 11.648 4.59198L7.39799 11.092C7.29783 11.2452 7.13556 11.3467 6.95402 11.3699C6.77247 11.3931 6.58989 11.3354 6.45446 11.2124L3.70446 8.71241C3.44905 8.48022 3.43023 8.08494 3.66242 7.82953C3.89461 7.57412 4.28989 7.5553 4.5453 7.78749L6.75292 9.79441L10.6018 3.90792C10.7907 3.61902 11.178 3.53795 11.4669 3.72684Z"

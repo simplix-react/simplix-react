@@ -37,6 +37,7 @@ vi.mock("../../crud/form/use-before-unload", () => ({
 import React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { CrudForm } from "../../crud/form/crud-form";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 describe("CrudForm (FormRoot)", () => {
   it("renders with data-testid", () => {
@@ -203,7 +204,7 @@ describe("CrudForm.Actions", () => {
     const wrapper = container.firstElementChild;
     // An auto margin on the first child pushes it away from the rest; the rest stay one group
     // however many they are, which `justify-between` does not do past two.
-    expect(wrapper?.className).toContain("[&>*:first-child]:mr-auto");
+    expect(drawnClasses(wrapper!)).toContain("[&>*:first-child]:mr-auto");
     expect(wrapper?.className).not.toContain("justify-between");
   });
 

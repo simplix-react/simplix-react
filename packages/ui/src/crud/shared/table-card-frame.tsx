@@ -1,6 +1,8 @@
 import { createContext, type ReactNode, useContext, useMemo } from "react";
 
 import { cn } from "../../utils/cn";
+import { slotAttributes } from "../../design/slot-style";
+import { tableCardFrameStyle } from "./table-card-frame.style";
 
 // ── Table card frame ──
 //
@@ -43,7 +45,7 @@ export function TableCardFrame({ maxHeight, fill, className, children }: TableCa
   const value = useMemo<TableCardFrameValue>(() => ({ framed: true, maxHeight, fill }), [maxHeight, fill]);
   return (
     <TableCardFrameContext.Provider value={value}>
-      <div className={cn("flex flex-col overflow-hidden rounded-lg border bg-card", fill && "min-h-0 flex-1", className)}>
+      <div className={cn("flex flex-col overflow-hidden", fill && "min-h-0 flex-1", className)} {...slotAttributes(tableCardFrameStyle, {})}>
         {children}
       </div>
     </TableCardFrameContext.Provider>

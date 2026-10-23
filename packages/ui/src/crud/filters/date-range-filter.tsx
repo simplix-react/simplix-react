@@ -1,11 +1,17 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "@simplix-react/i18n/react";
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
 import { formatDateRange } from "../../utils/format-date";
 import { CalendarDotsIcon, XIcon } from "../shared/icons";
 import type { DateRange } from "../../base/controls/calendar";
 import { Separator } from "../../base/display/separator";
 import { useFlatUIComponents } from "../../provider/ui-provider";
+import { crudFieldClearButtonStyle } from "./field-clear-button.style";
+import {
+  crudFilterChipStyle,
+  crudFilterChipTriggerStyle,
+} from "./filter-parts.style";
 
 /**
  * Props for the {@link DateRangeFilter} component.
@@ -78,32 +84,21 @@ export function DateRangeFilter({
           side inside it rather than one inside the other — a control nested in a control leaves the
           keyboard and assistive technology to guess which of the two a press belongs to. */}
       <span
-        className={cn(
-          "inline-flex h-8 items-center gap-2 rounded-md border px-3 text-sm",
-          hasValue ? "border-solid" : "border-dashed text-muted-foreground",
-          className,
-        )}
+        className={cn("inline-flex h-8 items-center", className)}
+        {...slotAttributes(crudFilterChipStyle, { filled: !!hasValue })}
       >
         <PopoverTrigger asChild>
           <button
             type="button"
-            className="inline-flex items-center gap-2 rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            className="inline-flex items-center"
+            {...slotAttributes(crudFilterChipTriggerStyle, {})}
           >
             <CalendarDotsIcon className="h-4 w-4" />
             {label}
           </button>
         </PopoverTrigger>
-        <Separator
-          orientation="vertical"
-          className={cn("mx-1 h-4", !hasValue && "opacity-0")}
-        />
-        <Badge
-          variant="secondary"
-          className={cn(
-            "w-[9.5rem] justify-center font-normal",
-            !hasValue && "opacity-0",
-          )}
-        >
+        <Separator orientation="vertical" className="h-4" />
+        <Badge variant="secondary" className="w-[9.5rem] justify-center">
           {rangeText}
         </Badge>
         <button
@@ -111,16 +106,16 @@ export function DateRangeFilter({
           tabIndex={hasValue ? 0 : -1}
           onClick={handleClear}
           className={cn(
-            "inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground",
-            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-            !hasValue && "pointer-events-none opacity-0",
+            "inline-flex h-4 w-4 shrink-0 items-center justify-center",
+            !hasValue && "pointer-events-none",
           )}
           aria-label={t("filter.clearDateRange")}
+          {...slotAttributes(crudFieldClearButtonStyle, { ring: true, hidden: !hasValue })}
         >
           <XIcon className="h-3 w-3" />
         </button>
       </span>
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent flush className="w-auto" align="start">
         <Calendar
           mode="range"
           selectedRange={{ from, to }}

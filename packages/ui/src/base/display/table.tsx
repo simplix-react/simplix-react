@@ -9,7 +9,19 @@ import {
   useRef,
 } from "react";
 
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
+import {
+  tableBodyStyle,
+  tableCaptionStyle,
+  tableCellStyle,
+  tableContainerStyle,
+  tableFooterStyle,
+  tableHeadStyle,
+  tableHeaderStyle,
+  tableRowStyle,
+  tableStyle,
+} from "./table.style";
 
 // ---------------------------------------------------------------------------
 // Context
@@ -101,29 +113,23 @@ function useAncestorStickyHeader(ref: RefObject<HTMLDivElement | null>, enabled:
 // Container variants (outer div)
 // ---------------------------------------------------------------------------
 
-const tableContainerVariants = cva("relative w-full", {
+const tableContainerLayout = cva("relative w-full", {
   variants: {
     rounded: {
       none: "",
-      sm: "rounded-sm overflow-hidden",
-      md: "rounded-md overflow-hidden",
-      lg: "rounded-lg overflow-hidden",
+      sm: "overflow-hidden",
+      md: "overflow-hidden",
+      lg: "overflow-hidden",
     },
   },
   defaultVariants: { rounded: "none" },
 });
 
 // ---------------------------------------------------------------------------
-// Size / density maps
+// Height maps (structure; the paddings are drawn by the slot declarations)
 // ---------------------------------------------------------------------------
 
-const headPxMap = { sm: "px-2", md: "px-3", lg: "px-4" } as const;
 const headHMap = { sm: "h-8", md: "h-10", lg: "h-12" } as const;
-
-const cellPxMap = { sm: "px-2", md: "px-3", lg: "px-4" } as const;
-const cellPyMap = { sm: "py-1.5", md: "py-2.5", lg: "py-4" } as const;
-
-const densityCellPyMap = { compact: "py-1.5", default: "py-2.5", comfortable: "py-3" } as const;
 const densityHeadHMap = { compact: "h-8", default: "h-9", comfortable: "h-11" } as const;
 
 // ---------------------------------------------------------------------------
@@ -173,26 +179,20 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
     <TableContext.Provider value={{ variant, size, density, stickyHeader, ownScroll: scrolls }}>
       <div
         ref={containerRef}
-        data-slot="table-container"
         data-sticky-header={ancestorSticky ? "ancestor" : undefined}
         className={cn(
-          tableContainerVariants({ rounded }),
+          tableContainerLayout({ rounded }),
           scrolls ? "overflow-auto" : "overflow-x-auto",
           fill && "min-h-0 flex-1",
-          variant === "bordered" && "border border-border",
         )}
         style={maxHeight != null ? { maxHeight } : undefined}
+        {...slotAttributes(tableContainerStyle, { rounded, bordered: variant === "bordered" })}
       >
         <table
           ref={ref}
-          data-slot="table"
-          className={cn(
-            "w-full caption-bottom text-base",
-            layout === "fixed" && "table-fixed",
-            variant === "bordered" && "border-separate border-spacing-0",
-            className,
-          )}
+          className={cn("w-full caption-bottom", layout === "fixed" && "table-fixed", className)}
           {...rest}
+          {...slotAttributes(tableStyle, { bordered: variant === "bordered" })}
         >
           {children}
         </table>
@@ -216,15 +216,9 @@ export const TableHeader = forwardRef<HTMLTableSectionElement, TableHeaderProps>
     return (
       <thead
         ref={ref}
-        data-slot="table-header"
-        className={cn(
-          // A framed card (own scroll region) draws the top edge; thead
-          // border-t would double it. Unframed tables keep their own edge.
-          !(stickyHeader && ownScroll) && "border-t border-border",
-          "bg-muted/40 [&_tr]:border-b [&_tr]:border-border-strong",
-          className,
-        )}
+        className={className}
         {...rest}
+        {...slotAttributes(tableHeaderStyle, { framed: !!(stickyHeader && ownScroll) })}
       />
     );
   },
@@ -244,14 +238,9 @@ export const TableBody = forwardRef<HTMLTableSectionElement, TableBodyProps>(
     return (
       <tbody
         ref={ref}
-        data-slot="table-body"
-        className={cn(
-          // Framed (own scroll region): card bottom / pagination border-t is
-          // the closing line, so the last row's border-b would double it.
-          stickyHeader && ownScroll && "[&>tr:last-child]:border-b-0",
-          className,
-        )}
+        className={className}
         {...rest}
+        {...slotAttributes(tableBodyStyle, { framed: !!(stickyHeader && ownScroll) })}
       />
     );
   },
@@ -269,12 +258,9 @@ export const TableFooter = forwardRef<HTMLTableSectionElement, TableFooterProps>
   ({ className, ...rest }, ref) => (
     <tfoot
       ref={ref}
-      data-slot="table-footer"
-      className={cn(
-        "border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
-        className,
-      )}
+      className={className}
       {...rest}
+      {...slotAttributes(tableFooterStyle, {})}
     />
   ),
 );
@@ -293,15 +279,9 @@ export const TableRow = forwardRef<HTMLTableRowElement, TableRowProps>(
     return (
       <tr
         ref={ref}
-        data-slot="table-row"
-        className={cn(
-          "border-b border-border transition-colors",
-          variant === "default" && "hover:bg-muted/40",
-          variant === "striped" && "even:bg-muted/50",
-          variant === "bordered" && "hover:bg-muted/50",
-          className,
-        )}
+        className={className}
         {...rest}
+        {...slotAttributes(tableRowStyle, { variant })}
       />
     );
   },
@@ -321,25 +301,19 @@ export const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
     return (
       <th
         ref={ref}
-        data-slot="table-head"
         className={cn(
-          "text-left align-middle text-xs font-semibold tracking-[0.01em] text-muted-foreground [&:has([role=checkbox])]:pr-0",
-          headPxMap[size],
+          "align-middle",
           density ? densityHeadHMap[density] : headHMap[size],
-          variant === "bordered" && "border border-border",
-          // Sticky header: th carries its own bg + borders so they travel with
-          // the floating cell (thead's borders stay at the layout position).
-          // The bg must be opaque (same tone as bg-muted/40 over the page
-          // background) so rows do not show through while it floats.
-          stickyHeader && "bg-[color-mix(in_srgb,var(--muted)_40%,var(--background))] border-b border-border",
-          // Own scroll region (framed card): CSS sticky, card draws the top
-          // edge. Otherwise the transform in useAncestorStickyHeader moves the
-          // thead, which paints above the in-flow rows on its own.
+          // Own scroll region (framed card): CSS sticky.
           stickyHeader && ownScroll && "sticky top-0 z-10",
-          stickyHeader && !ownScroll && "border-t border-border",
           className,
         )}
         {...rest}
+        {...slotAttributes(tableHeadStyle, {
+          size,
+          bordered: variant === "bordered",
+          sticky: !stickyHeader ? "none" : ownScroll ? "scroll" : "floating",
+        })}
       />
     );
   },
@@ -359,25 +333,20 @@ export const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(
     return (
       <td
         ref={ref}
-        data-slot="table-cell"
         className={cn(
-          // Data cells default to text-sm (the header row is text-xs); keeps record
-          // typography consistent so bare cells don't inherit the table root's text-base.
-          "align-middle text-sm [&:has([role=checkbox])]:pr-0",
+          "align-middle",
           // A single status/enum pill fills a uniform min width so a column's
-          // badges line up regardless of label length — whether it is the cell's
+          // badges line up regardless of label length - whether it is the cell's
           // own child or the lone child of an alignment wrapper. Multi-badge /
           // chip cells hold several badges, so `:only-child` leaves them untouched.
           "[&>[data-slot=badge]:not([data-compact])]:min-w-20",
           "[&>*>[data-slot=badge]:not([data-compact]):only-child]:min-w-20",
           "[&>[data-slot=status-badge]]:min-w-20",
           "[&>*>[data-slot=status-badge]:only-child]:min-w-20",
-          cellPxMap[size],
-          density ? densityCellPyMap[density] : cellPyMap[size],
-          variant === "bordered" && "border border-border",
           className,
         )}
         {...rest}
+        {...slotAttributes(tableCellStyle, { size, density, bordered: variant === "bordered" })}
       />
     );
   },
@@ -395,9 +364,9 @@ export const TableCaption = forwardRef<HTMLTableCaptionElement, TableCaptionProp
   ({ className, ...rest }, ref) => (
     <caption
       ref={ref}
-      data-slot="table-caption"
-      className={cn("mt-4 text-sm text-muted-foreground", className)}
+      className={className}
       {...rest}
+      {...slotAttributes(tableCaptionStyle, {})}
     />
   ),
 );

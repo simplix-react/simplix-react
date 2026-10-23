@@ -1,6 +1,13 @@
 import { Fragment, type ReactNode } from "react";
 import { Check } from "lucide-react";
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
+import {
+  steplineCircleStyle,
+  steplineConnectorStyle,
+  steplineItemStyle,
+  steplineLabelStyle,
+} from "./stepline.style";
 
 /** One entry of {@link Stepline}. */
 export interface SteplineItem {
@@ -51,12 +58,8 @@ function StepCircle({ state, ordinal }: { state: StepState; ordinal: number }) {
   return (
     <span
       aria-hidden
-      className={cn(
-        "flex size-7 shrink-0 items-center justify-center rounded-full border-2 text-xs font-semibold transition-colors",
-        state === "done" && "border-primary bg-primary text-primary-foreground",
-        state === "current" && "border-primary bg-primary text-primary-foreground ring-4 ring-primary/15",
-        state === "upcoming" && "border-muted-foreground/40 bg-background text-muted-foreground",
-      )}
+      className="flex size-7 shrink-0 items-center justify-center"
+      {...slotAttributes(steplineCircleStyle, { state })}
     >
       {state === "done" ? <Check className="size-4" /> : ordinal}
     </span>
@@ -96,24 +99,29 @@ export function Stepline({
         {items.map((item, index) => {
           const state = stateOf(item, index, currentIndex, current, completedKeys);
           return (
-            <li key={item.key} className="flex gap-3">
+            <li
+              key={item.key}
+              className="flex"
+              {...slotAttributes(steplineItemStyle, { orientation: "vertical" })}
+            >
               <div className="flex flex-col items-center">
                 <StepCircle state={state} ordinal={index + 1} />
                 {index < items.length - 1 ? (
                   <span
                     aria-hidden
-                    className={cn(
-                      "min-h-4 w-0.5 flex-1",
-                      state === "done" ? "bg-primary" : "bg-border",
-                    )}
+                    className="min-h-4 w-0.5 flex-1"
+                    {...slotAttributes(steplineConnectorStyle, {
+                      orientation: "vertical",
+                      filled: state === "done",
+                    })}
                   />
                 ) : null}
               </div>
               <span
-                className={cn(
-                  "pb-4 pt-1 text-sm",
-                  state === "current" ? "font-semibold text-foreground" : "text-muted-foreground",
-                )}
+                {...slotAttributes(steplineLabelStyle, {
+                  orientation: "vertical",
+                  current: state === "current",
+                })}
               >
                 {item.label}
               </span>
@@ -134,16 +142,23 @@ export function Stepline({
             {index > 0 ? (
               <span
                 aria-hidden
-                className={cn("mt-3.5 h-0.5 min-w-4 flex-1", reached ? "bg-primary" : "bg-border")}
+                className="h-0.5 min-w-4 flex-1"
+                {...slotAttributes(steplineConnectorStyle, {
+                  orientation: "horizontal",
+                  filled: reached,
+                })}
               />
             ) : null}
-            <li className="flex max-w-28 flex-col items-center gap-1 px-1">
+            <li
+              className="flex max-w-28 flex-col items-center"
+              {...slotAttributes(steplineItemStyle, { orientation: "horizontal" })}
+            >
               <StepCircle state={state} ordinal={index + 1} />
               <span
-                className={cn(
-                  "text-center text-xs leading-tight",
-                  state === "current" ? "font-semibold text-foreground" : "text-muted-foreground",
-                )}
+                {...slotAttributes(steplineLabelStyle, {
+                  orientation: "horizontal",
+                  current: state === "current",
+                })}
               >
                 {item.label}
               </span>

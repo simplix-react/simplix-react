@@ -3,12 +3,14 @@ import { CSS } from "@dnd-kit/utilities";
 import { flexRender } from "@tanstack/react-table";
 import type { Row } from "@tanstack/react-table";
 
+import { partAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
 import { type ColumnWidths, sizedCellProps } from "../list/column-widths";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import type { ReorderConfig } from "../shared";
 import { rowClickHandler, rowClickIgnoreForColumn, rowClickIgnoreProps } from "../shared";
 import { DragHandleCell } from "./drag-handle";
+import { draggableRowHandleCellStyle, draggableRowStyle } from "./draggable-row.style";
 
 interface DraggableRowProps<T> {
   row: Row<T>;
@@ -57,15 +59,14 @@ export function DraggableRow<T>({
       ref={setNodeRef}
       style={style}
       className={cn(
-        isSelected && "bg-muted/30",
-        isActive && "bg-muted/50",
-        isDragging && "z-10 opacity-50",
+        isDragging && "z-10",
         onRowClick && "cursor-pointer",
       )}
       onClick={rowClickHandler(row.original, onRowClick)}
       data-testid={`list-row-${rowId}`}
+      {...partAttributes(draggableRowStyle, { selected: !!isSelected, active: !!isActive, dragging: isDragging })}
     >
-      <TableCell className="w-10 px-2" {...rowClickIgnoreProps}>
+      <TableCell className="w-10" {...rowClickIgnoreProps} {...partAttributes(draggableRowHandleCellStyle, {})}>
         <DragHandleCell
           disabled={!canDrag}
           listeners={listeners}

@@ -1,9 +1,18 @@
 import * as SelectPrimitive from "@radix-ui/react-select";
-import { type VariantProps, cva } from "class-variance-authority";
+import type { VariantProps } from "class-variance-authority";
 import { type ComponentPropsWithRef, forwardRef } from "react";
 
 import { cn } from "../../utils/cn";
+import { slotAttributes, slotClassNames } from "../../design/slot-style";
 import { FieldChevron } from "./field-chevron";
+import {
+  selectContentStyle,
+  selectItemStyle,
+  selectLabelStyle,
+  selectSeparatorStyle,
+  selectTriggerStyle,
+  selectViewportStyle,
+} from "./select.style";
 
 // Root - pass through
 export const Select = SelectPrimitive.Root;
@@ -15,21 +24,7 @@ export const SelectValue = SelectPrimitive.Value;
 export const SelectGroup = SelectPrimitive.Group;
 
 // Trigger
-export const selectTriggerVariants = cva(
-  "flex w-full items-center justify-between rounded-md border border-input bg-background placeholder:text-muted-foreground focus:outline-none focus:border-foreground disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
-  {
-    variants: {
-      size: {
-        default: "h-8 px-3 py-1.5 text-sm",
-        sm: "h-7 px-2 py-1 text-xs",
-        xs: "h-6 px-2 py-0.5 text-xs",
-      },
-    },
-    defaultVariants: {
-      size: "default",
-    },
-  },
-);
+export const selectTriggerVariants = slotClassNames(selectTriggerStyle);
 
 export type SelectTriggerVariants = VariantProps<typeof selectTriggerVariants>;
 
@@ -38,14 +33,15 @@ export interface SelectTriggerProps
     SelectTriggerVariants {}
 
 export const SelectTrigger = forwardRef<HTMLButtonElement, SelectTriggerProps>(
-  ({ className, size, children, ...rest }, ref) => (
+  ({ className, size, compact, children, ...rest }, ref) => (
     <SelectPrimitive.Trigger
       ref={ref}
-      className={cn(selectTriggerVariants({ size }), className)}
+      className={cn("flex w-full items-center justify-between", className)}
       {...rest}
+      {...slotAttributes(selectTriggerStyle, { size, compact })}
     >
       {children}
-      <FieldChevron className="-mr-1.5" />
+      <FieldChevron trailing />
     </SelectPrimitive.Trigger>
   ),
 );
@@ -57,26 +53,27 @@ export type SelectContentProps = ComponentPropsWithRef<
   typeof SelectPrimitive.Content
 >;
 
+const SELECT_CONTENT_MOTION =
+  "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2";
+
 export const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(
   ({ className, children, position = "popper", ...rest }, ref) => (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Content
         ref={ref}
-        className={cn(
-          "relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-          position === "popper" &&
-            "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
-          className,
-        )}
+        // Entry and exit motion is tw-animate-css, which the design stylesheet cannot @apply; it stays
+        // on the element, the same in every design.
+        className={cn("relative z-50 max-h-96 min-w-[8rem] overflow-hidden", SELECT_CONTENT_MOTION, className)}
         position={position}
         {...rest}
+        {...slotAttributes(selectContentStyle, { position })}
       >
         <SelectPrimitive.Viewport
           className={cn(
-            "p-1",
             position === "popper" &&
               "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]",
           )}
+          {...slotAttributes(selectViewportStyle, {})}
         >
           {children}
         </SelectPrimitive.Viewport>
@@ -88,7 +85,7 @@ export const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(
 SelectContent.displayName = "SelectContent";
 
 // Item
-// TODO: SelectItem tag right-alignment — Radix ItemText renders as inline span,
+// TODO: SelectItem tag right-alignment - Radix ItemText renders as inline span,
 // preventing flex-based right-alignment of tag content inside children.
 // Options: (1) Add `trailing` prop to SelectItem rendered outside ItemText,
 // (2) Use Radix's SelectItemText portal behavior to separate trigger vs dropdown rendering.
@@ -101,10 +98,11 @@ export const SelectItem = forwardRef<HTMLDivElement, SelectItemProps>(
     <SelectPrimitive.Item
       ref={ref}
       className={cn(
-        "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "relative flex w-full cursor-default select-none items-center data-[disabled]:pointer-events-none",
         className,
       )}
       {...rest}
+      {...slotAttributes(selectItemStyle, {})}
     >
       <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
         <SelectPrimitive.ItemIndicator>
@@ -141,8 +139,9 @@ export const SelectLabel = forwardRef<HTMLDivElement, SelectLabelProps>(
   ({ className, ...rest }, ref) => (
     <SelectPrimitive.Label
       ref={ref}
-      className={cn("py-1.5 pl-8 pr-2 text-sm font-semibold", className)}
+      className={className}
       {...rest}
+      {...slotAttributes(selectLabelStyle, {})}
     />
   ),
 );
@@ -160,8 +159,9 @@ export const SelectSeparator = forwardRef<
 >(({ className, ...rest }, ref) => (
   <SelectPrimitive.Separator
     ref={ref}
-    className={cn("-mx-1 my-1 h-px bg-muted", className)}
+    className={cn("h-px", className)}
     {...rest}
+    {...slotAttributes(selectSeparatorStyle, {})}
   />
 ));
 

@@ -12,7 +12,7 @@ export interface DeleteConfirmDialogProps {
 /**
  * Delete confirmation dialog (UD-7).
  *
- * ★ UD-7: NOT matilo ConfirmDialog — uses useFlatUIComponents().Dialog (plan §6.6).
+ * ★ UD-7: NOT matilo ConfirmDialog - uses useFlatUIComponents().Dialog (plan §6.6).
  * The caller wires onConfirm to removeItem(localId) and manages isDeleting state.
  */
 export function DeleteConfirmDialog({

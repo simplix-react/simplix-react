@@ -38,7 +38,13 @@ import {
 } from '../../../base/navigation/dropdown-menu'
 import { ToolbarButton, type ToolbarButtonProps } from './toolbar'
 import { useTranslation } from '@simplix-react/i18n/react'
+import { partAttributes, slotAttributes } from '../../../design/slot-style'
 import { TableGridPicker } from './table-grid-picker'
+import {
+  plateTableMenuDangerStyle,
+  plateTableMenuGridStyle,
+  plateTableMenuIconStyle,
+} from './table-dropdown-menu.style'
 
 export interface TableDropdownMenuProps extends Omit<ToolbarButtonProps, 'onClick'> {}
 
@@ -107,10 +113,10 @@ export function TableDropdownMenu({ children, ...props }: TableDropdownMenuProps
         {/* Table - Insert with grid picker */}
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
-            <Grid3X3 className="mr-2 h-4 w-4" />
+            <Grid3X3 className="h-4 w-4" {...slotAttributes(plateTableMenuIconStyle, {})} />
             {t('plateEditor.table.table')}
           </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent className="p-0">
+          <DropdownMenuSubContent {...partAttributes(plateTableMenuGridStyle, {})}>
             <TableGridPicker
               maxRows={8}
               maxCols={8}
@@ -122,16 +128,16 @@ export function TableDropdownMenu({ children, ...props }: TableDropdownMenuProps
         {/* Cell operations */}
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
-            <SquareDashed className="mr-2 h-4 w-4" />
+            <SquareDashed className="h-4 w-4" {...slotAttributes(plateTableMenuIconStyle, {})} />
             {t('plateEditor.table.cell')}
           </DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
             <DropdownMenuItem onClick={handleMergeCells} disabled={!canMerge}>
-              <Combine className="mr-2 h-4 w-4" />
+              <Combine className="h-4 w-4" {...slotAttributes(plateTableMenuIconStyle, {})} />
               {t('plateEditor.table.mergeCells')}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleSplitCell} disabled={!canSplit}>
-              <SplitSquareHorizontal className="mr-2 h-4 w-4" />
+              <SplitSquareHorizontal className="h-4 w-4" {...slotAttributes(plateTableMenuIconStyle, {})} />
               {t('plateEditor.table.splitCell')}
             </DropdownMenuItem>
           </DropdownMenuSubContent>
@@ -140,21 +146,21 @@ export function TableDropdownMenu({ children, ...props }: TableDropdownMenuProps
         {/* Row operations */}
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
-            <Rows3 className="mr-2 h-4 w-4" />
+            <Rows3 className="h-4 w-4" {...slotAttributes(plateTableMenuIconStyle, {})} />
             {t('plateEditor.table.row')}
           </DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
             <DropdownMenuItem onClick={handleInsertRowAbove}>
-              <ArrowUp className="mr-2 h-4 w-4" />
+              <ArrowUp className="h-4 w-4" {...slotAttributes(plateTableMenuIconStyle, {})} />
               {t('plateEditor.table.insertRowAbove')}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleInsertRowBelow}>
-              <ArrowDown className="mr-2 h-4 w-4" />
+              <ArrowDown className="h-4 w-4" {...slotAttributes(plateTableMenuIconStyle, {})} />
               {t('plateEditor.table.insertRowBelow')}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleDeleteRow} className="text-destructive">
-              <Trash2 className="mr-2 h-4 w-4" />
+            <DropdownMenuItem onClick={handleDeleteRow} {...partAttributes(plateTableMenuDangerStyle, {})}>
+              <Trash2 className="h-4 w-4" {...slotAttributes(plateTableMenuIconStyle, {})} />
               {t('plateEditor.table.deleteRow')}
             </DropdownMenuItem>
           </DropdownMenuSubContent>
@@ -163,21 +169,21 @@ export function TableDropdownMenu({ children, ...props }: TableDropdownMenuProps
         {/* Column operations */}
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
-            <Columns3 className="mr-2 h-4 w-4" />
+            <Columns3 className="h-4 w-4" {...slotAttributes(plateTableMenuIconStyle, {})} />
             {t('plateEditor.table.column')}
           </DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
             <DropdownMenuItem onClick={handleInsertColumnLeft}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
+              <ArrowLeft className="h-4 w-4" {...slotAttributes(plateTableMenuIconStyle, {})} />
               {t('plateEditor.table.insertColumnLeft')}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleInsertColumnRight}>
-              <ArrowRight className="mr-2 h-4 w-4" />
+              <ArrowRight className="h-4 w-4" {...slotAttributes(plateTableMenuIconStyle, {})} />
               {t('plateEditor.table.insertColumnRight')}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleDeleteColumn} className="text-destructive">
-              <Trash2 className="mr-2 h-4 w-4" />
+            <DropdownMenuItem onClick={handleDeleteColumn} {...partAttributes(plateTableMenuDangerStyle, {})}>
+              <Trash2 className="h-4 w-4" {...slotAttributes(plateTableMenuIconStyle, {})} />
               {t('plateEditor.table.deleteColumn')}
             </DropdownMenuItem>
           </DropdownMenuSubContent>
@@ -186,8 +192,8 @@ export function TableDropdownMenu({ children, ...props }: TableDropdownMenuProps
         <DropdownMenuSeparator />
 
         {/* Delete Table */}
-        <DropdownMenuItem onClick={handleDeleteTable} className="text-destructive">
-          <Trash2 className="mr-2 h-4 w-4" />
+        <DropdownMenuItem onClick={handleDeleteTable} {...partAttributes(plateTableMenuDangerStyle, {})}>
+          <Trash2 className="h-4 w-4" {...slotAttributes(plateTableMenuIconStyle, {})} />
           {t('plateEditor.table.deleteTable')}
         </DropdownMenuItem>
       </DropdownMenuContent>

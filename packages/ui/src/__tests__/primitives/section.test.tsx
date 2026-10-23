@@ -4,6 +4,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { Section } from "../../primitives/section";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -12,7 +13,7 @@ describe("Section", () => {
     render(<Section data-testid="sec">content</Section>);
     const el = screen.getByTestId("sec");
     expect(el.tagName).toBe("SECTION");
-    expect(el.className).toContain("space-y-4");
+    expect(drawnClasses(el)).toContain("space-y-4");
     expect(el.textContent).toBe("content");
   });
 
@@ -26,7 +27,7 @@ describe("Section", () => {
     render(<Section title="T" description="desc text" />);
     const desc = screen.getByText("desc text");
     expect(desc.tagName).toBe("P");
-    expect(desc.className).toContain("text-muted-foreground");
+    expect(drawnClasses(desc)).toContain("text-muted-foreground");
   });
 
   it("does not render header when no title or description", () => {
@@ -39,7 +40,7 @@ describe("Section", () => {
 
   it("merges custom className", () => {
     render(<Section data-testid="sec" className="extra" />);
-    const classes = screen.getByTestId("sec").className;
+    const classes = drawnClasses(screen.getByTestId("sec"));
     expect(classes).toContain("space-y-4");
     expect(classes).toContain("extra");
   });

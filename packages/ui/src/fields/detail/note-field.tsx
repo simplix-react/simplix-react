@@ -1,4 +1,6 @@
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
+import { detailNoteFieldStyle } from "./note-field.style";
 
 /** Props for the {@link DetailNoteField} component. */
 export interface DetailNoteFieldProps {
@@ -23,7 +25,7 @@ export function DetailNoteField({ value, fallback, className }: DetailNoteFieldP
   if (!displayValue) return null;
 
   return (
-    <p className={cn("rounded-md bg-muted/50 px-3 py-2.5 text-sm text-muted-foreground whitespace-pre-wrap", className)}>
+    <p className={cn("whitespace-pre-wrap", className)} {...slotAttributes(detailNoteFieldStyle, {})}>
       {displayValue}
     </p>
   );

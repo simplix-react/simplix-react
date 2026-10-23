@@ -10,10 +10,18 @@ import { flip, shift, offset } from '@platejs/floating'
 import { useEditorSelector } from 'platejs/react'
 import { KEYS } from 'platejs'
 import { cn } from '../../../utils/cn'
+import { partAttributes, slotAttributes } from '../../../design/slot-style'
 import { Input } from '../../../base/inputs/input'
 import { Button } from '../../../base/controls/button'
 import { Separator } from '../../../base/display/separator'
 import { useTranslation } from '@simplix-react/i18n/react'
+import {
+  plateLinkInputStyle,
+  plateLinkToolbarIconStyle,
+  plateLinkToolbarOpenStyle,
+  plateLinkToolbarStyle,
+  plateLinkUnlinkStyle,
+} from './link-toolbar.style'
 
 // Floating options to keep toolbar within editor bounds
 const floatingOptions = {
@@ -38,18 +46,17 @@ export function LinkInsertToolbar() {
   return (
     <div
       ref={insertRef}
-      className={cn(
-        'z-50 flex items-center gap-2 rounded-md border bg-popover p-2 shadow-md',
-        'animate-in fade-in-0 zoom-in-95'
-      )}
+      className="z-50 flex items-center animate-in fade-in-0 zoom-in-95"
       {...insertProps}
+      {...slotAttributes(plateLinkToolbarStyle, {})}
     >
       <Input
         placeholder={t('plateEditor.link.placeholder')}
-        className="h-8 w-60 text-sm"
+        className="h-8 w-60"
+        {...partAttributes(plateLinkInputStyle, {})}
       />
       <Button size="sm" variant="default" className="h-8">
-        <Link className="h-4 w-4 mr-1" />
+        <Link className="h-4 w-4" {...slotAttributes(plateLinkToolbarIconStyle, {})} />
         {t('plateEditor.link.insert')}
       </Button>
     </div>
@@ -78,11 +85,9 @@ export function LinkEditToolbar() {
   return (
     <div
       ref={editRef}
-      className={cn(
-        'z-50 flex items-center gap-2 rounded-md border bg-popover p-2 shadow-md',
-        'animate-in fade-in-0 zoom-in-95'
-      )}
+      className="z-50 flex items-center animate-in fade-in-0 zoom-in-95"
       {...editProps}
+      {...slotAttributes(plateLinkToolbarStyle, {})}
     >
       <Button
         size="sm"
@@ -90,17 +95,18 @@ export function LinkEditToolbar() {
         className="h-8"
         {...editButtonProps}
       >
-        <Link className="h-4 w-4 mr-1" />
+        <Link className="h-4 w-4" {...slotAttributes(plateLinkToolbarIconStyle, {})} />
         {t('plateEditor.link.edit')}
       </Button>
       <Separator orientation="vertical" className="h-6" />
       <Button
         size="sm"
         variant="ghost"
-        className="h-8 text-destructive hover:text-destructive"
+        className="h-8"
+        {...partAttributes(plateLinkUnlinkStyle, {})}
         {...unlinkButtonProps}
       >
-        <Unlink className="h-4 w-4 mr-1" />
+        <Unlink className="h-4 w-4" {...slotAttributes(plateLinkToolbarIconStyle, {})} />
         {t('plateEditor.link.unlink')}
       </Button>
       <Separator orientation="vertical" className="h-6" />
@@ -113,10 +119,8 @@ export function LinkEditToolbar() {
         onClick={(e) => {
           if (!linkUrl) e.preventDefault()
         }}
-        className={cn(
-          'inline-flex h-8 items-center justify-center rounded px-3 text-sm font-medium hover:bg-accent hover:text-accent-foreground',
-          !linkUrl && 'pointer-events-none opacity-50'
-        )}
+        className={cn('inline-flex h-8 items-center justify-center', !linkUrl && 'pointer-events-none')}
+        {...slotAttributes(plateLinkToolbarOpenStyle, { disabled: !linkUrl })}
       >
         <ExternalLink className="h-4 w-4" />
       </a>

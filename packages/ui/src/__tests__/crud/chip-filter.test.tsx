@@ -6,6 +6,7 @@ afterEach(cleanup);
 
 import { ChipFilter } from "../../crud/filters/chip-filter";
 import type { CrudListFilters } from "../../crud/list/use-crud-list";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 function createMockState(values: Record<string, unknown> = {}): CrudListFilters {
   return {
@@ -91,7 +92,7 @@ describe("ChipFilter", () => {
       <ChipFilter field="status.in" options={options} state={state} />,
     );
     const activeBtn = screen.getByText("Active").closest("button");
-    expect(activeBtn?.className).toContain("bg-primary");
+    expect(drawnClasses(activeBtn ?? null)).toContain("bg-primary");
   });
 
   it("renders disabled option with disabled style", () => {

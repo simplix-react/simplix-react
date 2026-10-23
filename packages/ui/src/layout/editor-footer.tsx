@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
-import { Flex } from "../primitives/flex";
+import { slotAttributes } from "../design/slot-style";
+import { editorFooterStyle } from "./editor-footer.style";
 import { cn } from "../utils/cn";
 
 export interface EditorFooterProps {
@@ -10,8 +11,11 @@ export interface EditorFooterProps {
 
 export function EditorFooter({ children, className }: EditorFooterProps) {
   return (
-    <Flex justify="between" align="center" className={cn("shrink-0 border-t px-5 py-3", className)}>
+    <div
+      className={cn("flex flex-row items-center justify-between shrink-0", className)}
+      {...slotAttributes(editorFooterStyle, {})}
+    >
       {children}
-    </Flex>
+    </div>
   );
 }

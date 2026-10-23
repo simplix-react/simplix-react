@@ -1,6 +1,7 @@
 import { type ComponentPropsWithRef, forwardRef, type ReactNode } from "react";
 
-import { cn } from "../utils/cn";
+import { slotAttributes } from "../design/slot-style";
+import { sectionDescriptionStyle, sectionStyle, sectionTitleStyle } from "./section.style";
 import { Stack } from "./stack";
 
 /** Props for the {@link Section} layout component. */
@@ -38,14 +39,14 @@ export interface SectionProps
  */
 export const Section = forwardRef<HTMLElement, SectionProps>(
   ({ className, title, description, children, ...rest }, ref) => (
-    <section ref={ref} className={cn("space-y-4", className)} {...rest}>
+    <section ref={ref} className={className} {...rest} {...slotAttributes(sectionStyle, {})}>
       {(title || description) && (
         <Stack gap="xs">
           {title && (
-            <h3 className="text-lg font-semibold tracking-tight">{title}</h3>
+            <h3 {...slotAttributes(sectionTitleStyle, {})}>{title}</h3>
           )}
           {description && (
-            <p className="text-sm text-muted-foreground">{description}</p>
+            <p {...slotAttributes(sectionDescriptionStyle, {})}>{description}</p>
           )}
         </Stack>
       )}

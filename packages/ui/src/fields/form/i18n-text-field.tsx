@@ -2,7 +2,6 @@ import type { LocaleCode, LocaleConfig } from "@simplix-react/i18n";
 import { useState, type ReactNode } from "react";
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { useFlatUIComponents } from "../../provider/ui-provider";
-import { cn } from "../../utils/cn";
 import { FieldWrapper } from "../shared/field-wrapper";
 import { getFilledLanguages } from "../shared/filled-languages";
 import { LanguageSelector } from "../shared/language-selector";
@@ -124,7 +123,7 @@ export function I18nTextField({
           aria-invalid={!!error}
           aria-label={variantProps.layout === "hidden" ? label : undefined}
           {...inputProps}
-          className={cn(error && "border-destructive", inputProps?.className)}
+          className={inputProps?.className}
         />
       )}
     </FieldWrapper>

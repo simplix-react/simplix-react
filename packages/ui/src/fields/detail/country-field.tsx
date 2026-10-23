@@ -2,8 +2,11 @@ import { useMemo } from "react";
 
 import type { CommonDetailFieldProps } from "../../crud/shared/types";
 import { useCountryOptions } from "../../utils/use-country-options";
+import { slotAttributes } from "../../design/slot-style";
 import { detailFallback } from "../shared/detail-fallback";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
+import { detailCountryFieldValueStyle } from "./country-field.style";
+import { fieldFlagStyle } from "../shared/field-parts.style";
 
 /** Props for the {@link DetailCountryField} component. */
 export interface DetailCountryFieldProps extends CommonDetailFieldProps {
@@ -46,8 +49,8 @@ export function DetailCountryField({
       className={className}
     >
       {option ? (
-        <span className="inline-flex items-center gap-1.5">
-          <option.Flag className="h-3 w-4.5 shrink-0 rounded-[1px]" />
+        <span className="inline-flex items-center" {...slotAttributes(detailCountryFieldValueStyle, {})}>
+          <option.Flag className="h-3 w-4.5 shrink-0" {...slotAttributes(fieldFlagStyle, {})} />
           <span>{option.localName}</span>
         </span>
       ) : value ? (

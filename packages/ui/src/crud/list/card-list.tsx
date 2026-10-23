@@ -2,7 +2,8 @@ import type { ReactNode } from "react";
 
 import { Grid } from "../../primitives/grid";
 import { Stack } from "../../primitives/stack";
-import { cn } from "../../utils/cn";
+import { slotAttributes, partAttributes } from "../../design/slot-style";
+import { cardListEmptyStyle, cardListEmptyTextStyle } from "./card-list.style";
 
 // ── CardList — Mobile-friendly card-based layout (Phase 3 skeleton) ──
 
@@ -45,8 +46,8 @@ export function CardList<T>({
 }: CardListProps<T>) {
   if (data.length === 0) {
     return (
-      <Stack align="center" justify="center" className={cn("py-12", className)}>
-        <p className="text-sm text-muted-foreground">No items to display.</p>
+      <Stack align="center" justify="center" className={className} {...partAttributes(cardListEmptyStyle, {})}>
+        <p {...slotAttributes(cardListEmptyTextStyle, {})}>No items to display.</p>
       </Stack>
     );
   }

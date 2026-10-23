@@ -13,6 +13,15 @@ import {
 import { cn } from '../../../utils/cn'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../base/overlay/tooltip'
 import { Separator } from '../../../base/display/separator'
+import { partAttributes, slotAttributes } from '../../../design/slot-style'
+import {
+  plateFixedToolbarStyle,
+  plateToolbarButtonStyle,
+  plateToolbarGroupStyle,
+  plateToolbarSentinelStyle,
+  plateToolbarSeparatorStyle,
+  plateToolbarTooltipStyle,
+} from './toolbar.style'
 
 export interface ToolbarProps extends HTMLAttributes<HTMLDivElement> {
   /** Orientation of the toolbar */
@@ -50,27 +59,29 @@ export const FixedToolbar = forwardRef<HTMLDivElement, ToolbarProps>(
     return (
       <>
         {/* Sentinel element to detect sticky state */}
-        {floatingEffect && <div ref={sentinelRef} className="h-px w-full -mb-px" aria-hidden="true" />}
+        {floatingEffect && (
+          <div
+            ref={sentinelRef}
+            className="h-px w-full"
+            aria-hidden="true"
+            {...slotAttributes(plateToolbarSentinelStyle, {})}
+          />
+        )}
         <div
           ref={ref}
           className={cn(
-            'sticky z-50 flex items-center gap-0.5 border-b border-border bg-muted/40 px-1 py-0.5',
-            // Only transition floating effect properties, not all (prevents animation on hidden toggle)
-            'transition-[top,margin,padding,border-radius,box-shadow,transform,background-color] duration-200 ease-out',
+            'sticky z-50 flex items-center',
             orientation === 'vertical' && 'flex-col',
             // Normal state: no top offset
             !isSticky && 'top-0',
-            // Floating state styles: minimal top offset with rounded corners
-            floatingEffect && isSticky && [
-              'top-0.5 mx-2 rounded-lg border shadow-md',
-              'scale-[0.98] py-1',
-              'bg-background/95 backdrop-blur-sm',
-            ],
+            // Floating state: minimal top offset
+            floatingEffect && isSticky && 'top-0.5',
             className
           )}
           role="toolbar"
           aria-orientation={orientation}
           {...props}
+          {...slotAttributes(plateFixedToolbarStyle, { floating: floatingEffect && isSticky })}
         >
           {children}
         </div>
@@ -90,9 +101,10 @@ export const ToolbarGroup = forwardRef<
   return (
     <div
       ref={ref}
-      className={cn('flex items-center gap-0.5', className)}
+      className={cn('flex items-center', className)}
       role="group"
       {...props}
+      {...slotAttributes(plateToolbarGroupStyle, {})}
     >
       {children}
     </div>
@@ -111,8 +123,9 @@ export const ToolbarSeparator = forwardRef<
     <Separator
       ref={ref}
       orientation="vertical"
-      className={cn('mx-0.5 h-4', className)}
+      className={cn('h-4', className)}
       {...props}
+      {...partAttributes(plateToolbarSeparatorStyle, {})}
     />
   )
 })
@@ -144,14 +157,12 @@ export const ToolbarButton = forwardRef<HTMLButtonElement, ToolbarButtonProps>(
         aria-label={tooltip}
         disabled={disabled}
         className={cn(
-          'inline-flex h-6 min-w-6 items-center justify-center rounded px-1 text-xs font-medium transition-colors',
-          'hover:bg-accent hover:text-accent-foreground',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-          'disabled:pointer-events-none disabled:opacity-50',
-          pressed && 'bg-accent text-accent-foreground',
+          'inline-flex h-6 min-w-6 items-center justify-center',
+          'disabled:pointer-events-none',
           className
         )}
         {...props}
+        {...slotAttributes(plateToolbarButtonStyle, { pressed })}
       >
         {icon}
         {children}
@@ -163,7 +174,7 @@ export const ToolbarButton = forwardRef<HTMLButtonElement, ToolbarButtonProps>(
         <TooltipProvider delayDuration={300}>
           <Tooltip>
             <TooltipTrigger asChild>{button}</TooltipTrigger>
-            <TooltipContent side="bottom" className="text-xs">
+            <TooltipContent side="bottom" {...partAttributes(plateToolbarTooltipStyle, {})}>
               {tooltip}
             </TooltipContent>
           </Tooltip>

@@ -3,8 +3,16 @@ import { forwardRef } from 'react'
 import type { PlateElementProps } from 'platejs/react'
 import { useElement } from 'platejs/react'
 import { cn } from '../../../utils/cn'
+import { slotAttributes } from '../../../design/slot-style'
 import type { TElement } from 'platejs'
 import { filterPlateProps } from '../lib/filter-plate-props'
+import {
+  plateTableCellStyle,
+  plateTableHeaderCellStyle,
+  plateTableRowStyle,
+  plateTableScrollStyle,
+  plateTableStyle,
+} from './table-node.style'
 
 // Define interfaces for table elements
 interface TableCellElementType extends TElement {
@@ -21,14 +29,12 @@ export const TableElement = forwardRef<HTMLTableElement, PlateElementProps>(
     const domProps = filterPlateProps(props)
 
     return (
-      <div className="my-4 overflow-x-auto">
+      <div className="overflow-x-auto" {...slotAttributes(plateTableScrollStyle, {})}>
         <table
           ref={ref}
-          className={cn(
-            'w-full border-collapse border border-border',
-            className
-          )}
+          className={cn('w-full', className)}
           {...domProps}
+          {...slotAttributes(plateTableStyle, {})}
         >
           <tbody>{children}</tbody>
         </table>
@@ -46,7 +52,7 @@ export const TableRowElement = forwardRef<HTMLTableRowElement, PlateElementProps
     const domProps = filterPlateProps(props)
 
     return (
-      <tr ref={ref} className={cn('border-b border-border', className)} {...domProps}>
+      <tr ref={ref} className={className} {...domProps} {...slotAttributes(plateTableRowStyle, {})}>
         {children}
       </tr>
     )
@@ -67,15 +73,12 @@ export const TableCellElement = forwardRef<HTMLTableCellElement, PlateElementPro
     return (
       <Component
         ref={ref}
-        className={cn(
-          'relative border border-border p-2 text-left align-top',
-          isHeader && 'bg-muted font-semibold',
-          className
-        )}
+        className={cn('relative align-top', className)}
         colSpan={element.colSpan}
         rowSpan={element.rowSpan}
         style={style}
         {...domProps}
+        {...slotAttributes(plateTableCellStyle, { header: !!isHeader })}
       >
         {children}
       </Component>
@@ -95,14 +98,12 @@ export const TableHeaderCellElement = forwardRef<HTMLTableCellElement, PlateElem
     return (
       <th
         ref={ref}
-        className={cn(
-          'relative border border-border bg-muted p-2 text-left font-semibold align-top',
-          className
-        )}
+        className={cn('relative align-top', className)}
         colSpan={element.colSpan}
         rowSpan={element.rowSpan}
         style={style}
         {...domProps}
+        {...slotAttributes(plateTableHeaderCellStyle, {})}
       >
         {children}
       </th>

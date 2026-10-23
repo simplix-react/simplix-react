@@ -4,6 +4,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { Container } from "../../primitives/container";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -12,15 +13,15 @@ describe("Container", () => {
     render(<Container data-testid="ctr">content</Container>);
     const el = screen.getByTestId("ctr");
     expect(el.tagName).toBe("DIV");
-    expect(el.className).toContain("mx-auto");
-    expect(el.className).toContain("w-full");
-    expect(el.className).toContain("px-4");
+    expect(drawnClasses(el)).toContain("mx-auto");
+    expect(drawnClasses(el)).toContain("w-full");
+    expect(drawnClasses(el)).toContain("px-4");
     expect(el.textContent).toBe("content");
   });
 
   it("applies default size (lg)", () => {
     render(<Container data-testid="ctr" />);
-    expect(screen.getByTestId("ctr").className).toContain("max-w-screen-lg");
+    expect(drawnClasses(screen.getByTestId("ctr"))).toContain("max-w-screen-lg");
   });
 
   it("applies size variants", () => {
@@ -37,14 +38,14 @@ describe("Container", () => {
       const { unmount } = render(
         <Container data-testid="ctr" size={size as keyof typeof sizes} />,
       );
-      expect(screen.getByTestId("ctr").className).toContain(expected);
+      expect(drawnClasses(screen.getByTestId("ctr"))).toContain(expected);
       unmount();
     }
   });
 
   it("merges custom className", () => {
     render(<Container data-testid="ctr" className="extra" />);
-    const classes = screen.getByTestId("ctr").className;
+    const classes = drawnClasses(screen.getByTestId("ctr"));
     expect(classes).toContain("mx-auto");
     expect(classes).toContain("extra");
   });

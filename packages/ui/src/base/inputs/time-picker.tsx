@@ -3,6 +3,20 @@ import { useTranslation } from "@simplix-react/i18n/react";
 
 import { CaretDownIcon } from "../../crud/shared/icons";
 import { cn } from "../../utils/cn";
+import { slotAttributes } from "../../design/slot-style";
+import {
+  timeMeridiemOptionStyle,
+  timeMeridiemStyle,
+  timeScrollColumnStyle,
+  timeScrollListStyle,
+  timeScrollOptionStyle,
+  timeSelectColonStyle,
+  timeSelectControlStyle,
+  timeSelectRowStyle,
+  timeSpinnerInputStyle,
+  timeSpinnerStepStyle,
+  timeSpinnerSteppersStyle,
+} from "./time-picker.style";
 import {
   clampTimeValue,
   isHourOutOfRange,
@@ -103,19 +117,18 @@ function TimeSpinnerInput({
             step(-1);
           }
         }}
-        // `outline-none` with nothing put back: the box around the hour and minute fields
-        // carries `focus-within:border-foreground`, and two rings inside one control read as
-        // two controls.
-        className="min-w-8 flex-1 bg-transparent text-center text-sm outline-none disabled:cursor-not-allowed"
+        className="min-w-8 flex-1 disabled:cursor-not-allowed"
+        {...slotAttributes(timeSpinnerInputStyle, {})}
       />
-      <div className="flex shrink-0 flex-col border-l border-input">
+      <div className="flex shrink-0 flex-col" {...slotAttributes(timeSpinnerSteppersStyle, {})}>
         <button
           type="button"
           tabIndex={-1}
           aria-label={`${ariaLabel} +`}
           disabled={disabled}
           onClick={() => step(1)}
-          className="flex flex-1 items-center justify-center px-0.5 hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none"
+          className="flex flex-1 items-center justify-center disabled:pointer-events-none"
+          {...slotAttributes(timeSpinnerStepStyle, { direction: "increase" })}
         >
           <CaretDownIcon className="h-3 w-3 rotate-180" />
         </button>
@@ -125,7 +138,8 @@ function TimeSpinnerInput({
           aria-label={`${ariaLabel} -`}
           disabled={disabled}
           onClick={() => step(-1)}
-          className="flex flex-1 items-center justify-center border-t border-input px-0.5 hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none"
+          className="flex flex-1 items-center justify-center disabled:pointer-events-none"
+          {...slotAttributes(timeSpinnerStepStyle, { direction: "decrease" })}
         >
           <CaretDownIcon className="h-3 w-3" />
         </button>
@@ -150,18 +164,18 @@ function MeridiemToggle({
   disabled?: boolean;
 }) {
   return (
-    <div className="flex shrink-0 items-stretch border-r border-input" role="group">
+    <div
+      className="flex shrink-0 items-stretch"
+      role="group"
+      {...slotAttributes(timeMeridiemStyle, {})}
+    >
       <button
         type="button"
         aria-pressed={!pm}
         disabled={disabled}
         onClick={() => onChange(false)}
-        className={cn(
-          "whitespace-nowrap px-2 text-xs disabled:pointer-events-none",
-          !pm
-            ? "bg-primary text-primary-foreground"
-            : "hover:bg-accent hover:text-accent-foreground",
-        )}
+        className="whitespace-nowrap disabled:pointer-events-none"
+        {...slotAttributes(timeMeridiemOptionStyle, { position: "first", active: !pm })}
       >
         {amLabel}
       </button>
@@ -170,12 +184,8 @@ function MeridiemToggle({
         aria-pressed={pm}
         disabled={disabled}
         onClick={() => onChange(true)}
-        className={cn(
-          "whitespace-nowrap border-l border-input px-2 text-xs disabled:pointer-events-none",
-          pm
-            ? "bg-primary text-primary-foreground"
-            : "hover:bg-accent hover:text-accent-foreground",
-        )}
+        className="whitespace-nowrap disabled:pointer-events-none"
+        {...slotAttributes(timeMeridiemOptionStyle, { position: "second", active: pm })}
       >
         {pmLabel}
       </button>
@@ -197,6 +207,7 @@ function TimeScrollColumn({
   onSelect,
   ariaLabel,
   width,
+  drop,
   className,
   style,
 }: {
@@ -206,6 +217,8 @@ function TimeScrollColumn({
   ariaLabel: string;
   /** Width of the time input this column belongs to, so the two line up exactly. */
   width?: number;
+  /** Which side of the input row the list opens on. */
+  drop: "up" | "down";
   className?: string;
   style?: CSSProperties;
 }) {
@@ -223,24 +236,23 @@ function TimeScrollColumn({
       className={cn("relative", width == null && "w-14", className)}
       style={{ ...style, ...(width == null ? {} : { width }) }}
       aria-label={ariaLabel}
+      {...slotAttributes(timeScrollColumnStyle, { drop })}
     >
-      <div ref={listRef} className="absolute inset-0 flex flex-col gap-0.5 overflow-y-auto p-1">
+      <div
+        ref={listRef}
+        className="absolute inset-0 flex flex-col overflow-y-auto"
+        {...slotAttributes(timeScrollListStyle, {})}
+      >
         {items.map((item) => (
           <button
             key={item.value}
             type="button"
             disabled={item.disabled}
-            data-selected={item.value === selected}
             // Keep focus on the time input: a blur here would close the list before the click lands.
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => onSelect(item.value)}
-            className={cn(
-              "flex h-7 w-full shrink-0 items-center justify-center rounded-md text-sm whitespace-nowrap",
-              "hover:bg-accent hover:text-accent-foreground",
-              "disabled:pointer-events-none disabled:opacity-50",
-              item.value === selected &&
-                "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
-            )}
+            className="flex h-7 w-full shrink-0 items-center justify-center whitespace-nowrap disabled:pointer-events-none"
+            {...slotAttributes(timeScrollOptionStyle, { selected: item.value === selected })}
           >
             {item.label}
           </button>
@@ -320,7 +332,7 @@ export function TimeSelectControl({
   const [hourInputEl, setHourInputEl] = useState<HTMLDivElement | null>(null);
   const [minuteInputEl, setMinuteInputEl] = useState<HTMLDivElement | null>(null);
   const [columnWidths, setColumnWidths] = useState<{ hour?: number; minute?: number }>({});
-  // Which time input is being edited — its option list is the one that drops open.
+  // Which time input is being edited: its option list is the one that drops open.
   const [activeTimeField, setActiveTimeField] = useState<"hour" | "minute" | null>(null);
   // On a phone the floating list covers the very field it belongs to and fights
   // the on-screen keyboard, so the spinner boxes and their steppers are the whole
@@ -432,8 +444,7 @@ export function TimeSelectControl({
     [onCommit, meridiem.hour12, minutes],
   );
 
-  const listPositionClass =
-    dropDirection === "up" ? "bottom-full mb-1" : "top-full mt-1";
+  const listPositionClass = dropDirection === "up" ? "bottom-full" : "top-full";
 
   return (
     <div
@@ -441,6 +452,7 @@ export function TimeSelectControl({
       role="group"
       aria-labelledby={ariaLabelledBy}
       className={cn("relative", className)}
+      {...slotAttributes(timeSelectControlStyle, {})}
       onPointerDownCapture={() => {
         pointerInsideRef.current = true;
       }}
@@ -458,15 +470,8 @@ export function TimeSelectControl({
       }}
     >
       <div
-        className={cn(
-          "flex h-8 items-stretch overflow-hidden rounded-md border border-input bg-background",
-          // The hour and minute fields carry no ring of their own — two rings inside one control
-          // read as two controls — so the box they sit in shows where the keyboard is, the way
-          // `number-input` and `multi-select-field` do.
-          "focus-within:border-foreground",
-          disabled && "opacity-50",
-          rowClassName,
-        )}
+        className={cn("flex h-8 items-stretch overflow-hidden", rowClassName)}
+        {...slotAttributes(timeSelectRowStyle, { disabled })}
       >
         {/* grow (flex-basis auto), not flex-1: preserving each part's intrinsic
             width and splitting only the leftover keeps the two inputs equal. */}
@@ -491,7 +496,12 @@ export function TimeSelectControl({
           />
         </div>
         <div ref={setMinuteInputEl} className="flex grow items-stretch">
-          <span className="flex shrink-0 items-center border-l border-input px-1 text-sm text-muted-foreground">:</span>
+          <span
+            className="flex shrink-0 items-center"
+            {...slotAttributes(timeSelectColonStyle, {})}
+          >
+            :
+          </span>
           <TimeSpinnerInput
             value={minutes}
             min={0}
@@ -510,10 +520,8 @@ export function TimeSelectControl({
           onSelect={(h) => onCommit(h, minutes)}
           ariaLabel={t("date.hour")}
           width={columnWidths.hour}
-          className={cn(
-            "absolute left-0 z-10 h-56 rounded-md border border-input bg-popover shadow-md",
-            listPositionClass,
-          )}
+          drop={dropDirection}
+          className={cn("absolute left-0 z-10 h-56", listPositionClass)}
         />
       )}
       {activeTimeField === "minute" && (
@@ -523,10 +531,8 @@ export function TimeSelectControl({
           onSelect={(m) => onCommit(hours, m)}
           ariaLabel={t("date.minute")}
           width={columnWidths.minute}
-          className={cn(
-            "absolute z-10 h-56 rounded-md border border-input bg-popover shadow-md",
-            listPositionClass,
-          )}
+          drop={dropDirection}
+          className={cn("absolute z-10 h-56", listPositionClass)}
           style={{ left: columnWidths.hour }}
         />
       )}

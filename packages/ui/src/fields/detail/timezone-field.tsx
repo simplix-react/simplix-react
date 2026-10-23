@@ -2,8 +2,10 @@ import { useMemo } from "react";
 
 import type { CommonDetailFieldProps } from "../../crud/shared/types";
 import { useTimezoneOptions } from "../../utils/use-timezone-options";
+import { slotAttributes } from "../../design/slot-style";
 import { detailFallback } from "../shared/detail-fallback";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
+import { detailTimezoneFieldLocalNameStyle } from "./timezone-field.style";
 
 /** Props for the {@link DetailTimezoneField} component. */
 export interface DetailTimezoneFieldProps extends CommonDetailFieldProps {
@@ -53,7 +55,7 @@ export function DetailTimezoneField({
         <span>
           {option.label}
           {option.localizedName && option.localizedName !== option.value && (
-            <span className="text-muted-foreground"> ({option.localizedName})</span>
+            <span {...slotAttributes(detailTimezoneFieldLocalNameStyle, {})}> ({option.localizedName})</span>
           )}
         </span>
       ) : value ? (

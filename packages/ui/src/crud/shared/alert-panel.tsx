@@ -1,7 +1,28 @@
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
 import type { ReactNode } from "react";
 
+import { slotAttributes, slotClassNames } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
+import {
+  alertPanelActionStyle,
+  alertPanelBodyStyle,
+  alertPanelCancelStyle,
+  alertPanelContentStyle,
+  alertPanelDescriptionStyle,
+  alertPanelFooterStyle,
+  alertPanelOverlayStyle,
+  alertPanelTitleStyle,
+} from "./alert-panel.style";
+
+// Entry and exit motion is tw-animate-css, which a design stylesheet cannot @apply; it stays
+// on the element, the same in every design.
+const alertPanelContentMotion =
+  "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95";
+
+// Entry and exit motion is tw-animate-css, which a design stylesheet cannot @apply; it stays
+// on the element, the same in every design.
+const alertPanelOverlayMotion =
+  "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0";
 
 /** Props for the {@link AlertPanel} shell. */
 export interface AlertPanelProps {
@@ -53,8 +74,8 @@ export interface AlertPanelProps {
  *   description={t("list.deleteDescription")}
  *   actions={
  *     <>
- *       <AlertDialog.Cancel className={ALERT_CANCEL_CLASS}>{t("common.cancel")}</AlertDialog.Cancel>
- *       <AlertDialog.Action className={ALERT_ACTION_CLASS}>{t("common.delete")}</AlertDialog.Action>
+ *       <AlertDialog.Cancel className={ALERT_BUTTON_STRUCTURE} {...alertCancelAttributes}>{t("common.cancel")}</AlertDialog.Cancel>
+ *       <AlertDialog.Action className={ALERT_BUTTON_STRUCTURE} {...alertActionAttributes}>{t("common.delete")}</AlertDialog.Action>
  *     </>
  *   }
  * />
@@ -65,52 +86,58 @@ export function AlertPanel({ open, onOpenChange, title, description, actions }: 
     <AlertDialog.Root open={open} onOpenChange={onOpenChange}>
       <AlertDialog.Portal>
         <AlertDialog.Overlay
-          className="fixed inset-0 z-50 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
+          className={cn(alertPanelOverlayMotion, "fixed inset-0 z-50")}
+          {...slotAttributes(alertPanelOverlayStyle, {})}
         />
         <AlertDialog.Content
-          className={cn(
+          className={cn(alertPanelContentMotion, 
             "fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2",
             // The ceiling, and the column that lets the body take the overflow on its own.
             "flex max-h-[calc(100dvh-2rem)] flex-col",
-            "rounded-lg border bg-background p-6 shadow-lg",
-            "data-[state=open]:animate-in data-[state=closed]:animate-out",
-            "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-            "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
           )}
+          {...slotAttributes(alertPanelContentStyle, {})}
         >
-          <AlertDialog.Title className="shrink-0 text-lg font-semibold">
+          <AlertDialog.Title className="shrink-0" {...slotAttributes(alertPanelTitleStyle, {})}>
             {title}
           </AlertDialog.Title>
           {description !== undefined && description !== null && (
             // No `flex-1`: the body takes its natural height until the panel meets the ceiling and
             // then shrinks, which is what `min-h-0` allows. Growing it would stretch a two-line
             // confirmation down the whole window.
-            <div className="-mx-6 mt-2 min-h-0 overflow-y-auto px-6">
-              <AlertDialog.Description className="text-sm text-muted-foreground">
+            <div className="min-h-0 overflow-y-auto" {...slotAttributes(alertPanelBodyStyle, {})}>
+              <AlertDialog.Description {...slotAttributes(alertPanelDescriptionStyle, {})}>
                 {description}
               </AlertDialog.Description>
             </div>
           )}
-          <footer className="mt-6 flex w-full shrink-0 justify-end gap-2">{actions}</footer>
+          <footer className="flex w-full shrink-0 justify-end" {...slotAttributes(alertPanelFooterStyle, {})}>{actions}</footer>
         </AlertDialog.Content>
       </AlertDialog.Portal>
     </AlertDialog.Root>
   );
 }
 
-/** The footer's secondary button — what `AlertDialog.Cancel` is drawn as in all three panels. */
-export const ALERT_CANCEL_CLASS = cn(
-  "inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-medium",
-  "border border-input bg-background transition-colors",
-  "hover:bg-accent hover:text-accent-foreground",
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-  "disabled:pointer-events-none disabled:opacity-50",
-);
+/**
+ * The structure of the footer's buttons: the shape every alert panel's buttons share. The look is
+ * drawn from the `alert-panel-cancel` and `alert-panel-action` slots.
+ */
+export const ALERT_BUTTON_STRUCTURE =
+  "inline-flex h-10 items-center justify-center disabled:pointer-events-none";
 
-/** The footer's committing button — what `AlertDialog.Action` is drawn as in all three panels. */
-export const ALERT_ACTION_CLASS = cn(
-  "inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-medium",
-  "bg-primary text-primary-foreground transition-colors hover:bg-primary/90",
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-  "disabled:pointer-events-none disabled:opacity-50",
-);
+/** Attributes that draw `AlertDialog.Cancel` as the footer's secondary button. */
+export const alertCancelAttributes = slotAttributes(alertPanelCancelStyle, {});
+
+/** Attributes that draw `AlertDialog.Action` as the footer's committing button. */
+export const alertActionAttributes = slotAttributes(alertPanelActionStyle, {});
+
+/**
+ * The footer's secondary button as a class string, for a caller that draws an element of its own
+ * to look like it. The panels themselves use `ALERT_BUTTON_STRUCTURE` with `alertCancelAttributes`.
+ */
+export const ALERT_CANCEL_CLASS = cn(ALERT_BUTTON_STRUCTURE, slotClassNames(alertPanelCancelStyle)());
+
+/**
+ * The footer's committing button as a class string, for a caller that draws an element of its own
+ * to look like it. The panels themselves use `ALERT_BUTTON_STRUCTURE` with `alertActionAttributes`.
+ */
+export const ALERT_ACTION_CLASS = cn(ALERT_BUTTON_STRUCTURE, slotClassNames(alertPanelActionStyle)());

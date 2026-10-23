@@ -1,9 +1,10 @@
-
 import { forwardRef } from 'react'
 import type { PlateElementProps } from 'platejs/react'
 import { useElement, useSelected, useFocused } from 'platejs/react'
 import { cn } from '../../../utils/cn'
+import { slotAttributes } from '../../../design/slot-style'
 import { filterPlateProps } from '../lib/filter-plate-props'
+import { plateMentionInputStyle, plateMentionStyle } from './mention-node.style'
 
 // Use TElement from platejs for proper typing
 import type { TElement } from 'platejs'
@@ -28,12 +29,9 @@ export const MentionElement = forwardRef<HTMLSpanElement, PlateElementProps>(
         ref={ref}
         data-slate-value={element.value}
         contentEditable={false}
-        className={cn(
-          'inline-flex items-center rounded-md bg-primary/10 px-1.5 py-0.5 text-sm font-medium text-primary',
-          selected && focused && 'ring-2 ring-primary ring-offset-1',
-          className
-        )}
+        className={cn('inline-flex items-center', className)}
         {...domProps}
+        {...slotAttributes(plateMentionStyle, { selected: selected && focused })}
       >
         @{element.value}
         {children}
@@ -52,11 +50,9 @@ export const MentionInputElement = forwardRef<HTMLSpanElement, PlateElementProps
     return (
       <span
         ref={ref}
-        className={cn(
-          'inline-block rounded-md bg-primary/10 px-1.5 py-0.5 text-sm',
-          className
-        )}
+        className={cn('inline-block', className)}
         {...domProps}
+        {...slotAttributes(plateMentionInputStyle, {})}
       >
         {children}
       </span>

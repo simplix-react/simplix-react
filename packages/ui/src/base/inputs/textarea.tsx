@@ -2,6 +2,8 @@ import { type ComponentPropsWithRef, forwardRef } from "react";
 
 import { cn } from "../../utils/cn";
 import { createSelfResolving } from "../../provider/self-resolving";
+import { slotAttributes } from "../../design/slot-style";
+import { textareaStyle } from "./textarea.style";
 
 export type TextareaProps = ComponentPropsWithRef<"textarea">;
 
@@ -9,11 +11,9 @@ export const TextareaBase = forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, ...rest }, ref) => (
     <textarea
       ref={ref}
-      className={cn(
-        "flex min-h-16 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:border-foreground aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:border-destructive disabled:cursor-not-allowed disabled:opacity-50",
-        className,
-      )}
+      className={cn("flex min-h-16 w-full", className)}
       {...rest}
+      {...slotAttributes(textareaStyle, {})}
     />
   ),
 );

@@ -12,7 +12,7 @@ import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-
 import { CSS } from '@dnd-kit/utilities'
 import { useTranslation } from '@simplix-react/i18n/react'
 import { formatBytes } from '../../../utils/format-bytes'
-import { cn } from '../../../utils/cn'
+import { slotAttributes } from '../../../design/slot-style'
 import { FileListItem } from './file-list-item'
 import { FileTypeIcon } from '../atoms/file-type-icon'
 import { FileThumbnail } from '../atoms/file-thumbnail'
@@ -20,6 +20,12 @@ import { FileActionButton } from './file-action-button'
 import { useResolvedImageSrc } from '../use-resolved-image-src'
 import { downloadAttachment } from '../download-attachment'
 import type { FileAttachmentItem } from '../types'
+import {
+  fileSectionCountStyle,
+  fileSectionHeaderStyle,
+  fileSectionListStyle,
+  fileSectionStyle,
+} from './file-section.style'
 
 // ── SortableFileListItem ──────────────────────────────────────────────────────
 // Inline sortable wrapper per DEC-5: useSortable + FileListItem in this file.
@@ -74,7 +80,7 @@ function SortableFileListItem({
 
   // Resolve the thumbnail src: local preview → authenticated blob (when the host
   // provides fetchBlobUrl) → public `url` fallback. `thumbnailUrl` is a last resort.
-  // Only image rows fetch — passing no attachmentId for file rows stops the hook from
+  // Only image rows fetch - passing no attachmentId for file rows stops the hook from
   // calling the (image-only) thumbnail endpoint, which 500s for non-image files.
   const isImageRow = type === 'image'
   const resolvedSrc = useResolvedImageSrc({
@@ -140,7 +146,7 @@ function SortableFileListItem({
       {item.status === 'error' && (
         <FileActionButton kind="retry" onClick={() => onRetry(item.localId)} />
       )}
-      {/* delete shown for completed and error only — NOT for uploading/pending (brief §E) */}
+      {/* delete shown for completed and error only - NOT for uploading/pending (brief §E) */}
       {!isInProgress && (
         <FileActionButton kind="delete" onClick={() => onDelete(item.localId)} />
       )}
@@ -226,12 +232,12 @@ export function FileSection({
   }
 
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col" {...slotAttributes(fileSectionStyle, {})}>
       {/* Section header: i18n title + total count (all statuses) */}
-      <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+      <div className="inline-flex items-center" {...slotAttributes(fileSectionHeaderStyle, {})}>
         <Icon size={12} aria-hidden="true" />
         <span>{title ?? t(i18nKey)}</span>
-        <span className={cn('tabular-nums')}>({items.length})</span>
+        <span {...slotAttributes(fileSectionCountStyle, {})}>({items.length})</span>
       </div>
 
       {/* Sortable list */}
@@ -240,7 +246,7 @@ export function FileSection({
           items={items.map((i) => i.localId)}
           strategy={verticalListSortingStrategy}
         >
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col" {...slotAttributes(fileSectionListStyle, {})}>
             {items.map((item) => (
               <SortableFileListItem
                 key={item.localId}

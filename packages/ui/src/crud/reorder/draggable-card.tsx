@@ -4,18 +4,20 @@ import { useTranslation } from "@simplix-react/i18n/react";
 import type { ReactNode } from "react";
 
 import { Flex } from "../../primitives/flex";
+import { slotAttributes, partAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
 import type { ReorderConfig } from "../shared";
 import { rowClickHandler, rowClickIgnoreProps } from "../shared";
+import {
+  crudCardActionsStyle,
+  crudCardBodyStyle,
+  crudCardHeaderStyle,
+  crudSelectCheckboxStyle,
+  crudCardStyle,
+} from "../shared/crud-card.style";
 import { DragHandleCell } from "./drag-handle";
 
 type CardDensity = "compact" | "default" | "comfortable";
-
-const cardDensityPadding: Record<CardDensity, string> = {
-  compact: "px-3 py-2",
-  default: "px-4 py-3",
-  comfortable: "px-5 py-4",
-};
 
 interface DraggableCardProps<T> {
   row: T;
@@ -73,24 +75,17 @@ export function DraggableCard<T>({
     transition,
   };
 
-  const dp = cardDensityPadding[density];
-
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={cn(
-        "rounded-lg border transition-colors hover:bg-muted/50",
-        isSelected && "ring-2 ring-primary",
-        isActive && "bg-muted/50",
-        isDragging && "z-10 opacity-50",
-        onRowClick && "cursor-pointer",
-      )}
+      className={cn(isDragging && "z-10", onRowClick && "cursor-pointer")}
+      {...slotAttributes(crudCardStyle, { selected: isSelected, active: isActive, dragging: isDragging })}
       onClick={rowClickHandler(row, onRowClick)}
       data-testid={`list-row-${rowId}`}
     >
       {cardTitle && (
-        <Flex align="center" className="border-b px-1 py-1.5 gap-1">
+        <Flex align="center" {...partAttributes(crudCardHeaderStyle, {})}>
           <div className="flex shrink-0" {...rowClickIgnoreProps}>
             <DragHandleCell
               disabled={!canDrag}
@@ -99,14 +94,15 @@ export function DraggableCard<T>({
             />
           </div>
           <div className="min-w-0 flex-1">{cardTitle}</div>
-          <Flex gap="xs" align="center" className="shrink-0 ml-2" {...rowClickIgnoreProps}>
+          <Flex gap="xs" align="center" className="shrink-0" {...rowClickIgnoreProps} {...partAttributes(crudCardActionsStyle, {})}>
             {cardActions}
             {selectable && (
               <input
                 type="checkbox"
                 checked={isSelected ?? false}
                 onChange={() => onSelectionChange?.(index)}
-                className="h-4 w-4 rounded border-gray-300"
+                className="h-4 w-4"
+                {...slotAttributes(crudSelectCheckboxStyle, {})}
                 aria-label={t("list.selectRow", { index: index + 1 })}
               />
             )}
@@ -114,7 +110,7 @@ export function DraggableCard<T>({
         </Flex>
       )}
       {cardContent && (
-        <div className={cn(dp, cardTitle && "pt-2")}>
+        <div {...slotAttributes(crudCardBodyStyle, { density, titled: Boolean(cardTitle) })}>
           {cardContent}
         </div>
       )}

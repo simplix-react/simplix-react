@@ -4,6 +4,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Switch } from "../../base/inputs/switch";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -18,15 +19,15 @@ describe("Switch", () => {
   it("applies base classes", () => {
     render(<Switch aria-label="toggle" />);
     const sw = screen.getByRole("switch");
-    expect(sw.className).toContain("inline-flex");
-    expect(sw.className).toContain("rounded-full");
+    expect(drawnClasses(sw)).toContain("inline-flex");
+    expect(drawnClasses(sw)).toContain("rounded-full");
   });
 
   it("merges custom className", () => {
     render(<Switch aria-label="toggle" className="my-switch" />);
     const sw = screen.getByRole("switch");
-    expect(sw.className).toContain("my-switch");
-    expect(sw.className).toContain("rounded-full");
+    expect(drawnClasses(sw)).toContain("my-switch");
+    expect(drawnClasses(sw)).toContain("rounded-full");
   });
 
   it("forwards ref", () => {
@@ -64,6 +65,6 @@ describe("Switch", () => {
     const sw = screen.getByRole("switch");
     const thumb = sw.querySelector("span");
     expect(thumb).toBeDefined();
-    expect(thumb!.className).toContain("rounded-full");
+    expect(drawnClasses(thumb)).toContain("rounded-full");
   });
 });

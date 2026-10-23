@@ -117,7 +117,7 @@ describe("CrudDetail.Section", () => {
         <div>Field B</div>
       </CrudDetail.Section>,
     );
-    expect(container.querySelectorAll("[class*=border-l]").length).toBe(1);
+    expect(container.querySelectorAll(".grid-column-rule").length).toBe(1);
   });
 
   it("leaves a field that claims the whole row unruled", () => {

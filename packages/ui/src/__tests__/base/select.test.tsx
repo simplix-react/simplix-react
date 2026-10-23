@@ -13,6 +13,7 @@ import {
   SelectLabel,
   SelectSeparator,
 } from "../../base/inputs/select";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -39,9 +40,9 @@ describe("SelectTrigger", () => {
       </Select>,
     );
     const trigger = screen.getByRole("combobox");
-    expect(trigger.className).toContain("flex");
-    expect(trigger.className).toContain("rounded-md");
-    expect(trigger.className).toContain("border-input");
+    expect(drawnClasses(trigger)).toContain("flex");
+    expect(drawnClasses(trigger)).toContain("rounded-md");
+    expect(drawnClasses(trigger)).toContain("border-input");
   });
 
   it("merges custom className", () => {
@@ -53,7 +54,7 @@ describe("SelectTrigger", () => {
       </Select>,
     );
     const trigger = screen.getByRole("combobox");
-    expect(trigger.className).toContain("my-trigger");
+    expect(drawnClasses(trigger)).toContain("my-trigger");
   });
 
   it("forwards ref", () => {

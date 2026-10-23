@@ -4,6 +4,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { NumberInput } from "../../base/inputs/number-input";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -17,16 +18,16 @@ describe("NumberInput", () => {
   it("applies base classes to the wrapper", () => {
     render(<NumberInput data-testid="num" />);
     const wrapper = screen.getByTestId("num").parentElement as HTMLElement;
-    expect(wrapper.className).toContain("flex");
-    expect(wrapper.className).toContain("rounded-md");
-    expect(wrapper.className).toContain("border-input");
+    expect(drawnClasses(wrapper)).toContain("flex");
+    expect(drawnClasses(wrapper)).toContain("rounded-md");
+    expect(drawnClasses(wrapper)).toContain("border-input");
   });
 
   it("merges custom className on the wrapper", () => {
     render(<NumberInput data-testid="num" className="my-num" />);
     const wrapper = screen.getByTestId("num").parentElement as HTMLElement;
-    expect(wrapper.className).toContain("my-num");
-    expect(wrapper.className).toContain("border-input");
+    expect(drawnClasses(wrapper)).toContain("my-num");
+    expect(drawnClasses(wrapper)).toContain("border-input");
   });
 
   it("renders always-visible spinner buttons", () => {
@@ -156,14 +157,14 @@ describe("NumberInput", () => {
   it("fills the row when no digit count is given", () => {
     render(<NumberInput data-testid="num" />);
     const wrapper = screen.getByTestId("num").parentElement as HTMLElement;
-    expect(wrapper.className).toContain("w-full");
+    expect(drawnClasses(wrapper)).toContain("w-full");
     expect(wrapper.style.width).toBe("");
   });
 
   it("takes its width from the digit count instead of the row", () => {
     render(<NumberInput data-testid="num" digits={2} />);
     const wrapper = screen.getByTestId("num").parentElement as HTMLElement;
-    expect(wrapper.className).not.toContain("w-full");
+    expect(drawnClasses(wrapper)).not.toContain("w-full");
     expect(wrapper.style.width).toBe("calc(2ch + 2.75rem)");
   });
 

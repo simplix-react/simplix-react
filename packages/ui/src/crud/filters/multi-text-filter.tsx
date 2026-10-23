@@ -1,10 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "@simplix-react/i18n/react";
 
-import { Flex } from "../../primitives/flex";
 import { useFlatUIComponents } from "../../provider/ui-provider";
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
 import { CaretDownIcon, MagnifyingGlassIcon, XIcon } from "../shared/icons";
+import { crudFieldClearButtonStyle } from "./field-clear-button.style";
+import {
+  crudFilterInputRowStyle,
+  crudFilterOperatorMenuStyle,
+  crudFilterOperatorTriggerStyle,
+} from "./filter-parts.style";
 
 export interface MultiTextFilterField {
   field: string;
@@ -80,34 +86,40 @@ export function MultiTextFilter({
   }, [values, selectedField]); // inputValue intentionally excluded to avoid loops
 
   return (
-    <Flex align="center" className={cn("relative", className)}>
+    <div
+      className={cn("relative flex flex-row items-center", className)}
+      {...slotAttributes(crudFilterInputRowStyle, { lead: hasMultipleFields ? "field" : "icon" })}
+    >
       {hasMultipleFields && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
               type="button"
-              className="absolute left-0 z-10 inline-flex h-8 items-center gap-0.5 rounded-l-md border-r bg-muted/50 px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
+              className="absolute left-0 z-10 inline-flex h-8 items-center"
+              {...slotAttributes(crudFilterOperatorTriggerStyle, { attach: "joined", labelled: true })}
             >
               {activeFieldDef?.label}
               <CaretDownIcon className="h-3 w-3" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
-            {fields.map((f) => (
-              <DropdownMenuItem
-                key={f.field}
-                onClick={() => handleFieldSwitch(f.field)}
-                className={cn(f.field === selectedField && "bg-accent")}
-              >
-                {f.label}
-              </DropdownMenuItem>
-            ))}
+            <div {...slotAttributes(crudFilterOperatorMenuStyle, {})}>
+              {fields.map((f) => (
+                <DropdownMenuItem
+                  key={f.field}
+                  onClick={() => handleFieldSwitch(f.field)}
+                  data-current={f.field === selectedField}
+                >
+                  {f.label}
+                </DropdownMenuItem>
+              ))}
+            </div>
           </DropdownMenuContent>
         </DropdownMenu>
       )}
       <MagnifyingGlassIcon
         className={cn(
-          "absolute h-4 w-4 text-muted-foreground",
+          "absolute h-4 w-4",
           hasMultipleFields ? "left-[calc(var(--trigger-width,4rem)+0.625rem)]" : "left-2.5",
         )}
       />
@@ -116,22 +128,20 @@ export function MultiTextFilter({
         value={inputValue}
         onChange={(e) => handleInputChange(e.target.value)}
         placeholder={activeFieldDef?.placeholder ?? activeFieldDef?.label}
-        className={cn(
-          "h-8 pr-8 text-sm",
-          hasMultipleFields ? "pl-24" : "pl-8",
-        )}
+        className="h-8"
         aria-label={activeFieldDef?.label}
       />
       {inputValue && (
         <button
           type="button"
           onClick={handleClear}
-          className="absolute right-2 inline-flex h-4 w-4 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
+          className="absolute right-2 inline-flex h-4 w-4 items-center justify-center"
           aria-label={t("filter.clearFilter")}
+          {...slotAttributes(crudFieldClearButtonStyle, {})}
         >
           <XIcon className="h-3 w-3" />
         </button>
       )}
-    </Flex>
+    </div>
   );
 }

@@ -31,6 +31,7 @@ vi.mock("../../crud/filters/filter-icons", () => ({
 
 import { AdvancedSelectFilter } from "../../crud/filters/advanced-select-filter";
 import { SearchOperator } from "../../crud/filters/filter-types";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 const options = [
   { value: "active", label: "Active" },
@@ -203,7 +204,7 @@ describe("AdvancedSelectFilter (extended coverage)", () => {
       />,
     );
     const chip = container.querySelector("button")!.parentElement;
-    expect(chip?.className).toContain("border-solid");
+    expect(drawnClasses(chip ?? null)).toContain("border-solid");
   });
 
   it("renders dashed border when no value", () => {
@@ -219,7 +220,7 @@ describe("AdvancedSelectFilter (extended coverage)", () => {
       />,
     );
     const chip = container.querySelector("button")!.parentElement;
-    expect(chip?.className).toContain("border-dashed");
+    expect(drawnClasses(chip ?? null)).toContain("border-dashed");
   });
 
   it("applies custom className", () => {

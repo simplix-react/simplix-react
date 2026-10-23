@@ -31,6 +31,7 @@ vi.mock("../../crud/filters/filter-icons", () => ({
 
 import { AdvancedSelectFilter } from "../../crud/filters/advanced-select-filter";
 import { SearchOperator } from "../../crud/filters/filter-types";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 const options = [
   { value: "active", label: "Active" },
@@ -67,7 +68,7 @@ describe("AdvancedSelectFilter", () => {
       />,
     );
     const chip = container.querySelector("button")!.parentElement;
-    expect(chip?.className).toContain("border-dashed");
+    expect(drawnClasses(chip ?? null)).toContain("border-dashed");
   });
 
   it("renders solid border when selection exists", () => {
@@ -83,7 +84,7 @@ describe("AdvancedSelectFilter", () => {
       />,
     );
     const chip = container.querySelector("button")!.parentElement;
-    expect(chip?.className).toContain("border-solid");
+    expect(drawnClasses(chip ?? null)).toContain("border-solid");
   });
 
   it("shows clear button when selection exists", () => {
@@ -159,7 +160,7 @@ describe("AdvancedSelectFilter", () => {
       />,
     );
     const chip = container.querySelector("button")!.parentElement;
-    expect(chip?.className).toContain("border-solid");
+    expect(drawnClasses(chip ?? null)).toContain("border-solid");
   });
 
   it("shows count when selections exceed maxDisplayCount", () => {

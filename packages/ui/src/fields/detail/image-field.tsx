@@ -2,7 +2,9 @@ import { useCallback, useState } from "react";
 
 import type { CommonDetailFieldProps } from "../../crud/shared/types";
 import { cn } from "../../utils/cn";
+import { slotAttributes } from "../../design/slot-style";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
+import { detailImageFieldImageStyle, detailImageFieldPlaceholderStyle } from "./image-field.style";
 
 /** Props for the {@link DetailImageField} component. */
 export interface DetailImageFieldProps extends CommonDetailFieldProps {
@@ -53,12 +55,10 @@ export function DetailImageField({
     >
       {showPlaceholder ? (
         <span
-          className={cn(
-            "flex items-center justify-center rounded-md bg-muted text-muted-foreground",
-            imageClassName,
-          )}
+          className={cn("flex items-center justify-center", imageClassName)}
           style={{ width, height }}
           aria-label={alt || "No image"}
+          {...slotAttributes(detailImageFieldPlaceholderStyle, {})}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -81,8 +81,9 @@ export function DetailImageField({
           src={value}
           alt={alt}
           onError={handleError}
-          className={cn("rounded-md object-cover", imageClassName)}
+          className={cn("object-cover", imageClassName)}
           style={{ width, height }}
+          {...slotAttributes(detailImageFieldImageStyle, {})}
         />
       )}
     </DetailFieldWrapper>

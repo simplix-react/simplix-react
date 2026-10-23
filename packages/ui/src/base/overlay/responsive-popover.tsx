@@ -54,10 +54,8 @@ export function ResponsivePopover({
         <DialogContent
           showCloseButton={false}
           aria-describedby={undefined}
-          className={cn(
-            "w-auto max-w-[calc(100%-2rem)] max-h-[85vh] overflow-y-auto p-0",
-            contentClassName,
-          )}
+          flush
+          className={cn("w-auto max-w-[calc(100%-2rem)] max-h-[85vh] overflow-y-auto", contentClassName)}
         >
           <DialogTitle className="sr-only">{title}</DialogTitle>
           {children}
@@ -73,7 +71,8 @@ export function ResponsivePopover({
     <Popover open={open} onOpenChange={onOpenChange} modal>
       <PopoverTrigger asChild>{trigger}</PopoverTrigger>
       <PopoverContent
-        className={cn("w-auto p-0", contentClassName)}
+        flush
+        className={cn("w-auto", contentClassName)}
         align={align}
         style={{ maxHeight: "var(--radix-popover-content-available-height)", overflowY: "auto" }}
       >

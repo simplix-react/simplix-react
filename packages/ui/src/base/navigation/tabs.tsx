@@ -6,7 +6,9 @@ import {
   useContext,
 } from "react";
 
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
+import { tabsContentStyle, tabsListStyle, tabsTriggerStyle } from "./tabs.style";
 
 // Root - pass through
 export const Tabs = TabsPrimitive.Root;
@@ -20,25 +22,15 @@ export type TabsVariant = "default" | "full" | "bookmark" | "underline";
  */
 const TabsVariantContext = createContext<TabsVariant>("default");
 
-/**
- * Bottom-baseline track for the `bookmark` list variant. The line is an inset
- * shadow (not a border) so the active tab's `bg-card` covers it without relying
- * on overflow — the cutout survives `overflow-x-auto` horizontal scroll.
- */
-const lineListBase = "flex items-end px-2 shadow-[inset_0_-2px_0_0_var(--border)]";
-
-/**
- * Bottom baseline for the `underline` list variant.
- *
- * <p>A hairline rather than the 2px `bookmark` sits on: these tabs are a second level inside a
- * surface that already has tabs above it, and the thing that has to read as quieter is the line
- * as much as the triggers. Full width so the baseline runs the width of the panel and the tabs
- * sit on it from the start, which is where a reader looks for a second level.
- */
-const underlineListBase =
-  "mt-2 flex w-full items-end gap-1 shadow-[inset_0_-1px_0_0_var(--border)]";
-
 // ── List ──
+
+/** Layout classes of the list per variant: flow, alignment and sizing. */
+const listLayout: Record<TabsVariant, string> = {
+  default: "h-9 items-center justify-center inline-flex",
+  full: "h-9 items-center justify-center flex w-full [&>*]:flex-1",
+  bookmark: "flex items-end",
+  underline: "flex w-full items-end",
+};
 
 export interface TabsListProps
   extends ComponentPropsWithRef<typeof TabsPrimitive.List> {
@@ -65,25 +57,9 @@ export const TabsList = forwardRef<HTMLDivElement, TabsListProps>(
     <TabsVariantContext.Provider value={variant}>
       <TabsPrimitive.List
         ref={ref}
-        className={cn(
-          variant === "bookmark"
-            ? cn(lineListBase, "gap-0")
-            : variant === "underline"
-            ? underlineListBase
-            : cn(
-                // Vertical padding is half the horizontal one so the 28px trigger fits inside the
-                // 34px content box of an h-9 bordered track. With `p-1` the trigger overflows the
-                // box by 2px — invisible on its own, but a list wrapped in `overflow-x-auto` has
-                // its overflow-y computed to `auto` as well, and that 1px of bottom overflow paints
-                // a scrollbar. `items-center` keeps the trigger exactly where `p-1` rendered it.
-                "h-9 items-center justify-center rounded-lg border border-input bg-card px-1 py-0.5 text-muted-foreground",
-                variant === "full"
-                  ? "mt-3 flex w-full [&>*]:flex-1"
-                  : "inline-flex",
-              ),
-          className,
-        )}
+        className={cn(listLayout[variant], className)}
         {...rest}
+        {...slotAttributes(tabsListStyle, { variant })}
       />
     </TabsVariantContext.Provider>
   ),
@@ -98,19 +74,14 @@ export type TabsTriggerProps = ComponentPropsWithRef<
 >;
 
 const triggerBase =
-  "inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50";
+  "inline-flex items-center justify-center whitespace-nowrap disabled:pointer-events-none";
 
+/** Layout classes of the trigger per variant. */
 const triggerByVariant: Record<TabsVariant, string> = {
-  default:
-    "rounded-md px-3 py-1 hover:text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm data-[state=active]:hover:text-primary-foreground",
-  full: "rounded-md px-3 py-1 hover:text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm data-[state=active]:hover:text-primary-foreground",
-  bookmark:
-    "gap-2 rounded-t-lg border border-transparent border-b-0 px-4 py-2.5 font-semibold text-muted-foreground hover:bg-accent hover:text-accent-foreground data-[state=active]:-mb-px data-[state=active]:border-border data-[state=active]:bg-card data-[state=active]:font-bold data-[state=active]:text-foreground [&_svg]:size-4",
-  // The rule is drawn as a border on the trigger itself and it is transparent when the tab is not
-  // chosen, so the label never moves as the choice changes — a rule added on the active state
-  // alone shifts every label up by its own width the moment it appears.
-  underline:
-    "relative -mb-px gap-2 rounded-none border-b-2 border-transparent px-3 pb-2 pt-1 text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:font-semibold data-[state=active]:text-foreground [&_svg]:size-4",
+  default: "",
+  full: "",
+  bookmark: "[&_svg]:size-4",
+  underline: "relative [&_svg]:size-4",
 };
 
 export const TabsTrigger = forwardRef<HTMLButtonElement, TabsTriggerProps>(
@@ -121,6 +92,7 @@ export const TabsTrigger = forwardRef<HTMLButtonElement, TabsTriggerProps>(
         ref={ref}
         className={cn(triggerBase, triggerByVariant[variant], className)}
         {...rest}
+        {...slotAttributes(tabsTriggerStyle, { variant })}
       />
     );
   },
@@ -151,15 +123,9 @@ export const TabsContent = forwardRef<HTMLDivElement, TabsContentProps>(
   ({ className, padded = false, ...rest }, ref) => (
     <TabsPrimitive.Content
       ref={ref}
-      className={cn(
-        // `outline-none` on the panel, and only on the panel. Radix moves focus here when a tab is
-        // chosen so the next Tab lands inside; it is a region rather than a control, and the first
-        // control in it rings normally.
-        "flex-1 outline-none",
-        padded && "py-4",
-        className,
-      )}
+      className={cn("flex-1", className)}
       {...rest}
+      {...slotAttributes(tabsContentStyle, { padded })}
     />
   ),
 );

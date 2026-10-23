@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 
+import { slotAttributes } from "../../design/slot-style";
+import { columnResizeHandleStyle } from "./column-resize-handle.style";
 import { KEYBOARD_STEP, MIN_COLUMN_WIDTH } from "./column-widths";
 
 /** Props for {@link ColumnResizeHandle}. */
@@ -86,7 +88,8 @@ export function ColumnResizeHandle({
       aria-orientation="vertical"
       aria-label={label}
       tabIndex={0}
-      className="absolute inset-y-0 right-0 z-10 w-1.5 cursor-col-resize select-none hover:bg-current/25 focus-visible:bg-current/40 focus-visible:outline-none"
+      className="absolute inset-y-0 right-0 z-10 w-1.5 cursor-col-resize select-none"
+      {...slotAttributes(columnResizeHandleStyle, {})}
       onPointerDown={(event) => {
         if (event.button !== 0) return;
         // Stopped so the header's sort button never sees it. Sizing a column is not asking for it

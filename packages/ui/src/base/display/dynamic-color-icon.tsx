@@ -1,7 +1,9 @@
 import { type CSSProperties, type ReactElement } from "react";
 import type { IconName } from "lucide-react/dynamic";
 import { DynamicIconLazy } from "./dynamic-icon-lazy";
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
+import { dynamicColorIconTextStyle } from "./dynamic-color-icon.style";
 
 /**
  * Supported icon libraries.
@@ -106,16 +108,14 @@ export function DynamicColorIcon({
     const letter = fallbackText.trim().charAt(0);
     return (
       <span
-        className={cn(
-          "inline-flex items-center justify-center shrink-0 text-xs font-bold",
-          className
-        )}
+        className={cn("inline-flex items-center justify-center shrink-0", className)}
         style={{
           color: resolvedColor,
           width: dim,
           height: dim,
           ...style,
         }}
+        {...slotAttributes(dynamicColorIconTextStyle, {})}
       >
         {letter}
       </span>

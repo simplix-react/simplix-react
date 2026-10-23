@@ -4,6 +4,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { Text } from "../../primitives/text";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -16,7 +17,7 @@ describe("Text", () => {
 
   it("applies default variant classes, and names no size of its own", () => {
     render(<Text data-testid="t">text</Text>);
-    const classes = screen.getByTestId("t").className;
+    const classes = drawnClasses(screen.getByTestId("t"));
     expect(classes).toContain("font-normal");
     expect(classes).toContain("text-foreground");
     // A Text with no size takes the one its context sets, so it writes no size class itself.
@@ -39,7 +40,7 @@ describe("Text", () => {
           text
         </Text>,
       );
-      expect(screen.getByTestId("t").className).toContain(expected);
+      expect(drawnClasses(screen.getByTestId("t"))).toContain(expected);
       unmount();
     }
   });
@@ -58,7 +59,7 @@ describe("Text", () => {
           text
         </Text>,
       );
-      expect(screen.getByTestId("t").className).toContain(expected);
+      expect(drawnClasses(screen.getByTestId("t"))).toContain(expected);
       unmount();
     }
   });
@@ -76,7 +77,7 @@ describe("Text", () => {
           text
         </Text>,
       );
-      expect(screen.getByTestId("t").className).toContain(expected);
+      expect(drawnClasses(screen.getByTestId("t"))).toContain(expected);
       unmount();
     }
   });
@@ -102,7 +103,7 @@ describe("Text", () => {
         text
       </Text>,
     );
-    const classes = screen.getByTestId("t").className;
+    const classes = drawnClasses(screen.getByTestId("t"));
     expect(classes).toContain("font-normal");
     expect(classes).toContain("extra");
   });

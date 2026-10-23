@@ -1,18 +1,10 @@
-import { type VariantProps, cva } from "class-variance-authority";
+import type { VariantProps } from "class-variance-authority";
 
+import { slotAttributes, slotClassNames } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
+import { fieldMessageStyle } from "./field-message.style";
 
-const fieldMessageVariants = cva("text-xs leading-3.5", {
-  variants: {
-    variant: {
-      error: "text-destructive",
-      warning: "text-warning",
-      info: "text-info",
-      description: "text-muted-foreground",
-    },
-  },
-  defaultVariants: { variant: "error" },
-});
+const fieldMessageVariants = slotClassNames(fieldMessageStyle);
 
 /** Props for the {@link FieldMessage} component. */
 export interface FieldMessageProps extends VariantProps<typeof fieldMessageVariants> {
@@ -40,11 +32,8 @@ export function FieldMessage({ variant, children, className }: FieldMessageProps
 
   return (
     <p
-      className={cn(
-        fieldMessageVariants({ variant }),
-        hasIcon(variant) && "flex items-center gap-1",
-        className,
-      )}
+      className={cn(hasIcon(variant) && "flex items-center", className)}
+      {...slotAttributes(fieldMessageStyle, { variant, icon: hasIcon(variant) })}
       role={role}
     >
       {hasIcon(variant) && (

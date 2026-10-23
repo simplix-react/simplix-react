@@ -2,6 +2,8 @@ import { useTranslation } from "@simplix-react/i18n/react";
 import { useCallback, useEffect, useRef } from "react";
 
 import { cn } from "../../utils/cn";
+import { slotAttributes } from "../../design/slot-style";
+import { signaturePadCanvasStyle, signaturePadClearStyle } from "./signature-pad.style";
 
 /** Props for the {@link SignaturePad} component. */
 export interface SignaturePadProps {
@@ -141,10 +143,10 @@ export function SignaturePad({
       <canvas
         ref={canvasRef}
         className={cn(
-          "w-full rounded-md border border-input bg-white",
+          "w-full",
           mode === "drawn" && !disabled && "cursor-crosshair touch-none",
-          disabled && "opacity-50",
         )}
+        {...slotAttributes(signaturePadCanvasStyle, { disabled: Boolean(disabled) })}
         style={{ height }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
@@ -156,7 +158,8 @@ export function SignaturePad({
           type="button"
           onClick={clear}
           aria-label={t("field.clearSignature")}
-          className="absolute right-2 top-2 rounded-sm px-1.5 py-0.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
+          className="absolute right-2 top-2"
+          {...slotAttributes(signaturePadClearStyle, {})}
         >
           ⟲
         </button>

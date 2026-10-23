@@ -3,6 +3,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { DetailFieldWrapper } from "../../fields/shared/detail-field-wrapper";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -21,8 +22,8 @@ describe("DetailFieldWrapper", () => {
       </DetailFieldWrapper>,
     );
     const wrapper = screen.getByTestId("detail-field-email");
-    expect(wrapper.className).toContain("flex");
-    expect(wrapper.className).toContain("flex-col");
+    expect(drawnClasses(wrapper)).toContain("flex");
+    expect(drawnClasses(wrapper)).toContain("flex-col");
   });
 
   // ── Label position: left ──
@@ -34,7 +35,7 @@ describe("DetailFieldWrapper", () => {
       </DetailFieldWrapper>,
     );
     const wrapper = screen.getByTestId("detail-field-name");
-    expect(wrapper.className).toContain("grid");
+    expect(drawnClasses(wrapper)).toContain("grid");
   });
 
   // ── Label position: hidden ──
@@ -106,7 +107,7 @@ describe("DetailFieldWrapper", () => {
       </DetailFieldWrapper>,
     );
     const wrapper = screen.getByTestId("detail-field-name");
-    expect(wrapper.className).toContain("custom-cls");
+    expect(drawnClasses(wrapper)).toContain("custom-cls");
   });
   // ── Which layout spreads, and which does not ──
   //
@@ -123,8 +124,8 @@ describe("DetailFieldWrapper", () => {
     const wrapper = screen.getByTestId("detail-field-run-by");
     // Inside a two-column detail section a cell is about 270px, and spreading put a short value
     // two hundred pixels from its label and hard against the edge — read as a missing value.
-    expect(wrapper.className).not.toContain("justify-between");
-    expect(wrapper.className).toContain("items-start");
+    expect(drawnClasses(wrapper)).not.toContain("justify-between");
+    expect(drawnClasses(wrapper)).toContain("items-start");
   });
 
   // ── Where the label sits, and who decides it ──
@@ -138,8 +139,8 @@ describe("DetailFieldWrapper", () => {
     const wrapper = screen.getByTestId("detail-field-run-by");
     // Two tracks, label then value. A flex row cannot be shared: the label would take its own
     // width in every row and the values would start at as many x positions as there are labels.
-    expect(wrapper.className).toContain("grid");
-    expect(wrapper.className).toContain("grid-cols-[auto_minmax(0,1fr)]");
+    expect(drawnClasses(wrapper)).toContain("grid");
+    expect(drawnClasses(wrapper)).toContain("grid-cols-[auto_minmax(0,1fr)]");
   });
 
   it("names its layout on the element, which is what a section aligns by", () => {
@@ -162,7 +163,7 @@ describe("DetailFieldWrapper", () => {
       </DetailFieldWrapper>,
     );
     const value = container.querySelector(".field-value");
-    expect(value?.className).toContain("col-span-2");
+    expect(drawnClasses(value)).toContain("col-span-2");
   });
 
   it("keeps a labelled value out of the label's track without spanning it", () => {
@@ -171,7 +172,7 @@ describe("DetailFieldWrapper", () => {
         value
       </DetailFieldWrapper>,
     );
-    expect(container.querySelector(".field-value")?.className).not.toContain("col-span-2");
+    expect(drawnClasses(container.querySelector(".field-value"))).not.toContain("col-span-2");
   });
 
   it("leaves the layouts that carry no label column as flex rows", () => {
@@ -184,8 +185,8 @@ describe("DetailFieldWrapper", () => {
         </DetailFieldWrapper>,
       );
       const wrapper = container.querySelector("[data-field-layout]");
-      expect(wrapper?.className).toContain("flex");
-      expect(wrapper?.className).not.toContain("grid");
+      expect(drawnClasses(wrapper)).toContain("flex");
+      expect(drawnClasses(wrapper)).not.toContain("grid");
       cleanup();
     }
   });

@@ -3,9 +3,23 @@ import { useTranslation } from "@simplix-react/i18n/react";
 
 import type { CommonDetailFieldProps } from "../../crud/shared/types";
 import { MapPinIcon, LocateIcon, SunIcon, MoonIcon } from "../../crud/shared/icons";
-import { cn } from "../../utils/cn";
+import { slotAttributes } from "../../design/slot-style";
 import { detailFallback } from "../shared/detail-fallback";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
+import {
+  detailLocationFieldControlsStyle,
+  detailLocationFieldCoordinatesBadgeStyle,
+  detailLocationFieldCoordinatesStyle,
+  detailLocationFieldFlyBackStyle,
+  detailLocationFieldFrameStyle,
+  detailLocationFieldHeaderStyle,
+  detailLocationFieldOpenStyle,
+  detailLocationFieldPreviewButtonStyle,
+  detailLocationFieldPreviewStyle,
+  detailLocationFieldThemeButtonStyle,
+  detailLocationFieldThemeGroupStyle,
+  detailLocationMapBackground,
+} from "./location-field.style";
 import { Map, MapMarker } from "../../base/map/map";
 import {
   Dialog,
@@ -99,16 +113,17 @@ export function DetailLocationField({
     >
       {hasLocation ? (
         <>
-          <div className="overflow-hidden rounded-md border">
-            <span className="flex items-center justify-between border-b py-0.5 pl-3 pr-0.5">
-              <span className="text-muted-foreground text-sm tabular-nums">
+          <div className="overflow-hidden" {...slotAttributes(detailLocationFieldFrameStyle, {})}>
+            <span className="flex items-center justify-between" {...slotAttributes(detailLocationFieldHeaderStyle, {})}>
+              <span {...slotAttributes(detailLocationFieldCoordinatesStyle, {})}>
                 {latitude.toFixed(6)}, {longitude.toFixed(6)}
               </span>
               <button
                 type="button"
                 onClick={() => setOpen(true)}
-                className="inline-flex h-7 items-center gap-1.5 rounded-md border border-input px-2 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                className="inline-flex h-7 items-center"
                 aria-label={t("field.locationTitle")}
+                {...slotAttributes(detailLocationFieldOpenStyle, {})}
               >
                 <MapPinIcon className="h-3.5 w-3.5" />
               </button>
@@ -117,10 +132,11 @@ export function DetailLocationField({
             <button
               type="button"
               onClick={() => setOpen(true)}
-              className="block w-full transition-opacity hover:opacity-90"
+              className="block w-full"
               aria-label={t("field.openMap")}
+              {...slotAttributes(detailLocationFieldPreviewButtonStyle, {})}
             >
-              <div className="pointer-events-none h-[150px] bg-neutral-100 dark:bg-neutral-900">
+              <div className="pointer-events-none h-[150px]" {...slotAttributes(detailLocationFieldPreviewStyle, {})}>
                 <Map
                   center={[longitude, latitude]}
                   zoom={zoom}
@@ -142,10 +158,10 @@ export function DetailLocationField({
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="relative overflow-hidden rounded-md border" style={{ height: "450px" }}>
+              <div className="relative overflow-hidden" style={{ height: "450px" }} {...slotAttributes(detailLocationFieldFrameStyle, {})}>
                 <Map
                   ref={(m) => { dialogMapRef.current = m; }}
-                  className={mapTheme === "dark" ? "bg-neutral-900" : "bg-neutral-100"}
+                  className={detailLocationMapBackground[mapTheme]}
                   center={[longitude, latitude]}
                   zoom={zoom}
                   theme={mapTheme}
@@ -155,49 +171,46 @@ export function DetailLocationField({
                   <MapMarker longitude={longitude} latitude={latitude}>{markerIcon}</MapMarker>
                 </Map>
 
-                {/* Fly back + theme toggle — bottom left */}
-                <span className="absolute bottom-2 left-2 z-10 flex items-center gap-1">
+                {/* Fly back + theme toggle - bottom left */}
+                <span className="absolute bottom-2 left-2 z-10 flex items-center" {...slotAttributes(detailLocationFieldControlsStyle, {})}>
                   <button
                     type="button"
                     onClick={handleFlyBack}
-                    className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-black/10 bg-white text-neutral-700 shadow-sm transition-colors hover:bg-neutral-100 dark:bg-neutral-800 dark:text-white dark:hover:bg-neutral-700"
+                    className="inline-flex h-7 w-7 items-center justify-center"
                     aria-label={t("field.detectLocation")}
+                    {...slotAttributes(detailLocationFieldFlyBackStyle, {})}
                   >
                     <LocateIcon className="h-3.5 w-3.5" />
                   </button>
 
-                  <span className="inline-flex overflow-hidden rounded-md border border-black/10 shadow-sm">
+                  <span className="inline-flex overflow-hidden" {...slotAttributes(detailLocationFieldThemeGroupStyle, {})}>
                     <button
                       type="button"
                       onClick={() => setMapTheme("light")}
-                      className={cn(
-                        "inline-flex h-7 w-7 items-center justify-center transition-colors",
-                        mapTheme === "light"
-                          ? "bg-white text-neutral-800"
-                          : "bg-black/40 text-white/70 hover:text-white",
-                      )}
+                      className="inline-flex h-7 w-7 items-center justify-center"
                       aria-label={t("field.mapLight")}
+                      {...slotAttributes(detailLocationFieldThemeButtonStyle, {
+                        state: mapTheme === "light" ? "light-on" : "light-off",
+                      })}
                     >
                       <SunIcon className="h-3.5 w-3.5" />
                     </button>
                     <button
                       type="button"
                       onClick={() => setMapTheme("dark")}
-                      className={cn(
-                        "inline-flex h-7 w-7 items-center justify-center transition-colors",
-                        mapTheme === "dark"
-                          ? "bg-neutral-800 text-white"
-                          : "bg-white/80 text-neutral-400 hover:text-neutral-600",
-                      )}
+                      className="inline-flex h-7 w-7 items-center justify-center"
                       aria-label={t("field.mapDark")}
+                      {...slotAttributes(detailLocationFieldThemeButtonStyle, {
+                        state: mapTheme === "dark" ? "dark-on" : "dark-off",
+                      })}
                     >
                       <MoonIcon className="h-3.5 w-3.5" />
                     </button>
                   </span>
                 </span>
 
-                {/* Coordinates — bottom right */}
-                <span className="absolute bottom-2 right-2 z-10 rounded-md bg-black/60 px-2.5 py-1.5 text-sm tabular-nums text-white shadow-sm">
+                {/* Coordinates - bottom right */}
+                <span className="absolute bottom-2 right-2 z-10" {...slotAttributes(detailLocationFieldCoordinatesBadgeStyle, {})}>
                   {latitude.toFixed(6)}, {longitude.toFixed(6)}
                 </span>
               </div>

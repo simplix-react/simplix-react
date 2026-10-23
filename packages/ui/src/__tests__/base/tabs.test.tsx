@@ -4,6 +4,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../../base/navigation/tabs";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -64,7 +65,7 @@ describe("TabsList", () => {
       </Tabs>,
     );
     const list = container.querySelector("[role='tablist']") as HTMLElement;
-    expect(list.className).toContain("inline-flex");
+    expect(drawnClasses(list)).toContain("inline-flex");
   });
 
   it("applies full variant", () => {
@@ -77,8 +78,8 @@ describe("TabsList", () => {
       </Tabs>,
     );
     const list = container.querySelector("[role='tablist']") as HTMLElement;
-    expect(list.className).toContain("w-full");
-    expect(list.className).toContain("mt-3");
+    expect(drawnClasses(list)).toContain("w-full");
+    expect(drawnClasses(list)).toContain("mt-3");
   });
 
   it("applies bookmark variant", () => {
@@ -92,10 +93,10 @@ describe("TabsList", () => {
     );
     const list = container.querySelector("[role='tablist']") as HTMLElement;
     // bottom line is an inset shadow (scroll-safe), not a border
-    expect(list.className).toContain("shadow-[inset_0_-2px_0_0_var(--border)]");
-    expect(list.className).toContain("items-end");
+    expect(drawnClasses(list)).toContain("shadow-[inset_0_-2px_0_0_var(--border)]");
+    expect(drawnClasses(list)).toContain("items-end");
     // bookmark list drops the segmented-track background
-    expect(list.className).not.toContain("bg-muted");
+    expect(drawnClasses(list)).not.toContain("bg-muted");
   });
 
   it("merges custom className", () => {
@@ -108,7 +109,7 @@ describe("TabsList", () => {
       </Tabs>,
     );
     const list = container.querySelector("[role='tablist']") as HTMLElement;
-    expect(list.className).toContain("my-list");
+    expect(drawnClasses(list)).toContain("my-list");
   });
 
   it("forwards ref", () => {
@@ -166,7 +167,7 @@ describe("TabsTrigger", () => {
       </Tabs>,
     );
     const tab = screen.getByRole("tab");
-    expect(tab.className).toContain("my-trigger");
+    expect(drawnClasses(tab)).toContain("my-trigger");
   });
 
   it("adapts styling to the bookmark list variant via context", () => {
@@ -180,10 +181,10 @@ describe("TabsTrigger", () => {
     );
     const tab = screen.getByRole("tab");
     // folder-shaped trigger: top-rounded, no bottom border
-    expect(tab.className).toContain("rounded-t-lg");
-    expect(tab.className).toContain("border-b-0");
+    expect(drawnClasses(tab)).toContain("rounded-t-lg");
+    expect(drawnClasses(tab)).toContain("border-b-0");
     // segmented-control trigger classes are not applied in bookmark mode
-    expect(tab.className).not.toContain("rounded-md");
+    expect(drawnClasses(tab)).not.toContain("rounded-md");
   });
 
   it("forwards ref", () => {
@@ -240,7 +241,7 @@ describe("TabsContent", () => {
     // `py-4`, not the `pt-4 pb-8` this asserted before. A panel's top and bottom insets were once
     // set apart to keep the last row off the scroll container's edge; they are the same step now,
     // and the extra space under a panel comes from whatever the panel holds.
-    expect(content.className).toContain("py-4");
+    expect(drawnClasses(content)).toContain("py-4");
   });
 
   it("does not apply padded class by default", () => {
@@ -253,7 +254,7 @@ describe("TabsContent", () => {
       </Tabs>,
     );
     const content = screen.getByRole("tabpanel");
-    expect(content.className).not.toContain("py-4");
+    expect(drawnClasses(content)).not.toContain("py-4");
   });
 
   it("merges custom className", () => {
@@ -266,7 +267,7 @@ describe("TabsContent", () => {
       </Tabs>,
     );
     const content = screen.getByRole("tabpanel");
-    expect(content.className).toContain("my-content");
+    expect(drawnClasses(content)).toContain("my-content");
   });
 
   it("forwards ref", () => {

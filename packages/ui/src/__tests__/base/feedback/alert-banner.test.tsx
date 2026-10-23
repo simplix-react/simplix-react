@@ -5,6 +5,7 @@ import { AlertTriangleIcon, InfoIcon } from "lucide-react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { AlertBanner } from "../../../base";
+import { drawnClasses } from "../../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -24,74 +25,74 @@ describe("AlertBanner", () => {
     render(<AlertBanner title="Info" />);
     const banner = getBanner();
     // STATUS_TONES.info.surface
-    expect(banner.className).toContain("border-blue-200");
-    expect(banner.className).toContain("bg-blue-50/50");
-    expect(banner.className).toContain("dark:border-blue-900");
-    expect(banner.className).toContain("dark:bg-blue-950/50");
+    expect(drawnClasses(banner)).toContain("border-blue-200");
+    expect(drawnClasses(banner)).toContain("bg-blue-50/50");
+    expect(drawnClasses(banner)).toContain("dark:border-blue-900");
+    expect(drawnClasses(banner)).toContain("dark:bg-blue-950/50");
   });
 
   it("applies the danger tone surface", () => {
     render(<AlertBanner tone="danger" title="Danger" />);
     const banner = getBanner();
-    expect(banner.className).toContain("border-red-200");
-    expect(banner.className).toContain("bg-red-50/50");
-    expect(banner.className).toContain("dark:bg-red-950/50");
+    expect(drawnClasses(banner)).toContain("border-red-200");
+    expect(drawnClasses(banner)).toContain("bg-red-50/50");
+    expect(drawnClasses(banner)).toContain("dark:bg-red-950/50");
   });
 
   it("applies the warning tone surface", () => {
     render(<AlertBanner tone="warning" title="Warning" />);
     const banner = getBanner();
-    expect(banner.className).toContain("border-amber-200");
-    expect(banner.className).toContain("dark:border-amber-900");
+    expect(drawnClasses(banner)).toContain("border-amber-200");
+    expect(drawnClasses(banner)).toContain("dark:border-amber-900");
   });
 
   it("applies the success tone surface", () => {
     render(<AlertBanner tone="success" title="Success" />);
     const banner = getBanner();
-    expect(banner.className).toContain("border-emerald-200");
-    expect(banner.className).toContain("dark:bg-emerald-950/50");
+    expect(drawnClasses(banner)).toContain("border-emerald-200");
+    expect(drawnClasses(banner)).toContain("dark:bg-emerald-950/50");
   });
 
   it("applies the neutral tone surface", () => {
     render(<AlertBanner tone="neutral" title="Neutral" />);
     const banner = getBanner();
-    expect(banner.className).toContain("border-border");
-    expect(banner.className).toContain("bg-muted/30");
+    expect(drawnClasses(banner)).toContain("border-border");
+    expect(drawnClasses(banner)).toContain("bg-muted/30");
   });
 
   it("uses default density padding", () => {
     render(<AlertBanner title="Default" />);
     const banner = getBanner();
-    expect(banner.className).toContain("px-4");
-    expect(banner.className).toContain("py-3");
+    expect(drawnClasses(banner)).toContain("px-4");
+    expect(drawnClasses(banner)).toContain("py-3");
   });
 
   it("uses sm density padding and typography", () => {
     render(<AlertBanner density="sm" title="Small" />);
     const banner = getBanner();
-    expect(banner.className).toContain("px-3");
-    expect(banner.className).toContain("py-2");
-    expect(screen.getByText("Small").className).toContain("text-sm");
+    expect(drawnClasses(banner)).toContain("px-3");
+    expect(drawnClasses(banner)).toContain("py-2");
+    expect(drawnClasses(screen.getByText("Small"))).toContain("text-sm");
   });
 
   it("uses hint density padding and forces borderless transparent surface", () => {
     render(<AlertBanner density="hint" tone="danger" title="Hint" />);
     const banner = getBanner();
-    expect(banner.className).toContain("p-2.5");
+    expect(drawnClasses(banner)).toContain("p-2.5");
     // hint implies borderless: tone surface tint must NOT be applied
-    expect(banner.className).toContain("border-transparent");
-    expect(banner.className).toContain("bg-transparent");
-    expect(banner.className).not.toContain("bg-red-50/50");
+    expect(drawnClasses(banner)).toContain("border-transparent");
+    expect(drawnClasses(banner)).toContain("bg-transparent");
+    expect(drawnClasses(banner)).not.toContain("bg-red-50/50");
     // hint title typography
-    expect(screen.getByText("Hint").className).toContain("text-xs");
+    expect(drawnClasses(screen.getByText("Hint"))).toContain("text-xs");
   });
 
   it("drops the tone surface when bordered={false}", () => {
     render(<AlertBanner tone="info" bordered={false} title="Plain" />);
     const banner = getBanner();
-    expect(banner.className).toContain("border-transparent");
-    expect(banner.className).toContain("bg-transparent");
-    expect(banner.className).not.toContain("bg-blue-50/50");
+    expect(drawnClasses(banner)).toContain("border-transparent");
+    expect(drawnClasses(banner)).toContain("bg-transparent");
+    expect(drawnClasses(banner)).not.toContain("bg-blue-50/50");
   });
 
   it("draws a glyph for every tone that carries a tint, with no caller passing one", () => {
@@ -185,8 +186,8 @@ describe("AlertBanner", () => {
   it("merges a custom className", () => {
     render(<AlertBanner className="my-banner" title="Custom class" />);
     const banner = getBanner();
-    expect(banner.className).toContain("my-banner");
-    expect(banner.className).toContain("rounded-md");
+    expect(drawnClasses(banner)).toContain("my-banner");
+    expect(drawnClasses(banner)).toContain("rounded-md");
   });
 
   it("forwards a click handler on the container", () => {

@@ -3,6 +3,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ColorPicker } from "../../base/inputs/color-picker";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -32,13 +33,13 @@ describe("ColorPicker", () => {
   it("applies dashed border when no value", () => {
     const { container } = render(<ColorPicker value="" onChange={vi.fn()} />);
     const trigger = container.querySelector("button") as HTMLButtonElement;
-    expect(trigger.className).toContain("border-dashed");
+    expect(drawnClasses(trigger)).toContain("border-dashed");
   });
 
   it("does not apply dashed border when value is set", () => {
     const { container } = render(<ColorPicker value="#ff0000" onChange={vi.fn()} />);
     const trigger = container.querySelector("button") as HTMLButtonElement;
-    expect(trigger.className).not.toContain("border-dashed");
+    expect(drawnClasses(trigger)).not.toContain("border-dashed");
   });
 
   it("supports disabled state", () => {
@@ -57,7 +58,7 @@ describe("ColorPicker", () => {
       <ColorPicker value="#ff0000" onChange={vi.fn()} className="my-picker" />,
     );
     const trigger = container.querySelector("button") as HTMLButtonElement;
-    expect(trigger.className).toContain("my-picker");
+    expect(drawnClasses(trigger)).toContain("my-picker");
   });
 
   it("opens popover and shows preset colors on click", () => {

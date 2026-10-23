@@ -4,8 +4,12 @@ import { useTranslation } from "@simplix-react/i18n/react";
 
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { useFlatUIComponents } from "../../provider/ui-provider";
-import { cn } from "../../utils/cn";
+import { partAttributes, slotAttributes } from "../../design/slot-style";
+import { fieldControlStyle } from "../shared/field-parts.style";
+import { passwordToggleStyle } from "./password-field.style";
+
 import { FieldWrapper } from "../shared/field-wrapper";
+
 
 /** Props for the {@link PasswordField} form component. */
 export interface PasswordFieldProps extends CommonFieldProps {
@@ -73,17 +77,15 @@ export function PasswordField({
               variantProps.layout === "hidden" ? label : undefined
             }
             {...inputProps}
-            className={cn(
-              "pr-10",
-              error && "border-destructive",
-              inputProps?.className,
-            )}
+            className={inputProps?.className}
+            {...partAttributes(fieldControlStyle, { padded: true })}
           />
           <button
             type="button"
             onClick={() => setVisible((v) => !v)}
             disabled={disabled}
-            className="absolute right-2 flex h-6 w-6 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
+            className="absolute right-2 flex h-6 w-6 items-center justify-center disabled:pointer-events-none"
+            {...slotAttributes(passwordToggleStyle, {})}
             aria-label={visible ? t("common.hidePassword") : t("common.showPassword")}
           >
             <svg

@@ -13,6 +13,30 @@ import {
   SelectValue,
 } from "./select";
 import { cn } from "../../utils/cn";
+import { slotAttributes } from "../../design/slot-style";
+import {
+  dateRangePickerActionStyle,
+  dateRangePickerActionsStyle,
+  dateRangePickerAreaStyle,
+  dateRangePickerClearStyle,
+  dateRangePickerFooterStyle,
+  dateRangePickerLabelStyle,
+  dateRangePickerNavStyle,
+  dateRangePickerNavButtonStyle,
+  dateRangePickerPresetStyle,
+  dateRangePickerPresetsStyle,
+  dateRangePickerPresetsDividerStyle,
+  dateRangePickerPresetsGridStyle,
+  dateRangePickerPresetsHeaderStyle,
+  dateRangePickerPresetsListStyle,
+  dateRangePickerPresetsTitleStyle,
+  dateRangePickerSelectsStyle,
+  dateRangePickerSummaryStyle,
+  dateRangePickerSummaryCountStyle,
+  dateRangePickerSummaryLabelStyle,
+  dateRangePickerSummaryValueStyle,
+  dateRangePickerTriggerStyle,
+} from "./date-range-picker.style";
 import {
   endOfDay,
   endOfMonth,
@@ -47,7 +71,7 @@ function MonthYearSelect({
 }) {
   return (
     <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className={cn("h-8 gap-1 text-sm font-medium", className)}>
+      <SelectTrigger compact className={cn("h-8", className)}>
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
@@ -305,16 +329,11 @@ export function DateRangePicker({
           type="button"
           disabled={disabled}
           data-empty={!value.from}
-          className={cn(
-            "inline-flex h-9 w-full items-center justify-start gap-2 rounded-md border border-input bg-background pl-3 text-sm font-normal",
-            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-            "disabled:cursor-not-allowed disabled:opacity-50",
-            "data-[empty=true]:text-muted-foreground",
-            isClearable ? "pr-9" : "pr-3",
-          )}
+          className="inline-flex h-9 w-full items-center justify-start disabled:cursor-not-allowed"
+          {...slotAttributes(dateRangePickerTriggerStyle, { clearable: isClearable })}
         >
-          <CalendarDotsIcon className="h-4 w-4 shrink-0 opacity-50" />
-          <span className="flex-1 truncate text-start">
+          <CalendarDotsIcon className="h-4 w-4 shrink-0" />
+          <span className="flex-1 truncate" {...slotAttributes(dateRangePickerLabelStyle, {})}>
             {displayText ?? defaultPlaceholder}
           </span>
         </button>
@@ -323,25 +342,32 @@ export function DateRangePicker({
       <div className="flex">
           {/* Presets panel (desktop only, dual month) */}
           {visibleMonths === 2 && (
-            <div className="hidden md:flex flex-col border-r">
-              <div className="px-3 pt-3 pb-2">
-                <h4 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{t("date.presets")}</h4>
+            <div
+              className="hidden md:flex flex-col"
+              {...slotAttributes(dateRangePickerPresetsStyle, {})}
+            >
+              <div {...slotAttributes(dateRangePickerPresetsHeaderStyle, {})}>
+                <h4 {...slotAttributes(dateRangePickerPresetsTitleStyle, {})}>{t("date.presets")}</h4>
               </div>
-              <div className="flex flex-col px-1.5 pb-2 overflow-y-auto min-h-0 flex-1">
+              <div
+                className="flex flex-col overflow-y-auto min-h-0 flex-1"
+                {...slotAttributes(dateRangePickerPresetsListStyle, {})}
+              >
                 {presetGroups.map((group, gi) => (
                   <div key={gi}>
-                    {gi > 0 && <div className="border-t mx-1.5 my-1" />}
-                    <div className="grid grid-cols-2 gap-0.5">
+                    {gi > 0 && <div {...slotAttributes(dateRangePickerPresetsDividerStyle, {})} />}
+                    <div
+                      className="grid grid-cols-2"
+                      {...slotAttributes(dateRangePickerPresetsGridStyle, {})}
+                    >
                       {group.map((preset) => (
                         <button
                           key={preset.label}
                           type="button"
-                          className={cn(
-                            "rounded-md px-2 py-1 text-xs text-start whitespace-nowrap transition-colors shrink-0",
-                            selectedPreset === preset.label
-                              ? "bg-primary text-primary-foreground font-medium"
-                              : "text-foreground hover:bg-accent",
-                          )}
+                          className="whitespace-nowrap shrink-0"
+                          {...slotAttributes(dateRangePickerPresetStyle, {
+                            selected: selectedPreset === preset.label,
+                          })}
                           onClick={() => handlePresetSelect(preset)}
                         >
                           {preset.label}
@@ -355,12 +381,13 @@ export function DateRangePicker({
           )}
 
           {/* Calendar area */}
-          <div className="flex flex-col p-3">
+          <div className="flex flex-col" {...slotAttributes(dateRangePickerAreaStyle, {})}>
             {/* Month/Year navigation — one select pair per visible calendar */}
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center" {...slotAttributes(dateRangePickerNavStyle, {})}>
               <button
                 type="button"
-                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-input hover:bg-accent hover:text-accent-foreground"
+                className="inline-flex h-8 w-8 shrink-0 items-center justify-center"
+                {...slotAttributes(dateRangePickerNavButtonStyle, {})}
                 onClick={handlePrevMonth}
                 aria-label={t("date.previousMonth")}
               >
@@ -368,7 +395,10 @@ export function DateRangePicker({
                   <path d="M8.84182 3.13514C9.04327 3.32401 9.05348 3.64042 8.86462 3.84188L5.43521 7.49991L8.86462 11.1579C9.05348 11.3594 9.04327 11.6758 8.84182 11.8647C8.64036 12.0535 8.32394 12.0433 8.13508 11.8419L4.38508 7.84188C4.20477 7.64955 4.20477 7.35027 4.38508 7.15794L8.13508 3.15794C8.32394 2.95648 8.64036 2.94628 8.84182 3.13514Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd" />
                 </svg>
               </button>
-              <div className="flex flex-1 items-center justify-center gap-1">
+              <div
+                className="flex flex-1 items-center justify-center"
+                {...slotAttributes(dateRangePickerSelectsStyle, {})}
+              >
                 {renderMonthYear(
                   viewMonth,
                   (v) => setViewMonth((prev) => new Date(prev.getFullYear(), parseInt(v), 1)),
@@ -376,7 +406,10 @@ export function DateRangePicker({
                 )}
               </div>
               {visibleMonths === 2 && (
-                <div className="flex flex-1 items-center justify-center gap-1">
+                <div
+                className="flex flex-1 items-center justify-center"
+                {...slotAttributes(dateRangePickerSelectsStyle, {})}
+              >
                   {renderMonthYear(
                     secondViewMonth,
                     // The first calendar follows: keep it one month behind the second
@@ -387,7 +420,8 @@ export function DateRangePicker({
               )}
               <button
                 type="button"
-                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-input hover:bg-accent hover:text-accent-foreground"
+                className="inline-flex h-8 w-8 shrink-0 items-center justify-center"
+                {...slotAttributes(dateRangePickerNavButtonStyle, {})}
                 onClick={handleNextMonth}
                 aria-label={t("date.nextMonth")}
               >
@@ -411,16 +445,19 @@ export function DateRangePicker({
 
             {/* Range summary: start / end / day count (reflects the pending draft) */}
             {draft.from && (
-              <div className="mt-2 flex items-center justify-center gap-2 rounded-md bg-muted/50 px-3 py-1.5 text-xs">
-                <span className="text-muted-foreground">{t("date.startDate")}</span>
-                <span className="font-medium">{formatDateMedium(draft.from, bcp47)}</span>
-                <span className="text-muted-foreground">→</span>
-                <span className="text-muted-foreground">{t("date.endDate")}</span>
-                <span className="font-medium">
+              <div
+                className="flex items-center justify-center"
+                {...slotAttributes(dateRangePickerSummaryStyle, {})}
+              >
+                <span {...slotAttributes(dateRangePickerSummaryLabelStyle, {})}>{t("date.startDate")}</span>
+                <span {...slotAttributes(dateRangePickerSummaryValueStyle, {})}>{formatDateMedium(draft.from, bcp47)}</span>
+                <span {...slotAttributes(dateRangePickerSummaryLabelStyle, {})}>→</span>
+                <span {...slotAttributes(dateRangePickerSummaryLabelStyle, {})}>{t("date.endDate")}</span>
+                <span {...slotAttributes(dateRangePickerSummaryValueStyle, {})}>
                   {draft.to ? formatDateMedium(draft.to, bcp47) : "..."}
                 </span>
                 {dayCount != null && (
-                  <span className="rounded bg-primary/10 px-1.5 py-0.5 font-semibold text-primary">
+                  <span {...slotAttributes(dateRangePickerSummaryCountStyle, {})}>
                     {t("date.daysCount", { count: dayCount })}
                   </span>
                 )}
@@ -428,32 +465,39 @@ export function DateRangePicker({
             )}
 
             {/* Footer: Today / Reset (draft) / Close (discard) / Select (commit) */}
-            <div className="flex justify-between gap-2 border-t pt-2 mt-2">
+            <div
+              className="flex justify-between"
+              {...slotAttributes(dateRangePickerFooterStyle, {})}
+            >
               <button
                 type="button"
-                className="inline-flex h-7 items-center rounded-md border border-input px-2 text-xs hover:bg-accent"
+                className="inline-flex h-7 items-center"
+                {...slotAttributes(dateRangePickerActionStyle, { kind: "outline" })}
                 onClick={() => handlePresetSelect({ label: t("date.today"), from: startOfDay(today), to: endOfDay(today) })}
               >
                 {t("date.today")}
               </button>
-              <div className="flex gap-2">
+              <div className="flex" {...slotAttributes(dateRangePickerActionsStyle, {})}>
                 <button
                   type="button"
-                  className="inline-flex h-7 items-center rounded-md border border-input px-2 text-xs hover:bg-accent"
+                  className="inline-flex h-7 items-center"
+                {...slotAttributes(dateRangePickerActionStyle, { kind: "outline" })}
                   onClick={handleResetDraft}
                 >
                   {t("date.reset")}
                 </button>
                 <button
                   type="button"
-                  className="inline-flex h-7 items-center rounded-md border border-input px-2 text-xs hover:bg-accent"
+                  className="inline-flex h-7 items-center"
+                {...slotAttributes(dateRangePickerActionStyle, { kind: "outline" })}
                   onClick={() => setOpen(false)}
                 >
                   {t("common.close")}
                 </button>
                 <button
                   type="button"
-                  className="inline-flex h-7 items-center rounded-md bg-primary px-2.5 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+                  className="inline-flex h-7 items-center"
+                  {...slotAttributes(dateRangePickerActionStyle, { kind: "primary" })}
                   onClick={handleCommit}
                 >
                   {t("common.select")}
@@ -468,9 +512,10 @@ export function DateRangePicker({
           type="button"
           aria-label={t("common.clear")}
           onClick={handleClearField}
-          className="absolute right-2 rounded-sm p-0.5 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          className="absolute right-2"
+          {...slotAttributes(dateRangePickerClearStyle, {})}
         >
-          <XIcon className="h-3.5 w-3.5 opacity-50 hover:opacity-100" />
+          <XIcon className="h-3.5 w-3.5" />
         </button>
       )}
     </span>

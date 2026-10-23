@@ -4,6 +4,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { Card } from "../../primitives/card";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -17,7 +18,7 @@ describe("Card", () => {
 
   it("applies base and default variant classes", () => {
     render(<Card data-testid="card" />);
-    const classes = screen.getByTestId("card").className;
+    const classes = drawnClasses(screen.getByTestId("card"));
     expect(classes).toContain("rounded-lg");
     expect(classes).toContain("border");
     expect(classes).toContain("bg-card");
@@ -38,14 +39,14 @@ describe("Card", () => {
       const { unmount } = render(
         <Card data-testid="card" padding={padding as keyof typeof paddings} />,
       );
-      for (const cls of expected) expect(screen.getByTestId("card").className).toContain(cls);
+      for (const cls of expected) expect(drawnClasses(screen.getByTestId("card"))).toContain(cls);
       unmount();
     }
   });
 
   it("applies no padding class for 'none'", () => {
     render(<Card data-testid="card" padding="none" />);
-    const classes = screen.getByTestId("card").className;
+    const classes = drawnClasses(screen.getByTestId("card"));
     expect(classes).not.toContain("px-");
     expect(classes).not.toContain("py-");
   });
@@ -58,9 +59,9 @@ describe("Card", () => {
     );
     const el = screen.getByTestId("card");
     expect(el.tagName).toBe("BUTTON");
-    expect(el.className).toContain("cursor-pointer");
-    expect(el.className).toContain("w-full");
-    expect(el.className).toContain("text-left");
+    expect(drawnClasses(el)).toContain("cursor-pointer");
+    expect(drawnClasses(el)).toContain("w-full");
+    expect(drawnClasses(el)).toContain("text-left");
   });
 
   it("allows overriding tag with 'as' prop", () => {
@@ -74,7 +75,7 @@ describe("Card", () => {
 
   it("merges custom className", () => {
     render(<Card data-testid="card" className="extra" />);
-    const classes = screen.getByTestId("card").className;
+    const classes = drawnClasses(screen.getByTestId("card"));
     expect(classes).toContain("rounded-lg");
     expect(classes).toContain("extra");
   });

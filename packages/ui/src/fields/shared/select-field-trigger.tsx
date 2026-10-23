@@ -2,7 +2,13 @@ import type { ReactNode } from "react";
 
 import { FieldChevron } from "../../base/inputs/field-chevron";
 import { useFlatUIComponents } from "../../provider/ui-provider";
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
+import {
+  selectFieldTriggerActionsStyle,
+  selectFieldTriggerStyle,
+  selectFieldTriggerWrapperStyle,
+} from "./select-field-trigger.style";
 
 /** Props for the {@link SelectFieldTrigger} component. */
 export interface SelectFieldTriggerProps {
@@ -17,6 +23,8 @@ export interface SelectFieldTriggerProps {
   disabled?: boolean;
   /** Error message; only its presence is read, to tint the border. */
   error?: string;
+  /** Whether the field shows its placeholder; the wrapper then takes the muted text colour. */
+  empty?: boolean;
   /** Extra classes for the positioning wrapper, e.g. `flex-1` inside a row. */
   className?: string;
   /** Clear affordance, rendered over the trigger's trailing edge as its SIBLING. */
@@ -50,6 +58,7 @@ export function SelectFieldTrigger({
   open,
   disabled,
   error,
+  empty,
   className,
   clearAction,
   expandAction,
@@ -59,7 +68,10 @@ export function SelectFieldTrigger({
   const trailingCount = (clearAction ? 1 : 0) + (expandAction ? 1 : 0);
 
   return (
-    <div className={cn("relative flex w-full min-w-0 items-center", className)}>
+    <div
+      className={cn("relative flex w-full min-w-0 items-center", className)}
+      {...slotAttributes(selectFieldTriggerWrapperStyle, { empty: !!empty })}
+    >
       <PopoverTrigger asChild>
         <button
           type="button"
@@ -69,12 +81,8 @@ export function SelectFieldTrigger({
           aria-labelledby={labelId}
           aria-label={ariaLabel}
           disabled={disabled}
-          className={cn(
-            "flex h-8 w-full min-w-0 items-center gap-1 rounded-md border border-input bg-background px-3 text-left text-sm",
-            "focus-visible:border-foreground focus-visible:outline-none",
-            disabled && "cursor-not-allowed opacity-50",
-            error && "border-destructive focus-visible:border-destructive",
-          )}
+          className="flex h-8 w-full min-w-0 items-center"
+          {...slotAttributes(selectFieldTriggerStyle, { disabled: !!disabled, invalid: !!error })}
         >
           {children}
           {/* Holds open exactly the strip the sibling buttons are positioned over:
@@ -89,7 +97,10 @@ export function SelectFieldTrigger({
         </button>
       </PopoverTrigger>
       {trailingCount > 0 && (
-        <span className="absolute right-8 flex items-center gap-1">
+        <span
+          className="absolute right-8 flex items-center"
+          {...slotAttributes(selectFieldTriggerActionsStyle, {})}
+        >
           {clearAction}
           {expandAction}
         </span>

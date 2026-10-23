@@ -3,6 +3,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { FieldMessage } from "../../fields/shared/field-message";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -45,31 +46,31 @@ describe("FieldMessage", () => {
   it("applies error text class", () => {
     render(<FieldMessage variant="error">Error</FieldMessage>);
     const el = screen.getByRole("alert");
-    expect(el.className).toContain("text-destructive");
+    expect(drawnClasses(el)).toContain("text-destructive");
   });
 
   it("applies warning text class", () => {
     render(<FieldMessage variant="warning">Warning</FieldMessage>);
     const el = screen.getByRole("status");
-    expect(el.className).toContain("text-warning");
+    expect(drawnClasses(el)).toContain("text-warning");
   });
 
   it("applies info text class", () => {
     render(<FieldMessage variant="info">Info</FieldMessage>);
     const el = screen.getByRole("status");
-    expect(el.className).toContain("text-info");
+    expect(drawnClasses(el)).toContain("text-info");
   });
 
   it("applies description text class", () => {
     render(<FieldMessage variant="description">Description</FieldMessage>);
     const el = screen.getByText("Description");
-    expect(el.className).toContain("text-muted-foreground");
+    expect(drawnClasses(el)).toContain("text-muted-foreground");
   });
 
   it("defaults to error styling when no variant is specified", () => {
     render(<FieldMessage>Default error</FieldMessage>);
     const el = screen.getByText("Default error");
-    expect(el.className).toContain("text-destructive");
+    expect(drawnClasses(el)).toContain("text-destructive");
     // When variant is undefined, role is not set
     expect(el.getAttribute("role")).toBeNull();
   });
@@ -81,20 +82,20 @@ describe("FieldMessage", () => {
       </FieldMessage>,
     );
     const el = screen.getByRole("alert");
-    expect(el.className).toContain("my-custom");
+    expect(drawnClasses(el)).toContain("my-custom");
   });
 
   it("applies flex layout for error and warning (icon variants)", () => {
     render(<FieldMessage variant="error">Error</FieldMessage>);
     const el = screen.getByRole("alert");
-    expect(el.className).toContain("flex");
-    expect(el.className).toContain("items-center");
-    expect(el.className).toContain("gap-1");
+    expect(drawnClasses(el)).toContain("flex");
+    expect(drawnClasses(el)).toContain("items-center");
+    expect(drawnClasses(el)).toContain("gap-1");
   });
 
   it("does not apply flex layout for description", () => {
     render(<FieldMessage variant="description">Desc</FieldMessage>);
     const el = screen.getByText("Desc");
-    expect(el.className).not.toContain("flex");
+    expect(drawnClasses(el)).not.toContain("flex");
   });
 });

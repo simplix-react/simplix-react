@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "@simplix-react/i18n/react";
 
 import { cn } from "../../../utils/cn";
+import { partAttributes, slotAttributes } from "../../../design/slot-style";
 import { useChartTheme } from "../../charts/apexcharts/use-chart-theme";
 import { useMediaQuery } from "../../../hooks/use-media-query";
 import { Popover, PopoverContent, PopoverTrigger } from "../../overlay";
@@ -18,6 +19,19 @@ import {
   TimeLabels,
 } from "./components";
 import { AlertIcon, CalendarIcon, ClearIcon, ExpandIcon } from "./icons";
+import {
+  timeRangeActionStyle,
+  timeRangeBadgeStyle,
+  timeRangeControlsStartStyle,
+  timeRangeControlsStyle,
+  timeRangeErrorStyle,
+  timeRangeHeatmapRowStyle,
+  timeRangeHeatmapStyle,
+  timeRangePopoverBodyStyle,
+  timeRangeRetryStyle,
+  timeRangeSelectorStyle,
+  timeRangePopoverStyle,
+} from "./time-range-selector.style";
 import {
   bucketToDate,
   buildChartOptions,
@@ -584,25 +598,32 @@ export function TimeRangeSelector({
 
   // ── Render ──
   return (
-    <div className={cn("relative w-full rounded-lg border border-border bg-card", className)}>
+    <div
+      className={cn("relative w-full", className)}
+      {...slotAttributes(timeRangeSelectorStyle, {})}
+    >
       {/* Controls bar. It owns the sideways scroll, because it is the only row that can be wider
           than the card: the preset row is a dozen buttons that neither wrap nor shrink, while the
           heatmap and the labels under it are sized to whatever width they are given. The scroll
           must NOT live on the root — one axis of `overflow` makes the browser compute the other
           axis as `auto` too, and the hover tooltip is positioned to hang below the heatmap, so a
           scrolling root turns it into a vertical scrollbar. */}
-      <div className="flex min-w-0 items-center justify-between gap-2 overflow-x-auto px-2 pt-2 pb-1">
-        <div className="flex min-w-0 items-center gap-1.5">
+      <div
+        className="flex min-w-0 items-center justify-between overflow-x-auto"
+        {...slotAttributes(timeRangeControlsStyle, {})}
+      >
+        <div
+          className="flex min-w-0 items-center"
+          {...slotAttributes(timeRangeControlsStartStyle, {})}
+        >
           {/* The window, and the two things that can be done to the selection inside it —
               one set, because all three are about the span itself. */}
           <div className="flex items-center">
             {/* The badge closes the group's right edge itself when nothing follows it, rather
                 than leaning on a filler element to round the corner. */}
             <span
-              className={cn(
-                "inline-flex h-6 items-center whitespace-nowrap rounded-l-md border border-input bg-muted/40 px-2 text-xs font-semibold tabular-nums",
-                !selectionOverlay && "rounded-r-md",
-              )}
+              className="inline-flex h-6 items-center whitespace-nowrap"
+              {...slotAttributes(timeRangeBadgeStyle, { closed: !selectionOverlay })}
             >
               {rangeText}
             </span>
@@ -610,7 +631,8 @@ export function TimeRangeSelector({
               <>
                 <button
                   type="button"
-                  className="inline-flex h-6 w-6 items-center justify-center border-y border-r border-input bg-background text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  className="inline-flex h-6 w-6 items-center justify-center"
+                  {...slotAttributes(timeRangeActionStyle, { kind: "expand" })}
                   onClick={handleExpandToSelection}
                   aria-label={t("timeRange.expand", { defaultValue: "Expand to selection" })}
                   title={t("timeRange.expand", { defaultValue: "Expand to selection" })}
@@ -619,7 +641,8 @@ export function TimeRangeSelector({
                 </button>
                 <button
                   type="button"
-                  className="inline-flex h-6 w-6 items-center justify-center rounded-r-md border-y border-r border-input bg-background text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  className="inline-flex h-6 w-6 items-center justify-center"
+                  {...slotAttributes(timeRangeActionStyle, { kind: "clear" })}
                   onClick={handleReset}
                   aria-label={t("timeRange.clear", { defaultValue: "Clear selection" })}
                   title={t("timeRange.clear", { defaultValue: "Clear selection" })}
@@ -636,15 +659,16 @@ export function TimeRangeSelector({
               <PopoverTrigger asChild>
                 <button
                   type="button"
-                  className="inline-flex h-6 w-6 items-center justify-center rounded-l-md border border-input bg-background text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  className="inline-flex h-6 w-6 items-center justify-center"
+                  {...slotAttributes(timeRangeActionStyle, { kind: "calendar" })}
                   aria-label={t("timeRange.calendar", { defaultValue: "Calendar" })}
                   title={t("timeRange.calendar", { defaultValue: "Calendar" })}
                 >
                   <CalendarIcon className="size-3" />
                 </button>
               </PopoverTrigger>
-              <PopoverContent align="start" className="w-auto p-3">
-                <div className="flex flex-col gap-3">
+              <PopoverContent align="start" className="w-auto" {...partAttributes(timeRangePopoverStyle, {})}>
+                <div className="flex flex-col" {...slotAttributes(timeRangePopoverBodyStyle, {})}>
                   <DateTimeInput
                     label={t("timeRange.from", { defaultValue: "From" })}
                     value={shownRange.from}
@@ -660,7 +684,8 @@ export function TimeRangeSelector({
             </Popover>
             <button
               type="button"
-              className="inline-flex h-6 items-center rounded-r-md border-y border-r border-input bg-background px-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              className="inline-flex h-6 items-center"
+              {...slotAttributes(timeRangeActionStyle, { kind: "now" })}
               onClick={handleNow}
             >
               {t("timeRange.now", { defaultValue: "Now" })}
@@ -679,7 +704,10 @@ export function TimeRangeSelector({
       </div>
 
       {/* Heatmap with nav buttons */}
-      <div className="flex items-center gap-0 px-1">
+      <div
+        className="flex items-center"
+        {...slotAttributes(timeRangeHeatmapRowStyle, {})}
+      >
         <NavButton direction="prev" onClick={() => handleNavigate(-1)} label={t("timeRange.previous", { defaultValue: "Previous" })} />
 
         <div
@@ -690,13 +718,16 @@ export function TimeRangeSelector({
           aria-roledescription={t("timeRange.roleDescription", { defaultValue: "Time range heatmap" })}
           aria-keyshortcuts="ArrowLeft ArrowRight Shift+ArrowLeft Shift+ArrowRight Home End PageUp PageDown Escape"
           aria-busy={isLoading}
+          // `outline-none` on the chart's inner canvas and svg only: the heatmap surface itself
+          // carries the focus ring (the `time-range-heatmap` slot), and the inner chart is not
+          // focusable.
           className={cn(
-            "relative flex-1 min-w-0 overflow-visible touch-none transition-opacity rounded-sm",
+            "relative flex-1 min-w-0 overflow-visible touch-none",
             "[&_.apexcharts-canvas]:outline-none [&_.apexcharts-svg]:outline-none [&_.apexcharts-canvas]:overflow-visible [&_svg]:overflow-visible",
-            "select-none cursor-col-resize focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+            "select-none cursor-col-resize",
             "before:content-[''] before:absolute before:-top-1 before:-bottom-1 before:left-0 before:right-0",
-            isLoading && "opacity-50",
           )}
+          {...slotAttributes(timeRangeHeatmapStyle, { loading: Boolean(isLoading) })}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
@@ -744,14 +775,15 @@ export function TimeRangeSelector({
 
           {error && (
             <div
-              className="absolute inset-0 z-30 flex items-center justify-center gap-2 rounded-sm bg-card/85 text-xs text-muted-foreground"
+              className="absolute inset-0 z-30 flex items-center justify-center"
+              {...slotAttributes(timeRangeErrorStyle, {})}
               onPointerDown={(e) => e.stopPropagation()}
             >
-              <AlertIcon className="size-3.5 text-destructive" />
+              <AlertIcon className="size-3.5" />
               <span>{t("timeRange.loadError", { defaultValue: "Failed to load" })}</span>
               <button
                 type="button"
-                className="rounded border border-input px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                {...slotAttributes(timeRangeRetryStyle, {})}
                 onClick={() => setReloadNonce((n) => n + 1)}
               >
                 {t("timeRange.retry", { defaultValue: "Retry" })}

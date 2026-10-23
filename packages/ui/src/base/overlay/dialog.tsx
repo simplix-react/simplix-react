@@ -4,7 +4,18 @@ import { Maximize2, Minimize2 } from "lucide-react";
 
 import { useTranslation } from "@simplix-react/i18n/react";
 
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
+import {
+  dialogContentStyle,
+  dialogCornerActionsStyle,
+  dialogCornerButtonStyle,
+  dialogDescriptionStyle,
+  dialogFooterStyle,
+  dialogHeaderStyle,
+  dialogOverlayStyle,
+  dialogTitleStyle,
+} from "./dialog.style";
 
 /** True when the enclosing maximizable DialogContent is currently maximized. */
 const DialogMaximizedContext = createContext(false);
@@ -39,6 +50,14 @@ export const DialogPortal = DialogPrimitive.Portal;
 // Close - pass through
 export const DialogClose = DialogPrimitive.Close;
 
+// Entry and exit motion comes from the tw-animate-css utilities. They are not part of this
+// package's stylesheet, so they stay on the element: the generated design stylesheet cannot
+// @apply a utility that is not defined where it is compiled.
+const OVERLAY_MOTION =
+  "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0";
+const CONTENT_MOTION =
+  "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95";
+
 // Overlay
 export type DialogOverlayProps = ComponentPropsWithRef<
   typeof DialogPrimitive.Overlay
@@ -48,11 +67,9 @@ export const DialogOverlay = forwardRef<HTMLDivElement, DialogOverlayProps>(
   ({ className, ...rest }, ref) => (
     <DialogPrimitive.Overlay
       ref={ref}
-      className={cn(
-        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50",
-        className,
-      )}
+      className={cn("fixed inset-0 z-50", OVERLAY_MOTION, className)}
       {...rest}
+      {...slotAttributes(dialogOverlayStyle, {})}
     />
   ),
 );
@@ -66,14 +83,17 @@ export type DialogContentProps = ComponentPropsWithRef<
   showCloseButton?: boolean;
   /** Adds a maximize / restore toggle beside the close button and near-fullscreens the dialog. */
   maximizable?: boolean;
+  /** Drops the panel padding, for a body that draws its own. */
+  flush?: boolean;
 };
 
-// Shared style of the top-right corner icon buttons (maximize + close), so they read as one group.
+// Structure shared by the top-right corner icon buttons (maximize + close); their look is the
+// `dialog-corner-button` slot, so they read as one group.
 const CORNER_BUTTON_CLASS =
-  "rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
+  "disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
 
 export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(
-  ({ className, children, showCloseButton = true, maximizable = false, style, ...rest }, ref) => {
+  ({ className, children, showCloseButton = true, maximizable = false, flush = false, style, ...rest }, ref) => {
     const [maximized, setMaximized] = useState(false);
     const isMaximized = maximizable && maximized;
     const { t } = useTranslation("simplix/ui");
@@ -85,10 +105,8 @@ export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(
             ref={ref}
             data-maximized={isMaximized ? "" : undefined}
             className={cn(
-              // `outline-none` on the container, and only on the container. Radix moves focus here
-          // when the dialog opens; a ring around the whole panel reads as a border, not as focus.
-          // The first control inside still rings normally.
-          "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg duration-200 outline-none sm:max-w-lg",
+              "fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] sm:max-w-lg",
+              CONTENT_MOTION,
               className,
             )}
             // Maximized: pin every edge a uniform gap from the viewport (not %-based vw/vh,
@@ -101,27 +119,30 @@ export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(
               ? { ...style, top: "0.75rem", right: "0.75rem", bottom: "0.75rem", left: "0.75rem", width: "auto", height: "auto", maxWidth: "none", transform: "none", translate: "none", display: "flex", flexDirection: "column" }
               : style}
             {...rest}
+            {...slotAttributes(dialogContentStyle, { flush })}
           >
             {maximizable && <ResetMaximizeOnClose onReset={setMaximized} />}
             {children}
             {(maximizable || showCloseButton) && (
-              <div className="absolute top-3.5 right-3.5 flex items-center gap-0.5">
+              <div
+                className="absolute top-3.5 right-3.5 flex items-center"
+                {...slotAttributes(dialogCornerActionsStyle, {})}
+              >
                 {maximizable && (
                   <button
                     type="button"
                     onClick={() => setMaximized((prev) => !prev)}
                     aria-label={maximized ? t("common.restore") : t("common.maximize")}
                     className={CORNER_BUTTON_CLASS}
+                    {...slotAttributes(dialogCornerButtonStyle, {})}
                   >
                     {maximized ? <Minimize2 /> : <Maximize2 />}
                   </button>
                 )}
                 {showCloseButton && (
                   <DialogPrimitive.Close
-                    className={cn(
-                      "data-[state=open]:bg-accent data-[state=open]:text-muted-foreground",
-                      CORNER_BUTTON_CLASS,
-                    )}
+                    className={CORNER_BUTTON_CLASS}
+                    {...slotAttributes(dialogCornerButtonStyle, { close: true })}
                   >
                     <svg
                       width="15"
@@ -158,11 +179,9 @@ export type DialogHeaderProps = React.HTMLAttributes<HTMLDivElement>;
 export function DialogHeader({ className, ...rest }: DialogHeaderProps) {
   return (
     <div
-      className={cn(
-        "flex flex-col gap-2 text-center sm:text-left",
-        className,
-      )}
+      className={cn("flex flex-col", className)}
       {...rest}
+      {...slotAttributes(dialogHeaderStyle, {})}
     />
   );
 }
@@ -173,11 +192,9 @@ export type DialogFooterProps = React.HTMLAttributes<HTMLDivElement>;
 export function DialogFooter({ className, ...rest }: DialogFooterProps) {
   return (
     <div
-      className={cn(
-        "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
-        className,
-      )}
+      className={cn("flex flex-col-reverse sm:flex-row sm:justify-end", className)}
       {...rest}
+      {...slotAttributes(dialogFooterStyle, {})}
     />
   );
 }
@@ -191,8 +208,9 @@ export const DialogTitle = forwardRef<HTMLHeadingElement, DialogTitleProps>(
   ({ className, ...rest }, ref) => (
     <DialogPrimitive.Title
       ref={ref}
-      className={cn("text-lg leading-none font-semibold", className)}
+      className={className}
       {...rest}
+      {...slotAttributes(dialogTitleStyle, {})}
     />
   ),
 );
@@ -210,8 +228,9 @@ export const DialogDescription = forwardRef<
 >(({ className, ...rest }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn("text-muted-foreground text-sm", className)}
+    className={className}
     {...rest}
+    {...slotAttributes(dialogDescriptionStyle, {})}
   />
 ));
 

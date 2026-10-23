@@ -2,7 +2,20 @@ import type { LocaleCode, LocaleConfig } from "@simplix-react/i18n";
 import { useTranslation } from "@simplix-react/i18n/react";
 
 import { useFlatUIComponents } from "../../provider/ui-provider";
+import { partAttributes, slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
+import {
+  languageChevronStyle,
+  languageDotStyle,
+  languageItemStyle,
+  languageNameStyle,
+  languageSegmentStyle,
+  languageSegmentsStyle,
+  languageSelectorStyle,
+  languageStepStyle,
+  languageTriggerStyle,
+} from "./language-selector.style";
+
 
 export interface LanguageSelectorProps {
   languages: LocaleConfig[];
@@ -25,8 +38,9 @@ function ChevronLeftIcon() {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="size-3 text-muted-foreground"
+      className="size-3"
       aria-hidden="true"
+      {...slotAttributes(languageChevronStyle, {})}
     >
       <path d="m15 18-6-6 6-6" />
     </svg>
@@ -45,8 +59,9 @@ function ChevronRightIcon() {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="size-3 text-muted-foreground"
+      className="size-3"
       aria-hidden="true"
+      {...slotAttributes(languageChevronStyle, {})}
     >
       <path d="m9 18 6-6-6-6" />
     </svg>
@@ -86,10 +101,8 @@ export function LanguageSelector({
 
   return (
     <div
-      className={cn(
-        "flex flex-col rounded-md border border-input bg-muted overflow-hidden",
-        className,
-      )}
+      className={cn("flex flex-col overflow-hidden", className)}
+      {...slotAttributes(languageSelectorStyle, {})}
     >
       <div className="flex items-center">
         <button
@@ -97,7 +110,8 @@ export function LanguageSelector({
           onClick={handlePrev}
           disabled={disabled}
           aria-label={t("field.previousLanguage")}
-          className="flex h-4 w-4 items-center justify-center border-r border-input hover:bg-muted-foreground/10 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex h-4 w-4 items-center justify-center"
+          {...slotAttributes(languageStepStyle, { side: "prev" })}
         >
           <ChevronLeftIcon />
         </button>
@@ -105,14 +119,16 @@ export function LanguageSelector({
         <Select value={value} onValueChange={onChange} disabled={disabled}>
           <SelectTrigger
             aria-label={t("field.selectLanguage")}
-            className="!h-auto !min-h-0 w-[80px] border-0 !bg-transparent dark:!bg-transparent !p-0 !py-0 text-[10px] leading-none shadow-none focus-visible:ring-0 [&>svg]:hidden justify-center [&>span]:leading-none"
+            className="!h-auto !min-h-0 w-[80px] [&>svg]:hidden justify-center"
+            {...partAttributes(languageTriggerStyle, {})}
           >
-            <span className="flex items-center gap-1.5">
+            <span
+              className="flex items-center"
+              {...slotAttributes(languageNameStyle, { spacing: "tight" })}
+            >
               <span
-                className={cn(
-                  "size-1.5 rounded-full",
-                  isCurrentFilled ? "bg-green-500" : "bg-muted-foreground/30",
-                )}
+                className="size-1.5"
+                {...slotAttributes(languageDotStyle, { filled: isCurrentFilled })}
               />
               {currentLanguage.name}
             </span>
@@ -122,16 +138,15 @@ export function LanguageSelector({
               <SelectItem
                 key={lang.code}
                 value={lang.code}
-                className="text-xs"
+                {...partAttributes(languageItemStyle, {})}
               >
-                <span className="flex items-center gap-2">
+                <span
+                  className="flex items-center"
+                  {...slotAttributes(languageNameStyle, { spacing: "wide" })}
+                >
                   <span
-                    className={cn(
-                      "size-1.5 rounded-full",
-                      isFilled(lang.code)
-                        ? "bg-green-500"
-                        : "bg-muted-foreground/30",
-                    )}
+                    className="size-1.5"
+                    {...slotAttributes(languageDotStyle, { filled: isFilled(lang.code) })}
                   />
                   {lang.name}
                 </span>
@@ -145,13 +160,17 @@ export function LanguageSelector({
           onClick={handleNext}
           disabled={disabled}
           aria-label={t("field.nextLanguage")}
-          className="flex h-4 w-4 items-center justify-center border-l border-input hover:bg-muted-foreground/10 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex h-4 w-4 items-center justify-center"
+          {...slotAttributes(languageStepStyle, { side: "next" })}
         >
           <ChevronRightIcon />
         </button>
       </div>
 
-      <div className="flex items-center mx-1 mb-0.5 rounded-sm overflow-hidden">
+      <div
+        className="flex items-center overflow-hidden"
+        {...slotAttributes(languageSegmentsStyle, {})}
+      >
         {languages.map((lang) => (
           <button
             key={lang.code}
@@ -159,11 +178,11 @@ export function LanguageSelector({
             onClick={() => onChange(lang.code)}
             disabled={disabled}
             aria-label={t("field.switchToLanguage", { language: lang.name })}
-            className={cn(
-              "h-1 flex-1 transition-colors disabled:cursor-not-allowed",
-              isFilled(lang.code) ? "bg-green-500" : "bg-muted-foreground/30",
-              lang.code === value && "ring-1 ring-inset ring-foreground/50",
-            )}
+            className="h-1 flex-1"
+            {...slotAttributes(languageSegmentStyle, {
+              filled: isFilled(lang.code),
+              current: lang.code === value,
+            })}
           />
         ))}
       </div>

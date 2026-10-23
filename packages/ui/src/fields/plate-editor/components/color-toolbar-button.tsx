@@ -2,7 +2,7 @@
 import { type ChangeEvent, type FormEvent, type ReactNode, useCallback, useState } from 'react'
 import { useEditorRef, useEditorSelector } from 'platejs/react'
 
-import { cn } from '../../../utils/cn'
+import { partAttributes, slotAttributes } from '../../../design/slot-style'
 import { useTranslation } from '@simplix-react/i18n/react'
 import {
   Popover,
@@ -12,6 +12,16 @@ import {
 import { Input } from '../../../base/inputs/input'
 import { ToolbarButton } from './toolbar'
 import { FONT_COLORS, HIGHLIGHT_COLORS } from '../plugins/font-styles-kit'
+import {
+  plateColorClearStyle,
+  plateColorCustomStyle,
+  plateColorIndicatorStyle,
+  plateColorInputStyle,
+  plateColorPaletteStyle,
+  plateColorPickerStyle,
+  plateColorPopoverStyle,
+  plateColorSwatchStyle,
+} from './color-toolbar-button.style'
 
 export interface ColorToolbarButtonProps {
   /** Mark key for the color (e.g., 'color', 'backgroundColor') */
@@ -103,7 +113,8 @@ export function ColorToolbarButton({
           {children}
           {/* Color indicator bar */}
           <span
-            className="absolute bottom-0.5 left-1/2 h-0.5 w-3 -translate-x-1/2 rounded-full"
+            className="absolute bottom-0.5 left-1/2 h-0.5 w-3 -translate-x-1/2"
+            {...slotAttributes(plateColorIndicatorStyle, {})}
             style={{
               backgroundColor: currentColor || (isBackground ? 'transparent' : '#000000'),
               border: currentColor === 'transparent' || !currentColor ? '1px dashed currentColor' : 'none',
@@ -113,20 +124,21 @@ export function ColorToolbarButton({
       </PopoverTrigger>
       <PopoverContent
         align="start"
-        className="w-auto p-2"
+        className="w-auto"
+        {...partAttributes(plateColorPopoverStyle, {})}
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         {/* Color palette grid */}
-        <div className="grid grid-cols-8 gap-1">
+        <div className="grid grid-cols-8" {...slotAttributes(plateColorPaletteStyle, {})}>
           {colorPalette.map((color, index) => (
             <button
               key={`${color}-${index}`}
               type="button"
-              className={cn(
-                'h-5 w-5 rounded border border-border transition-transform hover:scale-110',
-                currentColor === color && 'ring-2 ring-primary ring-offset-1',
-                color === 'transparent' && 'bg-[linear-gradient(45deg,#ccc_25%,transparent_25%,transparent_75%,#ccc_75%,#ccc),linear-gradient(45deg,#ccc_25%,transparent_25%,transparent_75%,#ccc_75%,#ccc)] bg-[length:8px_8px] bg-[position:0_0,4px_4px]'
-              )}
+              className="h-5 w-5"
+              {...slotAttributes(plateColorSwatchStyle, {
+                selected: currentColor === color,
+                transparent: color === 'transparent',
+              })}
               style={{
                 backgroundColor: color === 'transparent' ? undefined : color,
               }}
@@ -137,12 +149,13 @@ export function ColorToolbarButton({
         </div>
 
         {/* Custom color input */}
-        <div className="mt-2 flex items-center gap-1 border-t border-border pt-2">
+        <div className="flex items-center" {...slotAttributes(plateColorCustomStyle, {})}>
           <input
             type="color"
             value={currentColor || '#000000'}
             onChange={handleColorInputChange}
-            className="h-6 w-6 cursor-pointer rounded border-0 p-0"
+            className="h-6 w-6 cursor-pointer"
+            {...slotAttributes(plateColorPickerStyle, {})}
             title={t('plateEditor.colorPicker.custom')}
           />
           <form onSubmit={handleCustomColorSubmit} className="flex-1">
@@ -151,7 +164,8 @@ export function ColorToolbarButton({
               value={customColor}
               onChange={(e) => setCustomColor(e.target.value)}
               placeholder="#000000"
-              className="h-6 px-1 text-[10px]"
+              className="h-6"
+              {...partAttributes(plateColorInputStyle, {})}
               maxLength={7}
             />
           </form>
@@ -161,7 +175,8 @@ export function ColorToolbarButton({
         {currentColor && currentColor !== 'transparent' && (
           <button
             type="button"
-            className="mt-2 w-full rounded border border-border px-2 py-1 text-[10px] text-muted-foreground hover:bg-accent"
+            className="w-full"
+            {...slotAttributes(plateColorClearStyle, {})}
             onClick={handleClear}
           >
             {t('plateEditor.colorPicker.clear')}

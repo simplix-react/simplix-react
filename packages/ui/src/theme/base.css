@@ -116,6 +116,10 @@
   --radius-overlay: calc(var(--radius) + 4px);
   --radius-badge: 999px;
 
+  /* ── the important card under the lead fill ── */
+  --lead: var(--primary);
+  --lead-foreground: var(--primary-foreground);
+
   /* ── spacing scale (custom names; independent of Tailwind --spacing) ── */
   --sp-1: 4px;
   --sp-2: 8px;

@@ -11,13 +11,13 @@ const SRC = fileURLToPath(new URL("..", import.meta.url));
  * Every control this package draws says where the keyboard is.
  *
  * <p>A style that writes `outline-none` takes away the one focus indicator the browser gives for
- * free, and nothing errors when it puts nothing back — the component renders, every test passes,
+ * free, and nothing errors when it puts nothing back: the component renders, every test passes,
  * and the only reader who loses anything is the one who cannot use a mouse. It went unnoticed on
  * the whole `Button` recipe, every variant and every size, until somebody pressed Tab inside a
  * drawer and could not tell what was selected.
  *
  * <p><b>The exemption is a comment, not a list here.</b> Three shapes take the outline away and are
- * right to — a container the library moves focus into, an inner field whose box shows focus for it,
+ * right to: a container the library moves focus into, an inner field whose box shows focus for it,
  * and an option row the cursor points at with a background. Each one says so beside the style,
  * naming `outline-none`, so the reason sits where the next person changing that line will read it.
  * A list in this file would go stale the moment a component moved.
@@ -30,8 +30,11 @@ const STRIPS_FOCUS = /(?:focus-visible:|focus:|focus-within:)?outline-none/;
 const SHOWS_FOCUS =
   /(?:focus|focus-visible|focus-within)[^\s"']*:(?:ring|border|bg-|text-|shadow|outline-(?!none))|data-\[(?:highlighted|selected=true|state=open)\][^\s"']*:(?:bg-|ring|border|text-)/;
 
-/** A comment that names what it is exempting, which is what makes it an argument. */
-const DECLARED = /\/\/[^\n]*outline-none/;
+/**
+ * A comment that names what it is exempting, which is what makes it an argument: a line comment,
+ * or a line of the doc comment above a slot declaration.
+ */
+const DECLARED = /(?:\/\/|^\s*\/?\*)[^\n]*outline-none/m;
 
 /**
  * How far above a class string the declaring comment may sit. A `cva(` recipe has room for the
@@ -54,7 +57,24 @@ function sources(dir: string, out: string[] = []): string[] {
 }
 
 /**
- * Each class string in a file, as the text from `cva(` or `className=` to its close.
+ * The doc comment directly above the declaration that starts at `at`, however long it is.
+ *
+ * <p>A slot declaration carries its argument in the doc comment above `export const`, which runs
+ * past {@link LINES_ABOVE} as often as not.
+ */
+function leadingDocComment(text: string, at: number): string {
+  const close = text.lastIndexOf("*/", at);
+  if (close < 0) return "";
+  const between = text.slice(close + 2, at);
+  if (!/^\s*(?:export\s+)?const\s+\w+\s*=\s*$/.test(between)) return "";
+  const open = text.lastIndexOf("/**", close);
+  return open < 0 ? "" : `${text.slice(open, close + 2)}\n`;
+}
+
+/**
+ * Each class string in a file, as the text from `cva(`, `defineSlotStyle(` or `className=` to its
+ * close. A `.style.ts` declaration is read as one region, so a variant that puts focus back
+ * answers the base that took the outline away.
  *
  * <p>Read by balancing brackets rather than by taking a line: a recipe runs to twenty lines and the
  * ring is as often on the fourth as on the first, so a line-at-a-time reader calls half of them
@@ -62,7 +82,7 @@ function sources(dir: string, out: string[] = []): string[] {
  */
 function classRegions(text: string): { region: string; line: number }[] {
   const out: { region: string; line: number }[] = [];
-  for (const opened of text.matchAll(/cva\(|className=\{|className="/g)) {
+  for (const opened of text.matchAll(/cva\(|defineSlotStyle\(|className=\{|className="/g)) {
     const at = opened.index ?? 0;
     let cursor = at + opened[0].length - 1;
     let end = cursor;
@@ -84,7 +104,7 @@ function classRegions(text: string): { region: string; line: number }[] {
     }
     const before = text.slice(0, at).split("\n");
     out.push({
-      region: before.slice(-LINES_ABOVE).join("\n") + text.slice(at, end),
+      region: leadingDocComment(text, at) + before.slice(-LINES_ABOVE).join("\n") + text.slice(at, end),
       line: before.length,
     });
   }

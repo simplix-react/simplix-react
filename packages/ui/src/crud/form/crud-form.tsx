@@ -7,7 +7,15 @@ import {
 import { Flex } from "../../primitives/flex";
 import { Grid } from "../../primitives/grid";
 import { Stack } from "../../primitives/stack";
+import { slotAttributes, partAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
+import {
+  crudFormActionsStyle,
+  crudFormBodyStyle,
+  crudFormContentStyle,
+  crudFormFooterStyle,
+  crudFormHeaderStyle,
+} from "./crud-form.style";
 import { useTranslation } from "@simplix-react/i18n/react";
 
 import { useFlatUIComponents } from "../../provider/ui-provider";
@@ -96,7 +104,7 @@ function FormRoot({
   const content = (
     <form onSubmit={handleSubmit} className={cn("flex flex-col w-full", !isPage && "flex-1 min-h-0", className)} data-testid="crud-form" data-submitting={isSubmitting || undefined}>
       {(onClose || header) && (
-        <Flex data-crud-slot="header" justify={header ? "between" : "end"} align="center" className={cn("shrink-0 border-b pb-2", !isPage && "px-3")}>
+        <Flex data-crud-slot="header" justify={header ? "between" : "end"} align="center" className="shrink-0" {...partAttributes(crudFormHeaderStyle, { page: isPage })}>
           {header}
           {onClose && (
             // Icon-only: without this the button has no accessible name at all, and a screen
@@ -111,13 +119,13 @@ function FormRoot({
           and the body scrollbar; header/body/footer share it so their edges
           stay aligned. Page variant: the document owns the scroll, so the body
           neither scrolls nor insets. */}
-      <div data-crud-slot="body" className={cn(!isPage && "flex-1 min-h-0 overflow-auto [scrollbar-gutter:stable] px-3")}>
-        <Stack gap="sm" className={cn("relative py-2", !(onClose || header) && "pt-2")}>
+      <div data-crud-slot="body" className={cn(!isPage && "flex-1 min-h-0 overflow-auto [scrollbar-gutter:stable]")} {...slotAttributes(crudFormBodyStyle, { page: isPage })}>
+        <Stack gap="sm" className="relative" {...partAttributes(crudFormContentStyle, {})}>
           {children}
         </Stack>
       </div>
       {footer && (
-        <div data-crud-slot="footer" className={cn("shrink-0", !isPage && "px-3")}>{footer}</div>
+        <div data-crud-slot="footer" className="shrink-0" {...slotAttributes(crudFormFooterStyle, { page: isPage })}>{footer}</div>
       )}
     </form>
   );
@@ -193,7 +201,8 @@ function FormActions({ spread, className, children }: CrudFormActionsProps) {
     <Flex
       gap="sm"
       justify={spread ? "start" : "end"}
-      className={cn("border-t pt-2", spread && "[&>*:first-child]:mr-auto", className)}
+      className={className}
+      {...partAttributes(crudFormActionsStyle, { spread: !!spread })}
     >
       {children}
     </Flex>

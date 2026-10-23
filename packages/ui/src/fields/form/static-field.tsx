@@ -1,7 +1,9 @@
 import type { ReactNode } from "react";
 
 import type { CommonFieldProps } from "../../crud/shared/types";
+import { slotAttributes } from "../../design/slot-style";
 import { FieldWrapper } from "../shared/field-wrapper";
+import { staticFieldValueStyle } from "./static-field.style";
 
 /** Props for the {@link StaticField} form component. */
 export interface StaticFieldProps extends CommonFieldProps {
@@ -42,7 +44,7 @@ export function StaticField({
       className={className}
       {...variantProps}
     >
-      {children ?? <span className="text-sm">{value ?? fallback}</span>}
+      {children ?? <span {...slotAttributes(staticFieldValueStyle, {})}>{value ?? fallback}</span>}
     </FieldWrapper>
   );
 }

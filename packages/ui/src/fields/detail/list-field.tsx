@@ -1,7 +1,9 @@
 import type { CommonDetailFieldProps } from "../../crud/shared/types";
 import { useFlatUIComponents } from "../../provider";
+import { slotAttributes } from "../../design/slot-style";
 import { detailFallback } from "../shared/detail-fallback";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
+import { detailListFieldBadgesStyle, detailListFieldBulletsStyle } from "./list-field.style";
 
 /** Display mode for the {@link DetailListField} component. */
 export type ListDisplayMode = "badges" | "comma" | "bullet";
@@ -61,7 +63,7 @@ export function DetailListField({
       className={className}
     >
       {mode === "badges" && (
-        <span className="flex flex-wrap gap-1">
+        <span className="flex flex-wrap" {...slotAttributes(detailListFieldBadgesStyle, {})}>
           {value.map((item) => (
             <Badge key={item} variant="secondary">
               {item}
@@ -71,7 +73,7 @@ export function DetailListField({
       )}
       {mode === "comma" && <span>{value.join(", ")}</span>}
       {mode === "bullet" && (
-        <ul className="list-inside list-disc space-y-0.5">
+        <ul className="list-inside list-disc" {...slotAttributes(detailListFieldBulletsStyle, {})}>
           {value.map((item) => (
             <li key={item}>{item}</li>
           ))}

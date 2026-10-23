@@ -3,6 +3,8 @@ import { ListIcon } from "lucide-react";
 import { useTranslation } from "@simplix-react/i18n/react";
 
 import { Badge } from "../../base/display/badge";
+import { partAttributes, slotAttributes } from "../../design/slot-style";
+import { listTotalBadgeIconStyle, listTotalBadgeStyle } from "./list-total-badge.style";
 
 export interface ListTotalBadgeProps {
   /**
@@ -39,8 +41,8 @@ export function ListTotalBadge({ count, children }: ListTotalBadgeProps) {
   const { t } = useTranslation("simplix/ui");
   const known = children !== undefined || count != null;
   return (
-    <Badge variant="outline" className="gap-1.5 font-normal" aria-busy={known ? undefined : true}>
-      <ListIcon className="size-3.5 text-muted-foreground" />
+    <Badge variant="outline" aria-busy={known ? undefined : true} {...partAttributes(listTotalBadgeStyle, {})}>
+      <ListIcon className="size-3.5" {...slotAttributes(listTotalBadgeIconStyle, {})} />
       {children ?? (count != null ? t("list.totalCount", { count }) : t("list.totalCountUnknown"))}
     </Badge>
   );

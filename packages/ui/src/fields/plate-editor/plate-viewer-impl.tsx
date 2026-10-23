@@ -2,7 +2,6 @@ import { useEffect, useMemo } from 'react'
 import { Plate, usePlateEditor } from 'platejs/react'
 import type { Value } from 'platejs'
 
-import { cn } from '../../utils/cn'
 import { parsePlateValue } from '../shared/plate-editor-helpers'
 import { EMPTY_EDITOR_VALUE } from './types'
 import { Editor } from './components/editor-container'
@@ -45,7 +44,7 @@ export function PlateViewerImpl({ value, variant = 'basic', className }: PlateVi
 
   return (
     <Plate editor={editor} readOnly>
-      <Editor readOnly className={cn('p-0', className)} />
+      <Editor readOnly padding="none" className={className} />
     </Plate>
   )
 }

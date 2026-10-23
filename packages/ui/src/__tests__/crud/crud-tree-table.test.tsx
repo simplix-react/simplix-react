@@ -14,6 +14,7 @@ vi.mock("@simplix-react/i18n/react", () => ({
 
 import React from "react";
 import { CrudTree } from "../../crud/tree/crud-tree";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 interface TreeNode {
   id: string;
@@ -175,7 +176,7 @@ describe("CrudTree.Table", () => {
       </CrudTree>,
     );
     const row = screen.getByTestId("tree-row-2");
-    expect(row.className).toContain("bg-muted/50");
+    expect(drawnClasses(row)).toContain("bg-muted/50");
   });
 
   it("renders sortable column header as button", () => {
@@ -318,7 +319,7 @@ describe("CrudTree.TableCard", () => {
         </CrudTree.TableCard>
       </CrudTree>,
     );
-    const card = container.querySelector(".rounded-lg.border.bg-card");
+    const card = container.querySelector("[data-slot='table-card-frame']");
     expect(card).toBeTruthy();
     // Table still renders inside the card.
     expect(screen.getByText("Category A")).toBeTruthy();
@@ -346,7 +347,7 @@ describe("CrudTree.TableCard", () => {
         </CrudTree.Table>
       </CrudTree>,
     );
-    expect(container.querySelector(".rounded-lg.border.bg-card")).toBeNull();
+    expect(container.querySelector("[data-slot='table-card-frame']")).toBeNull();
     // Standalone tables use the ancestor-driven sticky header by default:
     // no CSS-sticky cells, the container is marked for the scroll-synced mode.
     expect(container.querySelector("thead th.sticky")).toBeNull();

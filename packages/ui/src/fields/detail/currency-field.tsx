@@ -2,8 +2,10 @@ import { useMemo } from "react";
 
 import type { CommonDetailFieldProps } from "../../crud/shared/types";
 import { useCurrencyOptions } from "../../utils/use-currency-options";
+import { slotAttributes } from "../../design/slot-style";
 import { detailFallback } from "../shared/detail-fallback";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
+import { detailCurrencyFieldCodeStyle, detailCurrencyFieldValueStyle } from "./currency-field.style";
 
 /** Props for the {@link DetailCurrencyField} component. */
 export interface DetailCurrencyFieldProps extends CommonDetailFieldProps {
@@ -16,7 +18,7 @@ export interface DetailCurrencyFieldProps extends CommonDetailFieldProps {
 /**
  * Read-only currency display field: the ISO 4217 code beside its localized name.
  *
- * <p>The code stays visible rather than being replaced by the name — it is what the record
+ * <p>The code stays visible rather than being replaced by the name - it is what the record
  * stores and what an operator matches against an invoice.
  *
  * @example
@@ -49,12 +51,12 @@ export function DetailCurrencyField({
       className={className}
     >
       {option ? (
-        <span className="inline-flex items-center gap-1.5">
-          <span className="font-mono text-xs">{option.code}</span>
+        <span className="inline-flex items-center" {...slotAttributes(detailCurrencyFieldValueStyle, {})}>
+          <span {...slotAttributes(detailCurrencyFieldCodeStyle, {})}>{option.code}</span>
           <span>{option.localName}</span>
         </span>
       ) : value ? (
-        <span className="font-mono text-xs">{value}</span>
+        <span {...slotAttributes(detailCurrencyFieldCodeStyle, {})}>{value}</span>
       ) : (
         detailFallback(fallback)
       )}

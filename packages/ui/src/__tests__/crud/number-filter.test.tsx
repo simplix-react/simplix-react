@@ -24,6 +24,7 @@ vi.mock("../../crud/filters/filter-icons", () => ({
 
 import { NumberFilter } from "../../crud/filters/number-filter";
 import { SearchOperator } from "../../crud/filters/filter-types";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 describe("NumberFilter", () => {
   it("renders with label as aria-label", () => {
@@ -312,7 +313,7 @@ describe("NumberFilter", () => {
       />,
     );
     const input = container.querySelector("input");
-    expect(input?.className).toContain("pl-14");
+    expect(drawnClasses(input?.parentElement ?? null)).toContain("[&>input]:pl-14");
   });
 
   it("renders with smaller left padding when single operator", () => {
@@ -327,7 +328,7 @@ describe("NumberFilter", () => {
       />,
     );
     const input = container.querySelector("input");
-    expect(input?.className).toContain("pl-8");
+    expect(drawnClasses(input?.parentElement ?? null)).toContain("[&>input]:pl-8");
   });
 
   it("applies custom className", () => {

@@ -3,6 +3,7 @@ import { cleanup, fireEvent, render, screen, within } from "@testing-library/rea
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ComboboxField } from "../../fields/form/combobox-field";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -77,9 +78,10 @@ describe("ComboboxField (extended coverage)", () => {
     const { container } = render(
       <ComboboxField label="Fruit" value={null} onChange={vi.fn()} options={options} error="Required" />,
     );
-    // The trigger span should have error class
-    const triggerSpan = container.querySelector("[class*='border-destructive']");
-    expect(triggerSpan).not.toBeNull();
+    // The trigger is drawn with the error border
+    const trigger = container.querySelector("[data-slot='field-select-trigger'][data-invalid='true']");
+    expect(trigger).not.toBeNull();
+    expect(drawnClasses(trigger)).toContain("border-destructive");
   });
 
   it("renders description", () => {

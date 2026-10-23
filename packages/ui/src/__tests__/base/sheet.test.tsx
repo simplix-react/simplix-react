@@ -24,6 +24,7 @@ import {
   SheetDescription,
   SheetClose,
 } from "../../base/overlay/sheet";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -88,8 +89,8 @@ describe("SheetContent", () => {
       </Sheet>,
     );
     const content = screen.getByRole("dialog");
-    expect(content.className).toContain("inset-y-0");
-    expect(content.className).toContain("right-0");
+    expect(drawnClasses(content)).toContain("inset-y-0");
+    expect(drawnClasses(content)).toContain("right-0");
   });
 
   it("applies left side classes", () => {
@@ -102,7 +103,7 @@ describe("SheetContent", () => {
       </Sheet>,
     );
     const content = screen.getByRole("dialog");
-    expect(content.className).toContain("left-0");
+    expect(drawnClasses(content)).toContain("left-0");
   });
 
   it("applies top side classes", () => {
@@ -115,8 +116,8 @@ describe("SheetContent", () => {
       </Sheet>,
     );
     const content = screen.getByRole("dialog");
-    expect(content.className).toContain("top-0");
-    expect(content.className).toContain("border-b");
+    expect(drawnClasses(content)).toContain("top-0");
+    expect(drawnClasses(content)).toContain("border-b");
   });
 
   it("applies bottom side classes", () => {
@@ -129,8 +130,8 @@ describe("SheetContent", () => {
       </Sheet>,
     );
     const content = screen.getByRole("dialog");
-    expect(content.className).toContain("bottom-0");
-    expect(content.className).toContain("border-t");
+    expect(drawnClasses(content)).toContain("bottom-0");
+    expect(drawnClasses(content)).toContain("border-t");
   });
 
   it("forwards ref", () => {
@@ -154,7 +155,7 @@ describe("SheetContent", () => {
       </Sheet>,
     );
     const content = screen.getByRole("dialog");
-    expect(content.className).toContain("my-sheet");
+    expect(drawnClasses(content)).toContain("my-sheet");
   });
 });
 
@@ -184,8 +185,8 @@ describe("SheetHeader", () => {
     );
     const header = document.body.querySelector(".my-header");
     expect(header).not.toBeNull();
-    expect(header!.className).toContain("flex");
-    expect(header!.className).toContain("p-4");
+    expect(drawnClasses(header)).toContain("flex");
+    expect(drawnClasses(header)).toContain("p-4");
   });
 });
 
@@ -215,7 +216,7 @@ describe("SheetFooter", () => {
     );
     const footer = document.body.querySelector(".my-footer");
     expect(footer).not.toBeNull();
-    expect(footer!.className).toContain("mt-auto");
+    expect(drawnClasses(footer)).toContain("mt-auto");
   });
 });
 
@@ -252,8 +253,8 @@ describe("SheetTitle", () => {
       </Sheet>,
     );
     const title = screen.getByText("T");
-    expect(title.className).toContain("my-title");
-    expect(title.className).toContain("font-semibold");
+    expect(drawnClasses(title)).toContain("my-title");
+    expect(drawnClasses(title)).toContain("font-semibold");
   });
 });
 
@@ -293,8 +294,8 @@ describe("SheetDescription", () => {
       </Sheet>,
     );
     const desc = screen.getByText("D");
-    expect(desc.className).toContain("my-desc");
-    expect(desc.className).toContain("text-muted-foreground");
+    expect(drawnClasses(desc)).toContain("my-desc");
+    expect(drawnClasses(desc)).toContain("text-muted-foreground");
   });
 });
 

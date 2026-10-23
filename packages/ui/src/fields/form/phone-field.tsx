@@ -5,11 +5,18 @@ import { useTranslation } from "@simplix-react/i18n/react";
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { Flex } from "../../primitives/flex";
-import { cn } from "../../utils/cn";
+import { partAttributes, slotAttributes } from "../../design/slot-style";
+import {
+  fieldControlStyle,
+  fieldFlagStyle,
+} from "../shared/field-parts.style";
+import { phoneChevronStyle, phoneOptionCodeStyle, phoneTriggerStyle } from "./phone-field.style";
+
 import { useCountryOptions } from "../../utils/use-country-options";
 import type { CountryOption } from "../../utils/use-country-options";
 import { useLibphonenumber, type LibphonenumberModule } from "../../utils/use-libphonenumber";
 import { FieldWrapper } from "../shared/field-wrapper";
+
 
 /** Props for the {@link PhoneField} form component. */
 export interface PhoneFieldProps extends CommonFieldProps {
@@ -169,29 +176,28 @@ export function PhoneField({
               <button
                 type="button"
                 disabled={disabled}
-                className={cn(
-                  "flex h-8 shrink-0 items-center gap-1.5 rounded-md border border-input bg-background px-2.5 text-sm",
-                  "hover:bg-accent/50 focus:outline-none focus:ring-1 focus:ring-ring",
-                  disabled && "cursor-not-allowed opacity-50",
-                  error && "border-destructive",
-                  !selected && "text-muted-foreground",
-                )}
+                className="flex h-8 shrink-0 items-center"
+                {...slotAttributes(phoneTriggerStyle, {
+                  disabled: !!disabled,
+                  invalid: !!error,
+                  empty: !selected,
+                })}
                 aria-label={t("field.selectCountry")}
               >
                 {selected ? (
                   <>
-                    <selected.Flag className="h-3 w-4.5 shrink-0 rounded-[1px]" />
+                    <selected.Flag className="h-3 w-4.5 shrink-0" {...slotAttributes(fieldFlagStyle, {})} />
                     <span className="tabular-nums">+{selected.callingCode}</span>
                   </>
                 ) : (
                   <span>+?</span>
                 )}
-                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 opacity-50">
+                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" {...slotAttributes(phoneChevronStyle, {})}>
                   <path d="M4.93179 5.43179C4.75605 5.60753 4.75605 5.89245 4.93179 6.06819C5.10753 6.24392 5.39245 6.24392 5.56819 6.06819L7.49999 4.13638L9.43179 6.06819C9.60753 6.24392 9.89245 6.24392 10.0682 6.06819C10.2439 5.89245 10.2439 5.60753 10.0682 5.43179L7.81819 3.18179C7.64245 3.00605 7.35753 3.00605 7.18179 3.18179L4.93179 5.43179ZM10.0682 9.56819C10.2439 9.39245 10.2439 9.10753 10.0682 8.93179C9.89245 8.75606 9.60753 8.75606 9.43179 8.93179L7.49999 10.8636L5.56819 8.93179C5.39245 8.75606 5.10753 8.75606 4.93179 8.93179C4.75605 9.10753 4.75605 9.39245 4.93179 9.56819L7.18179 11.8182C7.35753 11.9939 7.64245 11.9939 7.81819 11.8182L10.0682 9.56819Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd" />
                 </svg>
               </button>
             </PopoverTrigger>
-            <PopoverContent className="w-72 p-0" align="start">
+            <PopoverContent flush className="w-72" align="start">
               <Command filter={filterFn}>
                 <CommandInput placeholder={t("field.searchCountry")} className="h-8" />
                 <CommandList className="max-h-[200px]">
@@ -203,9 +209,9 @@ export function PhoneField({
                         value={option.code}
                         onSelect={() => handleCountrySelect(option.code)}
                       >
-                        <option.Flag className="mr-2 h-3 w-4.5 shrink-0 rounded-[1px]" />
+                        <option.Flag className="h-3 w-4.5 shrink-0" {...slotAttributes(fieldFlagStyle, { spaced: true })} />
                         <span className="truncate">{option.localName}</span>
-                        <span className="ml-auto pl-2 text-muted-foreground tabular-nums">+{option.callingCode}</span>
+                        <span className="tabular-nums" {...slotAttributes(phoneOptionCodeStyle, {})}>+{option.callingCode}</span>
                       </CommandItem>
                     ))}
                   </CommandGroup>
@@ -220,7 +226,8 @@ export function PhoneField({
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleNationalChange(e.target.value)}
             placeholder={placeholder}
             disabled={disabled}
-            className={cn("h-8 min-w-0 flex-1", error && "border-destructive")}
+            className="h-8 min-w-0 flex-1"
+            {...partAttributes(fieldControlStyle, { invalid: !!error })}
           />
         </Flex>
       )}

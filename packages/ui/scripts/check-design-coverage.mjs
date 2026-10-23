@@ -9,13 +9,15 @@ const dir = "src/theme/designs";
 const args = process.argv.slice(2);
 const [classicFile, ...others] = args.length
   ? args
-  : [join(dir, "classic.css"), ...readdirSync(dir).filter((f) => f.endsWith(".css") && f !== "classic.css").map((f) => join(dir, f))];
+  : [join(dir, "classic.css"), ...readdirSync(dir).filter((f) => f.endsWith(".css") && f !== "classic.css" && !f.endsWith("-tokens.css")).map((f) => join(dir, f))];
 
 const keysOf = (file) => {
   const keys = new Set();
-  for (const m of readFileSync(file, "utf8").matchAll(/\[data-slot="([^"]+)"\]((?:\[data-[a-z-]+="[^"]*"\])*)/g)) {
-    const axes = [...m[2].matchAll(/\[data-([a-z-]+)="([^"]*)"\]/g)].map((a) => `${a[1]}=${a[2]}`);
-    keys.add(axes.length ? `${m[1]} ${axes.join(" ")}` : m[1]);
+  for (const m of readFileSync(file, "utf8").matchAll(/\[data-(slot|part)="([^"]+)"\]((?:\[data-[a-z-]+="[^"]*"\])*)/g)) {
+    const axes = [...m[3].matchAll(/\[data-(?:part-)?([a-z-]+)="([^"]*)"\]/g)].map((a) => `${a[1]}=${a[2]}`);
+    m[1] = m[1] === "part" ? "part:" : "";
+    m[2] = m[1] + m[2];
+    keys.add(axes.length ? `${m[2]} ${axes.join(" ")}` : m[2]);
   }
   return keys;
 };

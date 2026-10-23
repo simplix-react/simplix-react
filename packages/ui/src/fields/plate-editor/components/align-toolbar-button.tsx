@@ -17,7 +17,9 @@ import {
   DropdownMenuTrigger,
 } from '../../../base/navigation/dropdown-menu'
 import { useTranslation } from '@simplix-react/i18n/react'
+import { partAttributes } from '../../../design/slot-style'
 import { ToolbarButton } from './toolbar'
+import { plateAlignItemStyle, plateAlignTriggerStyle } from './align-toolbar-button.style'
 
 type AlignValue = 'left' | 'center' | 'right' | 'justify'
 
@@ -67,7 +69,7 @@ export function AlignToolbarButton({ tooltip }: AlignToolbarButtonProps) {
   return (
     <DropdownMenu open={open} onOpenChange={setOpen} modal={false}>
       <DropdownMenuTrigger asChild>
-        <ToolbarButton tooltip={tooltip} className="gap-0.5 px-1">
+        <ToolbarButton tooltip={tooltip} {...partAttributes(plateAlignTriggerStyle, {})}>
           {alignIcons[currentValue]}
           <ChevronDown className="h-3 w-3" />
         </ToolbarButton>
@@ -83,7 +85,7 @@ export function AlignToolbarButton({ tooltip }: AlignToolbarButtonProps) {
         {alignValues.map((value) => (
           <DropdownMenuItem
             key={value}
-            className="gap-2 text-xs"
+            {...partAttributes(plateAlignItemStyle, {})}
             onSelect={() => handleSelect(value)}
           >
             {alignIcons[value]}

@@ -3,7 +3,12 @@ import { Check, Minus } from "lucide-react";
 import { useTranslation } from "@simplix-react/i18n/react";
 
 import { useFlatUIComponents } from "../../provider/ui-provider";
-import { cn } from "../../utils/cn";
+import { partAttributes, slotAttributes } from "../../design/slot-style";
+import {
+  crudModalSidebarBlockStyle,
+  crudModalSidebarRowStyle,
+  crudModalSidebarTitleStyle,
+} from "./modal-sidebar.style";
 
 /* ============================ ModalSidebar =============================
  *
@@ -31,13 +36,8 @@ export interface ModalSidebarBlockProps {
 function ModalSidebarBlock({ title, children }: ModalSidebarBlockProps) {
   const { Text } = useFlatUIComponents();
   return (
-    <div>
-      <Text
-        as="div"
-        size="caption"
-        tone="muted"
-        className="mb-2.5 font-bold uppercase tracking-[0.08em]"
-      >
+    <div {...slotAttributes(crudModalSidebarBlockStyle, {})}>
+      <Text as="div" size="caption" tone="muted" {...partAttributes(crudModalSidebarTitleStyle, {})}>
         {title}
       </Text>
       <div>{children}</div>
@@ -63,7 +63,10 @@ function ModalSidebarRow({ label, value, bool, on, onLabel, offLabel, children }
   const { Badge, Text } = useFlatUIComponents();
   const isEmpty = value == null || value === "−" || value === "";
   return (
-    <div className="grid grid-cols-[1fr_120px] items-center gap-2 border-b border-dashed py-2 first:pt-0 last:border-0 last:pb-0">
+    <div
+      className="grid grid-cols-[1fr_120px] items-center"
+      {...slotAttributes(crudModalSidebarRowStyle, {})}
+    >
       <Text as="span" size="caption" tone="muted">
         {label}
       </Text>
@@ -72,7 +75,7 @@ function ModalSidebarRow({ label, value, bool, on, onLabel, offLabel, children }
       ) : bool ? (
         <Badge
           variant={on ? "default" : "secondary"}
-          className="justify-self-end gap-1 px-1.5"
+          className="justify-self-end"
           aria-label={on ? (onLabel ?? t("common.on")) : (offLabel ?? t("common.off"))}
         >
           {on ? <Check className="size-3" /> : <Minus className="size-3" />}
@@ -81,7 +84,9 @@ function ModalSidebarRow({ label, value, bool, on, onLabel, offLabel, children }
         <Text
           as="span"
           size="caption"
-          className={cn("justify-self-end text-right", isEmpty && "text-muted-foreground")}
+          align="end"
+          tone={isEmpty ? "muted" : "default"}
+          className="justify-self-end"
         >
           {value}
         </Text>

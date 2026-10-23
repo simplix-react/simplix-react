@@ -1,5 +1,14 @@
 import type { ReactNode } from "react";
 import { cn } from "../../utils/cn";
+import { slotAttributes } from "../../design/slot-style";
+import {
+  emptyStateActionStyle,
+  emptyStateDescriptionStyle,
+  emptyStateFooterStyle,
+  emptyStateIconStyle,
+  emptyStateStyle,
+  emptyStateTitleStyle,
+} from "./empty-state.style";
 
 export interface EmptyStateProps {
   icon?: ReactNode;
@@ -22,6 +31,11 @@ export interface EmptyStateProps {
    */
   iconClassName?: string;
   /**
+   * Attributes for the icon's badge beside {@link iconClassName}, such as the `data-part` marks a
+   * caller's design declaration draws the tint with (`partAttributes`).
+   */
+  iconAttributes?: Readonly<Record<string, string>>;
+  /**
    * A quiet line under the actions — a status number, a correlation id, whatever support reads and
    * the operator does not act on.
    */
@@ -36,17 +50,15 @@ export function EmptyState({
   action,
   size = "default",
   iconClassName,
+  iconAttributes,
   footer,
   className,
 }: EmptyStateProps) {
   const compact = size === "sm";
   return (
     <div
-      className={cn(
-        "flex flex-col items-center justify-center rounded-lg border px-6 text-center",
-        compact ? "py-5" : "py-16",
-        className,
-      )}
+      className={cn("flex flex-col items-center justify-center", className)}
+      {...slotAttributes(emptyStateStyle, { size })}
     >
       {icon && (
         <div
@@ -54,21 +66,23 @@ export function EmptyState({
             // `inline-flex` with the glyph centred, so the badge is a circle whatever is put in
             // it. As a plain block with padding it took the icon's own line box, and an icon of a
             // different aspect drew an oval.
-            "inline-flex items-center justify-center rounded-full bg-muted text-muted-foreground",
-            compact ? "mb-2 size-9 [&_svg]:size-5" : "mb-3 size-16 [&_svg]:size-8",
+            "inline-flex items-center justify-center",
+            compact ? "size-9 [&_svg]:size-5" : "size-16 [&_svg]:size-8",
             iconClassName,
           )}
+          {...iconAttributes}
+          {...slotAttributes(emptyStateIconStyle, { size })}
         >
           {icon}
         </div>
       )}
-      <p className={cn("font-semibold", compact ? "text-sm" : "text-base")}>{title}</p>
+      <p {...slotAttributes(emptyStateTitleStyle, { size })}>{title}</p>
       {description && (
-        <p className={cn("mt-1 w-full text-muted-foreground", compact ? "text-xs" : "text-sm")}>{description}</p>
+        <p className="w-full" {...slotAttributes(emptyStateDescriptionStyle, { size })}>{description}</p>
       )}
-      {action && <div className={compact ? "mt-2" : "mt-4"}>{action}</div>}
+      {action && <div {...slotAttributes(emptyStateActionStyle, { size })}>{action}</div>}
       {footer && (
-        <p className={cn("text-muted-foreground", compact ? "mt-2 text-xs" : "mt-4 text-xs")}>
+        <p {...slotAttributes(emptyStateFooterStyle, { size })}>
           {footer}
         </p>
       )}

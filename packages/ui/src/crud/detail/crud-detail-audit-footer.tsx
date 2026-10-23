@@ -5,6 +5,17 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { formatDateTime } from "../../utils/format-date";
 import { parseDate } from "../../utils/parse-date";
 import { useDefaultDisplayZone } from "../shared/display-zone-context";
+import { slotAttributes } from "../../design/slot-style";
+import {
+  crudDetailAuditCopiedStyle,
+  crudDetailAuditDateStyle,
+  crudDetailAuditDatesStyle,
+  crudDetailAuditFooterStyle,
+  crudDetailAuditIdStyle,
+  crudDetailAuditTooltipHintStyle,
+  crudDetailAuditTooltipIdStyle,
+  crudDetailAuditTooltipStyle,
+} from "./crud-detail-audit-footer.style";
 import { CalendarIcon, CheckIcon, IdCardIcon, PencilIcon } from "../shared/icons";
 
 // ── AuditFooter ──
@@ -86,7 +97,7 @@ export function DetailAuditFooter({ auditData, displayZone }: CrudDetailAuditFoo
   if (!hasId && !hasCreated && !hasUpdated) return null;
 
   return (
-    <div className="flex items-center gap-3 rounded-md bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
+    <div className="flex items-center" {...slotAttributes(crudDetailAuditFooterStyle, {})}>
       {/* Left: ID */}
       {hasId ? (
         <TooltipPrimitive.Provider delayDuration={0}>
@@ -95,11 +106,12 @@ export function DetailAuditFooter({ auditData, displayZone }: CrudDetailAuditFoo
               <button
                 type="button"
                 onClick={handleCopyId}
-                className="flex items-center gap-1.5 font-mono text-left hover:text-foreground transition-colors"
+                className="flex items-center"
+                {...slotAttributes(crudDetailAuditIdStyle, {})}
               >
                 <IdCardIcon className="h-3.5 w-3.5 shrink-0" />
                 <span className="truncate">{shown}</span>
-                {copied && <CheckIcon className="h-3 w-3 shrink-0 text-green-600" />}
+                {copied && <CheckIcon className="h-3 w-3 shrink-0" {...slotAttributes(crudDetailAuditCopiedStyle, {})} />}
               </button>
             </TooltipPrimitive.Trigger>
             <TooltipPrimitive.Portal>
@@ -107,10 +119,13 @@ export function DetailAuditFooter({ auditData, displayZone }: CrudDetailAuditFoo
                 side="top"
                 align="start"
                 sideOffset={4}
-                className="z-50 rounded-md border bg-popover px-3 py-1.5 text-popover-foreground shadow-sm animate-in fade-in-0 zoom-in-95"
+                // Entry motion is tw-animate-css, which a design stylesheet cannot @apply; it stays
+                // on the element, the same in every design.
+                className="z-50 animate-in fade-in-0 zoom-in-95"
+                {...slotAttributes(crudDetailAuditTooltipStyle, {})}
               >
-                <p className="font-mono text-[11px]">{auditData!.id}</p>
-                <p className="text-muted-foreground text-[11px]">
+                <p {...slotAttributes(crudDetailAuditTooltipIdStyle, {})}>{auditData!.id}</p>
+                <p {...slotAttributes(crudDetailAuditTooltipHintStyle, {})}>
                   {copied ? t("audit.copied") : t("audit.clickToCopy")}
                 </p>
               </TooltipPrimitive.Content>
@@ -123,20 +138,20 @@ export function DetailAuditFooter({ auditData, displayZone }: CrudDetailAuditFoo
 
       {/* Right: Dates (single row, right-aligned) */}
       {(hasCreated || hasUpdated) && (
-        <div className="ml-auto flex items-center gap-3">
+        <div className="flex items-center" {...slotAttributes(crudDetailAuditDatesStyle, {})}>
           {/* **Each date says which one it is.** The icons are decorative and hidden from the
               tree, so without a label a sighted reader tells the creation from the change by a
               3.5-unit glyph and a screen reader is read two bare dates in a row with nothing
               separating them. `audit.created` and `audit.modified` were already in every locale
               and nothing drew them. */}
           {hasCreated && (
-            <span className="flex items-center gap-1" title={t("audit.created")} aria-label={`${t("audit.created")}: ${formatAuditDate(auditData!.createdAt!, zone, locale) ?? auditData!.createdAt}`}>
+            <span className="flex items-center" {...slotAttributes(crudDetailAuditDateStyle, {})} title={t("audit.created")} aria-label={`${t("audit.created")}: ${formatAuditDate(auditData!.createdAt!, zone, locale) ?? auditData!.createdAt}`}>
               <CalendarIcon className="h-3.5 w-3.5 shrink-0" />
               {formatAuditDate(auditData!.createdAt!, zone, locale) ?? auditData!.createdAt}
             </span>
           )}
           {hasUpdated && (
-            <span className="flex items-center gap-1" title={t("audit.modified")} aria-label={`${t("audit.modified")}: ${formatAuditDate(auditData!.updatedAt!, zone, locale) ?? auditData!.updatedAt}`}>
+            <span className="flex items-center" {...slotAttributes(crudDetailAuditDateStyle, {})} title={t("audit.modified")} aria-label={`${t("audit.modified")}: ${formatAuditDate(auditData!.updatedAt!, zone, locale) ?? auditData!.updatedAt}`}>
               <PencilIcon className="h-3.5 w-3.5 shrink-0" />
               {formatAuditDate(auditData!.updatedAt!, zone, locale) ?? auditData!.updatedAt}
             </span>

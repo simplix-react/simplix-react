@@ -15,9 +15,18 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
 import type { GeoPoint } from "../../utils/geo";
 import { fitMapToBounds } from "../../utils/geo";
+import {
+  mapControlButtonStyle,
+  mapControlSeparatorStyle,
+  mapControlsGroupStyle,
+  mapControlsStyle,
+  mapMarkerDotStyle,
+  mapPinShapeStyle,
+} from "./map.style";
 import { useMapDefaults } from "./map-provider";
 
 // ── PMTiles protocol ──
@@ -183,6 +192,11 @@ export type MapStyleOption = string | MapLibreGL.StyleSpecification;
 type MapProps = {
   children?: ReactNode;
   className?: string;
+  /**
+   * Attributes for the map's container element, for a caller that marks it as a part of its own
+   * (`partAttributes`). The other props configure the map rather than the element.
+   */
+  partProps?: Record<string, string>;
   theme?: Theme;
   styles?: { light?: MapStyleOption; dark?: MapStyleOption };
   projection?: ProjectionSpecification;
@@ -194,7 +208,7 @@ type MapProps = {
 type MapRef = MapLibreGL.Map;
 
 const Map = forwardRef<MapRef, MapProps>(function Map(
-  { children, className, theme: themeProp, styles, projection, center, onError, fallbackTileUrl: fallbackTileUrlProp, ...props },
+  { children, className, partProps, theme: themeProp, styles, projection, center, onError, fallbackTileUrl: fallbackTileUrlProp, ...props },
   ref,
 ) {
   const mapDefaults = useMapDefaults();
@@ -366,7 +380,7 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
 
   return (
     <MapContext.Provider value={contextValue}>
-      <div ref={containerRef} className={cn("relative h-full w-full", className)}>
+      <div ref={containerRef} className={cn("relative h-full w-full", className)} {...partProps}>
         {mapInstance && children}
       </div>
     </MapContext.Provider>
@@ -411,11 +425,9 @@ function MapControlButton({ onClick, label, children, className: cls }: { onClic
     <button
       type="button"
       aria-label={label}
-      className={cn(
-        "flex h-8 w-8 items-center justify-center text-foreground/80 hover:bg-accent hover:text-foreground transition-colors",
-        cls,
-      )}
+      className={cn("flex h-8 w-8 items-center justify-center", cls)}
       onClick={onClick}
+      {...slotAttributes(mapControlButtonStyle, {})}
     >
       {children}
     </button>
@@ -474,7 +486,7 @@ function MapControls({
       <MapControlButton key="zoom-in" label="Zoom in" onClick={() => map?.zoomIn()}>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
       </MapControlButton>,
-      <div key="zoom-sep" className="h-px w-full bg-border" />,
+      <div key="zoom-sep" className="h-px w-full" {...slotAttributes(mapControlSeparatorStyle, {})} />,
       <MapControlButton key="zoom-out" label="Zoom out" onClick={() => map?.zoomOut()}>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /></svg>
       </MapControlButton>,
@@ -482,7 +494,7 @@ function MapControls({
   }
 
   if (showCompass) {
-    if (controls.length > 0) controls.push(<div key="compass-sep" className="h-px w-full bg-border" />);
+    if (controls.length > 0) controls.push(<div key="compass-sep" className="h-px w-full" {...slotAttributes(mapControlSeparatorStyle, {})} />);
     controls.push(
       <MapControlButton key="compass" label="Compass" onClick={() => {
         if (onCompass) {
@@ -505,7 +517,7 @@ function MapControls({
   }
 
   if (showLocate) {
-    if (controls.length > 0) controls.push(<div key="locate-sep" className="h-px w-full bg-border" />);
+    if (controls.length > 0) controls.push(<div key="locate-sep" className="h-px w-full" {...slotAttributes(mapControlSeparatorStyle, {})} />);
     controls.push(
       <MapControlButton key="locate" label="Locate" onClick={handleLocate}>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="2" x2="5" y1="12" y2="12" /><line x1="19" x2="22" y1="12" y2="12" /><line x1="12" x2="12" y1="2" y2="5" /><line x1="12" x2="12" y1="19" y2="22" /><circle cx="12" cy="12" r="7" /><circle cx="12" cy="12" r="3" /></svg>
@@ -514,7 +526,7 @@ function MapControls({
   }
 
   if (showFullscreen) {
-    if (controls.length > 0) controls.push(<div key="fs-sep" className="h-px w-full bg-border" />);
+    if (controls.length > 0) controls.push(<div key="fs-sep" className="h-px w-full" {...slotAttributes(mapControlSeparatorStyle, {})} />);
     controls.push(
       <MapControlButton
         key="fullscreen"
@@ -534,9 +546,13 @@ function MapControls({
 
   return (
     <div
-      className={cn("pointer-events-none absolute z-10 p-3", POSITION_CLASSES[position])}
+      className={cn("pointer-events-none absolute z-10", POSITION_CLASSES[position])}
+      {...slotAttributes(mapControlsStyle, {})}
     >
-      <div className={cn("pointer-events-auto flex flex-col rounded-md border bg-background shadow-md overflow-hidden", className)}>
+      <div
+        className={cn("pointer-events-auto flex flex-col overflow-hidden", className)}
+        {...slotAttributes(mapControlsGroupStyle, {})}
+      >
         {controls}
       </div>
     </div>
@@ -614,7 +630,7 @@ function MapMarker({
 
 function DefaultMarkerIcon() {
   return (
-    <div className="relative h-4 w-4 rounded-full border-2 border-white bg-blue-500 shadow-lg" />
+    <div className="relative h-4 w-4" {...slotAttributes(mapMarkerDotStyle, {})} />
   );
 }
 
@@ -643,7 +659,7 @@ function MapPinContainer({ children, className }: MapPinContainerProps) {
       >
         <path
           d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"
-          className="fill-white dark:fill-neutral-800"
+          {...slotAttributes(mapPinShapeStyle, {})}
         />
       </svg>
       <div className="absolute left-1/2 top-[41%] -translate-x-1/2 -translate-y-1/2">

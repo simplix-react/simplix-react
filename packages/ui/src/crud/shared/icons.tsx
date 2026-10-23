@@ -1,6 +1,9 @@
 /** Shared inline SVG icons for crud components (no lucide-react dependency). */
 
-import { cn } from "../../utils/cn";
+import type { SVGProps } from "react";
+
+import { slotAttributes } from "../../design/slot-style";
+import { spinnerIconStyle } from "./icons.style";
 
 export function EyeIcon({ className }: { className?: string }) {
   return (
@@ -51,9 +54,9 @@ export function TrashIcon({ className }: { className?: string }) {
   );
 }
 
-export function MagnifyingGlassIcon({ className }: { className?: string }) {
+export function MagnifyingGlassIcon({ className, ...rest }: SVGProps<SVGSVGElement>) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true" {...rest}>
       <circle cx="11" cy="11" r="8" />
       <path d="m21 21-4.3-4.3" />
     </svg>
@@ -69,9 +72,9 @@ export function XIcon({ className }: { className?: string }) {
   );
 }
 
-export function CaretDownIcon({ className }: { className?: string }) {
+export function CaretDownIcon({ className, ...rest }: SVGProps<SVGSVGElement>) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true" {...rest}>
       <path d="m6 9 6 6 6-6" />
     </svg>
   );
@@ -135,7 +138,7 @@ export function CheckIcon({ className }: { className?: string }) {
 /** Spinning ring for in-flight work. Carries its own animation class. */
 export function SpinnerIcon({ className }: { className?: string }) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cn("animate-spin", className)} aria-hidden="true">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true" {...slotAttributes(spinnerIconStyle, {})}>
       <path d="M21 12a9 9 0 1 1-6.219-8.56" />
     </svg>
   );

@@ -1,7 +1,11 @@
 import { lazy, Suspense } from "react";
 import { Plus } from "lucide-react";
 
-import { cn } from "../../utils/cn";
+import { slotAttributes } from "../../design/slot-style";
+import {
+  inlineIconPickerGlyphStyle,
+  inlineIconPickerPlaceholderStyle,
+} from "./inline-icon-picker-trigger.style";
 
 /**
  * Compact IconPicker rendered inline beside an input. Shows a `+` placeholder when
@@ -35,12 +39,10 @@ function TriggerPlaceholder({ disabled, ariaLabel }: { disabled?: boolean; ariaL
       type="button"
       disabled={disabled}
       aria-label={ariaLabel}
-      className={cn(
-        "flex h-9 w-9 shrink-0 items-center justify-center rounded-md border-2 border-dashed bg-background",
-        "disabled:cursor-not-allowed disabled:opacity-50",
-      )}
+      className="flex h-9 w-9 shrink-0 items-center justify-center"
+      {...slotAttributes(inlineIconPickerPlaceholderStyle, {})}
     >
-      <Plus className="size-4 text-muted-foreground" />
+      <Plus className="size-4" {...slotAttributes(inlineIconPickerGlyphStyle, {})} />
     </button>
   );
 }

@@ -75,6 +75,11 @@ export const badgeStyle = defineSlotStyle({
         rose:
           "border-transparent bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-100",
       },
+      /** Compact icon pill: the boolean badge trims the horizontal padding of its size. */
+      icon: { true: "px-1.5", false: "" },
+      /** Marks a missing value: dashed outline, regular weight, muted text. */
+      empty: { true: "border-dashed font-normal text-muted-foreground", false: "" },
+
     },
-    defaultVariants: { variant: "default", rounded: "xl", size: "default", interactive: false }
+    defaultVariants: { variant: "default", rounded: "xl", size: "default", interactive: false, icon: false, empty: false }
 });

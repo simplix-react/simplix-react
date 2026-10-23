@@ -13,6 +13,7 @@ import {
   TableCell,
   TableCaption,
 } from "../../base/display/table";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -41,8 +42,8 @@ describe("Table", () => {
       </Table>,
     );
     const table = container.querySelector("table");
-    expect(table!.className).toContain("w-full");
-    expect(table!.className).toContain("caption-bottom");
+    expect(drawnClasses(table)).toContain("w-full");
+    expect(drawnClasses(table)).toContain("caption-bottom");
   });
 
   it("applies striped variant to rows", () => {
@@ -56,7 +57,7 @@ describe("Table", () => {
       </Table>,
     );
     const row = container.querySelector("tr");
-    expect(row!.className).toContain("even:bg-muted/50");
+    expect(drawnClasses(row)).toContain("even:bg-muted/50");
   });
 
   it("applies bordered variant", () => {
@@ -70,9 +71,9 @@ describe("Table", () => {
       </Table>,
     );
     const tableContainer = container.querySelector("[data-slot='table-container']");
-    expect(tableContainer!.className).toContain("border");
+    expect(drawnClasses(tableContainer)).toContain("border");
     const table = container.querySelector("table");
-    expect(table!.className).toContain("border-separate");
+    expect(drawnClasses(table)).toContain("border-separate");
   });
 
   it("applies size='sm' classes to head and cell", () => {
@@ -91,11 +92,11 @@ describe("Table", () => {
       </Table>,
     );
     const th = container.querySelector("th");
-    expect(th!.className).toContain("px-2");
-    expect(th!.className).toContain("h-8");
+    expect(drawnClasses(th)).toContain("px-2");
+    expect(drawnClasses(th)).toContain("h-8");
     const td = container.querySelector("td");
-    expect(td!.className).toContain("px-2");
-    expect(td!.className).toContain("py-1.5");
+    expect(drawnClasses(td)).toContain("px-2");
+    expect(drawnClasses(td)).toContain("py-1.5");
   });
 
   it("applies size='lg' classes", () => {
@@ -114,11 +115,11 @@ describe("Table", () => {
       </Table>,
     );
     const th = container.querySelector("th");
-    expect(th!.className).toContain("px-4");
-    expect(th!.className).toContain("h-12");
+    expect(drawnClasses(th)).toContain("px-4");
+    expect(drawnClasses(th)).toContain("h-12");
     const td = container.querySelector("td");
-    expect(td!.className).toContain("px-4");
-    expect(td!.className).toContain("py-4");
+    expect(drawnClasses(td)).toContain("px-4");
+    expect(drawnClasses(td)).toContain("py-4");
   });
 
   it("applies density='compact' classes", () => {
@@ -137,9 +138,9 @@ describe("Table", () => {
       </Table>,
     );
     const th = container.querySelector("th");
-    expect(th!.className).toContain("h-8");
+    expect(drawnClasses(th)).toContain("h-8");
     const td = container.querySelector("td");
-    expect(td!.className).toContain("py-1");
+    expect(drawnClasses(td)).toContain("py-1");
   });
 
   it("applies density='comfortable' classes", () => {
@@ -158,9 +159,9 @@ describe("Table", () => {
       </Table>,
     );
     const th = container.querySelector("th");
-    expect(th!.className).toContain("h-11");
+    expect(drawnClasses(th)).toContain("h-11");
     const td = container.querySelector("td");
-    expect(td!.className).toContain("py-3");
+    expect(drawnClasses(td)).toContain("py-3");
   });
 
   it("applies rounded variant to container", () => {
@@ -174,7 +175,7 @@ describe("Table", () => {
       </Table>,
     );
     const tableContainer = container.querySelector("[data-slot='table-container']");
-    expect(tableContainer!.className).toContain("rounded-lg");
+    expect(drawnClasses(tableContainer)).toContain("rounded-lg");
   });
 
   it("forwards ref to table element", () => {
@@ -202,7 +203,7 @@ describe("Table", () => {
       </Table>,
     );
     const table = container.querySelector("table");
-    expect(table!.className).toContain("my-table");
+    expect(drawnClasses(table)).toContain("my-table");
   });
 });
 
@@ -218,8 +219,8 @@ describe("TableHeader", () => {
       </Table>,
     );
     const thead = container.querySelector("thead");
-    expect(thead!.className).toContain("border-t");
-    expect(thead!.className).toContain("bg-muted/40");
+    expect(drawnClasses(thead)).toContain("border-t");
+    expect(drawnClasses(thead)).toContain("bg-muted/40");
   });
 
   it("forwards ref", () => {
@@ -279,8 +280,8 @@ describe("TableFooter", () => {
       </Table>,
     );
     const tfoot = container.querySelector("tfoot");
-    expect(tfoot!.className).toContain("border-t");
-    expect(tfoot!.className).toContain("bg-muted/50");
+    expect(drawnClasses(tfoot)).toContain("border-t");
+    expect(drawnClasses(tfoot)).toContain("bg-muted/50");
   });
 
   it("forwards ref", () => {
@@ -310,7 +311,7 @@ describe("TableRow", () => {
       </Table>,
     );
     const tr = container.querySelector("tr");
-    expect(tr!.className).toContain("hover:bg-muted/40");
+    expect(drawnClasses(tr)).toContain("hover:bg-muted/40");
   });
 
   it("forwards ref", () => {
@@ -338,7 +339,7 @@ describe("TableCaption", () => {
     const caption = container.querySelector("caption");
     expect(caption).not.toBeNull();
     expect(caption!.textContent).toBe("Caption text");
-    expect(caption!.className).toContain("text-muted-foreground");
+    expect(drawnClasses(caption)).toContain("text-muted-foreground");
   });
 
   it("forwards ref", () => {
@@ -358,6 +359,6 @@ describe("TableCaption", () => {
       </Table>,
     );
     const caption = container.querySelector("caption");
-    expect(caption!.className).toContain("my-caption");
+    expect(drawnClasses(caption)).toContain("my-caption");
   });
 });

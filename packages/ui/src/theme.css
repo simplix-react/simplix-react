@@ -22,6 +22,9 @@
 @import "@simplix-react/ui/styles.css";
 @import "./theme/base.css";
 @import "./theme/designs/classic.css";
+@import "./theme/designs/clarity-tokens.css";
+@import "./theme/designs/clarity.css";
+@import "./theme/fills.css";
 @import "./theme/presets/blue.css";
 @import "./theme/presets/green.css";
 @import "./theme/presets/krds.css";

@@ -1,7 +1,14 @@
 import { Star } from 'lucide-react'
 import { useTranslation } from '@simplix-react/i18n/react'
 import { cn } from '../../../utils/cn'
+import { slotAttributes } from '../../../design/slot-style'
 import { useFlatUIComponents } from '../../../provider/ui-provider'
+import {
+  fileThumbnailImageStyle,
+  fileThumbnailOverlayStyle,
+  fileThumbnailStarStyle,
+  fileThumbnailStaticStarStyle,
+} from './file-thumbnail.style'
 
 export interface FileThumbnailProps {
   src: string
@@ -58,7 +65,7 @@ export function FileThumbnail({
       }
     >
       {/* Thumbnail image */}
-      <div className="w-full h-full rounded-sm overflow-hidden bg-muted">
+      <div className="w-full h-full overflow-hidden" {...slotAttributes(fileThumbnailImageStyle, {})}>
         {/* raw <img> permitted for content media (AG-6) */}
         <img
           src={src}
@@ -71,27 +78,18 @@ export function FileThumbnail({
       {/* Semi-transparent black hover overlay (brief §F) */}
       {isInteractive && (
         <div
-          className={cn(
-            'absolute inset-0 rounded-sm bg-black/40',
-            'opacity-0 group-hover:opacity-100 transition-opacity duration-150',
-            'pointer-events-none',
-          )}
+          className="absolute inset-0 pointer-events-none"
           aria-hidden="true"
+          {...slotAttributes(fileThumbnailOverlayStyle, {})}
         />
       )}
 
-      {/* Star badge — bottom-right absolute overlay */}
+      {/* Star badge - bottom-right absolute overlay */}
       {isInteractive && (
         <span
-          className={cn(
-            'absolute -right-[5px] -bottom-[5px] flex items-center justify-center',
-            'w-[17px] h-[17px] rounded-full bg-background shadow-sm',
-            'transition-opacity duration-150',
-            representative
-              ? 'opacity-100 scale-100'
-              : 'opacity-0 group-hover:opacity-60',
-          )}
+          className="absolute -right-[5px] -bottom-[5px] flex items-center justify-center w-[17px] h-[17px]"
           aria-hidden="true"
+          {...slotAttributes(fileThumbnailStarStyle, { representative })}
         >
           <Star
             size={11}
@@ -108,8 +106,9 @@ export function FileThumbnail({
       {/* Non-interactive representative star (display-only) */}
       {!isInteractive && representative && (
         <span
-          className="absolute -right-[5px] -bottom-[5px] flex items-center justify-center w-[17px] h-[17px] rounded-full bg-background shadow-sm"
+          className="absolute -right-[5px] -bottom-[5px] flex items-center justify-center w-[17px] h-[17px]"
           aria-label={t('file.representative.label')}
+          {...slotAttributes(fileThumbnailStaticStarStyle, {})}
         >
           <Star
             size={11}

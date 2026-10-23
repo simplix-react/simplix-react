@@ -2,10 +2,12 @@ import { type VariantProps, cva } from "class-variance-authority";
 import { Children, cloneElement, type ComponentPropsWithRef, forwardRef, isValidElement, type ReactNode } from "react";
 
 import { createSelfResolving } from "../provider/self-resolving";
+import { slotAttributes, slotClassNames } from "../design/slot-style";
 import { cn } from "../utils/cn";
+import { gridStyle } from "./grid.style";
 
-/** CVA variants for the Grid component column and gap configuration. */
-const gridVariants = cva("grid", {
+/** CVA variants for the Grid component's column structure. */
+const gridLayout = cva("grid", {
   variants: {
     columns: {
       1: "grid-cols-1",
@@ -15,21 +17,20 @@ const gridVariants = cva("grid", {
       5: "grid-cols-5",
       6: "grid-cols-6",
     },
-    gap: {
-      none: "gap-0",
-      px: "gap-px",
-      xs: "gap-1",
-      sm: "gap-2",
-      md: "gap-4",
-      lg: "gap-6",
-      xl: "gap-8",
-    },
   },
-  defaultVariants: { columns: 1, gap: "md" },
+  defaultVariants: { columns: 1 },
 });
 
+/** The grid's drawn look (gaps) as a class-string function. */
+const gridLook = slotClassNames(gridStyle);
+
+/** Class string for a grid with the given variants: its column classes plus its drawn gaps. */
+const gridVariants = (props?: GridVariants): string => cn(gridLayout(props), gridLook(props));
+
 /** Variant props extracted from {@link gridVariants}. */
-export type GridVariants = VariantProps<typeof gridVariants>;
+export type GridVariants = VariantProps<typeof gridLayout> & {
+  gap?: NonNullable<Parameters<typeof gridLook>[0]>["gap"];
+};
 
 /** Props for the {@link Grid} layout component. */
 export interface GridProps
@@ -115,61 +116,11 @@ const responsiveColumnClasses: Record<number, string> = {
   6: "grid-cols-1 @sm:grid-cols-2 @2xl:grid-cols-3 @4xl:grid-cols-4 @5xl:grid-cols-6",
 };
 
-const gapClassMap: Record<string, string> = {
-  none: "gap-0",
-  px: "gap-px",
-  xs: "gap-1",
-  sm: "gap-2",
-  md: "gap-4",
-  lg: "gap-6",
-  xl: "gap-8",
-};
+/** The class that marks a cell the grid draws a column rule on; see `rule` in `grid.style.ts`. */
+const COLUMN_RULE = "grid-column-rule";
 
-const gapXClassMap: Record<string, string> = {
-  none: "gap-x-0",
-  px: "gap-x-px",
-  xs: "gap-x-1",
-  sm: "gap-x-2",
-  md: "gap-x-4",
-  lg: "gap-x-6",
-  xl: "gap-x-8",
-};
-
-const gapYClassMap: Record<string, string> = {
-  none: "gap-y-0",
-  px: "gap-y-px",
-  xs: "gap-y-1",
-  sm: "gap-y-2",
-  md: "gap-y-4",
-  lg: "gap-y-6",
-  xl: "gap-y-8",
-};
-
-/** Resolve the combined gap classes honoring per-axis overrides. */
-function resolveGapClasses(gap: string, gapX?: string | null, gapY?: string | null): string {
-  return cn(
-    gapClassMap[gap] ?? "gap-4",
-    gapX ? gapXClassMap[gapX] : undefined,
-    gapY ? gapYClassMap[gapY] : undefined,
-  );
-}
-
-/**
- * The column rule, per horizontal gap, for a grid whose column count is fixed and for one that
- * collapses to a single column at narrow widths.
- *
- * <p>Written out rather than assembled from the gap size: the CSS compiler only emits classes it
- * can read in the source, so a name built at runtime resolves to no rule at all.
- */
-const columnRuleClasses: Record<string, { fixed: string; collapsing: string }> = {
-  none: { fixed: "border-l", collapsing: "@sm:border-l" },
-  px: { fixed: "border-l", collapsing: "@sm:border-l" },
-  xs: { fixed: "-ml-0.5 border-l pl-0.5", collapsing: "@sm:-ml-0.5 @sm:border-l @sm:pl-0.5" },
-  sm: { fixed: "-ml-1 border-l pl-1", collapsing: "@sm:-ml-1 @sm:border-l @sm:pl-1" },
-  md: { fixed: "-ml-2 border-l pl-2", collapsing: "@sm:-ml-2 @sm:border-l @sm:pl-2" },
-  lg: { fixed: "-ml-3 border-l pl-3", collapsing: "@sm:-ml-3 @sm:border-l @sm:pl-3" },
-  xl: { fixed: "-ml-4 border-l pl-4", collapsing: "@sm:-ml-4 @sm:border-l @sm:pl-4" },
-};
+/** The horizontal gaps the column rule has an offset for; another value falls back to `md`. */
+const RULE_GAPS = new Set(["none", "px", "xs", "sm", "md", "lg", "xl"]);
 
 /**
  * The column count that spreads `items` evenly over as few rows as `max` columns would need.
@@ -198,21 +149,14 @@ function balancedColumns(items: number, max: number): number {
  * sits on the cell's left edge, so the cell is widened by half a gutter and padded back by the
  * same amount, which puts the line mid-gutter without moving the content.
  *
+ * <p>The grid marks those cells with {@link COLUMN_RULE} and draws the rule itself (its `rule`
+ * axis), so the look stays in the grid's declaration while the cell only says where it sits.
+ *
  * @param children the grid's cells
  * @param cols how many columns the grid has
- * @param gap the horizontal gap key, which fixes the offset
- * @param hiddenWhenCollapsed true when the grid drops to one column at narrow widths
- * @returns the cells, with the rule applied to those that follow another in their row
+ * @returns the cells, with the marker on those that follow another in their row
  */
-function withColumnRules(
-  children: ReactNode,
-  cols: number,
-  gap: string,
-  hiddenWhenCollapsed?: boolean,
-): ReactNode {
-  const classes = columnRuleClasses[gap] ?? columnRuleClasses.md;
-  const rule = hiddenWhenCollapsed ? classes.collapsing : classes.fixed;
-
+function withColumnRules(children: ReactNode, cols: number): ReactNode {
   let filled = 0;
   return Children.map(children, (child) => {
     if (!isValidElement<{ className?: string }>(child)) return child;
@@ -225,7 +169,7 @@ function withColumnRules(
     filled += span;
 
     if (startsRow) return child;
-    return cloneElement(child, { className: cn(child.props.className, rule) });
+    return cloneElement(child, { className: cn(child.props.className, COLUMN_RULE) });
   });
 }
 
@@ -262,10 +206,12 @@ export const GridBase = forwardRef<HTMLDivElement, GridProps>(
     const gapKey = (gap ?? "md") as string;
     // Divider lines sit mid-gutter, so their position follows the horizontal gap.
     const dividerGap = (gapX as string | undefined) ?? gapKey;
-    const gapClasses = resolveGapClasses(gapKey, gapX as string | undefined, gapY as string | undefined);
     // Divider lines assume a stable column count: fixed grids always qualify;
     // responsive grids only in the two-column case (the line hides when collapsed).
     const showDivider = divider && cols > 1 && !template && (!isResponsive || cols === 2);
+    const ruleGap = RULE_GAPS.has(dividerGap) ? dividerGap : "md";
+    const rule = showDivider ? (isResponsive ? `${ruleGap}-collapsing` : ruleGap) : undefined;
+    const look = slotAttributes(gridStyle, { gap: gapKey, gapX, gapY, rule });
 
     // An explicit grid-template-columns string overrides the columns enum and
     // responsive container-query path; apply it as an inline style.
@@ -273,9 +219,10 @@ export const GridBase = forwardRef<HTMLDivElement, GridProps>(
       return (
         <div
           ref={ref}
-          className={cn("grid", gapClasses, className)}
+          className={cn("grid", className)}
           style={{ gridTemplateColumns: template, ...style }}
           {...rest}
+          {...look}
         >
           {children}
         </div>
@@ -285,10 +232,14 @@ export const GridBase = forwardRef<HTMLDivElement, GridProps>(
     if (isResponsive) {
       const colClass = responsiveColumnClasses[cols] ?? `grid-cols-${cols}`;
 
+      // A caller's part attributes mark the element that draws the grid, so they go to the inner
+      // grid with its className rather than to the container-query wrapper.
+      const outerProps = Object.fromEntries(Object.entries(rest).filter(([key]) => !key.startsWith("data-part")));
+      const partProps = Object.fromEntries(Object.entries(rest).filter(([key]) => key.startsWith("data-part")));
       return (
-        <div ref={ref} className="@container" style={style} {...rest}>
-          <div className={cn("relative grid", colClass, gapClasses, className)}>
-            {showDivider ? withColumnRules(children, cols, dividerGap, true) : children}
+        <div ref={ref} className="@container" style={style} {...outerProps}>
+          <div className={cn("relative grid", colClass, className)} {...partProps} {...look}>
+            {showDivider ? withColumnRules(children, cols) : children}
           </div>
         </div>
       );
@@ -297,11 +248,12 @@ export const GridBase = forwardRef<HTMLDivElement, GridProps>(
     return (
       <div
         ref={ref}
-        className={cn(gridVariants({ columns: cols as GridVariants["columns"] }), gapClasses, showDivider && "relative", className)}
+        className={cn(gridLayout({ columns: cols as GridVariants["columns"] }), showDivider && "relative", className)}
         style={style}
         {...rest}
+        {...look}
       >
-        {showDivider ? withColumnRules(children, cols, dividerGap) : children}
+        {showDivider ? withColumnRules(children, cols) : children}
       </div>
     );
   },

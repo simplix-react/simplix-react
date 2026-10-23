@@ -1,7 +1,15 @@
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { useFlatUIComponents } from "../../provider/ui-provider";
-import { cn } from "../../utils/cn";
+import { partAttributes, slotAttributes } from "../../design/slot-style";
+import {
+  radioGroupFieldDescriptionStyle,
+  radioGroupFieldGroupStyle,
+  radioGroupFieldLabelStyle,
+  radioGroupFieldOptionStyle,
+} from "./radio-group-field.style";
+
 import { FieldWrapper } from "../shared/field-wrapper";
+
 
 /** Props for the {@link RadioGroupField} form component. */
 export interface RadioGroupFieldProps<T extends string = string>
@@ -17,8 +25,8 @@ export interface RadioGroupFieldProps<T extends string = string>
 }
 
 const directionClasses = {
-  column: "flex flex-col gap-2",
-  row: "flex flex-row gap-4",
+  column: "flex flex-col",
+  row: "flex flex-row",
 } as const;
 
 /**
@@ -69,20 +77,22 @@ export function RadioGroupField<T extends string = string>({
           value={value}
           onValueChange={(v) => onChange(v as T)}
           disabled={disabled}
-          className={cn(directionClasses[direction])}
+          className={directionClasses[direction]}
+          {...partAttributes(radioGroupFieldGroupStyle, { direction })}
           aria-labelledby={labelId}
           aria-label={variantProps.layout === "hidden" ? label : undefined}
         >
           {options.map((opt) => (
             <label
               key={opt.value}
-              className="flex items-center gap-2 cursor-pointer"
+              className="flex items-center cursor-pointer"
+              {...slotAttributes(radioGroupFieldOptionStyle, {})}
             >
               <RadioGroupItem value={opt.value} />
-              <span className="text-sm">
+              <span {...slotAttributes(radioGroupFieldLabelStyle, {})}>
                 {opt.label}
                 {opt.description && (
-                  <span className="block text-xs text-muted-foreground">
+                  <span className="block" {...slotAttributes(radioGroupFieldDescriptionStyle, {})}>
                     {opt.description}
                   </span>
                 )}

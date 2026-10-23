@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import QRCode from "qrcode";
-import { cn } from "../../utils/cn";
+import { slotAttributes } from "../../design/slot-style";
+import { qrCodeStyle } from "./qr-code.style";
 
 /** Props for the {@link QrCode} component. */
 export interface QrCodeProps {
@@ -45,8 +46,9 @@ export function QrCode({ value, size = 192, level = "M", label, className }: QrC
       ref={canvasRef}
       role="img"
       aria-label={label}
-      className={cn("rounded-md bg-white", className)}
+      className={className}
       style={{ width: size, height: size }}
+      {...slotAttributes(qrCodeStyle, {})}
     />
   );
 }

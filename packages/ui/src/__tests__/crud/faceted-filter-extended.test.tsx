@@ -16,6 +16,7 @@ vi.mock("@simplix-react/i18n/react", () => ({
 }));
 
 import { FacetedFilter, type FacetedFilterOption } from "../../crud/filters/faceted-filter";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 const options: FacetedFilterOption[] = [
   { value: "active", label: "Active" },
@@ -212,6 +213,6 @@ describe("FacetedFilter (extended coverage)", () => {
       />,
     );
     const chip = container.querySelector("button")!.parentElement;
-    expect(chip?.className).toContain("border-dashed");
+    expect(drawnClasses(chip ?? null)).toContain("border-dashed");
   });
 });

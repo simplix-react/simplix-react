@@ -28,6 +28,7 @@ vi.mock("../../crud/reorder/drag-handle", () => ({
 
 import React from "react";
 import { DraggableCard } from "../../crud/reorder/draggable-card";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 interface TestItem {
   id: string;
@@ -99,7 +100,7 @@ describe("DraggableCard", () => {
       />,
     );
     const card = container.querySelector("[data-testid='list-row-1']");
-    expect(card?.className).toContain("bg-muted/50");
+    expect(drawnClasses(card ?? null)).toContain("bg-muted/50");
   });
 
   it("applies selected style", () => {
@@ -115,7 +116,7 @@ describe("DraggableCard", () => {
       />,
     );
     const card = container.querySelector("[data-testid='list-row-1']");
-    expect(card?.className).toContain("ring-2");
+    expect(drawnClasses(card ?? null)).toContain("ring-2");
   });
 
   it("calls onRowClick when clicked", () => {

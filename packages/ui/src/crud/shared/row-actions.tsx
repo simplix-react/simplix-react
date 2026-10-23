@@ -5,6 +5,8 @@ import { type MouseEvent, type ReactNode } from "react";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { Flex } from "../../primitives";
 import { cn } from "../../utils/cn";
+import { partAttributes, slotAttributes } from "../../design/slot-style";
+import { rowActionsStripButtonStyle, rowActionsStripStyle } from "./row-actions.style";
 import {
   ArrowUpDownIcon,
   CheckIcon,
@@ -159,7 +161,7 @@ export function RowActionCell<T>({
     return (
       <TooltipProvider>
         <Flex justify="end" align="center">
-          <div className="inline-flex items-center rounded-md border overflow-hidden">
+          <div className="inline-flex items-center overflow-hidden" {...slotAttributes(rowActionsStripStyle, {})}>
             {visible.map((action, i) => {
               const label = action.label ?? t(ACTION_LABEL_KEYS[action.type]);
               const resolvedIcon = typeof action.icon === "function" ? action.icon(row) : action.icon;
@@ -175,10 +177,7 @@ export function RowActionCell<T>({
                   // not name one, and a control nobody has hovered is never open. Assistive
                   // technology would announce every row's actions as unlabelled buttons.
                   aria-label={label}
-                  className={cn(
-                    "rounded-none",
-                    i > 0 && "border-l",
-                  )}
+                  {...partAttributes(rowActionsStripButtonStyle, { ruled: i > 0 })}
                   onClick={(e) => handleClick(e, action)}
                   disabled={isDisabled}
                 >

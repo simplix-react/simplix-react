@@ -2,9 +2,19 @@ import { useRef } from 'react'
 import { Upload, Layers, HardDrive, FileCheck } from 'lucide-react'
 import { useTranslation } from '@simplix-react/i18n/react'
 import { cn } from '../../../utils/cn'
+import { slotAttributes } from '../../../design/slot-style'
 import { useFlatUIComponents } from '../../../provider/ui-provider'
 import { PillDot } from '../../shared/pill-dot'
 import { useDropzoneDrag } from '../../shared/use-dropzone-drag'
+import {
+  fileDropzoneCountStyle,
+  fileDropzoneExtensionsStyle,
+  fileDropzoneExtensionsTitleStyle,
+  fileDropzoneIconStyle,
+  fileDropzoneMetaStyle,
+  fileDropzonePillStyle,
+  fileDropzoneStyle,
+} from './file-dropzone.style'
 
 export interface FileDropzoneProps {
   multiple?: boolean
@@ -36,13 +46,13 @@ function ExtensionsPill({ allowedExtensions }: ExtensionsPillProps) {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className="inline-flex cursor-help items-center gap-1 text-muted-foreground transition-colors hover:text-foreground">
+          <span className="inline-flex cursor-help items-center" {...slotAttributes(fileDropzoneExtensionsStyle, {})}>
             <FileCheck size={12} aria-hidden="true" />
             {t('file.dropzone.extensions')}
           </span>
         </TooltipTrigger>
         <TooltipContent>
-          <span className="mb-0.5 block text-[10px] font-semibold uppercase tracking-wide opacity-75">
+          <span className="block" {...slotAttributes(fileDropzoneExtensionsTitleStyle, {})}>
             {t('file.dropzone.extensionsTitle')}
           </span>
           {tooltipBody}
@@ -58,11 +68,11 @@ function ExtensionsPill({ allowedExtensions }: ExtensionsPillProps) {
  * CTA button uses useFlatUIComponents().Button.
  *
  * Prop contract (brief §C):
- *   currentCount  — total item count (all statuses) from file-field
- *   maxFiles      — config.maxAttachments
- *   maxSizeLabel  — pre-formatted size string
- *   allowedExtensions — raw extension array (e.g. ["pdf","docx"]), or undefined/empty for all
- *   title / cta   — override i18n defaults
+ *   currentCount  - total item count (all statuses) from file-field
+ *   maxFiles      - config.maxAttachments
+ *   maxSizeLabel  - pre-formatted size string
+ *   allowedExtensions - raw extension array (e.g. ["pdf","docx"]), or undefined/empty for all
+ *   title / cta   - override i18n defaults
  */
 export function FileDropzone({
   multiple,
@@ -98,41 +108,37 @@ export function FileDropzone({
     // A drop target and a mouse shortcut, not a control: the CTA inside it is the control, and a
     // control nested in a control leaves the keyboard and assistive technology to guess which of
     // the two a press belongs to. The zone therefore takes no role, no tab stop, and no key
-    // handler — reaching the picker from the keyboard goes through the CTA.
+    // handler - reaching the picker from the keyboard goes through the CTA.
     <div
       role="group"
       aria-label={resolvedTitle}
-      className={cn(
-        // Compact single row at any width: small icon + constraint meta + inline CTA.
-        'flex items-center gap-2.5 rounded-md border border-dashed border-input',
-        'bg-muted/60 px-3 py-2 transition-colors',
-        isDragOver && !disabled && 'border-primary bg-primary/10',
-        disabled && 'pointer-events-none opacity-50',
-      )}
+      // Compact single row at any width: small icon + constraint meta + inline CTA.
+      className={cn('flex items-center', disabled && 'pointer-events-none')}
       {...dragProps}
       onClick={() => inputRef.current?.click()}
+      {...slotAttributes(fileDropzoneStyle, { over: isDragOver && !disabled, disabled })}
     >
       {/* Icon */}
-      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-primary/10 text-primary">
+      <div className="flex h-7 w-7 shrink-0 items-center justify-center" {...slotAttributes(fileDropzoneIconStyle, {})}>
         <Upload size={15} aria-hidden="true" />
       </div>
 
       {/* Constraint pills: lucide icon + label. Each pill is an atomic inline-flex unit and
           carries its separator dot as a TRAILING child, so a wrapped second line never starts
           with a dot. gap-x for inline spacing, smaller gap-y for the wrapped line. */}
-      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2.5 gap-y-0.5 text-xs text-muted-foreground">
+      <div className="flex min-w-0 flex-1 flex-wrap items-center" {...slotAttributes(fileDropzoneMetaStyle, {})}>
         {maxFiles != null && (
-          <span className="inline-flex items-center gap-1">
+          <span className="inline-flex items-center" {...slotAttributes(fileDropzonePillStyle, {})}>
             <Layers size={12} aria-hidden="true" />
             {t('file.dropzone.maxFiles', { max: maxFiles })}
-            <span className="ml-0.5 font-bold tabular-nums text-foreground">
+            <span {...slotAttributes(fileDropzoneCountStyle, {})}>
               {t('file.dropzone.count', { current: currentCount, max: maxFiles })}
             </span>
             <PillDot />
           </span>
         )}
         {maxSizeLabel && (
-          <span className="inline-flex items-center gap-1">
+          <span className="inline-flex items-center" {...slotAttributes(fileDropzonePillStyle, {})}>
             <HardDrive size={12} aria-hidden="true" />
             {maxSizeLabel}
             <PillDot />
@@ -141,7 +147,7 @@ export function FileDropzone({
         <ExtensionsPill allowedExtensions={allowedExtensions} />
       </div>
 
-      {/* CTA button — inline, compact */}
+      {/* CTA button - inline, compact */}
       <Button
         type="button"
         variant="default"

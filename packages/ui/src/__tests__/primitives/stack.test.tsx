@@ -4,6 +4,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { Stack } from "../../primitives/stack";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -18,15 +19,15 @@ describe("Stack", () => {
   it("applies default variant classes", () => {
     render(<Stack data-testid="stack" />);
     const el = screen.getByTestId("stack");
-    expect(el.className).toContain("flex");
-    expect(el.className).toContain("flex-col");
-    expect(el.className).toContain("gap-4");
-    expect(el.className).toContain("items-stretch");
+    expect(drawnClasses(el)).toContain("flex");
+    expect(drawnClasses(el)).toContain("flex-col");
+    expect(drawnClasses(el)).toContain("gap-4");
+    expect(drawnClasses(el)).toContain("items-stretch");
   });
 
   it("applies direction variant", () => {
     render(<Stack data-testid="stack" direction="row" />);
-    expect(screen.getByTestId("stack").className).toContain("flex-row");
+    expect(drawnClasses(screen.getByTestId("stack"))).toContain("flex-row");
   });
 
   it("applies gap variants", () => {
@@ -43,7 +44,7 @@ describe("Stack", () => {
       const { unmount } = render(
         <Stack data-testid="stack" gap={gap as keyof typeof gaps} />,
       );
-      expect(screen.getByTestId("stack").className).toContain(expected);
+      expect(drawnClasses(screen.getByTestId("stack"))).toContain(expected);
       unmount();
     }
   });
@@ -61,7 +62,7 @@ describe("Stack", () => {
       const { unmount } = render(
         <Stack data-testid="stack" align={align as keyof typeof aligns} />,
       );
-      expect(screen.getByTestId("stack").className).toContain(expected);
+      expect(drawnClasses(screen.getByTestId("stack"))).toContain(expected);
       unmount();
     }
   });
@@ -82,19 +83,19 @@ describe("Stack", () => {
           justify={justify as keyof typeof justifies}
         />,
       );
-      expect(screen.getByTestId("stack").className).toContain(expected);
+      expect(drawnClasses(screen.getByTestId("stack"))).toContain(expected);
       unmount();
     }
   });
 
   it("applies wrap variant", () => {
     render(<Stack data-testid="stack" wrap={true} />);
-    expect(screen.getByTestId("stack").className).toContain("flex-wrap");
+    expect(drawnClasses(screen.getByTestId("stack"))).toContain("flex-wrap");
   });
 
   it("applies shrink={false} as shrink-0", () => {
     render(<Stack data-testid="stack" shrink={false} />);
-    expect(screen.getByTestId("stack").className).toContain("shrink-0");
+    expect(drawnClasses(screen.getByTestId("stack"))).toContain("shrink-0");
   });
 
   it("applies overflow variants", () => {
@@ -112,26 +113,26 @@ describe("Stack", () => {
           overflow={overflow as keyof typeof overflows}
         />,
       );
-      expect(screen.getByTestId("stack").className).toContain(expected);
+      expect(drawnClasses(screen.getByTestId("stack"))).toContain(expected);
       unmount();
     }
   });
 
   it("applies overflow='auto' as overflow-auto", () => {
     render(<Stack data-testid="stack" overflow="auto" />);
-    expect(screen.getByTestId("stack").className).toContain("overflow-auto");
+    expect(drawnClasses(screen.getByTestId("stack"))).toContain("overflow-auto");
   });
 
   it("applies minSize as min-w-0 and min-h-0", () => {
     render(<Stack data-testid="stack" minSize={true} />);
-    const classes = screen.getByTestId("stack").className;
+    const classes = drawnClasses(screen.getByTestId("stack"));
     expect(classes).toContain("min-w-0");
     expect(classes).toContain("min-h-0");
   });
 
   it("merges custom className", () => {
     render(<Stack data-testid="stack" className="custom-class" />);
-    const classes = screen.getByTestId("stack").className;
+    const classes = drawnClasses(screen.getByTestId("stack"));
     expect(classes).toContain("flex");
     expect(classes).toContain("custom-class");
   });

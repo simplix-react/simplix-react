@@ -7,8 +7,23 @@ import { filterTreeWithAncestors } from "../../crud/tree/tree-utils";
 import { FieldChevron } from "../../base/inputs/field-chevron";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { Stack } from "../../primitives";
+import { partAttributes, slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
+import { comboboxPanelStyle, comboboxSearchStyle, comboboxStatusStyle } from "./combobox-field.style";
 import { FieldWrapper } from "../shared/field-wrapper";
+import { multiSelectChipStyle, multiSelectChipsStyle, multiSelectRemoveStyle } from "./multi-select-field.style";
+import {
+  treeMultiSelectBoxStyle,
+  treeMultiSelectOpenStyle,
+  treeMultiSelectPlaceholderStyle,
+  treeSelectCascadeStyle,
+  treeSelectCheckEndStyle,
+  treeSelectCheckStyle,
+  treeSelectChooseStyle,
+  treeSelectNameStyle,
+  treeSelectRowStyle,
+  treeSelectToggleStyle,
+} from "./tree-select-field.style";
 
 // ── Icons ──
 
@@ -38,7 +53,7 @@ function FolderIcon() {
 
 function CheckIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="shrink-0 text-primary" aria-hidden="true">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="shrink-0" aria-hidden="true" {...slotAttributes(treeSelectCheckStyle, {})}>
       <path d="M13 5L6.5 11.5L3 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
@@ -173,11 +188,8 @@ function TreeMultiSelectItem<T>({
           leaves the keyboard and assistive technology to guess which of the two a press belongs
           to, and the guesses disagree. */}
       <span
-        className={cn(
-          "flex w-full items-center gap-1 rounded-sm px-2 py-1.5 text-sm",
-          isSelected && "bg-accent text-accent-foreground",
-          !isSelected && "hover:bg-accent/50",
-        )}
+        className="flex w-full items-center"
+        {...slotAttributes(treeSelectRowStyle, { selected: isSelected, hoverable: !isSelected })}
       >
         <span className="shrink-0" style={{ width: depth * 16 }} />
         <button
@@ -185,10 +197,10 @@ function TreeMultiSelectItem<T>({
           tabIndex={hasChildren ? 0 : -1}
           aria-label={hasChildren ? (isExpanded ? "Collapse" : "Expand") : undefined}
           className={cn(
-            "inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-sm",
-            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-            hasChildren ? "text-muted-foreground hover:text-foreground" : "invisible",
+            "inline-flex h-4 w-4 shrink-0 items-center justify-center",
+            !hasChildren && "invisible",
           )}
+          {...slotAttributes(treeSelectToggleStyle, { branch: hasChildren })}
           onClick={() => {
             if (hasChildren) onToggleExpand(id);
           }}
@@ -196,7 +208,10 @@ function TreeMultiSelectItem<T>({
           {hasChildren ? (isExpanded ? <ChevronDownIcon /> : <ChevronRightIcon />) : null}
         </button>
         {cascade ? (
-          <span className="flex min-w-0 flex-1 items-center gap-2">
+          <span
+            className="flex min-w-0 flex-1 items-center"
+            {...slotAttributes(treeSelectCascadeStyle, {})}
+          >
             <Checkbox
               checked={state === "all" ? true : state === "some" ? "indeterminate" : false}
               onCheckedChange={() => onToggleSelect(id)}
@@ -208,15 +223,13 @@ function TreeMultiSelectItem<T>({
           <button
             type="button"
             onClick={() => onToggleSelect(id)}
-            className={cn(
-              "flex min-w-0 flex-1 items-center gap-1 rounded-sm text-start",
-              "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-            )}
+            className="flex min-w-0 flex-1 items-center"
+            {...slotAttributes(treeSelectChooseStyle, {})}
           >
             <FolderIcon />
-            <span className="ml-0.5 truncate">{displayName}</span>
+            <span className="truncate" {...slotAttributes(treeSelectNameStyle, {})}>{displayName}</span>
             {isSelected && (
-              <span className="ml-auto shrink-0"><CheckIcon /></span>
+              <span className="shrink-0" {...slotAttributes(treeSelectCheckEndStyle, {})}><CheckIcon /></span>
             )}
           </button>
         )}
@@ -444,12 +457,8 @@ export function TreeMultiSelectField<T>({
           <PopoverAnchor asChild>
             <span
               ref={boxRef}
-              className={cn(
-                "flex min-h-8 w-full items-center gap-1 rounded-md border border-input bg-background px-3 py-1 text-sm",
-                "focus-within:border-foreground",
-                disabled && "cursor-not-allowed opacity-50",
-                error && "border-destructive focus-within:border-destructive",
-              )}
+              className="flex min-h-8 w-full items-center"
+              {...slotAttributes(treeMultiSelectBoxStyle, { disabled: !!disabled, invalid: !!error })}
               onMouseDown={(e) => {
                 // A press on the box's own surface reaches the same popover the
                 // chevron opens; a press on a chip's remove button does not.
@@ -458,9 +467,12 @@ export function TreeMultiSelectField<T>({
                 setOpen((v) => !v);
               }}
             >
-              <span className="flex flex-1 flex-wrap items-center gap-1 overflow-hidden">
+              <span
+                className="flex flex-1 flex-wrap items-center overflow-hidden"
+                {...slotAttributes(multiSelectChipsStyle, {})}
+              >
                 {chips.length === 0 && (
-                  <span className="truncate text-muted-foreground">
+                  <span className="truncate" {...slotAttributes(treeMultiSelectPlaceholderStyle, {})}>
                     {placeholder ?? t("tree.searchPlaceholder")}
                   </span>
                 )}
@@ -469,14 +481,15 @@ export function TreeMultiSelectField<T>({
                     key={chip.key}
                     data-testid="tree-chip"
                     variant="secondary"
-                    className="shrink-0 gap-0.5 pr-0.5 text-[11px] py-0 h-5"
+                    className="shrink-0 h-5"
+                  {...partAttributes(multiSelectChipStyle, {})}
                   >
                     {chip.label}
                     {!disabled && (
                       <button
                         type="button"
                         onClick={() => removeSelected(chip.ids)}
-                        className="ml-0.5 rounded-sm hover:bg-muted"
+                        {...slotAttributes(multiSelectRemoveStyle, {})}
                         aria-label={t("field.removeOption", {
                           label: String(chip.label),
                         })}
@@ -496,7 +509,8 @@ export function TreeMultiSelectField<T>({
                   aria-labelledby={labelId}
                   aria-label={variantProps.layout === "hidden" ? label : undefined}
                   disabled={disabled}
-                  className="flex shrink-0 items-center rounded-sm outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  className="flex shrink-0 items-center"
+                  {...slotAttributes(treeMultiSelectOpenStyle, {})}
                 >
                   <FieldChevron />
                 </button>
@@ -504,7 +518,8 @@ export function TreeMultiSelectField<T>({
             </span>
           </PopoverAnchor>
           <PopoverContent
-            className="w-[var(--radix-popover-trigger-width)] p-0"
+            flush
+            className="w-[var(--radix-popover-trigger-width)]"
             align="start"
             onOpenAutoFocus={(e) => e.preventDefault()}
             // The box is the anchor, not the trigger, so Radix reads a press on a
@@ -513,21 +528,21 @@ export function TreeMultiSelectField<T>({
               if (boxRef.current?.contains(e.target as Node)) e.preventDefault();
             }}
           >
-            <Stack gap="none" className="p-2">
+            <Stack gap="none" {...partAttributes(comboboxPanelStyle, {})}>
               <Input
                 type="search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={t("tree.searchPlaceholder")}
-                className="mb-2"
+                {...partAttributes(comboboxSearchStyle, {})}
               />
               <div className="max-h-60 overflow-y-auto">
                 {isLoading ? (
-                  <p className="py-4 text-center text-sm text-muted-foreground">
+                  <p {...slotAttributes(comboboxStatusStyle, { kind: "empty" })}>
                     {t("common.loading")}
                   </p>
                 ) : filteredData.length === 0 ? (
-                  <p className="py-4 text-center text-sm text-muted-foreground">
+                  <p {...slotAttributes(comboboxStatusStyle, { kind: "empty" })}>
                     {t("list.noResults")}
                   </p>
                 ) : (

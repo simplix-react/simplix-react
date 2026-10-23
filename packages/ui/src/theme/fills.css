@@ -1,0 +1,24 @@
+/* ===== Card fills =====
+   How surfaces take their ground, named by the colour theme (ColorTheme.fill) and written as
+   data-fill on the document element. They apply under every design: one attribute of specificity,
+   above the design rules (which carry none), in the utilities layer so a caller's className still
+   wins. plain is the absence of the attribute. */
+
+@layer utilities {
+  [data-fill="outline"] :where([data-slot="card"], [data-slot="stat-card"]) {
+    background-color: transparent;
+    box-shadow: none;
+    border-color: var(--border-strong);
+  }
+
+  [data-fill="raised"] :where([data-slot="card"], [data-slot="stat-card"]) {
+    border-color: transparent;
+    box-shadow: var(--shadow-2);
+  }
+
+  [data-fill="tint"] :where([data-slot="stat-card"]) {
+    background-color: var(--primary-soft);
+    border-color: transparent;
+    box-shadow: none;
+  }
+}

@@ -2,11 +2,13 @@ import { useTranslation } from "@simplix-react/i18n/react";
 import { useCallback } from "react";
 
 import { cn } from "../../utils/cn";
+import { slotAttributes } from "../../design/slot-style";
+import { dateNavigatorStepStyle } from "./date-navigator.style";
 import { DatePicker } from "./date-picker";
 import type { DatePickerProps } from "./date-picker";
 
 /** Props for the {@link DateNavigator} component. */
-export interface DateNavigatorProps extends Omit<DatePickerProps, "clearable"> {
+export interface DateNavigatorProps extends Omit<DatePickerProps, "clearable" | "joined"> {
   /** Size variant. @defaultValue "default" */
   size?: "sm" | "default";
 }
@@ -62,12 +64,10 @@ export function DateNavigator({
       <button
         type="button"
         className={cn(
-          "inline-flex items-center justify-center border border-input bg-background transition-colors",
-          "rounded-l-md rounded-r-none",
-          "hover:bg-accent hover:text-accent-foreground",
-          "disabled:pointer-events-none disabled:opacity-50",
+          "inline-flex items-center justify-center disabled:pointer-events-none",
           h, sm ? "w-7" : "w-9",
         )}
+        {...slotAttributes(dateNavigatorStepStyle, { side: "prev" })}
         disabled={prevDisabled}
         onClick={goPrev}
         aria-label={t("date.previousDay")}
@@ -80,21 +80,17 @@ export function DateNavigator({
         minDate={minDate}
         maxDate={maxDate}
         clearable={false}
-        className={cn(
-          h, "w-auto -ml-px rounded-none border-input",
-          sm ? "text-xs px-2" : "text-sm",
-        )}
+        className={cn(h, "w-auto")}
+        joined={size}
         {...rest}
       />
       <button
         type="button"
         className={cn(
-          "inline-flex items-center justify-center border border-input bg-background transition-colors",
-          "rounded-r-md rounded-l-none -ml-px",
-          "hover:bg-accent hover:text-accent-foreground",
-          "disabled:pointer-events-none disabled:opacity-50",
+          "inline-flex items-center justify-center disabled:pointer-events-none",
           h, sm ? "w-7" : "w-9",
         )}
+        {...slotAttributes(dateNavigatorStepStyle, { side: "next" })}
         disabled={nextDisabled}
         onClick={goNext}
         aria-label={t("date.nextDay")}

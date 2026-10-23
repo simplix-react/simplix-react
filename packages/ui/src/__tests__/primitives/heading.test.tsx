@@ -4,6 +4,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { Heading } from "../../primitives/heading";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -16,7 +17,7 @@ describe("Heading", () => {
 
   it("applies default variant classes (level 1)", () => {
     render(<Heading data-testid="h">Title</Heading>);
-    const classes = screen.getByTestId("h").className;
+    const classes = drawnClasses(screen.getByTestId("h"));
     expect(classes).toContain("tracking-tight");
     expect(classes).toContain("text-4xl");
     expect(classes).toContain("font-bold");
@@ -50,7 +51,7 @@ describe("Heading", () => {
           text
         </Heading>,
       );
-      expect(screen.getByTestId("h").className).toContain(expected);
+      expect(drawnClasses(screen.getByTestId("h"))).toContain(expected);
       unmount();
     }
   });
@@ -69,7 +70,7 @@ describe("Heading", () => {
           text
         </Heading>,
       );
-      expect(screen.getByTestId("h").className).toContain(expected);
+      expect(drawnClasses(screen.getByTestId("h"))).toContain(expected);
       unmount();
     }
   });
@@ -87,7 +88,7 @@ describe("Heading", () => {
           text
         </Heading>,
       );
-      expect(screen.getByTestId("h").className).toContain(expected);
+      expect(drawnClasses(screen.getByTestId("h"))).toContain(expected);
       unmount();
     }
   });
@@ -100,7 +101,7 @@ describe("Heading", () => {
     );
     const el = screen.getByText("Override");
     expect(el.tagName).toBe("H2");
-    expect(el.className).toContain("text-lg");
+    expect(drawnClasses(el)).toContain("text-lg");
   });
 
   it("merges custom className", () => {
@@ -109,7 +110,7 @@ describe("Heading", () => {
         text
       </Heading>,
     );
-    const classes = screen.getByTestId("h").className;
+    const classes = drawnClasses(screen.getByTestId("h"));
     expect(classes).toContain("tracking-tight");
     expect(classes).toContain("extra");
   });

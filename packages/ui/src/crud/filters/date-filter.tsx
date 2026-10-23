@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "@simplix-react/i18n/react";
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
 import { formatDateMedium, formatDateRange } from "../../utils/format-date";
 import { CalendarDotIcon, CalendarDotsIcon, XIcon, CaretDownIcon } from "../shared/icons";
@@ -9,7 +10,14 @@ import { Separator } from "../../base/display/separator";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import type { SearchOperator } from "./filter-types";
 import { dateOperatorConfig } from "./filter-types";
+import { crudFieldClearButtonStyle } from "./field-clear-button.style";
 import { operatorConfig } from "./filter-icons";
+import {
+  crudFilterChipStyle,
+  crudFilterChipTriggerStyle,
+  crudFilterOperatorMenuStyle,
+  crudFilterOperatorTriggerStyle,
+} from "./filter-parts.style";
 
 export interface DateFilterProps {
   label?: string;
@@ -112,33 +120,32 @@ export function DateFilter({
           <DropdownMenuTrigger asChild>
             <button
               type="button"
-              className="inline-flex h-8 items-center gap-0.5 rounded-md border bg-muted/50 px-2 text-muted-foreground hover:text-foreground"
+              className="inline-flex h-8 items-center"
               aria-label={t("filter.selectOperator")}
+              {...slotAttributes(crudFilterOperatorTriggerStyle, { attach: "chip" })}
             >
               <currentOp.icon className="h-3.5 w-3.5" />
               <CaretDownIcon className="h-3 w-3" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
-            {operators.map((op) => {
-              const meta = operatorConfig[op];
-              const opIsRange = dateOperatorConfig[op]?.requiresRange ?? false;
-              return (
-                <DropdownMenuItem
-                  key={op}
-                  onClick={() => handleOperatorChange(op)}
-                  className={cn(op === operator && "bg-accent")}
-                >
-                  <meta.icon className="mr-2 h-3.5 w-3.5" />
-                  {t(meta.labelKey)}
-                  {opIsRange && (
-                    <Badge variant="outline" className="ml-auto text-[10px]">
-                      Range
-                    </Badge>
-                  )}
-                </DropdownMenuItem>
-              );
-            })}
+            <div {...slotAttributes(crudFilterOperatorMenuStyle, {})}>
+              {operators.map((op) => {
+                const meta = operatorConfig[op];
+                const opIsRange = dateOperatorConfig[op]?.requiresRange ?? false;
+                return (
+                  <DropdownMenuItem
+                    key={op}
+                    onClick={() => handleOperatorChange(op)}
+                    data-current={op === operator}
+                  >
+                    <meta.icon className="h-3.5 w-3.5" />
+                    {t(meta.labelKey)}
+                    {opIsRange && <Badge variant="outline">Range</Badge>}
+                  </DropdownMenuItem>
+                );
+              })}
+            </div>
           </DropdownMenuContent>
         </DropdownMenu>
       )}
@@ -147,32 +154,21 @@ export function DateFilter({
             side inside it rather than one inside the other — a control nested in a control leaves
             the keyboard and assistive technology to guess which of the two a press belongs to. */}
         <span
-          className={cn(
-            "inline-flex h-8 items-center gap-2 rounded-md border px-3 text-sm",
-            hasValue ? "border-solid" : "border-dashed text-muted-foreground",
-          )}
+          className="inline-flex h-8 items-center"
+          {...slotAttributes(crudFilterChipStyle, { filled: hasValue })}
         >
           <PopoverTrigger asChild>
             <button
               type="button"
-              className="inline-flex items-center gap-2 rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              className="inline-flex items-center"
+              {...slotAttributes(crudFilterChipTriggerStyle, {})}
             >
               <Icon className="h-4 w-4" />
               {label ?? "Pick a date"}
             </button>
           </PopoverTrigger>
-          <Separator
-            orientation="vertical"
-            className={cn("mx-1 h-4", !hasValue && "opacity-0")}
-          />
-          <Badge
-            variant="secondary"
-            className={cn(
-              badgeWidth,
-              "justify-center font-normal",
-              !hasValue && "opacity-0",
-            )}
-          >
+          <Separator orientation="vertical" className="h-4" />
+          <Badge variant="secondary" className={cn(badgeWidth, "justify-center")}>
             {displayText ?? "–"}
           </Badge>
           <button
@@ -180,16 +176,16 @@ export function DateFilter({
             tabIndex={hasValue ? 0 : -1}
             onClick={handleClear}
             className={cn(
-              "inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground",
-              "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-              !hasValue && "pointer-events-none opacity-0",
+              "inline-flex h-4 w-4 shrink-0 items-center justify-center",
+              !hasValue && "pointer-events-none",
             )}
             aria-label={t("filter.clearDate")}
+            {...slotAttributes(crudFieldClearButtonStyle, { ring: true, hidden: !hasValue })}
           >
             <XIcon className="h-3 w-3" />
           </button>
         </span>
-        <PopoverContent className="w-auto p-0" align="start">
+        <PopoverContent flush className="w-auto" align="start">
           <Calendar {...calendarProps} />
         </PopoverContent>
       </Popover>

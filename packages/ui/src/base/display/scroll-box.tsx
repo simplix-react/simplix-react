@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
+import { scrollBoxStyle } from "./scroll-box.style";
 
 /** Props for the {@link ScrollBox} component. */
 export interface ScrollBoxProps {
@@ -30,12 +32,9 @@ export function ScrollBox({
 }: ScrollBoxProps) {
   return (
     <div
-      className={cn(
-        "overflow-y-auto rounded-md border p-3 text-sm",
-        preserveWhitespace && "whitespace-pre-wrap",
-        className,
-      )}
+      className={cn("overflow-y-auto", preserveWhitespace && "whitespace-pre-wrap", className)}
       style={{ maxHeight }}
+      {...slotAttributes(scrollBoxStyle, {})}
     >
       {children}
     </div>

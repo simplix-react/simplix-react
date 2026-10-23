@@ -1,6 +1,22 @@
 import { useRef } from 'react'
 import { useTranslation } from '@simplix-react/i18n/react'
-import { cn } from '../../../utils/cn'
+import { slotAttributes } from '../../../design/slot-style'
+import {
+  stageDropzoneBodyStyle,
+  stageDropzoneConstraintsStyle,
+  stageDropzoneCountStyle,
+  stageDropzoneCtaStyle,
+  stageDropzoneExtensionsStyle,
+  stageDropzoneIconStyle,
+  stageDropzoneOutlineStyle,
+  stageDropzonePillIconStyle,
+  stageDropzonePillStyle,
+  stageDropzoneStyle,
+  stageDropzoneTitleStyle,
+  stageDropzoneTooltipArrowStyle,
+  stageDropzoneTooltipStyle,
+  stageDropzoneTooltipTitleStyle,
+} from './stage-dropzone.style'
 import { PillDot } from '../../shared/pill-dot'
 import { useDropzoneDrag } from '../../shared/use-dropzone-drag'
 
@@ -42,32 +58,27 @@ export function StageDropzone({
   // A drop target and a mouse shortcut, not a control: the CTA inside it is the control, and a
   // control nested in a control leaves the keyboard and assistive technology to guess which of the
   // two a press belongs to. The zone therefore takes no button role, no tab stop, and no key
-  // handler — reaching the picker from the keyboard goes through the CTA.
+  // handler - reaching the picker from the keyboard goes through the CTA.
   return (
     <div
-      className={cn(
-        'absolute inset-0 grid place-items-center cursor-pointer',
-        'bg-muted transition-[background]',
-        isDragOver ? 'bg-[color-mix(in_srgb,var(--primary)_10%,transparent)]' : '',
-      )}
+      className="absolute inset-0 grid place-items-center cursor-pointer"
       role="group"
       aria-label={t('file.stage.dropTitle')}
       onClick={() => inputRef.current?.click()}
       {...dragProps}
+      {...slotAttributes(stageDropzoneStyle, { over: isDragOver })}
     >
-      {/* Dashed border affordance — same style as FileDropzone (border-2 border-dashed
+      {/* Dashed border affordance - same style as FileDropzone (border-2 border-dashed
           border-input rounded-md), inset from the stage edge. */}
       <span
-        className={cn(
-          'pointer-events-none absolute inset-3 rounded-md border-2 border-dashed transition-colors',
-          isDragOver ? 'border-primary' : 'border-input',
-        )}
+        className="pointer-events-none absolute inset-3"
         aria-hidden="true"
+        {...slotAttributes(stageDropzoneOutlineStyle, { over: isDragOver })}
       />
 
-      <div className="flex flex-col items-center gap-2 @md:gap-[14px] text-center px-4 py-4 @md:px-6 @md:py-6 max-w-[540px] pointer-events-none">
+      <div className="flex flex-col items-center max-w-[540px] pointer-events-none" {...slotAttributes(stageDropzoneBodyStyle, {})}>
         {/* Upload icon */}
-        <div className="w-10 h-10 @md:w-[54px] @md:h-[54px] rounded-lg bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] text-primary grid place-items-center shrink-0 shadow-sm">
+        <div className="w-10 h-10 @md:w-[54px] @md:h-[54px] grid place-items-center shrink-0" {...slotAttributes(stageDropzoneIconStyle, {})}>
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -84,16 +95,16 @@ export function StageDropzone({
           </svg>
         </div>
 
-        {/* Title — hidden when the dropzone stacks to the cramped/narrow stage (< @md), shown from @md */}
-        <div className="hidden text-[15.5px] font-bold text-foreground tracking-[-0.01em] leading-[1.35] @md:block">
+        {/* Title - hidden when the dropzone stacks to the cramped/narrow stage (< @md), shown from @md */}
+        <div className="hidden @md:block" {...slotAttributes(stageDropzoneTitleStyle, {})}>
           {t('file.stage.dropTitle')}
         </div>
 
         {/* Constraints row */}
         {(maxFiles != null || maxSizeLabel || extensionsLabel) ? (
-          <div className="flex items-center gap-[10px] text-[11.5px] text-muted-foreground flex-wrap justify-center">
+          <div className="flex items-center flex-wrap justify-center" {...slotAttributes(stageDropzoneConstraintsStyle, {})}>
             {maxFiles != null ? (
-              <span className="inline-flex items-center gap-[5px]">
+              <span className="inline-flex items-center" {...slotAttributes(stageDropzonePillStyle, {})}>
                 <svg
                   viewBox="0 0 24 24"
                   fill="none"
@@ -101,8 +112,9 @@ export function StageDropzone({
                   strokeWidth="1.8"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="w-[13px] h-[13px] text-muted-foreground"
+                  className="w-[13px] h-[13px]"
                   aria-hidden="true"
+                  {...slotAttributes(stageDropzonePillIconStyle, {})}
                 >
                   <path d="M12 2 2 7l10 5 10-5-10-5z" />
                   <path d="m2 17 10 5 10-5" />
@@ -110,7 +122,7 @@ export function StageDropzone({
                 </svg>
                 {t('file.dropzone.maxFiles', { max: maxFiles })}
                 {currentCount != null ? (
-                  <span className="ml-[2px] tabular-nums font-bold text-foreground tracking-[-0.005em]">
+                  <span {...slotAttributes(stageDropzoneCountStyle, {})}>
                     {t('file.dropzone.count', { current: currentCount, max: maxFiles })}
                   </span>
                 ) : null}
@@ -120,7 +132,7 @@ export function StageDropzone({
             {maxFiles != null && maxSizeLabel ? <PillDot /> : null}
 
             {maxSizeLabel ? (
-              <span className="inline-flex items-center gap-[5px]">
+              <span className="inline-flex items-center" {...slotAttributes(stageDropzonePillStyle, {})}>
                 <svg
                   viewBox="0 0 24 24"
                   fill="none"
@@ -128,8 +140,9 @@ export function StageDropzone({
                   strokeWidth="1.8"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="w-[13px] h-[13px] text-muted-foreground"
+                  className="w-[13px] h-[13px]"
                   aria-hidden="true"
+                  {...slotAttributes(stageDropzonePillIconStyle, {})}
                 >
                   <line x1="22" y1="12" x2="2" y2="12" />
                   <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
@@ -144,8 +157,9 @@ export function StageDropzone({
 
             {extensionsLabel ? (
               <span
-                className="group relative inline-flex items-center gap-[5px] cursor-help pointer-events-auto rounded-sm px-[2px] mx-[-2px] transition-colors hover:text-secondary-foreground hover:bg-muted focus-visible:outline-none focus-visible:text-secondary-foreground focus-visible:bg-muted"
+                className="group relative inline-flex items-center cursor-help pointer-events-auto"
                 tabIndex={0}
+                {...slotAttributes(stageDropzoneExtensionsStyle, {})}
                 onClick={(e) => e.stopPropagation()}
               >
                 <svg
@@ -165,22 +179,18 @@ export function StageDropzone({
                 {t('file.stage.extensions')}
                 {/* Tooltip */}
                 <span
-                  className={cn(
-                    'absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2',
-                    'bg-foreground text-white text-[11.5px] leading-[1.5] py-[7px] px-[11px] rounded',
-                    'w-max max-w-[260px] text-left font-medium tracking-[.01em]',
-                    'pointer-events-none z-50 opacity-0 invisible transition-[opacity,transform]',
-                    'group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible',
-                  )}
+                  className="absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 w-max max-w-[260px] pointer-events-none z-50 invisible group-hover:visible group-focus-within:visible"
                   role="tooltip"
+                  {...slotAttributes(stageDropzoneTooltipStyle, {})}
                 >
-                  <strong className="block font-semibold text-white mb-[3px] text-[10.5px] opacity-75 tracking-[.04em] uppercase">
+                  <strong className="block" {...slotAttributes(stageDropzoneTooltipTitleStyle, {})}>
                     {t('file.stage.extensionsTitle')}
                   </strong>
                   {extensionsLabel}
                   <span
-                    className="absolute bottom-[-3px] left-1/2 ml-[-5px] w-[9px] h-[9px] bg-foreground rotate-45 rounded-sm"
+                    className="absolute bottom-[-3px] left-1/2 w-[9px] h-[9px] rotate-45"
                     aria-hidden="true"
+                    {...slotAttributes(stageDropzoneTooltipArrowStyle, {})}
                   />
                 </span>
               </span>
@@ -191,7 +201,8 @@ export function StageDropzone({
         {/* CTA button */}
         <button
           type="button"
-          className="mt-[2px] h-[34px] px-[18px] rounded bg-primary text-primary-foreground border-none text-[12.5px] font-semibold cursor-pointer transition-[background] pointer-events-auto hover:bg-[var(--primary-hover,var(--primary))] font-[inherit]"
+          className="h-[34px] cursor-pointer pointer-events-auto"
+          {...slotAttributes(stageDropzoneCtaStyle, {})}
           onClick={(e) => {
             e.stopPropagation()
             inputRef.current?.click()

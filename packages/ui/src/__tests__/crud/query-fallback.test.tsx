@@ -24,7 +24,7 @@ describe("QueryFallback", () => {
     const { container } = render(
       <QueryFallback isLoading={true} />,
     );
-    const spinner = container.querySelector(".animate-spin");
+    const spinner = container.querySelector("[data-slot='query-fallback-spinner']");
     expect(spinner).toBeTruthy();
   });
 
@@ -62,7 +62,7 @@ describe("QueryFallback", () => {
       <QueryFallback isLoading={true} onNotFound={onNotFound} />,
     );
     // Should show spinner, not dialog
-    expect(container.querySelector(".animate-spin")).toBeTruthy();
+    expect(container.querySelector("[data-slot='query-fallback-spinner']")).toBeTruthy();
   });
 
   it("calls onNotFound and cleans URL params on confirm", async () => {

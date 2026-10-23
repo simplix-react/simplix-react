@@ -14,7 +14,18 @@ import { useTranslation } from "@simplix-react/i18n/react";
 
 import { SheetContent } from "../../base/overlay/sheet";
 import { useUIDefaults } from "../../provider/ui-defaults-context";
+import { partAttributes, slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
+import {
+  crudListDetailDrawerStyle,
+  crudListDetailDetailStyle,
+  crudListDetailDialogStyle,
+  crudListDetailDividerStyle,
+  crudListDetailDrawerBodyStyle,
+  crudListDetailListStyle,
+  crudListDetailOverlayStyle,
+  crudListDetailRootStyle,
+} from "./list-detail.style";
 
 // ── Context ──
 
@@ -257,31 +268,35 @@ export function ListDetailRoot({ variant: variantProp, activePanel: activePanelP
     ? `${listCol} ${DIVIDER_TRACK}px ${detailCol}`
     : "1fr 0px 0px";
 
+  // Structure of the section, by state.
+  //
+  // - Capped only while a detail stands beside it. `min-h-0` belongs to that state alone - it is
+  //   the permission for a flex item to shrink below its own content, which is the whole mechanism
+  //   being switched off when the list is on its own.
+  // - `grid-rows-1` is `minmax(0, 1fr)`, which sizes to the track rather than to the row's content
+  //   and collapses in a section with no height of its own.
+  // - A drag that crosses the list and the panel selects every word it passes over, and the
+  //   selection is left standing when the pointer comes up. `preventDefault` on the handle stops
+  //   the selection from starting; `select-none` stops one that was already in progress from
+  //   extending, and covers the case where the press landed on a word rather than on the handle
+  //   itself.
+  const sectionClassName = cn(
+    "flex-1",
+    isDetailOpen && "h-full min-h-0 overflow-hidden",
+    "md:grid",
+    isDetailOpen ? "md:grid-rows-1" : "md:grid-rows-[auto]",
+    isDragging && "select-none",
+    "max-md:flex max-md:flex-col",
+    className,
+  );
+
   return (
     <ListDetailContext.Provider value={contextValue}>
       <section
         ref={sectionRef}
-        className={cn(
-          "flex-1",
-          // Capped only while a detail stands beside it. `min-h-0` belongs to that state alone —
-          // it is the permission for a flex item to shrink below its own content, which is the
-          // whole mechanism being switched off when the list is on its own.
-          isDetailOpen && "h-full min-h-0 overflow-hidden",
-          "md:grid",
-          // `grid-rows-1` is `minmax(0, 1fr)`, which sizes to the track rather than to the row's
-          // content and collapses in a section with no height of its own.
-          isDetailOpen ? "md:grid-rows-1" : "md:grid-rows-[auto]",
-          !isDragging && "md:transition-[grid-template-columns] md:duration-300 md:ease-in-out",
-          // A drag that crosses the list and the panel selects every word it passes over, and
-          // the selection is left standing when the pointer comes up. `preventDefault` on the
-          // handle stops the selection from starting; this stops one that was already in
-          // progress from extending, and covers the case where the press landed on a word
-          // rather than on the handle itself.
-          isDragging && "select-none",
-          "max-md:flex max-md:flex-col",
-          className,
-        )}
+        className={sectionClassName}
         style={gridCols ? { gridTemplateColumns: gridCols } : undefined}
+        {...slotAttributes(crudListDetailRootStyle, { dragging: isDragging })}
       >
         {children}
         <Divider onDrag={handleDrag} onDragStart={handleDragStart} onDragEnd={handleDragEnd} />
@@ -356,11 +371,10 @@ function Divider({ onDrag, onDragStart, onDragEnd }: DividerProps) {
       tabIndex={collapsed ? -1 : 0}
       className={cn(
         "md:order-2 box-content cursor-col-resize select-none self-stretch",
-        "bg-border bg-clip-content hover:bg-primary/30 active:bg-primary/50",
         "max-md:hidden",
-        "transition-[padding,opacity] duration-300 ease-in-out",
-        collapsed ? "opacity-0 pointer-events-none px-0" : "px-2",
+        collapsed && "pointer-events-none",
       )}
+      {...slotAttributes(crudListDetailDividerStyle, { collapsed })}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
@@ -399,16 +413,19 @@ const ListPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }, 
       ref={ref}
       data-panel="list"
       className={cn(
-        "flex flex-col gap-3 min-w-0",
+        "flex flex-col min-w-0",
         // The list scrolls inside itself only while it is a column beside an open detail. On its
         // own it is drawn whole and the page scrolls it, so `min-h-0` is scoped to the same
         // condition as the overflow it enables.
-        variant === "panel" && activePanel === "detail" && "min-h-0 overflow-auto md:pr-4",
+        variant === "panel" && activePanel === "detail" && "min-h-0 overflow-auto",
         variant === "panel" && "md:order-1",
         // Panel mode mobile: hide when detail is active
         variant === "panel" && activePanel !== "list" && "max-md:hidden",
         className,
       )}
+      {...slotAttributes(crudListDetailListStyle, {
+        beside: variant === "panel" && activePanel === "detail",
+      })}
     >
       {children}
       {/* Room under the last row, for the state where the page is what scrolls.
@@ -467,25 +484,22 @@ const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }
         // one the panel variant shows — and two of them in one corner is a screen telling the
         // reader there are two ways out of the same thing.
         showCloseButton={false}
-        className={cn(
-          // The sheet's own `sm:max-w-sm` is sized for a settings pane and made the drawer the
-          // narrowest of the three presentations — the one the reader was most likely looking at
-          // fitted the least. The inline `maxWidth` below replaces it; an inline style outranks any
-          // class, so nothing has to be unset here.
-          "gap-0 py-4",
-          // The same slot padding the dialog variant pushes down, for the same reason: the header
-          // and footer rules have to span the full width rather than stopping inside a gutter.
-          "[&_[data-crud-slot=header]]:px-6",
-          "[&_[data-crud-slot=body]]:px-0 [&_[data-crud-slot=body]>*]:px-6",
-          "[&_[data-crud-slot=footer]]:px-0 [&_[data-crud-slot=footer]>*]:px-6",
-          className,
-        )}
+        className={className}
+        {...partAttributes(crudListDetailDrawerStyle, {})}
+        // The sheet's own `sm:max-w-sm` is sized for a settings pane and made the drawer the
+        // narrowest of the three presentations - the one the reader was most likely looking at
+        // fitted the least. The inline `maxWidth` below replaces it; an inline style outranks any
+        // class, so nothing has to be unset here.
         // `w-3/4` from the sheet still governs below the `sm` breakpoint, where three quarters of
         // a phone is the right answer and 768 is not; this caps it everywhere above.
         style={{ maxWidth: DETAIL_PANEL_WIDTH }}
       >
         <DialogPrimitive.Title className="sr-only">{t("common.detail")}</DialogPrimitive.Title>
-        {children}
+        {/* The same slot padding the dialog variant pushes down, for the same reason: the header
+            and footer rules have to span the full width rather than stopping inside a gutter. */}
+        <div className="contents" {...slotAttributes(crudListDetailDrawerBodyStyle, {})}>
+          {children}
+        </div>
       </SheetContent>
     );
   }
@@ -494,31 +508,20 @@ const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }
     return (
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay
-          className={cn(
-            "fixed inset-0 z-50 bg-black/80",
-            "data-[state=open]:animate-in data-[state=closed]:animate-out",
-            "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-          )}
+          className={cn(crudListDetailOverlayMotion, "fixed inset-0 z-50")}
+          {...slotAttributes(crudListDetailOverlayStyle, {})}
         />
         <DialogPrimitive.Content
           ref={ref as React.Ref<HTMLDivElement>}
           aria-describedby={undefined}
-          className={cn(
+          className={cn(crudListDetailDialogMotion, 
             "fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2",
             "w-full",
             !dialogHeight && "max-h-[85vh]",
             "flex flex-col overflow-hidden",
-            "rounded-lg border bg-background py-4 shadow-lg",
-            // Push horizontal padding into CrudDetail/CrudForm slots so border lines span full dialog width.
-            // Body/footer slots carry their own panel padding — zero it so the pushed padding does not stack.
-            "[&_[data-crud-slot=header]]:px-6",
-            "[&_[data-crud-slot=body]]:px-0 [&_[data-crud-slot=body]>*]:px-6",
-            "[&_[data-crud-slot=footer]]:px-0 [&_[data-crud-slot=footer]>*]:px-6",
-            "data-[state=open]:animate-in data-[state=closed]:animate-out",
-            "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-            "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
             className,
           )}
+          {...slotAttributes(crudListDetailDialogStyle, {})}
           style={{ maxWidth: DETAIL_PANEL_WIDTH, ...(dialogHeight ? { height: dialogHeight } : {}) }}
         >
           <DialogPrimitive.Title className="sr-only">{t("common.detail")}</DialogPrimitive.Title>
@@ -532,13 +535,13 @@ const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }
     <article
       ref={ref}
       className={cn(
-        "min-h-0 min-w-0 md:order-3 flex flex-col md:pl-2",
-        "md:transition-opacity md:duration-300 md:ease-in-out",
+        "min-h-0 min-w-0 md:order-3 flex flex-col",
         activePanel === "detail"
-          ? "overflow-hidden md:opacity-100"
-          : "max-md:hidden overflow-hidden md:opacity-0 md:pointer-events-none",
+          ? "overflow-hidden"
+          : "max-md:hidden overflow-hidden md:pointer-events-none",
         className,
       )}
+      {...slotAttributes(crudListDetailDetailStyle, { open: activePanel === "detail" })}
     >
       {children}
     </article>
@@ -550,6 +553,16 @@ DetailPanel.displayName = "ListDetail.Detail";
 // ── Compound export ──
 
 import { ListDetailViewSwitch } from "./list-detail-view-switch";
+
+// Entry and exit motion is tw-animate-css, which a design stylesheet cannot @apply; it stays
+// on the element, the same in every design.
+const crudListDetailDialogMotion =
+  "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95";
+
+// Entry and exit motion is tw-animate-css, which a design stylesheet cannot @apply; it stays
+// on the element, the same in every design.
+const crudListDetailOverlayMotion =
+  "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0";
 
 /**
  * List-detail layout in three shapes:

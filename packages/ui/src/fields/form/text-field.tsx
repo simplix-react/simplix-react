@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { useFlatUIComponents } from "../../provider/ui-provider";
-import { cn } from "../../utils/cn";
 import { FieldWrapper } from "../shared/field-wrapper";
 import { InlineIconPickerTrigger } from "../shared/inline-icon-picker-trigger";
 import { ColorPicker } from "../../base/inputs/color-picker";
@@ -105,7 +104,7 @@ export function TextField({
           aria-invalid={!!error}
           aria-label={variantProps.layout === "hidden" ? label : undefined}
           {...inputProps}
-          className={cn(error && "border-destructive", inputProps?.className)}
+          className={inputProps?.className}
         />
       )}
     </FieldWrapper>

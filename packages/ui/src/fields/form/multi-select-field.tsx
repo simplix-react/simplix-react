@@ -5,8 +5,21 @@ import { useTranslation } from "@simplix-react/i18n/react";
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { FieldChevron } from "../../base/inputs/field-chevron";
 import { useFlatUIComponents } from "../../provider/ui-provider";
-import { cn } from "../../utils/cn";
+import { partAttributes, slotAttributes } from "../../design/slot-style";
+import { comboboxStatusStyle } from "./combobox-field.style";
+import {
+  multiSelectBoxStyle,
+  multiSelectCheckStyle,
+  multiSelectChipStyle,
+  multiSelectChipsStyle,
+  multiSelectInputStyle,
+  multiSelectListStyle,
+  multiSelectOptionStyle,
+  multiSelectRemoveStyle,
+} from "./multi-select-field.style";
+
 import { FieldWrapper } from "../shared/field-wrapper";
+
 
 /** Props for the {@link MultiSelectField} form component. */
 export interface MultiSelectFieldProps<T extends string = string>
@@ -113,12 +126,8 @@ export function MultiSelectField<T extends string = string>({
           <PopoverAnchor asChild>
             <span
               ref={boxRef}
-              className={cn(
-                "flex h-8 w-full items-center gap-1 rounded-md border border-input bg-background px-3 text-sm",
-                "focus-within:outline-none focus-within:border-foreground",
-                disabled && "cursor-not-allowed opacity-50",
-                error && "border-destructive focus-within:border-destructive",
-              )}
+              className="flex h-8 w-full items-center"
+              {...slotAttributes(multiSelectBoxStyle, { disabled: !!disabled, invalid: !!error })}
               onMouseDown={(e) => {
                 // A press on the box's own surface belongs to the search input.
                 if (disabled || (e.target as HTMLElement).closest("button, input")) return;
@@ -127,19 +136,23 @@ export function MultiSelectField<T extends string = string>({
                 setOpen(true);
               }}
             >
-              <span className="flex flex-1 items-center gap-1 overflow-hidden">
+              <span
+                className="flex flex-1 items-center overflow-hidden"
+                {...slotAttributes(multiSelectChipsStyle, {})}
+              >
               {selectedLabels.map((opt) => (
                 <Badge
                   key={opt.value}
                   variant="secondary"
-                  className="shrink-0 gap-0.5 pr-0.5 text-[11px] py-0 h-5"
+                  className="shrink-0 h-5"
+                  {...partAttributes(multiSelectChipStyle, {})}
                 >
                   {opt.label}
                   {!disabled && (
                     <button
                       type="button"
                       onClick={() => removeOption(opt.value)}
-                      className="ml-0.5 rounded-sm hover:bg-muted"
+                      {...slotAttributes(multiSelectRemoveStyle, {})}
                       aria-label={t("field.removeOption", { label: opt.label })}
                     >
                       <svg
@@ -176,16 +189,16 @@ export function MultiSelectField<T extends string = string>({
                 onClick={() => setOpen(true)}
                 placeholder={value.length === 0 ? selectPlaceholder : ""}
                 disabled={disabled}
-                // `outline-none` with nothing put back: the box around this input carries
-              // `focus-within:border-foreground`, so focus shows on the whole control.
-              className="min-w-[60px] flex-1 bg-transparent outline-none text-sm placeholder:text-muted-foreground disabled:cursor-not-allowed"
+                className="min-w-[60px] flex-1"
+                {...slotAttributes(multiSelectInputStyle, {})}
               />
               </span>
               <FieldChevron />
             </span>
           </PopoverAnchor>
           <PopoverContent
-            className="w-[var(--radix-popover-trigger-width)] p-0"
+            flush
+            className="w-[var(--radix-popover-trigger-width)]"
             align="start"
             onOpenAutoFocus={(e) => e.preventDefault()}
             // The box is the anchor, not the trigger, so Radix reads a press on a
@@ -194,9 +207,14 @@ export function MultiSelectField<T extends string = string>({
               if (boxRef.current?.contains(e.target as Node)) e.preventDefault();
             }}
           >
-            <ul className="max-h-60 overflow-y-auto p-1" role="listbox" id={listboxId}>
+            <ul
+              className="max-h-60 overflow-y-auto"
+              role="listbox"
+              id={listboxId}
+              {...slotAttributes(multiSelectListStyle, {})}
+            >
               {filtered.length === 0 && (
-                <li className="py-4 text-center text-sm text-muted-foreground">
+                <li {...slotAttributes(comboboxStatusStyle, { kind: "empty" })}>
                   {noResultsMessage}
                 </li>
               )}
@@ -207,13 +225,8 @@ export function MultiSelectField<T extends string = string>({
                     key={opt.value}
                     role="option"
                     aria-selected={selected}
-                    className={cn(
-                      // `outline-none` with nothing put back: the input keeps focus and this row
-                      // is pointed at by hover and by the selected accent below.
-                      "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none",
-                      "hover:bg-accent hover:text-accent-foreground",
-                      selected && "bg-accent/50",
-                    )}
+                    className="relative flex cursor-pointer select-none items-center"
+                    {...slotAttributes(multiSelectOptionStyle, { selected })}
                     onClick={() => toggleOption(opt.value)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
@@ -222,12 +235,8 @@ export function MultiSelectField<T extends string = string>({
                     }}
                   >
                     <span
-                      className={cn(
-                        "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                        selected
-                          ? "bg-primary text-primary-foreground"
-                          : "opacity-50",
-                      )}
+                      className="flex h-4 w-4 items-center justify-center"
+                      {...slotAttributes(multiSelectCheckStyle, { selected })}
                     >
                       {selected && (
                         <svg

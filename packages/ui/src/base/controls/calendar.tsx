@@ -1,7 +1,22 @@
 import { type ComponentPropsWithRef, forwardRef, useMemo, useState } from "react";
 import { useTranslation } from "@simplix-react/i18n/react";
 
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
+import {
+  calendarDayStyle,
+  calendarGridStyle,
+  calendarHeaderStyle,
+  calendarMonthGridStyle,
+  calendarMonthPanelStyle,
+  calendarMonthStyle,
+  calendarMonthsStyle,
+  calendarNavButtonStyle,
+  calendarStyle,
+  calendarTitleLabelStyle,
+  calendarTitleStyle,
+  calendarWeekdayStyle,
+} from "./calendar.style";
 import { createSelfResolving } from "../../provider/self-resolving";
 import {
   endOfWeek as endOfWeekFn,
@@ -133,7 +148,7 @@ function MonthGrid({
   const monthNames = useMemo(() => getMonthNames(locale ?? "en"), [locale]);
 
   return (
-    <div className="grid grid-cols-2 gap-1">
+    <div className="grid grid-cols-2" {...slotAttributes(calendarMonthGridStyle, {})}>
       {monthNames.map((name, i) => {
         const mStart = new Date(year, i, 1);
         const mEnd = new Date(year, i + 1, 0);
@@ -153,15 +168,11 @@ function MonthGrid({
             type="button"
             disabled={disabled}
             onClick={() => onSelectMonth({ from: mStart, to: mEnd })}
-            className={cn(
-              "flex h-8 items-center justify-center rounded-md text-sm",
-              "hover:bg-accent hover:text-accent-foreground",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-              "disabled:pointer-events-none disabled:opacity-50",
-              isCurrentMonth && !isSelected && "bg-accent/50 font-semibold",
-              isSelected &&
-                "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
-            )}
+            className="flex h-8 items-center justify-center disabled:pointer-events-none"
+            {...slotAttributes(calendarMonthStyle, {
+              current: isCurrentMonth && !isSelected,
+              selected: isSelected,
+            })}
           >
             {name}
           </button>
@@ -302,35 +313,45 @@ export const CalendarBase = forwardRef<HTMLDivElement, CalendarProps>(
         );
 
     return (
-      <div ref={ref} className={cn("w-fit p-3", className)} {...rest}>
+      <div
+        ref={ref}
+        className={cn("w-fit", className)}
+        {...rest}
+        {...slotAttributes(calendarStyle, {})}
+      >
         {/* Header */}
         {!hideHeader && (
-          <nav className="flex items-center justify-between pb-2">
+          <nav
+            className="flex items-center justify-between"
+            {...slotAttributes(calendarHeaderStyle, {})}
+          >
             {!hideNavigation ? (
               <button
                 type="button"
-                className="inline-flex h-7 w-7 items-center justify-center rounded-md text-sm hover:bg-accent hover:text-accent-foreground"
+                className="inline-flex h-7 w-7 items-center justify-center"
                 onClick={handlePrev}
                 aria-label={prevLabel}
+                {...slotAttributes(calendarNavButtonStyle, {})}
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
             ) : <span />}
-            <div className="flex gap-4">
+            <div className="flex" {...slotAttributes(calendarTitleStyle, {})}>
               {isMonthMode ? (
-                <span className="text-sm font-medium">{headerLabel}</span>
+                <span {...slotAttributes(calendarTitleLabelStyle, {})}>{headerLabel}</span>
               ) : (
                 (headerLabel as string[]).map((label, i) => (
-                  <span key={i} className="text-sm font-medium">{label}</span>
+                  <span key={i} {...slotAttributes(calendarTitleLabelStyle, {})}>{label}</span>
                 ))
               )}
             </div>
             {!hideNavigation ? (
               <button
                 type="button"
-                className="inline-flex h-7 w-7 items-center justify-center rounded-md text-sm hover:bg-accent hover:text-accent-foreground"
+                className="inline-flex h-7 w-7 items-center justify-center"
                 onClick={handleNext}
                 aria-label={nextLabel}
+                {...slotAttributes(calendarNavButtonStyle, {})}
               >
                 <ChevronRight className="h-4 w-4" />
               </button>
@@ -342,7 +363,10 @@ export const CalendarBase = forwardRef<HTMLDivElement, CalendarProps>(
         {isMonthMode && (
           <div>
             {/* Invisible sizing row — 7 cells matching the day grid to maintain consistent width */}
-            <div className="grid grid-cols-[repeat(7,minmax(0,2.75rem))] gap-0 md:grid-cols-[repeat(7,minmax(0,2.25rem))]">
+            <div
+              className="grid grid-cols-[repeat(7,minmax(0,2.75rem))] md:grid-cols-[repeat(7,minmax(0,2.25rem))]"
+              {...slotAttributes(calendarGridStyle, {})}
+            >
               {Array.from({ length: 7 }, (_, i) => (
                 <span key={i} className="h-0 w-full" aria-hidden="true" />
               ))}
@@ -360,15 +384,23 @@ export const CalendarBase = forwardRef<HTMLDivElement, CalendarProps>(
 
         {/* Day grid modes: single, range, week */}
         {!isMonthMode && (
-          <div className="flex gap-3">
+          <div className="flex" {...slotAttributes(calendarMonthsStyle, {})}>
             {months.map(({ year, month, days }) => (
-              <div key={`${year}-${month}`} className={cn("flex-1 min-w-0", numberOfMonths > 1 && "rounded-md border border-input p-2")}>
+              <div
+                key={`${year}-${month}`}
+                className="flex-1 min-w-0"
+                {...slotAttributes(calendarMonthPanelStyle, { framed: numberOfMonths > 1 })}
+              >
                 {/* Day-of-week headers */}
-                <header className="grid grid-cols-[repeat(7,minmax(0,2.75rem))] gap-0 md:grid-cols-[repeat(7,minmax(0,2.25rem))]">
+                <header
+                  className="grid grid-cols-[repeat(7,minmax(0,2.75rem))] md:grid-cols-[repeat(7,minmax(0,2.25rem))]"
+                  {...slotAttributes(calendarGridStyle, {})}
+                >
                   {weekdayNames.map((day, i) => (
                     <span
                       key={i}
-                      className="flex h-9 w-full items-center justify-center text-sm font-medium text-muted-foreground md:h-7 md:text-xs"
+                      className="flex h-9 w-full items-center justify-center md:h-7"
+                      {...slotAttributes(calendarWeekdayStyle, {})}
                     >
                       {day}
                     </span>
@@ -376,7 +408,10 @@ export const CalendarBase = forwardRef<HTMLDivElement, CalendarProps>(
                 </header>
 
                 {/* Day grid */}
-                <div className="grid grid-cols-[repeat(7,minmax(0,2.75rem))] gap-0 md:grid-cols-[repeat(7,minmax(0,2.25rem))]">
+                <div
+                  className="grid grid-cols-[repeat(7,minmax(0,2.75rem))] md:grid-cols-[repeat(7,minmax(0,2.25rem))]"
+                  {...slotAttributes(calendarGridStyle, {})}
+                >
                   {days.map((date, i) => {
                     if (!date) {
                       return <span key={`empty-${i}`} className="h-8" />;
@@ -415,28 +450,16 @@ export const CalendarBase = forwardRef<HTMLDivElement, CalendarProps>(
                         onClick={() => handleDayClick(date)}
                         onMouseEnter={mode === "week" ? () => setHoveredDate(date) : undefined}
                         onMouseLeave={mode === "week" ? () => setHoveredDate(undefined) : undefined}
-                        className={cn(
-                          // Normal weight and a softened foreground: at this size full
-                          // contrast reads heavier than the muted weekday row above it.
-                          "flex h-11 w-full items-center justify-center rounded-md text-lg font-normal text-foreground/80 md:h-9 md:text-[15px]",
-                          "hover:bg-accent hover:text-accent-foreground",
-                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                          "disabled:pointer-events-none disabled:opacity-50",
-                          isToday && "bg-accent/50 font-semibold",
-                          // Single mode selection
-                          isSelected &&
-                            "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
-                          // Range mode highlighting
-                          inRange && "bg-accent rounded-none",
-                          isStart &&
-                            "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground rounded-l-md rounded-r-none",
-                          isEnd &&
-                            "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground rounded-r-md rounded-l-none",
-                          // Week mode: selected week background
-                          mode === "week" && inSelectedWeek && !isStart && !isEnd && "bg-accent rounded-none",
-                          // Week mode: hover week background
-                          inHoverWeek && "bg-accent/50 rounded-none",
-                        )}
+                        className="flex h-11 w-full items-center justify-center disabled:pointer-events-none md:h-9"
+                        {...slotAttributes(calendarDayStyle, {
+                          today: isToday,
+                          selected: isSelected,
+                          inRange,
+                          start: isStart,
+                          end: isEnd,
+                          weekSelected: mode === "week" && inSelectedWeek && !isStart && !isEnd,
+                          weekHover: inHoverWeek,
+                        })}
                       >
                         {date.getDate()}
                       </button>

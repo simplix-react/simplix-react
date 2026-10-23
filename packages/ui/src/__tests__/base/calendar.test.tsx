@@ -11,6 +11,7 @@ vi.mock("@simplix-react/i18n/react", () => ({
 }));
 
 import { Calendar } from "../../base/controls/calendar";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -100,7 +101,7 @@ describe("Calendar", () => {
       />,
     );
     const day15 = screen.getByText("15");
-    expect(day15.className).toContain("bg-primary");
+    expect(drawnClasses(day15)).toContain("bg-primary");
   });
 
   it("hides navigation when hideNavigation is true", () => {

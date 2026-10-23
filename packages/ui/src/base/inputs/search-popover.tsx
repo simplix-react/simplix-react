@@ -155,7 +155,7 @@ export function SearchPopover<T>({
           {triggerText}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-60 p-0" align={align}>
+      <PopoverContent flush className="w-60" align={align}>
         <Command>
           <CommandInput placeholder={searchPlaceholder} />
           <CommandList>

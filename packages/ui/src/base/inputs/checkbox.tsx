@@ -3,6 +3,8 @@ import { type ComponentPropsWithRef, forwardRef } from "react";
 
 import { cn } from "../../utils/cn";
 import { createSelfResolving } from "../../provider/self-resolving";
+import { slotAttributes } from "../../design/slot-style";
+import { checkboxIndicatorStyle, checkboxStyle } from "./checkbox.style";
 
 export type CheckboxProps = ComponentPropsWithRef<
   typeof CheckboxPrimitive.Root
@@ -12,7 +14,7 @@ export type CheckboxProps = ComponentPropsWithRef<
  * Tri-state checkbox.
  *
  * @remarks
- * `checked="indeterminate"` draws a dash instead of a check — the state a parent row uses when
+ * `checked="indeterminate"` draws a dash instead of a check, the state a parent row uses when
  * only some of the rows beneath it are selected. The glyph is picked from the `checked` prop
  * rather than from the rendered `data-state`, so it reports the caller's own value; the
  * indeterminate state exists only under a controlled checkbox, which is where it is used.
@@ -21,13 +23,14 @@ export const CheckboxBase = forwardRef<HTMLButtonElement, CheckboxProps>(
   ({ className, ...rest }, ref) => (
     <CheckboxPrimitive.Root
       ref={ref}
-      className={cn(
-        "peer h-4 w-4 shrink-0 rounded-sm border border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground data-[state=indeterminate]:bg-primary data-[state=indeterminate]:text-primary-foreground",
-        className,
-      )}
+      className={cn("peer h-4 w-4 shrink-0", className)}
       {...rest}
+      {...slotAttributes(checkboxStyle, {})}
     >
-      <CheckboxPrimitive.Indicator className="flex items-center justify-center text-current">
+      <CheckboxPrimitive.Indicator
+        className="flex items-center justify-center"
+        {...slotAttributes(checkboxIndicatorStyle, {})}
+      >
         {rest.checked === "indeterminate" ? (
           <svg
             data-glyph="dash"

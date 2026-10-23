@@ -12,6 +12,7 @@ import {
   CommandItem,
   CommandSeparator,
 } from "../../base/inputs/command";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -19,15 +20,15 @@ describe("Command", () => {
   it("renders with base classes", () => {
     const { container } = render(<Command data-testid="cmd" />);
     const cmd = container.firstElementChild as HTMLElement;
-    expect(cmd.className).toContain("flex");
-    expect(cmd.className).toContain("overflow-hidden");
-    expect(cmd.className).toContain("rounded-md");
+    expect(drawnClasses(cmd)).toContain("flex");
+    expect(drawnClasses(cmd)).toContain("overflow-hidden");
+    expect(drawnClasses(cmd)).toContain("rounded-md");
   });
 
   it("merges custom className", () => {
     const { container } = render(<Command className="my-cmd" />);
     const cmd = container.firstElementChild as HTMLElement;
-    expect(cmd.className).toContain("my-cmd");
+    expect(drawnClasses(cmd)).toContain("my-cmd");
   });
 
   it("forwards ref", () => {

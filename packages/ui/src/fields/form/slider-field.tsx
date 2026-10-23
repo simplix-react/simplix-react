@@ -1,5 +1,7 @@
 import type { CommonFieldProps } from "../../crud/shared/types";
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
+import { sliderFieldRowStyle, sliderFieldValueStyle } from "./slider-field.style";
 import { FieldWrapper } from "../shared/field-wrapper";
 
 /** Props for the {@link SliderField} form component. */
@@ -54,7 +56,7 @@ export function SliderField({
       {...variantProps}
     >
       {({ id }) => (
-        <span className="flex items-center gap-3">
+        <span className="flex items-center" {...slotAttributes(sliderFieldRowStyle, {})}>
           <input
             id={id}
             type="range"
@@ -75,7 +77,7 @@ export function SliderField({
             className={cn("w-full", inputProps?.className)}
           />
           {showValue && (
-            <span className="min-w-[3ch] text-right text-sm tabular-nums text-muted-foreground">
+            <span className="min-w-[3ch]" {...slotAttributes(sliderFieldValueStyle, {})}>
               {value}
             </span>
           )}

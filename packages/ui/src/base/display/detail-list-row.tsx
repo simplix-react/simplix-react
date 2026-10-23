@@ -4,10 +4,15 @@ import {
   type ReactNode,
 } from "react";
 
-import { Flex } from "../../primitives";
-import { Stack } from "../../primitives";
 import { Text } from "../../primitives";
+import { partAttributes, slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
+import {
+  detailListFooterStyle,
+  detailListRowPrimaryStyle,
+  detailListRowStyle,
+  detailListStyle,
+} from "./detail-list-row.style";
 
 /** Props for the {@link DetailListRow} component. */
 export interface DetailListRowProps {
@@ -62,27 +67,26 @@ export const DetailListRow = forwardRef<HTMLDivElement, DetailListRowProps>(
     };
 
     return (
-      <Flex
+      <div
         ref={ref}
-        align="center"
-        gap="md"
-        className={cn(
-          "h-10 border-b px-4 last:border-b-0",
-          interactive &&
-            "cursor-pointer transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-          className,
-        )}
+        className={cn("flex flex-row items-center h-10", interactive && "cursor-pointer", className)}
         role={interactive ? "button" : undefined}
         tabIndex={interactive ? 0 : undefined}
         onClick={interactive ? onClick : undefined}
         onKeyDown={interactive ? handleKeyDown : undefined}
+        {...slotAttributes(detailListRowStyle, { interactive })}
       >
         {icon}
-        <Text as="div" size="sm" className="font-medium flex-1 truncate">
+        <Text
+          as="div"
+          size="sm"
+          className="flex-1 truncate"
+          {...partAttributes(detailListRowPrimaryStyle, {})}
+        >
           {primary}
         </Text>
         {trailing}
-      </Flex>
+      </div>
     );
   },
 );
@@ -122,14 +126,14 @@ export interface DetailListProps {
  */
 export const DetailList = forwardRef<HTMLDivElement, DetailListProps>(
   ({ children, footer, className }, ref) => (
-    <Stack
+    <div
       ref={ref}
-      gap="none"
-      className={cn("overflow-hidden rounded-lg border", className)}
+      className={cn("flex flex-col items-stretch overflow-hidden", className)}
+      {...slotAttributes(detailListStyle, {})}
     >
       {children}
-      {footer != null && <div className="border-t">{footer}</div>}
-    </Stack>
+      {footer != null && <div {...slotAttributes(detailListFooterStyle, {})}>{footer}</div>}
+    </div>
   ),
 );
 

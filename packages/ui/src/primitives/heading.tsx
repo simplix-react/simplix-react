@@ -2,33 +2,11 @@ import { type VariantProps, cva } from "class-variance-authority";
 import { type ComponentPropsWithRef, forwardRef } from "react";
 
 import { createSelfResolving } from "../provider/self-resolving";
-import { cn } from "../utils/cn";
+import { slotAttributes, slotClassNames } from "../design/slot-style";
+import { headingStyle } from "./heading.style";
 
-/** CVA variants for the Heading component typography scale. */
-const headingVariants = cva("tracking-tight", {
-  variants: {
-    level: {
-      1: "text-4xl font-bold",
-      2: "text-3xl font-semibold",
-      3: "text-2xl font-semibold",
-      4: "text-xl font-semibold",
-      5: "text-lg font-medium",
-      6: "text-base font-medium",
-    },
-    tone: {
-      default: "text-foreground",
-      muted: "text-muted-foreground",
-      primary: "text-primary",
-      destructive: "text-destructive",
-    },
-    font: {
-      sans: "font-sans",
-      display: "font-display",
-      mono: "font-mono",
-    },
-  },
-  defaultVariants: { level: 1, tone: "default" },
-});
+/** Class string of the heading scale, drawn from {@link headingStyle}. */
+const headingVariants = slotClassNames(headingStyle);
 
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 export type HeadingTag = "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
@@ -59,7 +37,7 @@ export interface HeadingProps
  * @example
  * ```tsx
  * <Heading level={1}>Page Title</Heading>
- * <Heading level={3} className="mb-6">Section Title</Heading>
+ * <Heading level={3} id="section-title">Section Title</Heading>
  * <Heading level={5} as="h2">Visually small but semantically h2</Heading>
  * ```
  */
@@ -69,8 +47,9 @@ export const HeadingBase = forwardRef<HTMLHeadingElement, HeadingProps>(
     return (
       <Tag
         ref={ref}
-        className={cn(headingVariants({ level, tone, font }), className)}
+        className={className}
         {...rest}
+        {...slotAttributes(headingStyle, { level: String(level), tone, font })}
       >
         {children}
       </Tag>

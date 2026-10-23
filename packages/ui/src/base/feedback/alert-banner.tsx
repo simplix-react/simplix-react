@@ -7,7 +7,13 @@ import {
   TriangleAlertIcon,
 } from "lucide-react";
 
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
+import {
+  alertBannerStyle,
+  alertBannerSubtitleStyle,
+  alertBannerTitleStyle,
+} from "./alert-banner.style";
 import { Flex } from "../../primitives";
 import { type IconComponent, type StatusTone } from "../status-tone";
 import { useStatusTones } from "../status-tone-context";
@@ -31,47 +37,21 @@ export type AlertTone = StatusTone;
  */
 export type AlertDensity = "default" | "sm" | "hint";
 
-/** Per-density class bundle resolved once at render time. */
+/** Per-density structure resolved once at render time. */
 interface DensityToken {
-  /** Outer container padding. */
-  container: string;
   /** Caller-supplied icon sizing. */
   icon: string;
-  /** Title line typography. */
-  title: string;
-  /** Subtitle line typography. */
-  subtitle: string;
   /** Whether this density forces the borderless surface. */
   borderless: boolean;
 }
 
-// One type scale across `default` and `sm`, which differ in the room they take and not in what a
-// title is. Given its own scale, `default` read 14/600 over a 14px body while every `sm` banner —
-// and every notice card, which is one — read 14/500 over 12px muted: the same box at two sizes
-// depending on which file drew it, and a product split 79 to 77 between them. `hint` keeps its
-// smaller title; it is the one density that means "smaller", rather than "roomier".
+// `default` and `sm` differ in the room they take and not in what a title is; the type scale
+// lives in the `alert-banner-title` slot declaration. `hint` is the one density that means
+// "smaller", rather than "roomier".
 const DENSITY_TOKENS: Record<AlertDensity, DensityToken> = {
-  default: {
-    container: "px-4 py-3",
-    icon: "size-5",
-    title: "text-sm font-medium",
-    subtitle: "text-xs text-muted-foreground",
-    borderless: false,
-  },
-  sm: {
-    container: "px-3 py-2",
-    icon: "size-4",
-    title: "text-sm font-medium",
-    subtitle: "text-xs text-muted-foreground",
-    borderless: false,
-  },
-  hint: {
-    container: "p-2.5",
-    icon: "size-3.5",
-    title: "text-xs",
-    subtitle: "text-xs text-muted-foreground",
-    borderless: true,
-  },
+  default: { icon: "size-5", borderless: false },
+  sm: { icon: "size-4", borderless: false },
+  hint: { icon: "size-3.5", borderless: true },
 };
 
 /**
@@ -199,9 +179,9 @@ export const AlertBanner = forwardRef<HTMLDivElement, AlertBannerProps>(
     // "hint" density is intrinsically borderless; otherwise honor `bordered`.
     const showBorder = densityToken.borderless ? false : bordered;
 
-    // Surface token bundles border + background tint; drop the border classes
-    // when the banner should read as borderless.
-    const surfaceClass = showBorder ? toneToken.surface : "border-transparent bg-transparent";
+    // Surface token bundles border + background tint; a borderless banner takes the transparent
+    // surface from its slot declaration instead.
+    const surfaceClass = showBorder ? toneToken.surface : undefined;
 
     // Align the icon to the start so multi-line bodies stay top-aligned, but
     // center single-line content vertically. Free-form children may wrap, so we
@@ -212,13 +192,9 @@ export const AlertBanner = forwardRef<HTMLDivElement, AlertBannerProps>(
       <div
         ref={ref}
         role="alert"
-        className={cn(
-          "rounded-md border",
-          densityToken.container,
-          surfaceClass,
-          className,
-        )}
+        className={cn(surfaceClass, className)}
         {...rest}
+        {...slotAttributes(alertBannerStyle, { density, borderless: !showBorder })}
       >
         <Flex align={verticalAlign} gap="sm">
           {Icon ? (
@@ -230,10 +206,10 @@ export const AlertBanner = forwardRef<HTMLDivElement, AlertBannerProps>(
             ) : (
               <>
                 {title != null ? (
-                  <span className={cn("leading-tight", densityToken.title)}>{title}</span>
+                  <span {...slotAttributes(alertBannerTitleStyle, { density })}>{title}</span>
                 ) : null}
                 {subtitle != null ? (
-                  <span className={cn("leading-snug", densityToken.subtitle)}>{subtitle}</span>
+                  <span {...slotAttributes(alertBannerSubtitleStyle, {})}>{subtitle}</span>
                 ) : null}
               </>
             )}

@@ -24,6 +24,7 @@ import {
   DialogDescription,
   DialogClose,
 } from "../../base/overlay/dialog";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -117,7 +118,7 @@ describe("DialogContent", () => {
       </Dialog>,
     );
     const content = screen.getByRole("dialog");
-    expect(content.className).toContain("my-dialog");
+    expect(drawnClasses(content)).toContain("my-dialog");
   });
 });
 
@@ -163,7 +164,7 @@ describe("DialogHeader", () => {
     // Content is rendered in a portal, search document.body
     const header = document.body.querySelector(".my-header");
     expect(header).not.toBeNull();
-    expect(header!.className).toContain("flex");
+    expect(drawnClasses(header)).toContain("flex");
   });
 });
 
@@ -195,7 +196,7 @@ describe("DialogFooter", () => {
     );
     const footer = document.body.querySelector(".my-footer");
     expect(footer).not.toBeNull();
-    expect(footer!.className).toContain("flex");
+    expect(drawnClasses(footer)).toContain("flex");
   });
 });
 
@@ -232,8 +233,8 @@ describe("DialogTitle", () => {
       </Dialog>,
     );
     const title = screen.getByText("T");
-    expect(title.className).toContain("my-title");
-    expect(title.className).toContain("text-lg");
+    expect(drawnClasses(title)).toContain("my-title");
+    expect(drawnClasses(title)).toContain("text-lg");
   });
 });
 
@@ -273,8 +274,8 @@ describe("DialogDescription", () => {
       </Dialog>,
     );
     const desc = screen.getByText("D");
-    expect(desc.className).toContain("my-desc");
-    expect(desc.className).toContain("text-muted-foreground");
+    expect(drawnClasses(desc)).toContain("my-desc");
+    expect(drawnClasses(desc)).toContain("text-muted-foreground");
   });
 });
 

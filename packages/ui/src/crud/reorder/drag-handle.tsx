@@ -2,6 +2,8 @@ import type { DraggableAttributes, DraggableSyntheticListeners } from "@dnd-kit/
 import { useTranslation } from "@simplix-react/i18n/react";
 
 import { cn } from "../../utils/cn";
+import { partAttributes, slotAttributes } from "../../design/slot-style";
+import { dragHandleGripStyle, dragHandleHeaderStyle, dragHandleStyle } from "./drag-handle.style";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 
 interface DragHandleCellProps {
@@ -17,15 +19,15 @@ interface DragHandleCellProps {
   attributes?: DraggableAttributes;
 }
 
-function GripIcon({ className }: { className?: string }) {
+function GripIcon({ muted }: { muted?: boolean }) {
   return (
     <svg
       width="16"
       height="16"
       viewBox="0 0 16 16"
       fill="currentColor"
-      className={className}
       aria-hidden="true"
+      {...slotAttributes(dragHandleGripStyle, { muted })}
     >
       <circle cx="5.5" cy="3.5" r="1" />
       <circle cx="10.5" cy="3.5" r="1" />
@@ -42,11 +44,11 @@ export function DragHandleCell({ disabled, disabledLabel, listeners, attributes 
 
   if (disabled) {
     if (!disabledLabel) {
-      return <GripIcon className="text-muted-foreground/30" />;
+      return <GripIcon muted />;
     }
     return (
       <span role="img" aria-label={disabledLabel} title={disabledLabel} className="inline-flex">
-        <GripIcon className="text-muted-foreground/30" />
+        <GripIcon muted />
       </span>
     );
   }
@@ -55,13 +57,10 @@ export function DragHandleCell({ disabled, disabledLabel, listeners, attributes 
     <button
       type="button"
       aria-label={t("file.handle.reorder")}
-      className={cn(
-        "inline-flex cursor-grab items-center justify-center rounded p-0.5",
-        "text-muted-foreground hover:text-foreground",
-        "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-      )}
+      className="inline-flex cursor-grab items-center justify-center"
       {...listeners}
       {...attributes}
+      {...slotAttributes(dragHandleStyle, {})}
     >
       <GripIcon />
     </button>
@@ -107,7 +106,8 @@ export function DragHandleHeader({ isDragEnabled, onActivate }: DragHandleHeader
       size="icon-xs"
       onClick={isDragEnabled ? undefined : onActivate}
       disabled={isDragEnabled}
-      className={cn(isDragEnabled && "pointer-events-none opacity-100")}
+      className={cn(isDragEnabled && "pointer-events-none")}
+      {...partAttributes(dragHandleHeaderStyle, { engaged: isDragEnabled })}
       aria-label={label}
       title={label}
     >

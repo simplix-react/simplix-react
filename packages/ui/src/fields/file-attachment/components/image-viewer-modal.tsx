@@ -2,6 +2,16 @@ import type { ReactNode } from 'react'
 import { Image as ImageIcon, X } from 'lucide-react'
 import { useTranslation } from '@simplix-react/i18n/react'
 import { useFlatUIComponents } from '../../../provider/ui-provider'
+import { partAttributes, slotAttributes } from '../../../design/slot-style'
+import {
+  imageViewerModalTitleRowStyle,
+  imageViewerModalActionsStyle,
+  imageViewerModalBodyStyle,
+  imageViewerModalCloseStyle,
+  imageViewerModalFooterStyle,
+  imageViewerModalMetaStyle,
+  imageViewerModalPreviewStyle,
+} from './image-viewer-modal.style'
 
 export interface ImageViewerModalProps {
   open: boolean
@@ -46,7 +56,7 @@ export function ImageViewerModal({
           align vertically (issue 4) and the title truncates reliably (issue 6). */}
       <DialogContent showCloseButton={false} className="sm:max-w-[600px] w-[90vw]">
         <DialogHeader className="min-w-0">
-          <div className="flex min-w-0 items-center gap-2">
+          <div className="flex min-w-0 items-center" {...slotAttributes(imageViewerModalTitleRowStyle, {})}>
             <ImageIcon size={16} aria-hidden="true" className="shrink-0" />
             <DialogTitle className="min-w-0 flex-1 truncate">
               {fileName ?? t('file.viewer.title')}
@@ -57,7 +67,8 @@ export function ImageViewerModal({
               size="icon-sm"
               onClick={onClose}
               aria-label={t('file.viewer.close')}
-              className="-mr-1 shrink-0"
+              className="shrink-0"
+              {...partAttributes(imageViewerModalCloseStyle, {})}
             >
               <X size={16} aria-hidden="true" />
             </Button>
@@ -65,17 +76,20 @@ export function ImageViewerModal({
         </DialogHeader>
 
         {/* Preview area */}
-        <div className="px-6 py-2">
-          <div className="flex min-h-[200px] items-center justify-center overflow-hidden rounded bg-muted">
+        <div {...slotAttributes(imageViewerModalBodyStyle, {})}>
+          <div className="flex min-h-[200px] items-center justify-center overflow-hidden" {...slotAttributes(imageViewerModalPreviewStyle, {})}>
             {preview}
           </div>
         </div>
 
         {/* flex-col (not the default flex-col-reverse) so the left item (meta) sits on TOP
             when stacked; sm:justify-between for meta-left / actions-right on desktop. */}
-        <DialogFooter className="flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
-          {/* Meta badges — top on mobile, left on desktop */}
-          <div className="flex items-center gap-2">
+        <DialogFooter
+          className="flex-col sm:flex-row sm:items-center sm:justify-between"
+          {...partAttributes(imageViewerModalFooterStyle, {})}
+        >
+          {/* Meta badges - top on mobile, left on desktop */}
+          <div className="flex items-center" {...slotAttributes(imageViewerModalMetaStyle, {})}>
             {fileSize && (
               <Badge variant="secondary" title={t('file.viewer.size')}>
                 {fileSize}
@@ -88,9 +102,9 @@ export function ImageViewerModal({
             )}
           </div>
 
-          {/* Actions — below on mobile (full-width stacked; flex-col-reverse puts download on top,
+          {/* Actions - below on mobile (full-width stacked; flex-col-reverse puts download on top,
               close below, matching the description dialog) / right on desktop (close, download) */}
-          <div className="flex flex-col-reverse gap-2 sm:flex-row">
+          <div className="flex flex-col-reverse sm:flex-row" {...slotAttributes(imageViewerModalActionsStyle, {})}>
             <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={onClose}>
               {t('file.viewer.close')}
             </Button>

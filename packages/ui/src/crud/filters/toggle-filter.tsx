@@ -1,8 +1,14 @@
 import { useTranslation } from "@simplix-react/i18n/react";
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
 import { Separator } from "../../base/display/separator";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { ToggleLeftIcon, XIcon } from "../shared/icons";
+import { crudFieldClearButtonStyle } from "./field-clear-button.style";
+import {
+  crudFilterChipStyle,
+  crudFilterChipTriggerStyle,
+} from "./filter-parts.style";
 
 export interface ToggleFilterProps {
   label: string;
@@ -26,31 +32,20 @@ export function ToggleFilter({
   // the two a press belongs to, and the guesses disagree.
   return (
     <span
-      className={cn(
-        "inline-flex h-8 items-center gap-2 rounded-md border px-3 text-sm",
-        isActive ? "border-solid" : "border-dashed text-muted-foreground",
-        className,
-      )}
+      className={cn("inline-flex h-8 items-center", className)}
+      {...slotAttributes(crudFilterChipStyle, { filled: isActive })}
     >
       <button
         type="button"
         onClick={() => onChange(isActive ? !value : true)}
-        className="inline-flex items-center gap-2 rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        className="inline-flex items-center"
+        {...slotAttributes(crudFilterChipTriggerStyle, {})}
       >
         <ToggleLeftIcon className="h-4 w-4" />
         {label}
       </button>
-      <Separator
-        orientation="vertical"
-        className={cn("mx-1 h-4", !isActive && "opacity-0")}
-      />
-      <Badge
-        variant="secondary"
-        className={cn(
-          "w-[2.25rem] justify-center font-normal",
-          !isActive && "opacity-0",
-        )}
-      >
+      <Separator orientation="vertical" className="h-4" />
+      <Badge variant="secondary" className="w-[2.25rem] justify-center">
         {value ? t("common.yes") : t("common.no")}
       </Badge>
       <button
@@ -58,11 +53,11 @@ export function ToggleFilter({
         tabIndex={isActive ? 0 : -1}
         onClick={() => onChange(undefined)}
         className={cn(
-          "inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground",
-          "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-          !isActive && "pointer-events-none opacity-0",
+          "inline-flex h-4 w-4 shrink-0 items-center justify-center",
+          !isActive && "pointer-events-none",
         )}
         aria-label={t("filter.clearFilter")}
+        {...slotAttributes(crudFieldClearButtonStyle, { ring: true, hidden: !isActive })}
       >
         <XIcon className="h-3 w-3" />
       </button>

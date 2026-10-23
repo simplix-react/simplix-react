@@ -28,6 +28,7 @@ vi.mock("../../crud/filters/filter-icons", () => ({
 
 import { AdvancedTextFilter } from "../../crud/filters/advanced-text-filter";
 import { SearchOperator } from "../../crud/filters/filter-types";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 describe("AdvancedTextFilter (extended coverage)", () => {
   it("resets operator to defaultOperator on clear when operator differs", () => {
@@ -152,7 +153,7 @@ describe("AdvancedTextFilter (extended coverage)", () => {
       />,
     );
     const input = container.querySelector("input");
-    expect(input?.className).toContain("pl-14");
+    expect(drawnClasses(input?.parentElement ?? null)).toContain("[&>input]:pl-14");
   });
 
   it("renders with smaller left padding when single operator", () => {
@@ -167,7 +168,7 @@ describe("AdvancedTextFilter (extended coverage)", () => {
       />,
     );
     const input = container.querySelector("input");
-    expect(input?.className).toContain("pl-8");
+    expect(drawnClasses(input?.parentElement ?? null)).toContain("[&>input]:pl-8");
   });
 
   it("renders operator dropdown trigger when multiple operators", () => {

@@ -1,6 +1,8 @@
 import { useCallback, type ReactNode } from "react";
 
 import { Flex } from "../../primitives";
+import { slotAttributes } from "../../design/slot-style";
+import { crudChipFilterChipStyle, crudChipFilterIdleMarkStyle, crudChipFilterLabelStyle } from "./chip-filter.style";
 import { CheckIcon, CircleIcon } from "../shared/icons";
 import { cn } from "../../utils/cn";
 import type { CrudListFilters } from "../list/use-crud-list";
@@ -132,22 +134,21 @@ export function ChipFilter<T extends string | number = string>({
             disabled={opt.disabled}
             aria-pressed={isActive}
             onClick={() => handleToggle(opt.value)}
-            className={cn(
-              "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors",
-              !opt.disabled && !isActive
-                && "border-transparent bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground",
-              !opt.disabled && isActive
-                && "border-transparent bg-primary text-primary-foreground",
-              opt.disabled
-                && "border-transparent bg-muted/50 text-muted-foreground/40 cursor-not-allowed",
-            )}
+            className={cn("inline-flex shrink-0 items-center", opt.disabled && "cursor-not-allowed")}
+            {...slotAttributes(crudChipFilterChipStyle, {
+              state: opt.disabled ? "disabled" : isActive ? "active" : "idle",
+            })}
           >
             {opt.icon ?? (
               isActive
                 ? <CheckIcon className="size-3.5 shrink-0" />
-                : <CircleIcon className="size-3.5 shrink-0 opacity-50" />
+                : (
+                <span className="inline-flex shrink-0" {...slotAttributes(crudChipFilterIdleMarkStyle, {})}>
+                  <CircleIcon className="size-3.5 shrink-0" />
+                </span>
+              )
             )}
-            <span className={cn(opt.disabled && "line-through opacity-50")}>
+            <span {...slotAttributes(crudChipFilterLabelStyle, { disabled: !!opt.disabled })}>
               {opt.label}
             </span>
           </button>

@@ -30,7 +30,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '../../../base/overlay/tooltip'
+import { partAttributes, slotAttributes } from '../../../design/slot-style'
 import { useTranslation } from '@simplix-react/i18n/react'
+import {
+  plateTableToolbarDangerStyle,
+  plateTableToolbarSeparatorStyle,
+  plateTableToolbarStyle,
+  plateTableToolbarTooltipStyle,
+} from './table-floating-toolbar.style'
 
 export interface TableFloatingToolbarProps {
   className?: string
@@ -105,11 +112,8 @@ export function TableFloatingToolbar({ className }: TableFloatingToolbarProps) {
   return (
     <TooltipProvider delayDuration={0}>
       <div
-        className={cn(
-          'flex items-center gap-0.5 rounded-md border bg-background p-1 shadow-md',
-          'animate-in fade-in-0 zoom-in-95',
-          className
-        )}
+        className={cn('flex items-center animate-in fade-in-0 zoom-in-95', className)}
+        {...slotAttributes(plateTableToolbarStyle, {})}
       >
         {/* Row operations */}
         <Tooltip>
@@ -124,7 +128,7 @@ export function TableFloatingToolbar({ className }: TableFloatingToolbarProps) {
               <ArrowUp className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="top" className="text-xs">
+          <TooltipContent side="top" {...partAttributes(plateTableToolbarTooltipStyle, {})}>
             {t('plateEditor.table.insertRowAbove')}
           </TooltipContent>
         </Tooltip>
@@ -141,12 +145,12 @@ export function TableFloatingToolbar({ className }: TableFloatingToolbarProps) {
               <ArrowDown className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="top" className="text-xs">
+          <TooltipContent side="top" {...partAttributes(plateTableToolbarTooltipStyle, {})}>
             {t('plateEditor.table.insertRowBelow')}
           </TooltipContent>
         </Tooltip>
 
-        <Separator orientation="vertical" className="mx-0.5 h-5" />
+        <Separator orientation="vertical" className="h-5" {...partAttributes(plateTableToolbarSeparatorStyle, {})} />
 
         {/* Column operations */}
         <Tooltip>
@@ -161,7 +165,7 @@ export function TableFloatingToolbar({ className }: TableFloatingToolbarProps) {
               <ArrowLeft className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="top" className="text-xs">
+          <TooltipContent side="top" {...partAttributes(plateTableToolbarTooltipStyle, {})}>
             {t('plateEditor.table.insertColumnLeft')}
           </TooltipContent>
         </Tooltip>
@@ -178,12 +182,12 @@ export function TableFloatingToolbar({ className }: TableFloatingToolbarProps) {
               <ArrowRight className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="top" className="text-xs">
+          <TooltipContent side="top" {...partAttributes(plateTableToolbarTooltipStyle, {})}>
             {t('plateEditor.table.insertColumnRight')}
           </TooltipContent>
         </Tooltip>
 
-        <Separator orientation="vertical" className="mx-0.5 h-5" />
+        <Separator orientation="vertical" className="h-5" {...partAttributes(plateTableToolbarSeparatorStyle, {})} />
 
         {/* Cell operations */}
         <Tooltip>
@@ -199,7 +203,7 @@ export function TableFloatingToolbar({ className }: TableFloatingToolbarProps) {
               <Combine className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="top" className="text-xs">
+          <TooltipContent side="top" {...partAttributes(plateTableToolbarTooltipStyle, {})}>
             {t('plateEditor.table.mergeCells')}
           </TooltipContent>
         </Tooltip>
@@ -217,12 +221,12 @@ export function TableFloatingToolbar({ className }: TableFloatingToolbarProps) {
               <SplitSquareHorizontal className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="top" className="text-xs">
+          <TooltipContent side="top" {...partAttributes(plateTableToolbarTooltipStyle, {})}>
             {t('plateEditor.table.splitCell')}
           </TooltipContent>
         </Tooltip>
 
-        <Separator orientation="vertical" className="mx-0.5 h-5" />
+        <Separator orientation="vertical" className="h-5" {...partAttributes(plateTableToolbarSeparatorStyle, {})} />
 
         {/* Delete operations */}
         <Tooltip>
@@ -230,14 +234,15 @@ export function TableFloatingToolbar({ className }: TableFloatingToolbarProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7 text-destructive hover:text-destructive"
+              className="h-7 w-7"
+              {...partAttributes(plateTableToolbarDangerStyle, {})}
               aria-label={t('plateEditor.table.deleteRow')}
               onClick={handleDeleteRow}
             >
               <Trash2 className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="top" className="text-xs">
+          <TooltipContent side="top" {...partAttributes(plateTableToolbarTooltipStyle, {})}>
             {t('plateEditor.table.deleteRow')}
           </TooltipContent>
         </Tooltip>
@@ -247,14 +252,15 @@ export function TableFloatingToolbar({ className }: TableFloatingToolbarProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7 text-destructive hover:text-destructive"
+              className="h-7 w-7"
+              {...partAttributes(plateTableToolbarDangerStyle, {})}
               aria-label={t('plateEditor.table.deleteColumn')}
               onClick={handleDeleteColumn}
             >
               <Trash2 className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="top" className="text-xs">
+          <TooltipContent side="top" {...partAttributes(plateTableToolbarTooltipStyle, {})}>
             {t('plateEditor.table.deleteColumn')}
           </TooltipContent>
         </Tooltip>
@@ -264,14 +270,15 @@ export function TableFloatingToolbar({ className }: TableFloatingToolbarProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7 text-destructive hover:text-destructive"
+              className="h-7 w-7"
+              {...partAttributes(plateTableToolbarDangerStyle, {})}
               aria-label={t('plateEditor.table.deleteTable')}
               onClick={handleDeleteTable}
             >
               <Trash2 className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="top" className="text-xs">
+          <TooltipContent side="top" {...partAttributes(plateTableToolbarTooltipStyle, {})}>
             {t('plateEditor.table.deleteTable')}
           </TooltipContent>
         </Tooltip>

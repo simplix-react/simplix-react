@@ -1,9 +1,17 @@
-
 import { forwardRef } from 'react'
 import type { PlateElementProps } from 'platejs/react'
 import { useElement, useSelected, useFocused } from 'platejs/react'
 import { cn } from '../../../utils/cn'
+import { slotAttributes } from '../../../design/slot-style'
 import { filterPlateProps } from '../lib/filter-plate-props'
+import {
+  plateImagePictureStyle,
+  plateImagePlaceholderBodyStyle,
+  plateImagePlaceholderSpinnerStyle,
+  plateImagePlaceholderStyle,
+  plateImagePlaceholderTextStyle,
+  plateImageStyle,
+} from './image-node.style'
 
 // Use TElement from platejs for proper typing
 import type { TElement } from 'platejs'
@@ -22,15 +30,13 @@ export const ImageElement = forwardRef<HTMLDivElement, PlateElementProps>(
     const domProps = filterPlateProps(props)
 
     return (
-      <div ref={ref} className={cn('my-4', className)} {...domProps}>
+      <div ref={ref} className={className} {...domProps} {...slotAttributes(plateImageStyle, {})}>
         <div className="relative inline-block max-w-full">
           <img
             src={element.url}
             alt={element.caption || ''}
-            className={cn(
-              'max-w-full h-auto rounded-md',
-              selected && focused && 'ring-2 ring-primary ring-offset-2'
-            )}
+            className="max-w-full h-auto"
+            {...slotAttributes(plateImagePictureStyle, { selected: selected && focused })}
           />
         </div>
         {children}
@@ -49,15 +55,19 @@ export const PlaceholderElement = forwardRef<HTMLDivElement, PlateElementProps>(
     return (
       <div
         ref={ref}
-        className={cn(
-          'my-4 flex items-center justify-center rounded-md border-2 border-dashed border-muted-foreground/25 bg-muted/50 p-8',
-          className
-        )}
+        className={cn('flex items-center justify-center', className)}
         {...domProps}
+        {...slotAttributes(plateImagePlaceholderStyle, {})}
       >
-        <div className="flex flex-col items-center gap-2 text-muted-foreground">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          <span className="text-sm">Uploading...</span>
+        <div
+          className="flex flex-col items-center"
+          {...slotAttributes(plateImagePlaceholderBodyStyle, {})}
+        >
+          <div
+            className="h-8 w-8"
+            {...slotAttributes(plateImagePlaceholderSpinnerStyle, {})}
+          />
+          <span {...slotAttributes(plateImagePlaceholderTextStyle, {})}>Uploading...</span>
         </div>
         {children}
       </div>

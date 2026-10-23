@@ -29,6 +29,7 @@ vi.mock("../../crud/filters/filter-icons", () => ({
 
 import { DateFilter } from "../../crud/filters/date-filter";
 import { SearchOperator } from "../../crud/filters/filter-types";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 describe("DateFilter", () => {
   it("renders label", () => {
@@ -70,7 +71,7 @@ describe("DateFilter", () => {
       />,
     );
     const chip = container.querySelector("button")!.parentElement;
-    expect(chip?.className).toContain("border-dashed");
+    expect(drawnClasses(chip ?? null)).toContain("border-dashed");
   });
 
   it("renders solid border when value is present", () => {
@@ -85,7 +86,7 @@ describe("DateFilter", () => {
       />,
     );
     const chip = container.querySelector("button")!.parentElement;
-    expect(chip?.className).toContain("border-solid");
+    expect(drawnClasses(chip ?? null)).toContain("border-solid");
   });
 
   it("shows operator dropdown when multiple operators provided", () => {

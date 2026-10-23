@@ -4,6 +4,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Input } from "../../base/inputs/input";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -18,9 +19,9 @@ describe("Input", () => {
   it("applies base classes", () => {
     render(<Input data-testid="input" />);
     const input = screen.getByTestId("input");
-    expect(input.className).toContain("flex");
-    expect(input.className).toContain("rounded-md");
-    expect(input.className).toContain("border-input");
+    expect(drawnClasses(input)).toContain("flex");
+    expect(drawnClasses(input)).toContain("rounded-md");
+    expect(drawnClasses(input)).toContain("border-input");
   });
 
   it("accepts custom type", () => {
@@ -32,8 +33,8 @@ describe("Input", () => {
   it("merges custom className", () => {
     render(<Input data-testid="input" className="my-input" />);
     const input = screen.getByTestId("input");
-    expect(input.className).toContain("my-input");
-    expect(input.className).toContain("border-input");
+    expect(drawnClasses(input)).toContain("my-input");
+    expect(drawnClasses(input)).toContain("border-input");
   });
 
   it("forwards ref", () => {

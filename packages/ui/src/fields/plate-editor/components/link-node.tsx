@@ -1,9 +1,10 @@
-
 import { forwardRef } from 'react'
 import type { PlateElementProps } from 'platejs/react'
 import { useElement } from 'platejs/react'
 import { cn } from '../../../utils/cn'
+import { slotAttributes } from '../../../design/slot-style'
 import { filterPlateProps } from '../lib/filter-plate-props'
+import { plateLinkStyle } from './link-node.style'
 
 // Use TElement from platejs for proper typing
 import type { TElement } from 'platejs'
@@ -24,11 +25,9 @@ export const LinkElement = forwardRef<HTMLAnchorElement, PlateElementProps>(
         href={element.url}
         target="_blank"
         rel="noopener noreferrer"
-        className={cn(
-          'text-primary underline underline-offset-4 hover:text-primary/80 cursor-pointer',
-          className
-        )}
+        className={cn('cursor-pointer', className)}
         {...domProps}
+        {...slotAttributes(plateLinkStyle, {})}
       >
         {children}
       </a>

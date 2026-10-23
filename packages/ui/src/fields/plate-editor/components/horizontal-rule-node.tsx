@@ -1,7 +1,7 @@
-
 import type { PlateElementProps } from 'platejs/react'
 import { PlateElement } from 'platejs/react'
-import { cn } from '../../../utils/cn'
+import { slotAttributes } from '../../../design/slot-style'
+import { plateHorizontalRuleLineStyle, plateHorizontalRuleStyle } from './horizontal-rule-node.style'
 
 /**
  * Horizontal rule element component
@@ -9,8 +9,12 @@ import { cn } from '../../../utils/cn'
  */
 export function HorizontalRuleElement({ className, children, ...props }: PlateElementProps) {
   return (
-    <PlateElement className={cn('py-2', className)} {...props}>
-      <div className="h-px w-full bg-border" contentEditable={false} />
+    <PlateElement className={className} {...props} attributes={{ ...props.attributes, ...slotAttributes(plateHorizontalRuleStyle, {}) }}>
+      <div
+        className="h-px w-full"
+        contentEditable={false}
+        {...slotAttributes(plateHorizontalRuleLineStyle, {})}
+      />
       {children}
     </PlateElement>
   )

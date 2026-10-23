@@ -3,7 +3,17 @@ import { type ComponentPropsWithRef, forwardRef } from "react";
 
 import { useTranslation } from "@simplix-react/i18n/react";
 
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
+import {
+  sheetCloseStyle,
+  sheetContentStyle,
+  sheetDescriptionStyle,
+  sheetFooterStyle,
+  sheetHeaderStyle,
+  sheetOverlayStyle,
+  sheetTitleStyle,
+} from "./sheet.style";
 
 // Root - pass through
 export const Sheet = DialogPrimitive.Root;
@@ -14,6 +24,12 @@ export const SheetTrigger = DialogPrimitive.Trigger;
 // Close - pass through
 export const SheetClose = DialogPrimitive.Close;
 
+// Entry and exit motion comes from the tw-animate-css utilities. They are not part of this
+// package's stylesheet, so they stay on the element: the generated design stylesheet cannot
+// @apply a utility that is not defined where it is compiled.
+const OVERLAY_MOTION =
+  "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0";
+
 // Overlay (internal)
 const SheetOverlay = forwardRef<
   HTMLDivElement,
@@ -21,11 +37,9 @@ const SheetOverlay = forwardRef<
 >(({ className, ...rest }, ref) => (
   <DialogPrimitive.Overlay
     ref={ref}
-    className={cn(
-      "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50",
-      className,
-    )}
+    className={cn("fixed inset-0 z-50", OVERLAY_MOTION, className)}
     {...rest}
+    {...slotAttributes(sheetOverlayStyle, {})}
   />
 ));
 
@@ -70,27 +84,27 @@ export const SheetContent = forwardRef<HTMLDivElement, SheetContentProps>(
         <DialogPrimitive.Content
           ref={ref}
           className={cn(
-            // `outline-none` on the container, and only on the container. Radix moves focus here when
-            // the sheet opens, so the browser paints its focus ring around the whole panel — of which
-            // only the edge nearest the page is on screen, which reads as a stray coloured line down
-            // the side of the sheet rather than as focus. Nothing is lost by removing it: this element
-            // is a region, not a control, and the first control inside still rings normally.
-            "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 flex flex-col gap-4 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 focus:outline-none",
+            "fixed z-50 flex flex-col",
+            "data-[state=open]:animate-in data-[state=closed]:animate-out",
             side === "right" &&
-              "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm",
+              "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 sm:max-w-sm",
             side === "left" &&
-              "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left inset-y-0 left-0 h-full w-3/4 border-r sm:max-w-sm",
+              "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left inset-y-0 left-0 h-full w-3/4 sm:max-w-sm",
             side === "top" &&
-              "data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top inset-x-0 top-0 h-auto border-b",
+              "data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top inset-x-0 top-0 h-auto",
             side === "bottom" &&
-              "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom inset-x-0 bottom-0 h-auto border-t",
+              "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom inset-x-0 bottom-0 h-auto",
             className,
           )}
           {...rest}
+          {...slotAttributes(sheetContentStyle, { side })}
         >
           {children}
           {showCloseButton && (
-            <DialogPrimitive.Close className="data-[state=open]:bg-secondary absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:outline-hidden disabled:pointer-events-none">
+            <DialogPrimitive.Close
+              className="absolute top-4 right-4 disabled:pointer-events-none"
+              {...slotAttributes(sheetCloseStyle, {})}
+            >
               <svg
                 width="15"
                 height="15"
@@ -123,8 +137,9 @@ export type SheetHeaderProps = React.HTMLAttributes<HTMLDivElement>;
 export function SheetHeader({ className, ...rest }: SheetHeaderProps) {
   return (
     <div
-      className={cn("flex flex-col gap-1.5 p-4", className)}
+      className={cn("flex flex-col", className)}
       {...rest}
+      {...slotAttributes(sheetHeaderStyle, {})}
     />
   );
 }
@@ -135,8 +150,9 @@ export type SheetFooterProps = React.HTMLAttributes<HTMLDivElement>;
 export function SheetFooter({ className, ...rest }: SheetFooterProps) {
   return (
     <div
-      className={cn("mt-auto flex flex-col gap-2 p-4", className)}
+      className={cn("flex flex-col", className)}
       {...rest}
+      {...slotAttributes(sheetFooterStyle, {})}
     />
   );
 }
@@ -150,8 +166,9 @@ export const SheetTitle = forwardRef<HTMLHeadingElement, SheetTitleProps>(
   ({ className, ...rest }, ref) => (
     <DialogPrimitive.Title
       ref={ref}
-      className={cn("text-foreground font-semibold", className)}
+      className={className}
       {...rest}
+      {...slotAttributes(sheetTitleStyle, {})}
     />
   ),
 );
@@ -169,8 +186,9 @@ export const SheetDescription = forwardRef<
 >(({ className, ...rest }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn("text-muted-foreground text-sm", className)}
+    className={className}
     {...rest}
+    {...slotAttributes(sheetDescriptionStyle, {})}
   />
 ));
 

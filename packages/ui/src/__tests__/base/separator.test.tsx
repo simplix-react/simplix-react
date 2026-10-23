@@ -4,6 +4,7 @@ import { cleanup, render } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { Separator } from "../../base/display/separator";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -23,15 +24,15 @@ describe("Separator", () => {
   it("applies base classes", () => {
     const { container } = render(<Separator />);
     const sep = container.firstElementChild as HTMLElement;
-    expect(sep.className).toContain("bg-border");
-    expect(sep.className).toContain("shrink-0");
+    expect(drawnClasses(sep)).toContain("bg-border");
+    expect(drawnClasses(sep)).toContain("shrink-0");
   });
 
   it("merges custom className", () => {
     const { container } = render(<Separator className="my-sep" />);
     const sep = container.firstElementChild as HTMLElement;
-    expect(sep.className).toContain("my-sep");
-    expect(sep.className).toContain("bg-border");
+    expect(drawnClasses(sep)).toContain("my-sep");
+    expect(drawnClasses(sep)).toContain("bg-border");
   });
 
   it("forwards ref", () => {

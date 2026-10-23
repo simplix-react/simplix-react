@@ -13,6 +13,7 @@ vi.mock("@simplix-react/i18n/react", () => ({
 }));
 
 import { DateRangeFilter } from "../../crud/filters/date-range-filter";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 describe("DateRangeFilter", () => {
   it("renders label", () => {
@@ -37,7 +38,7 @@ describe("DateRangeFilter", () => {
       />,
     );
     const chip = container.querySelector("button")!.parentElement;
-    expect(chip?.className).toContain("border-dashed");
+    expect(drawnClasses(chip ?? null)).toContain("border-dashed");
   });
 
   it("renders solid border when value is present", () => {
@@ -50,7 +51,7 @@ describe("DateRangeFilter", () => {
       />,
     );
     const chip = container.querySelector("button")!.parentElement;
-    expect(chip?.className).toContain("border-solid");
+    expect(drawnClasses(chip ?? null)).toContain("border-solid");
   });
 
   it("shows clear button when value is present", () => {
@@ -147,7 +148,7 @@ describe("DateRangeFilter", () => {
       />,
     );
     const chip = container.querySelector("button")!.parentElement;
-    expect(chip?.className).toContain("border-solid");
+    expect(drawnClasses(chip ?? null)).toContain("border-solid");
   });
 
   it("renders solid border when only to is set", () => {
@@ -160,7 +161,7 @@ describe("DateRangeFilter", () => {
       />,
     );
     const chip = container.querySelector("button")!.parentElement;
-    expect(chip?.className).toContain("border-solid");
+    expect(drawnClasses(chip ?? null)).toContain("border-solid");
   });
 
   it("applies custom className", () => {

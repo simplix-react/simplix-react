@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from '@simplix-react/i18n/react'
 import { FieldWrapper } from '../shared/field-wrapper'
+import { slotAttributes } from '../../design/slot-style'
+import {
+  fieldUploadStackStyle,
+  fieldValidationListStyle,
+} from '../shared/field-parts.style'
 import { useFlatUIComponents } from '../../provider/ui-provider'
 import { useFileAttachment } from '../file-attachment/use-file-attachment'
 import { useResolvedImageSrc } from '../file-attachment/use-resolved-image-src'
@@ -149,7 +154,7 @@ export function FileField({
       {/* FileAttachmentBody — inline div (DEC-4: no separate component file).
           @container: children adapt to the FIELD's own width (matches Grid primitive),
           so dropzone/list switch layout by container width, not viewport. */}
-      <div className="@container flex flex-col gap-4">
+      <div className="@container flex flex-col" {...slotAttributes(fieldUploadStackStyle, {})}>
         {/* §J: validation errors as Dialog popup (§C dropzone props per brief) */}
         <Dialog
           open={validationDialogOpen && validationErrors.length > 0}
@@ -159,7 +164,7 @@ export function FileField({
             <DialogHeader>
               <DialogTitle>{t('file.validation.title')}</DialogTitle>
             </DialogHeader>
-            <ul className="space-y-1 text-sm">
+            <ul {...slotAttributes(fieldValidationListStyle, {})}>
               {validationErrors.map((msg, idx) => (
                 // eslint-disable-next-line react/no-array-index-key
                 <li key={idx}>{msg}</li>

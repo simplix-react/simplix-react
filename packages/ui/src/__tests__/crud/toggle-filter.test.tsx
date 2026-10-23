@@ -13,6 +13,7 @@ vi.mock("@simplix-react/i18n/react", () => ({
 }));
 
 import { ToggleFilter } from "../../crud/filters/toggle-filter";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 describe("ToggleFilter", () => {
   it("renders label", () => {
@@ -27,7 +28,7 @@ describe("ToggleFilter", () => {
       <ToggleFilter label="Active" value={undefined} onChange={vi.fn()} />,
     );
     const chip = container.firstElementChild;
-    expect(chip?.className).toContain("border-dashed");
+    expect(drawnClasses(chip ?? null)).toContain("border-dashed");
   });
 
   it("shows solid border when active (value=true)", () => {
@@ -35,7 +36,7 @@ describe("ToggleFilter", () => {
       <ToggleFilter label="Active" value={true} onChange={vi.fn()} />,
     );
     const chip = container.firstElementChild;
-    expect(chip?.className).toContain("border-solid");
+    expect(drawnClasses(chip ?? null)).toContain("border-solid");
   });
 
   it("shows solid border when active (value=false)", () => {
@@ -43,7 +44,7 @@ describe("ToggleFilter", () => {
       <ToggleFilter label="Active" value={false} onChange={vi.fn()} />,
     );
     const chip = container.firstElementChild;
-    expect(chip?.className).toContain("border-solid");
+    expect(drawnClasses(chip ?? null)).toContain("border-solid");
   });
 
   it("calls onChange(true) on first click (from undefined)", () => {
@@ -161,7 +162,6 @@ describe("ToggleFilter", () => {
     const { container } = render(
       <ToggleFilter label="Active" value={undefined} onChange={vi.fn()} />,
     );
-    const badge = container.querySelector("[class*='opacity-0']");
-    expect(badge).toBeTruthy();
+    expect(drawnClasses(container.firstElementChild)).toContain("[&_[data-slot=badge]]:opacity-0");
   });
 });

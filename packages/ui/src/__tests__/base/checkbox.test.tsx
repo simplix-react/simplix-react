@@ -4,6 +4,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Checkbox } from "../../base/inputs/checkbox";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -18,15 +19,15 @@ describe("Checkbox", () => {
   it("applies base classes", () => {
     render(<Checkbox aria-label="agree" />);
     const cb = screen.getByRole("checkbox");
-    expect(cb.className).toContain("rounded-sm");
-    expect(cb.className).toContain("border-primary");
+    expect(drawnClasses(cb)).toContain("rounded-sm");
+    expect(drawnClasses(cb)).toContain("border-primary");
   });
 
   it("merges custom className", () => {
     render(<Checkbox aria-label="agree" className="my-checkbox" />);
     const cb = screen.getByRole("checkbox");
-    expect(cb.className).toContain("my-checkbox");
-    expect(cb.className).toContain("border-primary");
+    expect(drawnClasses(cb)).toContain("my-checkbox");
+    expect(drawnClasses(cb)).toContain("border-primary");
   });
 
   it("forwards ref", () => {
@@ -76,7 +77,7 @@ describe("Checkbox", () => {
 
   it("fills the box in the indeterminate state as it does when checked", () => {
     render(<Checkbox aria-label="partial" checked="indeterminate" />);
-    expect(screen.getByRole("checkbox").className)
+    expect(drawnClasses(screen.getByRole("checkbox")))
       .toContain("data-[state=indeterminate]:bg-primary");
   });
 });

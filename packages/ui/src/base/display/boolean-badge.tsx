@@ -1,6 +1,5 @@
 import { Badge } from "./badge";
 import type { BadgeVariants } from "./badge";
-import { cn } from "../../utils/cn";
 import { CheckIcon, XIcon } from "../../crud/shared/icons";
 
 export interface BooleanBadgeProps {
@@ -29,7 +28,8 @@ export function BooleanBadge({
   return (
     <Badge
       variant={variant}
-      className={cn("px-1.5", className)}
+      icon
+      className={className}
       aria-label={isTrue ? trueLabel : falseLabel}
       // Opt out of the list-cell uniform-width rule ([data-slot=badge]); a
       // boolean indicator is a compact icon pill, not a labeled status pill.

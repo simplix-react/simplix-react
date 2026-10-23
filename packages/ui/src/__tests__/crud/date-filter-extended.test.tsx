@@ -28,6 +28,7 @@ vi.mock("../../crud/filters/filter-icons", () => ({
 
 import { DateFilter } from "../../crud/filters/date-filter";
 import { SearchOperator } from "../../crud/filters/filter-types";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 describe("DateFilter (extended coverage)", () => {
   it("calls onChange(undefined) when clear button is clicked", () => {
@@ -123,7 +124,7 @@ describe("DateFilter (extended coverage)", () => {
       />,
     );
     const chip = screen.getAllByRole("button")[0].parentElement;
-    expect(chip?.className).toContain("border-solid");
+    expect(drawnClasses(chip ?? null)).toContain("border-solid");
   });
 
   it("applies custom className", () => {
@@ -218,6 +219,6 @@ describe("DateFilter (extended coverage)", () => {
     );
     // Should still show solid border since there is a value
     const chip = screen.getAllByRole("button")[0].parentElement;
-    expect(chip?.className).toContain("border-solid");
+    expect(drawnClasses(chip ?? null)).toContain("border-solid");
   });
 });

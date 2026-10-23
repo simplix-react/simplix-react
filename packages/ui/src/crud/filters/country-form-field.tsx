@@ -2,12 +2,14 @@ import { useCallback, useMemo } from "react";
 import { useTranslation } from "@simplix-react/i18n/react";
 
 import { Flex } from "../../primitives/flex";
-import { Stack } from "../../primitives/stack";
 import { useFlatUIComponents } from "../../provider/ui-provider";
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
 import { useCountryOptions } from "../../utils/use-country-options";
 import { CheckIcon } from "../shared/icons";
+import { crudCountryFlagStyle, crudFilterListFieldStyle } from "./country-form-field.style";
 import { FieldClearButton } from "./field-clear-button";
+import { crudFilterOptionCheckStyle } from "./filter-parts.style";
 import { SearchOperator } from "./filter-types";
 import { makeFilterKey } from "./filter-utils";
 import type { CrudListFilters } from "../list/use-crud-list";
@@ -60,12 +62,12 @@ export function CountryFormField({
   );
 
   return (
-    <Stack gap="xs" className={className}>
+    <div className={cn("flex flex-col", className)} {...slotAttributes(crudFilterListFieldStyle, {})}>
       <Flex align="center" justify="between">
-        <Label className="text-xs font-medium text-muted-foreground">{label}</Label>
+        <Label>{label}</Label>
         {selectedValues.size > 0 && <FieldClearButton onClick={() => state.setValue(key, undefined)} label={label} />}
       </Flex>
-      <Command filter={filterFn} className="rounded-md border">
+      <Command filter={filterFn}>
         <CommandInput placeholder={label} className="h-8" />
         <CommandList className="max-h-[160px]">
           <CommandEmpty>{t("filter.noResultsFound")}</CommandEmpty>
@@ -79,16 +81,14 @@ export function CountryFormField({
                   onSelect={() => handleSelect(option.code)}
                 >
                   <span
-                    className={cn(
-                      "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                      isSelected
-                        ? "bg-primary text-primary-foreground"
-                        : "opacity-50 [&_svg]:invisible",
-                    )}
+                    className="flex h-4 w-4 items-center justify-center"
+                    {...slotAttributes(crudFilterOptionCheckStyle, { selected: isSelected })}
                   >
                     <CheckIcon className="h-3 w-3" />
                   </span>
-                  <option.Flag className="mr-2 h-3 w-4.5 rounded-[1px]" />
+                  <span className="inline-flex" {...slotAttributes(crudCountryFlagStyle, {})}>
+                    <option.Flag className="h-3 w-4.5" />
+                  </span>
                   <span>{option.localName}</span>
                 </CommandItem>
               );
@@ -96,6 +96,6 @@ export function CountryFormField({
           </CommandGroup>
         </CommandList>
       </Command>
-    </Stack>
+    </div>
   );
 }

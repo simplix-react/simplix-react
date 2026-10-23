@@ -1,4 +1,6 @@
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
+import { mediaEmbedStyle } from "./media-embed.style";
 
 /** Props for the {@link MediaEmbed} component. */
 export interface MediaEmbedProps {
@@ -48,8 +50,9 @@ export function MediaEmbed({
         controls
         playsInline
         onEnded={onEnded}
-        className={cn("w-full rounded-md border", className)}
+        className={cn("w-full", className)}
         style={height ? { height } : undefined}
+        {...slotAttributes(mediaEmbedStyle, {})}
       />
     );
   }
@@ -59,8 +62,9 @@ export function MediaEmbed({
       title={title}
       allow="autoplay; encrypted-media; picture-in-picture"
       allowFullScreen
-      className={cn("w-full rounded-md border", widescreen && "aspect-video", className)}
+      className={cn("w-full", widescreen && "aspect-video", className)}
       style={!widescreen ? { height: height ?? 384 } : undefined}
+      {...slotAttributes(mediaEmbedStyle, {})}
     />
   );
 }

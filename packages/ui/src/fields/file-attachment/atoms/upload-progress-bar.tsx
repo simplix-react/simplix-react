@@ -1,3 +1,11 @@
+import { slotAttributes } from '../../../design/slot-style'
+import {
+  uploadProgressBarFillStyle,
+  uploadProgressBarLabelStyle,
+  uploadProgressBarStyle,
+  uploadProgressBarTrackStyle,
+} from './upload-progress-bar.style'
+
 export interface UploadProgressBarProps {
   /** Progress value 0-100. */
   value: number
@@ -7,23 +15,25 @@ export interface UploadProgressBarProps {
 /**
  * Upload progress bar atom.
  *
- * ★ UD-3/FX-1: Uses own fill <div className="bg-primary"> — NO generic Progress primitive.
- * Track height is 3px (hardcoded — no token equivalent, plan §5.4).
+ * ★ UD-3/FX-1: Uses own fill div (bg-primary) - NO generic Progress primitive.
+ * Track height is 3px (hardcoded - no token equivalent, plan §5.4).
  */
 export function UploadProgressBar({ value, showPct }: UploadProgressBarProps) {
   const pct = Math.min(100, Math.max(0, value))
 
   return (
-    <div className="flex items-center gap-2.5">
-      {/* Track — 3px height hardcoded (no token) */}
+    <div className="flex items-center" {...slotAttributes(uploadProgressBarStyle, {})}>
+      {/* Track - 3px height hardcoded (no token) */}
       <div
-        className="flex-1 overflow-hidden rounded-full bg-muted"
+        className="flex-1 overflow-hidden"
         style={{ height: 3 }}
+        {...slotAttributes(uploadProgressBarTrackStyle, {})}
       >
-        {/* Fill div — bg-primary, no Progress primitive (UD-3) */}
+        {/* Fill div - bg-primary, no Progress primitive (UD-3) */}
         <div
-          className="h-full bg-primary transition-[width]"
+          className="h-full"
           style={{ width: `${pct}%` }}
+          {...slotAttributes(uploadProgressBarFillStyle, {})}
           role="progressbar"
           aria-valuenow={pct}
           aria-valuemin={0}
@@ -31,7 +41,7 @@ export function UploadProgressBar({ value, showPct }: UploadProgressBarProps) {
         />
       </div>
       {showPct && (
-        <span className="text-[10.5px] tabular-nums text-muted-foreground">
+        <span {...slotAttributes(uploadProgressBarLabelStyle, {})}>
           {pct}%
         </span>
       )}

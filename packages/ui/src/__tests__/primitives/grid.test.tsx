@@ -4,6 +4,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { Grid } from "../../primitives/grid";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -17,7 +18,7 @@ describe("Grid", () => {
 
   it("applies default variant classes when columns=1", () => {
     render(<Grid data-testid="grid" />);
-    const classes = screen.getByTestId("grid").className;
+    const classes = drawnClasses(screen.getByTestId("grid"));
     expect(classes).toContain("grid-cols-1");
     expect(classes).toContain("gap-4");
   });
@@ -36,7 +37,7 @@ describe("Grid", () => {
       const { unmount } = render(
         <Grid data-testid="grid" columns={Number(col) as 1 | 2 | 3 | 4 | 5 | 6} responsive={false} />,
       );
-      expect(screen.getByTestId("grid").className).toContain(expected);
+      expect(drawnClasses(screen.getByTestId("grid"))).toContain(expected);
       unmount();
     }
   });
@@ -45,27 +46,27 @@ describe("Grid", () => {
     render(<Grid data-testid="grid" columns={2}>content</Grid>);
     const wrapper = screen.getByTestId("grid");
     // Wrapper has @container class
-    expect(wrapper.className).toContain("@container");
+    expect(drawnClasses(wrapper)).toContain("@container");
     // Inner grid has responsive column classes
     const inner = wrapper.firstElementChild!;
-    expect(inner.className).toContain("grid");
-    expect(inner.className).toContain("grid-cols-1");
-    expect(inner.className).toContain("@sm:grid-cols-2");
+    expect(drawnClasses(inner)).toContain("grid");
+    expect(drawnClasses(inner)).toContain("grid-cols-1");
+    expect(drawnClasses(inner)).toContain("@sm:grid-cols-2");
   });
 
   it("does not wrap when columns=1", () => {
     render(<Grid data-testid="grid" columns={1}>content</Grid>);
     const el = screen.getByTestId("grid");
-    expect(el.className).toContain("grid");
-    expect(el.className).toContain("grid-cols-1");
-    expect(el.className).not.toContain("@container");
+    expect(drawnClasses(el)).toContain("grid");
+    expect(drawnClasses(el)).toContain("grid-cols-1");
+    expect(drawnClasses(el)).not.toContain("@container");
   });
 
   it("applies responsive classes for columns=3", () => {
     render(<Grid data-testid="grid" columns={3}>content</Grid>);
     const inner = screen.getByTestId("grid").firstElementChild!;
-    expect(inner.className).toContain("@sm:grid-cols-2");
-    expect(inner.className).toContain("@2xl:grid-cols-3");
+    expect(drawnClasses(inner)).toContain("@sm:grid-cols-2");
+    expect(drawnClasses(inner)).toContain("@2xl:grid-cols-3");
   });
 
   it("applies gap variants", () => {
@@ -83,7 +84,7 @@ describe("Grid", () => {
       const { unmount } = render(
         <Grid data-testid="grid" gap={gap as keyof typeof gaps} />,
       );
-      expect(screen.getByTestId("grid").className).toContain(expected);
+      expect(drawnClasses(screen.getByTestId("grid"))).toContain(expected);
       unmount();
     }
   });
@@ -91,12 +92,12 @@ describe("Grid", () => {
   it("applies gap to inner grid when responsive", () => {
     render(<Grid data-testid="grid" columns={2} gap="lg">content</Grid>);
     const inner = screen.getByTestId("grid").firstElementChild!;
-    expect(inner.className).toContain("gap-6");
+    expect(drawnClasses(inner)).toContain("gap-6");
   });
 
   it("applies gap='px' as gap-px", () => {
     render(<Grid data-testid="grid" gap="px" />);
-    expect(screen.getByTestId("grid").className).toContain("gap-px");
+    expect(drawnClasses(screen.getByTestId("grid"))).toContain("gap-px");
   });
 
   it("applies template as inline grid-template-columns and skips columns class", () => {
@@ -107,10 +108,10 @@ describe("Grid", () => {
     );
     const el = screen.getByTestId("grid") as HTMLDivElement;
     expect(el.style.gridTemplateColumns).toBe("200px 1fr");
-    expect(el.className).toContain("grid");
+    expect(drawnClasses(el)).toContain("grid");
     // template path is flat: no @container wrapper and no columns enum class
-    expect(el.className).not.toContain("@container");
-    expect(el.className).not.toContain("grid-cols-1");
+    expect(drawnClasses(el)).not.toContain("@container");
+    expect(drawnClasses(el)).not.toContain("grid-cols-1");
   });
 
   it("template path keeps the gap class", () => {
@@ -120,7 +121,7 @@ describe("Grid", () => {
       </Grid>,
     );
     const el = screen.getByTestId("grid");
-    expect(el.className).toContain("gap-2");
+    expect(drawnClasses(el)).toContain("gap-2");
   });
 
   it("template overrides columns and responsive path", () => {
@@ -137,7 +138,7 @@ describe("Grid", () => {
     expect(el.style.gridTemplateColumns).toBe(
       "repeat(auto-fill, minmax(12rem, 1fr))",
     );
-    expect(el.className).not.toContain("@container");
+    expect(drawnClasses(el)).not.toContain("@container");
   });
 
   it("merges custom style with template", () => {
@@ -157,7 +158,7 @@ describe("Grid", () => {
 
   it("merges custom className", () => {
     render(<Grid data-testid="grid" className="custom" />);
-    const classes = screen.getByTestId("grid").className;
+    const classes = drawnClasses(screen.getByTestId("grid"));
     expect(classes).toContain("grid");
     expect(classes).toContain("custom");
   });
@@ -165,7 +166,7 @@ describe("Grid", () => {
   it("merges custom className to inner grid when responsive", () => {
     render(<Grid data-testid="grid" columns={2} className="custom">content</Grid>);
     const inner = screen.getByTestId("grid").firstElementChild!;
-    expect(inner.className).toContain("custom");
+    expect(drawnClasses(inner)).toContain("custom");
   });
 
   it("forwards ref", () => {
@@ -178,7 +179,7 @@ describe("Grid", () => {
     const ref = createRef<HTMLDivElement>();
     render(<Grid ref={ref} columns={2}>child</Grid>);
     expect(ref.current).toBeInstanceOf(HTMLDivElement);
-    expect(ref.current?.className).toContain("@container");
+    expect(drawnClasses(ref.current)).toContain("@container");
   });
 });
 
@@ -192,7 +193,8 @@ describe("Grid divider", () => {
       </Grid>,
     );
     // The first cell of the row opens it; the other two each get the rule on their left edge.
-    expect(container.querySelectorAll("[class*=border-l]")).toHaveLength(2);
+    expect(container.querySelectorAll(".grid-column-rule")).toHaveLength(2);
+    expect(drawnClasses(container.querySelector("[data-slot=grid]"))).toContain("[&>.grid-column-rule]:border-l");
   });
 
   it("leaves a cell spanning the row unruled, and reopens the rule after it", () => {
@@ -205,7 +207,7 @@ describe("Grid divider", () => {
         <div>d</div>
       </Grid>,
     );
-    const ruled = [...container.querySelectorAll("[class*=border-l]")].map((n) => n.textContent);
+    const ruled = [...container.querySelectorAll(".grid-column-rule")].map((n) => n.textContent);
     expect(ruled).toEqual(["b", "d"]);
   });
 
@@ -216,10 +218,10 @@ describe("Grid divider", () => {
         <div>b</div>
       </Grid>,
     );
-    const lines = container.querySelectorAll("[class*=border-l]");
+    const lines = container.querySelectorAll(".grid-column-rule");
     expect(lines).toHaveLength(1);
     // Collapsed to one column there is no gutter to rule, so the border is container-gated.
-    expect(lines[0].className).toContain("@sm:border-l");
+    expect(drawnClasses(container.querySelector("[data-slot=grid]"))).toContain("@sm:[&>.grid-column-rule]:border-l");
   });
 
   it("ignores divider for responsive grids with more than two columns", () => {
@@ -243,8 +245,8 @@ describe("Grid per-axis gap", () => {
       </Grid>,
     );
     const el = container.firstElementChild as HTMLElement;
-    expect(el.className).toContain("gap-x-6");
-    expect(el.className).toContain("gap-y-2");
+    expect(drawnClasses(el)).toContain("gap-x-6");
+    expect(drawnClasses(el)).toContain("gap-y-2");
   });
 });
 

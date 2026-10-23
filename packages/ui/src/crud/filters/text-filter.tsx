@@ -1,10 +1,12 @@
 import { useCallback } from "react";
 import { useTranslation } from "@simplix-react/i18n/react";
 
-import { Flex } from "../../primitives/flex";
 import { useFlatUIComponents } from "../../provider/ui-provider";
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
 import { MagnifyingGlassIcon, XIcon } from "../shared/icons";
+import { crudFieldClearButtonStyle } from "./field-clear-button.style";
+import { crudFilterInputRowStyle } from "./filter-parts.style";
 
 /**
  * Props for the {@link TextFilter} component.
@@ -38,26 +40,27 @@ export function TextFilter({ label, value, onChange, placeholder, className }: T
   const handleClear = useCallback(() => onChange(""), [onChange]);
 
   return (
-    <Flex align="center" className={cn("relative", className)}>
-      <MagnifyingGlassIcon className="absolute left-2.5 h-4 w-4 text-muted-foreground" />
+    <div className={cn("relative flex flex-row items-center", className)} {...slotAttributes(crudFilterInputRowStyle, { lead: "icon" })}>
+      <MagnifyingGlassIcon className="absolute left-2.5 h-4 w-4" />
       <Input
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder ?? label}
-        className="h-8 pl-8 pr-8 text-sm"
+        className="h-8"
         aria-label={label}
       />
       {value && (
         <button
           type="button"
           onClick={handleClear}
-          className="absolute right-2 inline-flex h-4 w-4 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
+          className="absolute right-2 inline-flex h-4 w-4 items-center justify-center"
           aria-label={t("filter.clearFilter")}
+          {...slotAttributes(crudFieldClearButtonStyle, {})}
         >
           <XIcon className="h-3 w-3" />
         </button>
       )}
-    </Flex>
+    </div>
   );
 }

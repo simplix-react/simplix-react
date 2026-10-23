@@ -13,6 +13,23 @@ import {
 } from "./select";
 import { TimeSelectControl } from "./time-picker";
 import { cn } from "../../utils/cn";
+import { partAttributes, slotAttributes } from "../../design/slot-style";
+import {
+  datePickerActionStyle,
+  datePickerActionsStyle,
+  datePickerClearStyle,
+  datePickerFooterStyle,
+  datePickerHeaderStyle,
+  datePickerLabelStyle,
+  datePickerNavButtonStyle,
+  datePickerNavStyle,
+  datePickerPanelStyle,
+  datePickerSelectsStyle,
+  datePickerStyle,
+  datePickerTriggerStyle,
+  datePickerZoneStyle,
+  datePickerCalendarStyle,
+} from "./date-picker.style";
 import {
   formatDateMedium,
   formatDateTime,
@@ -44,7 +61,7 @@ function MonthYearSelect({
 }) {
   return (
     <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className={cn("h-8 gap-1 text-sm font-medium", className)}>
+      <SelectTrigger compact className={cn("h-8", className)}>
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
@@ -91,6 +108,11 @@ export interface DatePickerProps {
   disabled?: boolean;
   /** Additional class name for the trigger button. */
   className?: string;
+  /**
+   * Draw the field as the middle segment of a button group, at the group's size.
+   * Set by {@link DateNavigator}; leave unset elsewhere.
+   */
+  joined?: "sm" | "default";
   /**
    * Show time selection: an hour/minute spinner input row under the calendar.
    * Focusing the hour or minute box drops a scrollable option list open.
@@ -158,6 +180,7 @@ export function DatePicker({
   clearable = true,
   disabled = false,
   className,
+  joined,
   showTime = false,
   hour12 = true,
   minuteStep = 1,
@@ -325,7 +348,10 @@ export function DatePicker({
   // control leaves the keyboard and assistive technology to guess which of the two a press belongs
   // to, and the guesses disagree.
   return (
-    <span className={cn("relative inline-flex w-full items-center", className)}>
+    <span
+      className={cn("relative inline-flex w-full items-center", className)}
+      {...slotAttributes(datePickerStyle, { joined })}
+    >
     <ResponsivePopover
       open={open}
       onOpenChange={handleOpenChange}
@@ -340,15 +366,12 @@ export function DatePicker({
             // `h-8`, which is what `Input`, `SelectTrigger`, `NumberInput` and the time
             // picker are. A row of fields reads as one row only if they are one height, and
             // four pixels is enough to see and not enough to name.
-            "inline-flex h-8 w-full items-center justify-start gap-2 rounded-md border border-input bg-background pl-3 text-sm font-normal",
-            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-            "disabled:cursor-not-allowed disabled:opacity-50",
-            "data-[empty=true]:text-muted-foreground",
-            isClearable ? "pr-9" : "pr-3",
+            "inline-flex h-8 w-full items-center justify-start disabled:cursor-not-allowed",
           )}
+          {...slotAttributes(datePickerTriggerStyle, { clearable: isClearable })}
         >
-          <CalendarDotIcon className="h-4 w-4 shrink-0 opacity-50" />
-          <span className="flex-1 truncate text-start">
+          <CalendarDotIcon className="h-4 w-4 shrink-0" />
+          <span className="flex-1 truncate" {...slotAttributes(datePickerLabelStyle, {})}>
             {value
               ? showTime
                 ? formatDateTime(value, bcp47)
@@ -358,13 +381,17 @@ export function DatePicker({
         </button>
       }
     >
-      <div className="p-3">
+      <div {...slotAttributes(datePickerPanelStyle, {})}>
           {/* Header: month/year navigation + optional time inputs */}
-          <div className="mb-2 flex items-center gap-3">
-            <div className="flex flex-1 items-center justify-between gap-2">
+          <div className="flex items-center" {...slotAttributes(datePickerHeaderStyle, {})}>
+            <div
+              className="flex flex-1 items-center justify-between"
+              {...slotAttributes(datePickerNavStyle, {})}
+            >
               <button
                 type="button"
-                className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-input hover:bg-accent hover:text-accent-foreground"
+                className="inline-flex h-8 w-8 items-center justify-center"
+                {...slotAttributes(datePickerNavButtonStyle, {})}
                 onClick={handlePrevMonth}
                 aria-label={t("date.previousMonth")}
               >
@@ -372,7 +399,7 @@ export function DatePicker({
                   <path d="M8.84182 3.13514C9.04327 3.32401 9.05348 3.64042 8.86462 3.84188L5.43521 7.49991L8.86462 11.1579C9.05348 11.3594 9.04327 11.6758 8.84182 11.8647C8.64036 12.0535 8.32394 12.0433 8.13508 11.8419L4.38508 7.84188C4.20477 7.64955 4.20477 7.35027 4.38508 7.15794L8.13508 3.15794C8.32394 2.95648 8.64036 2.94628 8.84182 3.13514Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd" />
                 </svg>
               </button>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center" {...slotAttributes(datePickerSelectsStyle, {})}>
                 {yearFirst ? (
                   <>{YearSelect}{MonthSelect}</>
                 ) : (
@@ -381,7 +408,8 @@ export function DatePicker({
               </div>
               <button
                 type="button"
-                className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-input hover:bg-accent hover:text-accent-foreground"
+                className="inline-flex h-8 w-8 items-center justify-center"
+                {...slotAttributes(datePickerNavButtonStyle, {})}
                 onClick={handleNextMonth}
                 aria-label={t("date.nextMonth")}
               >
@@ -391,12 +419,7 @@ export function DatePicker({
               </button>
             </div>
           </div>
-          {/* Calendar (header hidden — we provide our own) */}
-          {/* p-0, and no width override: the popover already pads, so the calendar's
-              own padding on top of it inset the day grid and left dead space at both
-              edges. Its intrinsic (w-fit) width must survive though — forcing w-full
-              hands sizing to the narrower month/year row above, and the day cells then
-              overflow their tracks and overlap sideways while rows keep full height. */}
+          {/* Calendar (header hidden: we provide our own) */}
           <Calendar
             mode="single"
             selected={draft}
@@ -407,7 +430,7 @@ export function DatePicker({
             maxDate={maxDate}
             locale={bcp47}
             hideHeader
-            className="p-0"
+            {...partAttributes(datePickerCalendarStyle, {})}
           />
           {/* Time input under the calendar; focusing hour or minute drops its option list open.
               The lists drop UP over the calendar: the popover ends right below the time
@@ -422,30 +445,34 @@ export function DatePicker({
               isHourDisabled={hourDisabledInDay}
               isMinuteDisabled={minuteDisabledInDay}
               dropDirection="up"
-              className="mt-2"
             />
           )}
           {displayZone && (
-            <div className="mt-2 text-xs text-muted-foreground">{displayZoneLabel ?? displayZone}</div>
+            <div {...slotAttributes(datePickerZoneStyle, {})}>{displayZoneLabel ?? displayZone}</div>
           )}
           {/* Footer: optional Now, plus explicit Close (discard) / Select (commit) */}
-          <div className="mt-3 flex items-center justify-between gap-2 border-t border-input pt-2">
+          <div
+            className="flex items-center justify-between"
+            {...slotAttributes(datePickerFooterStyle, {})}
+          >
             <div>
               {showTime && (
                 <button
                   type="button"
                   onClick={handleNow}
-                  className="inline-flex h-7 items-center rounded-md px-2 text-xs hover:bg-accent hover:text-accent-foreground"
+                  className="inline-flex h-7 items-center"
+                  {...slotAttributes(datePickerActionStyle, { kind: "now" })}
                 >
                   {t("date.now")}
                 </button>
               )}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center" {...slotAttributes(datePickerActionsStyle, {})}>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="inline-flex h-7 items-center rounded-md border border-input px-2.5 text-xs hover:bg-accent hover:text-accent-foreground"
+                className="inline-flex h-7 items-center"
+                {...slotAttributes(datePickerActionStyle, { kind: "close" })}
               >
                 {t("common.close")}
               </button>
@@ -453,7 +480,8 @@ export function DatePicker({
                 type="button"
                 onClick={handleCommit}
                 disabled={!draft}
-                className="inline-flex h-7 items-center rounded-md bg-primary px-2.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex h-7 items-center disabled:cursor-not-allowed"
+                {...slotAttributes(datePickerActionStyle, { kind: "select" })}
               >
                 {t("common.select")}
               </button>
@@ -466,9 +494,10 @@ export function DatePicker({
           type="button"
           aria-label={t("common.clear")}
           onClick={handleClear}
-          className="absolute right-2 rounded-sm p-0.5 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          className="absolute right-2"
+          {...slotAttributes(datePickerClearStyle, {})}
         >
-          <XIcon className="h-3.5 w-3.5 opacity-50 hover:opacity-100" />
+          <XIcon className="h-3.5 w-3.5" />
         </button>
       )}
     </span>

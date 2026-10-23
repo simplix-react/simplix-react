@@ -1,7 +1,7 @@
 import { useTranslation } from "@simplix-react/i18n/react";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
 
-import { ALERT_ACTION_CLASS, ALERT_CANCEL_CLASS, AlertPanel } from "./alert-panel";
+import { ALERT_BUTTON_STRUCTURE, alertActionAttributes, alertCancelAttributes, AlertPanel } from "./alert-panel";
 
 export interface ConfirmDialogProps {
   open: boolean;
@@ -53,7 +53,7 @@ export function ConfirmDialog({
       actions={
         <>
           {!hideCancel && (
-            <AlertDialog.Cancel className={ALERT_CANCEL_CLASS} disabled={isPending}>
+            <AlertDialog.Cancel className={ALERT_BUTTON_STRUCTURE} {...alertCancelAttributes} disabled={isPending}>
               {resolvedCancelLabel}
             </AlertDialog.Cancel>
           )}
@@ -62,7 +62,7 @@ export function ConfirmDialog({
               e.preventDefault();
               onConfirm();
             }}
-            className={ALERT_ACTION_CLASS}
+            className={ALERT_BUTTON_STRUCTURE} {...alertActionAttributes}
             disabled={isPending}
           >
             {isPending ? (pendingLabel ?? resolvedConfirmLabel) : resolvedConfirmLabel}

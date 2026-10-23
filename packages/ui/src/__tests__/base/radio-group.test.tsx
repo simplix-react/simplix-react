@@ -4,6 +4,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { RadioGroup, RadioGroupItem } from "../../base/inputs/radio-group";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -26,8 +27,8 @@ describe("RadioGroup", () => {
       </RadioGroup>,
     );
     const group = container.querySelector("[role='radiogroup']") as HTMLElement;
-    expect(group.className).toContain("grid");
-    expect(group.className).toContain("gap-2");
+    expect(drawnClasses(group)).toContain("grid");
+    expect(drawnClasses(group)).toContain("gap-2");
   });
 
   it("merges custom className on group", () => {
@@ -37,7 +38,7 @@ describe("RadioGroup", () => {
       </RadioGroup>,
     );
     const group = container.querySelector("[role='radiogroup']") as HTMLElement;
-    expect(group.className).toContain("my-group");
+    expect(drawnClasses(group)).toContain("my-group");
   });
 
   it("forwards ref on RadioGroup", () => {
@@ -92,8 +93,8 @@ describe("RadioGroupItem", () => {
       </RadioGroup>,
     );
     const radio = screen.getByRole("radio");
-    expect(radio.className).toContain("rounded-full");
-    expect(radio.className).toContain("border-primary");
+    expect(drawnClasses(radio)).toContain("rounded-full");
+    expect(drawnClasses(radio)).toContain("border-primary");
   });
 
   it("merges custom className on item", () => {
@@ -103,7 +104,7 @@ describe("RadioGroupItem", () => {
       </RadioGroup>,
     );
     const radio = screen.getByRole("radio");
-    expect(radio.className).toContain("my-radio");
+    expect(drawnClasses(radio)).toContain("my-radio");
   });
 
   it("forwards ref on RadioGroupItem", () => {

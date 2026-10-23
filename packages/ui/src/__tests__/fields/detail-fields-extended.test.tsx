@@ -2,6 +2,7 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { drawnClasses } from "../helpers/drawn-classes";
 import { DetailCountryField } from "../../fields/detail/country-field";
 import { DetailDateField } from "../../fields/detail/date-field";
 import { DetailLocationField } from "../../fields/detail/location-field";
@@ -46,8 +47,8 @@ describe("DetailNoteField", () => {
   it("applies card styling", () => {
     render(<DetailNoteField value="Note text" />);
     const p = screen.getByText("Note text");
-    expect(p.className).toContain("rounded-md");
-    expect(p.className).toContain("bg-muted/50");
+    expect(drawnClasses(p)).toContain("rounded-md");
+    expect(drawnClasses(p)).toContain("bg-muted/50");
   });
 
   it("returns null when value is null and no fallback", () => {
@@ -307,9 +308,9 @@ describe("DetailDateField (extended)", () => {
     const wrapper = screen.getByTestId("detail-field-created");
     // Label and value on one row, in two tracks, so a section can share the first one across
     // every field it holds.
-    expect(wrapper.className).toContain("grid-cols-[auto_minmax(0,1fr)]");
+    expect(drawnClasses(wrapper)).toContain("grid-cols-[auto_minmax(0,1fr)]");
     // The label and its value stay together; spreading them is `trailing`'s layout, not this one.
-    expect(wrapper.className).not.toContain("justify-between");
+    expect(drawnClasses(wrapper)).not.toContain("justify-between");
   });
 });
 
@@ -346,7 +347,7 @@ describe("DetailTextField (extended)", () => {
       <DetailTextField label="Name" value="John" layout="left" />,
     );
     const wrapper = screen.getByTestId("detail-field-name");
-    expect(wrapper.className).toContain("grid");
+    expect(drawnClasses(wrapper)).toContain("grid");
   });
 
   it("renders with layout=hidden", () => {
@@ -365,7 +366,7 @@ describe("DetailTextField (extended)", () => {
       <DetailTextField label="Name" value="John" size="lg" />,
     );
     const wrapper = screen.getByTestId("detail-field-name");
-    expect(wrapper.className).toContain("[&_.field-label]:text-base");
+    expect(drawnClasses(wrapper)).toContain("[&_.field-label]:text-base");
   });
 });
 

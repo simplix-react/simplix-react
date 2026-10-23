@@ -7,6 +7,10 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
 const LOOK = /^(?:[a-z-]+:)*(?:-?(?:bg|text|border|rounded|shadow|ring|outline|fill|stroke|font|leading|tracking|opacity|p|px|py|pt|pb|pl|pr|ps|pe|m|mx|my|mt|mb|ml|mr|gap|gap-x|gap-y|space-x|space-y|divide|decoration|underline|from|via|to|accent|caret|placeholder|backdrop|blur|transition|duration|ease|animate)(?:-|$))/;
+// tw-animate-css entry and exit motion stays on the element in every design (build-design-css
+// refuses it in a declaration), so it is not a look class here.
+const MOTION = /(?:^|:)(?:animate-in|animate-out|fade-(?:in|out)(?:-\d+)?|zoom-(?:in|out)(?:-\d+)?|slide-(?:in|out)-from-[a-z]+(?:-\d+)?|spin-(?:in|out)(?:-\d+)?|animate-collapsible-(?:up|down))$/;
+const isLook = (cls) => LOOK.test(cls) && !MOTION.test(cls);
 const root = process.cwd();
 const args = process.argv.slice(2);
 const maxIdx = args.indexOf("--max");
@@ -24,12 +28,12 @@ for (const file of files) {
   for (const m of text.matchAll(/className=(?:"([^"]*)"|\{([\s\S]*?)\}\s*(?:\n|\/?>|[a-zA-Z-]+=))/g)) {
     const chunk = m[1] ?? m[2] ?? "";
     for (const lit of chunk.matchAll(/["'`]([^"'`]*)["'`]/g).toArray?.() ?? [...chunk.matchAll(/["'`]([^"'`]*)["'`]/g)]) {
-      for (const cls of lit[1].split(/\s+/)) if (cls && LOOK.test(cls)) hits.push(cls);
+      for (const cls of lit[1].split(/\s+/)) if (cls && isLook(cls)) hits.push(cls);
     }
-    if (m[1]) for (const cls of m[1].split(/\s+/)) if (cls && LOOK.test(cls)) hits.push(cls);
+    if (m[1]) for (const cls of m[1].split(/\s+/)) if (cls && isLook(cls)) hits.push(cls);
   }
   for (const m of text.matchAll(/\bcn\(([\s\S]*?)\)/g)) {
-    for (const lit of m[1].matchAll(/["'`]([^"'`]*)["'`]/g)) for (const cls of lit[1].split(/\s+/)) if (cls && LOOK.test(cls)) hits.push(cls);
+    for (const lit of m[1].matchAll(/["'`]([^"'`]*)["'`]/g)) for (const cls of lit[1].split(/\s+/)) if (cls && isLook(cls)) hits.push(cls);
   }
   const unique = [...new Set(hits)];
   if (unique.length) {

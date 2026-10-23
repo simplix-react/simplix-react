@@ -3,8 +3,11 @@ import { useMemo } from "react";
 import type { CommonDetailFieldProps } from "../../crud/shared/types";
 import { useCountryOptions } from "../../utils/use-country-options";
 import { useLibphonenumber } from "../../utils/use-libphonenumber";
+import { slotAttributes } from "../../design/slot-style";
 import { detailFallback } from "../shared/detail-fallback";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
+import { detailPhoneFieldValueStyle } from "./phone-field.style";
+import { fieldFlagStyle } from "../shared/field-parts.style";
 
 /** Props for the {@link DetailPhoneField} component. */
 export interface DetailPhoneFieldProps extends CommonDetailFieldProps {
@@ -54,8 +57,8 @@ export function DetailPhoneField({
       className={className}
     >
       {parsed ? (
-        <span className="inline-flex items-center gap-1.5">
-          {option && <option.Flag className="h-3 w-4.5 shrink-0 rounded-[1px]" />}
+        <span className="inline-flex items-center" {...slotAttributes(detailPhoneFieldValueStyle, {})}>
+          {option && <option.Flag className="h-3 w-4.5 shrink-0" {...slotAttributes(fieldFlagStyle, {})} />}
           <span className="tabular-nums">
             {option ? parsed.formatNational() : parsed.formatInternational()}
           </span>

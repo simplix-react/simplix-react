@@ -4,6 +4,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { Flex } from "../../primitives/flex";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -12,25 +13,25 @@ describe("Flex", () => {
     render(<Flex data-testid="flex">content</Flex>);
     const el = screen.getByTestId("flex");
     expect(el.tagName).toBe("DIV");
-    expect(el.className).toContain("flex-row");
+    expect(drawnClasses(el)).toContain("flex-row");
     expect(el.textContent).toBe("content");
   });
 
   it("inherits Stack variant props", () => {
     render(<Flex data-testid="flex" gap="lg" align="center" />);
-    const classes = screen.getByTestId("flex").className;
+    const classes = drawnClasses(screen.getByTestId("flex"));
     expect(classes).toContain("gap-6");
     expect(classes).toContain("items-center");
   });
 
   it("allows overriding direction to column", () => {
     render(<Flex data-testid="flex" direction="column" />);
-    expect(screen.getByTestId("flex").className).toContain("flex-col");
+    expect(drawnClasses(screen.getByTestId("flex"))).toContain("flex-col");
   });
 
   it("merges custom className", () => {
     render(<Flex data-testid="flex" className="my-class" />);
-    const classes = screen.getByTestId("flex").className;
+    const classes = drawnClasses(screen.getByTestId("flex"));
     expect(classes).toContain("flex-row");
     expect(classes).toContain("my-class");
   });

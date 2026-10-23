@@ -4,9 +4,35 @@ import { useTranslation } from "@simplix-react/i18n/react";
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { MapPinIcon, MagnifyingGlassIcon, LocateIcon, SunIcon, MoonIcon, XIcon } from "../../crud/shared/icons";
 import { useFlatUIComponents } from "../../provider/ui-provider";
-import { cn } from "../../utils/cn";
+import { partAttributes, slotAttributes } from "../../design/slot-style";
+import {
+  locationActionsStyle,
+  locationCardStyle,
+  locationClearStyle,
+  locationCoordsStyle,
+  locationHeaderStyle,
+  locationLocateIconStyle,
+  locationLocateStyle,
+  locationMapStyle,
+  locationOpenStyle,
+  locationPreviewButtonStyle,
+  locationPreviewStyle,
+  locationPromptStyle,
+  locationReadoutStyle,
+  locationResultStyle,
+  locationResultTextStyle,
+  locationResultsStyle,
+  locationRowStyle,
+  locationSearchIconStyle,
+  locationSearchInputStyle,
+  locationThemeButtonStyle,
+  locationThemeToggleStyle,
+  locationUnavailableStyle,
+} from "./location-picker-field.style";
+
 import { Map, MapMarker } from "../../base/map/map";
 import { FieldWrapper } from "../shared/field-wrapper";
+
 
 /** Props for the {@link LocationPickerField} component. */
 export interface LocationPickerFieldProps extends CommonFieldProps {
@@ -110,17 +136,21 @@ export function LocationPickerField({
       {canUseMap ? (
         <>
         {hasLocation ? (
-          <div className="overflow-hidden rounded-md border">
-            <span className="flex items-center justify-between border-b py-0.5 pl-3 pr-0.5">
-              <span className="text-muted-foreground text-sm tabular-nums">
+          <div className="overflow-hidden" {...slotAttributes(locationCardStyle, {})}>
+            <span
+              className="flex items-center justify-between"
+              {...slotAttributes(locationHeaderStyle, {})}
+            >
+              <span {...slotAttributes(locationCoordsStyle, {})}>
                 {formatCoord(latitude)}, {formatCoord(longitude)}
               </span>
-              <span className="flex items-center gap-0.5">
+              <span className="flex items-center" {...slotAttributes(locationActionsStyle, {})}>
                 <button
                   type="button"
                   disabled={disabled}
                   onClick={() => onLocationChange(0, 0)}
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
+                  className="inline-flex h-7 w-7 items-center justify-center disabled:pointer-events-none"
+                  {...slotAttributes(locationClearStyle, {})}
                   aria-label={t("field.clearLocation")}
                 >
                   <XIcon className="h-3.5 w-3.5" />
@@ -129,7 +159,8 @@ export function LocationPickerField({
                   type="button"
                   disabled={disabled}
                   onClick={() => setOpen(true)}
-                  className="inline-flex h-7 items-center gap-1.5 rounded-md border border-input px-2 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
+                  className="inline-flex h-7 items-center disabled:pointer-events-none"
+                  {...slotAttributes(locationOpenStyle, {})}
                   aria-label={t("field.selectLocationOnMap")}
                 >
                   <MapPinIcon className="h-3.5 w-3.5" />
@@ -141,10 +172,14 @@ export function LocationPickerField({
               type="button"
               disabled={disabled}
               onClick={() => setOpen(true)}
-              className="block w-full transition-opacity hover:opacity-90 disabled:pointer-events-none disabled:opacity-50"
+              className="block w-full disabled:pointer-events-none"
+              {...slotAttributes(locationPreviewButtonStyle, {})}
               aria-label={t("field.openMap")}
             >
-              <div className="pointer-events-none h-[150px] bg-neutral-100 dark:bg-neutral-900">
+              <div
+                className="pointer-events-none h-[150px]"
+                {...slotAttributes(locationPreviewStyle, {})}
+              >
                 <Map
                   center={[longitude, latitude]}
                   zoom={zoom}
@@ -161,7 +196,8 @@ export function LocationPickerField({
             type="button"
             disabled={disabled}
             onClick={() => setOpen(true)}
-            className="flex h-8 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
+            className="flex h-8 w-full items-center justify-between disabled:pointer-events-none"
+            {...slotAttributes(locationPromptStyle, {})}
           >
             <span>{t("field.selectLocationPrompt")}</span>
             <MapPinIcon className="h-4 w-4" />
@@ -185,7 +221,7 @@ export function LocationPickerField({
         />
         </>
       ) : (
-        <span className="flex items-center gap-2">
+        <span className="flex items-center" {...slotAttributes(locationRowStyle, {})}>
           <Input
             type="number"
             value={latitude === 0 ? "" : String(latitude)}
@@ -213,7 +249,8 @@ export function LocationPickerField({
           <button
             type="button"
             disabled
-            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-input bg-background text-muted-foreground opacity-50"
+            className="inline-flex h-8 w-8 shrink-0 items-center justify-center"
+            {...slotAttributes(locationUnavailableStyle, {})}
             title={t("field.mapUnavailable")}
             aria-label={t("field.mapUnavailable")}
           >
@@ -328,7 +365,7 @@ function LocationPickerDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <span className="flex items-center gap-2">
+        <span className="flex items-center" {...slotAttributes(locationRowStyle, {})}>
           <span className="flex-1">
             <GeoSearch onSelect={handleSearchSelect} />
           </span>
@@ -336,21 +373,26 @@ function LocationPickerDialog({
             type="button"
             disabled={locating}
             onClick={handleLocate}
-            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-input bg-background text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
+            className="inline-flex h-8 w-8 shrink-0 items-center justify-center disabled:pointer-events-none"
+            {...slotAttributes(locationLocateStyle, {})}
             title={t("field.detectLocation")}
             aria-label={t("field.detectLocation")}
           >
-            <LocateIcon className={cn("h-4 w-4", locating && "animate-pulse")} />
+            <LocateIcon className="h-4 w-4" {...slotAttributes(locationLocateIconStyle, { locating })} />
           </button>
         </span>
 
-        <div className="relative overflow-hidden rounded-md border" style={{ height: mapHeight }}>
+        <div
+          className="relative overflow-hidden"
+          style={{ height: mapHeight }}
+          {...slotAttributes(locationCardStyle, {})}
+        >
           <Map
             ref={(m) => {
               mapRef.current = m;
               if (m) m.on("click", handleMapClick);
             }}
-            className={mapTheme === "dark" ? "bg-neutral-900" : "bg-neutral-100"}
+            partProps={partAttributes(locationMapStyle, { theme: mapTheme === "dark" ? "dark" : "light" })}
             center={[center.lng, center.lat]}
             zoom={zoom}
             theme={mapTheme}
@@ -372,16 +414,17 @@ function LocationPickerDialog({
           </Map>
 
           {/* Theme toggle — bottom left */}
-          <span className="absolute bottom-2 left-2 z-10 inline-flex overflow-hidden rounded-md border border-black/10 shadow-sm">
+          <span
+            className="absolute bottom-2 left-2 z-10 inline-flex overflow-hidden"
+            {...slotAttributes(locationThemeToggleStyle, {})}
+          >
             <button
               type="button"
               onClick={() => setMapTheme("light")}
-              className={cn(
-                "inline-flex h-7 w-7 items-center justify-center transition-colors",
-                mapTheme === "light"
-                  ? "bg-white text-neutral-800"
-                  : "bg-black/40 text-white/70 hover:text-white",
-              )}
+              className="inline-flex h-7 w-7 items-center justify-center"
+              {...slotAttributes(locationThemeButtonStyle, {
+                state: mapTheme === "light" ? "light-active" : "light-idle",
+              })}
               aria-label={t("field.mapLight")}
             >
               <SunIcon className="h-3.5 w-3.5" />
@@ -389,12 +432,10 @@ function LocationPickerDialog({
             <button
               type="button"
               onClick={() => setMapTheme("dark")}
-              className={cn(
-                "inline-flex h-7 w-7 items-center justify-center transition-colors",
-                mapTheme === "dark"
-                  ? "bg-neutral-800 text-white"
-                  : "bg-white/80 text-neutral-400 hover:text-neutral-600",
-              )}
+              className="inline-flex h-7 w-7 items-center justify-center"
+              {...slotAttributes(locationThemeButtonStyle, {
+                state: mapTheme === "dark" ? "dark-active" : "dark-idle",
+              })}
               aria-label={t("field.mapDark")}
             >
               <MoonIcon className="h-3.5 w-3.5" />
@@ -402,7 +443,10 @@ function LocationPickerDialog({
           </span>
 
           {/* Coordinates — bottom right */}
-          <span className="absolute bottom-2 right-2 z-10 rounded-md bg-black/60 px-2.5 py-1.5 text-sm tabular-nums text-white shadow-sm">
+          <span
+            className="absolute bottom-2 right-2 z-10"
+            {...slotAttributes(locationReadoutStyle, {})}
+          >
             {tempLat.toFixed(6)}, {tempLng.toFixed(6)}
           </span>
         </div>
@@ -468,29 +512,32 @@ function GeoSearch({ onSelect }: { onSelect: (lat: number, lng: number) => void 
   return (
     <div className="relative">
       <span className="relative flex items-center">
-        <MagnifyingGlassIcon className="pointer-events-none absolute left-2 h-4 w-4 text-muted-foreground" />
+        <MagnifyingGlassIcon
+          className="pointer-events-none absolute left-2 h-4 w-4"
+          {...slotAttributes(locationSearchIconStyle, {})}
+        />
         <Input
           type="text"
           value={query}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
           placeholder={t("field.searchLocation")}
-          className="pl-8"
+          {...partAttributes(locationSearchInputStyle, {})}
           onFocus={() => results.length > 0 && setShowResults(true)}
           onBlur={() => setTimeout(() => setShowResults(false), 200)}
         />
       </span>
 
       {showResults && results.length > 0 && (
-        <ul className="absolute z-50 mt-1 max-h-48 w-full overflow-auto rounded-md border bg-popover p-1 text-popover-foreground shadow-md">
+        <ul
+          className="absolute z-50 max-h-48 w-full overflow-auto"
+          {...slotAttributes(locationResultsStyle, {})}
+        >
           {results.map((r) => (
             <li key={r.place_id}>
               <button
                 type="button"
-                className={cn(
-                  "w-full rounded-sm px-2 py-1.5 text-left text-sm",
-                  "hover:bg-accent hover:text-accent-foreground",
-                  "focus:bg-accent focus:text-accent-foreground focus:outline-none",
-                )}
+                className="w-full"
+                {...slotAttributes(locationResultStyle, {})}
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => {
                   onSelect(Number(r.lat), Number(r.lon));
@@ -498,7 +545,7 @@ function GeoSearch({ onSelect }: { onSelect: (lat: number, lng: number) => void 
                   setShowResults(false);
                 }}
               >
-                <span className="line-clamp-2 text-xs">{r.display_name}</span>
+                <span className="line-clamp-2" {...slotAttributes(locationResultTextStyle, {})}>{r.display_name}</span>
               </button>
             </li>
           ))}

@@ -3,6 +3,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { LabeledField } from "../../base";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -58,13 +59,13 @@ describe("LabeledField", () => {
       />,
     );
     const label = screen.getByText("Clickable").closest("label");
-    expect(label?.className).toContain("cursor-pointer");
+    expect(drawnClasses(label)).toContain("cursor-pointer");
   });
 
   it("omits cursor-pointer when htmlFor is not set", () => {
     render(<LabeledField label="Static" control={<button>X</button>} />);
     const label = screen.getByText("Static").closest("label");
-    expect(label?.className).not.toContain("cursor-pointer");
+    expect(drawnClasses(label)).not.toContain("cursor-pointer");
     expect(label?.getAttribute("for")).toBeNull();
   });
 
@@ -73,7 +74,7 @@ describe("LabeledField", () => {
       <LabeledField label="Default Align" control={<button>X</button>} />,
     );
     const row = container.firstElementChild;
-    expect(row?.className).toContain("items-start");
+    expect(drawnClasses(row)).toContain("items-start");
   });
 
   it("applies center alignment when align='center'", () => {
@@ -85,7 +86,7 @@ describe("LabeledField", () => {
       />,
     );
     const row = container.firstElementChild;
-    expect(row?.className).toContain("items-center");
+    expect(drawnClasses(row)).toContain("items-center");
   });
 
   it("renders the description with a dark-mode-correct muted token", () => {
@@ -98,7 +99,7 @@ describe("LabeledField", () => {
     );
     const desc = screen.getByText("Helper text");
     // Semantic muted token resolves correctly in both light and dark themes.
-    expect(desc.className).toContain("text-muted-foreground");
+    expect(drawnClasses(desc)).toContain("text-muted-foreground");
   });
 
   it("merges custom className onto the outer row", () => {
@@ -109,6 +110,6 @@ describe("LabeledField", () => {
         control={<button>X</button>}
       />,
     );
-    expect(container.firstElementChild?.className).toContain("my-row");
+    expect(drawnClasses(container.firstElementChild)).toContain("my-row");
   });
 });

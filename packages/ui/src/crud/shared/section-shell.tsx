@@ -3,9 +3,20 @@ import { type ReactNode, useState } from "react";
 
 import { Flex } from "../../primitives";
 import { Stack } from "../../primitives";
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { CaretDownIcon } from "./icons";
+import {
+  sectionShellBodyStyle,
+  sectionShellCaretStyle,
+  sectionShellCollapseStyle,
+  sectionShellDescriptionStyle,
+  sectionShellGroupTitleStyle,
+  sectionShellHeaderStyle,
+  sectionShellStyle,
+  sectionShellTitleStyle,
+} from "./section-shell.style";
 
 // variant="card" (default)
 //
@@ -95,13 +106,10 @@ export function SectionShell({
   const TitleTag = sectionTitle ? "h4" : "h3";
   const isCard = variant === "card";
   const isLined = variant === "lined";
-  const titleClass = isCard || isLined
-    ? "text-sm font-semibold tracking-tight"
-    : "text-lg font-semibold tracking-tight";
   const headerContent = (
     <Stack gap="xs">
       <Flex align="center" justify="between">
-        <TitleTag className={cn(titleClass, "inline-flex items-center gap-1.5")}>{title}</TitleTag>
+        <TitleTag className="inline-flex items-center" {...slotAttributes(sectionShellTitleStyle, { variant })}>{title}</TitleTag>
         {(trailing || collapsible) && (
           <Flex align="center" gap="xs">
             {trailing}
@@ -115,10 +123,8 @@ export function SectionShell({
                   aria-label={open ? "Collapse" : "Expand"}
                 >
                   <CaretDownIcon
-                    className={cn(
-                      "h-4 w-4 transition-transform duration-200",
-                      !open && "-rotate-90",
-                    )}
+                    className={cn("h-4 w-4", !open && "-rotate-90")}
+                    {...slotAttributes(sectionShellCaretStyle, {})}
                   />
                 </Button>
               </CollapsiblePrimitive.Trigger>
@@ -127,25 +133,25 @@ export function SectionShell({
         )}
       </Flex>
       {description && (
-        <p className="text-sm text-muted-foreground">{description}</p>
+        <p {...slotAttributes(sectionShellDescriptionStyle, {})}>{description}</p>
       )}
     </Stack>
   );
 
   const header = isCard ? (
-    <div className="rounded-t-lg border-b bg-muted/50 pl-4 pr-2 py-0.5">
+    <div {...slotAttributes(sectionShellHeaderStyle, { variant })}>
       {headerContent}
     </div>
   ) : (
-    <div className="pl-0">{headerContent}</div>
+    <div {...slotAttributes(sectionShellHeaderStyle, { variant })}>{headerContent}</div>
   );
 
   const body = isCard ? (
-    <div className="px-4 py-2">{children}</div>
+    <div {...slotAttributes(sectionShellBodyStyle, { variant })}>{children}</div>
   ) : isLined ? (
-    <div className="ml-2 border-l-2 border-border/50 pl-4">{children}</div>
+    <div {...slotAttributes(sectionShellBodyStyle, { variant })}>{children}</div>
   ) : (
-    <div>{children}</div>
+    <div {...slotAttributes(sectionShellBodyStyle, { variant })}>{children}</div>
   );
 
   const showHeader = title || trailing || collapsible;
@@ -153,7 +159,7 @@ export function SectionShell({
   const cardInner = collapsible ? (
     <CollapsiblePrimitive.Root open={open} onOpenChange={setOpen}>
       {showHeader && header}
-      <CollapsiblePrimitive.Content className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+      <CollapsiblePrimitive.Content className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down" {...slotAttributes(sectionShellCollapseStyle, {})}>
         {body}
       </CollapsiblePrimitive.Content>
     </CollapsiblePrimitive.Root>
@@ -167,18 +173,11 @@ export function SectionShell({
   const section = (
     <section
       className={cn(
-        isCard &&
-          "overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm",
-        // The rule belongs to both sections it separates, so the inset is the same on each side.
-        // It was `pb-2` alone, which paid 8px under the content above and nothing over the
-        // heading below — the rule then sat against the next title and read as underlining it
-        // rather than as ending the section before. The `isLined` variant beside this one had
-        // the symmetric form already.
-        variant === "flat" &&
-          "flex flex-col gap-2 py-3 border-b border-border/50 first:pt-0 last:border-b-0 last:pb-0",
-        isLined && "flex flex-col gap-2 py-2",
+        isCard && "overflow-hidden",
+        (variant === "flat" || isLined) && "flex flex-col",
         className,
       )}
+      {...slotAttributes(sectionShellStyle, { variant })}
     >
       {cardInner}
     </section>
@@ -187,7 +186,7 @@ export function SectionShell({
   if (sectionTitle) {
     return (
       <Stack gap="sm">
-        <h3 className="text-lg font-semibold tracking-tight">{sectionTitle}</h3>
+        <h3 {...slotAttributes(sectionShellGroupTitleStyle, {})}>{sectionTitle}</h3>
         {section}
       </Stack>
     );

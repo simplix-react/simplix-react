@@ -7,42 +7,28 @@ import {
 } from "react";
 
 import { createSelfResolving } from "../provider/self-resolving";
+import { slotAttributes, slotClassNames } from "../design/slot-style";
 import { cn } from "../utils/cn";
+import { cardStyle } from "./card.style";
 
-/** CVA variants for the Card component visual configuration. */
-const cardVariants = cva(
-  "rounded-lg border border-border bg-card text-card-foreground shadow-sm",
-  {
-    variants: {
-      /**
-       * Horizontal and vertical padding are set apart, and the vertical one is a step smaller.
-       *
-       * <p>A card is wider than it is tall and its content is lines of text, so equal padding on
-       * all four sides spends the height that lines would use on empty space above and below them
-       * — a three-line stat card came out 130px tall, of which 48px was padding. The sides still
-       * need the full step: that is the gutter between the border and the first character, and
-       * narrowing it makes the text look pressed against the edge.
-       */
-      padding: {
-        none: "",
-        sm: "px-4 py-3",
-        md: "px-6 py-4",
-        lg: "px-8 py-6",
-      },
-      /** Take the whole width of whatever holds it — a card that IS the column it sits in. */
-      fill: { true: "w-full", false: "" },
-
-      interactive: {
-        true: "cursor-pointer hover:border-primary/30 hover:shadow-md transition-all",
-        false: "",
-      },
-    },
-    defaultVariants: { padding: "md", interactive: false, fill: false },
+/** CVA variants for the Card component's structure: width and pointer. */
+const cardLayout = cva("", {
+  variants: {
+    /** Take the whole width of whatever holds it - a card that IS the column it sits in. */
+    fill: { true: "w-full", false: "" },
+    interactive: { true: "cursor-pointer", false: "" },
   },
-);
+  defaultVariants: { interactive: false, fill: false },
+});
+
+/** The card's drawn look (surface, padding, hover) as a class-string function. */
+const cardLook = slotClassNames(cardStyle);
+
+/** Class string for a card with the given variants: its layout classes plus its drawn look. */
+const cardVariants = (props?: CardVariants): string => cn(cardLayout(props), cardLook(props));
 
 /** Variant props extracted from {@link cardVariants}. */
-export type CardVariants = VariantProps<typeof cardVariants>;
+export type CardVariants = VariantProps<typeof cardLayout> & VariantProps<typeof cardLook>;
 
 export type CardTag = "div" | "button" | "article";
 
@@ -71,12 +57,11 @@ export const CardBase = forwardRef<HTMLElement, CardProps>(
     return (
       <Tag
         ref={ref as ComponentPropsWithRef<typeof Tag>["ref"]}
-        className={cn(
-          cardVariants({ padding, interactive }),
-          Tag === "button" && "w-full text-left",
-          className,
-        )}
+        // fill is declared but not drawn and reaches the element as an attribute, as the class-string
+        // form of this primitive did; drawing it changes the classic look.
+        className={cn(cardLayout({ interactive }), Tag === "button" && "w-full", className)}
         {...(rest as ComponentPropsWithRef<ElementType>)}
+        {...slotAttributes(cardStyle, { padding, interactive, button: Tag === "button" })}
       >
         {children}
       </Tag>

@@ -1,7 +1,19 @@
 import type { ReactNode } from "react";
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
 import { type StatusTone } from "../status-tone";
 import { useStatusTones } from "../status-tone-context";
+import {
+  statCardBodyStyle,
+  statCardDescriptionStyle,
+  statCardFooterStyle,
+  statCardHeaderStyle,
+  statCardIconStyle,
+  statCardStyle,
+  statCardTitleStyle,
+  statCardTrendStyle,
+  statCardValueStyle,
+} from "./stat-card.style";
 
 export interface StatCardProps {
   /** Card title shown above the value. */
@@ -63,34 +75,21 @@ export function StatCard({
   const tones = useStatusTones();
   return (
     <div
-      className={cn(
-        // Card's `sm` step, not its `md`. A figure tile is a card and must not sit taller than the
-        // cards beside it; four of them across the top of a list screen is the first thing between
-        // the header and the rows, and every row of padding there is a row of the list pushed off
-        // the fold. The sides keep the full step — that is the gutter between the border and the
-        // first character, and narrowing it makes the text look pressed against the edge.
-        // Full height of whatever row it is in, because that is what every caller wants and each
-        // one was writing `className="h-full"` to get it — the shared tile row of one product
-        // included. A row of four with one two-line basis otherwise draws three cards floating
-        // above a taller neighbour. In a parent that does not stretch, `h-full` resolves to auto
-        // and nothing changes, so this costs a lone tile nothing.
-        "h-full rounded-lg border px-4 py-3 text-card-foreground shadow-sm",
-        highlighted && tone ? tones[tone].surface : "bg-card",
-        className,
-      )}
+      className={cn(highlighted && tone ? tones[tone].surface : undefined, className)}
+      {...slotAttributes(statCardStyle, { tinted: highlighted && !!tone })}
     >
       {/* Three rows — what it is called, the figure, what the figure was read from — and the shape
           beside the figure rather than under it, which is how the wireframe board draws the same
           tile. The label owns its own row so a long one is not competing with the figure for the
           width, and the figure starts at the card's left edge where the eye already is after
           reading the label. */}
-      <div className="flex min-w-0 items-center gap-1.5">
-        <p className="truncate text-sm font-medium text-muted-foreground">{title}</p>
+      <div className="flex min-w-0 items-center" {...slotAttributes(statCardHeaderStyle, {})}>
+        <p className="truncate" {...slotAttributes(statCardTitleStyle, {})}>{title}</p>
         {headerExtra}
-        {icon && <span className="shrink-0 text-muted-foreground">{icon}</span>}
+        {icon && <span className="shrink-0" {...slotAttributes(statCardIconStyle, {})}>{icon}</span>}
       </div>
-      <div className="mt-1 flex items-end justify-between gap-3">
-        <p className="min-w-0 truncate text-2xl font-bold leading-none">{value}</p>
+      <div className="flex items-end justify-between" {...slotAttributes(statCardBodyStyle, {})}>
+        <p className="min-w-0 truncate" {...slotAttributes(statCardValueStyle, {})}>{value}</p>
         {/* 84px is the width the wireframe board draws a sparkline at, so a plot moved from a frame
             into a tile arrives at the size it was drawn. Nothing is rendered where there is no plot
             — the figure is left-aligned either way, so an empty box would reserve a column that
@@ -98,18 +97,16 @@ export function StatCard({
         {chart && <div className="w-[84px] shrink-0">{chart}</div>}
       </div>
       {(description || trend) && (
-        <div className="mt-1.5 flex items-baseline justify-between gap-3">
+        <div className="flex items-baseline justify-between" {...slotAttributes(statCardFooterStyle, {})}>
           {description ? (
-            <p className="min-w-0 text-xs text-muted-foreground">{description}</p>
+            <p className="min-w-0" {...slotAttributes(statCardDescriptionStyle, {})}>{description}</p>
           ) : (
             <span />
           )}
           {trend && (
             <p
-              className={cn(
-                "shrink-0 text-xs font-medium",
-                trend.value >= 0 ? tones.success.icon : tones.danger.icon,
-              )}
+              className={cn("shrink-0", trend.value >= 0 ? tones.success.icon : tones.danger.icon)}
+              {...slotAttributes(statCardTrendStyle, {})}
             >
               {trend.value >= 0 ? "+" : ""}{trend.value}%{trend.label ? ` ${trend.label}` : ""}
             </p>

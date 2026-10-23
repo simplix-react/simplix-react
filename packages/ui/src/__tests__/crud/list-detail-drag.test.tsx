@@ -6,6 +6,7 @@ afterEach(cleanup);
 
 import React from "react";
 import { ListDetail } from "../../crud/patterns/list-detail";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 describe("ListDetail Divider drag interactions", () => {
   it("starts drag on pointer down on separator", () => {
@@ -66,7 +67,7 @@ describe("ListDetail Divider drag interactions", () => {
 
     // Section should have transition class restored (isDragging = false)
     const section = container.querySelector("section");
-    expect(section?.className).toContain("md:transition-");
+    expect(drawnClasses(section ?? null)).toContain("md:transition-");
   });
 
   it("resizes panels using keyboard on separator (ArrowLeft)", () => {
@@ -147,7 +148,7 @@ describe("ListDetail divider collapse behavior", () => {
     );
 
     const separator = container.querySelector("[role='separator']") as HTMLElement;
-    expect(separator?.className).toContain("opacity-0");
+    expect(drawnClasses(separator ?? null)).toContain("opacity-0");
     expect(separator?.className).toContain("pointer-events-none");
   });
 
@@ -160,7 +161,7 @@ describe("ListDetail divider collapse behavior", () => {
     );
 
     const separator = container.querySelector("[role='separator']") as HTMLElement;
-    expect(separator?.className).not.toContain("opacity-0");
+    expect(drawnClasses(separator ?? null)).not.toContain("opacity-0");
     expect(separator?.className).not.toContain("pointer-events-none");
   });
 
@@ -198,18 +199,18 @@ describe("ListDetail divider collapse behavior", () => {
     const section = container.querySelector("section")!;
 
     // Before drag: transition class exists
-    expect(section.className).toContain("md:transition-");
+    expect(drawnClasses(section ?? null)).toContain("md:transition-");
 
     // Start drag
     fireEvent.pointerDown(separator, { clientX: 400, pointerId: 1 });
 
     // During drag: transition should be suppressed (isDragging = true)
-    expect(section.className).not.toContain("md:transition-[grid-template-columns]");
+    expect(drawnClasses(section ?? null)).not.toContain("md:transition-[grid-template-columns]");
 
     // End drag
     fireEvent.pointerUp(separator);
 
     // After drag: transition restored
-    expect(section.className).toContain("md:transition-");
+    expect(drawnClasses(section ?? null)).toContain("md:transition-");
   });
 });

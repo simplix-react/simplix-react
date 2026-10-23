@@ -1,11 +1,20 @@
 import { useCallback, useMemo } from "react";
 import type { ComponentType } from "react";
 import { useTranslation } from "@simplix-react/i18n/react";
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
 import { CheckIcon, XIcon } from "../shared/icons";
 import { Flex } from "../../primitives/flex";
 import { Separator } from "../../base/display/separator";
 import { useFlatUIComponents } from "../../provider/ui-provider";
+import { crudFieldClearButtonStyle } from "./field-clear-button.style";
+import {
+  crudFilterChipStyle,
+  crudFilterChipTriggerStyle,
+  crudFilterClearEntryStyle,
+  crudFilterOptionCheckStyle,
+  crudFilterOptionIconStyle,
+} from "./filter-parts.style";
 
 /**
  * A single option in a {@link FacetedFilter}.
@@ -105,35 +114,33 @@ export function FacetedFilter({
           side inside it rather than one inside the other — a control nested in a control leaves the
           keyboard and assistive technology to guess which of the two a press belongs to. */}
       <span
-        className={cn(
-          "inline-flex h-8 items-center gap-2 rounded-md border px-3 text-sm",
-          selectedCount > 0 ? "border-solid" : "border-dashed text-muted-foreground",
-          className,
-        )}
+        className={cn("inline-flex h-8 items-center", className)}
+        {...slotAttributes(crudFilterChipStyle, { filled: selectedCount > 0 })}
       >
         <PopoverTrigger asChild>
           <button
             type="button"
-            className="inline-flex items-center gap-2 rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            className="inline-flex items-center"
+            {...slotAttributes(crudFilterChipTriggerStyle, {})}
           >
             {label}
             {selectedCount > 0 && (
               <>
-                <Separator orientation="vertical" className="mx-1 h-4" />
+                <Separator orientation="vertical" className="h-4" />
                 {/* Mobile: count only */}
-                <Badge variant="secondary" className="font-normal sm:hidden">
+                <Badge variant="secondary" className="sm:hidden">
                   {selectedCount}
                 </Badge>
                 {/* Desktop: labels or count */}
                 <Flex gap="xs" className="hidden sm:flex">
                   {selectedCount <= maxDisplayCount ? (
                     selectedOptions.map((opt) => (
-                      <Badge key={opt.value} variant="secondary" className="font-normal">
+                      <Badge key={opt.value} variant="secondary">
                         {opt.label}
                       </Badge>
                     ))
                   ) : (
-                    <Badge variant="secondary" className="font-normal">
+                    <Badge variant="secondary">
                       {t("list.selected", { count: selectedCount })}
                     </Badge>
                   )}
@@ -146,14 +153,15 @@ export function FacetedFilter({
           <button
             type="button"
             onClick={handleClear}
-            className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            className="inline-flex h-4 w-4 shrink-0 items-center justify-center"
             aria-label={t("filter.clearFilter")}
+            {...slotAttributes(crudFieldClearButtonStyle, { ring: true })}
           >
             <XIcon className="h-3 w-3" />
           </button>
         )}
       </span>
-      <PopoverContent className="w-[200px] p-0" align="start">
+      <PopoverContent flush className="w-[200px]" align="start">
         <Command>
           <CommandInput placeholder={label} />
           <CommandList>
@@ -167,16 +175,16 @@ export function FacetedFilter({
                     onSelect={() => handleSelect(option.value)}
                   >
                     <span
-                      className={cn(
-                        "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                        isSelected
-                          ? "bg-primary text-primary-foreground"
-                          : "opacity-50 [&_svg]:invisible",
-                      )}
+                      className="flex h-4 w-4 items-center justify-center"
+                      {...slotAttributes(crudFilterOptionCheckStyle, { selected: isSelected })}
                     >
                       <CheckIcon className="h-3 w-3" />
                     </span>
-                    {option.icon && <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />}
+                    {option.icon && (
+                      <span className="inline-flex" {...slotAttributes(crudFilterOptionIconStyle, {})}>
+                        <option.icon className="h-4 w-4" />
+                      </span>
+                    )}
                     <span>{option.label}</span>
                   </CommandItem>
                 );
@@ -186,11 +194,8 @@ export function FacetedFilter({
               <>
                 <CommandSeparator />
                 <CommandGroup>
-                  <CommandItem
-                    onSelect={handleClear}
-                    className="justify-center text-center"
-                  >
-                    {t("filter.clearFilters")}
+                  <CommandItem onSelect={handleClear} className="justify-center">
+                    <span {...slotAttributes(crudFilterClearEntryStyle, {})}>{t("filter.clearFilters")}</span>
                   </CommandItem>
                 </CommandGroup>
               </>

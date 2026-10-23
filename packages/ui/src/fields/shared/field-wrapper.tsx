@@ -1,28 +1,20 @@
-import { type VariantProps, cva } from "class-variance-authority";
+import type { VariantProps } from "class-variance-authority";
 import { type ReactNode, useId } from "react";
 
 import { type FieldVariant, useFieldVariant } from "../../crud/shared/types";
 import { useFlatUIComponents } from "../../provider/ui-provider";
-import { cn, toTestId } from "../../utils/cn";
+import { slotAttributes, slotClassNames } from "../../design/slot-style";
+import { toTestId } from "../../utils/cn";
 import { FieldMessage } from "./field-message";
+import {
+  fieldInputRowStyle,
+  fieldLeaderStyle,
+  fieldRequiredStyle,
+  fieldTrailingRowStyle,
+  fieldWrapperStyle,
+} from "./field-wrapper.style";
 
-const fieldWrapperVariants = cva("py-1", {
-  variants: {
-    layout: {
-      top: "flex flex-col gap-1",
-      left: "grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-1",
-      inline: "flex items-center justify-between gap-3",
-      trailing: "flex flex-col gap-1",
-      hidden: "flex flex-col gap-1.5",
-    },
-    size: {
-      sm: "[&_label]:text-xs [&_input]:h-8 [&_input]:text-sm",
-      md: "[&_label]:text-sm [&_input]:h-10 [&_input]:text-base",
-      lg: "[&_label]:text-base [&_input]:h-12 [&_input]:text-lg",
-    },
-  },
-  defaultVariants: { layout: "top", size: "sm" },
-});
+const fieldWrapperVariants = slotClassNames(fieldWrapperStyle);
 
 /** Variant props extracted from {@link fieldWrapperVariants}. */
 export type FieldWrapperVariants = VariantProps<typeof fieldWrapperVariants>;
@@ -31,10 +23,10 @@ export type FieldWrapperVariants = VariantProps<typeof fieldWrapperVariants>;
  * Identifiers a {@link FieldWrapper} hands to the control it wraps so the label
  * actually names it in the accessibility tree.
  *
- * - `id` — put it on a labelable control (`input`, `textarea`, `select`,
+ * - `id` - put it on a labelable control (`input`, `textarea`, `select`,
  *   `button`, and Radix primitives that render one). The wrapper's `<Label>`
  *   points its `htmlFor` here, so clicking the label focuses the control.
- * - `labelId` — the id of the rendered label element. Use it with
+ * - `labelId` - the id of the rendered label element. Use it with
  *   `aria-labelledby` when the control is a composite with no single labelable
  *   element (radio group, time picker, rich-text editor, tag combobox).
  */
@@ -131,7 +123,7 @@ export function FieldWrapper({
       : children;
 
   const inputRow = (prefixControl || suffixControl) ? (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center" {...slotAttributes(fieldInputRowStyle, {})}>
       {prefixControl}
       <div className="flex-1 min-w-0">{control}</div>
       {suffixControl}
@@ -148,7 +140,7 @@ export function FieldWrapper({
     <Label id={labelId} htmlFor={id}>
       {label}
       {required && (
-        <span className="text-destructive ml-0.5" aria-hidden="true">
+        <span aria-hidden="true" {...slotAttributes(fieldRequiredStyle, {})}>
           *
         </span>
       )}
@@ -164,10 +156,8 @@ export function FieldWrapper({
 
   return (
     <fieldset
-      className={cn(
-        fieldWrapperVariants({ layout, size }),
-        className,
-      )}
+      className={className}
+      {...slotAttributes(fieldWrapperStyle, { layout, size })}
       disabled={disabled ?? undefined}
       data-testid={testId}
       aria-label={isHidden && label ? label : undefined}
@@ -193,12 +183,13 @@ export function FieldWrapper({
           {/* Settings-row style: label left, control right, a dashed leader
               line between the two. Messages start at the label's left edge. */}
           {label ? (
-            <div className="flex min-h-6 items-center gap-3">
+            <div className="flex min-h-6 items-center" {...slotAttributes(fieldTrailingRowStyle, {})}>
               {labelText}
               {labelExtra}
               <span
                 aria-hidden="true"
-                className="min-w-4 flex-1 border-b border-dashed border-border"
+                className="min-w-4 flex-1"
+                {...slotAttributes(fieldLeaderStyle, {})}
               />
               {inputRow}
             </div>

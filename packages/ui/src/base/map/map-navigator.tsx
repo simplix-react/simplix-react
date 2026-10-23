@@ -3,7 +3,15 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { GeoPoint, MapFitOptions } from "../../utils/geo";
 import { DEFAULT_MAP_FIT_OPTIONS, fitMapToBounds } from "../../utils/geo";
+import { slotAttributes } from "../../design/slot-style";
 import { Button } from "../controls/button";
+import {
+  mapNavigatorBarStyle,
+  mapNavigatorCounterStyle,
+  mapNavigatorSelectStyle,
+  mapNavigatorSeparatorStyle,
+  mapNavigatorStyle,
+} from "./map-navigator.style";
 
 // ── useMapNavigator hook ──
 
@@ -94,23 +102,31 @@ function MapNavigator({ total, focusedIndex, label, fallbackLabel, onPrev, onNex
   if (total === 0) return null;
 
   return (
-    <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center p-3" style={{ zIndex: 10 }}>
-      <div className="pointer-events-auto flex items-center rounded-md border bg-background shadow-md">
-        <Button size="icon-sm" variant="ghost" className="rounded-none rounded-l-md" aria-label={t("field.mapPrevious")} onClick={onPrev}>
+    <div
+      className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center"
+      style={{ zIndex: 10 }}
+      {...slotAttributes(mapNavigatorStyle, {})}
+    >
+      <div
+        className="pointer-events-auto flex items-center"
+        {...slotAttributes(mapNavigatorBarStyle, {})}
+      >
+        <Button size="icon-sm" variant="ghost" aria-label={t("field.mapPrevious")} onClick={onPrev}>
           <ChevronLeftIcon />
         </Button>
-        <div className="w-px bg-border" />
+        <div className="w-px" {...slotAttributes(mapNavigatorSeparatorStyle, {})} />
         <button
           type="button"
-          className="flex items-center gap-1.5 px-3 py-1 text-xs font-medium hover:bg-accent transition-colors whitespace-nowrap"
+          className="flex items-center whitespace-nowrap"
           onClick={onSelect}
+          {...slotAttributes(mapNavigatorSelectStyle, {})}
         >
-          <span className="tabular-nums text-muted-foreground">{String(focusedIndex + 1).padStart(2, "0")}</span>
+          <span className="tabular-nums" {...slotAttributes(mapNavigatorCounterStyle, {})}>{String(focusedIndex + 1).padStart(2, "0")}</span>
           <span className="max-w-32 truncate">{label ?? fallbackLabel}</span>
-          <span className="text-muted-foreground">/ {total}</span>
+          <span {...slotAttributes(mapNavigatorCounterStyle, {})}>/ {total}</span>
         </button>
-        <div className="w-px bg-border" />
-        <Button size="icon-sm" variant="ghost" className="rounded-none rounded-r-md" aria-label={t("field.mapNext")} onClick={onNext}>
+        <div className="w-px" {...slotAttributes(mapNavigatorSeparatorStyle, {})} />
+        <Button size="icon-sm" variant="ghost" aria-label={t("field.mapNext")} onClick={onNext}>
           <ChevronRightIcon />
         </Button>
       </div>

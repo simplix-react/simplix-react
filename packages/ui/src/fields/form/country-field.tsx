@@ -5,11 +5,20 @@ import type { CommonFieldProps } from "../../crud/shared/types";
 import { MapPinIcon } from "../../crud/shared/icons";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { Flex } from "../../primitives/flex";
-import { cn } from "../../utils/cn";
+import { slotAttributes } from "../../design/slot-style";
+import {
+  fieldClearButtonStyle,
+  fieldDetectButtonStyle,
+  fieldFlagStyle,
+  fieldOptionCheckStyle,
+  fieldSelectedValueStyle,
+} from "../shared/field-parts.style";
+
 import { countryFromTimezone } from "../../utils/timezone-country-map";
 import { useCountryOptions } from "../../utils/use-country-options";
 import { FieldWrapper } from "../shared/field-wrapper";
 import { SelectFieldTrigger } from "../shared/select-field-trigger";
+
 
 /** Props for the {@link CountryField} form component. */
 export interface CountryFieldProps extends CommonFieldProps {
@@ -100,13 +109,15 @@ export function CountryField({
               open={open}
               disabled={disabled}
               error={error}
-              className={cn("flex-1", !value && "text-muted-foreground")}
+              className="flex-1"
+              empty={!value}
               clearAction={
                 value && !disabled ? (
                   <button
                     type="button"
                     onClick={handleClear}
-                    className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
+                    className="flex h-5 w-5 shrink-0 items-center justify-center"
+{...slotAttributes(fieldClearButtonStyle, {})}
                     aria-label={t("field.clear")}
                   >
                     <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-3 w-3">
@@ -117,8 +128,11 @@ export function CountryField({
               }
             >
               {selectedOption ? (
-                <span className="flex min-w-0 flex-1 items-center gap-2 truncate">
-                  <selectedOption.Flag className="h-3 w-4.5 shrink-0 rounded-[1px]" />
+                <span
+                  className="flex min-w-0 flex-1 items-center truncate"
+                  {...slotAttributes(fieldSelectedValueStyle, {})}
+                >
+                  <selectedOption.Flag className="h-3 w-4.5 shrink-0" {...slotAttributes(fieldFlagStyle, {})} />
                   <span className="truncate">{selectedOption.localName}</span>
                 </span>
               ) : (
@@ -126,7 +140,8 @@ export function CountryField({
               )}
             </SelectFieldTrigger>
             <PopoverContent
-              className="w-[var(--radix-popover-trigger-width)] p-0"
+              flush
+            className="w-[var(--radix-popover-trigger-width)]"
               align="start"
             >
               <Command filter={filterFn}>
@@ -146,11 +161,12 @@ export function CountryField({
                           viewBox="0 0 15 15"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
-                          className={cn("mr-2 h-4 w-4", value === option.code ? "opacity-100" : "opacity-0")}
+                          className="h-4 w-4"
+                          {...slotAttributes(fieldOptionCheckStyle, { selected: value === option.code })}
                         >
                           <path d="M11.4669 3.72684C11.7558 3.91574 11.8369 4.30308 11.648 4.59198L7.39799 11.092C7.29783 11.2452 7.13556 11.3467 6.95402 11.3699C6.77247 11.3931 6.58989 11.3354 6.45446 11.2124L3.70446 8.71241C3.44905 8.48022 3.43023 8.08494 3.66242 7.82953C3.89461 7.57412 4.28989 7.5553 4.5453 7.78749L6.75292 9.79441L10.6018 3.90792C10.7907 3.61902 11.178 3.53795 11.4669 3.72684Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd" />
                         </svg>
-                        <option.Flag className="mr-2 h-3 w-4.5 shrink-0 rounded-[1px]" />
+                        <option.Flag className="h-3 w-4.5 shrink-0" {...slotAttributes(fieldFlagStyle, { spaced: true })} />
                         <span className="truncate">{option.localName}</span>
                       </CommandItem>
                     ))}
@@ -163,7 +179,8 @@ export function CountryField({
             <button
               type="button"
               onClick={handleDetect}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-input bg-background text-muted-foreground hover:bg-accent hover:text-foreground"
+              className="flex h-8 w-8 shrink-0 items-center justify-center"
+              {...slotAttributes(fieldDetectButtonStyle, {})}
               aria-label={t("field.detectCountry")}
             >
               <MapPinIcon className="h-4 w-4" />

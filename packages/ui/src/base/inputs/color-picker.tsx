@@ -10,6 +10,20 @@ import {
   PopoverTrigger,
 } from "../overlay/popover";
 import { cn } from "../../utils/cn";
+import { partAttributes, slotAttributes } from "../../design/slot-style";
+import {
+  colorPickerBodyStyle,
+  colorPickerClearStyle,
+  colorPickerCustomLabelStyle,
+  colorPickerCustomStyle,
+  colorPickerFooterStyle,
+  colorPickerInputStyle,
+  colorPickerPaletteStyle,
+  colorPickerPlaceholderStyle,
+  colorPickerSwatchStyle,
+  colorPickerTriggerStyle,
+  colorPickerPopoverStyle,
+} from "./color-picker.style";
 import {
   type ColorPickerLocale,
   getColorName,
@@ -108,44 +122,38 @@ export function ColorPicker({
           type="button"
           disabled={disabled}
           className={cn(
-            "flex h-9 w-9 shrink-0 items-center justify-center rounded-md border-2 p-0 transition-all",
-            "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-            "disabled:cursor-not-allowed disabled:opacity-50",
-            !value && "border-dashed",
+            "flex h-9 w-9 shrink-0 items-center justify-center disabled:cursor-not-allowed",
             className,
           )}
+          {...slotAttributes(colorPickerTriggerStyle, { empty: !value })}
           style={{ backgroundColor: value || "transparent" }}
           aria-label={ariaLabel ?? locale.triggerPlaceholder}
         >
           {!value && (
-            <Plus className="size-4 text-muted-foreground" />
+            <Plus className="size-4" {...slotAttributes(colorPickerPlaceholderStyle, {})} />
           )}
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-3" align="start">
-        <div className="space-y-3">
+      <PopoverContent className="w-auto" align="start" {...partAttributes(colorPickerPopoverStyle, {})}>
+        <div {...slotAttributes(colorPickerBodyStyle, {})}>
           {/* Preset color palette */}
-          <div className="grid grid-cols-8 gap-1.5">
+          <div className="grid grid-cols-8" {...slotAttributes(colorPickerPaletteStyle, {})}>
             {presetColors.map((color) => {
               const displayName = color.key ? getColorName(locale, color.key) : color.name;
               return (
                 <button
                   key={color.value}
                   type="button"
-                  className={cn(
-                    "size-6 rounded-md border-2 transition-all",
-                    "hover:scale-110",
-                    "focus:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-                    value?.toUpperCase() === color.value.toUpperCase()
-                      ? "border-foreground scale-110"
-                      : "border-transparent hover:border-muted-foreground/50",
-                  )}
+                  className="size-6"
+                  {...slotAttributes(colorPickerSwatchStyle, {
+                    selected: value?.toUpperCase() === color.value.toUpperCase(),
+                  })}
                   style={{ backgroundColor: color.value }}
                   onClick={() => onChange(color.value)}
                   title={displayName}
                 >
                   {value?.toUpperCase() === color.value.toUpperCase() && (
-                    <CheckIcon className="size-4 text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] mx-auto" />
+                    <CheckIcon className="size-4" />
                   )}
                 </button>
               );
@@ -153,17 +161,21 @@ export function ColorPicker({
           </div>
           {/* Custom color picker and clear */}
           {(showCustomPicker || (clearable && value)) && (
-            <div className="flex items-center justify-between border-t pt-2">
+            <div
+              className="flex items-center justify-between"
+              {...slotAttributes(colorPickerFooterStyle, {})}
+            >
               {showCustomPicker && (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center" {...slotAttributes(colorPickerCustomStyle, {})}>
                   <input
                     type="color"
                     value={value || "#3B82F6"}
                     onChange={(e) => onChange(e.target.value)}
                     disabled={disabled}
-                    className="h-8 w-8 cursor-pointer rounded border-0 p-0"
+                    className="h-8 w-8 cursor-pointer"
+                    {...slotAttributes(colorPickerInputStyle, {})}
                   />
-                  <span className="text-xs text-muted-foreground">
+                  <span {...slotAttributes(colorPickerCustomLabelStyle, {})}>
                     {locale.custom}
                   </span>
                 </div>
@@ -172,10 +184,11 @@ export function ColorPicker({
                 renderClear ? renderClear(() => onChange("")) : (
                   <button
                     type="button"
-                    className="inline-flex h-7 items-center rounded-md px-2 text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                    className="inline-flex h-7 items-center"
+                    {...slotAttributes(colorPickerClearStyle, {})}
                     onClick={() => onChange("")}
                   >
-                    <XIcon className="size-3 mr-1" />
+                    <XIcon className="size-3" />
                     {locale.clear}
                   </button>
                 )

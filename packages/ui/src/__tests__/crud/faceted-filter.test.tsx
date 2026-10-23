@@ -16,6 +16,7 @@ vi.mock("@simplix-react/i18n/react", () => ({
 }));
 
 import { FacetedFilter, type FacetedFilterOption } from "../../crud/filters/faceted-filter";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 const options: FacetedFilterOption[] = [
   { value: "active", label: "Active" },
@@ -46,7 +47,7 @@ describe("FacetedFilter", () => {
       />,
     );
     const chip = container.querySelector("button")!.parentElement;
-    expect(chip?.className).toContain("border-dashed");
+    expect(drawnClasses(chip ?? null)).toContain("border-dashed");
   });
 
   it("renders solid border when selection exists", () => {
@@ -59,7 +60,7 @@ describe("FacetedFilter", () => {
       />,
     );
     const chip = container.querySelector("button")!.parentElement;
-    expect(chip?.className).toContain("border-solid");
+    expect(drawnClasses(chip ?? null)).toContain("border-solid");
   });
 
   it("shows clear button when selection exists", () => {
@@ -97,7 +98,7 @@ describe("FacetedFilter", () => {
       />,
     );
     const chip = container.querySelector("button")!.parentElement;
-    expect(chip?.className).toContain("border-solid");
+    expect(drawnClasses(chip ?? null)).toContain("border-solid");
   });
 
   it("shows count badge when many selections exceed maxDisplayCount", () => {

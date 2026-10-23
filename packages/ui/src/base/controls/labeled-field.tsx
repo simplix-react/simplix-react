@@ -3,7 +3,9 @@ import type { ReactNode } from "react";
 import { Flex } from "../../primitives";
 import { Stack } from "../../primitives";
 import { cn } from "../../utils/cn";
+import { slotAttributes } from "../../design/slot-style";
 import { Label } from "./label";
+import { labeledFieldDescriptionStyle } from "./labeled-field.style";
 
 export interface LabeledFieldProps {
   /** Label text. Already translated by the caller. */
@@ -50,12 +52,12 @@ export function LabeledField({
       <Stack gap="none" className="flex-1 min-w-0">
         <Label
           htmlFor={htmlFor}
-          className={cn("text-sm font-medium", htmlFor && "cursor-pointer")}
+          className={cn(htmlFor && "cursor-pointer")}
         >
           {label}
         </Label>
         {description && (
-          <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+          <p {...slotAttributes(labeledFieldDescriptionStyle, {})}>
             {description}
           </p>
         )}

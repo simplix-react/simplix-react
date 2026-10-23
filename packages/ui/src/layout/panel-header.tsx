@@ -5,7 +5,8 @@ import { useTranslation } from "@simplix-react/i18n/react";
 import { XIcon } from "../crud/shared/icons";
 import { useFlatUIComponents } from "../provider/ui-provider";
 import { cn } from "../utils/cn";
-import { Flex } from "../primitives/flex";
+import { slotAttributes } from "../design/slot-style";
+import { panelHeaderDescriptionStyle, panelHeaderStyle } from "./panel-header.style";
 import { Heading } from "../primitives/heading";
 import { Stack } from "../primitives/stack";
 
@@ -35,12 +36,15 @@ export function PanelHeader({
   const { t } = useTranslation("simplix/ui");
 
   return (
-    <Flex align="center" gap="sm" className={cn("border-b px-0 py-4 shrink-0", borderVariant)}>
+    <div
+      className={cn("flex flex-row items-center shrink-0", borderVariant)}
+      {...slotAttributes(panelHeaderStyle, {})}
+    >
       {thumbnail}
       <Stack gap="none" className="flex-1 min-w-0">
         <Heading level={3} className="truncate">{title}</Heading>
         {description && (
-          <p className="text-sm text-muted-foreground truncate">{description}</p>
+          <p className="truncate" {...slotAttributes(panelHeaderDescriptionStyle, {})}>{description}</p>
         )}
       </Stack>
       {children}
@@ -52,6 +56,6 @@ export function PanelHeader({
           <XIcon className="size-3" aria-hidden />
         </Button>
       )}
-    </Flex>
+    </div>
   );
 }

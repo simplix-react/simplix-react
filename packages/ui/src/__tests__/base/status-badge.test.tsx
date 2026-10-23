@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import { StatusBadge } from "../../base";
 import { STATUS_TONES } from "../../base";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -18,11 +19,11 @@ describe("StatusBadge", () => {
   it("defaults to outline appearance with border + tone outline classes", () => {
     const { container } = render(<StatusBadge tone="info" label="Info" />);
     const pill = container.firstElementChild as HTMLElement;
-    expect(pill.className).toContain("border");
-    expect(pill.className).toContain("bg-transparent");
-    expect(pill.className).toContain(STATUS_TONES.info.outline);
+    expect(drawnClasses(pill)).toContain("border");
+    expect(drawnClasses(pill)).toContain("bg-transparent");
+    expect(drawnClasses(pill)).toContain(STATUS_TONES.info.outline);
     // outline tone classes carry dark: variants
-    expect(pill.className).toContain("dark:text-blue-400");
+    expect(drawnClasses(pill)).toContain("dark:text-blue-400");
   });
 
   it("uses the filled badge bundle when appearance is filled", () => {
@@ -30,31 +31,31 @@ describe("StatusBadge", () => {
       <StatusBadge tone="success" label="Done" appearance="filled" />,
     );
     const pill = container.firstElementChild as HTMLElement;
-    expect(pill.className).toContain(STATUS_TONES.success.badge);
-    expect(pill.className).toContain("dark:bg-emerald-900");
-    expect(pill.className).not.toContain("bg-transparent");
+    expect(drawnClasses(pill)).toContain(STATUS_TONES.success.badge);
+    expect(drawnClasses(pill)).toContain("dark:bg-emerald-900");
+    expect(drawnClasses(pill)).not.toContain("bg-transparent");
   });
 
   it("maps size tokens to text + padding classes", () => {
     const { container: xs } = render(
       <StatusBadge tone="info" label="x" size="xs" />,
     );
-    expect((xs.firstElementChild as HTMLElement).className).toContain("text-[0.625rem]");
+    expect(drawnClasses((xs.firstElementChild as HTMLElement))).toContain("text-[0.625rem]");
 
     const { container: sm } = render(
       <StatusBadge tone="info" label="s" size="sm" />,
     );
-    expect((sm.firstElementChild as HTMLElement).className).toContain("text-xs");
+    expect(drawnClasses((sm.firstElementChild as HTMLElement))).toContain("text-xs");
 
     const { container: def } = render(
       <StatusBadge tone="info" label="d" size="default" />,
     );
-    expect((def.firstElementChild as HTMLElement).className).toContain("text-sm");
+    expect(drawnClasses((def.firstElementChild as HTMLElement))).toContain("text-sm");
   });
 
   it("defaults to the compact sm size when size is omitted", () => {
     const { container } = render(<StatusBadge tone="info" label="d" />);
-    expect((container.firstElementChild as HTMLElement).className).toContain("text-xs");
+    expect(drawnClasses((container.firstElementChild as HTMLElement))).toContain("text-xs");
   });
 
   it("renders a leading icon with tone icon color in outline mode", () => {
@@ -87,7 +88,7 @@ describe("StatusBadge", () => {
     );
     // pill > StatusDot wrapper > solid dot leaf
     const dot = container.querySelector("span span span");
-    expect(dot?.className).toContain(STATUS_TONES.success.dot);
+    expect(drawnClasses(dot)).toContain(STATUS_TONES.success.dot);
     expect(container.querySelector("svg")).toBeNull();
   });
 
@@ -95,14 +96,14 @@ describe("StatusBadge", () => {
     const { container } = render(
       <StatusBadge tone="processing" label="Syncing" showDot pulse />,
     );
-    expect(container.querySelector(".animate-ping")).not.toBeNull();
+    expect(container.querySelector("[data-slot='status-dot-ring'][data-animation='ping']")).not.toBeNull();
   });
 
   it("does not pulse the dot without the pulse prop", () => {
     const { container } = render(
       <StatusBadge tone="processing" label="Idle" showDot />,
     );
-    expect(container.querySelector(".animate-ping")).toBeNull();
+    expect(container.querySelector("[data-slot='status-dot-ring'][data-animation='ping']")).toBeNull();
   });
 
   it("merges custom className and forwards ref", () => {
@@ -110,7 +111,7 @@ describe("StatusBadge", () => {
     const { container } = render(
       <StatusBadge tone="info" label="Ref" className="my-pill" ref={ref} />,
     );
-    expect((container.firstElementChild as HTMLElement).className).toContain("my-pill");
+    expect(drawnClasses((container.firstElementChild as HTMLElement))).toContain("my-pill");
     expect(ref.current).toBeInstanceOf(HTMLSpanElement);
   });
 });

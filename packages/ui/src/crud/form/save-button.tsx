@@ -2,7 +2,9 @@ import { useTranslation } from "@simplix-react/i18n/react";
 import type { ReactNode } from "react";
 
 import type { ButtonProps } from "../../base/controls/button";
+import { partAttributes } from "../../design/slot-style";
 import { useFlatUIComponents } from "../../provider/ui-provider";
+import { saveButtonErrorCountStyle } from "./save-button.style";
 
 /**
  * Props for the {@link SaveButton} component.
@@ -83,7 +85,7 @@ export function SaveButton({
     >
       {children}
       {!isSaving && errorCount > 0 && (
-        <Badge variant="destructive" className="size-5 justify-center p-0 text-[0.625rem]">
+        <Badge variant="destructive" className="size-5 justify-center" {...partAttributes(saveButtonErrorCountStyle, {})}>
           {errorCount}
         </Badge>
       )}

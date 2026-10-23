@@ -103,7 +103,7 @@ describe("AssignmentPanel", () => {
         <div>Body</div>
       </AssignmentPanel>,
     );
-    expect(container.querySelector(".text-destructive")?.textContent).toBe("*");
+    expect(container.querySelector("[data-slot='crud-assignment-panel-required']")?.textContent).toBe("*");
   });
 });
 
@@ -223,7 +223,7 @@ describe("AssignmentPanel.Table", () => {
         </AssignmentPanel.Table>
       </AssignmentPanel>,
     );
-    const mark = container.querySelector("th .text-destructive");
+    const mark = container.querySelector("th [data-slot='crud-list-required-mark']");
     expect(mark?.textContent).toBe("*");
   });
 
@@ -235,6 +235,6 @@ describe("AssignmentPanel.Table", () => {
         </AssignmentPanel.Table>
       </AssignmentPanel>,
     );
-    expect(container.querySelector("th .text-destructive")).toBeNull();
+    expect(container.querySelector("th [data-slot='crud-list-required-mark']")).toBeNull();
   });
 });

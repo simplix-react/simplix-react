@@ -38,7 +38,7 @@ function openTrigger(container: HTMLElement) {
 
 /** The dialog overlay is unique to the mobile (modal-dialog) branch. */
 function hasDialogOverlay(): boolean {
-  return document.body.querySelector('[class*="bg-black/50"]') != null;
+  return document.body.querySelector('[data-slot="dialog-overlay"]') != null;
 }
 
 afterEach(() => {

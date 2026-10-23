@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from "react";
 import type { ComponentType } from "react";
 import { useTranslation } from "@simplix-react/i18n/react";
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
 import { CheckIcon, CaretDownIcon, XIcon } from "../shared/icons";
 import { Flex } from "../../primitives/flex";
@@ -8,7 +9,17 @@ import { Separator } from "../../base/display/separator";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import type { SearchOperator } from "./filter-types";
 import { selectOperatorConfig } from "./filter-types";
+import { crudFieldClearButtonStyle } from "./field-clear-button.style";
 import { operatorConfig } from "./filter-icons";
+import {
+  crudFilterChipStyle,
+  crudFilterChipTriggerStyle,
+  crudFilterClearEntryStyle,
+  crudFilterOperatorMenuStyle,
+  crudFilterOperatorTriggerStyle,
+  crudFilterOptionCheckStyle,
+  crudFilterOptionIconStyle,
+} from "./filter-parts.style";
 
 export interface AdvancedSelectFilterOption {
   label: string;
@@ -92,33 +103,32 @@ export function AdvancedSelectFilter({
           <DropdownMenuTrigger asChild>
             <button
               type="button"
-              className="inline-flex h-8 items-center gap-0.5 rounded-md border bg-muted/50 px-2 text-muted-foreground hover:text-foreground"
+              className="inline-flex h-8 items-center"
               aria-label={t("filter.selectOperator")}
+              {...slotAttributes(crudFilterOperatorTriggerStyle, { attach: "chip" })}
             >
               <currentOp.icon className="h-3.5 w-3.5" />
               <CaretDownIcon className="h-3 w-3" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
-            {operators.map((op) => {
-              const meta = operatorConfig[op];
-              const opAllowMultiple = selectOperatorConfig[op]?.allowMultiple ?? false;
-              return (
-                <DropdownMenuItem
-                  key={op}
-                  onClick={() => handleOperatorChange(op)}
-                  className={cn(op === operator && "bg-accent")}
-                >
-                  <meta.icon className="mr-2 h-3.5 w-3.5" />
-                  {t(meta.labelKey)}
-                  {opAllowMultiple && (
-                    <Badge variant="outline" className="ml-auto text-[10px]">
-                      Multiple
-                    </Badge>
-                  )}
-                </DropdownMenuItem>
-              );
-            })}
+            <div {...slotAttributes(crudFilterOperatorMenuStyle, {})}>
+              {operators.map((op) => {
+                const meta = operatorConfig[op];
+                const opAllowMultiple = selectOperatorConfig[op]?.allowMultiple ?? false;
+                return (
+                  <DropdownMenuItem
+                    key={op}
+                    onClick={() => handleOperatorChange(op)}
+                    data-current={op === operator}
+                  >
+                    <meta.icon className="h-3.5 w-3.5" />
+                    {t(meta.labelKey)}
+                    {opAllowMultiple && <Badge variant="outline">Multiple</Badge>}
+                  </DropdownMenuItem>
+                );
+              })}
+            </div>
           </DropdownMenuContent>
         </DropdownMenu>
       )}
@@ -127,30 +137,29 @@ export function AdvancedSelectFilter({
             side inside it rather than one inside the other — a control nested in a control leaves
             the keyboard and assistive technology to guess which of the two a press belongs to. */}
         <span
-          className={cn(
-            "inline-flex h-8 items-center gap-2 rounded-md border px-3 text-sm",
-            selectedCount > 0 ? "border-solid" : "border-dashed text-muted-foreground",
-          )}
+          className="inline-flex h-8 items-center"
+          {...slotAttributes(crudFilterChipStyle, { filled: selectedCount > 0 })}
         >
           <PopoverTrigger asChild>
             <button
               type="button"
-              className="inline-flex items-center gap-2 rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              className="inline-flex items-center"
+              {...slotAttributes(crudFilterChipTriggerStyle, {})}
             >
               {label ?? t(currentOp.labelKey)}
               {selectedCount > 0 && (
                 <>
-                  <Separator orientation="vertical" className="mx-1 h-4" />
+                  <Separator orientation="vertical" className="h-4" />
                   {selectedCount <= maxDisplayCount ? (
                     <Flex gap="xs">
                       {selectedOptions.map((opt) => (
-                        <Badge key={opt.value} variant="secondary" className="font-normal">
+                        <Badge key={opt.value} variant="secondary">
                           {opt.label}
                         </Badge>
                       ))}
                     </Flex>
                   ) : (
-                    <Badge variant="secondary" className="font-normal">
+                    <Badge variant="secondary">
                       {t("list.selected", { count: selectedCount })}
                     </Badge>
                   )}
@@ -162,14 +171,15 @@ export function AdvancedSelectFilter({
             <button
               type="button"
               onClick={handleClear}
-              className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              className="inline-flex h-4 w-4 shrink-0 items-center justify-center"
               aria-label={t("filter.clearFilter")}
+              {...slotAttributes(crudFieldClearButtonStyle, { ring: true })}
             >
               <XIcon className="h-3 w-3" />
             </button>
           )}
         </span>
-        <PopoverContent className="w-[200px] p-0" align="start">
+        <PopoverContent flush className="w-[200px]" align="start">
           <Command>
             <CommandInput placeholder={`Search ${label ?? ""}...`} />
             <CommandList>
@@ -183,16 +193,16 @@ export function AdvancedSelectFilter({
                       onSelect={() => handleSelect(option.value)}
                     >
                       <span
-                        className={cn(
-                          "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                          isSelected
-                            ? "bg-primary text-primary-foreground"
-                            : "opacity-50 [&_svg]:invisible",
-                        )}
+                        className="flex h-4 w-4 items-center justify-center"
+                        {...slotAttributes(crudFilterOptionCheckStyle, { selected: isSelected })}
                       >
                         <CheckIcon className="h-3 w-3" />
                       </span>
-                      {option.icon && <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />}
+                      {option.icon && (
+                        <span className="inline-flex" {...slotAttributes(crudFilterOptionIconStyle, {})}>
+                          <option.icon className="h-4 w-4" />
+                        </span>
+                      )}
                       <span>{option.label}</span>
                     </CommandItem>
                   );
@@ -202,11 +212,8 @@ export function AdvancedSelectFilter({
                 <>
                   <CommandSeparator />
                   <CommandGroup>
-                    <CommandItem
-                      onSelect={handleClear}
-                      className="justify-center text-center"
-                    >
-                      {t("filter.clearFilters")}
+                    <CommandItem onSelect={handleClear} className="justify-center">
+                      <span {...slotAttributes(crudFilterClearEntryStyle, {})}>{t("filter.clearFilters")}</span>
                     </CommandItem>
                   </CommandGroup>
                 </>

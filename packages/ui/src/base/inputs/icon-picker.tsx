@@ -22,7 +22,25 @@ import {
   TooltipTrigger,
 } from "../overlay/tooltip";
 import { Skeleton } from "../display/skeleton";
-import { cn } from "../../utils/cn";
+import { partAttributes, slotAttributes } from "../../design/slot-style";
+import {
+  iconPickerBodyStyle,
+  iconPickerCategoriesStyle,
+  iconPickerCategoryStyle,
+  iconPickerCategoryCountStyle,
+  iconPickerCategoryListStyle,
+  iconPickerClearStyle,
+  iconPickerEmptyStyle,
+  iconPickerFooterStyle,
+  iconPickerGridStyle,
+  iconPickerIconStyle,
+  iconPickerSkeletonStyle,
+  iconPickerSkeletonGridStyle,
+  iconPickerStatusStyle,
+  iconPickerTooltipNameStyle,
+  iconPickerTriggerStyle,
+  iconPickerPopoverStyle,
+} from "./icon-picker.style";
 import type { LucideProps, LucideIcon } from "lucide-react";
 // Type-only imports on purpose: the dynamic icon registry and the icon catalog
 // are heavy payloads, so their runtime values are loaded lazily (see
@@ -102,11 +120,17 @@ IconRenderer.displayName = "IconRenderer";
 
 const IconsColumnSkeleton = () => {
   return (
-    <div className="flex w-full flex-col gap-2">
-      <Skeleton className="h-4 w-1/2 rounded-md" />
-      <div className="grid w-full grid-cols-6 gap-2">
+    <div
+      className="flex w-full flex-col"
+      {...slotAttributes(iconPickerSkeletonStyle, {})}
+    >
+      <Skeleton className="h-4 w-1/2" />
+      <div
+        className="grid w-full grid-cols-6"
+        {...slotAttributes(iconPickerSkeletonGridStyle, {})}
+      >
         {Array.from({ length: 30 }).map((_, i) => (
-          <Skeleton key={i} className="size-9 rounded-md" />
+          <Skeleton key={i} className="size-9" />
         ))}
       </div>
     </div>
@@ -285,12 +309,8 @@ const IconPicker = forwardRef<
           {children || (
             <button
               type="button"
-              className={cn(
-                "flex h-9 items-center gap-2 rounded-md border px-3 text-sm transition-colors",
-                "hover:bg-accent hover:text-accent-foreground",
-                "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                "disabled:cursor-not-allowed disabled:opacity-50"
-              )}
+              className="flex h-9 items-center disabled:cursor-not-allowed"
+              {...slotAttributes(iconPickerTriggerStyle, {})}
             >
               {value || selectedIcon ? (
                 <>
@@ -303,28 +323,30 @@ const IconPicker = forwardRef<
             </button>
           )}
         </PopoverTrigger>
-        <PopoverContent className="w-[560px] max-w-[calc(100vw-32px)] p-3">
-          <div className="flex gap-3">
+        <PopoverContent
+          className="w-[560px] max-w-[calc(100vw-32px)]"
+          {...partAttributes(iconPickerPopoverStyle, {})}
+        >
+          <div className="flex" {...slotAttributes(iconPickerBodyStyle, {})}>
             {/* Category List - Left Side */}
             {categorized && (
               <div
-                className="h-80 w-36 shrink-0 overflow-y-auto overflow-x-hidden border-r pr-2"
+                className="h-80 w-36 shrink-0 overflow-y-auto overflow-x-hidden"
                 onWheel={handleWheel}
+                {...slotAttributes(iconPickerCategoriesStyle, {})}
               >
-                <div className="space-y-0.5">
+                <div {...slotAttributes(iconPickerCategoryListStyle, {})}>
                   <button
                     type="button"
-                    className={cn(
-                      "flex w-full items-center justify-between rounded-md px-2 py-1.5 text-xs transition-colors",
-                      "hover:bg-accent hover:text-accent-foreground",
-                      !selectedCategory
-                        ? "bg-primary/10 font-medium text-primary"
-                        : "text-muted-foreground"
-                    )}
+                    className="flex w-full items-center justify-between"
+                    {...slotAttributes(iconPickerCategoryStyle, { selected: !selectedCategory })}
                     onClick={() => setSelectedCategory(null)}
                   >
                     <span>{locale.randomIcons}</span>
-                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-muted px-1.5 text-[10px]">
+                    <span
+                      className="flex h-5 min-w-5 items-center justify-center"
+                      {...slotAttributes(iconPickerCategoryCountStyle, {})}
+                    >
                       100
                     </span>
                   </button>
@@ -332,20 +354,20 @@ const IconPicker = forwardRef<
                     <button
                       key={category}
                       type="button"
-                      className={cn(
-                        "flex w-full items-center justify-between rounded-md px-2 py-1.5 text-xs transition-colors",
-                        "hover:bg-accent hover:text-accent-foreground",
-                        selectedCategory === category
-                          ? "bg-primary/10 font-medium text-primary"
-                          : "text-muted-foreground"
-                      )}
+                      className="flex w-full items-center justify-between"
+                      {...slotAttributes(iconPickerCategoryStyle, {
+                        selected: selectedCategory === category,
+                      })}
                       onClick={() => handleCategoryClick(category)}
                       title={getCategoryName(locale, category)}
                     >
                       <span className="truncate">
                         {getCategoryName(locale, category)}
                       </span>
-                      <span className="ml-1 flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-muted px-1.5 text-[10px]">
+                      <span
+                        className="flex h-5 min-w-5 shrink-0 items-center justify-center"
+                        {...slotAttributes(iconPickerCategoryCountStyle, { spaced: true })}
+                      >
                         {categoryCounts[category] || 0}
                       </span>
                     </button>
@@ -362,25 +384,25 @@ const IconPicker = forwardRef<
               {isLoadingIcons ? (
                 <IconsColumnSkeleton />
               ) : filteredIcons.length === 0 ? (
-                <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+                <div
+                  className="flex h-full items-center justify-center"
+                  {...slotAttributes(iconPickerEmptyStyle, {})}
+                >
                   {locale.noIconsFound}
                 </div>
               ) : (
                 <TooltipProvider delayDuration={300}>
-                  <div className="grid grid-cols-6 gap-1">
+                  <div className="grid grid-cols-6" {...slotAttributes(iconPickerGridStyle, {})}>
                     {filteredIcons.map((icon) => (
                       <Tooltip key={icon.name}>
                         <TooltipTrigger asChild>
                           <button
                             type="button"
                             aria-label={icon.name}
-                            className={cn(
-                              "flex size-9 items-center justify-center rounded-md border transition-colors",
-                              "hover:bg-accent hover:text-accent-foreground",
-                              "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1",
-                              (value || selectedIcon) === icon.name &&
-                                "border-primary bg-primary/10"
-                            )}
+                            className="flex size-9 items-center justify-center"
+                            {...slotAttributes(iconPickerIconStyle, {
+                              selected: (value || selectedIcon) === icon.name,
+                            })}
                             onClick={() =>
                               handleIconClick(icon.name as IconName)
                             }
@@ -389,7 +411,7 @@ const IconPicker = forwardRef<
                           </button>
                         </TooltipTrigger>
                         <TooltipContent side="bottom">
-                          <p className="text-xs">{icon.name}</p>
+                          <p {...slotAttributes(iconPickerTooltipNameStyle, {})}>{icon.name}</p>
                         </TooltipContent>
                       </Tooltip>
                     ))}
@@ -399,17 +421,21 @@ const IconPicker = forwardRef<
             </div>
           </div>
           {/* Footer */}
-          <div className="mt-2 flex items-center justify-between text-xs">
-            <span className="text-muted-foreground">
+          <div
+          className="flex items-center justify-between"
+          {...slotAttributes(iconPickerFooterStyle, {})}
+        >
+          <span {...slotAttributes(iconPickerStatusStyle, {})}>
               {!selectedCategory ? locale.selectCategory : statusText}
             </span>
             {(value || selectedIcon) && (
               <button
                 type="button"
-                className="inline-flex h-7 items-center rounded-md px-2 text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                className="inline-flex h-7 items-center"
+                {...slotAttributes(iconPickerClearStyle, {})}
                 onClick={handleClear}
               >
-                <XIcon className="size-3 mr-1" />
+                <XIcon className="size-3" />
                 {locale.clear}
               </button>
             )}

@@ -3,6 +3,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { StatCard } from "../../base/charts/stat-card";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -67,7 +68,7 @@ describe("StatCard", () => {
     const trendEl = container.querySelector(".text-emerald-500");
     expect(trendEl).not.toBeNull();
     // dark-mode bug fix: tone-driven trend color now carries a dark: variant
-    expect(trendEl?.className).toContain("dark:text-emerald-400");
+    expect(drawnClasses(trendEl)).toContain("dark:text-emerald-400");
   });
 
   it("applies negative trend color class with dark variant", () => {
@@ -77,7 +78,7 @@ describe("StatCard", () => {
     const trendEl = container.querySelector(".text-red-500");
     expect(trendEl).not.toBeNull();
     // dark-mode bug fix: tone-driven trend color now carries a dark: variant
-    expect(trendEl?.className).toContain("dark:text-red-400");
+    expect(drawnClasses(trendEl)).toContain("dark:text-red-400");
   });
 
   it("merges custom className", () => {
@@ -85,14 +86,14 @@ describe("StatCard", () => {
       <StatCard title="T" value={1} className="my-card" />,
     );
     const root = container.firstElementChild as HTMLElement;
-    expect(root.className).toContain("my-card");
-    expect(root.className).toContain("rounded-lg");
+    expect(drawnClasses(root)).toContain("my-card");
+    expect(drawnClasses(root)).toContain("rounded-lg");
   });
 
   it("uses bg-card by default", () => {
     const { container } = render(<StatCard title="T" value={1} />);
     const root = container.firstElementChild as HTMLElement;
-    expect(root.className).toContain("bg-card");
+    expect(drawnClasses(root)).toContain("bg-card");
   });
 
   it("applies tone surface classes when highlighted with tone", () => {
@@ -101,11 +102,11 @@ describe("StatCard", () => {
     );
     const root = container.firstElementChild as HTMLElement;
     // success surface tint, including its dark: variants
-    expect(root.className).toContain("bg-emerald-50/50");
-    expect(root.className).toContain("border-emerald-200");
-    expect(root.className).toContain("dark:bg-emerald-950/50");
-    expect(root.className).toContain("dark:border-emerald-900");
-    expect(root.className).not.toContain("bg-card");
+    expect(drawnClasses(root)).toContain("bg-emerald-50/50");
+    expect(drawnClasses(root)).toContain("border-emerald-200");
+    expect(drawnClasses(root)).toContain("dark:bg-emerald-950/50");
+    expect(drawnClasses(root)).toContain("dark:border-emerald-900");
+    expect(drawnClasses(root)).not.toContain("bg-card");
   });
 
   it("applies danger tone surface classes when highlighted", () => {
@@ -113,9 +114,9 @@ describe("StatCard", () => {
       <StatCard title="T" value={1} tone="danger" highlighted />,
     );
     const root = container.firstElementChild as HTMLElement;
-    expect(root.className).toContain("bg-red-50/50");
-    expect(root.className).toContain("dark:bg-red-950/50");
-    expect(root.className).not.toContain("bg-card");
+    expect(drawnClasses(root)).toContain("bg-red-50/50");
+    expect(drawnClasses(root)).toContain("dark:bg-red-950/50");
+    expect(drawnClasses(root)).not.toContain("bg-card");
   });
 
   it("keeps bg-card when tone is set but not highlighted", () => {
@@ -123,8 +124,8 @@ describe("StatCard", () => {
       <StatCard title="T" value={1} tone="success" />,
     );
     const root = container.firstElementChild as HTMLElement;
-    expect(root.className).toContain("bg-card");
-    expect(root.className).not.toContain("bg-emerald-50/50");
+    expect(drawnClasses(root)).toContain("bg-card");
+    expect(drawnClasses(root)).not.toContain("bg-emerald-50/50");
   });
 
   it("keeps bg-card when highlighted but tone is omitted", () => {
@@ -132,7 +133,7 @@ describe("StatCard", () => {
       <StatCard title="T" value={1} highlighted />,
     );
     const root = container.firstElementChild as HTMLElement;
-    expect(root.className).toContain("bg-card");
+    expect(drawnClasses(root)).toContain("bg-card");
   });
 
   it("merges custom className alongside tone surface", () => {
@@ -140,9 +141,9 @@ describe("StatCard", () => {
       <StatCard title="T" value={1} tone="info" highlighted className="my-card" />,
     );
     const root = container.firstElementChild as HTMLElement;
-    expect(root.className).toContain("my-card");
-    expect(root.className).toContain("bg-blue-50/50");
-    expect(root.className).toContain("rounded-lg");
+    expect(drawnClasses(root)).toContain("my-card");
+    expect(drawnClasses(root)).toContain("bg-blue-50/50");
+    expect(drawnClasses(root)).toContain("rounded-lg");
   });
 
   it("renders children", () => {

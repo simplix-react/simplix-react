@@ -6,6 +6,7 @@ afterEach(cleanup);
 
 import React from "react";
 import { ListDetail } from "../../crud/patterns/list-detail";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 describe("ListDetail (panel variant extended)", () => {
   it("shows detail panel with opacity-100 when activePanel=detail", () => {
@@ -17,7 +18,7 @@ describe("ListDetail (panel variant extended)", () => {
     );
     const articles = container.querySelectorAll("article");
     const detailPanel = Array.from(articles).find((a) => a.className.includes("order-3"));
-    expect(detailPanel?.className).toContain("opacity-100");
+    expect(drawnClasses(detailPanel ?? null)).toContain("opacity-100");
   });
 
   it("hides detail panel with opacity-0 when activePanel=list", () => {
@@ -29,7 +30,7 @@ describe("ListDetail (panel variant extended)", () => {
     );
     const articles = container.querySelectorAll("article");
     const detailPanel = Array.from(articles).find((a) => a.className.includes("order-3"));
-    expect(detailPanel?.className).toContain("opacity-0");
+    expect(drawnClasses(detailPanel ?? null)).toContain("opacity-0");
   });
 
   it("renders grid template when detail is open", () => {
@@ -185,7 +186,7 @@ describe("ListDetail.List panel classes", () => {
       </ListDetail>,
     );
     const listPanel = container.querySelector("[data-panel='list']");
-    expect(listPanel?.className).toContain("md:pr-4");
+    expect(drawnClasses(listPanel ?? null)).toContain("md:pr-4");
   });
 
   it("does not have pr-4 when detail is closed", () => {
@@ -195,7 +196,7 @@ describe("ListDetail.List panel classes", () => {
       </ListDetail>,
     );
     const listPanel = container.querySelector("[data-panel='list']");
-    expect(listPanel?.className).not.toContain("md:pr-4");
+    expect(drawnClasses(listPanel ?? null)).not.toContain("md:pr-4");
   });
 
   it("hides list on mobile when detail is active", () => {

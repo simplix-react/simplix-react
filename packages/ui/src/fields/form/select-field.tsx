@@ -2,9 +2,20 @@ import { useTranslation } from "@simplix-react/i18n/react";
 
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { useFlatUIComponents } from "../../provider/ui-provider";
+import { partAttributes, slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
+import {
+  selectFieldClearTextStyle,
+  selectFieldCompactStyle,
+  selectFieldMeasureStyle,
+  selectFieldOptionStyle,
+  selectFieldStackStyle,
+  selectFieldTagStyle,
+} from "./select-field.style";
+
 import { FieldMessage } from "../shared/field-message";
 import { FieldWrapper } from "../shared/field-wrapper";
+
 
 /** Props for the {@link SelectField} form component. */
 export interface SelectFieldProps<T extends string = string>
@@ -153,14 +164,15 @@ export function SelectField<T extends string = string>({
         aria-invalid={!!error}
         aria-required={required || undefined}
         aria-label={compact ? label ?? placeholder : variantProps.layout === "hidden" ? label : undefined}
-        className={compact ? "h-8 text-sm" : undefined}
+        className={compact ? "h-8" : undefined}
+        {...(compact ? partAttributes(selectFieldCompactStyle, {}) : {})}
       >
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
         {offersClearing && (
           <SelectItem value={CLEARED}>
-            <span className="text-muted-foreground">{clearText}</span>
+            <span {...slotAttributes(selectFieldClearTextStyle, {})}>{clearText}</span>
           </SelectItem>
         )}
         {options.map((opt) => (
@@ -170,11 +182,11 @@ export function SelectField<T extends string = string>({
             disabled={opt.disabled}
           >
             {opt.icon || opt.tag ? (
-              <span className="flex w-full items-center gap-1.5">
+              <span className="flex w-full items-center" {...slotAttributes(selectFieldOptionStyle, {})}>
                 {opt.icon}
                 <span>{opt.label}</span>
                 {opt.tag && (
-                  <span className="ml-auto text-xs text-muted-foreground">{opt.tag}</span>
+                  <span {...slotAttributes(selectFieldTagStyle, {})}>{opt.tag}</span>
                 )}
               </span>
             ) : (
@@ -205,7 +217,7 @@ export function SelectField<T extends string = string>({
     // Wrapped only when there is something to say: without a message the field keeps the exact
     // box it had before, so the trigger stays the outermost element.
     return (
-      <div className={cn("flex w-full flex-col gap-1", className)}>
+      <div className={cn("flex w-full flex-col", className)} {...slotAttributes(selectFieldStackStyle, {})}>
         {renderSelect()}
         {compactMessages}
       </div>
@@ -217,7 +229,8 @@ export function SelectField<T extends string = string>({
       <span className="inline-grid items-center">
         {/* Hidden native select: browser auto-sizes to longest option label */}
         <select
-          className="invisible col-start-1 row-start-1 h-8 appearance-none border px-3 pr-8 text-sm"
+          className="invisible col-start-1 row-start-1 h-8 appearance-none"
+          {...slotAttributes(selectFieldMeasureStyle, {})}
           aria-hidden="true"
           tabIndex={-1}
         >
@@ -233,7 +246,7 @@ export function SelectField<T extends string = string>({
     // Wrapped only when there is something to say: without a message the field keeps the exact
     // box it had before, so the measuring grid stays the outermost element.
     return compactMessages ? (
-      <div className="inline-flex flex-col gap-1">
+      <div className="inline-flex flex-col" {...slotAttributes(selectFieldStackStyle, {})}>
         {sized}
         {compactMessages}
       </div>

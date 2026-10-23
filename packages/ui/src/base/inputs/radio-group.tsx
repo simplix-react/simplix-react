@@ -2,6 +2,8 @@ import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { type ComponentPropsWithRef, forwardRef } from "react";
 
 import { cn } from "../../utils/cn";
+import { slotAttributes } from "../../design/slot-style";
+import { radioGroupItemStyle, radioGroupStyle } from "./radio-group.style";
 
 export type RadioGroupProps = ComponentPropsWithRef<
   typeof RadioGroupPrimitive.Root
@@ -11,8 +13,9 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
   ({ className, ...rest }, ref) => (
     <RadioGroupPrimitive.Root
       ref={ref}
-      className={cn("grid gap-2", className)}
+      className={cn("grid", className)}
       {...rest}
+      {...slotAttributes(radioGroupStyle, {})}
     />
   ),
 );
@@ -27,11 +30,9 @@ export const RadioGroupItem = forwardRef<HTMLButtonElement, RadioGroupItemProps>
   ({ className, ...rest }, ref) => (
     <RadioGroupPrimitive.Item
       ref={ref}
-      className={cn(
-        "aspect-square h-4 w-4 rounded-full border border-primary text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
-        className,
-      )}
+      className={cn("aspect-square h-4 w-4", className)}
       {...rest}
+      {...slotAttributes(radioGroupItemStyle, {})}
     >
       <RadioGroupPrimitive.Indicator className="flex items-center justify-center">
         <svg

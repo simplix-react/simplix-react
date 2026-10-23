@@ -6,6 +6,11 @@ interface MenuLinkProps {
   href: string;
   linkTarget?: LinkTarget;
   className?: string;
+  /**
+   * Attributes for the anchor beside its class, such as the `data-part` marks a caller's design
+   * declaration draws on (`partAttributes`).
+   */
+  attributes?: Readonly<Record<string, string>>;
   children: ReactNode;
 }
 
@@ -21,7 +26,7 @@ function isExternalUrl(url: string): boolean {
  * WINDOW targets, it renders a plain anchor. Modifier-clicks (cmd/ctrl/shift/alt,
  * middle/right button) fall through to native browser handling so new-tab works.
  */
-export function MenuLink({ href, linkTarget, className, children }: MenuLinkProps) {
+export function MenuLink({ href, linkTarget, className, attributes, children }: MenuLinkProps) {
   const router = useRouter();
   const target: LinkTarget = linkTarget ?? "SELF";
 
@@ -32,6 +37,7 @@ export function MenuLink({ href, linkTarget, className, children }: MenuLinkProp
         target="_blank"
         rel="noopener noreferrer"
         className={className}
+        {...attributes}
       >
         {children}
       </a>
@@ -44,7 +50,7 @@ export function MenuLink({ href, linkTarget, className, children }: MenuLinkProp
       window.open(href, "_blank", "noopener,noreferrer,popup");
     };
     return (
-      <a href={href} onClick={handleClick} className={className}>
+      <a href={href} onClick={handleClick} className={className} {...attributes}>
         {children}
       </a>
     );
@@ -52,7 +58,7 @@ export function MenuLink({ href, linkTarget, className, children }: MenuLinkProp
 
   if (isExternalUrl(href) || !router) {
     return (
-      <a href={href} className={className}>
+      <a href={href} className={className} {...attributes}>
         {children}
       </a>
     );
@@ -74,7 +80,7 @@ export function MenuLink({ href, linkTarget, className, children }: MenuLinkProp
   };
 
   return (
-    <a href={href} onClick={handleClick} className={className}>
+    <a href={href} onClick={handleClick} className={className} {...attributes}>
       {children}
     </a>
   );

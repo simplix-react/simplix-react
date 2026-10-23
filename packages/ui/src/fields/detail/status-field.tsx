@@ -11,7 +11,7 @@ export interface DetailStatusFieldProps extends CommonDetailFieldProps {
   /**
    * Resolved semantic tone for the status pill. Look this up via a shared tone
    * map (e.g. `@pacs-studio/pacs-ui` `cardholderStatusToTone[value] ?? "neutral"`)
-   * — never hand-write an enum→color map at the call site.
+   * - never hand-write an enum→color map at the call site.
    */
   tone: StatusTone;
   /** Already-translated status label shown inside the pill. */

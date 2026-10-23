@@ -1,11 +1,18 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "@simplix-react/i18n/react";
 
-import { Flex } from "../../primitives/flex";
 import { useFlatUIComponents } from "../../provider/ui-provider";
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
 import { CaretDownIcon, HashIcon, XIcon } from "../shared/icons";
+import { crudFieldClearButtonStyle } from "./field-clear-button.style";
 import { operatorConfig } from "./filter-icons";
+import {
+  crudFilterInputIconStyle,
+  crudFilterInputRowStyle,
+  crudFilterOperatorMenuStyle,
+  crudFilterOperatorTriggerStyle,
+} from "./filter-parts.style";
 import type { SearchOperator } from "./filter-types";
 
 export interface NumberFilterProps {
@@ -68,37 +75,43 @@ export function NumberFilter({
   }, [onChange, onOperatorChange, operator, defaultOperator]);
 
   return (
-    <Flex align="center" className={cn("relative", className)}>
+    <div
+      className={cn("relative flex flex-row items-center", className)}
+      {...slotAttributes(crudFilterInputRowStyle, { lead: operators.length > 1 ? "operator" : "icon" })}
+    >
       {operators.length > 1 ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
               type="button"
-              className="absolute left-0 z-10 inline-flex h-8 items-center gap-0.5 rounded-l-md border-r bg-muted/50 px-2 text-muted-foreground hover:text-foreground"
+              className="absolute left-0 z-10 inline-flex h-8 items-center"
               aria-label={t("filter.selectOperator")}
+              {...slotAttributes(crudFilterOperatorTriggerStyle, { attach: "joined" })}
             >
               <currentOp.icon className="h-3.5 w-3.5" />
               <CaretDownIcon className="h-3 w-3" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
-            {operators.map((op) => {
-              const meta = operatorConfig[op];
-              return (
-                <DropdownMenuItem
-                  key={op}
-                  onClick={() => onOperatorChange(op)}
-                  className={cn(op === operator && "bg-accent")}
-                >
-                  <meta.icon className="mr-2 h-3.5 w-3.5" />
-                  {t(meta.labelKey)}
-                </DropdownMenuItem>
-              );
-            })}
+            <div {...slotAttributes(crudFilterOperatorMenuStyle, {})}>
+              {operators.map((op) => {
+                const meta = operatorConfig[op];
+                return (
+                  <DropdownMenuItem
+                    key={op}
+                    onClick={() => onOperatorChange(op)}
+                    data-current={op === operator}
+                  >
+                    <meta.icon className="h-3.5 w-3.5" />
+                    {t(meta.labelKey)}
+                  </DropdownMenuItem>
+                );
+              })}
+            </div>
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
-        <span className="absolute left-2.5 text-muted-foreground">
+        <span className="absolute left-2.5" {...slotAttributes(crudFilterInputIconStyle, {})}>
           <HashIcon className="h-4 w-4" />
         </span>
       )}
@@ -107,22 +120,20 @@ export function NumberFilter({
         value={inputValue}
         onChange={(e) => handleInputChange(e.target.value)}
         placeholder={placeholder ?? label ?? t("filter.numberPlaceholder")}
-        className={cn(
-          "h-8 pr-8 text-sm",
-          operators.length > 1 ? "pl-14" : "pl-8",
-        )}
+        className="h-8"
         aria-label={label ?? t("filter.numberFilter")}
       />
       {inputValue && (
         <button
           type="button"
           onClick={handleClear}
-          className="absolute right-2 inline-flex h-4 w-4 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
+          className="absolute right-2 inline-flex h-4 w-4 items-center justify-center"
           aria-label={t("filter.clearFilter")}
+          {...slotAttributes(crudFieldClearButtonStyle, {})}
         >
           <XIcon className="h-3 w-3" />
         </button>
       )}
-    </Flex>
+    </div>
   );
 }

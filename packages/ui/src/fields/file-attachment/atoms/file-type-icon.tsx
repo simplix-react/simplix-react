@@ -1,6 +1,8 @@
 import { FileIcon, defaultStyles } from 'react-file-icon'
 import type { FileIconProps } from 'react-file-icon'
 import { cn } from '../../../utils/cn'
+import { slotAttributes } from '../../../design/slot-style'
+import { fileTypeIconStyle } from './file-type-icon.style'
 
 export interface FileTypeIconProps {
   /** Explicit extension (e.g. 'pdf'). Overrides mimeType/fileName derivation. */
@@ -64,12 +66,10 @@ export function FileTypeIcon({
 
   return (
     <div
-      className={cn(
-        'grid place-items-center rounded-sm bg-muted',
-        className,
-      )}
+      className={cn('grid place-items-center', className)}
       style={{ width: size, height: size }}
       aria-hidden="true"
+      {...slotAttributes(fileTypeIconStyle, {})}
     >
       <div style={{ width: size * 0.5, height: size * 0.5 }}>
         <FileIcon extension={ext} {...styles} />

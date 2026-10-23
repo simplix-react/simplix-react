@@ -1,7 +1,7 @@
 import { useTranslation } from "@simplix-react/i18n/react";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
 
-import { ALERT_ACTION_CLASS, ALERT_CANCEL_CLASS, AlertPanel } from "../shared/alert-panel";
+import { ALERT_BUTTON_STRUCTURE, alertActionAttributes, alertCancelAttributes, AlertPanel } from "../shared/alert-panel";
 
 /** Props for the {@link CrudDelete} confirmation dialog. */
 export interface CrudDeleteProps {
@@ -71,7 +71,7 @@ export function CrudDelete({
       description={displayDescription}
       actions={
         <>
-          <AlertDialog.Cancel className={ALERT_CANCEL_CLASS} disabled={loading}>
+          <AlertDialog.Cancel className={ALERT_BUTTON_STRUCTURE} {...alertCancelAttributes} disabled={loading}>
             {cancelLabel ?? t("common.cancel")}
           </AlertDialog.Cancel>
           <AlertDialog.Action
@@ -79,7 +79,7 @@ export function CrudDelete({
               e.preventDefault();
               onConfirm();
             }}
-            className={ALERT_ACTION_CLASS}
+            className={ALERT_BUTTON_STRUCTURE} {...alertActionAttributes}
             disabled={loading}
           >
             {loading ? (deletingLabel ?? t("common.deleting")) : (deleteLabel ?? t("common.delete"))}

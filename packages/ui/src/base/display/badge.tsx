@@ -21,14 +21,14 @@ export interface BadgeProps
 }
 
 export const BadgeBase = forwardRef<HTMLSpanElement, BadgeProps>(
-  ({ className, variant, rounded, size, asChild, ...rest }, ref) => {
+  ({ className, variant, rounded, size, interactive, icon, empty, asChild, ...rest }, ref) => {
     const Comp = asChild ? Slot : "span";
     return (
       <Comp
         ref={ref}
         className={className}
         {...rest}
-        {...slotAttributes(badgeStyle, { variant, rounded, size })}
+        {...slotAttributes(badgeStyle, { variant, rounded, size, interactive, icon, empty })}
       />
     );
   },

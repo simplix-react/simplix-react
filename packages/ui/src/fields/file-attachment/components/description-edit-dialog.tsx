@@ -4,6 +4,12 @@ import type { LocaleCode, LocaleConfig } from '@simplix-react/i18n'
 import { useTranslation } from '@simplix-react/i18n/react'
 import { useFlatUIComponents } from '../../../provider/ui-provider'
 import { I18nTextField } from '../../form/i18n-text-field'
+import { partAttributes, slotAttributes } from '../../../design/slot-style'
+import {
+  descriptionEditDialogTitleRowStyle,
+  descriptionEditDialogBodyStyle,
+  descriptionEditDialogCloseStyle,
+} from './description-edit-dialog.style'
 
 export interface DescriptionEditDialogProps {
   open: boolean
@@ -65,7 +71,7 @@ export function DescriptionEditDialog({
       {/* Custom close in-header: title + X share one flex row (vertical align) and the title truncates (issue 1). */}
       <DialogContent showCloseButton={false} className="sm:max-w-md">
         <DialogHeader className="min-w-0">
-          <div className="flex min-w-0 items-center gap-2">
+          <div className="flex min-w-0 items-center" {...slotAttributes(descriptionEditDialogTitleRowStyle, {})}>
             <FileText size={16} aria-hidden="true" className="shrink-0" />
             <DialogTitle className="min-w-0 flex-1 truncate">
               {fileName ?? t('file.description.title')}
@@ -76,7 +82,8 @@ export function DescriptionEditDialog({
               size="icon-sm"
               onClick={onClose}
               aria-label={t('file.description.close')}
-              className="-mr-1 shrink-0"
+              className="shrink-0"
+              {...partAttributes(descriptionEditDialogCloseStyle, {})}
             >
               <X size={16} aria-hidden="true" />
             </Button>
@@ -86,8 +93,8 @@ export function DescriptionEditDialog({
           </DialogDescription>
         </DialogHeader>
 
-        {/* py only — no horizontal padding so the i18n input is flush with header/footer (issue 2) */}
-        <div className="py-1">
+        {/* py only - no horizontal padding so the i18n input is flush with header/footer (issue 2) */}
+        <div {...slotAttributes(descriptionEditDialogBodyStyle, {})}>
           <I18nTextField
             value={working as Record<LocaleCode, string>}
             onChange={(v) => setWorking(v)}

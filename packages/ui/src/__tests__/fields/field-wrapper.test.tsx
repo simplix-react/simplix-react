@@ -3,6 +3,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { FieldWrapper } from "../../fields/shared/field-wrapper";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -17,8 +18,8 @@ describe("FieldWrapper", () => {
   it("applies top layout classes by default", () => {
     render(<FieldWrapper label="Name">input</FieldWrapper>);
     const fieldset = screen.getByRole("group");
-    expect(fieldset.className).toContain("flex");
-    expect(fieldset.className).toContain("flex-col");
+    expect(drawnClasses(fieldset)).toContain("flex");
+    expect(drawnClasses(fieldset)).toContain("flex-col");
   });
 
   // ── Label position: left ──
@@ -30,7 +31,7 @@ describe("FieldWrapper", () => {
       </FieldWrapper>,
     );
     const fieldset = screen.getByRole("group");
-    expect(fieldset.className).toContain("grid");
+    expect(drawnClasses(fieldset)).toContain("grid");
   });
 
   // ── Label position: hidden ──
@@ -44,7 +45,7 @@ describe("FieldWrapper", () => {
     // The label text should not be rendered via <Label>
     // Instead, an sr-only span should exist
     const srSpan = screen.getByText("Search");
-    expect(srSpan.className).toContain("sr-only");
+    expect(drawnClasses(srSpan)).toContain("sr-only");
   });
 
   it("sets aria-label on fieldset when label is hidden", () => {
@@ -155,7 +156,7 @@ describe("FieldWrapper", () => {
       </FieldWrapper>,
     );
     const fieldset = screen.getByRole("group");
-    expect(fieldset.className).toContain("my-custom");
+    expect(drawnClasses(fieldset)).toContain("my-custom");
   });
 
   // ── Left layout with description and error ──

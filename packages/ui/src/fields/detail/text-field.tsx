@@ -1,9 +1,10 @@
 import { useCallback, useState } from "react";
 
 import type { CommonDetailFieldProps } from "../../crud/shared/types";
-import { cn } from "../../utils/cn";
+import { slotAttributes } from "../../design/slot-style";
 import { detailFallback } from "../shared/detail-fallback";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
+import { detailTextFieldCopyStyle, detailTextFieldValueStyle } from "./text-field.style";
 
 /** Props for the {@link DetailTextField} component. */
 export interface DetailTextFieldProps extends CommonDetailFieldProps {
@@ -54,17 +55,15 @@ export function DetailTextField({
       size={size}
       className={className}
     >
-      <span className="inline-flex min-w-0 items-start gap-1.5">
+      <span className="inline-flex min-w-0 items-start" {...slotAttributes(detailTextFieldValueStyle, {})}>
         <span className="min-w-0 break-words">{displayValue}</span>
         {copyable && hasValue && (
           <button
             type="button"
             onClick={handleCopy}
-            className={cn(
-              "inline-flex h-5 w-5 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:text-foreground",
-              copied && "text-green-600",
-            )}
+            className="inline-flex h-5 w-5 items-center justify-center"
             aria-label={copied ? "Copied" : "Copy to clipboard"}
+            {...slotAttributes(detailTextFieldCopyStyle, { copied })}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

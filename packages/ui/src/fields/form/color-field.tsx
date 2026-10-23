@@ -2,8 +2,12 @@ import type { CommonFieldProps } from "../../crud/shared/types";
 import { ColorPicker } from "../../base/inputs";
 import type { PresetColor } from "../../base/inputs";
 import { useFlatUIComponents } from "../../provider/ui-provider";
-import { cn } from "../../utils/cn";
+import { partAttributes, slotAttributes } from "../../design/slot-style";
+import { fieldControlStyle } from "../shared/field-parts.style";
+import { colorFieldRowStyle } from "./color-field.style";
+
 import { FieldWrapper } from "../shared/field-wrapper";
+
 
 /** Props for the {@link ColorField} form component. */
 export interface ColorFieldProps extends CommonFieldProps {
@@ -59,7 +63,7 @@ export function ColorField({
       {...variantProps}
     >
       {({ id }) => (
-        <span className="flex items-center gap-2">
+        <span className="flex items-center" {...slotAttributes(colorFieldRowStyle, {})}>
           <ColorPicker
             value={value}
             onChange={onChange}
@@ -81,11 +85,8 @@ export function ColorField({
             disabled={disabled}
             aria-invalid={!!error}
             {...inputProps}
-            className={cn(
-              "font-mono",
-              error && "border-destructive",
-              inputProps?.className,
-            )}
+            className={inputProps?.className}
+            {...partAttributes(fieldControlStyle, { mono: true })}
           />
         </span>
       )}

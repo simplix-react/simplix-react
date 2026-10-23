@@ -3,6 +3,17 @@ import { useCallback, useMemo, useState, type ReactNode } from "react";
 
 import { Stack } from "../../primitives";
 import { cn } from "../../utils/cn";
+import { slotAttributes } from "../../design/slot-style";
+import {
+  treeMoveCheckStyle,
+  treeMoveLabelStyle,
+  treeMoveListStyle,
+  treeMoveLockStyle,
+  treeMoveMarkerStyle,
+  treeMovePickStyle,
+  treeMoveRowStyle,
+  treeMoveToggleStyle,
+} from "./tree-move-dialog.style";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import type { TreeMoveConfig } from "./tree-types";
 import { filterTreeWithAncestors, getDescendantIds } from "./tree-utils";
@@ -35,7 +46,7 @@ function FolderIcon() {
 
 function CheckIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0 text-primary" aria-hidden="true">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0" aria-hidden="true" {...slotAttributes(treeMoveCheckStyle, {})}>
       <path d="M13 5L6.5 11.5L3 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
@@ -43,7 +54,7 @@ function CheckIcon() {
 
 function LockIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="shrink-0 text-muted-foreground" aria-hidden="true">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="shrink-0" aria-hidden="true" {...slotAttributes(treeMoveLockStyle, {})}>
       <rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.2" />
       <path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
     </svg>
@@ -89,23 +100,20 @@ function TreeItem<T>({
           leaves the keyboard and assistive technology to guess which of the two a press belongs
           to, and the guesses disagree. */}
       <span
-        className={cn(
-          "flex w-full items-center gap-1 rounded-sm px-2 py-1.5 text-sm",
-          isSelected && "bg-accent text-accent-foreground",
-          !isSelected && !isDisabled && "hover:bg-accent/50",
-          isDisabled && "cursor-not-allowed opacity-50",
-        )}
+        className={cn("flex w-full items-center", isDisabled && "cursor-not-allowed")}
+        {...slotAttributes(treeMoveRowStyle, {
+          selected: isSelected,
+          interactive: !isSelected && !isDisabled,
+          disabled: isDisabled,
+        })}
       >
         <span className="shrink-0" style={{ width: depth * 20 }} />
         <button
           type="button"
           tabIndex={hasChildren ? 0 : -1}
           aria-label={hasChildren ? (isExpanded ? "Collapse" : "Expand") : undefined}
-          className={cn(
-            "inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-sm",
-            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-            hasChildren ? "text-muted-foreground hover:text-foreground" : "invisible",
-          )}
+          className={cn("inline-flex h-5 w-5 shrink-0 items-center justify-center", !hasChildren && "invisible")}
+          {...slotAttributes(treeMoveToggleStyle, { branch: hasChildren })}
           onClick={() => {
             if (hasChildren) onToggleExpand(id);
           }}
@@ -116,15 +124,12 @@ function TreeItem<T>({
           type="button"
           disabled={isDisabled}
           onClick={() => !isDisabled && onSelect(id)}
-          className={cn(
-            "flex min-w-0 flex-1 items-center gap-1 rounded-sm text-start",
-            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-            isDisabled && "cursor-not-allowed",
-          )}
+          className={cn("flex min-w-0 flex-1 items-center", isDisabled && "cursor-not-allowed")}
+          {...slotAttributes(treeMovePickStyle, {})}
         >
           <FolderIcon />
-          <span className="ml-1 truncate">{config.getDisplayName(item)}</span>
-          <span className="ml-auto shrink-0">
+          <span className="truncate" {...slotAttributes(treeMoveLabelStyle, {})}>{config.getDisplayName(item)}</span>
+          <span className="shrink-0" {...slotAttributes(treeMoveMarkerStyle, {})}>
             {isDisabled && <LockIcon />}
             {isSelected && !isDisabled && <CheckIcon />}
           </span>
@@ -267,22 +272,23 @@ export function TreeMoveDialog<T>({
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t("tree.searchPlaceholder")}
           />
-          <div className="max-h-72 overflow-y-auto rounded-md border p-1">
+          <div className="max-h-72 overflow-y-auto" {...slotAttributes(treeMoveListStyle, {})}>
             <Stack gap="none">
               {/* Root option */}
               <button
                 type="button"
                 onClick={() => setSelectedParentId(null)}
-                className={cn(
-                  "flex w-full items-center gap-1 rounded-sm px-2 py-1.5 text-sm",
-                  isRootSelected && "bg-accent text-accent-foreground",
-                  !isRootSelected && "hover:bg-accent/50",
-                )}
+                className="flex w-full items-center"
+                {...slotAttributes(treeMoveRowStyle, {
+                  selected: isRootSelected,
+                  interactive: !isRootSelected,
+                  disabled: false,
+                })}
               >
                 <FolderIcon />
-                <span className="ml-1 truncate">{rootLabel ?? t("tree.rootNode")}</span>
+                <span className="truncate" {...slotAttributes(treeMoveLabelStyle, {})}>{rootLabel ?? t("tree.rootNode")}</span>
                 {isRootSelected && (
-                  <span className="ml-auto shrink-0"><CheckIcon /></span>
+                  <span className="shrink-0" {...slotAttributes(treeMoveMarkerStyle, {})}><CheckIcon /></span>
                 )}
               </button>
               {/* Tree items */}

@@ -57,6 +57,7 @@ vi.mock("../../crud/reorder/draggable-card", () => ({
 
 import React from "react";
 import { CrudList } from "../../crud/list/crud-list";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 // ── ListRoot ──
 
@@ -562,7 +563,7 @@ describe("CrudList.Table", () => {
       </CrudList>,
     );
     const activeRow = container.querySelector("[data-testid='list-row-2']");
-    expect(activeRow?.className).toContain("bg-muted/50");
+    expect(drawnClasses(activeRow!)).toContain("bg-muted/50");
   });
 });
 

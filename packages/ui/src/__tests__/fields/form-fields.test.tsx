@@ -25,6 +25,7 @@ import { NumberField } from "../../fields/form/number-field";
 import { PasswordField } from "../../fields/form/password-field";
 import { ColorField } from "../../fields/form/color-field";
 import { Field } from "../../fields/form/field";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 // ── TextField ──
 
@@ -143,7 +144,7 @@ describe("CheckboxField", () => {
       <CheckboxField label="Active" value={false} onChange={vi.fn()} />,
     );
     const fieldset = screen.getByRole("group");
-    expect(fieldset.className).toContain("grid");
+    expect(drawnClasses(fieldset)).toContain("grid");
   });
 
   it("shows error", () => {
@@ -182,9 +183,9 @@ describe("SwitchField", () => {
       <SwitchField label="Mode" value={false} onChange={vi.fn()} />,
     );
     const fieldset = screen.getByRole("group");
-    expect(fieldset.className).toContain("flex-col");
+    expect(drawnClasses(fieldset)).toContain("flex-col");
     // Leader line between label and the right-aligned switch
-    expect(container.querySelector(".border-dashed")).toBeTruthy();
+    expect(drawnClasses(container.querySelector("[data-slot='field-leader']"))).toContain("border-dashed");
   });
 
   it("shows error", () => {

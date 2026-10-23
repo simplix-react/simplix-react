@@ -2,7 +2,9 @@ import { type ComponentPropsWithRef, type ReactNode, forwardRef } from "react";
 
 import { type StatusTone } from "../status-tone";
 import { useStatusTones } from "../status-tone-context";
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
+import { statusDotCoreStyle, statusDotRingStyle, statusDotStyle } from "./status-dot.style";
 
 /** Dot size token → Tailwind `size-*` class for both the ring layer and the dot. */
 const DOT_SIZE: Record<NonNullable<StatusDotProps["size"]>, string> = {
@@ -69,29 +71,22 @@ export const StatusDot = forwardRef<HTMLSpanElement, StatusDotProps>(
         ref={ref}
         aria-label={label}
         role={label ? "img" : undefined}
-        className={cn(
-          "relative inline-flex shrink-0 items-center justify-center",
-          sizeClass,
-          !active && "opacity-60",
-          className,
-        )}
+        className={cn("relative inline-flex shrink-0 items-center justify-center", sizeClass, className)}
         {...rest}
+        {...slotAttributes(statusDotStyle, { active })}
       >
         {showRing ? (
           <span
             aria-hidden="true"
-            className={cn(
-              "absolute inset-0 rounded-full opacity-75",
-              sizeClass,
-              tones[tone].ring,
-              animation === "ping" ? "animate-ping" : "animate-status-flash",
-            )}
+            className={cn("absolute inset-0", sizeClass, tones[tone].ring)}
+            {...slotAttributes(statusDotRingStyle, { animation })}
           />
         ) : null}
         {children ?? (
           <span
             aria-hidden="true"
-            className={cn("relative rounded-full", sizeClass, dotClass)}
+            className={cn("relative", sizeClass, dotClass)}
+            {...slotAttributes(statusDotCoreStyle, {})}
           />
         )}
       </span>

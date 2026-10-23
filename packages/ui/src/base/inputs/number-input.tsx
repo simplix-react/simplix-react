@@ -3,6 +3,14 @@ import { type ComponentPropsWithRef, forwardRef, useRef } from "react";
 
 import { CaretDownIcon } from "../../crud/shared/icons";
 import { cn } from "../../utils/cn";
+import { slotAttributes } from "../../design/slot-style";
+import {
+  numberInputFieldStyle,
+  numberInputSpinnerStyle,
+  numberInputStepStyle,
+  numberInputStyle,
+  numberInputSuffixStyle,
+} from "./number-input.style";
 
 export interface NumberInputProps extends Omit<ComponentPropsWithRef<"input">, "type" | "onChange"> {
   onChange?: (value: number) => void;
@@ -11,7 +19,7 @@ export interface NumberInputProps extends Omit<ComponentPropsWithRef<"input">, "
   /**
    * How many characters the longest value takes, which is what decides the control's width.
    *
-   * <p>Left out, the control fills the width it is given — right for a cell it has to fill, wrong
+   * <p>Left out, the control fills the width it is given, right for a cell it has to fill, wrong
    * for a form, where a box the width of a sentence asks for a sentence. {@link NumberField}
    * works this out from the bounds it was given and passes it, so a form field carries the
    * measure without every screen stating one.
@@ -54,7 +62,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
 
     // The chrome around the digits: the input's own side padding, the spinner column with its
     // divider, and the suffix when there is one. Held in `ch` and `rem` rather than a Tailwind
-    // class because the count is only known at render — a class name assembled from a number
+    // class because the count is only known at render: a class name assembled from a number
     // reaches no stylesheet.
     const width = digits === undefined
       ? undefined
@@ -64,12 +72,12 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
       <div
         style={width ? { width } : undefined}
         className={cn(
-          "flex h-8 items-stretch overflow-hidden rounded-md border border-input bg-background text-sm",
+          "flex h-8 items-stretch overflow-hidden",
           width === undefined && "w-full",
-          "focus-within:border-foreground has-[[aria-invalid=true]]:border-destructive",
-          disabled && "cursor-not-allowed opacity-50",
+          disabled && "cursor-not-allowed",
           className,
         )}
+        {...slotAttributes(numberInputStyle, { disabled: Boolean(disabled) })}
       >
         <input
           ref={(el) => {
@@ -88,29 +96,34 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
             onChange?.(clamp(v));
           }}
           className={cn(
-            // `outline-none` with nothing put back: the box around this input carries
-            // `focus-within:border-foreground`, so focus shows on the control the reader sees as
-            // one thing. A ring on the inner field would draw a second control inside the first.
-            "min-w-0 flex-1 bg-transparent px-1.5 py-1.5 text-center outline-none",
-            "placeholder:text-muted-foreground disabled:cursor-not-allowed",
+            "min-w-0 flex-1",
+            "disabled:cursor-not-allowed",
             // Hide the hover-only native spinners; the buttons replace them
             "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
           )}
           {...rest}
+          {...slotAttributes(numberInputFieldStyle, {})}
         />
         {suffix && (
-          <span className="flex shrink-0 items-center pr-1.5 text-xs text-muted-foreground">
+          <span
+            className="flex shrink-0 items-center"
+            {...slotAttributes(numberInputSuffixStyle, {})}
+          >
             {suffix}
           </span>
         )}
-        <div className="flex shrink-0 flex-col border-l border-input">
+        <div
+          className="flex shrink-0 flex-col"
+          {...slotAttributes(numberInputSpinnerStyle, {})}
+        >
           <button
             type="button"
             tabIndex={-1}
             aria-label={t("common.increase")}
             disabled={disabled}
             onClick={() => stepBy(1)}
-            className="flex flex-1 items-center justify-center px-0.5 hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none"
+            className="flex flex-1 items-center justify-center disabled:pointer-events-none"
+            {...slotAttributes(numberInputStepStyle, { direction: "increase" })}
           >
             <CaretDownIcon className="h-3 w-3 rotate-180" />
           </button>
@@ -120,7 +133,8 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
             aria-label={t("common.decrease")}
             disabled={disabled}
             onClick={() => stepBy(-1)}
-            className="flex flex-1 items-center justify-center border-t border-input px-0.5 hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none"
+            className="flex flex-1 items-center justify-center disabled:pointer-events-none"
+            {...slotAttributes(numberInputStepStyle, { direction: "decrease" })}
           >
             <CaretDownIcon className="h-3 w-3" />
           </button>

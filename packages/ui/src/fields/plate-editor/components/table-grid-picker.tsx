@@ -2,7 +2,13 @@
 import { useTranslation } from '@simplix-react/i18n/react'
 import { useState } from 'react'
 
-import { cn } from '../../../utils/cn'
+import { slotAttributes } from '../../../design/slot-style'
+import {
+  plateTableGridCellStyle,
+  plateTableGridCellsStyle,
+  plateTableGridLabelStyle,
+  plateTableGridStyle,
+} from './table-grid-picker.style'
 
 export interface TableGridPickerProps {
   /** Maximum number of rows in the grid (default: 8) */
@@ -46,8 +52,8 @@ export function TableGridPicker({
   }
 
   return (
-    <div className="p-2" onMouseLeave={handleMouseLeave}>
-      <div className="grid gap-0.5" style={{ gridTemplateColumns: `repeat(${maxCols}, 1fr)` }}>
+    <div onMouseLeave={handleMouseLeave} {...slotAttributes(plateTableGridStyle, {})}>
+      <div className="grid" style={{ gridTemplateColumns: `repeat(${maxCols}, 1fr)` }} {...slotAttributes(plateTableGridCellsStyle, {})}>
         {Array.from({ length: maxRows }, (_, rowIndex) =>
           Array.from({ length: maxCols }, (_, colIndex) => {
             const row = rowIndex + 1
@@ -59,12 +65,8 @@ export function TableGridPicker({
                 key={`${row}-${col}`}
                 type="button"
                 aria-label={t('plateEditor.table.gridSize', { rows: row, cols: col })}
-                className={cn(
-                  'h-4 w-4 border border-border rounded-[2px] transition-colors',
-                  isHighlighted
-                    ? 'bg-primary border-primary'
-                    : 'bg-background hover:border-primary/50'
-                )}
+                className="h-4 w-4"
+                {...slotAttributes(plateTableGridCellStyle, { highlighted: isHighlighted })}
                 onMouseEnter={() => handleCellHover(row, col)}
                 onClick={() => handleCellClick(row, col)}
               />
@@ -73,7 +75,7 @@ export function TableGridPicker({
         )}
       </div>
       {hoveredCell && (
-        <div className="mt-2 text-center text-sm text-muted-foreground">
+        <div {...slotAttributes(plateTableGridLabelStyle, {})}>
           {formatLabel(hoveredCell.row, hoveredCell.col)}
         </div>
       )}

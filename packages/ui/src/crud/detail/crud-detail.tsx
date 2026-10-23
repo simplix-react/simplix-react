@@ -4,14 +4,33 @@ import type { ReactNode } from "react";
 import { Flex } from "../../primitives/flex";
 import { Grid } from "../../primitives/grid";
 import { Stack } from "../../primitives/stack";
+import { slotAttributes, partAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { ArrowLeftIcon, XIcon, TrashIcon } from "../shared/icons";
 import type { SectionShellProps } from "../shared/section-shell";
 import { type FieldVariant, FieldVariantContext } from "../shared/types";
+import {
+  crudDetailActionFooterRowStyle,
+  crudDetailActionFooterStyle,
+  crudDetailActionsStyle,
+  crudDetailAuditStyle,
+  crudDetailBodyStyle,
+  crudDetailContentStyle,
+  crudDetailFooterStyle,
+  crudDetailHeaderStyle,
+  crudDetailLoadingStyle,
+  crudDetailSectionBodyStyle,
+  crudDetailSpinnerStyle,
+} from "./crud-detail.style";
 import { DetailAuditFooter, type AuditData } from "./crud-detail-audit-footer";
 import { DetailPagedList } from "./crud-detail-list";
 import { DetailPagedTable } from "./crud-detail-table";
+
+// Entry and exit motion is tw-animate-css, which a design stylesheet cannot @apply; it stays
+// on the element, the same in every design.
+const crudDetailLoadingMotion =
+  "animate-in fade-in-0";
 
 // ── Detail Root ──
 //
@@ -108,14 +127,13 @@ function DetailRoot({ isLoading, onClose, header, footer, variant = "default", a
   // Header / body / footer share one horizontal padding so their edges stay
   // aligned. Side panels sit flush to the panel width (the enclosing
   // `ListDetail.Detail` already insets from the divider); dialogs keep an
-  // inner gutter. The body scrolls with a plain overflow — no reserved
-  // scrollbar gutter — so a scrollbar appears at the edge only when needed.
-  const px = isDialog ? "px-5" : "";
+  // inner gutter. The body scrolls with a plain overflow - no reserved
+  // scrollbar gutter - so a scrollbar appears at the edge only when needed.
 
   const content = (
     <div className={cn("flex flex-col flex-1 min-h-0 w-full", className)} data-testid="crud-detail">
       {(onClose || header) && (
-        <Flex data-crud-slot="header" justify={header ? "between" : "end"} align="center" className={cn("shrink-0 border-b pb-2", px, isDialog && "pt-3")}>
+        <Flex data-crud-slot="header" justify={header ? "between" : "end"} align="center" className="shrink-0" {...partAttributes(crudDetailHeaderStyle, { dialog: isDialog })}>
           {header}
           {onClose && (
             // Icon-only: without this the button has no accessible name at all, and a screen
@@ -130,27 +148,28 @@ function DetailRoot({ isLoading, onClose, header, footer, variant = "default", a
           )}
         </Flex>
       )}
-      <div data-crud-slot="body" className={cn("flex flex-col flex-1 min-h-0 overflow-auto", px)}>
-        <Stack gap="sm" className={cn("relative py-2", !(onClose || header) && "pt-2")}>
+      <div data-crud-slot="body" className="flex flex-col flex-1 min-h-0 overflow-auto" {...slotAttributes(crudDetailBodyStyle, { dialog: isDialog })}>
+        <Stack gap="sm" className="relative" {...partAttributes(crudDetailContentStyle, {})}>
           {isLoading && (
             <output
               aria-busy="true"
               aria-label={t("common.loading")}
-              className="absolute inset-0 z-10 flex items-center justify-center rounded-md bg-background/60 animate-in fade-in-0 duration-150"
+              className={cn(crudDetailLoadingMotion, "absolute inset-0 z-10 flex items-center justify-center")}
+              {...slotAttributes(crudDetailLoadingStyle, {})}
             >
-              <span className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              <span className="h-6 w-6" {...slotAttributes(crudDetailSpinnerStyle, {})} />
             </output>
           )}
           {children}
         </Stack>
         {auditData && (
-          <div data-crud-slot="audit" className="pt-4 pb-2">
+          <div data-crud-slot="audit" {...slotAttributes(crudDetailAuditStyle, {})}>
             <DetailAuditFooter auditData={auditData} displayZone={displayZone} />
           </div>
         )}
       </div>
       {footer && (
-        <div data-crud-slot="footer" className={cn("shrink-0", px, isDialog && "pb-3")}>{footer}</div>
+        <div data-crud-slot="footer" className="shrink-0" {...slotAttributes(crudDetailFooterStyle, { dialog: isDialog })}>{footer}</div>
       )}
     </div>
   );
@@ -257,19 +276,19 @@ export interface CrudDetailSectionProps extends SectionShellProps {
 function DetailSection({ layout = "single-column", ...props }: CrudDetailSectionProps) {
   const { SectionShell } = useFlatUIComponents();
   const columns = detailLayoutColumns[layout];
-  const body = cn("pl-2", detailLayoutTracks[layout], DETAIL_FIELD_PAIR);
+  const body = cn(detailLayoutTracks[layout], DETAIL_FIELD_PAIR);
   return (
     <SectionShell {...props}>
       {columns === 1 ? (
         // Rows keep the tight rhythm a stacked section reads at. The column gap is the one a
         // field draws between its own label and value, so the two agree and the tracks measure to
         // the labels exactly.
-        <div className={cn("grid gap-x-3 gap-y-1", body)}>{props.children}</div>
+        <div className={cn("grid", body)} {...partAttributes(crudDetailSectionBodyStyle, { single: true })}>{props.children}</div>
       ) : (
         // The wide gutter stays between the section's columns: a field overrides it with its own
         // narrower one across the pair it holds, so a label sits close to its value while the
         // columns stay far apart.
-        <Grid columns={columns} gapX="lg" gapY="xs" divider className={body}>
+        <Grid columns={columns} gapX="lg" gapY="xs" divider className={body} {...partAttributes(crudDetailSectionBodyStyle, { single: false })}>
           {props.children}
         </Grid>
       )}
@@ -323,7 +342,8 @@ function DetailActions({ spread, className, children }: CrudDetailActionsProps) 
     <Flex
       gap="sm"
       justify="start"
-      className={cn("border-t pt-2", spread && "[&>*:first-child]:mr-auto", className)}
+      className={className}
+      {...partAttributes(crudDetailActionsStyle, { spread: !!spread })}
     >
       {children}
     </Flex>
@@ -484,12 +504,12 @@ export interface CrudDetailActionFooterProps extends CrudDetailDefaultActionsPro
 function DetailActionFooter({ actions, ...rest }: CrudDetailActionFooterProps) {
   const { leftButton, rightGroup, hasLeft } = useStandardDetailActions(rest);
   return (
-    <Stack gap="sm" className={cn("border-t pt-2", rest.className)}>
+    <Stack gap="sm" className={rest.className} {...partAttributes(crudDetailActionFooterStyle, {})}>
       <Flex gap="sm" align="center" className={ACTION_TIER_FILL}>
         {actions}
       </Flex>
       {/* A divider separates the domain-action tier from the standard row. */}
-      <Flex gap="sm" align="center" className={cn("flex-wrap border-t pt-2", hasLeft ? "justify-between" : "justify-end")}>
+      <Flex gap="sm" align="center" className={cn("flex-wrap", hasLeft ? "justify-between" : "justify-end")} {...partAttributes(crudDetailActionFooterRowStyle, {})}>
         {leftButton}
         {rightGroup}
       </Flex>

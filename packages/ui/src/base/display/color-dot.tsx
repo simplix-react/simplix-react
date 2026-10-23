@@ -1,4 +1,6 @@
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
+import { colorDotStyle } from "./color-dot.style";
 
 /** Props for the {@link ColorDot} component. */
 export interface ColorDotProps {
@@ -30,9 +32,10 @@ const SIZE_CLASS: Record<NonNullable<ColorDotProps["size"]>, string> = {
 export function ColorDot({ color, size = "sm", className }: ColorDotProps) {
   return (
     <span
-      className={cn("inline-block shrink-0 rounded-full", SIZE_CLASS[size], className)}
+      className={cn("inline-block shrink-0", SIZE_CLASS[size], className)}
       style={{ backgroundColor: color }}
       aria-hidden
+      {...slotAttributes(colorDotStyle, {})}
     />
   );
 }

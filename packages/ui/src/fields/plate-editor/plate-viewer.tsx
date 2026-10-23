@@ -23,7 +23,7 @@ const LazyViewer = lazy(() =>
  * values render as one paragraph per line.
  *
  * The Plate runtime is heavy, so the actual renderer is code-split and loads
- * on first mount — screens without rich-text content never fetch it.
+ * on first mount - screens without rich-text content never fetch it.
  */
 export function PlateViewer(props: PlateViewerProps) {
   return (

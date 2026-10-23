@@ -1,6 +1,8 @@
 import type { CommonDetailFieldProps } from "../../crud/shared/types";
+import { slotAttributes } from "../../design/slot-style";
 import { detailFallback } from "../shared/detail-fallback";
 import { DetailFieldWrapper } from "../shared/detail-field-wrapper";
+import { detailLinkFieldLinkStyle } from "./link-field.style";
 
 /** Props for the {@link DetailLinkField} component. */
 export interface DetailLinkFieldProps extends CommonDetailFieldProps {
@@ -46,7 +48,7 @@ export function DetailLinkField({
       {hasValue ? (
         <a
           href={href}
-          className="text-primary underline-offset-4 hover:underline"
+          {...slotAttributes(detailLinkFieldLinkStyle, {})}
           {...(external && {
             target: "_blank",
             rel: "noopener noreferrer",

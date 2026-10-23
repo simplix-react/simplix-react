@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
-import { cn } from "../../utils/cn";
+import { slotAttributes } from "../../design/slot-style";
+import { emptyValueStyle } from "./empty-value.style";
 
 /** Props for the {@link EmptyValue} component. */
 export interface EmptyValueProps {
@@ -21,5 +22,5 @@ export interface EmptyValueProps {
  * ```
  */
 export function EmptyValue({ children = "—", className }: EmptyValueProps) {
-  return <span className={cn("text-muted-foreground", className)}>{children}</span>;
+  return <span className={className} {...slotAttributes(emptyValueStyle, {})}>{children}</span>;
 }

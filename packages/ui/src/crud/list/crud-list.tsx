@@ -30,6 +30,47 @@ import {useFlatUIComponents} from "../../provider/ui-provider";
 import {useUIDefaults} from "../../provider/ui-defaults-context";
 import {Flex, Stack} from "../../primitives";
 import {cn} from "../../utils/cn";
+import { slotAttributes, partAttributes } from "../../design/slot-style";
+import {
+  crudCardActionsStyle,
+  crudCardBodyStyle,
+  crudCardSkeletonStyle,
+  crudCardStyle,
+  crudSelectCheckboxStyle,
+} from "../shared/crud-card.style";
+import {
+  crudListBulkActionStyle,
+  crudListBulkActionsStyle,
+  crudListBulkClearStyle,
+  crudListBulkCountStyle,
+  crudListCardEmptyStyle,
+  crudListCardHeaderStyle,
+  crudListEmptyMessageStyle,
+  crudListEmptyStyle,
+  crudListEmptyTextStyle,
+  crudListPageButtonStyle,
+  crudListPageEllipsisStyle,
+  crudListPageStatusStyle,
+  crudListPaginationLabelStyle,
+  crudListPaginationStyle,
+  crudListReasonDescriptionStyle,
+  crudListReasonIconStyle,
+  crudListReasonStyle,
+  crudListReasonTitleStyle,
+  crudListRequiredMarkStyle,
+  crudListSelectAllRowStyle,
+  crudListSelectAllStyle,
+  crudListSortButtonStyle,
+  crudListSortIconStyle,
+  crudListToolbarStyle,
+  crudListViewStyle,
+  crudListHandleHeadStyle,
+  crudListEmptyCellStyle,
+  crudListRowStyle,
+  crudListGroupRowStyle,
+  crudListGroupCellStyle,
+  crudListPageSizeStyle,
+} from "./crud-list.style";
 import type {ColumnInfo, EmptyReason, SortState} from "../shared";
 import {
   CrudListColumnContext,
@@ -66,6 +107,11 @@ import type { ReorderConfig } from "../shared";
 import { useReorder, DragHandleHeader, DraggableRow, DraggableCard } from "../reorder";
 import {useContainerWidth} from "./use-container-width";
 
+// Entry and exit motion is tw-animate-css, which a design stylesheet cannot @apply; it stays
+// on the element, the same in every design.
+const crudListViewMotion =
+  "animate-in fade-in-0";
+
 // ── Table Card frame context ──
 //
 // Set by CrudList.TableCard (via the shared TableCardFrame) so List.Table and
@@ -76,22 +122,22 @@ import {useContainerWidth} from "./use-container-width";
 // ── Empty Reason Card ──
 
 const emptyReasonConfig = {
-  error: { icon: <AlertTriangleIcon />, iconClassName: "bg-destructive/10 text-destructive", titleKey: "list.errorTitle", descKey: "list.errorDescription" },
-  unavailable: { icon: <CloudOffIcon />, iconClassName: "bg-destructive/10 text-destructive", titleKey: "list.unavailableTitle", descKey: "list.unavailableDescription" },
-  "no-filter": { icon: <FunnelIcon />, iconClassName: "bg-muted text-muted-foreground", titleKey: "list.noFilterTitle", descKey: "list.noFilter" },
-  "no-search": { icon: <MagnifyingGlassIcon />, iconClassName: "bg-muted text-muted-foreground", titleKey: "list.noSearchTitle", descKey: "list.noSearch" },
+  error: { icon: <AlertTriangleIcon />, tone: "destructive", titleKey: "list.errorTitle", descKey: "list.errorDescription" },
+  unavailable: { icon: <CloudOffIcon />, tone: "destructive", titleKey: "list.unavailableTitle", descKey: "list.unavailableDescription" },
+  "no-filter": { icon: <FunnelIcon />, tone: "muted", titleKey: "list.noFilterTitle", descKey: "list.noFilter" },
+  "no-search": { icon: <MagnifyingGlassIcon />, tone: "muted", titleKey: "list.noSearchTitle", descKey: "list.noSearch" },
 } as const;
 
 function EmptyReasonCard({ reason, bordered = true }: { reason: Exclude<EmptyReason, "no-data">; bordered?: boolean }) {
   const { t } = useTranslation("simplix/ui");
   const config = emptyReasonConfig[reason];
   return (
-    <div className={cn("flex min-h-[280px] flex-col items-center justify-center px-6 py-16 text-center", bordered && "rounded-lg border")}>
-      <div className={`mb-3 rounded-full p-4 [&_svg]:size-8 ${config.iconClassName}`}>
+    <div className="flex min-h-[280px] flex-col items-center justify-center" {...slotAttributes(crudListReasonStyle, { bordered })}>
+      <div className="[&_svg]:size-8" {...slotAttributes(crudListReasonIconStyle, { tone: config.tone })}>
         {config.icon}
       </div>
-      <p className="text-base font-semibold">{t(config.titleKey)}</p>
-      <p className="mt-1 max-w-sm text-sm text-muted-foreground">{t(config.descKey)}</p>
+      <p {...slotAttributes(crudListReasonTitleStyle, {})}>{t(config.titleKey)}</p>
+      <p className="max-w-sm" {...slotAttributes(crudListReasonDescriptionStyle, {})}>{t(config.descKey)}</p>
     </div>
   );
 }
@@ -167,7 +213,8 @@ function ListToolbar({ className, children }: ListToolbarProps) {
       gap="sm"
       align="center"
       wrap
-      className={cn("w-full rounded-lg border bg-card p-3 [&>*]:grow", className)}
+      className={cn("w-full [&>*]:grow", className)}
+      {...partAttributes(crudListToolbarStyle, {})}
     >
       {children}
     </Flex>
@@ -247,8 +294,9 @@ function SortIcon({ direction }: { direction: "asc" | "desc" | null }) {
       strokeLinecap="round"
       strokeLinejoin="round"
       xmlns="http://www.w3.org/2000/svg"
-      className={cn("ml-1 inline-block shrink-0", direction ? "opacity-100" : "opacity-30")}
+      className="inline-block shrink-0"
       aria-hidden="true"
+      {...slotAttributes(crudListSortIconStyle, { sorted: Boolean(direction) })}
     >
       {direction === "asc" ? <path d="m18 15-6-6-6 6" /> : <path d="m6 9 6 6 6-6" />}
     </svg>
@@ -635,7 +683,7 @@ function ReorderableTable<T>({
     <TableHeader>
       {table.getHeaderGroups().map((headerGroup) => (
         <TableRow key={headerGroup.id}>
-          <TableHead className="w-10 px-2" style={{ width: 40 }}>
+          <TableHead className="w-10" style={{ width: 40 }} {...partAttributes(crudListHandleHeadStyle, {})}>
             <DragHandleHeader
               isDragEnabled={isDragEnabled}
               onActivate={() => onSortChange?.({ field: reorderConfig.orderField, direction: "asc" })}
@@ -705,7 +753,7 @@ function ReorderableTable<T>({
       return <EmptyReasonCard reason={emptyReason} />;
     }
     return (
-      <div className="flex min-h-[280px] items-center justify-center rounded-lg border text-sm text-muted-foreground">
+      <div className="flex min-h-[280px] items-center justify-center" {...slotAttributes(crudListEmptyMessageStyle, {})}>
         {emptyMessages[emptyReason]}
       </div>
     );
@@ -750,12 +798,6 @@ function ReorderableTable<T>({
 // ── Reorderable Card List ──
 
 type CardDensity = "compact" | "default" | "comfortable";
-
-const cardDensityPadding: Record<CardDensity, string> = {
-  compact: "px-3 py-2",
-  default: "px-4 py-3",
-  comfortable: "px-5 py-4",
-};
 
 interface ReorderableCardListProps<T> {
   reorderConfig: ReorderConfig<T>;
@@ -825,13 +867,11 @@ function ReorderableCardList<T>({
     [optimisticData, dndGetRowId],
   );
 
-  const skeletonPadding = cardDensityPadding[density];
-
   if (isLoading && data.length === 0) {
     return (
       <Stack gap="sm">
         {Array.from({ length: 3 }, (_, i) => (
-          <div key={`card-skeleton-${i}`} className={cn("rounded-lg border", skeletonPadding)}>
+          <div key={`card-skeleton-${i}`} {...slotAttributes(crudCardSkeletonStyle, { density })}>
             <Stack gap="xs">
               <Skeleton className="h-5 w-2/3" />
               <Skeleton className="h-4 w-1/2" />
@@ -851,7 +891,7 @@ function ReorderableCardList<T>({
       return <EmptyReasonCard reason={emptyReason} />;
     }
     return (
-      <div className="flex min-h-[280px] items-center justify-center rounded-lg border text-sm text-muted-foreground">
+      <div className="flex min-h-[280px] items-center justify-center" {...slotAttributes(crudListEmptyMessageStyle, {})}>
         {emptyMessages[emptyReason]}
       </div>
     );
@@ -1099,7 +1139,7 @@ function ListTable<T>({
             type="checkbox"
             checked={selectedIndices?.size === data.length && data.length > 0}
             onChange={() => onSelectAll?.()}
-            className="h-4 w-4 rounded border-gray-300"
+            className="h-4 w-4" {...slotAttributes(crudSelectCheckboxStyle, {})}
             aria-label={t("list.selectAllRows")}
           />
         ),
@@ -1108,7 +1148,7 @@ function ListTable<T>({
             type="checkbox"
             checked={selectedIndices?.has(row.index) ?? false}
             onChange={() => onSelectionChange?.(row.index)}
-            className="h-4 w-4 rounded border-gray-300"
+            className="h-4 w-4" {...slotAttributes(crudSelectCheckboxStyle, {})}
             aria-label={t("list.selectRow", { index: row.index + 1 })}
           />
         ),
@@ -1142,7 +1182,7 @@ function ListTable<T>({
           const labelNode = colDef.required ? (
             <>
               {label}
-              <span className="text-destructive ml-0.5" aria-hidden="true">
+              <span aria-hidden="true" {...slotAttributes(crudListRequiredMarkStyle, {})}>
                 *
               </span>
             </>
@@ -1170,10 +1210,8 @@ function ListTable<T>({
               <button
                 type="button"
                 onClick={() => handleSortChange(colDef.field!)}
-                className={cn(
-                  "inline-flex max-w-full items-center font-semibold hover:text-foreground",
-                  isSorted && "text-foreground",
-                )}
+                className="inline-flex max-w-full items-center"
+                {...slotAttributes(crudListSortButtonStyle, { sorted: isSorted })}
                 style={headerStyle}
               >
                 <span className="truncate">{labelNode}</span>
@@ -1302,16 +1340,17 @@ function ListTable<T>({
       )}
     >
       {isCardMode ? (
-        <div key="card" className="animate-in fade-in-0 duration-200">
+        <div key="card" className={crudListViewMotion}
+{...slotAttributes(crudListViewStyle, {})}>
           <Stack gap="sm">
             {selectable && (
-              <Flex align="center" className="px-1">
-                <label className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Flex align="center" {...partAttributes(crudListSelectAllRowStyle, {})}>
+                <label className="flex items-center" {...slotAttributes(crudListSelectAllStyle, {})}>
                   <input
                     type="checkbox"
                     checked={selectedIndices?.size === data.length && data.length > 0}
                     onChange={() => onSelectAll?.()}
-                    className="h-4 w-4 rounded border-gray-300"
+                    className="h-4 w-4" {...slotAttributes(crudSelectCheckboxStyle, {})}
                     aria-label={t("list.selectAll")}
                   />
                   {t("list.selectAll")}
@@ -1341,7 +1380,7 @@ function ListTable<T>({
               />
             ) : isLoading && data.length === 0
               ? Array.from({ length: 3 }, (_, i) => (
-                  <div key={`card-skeleton-${i}`} className={cn("rounded-lg border", cardDensityPadding[density ?? "default"])}>
+                  <div key={`card-skeleton-${i}`} {...slotAttributes(crudCardSkeletonStyle, { density: density ?? "default" })}>
                     <Stack gap="xs">
                       <Skeleton className="h-5 w-2/3" />
                       <Skeleton className="h-4 w-1/2" />
@@ -1350,7 +1389,7 @@ function ListTable<T>({
                   </div>
                 ))
               : emptyReason && data.length === 0
-                ? <div className="flex h-24 items-center justify-center text-sm text-muted-foreground">{emptyMessages[emptyReason]}</div>
+                ? <div className="flex h-24 items-center justify-center" {...slotAttributes(crudListCardEmptyStyle, {})}>{emptyMessages[emptyReason]}</div>
               : data.map((row, index) => {
                   const rid = rowId?.(row) ?? String(index);
                   const isSelected = selectedIndices?.has(index);
@@ -1359,19 +1398,18 @@ function ListTable<T>({
                     <div
                       key={rid}
                       className={cn(
-                        "relative rounded-lg border transition-colors hover:bg-muted/50",
-                        isSelected && "ring-2 ring-primary",
-                        isActive && "bg-muted/50",
+                        "relative",
                         onRowClick && "cursor-pointer",
                         rowClassName?.(row),
                       )}
+                      {...slotAttributes(crudCardStyle, { selected: isSelected, active: isActive })}
                       onClick={rowClickHandler(row, onRowClick)}
                       data-testid={`list-row-${rid}`}
                     >
                       {cardTitle && (
-                        <Flex align="center" justify="between" className={cn("border-b px-2 py-1.5")}>
+                        <Flex align="center" justify="between" {...partAttributes(crudListCardHeaderStyle, {})}>
                           <div className="min-w-0 flex-1">{createElement(cardTitle, { row, index })}</div>
-                          <Flex gap="xs" align="center" className="shrink-0 ml-2" {...rowClickIgnoreProps}>
+                          <Flex gap="xs" align="center" className="shrink-0" {...rowClickIgnoreProps} {...partAttributes(crudCardActionsStyle, {})}>
                             {slots?.rowActions
                               ? slots.rowActions({ row })
                               : actions && actions.length > 0 && (
@@ -1382,7 +1420,7 @@ function ListTable<T>({
                                 type="checkbox"
                                 checked={isSelected ?? false}
                                 onChange={() => onSelectionChange?.(index)}
-                                className="h-4 w-4 rounded border-gray-300"
+                                className="h-4 w-4" {...slotAttributes(crudSelectCheckboxStyle, {})}
                                 aria-label={t("list.selectRow", { index: index + 1 })}
                               />
                             )}
@@ -1390,7 +1428,7 @@ function ListTable<T>({
                         </Flex>
                       )}
                       {cardContent && (
-                        <div className={cn(cardDensityPadding[density ?? "default"], cardTitle && "pt-2")}>
+                        <div {...slotAttributes(crudCardBodyStyle, { density: density ?? "default", titled: Boolean(cardTitle) })}>
                           {createElement(cardContent, { row, index })}
                         </div>
                       )}
@@ -1400,7 +1438,8 @@ function ListTable<T>({
           </Stack>
         </div>
       ) : (
-        <div key="table" className="animate-in fade-in-0 duration-200">
+        <div key="table" className={crudListViewMotion}
+{...slotAttributes(crudListViewStyle, {})}>
           {reorder ? (
             <ReorderableTable
               reorderConfig={reorder}
@@ -1488,7 +1527,7 @@ function ListTable<T>({
                       </TableRow>
                     ))
                   : emptyReason && data.length === 0
-                    ? <TableRow><TableCell colSpan={table.getAllColumns().length} className="h-24 text-center text-muted-foreground">{emptyMessages[emptyReason]}</TableCell></TableRow>
+                    ? <TableRow><TableCell colSpan={table.getAllColumns().length} className="h-24" {...partAttributes(crudListEmptyCellStyle, {})}>{emptyMessages[emptyReason]}</TableCell></TableRow>
                     : (() => {
                       const modelRows = table.getRowModel().rows;
                       const drawRow = (row: (typeof modelRows)[number]) => {
@@ -1498,13 +1537,12 @@ function ListTable<T>({
                           <TableRow
                             key={row.id}
                             className={cn(
-                              selectedIndices?.has(row.index) && "bg-muted",
-                              isActive && "bg-muted/50",
                               onRowClick && "cursor-pointer",
                               rowClassName?.(row.original),
                             )}
                             onClick={rowClickHandler(row.original, onRowClick)}
                             data-testid={`list-row-${rid}`}
+                            {...partAttributes(crudListRowStyle, { selected: !!selectedIndices?.has(row.index), active: isActive })}
                           >
                             {row.getVisibleCells().map((cell) => (
                               <TableCell
@@ -1533,12 +1571,12 @@ function ListTable<T>({
                               look for a value under each column header. */}
                           {group.label !== null && group.label !== undefined && (
                             <TableRow
-                              className="hover:bg-transparent"
+                              {...partAttributes(crudListGroupRowStyle, {})}
                               data-testid={`list-group-${group.key ?? "ungrouped"}`}
                             >
                               <TableCell
                                 colSpan={table.getAllColumns().length}
-                                className="bg-muted/40 py-1 text-xs font-semibold text-muted-foreground"
+                                {...partAttributes(crudListGroupCellStyle, {})}
                               >
                                 {group.label}
                               </TableCell>
@@ -1619,12 +1657,12 @@ function ListPagination({
   const isCompact = containerWidth > 0 && containerWidth < compactBreakpoint;
   const pageSizeSelector = onPageSizeChange && (
     <Flex gap="xs" align="center">
-      <span className="text-xs text-muted-foreground">{rowsLabel ?? t("list.rows")}</span>
+      <span {...slotAttributes(crudListPaginationLabelStyle, {})}>{rowsLabel ?? t("list.rows")}</span>
       <Select
         value={String(pageSize)}
         onValueChange={(v) => onPageSizeChange(Number(v))}
       >
-        <SelectTrigger size="xs" className="w-[64px] rounded-md border-border bg-card font-medium text-secondary-foreground" aria-label={t("list.pageSize")}>
+        <SelectTrigger size="xs" className="w-[64px]" aria-label={t("list.pageSize")} {...partAttributes(crudListPageSizeStyle, {})}>
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -1638,8 +1676,7 @@ function ListPagination({
     </Flex>
   );
 
-  const navCell =
-    "inline-flex h-6 items-center justify-center rounded-md border border-border bg-card text-xs font-medium text-secondary-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-50";
+  const navCell = "inline-flex h-6 items-center justify-center disabled:pointer-events-none";
 
   const prevButton = (
     <button
@@ -1648,6 +1685,7 @@ function ListPagination({
       onClick={() => onPageChange(page - 1)}
       className={cn(navCell, "w-8")}
       aria-label={t("list.previousPage")}
+      {...slotAttributes(crudListPageButtonStyle, {})}
     >
       <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
         <path d="M10 4L6 8L10 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -1662,6 +1700,7 @@ function ListPagination({
       onClick={() => onPageChange(page + 1)}
       className={cn(navCell, "w-8")}
       aria-label={t("list.nextPage")}
+      {...slotAttributes(crudListPageButtonStyle, {})}
     >
       <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
         <path d="M6 4L10 8L6 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -1672,17 +1711,17 @@ function ListPagination({
   const pageNumbers = isCompact ? null : getPageNumbers(page, totalPages);
 
   return (
-    <div ref={containerRef} className={cn("flex w-full items-center justify-end gap-2 border-t px-3.5 py-2.5", framed ? "bg-card" : "bg-muted/60", className)}>
+    <div ref={containerRef} className={cn("flex w-full items-center justify-end", className)} {...slotAttributes(crudListPaginationStyle, { framed })}>
       <Flex gap="sm" align="center">
         {pageSizeSelector}
         <Flex gap="xs" align="center">
         {prevButton}
         {isCompact ? (
-          <span className="text-xs">{page} / {totalPages}</span>
+          <span {...slotAttributes(crudListPageStatusStyle, {})}>{page} / {totalPages}</span>
         ) : (
           pageNumbers!.map((p, i) =>
             p === "ellipsis" ? (
-              <span key={`ellipsis-${i}`} className="inline-flex h-6 min-w-[26px] items-center justify-center text-xs text-muted-foreground">
+              <span key={`ellipsis-${i}`} className="inline-flex h-6 min-w-[26px] items-center justify-center" {...slotAttributes(crudListPageEllipsisStyle, {})}>
                 &hellip;
               </span>
             ) : (
@@ -1690,12 +1729,8 @@ function ListPagination({
                 key={p}
                 type="button"
                 onClick={() => onPageChange(p)}
-                className={cn(
-                  navCell,
-                  "min-w-[26px] px-2",
-                  p === page &&
-                    "border-primary bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
-                )}
+                className={cn(navCell, "min-w-[26px]")}
+                {...slotAttributes(crudListPageButtonStyle, { numbered: true, current: p === page })}
                 aria-label={t("list.pageNumber", { page: p })}
                 aria-current={p === page ? "page" : undefined}
               >
@@ -1733,12 +1768,10 @@ function ListBulkActions({ selectedCount, onClear, selectedLabel, clearLabel, cl
     <Flex
       gap="sm"
       align="center"
-      className={cn(
-        "rounded-md border bg-muted/50 px-4 py-2",
-        className,
-      )}
+      className={className}
+      {...partAttributes(crudListBulkActionsStyle, {})}
     >
-      <span className="text-sm font-medium">
+      <span {...slotAttributes(crudListBulkCountStyle, {})}>
         {selectedLabel ? selectedLabel(selectedCount) : t("list.selected", { count: selectedCount })}
       </span>
       {children}
@@ -1746,7 +1779,7 @@ function ListBulkActions({ selectedCount, onClear, selectedLabel, clearLabel, cl
         <button
           type="button"
           onClick={onClear}
-          className="ml-auto text-sm text-muted-foreground hover:text-foreground"
+          {...slotAttributes(crudListBulkClearStyle, {})}
         >
           {clearLabel ?? t("common.clear")}
         </button>
@@ -1776,13 +1809,8 @@ function ListBulkAction({
     <button
       type="button"
       onClick={onClick}
-      className={cn(
-        "inline-flex items-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
-        variant === "destructive"
-          ? "text-foreground hover:bg-muted"
-          : "text-foreground hover:bg-muted",
-        className,
-      )}
+      className={cn("inline-flex items-center", className)}
+      {...slotAttributes(crudListBulkActionStyle, { variant })}
     >
       {label}
     </button>
@@ -1815,8 +1843,8 @@ function ListEmpty({ reason = "no-data", messages, className, children }: ListEm
     : children ?? mergedMessages[reason];
 
   return (
-    <Stack align="center" justify="center" className={cn("py-12", className)}>
-      <p className="text-sm text-muted-foreground">{content}</p>
+    <Stack align="center" justify="center" className={className} {...partAttributes(crudListEmptyStyle, {})}>
+      <p {...slotAttributes(crudListEmptyTextStyle, {})}>{content}</p>
     </Stack>
   );
 }

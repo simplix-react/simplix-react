@@ -1,6 +1,5 @@
 import { NumberInput } from "../../base/inputs/number-input";
 import type { CommonFieldProps } from "../../crud/shared/types";
-import { cn } from "../../utils/cn";
 import { FieldWrapper } from "../shared/field-wrapper";
 
 /** Props for the {@link NumberField} form component. */
@@ -129,7 +128,7 @@ export function NumberField({
           // number box four pixels taller than the select beside it — enough to see and not
           // enough to name, so it reads as the screen being slightly wrong rather than as a
           // control being wrong.
-          className={cn(error && "border-destructive", inputProps?.className)}
+          className={inputProps?.className}
         />
       )}
     </FieldWrapper>

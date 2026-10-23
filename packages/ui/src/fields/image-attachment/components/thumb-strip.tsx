@@ -19,6 +19,19 @@ import { CSS } from '@dnd-kit/utilities'
 import { useResolvedImageSrc } from '../../file-attachment/use-resolved-image-src'
 import { THUMB_STRIP_SIZE } from '../lib/thumbnail-sizes'
 import { cn } from '../../../utils/cn'
+import { slotAttributes } from '../../../design/slot-style'
+import {
+  thumbStripClipStyle,
+  thumbStripErrorOverlayStyle,
+  thumbStripImageStyle,
+  thumbStripItemStyle,
+  thumbStripPlaceholderStyle,
+  thumbStripProgressFillStyle,
+  thumbStripProgressStyle,
+  thumbStripStarStyle,
+  thumbStripStyle,
+  thumbStripUploadingStyle,
+} from './thumb-strip.style'
 
 // Local modifiers (avoids a @dnd-kit/modifiers dependency).
 // Lock drag to the horizontal axis.
@@ -50,12 +63,12 @@ export interface ThumbItem {
   localId: string
   /** Local object URL for a not-yet-uploaded file (takes precedence). */
   preview?: string
-  /** Server attachment id — resolved via fetchBlobUrl (authenticated thumbnail). */
+  /** Server attachment id - resolved via fetchBlobUrl (authenticated thumbnail). */
   attachmentId?: string
   /** Public direct URL fallback when no authenticated fetcher is available. */
   fallbackUrl?: string
   state?: ThumbState
-  /** Display-only — read from representative flag. No write prop (plan §3.3 reconcile #1). */
+  /** Display-only: read from representative flag. No write prop (plan §3.3 reconcile #1). */
   primary?: boolean
   uploadProgress?: number
 }
@@ -66,7 +79,7 @@ export interface ThumbStripProps {
   onActivate: (localId: string) => void
   /** When provided, thumbnails become drag-sortable; reorder moves the underlying list. */
   onReorder?: (fromIndex: number, toIndex: number) => void
-  /** Authenticated blob fetcher — resolves thumbnails like the file detail list (issue: webp). */
+  /** Authenticated blob fetcher - resolves thumbnails like the file detail list (issue: webp). */
   fetchBlobUrl?: (attachmentId: string, opts?: { thumbnail?: boolean; size?: number }) => Promise<string>
 }
 
@@ -86,7 +99,7 @@ function ThumbButton({ item, isActive, label, onActivate, sortable, fetchBlobUrl
 
   // Resolve the thumbnail the same way the file detail list does (authenticated thumbnail blob).
   // If the thumbnail itself can't load (e.g. backend can't generate a webp thumbnail) we show a
-  // lightweight icon placeholder — never the full-size image (that would be a bandwidth hazard).
+  // lightweight icon placeholder - never the full-size image (that would be a bandwidth hazard).
   const [failed, setFailed] = useState(false)
   const src = useResolvedImageSrc({
     preview: item.preview,
@@ -113,84 +126,70 @@ function ThumbButton({ item, isActive, label, onActivate, sortable, fetchBlobUrl
       style={style}
       type="button"
       className={cn(
-        'relative w-[74px] h-[74px] rounded shrink-0 cursor-pointer p-0 font-[inherit]',
+        'relative w-[74px] h-[74px] shrink-0 cursor-pointer',
         // No overflow-hidden here so the representative star (offset outside) is not clipped;
         // the image + overlays are clipped by an inner rounded wrapper instead.
-        'border border-border bg-muted',
-        'transition-[outline,transform,border-color]',
-        // Active blue glow — no token (styles.css:218)
-        isActive &&
-          !isError && [
-            'outline outline-2 outline-primary outline-offset-2 border-transparent',
-            'shadow-[0_0_0_4px_rgba(36,107,253,.14),0_6px_16px_rgba(36,107,253,.22),0_2px_6px_rgba(36,107,253,.12)]',
-          ],
-        // Error + active red glow — no token (styles.css:231)
-        isActive &&
-          isError && [
-            'outline outline-2 outline-destructive outline-offset-2 border-transparent',
-            'shadow-[0_0_0_4px_rgba(200,53,31,.14),0_6px_16px_rgba(200,53,31,.22),0_2px_6px_rgba(200,53,31,.12)]',
-          ],
-        !isActive && !isError && 'hover:-translate-y-[1px]',
         draggable && 'cursor-grab active:cursor-grabbing',
-        isDragging && 'z-10 opacity-80',
+        isDragging && 'z-10',
       )}
       aria-label={isError ? label : undefined}
       onClick={() => onActivate(item.localId)}
       {...attributes}
       {...listeners}
+      {...slotAttributes(thumbStripItemStyle, {
+        tone: isActive ? (isError ? 'active-error' : 'active') : isError ? 'error' : 'idle',
+        dragging: isDragging,
+      })}
     >
-      {/* Image + status overlays — clipped to the rounded box (star sits outside, below) */}
-      <span className="absolute inset-0 rounded-[inherit] overflow-hidden">
-      {/* Scene image — or an icon placeholder when the thumbnail can't be loaded */}
+      {/* Image + status overlays - clipped to the rounded box (star sits outside, below) */}
+      <span className="absolute inset-0 overflow-hidden" {...slotAttributes(thumbStripClipStyle, {})}>
+      {/* Scene image - or an icon placeholder when the thumbnail can't be loaded */}
       {failed ? (
-        <span className="grid h-full w-full place-items-center bg-muted text-muted-foreground" aria-hidden="true">
+        <span className="grid h-full w-full place-items-center" aria-hidden="true" {...slotAttributes(thumbStripPlaceholderStyle, {})}>
           <ImageOff className="h-6 w-6" />
         </span>
       ) : src ? (
         <img
           src={src}
           alt=""
-          className={cn(
-            'w-full h-full object-cover block',
-            // Error grayscale + red overlay — no token (styles.css:154-155,226-227)
-            isError && 'grayscale brightness-50',
-          )}
+          className="w-full h-full object-cover block"
           aria-hidden="true"
           draggable={false}
+          {...slotAttributes(thumbStripImageStyle, { error: isError })}
           onError={() => setFailed(true)}
         />
       ) : null}
 
-      {/* Uploading overlay — blue gradient — no token (styles.css:149,223) */}
+      {/* Uploading overlay: blue gradient, no token (styles.css:149,223) */}
       {isUploading ? (
         <span
-          className={cn(
-            'absolute inset-0 pointer-events-none rounded-[inherit]',
-            // Upload progress blue gradient — no token (styles.css:149,223)
-            'bg-[linear-gradient(180deg,rgba(18,104,179,0)_0%,rgba(18,104,179,.55)_100%)]',
-          )}
+          className="absolute inset-0 pointer-events-none"
           aria-hidden="true"
+          {...slotAttributes(thumbStripUploadingStyle, {})}
         />
       ) : null}
 
-      {/* Error red overlay — no token (styles.css:154-155,226-227) */}
+      {/* Error red overlay: no token (styles.css:154-155,226-227) */}
       {isError ? (
         <span
-          className="absolute inset-0 pointer-events-none rounded-[inherit] bg-[rgba(200,53,31,.55)]"
+          className="absolute inset-0 pointer-events-none"
           aria-hidden="true"
+          {...slotAttributes(thumbStripErrorOverlayStyle, {})}
         />
       ) : null}
 
-      {/* Uploading progress bar — fill nested in the track so its width is relative to the
+      {/* Uploading progress bar - fill nested in the track so its width is relative to the
           track (inset 6px each side), not the full thumb; otherwise it overflows/clips (issue #5). */}
       {isUploading ? (
         <span
-          className="absolute left-[6px] right-[6px] bottom-[6px] h-[3px] rounded-full bg-white/35 z-[2] overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,.2)]"
+          className="absolute left-[6px] right-[6px] bottom-[6px] h-[3px] z-[2] overflow-hidden"
           aria-hidden="true"
+          {...slotAttributes(thumbStripProgressStyle, {})}
         >
           <span
-            className="block h-full rounded-full bg-white"
+            className="block h-full"
             style={{ width: `${Math.max(0, Math.min(100, item.uploadProgress ?? 0))}%` }}
+            {...slotAttributes(thumbStripProgressFillStyle, {})}
           />
         </span>
       ) : null}
@@ -220,16 +219,17 @@ function ThumbButton({ item, isActive, label, onActivate, sortable, fetchBlobUrl
 
       </span>
 
-      {/* Representative star — identical to FileThumbnail (bg circle + gold star),
+      {/* Representative star - identical to FileThumbnail (bg circle + gold star),
           rendered outside the clip wrapper so the offset badge is never cut off. */}
       {item.primary ? (
         <span
-          className="absolute -right-[5px] -bottom-[5px] z-[4] flex items-center justify-center w-[17px] h-[17px] rounded-full bg-background shadow-sm"
+          className="absolute -right-[5px] -bottom-[5px] z-[4] flex items-center justify-center w-[17px] h-[17px]"
           aria-hidden="true"
+          {...slotAttributes(thumbStripStarStyle, {})}
         >
           <Star
             size={11}
-            // Star color: #FFC107 fill / #5C3A10 stroke (no token equivalent — matches FileThumbnail)
+            // Star color: #FFC107 fill / #5C3A10 stroke (no token equivalent; matches FileThumbnail)
             style={{ color: '#FFC107', fill: '#FFC107', stroke: '#5C3A10' }}
           />
         </span>
@@ -255,7 +255,7 @@ export function ThumbStrip({ items, activeId, onActivate, onReorder, fetchBlobUr
   }
 
   const strip = (
-    <div className="flex gap-[10px] mt-[14px] px-1 py-[6px] overflow-x-auto overflow-y-visible [scrollbar-width:thin]">
+    <div className="flex overflow-x-auto overflow-y-visible [scrollbar-width:thin]" {...slotAttributes(thumbStripStyle, {})}>
       {items.map((item) => (
         <ThumbButton
           key={item.localId}
@@ -280,7 +280,7 @@ export function ThumbStrip({ items, activeId, onActivate, onReorder, fetchBlobUr
       // Lock to horizontal + clamp within the strip so the dragged thumb can't drift
       // vertically or escape the container (smoother than manual transform zeroing).
       modifiers={[restrictToHorizontalAxis, restrictToParentElement]}
-      // Disable auto-scroll — otherwise dragging scrolls the page vertically (issue: keeps
+      // Disable auto-scroll - otherwise dragging scrolls the page vertically (issue: keeps
       // moving downward). The strip is horizontal-only; no auto-scroll needed.
       autoScroll={false}
     >

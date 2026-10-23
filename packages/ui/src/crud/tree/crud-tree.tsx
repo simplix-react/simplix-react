@@ -24,6 +24,25 @@ import { useUIDefaults } from "../../provider/ui-defaults-context";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { Flex, Stack } from "../../primitives";
 import { cn } from "../../utils/cn";
+import { slotAttributes, partAttributes } from "../../design/slot-style";
+import {
+  crudTreeEmptyStyle,
+  crudTreeEmptyTextStyle,
+  crudTreeExpandToggleStyle,
+  crudTreeLabelStyle,
+  crudTreeLeafDotStyle,
+  crudTreeSearchClearStyle,
+  crudTreeSearchIconStyle,
+  crudTreeSearchInputStyle,
+  crudTreeRowStyle,
+  crudTreeSearchPopoverStyle,
+  crudTreeSearchPopoverInputStyle,
+  crudTreeSortButtonStyle,
+  crudTreeSortIconStyle,
+  crudTreeToggleStyle,
+  crudTreeToolbarControlsStyle,
+  crudTreeToolbarStyle,
+} from "./crud-tree.style";
 import type { ColumnInfo, EmptyReason, SortState } from "../shared";
 import { ListTotalBadge } from "../shared/list-total-badge";
 import { useDefaultDisplayZone } from "../shared/display-zone-context";
@@ -57,14 +76,14 @@ function ChevronDownIcon() {
 function SortIcon({ direction }: { direction: "asc" | "desc" | null }) {
   if (!direction) {
     return (
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="ml-1 inline-block opacity-30" aria-hidden="true">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="inline-block" aria-hidden="true" {...slotAttributes(crudTreeSortIconStyle, { sorted: false })}>
         <path d="M8 4L11 7H5L8 4Z" fill="currentColor" />
         <path d="M8 12L5 9H11L8 12Z" fill="currentColor" />
       </svg>
     );
   }
   return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="ml-1 inline-block" aria-hidden="true">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="inline-block" aria-hidden="true" {...slotAttributes(crudTreeSortIconStyle, { sorted: true })}>
       {direction === "asc" ? (
         <path d="M8 4L11 8H5L8 4Z" fill="currentColor" />
       ) : (
@@ -179,7 +198,8 @@ function TreeToolbar({ className, count, leading, children }: TreeToolbarProps) 
       gap="sm"
       align="center"
       wrap
-      className={cn("w-full rounded-lg border bg-card p-2", className)}
+      className={cn("w-full", className)}
+      {...partAttributes(crudTreeToolbarStyle, {})}
     >
       {given
         ? <ListTotalBadge>{typeof count === "number" ? undefined : count}</ListTotalBadge>
@@ -193,7 +213,7 @@ function TreeToolbar({ className, count, leading, children }: TreeToolbarProps) 
         for one screen. `min-w-0` is what lets the group narrow instead of pushing the break
         earlier.
       */}
-      <Flex gap="sm" align="center" className="ml-auto min-w-0">
+      <Flex gap="sm" align="center" className="min-w-0" {...partAttributes(crudTreeToolbarControlsStyle, {})}>
         {rest}
       </Flex>
     </Flex>
@@ -221,7 +241,7 @@ function TreeSearch({ value, onChange, placeholder, className }: TreeSearchProps
     // detail, where the column is half as wide and a search at full width would fold the
     // expand controls onto a second line.
     <div className={cn("relative w-full min-w-0 max-w-56", className)}>
-      <MagnifyingGlassIcon className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+      <MagnifyingGlassIcon className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2" {...slotAttributes(crudTreeSearchIconStyle, {})} />
       <Input
         type="search"
         value={controlled ? value : (ctx?.search ?? "")}
@@ -234,7 +254,7 @@ function TreeSearch({ value, onChange, placeholder, className }: TreeSearchProps
           }
         }}
         placeholder={placeholder ?? t("tree.searchPlaceholder")}
-        className="pl-8"
+        {...partAttributes(crudTreeSearchInputStyle, {})}
       />
     </div>
   );
@@ -252,7 +272,7 @@ function TreeExpandToggle({ className }: { className?: string }) {
 
   return (
     <TooltipProvider>
-      <Flex gap="xs" align="center" className={cn("!grow-0 ml-auto", className)}>
+      <Flex gap="xs" align="center" className={cn("!grow-0", className)} {...partAttributes(crudTreeExpandToggleStyle, {})}>
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -494,7 +514,8 @@ function TreeTable<T>({
               <button
                 type="button"
                 onClick={() => handleSortChange(colDef.field!)}
-                className="inline-flex items-center font-medium hover:text-foreground"
+                className="inline-flex items-center"
+                {...slotAttributes(crudTreeSortButtonStyle, {})}
               >
                 {colDef.header ?? ""}
                 <SortIcon direction={dir} />
@@ -522,12 +543,8 @@ function TreeTable<T>({
                 />
                 <button
                   type="button"
-                  className={cn(
-                    "inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-sm",
-                    meta._hasChildren
-                      ? "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                      : "text-transparent",
-                  )}
+                  className="inline-flex h-6 w-6 shrink-0 items-center justify-center"
+                  {...slotAttributes(crudTreeToggleStyle, { branch: Boolean(meta._hasChildren) })}
                   onClick={(e) => {
                     e.stopPropagation();
                     if (meta._hasChildren) {
@@ -541,10 +558,10 @@ function TreeTable<T>({
                   {meta._hasChildren ? (
                     meta._isExpanded ? <ChevronDownIcon /> : <ChevronRightIcon />
                   ) : (
-                    <span className="inline-block h-1 w-1 rounded-full bg-current opacity-30" />
+                    <span className="inline-block h-1 w-1" {...slotAttributes(crudTreeLeafDotStyle, {})} />
                   )}
                 </button>
-                <span className="ml-1 truncate">{cellContent}</span>
+                <span className="truncate" {...slotAttributes(crudTreeLabelStyle, {})}>{cellContent}</span>
               </Flex>
             );
           }
@@ -636,12 +653,10 @@ function TreeTable<T>({
                 return (
                   <TableRow
                     key={row.id}
-                    className={cn(
-                      isActive && "bg-muted/50",
-                      onRowClick && "cursor-pointer",
-                    )}
+                    className={cn(onRowClick && "cursor-pointer")}
                     onClick={onRowClick ? () => onRowClick(row.original) : undefined}
                     data-testid={`tree-row-${rid}`}
+                    {...partAttributes(crudTreeRowStyle, { active: isActive })}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} className="truncate">
@@ -728,24 +743,27 @@ function TreeHeaderActions({ searchPlaceholder, className }: TreeHeaderActionsPr
             side="left"
             align="center"
             sideOffset={4}
-            className="w-auto p-1"
+            className="w-auto"
+            {...partAttributes(crudTreeSearchPopoverStyle, {})}
             onOpenAutoFocus={(e) => e.preventDefault()}
           >
             <div className="relative">
-              <MagnifyingGlassIcon className="pointer-events-none absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+              <MagnifyingGlassIcon className="pointer-events-none absolute left-2 top-1/2 size-3.5 -translate-y-1/2" {...slotAttributes(crudTreeSearchIconStyle, {})} />
               <Input
                 type="search"
                 value={ctx?.search ?? ""}
                 onChange={(e) => ctx?.setSearch(e.target.value)}
                 placeholder={searchPlaceholder ?? t("tree.searchPlaceholder")}
-                className="h-7 w-44 pl-7 pr-7 text-xs"
+                className="h-7 w-44"
+                {...partAttributes(crudTreeSearchPopoverInputStyle, {})}
                 autoFocus
               />
               <button
                 type="button"
                 onClick={handleClear}
                 aria-label={t("common.clear")}
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-sm p-0.5 text-muted-foreground hover:text-foreground"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2"
+                {...slotAttributes(crudTreeSearchClearStyle, {})}
               >
                 <XIcon className="size-3.5" />
               </button>
@@ -801,8 +819,8 @@ function TreeEmpty({ reason = "no-data", messages, className, children }: TreeEm
     : children ?? mergedMessages[reason];
 
   return (
-    <Stack align="center" justify="center" className={cn("py-12", className)}>
-      <p className="text-sm text-muted-foreground">{content}</p>
+    <Stack align="center" justify="center" className={className} {...partAttributes(crudTreeEmptyStyle, {})}>
+      <p {...slotAttributes(crudTreeEmptyTextStyle, {})}>{content}</p>
     </Stack>
   );
 }

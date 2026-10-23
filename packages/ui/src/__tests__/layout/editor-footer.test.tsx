@@ -3,6 +3,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { EditorFooter } from "../../layout/editor-footer";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -25,8 +26,8 @@ describe("EditorFooter", () => {
       </EditorFooter>,
     );
     const el = container.firstElementChild!;
-    expect(el.className).toContain("border-t");
-    expect(el.className).toContain("shrink-0");
+    expect(drawnClasses(el)).toContain("border-t");
+    expect(drawnClasses(el)).toContain("shrink-0");
   });
 
   it("merges custom className", () => {
@@ -36,7 +37,7 @@ describe("EditorFooter", () => {
       </EditorFooter>,
     );
     const el = container.firstElementChild!;
-    expect(el.className).toContain("custom-class");
-    expect(el.className).toContain("border-t");
+    expect(drawnClasses(el)).toContain("custom-class");
+    expect(drawnClasses(el)).toContain("border-t");
   });
 });

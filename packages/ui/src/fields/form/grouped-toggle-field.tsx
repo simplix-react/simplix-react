@@ -6,8 +6,23 @@ import { useMemo, type ReactNode } from "react";
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { Flex } from "../../primitives/flex";
 import { useFlatUIComponents } from "../../provider/ui-provider";
+import { partAttributes, slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
+import {
+  groupedToggleCheckStyle,
+  groupedToggleChipStyle,
+  groupedToggleChipsStyle,
+  groupedToggleGridStyle,
+  groupedToggleGroupStyle,
+  groupedToggleHeaderStyle,
+  groupedToggleIconStyle,
+  groupedToggleNoteStyle,
+  groupedToggleSelectAllStyle,
+  groupedToggleTitleStyle,
+} from "./grouped-toggle-field.style";
+
 import { FieldWrapper } from "../shared/field-wrapper";
+
 
 /** A single toggleable chip option within a {@link GroupedToggleGroup}. */
 export interface GroupedToggleOption<T extends string = string> {
@@ -102,19 +117,14 @@ function ToggleChip<T extends string>({
       aria-pressed={pressed}
       disabled={option.disabled}
       onClick={onToggle}
-      className={cn(
-        "group inline-flex select-none items-center gap-1 rounded-sm border px-2 py-0.5 text-xs transition-all",
-        "border-transparent bg-muted text-muted-foreground hover:bg-muted/70 hover:text-foreground",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
-        "disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-muted disabled:hover:text-muted-foreground",
-        pressed &&
-          "border-primary bg-primary/20 font-semibold text-primary hover:bg-primary/25 hover:text-primary",
-      )}
+      className="group inline-flex select-none items-center"
+      {...slotAttributes(groupedToggleChipStyle, { pressed })}
     >
       <Check
         strokeWidth={3}
         aria-hidden="true"
-        className={cn("size-3 opacity-50", pressed && "opacity-100")}
+        className="size-3"
+        {...slotAttributes(groupedToggleCheckStyle, { pressed })}
       />
       {option.icon && <DynamicIconLazy name={option.icon} className="size-3" />}
       {option.label}
@@ -220,7 +230,10 @@ export function GroupedToggleField<T extends string = string>({
       className={className}
       {...variantProps}
     >
-      <div className={cn("grid grid-cols-1 gap-3", gridCols)}>
+      <div
+        className={cn("grid grid-cols-1", gridCols)}
+        {...slotAttributes(groupedToggleGridStyle, {})}
+      >
         {groups.map((group) => {
           const current = value[group.id] ?? [];
           const enabled = group.options
@@ -234,29 +247,33 @@ export function GroupedToggleField<T extends string = string>({
               key={group.id}
               role="group"
               aria-label={group.label}
-              className="rounded-lg border border-border bg-secondary/40 p-3"
+              {...slotAttributes(groupedToggleGroupStyle, {})}
             >
               <Flex
                 align="center"
                 justify="between"
                 gap="sm"
-                className="mb-2.5"
+                {...partAttributes(groupedToggleHeaderStyle, {})}
               >
                 <Flex
                   align="center"
-                  className="gap-1.5 text-sm font-medium text-foreground"
+                  {...partAttributes(groupedToggleTitleStyle, {})}
                 >
                   {group.icon && (
                     <DynamicIconLazy
                       name={group.icon}
-                      className="size-4 text-muted-foreground"
+                      className="size-4"
                       aria-hidden="true"
+                      {...slotAttributes(groupedToggleIconStyle, {})}
                     />
                   )}
                   {group.label}
                 </Flex>
                 {showSelectAll && (
-                  <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <label
+                    className="flex items-center"
+                    {...slotAttributes(groupedToggleSelectAllStyle, {})}
+                  >
                     <span>{selectAllLabel}</span>
                     <Switch
                       size="sm"
@@ -268,7 +285,7 @@ export function GroupedToggleField<T extends string = string>({
                   </label>
                 )}
               </Flex>
-              <Flex wrap className="gap-1.5">
+              <Flex wrap {...partAttributes(groupedToggleChipsStyle, {})}>
                 {group.options.map((option) => (
                   <ToggleChip
                     key={option.value}
@@ -283,7 +300,7 @@ export function GroupedToggleField<T extends string = string>({
         })}
       </div>
       {renderOtherNote && otherInfo.count > 0 && (
-        <div className="mt-3 text-xs text-muted-foreground">
+        <div {...slotAttributes(groupedToggleNoteStyle, {})}>
           {renderOtherNote(otherInfo)}
         </div>
       )}

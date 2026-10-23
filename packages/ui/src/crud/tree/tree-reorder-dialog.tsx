@@ -6,6 +6,14 @@ import { useCallback, useState, type ReactNode } from "react";
 
 import { Stack } from "../../primitives";
 import { cn } from "../../utils/cn";
+import { slotAttributes } from "../../design/slot-style";
+import {
+  treeReorderEmptyStyle,
+  treeReorderGripStyle,
+  treeReorderItemStyle,
+  treeReorderLabelStyle,
+  treeReorderListStyle,
+} from "./tree-reorder-dialog.style";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import type { TreeReorderConfig } from "./tree-types";
 
@@ -44,21 +52,20 @@ function SortableItem({ id, label }: SortableItemProps) {
     <div
       ref={setNodeRef}
       style={style}
-      className={cn(
-        "flex items-center gap-2 rounded-md border bg-background px-3 py-2",
-        isDragging && "z-10 shadow-md opacity-90",
-      )}
+      className={cn("flex items-center", isDragging && "z-10")}
+      {...slotAttributes(treeReorderItemStyle, { dragging: isDragging })}
     >
       <button
         type="button"
         aria-label={t("tree.reorder")}
-        className="cursor-grab text-muted-foreground hover:text-foreground active:cursor-grabbing"
+        className="cursor-grab active:cursor-grabbing"
         {...attributes}
         {...listeners}
+        {...slotAttributes(treeReorderGripStyle, {})}
       >
         <GripIcon />
       </button>
-      <span className="truncate text-sm">{label}</span>
+      <span className="truncate" {...slotAttributes(treeReorderLabelStyle, {})}>{label}</span>
     </div>
   );
 }
@@ -143,9 +150,9 @@ export function TreeReorderDialog<T>({
           <DialogTitle>{title ?? t("tree.reorderTitle")}</DialogTitle>
           <DialogDescription>{description ?? t("tree.reorderDescription")}</DialogDescription>
         </DialogHeader>
-        <div className="max-h-72 overflow-y-auto py-2">
+        <div className="max-h-72 overflow-y-auto" {...slotAttributes(treeReorderListStyle, {})}>
           {items.length <= 1 ? (
-            <p className="py-6 text-center text-sm text-muted-foreground">{t("tree.reorderEmpty")}</p>
+            <p {...slotAttributes(treeReorderEmptyStyle, {})}>{t("tree.reorderEmpty")}</p>
           ) : (
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <SortableContext items={sortableIds} strategy={verticalListSortingStrategy}>

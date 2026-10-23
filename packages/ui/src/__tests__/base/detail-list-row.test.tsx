@@ -4,6 +4,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { DetailList, DetailListRow } from "../../base";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -12,10 +13,10 @@ describe("DetailListRow", () => {
     render(<DetailListRow primary="Region" />);
     const primary = screen.getByText("Region");
     expect(primary).toBeDefined();
-    expect(primary.className).toContain("font-medium");
-    expect(primary.className).toContain("flex-1");
-    expect(primary.className).toContain("truncate");
-    expect(primary.className).toContain("text-sm");
+    expect(drawnClasses(primary)).toContain("font-medium");
+    expect(drawnClasses(primary)).toContain("flex-1");
+    expect(drawnClasses(primary)).toContain("truncate");
+    expect(drawnClasses(primary)).toContain("text-sm");
   });
 
   it("renders the leading icon when provided", () => {
@@ -51,10 +52,10 @@ describe("DetailListRow", () => {
   it("applies the fixed-height bordered layout classes", () => {
     const ref = createRef<HTMLDivElement>();
     render(<DetailListRow ref={ref} primary="Layout" />);
-    expect(ref.current?.className).toContain("h-10");
-    expect(ref.current?.className).toContain("border-b");
-    expect(ref.current?.className).toContain("last:border-b-0");
-    expect(ref.current?.className).toContain("px-4");
+    expect(drawnClasses(ref.current)).toContain("h-10");
+    expect(drawnClasses(ref.current)).toContain("border-b");
+    expect(drawnClasses(ref.current)).toContain("last:border-b-0");
+    expect(drawnClasses(ref.current)).toContain("px-4");
   });
 
   it("stays non-interactive without onClick", () => {
@@ -62,7 +63,7 @@ describe("DetailListRow", () => {
     render(<DetailListRow ref={ref} primary="Static" />);
     expect(ref.current?.getAttribute("role")).toBeNull();
     expect(ref.current?.getAttribute("tabindex")).toBeNull();
-    expect(ref.current?.className).not.toContain("cursor-pointer");
+    expect(drawnClasses(ref.current)).not.toContain("cursor-pointer");
   });
 
   it("becomes an interactive button when onClick is set", () => {
@@ -70,8 +71,8 @@ describe("DetailListRow", () => {
     render(<DetailListRow ref={ref} primary="Clickable" onClick={vi.fn()} />);
     expect(ref.current?.getAttribute("role")).toBe("button");
     expect(ref.current?.getAttribute("tabindex")).toBe("0");
-    expect(ref.current?.className).toContain("cursor-pointer");
-    expect(ref.current?.className).toContain("hover:bg-muted/50");
+    expect(drawnClasses(ref.current)).toContain("cursor-pointer");
+    expect(drawnClasses(ref.current)).toContain("hover:bg-muted/50");
   });
 
   it("fires onClick on mouse click", () => {
@@ -105,8 +106,8 @@ describe("DetailListRow", () => {
   it("merges a custom className onto the row", () => {
     const ref = createRef<HTMLDivElement>();
     render(<DetailListRow ref={ref} primary="Custom" className="my-row" />);
-    expect(ref.current?.className).toContain("my-row");
-    expect(ref.current?.className).toContain("h-10");
+    expect(drawnClasses(ref.current)).toContain("my-row");
+    expect(drawnClasses(ref.current)).toContain("h-10");
   });
 });
 
@@ -119,9 +120,9 @@ describe("DetailList", () => {
         <DetailListRow primary="B" />
       </DetailList>,
     );
-    expect(ref.current?.className).toContain("overflow-hidden");
-    expect(ref.current?.className).toContain("rounded-lg");
-    expect(ref.current?.className).toContain("border");
+    expect(drawnClasses(ref.current)).toContain("overflow-hidden");
+    expect(drawnClasses(ref.current)).toContain("rounded-lg");
+    expect(drawnClasses(ref.current)).toContain("border");
     expect(screen.getByText("A")).toBeDefined();
     expect(screen.getByText("B")).toBeDefined();
   });
@@ -133,7 +134,7 @@ describe("DetailList", () => {
         <DetailListRow primary="A" />
       </DetailList>,
     );
-    expect(ref.current?.className).toContain("my-list");
-    expect(ref.current?.className).toContain("rounded-lg");
+    expect(drawnClasses(ref.current)).toContain("my-list");
+    expect(drawnClasses(ref.current)).toContain("rounded-lg");
   });
 });

@@ -3,11 +3,21 @@ import type { ReactNode } from "react";
 import { useLocale, useTranslation } from "@simplix-react/i18n/react";
 import { resolveEmptyReason } from "@simplix-react/headless";
 import { Card, Flex, Text } from "../../primitives";
+import { slotAttributes } from "../../design/slot-style";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { EmptyState } from "../shared/empty-state";
 import { CrudList } from "../list/crud-list";
 import type { RowActionDef } from "../list/crud-list";
 import type { EmptyReason } from "../shared/types";
+import {
+  crudAssignmentPanelBodyStyle,
+  crudAssignmentPanelChipRemoveStyle,
+  crudAssignmentPanelChipStyle,
+  crudAssignmentPanelChipsStyle,
+  crudAssignmentPanelEmptyStyle,
+  crudAssignmentPanelHeaderStyle,
+  crudAssignmentPanelRequiredStyle,
+} from "./assignment-panel.style";
 
 // ── Icons ──
 
@@ -95,13 +105,16 @@ function AssignmentPanelRoot({ title, count, required, action, children }: Assig
   const locale = useLocale();
   const { Badge } = useFlatUIComponents();
   return (
-    <Card padding="none" className="overflow-hidden [&_div.rounded-lg.border]:border-0 [&_div.rounded-lg.border]:rounded-none">
-      <Flex justify="between" align="center" className="border-b bg-muted/50 px-4 py-2">
+    <Card padding="none" className="overflow-hidden">
+      <div
+        className="flex flex-row items-center justify-between"
+        {...slotAttributes(crudAssignmentPanelHeaderStyle, {})}
+      >
         <Flex gap="sm" align="center">
-          <Text size="sm" className="font-semibold">
+          <Text size="sm">
             {title}
             {required && (
-              <span className="text-destructive ml-0.5" aria-hidden="true">
+              <span aria-hidden="true" {...slotAttributes(crudAssignmentPanelRequiredStyle, {})}>
                 *
               </span>
             )}
@@ -109,8 +122,10 @@ function AssignmentPanelRoot({ title, count, required, action, children }: Assig
           <Badge variant="secondary">{count.toLocaleString(locale)}</Badge>
         </Flex>
         {action}
-      </Flex>
-      {children}
+      </div>
+      <div className="contents" {...slotAttributes(crudAssignmentPanelBodyStyle, {})}>
+        {children}
+      </div>
     </Card>
   );
 }
@@ -138,7 +153,11 @@ function AssignmentTable<T>({
 
   if (!isLoading && computedEmptyReason === "no-data" && data.length === 0) {
     const resolved = emptyState ?? { title: t("list.noData") };
-    return <EmptyState {...resolved} className="border-0 py-10" />;
+    return (
+      <div className="contents" {...slotAttributes(crudAssignmentPanelEmptyStyle, {})}>
+        <EmptyState {...resolved} />
+      </div>
+    );
   }
 
   return (
@@ -167,13 +186,17 @@ function AssignmentChips<T>({
 
   if (data.length === 0) {
     const resolved = emptyState ?? { title: t("list.noData") };
-    return <EmptyState {...resolved} className="border-0 py-10" />;
+    return (
+      <div className="contents" {...slotAttributes(crudAssignmentPanelEmptyStyle, {})}>
+        <EmptyState {...resolved} />
+      </div>
+    );
   }
 
   return (
-    <Flex wrap gap="sm" className="px-4 py-3">
+    <div className="flex flex-row flex-wrap" {...slotAttributes(crudAssignmentPanelChipsStyle, {})}>
       {data.map(renderItem)}
-    </Flex>
+    </div>
   );
 }
 
@@ -181,7 +204,10 @@ function AssignmentChip({ label, icon, trailing, onRemove }: AssignmentChipProps
   const { t } = useTranslation("simplix/ui");
 
   return (
-    <Flex align="center" gap="xs" className="h-8 rounded-md border bg-card px-3">
+    <div
+      className="flex flex-row items-center h-8"
+      {...slotAttributes(crudAssignmentPanelChipStyle, {})}
+    >
       {icon}
       <Text size="sm">{label}</Text>
       {trailing}
@@ -190,12 +216,12 @@ function AssignmentChip({ label, icon, trailing, onRemove }: AssignmentChipProps
           type="button"
           onClick={onRemove}
           aria-label={t("common.unlink")}
-          className="ml-1 rounded-sm text-muted-foreground hover:text-foreground"
+          {...slotAttributes(crudAssignmentPanelChipRemoveStyle, {})}
         >
           <XIcon />
         </button>
       )}
-    </Flex>
+    </div>
   );
 }
 

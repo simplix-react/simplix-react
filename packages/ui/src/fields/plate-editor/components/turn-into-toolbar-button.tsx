@@ -11,6 +11,13 @@ import {
   DropdownMenuTrigger,
 } from '../../../base/navigation/dropdown-menu'
 import { ToolbarButton } from './toolbar'
+import { partAttributes, slotAttributes } from '../../../design/slot-style'
+import {
+  plateTurnIntoOptionStyle,
+  plateTurnIntoChevronStyle,
+  plateTurnIntoIconStyle,
+  plateTurnIntoTriggerStyle,
+} from './turn-into-toolbar-button.style'
 
 export interface TurnIntoOption {
   label: string
@@ -59,10 +66,11 @@ export const TurnIntoToolbarButton = forwardRef<
       <DropdownMenuTrigger asChild>
         <ToolbarButton
           ref={ref}
-          className={cn('min-w-[100px] justify-between gap-1', className)}
+          className={cn('min-w-[100px] justify-between', className)}
+          {...partAttributes(plateTurnIntoTriggerStyle, {})}
         >
           <span className="truncate">{currentOption?.label || 'Paragraph'}</span>
-          <ChevronDown className="h-3 w-3 shrink-0 opacity-50" />
+          <ChevronDown className="h-3 w-3 shrink-0" {...slotAttributes(plateTurnIntoChevronStyle, {})} />
         </ToolbarButton>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="min-w-[150px]">
@@ -70,9 +78,9 @@ export const TurnIntoToolbarButton = forwardRef<
           <DropdownMenuItem
             key={option.value}
             onClick={() => handleSelect(option.value)}
-            className={cn(currentType === option.value && 'bg-accent')}
+            {...partAttributes(plateTurnIntoOptionStyle, { active: currentType === option.value })}
           >
-            {option.icon && <span className="mr-2">{option.icon}</span>}
+            {option.icon && <span {...slotAttributes(plateTurnIntoIconStyle, {})}>{option.icon}</span>}
             {option.label}
           </DropdownMenuItem>
         ))}

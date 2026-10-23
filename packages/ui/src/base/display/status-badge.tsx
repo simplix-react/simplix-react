@@ -3,14 +3,9 @@ import { type ComponentPropsWithRef, type ReactNode, forwardRef } from "react";
 import { type IconComponent, type StatusTone } from "../status-tone";
 import { useStatusTones } from "../status-tone-context";
 import { StatusDot } from "./status-dot";
+import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
-
-/** Text size token → Tailwind text + padding classes for the pill. */
-const SIZE_CLASS: Record<NonNullable<StatusBadgeProps["size"]>, string> = {
-  xs: "text-[0.625rem] px-1.5 py-0.5 gap-1",
-  sm: "text-xs px-2 py-0.5 gap-1",
-  default: "text-sm px-2.5 py-1 gap-1.5",
-};
+import { statusBadgeStyle } from "./status-badge.style";
 
 export interface StatusBadgeProps
   extends Omit<ComponentPropsWithRef<"span">, "children"> {
@@ -61,27 +56,24 @@ export const StatusBadge = forwardRef<HTMLSpanElement, StatusBadgeProps>(
     ref,
   ) => {
     const token = useStatusTones()[tone];
-    const appearanceClass =
-      appearance === "filled"
-        ? token.badge
-        : cn("border bg-transparent", token.outline);
+    const appearanceClass = appearance === "filled" ? token.badge : token.outline;
+    const iconTone = appearance === "outline" ? token.icon : undefined;
 
     return (
       <span
         ref={ref}
-        data-slot="status-badge"
         className={cn(
-          "inline-flex items-center justify-center whitespace-nowrap rounded-full font-medium",
-          SIZE_CLASS[size],
+          "inline-flex items-center justify-center whitespace-nowrap",
           appearanceClass,
           className,
         )}
         {...rest}
+        {...slotAttributes(statusBadgeStyle, { size, appearance })}
       >
         {Icon ? (
           <Icon
             aria-hidden="true"
-            className={cn("size-3.5 shrink-0", appearance === "outline" && token.icon)}
+            className={cn("size-3.5 shrink-0", iconTone)}
           />
         ) : showDot ? (
           <StatusDot

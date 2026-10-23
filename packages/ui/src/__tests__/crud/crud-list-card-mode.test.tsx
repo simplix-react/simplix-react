@@ -55,6 +55,7 @@ vi.mock("../../crud/reorder/draggable-card", () => ({
 
 import React from "react";
 import { CrudList } from "../../crud/list/crud-list";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 interface TestItem {
   id: number;
@@ -99,7 +100,7 @@ describe("CrudList.Table (card mode)", () => {
       </CrudList>,
     );
     // Should render skeleton cards instead of table skeleton rows
-    const skeletons = container.querySelectorAll("[class*='rounded-lg border']");
+    const skeletons = container.querySelectorAll("[data-slot='crud-card-skeleton']");
     expect(skeletons.length).toBeGreaterThan(0);
   });
 
@@ -229,7 +230,7 @@ describe("CrudList.Table (card mode)", () => {
       </CrudList>,
     );
     const activeCard = screen.getByTestId("list-row-2");
-    expect(activeCard.className).toContain("bg-muted/50");
+    expect(drawnClasses(activeCard)).toContain("bg-muted/50");
   });
 
   it("renders actions in card mode", () => {
@@ -267,6 +268,6 @@ describe("CrudList.Table (card mode)", () => {
       </CrudList>,
     );
     const selectedCard = screen.getByTestId("list-row-1");
-    expect(selectedCard.className).toContain("ring-2");
+    expect(drawnClasses(selectedCard)).toContain("ring-2");
   });
 });

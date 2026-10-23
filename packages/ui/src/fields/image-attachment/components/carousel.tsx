@@ -1,6 +1,34 @@
 import type { ReactNode } from 'react'
 import { useTranslation } from '@simplix-react/i18n/react'
 import { cn } from '../../../utils/cn'
+import { slotAttributes } from '../../../design/slot-style'
+import {
+  carouselActionsStyle,
+  carouselBadgeLabelStyle,
+  carouselBadgeRowStyle,
+  carouselBadgeTitleStyle,
+  carouselBadgeTooltipStyle,
+  carouselBottomStyle,
+  carouselDotStyle,
+  carouselDotsStyle,
+  carouselEmptyBodyStyle,
+  carouselEmptyDescriptionStyle,
+  carouselEmptyIconStyle,
+  carouselEmptyStyle,
+  carouselEmptyTitleStyle,
+  carouselErrorBodyStyle,
+  carouselErrorMessageStyle,
+  carouselFileBadgeIconStyle,
+  carouselFileBadgeStyle,
+  carouselFileNameStyle,
+  carouselNavStyle,
+  carouselProgressFillStyle,
+  carouselProgressLabelStyle,
+  carouselProgressStyle,
+  carouselSceneStyle,
+  carouselStageStyle,
+  carouselStyle,
+} from './carousel.style'
 
 export type CarouselStatus = 'empty' | 'uploading' | 'complete' | 'error'
 
@@ -47,40 +75,32 @@ export function Carousel({
 
   return (
     <div
-      className="relative w-full overflow-hidden rounded border border-border bg-muted mt-[18px]"
+      className="relative w-full overflow-hidden"
       data-mode={mode}
+      {...slotAttributes(carouselStyle, {})}
     >
-      {/* Stage — 16:9 */}
+      {/* Stage - 16:9 */}
       <div
         className={cn(
           'relative block overflow-hidden',
           // aspect-ratio via tailwind
           'aspect-video',
-          // uploading blue gradient overlay — no token (styles.css:149,223)
-          status === 'uploading' && [
+          // uploading blue gradient overlay and error red overlay: no token for either
+          // (styles.css:149,223 and 154-155); the overlay colours are in the stage slot.
+          (status === 'uploading' || status === 'error') && [
             "after:absolute after:inset-0 after:content-[''] after:pointer-events-none after:z-[1]",
-            'after:bg-[linear-gradient(180deg,rgba(18,104,179,0)_0%,rgba(18,104,179,.55)_100%)]',
-          ],
-          // error grayscale + red overlay — no token (styles.css:154-155)
-          status === 'error' && [
-            "after:absolute after:inset-0 after:content-[''] after:pointer-events-none after:z-[1]",
-            'after:bg-[rgba(200,53,31,.55)]',
           ],
         )}
+        {...slotAttributes(carouselStageStyle, { status })}
       >
         {/* Drop content (single-empty) */}
         {dropContent ?? null}
 
-        {/* Scene image — apply grayscale filter for error */}
+        {/* Scene image - apply grayscale filter for error */}
         {status !== 'empty' && !dropContent && scene ? (
           <div
-            className={cn(
-              'absolute inset-0 w-full h-full',
-              status === 'error' && [
-                // Error grayscale + red overlay — no token (styles.css:154-155,226-227)
-                '[&>*]:grayscale [&>*]:brightness-50',
-              ],
-            )}
+            className="absolute inset-0 w-full h-full"
+            {...slotAttributes(carouselSceneStyle, { status })}
           >
             {scene}
           </div>
@@ -88,8 +108,8 @@ export function Carousel({
 
         {/* Empty state (no dropContent) */}
         {status === 'empty' && !dropContent ? (
-          <div className="absolute inset-0 grid place-items-center bg-muted text-muted-foreground">
-            <div className="flex flex-col items-center gap-2 p-5 text-center">
+          <div className="absolute inset-0 grid place-items-center" {...slotAttributes(carouselEmptyStyle, {})}>
+            <div className="flex flex-col items-center" {...slotAttributes(carouselEmptyBodyStyle, {})}>
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
@@ -97,34 +117,37 @@ export function Carousel({
                 strokeWidth="1.4"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="w-10 h-10 text-muted-foreground"
+                className="w-10 h-10"
                 aria-hidden="true"
+                {...slotAttributes(carouselEmptyIconStyle, {})}
               >
                 <rect x="3" y="3" width="18" height="18" rx="2" />
                 <circle cx="8.5" cy="8.5" r="1.5" />
                 <path d="M21 15l-5-5L5 21" />
               </svg>
-              <span className="text-[13.5px] font-semibold text-secondary-foreground">
+              <span {...slotAttributes(carouselEmptyTitleStyle, {})}>
                 {t('file.stage.emptyTitle')}
               </span>
-              <span className="text-[12px] text-muted-foreground">
+              <span {...slotAttributes(carouselEmptyDescriptionStyle, {})}>
                 {t('file.stage.emptyDesc')}
               </span>
             </div>
           </div>
         ) : null}
 
-        {/* Upload progress bar — single mode only (multi shows it on the thumb + detail row
+        {/* Upload progress bar - single mode only (multi shows it on the thumb + detail row
             already, so 3 bars on the slide is redundant; issue #5). */}
         {status === 'uploading' && mode === 'single' ? (
-          <div className="absolute left-6 right-6 bottom-16 h-[5px] rounded-full bg-white/35 z-[3] shadow-[0_1px_2px_rgba(0,0,0,.2)]">
+          <div className="absolute left-6 right-6 bottom-16 h-[5px] z-[3]" {...slotAttributes(carouselProgressStyle, {})}>
             <div
-              className="h-full rounded-full bg-white shadow-[0_1px_2px_rgba(0,0,0,.2)]"
+              className="h-full"
               style={{ width: `${pct}%` }}
+              {...slotAttributes(carouselProgressFillStyle, {})}
             />
             <span
-              className="absolute right-0 top-[-22px] font-mono text-[11px] font-semibold text-white tracking-[.01em] text-shadow tabular-nums"
+              className="absolute right-0 top-[-22px]"
               style={{ textShadow: '0 1px 2px rgba(0,0,0,.45)' }}
+              {...slotAttributes(carouselProgressLabelStyle, {})}
             >
               {pct}%
             </span>
@@ -137,7 +160,7 @@ export function Carousel({
             className="absolute inset-0 grid place-items-center z-[2] pointer-events-none"
             aria-hidden="true"
           >
-            <div className="flex flex-col items-center gap-2.5 text-center px-5">
+            <div className="flex flex-col items-center" {...slotAttributes(carouselErrorBodyStyle, {})}>
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
@@ -155,8 +178,8 @@ export function Carousel({
               </svg>
               {errorMessage ? (
                 <span
-                  className="text-[12.5px] font-semibold text-white tracking-[.01em]"
                   style={{ textShadow: '0 1px 2px rgba(0,0,0,.45)' }}
+                  {...slotAttributes(carouselErrorMessageStyle, {})}
                 >
                   {errorMessage}
                 </span>
@@ -165,14 +188,15 @@ export function Carousel({
           </div>
         ) : null}
 
-        {/* Nav buttons — multi + complete only (plan §3.5) */}
+        {/* Nav buttons - multi + complete only (plan §3.5) */}
         {mode === 'multi' && onPrev && onNext && status === 'complete' ? (
           <>
             <button
               type="button"
-              className="absolute top-1/2 -translate-y-1/2 left-[14px] w-[38px] h-[38px] rounded-full bg-white/95 border-none grid place-items-center shadow-md text-foreground z-[2] cursor-pointer transition-transform hover:bg-white hover:scale-105 font-[inherit]"
+              className="absolute top-1/2 -translate-y-1/2 left-[14px] w-[38px] h-[38px] grid place-items-center z-[2] cursor-pointer"
               aria-label={t('file.nav.prev')}
               onClick={onPrev}
+              {...slotAttributes(carouselNavStyle, {})}
             >
               <svg
                 viewBox="0 0 24 24"
@@ -189,9 +213,10 @@ export function Carousel({
             </button>
             <button
               type="button"
-              className="absolute top-1/2 -translate-y-1/2 right-[14px] w-[38px] h-[38px] rounded-full bg-white/95 border-none grid place-items-center shadow-md text-foreground z-[2] cursor-pointer transition-transform hover:bg-white hover:scale-105 font-[inherit]"
+              className="absolute top-1/2 -translate-y-1/2 right-[14px] w-[38px] h-[38px] grid place-items-center z-[2] cursor-pointer"
               aria-label={t('file.nav.next')}
               onClick={onNext}
+              {...slotAttributes(carouselNavStyle, {})}
             >
               <svg
                 viewBox="0 0 24 24"
@@ -209,19 +234,15 @@ export function Carousel({
           </>
         ) : null}
 
-        {/* Dots — multi, always render (disabled when not complete per plan §3.5) */}
+        {/* Dots - multi, always render (disabled when not complete per plan §3.5) */}
         {mode === 'multi' && totalDots && totalDots > 1 ? (
-          <div className="absolute left-1/2 -translate-x-1/2 bottom-[14px] flex gap-[5px] z-[1]">
+          <div className="absolute left-1/2 -translate-x-1/2 bottom-[14px] flex z-[1]" {...slotAttributes(carouselDotsStyle, {})}>
             {Array.from({ length: totalDots }).map((_, idx) => (
               <button
                 key={idx}
                 type="button"
-                className={cn(
-                  'h-[6px] rounded-full border-none p-0 cursor-pointer transition-[width,background]',
-                  idx === activeDot
-                    ? 'bg-white w-[16px] rounded-[3px]'
-                    : 'bg-white/45 w-[6px]',
-                )}
+                className="h-[6px] cursor-pointer"
+                {...slotAttributes(carouselDotStyle, { active: idx === activeDot })}
                 aria-label={t('file.nav.dotLabel', {
                   index: idx + 1,
                   total: totalDots,
@@ -235,20 +256,17 @@ export function Carousel({
 
         {/* Stage bottom: info-badge + rightActions (always visible when not empty+no dropContent) */}
         {(fileName || rightActions) && status !== 'empty' && !dropContent ? (
-          <div className="absolute left-0 right-0 bottom-0 px-[14px] py-3 flex items-end justify-between gap-3 pointer-events-none z-[4]">
+          <div className="absolute left-0 right-0 bottom-0 flex items-end justify-between pointer-events-none z-[4]" {...slotAttributes(carouselBottomStyle, {})}>
             {fileName ? (
               <span
-                className={cn(
-                  'group relative inline-flex items-center gap-[6px] pointer-events-auto',
-                  // Glass bg for stage overlay — no token (styles.css:192,204-205)
-                  'bg-[rgba(20,22,30,.62)] backdrop-blur-[8px]',
-                  'text-white px-[11px] py-[6px] rounded text-[11.5px] tracking-[.01em] font-medium',
-                  'max-w-[calc(100%-90px)] min-w-0 shadow-[0_1px_2px_rgba(0,0,0,.18)] cursor-default',
-                )}
+                // The glass background of the stage overlay has no token (styles.css:192,204-205).
+                className="group relative inline-flex items-center pointer-events-auto max-w-[calc(100%-90px)] min-w-0 cursor-default"
                 tabIndex={0}
+                {...slotAttributes(carouselFileBadgeStyle, {})}
               >
                 <svg
-                  className="w-[11px] h-[11px] shrink-0 opacity-70"
+                  className="w-[11px] h-[11px] shrink-0"
+                  {...slotAttributes(carouselFileBadgeIconStyle, {})}
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -261,31 +279,26 @@ export function Carousel({
                   <circle cx="8.5" cy="8.5" r="1.5" />
                   <path d="M21 15l-5-5L5 21" />
                 </svg>
-                <span className="font-mono text-[11px] font-semibold whitespace-nowrap overflow-hidden text-ellipsis min-w-0 tracking-[.005em]">
+                <span className="truncate min-w-0" {...slotAttributes(carouselFileNameStyle, {})}>
                   {fileName}
                 </span>
                 {badgeMeta && badgeMeta.length > 0 ? (
                   <span
-                    className={cn(
-                      'absolute bottom-[calc(100%+8px)] left-0',
-                      // Same glass bg + opacity as the file-name badge (styles.css:192) — issue #4
-                      'bg-[rgba(20,22,30,.62)] backdrop-blur-[8px] text-white text-[11.5px] leading-[1.5] py-[7px] px-[11px] rounded',
-                      'w-max max-w-[280px] text-left font-[500] tracking-[.01em]',
-                      'pointer-events-none z-50 opacity-0 invisible',
-                      'group-hover:opacity-100 group-hover:visible',
-                      'transition-[opacity,transform]',
-                    )}
+                    // Same glass bg + opacity as the file-name badge (styles.css:192) - issue #4
+                    className="absolute bottom-[calc(100%+8px)] left-0 w-max max-w-[280px] pointer-events-none z-50 invisible group-hover:visible"
                     role="tooltip"
+                    {...slotAttributes(carouselBadgeTooltipStyle, {})}
                   >
-                    <strong className="block font-mono font-semibold text-white mb-[3px] text-[10.5px] opacity-75 tracking-[.04em] uppercase">
+                    <strong className="block" {...slotAttributes(carouselBadgeTitleStyle, {})}>
                       {t('file.nav.badgeInfo')}
                     </strong>
                     {badgeMeta.map((row) => (
                       <span
                         key={row.label}
-                        className="flex items-center gap-[6px] font-mono text-[10.5px] text-white/90 tabular-nums leading-[1.5]"
+                        className="flex items-center"
+                        {...slotAttributes(carouselBadgeRowStyle, {})}
                       >
-                        <span className="text-white/60 min-w-[32px] uppercase tracking-[.06em] text-[9.5px] font-semibold">
+                        <span className="min-w-[32px]" {...slotAttributes(carouselBadgeLabelStyle, {})}>
                           {row.label}
                         </span>
                         {row.value}
@@ -300,7 +313,7 @@ export function Carousel({
             {rightActions ? (
               // White card pill behind the actions so they're distinguishable from the image /
               // empty background (same idea as the file detail row's white background).
-              <div className="inline-flex items-center gap-[2px] shrink-0 pointer-events-auto rounded-md bg-card/95 px-1 py-1 shadow-sm backdrop-blur-sm">
+              <div className="inline-flex items-center shrink-0 pointer-events-auto" {...slotAttributes(carouselActionsStyle, {})}>
                 {rightActions}
               </div>
             ) : null}

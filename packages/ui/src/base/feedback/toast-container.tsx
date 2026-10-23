@@ -2,41 +2,30 @@ import { useEffect, useRef, useState } from "react";
 
 import { useTranslation } from "@simplix-react/i18n/react";
 
-import { cn } from "../../utils/cn";
+import { slotAttributes } from "../../design/slot-style";
+import {
+  toastActionStyle,
+  toastContainerStyle,
+  toastDismissStyle,
+  toastIconStyle,
+  toastMessageStyle,
+  toastStyle,
+} from "./toast-container.style";
 import { AlertTriangleIcon, CheckCircleIcon, InfoIcon, XCircleIcon, XIcon } from "../../crud/shared/icons";
 import { Button } from "../controls/button";
 import { Flex } from "../../primitives/flex";
 import { Stack } from "../../primitives/stack";
 import { useToastStore, removeToast, type Toast } from "./toast-store";
 
-const typeConfig: Record<
-  Toast["type"],
-  {
-    icon: React.ReactNode;
-    containerClassName: string;
-  }
-> = {
-  success: {
-    icon: <CheckCircleIcon className="size-4 text-emerald-500 shrink-0" />,
-    containerClassName: "border-emerald-200 bg-emerald-50/90 dark:border-emerald-800 dark:bg-emerald-950/90",
-  },
-  warning: {
-    icon: <AlertTriangleIcon className="size-4 text-amber-500 shrink-0" />,
-    containerClassName: "border-amber-200 bg-amber-50/90 dark:border-amber-800 dark:bg-amber-950/90",
-  },
-  error: {
-    icon: <XCircleIcon className="size-4 text-red-500 shrink-0" />,
-    containerClassName: "border-red-200 bg-red-50/90 dark:border-red-800 dark:bg-red-950/90",
-  },
-  info: {
-    icon: <InfoIcon className="size-4 text-blue-500 shrink-0" />,
-    containerClassName: "border-blue-200 bg-blue-50/90 dark:border-blue-800 dark:bg-blue-950/90",
-  },
+const typeIcon: Record<Toast["type"], React.ReactNode> = {
+  success: <CheckCircleIcon className="size-4 shrink-0" />,
+  warning: <AlertTriangleIcon className="size-4 shrink-0" />,
+  error: <XCircleIcon className="size-4 shrink-0" />,
+  info: <InfoIcon className="size-4 shrink-0" />,
 };
 
 function ToastItem({ toast }: { toast: Toast }) {
   const { t } = useTranslation("simplix/ui");
-  const config = typeConfig[toast.type];
   const [isExiting, setIsExiting] = useState(false);
   const [isEntering, setIsEntering] = useState(true);
 
@@ -47,6 +36,8 @@ function ToastItem({ toast }: { toast: Toast }) {
     return () => cancelAnimationFrame(enterTimer);
   }, []);
 
+  const phase = isExiting ? "exiting" : isEntering ? "entering" : "shown";
+
   const handleDismiss = () => {
     setIsExiting(true);
     setTimeout(() => removeToast(toast.id), 200);
@@ -55,36 +46,34 @@ function ToastItem({ toast }: { toast: Toast }) {
   return (
     <div
       role={toast.type === "error" || toast.type === "warning" ? "alert" : "status"}
-      className={cn(
-        "pointer-events-auto w-80 rounded-lg border p-3 shadow-lg backdrop-blur-sm transition-all duration-200",
-        config.containerClassName,
-        isEntering && "translate-x-full opacity-0",
-        isExiting && "translate-x-full opacity-0",
-        !isEntering && !isExiting && "translate-x-0 opacity-100",
-      )}
+      className="pointer-events-auto w-80"
+      {...slotAttributes(toastStyle, { type: toast.type, phase })}
     >
       <Flex align="start" gap="sm">
-        {config.icon}
+        <span className="flex shrink-0" {...slotAttributes(toastIconStyle, { type: toast.type })}>
+          {typeIcon[toast.type]}
+        </span>
         <Stack gap="xs" className="flex-1 min-w-0">
-          <span className="text-sm font-medium leading-tight">{toast.message}</span>
+          <span {...slotAttributes(toastMessageStyle, {})}>{toast.message}</span>
           {toast.action && (
             <a
               href={toast.action.href}
-              className="text-xs font-medium text-primary underline-offset-2 hover:underline"
+              {...slotAttributes(toastActionStyle, {})}
             >
               {toast.action.label} {"\u2192"}
             </a>
           )}
         </Stack>
-        <Button
-          variant="ghost"
-          size="icon-xs"
-          className="shrink-0 -mt-0.5 -mr-1"
-          aria-label={t("common.close")}
-          onClick={handleDismiss}
-        >
-          <XIcon className="size-3.5" />
-        </Button>
+        <div className="flex shrink-0" {...slotAttributes(toastDismissStyle, {})}>
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            aria-label={t("common.close")}
+            onClick={handleDismiss}
+          >
+            <XIcon className="size-3.5" />
+          </Button>
+        </div>
       </Flex>
     </div>
   );
@@ -99,7 +88,8 @@ export function ToastContainer() {
   return (
     <div
       ref={containerRef}
-      className="fixed bottom-12 right-4 z-[100] flex flex-col-reverse gap-2 pointer-events-none"
+      className="fixed bottom-12 right-4 z-[100] flex flex-col-reverse pointer-events-none"
+      {...slotAttributes(toastContainerStyle, {})}
     >
       {toasts.map((toast) => (
         <ToastItem key={toast.id} toast={toast} />

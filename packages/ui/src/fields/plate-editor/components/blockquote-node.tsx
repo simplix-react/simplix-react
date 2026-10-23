@@ -1,17 +1,15 @@
-
 import type { PlateElementProps } from 'platejs/react'
 import { PlateElement } from 'platejs/react'
-import { cn } from '../../../utils/cn'
+import { slotAttributes } from '../../../design/slot-style'
+import { plateBlockquoteStyle } from './blockquote-node.style'
 
 export function BlockquoteElement({ className, ...props }: PlateElementProps) {
   return (
     <PlateElement
       as="blockquote"
-      className={cn(
-        'my-4 border-l-4 border-muted-foreground/30 pl-4 italic text-muted-foreground',
-        className
-      )}
+      className={className}
       {...props}
+      attributes={{ ...props.attributes, ...slotAttributes(plateBlockquoteStyle, {}) }}
     />
   )
 }

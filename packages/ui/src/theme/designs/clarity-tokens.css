@@ -1,0 +1,78 @@
+/* ===== Clarity design: tokens =====
+   The values the clarity design draws with. Colour themes are imported after this file, so a
+   chosen theme still sets the accent, the radius and the typeface over these defaults. */
+
+[data-design='clarity'] {
+  --radius: 6px;
+  --font-sans: "Pretendard Variable", Pretendard, ui-sans-serif, system-ui, sans-serif;
+
+  --background: oklch(0.982 0.003 260);
+  --card: oklch(1 0 0);
+  --popover: oklch(1 0 0);
+  --surface-2: oklch(0.976 0.004 260);
+  --surface-3: oklch(0.954 0.006 260);
+  --table-head: oklch(0.988 0.002 260);
+  --foreground: oklch(0.2 0.016 265);
+  --card-foreground: oklch(0.2 0.016 265);
+  --popover-foreground: oklch(0.2 0.016 265);
+  --secondary-foreground: oklch(0.37 0.016 265);
+  --muted-foreground: oklch(0.54 0.016 265);
+  --muted-2: oklch(0.72 0.01 265);
+  --border: oklch(0.928 0.006 265);
+  --border-strong: oklch(0.875 0.008 265);
+  --input: oklch(0.875 0.008 265);
+  --hover-bg: oklch(0.2 0.02 265 / 0.03);
+  --hover-bg-strong: oklch(0.2 0.02 265 / 0.055);
+  --scrim: oklch(0.2 0.02 265 / 0.28);
+
+  --primary: oklch(0.5 0.15 255);
+  --primary-foreground: oklch(0.99 0.004 255);
+  --primary-hover: oklch(0.44 0.15 255);
+  --primary-soft: oklch(0.962 0.024 255);
+  --primary-soft-2: oklch(0.925 0.042 255);
+  --ring: oklch(0.5 0.15 255);
+  --accent: oklch(0.954 0.006 260);
+  --accent-foreground: oklch(0.2 0.016 265);
+  --secondary: oklch(0.954 0.006 260);
+  --muted: oklch(0.954 0.006 260);
+
+  --shadow-1: 0 1px 2px oklch(0.2 0.02 265 / 0.04);
+  --shadow-2: 0 1px 2px oklch(0.2 0.02 265 / 0.04), 0 10px 24px -12px oklch(0.2 0.03 265 / 0.16);
+  --shadow-3: 0 0 0 1px oklch(0.2 0.02 265 / 0.04), 0 24px 48px -16px oklch(0.2 0.03 265 / 0.22);
+  --shadow-btn: inset 0 1px 0 oklch(1 0 0 / 0.14), 0 1px 2px oklch(0.2 0.05 260 / 0.18);
+}
+
+[data-design='clarity'].dark {
+  --background: oklch(0.165 0.008 265);
+  --card: oklch(0.2 0.009 265);
+  --popover: oklch(0.225 0.01 265);
+  --surface-2: oklch(0.215 0.009 265);
+  --surface-3: oklch(0.255 0.01 265);
+  --table-head: oklch(0.205 0.009 265);
+  --foreground: oklch(0.95 0.004 265);
+  --card-foreground: oklch(0.95 0.004 265);
+  --popover-foreground: oklch(0.95 0.004 265);
+  --secondary-foreground: oklch(0.8 0.008 265);
+  --muted-foreground: oklch(0.64 0.01 265);
+  --muted-2: oklch(0.48 0.01 265);
+  --border: oklch(0.27 0.01 265);
+  --border-strong: oklch(0.33 0.012 265);
+  --input: oklch(0.33 0.012 265);
+  --hover-bg: oklch(1 0 0 / 0.03);
+  --hover-bg-strong: oklch(1 0 0 / 0.06);
+  --scrim: oklch(0 0 0 / 0.5);
+  --primary: oklch(0.68 0.14 255);
+  --primary-foreground: oklch(0.16 0.03 255);
+  --primary-hover: oklch(0.74 0.13 255);
+  --primary-soft: oklch(0.28 0.05 255);
+  --primary-soft-2: oklch(0.34 0.07 255);
+  --ring: oklch(0.68 0.14 255);
+  --accent: oklch(0.255 0.01 265);
+  --accent-foreground: oklch(0.95 0.004 265);
+  --secondary: oklch(0.255 0.01 265);
+  --muted: oklch(0.255 0.01 265);
+  --shadow-1: 0 1px 2px oklch(0 0 0 / 0.3);
+  --shadow-2: 0 12px 28px -12px oklch(0 0 0 / 0.6);
+  --shadow-3: 0 0 0 1px oklch(1 0 0 / 0.05), 0 24px 48px -16px oklch(0 0 0 / 0.7);
+  --shadow-btn: inset 0 1px 0 oklch(1 0 0 / 0.08), 0 1px 2px oklch(0 0 0 / 0.4);
+}

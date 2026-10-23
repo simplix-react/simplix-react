@@ -2,6 +2,12 @@ import { useTranslation } from "@simplix-react/i18n/react";
 import { useCallback, useState, useEffect, type ReactNode } from "react";
 
 import { ConfirmDialog } from "./confirm-dialog";
+import { slotAttributes } from "../../design/slot-style";
+import {
+  queryFallbackLoadingStyle,
+  queryFallbackNotFoundStyle,
+  queryFallbackSpinnerStyle,
+} from "./query-fallback.style";
 
 /** Props for the {@link QueryFallback} component. */
 export interface QueryFallbackProps {
@@ -48,8 +54,8 @@ export function QueryFallback({
 
   if (isLoading) {
     return (
-      <div className="flex flex-1 items-center justify-center py-12">
-        <span className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+      <div className="flex flex-1 items-center justify-center" {...slotAttributes(queryFallbackLoadingStyle, {})}>
+        <span className="h-6 w-6" {...slotAttributes(queryFallbackSpinnerStyle, {})} />
       </div>
     );
   }
@@ -68,7 +74,7 @@ export function QueryFallback({
   }
 
   return (
-    <div className="text-muted-foreground">
+    <div {...slotAttributes(queryFallbackNotFoundStyle, {})}>
       {notFoundMessage ?? t("common.notFound")}
     </div>
   );

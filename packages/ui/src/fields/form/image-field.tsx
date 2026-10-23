@@ -2,6 +2,12 @@ import { useEffect, useState } from 'react'
 import type { LocaleConfig } from '@simplix-react/i18n'
 import { useTranslation } from '@simplix-react/i18n/react'
 import { FieldWrapper } from '../shared/field-wrapper'
+import { slotAttributes } from '../../design/slot-style'
+import {
+  fieldUploadStackStyle,
+  fieldValidationListStyle,
+  fieldThumbnailPlaceholderStyle,
+} from '../shared/field-parts.style'
 import { useFlatUIComponents } from '../../provider/ui-provider'
 import { useFileAttachment } from '../file-attachment/use-file-attachment'
 import { useResolvedImageSrc } from '../file-attachment/use-resolved-image-src'
@@ -322,7 +328,7 @@ export function ImageField({
       className={className}
       {...variantProps}
     >
-      <div className="@container flex flex-col gap-4">
+      <div className="@container flex flex-col" {...slotAttributes(fieldUploadStackStyle, {})}>
 
         {/* Validation dialog */}
         <Dialog
@@ -333,7 +339,7 @@ export function ImageField({
             <DialogHeader>
               <DialogTitle>{t('file.validation.title')}</DialogTitle>
             </DialogHeader>
-            <ul className="space-y-1 text-sm">
+            <ul {...slotAttributes(fieldValidationListStyle, {})}>
               {validationErrors.map((msg, idx) => (
                 // eslint-disable-next-line react/no-array-index-key
                 <li key={idx}>{msg}</li>
@@ -436,7 +442,7 @@ export function ImageField({
                       size={40}
                     />
                   ) : (
-                    <span className="block h-10 w-10 rounded-sm bg-muted" />
+                    <span className="block h-10 w-10" {...slotAttributes(fieldThumbnailPlaceholderStyle, {})} />
                   )
                 }
                 actions={buildItemActions(activeItem)}

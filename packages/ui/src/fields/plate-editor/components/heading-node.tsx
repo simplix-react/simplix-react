@@ -1,14 +1,15 @@
-
 import type { PlateElementProps } from 'platejs/react'
 import { PlateElement } from 'platejs/react'
-import { cn } from '../../../utils/cn'
+import { slotAttributes } from '../../../design/slot-style'
+import { plateHeadingStyle } from './heading-node.style'
 
 export function H1Element({ className, ...props }: PlateElementProps) {
   return (
     <PlateElement
       as="h1"
-      className={cn('text-2xl font-bold mb-4 mt-6 first:mt-0', className)}
+      className={className}
       {...props}
+      attributes={{ ...props.attributes, ...slotAttributes(plateHeadingStyle, { level: '1' }) }}
     />
   )
 }
@@ -17,8 +18,9 @@ export function H2Element({ className, ...props }: PlateElementProps) {
   return (
     <PlateElement
       as="h2"
-      className={cn('text-xl font-semibold mb-3 mt-5 first:mt-0', className)}
+      className={className}
       {...props}
+      attributes={{ ...props.attributes, ...slotAttributes(plateHeadingStyle, { level: '2' }) }}
     />
   )
 }
@@ -27,8 +29,9 @@ export function H3Element({ className, ...props }: PlateElementProps) {
   return (
     <PlateElement
       as="h3"
-      className={cn('text-lg font-semibold mb-2 mt-4 first:mt-0', className)}
+      className={className}
       {...props}
+      attributes={{ ...props.attributes, ...slotAttributes(plateHeadingStyle, { level: '3' }) }}
     />
   )
 }

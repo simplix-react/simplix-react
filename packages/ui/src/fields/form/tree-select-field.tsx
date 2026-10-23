@@ -6,9 +6,21 @@ import type { TreeConfig } from "../../crud/tree/tree-types";
 import { filterTreeWithAncestors, getDescendantIds } from "../../crud/tree/tree-utils";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { Stack } from "../../primitives";
+import { partAttributes, slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
+import { fieldClearButtonStyle } from "../shared/field-parts.style";
+import { comboboxPanelStyle, comboboxSearchStyle, comboboxStatusStyle } from "./combobox-field.style";
 import { FieldWrapper } from "../shared/field-wrapper";
 import { SelectFieldTrigger } from "../shared/select-field-trigger";
+import {
+  treeSelectCheckEndStyle,
+  treeSelectCheckStyle,
+  treeSelectChooseStyle,
+  treeSelectNameStyle,
+  treeSelectRowStyle,
+  treeSelectToggleStyle,
+  treeSelectValueStyle,
+} from "./tree-select-field.style";
 
 // ── Icons ──
 
@@ -38,7 +50,7 @@ function FolderIcon() {
 
 function CheckIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="shrink-0 text-primary" aria-hidden="true">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="shrink-0" aria-hidden="true" {...slotAttributes(treeSelectCheckStyle, {})}>
       <path d="M13 5L6.5 11.5L3 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
@@ -98,12 +110,12 @@ function TreeSelectItem<T>({
           leaves the keyboard and assistive technology to guess which of the two a press belongs
           to, and the guesses disagree. */}
       <span
-        className={cn(
-          "flex w-full items-center gap-1 rounded-sm px-2 py-1.5 text-sm",
-          isSelected && "bg-accent text-accent-foreground",
-          !isSelected && !isDisabled && "hover:bg-accent/50",
-          isDisabled && "cursor-not-allowed opacity-50",
-        )}
+        className="flex w-full items-center"
+        {...slotAttributes(treeSelectRowStyle, {
+          selected: isSelected,
+          hoverable: !isSelected && !isDisabled,
+          disabled: isDisabled,
+        })}
       >
         <span className="shrink-0" style={{ width: depth * 16 }} />
         <button
@@ -111,10 +123,10 @@ function TreeSelectItem<T>({
           tabIndex={hasChildren ? 0 : -1}
           aria-label={hasChildren ? (isExpanded ? "Collapse" : "Expand") : undefined}
           className={cn(
-            "inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-sm",
-            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-            hasChildren ? "text-muted-foreground hover:text-foreground" : "invisible",
+            "inline-flex h-4 w-4 shrink-0 items-center justify-center",
+            !hasChildren && "invisible",
           )}
+          {...slotAttributes(treeSelectToggleStyle, { branch: hasChildren })}
           onClick={() => {
             if (hasChildren) onToggleExpand(id);
           }}
@@ -125,16 +137,13 @@ function TreeSelectItem<T>({
           type="button"
           disabled={isDisabled}
           onClick={() => !isDisabled && onSelect(id)}
-          className={cn(
-            "flex min-w-0 flex-1 items-center gap-1 rounded-sm text-start",
-            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-            isDisabled && "cursor-not-allowed",
-          )}
+          className={cn("flex min-w-0 flex-1 items-center", isDisabled && "cursor-not-allowed")}
+          {...slotAttributes(treeSelectChooseStyle, {})}
         >
           <FolderIcon />
-          <span className="ml-0.5 truncate">{getDisplayName(item)}</span>
+          <span className="truncate" {...slotAttributes(treeSelectNameStyle, {})}>{getDisplayName(item)}</span>
           {isSelected && (
-            <span className="ml-auto shrink-0"><CheckIcon /></span>
+            <span className="shrink-0" {...slotAttributes(treeSelectCheckEndStyle, {})}><CheckIcon /></span>
           )}
         </button>
       </span>
@@ -305,7 +314,8 @@ export function TreeSelectField<T>({
                 <button
                   type="button"
                   onClick={handleClear}
-                  className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
+                  className="flex h-5 w-5 shrink-0 items-center justify-center"
+                  {...slotAttributes(fieldClearButtonStyle, {})}
                   aria-label={t("field.clearSelection")}
                 >
                   <ClearIcon />
@@ -313,30 +323,34 @@ export function TreeSelectField<T>({
               ) : undefined
             }
           >
-            <span className={cn("flex-1 truncate", !value && "text-muted-foreground")}>
+            <span
+              className="flex-1 truncate"
+              {...slotAttributes(treeSelectValueStyle, { empty: !value })}
+            >
               {value ? selectedLabel : (placeholder ?? t("tree.searchPlaceholder"))}
             </span>
           </SelectFieldTrigger>
           <PopoverContent
-            className="w-[var(--radix-popover-trigger-width)] p-0"
+            flush
+            className="w-[var(--radix-popover-trigger-width)]"
             align="start"
             onOpenAutoFocus={(e) => e.preventDefault()}
           >
-            <Stack gap="none" className="p-2">
+            <Stack gap="none" {...partAttributes(comboboxPanelStyle, {})}>
               <Input
                 type="search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={t("tree.searchPlaceholder")}
-                className="mb-2"
+                {...partAttributes(comboboxSearchStyle, {})}
               />
               <div className="max-h-60 overflow-y-auto">
                 {isLoading ? (
-                  <p className="py-4 text-center text-sm text-muted-foreground">
+                  <p {...slotAttributes(comboboxStatusStyle, { kind: "empty" })}>
                     {t("common.loading")}
                   </p>
                 ) : filteredData.length === 0 ? (
-                  <p className="py-4 text-center text-sm text-muted-foreground">
+                  <p {...slotAttributes(comboboxStatusStyle, { kind: "empty" })}>
                     {t("list.noResults")}
                   </p>
                 ) : (
