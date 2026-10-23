@@ -3,9 +3,9 @@ import type { ReactNode } from "react";
 import { Flex } from "../../primitives";
 import { Stack } from "../../primitives";
 import { cn } from "../../utils/cn";
-import { slotAttributes } from "../../design/slot-style";
+import { partAttributes, slotAttributes } from "../../design/slot-style";
 import { Label } from "./label";
-import { labeledFieldDescriptionStyle } from "./labeled-field.style";
+import { labeledFieldDescriptionStyle, labeledFieldLabelStyle } from "./labeled-field.style";
 
 export interface LabeledFieldProps {
   /** Label text. Already translated by the caller. */
@@ -53,6 +53,7 @@ export function LabeledField({
         <Label
           htmlFor={htmlFor}
           className={cn(htmlFor && "cursor-pointer")}
+          {...partAttributes(labeledFieldLabelStyle, {})}
         >
           {label}
         </Label>
