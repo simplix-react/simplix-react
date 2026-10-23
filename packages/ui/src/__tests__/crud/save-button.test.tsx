@@ -72,7 +72,7 @@ describe("SaveButton", () => {
       </SaveButton>,
     );
     // Badge should not render
-    const badge = document.querySelector("[data-variant]");
+    const badge = document.querySelector("[data-slot=badge]");
     expect(badge).toBeNull();
   });
 

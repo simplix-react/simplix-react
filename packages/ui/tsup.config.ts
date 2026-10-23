@@ -3,6 +3,8 @@ import { defineConfig } from "tsup";
 export default defineConfig((options) => ({
   entry: {
     index: "src/index.ts",
+    // The slot helpers and the design list, for a kit that declares slots of its own.
+    design: "src/design/index.ts",
     "plate-editor": "src/fields/plate-editor/index.ts",
     // Viewer-only entry: read-only consumers import this instead of the full
     // plate-editor barrel, whose plugin re-exports carry the heavy runtime.

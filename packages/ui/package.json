@@ -17,6 +17,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./design": {
+      "source": "./src/design/index.ts",
+      "types": "./dist/design.d.ts",
+      "import": "./dist/design.js"
+    },
     "./plate-editor": {
       "source": "./src/fields/plate-editor/index.ts",
       "types": "./dist/plate-editor.d.ts",
@@ -32,7 +37,10 @@
   },
   "files": [
     "dist",
-    "src"
+    "src",
+    "scripts/build-design-css.mjs",
+    "scripts/check-design-classes.mjs",
+    "scripts/check-design-coverage.mjs"
   ],
   "publishConfig": {
     "access": "public"
@@ -40,6 +48,8 @@
   "scripts": {
     "prebuild": "find src -name '*.d.ts' -o -name '*.d.ts.map' -o -name '*.js' -o -name '*.js.map' | xargs rm -f",
     "build": "tsup",
+    "design:css": "node scripts/build-design-css.mjs",
+    "design:check": "node scripts/build-design-css.mjs --check && node scripts/check-design-coverage.mjs",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint src",
@@ -133,5 +143,10 @@
     "vitest": "catalog:"
   },
   "types": "./dist/index.d.ts",
-  "main": "./dist/index.js"
+  "main": "./dist/index.js",
+  "bin": {
+    "simplix-design-css": "./scripts/build-design-css.mjs",
+    "simplix-design-classes": "./scripts/check-design-classes.mjs",
+    "simplix-design-coverage": "./scripts/check-design-coverage.mjs"
+  }
 }

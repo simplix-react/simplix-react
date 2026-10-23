@@ -1,0 +1,42 @@
+/* ===== Fresh theme: accent, corner radius and typeface as one choice ===== */
+
+[data-color-theme='fresh'] {
+  --radius: 10px;
+  --font-sans: "Pretendard Variable", Pretendard, "Pretendard Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-sans);
+  --card-fill: lead;
+
+  --primary: oklch(0.5 0.11 178);
+  --primary-foreground: oklch(0.99 0.004 178);
+  --primary-hover: oklch(0.44 0.11 178);
+  --primary-soft: oklch(0.962 0.018 178);
+  --primary-soft-2: oklch(0.925 0.031 178);
+  --lead: oklch(0.45 0.1 182);
+  --lead-foreground: oklch(0.99 0.004 178);
+
+  --secondary: oklch(0.965 0.026 178);
+  --secondary-foreground: oklch(0.24 0.033 178);
+  --muted: oklch(0.965 0.026 178);
+  --muted-foreground: oklch(0.54 0.04 178);
+  --accent: oklch(0.95 0.022 178);
+  --accent-foreground: oklch(0.24 0.033 178);
+  --border: oklch(0.92 0.026 178);
+  --input: oklch(0.92 0.026 178);
+  --ring: oklch(0.5 0.11 178);
+  --chart-1: oklch(0.5 0.11 178);
+}
+
+[data-color-theme='fresh'].dark {
+  --primary: oklch(0.66 0.099 178);
+  --primary-foreground: oklch(0.16 0.033 178);
+  --primary-hover: oklch(0.72 0.099 178);
+  --primary-soft: oklch(0.27 0.033 178);
+  --primary-soft-2: oklch(0.33 0.044 178);
+  --lead: oklch(0.52 0.093 178);
+  --lead-foreground: oklch(0.99 0.004 178);
+  --secondary: oklch(0.26 0.026 178);
+  --muted: oklch(0.26 0.026 178);
+  --accent: oklch(0.28 0.022 178);
+  --ring: oklch(0.66 0.099 178);
+  --chart-1: oklch(0.66 0.099 178);
+}

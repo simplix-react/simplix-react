@@ -1,0 +1,42 @@
+/* ===== Cobalt theme: accent, corner radius and typeface as one choice ===== */
+
+[data-color-theme='cobalt'] {
+  --radius: 6px;
+  --font-sans: "Pretendard Variable", Pretendard, "Pretendard Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-sans);
+  --card-fill: plain;
+
+  --primary: oklch(0.52 0.16 255);
+  --primary-foreground: oklch(0.99 0.004 255);
+  --primary-hover: oklch(0.46 0.16 255);
+  --primary-soft: oklch(0.962 0.026 255);
+  --primary-soft-2: oklch(0.925 0.045 255);
+  --lead: oklch(0.42 0.14 258);
+  --lead-foreground: oklch(0.99 0.004 255);
+
+  --secondary: oklch(0.965 0.019 255);
+  --secondary-foreground: oklch(0.24 0.048 255);
+  --muted: oklch(0.965 0.019 255);
+  --muted-foreground: oklch(0.54 0.029 255);
+  --accent: oklch(0.95 0.032 255);
+  --accent-foreground: oklch(0.24 0.048 255);
+  --border: oklch(0.92 0.019 255);
+  --input: oklch(0.92 0.019 255);
+  --ring: oklch(0.52 0.16 255);
+  --chart-1: oklch(0.52 0.16 255);
+}
+
+[data-color-theme='cobalt'].dark {
+  --primary: oklch(0.68 0.144 255);
+  --primary-foreground: oklch(0.16 0.048 255);
+  --primary-hover: oklch(0.74 0.144 255);
+  --primary-soft: oklch(0.27 0.048 255);
+  --primary-soft-2: oklch(0.33 0.064 255);
+  --lead: oklch(0.54 0.136 255);
+  --lead-foreground: oklch(0.99 0.004 255);
+  --secondary: oklch(0.26 0.019 255);
+  --muted: oklch(0.26 0.019 255);
+  --accent: oklch(0.28 0.032 255);
+  --ring: oklch(0.68 0.144 255);
+  --chart-1: oklch(0.68 0.144 255);
+}

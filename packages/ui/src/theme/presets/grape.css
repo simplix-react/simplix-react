@@ -1,0 +1,42 @@
+/* ===== Grape theme: accent, corner radius and typeface as one choice ===== */
+
+[data-color-theme='grape'] {
+  --radius: 12px;
+  --font-sans: "Wanted Sans Variable", "Wanted Sans", "Pretendard Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-sans);
+  --card-fill: lead;
+
+  --primary: oklch(0.5 0.15 292);
+  --primary-foreground: oklch(0.99 0.004 292);
+  --primary-hover: oklch(0.44 0.15 292);
+  --primary-soft: oklch(0.962 0.024 292);
+  --primary-soft-2: oklch(0.925 0.042 292);
+  --lead: oklch(0.42 0.15 292);
+  --lead-foreground: oklch(0.99 0.004 292);
+
+  --secondary: oklch(0.965 0.03 292);
+  --secondary-foreground: oklch(0.24 0.045 292);
+  --muted: oklch(0.965 0.03 292);
+  --muted-foreground: oklch(0.54 0.045 292);
+  --accent: oklch(0.95 0.03 292);
+  --accent-foreground: oklch(0.24 0.045 292);
+  --border: oklch(0.92 0.03 292);
+  --input: oklch(0.92 0.03 292);
+  --ring: oklch(0.5 0.15 292);
+  --chart-1: oklch(0.5 0.15 292);
+}
+
+[data-color-theme='grape'].dark {
+  --primary: oklch(0.66 0.135 292);
+  --primary-foreground: oklch(0.16 0.045 292);
+  --primary-hover: oklch(0.72 0.135 292);
+  --primary-soft: oklch(0.27 0.045 292);
+  --primary-soft-2: oklch(0.33 0.06 292);
+  --lead: oklch(0.52 0.128 292);
+  --lead-foreground: oklch(0.99 0.004 292);
+  --secondary: oklch(0.26 0.03 292);
+  --muted: oklch(0.26 0.03 292);
+  --accent: oklch(0.28 0.03 292);
+  --ring: oklch(0.66 0.135 292);
+  --chart-1: oklch(0.66 0.135 292);
+}

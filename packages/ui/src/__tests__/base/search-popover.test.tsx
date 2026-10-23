@@ -17,6 +17,7 @@ vi.mock("@simplix-react/i18n/react", () => ({
 }));
 
 import { SearchPopover } from "../../base/inputs/search-popover";
+import { drawnClasses } from "../helpers/drawn-classes";
 
 afterEach(cleanup);
 
@@ -54,7 +55,7 @@ describe("SearchPopover", () => {
       />,
     );
     const btn = screen.getByText("Add").closest("button") as HTMLButtonElement;
-    expect(btn.className).toContain("h-8"); // sm size
+    expect(drawnClasses(btn)).toContain("h-8"); // sm size
   });
 
   it("renders PlusIcon in trigger", () => {

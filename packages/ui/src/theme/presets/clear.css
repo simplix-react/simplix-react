@@ -1,0 +1,42 @@
+/* ===== Clear theme: accent, corner radius and typeface as one choice ===== */
+
+[data-color-theme='clear'] {
+  --radius: 10px;
+  --font-sans: "SUIT Variable", SUIT, "Pretendard Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-sans);
+  --card-fill: tint;
+
+  --primary: oklch(0.53 0.19 248);
+  --primary-foreground: oklch(0.99 0.004 248);
+  --primary-hover: oklch(0.47 0.19 248);
+  --primary-soft: oklch(0.962 0.03 248);
+  --primary-soft-2: oklch(0.925 0.053 248);
+  --lead: oklch(0.5 0.19 248);
+  --lead-foreground: oklch(0.99 0.004 248);
+
+  --secondary: oklch(0.965 0.046 248);
+  --secondary-foreground: oklch(0.24 0.057 248);
+  --muted: oklch(0.965 0.046 248);
+  --muted-foreground: oklch(0.54 0.068 248);
+  --accent: oklch(0.95 0.038 248);
+  --accent-foreground: oklch(0.24 0.057 248);
+  --border: oklch(0.92 0.046 248);
+  --input: oklch(0.92 0.046 248);
+  --ring: oklch(0.53 0.19 248);
+  --chart-1: oklch(0.53 0.19 248);
+}
+
+[data-color-theme='clear'].dark {
+  --primary: oklch(0.69 0.171 248);
+  --primary-foreground: oklch(0.16 0.057 248);
+  --primary-hover: oklch(0.75 0.171 248);
+  --primary-soft: oklch(0.27 0.057 248);
+  --primary-soft-2: oklch(0.33 0.076 248);
+  --lead: oklch(0.55 0.162 248);
+  --lead-foreground: oklch(0.99 0.004 248);
+  --secondary: oklch(0.26 0.046 248);
+  --muted: oklch(0.26 0.046 248);
+  --accent: oklch(0.28 0.038 248);
+  --ring: oklch(0.69 0.171 248);
+  --chart-1: oklch(0.69 0.171 248);
+}

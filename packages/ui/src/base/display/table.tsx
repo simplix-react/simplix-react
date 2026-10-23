@@ -368,8 +368,10 @@ export const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(
           // badges line up regardless of label length — whether it is the cell's
           // own child or the lone child of an alignment wrapper. Multi-badge /
           // chip cells hold several badges, so `:only-child` leaves them untouched.
-          "[&>[data-slot=badge]]:min-w-20",
-          "[&>*>[data-slot=badge]:only-child]:min-w-20",
+          "[&>[data-slot=badge]:not([data-compact])]:min-w-20",
+          "[&>*>[data-slot=badge]:not([data-compact]):only-child]:min-w-20",
+          "[&>[data-slot=status-badge]]:min-w-20",
+          "[&>*>[data-slot=status-badge]:only-child]:min-w-20",
           cellPxMap[size],
           density ? densityCellPyMap[density] : cellPyMap[size],
           variant === "bordered" && "border border-border",

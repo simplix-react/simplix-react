@@ -7,7 +7,9 @@
  *   @import "@simplix-react/ui/theme.css";
  *
  * It brings in the component style registration (styles.css), the generic
- * base tokens (theme/base.css), and every color preset (theme/presets/*).
+ * base tokens (theme/base.css), the classic design (theme/designs/classic.css,
+ * generated from the components' .style.ts declarations) and every theme
+ * preset (theme/presets/*). A preset sets colour, corner radius and typeface.
  * Presets activate via [data-color-theme="<name>"]; dark mode via .dark.
  * Apps may override any token after this import (e.g. brand fonts, status
  * tone seeds, categorical accents).
@@ -19,9 +21,16 @@
    The token layer below uses relative paths so it hot-reloads from src. */
 @import "@simplix-react/ui/styles.css";
 @import "./theme/base.css";
+@import "./theme/designs/classic.css";
 @import "./theme/presets/blue.css";
 @import "./theme/presets/green.css";
 @import "./theme/presets/krds.css";
 @import "./theme/presets/orange.css";
 @import "./theme/presets/rose.css";
 @import "./theme/presets/violet.css";
+@import "./theme/presets/graphite.css";
+@import "./theme/presets/cobalt.css";
+@import "./theme/presets/forest.css";
+@import "./theme/presets/clear.css";
+@import "./theme/presets/fresh.css";
+@import "./theme/presets/grape.css";
