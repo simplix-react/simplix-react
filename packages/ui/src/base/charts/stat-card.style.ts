@@ -57,6 +57,34 @@ export const statCardBodyStyle = defineSlotStyle({
 export const statCardValueStyle = defineSlotStyle({
   slot: "stat-card-value",
   base: "text-2xl font-bold leading-none",
+  variants: {
+    /** The card's status tone, so a design can colour the figure instead of tinting the card. */
+    tone: {
+      none: "",
+      success: "",
+      warning: "",
+      danger: "",
+      info: "",
+      neutral: "",
+      pending: "",
+      processing: "",
+    },
+  },
+  defaultVariants: { tone: "none" },
+});
+
+/** What stands in for the figure while it is being read. */
+export const statCardSkeletonStyle = defineSlotStyle({
+  slot: "stat-card-skeleton",
+  base: "h-6 w-14 animate-pulse rounded bg-muted",
+  variants: {},
+  defaultVariants: {},
+});
+
+/** The unit beside the figure; classic draws it in the figure's own type. */
+export const statCardUnitStyle = defineSlotStyle({
+  slot: "stat-card-unit",
+  base: "",
   variants: {},
   defaultVariants: {},
 });

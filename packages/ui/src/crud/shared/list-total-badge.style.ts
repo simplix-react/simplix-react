@@ -16,3 +16,11 @@ export const listTotalBadgeStyle = defineSlotStyle({
   variants: {},
   defaultVariants: {},
 });
+
+/** The figure inside the total's sentence, which a design may set apart from the words. */
+export const listTotalBadgeFigureStyle = defineSlotStyle({
+  slot: "list-total-badge-figure",
+  base: "",
+  variants: {},
+  defaultVariants: {},
+});

@@ -4,7 +4,7 @@ import { useLocale, useTranslation } from "@simplix-react/i18n/react";
 import type { DateRange } from "../../base/controls/calendar";
 import { FieldChevron } from "../../base/inputs/field-chevron";
 import { Flex } from "../../primitives/flex";
-import { slotAttributes } from "../../design/slot-style";
+import { partAttributes, slotAttributes } from "../../design/slot-style";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
 import { endOfDay, startOfDay } from "../../utils/date-math";
@@ -41,6 +41,7 @@ import {
   crudFilterBarToggleLeaderStyle,
   crudFilterBarTrailingStyle,
   crudFilterBarTriggerStyle,
+  crudFilterBarStyle,
   crudFilterBarViewButtonStyle,
 } from "./filter-bar.style";
 import { crudFilterOptionCheckStyle, crudFilterOptionIconStyle } from "./filter-parts.style";
@@ -466,6 +467,7 @@ export function FilterBar({ filters, state, leading, trailing, maxBadges, onPrev
       wrap
       justify={hasLeadingGroup ? "between" : "end"}
       className={cn("w-full", className)}
+      {...partAttributes(crudFilterBarStyle, {})}
     >
       {hasLeadingGroup && (
         <div

@@ -10,6 +10,7 @@ import {
 import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
 import {
+  alertBannerIconStyle,
   alertBannerStyle,
   alertBannerSubtitleStyle,
   alertBannerTitleStyle,
@@ -194,11 +195,15 @@ export const AlertBanner = forwardRef<HTMLDivElement, AlertBannerProps>(
         role="alert"
         className={cn(surfaceClass, className)}
         {...rest}
-        {...slotAttributes(alertBannerStyle, { density, borderless: !showBorder })}
+        {...slotAttributes(alertBannerStyle, { density, borderless: !showBorder, tone })}
       >
         <Flex align={verticalAlign} gap="sm">
           {Icon ? (
-            <Icon className={cn("shrink-0", densityToken.icon, toneToken.icon)} aria-hidden="true" />
+            <Icon
+              className={cn("shrink-0", densityToken.icon, toneToken.icon)}
+              aria-hidden="true"
+              {...slotAttributes(alertBannerIconStyle, { tone })}
+            />
           ) : null}
           <Flex direction="column" gap="none" align="stretch" className="min-w-0 flex-1">
             {children != null ? (

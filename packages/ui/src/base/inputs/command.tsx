@@ -40,7 +40,7 @@ const CommandInput = forwardRef<HTMLInputElement, ComponentPropsWithRef<typeof C
       />
       <CommandPrimitive.Input
         ref={ref}
-        className={cn("flex h-10 w-full disabled:cursor-not-allowed", className)}
+        className={cn("flex w-full disabled:cursor-not-allowed", className)}
         {...props}
         {...slotAttributes(commandInputStyle, {})}
       />

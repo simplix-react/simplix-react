@@ -1,4 +1,5 @@
 import { useTranslation } from "@simplix-react/i18n/react";
+import { DetailPlacementContext } from "../shared/detail-placement";
 import type { ReactNode } from "react";
 
 import { Flex } from "../../primitives/flex";
@@ -149,6 +150,7 @@ function DetailRoot({ isLoading, onClose, header, footer, variant = "default", a
         </Flex>
       )}
       <div data-crud-slot="body" className="flex flex-col flex-1 min-h-0 overflow-auto" {...slotAttributes(crudDetailBodyStyle, { dialog: isDialog })}>
+        <DetailPlacementContext.Provider value={true}>
         <Stack gap="sm" className="relative" {...partAttributes(crudDetailContentStyle, {})}>
           {isLoading && (
             <output
@@ -162,6 +164,7 @@ function DetailRoot({ isLoading, onClose, header, footer, variant = "default", a
           )}
           {children}
         </Stack>
+        </DetailPlacementContext.Provider>
         {auditData && (
           <div data-crud-slot="audit" {...slotAttributes(crudDetailAuditStyle, {})}>
             <DetailAuditFooter auditData={auditData} displayZone={displayZone} />

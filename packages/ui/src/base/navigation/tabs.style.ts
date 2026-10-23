@@ -12,7 +12,7 @@ export const tabsListStyle = defineSlotStyle({
       // computed to `auto` as well, and that 1px of bottom overflow paints a scrollbar.
       // `items-center` keeps the trigger exactly where `p-1` rendered it.
       default: "rounded-lg border border-input bg-card px-1 py-0.5 text-muted-foreground",
-      full: "mt-3 rounded-lg border border-input bg-card px-1 py-0.5 text-muted-foreground",
+      full: "mt-3 h-9 justify-center rounded-lg border border-input bg-card px-1 py-0.5 text-muted-foreground [&>[role=tab]]:flex-1",
       // Bottom-baseline track for the `bookmark` list variant. The line is an inset shadow (not a
       // border) so the active tab's `bg-card` covers it without relying on overflow - the cutout
       // survives `overflow-x-auto` horizontal scroll.
@@ -25,6 +25,16 @@ export const tabsListStyle = defineSlotStyle({
       // the tabs sit on it from the start, which is where a reader looks for a second level.
       underline: "mt-2 gap-1 shadow-[inset_0_-1px_0_0_var(--border)]",
     },
+  },
+  defaultVariants: { variant: "default" },
+});
+
+/** The rule under the chosen tab, placed by `--x` and `--w`; classic marks the tab itself instead. */
+export const tabsInkStyle = defineSlotStyle({
+  slot: "tabs-ink",
+  base: "hidden",
+  variants: {
+    variant: { default: "", full: "", bookmark: "", underline: "" },
   },
   defaultVariants: { variant: "default" },
 });

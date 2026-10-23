@@ -8,6 +8,8 @@ export interface LegendSeries {
   label: string;
   /** Any CSS colour; the swatch is filled with it while the series shows. */
   color: string;
+  /** How the swatch is painted, matching the series' marks; defaults to a filled square. */
+  fill?: "solid" | "hatch" | "outline" | "dot";
 }
 
 /**
@@ -59,9 +61,9 @@ export function LegendToggle({ series, hidden, onToggle, className }: LegendTogg
             <span
               data-swatch=""
               aria-hidden="true"
-              className="inline-block size-2.5 shrink-0"
+              className="inline-block shrink-0"
               style={{ "--swatch": s.color } as CSSProperties}
-              {...slotAttributes(legendToggleSwatchStyle, {})}
+              {...slotAttributes(legendToggleSwatchStyle, { fill: s.fill ?? "solid" })}
             />
             {s.label}
           </button>

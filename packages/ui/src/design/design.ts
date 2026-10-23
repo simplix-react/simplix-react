@@ -17,6 +17,12 @@ export interface Design {
   id: string;
   /** Prop defaults this design implies; the provider's own `defaults` still win over them. */
   defaults?: Partial<UIDefaults>;
+  /**
+   * Loads the stylesheets this design draws with, as CSS text: the design's compiled rules and
+   * tokens, and those of any kit that adds its own slots. Absent for classic, whose rules are in
+   * `theme.css`. Loaded on demand so a page carries only the active design's rules.
+   */
+  load?: () => Promise<readonly string[]>;
 }
 
 /** The framework's original look. Applies when no design is set. */
@@ -27,7 +33,11 @@ export const CLASSIC_DESIGN: Design = { id: "classic" };
  * reader is and what they can press, hierarchy from type weight and spacing. Drawn by
  * `theme/designs/clarity.css`; it sets rows a step looser than classic.
  */
-export const CLARITY_DESIGN: Design = { id: "clarity", defaults: { density: "comfortable" } };
+export const CLARITY_DESIGN: Design = {
+  id: "clarity",
+  defaults: { density: "comfortable" },
+  load: () => import("./clarity-stylesheet").then((m) => [m.default]),
+};
 
 /** Every design this package draws, for a picker. */
 export const DESIGNS: readonly Design[] = [CLASSIC_DESIGN, CLARITY_DESIGN];

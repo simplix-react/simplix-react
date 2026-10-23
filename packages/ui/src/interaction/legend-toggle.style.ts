@@ -21,7 +21,14 @@ export const legendToggleItemStyle = defineSlotStyle({
 /** The colour swatch beside a series name. */
 export const legendToggleSwatchStyle = defineSlotStyle({
   slot: "legend-toggle-swatch",
-  base: "rounded-sm border-2 border-[var(--swatch)] bg-[var(--swatch)]",
-  variants: {},
-  defaultVariants: {},
+  base: "size-2.5 rounded-sm border-2 border-[var(--swatch)] bg-[var(--swatch)]",
+  variants: {
+    fill: {
+      solid: "",
+      hatch: "bg-[repeating-linear-gradient(45deg,var(--swatch)_0_2px,color-mix(in_oklch,var(--swatch)_45%,var(--card))_2px_3.5px)]",
+      outline: "bg-transparent [border-style:dashed]",
+      dot: "rounded-full",
+    },
+  },
+  defaultVariants: { fill: "solid" },
 });

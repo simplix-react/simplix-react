@@ -19,12 +19,12 @@ import { ListTotalBadge } from "../../crud/shared/list-total-badge";
 describe("ListTotalBadge", () => {
   it("states the count when it is known", () => {
     render(<ListTotalBadge count={42} />);
-    expect(screen.getByText("list.totalCount:42")).toBeTruthy();
+    expect(document.querySelector("[data-part=list-total-badge]")?.textContent).toBe("list.totalCount:42");
   });
 
   it("states zero when the list is genuinely empty", () => {
     render(<ListTotalBadge count={0} />);
-    expect(screen.getByText("list.totalCount:0")).toBeTruthy();
+    expect(document.querySelector("[data-part=list-total-badge]")?.textContent).toBe("list.totalCount:0");
   });
 
   it("leaves the value empty rather than claiming zero when the count is unknown", () => {

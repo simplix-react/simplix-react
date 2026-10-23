@@ -1,6 +1,6 @@
 /* ===== Clear theme: accent, corner radius and typeface as one choice ===== */
 
-[data-color-theme='clear'] {
+:root[data-color-theme='clear'] {
   --radius: 10px;
   --font-sans: "SUIT Variable", SUIT, "Pretendard Variable", ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-sans);
@@ -26,7 +26,7 @@
   --chart-1: oklch(0.53 0.19 248);
 }
 
-[data-color-theme='clear'].dark {
+:root[data-color-theme='clear'].dark {
   --primary: oklch(0.69 0.171 248);
   --primary-foreground: oklch(0.16 0.057 248);
   --primary-hover: oklch(0.75 0.171 248);

@@ -4,7 +4,7 @@ import { useTranslation } from "@simplix-react/i18n/react";
 
 import { Badge } from "../../base/display/badge";
 import { partAttributes, slotAttributes } from "../../design/slot-style";
-import { listTotalBadgeIconStyle, listTotalBadgeStyle } from "./list-total-badge.style";
+import { listTotalBadgeFigureStyle, listTotalBadgeIconStyle, listTotalBadgeStyle } from "./list-total-badge.style";
 
 export interface ListTotalBadgeProps {
   /**
@@ -43,7 +43,25 @@ export function ListTotalBadge({ count, children }: ListTotalBadgeProps) {
   return (
     <Badge variant="outline" aria-busy={known ? undefined : true} {...partAttributes(listTotalBadgeStyle, {})}>
       <ListIcon className="size-3.5" {...slotAttributes(listTotalBadgeIconStyle, {})} />
-      {children ?? (count != null ? t("list.totalCount", { count }) : t("list.totalCountUnknown"))}
+      {children ?? (count != null ? <TotalSentence text={t("list.totalCount", { count })} count={count} /> : t("list.totalCountUnknown"))}
     </Badge>
+  );
+}
+
+/**
+ * The translated total with its figure marked, so a design can weigh the number apart from the
+ * words around it. The sentence stays one run of text: only the figure is wrapped.
+ */
+function TotalSentence({ text, count }: { text: string; count: number }) {
+  const figures = [count.toLocaleString(), String(count)];
+  const figure = figures.find((candidate) => text.includes(candidate));
+  if (!figure) return <>{text}</>;
+  const at = text.indexOf(figure);
+  return (
+    <span>
+      {text.slice(0, at)}
+      <span {...slotAttributes(listTotalBadgeFigureStyle, {})}>{figure}</span>
+      {text.slice(at + figure.length)}
+    </span>
   );
 }

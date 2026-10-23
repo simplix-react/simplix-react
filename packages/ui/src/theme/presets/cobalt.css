@@ -1,6 +1,6 @@
 /* ===== Cobalt theme: accent, corner radius and typeface as one choice ===== */
 
-[data-color-theme='cobalt'] {
+:root[data-color-theme='cobalt'] {
   --radius: 6px;
   --font-sans: "Pretendard Variable", Pretendard, "Pretendard Variable", ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-sans);
@@ -26,7 +26,7 @@
   --chart-1: oklch(0.52 0.16 255);
 }
 
-[data-color-theme='cobalt'].dark {
+:root[data-color-theme='cobalt'].dark {
   --primary: oklch(0.68 0.144 255);
   --primary-foreground: oklch(0.16 0.048 255);
   --primary-hover: oklch(0.74 0.144 255);

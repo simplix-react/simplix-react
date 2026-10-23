@@ -1,7 +1,7 @@
-import { baseSlots } from "./clarity/base";
+import { commandSlots } from "./clarity/command";
 import { dashboardSlots } from "./clarity/dashboard";
 import { listSlots } from "./clarity/list";
-import { shellSlots } from "./clarity/shell";
+import { pageSlots } from "./clarity/page";
 import type { DesignSpec } from "./design-spec";
 
 /**
@@ -48,7 +48,7 @@ export const CLARITY_REPLACE: Record<string, string> = {
 const spec: DesignSpec = {
   id: "clarity",
   replace: CLARITY_REPLACE,
-  slots: { ...baseSlots, ...shellSlots, ...listSlots, ...dashboardSlots },
+  slots: { ...listSlots, ...pageSlots, ...commandSlots, ...dashboardSlots },
 };
 
 export default spec;

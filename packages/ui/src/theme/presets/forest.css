@@ -1,6 +1,6 @@
 /* ===== Forest theme: accent, corner radius and typeface as one choice ===== */
 
-[data-color-theme='forest'] {
+:root[data-color-theme='forest'] {
   --radius: 8px;
   --font-sans: "Spoqa Han Sans Neo", "Pretendard Variable", ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-sans);
@@ -26,7 +26,7 @@
   --chart-1: oklch(0.45 0.11 160);
 }
 
-[data-color-theme='forest'].dark {
+:root[data-color-theme='forest'].dark {
   --primary: oklch(0.61 0.099 160);
   --primary-foreground: oklch(0.16 0.033 160);
   --primary-hover: oklch(0.67 0.099 160);

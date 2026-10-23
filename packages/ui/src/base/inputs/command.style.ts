@@ -33,7 +33,7 @@ export const commandInputIconStyle = defineSlotStyle({
  */
 export const commandInputStyle = defineSlotStyle({
   slot: "command-input",
-  base: "rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:opacity-50",
+  base: "h-10 rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:opacity-50",
   variants: {},
   defaultVariants: {},
 });

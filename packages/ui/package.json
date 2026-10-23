@@ -53,8 +53,8 @@
   "scripts": {
     "prebuild": "find src -name '*.d.ts' -o -name '*.d.ts.map' -o -name '*.js' -o -name '*.js.map' | xargs rm -f",
     "build": "tsup",
-    "design:css": "node scripts/build-design-css.mjs && node scripts/build-design-css.mjs --design-spec src/design/clarity.spec.ts --out src/theme/designs/clarity.css",
-    "design:check": "node scripts/build-design-css.mjs --check && node scripts/build-design-css.mjs --design-spec src/design/clarity.spec.ts --out src/theme/designs/clarity.css --check && node scripts/check-design-coverage.mjs",
+    "design:css": "node scripts/build-design-css.mjs && node scripts/build-design-css.mjs --design-spec src/design/clarity.spec.ts --out src/theme/designs/clarity.css --compiled src/design/clarity-stylesheet.ts --tokens src/theme/designs/clarity-tokens.css --tailwind-from ../../apps/storybook",
+    "design:check": "node scripts/build-design-css.mjs --check && node scripts/build-design-css.mjs --design-spec src/design/clarity.spec.ts --out src/theme/designs/clarity.css --compiled src/design/clarity-stylesheet.ts --tokens src/theme/designs/clarity-tokens.css --tailwind-from ../../apps/storybook --check && node scripts/check-design-coverage.mjs",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint src",

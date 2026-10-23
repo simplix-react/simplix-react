@@ -70,7 +70,17 @@ import {
   crudListGroupRowStyle,
   crudListGroupCellStyle,
   crudListPageSizeStyle,
+  crudListGroupCountStyle,
+  crudListPaginationLeadStyle,
+  crudListPaginationRangeStyle,
+  crudListSearchIconStyle,
+  crudListSearchInputStyle,
+  crudListSearchKeyStyle,
+  crudListSortPairStyle,
+  crudListSortSingleStyle,
+  crudListStyle,
 } from "./crud-list.style";
+import { useInDetail } from "../shared/detail-placement";
 import type {ColumnInfo, EmptyReason, SortState} from "../shared";
 import {
   CrudListColumnContext,
@@ -176,6 +186,7 @@ function ListRoot({ className, children, ref }: ListProps) {
   const [viewMode, setViewMode] = useState<CrudListViewMode>("list");
   const [canGridView, setCanGridView] = useState(false);
   const [responsiveCardMode, setResponsiveCardMode] = useState(false);
+  const inDetail = useInDetail();
 
   const columnCtx = useMemo(
     () => ({
@@ -192,6 +203,7 @@ function ListRoot({ className, children, ref }: ListProps) {
         gap="sm"
         className={cn("w-full", className)}
         data-testid="crud-list"
+        {...partAttributes(crudListStyle, { placement: inDetail ? "detail" : "page" })}
       >
         {children}
       </Stack>
@@ -261,19 +273,77 @@ export interface ListSearchProps {
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
+  /**
+   * A key that moves the focus into the field from anywhere on the page, such as `"/"`. It is
+   * ignored while the reader is typing in another field or a modifier is held. A design may draw
+   * the key at the end of the field.
+   */
+  shortcut?: string;
 }
 
-function ListSearch({ value, onChange, placeholder, className }: ListSearchProps) {
+/**
+ * Whether a key press belongs to the element it landed on rather than to the page: a field being
+ * typed in, or a control that answers Enter and Space itself.
+ */
+function isOwnedKeyTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  if (target.isContentEditable) return true;
+  return !!target.closest("input, textarea, select, button, a[href], [role=button], [role=menuitem], [role=option], [role=tab], [role=combobox]");
+}
+
+function ListSearch({ value, onChange, placeholder, className, shortcut }: ListSearchProps) {
   const { t } = useTranslation("simplix/ui");
   const { Input } = useFlatUIComponents();
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!shortcut) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== shortcut || e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (isOwnedKeyTarget(e.target)) return;
+      e.preventDefault();
+      inputRef.current?.focus();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [shortcut]);
+
+  if (!shortcut) {
+    return (
+      <Input
+        type="search"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder ?? t("list.searchPlaceholder")}
+        className={cn("max-w-xs", className)}
+      />
+    );
+  }
   return (
-    <Input
-      type="search"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder ?? t("list.searchPlaceholder")}
-      className={cn("max-w-xs", className)}
-    />
+    <div className={cn("relative max-w-xs", className)}>
+      <MagnifyingGlassIcon
+        aria-hidden="true"
+        className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2"
+        {...slotAttributes(crudListSearchIconStyle, {})}
+      />
+      <Input
+        ref={inputRef}
+        type="search"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder ?? t("list.searchPlaceholder")}
+        aria-keyshortcuts={shortcut}
+        className="w-full"
+        {...partAttributes(crudListSearchInputStyle, {})}
+      />
+      <kbd
+        aria-hidden="true"
+        className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2"
+        {...slotAttributes(crudListSearchKeyStyle, {})}
+      >
+        {shortcut}
+      </kbd>
+    </div>
   );
 }
 
@@ -298,7 +368,16 @@ function SortIcon({ direction }: { direction: "asc" | "desc" | null }) {
       aria-hidden="true"
       {...slotAttributes(crudListSortIconStyle, { sorted: Boolean(direction) })}
     >
-      {direction === "asc" ? <path d="m18 15-6-6-6 6" /> : <path d="m6 9 6 6 6-6" />}
+      {direction === "asc" ? (
+        <path d="m18 15-6-6-6 6" />
+      ) : direction === "desc" ? (
+        <path d="m6 9 6 6 6-6" />
+      ) : (
+        <>
+          <path d="m6 9 6 6 6-6" {...slotAttributes(crudListSortSingleStyle, {})} />
+          <path d="m7 15 5 5 5-5M7 9l5-5 5 5" {...slotAttributes(crudListSortPairStyle, {})} />
+        </>
+      )}
     </svg>
   );
 }
@@ -428,6 +507,13 @@ export interface ListTableProps<T> {
   selectedIndices?: Set<number>;
   onSelectionChange?: (index: number) => void;
   onSelectAll?: () => void;
+  /**
+   * Moves a focus mark along the record rows with `j` and `k`, in the order they are drawn;
+   * `x` toggles the marked row's selection and `Enter` opens it through `onRowClick`. The keys
+   * are ignored while the reader types in a field or presses a control. Off unless asked for, so
+   * a page with several lists gives the keys to one of them.
+   */
+  keyboardNav?: boolean;
   rowId?: (row: T) => string;
   /** Container width threshold (px) below which card mode activates. Disabled when omitted. */
   cardBreakpoint?: number;
@@ -962,6 +1048,7 @@ function ListTable<T>({
   selectedIndices,
   onSelectionChange,
   onSelectAll,
+  keyboardNav = false,
   rowId,
   cardBreakpoint,
   gridView,
@@ -1138,6 +1225,10 @@ function ListTable<T>({
           <input
             type="checkbox"
             checked={selectedIndices?.size === data.length && data.length > 0}
+            ref={(box) => {
+              // Some rows chosen but not all reads as a third state, which only a property sets.
+              if (box) box.indeterminate = !!selectedIndices && selectedIndices.size > 0 && selectedIndices.size < data.length;
+            }}
             onChange={() => onSelectAll?.()}
             className="h-4 w-4" {...slotAttributes(crudSelectCheckboxStyle, {})}
             aria-label={t("list.selectAllRows")}
@@ -1305,6 +1396,57 @@ function ListTable<T>({
     getCoreRowModel: getCoreRowModel(),
     manualSorting: true,
   });
+
+  // ── Keyboard row navigation ──
+  // The rows in the order the reader sees them: grouped rows run group by group.
+  const [focusedRowId, setFocusedRowId] = useState<string | null>(null);
+  const drawnRows = (() => {
+    const modelRows = table.getRowModel().rows;
+    const grouped = groupRows(modelRows, groupBy);
+    return (grouped ? grouped.flatMap((group) => group.rows) : modelRows).map((row) => ({
+      id: rowId?.(row.original) ?? row.id,
+      index: row.index,
+      original: row.original,
+    }));
+  })();
+  // The listener is registered once; what it reads is refreshed on every render.
+  const keyboardRead = useRef({ drawnRows, focusedRowId, selectable, onSelectionChange, onRowClick });
+  keyboardRead.current = { drawnRows, focusedRowId, selectable, onSelectionChange, onRowClick };
+
+  useEffect(() => {
+    if (!keyboardNav) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || isOwnedKeyTarget(e.target)) return;
+      // A modal over the list owns the keyboard.
+      if (document.querySelector("[role=dialog][aria-modal=true], [role=alertdialog]")) return;
+      const read = keyboardRead.current;
+      if (e.key === "j" || e.key === "k") {
+        if (read.drawnRows.length === 0) return;
+        const at = read.drawnRows.findIndex((row) => row.id === read.focusedRowId);
+        const step = e.key === "j" ? 1 : -1;
+        const next = at < 0 ? (step > 0 ? 0 : read.drawnRows.length - 1) : Math.max(0, Math.min(read.drawnRows.length - 1, at + step));
+        e.preventDefault();
+        setFocusedRowId(read.drawnRows[next]!.id);
+        return;
+      }
+      const focused = read.drawnRows.find((row) => row.id === read.focusedRowId);
+      if (!focused) return;
+      if (e.key === "x" && read.selectable && read.onSelectionChange) {
+        e.preventDefault();
+        read.onSelectionChange(focused.index);
+      } else if (e.key === "Enter" && read.onRowClick) {
+        e.preventDefault();
+        read.onRowClick(focused.original);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [keyboardNav]);
+
+  useEffect(() => {
+    if (!focusedRowId) return;
+    containerRef.current?.querySelector("[data-focused=true]")?.scrollIntoView({ block: "nearest" });
+  }, [focusedRowId]);
 
   // Empty states — replace the entire table/card area
   if (emptyReason && data.length === 0 && !isLoading) {
@@ -1542,7 +1684,11 @@ function ListTable<T>({
                             )}
                             onClick={rowClickHandler(row.original, onRowClick)}
                             data-testid={`list-row-${rid}`}
-                            {...partAttributes(crudListRowStyle, { selected: !!selectedIndices?.has(row.index), active: isActive })}
+                            {...partAttributes(crudListRowStyle, {
+                              selected: !!selectedIndices?.has(row.index),
+                              active: isActive,
+                              focused: keyboardNav && rid === focusedRowId,
+                            })}
                           >
                             {row.getVisibleCells().map((cell) => (
                               <TableCell
@@ -1579,6 +1725,8 @@ function ListTable<T>({
                                 {...partAttributes(crudListGroupCellStyle, {})}
                               >
                                 {group.label}
+                                {/* Drawn from the attribute, so the heading's text stays its label alone. */}
+                                <span data-count={group.rows.length} {...slotAttributes(crudListGroupCountStyle, {})} />
                               </TableCell>
                             </TableRow>
                           )}
@@ -1709,11 +1857,18 @@ function ListPagination({
   );
 
   const pageNumbers = isCompact ? null : getPageNumbers(page, totalPages);
+  const first = _total > 0 ? (page - 1) * pageSize + 1 : 0;
+  const last = Math.min(_total, page * pageSize);
 
   return (
-    <div ref={containerRef} className={cn("flex w-full items-center justify-end", className)} {...slotAttributes(crudListPaginationStyle, { framed })}>
-      <Flex gap="sm" align="center">
+    <div ref={containerRef} className={cn("flex w-full items-center justify-end", className)} {...slotAttributes(crudListPaginationStyle, { framed, single: totalPages <= 1 })}>
+      <div className="flex items-center" {...slotAttributes(crudListPaginationLeadStyle, {})}>
         {pageSizeSelector}
+        <span {...slotAttributes(crudListPaginationRangeStyle, {})}>
+          {first}-{last} / {_total}
+        </span>
+      </div>
+      <Flex gap="sm" align="center">
         <Flex gap="xs" align="center">
         {prevButton}
         {isCompact ? (

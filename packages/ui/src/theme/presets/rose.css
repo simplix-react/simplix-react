@@ -1,6 +1,6 @@
 /* ===== Rose Theme — Modern / Creative ===== */
 
-[data-color-theme='rose'] {
+:root[data-color-theme='rose'] {
   /* Primary */
   --primary: oklch(0.645 0.246 16.439);
   --primary-foreground: oklch(0.985 0.003 12);
@@ -36,7 +36,7 @@
   --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
-[data-color-theme='rose'].dark {
+:root[data-color-theme='rose'].dark {
   /* Background — rose-tinted dark */
   --background: oklch(0.135 0.025 15);
   --foreground: oklch(0.984 0.003 12);

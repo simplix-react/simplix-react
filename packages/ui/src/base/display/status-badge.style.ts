@@ -13,6 +13,8 @@ export const statusBadgeStyle = defineSlotStyle({
     },
     /** `outline` draws a border over a transparent background; `filled` takes the tone's soft fill. */
     appearance: { outline: "border bg-transparent", filled: "" },
+    /** The tone, so a design can draw each one its own way; the classic colours come from the tone context. */
+    tone: { success: "", warning: "", danger: "", info: "", neutral: "", pending: "", processing: "" },
   },
-  defaultVariants: { size: "sm", appearance: "outline" },
+  defaultVariants: { size: "sm", appearance: "outline", tone: "neutral" },
 });

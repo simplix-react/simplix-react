@@ -65,9 +65,9 @@ describe("ListDetail Divider drag interactions", () => {
     // End drag
     fireEvent.pointerUp(separator);
 
-    // Section should have transition class restored (isDragging = false)
+    // At rest the columns do not animate: only opening and closing does.
     const section = container.querySelector("section");
-    expect(drawnClasses(section ?? null)).toContain("md:transition-");
+    expect(drawnClasses(section ?? null)).not.toContain("md:transition-[grid-template-columns]");
   });
 
   it("resizes panels using keyboard on separator (ArrowLeft)", () => {
@@ -198,8 +198,8 @@ describe("ListDetail divider collapse behavior", () => {
     const separator = container.querySelector("[role='separator']") as HTMLElement;
     const section = container.querySelector("section")!;
 
-    // Before drag: transition class exists
-    expect(drawnClasses(section ?? null)).toContain("md:transition-");
+    // Before drag, at rest: no transition either.
+    expect(drawnClasses(section ?? null)).not.toContain("md:transition-[grid-template-columns]");
 
     // Start drag
     fireEvent.pointerDown(separator, { clientX: 400, pointerId: 1 });
@@ -210,7 +210,25 @@ describe("ListDetail divider collapse behavior", () => {
     // End drag
     fireEvent.pointerUp(separator);
 
-    // After drag: transition restored
-    expect(drawnClasses(section ?? null)).toContain("md:transition-");
+    // After drag: still none, the width the drag left is applied as it stands.
+    expect(drawnClasses(section ?? null)).not.toContain("md:transition-[grid-template-columns]");
+  });
+
+  it("animates the columns only while the detail opens or closes", () => {
+    const { container, rerender } = render(
+      <ListDetail activePanel="list">
+        <ListDetail.List>List</ListDetail.List>
+        <ListDetail.Detail>Detail</ListDetail.Detail>
+      </ListDetail>,
+    );
+    const section = () => container.querySelector("section");
+    expect(drawnClasses(section() ?? null)).not.toContain("md:transition-[grid-template-columns]");
+    rerender(
+      <ListDetail activePanel="detail">
+        <ListDetail.List>List</ListDetail.List>
+        <ListDetail.Detail>Detail</ListDetail.Detail>
+      </ListDetail>,
+    );
+    expect(drawnClasses(section() ?? null)).toContain("md:transition-[grid-template-columns]");
   });
 });

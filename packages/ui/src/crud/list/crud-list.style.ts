@@ -124,8 +124,12 @@ export const crudListCardHeaderStyle = defineSlotStyle({
 export const crudListPaginationStyle = defineSlotStyle({
   slot: "crud-list-pagination",
   base: "gap-2 border-t px-3.5 py-2.5",
-  variants: { framed: { true: "bg-card", false: "bg-muted/60" } },
-  defaultVariants: { framed: false },
+  variants: {
+    framed: { true: "bg-card", false: "bg-muted/60" },
+    // Everything fits on one page, so the pager has nowhere to go; a design may leave it out.
+    single: { true: "", false: "" },
+  },
+  defaultVariants: { framed: false, single: false },
 });
 
 /** The "rows per page" label. */
@@ -244,8 +248,10 @@ export const crudListRowStyle = defineSlotStyle({
   variants: {
     selected: { true: "bg-muted", false: "" },
     active: { true: "bg-muted/50", false: "" },
+    // The row the keyboard stands on (j / k); Enter opens it and x selects it.
+    focused: { true: "shadow-[inset_0_0_0_1.5px_var(--ring)]", false: "" },
   },
-  defaultVariants: { selected: false, active: false },
+  defaultVariants: { selected: false, active: false, focused: false },
 });
 
 /** The row that heads a group of records; it is not a record, so it does not light on hover. */
@@ -273,4 +279,81 @@ export const crudListPageSizeStyle = defineSlotStyle({
   base: "rounded-md border-border bg-card font-medium text-secondary-foreground",
   variants: {},
   defaultVariants: {},
+});
+
+/** How many records a group heading holds, beside its label. The classic design leaves it out. */
+export const crudListGroupCountStyle = defineSlotStyle({
+  slot: "crud-list-group-count",
+  base: "hidden",
+  variants: {},
+  defaultVariants: {},
+});
+
+/** What sits at the start of the pager: the page-size picker and the range on show. */
+export const crudListPaginationLeadStyle = defineSlotStyle({
+  slot: "crud-list-pagination-lead",
+  base: "gap-1",
+  variants: {},
+  defaultVariants: {},
+});
+
+/** The rows on show out of all of them, 「1-10 / 10」. The classic design leaves it out. */
+export const crudListPaginationRangeStyle = defineSlotStyle({
+  slot: "crud-list-pagination-range",
+  base: "hidden",
+  variants: {},
+  defaultVariants: {},
+});
+
+/** The search field when it draws a leading icon and a shortcut hint around its input. */
+export const crudListSearchInputStyle = defineSlotStyle({
+  slot: "crud-list-search-input",
+  as: "part",
+  base: "",
+  variants: {},
+  defaultVariants: {},
+});
+
+/** The magnifier at the start of the search field. The classic design leaves it out. */
+export const crudListSearchIconStyle = defineSlotStyle({
+  slot: "crud-list-search-icon",
+  base: "hidden",
+  variants: {},
+  defaultVariants: {},
+});
+
+/** The key that moves the focus into the search field, drawn at its end. The classic design leaves it out. */
+export const crudListSearchKeyStyle = defineSlotStyle({
+  slot: "crud-list-search-key",
+  base: "hidden",
+  variants: {},
+  defaultVariants: {},
+});
+
+/** The sort mark of a column not sorted yet, as one chevron. A design may draw the pair instead. */
+export const crudListSortSingleStyle = defineSlotStyle({
+  slot: "crud-list-sort-single",
+  base: "",
+  variants: {},
+  defaultVariants: {},
+});
+
+/** The sort mark of a column not sorted yet, as a pair of chevrons. The classic design leaves it out. */
+export const crudListSortPairStyle = defineSlotStyle({
+  slot: "crud-list-sort-pair",
+  base: "hidden",
+  variants: {},
+  defaultVariants: {},
+});
+
+/**
+ * The list as a whole. Inside a record's detail it is part of the record: a design draws its head,
+ * rows and pager lighter than a list standing on the page.
+ */
+export const crudListStyle = defineSlotStyle({
+  slot: "crud-list",
+  as: "part",
+  base: "",
+  variants: { placement: { page: "", detail: "" } },
+  defaultVariants: { placement: "page" },
 });

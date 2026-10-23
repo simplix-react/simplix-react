@@ -93,7 +93,7 @@ describe("FilterBar", () => {
     expect(screen.getByText("list.totalCountUnknown")).toBeTruthy();
 
     rerender(<FilterBar filters={[textFilter]} state={state} count={12} />);
-    expect(screen.getByText("12 selected")).toBeTruthy();
+    expect(document.querySelector("[data-part=list-total-badge]")?.textContent).toBe("12 selected");
   });
 
   it("lets a standalone FilterBar declare the count unknown itself", () => {

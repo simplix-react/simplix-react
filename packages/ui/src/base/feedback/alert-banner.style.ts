@@ -12,8 +12,20 @@ export const alertBannerStyle = defineSlotStyle({
     },
     /** A borderless banner replaces the tone surface with a transparent one. */
     borderless: { true: "border-transparent bg-transparent", false: "" },
+    /** The banner's status tone, so a design can draw a tone's ground its own way. */
+    tone: { success: "", warning: "", danger: "", info: "", neutral: "", pending: "", processing: "" },
   },
-  defaultVariants: { density: "default", borderless: false },
+  defaultVariants: { density: "default", borderless: false, tone: "neutral" },
+});
+
+/** The banner's glyph; its colour arrives from the status tone as a class. */
+export const alertBannerIconStyle = defineSlotStyle({
+  slot: "alert-banner-icon",
+  base: "",
+  variants: {
+    tone: { success: "", warning: "", danger: "", info: "", neutral: "", pending: "", processing: "" },
+  },
+  defaultVariants: { tone: "neutral" },
 });
 
 /**

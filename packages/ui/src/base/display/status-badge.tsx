@@ -68,7 +68,7 @@ export const StatusBadge = forwardRef<HTMLSpanElement, StatusBadgeProps>(
           className,
         )}
         {...rest}
-        {...slotAttributes(statusBadgeStyle, { size, appearance })}
+        {...slotAttributes(statusBadgeStyle, { size, appearance, tone })}
       >
         {Icon ? (
           <Icon

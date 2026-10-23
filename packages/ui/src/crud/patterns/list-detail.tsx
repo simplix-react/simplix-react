@@ -4,6 +4,7 @@ import {
   forwardRef,
   useCallback,
   useContext,
+  useEffect,
   useRef,
   useState,
 } from "react";
@@ -167,13 +168,46 @@ export const DETAIL_PANEL_WIDTH = 768;
 /** Minimum width (px) for both list and detail panels during drag. */
 const MIN_PANEL_WIDTH = 280;
 
-export function ListDetailRoot({ variant: variantProp, activePanel: activePanelProp, detailWidth = DETAIL_PANEL_WIDTH, listWidth, onClose, dialogHeight, className, children }: ListDetailProps) {
+/**
+ * The custom property through which a design names the detail column's width, in px, for a screen
+ * that names none. A design that draws the panel as a narrow card beside a wide list sets it.
+ */
+const DESIGN_DETAIL_WIDTH_PROPERTY = "--detail-panel-width";
+
+/**
+ * The detail width the design in force names, read from the document and read again when the
+ * design changes. `undefined` when the design names none.
+ */
+function readDesignDetailWidth(): number | undefined {
+  if (typeof document === "undefined") return undefined;
+  const value = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue(DESIGN_DETAIL_WIDTH_PROPERTY));
+  return Number.isFinite(value) && value > 0 ? value : undefined;
+}
+
+function useDesignDetailWidth(): number | undefined {
+  // Read before the first paint: a detail that opens with the page would otherwise be drawn at the
+  // fallback width and then animate to the design's, which reads as the panel shrinking by itself.
+  const [width, setWidth] = useState<number | undefined>(readDesignDetailWidth);
+  useEffect(() => {
+    const root = document.documentElement;
+    const read = () => setWidth(readDesignDetailWidth());
+    read();
+    const observer = new MutationObserver(read);
+    observer.observe(root, { attributes: true, attributeFilter: ["data-design", "class", "style"] });
+    return () => observer.disconnect();
+  }, []);
+  return width;
+}
+
+export function ListDetailRoot({ variant: variantProp, activePanel: activePanelProp, detailWidth: detailWidthProp, listWidth, onClose, dialogHeight, className, children }: ListDetailProps) {
   // The installation's answer when the screen does not give one. A screen that names a variant
   // wins — that is the escape hatch for the one surface whose shape is genuinely its own — but a
   // screen naming `"panel"` because the scaffold wrote it there takes the choice away from every
   // installation without meaning to.
   const uiDefaults = useUIDefaults();
   const variant = variantProp ?? uiDefaults.detailPresentation;
+  const designDetailWidth = useDesignDetailWidth();
+  const detailWidth = detailWidthProp ?? designDetailWidth ?? DETAIL_PANEL_WIDTH;
 
   const [activePanelState, setActivePanel] = useState<"list" | "detail">("list");
   const activePanel = activePanelProp ?? activePanelState;
@@ -196,6 +230,11 @@ export function ListDetailRoot({ variant: variantProp, activePanel: activePanelP
   );
 
   const handleDragStart = useCallback(() => setIsDragging(true), []);
+  // Back to the width the screen or the design names.
+  const handleDragReset = useCallback(() => {
+    setDragDetailWidth(null);
+    setDragListWidth(null);
+  }, []);
   const handleDragEnd = useCallback(() => setIsDragging(false), []);
 
   const contextValue: ListDetailContextValue = { variant, activePanel, setActivePanel, dialogHeight };
@@ -242,6 +281,21 @@ export function ListDetailRoot({ variant: variantProp, activePanel: activePanelP
   const effectiveListWidth = dragListWidth ?? listWidth;
   const effectiveDetailWidth = dragDetailWidth ?? detailWidth;
   const isDetailOpen = activePanel === "detail";
+  // The columns animate only while the detail opens or closes. Any other change of width (the
+  // design naming its own, the stylesheet arriving after the first paint, a new viewport) is
+  // applied at once: run through the transition it reads as the panel resizing by itself.
+  // Set during render, so the transition is on in the same paint as the columns it animates.
+  const [toggling, setToggling] = useState(false);
+  const [seenOpen, setSeenOpen] = useState(isDetailOpen);
+  if (seenOpen !== isDetailOpen) {
+    setSeenOpen(isDetailOpen);
+    setToggling(true);
+  }
+  useEffect(() => {
+    if (!toggling) return;
+    const timer = window.setTimeout(() => setToggling(false), 400);
+    return () => window.clearTimeout(timer);
+  }, [toggling, isDetailOpen]);
   const listCol = effectiveListWidth != null ? `${effectiveListWidth}px` : "1fr";
   const detailCol = effectiveListWidth != null ? "1fr" : `${effectiveDetailWidth}px`;
   // **Which box scrolls depends on whether the detail is open, and the two states are opposite.**
@@ -296,10 +350,10 @@ export function ListDetailRoot({ variant: variantProp, activePanel: activePanelP
         ref={sectionRef}
         className={sectionClassName}
         style={gridCols ? { gridTemplateColumns: gridCols } : undefined}
-        {...slotAttributes(crudListDetailRootStyle, { dragging: isDragging })}
+        {...slotAttributes(crudListDetailRootStyle, { dragging: isDragging || !toggling })}
       >
         {children}
-        <Divider onDrag={handleDrag} onDragStart={handleDragStart} onDragEnd={handleDragEnd} />
+        <Divider onDrag={handleDrag} onDragStart={handleDragStart} onDragEnd={handleDragEnd} onReset={handleDragReset} />
       </section>
     </ListDetailContext.Provider>
   );
@@ -320,9 +374,11 @@ interface DividerProps {
   onDrag: (newListWidth: number) => void;
   onDragStart: () => void;
   onDragEnd: () => void;
+  /** A double press returns the columns to the width they opened at. */
+  onReset: () => void;
 }
 
-function Divider({ onDrag, onDragStart, onDragEnd }: DividerProps) {
+function Divider({ onDrag, onDragStart, onDragEnd, onReset }: DividerProps) {
   const { activePanel } = useListDetail();
   const collapsed = activePanel !== "detail";
   const dragging = useRef(false);
@@ -378,6 +434,7 @@ function Divider({ onDrag, onDragStart, onDragEnd }: DividerProps) {
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
+      onDoubleClick={onReset}
       onKeyDown={(e) => {
         const section = (e.currentTarget as HTMLElement).closest("section");
         const listPanel = section?.querySelector<HTMLElement>("[data-panel='list']");

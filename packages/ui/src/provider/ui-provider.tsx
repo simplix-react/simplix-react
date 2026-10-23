@@ -84,16 +84,45 @@ export function UIProvider({ overrides, statusTones, defaults, design, children 
   );
 
   const designId = design?.id;
+  const loadDesign = design?.load;
+  // The design is written on the document element so dialogs, popovers and toasts rendered into
+  // document.body take it too. A design's own stylesheets go on the page only while it is the
+  // design in force: rules of a design nobody is looking at still cost every rendering update
+  // (Safari re-checks each scoped rule), so they are added on selection and removed on change.
+  // The attribute moves only once they are in, so the page never shows a design without its rules.
   useLayoutEffect(() => {
     if (!designId) return;
     const root = document.documentElement;
     const previous = root.getAttribute("data-design");
-    root.setAttribute("data-design", designId);
+    const elements: HTMLStyleElement[] = [];
+    let cancelled = false;
+    const apply = () => root.setAttribute("data-design", designId);
+    if (!loadDesign) apply();
+    else
+      loadDesign().then(
+        (sheets) => {
+          if (cancelled) return;
+          for (const text of sheets) {
+            const el = document.createElement("style");
+            el.dataset.designStylesheet = designId;
+            el.textContent = text;
+            document.head.appendChild(el);
+            elements.push(el);
+          }
+          apply();
+        },
+        (error: unknown) => {
+          // The page stays in the design it had; say why rather than leave it silently unchanged.
+          console.error(`design "${designId}" failed to load its stylesheets`, error);
+        },
+      );
     return () => {
+      cancelled = true;
+      for (const el of elements) el.remove();
       if (previous === null) root.removeAttribute("data-design");
       else root.setAttribute("data-design", previous);
     };
-  }, [designId]);
+  }, [designId, loadDesign]);
 
   return (
     <UIComponentContext.Provider value={merged}>

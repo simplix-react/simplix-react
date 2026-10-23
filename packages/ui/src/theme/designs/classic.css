@@ -109,6 +109,9 @@
   :where(:root:not([data-design]), [data-design="classic"]) :where([data-part="crud-list-row"][data-part-active="true"])[data-part] {
     @apply bg-muted/50;
   }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-part="crud-list-row"][data-part-focused="true"])[data-part] {
+    @apply shadow-[inset_0_0_0_1.5px_var(--ring)];
+  }
   :where(:root:not([data-design]), [data-design="classic"]) :where([data-part="crud-list-select-all-row"])[data-part] {
     @apply px-1;
   }
@@ -289,6 +292,99 @@
   :where(:root:not([data-design]), [data-design="classic"]) :where([data-part="field-language-trigger"])[data-part] {
     @apply border-0 !bg-transparent dark:!bg-transparent !p-0 !py-0 text-[10px] leading-none shadow-none focus-visible:ring-0 [&>span]:leading-none;
   }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-area"]) {
+    @apply [transition:opacity_var(--dur-base)_var(--ease)];
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-area"][data-shown="false"]) {
+    @apply opacity-0;
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-axis"]) {
+    @apply fill-muted-foreground text-[11px] tabular-nums;
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-axis"][data-highlighted="true"]) {
+    @apply fill-foreground font-semibold;
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-bar"]) {
+    @apply [transition:opacity_var(--dur-fast)_var(--ease),transform_var(--dur-slow)_var(--ease)];
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-bar"][data-fill="solid"]) {
+    @apply fill-[var(--series)];
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-bar"][data-fill="outline"]) {
+    @apply fill-transparent stroke-[var(--series)] [stroke-width:1.25] [stroke-dasharray:3_2];
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-bar"][data-dimmed="true"]) {
+    @apply opacity-40;
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-column-hit"]) {
+    @apply fill-transparent;
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-column-hit"][data-hot="true"]) {
+    @apply fill-accent;
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-crosshair"]) {
+    @apply stroke-border [transition:opacity_var(--dur-fast)_var(--ease)];
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-crosshair"][data-on="true"]) {
+    @apply opacity-100;
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-crosshair"][data-on="false"]) {
+    @apply opacity-0;
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-grid"]) {
+    @apply stroke-border [stroke-width:1];
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-grid"][data-base="false"]) {
+    @apply [stroke-dasharray:2_3];
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-line"]) {
+    @apply fill-none stroke-[var(--series)] [stroke-linecap:round] [stroke-linejoin:round] [transition:opacity_var(--dur-base)_var(--ease),stroke-dashoffset_var(--dur-slow)_var(--ease)];
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-line"][data-weight="strong"]) {
+    @apply [stroke-width:2];
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-line"][data-weight="soft"]) {
+    @apply [stroke-width:1.5];
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-line"][data-shown="false"]) {
+    @apply opacity-0;
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-point"]) {
+    @apply fill-card stroke-[var(--series)] [stroke-width:1.75] [transition:opacity_var(--dur-fast)_var(--ease)];
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-point"][data-hot="true"]) {
+    @apply opacity-100;
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-point"][data-hot="false"]) {
+    @apply opacity-0;
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-skeleton-bar"]) {
+    @apply animate-pulse rounded-sm bg-muted;
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-skeleton"]) {
+    @apply gap-[6%];
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot"][data-loading="true"]) {
+    @apply [&>svg]:opacity-0;
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-swatch"]) {
+    @apply rounded-[2px] bg-[var(--series)];
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-swatch"][data-fill="hatch"]) {
+    @apply bg-[repeating-linear-gradient(45deg,var(--series)_0_2px,color-mix(in_oklch,var(--series)_45%,var(--card))_2px_3.5px)];
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-swatch"][data-fill="outline"]) {
+    @apply bg-transparent shadow-[inset_0_0_0_1.5px_var(--series)];
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-swatch"][data-fill="dot"]) {
+    @apply rounded-full;
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-tooltip-row"]) {
+    @apply gap-1.5 tabular-nums;
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="plot-tooltip"]) {
+    @apply gap-[3px] rounded-md bg-popover px-2.5 py-2 text-xs text-popover-foreground shadow-md border;
+  }
   :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="stat-card-body"]) {
     @apply mt-1 gap-3;
   }
@@ -303,6 +399,9 @@
   }
   :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="stat-card-icon"]) {
     @apply text-muted-foreground;
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="stat-card-skeleton"]) {
+    @apply h-6 w-14 animate-pulse rounded bg-muted;
   }
   :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="stat-card"]) {
     @apply h-full rounded-lg border px-4 py-3 text-card-foreground shadow-sm;
@@ -911,7 +1010,7 @@
     @apply mr-2 opacity-50;
   }
   :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="command-input"]) {
-    @apply rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:opacity-50;
+    @apply h-10 rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:opacity-50;
   }
   :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="command-input-wrapper"]) {
     @apply border-b px-3;
@@ -1486,11 +1585,14 @@
   :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="tabs-content"][data-padded="true"]) {
     @apply py-4;
   }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="tabs-ink"]) {
+    @apply hidden;
+  }
   :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="tabs-list"][data-variant="default"]) {
     @apply rounded-lg border border-input bg-card px-1 py-0.5 text-muted-foreground;
   }
   :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="tabs-list"][data-variant="full"]) {
-    @apply mt-3 rounded-lg border border-input bg-card px-1 py-0.5 text-muted-foreground;
+    @apply mt-3 h-9 justify-center rounded-lg border border-input bg-card px-1 py-0.5 text-muted-foreground [&>[role=tab]]:flex-1;
   }
   :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="tabs-list"][data-variant="bookmark"]) {
     @apply gap-0 px-2 shadow-[inset_0_-2px_0_0_var(--border)];
@@ -1954,6 +2056,9 @@
   :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="crud-list-empty-text"]) {
     @apply text-sm text-muted-foreground;
   }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="crud-list-group-count"]) {
+    @apply hidden;
+  }
   :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="crud-list-page-button"]) {
     @apply rounded-md border border-border bg-card text-xs font-medium text-secondary-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50;
   }
@@ -1971,6 +2076,12 @@
   }
   :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="crud-list-pagination-label"]) {
     @apply text-xs text-muted-foreground;
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="crud-list-pagination-lead"]) {
+    @apply gap-1;
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="crud-list-pagination-range"]) {
+    @apply hidden;
   }
   :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="crud-list-pagination"]) {
     @apply gap-2 border-t px-3.5 py-2.5;
@@ -2005,6 +2116,12 @@
   :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="crud-list-required-mark"]) {
     @apply text-destructive ml-0.5;
   }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="crud-list-search-icon"]) {
+    @apply hidden;
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="crud-list-search-key"]) {
+    @apply hidden;
+  }
   :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="crud-list-select-all"]) {
     @apply gap-2 text-sm text-muted-foreground;
   }
@@ -2022,6 +2139,9 @@
   }
   :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="crud-list-sort-icon"][data-sorted="false"]) {
     @apply opacity-30;
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="crud-list-sort-pair"]) {
+    @apply hidden;
   }
   :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="crud-list-view"]) {
     @apply duration-200;
@@ -3656,7 +3776,28 @@
     @apply gap-1;
   }
   :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="legend-toggle-swatch"]) {
-    @apply rounded-sm border-2 border-[var(--swatch)] bg-[var(--swatch)];
+    @apply size-2.5 rounded-sm border-2 border-[var(--swatch)] bg-[var(--swatch)];
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="legend-toggle-swatch"][data-fill="hatch"]) {
+    @apply bg-[repeating-linear-gradient(45deg,var(--swatch)_0_2px,color-mix(in_oklch,var(--swatch)_45%,var(--card))_2px_3.5px)];
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="legend-toggle-swatch"][data-fill="outline"]) {
+    @apply bg-transparent [border-style:dashed];
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="legend-toggle-swatch"][data-fill="dot"]) {
+    @apply rounded-full;
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="segmented-control-item"]) {
+    @apply h-8 px-3.5 text-sm font-medium text-muted-foreground [transition:color_var(--dur-fast)_var(--ease)] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm;
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="segmented-control-item"][data-selected="true"]) {
+    @apply text-foreground;
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="segmented-control"]) {
+    @apply rounded-md bg-muted p-0.5;
+  }
+  :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="segmented-control-thumb"]) {
+    @apply rounded-sm bg-background shadow-sm [transition:transform_var(--dur-slow)_var(--ease),width_var(--dur-slow)_var(--ease)];
   }
   :where(:root:not([data-design]), [data-design="classic"]) :where([data-slot="editor-footer"]) {
     @apply gap-4 border-t px-5 py-3;

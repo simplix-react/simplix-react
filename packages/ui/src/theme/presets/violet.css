@@ -1,6 +1,6 @@
 /* ===== Violet Theme — Premium / Creative ===== */
 
-[data-color-theme='violet'] {
+:root[data-color-theme='violet'] {
   /* Primary */
   --primary: oklch(0.606 0.25 292.717);
   --primary-foreground: oklch(0.985 0.003 293);
@@ -36,7 +36,7 @@
   --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
-[data-color-theme='violet'].dark {
+:root[data-color-theme='violet'].dark {
   /* Background — violet-tinted dark */
   --background: oklch(0.135 0.035 293);
   --foreground: oklch(0.984 0.003 293);

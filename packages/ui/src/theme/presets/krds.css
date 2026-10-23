@@ -3,7 +3,7 @@
  * sidebar), converted from HEX to oklch. Color identity only — typography,
  * spacing and fonts follow the neutral base. */
 
-[data-color-theme='krds'] {
+:root[data-color-theme='krds'] {
   /* Surfaces — grey page frame, white cards */
   --background: oklch(0.964 0.003 264.54);
   --card: oklch(1 0 0);
@@ -68,7 +68,7 @@
   --hatch-stroke: oklch(0.205 0.01 268.17);
 }
 
-[data-color-theme='krds'].dark {
+:root[data-color-theme='krds'].dark {
   /* Surfaces */
   --background: oklch(0.159 0.009 264.27);
   --card: oklch(0.204 0.013 264.23);

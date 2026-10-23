@@ -1,6 +1,6 @@
 /* ===== Graphite theme: accent, corner radius and typeface as one choice ===== */
 
-[data-color-theme='graphite'] {
+:root[data-color-theme='graphite'] {
   --radius: 2px;
   --font-sans: "IBM Plex Sans KR", "Pretendard Variable", ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-sans);
@@ -26,7 +26,7 @@
   --chart-1: oklch(0.3 0.015 265);
 }
 
-[data-color-theme='graphite'].dark {
+:root[data-color-theme='graphite'].dark {
   --primary: oklch(0.86 0.012 265);
   --primary-foreground: oklch(0.16 0.004 265);
   --primary-hover: oklch(0.92 0.01 265);

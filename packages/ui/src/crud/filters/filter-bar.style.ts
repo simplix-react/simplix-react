@@ -1,5 +1,14 @@
 import { defineSlotStyle } from "../../design/slot-style";
 
+/** The toolbar row itself, which holds the leading and the trailing group. */
+export const crudFilterBarStyle = defineSlotStyle({
+  slot: "crud-filter-bar",
+  as: "part",
+  base: "",
+  variants: {},
+  defaultVariants: {},
+});
+
 /**
  * The group at the start of the toolbar: count, caller content, view toggle and preview button.
  *

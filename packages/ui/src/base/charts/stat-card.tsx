@@ -9,17 +9,24 @@ import {
   statCardFooterStyle,
   statCardHeaderStyle,
   statCardIconStyle,
+  statCardSkeletonStyle,
   statCardStyle,
   statCardTitleStyle,
   statCardTrendStyle,
+  statCardUnitStyle,
   statCardValueStyle,
 } from "./stat-card.style";
 
 export interface StatCardProps {
   /** Card title shown above the value. */
   title: string;
-  /** Primary metric value. */
-  value: string | number;
+  /** Primary metric value; a node lets a caller draw it with `DigitRoll`. */
+  value: ReactNode;
+  /**
+   * The unit the figure is counted in, drawn beside the value as its own element so a design can
+   * set it smaller than the figure. Classic draws it in the figure's own type.
+   */
+  unit?: ReactNode;
   /** Optional supporting text below the value. */
   description?: string;
   /** Optional icon rendered in the header's trailing slot. */
@@ -42,6 +49,12 @@ export interface StatCardProps {
    * down a row of them stay in one column.
    */
   chart?: ReactNode;
+  /**
+   * Whether the figure is still being read. The figure is replaced by a placeholder of the same
+   * height, and the plot and the lines under it keep their room but are not drawn, so the card
+   * does not change size when the reading arrives.
+   */
+  loading?: boolean;
   /** Optional content rendered below the value/description block. */
   children?: ReactNode;
 }
@@ -62,6 +75,7 @@ export interface StatCardProps {
 export function StatCard({
   title,
   value,
+  unit,
   description,
   icon,
   headerExtra,
@@ -70,12 +84,14 @@ export function StatCard({
   highlighted = false,
   className,
   chart,
+  loading = false,
   children,
 }: StatCardProps) {
   const tones = useStatusTones();
   return (
     <div
       className={cn(highlighted && tone ? tones[tone].surface : undefined, className)}
+      aria-busy={loading || undefined}
       {...slotAttributes(statCardStyle, { tinted: highlighted && !!tone })}
     >
       {/* Three rows — what it is called, the figure, what the figure was read from — and the shape
@@ -89,15 +105,24 @@ export function StatCard({
         {icon && <span className="shrink-0" {...slotAttributes(statCardIconStyle, {})}>{icon}</span>}
       </div>
       <div className="flex items-end justify-between" {...slotAttributes(statCardBodyStyle, {})}>
-        <p className="min-w-0 truncate" {...slotAttributes(statCardValueStyle, {})}>{value}</p>
+        <p className="min-w-0 truncate" {...slotAttributes(statCardValueStyle, { tone: tone ?? "none" })}>
+          {loading ? (
+            <span aria-hidden className="inline-block align-bottom" {...slotAttributes(statCardSkeletonStyle, {})} />
+          ) : (
+            <>
+              {value}
+              {unit !== undefined && unit !== "" && <span {...slotAttributes(statCardUnitStyle, {})}>{unit}</span>}
+            </>
+          )}
+        </p>
         {/* 84px is the width the wireframe board draws a sparkline at, so a plot moved from a frame
             into a tile arrives at the size it was drawn. Nothing is rendered where there is no plot
             — the figure is left-aligned either way, so an empty box would reserve a column that
             already looks reserved, on the 94% of tiles that carry no plot at all. */}
-        {chart && <div className="w-[84px] shrink-0">{chart}</div>}
+        {chart && <div className={cn("w-[84px] shrink-0", loading && "invisible")}>{chart}</div>}
       </div>
       {(description || trend) && (
-        <div className="flex items-baseline justify-between" {...slotAttributes(statCardFooterStyle, {})}>
+        <div className={cn("flex items-baseline justify-between", loading && "invisible")} {...slotAttributes(statCardFooterStyle, {})}>
           {description ? (
             <p className="min-w-0" {...slotAttributes(statCardDescriptionStyle, {})}>{description}</p>
           ) : (
@@ -113,7 +138,7 @@ export function StatCard({
           )}
         </div>
       )}
-      {children}
+      {loading && children ? <div className="invisible">{children}</div> : children}
     </div>
   );
 }

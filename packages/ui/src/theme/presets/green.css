@@ -1,6 +1,6 @@
 /* ===== Green Theme — Finance / Analytics ===== */
 
-[data-color-theme='green'] {
+:root[data-color-theme='green'] {
   /* Primary */
   --primary: oklch(0.596 0.145 163.225);
   --primary-foreground: oklch(0.985 0.003 155);
@@ -36,7 +36,7 @@
   --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
-[data-color-theme='green'].dark {
+:root[data-color-theme='green'].dark {
   /* Background — green-tinted dark */
   --background: oklch(0.135 0.03 160);
   --foreground: oklch(0.984 0.003 155);
