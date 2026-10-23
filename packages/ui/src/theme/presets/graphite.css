@@ -27,9 +27,9 @@
 }
 
 [data-color-theme='graphite'].dark {
-  --primary: oklch(0.46 0.013 265);
+  --primary: oklch(0.86 0.012 265);
   --primary-foreground: oklch(0.16 0.004 265);
-  --primary-hover: oklch(0.52 0.013 265);
+  --primary-hover: oklch(0.92 0.01 265);
   --primary-soft: oklch(0.27 0.004 265);
   --primary-soft-2: oklch(0.33 0.006 265);
   --lead: oklch(0.32 0.013 265);
@@ -37,6 +37,6 @@
   --secondary: oklch(0.26 0.002 265);
   --muted: oklch(0.26 0.002 265);
   --accent: oklch(0.28 0.003 265);
-  --ring: oklch(0.46 0.013 265);
-  --chart-1: oklch(0.46 0.013 265);
+  --ring: oklch(0.86 0.012 265);
+  --chart-1: oklch(0.86 0.012 265);
 }
