@@ -3709,13 +3709,13 @@
     @apply border-t pt-3 border-[var(--border)];
   }
   :where([data-part="crud-detail-action-footer"])[data-part][data-p-crud-detail-action-footer] {
-    @apply border-t px-4 pt-3 pb-3 border-[var(--border)];
+    @apply border-t px-4 pt-3 pb-3 border-[var(--border)] [&_[data-slot=button][data-size=sm]]:h-8 [&_[data-slot=button][data-size=sm]]:px-3 [&_[data-slot=button][data-size=sm]]:text-[13px];
   }
   :where([data-part="crud-detail-actions-group"])[data-part][data-p-crud-detail-actions-group] {
     @apply ml-auto flex-1 justify-end [&>[data-variant=destructive]]:order-first [&>[data-variant=destructive]]:mr-auto [&>[data-action=delete]]:order-first [&>[data-action=delete]]:mr-auto;
   }
   :where([data-part="crud-detail-actions"])[data-part][data-p-crud-detail-actions] {
-    @apply border-t px-4 pt-3 pb-3 border-[var(--border)] [&_[data-slot=button][data-variant=destructive]]:bg-transparent [&_[data-slot=button][data-variant=destructive]]:text-[var(--destructive-text)] [&_[data-slot=button][data-variant=destructive]]:shadow-none [&_[data-slot=button][data-variant=destructive]:focus-visible]:shadow-[var(--focus-halo)] [&_[data-slot=button][data-variant=destructive]:hover]:bg-[var(--danger-soft)];
+    @apply border-t px-4 pt-3 pb-3 border-[var(--border)] [&_[data-slot=button][data-variant=destructive]]:bg-transparent [&_[data-slot=button][data-variant=destructive]]:text-[var(--destructive-text)] [&_[data-slot=button][data-variant=destructive]]:shadow-none [&_[data-slot=button][data-variant=destructive]:focus-visible]:shadow-[var(--focus-halo)] [&_[data-slot=button][data-variant=destructive]:hover]:bg-[var(--danger-soft)] [&_[data-slot=button][data-size=sm]]:h-8 [&_[data-slot=button][data-size=sm]]:px-3 [&_[data-slot=button][data-size=sm]]:text-[13px];
   }
   :where([data-part="crud-detail-actions"][data-part-spread="true"])[data-part][data-p-crud-detail-actions] {
     @apply [&>*:first-child]:mr-auto;
@@ -3751,7 +3751,7 @@
     @apply gap-2 border-b border-[var(--border)] px-3 py-2.5;
   }
   :where([data-part="crud-form-actions"])[data-part][data-p-crud-form-actions] {
-    @apply border-t gap-1.5 border-[var(--border)] py-3;
+    @apply border-t gap-1.5 border-[var(--border)] py-3 [&_[data-slot=button][data-size=sm]]:h-8 [&_[data-slot=button][data-size=sm]]:px-3 [&_[data-slot=button][data-size=sm]]:text-[13px];
   }
   :where([data-part="crud-form-actions"][data-part-spread="true"])[data-part][data-p-crud-form-actions] {
     @apply [&>*:first-child]:mr-auto;
@@ -4479,6 +4479,9 @@
   :where([data-slot="dialog-corner-button"][data-close="true"])[data-s-dialog-corner-button] {
     @apply data-[state=open]:bg-accent data-[state=open]:text-muted-foreground;
   }
+  :where([data-slot="dialog-footer"])[data-s-dialog-footer] {
+    @apply [&_[data-slot=button][data-size=sm]]:h-8 [&_[data-slot=button][data-size=sm]]:px-3 [&_[data-slot=button][data-size=sm]]:text-[13px];
+  }
   :where([data-slot="dialog-overlay"])[data-s-dialog-overlay] {
     @apply data-[state=closed]:duration-[var(--dur-base)];
   }
@@ -4490,6 +4493,9 @@
   }
   :where([data-slot="sheet-content"])[data-s-sheet-content] {
     @apply data-[state=open]:duration-[var(--dur-slow)] data-[state=closed]:duration-[var(--dur-base)] data-[state=closed]:ease-[var(--ease)] focus:outline-none;
+  }
+  :where([data-slot="sheet-footer"])[data-s-sheet-footer] {
+    @apply [&_[data-slot=button][data-size=sm]]:h-8 [&_[data-slot=button][data-size=sm]]:px-3 [&_[data-slot=button][data-size=sm]]:text-[13px];
   }
   :where([data-slot="tooltip-content"])[data-s-tooltip-content] {
     @apply data-[state=closed]:ease-[var(--ease)];
@@ -4709,6 +4715,9 @@
   }
   :where([data-slot="alert-panel-content"])[data-s-alert-panel-content] {
     @apply data-[state=closed]:duration-[var(--dur-base)] data-[state=closed]:ease-[var(--ease)] sm:data-[state=open]:[--tw-enter-scale:0.97]! sm:data-[state=open]:[--tw-enter-translate-y:8px]! sm:data-[state=closed]:[--tw-exit-scale:0.98]!;
+  }
+  :where([data-slot="alert-panel-footer"])[data-s-alert-panel-footer] {
+    @apply [&_[data-slot=button][data-size=sm]]:h-8 [&_[data-slot=button][data-size=sm]]:px-3 [&_[data-slot=button][data-size=sm]]:text-[13px];
   }
   :where([data-slot="alert-panel-overlay"])[data-s-alert-panel-overlay] {
     @apply data-[state=closed]:duration-[var(--dur-base)];

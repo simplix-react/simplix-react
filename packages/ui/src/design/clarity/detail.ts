@@ -48,7 +48,7 @@ export const detailSlots: Record<string, string> = {
   // cool shadow.
   "crud-detail-footer overflow=true": "shadow-[0_-8px_12px_-12px_oklch(0.2_0.03_265/0.45)]",
   "crud-detail-actions":
-    "border-[var(--border)] [&_[data-slot=button][data-variant=destructive]]:bg-transparent [&_[data-slot=button][data-variant=destructive]]:text-[var(--destructive-text)] [&_[data-slot=button][data-variant=destructive]]:shadow-none [&_[data-slot=button][data-variant=destructive]:focus-visible]:shadow-[var(--focus-halo)] [&_[data-slot=button][data-variant=destructive]:hover]:bg-[var(--danger-soft)]",
-  "crud-detail-action-footer": "border-[var(--border)]",
+    "border-[var(--border)] [&_[data-slot=button][data-variant=destructive]]:bg-transparent [&_[data-slot=button][data-variant=destructive]]:text-[var(--destructive-text)] [&_[data-slot=button][data-variant=destructive]]:shadow-none [&_[data-slot=button][data-variant=destructive]:focus-visible]:shadow-[var(--focus-halo)] [&_[data-slot=button][data-variant=destructive]:hover]:bg-[var(--danger-soft)] [&_[data-slot=button][data-size=sm]]:h-8 [&_[data-slot=button][data-size=sm]]:px-3 [&_[data-slot=button][data-size=sm]]:text-[13px]",
+  "crud-detail-action-footer": "border-[var(--border)] [&_[data-slot=button][data-size=sm]]:h-8 [&_[data-slot=button][data-size=sm]]:px-3 [&_[data-slot=button][data-size=sm]]:text-[13px]",
   "crud-detail-action-footer-row": "border-[var(--border)]",
 };

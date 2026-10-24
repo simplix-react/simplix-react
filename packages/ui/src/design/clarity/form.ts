@@ -82,7 +82,8 @@ export const formSlots: Record<string, string> = {
   "crud-form-footer": "transition-shadow duration-[var(--dur-base)] ease-[var(--ease)]",
   "crud-form-footer page=false": "px-4",
   "crud-form-footer overflow=true": "relative z-[1] shadow-[0_-8px_12px_-12px_oklch(0.2_0.03_265/0.45)]",
-  "crud-form-actions": "gap-1.5 border-[var(--border)] py-3",
+  // Footer and dialog action buttons are one height, 32px, in every footer.
+  "crud-form-actions": "gap-1.5 border-[var(--border)] py-3 [&_[data-slot=button][data-size=sm]]:h-8 [&_[data-slot=button][data-size=sm]]:px-3 [&_[data-slot=button][data-size=sm]]:text-[13px]",
 
   // ── Dialogs, alert panels and sheets: the bands, spacing and motion are the shared declarations;
   // clarity draws them as a card on the tinted scrim with a 17/650 title, hairlines in --border
@@ -93,7 +94,7 @@ export const formSlots: Record<string, string> = {
   "dialog-header scrolled=true": "shadow-[0_8px_12px_-12px_oklch(0.2_0.03_265/0.45)]",
   "dialog-title": "text-[17px] font-[650] tracking-[-0.02em]",
   "dialog-description": "text-[13.5px] leading-5 text-secondary-foreground",
-  "dialog-footer": "border-[var(--border)] bg-[var(--surface-2)]",
+  "dialog-footer": "border-[var(--border)] bg-[var(--surface-2)] [&_[data-slot=button][data-size=sm]]:h-8 [&_[data-slot=button][data-size=sm]]:px-3 [&_[data-slot=button][data-size=sm]]:text-[13px]",
   "dialog-footer overflow=true": "shadow-[0_-8px_12px_-12px_oklch(0.2_0.03_265/0.45)]",
   "dialog-corner-button": "rounded-[var(--radius-control)] text-muted-foreground opacity-100 hover:bg-[var(--hover-bg-strong)] hover:text-foreground",
 
@@ -102,7 +103,7 @@ export const formSlots: Record<string, string> = {
   "alert-panel-title": "text-[17px] font-[650] tracking-[-0.02em] border-[var(--border)]",
   "alert-panel-title scrolled=true": "shadow-[0_8px_12px_-12px_oklch(0.2_0.03_265/0.45)]",
   "alert-panel-description": "text-[13.5px] leading-[1.6] text-secondary-foreground whitespace-pre-line",
-  "alert-panel-footer": "border-[var(--border)] bg-[var(--surface-2)]",
+  "alert-panel-footer": "border-[var(--border)] bg-[var(--surface-2)] [&_[data-slot=button][data-size=sm]]:h-8 [&_[data-slot=button][data-size=sm]]:px-3 [&_[data-slot=button][data-size=sm]]:text-[13px]",
   "alert-panel-footer overflow=true": "shadow-[0_-8px_12px_-12px_oklch(0.2_0.03_265/0.45)]",
   "alert-panel-cancel": "rounded-[var(--radius-control)] text-[13px] transition-[background-color,box-shadow,transform] duration-[var(--dur-fast)] ease-[var(--ease)] focus-visible:ring-0 focus-visible:shadow-[var(--focus-halo)] border-[var(--border-strong)] bg-card shadow-[var(--shadow-1)] hover:bg-[var(--surface-2)] hover:text-foreground",
   "alert-panel-action": "rounded-[var(--radius-control)] text-[13px] transition-[background-color,box-shadow,transform] duration-[var(--dur-fast)] ease-[var(--ease)] focus-visible:ring-0 focus-visible:shadow-[var(--focus-halo)] shadow-[var(--shadow-btn)] hover:bg-[var(--primary-hover)]",
@@ -114,7 +115,7 @@ export const formSlots: Record<string, string> = {
   "sheet-header": "border-[var(--border)]",
   "sheet-title": "text-[17px] font-[650] tracking-[-0.02em]",
   "sheet-description": "text-[13.5px] text-secondary-foreground",
-  "sheet-footer": "border-[var(--border)] bg-[var(--surface-2)]",
+  "sheet-footer": "border-[var(--border)] bg-[var(--surface-2)] [&_[data-slot=button][data-size=sm]]:h-8 [&_[data-slot=button][data-size=sm]]:px-3 [&_[data-slot=button][data-size=sm]]:text-[13px]",
 
   // ── Toasts: the dark strong overlay, a tinted glyph, a spring in and a slide out ──
   toast: "rounded-[var(--radius-overlay)] border-0 bg-[var(--popover-strong)] py-2.5 ps-3.5 pe-2 text-[var(--popover-strong-foreground)] shadow-[var(--shadow-3)] backdrop-blur-none duration-[var(--dur-base)] ease-[var(--ease-spring)]",
