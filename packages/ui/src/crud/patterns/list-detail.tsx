@@ -43,6 +43,8 @@ export interface ListDetailContextValue {
   activePanel: "list" | "detail";
   setActivePanel: (panel: "list" | "detail") => void;
   dialogHeight?: string;
+  /** The detail's width in px, which the drawer and the dialog cap themselves at as the panel does. */
+  detailWidth?: number;
 }
 
 const ListDetailContext = createContext<ListDetailContextValue>({
@@ -248,7 +250,7 @@ export function ListDetailRoot({ variant: variantProp, activePanel: activePanelP
   }, []);
   const handleDragEnd = useCallback(() => setIsDragging(false), []);
 
-  const contextValue: ListDetailContextValue = { variant, activePanel, setActivePanel, dialogHeight };
+  const contextValue: ListDetailContextValue = { variant, activePanel, setActivePanel, dialogHeight, detailWidth };
 
   const effectiveListWidth = dragListWidth ?? listWidth;
   const roomForDetail = sectionWidth != null ? sectionWidth - DIVIDER_TRACK - MIN_PANEL_WIDTH : null;
@@ -533,7 +535,7 @@ ListPanel.displayName = "ListDetail.List";
 //   pointer-events-none              └────────────────────────────┘
 
 const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }, ref) => {
-  const { variant, activePanel, dialogHeight } = useListDetail();
+  const { variant, activePanel, dialogHeight, detailWidth = DETAIL_PANEL_WIDTH } = useListDetail();
   const { t } = useTranslation("simplix/ui");
 
   if (variant === "drawer") {
@@ -565,8 +567,9 @@ const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }
         // fitted the least. The inline `maxWidth` below replaces it; an inline style outranks any
         // class, so nothing has to be unset here.
         // `w-3/4` from the sheet still governs below the `sm` breakpoint, where three quarters of
-        // a phone is the right answer and 768 is not; this caps it everywhere above.
-        style={{ maxWidth: DETAIL_PANEL_WIDTH }}
+        // a phone is the right answer and 768 is not; this caps it everywhere above, at the same
+        // width the panel gives the detail, so a screen that widens its detail widens it in all three.
+        style={{ maxWidth: detailWidth }}
       >
         <DialogPrimitive.Title className="sr-only">{t("common.detail")}</DialogPrimitive.Title>
         {/* The same slot padding the dialog variant pushes down, for the same reason: the header
@@ -590,7 +593,7 @@ const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }
         flush
         showCloseButton={false}
         className={cn("overflow-hidden sm:max-w-[var(--detail-dialog-width)]", !dialogHeight && "max-h-[85vh]", className)}
-        style={{ "--detail-dialog-width": `${DETAIL_PANEL_WIDTH}px`, ...(dialogHeight ? { height: dialogHeight } : {}) } as React.CSSProperties}
+        style={{ "--detail-dialog-width": `${detailWidth}px`, ...(dialogHeight ? { height: dialogHeight } : {}) } as React.CSSProperties}
       >
         <DialogPrimitive.Title className="sr-only">{t("common.detail")}</DialogPrimitive.Title>
         {children}
