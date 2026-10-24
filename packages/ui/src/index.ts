@@ -375,6 +375,8 @@ export type {
 export { CrudForm, SaveButton, useAutosave, useBeforeUnload, useCrudFormSubmit, useIsDirty, useUnsavedChanges, Wizard } from "./crud/form";
 export { adaptOrvalCreate, adaptOrvalDelete, adaptOrvalOrder, adaptOrvalUpdate, useInvalidateEntity } from "./crud/form";
 export { groupValidationErrors } from "./crud/form/group-validation-errors";
+export { prepareValues } from "./crud/form";
+export type { DeclaredFields, I18nFieldPairs } from "./crud/form";
 export type {
   AutosaveStatus,
   CrudFormActionsProps,
@@ -795,3 +797,14 @@ export type { RemoteConfigQueryDef } from "./config";
 // values ship in theme.css / theme/presets/*.css; this only enumerates them.
 export { THEMES } from "./theme/manifest";
 export type { ColorTheme } from "./theme/manifest";
+
+// ── Entity pickers, forced lists and the server error store ──
+export { createEntityFacet } from "./crud/entity/entity-facet";
+export type { EntityFacet, EntityFacetConfig } from "./crud/entity/entity-facet";
+export { createEntityOptions, shortEntityId } from "./crud/entity/entity-options";
+export type { EntityOption, EntityOptionsConfig } from "./crud/entity/entity-options";
+export { createEntitySearch } from "./crud/entity/entity-search";
+export type { EntitySearch, EntitySearchConfig } from "./crud/entity/entity-search";
+export { adaptForcedList, filtersOutsideForced, forcedScope, withForced } from "./crud/entity/forced-list";
+export type { UnderForced } from "./crud/entity/forced-list";
+export { dismissAllErrors, dismissError, dispatchError, useErrorStore } from "./hooks/error-store";

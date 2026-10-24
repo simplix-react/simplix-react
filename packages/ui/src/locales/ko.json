@@ -54,7 +54,7 @@
     "noResults": "결과 없음",
     "totalCount": "전체 {{count, number}}건",
     "totalCountUnknown": "전체 —건",
-    "rows": "행:",
+    "rows": "페이지당",
     "viewList": "목록",
     "viewGrid": "그리드",
     "preview": "미리보기",
@@ -73,7 +73,7 @@
     "resizeColumn": "열 너비 조절"
   },
   "filter": {
-    "label": "검색",
+    "label": "필터",
     "apply": "적용",
     "clearFilter": "필터 지우기",
     "clearFilters": "필터 지우기",

@@ -463,4 +463,28 @@ describe("useCrudList", () => {
       expect(result.current.data).toHaveLength(5);
     });
   });
+
+  describe("client mode filters", () => {
+    const rows = [
+      { id: 1, name: "김안전", role: "SAFETY" },
+      { id: 2, name: "조보건", role: "HEALTH" },
+      { id: 3, name: "최감독", role: "SUPERVISOR" },
+    ];
+
+    it("narrows by a filter bar's field.operator key", () => {
+      const { result } = renderHook(() =>
+        useCrudList(createMockListHook(rows), { stateMode: "client", filterMode: "immediate" }),
+      );
+      act(() => result.current.filters.setValue("name.contains", "보건"));
+      expect(result.current.data.map((row) => row.id)).toEqual([2]);
+    });
+
+    it("narrows by a chip row's array", () => {
+      const { result } = renderHook(() =>
+        useCrudList(createMockListHook(rows), { stateMode: "client", filterMode: "immediate" }),
+      );
+      act(() => result.current.filters.setValue("role.in", ["SAFETY", "SUPERVISOR"]));
+      expect(result.current.data.map((row) => row.id)).toEqual([1, 3]);
+    });
+  });
 });

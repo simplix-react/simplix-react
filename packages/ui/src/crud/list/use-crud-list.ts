@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 
-import { resolveEmptyReason, type ListHook, type ListHookResult } from "@simplix-react/headless";
+import { matchesFilter, resolveEmptyReason, type ListHook, type ListHookResult } from "@simplix-react/headless";
 
 import type { EmptyReason, SortState } from "../shared/types";
 
@@ -352,12 +352,9 @@ export function useCrudList<T>(
 
     // Apply filter values
     for (const [key, val] of Object.entries(committedFilterValues)) {
-      if (val !== undefined && val !== null && val !== "") {
-        filtered = filtered.filter((item) => {
-          const record = item as Record<string, unknown>;
-          return record[key] === val;
-        });
-      }
+      // A filter bar commits `field.operator` keys and a chip row commits arrays; both narrow the
+      // rows here exactly as a server reading the same key would.
+      filtered = filtered.filter((item) => matchesFilter(item as Record<string, unknown>, key, val));
     }
 
     // Apply sort
