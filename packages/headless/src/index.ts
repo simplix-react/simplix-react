@@ -100,3 +100,26 @@ export { generateLocalId } from "./local-id";
 // ── Theme registry ──
 export { THEMES } from "./theme-manifest";
 export type { ColorTheme } from "./theme-manifest";
+
+// ── Application helpers: zones and dates, clipboard, list and form state ──
+export { APP_TIME_ZONE, configureAppTimeZone, getAppTimeZone, useAppTimeZone } from "./datetime/app-timezone";
+export { browserZoneLabel, withBrowserZone, zoneLabel } from "./datetime/browser-zone-label";
+export { daysUntilDay } from "./datetime/days-until";
+export { elapsedSpan, elapsedSpanBetween, elapsedSpanOf } from "./datetime/elapsed-span";
+export type { ElapsedSpan, ElapsedUnit } from "./datetime/elapsed-span";
+export { periodStanding } from "./datetime/period-distance";
+export type { PeriodStanding } from "./datetime/period-distance";
+export { calendarDayLabel, pickedCalendarDay, zoneCalendarDate, zoneDayRange, zoneDayShifted, zoneDayStartInstant, zoneLastDaysRange, zoneMonthRange, zonePickedDayRange, zonePickedMonthRange, zonePickedWeekRange, zoneWeekRange } from "./datetime/zone-bounds";
+export type { CalendarDayStyle, ZoneInstantRange } from "./datetime/zone-bounds";
+export { isSameZoneDay, timeAtOrAfter, timePlusHours, zoneClockOf, zoneDateTimeText, zoneDayOf, zoneInstantAt, zoneInstantOnDayOf, zoneTimeOf } from "./datetime/zone-time";
+export { copyText } from "./clipboard/copy-text";
+export type { CopyOutcome } from "./clipboard/copy-text";
+export { installClipboardFallback } from "./clipboard/install-clipboard-fallback";
+export { missingRequired } from "./entity/missing-required";
+export { paginationHandlers } from "./entity/pagination-handlers";
+export type { PaginationHandlers } from "./entity/pagination-handlers";
+export { useDebouncedValue } from "./entity/use-debounced-value";
+export { useOnline } from "./entity/use-online";
+
+// ── In-memory filtering ──
+export { matchesFilter } from "./client-filter";

@@ -23,3 +23,12 @@ export {
   useFormattedDateTime,
   useFormattedRelative,
 } from "./use-datetime.js";
+
+// ── Content language, grouped figures and optional translations ──
+export { useContentEditLanguage, useI18nEditLanguage } from "./edit-language.js";
+export type { I18nEditLanguage } from "./edit-language.js";
+export { useGroupedFigure } from "./grouped-figure.js";
+export { useOptionalTranslation } from "./optional-translation.js";
+export type { OptionalTranslation } from "./optional-translation.js";
+export { contentLanguageDualName, contentLanguageLabel, contentLanguageNames, useContentLanguageLabel, useContentLanguageNames } from "./content-language.js";
+export { countedFigure } from "./counted-figure.js";

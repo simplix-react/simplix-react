@@ -176,3 +176,6 @@ export {
   classifyError,
   createMutationErrorHandler,
 } from "./error-utils.js";
+
+// ── Read failures ──
+export { recordIsAbsent, recordIsOutOfScope } from "./read-failed.js";

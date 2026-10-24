@@ -19,3 +19,7 @@ export type { MockResult } from "./mock-result.js";
 
 // Tree builder
 export { buildEmbeddedTree, buildTreeFromFlatRows } from "./tree-builder.js";
+
+// ── Stopping a stale mock worker ──
+export { stopMocking } from "./stop-mocking.js";
+export type { StopMockingOptions } from "./stop-mocking.js";

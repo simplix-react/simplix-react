@@ -38,3 +38,7 @@ export { createCrossTabSync } from "./helpers/cross-tab-sync.js";
 export type { CrossTabSyncOptions } from "./helpers/cross-tab-sync.js";
 export { openOAuth2Popup } from "./helpers/oauth2-popup.js";
 export type { OAuth2PopupOptions, OAuth2PopupResult } from "./helpers/oauth2-popup.js";
+
+// ── Remember-me token storage ──
+export { createRememberMe } from "./remember-me.js";
+export type { RememberMe } from "./remember-me.js";
