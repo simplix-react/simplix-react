@@ -42,7 +42,7 @@ export const wizardStepDescriptionStyle = defineSlotStyle({
 /** The line between two step markers. */
 export const wizardStepConnectorStyle = defineSlotStyle({
   slot: "wizard-step-connector",
-  base: "mx-3",
+  base: "",
   variants: { done: { true: "bg-primary", false: "bg-muted-foreground/30" } },
   defaultVariants: { done: false },
 });

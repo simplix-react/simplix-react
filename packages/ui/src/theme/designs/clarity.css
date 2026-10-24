@@ -1681,9 +1681,6 @@
   [data-slot="wizard-previous"][data-slot][data-s-wizard-previous] {
     @apply rounded-[var(--radius-control)] border px-4 py-2 text-sm font-medium transition-colors duration-[var(--dur-fast)] ease-[var(--ease)];
   }
-  [data-slot="wizard-step-connector"][data-slot][data-s-wizard-step-connector] {
-    @apply mx-3;
-  }
   [data-slot="wizard-step-connector"][data-done="true"][data-s-wizard-step-connector] {
     @apply bg-primary;
   }

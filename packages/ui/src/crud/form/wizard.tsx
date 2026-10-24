@@ -57,6 +57,13 @@ export interface StepIndicatorProps {
   rejectedStep?: number;
   /** Names the list for assistive technology; the wizard's own label when absent. */
   label?: string;
+  /**
+   * `horizontal` (the wizard's) runs the steps along one line; `vertical` stacks them down a rule,
+   * for a side column where a long chain would otherwise run past its box.
+   *
+   * @default "horizontal"
+   */
+  orientation?: "horizontal" | "vertical";
 }
 
 /**
@@ -64,18 +71,19 @@ export interface StepIndicatorProps {
  * the done steps ticked, the one in hand filled, the rest outlined, so the order and the place in
  * it read at a glance. One line that scrolls sideways when it is wider than its box.
  */
-export function StepIndicator({ steps, currentStep, rejectedStep, label }: StepIndicatorProps) {
+export function StepIndicator({ steps, currentStep, rejectedStep, label, orientation = "horizontal" }: StepIndicatorProps) {
   const { t } = useTranslation("simplix/ui");
+  const vertical = orientation === "vertical";
   return (
-    <nav aria-label={label ?? t("wizard.steps")} className="min-w-0 overflow-x-auto">
-      <ol className="flex items-center" {...slotAttributes(wizardStepsStyle, {})}>
+    <nav aria-label={label ?? t("wizard.steps")} className={vertical ? "min-w-0" : "min-w-0 overflow-x-auto"}>
+      <ol className={vertical ? "flex flex-col" : "flex items-center"} {...slotAttributes(wizardStepsStyle, {})}>
         {steps.map((step, index) => {
           const isRejected = index === rejectedStep;
           const isActive = index === currentStep && !isRejected;
           const isCompleted = index < currentStep && !isRejected;
 
           return (
-            <li key={`${index}-${step.title}`} className="flex shrink-0 items-center">
+            <li key={`${index}-${step.title}`} className={vertical ? "flex flex-col" : "flex shrink-0 items-center"}>
               <Flex gap="xs" align="center">
                 <span
                   className="inline-flex h-8 w-8 items-center justify-center"
@@ -104,7 +112,7 @@ export function StepIndicator({ steps, currentStep, rejectedStep, label }: StepI
                     index + 1
                   )}
                 </span>
-                <Stack gap="none" className="min-w-0 whitespace-nowrap">
+                <Stack gap="none" className={vertical ? "min-w-0" : "min-w-0 whitespace-nowrap"}>
                   <span
                     {...slotAttributes(wizardStepTitleStyle, { active: isActive })}
                   >
@@ -119,7 +127,8 @@ export function StepIndicator({ steps, currentStep, rejectedStep, label }: StepI
               </Flex>
               {index < steps.length - 1 && (
                 <span
-                  className="h-px w-8 flex-shrink-0"
+                  // Vertical: a rule down from the centre of the 32px marker to the next one.
+                  className={vertical ? "my-1 ml-4 h-5 w-px flex-shrink-0" : "mx-3 h-px w-8 flex-shrink-0"}
                   {...slotAttributes(wizardStepConnectorStyle, { done: index < currentStep })}
                   aria-hidden="true"
                 />
