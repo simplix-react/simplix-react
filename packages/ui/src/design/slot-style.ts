@@ -36,6 +36,27 @@ export function defineSlotStyle<V extends SlotVariants>(style: SlotStyle<V>): Sl
   return style;
 }
 
+/**
+ * Prefix of the attribute naming one slot (`data-s-button`), and of the one naming one part.
+ *
+ * <p>Safari files a style rule under the last attribute name in its rightmost compound and checks
+ * an element only against the rules filed under the attributes it carries. Keyed on `data-slot`
+ * alone, every rule of every slot is filed under that one name and checked against every slot
+ * element on every style update; keyed on an attribute per slot, an element meets only its own
+ * slot's rules.
+ */
+export const SLOT_KEY = "data-s-";
+/** See {@link SLOT_KEY}. */
+export const PART_KEY = "data-p-";
+
+/**
+ * Whether an attribute name is one of those {@link partAttributes} writes, for a component that
+ * passes a caller's part attributes on to the element that draws the part.
+ */
+export function isPartAttribute(name: string): boolean {
+  return name.startsWith("data-part") || name.startsWith(PART_KEY);
+}
+
 /** A variant prop as the caller passes it: a value name, or a boolean for a true/false axis. */
 type AxisValue = string | boolean | null | undefined;
 
@@ -44,13 +65,14 @@ type AxisValue = string | boolean | null | undefined;
  *
  * @param style - the slot's declaration
  * @param props - the caller's variant values; an absent one takes the declared default
- * @returns `data-slot` plus `data-<axis>` for every declared axis
+ * @returns `data-slot`, `data-s-<slot>` and `data-<axis>` for every declared axis
  */
 export function slotAttributes<V extends SlotVariants>(
   style: SlotStyle<V>,
   props: { [K in keyof V]?: AxisValue },
 ): Record<string, string> {
-  const attributes: Record<string, string> = { "data-slot": style.slot };
+  // data-s-<slot> is the attribute the design stylesheets key each rule on; see SLOT_KEY.
+  const attributes: Record<string, string> = { "data-slot": style.slot, [`${SLOT_KEY}${style.slot}`]: "" };
   for (const axis of Object.keys(style.variants)) {
     const given = props[axis as keyof V];
     const value = given ?? style.defaultVariants[axis as keyof V];
@@ -70,13 +92,13 @@ export function slotAttributes<V extends SlotVariants>(
  *
  * @param style - the declaration of how the part looks in this place
  * @param props - the caller's variant values; an absent one takes the declared default
- * @returns `data-part` plus `data-part-<axis>` for every declared axis
+ * @returns `data-part`, `data-p-<part>` and `data-part-<axis>` for every declared axis
  */
 export function partAttributes<V extends SlotVariants>(
   style: SlotStyle<V>,
   props: { [K in keyof V]?: AxisValue },
 ): Record<string, string> {
-  const attributes: Record<string, string> = { "data-part": style.slot };
+  const attributes: Record<string, string> = { "data-part": style.slot, [`${PART_KEY}${style.slot}`]: "" };
   for (const axis of Object.keys(style.variants)) {
     const given = props[axis as keyof V];
     const value = given ?? style.defaultVariants[axis as keyof V];

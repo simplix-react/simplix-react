@@ -2,7 +2,7 @@ import { type VariantProps, cva } from "class-variance-authority";
 import { Children, cloneElement, type ComponentPropsWithRef, forwardRef, isValidElement, type ReactNode } from "react";
 
 import { createSelfResolving } from "../provider/self-resolving";
-import { slotAttributes, slotClassNames } from "../design/slot-style";
+import { isPartAttribute, slotAttributes, slotClassNames } from "../design/slot-style";
 import { cn } from "../utils/cn";
 import { gridStyle } from "./grid.style";
 
@@ -234,8 +234,8 @@ export const GridBase = forwardRef<HTMLDivElement, GridProps>(
 
       // A caller's part attributes mark the element that draws the grid, so they go to the inner
       // grid with its className rather than to the container-query wrapper.
-      const outerProps = Object.fromEntries(Object.entries(rest).filter(([key]) => !key.startsWith("data-part")));
-      const partProps = Object.fromEntries(Object.entries(rest).filter(([key]) => key.startsWith("data-part")));
+      const outerProps = Object.fromEntries(Object.entries(rest).filter(([key]) => !isPartAttribute(key)));
+      const partProps = Object.fromEntries(Object.entries(rest).filter(([key]) => isPartAttribute(key)));
       return (
         <div ref={ref} className="@container" style={style} {...outerProps}>
           <div className={cn("relative grid", colClass, className)} {...partProps} {...look}>
