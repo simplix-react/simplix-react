@@ -211,7 +211,7 @@ export const GridBase = forwardRef<HTMLDivElement, GridProps>(
     const showDivider = divider && cols > 1 && !template && (!isResponsive || cols === 2);
     const ruleGap = RULE_GAPS.has(dividerGap) ? dividerGap : "md";
     const rule = showDivider ? (isResponsive ? `${ruleGap}-collapsing` : ruleGap) : undefined;
-    const look = slotAttributes(gridStyle, { gap: gapKey, gapX, gapY, rule });
+    const look = slotAttributes(gridStyle, { gap: gapKey, gapx: gapX, gapy: gapY, rule });
 
     // An explicit grid-template-columns string overrides the columns enum and
     // responsive container-query path; apply it as an inline style.

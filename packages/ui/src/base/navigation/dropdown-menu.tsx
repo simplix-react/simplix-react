@@ -38,7 +38,7 @@ export const DropdownMenuSub = DropdownMenuPrimitive.Sub;
 // package's stylesheet, so they stay on the element: the generated design stylesheet cannot
 // @apply a utility that is not defined where it is compiled.
 const PANEL_MOTION =
-  "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2";
+  "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[side=bottom]:slide-in-from-top-1 data-[side=left]:slide-in-from-right-1 data-[side=right]:slide-in-from-left-1 data-[side=top]:slide-in-from-bottom-1 data-[state=closed]:data-[side=bottom]:slide-out-to-top-1 data-[state=closed]:data-[side=top]:slide-out-to-bottom-1 data-[state=closed]:data-[side=left]:slide-out-to-right-1 data-[state=closed]:data-[side=right]:slide-out-to-left-1";
 
 // Content
 export type DropdownMenuContentProps = ComponentPropsWithRef<

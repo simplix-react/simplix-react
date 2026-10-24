@@ -12,7 +12,9 @@ export const tabsListStyle = defineSlotStyle({
       // computed to `auto` as well, and that 1px of bottom overflow paints a scrollbar.
       // `items-center` keeps the trigger exactly where `p-1` rendered it.
       default: "rounded-lg border border-input bg-card px-1 py-0.5 text-muted-foreground",
-      full: "mt-3 h-9 justify-center rounded-lg border border-input bg-card px-1 py-0.5 text-muted-foreground [&>[role=tab]]:flex-1",
+      // The page's own tab strip: tabs standing on a hairline from the start, the chosen one marked
+      // by the ink that slides under it.
+      full: "mt-0 h-auto justify-start gap-0.5 p-0 text-muted-foreground shadow-[inset_0_-1px_0_0_var(--border)] [&>[role=tab]]:flex-none",
       // Bottom-baseline track for the `bookmark` list variant. The line is an inset shadow (not a
       // border) so the active tab's `bg-card` covers it without relying on overflow - the cutout
       // survives `overflow-x-auto` horizontal scroll.
@@ -29,12 +31,20 @@ export const tabsListStyle = defineSlotStyle({
   defaultVariants: { variant: "default" },
 });
 
-/** The rule under the chosen tab, placed by `--x` and `--w`; classic marks the tab itself instead. */
+/**
+ * The rule under the chosen tab, placed by `--x` and `--w`. The page strip draws it and slides it
+ * to the new tab; the other variants mark the tab itself.
+ */
 export const tabsInkStyle = defineSlotStyle({
   slot: "tabs-ink",
   base: "hidden",
   variants: {
-    variant: { default: "", full: "", bookmark: "", underline: "" },
+    variant: {
+      default: "",
+      full: "block h-0.5 w-[var(--w)] translate-x-[var(--x)] bg-primary transition-[translate,width] duration-[var(--dur-slow)] ease-[var(--ease)]",
+      bookmark: "",
+      underline: "",
+    },
   },
   defaultVariants: { variant: "default" },
 });
@@ -42,12 +52,12 @@ export const tabsInkStyle = defineSlotStyle({
 /** One tab trigger; it takes the variant of the list it sits in. */
 export const tabsTriggerStyle = defineSlotStyle({
   slot: "tabs-trigger",
-  base: "text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50",
+  base: "text-sm font-medium transition-all focus-visible:outline-none disabled:opacity-50 focus-visible:shadow-[var(--focus-halo)]",
   variants: {
     variant: {
       default:
         "rounded-md px-3 py-1 hover:text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm data-[state=active]:hover:text-primary-foreground",
-      full: "rounded-md px-3 py-1 hover:text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm data-[state=active]:hover:text-primary-foreground",
+      full: "h-10 gap-[7px] rounded-none px-3 py-0 text-muted-foreground transition-colors duration-[var(--dur-fast)] hover:text-foreground data-[state=active]:text-foreground data-[state=active]:hover:text-foreground",
       bookmark:
         "gap-2 rounded-t-lg border border-transparent border-b-0 px-4 py-2.5 font-semibold text-muted-foreground hover:bg-accent hover:text-accent-foreground data-[state=active]:-mb-px data-[state=active]:border-border data-[state=active]:bg-card data-[state=active]:font-bold data-[state=active]:text-foreground",
       // The rule is drawn as a border on the trigger itself and it is transparent when the tab is
@@ -66,7 +76,8 @@ export const tabsContentStyle = defineSlotStyle({
   // `outline-none` on the panel, and only on the panel. Radix moves focus here when a tab is
   // chosen so the next Tab lands inside; it is a region rather than a control, and the first
   // control in it rings normally.
-  base: "outline-none",
+  // A tab panel takes focus from the keyboard; it shows the shared halo.
+  base: "outline-none duration-[var(--dur-base)] ease-[var(--ease)] focus-visible:shadow-[var(--focus-halo)]",
   variants: {
     /**
      * Insets the panel from the strip above it and from whatever follows.

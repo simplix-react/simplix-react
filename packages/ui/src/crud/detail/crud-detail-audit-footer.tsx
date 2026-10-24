@@ -111,7 +111,12 @@ export function DetailAuditFooter({ auditData, displayZone }: CrudDetailAuditFoo
               >
                 <IdCardIcon className="h-3.5 w-3.5 shrink-0" />
                 <span className="truncate">{shown}</span>
-                {copied && <CheckIcon className="h-3 w-3 shrink-0" {...slotAttributes(crudDetailAuditCopiedStyle, {})} />}
+                {/* The icon takes no data attributes, so the slot sits on a wrapper; the tick pops in as the copy lands. */}
+                {copied && (
+                  <span className="inline-flex shrink-0 animate-in zoom-in-50 fade-in-0" {...slotAttributes(crudDetailAuditCopiedStyle, {})}>
+                    <CheckIcon className="h-3 w-3" />
+                  </span>
+                )}
               </button>
             </TooltipPrimitive.Trigger>
             <TooltipPrimitive.Portal>
@@ -120,8 +125,8 @@ export function DetailAuditFooter({ auditData, displayZone }: CrudDetailAuditFoo
                 align="start"
                 sideOffset={4}
                 // Entry motion is tw-animate-css, which a design stylesheet cannot @apply; it stays
-                // on the element, the same in every design.
-                className="z-50 animate-in fade-in-0 zoom-in-95"
+                // on the element, the same in every design: the shared appear (fade, 4px rise from the trigger).
+                className="z-50 animate-in fade-in-0 slide-in-from-bottom-1"
                 {...slotAttributes(crudDetailAuditTooltipStyle, {})}
               >
                 <p {...slotAttributes(crudDetailAuditTooltipIdStyle, {})}>{auditData!.id}</p>

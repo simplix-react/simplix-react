@@ -3,7 +3,7 @@ import { defineSlotStyle } from "../../design/slot-style";
 /** The box a hand-drawn plot sits in: the drawing, and the skeleton over it while it loads. */
 export const plotStyle = defineSlotStyle({
   slot: "plot",
-  base: "",
+  base: "rounded-md outline-none [&>svg]:transition-opacity [&>svg]:duration-[var(--dur-base)] [&>svg]:ease-[var(--ease)] focus-visible:shadow-[var(--focus-halo)] focus-visible:outline-none",
   variants: {
     loading: { true: "[&>svg]:opacity-0", false: "" },
   },
@@ -43,7 +43,7 @@ export const plotColumnHitStyle = defineSlotStyle({
 /** One segment of a stacked column, filled by its series. */
 export const plotBarStyle = defineSlotStyle({
   slot: "plot-bar",
-  base: "[transition:opacity_var(--dur-fast)_var(--ease),transform_var(--dur-slow)_var(--ease)]",
+  base: "[transition:opacity_var(--dur-fast)_var(--ease),transform_var(--dur-slow)_var(--ease),y_var(--dur-slow)_var(--ease),height_var(--dur-slow)_var(--ease)]",
   variants: {
     fill: {
       solid: "fill-[var(--series)]",
@@ -99,7 +99,7 @@ export const plotCrosshairStyle = defineSlotStyle({
 /** The stand-in columns drawn while the plot's data is on its way. */
 export const plotSkeletonStyle = defineSlotStyle({
   slot: "plot-skeleton",
-  base: "gap-[6%]",
+  base: "gap-[6%] transition-opacity duration-[var(--dur-base)] starting:opacity-0",
   variants: {},
   defaultVariants: {},
 });
@@ -107,7 +107,7 @@ export const plotSkeletonStyle = defineSlotStyle({
 /** One stand-in column. */
 export const plotSkeletonBarStyle = defineSlotStyle({
   slot: "plot-skeleton-bar",
-  base: "animate-pulse rounded-sm bg-muted",
+  base: "rounded-sm bg-muted bg-[linear-gradient(90deg,var(--muted),var(--shimmer),var(--muted))] bg-[length:200%_100%] animate-skeleton-shine motion-reduce:animate-none",
   variants: {},
   defaultVariants: {},
 });
@@ -115,7 +115,7 @@ export const plotSkeletonBarStyle = defineSlotStyle({
 /** The reading that follows the pointer over a plot. */
 export const plotTooltipStyle = defineSlotStyle({
   slot: "plot-tooltip",
-  base: "gap-[3px] rounded-md bg-popover px-2.5 py-2 text-xs text-popover-foreground shadow-md border",
+  base: "gap-[3px] [transition:opacity_var(--dur-base)_var(--ease-spring),translate_var(--dur-base)_var(--ease-spring)] starting:opacity-0 starting:-translate-x-1 rounded-md bg-popover px-2.5 py-2 text-xs text-popover-foreground shadow-md border",
   variants: {},
   defaultVariants: {},
 });

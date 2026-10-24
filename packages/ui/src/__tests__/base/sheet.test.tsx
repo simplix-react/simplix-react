@@ -186,7 +186,7 @@ describe("SheetHeader", () => {
     const header = document.body.querySelector(".my-header");
     expect(header).not.toBeNull();
     expect(drawnClasses(header)).toContain("flex");
-    expect(drawnClasses(header)).toContain("p-4");
+    expect(drawnClasses(header)).toContain("px-5");
   });
 });
 

@@ -11,7 +11,7 @@ export const fileThumbnailImageStyle = defineSlotStyle({
 /** The hover overlay of an interactive thumbnail. */
 export const fileThumbnailOverlayStyle = defineSlotStyle({
   slot: "file-thumbnail-overlay",
-  base: "rounded-sm bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-150",
+  base: "rounded-sm bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-[var(--dur-fast)]",
   variants: {},
   defaultVariants: {},
 });
@@ -19,7 +19,7 @@ export const fileThumbnailOverlayStyle = defineSlotStyle({
 /** The representative star badge of an interactive thumbnail. */
 export const fileThumbnailStarStyle = defineSlotStyle({
   slot: "file-thumbnail-star",
-  base: "rounded-full bg-background shadow-sm transition-opacity duration-150",
+  base: "rounded-full bg-background shadow-sm transition-opacity duration-[var(--dur-fast)]",
   variants: {
     representative: {
       true: "opacity-100 scale-100",

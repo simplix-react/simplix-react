@@ -6,7 +6,7 @@ export const crudFieldClearButtonStyle = defineSlotStyle({
   base: "rounded-sm text-muted-foreground hover:text-foreground",
   variants: {
     // A button inside a chip draws its own focus ring.
-    ring: { true: "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring", false: "" },
+    ring: { true: "focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]", false: "" },
     // A cleared chip keeps the button's box so the chip does not change width.
     hidden: { true: "opacity-0", false: "" },
   },

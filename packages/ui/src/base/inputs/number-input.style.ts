@@ -3,7 +3,8 @@ import { defineSlotStyle } from "../../design/slot-style";
 /** The number input box's classic look. Drawn by `theme/designs/classic.css`; see {@link defineSlotStyle}. */
 export const numberInputStyle = defineSlotStyle({
   slot: "number-input",
-  base: "rounded-md border border-input bg-background text-sm focus-within:border-foreground has-[[aria-invalid=true]]:border-destructive",
+  // Focus shows on the whole control: the border and the shared halo; an invalid value keeps the invalid halo.
+  base: "rounded-md border border-input bg-background text-sm focus-within:border-foreground has-[[aria-invalid=true]]:border-destructive focus-within:shadow-[var(--focus-halo)] has-[[aria-invalid=true]]:shadow-[var(--invalid-halo)]",
   variants: {
     disabled: { true: "opacity-50", false: "" },
   },
@@ -43,7 +44,7 @@ export const numberInputSpinnerStyle = defineSlotStyle({
 /** One step button of the spinner. */
 export const numberInputStepStyle = defineSlotStyle({
   slot: "number-input-step",
-  base: "px-0.5 hover:bg-accent hover:text-accent-foreground",
+  base: "px-0.5 hover:bg-accent hover:text-accent-foreground transition-colors duration-[var(--dur-fast)] active:bg-muted",
   variants: {
     direction: {
       increase: "",

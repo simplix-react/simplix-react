@@ -15,7 +15,7 @@ export const treeSelectRowStyle = defineSlotStyle({
 /** The button that expands or collapses a branch. */
 export const treeSelectToggleStyle = defineSlotStyle({
   slot: "field-tree-toggle",
-  base: "rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+  base: "rounded-sm focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]",
   variants: {
     branch: { true: "text-muted-foreground hover:text-foreground", false: "" },
   },
@@ -25,7 +25,7 @@ export const treeSelectToggleStyle = defineSlotStyle({
 /** The button that chooses a node. */
 export const treeSelectChooseStyle = defineSlotStyle({
   slot: "field-tree-choose",
-  base: "gap-1 rounded-sm text-start focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+  base: "gap-1 rounded-sm text-start focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]",
   variants: {},
   defaultVariants: {},
 });
@@ -86,7 +86,7 @@ export const treeMultiSelectPlaceholderStyle = defineSlotStyle({
 /** The chevron button that opens a tree multi-select. */
 export const treeMultiSelectOpenStyle = defineSlotStyle({
   slot: "field-tree-open",
-  base: "rounded-sm outline-none focus-visible:ring-1 focus-visible:ring-ring",
+  base: "rounded-sm outline-none focus-visible:shadow-[var(--focus-halo)] focus-visible:outline-none",
   variants: {},
   defaultVariants: {},
 });

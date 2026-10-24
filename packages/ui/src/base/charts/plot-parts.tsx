@@ -1,4 +1,4 @@
-import { type CSSProperties, type ReactNode, useEffect, useState } from "react";
+import { type CSSProperties, type KeyboardEvent, type ReactNode, type RefObject, useEffect, useLayoutEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { slotAttributes } from "../../design/slot-style";
@@ -35,11 +35,84 @@ export function useDrawnIn(): boolean {
   return drawn;
 }
 
+/**
+ * The drawing's size in its own units, kept equal to the pixels it is drawn at.
+ *
+ * <p>The width follows the box the plot is given and the height keeps the plot's proportion, so
+ * the plot grows and shrinks with its card while axis text, strokes and marks stay at the size
+ * their declarations name. A fixed view box would scale them with the card instead.
+ *
+ * @param svg the plot's drawing
+ * @param width the width drawn before the box is measured
+ * @param height the height at that width
+ */
+export function usePlotSize(svg: RefObject<SVGSVGElement | null>, width: number, height: number): { W: number; H: number } {
+  const [measured, setMeasured] = useState(width);
+  useLayoutEffect(() => {
+    const el = svg.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const read = () => {
+      const w = Math.round(el.getBoundingClientRect().width);
+      if (w > 0) setMeasured(w);
+    };
+    read();
+    const observer = new ResizeObserver(read);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [svg]);
+  return { W: measured, H: Math.round((measured * height) / width) };
+}
+
+/**
+ * Reading a plot from the keyboard: focus it, then the arrow keys step through its categories.
+ *
+ * <p>The reading stands where the pointer would have put it over the category's mark, so a reader
+ * with a keyboard sees the same tooltip a reader with a mouse does. Home and End jump to the ends,
+ * Escape and leaving the plot put the reading away.
+ *
+ * @param svg the plot's drawing, whose box places the reading
+ * @param count how many categories there are
+ * @param hot the category being read, or null
+ * @param centre where a category's mark stands across the drawing, in its own units
+ * @param width the drawing's width in its own units
+ * @param show reads a category at a point, or puts the reading away
+ * @returns the props for the element that takes the focus
+ */
+export function usePlotKeys(
+  svg: RefObject<SVGSVGElement | null>,
+  count: number,
+  hot: number | null,
+  centre: (index: number) => number,
+  width: number,
+  show: (index: number | null, at: PlotPointer | null) => void,
+) {
+  const readAt = (i: number | null) => {
+    const box = svg.current?.getBoundingClientRect();
+    if (i === null || !box) return show(null, null);
+    show(i, { x: box.left + (box.width * centre(i)) / width, y: box.top + box.height * 0.45 });
+  };
+  return {
+    tabIndex: 0,
+    onKeyDown: (e: KeyboardEvent) => {
+      const at = hot ?? -1;
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") readAt(Math.min(count - 1, at + 1));
+      else if (e.key === "ArrowLeft" || e.key === "ArrowUp") readAt(at < 0 ? count - 1 : Math.max(0, at - 1));
+      else if (e.key === "Home") readAt(0);
+      else if (e.key === "End") readAt(count - 1);
+      else if (e.key === "Escape" && hot !== null) readAt(null);
+      else return;
+      e.preventDefault();
+    },
+    onBlur: () => readAt(null),
+  };
+}
+
 /** The reading that follows the pointer, drawn over everything so no card clips it. */
-export function PlotTooltip({ at, children }: { at: PlotPointer | null; children: ReactNode }) {
+export function PlotTooltip({ at, id, children }: { at: PlotPointer | null; id?: string; children: ReactNode }) {
   if (!at || typeof document === "undefined") return null;
   return createPortal(
     <div
+      id={id}
       role="tooltip"
       className="pointer-events-none fixed z-[80] flex flex-col"
       style={{ left: at.x, top: at.y, transform: "translate(14px, -50%)" }}

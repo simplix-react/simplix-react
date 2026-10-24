@@ -3,10 +3,10 @@ import { defineSlotStyle } from "../../design/slot-style";
 /** The popover select trigger's classic look. Drawn by `theme/designs/classic.css`; see {@link defineSlotStyle}. */
 export const selectFieldTriggerStyle = defineSlotStyle({
   slot: "field-select-trigger",
-  base: "gap-1 rounded-md border border-input bg-background px-3 text-left text-sm focus-visible:border-foreground focus-visible:outline-none",
+  base: "gap-1 rounded-md border border-input bg-background px-3 text-left text-sm focus-visible:border-foreground focus-visible:shadow-[var(--focus-halo)] focus-visible:outline-none",
   variants: {
     disabled: { true: "cursor-not-allowed opacity-50", false: "" },
-    invalid: { true: "border-destructive focus-visible:border-destructive", false: "" },
+    invalid: { true: "border-destructive focus-visible:border-destructive focus-visible:shadow-[var(--invalid-halo)]", false: "" },
   },
   defaultVariants: { disabled: false, invalid: false },
 });

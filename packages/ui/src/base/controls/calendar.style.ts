@@ -83,7 +83,7 @@ export const calendarWeekdayStyle = defineSlotStyle({
  */
 export const calendarDayStyle = defineSlotStyle({
   slot: "calendar-day",
-  base: "rounded-md text-lg font-normal text-foreground/80 md:text-[15px] hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50",
+  base: "rounded-md text-lg font-normal text-foreground/80 md:text-[15px] hover:bg-accent hover:text-accent-foreground focus-visible:outline-none disabled:opacity-50 focus-visible:shadow-[var(--focus-halo)]",
   variants: {
     today: { true: "bg-accent/50 font-semibold", false: "" },
     // Single mode selection.
@@ -92,7 +92,7 @@ export const calendarDayStyle = defineSlotStyle({
       false: "",
     },
     // Range mode highlighting.
-    inRange: { true: "bg-accent rounded-none", false: "" },
+    inrange: { true: "bg-accent rounded-none", false: "" },
     start: {
       true: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground rounded-l-md rounded-r-none",
       false: "",
@@ -102,18 +102,18 @@ export const calendarDayStyle = defineSlotStyle({
       false: "",
     },
     // Week mode: selected week background.
-    weekSelected: { true: "bg-accent rounded-none", false: "" },
+    weekselected: { true: "bg-accent rounded-none", false: "" },
     // Week mode: hover week background.
-    weekHover: { true: "bg-accent/50 rounded-none", false: "" },
+    weekhover: { true: "bg-accent/50 rounded-none", false: "" },
   },
   defaultVariants: {
     today: false,
     selected: false,
-    inRange: false,
+    inrange: false,
     start: false,
     end: false,
-    weekSelected: false,
-    weekHover: false,
+    weekselected: false,
+    weekhover: false,
   },
 });
 
@@ -128,7 +128,7 @@ export const calendarMonthGridStyle = defineSlotStyle({
 /** A month cell of `month` mode. */
 export const calendarMonthStyle = defineSlotStyle({
   slot: "calendar-month",
-  base: "rounded-md text-sm hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50",
+  base: "rounded-md text-sm hover:bg-accent hover:text-accent-foreground focus-visible:outline-none disabled:opacity-50 focus-visible:shadow-[var(--focus-halo)]",
   variants: {
     current: { true: "bg-accent/50 font-semibold", false: "" },
     selected: {

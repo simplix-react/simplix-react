@@ -3,12 +3,12 @@ import { defineSlotStyle } from "../../design/slot-style";
 /** The button's classic look. Drawn by `theme/designs/classic.css`; see {@link defineSlotStyle}. */
 export const buttonStyle = defineSlotStyle({
   slot: "button",
-  base: "inline-flex items-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0",
+  base: "inline-flex items-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-[color,background-color,border-color,box-shadow,scale] duration-[var(--dur-fast)] ease-[var(--ease)] enabled:active:scale-[0.98] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 focus-visible:shadow-[var(--focus-halo)]",
 
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        primary: "bg-primary text-primary-foreground hover:bg-primary/90 min-w-32",
+        primary: "bg-primary text-primary-foreground hover:bg-primary/90",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:

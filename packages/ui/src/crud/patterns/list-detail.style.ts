@@ -1,16 +1,5 @@
 import { defineSlotStyle } from "../../design/slot-style";
 
-/**
- * Horizontal padding pushed down into the slots of a detail that opens over the list.
- *
- * <p>The header and footer rules of CrudDetail and CrudForm have to span the full width rather
- * than stopping inside a gutter, so the container carries the padding and the slots drop theirs.
- * Body and footer slots carry their own panel padding; it is zeroed here so the pushed padding
- * does not stack.
- */
-const OVERLAY_SLOT_PADDING =
-  "[&_[data-crud-slot=header]]:px-6 [&_[data-crud-slot=body]]:px-0 [&_[data-crud-slot=body]>*]:px-6 [&_[data-crud-slot=footer]]:px-0 [&_[data-crud-slot=footer]>*]:px-6";
-
 /** The grid that holds the list, the divider and the detail of a panel-shaped list-detail. */
 export const crudListDetailRootStyle = defineSlotStyle({
   slot: "crud-list-detail-root",
@@ -19,18 +8,22 @@ export const crudListDetailRootStyle = defineSlotStyle({
     // The columns animate when the detail opens or closes, but not while the divider is dragged.
     dragging: {
       true: "",
-      false: "md:transition-[grid-template-columns] md:duration-300 md:ease-in-out",
+      false: "md:transition-[grid-template-columns] md:duration-[var(--dur-slow)] md:ease-[var(--ease)]",
     },
   },
   defaultVariants: { dragging: false },
 });
 
-/** The drag handle between the list and the detail. */
+/**
+ * The drag handle between the list and the detail. The detail is a framed card, so the handle draws
+ * no line at rest: a thin rule and a grip appear on hover, press and keyboard focus.
+ */
 export const crudListDetailDividerStyle = defineSlotStyle({
   slot: "crud-list-detail-divider",
-  base: "bg-border bg-clip-content hover:bg-primary/30 active:bg-primary/50 transition-[padding,opacity] duration-300 ease-in-out",
+  base:
+    "relative bg-transparent bg-clip-content hover:bg-primary/30 active:bg-primary/50 focus-visible:bg-primary/50 focus-visible:outline-none focus-visible:before:shadow-[var(--focus-halo)] transition-[padding,opacity,background-color] duration-[var(--dur-base)] ease-[var(--ease)] before:absolute before:top-1/2 before:left-1/2 before:h-9 before:w-[5px] before:-translate-x-1/2 before:-translate-y-1/2 before:rounded-full before:border before:border-[var(--border-strong)] before:bg-card before:opacity-0 before:shadow-[var(--shadow-1)] before:transition-opacity before:duration-[var(--dur-fast)] before:content-[''] hover:before:opacity-100 focus-visible:before:opacity-100 active:before:opacity-100",
   variants: {
-    collapsed: { true: "opacity-0 px-0", false: "px-2" },
+    collapsed: { true: "opacity-0 px-0", false: "px-[7px]" },
   },
   defaultVariants: { collapsed: false },
 });
@@ -46,30 +39,17 @@ export const crudListDetailListStyle = defineSlotStyle({
   defaultVariants: { beside: false },
 });
 
-/** The detail column of a panel-shaped list-detail. */
+/**
+ * The detail column of a panel-shaped list-detail: a framed card that slides 16px from the divider
+ * side as it fades in.
+ */
 export const crudListDetailDetailStyle = defineSlotStyle({
   slot: "crud-list-detail-detail",
-  base: "md:pl-2 md:transition-opacity md:duration-300 md:ease-in-out",
+  base: "md:transition-[opacity,translate] md:duration-[var(--dur-slow)] md:ease-[var(--ease-spring)] motion-reduce:md:translate-x-0",
   variants: {
-    open: { true: "md:opacity-100", false: "md:opacity-0" },
+    open: { true: "md:opacity-100 md:pl-0 md:translate-x-0 rounded-lg border bg-card", false: "md:opacity-0 md:translate-x-4" },
   },
   defaultVariants: { open: false },
-});
-
-/** The backdrop behind a detail that opens as a dialog. */
-export const crudListDetailOverlayStyle = defineSlotStyle({
-  slot: "crud-list-detail-overlay",
-  base: "bg-black/80",
-  variants: {},
-  defaultVariants: {},
-});
-
-/** A detail that opens as a centred dialog. */
-export const crudListDetailDialogStyle = defineSlotStyle({
-  slot: "crud-list-detail-dialog",
-  base: `rounded-lg border bg-background py-4 shadow-lg ${OVERLAY_SLOT_PADDING}`,
-  variants: {},
-  defaultVariants: {},
 });
 
 /**
@@ -80,16 +60,17 @@ export const crudListDetailDialogStyle = defineSlotStyle({
  */
 export const crudListDetailDrawerBodyStyle = defineSlotStyle({
   slot: "crud-list-detail-drawer-body",
-  base: OVERLAY_SLOT_PADDING,
+  // The same 16px inset as the panel.
+  base: "[&_[data-crud-slot=header]]:px-4 [&_[data-crud-slot=body]]:px-0 [&_[data-crud-slot=body]>*]:px-4 [&_[data-crud-slot=footer]]:px-0 [&_[data-crud-slot=footer]>*]:px-4",
   variants: {},
   defaultVariants: {},
 });
 
-/** The drawer that holds the detail: no gap of its own, padded top and bottom. */
+/** The drawer that holds the detail: no gap of its own; the detail's header and footer pad it. */
 export const crudListDetailDrawerStyle = defineSlotStyle({
   slot: "crud-list-detail-drawer",
   as: "part",
-  base: "gap-0 py-4",
+  base: "gap-0 py-0",
   variants: {},
   defaultVariants: {},
 });

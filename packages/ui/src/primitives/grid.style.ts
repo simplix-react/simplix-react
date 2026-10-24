@@ -15,7 +15,7 @@ export const gridStyle = defineSlotStyle({
       xl: "gap-8",
     },
     // Per-axis overrides sit after `gap` so they win over it.
-    gapX: {
+    gapx: {
       none: "gap-x-0",
       px: "gap-x-px",
       xs: "gap-x-1",
@@ -24,7 +24,7 @@ export const gridStyle = defineSlotStyle({
       lg: "gap-x-6",
       xl: "gap-x-8",
     },
-    gapY: {
+    gapy: {
       none: "gap-y-0",
       px: "gap-y-px",
       xs: "gap-y-1",

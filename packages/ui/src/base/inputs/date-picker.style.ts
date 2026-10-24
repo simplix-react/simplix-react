@@ -21,7 +21,7 @@ export const datePickerStyle = defineSlotStyle({
 /** The button that opens the calendar. Drawn by `theme/designs/classic.css`; see {@link defineSlotStyle}. */
 export const datePickerTriggerStyle = defineSlotStyle({
   slot: "date-picker-trigger",
-  base: "gap-2 rounded-md border border-input bg-background pl-3 text-sm font-normal focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50 data-[empty=true]:text-muted-foreground [&>svg:first-child]:opacity-50",
+  base: "gap-2 rounded-md border border-input bg-background pl-3 text-sm font-normal focus-visible:outline-none disabled:opacity-50 data-[empty=true]:text-muted-foreground [&>svg:first-child]:opacity-50 focus-visible:shadow-[var(--focus-halo)]",
   variants: {
     clearable: { true: "pr-9", false: "pr-3" },
   },
@@ -117,7 +117,7 @@ export const datePickerActionStyle = defineSlotStyle({
 /** The button that clears the field. */
 export const datePickerClearStyle = defineSlotStyle({
   slot: "date-picker-clear",
-  base: "rounded-sm p-0.5 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring [&>svg]:opacity-50 [&>svg:hover]:opacity-100",
+  base: "rounded-sm p-0.5 transition-colors hover:bg-muted focus-visible:outline-none [&>svg]:opacity-50 [&>svg:hover]:opacity-100 focus-visible:shadow-[var(--focus-halo)]",
   variants: {},
   defaultVariants: {},
 });

@@ -78,8 +78,12 @@ describe("TabsList", () => {
       </Tabs>,
     );
     const list = container.querySelector("[role='tablist']") as HTMLElement;
+    // The page strip: tabs on a hairline from the start, each at its own width, the ink drawn.
     expect(drawnClasses(list)).toContain("w-full");
-    expect(drawnClasses(list)).toContain("mt-3");
+    expect(drawnClasses(list)).toContain("justify-start");
+    expect(drawnClasses(list)).toContain("[&>[role=tab]]:flex-none");
+    const ink = container.querySelector("[data-slot='tabs-ink']");
+    expect(drawnClasses(ink).split(/\s+/)).toContain("block");
   });
 
   it("applies bookmark variant", () => {

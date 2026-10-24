@@ -102,7 +102,7 @@ export const SheetContent = forwardRef<HTMLDivElement, SheetContentProps>(
           {children}
           {showCloseButton && (
             <DialogPrimitive.Close
-              className="absolute top-4 right-4 disabled:pointer-events-none"
+              className="absolute top-4 right-4 z-[2] disabled:pointer-events-none"
               {...slotAttributes(sheetCloseStyle, {})}
             >
               <svg

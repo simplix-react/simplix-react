@@ -37,7 +37,8 @@ export const toolbarStyle = defineSlotStyle({
 ```
 
 - Structure classes (display, flex and grid flow, position, overflow, size) stay on the element; look classes (colour, border, radius, shadow, spacing, type) go into the declaration.
-- An element that another component renders (a `Badge`, `Stack`, `PopoverContent`) is marked with `partAttributes` and a declaration with `as: "part"`; the component's own `data-slot` stays, and the part rule draws over it.
+- An element that another component renders (a `Badge`, `Stack`, `PopoverContent`) is marked with `partAttributes` and a declaration with `as: "part"`; the component's own `data-slot` stays, and the part rule draws over it. A selector that reaches such an element names it as `[data-part=<name>]`, never `[data-slot=<name>]`. `design:check` runs `scripts/check-slot-spread.mjs`, which refuses both mistakes: a slot spread onto a component that writes its own `data-slot`, and a selector keyed on the wrong attribute.
+- Keyboard focus is one visual in every design: `focus-visible:shadow-[var(--focus-halo)]`, with `--invalid-halo` for an invalid control. A rule that resets a control's shadow (`shadow-none`, to drop a variant's resting shadow) also erases the halo, so the same rule writes the halo back on `:focus-visible`. Excluding focus with `:not(:focus-visible)` does not work in Storybook, whose pseudo-states addon rewrites it into a selector list that still matches the focused element.
 - Entry and exit motion (`animate-in`, `fade-*`, `zoom-*`, `slide-*`) stays on the element: it is the same in every design, and the generator refuses it in a declaration.
 
 Regenerate the stylesheets after changing a declaration:

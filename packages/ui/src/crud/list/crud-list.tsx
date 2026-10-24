@@ -1,3 +1,4 @@
+import { CircleAlertIcon, InboxIcon, SearchXIcon } from "lucide-react";
 import {useTranslation} from "@simplix-react/i18n/react";
 import {
   type ColumnDef,
@@ -47,6 +48,8 @@ import {
   crudListCardHeaderStyle,
   crudListEmptyMessageStyle,
   crudListEmptyStyle,
+  crudListEmptyActionStyle,
+  crudListEmptyIconStyle,
   crudListEmptyTextStyle,
   crudListPageButtonStyle,
   crudListPageEllipsisStyle,
@@ -116,6 +119,7 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import type { ReorderConfig } from "../shared";
 import { useReorder, DragHandleHeader, DraggableRow, DraggableCard } from "../reorder";
 import {useContainerWidth} from "./use-container-width";
+import { useColumnMotion } from "./use-column-motion";
 
 // Entry and exit motion is tw-animate-css, which a design stylesheet cannot @apply; it stays
 // on the element, the same in every design.
@@ -1397,6 +1401,13 @@ function ListTable<T>({
     manualSorting: true,
   });
 
+  // A column the width drops or the reader hides leaves without the others jumping. The
+  // reorderable table draws its own handle column first, so its cells are not traced.
+  useColumnMotion(
+    containerRef,
+    isCardMode || reorder ? [] : table.getVisibleLeafColumns().map((column) => column.id),
+  );
+
   // ── Keyboard row navigation ──
   // The rows in the order the reader sees them: grouped rows run group by group.
   const [focusedRowId, setFocusedRowId] = useState<string | null>(null);
@@ -1979,11 +1990,22 @@ export interface ListEmptyProps {
   reason?: EmptyReason;
   /** Override default empty messages per reason. */
   messages?: Partial<Record<EmptyReason, string>>;
+  /** The action that fills the list (an add button), under the sentence. */
+  action?: ReactNode;
   className?: string;
   children?: ReactNode | ((props: { reason: EmptyReason }) => ReactNode);
 }
 
-function ListEmpty({ reason = "no-data", messages, className, children }: ListEmptyProps) {
+/** The glyph for each kind of empty: nothing yet, nothing matching, or nothing readable. */
+const EMPTY_ICON: Record<EmptyReason, typeof InboxIcon> = {
+  "no-data": InboxIcon,
+  "no-filter": SearchXIcon,
+  "no-search": SearchXIcon,
+  "error": CircleAlertIcon,
+  "unavailable": CircleAlertIcon,
+};
+
+function ListEmpty({ reason = "no-data", messages, action, className, children }: ListEmptyProps) {
   const { t } = useTranslation("simplix/ui");
   const defaultMessages: Record<EmptyReason, string> = {
     "no-data": t("list.noData"),
@@ -1996,10 +2018,14 @@ function ListEmpty({ reason = "no-data", messages, className, children }: ListEm
   const content = typeof children === "function"
     ? children({ reason })
     : children ?? mergedMessages[reason];
+  const Icon = EMPTY_ICON[reason];
 
   return (
+    // The shared empty pattern: a glyph, one sentence and the action that fills the list, centred.
     <Stack align="center" justify="center" className={className} {...partAttributes(crudListEmptyStyle, {})}>
+      <Icon aria-hidden="true" {...slotAttributes(crudListEmptyIconStyle, {})} />
       <p {...slotAttributes(crudListEmptyTextStyle, {})}>{content}</p>
+      {action ? <div {...slotAttributes(crudListEmptyActionStyle, {})}>{action}</div> : null}
     </Stack>
   );
 }

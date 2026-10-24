@@ -93,7 +93,7 @@ export const TabsList = forwardRef<HTMLDivElement, TabsListProps>(
 
 /**
  * Keeps the ink under the chosen trigger: its offset and width are written as `--x` and `--w` on
- * the ink whenever the chosen tab changes or the strip changes size.
+ * the ink whenever the chosen tab changes, or the strip or any tab changes size.
  *
  * <p>Read from the DOM because the list does not know the value; Radix marks the chosen trigger
  * with `data-state="active"`, and a mutation observer on that attribute is what follows it.
@@ -111,11 +111,21 @@ function useTabInk(
       mark.style.setProperty("--x", `${chosen ? chosen.offsetLeft : 0}px`);
       mark.style.setProperty("--w", `${chosen ? chosen.offsetWidth : 0}px`);
     };
-    place();
-    const states = new MutationObserver(place);
-    states.observe(strip, { attributes: true, attributeFilter: ["data-state"], subtree: true, childList: true });
+    // A tab changes width without the strip changing (the design's stylesheet arriving, a font, a
+    // count), so each trigger is watched as well as the strip.
     const sizes = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(place);
-    sizes?.observe(strip);
+    const watch = () => {
+      sizes?.disconnect();
+      sizes?.observe(strip);
+      strip.querySelectorAll<HTMLElement>('[role="tab"]').forEach((tab) => sizes?.observe(tab));
+    };
+    place();
+    watch();
+    const states = new MutationObserver((records) => {
+      if (records.some((record) => record.type === "childList")) watch();
+      place();
+    });
+    states.observe(strip, { attributes: true, attributeFilter: ["data-state"], subtree: true, childList: true });
     return () => {
       states.disconnect();
       sizes?.disconnect();
@@ -181,7 +191,12 @@ export const TabsContent = forwardRef<HTMLDivElement, TabsContentProps>(
   ({ className, padded = false, ...rest }, ref) => (
     <TabsPrimitive.Content
       ref={ref}
-      className={cn("flex-1", className)}
+      // The panel a tab brings up rises into place as it fades in, so the switch reads as the
+      // content changing rather than the page blinking.
+      className={cn(
+        "flex-1 data-[state=active]:animate-in data-[state=active]:fade-in-0 data-[state=active]:slide-in-from-bottom-1",
+        className,
+      )}
       {...rest}
       {...slotAttributes(tabsContentStyle, { padded })}
     />

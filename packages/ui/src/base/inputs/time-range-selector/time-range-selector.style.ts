@@ -1,7 +1,7 @@
 import { defineSlotStyle } from "../../../design/slot-style";
 
 /** The focus ring every button of the time range selector draws. */
-const FOCUS_RING = "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
+const FOCUS_RING = "focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]";
 
 /** The selector card. Drawn by `theme/designs/classic.css`; see {@link defineSlotStyle}. */
 export const timeRangeSelectorStyle = defineSlotStyle({
@@ -71,7 +71,7 @@ export const timeRangeHeatmapRowStyle = defineSlotStyle({
 /** The draggable heatmap surface. */
 export const timeRangeHeatmapStyle = defineSlotStyle({
   slot: "time-range-heatmap",
-  base: "transition-opacity rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+  base: "transition-opacity rounded-sm focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]",
   variants: {
     loading: { true: "opacity-50", false: "" },
   },

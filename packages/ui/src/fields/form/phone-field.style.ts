@@ -3,7 +3,7 @@ import { defineSlotStyle } from "../../design/slot-style";
 /** The phone field's calling-code button. Drawn by `theme/designs/classic.css`; see {@link defineSlotStyle}. */
 export const phoneTriggerStyle = defineSlotStyle({
   slot: "field-phone-trigger",
-  base: "gap-1.5 rounded-md border border-input bg-background px-2.5 text-sm hover:bg-accent/50 focus:outline-none focus:ring-1 focus:ring-ring",
+  base: "gap-1.5 rounded-md border border-input bg-background px-2.5 text-sm hover:bg-accent/50 focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]",
   variants: {
     disabled: { true: "cursor-not-allowed opacity-50", false: "" },
     invalid: { true: "border-destructive", false: "" },

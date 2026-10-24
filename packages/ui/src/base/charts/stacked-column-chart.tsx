@@ -1,8 +1,8 @@
-import { type CSSProperties, type ReactNode, type MouseEvent, useId, useState } from "react";
+import { type CSSProperties, type ReactNode, type MouseEvent, useId, useRef, useState } from "react";
 
 import { slotAttributes } from "../../design/slot-style";
 import { plotAxisStyle, plotBarStyle, plotColumnHitStyle, plotGridStyle, plotStyle } from "./plot.style";
-import { type PlotFill, type PlotPointer, PlotSkeleton, PlotTooltip, niceStep, useDrawnIn } from "./plot-parts";
+import { type PlotFill, type PlotPointer, PlotSkeleton, PlotTooltip, niceStep, useDrawnIn, usePlotKeys, usePlotSize } from "./plot-parts";
 
 /** One series of a stacked column chart. */
 export interface StackedColumnSeries {
@@ -32,8 +32,9 @@ export interface StackedColumnChartProps {
   tooltip?: (index: number) => ReactNode;
 }
 
-const W = 520;
-const H = 200;
+/** The drawing's proportion; the size itself follows the card (see `usePlotSize`). */
+const PLOT_W = 520;
+const PLOT_H = 200;
 const L = 28;
 const B = 24;
 const T = 8;
@@ -48,6 +49,8 @@ const T = 8;
 export function StackedColumnChart({ label, categories, series, hidden, highlight, loading = false, tooltip }: StackedColumnChartProps) {
   const id = useId();
   const drawn = useDrawnIn();
+  const svg = useRef<SVGSVGElement>(null);
+  const { W, H } = usePlotSize(svg, PLOT_W, PLOT_H);
   const [hot, setHot] = useState<number | null>(null);
   const [pointer, setPointer] = useState<PlotPointer | null>(null);
 
@@ -68,10 +71,19 @@ export function StackedColumnChart({ label, categories, series, hidden, highligh
     setHot(null);
     setPointer(null);
   };
+  const keys = usePlotKeys(svg, categories.length, hot, (i) => L + cw * i + cw / 2, W, (i, at) => {
+    setHot(i);
+    setPointer(at);
+  });
+  const tipId = `${id.replace(/:/g, "")}-tip`;
 
   return (
-    <div className="relative" {...slotAttributes(plotStyle, { loading })}>
-      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label} className="block h-auto w-full overflow-visible">
+    <div
+      className="relative"
+      {...(tooltip ? { ...keys, "aria-describedby": hot !== null ? tipId : undefined } : {})}
+      {...slotAttributes(plotStyle, { loading })}
+    >
+      <svg ref={svg} viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label} className="block h-auto w-full overflow-visible">
         <defs>
           {series
             .filter((s) => s.fill === "hatch")
@@ -107,18 +119,20 @@ export function StackedColumnChart({ label, categories, series, hidden, highligh
                   <rect
                     key={s.key}
                     x={x}
-                    y={y1}
                     width={bw}
-                    height={Math.max(0, y0 - y1 - 1)}
                     rx={2}
                     style={
                       {
+                        // Geometry as properties, so a rescale (a series switched off, a period
+                        // switched) eases the segments to their new height instead of jumping.
+                        y: y1,
+                        height: Math.max(0, y0 - y1 - 1),
                         "--series": s.color,
                         fill: fill === "hatch" ? `url(#${patternId(s.key)})` : undefined,
                         transformBox: "fill-box",
                         transformOrigin: "50% 100%",
                         transform: drawn ? "scaleY(1)" : "scaleY(0)",
-                        transitionDelay: drawn ? `0ms, ${i * 45}ms` : undefined,
+                        transitionDelay: drawn ? `0ms, ${i * 45}ms, 0ms, 0ms` : undefined,
                       } as CSSProperties
                     }
                     {...slotAttributes(plotBarStyle, { fill, dimmed: hot !== null && hot !== i })}
@@ -133,7 +147,7 @@ export function StackedColumnChart({ label, categories, series, hidden, highligh
         })}
       </svg>
       {loading && <PlotSkeleton count={categories.length} />}
-      {tooltip && hot !== null && <PlotTooltip at={pointer}>{tooltip(hot)}</PlotTooltip>}
+      {tooltip && hot !== null && <PlotTooltip at={pointer} id={tipId}>{tooltip(hot)}</PlotTooltip>}
     </div>
   );
 }

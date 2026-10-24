@@ -3,7 +3,7 @@ import { defineSlotStyle } from "../../design/slot-style";
 /** One toast. */
 export const toastStyle = defineSlotStyle({
   slot: "toast",
-  base: "rounded-lg border p-3 shadow-lg backdrop-blur-sm transition-all duration-200",
+  base: "rounded-[var(--radius-overlay)] border p-3 shadow-lg backdrop-blur-sm transition-all duration-[var(--dur-base)] ease-[var(--ease-spring)]",
   variants: {
     type: {
       success: "border-emerald-200 bg-emerald-50/90 dark:border-emerald-800 dark:bg-emerald-950/90",
@@ -13,8 +13,9 @@ export const toastStyle = defineSlotStyle({
     },
     /** Slides in from the right on mount and out again on dismiss. */
     phase: {
-      entering: "translate-x-full opacity-0",
-      exiting: "translate-x-full opacity-0",
+      // The shared appear pattern: a fade with a 4px rise from the anchor (the bottom edge).
+      entering: "translate-y-1 opacity-0",
+      exiting: "translate-y-1 opacity-0 ease-[var(--ease)]",
       shown: "translate-x-0 opacity-100",
     },
   },

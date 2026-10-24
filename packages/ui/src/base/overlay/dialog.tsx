@@ -1,12 +1,24 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { type ComponentPropsWithRef, createContext, forwardRef, useContext, useEffect, useState } from "react";
+import {
+  Children,
+  type ComponentPropsWithRef,
+  createContext,
+  forwardRef,
+  isValidElement,
+  type ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { Maximize2, Minimize2 } from "lucide-react";
 
 import { useTranslation } from "@simplix-react/i18n/react";
 
 import { slotAttributes } from "../../design/slot-style";
+import { useScrollEdges, type ScrollEdges } from "../../crud/form/use-scroll-edges";
 import { cn } from "../../utils/cn";
 import {
+  dialogBodyStyle,
   dialogContentStyle,
   dialogCornerActionsStyle,
   dialogCornerButtonStyle,
@@ -16,6 +28,23 @@ import {
   dialogOverlayStyle,
   dialogTitleStyle,
 } from "./dialog.style";
+
+/**
+ * What the bands of a banded dialog share: which bands exist, and which edges of the body hide
+ * content, so the header and the footer mark the strip the body scrolls under.
+ */
+interface DialogBandsValue {
+  edges: ScrollEdges;
+  setEdges: (edges: ScrollEdges) => void;
+  head: boolean;
+  foot: boolean;
+  /** A maximize or close button sits in the top-right corner, over the header band. */
+  corner: boolean;
+}
+
+const NO_EDGES: ScrollEdges = { above: false, below: false };
+
+const DialogBandsContext = createContext<DialogBandsValue | null>(null);
 
 /** True when the enclosing maximizable DialogContent is currently maximized. */
 const DialogMaximizedContext = createContext(false);
@@ -58,6 +87,36 @@ const OVERLAY_MOTION =
 const CONTENT_MOTION =
   "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95";
 
+// A banded dialog on a phone-width window is a bottom sheet: pinned to the bottom edge at full
+// width, square at the bottom, rising from below instead of zooming. The position is written as
+// `top` + `translate` on both sides of the breakpoint (50%/-50% centred, 100%/-100% docked) so a
+// window resized across it glides between the two rather than jumping.
+const SHEET_BELOW_SM =
+  "max-sm:top-full max-sm:translate-y-[-100%] max-sm:max-w-full max-sm:rounded-b-none max-sm:max-h-[calc(100dvh-1rem)] transition-[top,translate,max-width,border-radius] max-sm:data-[state=open]:zoom-in-100 max-sm:data-[state=closed]:zoom-out-100 max-sm:data-[state=open]:slide-in-from-bottom-8 max-sm:data-[state=closed]:slide-out-to-bottom-8";
+
+/**
+ * Splits a dialog's children into its bands. A dialog is banded when a {@link DialogHeader} or a
+ * {@link DialogFooter} is a direct child: the headers lead, the footers close, and everything else
+ * goes into one {@link DialogBody} between them, the only part that scrolls. A dialog without
+ * either (a palette, a viewer drawing its own frame) is left exactly as written.
+ */
+function splitBands(children: ReactNode) {
+  const head: ReactNode[] = [];
+  const foot: ReactNode[] = [];
+  const middle: ReactNode[] = [];
+  let explicitBody = false;
+  Children.forEach(children, (child) => {
+    if (isValidElement(child) && child.type === DialogHeader) head.push(child);
+    else if (isValidElement(child) && child.type === DialogFooter) foot.push(child);
+    else {
+      if (isValidElement(child) && child.type === DialogBody) explicitBody = true;
+      if (child !== null && child !== undefined && child !== false) middle.push(child);
+    }
+  })
+  const banded = head.length > 0 || foot.length > 0;
+  return { banded, head, foot, middle, explicitBody };
+}
+
 // Overlay
 export type DialogOverlayProps = ComponentPropsWithRef<
   typeof DialogPrimitive.Overlay
@@ -85,6 +144,12 @@ export type DialogContentProps = ComponentPropsWithRef<
   maximizable?: boolean;
   /** Drops the panel padding, for a body that draws its own. */
   flush?: boolean;
+  /**
+   * `"column"` gives the panel the banded frame (a column with a height ceiling, the bottom sheet
+   * below `sm`) without wrapping the children, for content that draws its own header, scrolling
+   * body and footer (a CRUD detail or form). Otherwise the frame follows the children (`"auto"`).
+   */
+  frame?: "auto" | "column";
 };
 
 // Structure shared by the top-right corner icon buttons (maximize + close); their look is the
@@ -93,20 +158,31 @@ const CORNER_BUTTON_CLASS =
   "disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
 
 export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(
-  ({ className, children, showCloseButton = true, maximizable = false, flush = false, style, ...rest }, ref) => {
+  ({ className, children, showCloseButton = true, maximizable = false, flush = false, frame = "auto", style, ...rest }, ref) => {
     const [maximized, setMaximized] = useState(false);
+    const [edges, setEdges] = useState<ScrollEdges>(NO_EDGES);
     const isMaximized = maximizable && maximized;
     const { t } = useTranslation("simplix/ui");
+    const bands = splitBands(children);
+    const column = bands.banded || frame === "column";
+    const bandsValue: DialogBandsValue | null = bands.banded
+      ? { edges, setEdges, head: bands.head.length > 0, foot: bands.foot.length > 0, corner: maximizable || showCloseButton }
+      : null;
     return (
       <DialogPortal>
         <DialogOverlay />
         <DialogMaximizedContext.Provider value={isMaximized}>
+        <DialogBandsContext.Provider value={bandsValue}>
           <DialogPrimitive.Content
             ref={ref}
             data-maximized={isMaximized ? "" : undefined}
             className={cn(
-              "fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] sm:max-w-lg",
+              "fixed top-[50%] left-[50%] z-50 w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] sm:max-w-lg",
+              // Banded: a column with a ceiling, so the body takes the overflow and the header
+              // and footer stay put.
+              column ? "flex max-h-[calc(100dvh-2rem)] flex-col" : "grid",
               CONTENT_MOTION,
+              column && !isMaximized && SHEET_BELOW_SM,
               className,
             )}
             // Maximized: pin every edge a uniform gap from the viewport (not %-based vw/vh,
@@ -114,18 +190,26 @@ export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(
             // column so a flex-1 body (see useDialogMaximized) fills the frame; the fixed
             // insets + transform:none override the base centered grid.
             style={isMaximized
-              // translate:none (not transform) cancels the base centering — Tailwind v4's
+              // translate:none (not transform) cancels the base centering: Tailwind v4's
               // translate-x/y compile to the `translate` property, which `transform` won't reset.
               ? { ...style, top: "0.75rem", right: "0.75rem", bottom: "0.75rem", left: "0.75rem", width: "auto", height: "auto", maxWidth: "none", transform: "none", translate: "none", display: "flex", flexDirection: "column" }
               : style}
             {...rest}
-            {...slotAttributes(dialogContentStyle, { flush })}
+            {...slotAttributes(dialogContentStyle, { flush, banded: column })}
           >
             {maximizable && <ResetMaximizeOnClose onReset={setMaximized} />}
-            {children}
+            {bands.banded ? (
+              <>
+                {bands.head}
+                {bands.explicitBody && bands.middle.length === 1 ? bands.middle : <DialogBody>{bands.middle}</DialogBody>}
+                {bands.foot}
+              </>
+            ) : (
+              children
+            )}
             {(maximizable || showCloseButton) && (
               <div
-                className="absolute top-3.5 right-3.5 flex items-center"
+                className="absolute z-[2] flex items-center"
                 {...slotAttributes(dialogCornerActionsStyle, {})}
               >
                 {maximizable && (
@@ -165,6 +249,7 @@ export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(
               </div>
             )}
           </DialogPrimitive.Content>
+        </DialogBandsContext.Provider>
         </DialogMaximizedContext.Provider>
       </DialogPortal>
     );
@@ -177,11 +262,43 @@ DialogContent.displayName = "DialogContent";
 export type DialogHeaderProps = React.HTMLAttributes<HTMLDivElement>;
 
 export function DialogHeader({ className, ...rest }: DialogHeaderProps) {
+  const bands = useContext(DialogBandsContext);
   return (
     <div
-      className={cn("flex flex-col", className)}
+      className={cn("flex flex-col", bands && "relative z-[1] shrink-0", className)}
       {...rest}
-      {...slotAttributes(dialogHeaderStyle, {})}
+      {...slotAttributes(dialogHeaderStyle, { scrolled: bands?.edges.above ?? false, corner: bands?.corner ?? true })}
+    />
+  );
+}
+
+// Body
+export type DialogBodyProps = React.HTMLAttributes<HTMLDivElement>;
+
+/**
+ * The scrolling middle of a banded dialog. {@link DialogContent} wraps everything between its
+ * header and footer in one automatically; write it by hand only to put props on it.
+ *
+ * @remarks
+ * It reports which of its edges hide content, and the header and footer draw the scroll-edge
+ * shadow on the strip the content passes under.
+ */
+export function DialogBody({ className, ...rest }: DialogBodyProps) {
+  const bands = useContext(DialogBandsContext);
+  const { ref, edges } = useScrollEdges<HTMLDivElement>(true);
+  const setEdges = bands?.setEdges;
+  useEffect(() => {
+    setEdges?.(edges);
+  }, [edges, setEdges]);
+  // The edges live on the content, which outlives the body across a close; reset them so a
+  // reopened dialog does not start with the last session's shadows.
+  useEffect(() => () => setEdges?.(NO_EDGES), [setEdges]);
+  return (
+    <div
+      ref={ref}
+      className={cn("min-h-0 flex-1 overflow-y-auto overscroll-contain", className)}
+      {...rest}
+      {...slotAttributes(dialogBodyStyle, { head: bands?.head ?? false, foot: bands?.foot ?? false })}
     />
   );
 }
@@ -190,11 +307,12 @@ export function DialogHeader({ className, ...rest }: DialogHeaderProps) {
 export type DialogFooterProps = React.HTMLAttributes<HTMLDivElement>;
 
 export function DialogFooter({ className, ...rest }: DialogFooterProps) {
+  const bands = useContext(DialogBandsContext);
   return (
     <div
-      className={cn("flex flex-col-reverse sm:flex-row sm:justify-end", className)}
+      className={cn("flex flex-col-reverse sm:flex-row sm:justify-end", bands && "relative z-[1] shrink-0", className)}
       {...rest}
-      {...slotAttributes(dialogFooterStyle, {})}
+      {...slotAttributes(dialogFooterStyle, { overflow: bands?.edges.below ?? false })}
     />
   );
 }

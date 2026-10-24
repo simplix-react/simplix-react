@@ -54,7 +54,7 @@
     "prebuild": "find src -name '*.d.ts' -o -name '*.d.ts.map' -o -name '*.js' -o -name '*.js.map' | xargs rm -f",
     "build": "tsup",
     "design:css": "node scripts/build-design-css.mjs && node scripts/build-design-css.mjs --design-spec src/design/clarity.spec.ts --out src/theme/designs/clarity.css --compiled src/design/clarity-stylesheet.ts --tokens src/theme/designs/clarity-tokens.css --tailwind-from ../../apps/storybook",
-    "design:check": "node scripts/build-design-css.mjs --check && node scripts/build-design-css.mjs --design-spec src/design/clarity.spec.ts --out src/theme/designs/clarity.css --compiled src/design/clarity-stylesheet.ts --tokens src/theme/designs/clarity-tokens.css --tailwind-from ../../apps/storybook --check && node scripts/check-design-coverage.mjs",
+    "design:check": "node scripts/build-design-css.mjs --check && node scripts/build-design-css.mjs --design-spec src/design/clarity.spec.ts --out src/theme/designs/clarity.css --compiled src/design/clarity-stylesheet.ts --tokens src/theme/designs/clarity-tokens.css --tailwind-from ../../apps/storybook --check && node scripts/check-design-coverage.mjs && node scripts/check-slot-spread.mjs",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint src",
@@ -152,6 +152,7 @@
   "bin": {
     "simplix-design-css": "./scripts/build-design-css.mjs",
     "simplix-design-classes": "./scripts/check-design-classes.mjs",
-    "simplix-design-coverage": "./scripts/check-design-coverage.mjs"
+    "simplix-design-coverage": "./scripts/check-design-coverage.mjs",
+    "simplix-slot-spread": "./scripts/check-slot-spread.mjs"
   }
 }

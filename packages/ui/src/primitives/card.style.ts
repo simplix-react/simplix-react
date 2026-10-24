@@ -21,7 +21,8 @@ export const cardStyle = defineSlotStyle({
       lg: "px-8 py-6",
     },
     interactive: {
-      true: "hover:border-primary/30 hover:shadow-md transition-all",
+      // Pointed at, an interactive card lifts 1px with a shadow; pressed, it settles.
+      true: "hover:border-primary/30 hover:shadow-md transition-[box-shadow,border-color,translate,scale] duration-[var(--dur-fast)] ease-[var(--ease)] hover:-translate-y-px active:translate-y-0 active:scale-[0.98]",
       false: "",
     },
     /** A card drawn as a button aligns its content to the start edge. */

@@ -70,8 +70,9 @@ describe("AlertBanner", () => {
   it("uses sm density padding and typography", () => {
     render(<AlertBanner density="sm" title="Small" />);
     const banner = getBanner();
-    expect(drawnClasses(banner)).toContain("px-3");
-    expect(drawnClasses(banner)).toContain("py-2");
+    // 10px above and below, 16px at the start, a tighter end where the dismiss control sits.
+    const drawn = drawnClasses(banner).split(/\s+/);
+    expect(drawn).toEqual(expect.arrayContaining(["py-2.5", "ps-4", "pe-2.5"]));
     expect(drawnClasses(screen.getByText("Small"))).toContain("text-sm");
   });
 

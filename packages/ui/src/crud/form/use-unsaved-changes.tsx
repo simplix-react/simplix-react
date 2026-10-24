@@ -2,7 +2,7 @@ import { useCallback, useState, type ReactNode } from "react";
 import { useTranslation } from "@simplix-react/i18n/react";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
 
-import { ALERT_BUTTON_STRUCTURE, alertActionAttributes, alertCancelAttributes, AlertPanel } from "../shared/alert-panel";
+import { ALERT_BUTTON_STRUCTURE, alertCancelAttributes, alertDangerActionAttributes, AlertPanel } from "../shared/alert-panel";
 import { useBeforeUnload } from "./use-before-unload";
 
 /** Options for the {@link useUnsavedChanges} hook. */
@@ -84,7 +84,7 @@ export function useUnsavedChanges({ isDirty }: UseUnsavedChangesOptions): UseUns
               e.preventDefault();
               handleConfirm();
             }}
-            className={ALERT_BUTTON_STRUCTURE} {...alertActionAttributes}
+            className={ALERT_BUTTON_STRUCTURE} {...alertDangerActionAttributes}
           >
             {t("common.discard")}
           </AlertDialog.Action>

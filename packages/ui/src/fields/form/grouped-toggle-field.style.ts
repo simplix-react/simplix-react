@@ -62,7 +62,7 @@ export const groupedToggleChipsStyle = defineSlotStyle({
 /** One toggle chip. */
 export const groupedToggleChipStyle = defineSlotStyle({
   slot: "field-toggle-chip",
-  base: "gap-1 rounded-sm border px-2 py-0.5 text-xs transition-all border-transparent bg-muted text-muted-foreground hover:bg-muted/70 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-muted disabled:hover:text-muted-foreground",
+  base: "gap-1 rounded-sm border px-2 py-0.5 text-xs transition-all border-transparent bg-muted text-muted-foreground hover:bg-muted/70 hover:text-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-muted disabled:hover:text-muted-foreground focus-visible:shadow-[var(--focus-halo)]",
   variants: {
     pressed: {
       true: "border-primary bg-primary/20 font-semibold text-primary hover:bg-primary/25 hover:text-primary",

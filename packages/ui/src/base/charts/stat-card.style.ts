@@ -13,7 +13,8 @@ export const statCardStyle = defineSlotStyle({
   // included. A row of four with one two-line basis otherwise draws three cards floating
   // above a taller neighbour. In a parent that does not stretch, `h-full` resolves to auto
   // and nothing changes, so this costs a lone tile nothing.
-  base: "h-full rounded-lg border px-4 py-3 text-card-foreground shadow-sm",
+  // A figure tile: the title, the figure and its foot down a 124px card that lifts when pointed at.
+  base: "h-full rounded-lg border px-4 text-card-foreground shadow-sm flex min-h-[124px] flex-col gap-1 py-3.5 transition-[box-shadow,border-color,translate,scale] duration-[var(--dur-fast)] ease-[var(--ease)] hover:-translate-y-px hover:shadow-md active:translate-y-0 active:scale-[0.98]",
   variants: {
     /** A tinted card takes its surface from the status tone the caller passes as a class. */
     tinted: { true: "", false: "bg-card" },
@@ -24,7 +25,7 @@ export const statCardStyle = defineSlotStyle({
 /** The row holding the card title, its extra content and its icon. */
 export const statCardHeaderStyle = defineSlotStyle({
   slot: "stat-card-header",
-  base: "gap-1.5",
+  base: "min-h-[22px] gap-2",
   variants: {},
   defaultVariants: {},
 });
@@ -48,7 +49,7 @@ export const statCardIconStyle = defineSlotStyle({
 /** The row holding the figure and the optional plot beside it. */
 export const statCardBodyStyle = defineSlotStyle({
   slot: "stat-card-body",
-  base: "mt-1 gap-3",
+  base: "gap-3 mt-1.5",
   variants: {},
   defaultVariants: {},
 });
@@ -76,7 +77,7 @@ export const statCardValueStyle = defineSlotStyle({
 /** What stands in for the figure while it is being read. */
 export const statCardSkeletonStyle = defineSlotStyle({
   slot: "stat-card-skeleton",
-  base: "h-6 w-14 animate-pulse rounded bg-muted",
+  base: "h-6 w-14 rounded bg-muted bg-[linear-gradient(90deg,var(--muted),var(--shimmer),var(--muted))] bg-[length:200%_100%] animate-skeleton-shine motion-reduce:animate-none",
   variants: {},
   defaultVariants: {},
 });
@@ -84,7 +85,8 @@ export const statCardSkeletonStyle = defineSlotStyle({
 /** The unit beside the figure; classic draws it in the figure's own type. */
 export const statCardUnitStyle = defineSlotStyle({
   slot: "stat-card-unit",
-  base: "",
+  // The unit stands apart from the figure, quieter.
+  base: "ms-1 font-sans font-medium tracking-normal text-sm text-muted-foreground",
   variants: {},
   defaultVariants: {},
 });
@@ -92,7 +94,7 @@ export const statCardUnitStyle = defineSlotStyle({
 /** The row holding the description and the trend. */
 export const statCardFooterStyle = defineSlotStyle({
   slot: "stat-card-footer",
-  base: "mt-1.5 gap-3",
+  base: "mt-auto pt-2 gap-x-2.5",
   variants: {},
   defaultVariants: {},
 });

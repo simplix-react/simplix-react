@@ -17,7 +17,7 @@ describe("Skeleton", () => {
   it("applies base classes", () => {
     render(<Skeleton data-testid="sk" />);
     const sk = screen.getByTestId("sk");
-    expect(drawnClasses(sk)).toContain("animate-pulse");
+    expect(drawnClasses(sk)).toContain("animate-skeleton-shine");
     expect(drawnClasses(sk)).toContain("rounded-md");
     expect(drawnClasses(sk)).toContain("bg-muted");
   });
@@ -27,7 +27,7 @@ describe("Skeleton", () => {
     const sk = screen.getByTestId("sk");
     expect(drawnClasses(sk)).toContain("h-4");
     expect(drawnClasses(sk)).toContain("w-32");
-    expect(drawnClasses(sk)).toContain("animate-pulse");
+    expect(drawnClasses(sk)).toContain("animate-skeleton-shine");
   });
 
   it("passes through HTML attributes", () => {

@@ -3,7 +3,7 @@ import { defineSlotStyle } from "../../design/slot-style";
 /** The color picker trigger swatch. Drawn by `theme/designs/classic.css`; see {@link defineSlotStyle}. */
 export const colorPickerTriggerStyle = defineSlotStyle({
   slot: "color-picker-trigger",
-  base: "rounded-md border-2 p-0 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50",
+  base: "rounded-md border-2 p-0 transition-all disabled:opacity-50 focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]",
   variants: {
     empty: { true: "border-dashed", false: "" },
   },
@@ -37,7 +37,7 @@ export const colorPickerPaletteStyle = defineSlotStyle({
 /** One preset color swatch; the check glyph of the picked one sits inside it. */
 export const colorPickerSwatchStyle = defineSlotStyle({
   slot: "color-picker-swatch",
-  base: "rounded-md border-2 transition-all hover:scale-110 focus:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+  base: "rounded-md border-2 transition-all hover:scale-110 focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]",
   variants: {
     selected: {
       true: "border-foreground scale-110 [&>svg]:text-white [&>svg]:drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] [&>svg]:mx-auto",

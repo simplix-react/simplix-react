@@ -11,7 +11,7 @@ export const radioGroupStyle = defineSlotStyle({
 /** One radio item's classic look. */
 export const radioGroupItemStyle = defineSlotStyle({
   slot: "radio-group-item",
-  base: "rounded-full border border-primary text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+  base: "rounded-full border border-primary text-primary disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]",
   variants: {},
   defaultVariants: {},
 });

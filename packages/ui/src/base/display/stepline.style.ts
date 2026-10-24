@@ -5,7 +5,8 @@ export const steplineItemStyle = defineSlotStyle({
   slot: "stepline-item",
   base: "",
   variants: {
-    orientation: { vertical: "gap-3", horizontal: "gap-1 px-1" },
+    // The label stands 8px under its circle, clear of the ring.
+    orientation: { vertical: "gap-3", horizontal: "gap-2 px-1" },
   },
   defaultVariants: { orientation: "horizontal" },
 });

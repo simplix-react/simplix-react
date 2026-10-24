@@ -48,6 +48,8 @@
   /* ── secondary / muted / accent ── */
   --secondary: oklch(0.968 0.007 247.896);
   --muted: oklch(0.968 0.007 247.896);
+  /* The shine that passes across a loading skeleton. */
+  --shimmer: oklch(1 0 0 / 0.7);
   --accent: oklch(0.968 0.007 247.896);
   --accent-foreground: oklch(0.208 0.042 265.755);
 
@@ -107,6 +109,16 @@
   --dur-fast: 120ms;
   --dur-base: 200ms;
   --dur-slow: 320ms;
+
+  /* ── focus: the one keyboard-focus visual every design draws ──
+     A 3px halo outside the element; form controls also take the ring colour on their border. A
+     design changes the halo's colour, never its shape. */
+  --focus-halo: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent);
+  --invalid-halo: 0 0 0 3px color-mix(in oklab, var(--destructive) 20%, transparent);
+
+  /* ── layout shared by every design ──
+     The record panel is a narrow column beside a wide list (list-detail reads it). */
+  --detail-panel-width: 440px;
 
   /* ── radius by use ──
      Controls take the base radius, surfaces a step more, overlays a step more again, badges are
@@ -190,6 +202,7 @@
   /* ── secondary / muted / accent ── */
   --secondary: oklch(0.279 0.041 260.031);
   --muted: oklch(0.279 0.041 260.031);
+  --shimmer: oklch(1 0 0 / 0.07);
   --accent: oklch(0.279 0.041 260.031);
   --accent-foreground: oklch(0.984 0.003 247.858);
 
@@ -323,6 +336,20 @@
   --color-fg-soft: var(--fg-soft);
   --color-hairline: var(--hairline);
   --color-hairline-2: var(--hairline-2);
+}
+
+/* Loading skeleton shine: a light band passes across the stand-in, in every design. */
+@theme {
+  --animate-skeleton-shine: skeleton-shine 1.6s linear infinite;
+}
+
+@keyframes skeleton-shine {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
 }
 
 /* Status indicator animation — the one-shot ring used by StatusDot

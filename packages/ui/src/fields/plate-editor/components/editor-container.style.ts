@@ -17,8 +17,8 @@ export const plateEditorWrapperStyle = defineSlotStyle({
   variants: {
     // The error colours replace the resting and focus colours, so each sits in its own value.
     invalid: {
-      true: "border-destructive ring-destructive/20 dark:ring-destructive/40 ring-[3px]",
-      false: "border-input focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px]",
+      true: "border-destructive focus-within:shadow-[var(--invalid-halo)]",
+      false: "border-input focus-within:border-ring focus-within:shadow-[var(--focus-halo)]",
     },
     disabled: { true: "opacity-50", false: "" },
   },

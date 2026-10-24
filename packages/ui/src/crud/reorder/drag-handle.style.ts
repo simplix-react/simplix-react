@@ -11,7 +11,7 @@ export const dragHandleGripStyle = defineSlotStyle({
 /** The button a reader grabs to drag a row. */
 export const dragHandleStyle = defineSlotStyle({
   slot: "drag-handle",
-  base: "rounded p-0.5 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+  base: "rounded p-0.5 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]",
   variants: {},
   defaultVariants: {},
 });

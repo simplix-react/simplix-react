@@ -1,7 +1,7 @@
 import { useTranslation } from "@simplix-react/i18n/react";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
 
-import { ALERT_BUTTON_STRUCTURE, alertActionAttributes, alertCancelAttributes, AlertPanel } from "./alert-panel";
+import { ALERT_BUTTON_STRUCTURE, alertActionAttributes, alertCancelAttributes, alertDangerActionAttributes, AlertPanel } from "./alert-panel";
 
 export interface ConfirmDialogProps {
   open: boolean;
@@ -12,6 +12,8 @@ export interface ConfirmDialogProps {
   cancelLabel?: string;
   /** When true, hides the cancel button. Useful for info-only dialogs. */
   hideCancel?: boolean;
+  /** Draws the confirm button as destructive, for a confirmation that deletes or discards. */
+  destructive?: boolean;
 
   onConfirm: () => void;
   isPending?: boolean;
@@ -36,6 +38,7 @@ export function ConfirmDialog({
   cancelLabel,
 
   hideCancel = false,
+  destructive = false,
   onConfirm,
   isPending = false,
   pendingLabel,
@@ -62,7 +65,8 @@ export function ConfirmDialog({
               e.preventDefault();
               onConfirm();
             }}
-            className={ALERT_BUTTON_STRUCTURE} {...alertActionAttributes}
+            className={ALERT_BUTTON_STRUCTURE}
+            {...(destructive ? alertDangerActionAttributes : alertActionAttributes)}
             disabled={isPending}
           >
             {isPending ? (pendingLabel ?? resolvedConfirmLabel) : resolvedConfirmLabel}

@@ -1,13 +1,18 @@
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 
+import { motionTokenMs } from "../../utils/motion-duration";
+
 /** Options for {@link useFadeTransition}. */
 export interface UseFadeTransitionOptions {
   /** Whether the detail panel is currently showing (e.g. `view === "detail"`). */
   active: boolean;
   /** The id of the item to display. */
   targetId: string | null;
-  /** Fade duration in milliseconds. @defaultValue 200 */
+  /**
+   * Fade duration in milliseconds. When omitted the fade runs on the `--dur-base` motion token
+   * (and `--ease`), so a design's timing and reduced motion apply.
+   */
   duration?: number;
 }
 
@@ -34,7 +39,7 @@ export interface UseFadeTransitionResult {
 export function useFadeTransition(
   options: UseFadeTransitionOptions,
 ): UseFadeTransitionResult {
-  const { active, targetId, duration = 200 } = options;
+  const { active, targetId, duration } = options;
 
   const [displayedId, setDisplayedId] = useState<string | null>(null);
   const [fading, setFading] = useState(false);
@@ -59,13 +64,13 @@ export function useFadeTransition(
     timerRef.current = setTimeout(() => {
       setDisplayedId(targetId);
       setFading(false);
-    }, duration);
+    }, duration ?? motionTokenMs("--dur-base"));
 
     return () => clearTimeout(timerRef.current);
   }, [active, targetId, displayedId, duration]);
 
   const style: CSSProperties = {
-    transition: `opacity ${duration}ms ease-in-out`,
+    transition: duration === undefined ? "opacity var(--dur-base) var(--ease)" : `opacity ${duration}ms var(--ease)`,
     opacity: fading ? 0 : 1,
   };
 

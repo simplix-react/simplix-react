@@ -74,7 +74,7 @@ describe("useFadeTransition", () => {
     rerender({ targetId: "b" });
 
     expect(result.current.fading).toBe(true);
-    expect(result.current.style.transition).toBe("opacity 500ms ease-in-out");
+    expect(result.current.style.transition).toBe("opacity 500ms var(--ease)");
 
     act(() => {
       vi.advanceTimersByTime(499);
@@ -113,11 +113,49 @@ describe("useFadeTransition", () => {
     expect(result.current.displayedId).toBeNull();
   });
 
-  it("defaults duration to 200ms", () => {
+  it("runs on the motion tokens when no duration is given", () => {
     const { result } = renderHook(() =>
       useFadeTransition({ active: true, targetId: "x" }),
     );
 
-    expect(result.current.style.transition).toBe("opacity 200ms ease-in-out");
+    expect(result.current.style.transition).toBe("opacity var(--dur-base) var(--ease)");
+  });
+
+  it("swaps after the --dur-base token's time", () => {
+    document.documentElement.style.setProperty("--dur-base", "150ms");
+    try {
+      const { result, rerender } = renderHook(
+        ({ targetId }) => useFadeTransition({ active: true, targetId }),
+        { initialProps: { targetId: "item-1" as string | null } },
+      );
+      rerender({ targetId: "item-2" });
+      act(() => {
+        vi.advanceTimersByTime(149);
+      });
+      expect(result.current.displayedId).toBe("item-1");
+      act(() => {
+        vi.advanceTimersByTime(1);
+      });
+      expect(result.current.displayedId).toBe("item-2");
+    } finally {
+      document.documentElement.style.removeProperty("--dur-base");
+    }
+  });
+
+  it("swaps at once when reduced motion sets the token to 0", () => {
+    document.documentElement.style.setProperty("--dur-base", "0ms");
+    try {
+      const { result, rerender } = renderHook(
+        ({ targetId }) => useFadeTransition({ active: true, targetId }),
+        { initialProps: { targetId: "item-1" as string | null } },
+      );
+      rerender({ targetId: "item-2" });
+      act(() => {
+        vi.advanceTimersByTime(0);
+      });
+      expect(result.current.displayedId).toBe("item-2");
+    } finally {
+      document.documentElement.style.removeProperty("--dur-base");
+    }
   });
 });

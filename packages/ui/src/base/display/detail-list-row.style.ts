@@ -7,7 +7,7 @@ export const detailListRowStyle = defineSlotStyle({
   variants: {
     /** A row with an `onClick` is a button: hover background and a focus ring. */
     interactive: {
-      true: "transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+      true: "transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]",
       false: "",
     },
   },

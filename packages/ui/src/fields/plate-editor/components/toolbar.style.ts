@@ -33,7 +33,7 @@ export const plateToolbarGroupStyle = defineSlotStyle({
 /** A toolbar button. */
 export const plateToolbarButtonStyle = defineSlotStyle({
   slot: "plate-toolbar-button",
-  base: "rounded px-1 text-xs font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50",
+  base: "rounded px-1 text-xs font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none disabled:opacity-50 focus-visible:shadow-[var(--focus-halo)]",
   variants: {
     pressed: { true: "bg-accent text-accent-foreground", false: "" },
   },

@@ -11,7 +11,7 @@ export const segmentedControlStyle = defineSlotStyle({
 /** One choice. */
 export const segmentedControlItemStyle = defineSlotStyle({
   slot: "segmented-control-item",
-  base: "h-8 px-3.5 text-sm font-medium text-muted-foreground [transition:color_var(--dur-fast)_var(--ease)] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm",
+  base: "h-8 px-3.5 text-sm font-medium text-muted-foreground [transition:color_var(--dur-fast)_var(--ease)] hover:text-foreground focus-visible:outline-none rounded-sm focus-visible:shadow-[var(--focus-halo)]",
   variants: {
     selected: { true: "text-foreground", false: "" },
   },
@@ -21,7 +21,7 @@ export const segmentedControlItemStyle = defineSlotStyle({
 /** The surface under the chosen item, which slides to the next choice. */
 export const segmentedControlThumbStyle = defineSlotStyle({
   slot: "segmented-control-thumb",
-  base: "rounded-sm bg-background shadow-sm [transition:transform_var(--dur-slow)_var(--ease),width_var(--dur-slow)_var(--ease)]",
+  base: "rounded-sm bg-background shadow-sm [transition:transform_var(--dur-base)_var(--ease),width_var(--dur-base)_var(--ease)]",
   variants: {},
   defaultVariants: {},
 });

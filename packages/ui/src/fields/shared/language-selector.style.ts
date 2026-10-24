@@ -30,7 +30,7 @@ export const languageChevronStyle = defineSlotStyle({
 export const languageTriggerStyle = defineSlotStyle({
   slot: "field-language-trigger",
   as: "part",
-  base: "border-0 !bg-transparent dark:!bg-transparent !p-0 !py-0 text-[10px] leading-none shadow-none focus-visible:ring-0 [&>span]:leading-none",
+  base: "border-0 !bg-transparent dark:!bg-transparent !p-0 !py-0 text-[10px] leading-none shadow-none [&>span]:leading-none",
   variants: {},
   defaultVariants: {},
 });

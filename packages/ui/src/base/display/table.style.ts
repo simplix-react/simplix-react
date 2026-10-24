@@ -60,10 +60,11 @@ export const tableFooterStyle = defineSlotStyle({
 /** A table row. */
 export const tableRowStyle = defineSlotStyle({
   slot: "table-row",
-  base: "border-b border-border transition-colors",
+  base: "border-b border-border transition-colors duration-[var(--dur-fast)]",
   variants: {
     variant: {
-      default: "hover:bg-muted/40",
+      // Hover one step, press one more.
+      default: "hover:bg-muted/40 active:bg-muted/70",
       striped: "even:bg-muted/50",
       bordered: "hover:bg-muted/50",
     },

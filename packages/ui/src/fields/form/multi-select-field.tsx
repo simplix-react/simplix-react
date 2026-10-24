@@ -187,6 +187,13 @@ export function MultiSelectField<T extends string = string>({
                 onChange={(e) => setQuery(e.target.value)}
                 onFocus={() => setOpen(true)}
                 onClick={() => setOpen(true)}
+                // Tabbing on closes the list. An open popover holds a focus scope that pauses the
+                // enclosing dialog's trap, so leaving it open let Tab walk out of the dialog.
+                onBlur={(e) => {
+                  const next = e.relatedTarget as Node | null;
+                  if (next && (boxRef.current?.contains(next) || document.getElementById(listboxId)?.contains(next))) return;
+                  setOpen(false);
+                }}
                 placeholder={value.length === 0 ? selectPlaceholder : ""}
                 disabled={disabled}
                 className="min-w-[60px] flex-1"

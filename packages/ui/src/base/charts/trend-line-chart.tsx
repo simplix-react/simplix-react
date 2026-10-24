@@ -2,7 +2,7 @@ import { type CSSProperties, type MouseEvent, type ReactNode, useId, useRef, use
 
 import { slotAttributes } from "../../design/slot-style";
 import { plotAreaStyle, plotAxisStyle, plotCrosshairStyle, plotGridStyle, plotLineStyle, plotPointStyle, plotStyle } from "./plot.style";
-import { type PlotPointer, PlotSkeleton, PlotTooltip, useDrawnIn } from "./plot-parts";
+import { type PlotPointer, PlotSkeleton, PlotTooltip, useDrawnIn, usePlotKeys, usePlotSize } from "./plot-parts";
 
 /** One series of a trend line chart. */
 export interface TrendLineSeries {
@@ -29,8 +29,9 @@ export interface TrendLineChartProps {
   tooltip?: (index: number) => ReactNode;
 }
 
-const W = 520;
-const H = 200;
+/** The drawing's proportion; the size itself follows the card (see `usePlotSize`). */
+const PLOT_W = 520;
+const PLOT_H = 200;
 const L = 34;
 const B = 24;
 const T = 10;
@@ -47,6 +48,7 @@ export function TrendLineChart({ label, categories, series, domain, hidden, load
   const id = useId().replace(/:/g, "");
   const drawn = useDrawnIn();
   const svg = useRef<SVGSVGElement>(null);
+  const { W, H } = usePlotSize(svg, PLOT_W, PLOT_H);
   const [hot, setHot] = useState<number | null>(null);
   const [pointer, setPointer] = useState<PlotPointer | null>(null);
 
@@ -68,9 +70,18 @@ export function TrendLineChart({ label, categories, series, domain, hidden, load
     setHot(null);
     setPointer(null);
   };
+  const keys = usePlotKeys(svg, categories.length, hot, x, W, (i, at) => {
+    setHot(i);
+    setPointer(at);
+  });
+  const tipId = `${id}-tip`;
 
   return (
-    <div className="relative" {...slotAttributes(plotStyle, { loading })}>
+    <div
+      className="relative"
+      {...(tooltip ? { ...keys, "aria-describedby": hot !== null ? tipId : undefined } : {})}
+      {...slotAttributes(plotStyle, { loading })}
+    >
       <svg ref={svg} viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label} className="block h-auto w-full overflow-visible">
         <defs>
           {series
@@ -123,7 +134,7 @@ export function TrendLineChart({ label, categories, series, domain, hidden, load
         <rect x={L} y={T} width={W - L} height={H - T - B} fill="transparent" onMouseMove={move} onMouseLeave={leave} />
       </svg>
       {loading && <PlotSkeleton count={categories.length} />}
-      {tooltip && hot !== null && <PlotTooltip at={pointer}>{tooltip(hot)}</PlotTooltip>}
+      {tooltip && hot !== null && <PlotTooltip at={pointer} id={tipId}>{tooltip(hot)}</PlotTooltip>}
     </div>
   );
 }

@@ -62,10 +62,13 @@ describe("Button", () => {
     expect(drawnClasses(button)).toContain("underline-offset-4");
   });
 
-  it("applies variant='primary' with min-w-32", () => {
+  it("applies variant='primary' at its label's width", () => {
     render(<Button variant="primary">Primary</Button>);
     const button = screen.getByRole("button");
-    expect(drawnClasses(button)).toContain("min-w-32");
+    // A primary sits beside its secondary at the same measure; a minimum width stretched a short
+    // label in a dialog footer.
+    expect(drawnClasses(button)).toContain("bg-primary");
+    expect(drawnClasses(button)).not.toMatch(/(^|\s)min-w-/);
   });
 
   it("applies size='sm'", () => {

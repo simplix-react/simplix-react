@@ -19,7 +19,8 @@ export const crudCardBodyStyle = defineSlotStyle({
 /** A card in a reorderable or selectable card list. */
 export const crudCardStyle = defineSlotStyle({
   slot: "crud-card",
-  base: "rounded-lg border transition-colors hover:bg-muted/50",
+  // Pointed at, a card lifts 1px with a shadow.
+  base: "rounded-lg border transition-[background-color,border-color,box-shadow,translate] duration-[var(--dur-fast)] ease-[var(--ease)] hover:bg-muted/50 hover:shadow-md hover:-translate-y-px",
   variants: {
     selected: { true: "ring-2 ring-primary", false: "" },
     active: { true: "bg-muted/50", false: "" },

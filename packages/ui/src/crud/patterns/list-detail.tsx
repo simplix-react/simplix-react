@@ -13,6 +13,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 
 import { useTranslation } from "@simplix-react/i18n/react";
 
+import { DialogContent } from "../../base/overlay/dialog";
 import { SheetContent } from "../../base/overlay/sheet";
 import { useUIDefaults } from "../../provider/ui-defaults-context";
 import { partAttributes, slotAttributes } from "../../design/slot-style";
@@ -20,11 +21,9 @@ import { cn } from "../../utils/cn";
 import {
   crudListDetailDrawerStyle,
   crudListDetailDetailStyle,
-  crudListDetailDialogStyle,
   crudListDetailDividerStyle,
   crudListDetailDrawerBodyStyle,
   crudListDetailListStyle,
-  crudListDetailOverlayStyle,
   crudListDetailRootStyle,
 } from "./list-detail.style";
 
@@ -147,12 +146,12 @@ export type ListDetailProps = ListDetailBaseProps & (
  * detail's action row — four buttons, in English, at a 1280 viewport — pushed its last button
  * 141px past the edge. At 768 that row ends 24px inside it.
  *
- * <p><b>A screen that pins `listWidth` does not use this in panel mode</b>, and today every screen
- * in this console does: the list takes the width it asked for and the detail column takes whatever
- * remains, which is wider than 768 on a large monitor and narrower on a small one. So this unifies
- * the two presentations that float over the list and sets the default for the panel; making the
- * third agree as well would mean overriding a number each screen chose for its own list, which is
- * a different decision from this one.
+ * <p><b>A screen that pins `listWidth` does not use this in panel mode</b>: the list takes the width
+ * it asked for and the detail column takes whatever remains.
+ *
+ * <p><b>The theme names the width first.</b> `--detail-panel-width` (theme/base.css, the same in
+ * every design) puts the record panel at 440px beside a wide list; this number is the fallback for
+ * an application whose stylesheet leaves the property unset.
  */
 export const DETAIL_PANEL_WIDTH = 768;
 
@@ -167,8 +166,9 @@ export const DETAIL_PANEL_WIDTH = 768;
 const MIN_PANEL_WIDTH = 280;
 
 /**
- * The custom property through which a design names the detail column's width, in px, for a screen
- * that names none. A design that draws the panel as a narrow card beside a wide list sets it.
+ * The custom property through which the theme names the detail column's width, in px, for a
+ * screen that names none. theme/base.css sets it for every design; a design or an application may
+ * override it.
  */
 const DESIGN_DETAIL_WIDTH_PROPERTY = "--detail-panel-width";
 
@@ -213,6 +213,19 @@ export function ListDetailRoot({ variant: variantProp, activePanel: activePanelP
   const [dragListWidth, setDragListWidth] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
+  // The section's width, so a detail column wider than the room beside a usable list gives way
+  // instead of squeezing the list under its minimum. The tracks transition, so the panel narrows
+  // smoothly as the window does.
+  const [sectionWidth, setSectionWidth] = useState<number | null>(null);
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry) setSectionWidth(entry.contentRect.width);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const handleDrag = useCallback(
     (newListWidth: number) => {
@@ -238,7 +251,11 @@ export function ListDetailRoot({ variant: variantProp, activePanel: activePanelP
   const contextValue: ListDetailContextValue = { variant, activePanel, setActivePanel, dialogHeight };
 
   const effectiveListWidth = dragListWidth ?? listWidth;
-  const effectiveDetailWidth = dragDetailWidth ?? detailWidth;
+  const roomForDetail = sectionWidth != null ? sectionWidth - DIVIDER_TRACK - MIN_PANEL_WIDTH : null;
+  const effectiveDetailWidth =
+    roomForDetail != null && roomForDetail >= MIN_PANEL_WIDTH
+      ? Math.min(dragDetailWidth ?? detailWidth, roomForDetail)
+      : (dragDetailWidth ?? detailWidth);
   const isDetailOpen = activePanel === "detail";
   // The columns animate only while the detail opens or closes. Any other change of width (the
   // design naming its own, the stylesheet arriving after the first paint, a new viewport) is
@@ -562,29 +579,22 @@ const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }
   }
 
   if (variant === "dialog") {
+    // The shared dialog frame: scrim, landing motion, height ceiling and the bottom sheet below
+    // `sm`. The detail draws its own header, scrolling body and footer, so the frame is a bare
+    // column (`frame="column"`, `flush`) and the detail's own close replaces the corner one.
     return (
-      <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay
-          className={cn(crudListDetailOverlayMotion, "fixed inset-0 z-50")}
-          {...slotAttributes(crudListDetailOverlayStyle, {})}
-        />
-        <DialogPrimitive.Content
-          ref={ref as React.Ref<HTMLDivElement>}
-          aria-describedby={undefined}
-          className={cn(crudListDetailDialogMotion, 
-            "fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2",
-            "w-full",
-            !dialogHeight && "max-h-[85vh]",
-            "flex flex-col overflow-hidden",
-            className,
-          )}
-          {...slotAttributes(crudListDetailDialogStyle, {})}
-          style={{ maxWidth: DETAIL_PANEL_WIDTH, ...(dialogHeight ? { height: dialogHeight } : {}) }}
-        >
-          <DialogPrimitive.Title className="sr-only">{t("common.detail")}</DialogPrimitive.Title>
-          {children}
-        </DialogPrimitive.Content>
-      </DialogPrimitive.Portal>
+      <DialogContent
+        ref={ref as React.Ref<HTMLDivElement>}
+        aria-describedby={undefined}
+        frame="column"
+        flush
+        showCloseButton={false}
+        className={cn("overflow-hidden sm:max-w-[var(--detail-dialog-width)]", !dialogHeight && "max-h-[85vh]", className)}
+        style={{ "--detail-dialog-width": `${DETAIL_PANEL_WIDTH}px`, ...(dialogHeight ? { height: dialogHeight } : {}) } as React.CSSProperties}
+      >
+        <DialogPrimitive.Title className="sr-only">{t("common.detail")}</DialogPrimitive.Title>
+        {children}
+      </DialogContent>
     );
   }
 
@@ -610,16 +620,6 @@ DetailPanel.displayName = "ListDetail.Detail";
 // ── Compound export ──
 
 import { ListDetailViewSwitch } from "./list-detail-view-switch";
-
-// Entry and exit motion is tw-animate-css, which a design stylesheet cannot @apply; it stays
-// on the element, the same in every design.
-const crudListDetailDialogMotion =
-  "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95";
-
-// Entry and exit motion is tw-animate-css, which a design stylesheet cannot @apply; it stays
-// on the element, the same in every design.
-const crudListDetailOverlayMotion =
-  "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0";
 
 /**
  * List-detail layout in three shapes:

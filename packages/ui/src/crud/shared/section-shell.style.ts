@@ -58,7 +58,7 @@ export const sectionShellDescriptionStyle = defineSlotStyle({
 /** The caret of the collapse button. */
 export const sectionShellCaretStyle = defineSlotStyle({
   slot: "section-shell-caret",
-  base: "transition-transform duration-200",
+  base: "transition-transform duration-[var(--dur-base)] ease-[var(--ease)]",
   variants: {},
   defaultVariants: {},
 });

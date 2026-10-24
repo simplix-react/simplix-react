@@ -3,10 +3,10 @@ import { defineSlotStyle } from "../../design/slot-style";
 /** The box of a multi-select: chips and the search input inside one bordered control. */
 export const multiSelectBoxStyle = defineSlotStyle({
   slot: "field-multiselect-box",
-  base: "gap-1 rounded-md border border-input bg-background px-3 text-sm focus-within:outline-none focus-within:border-foreground",
+  base: "gap-1 rounded-md border border-input bg-background px-3 text-sm focus-within:outline-none focus-within:border-foreground focus-within:shadow-[var(--focus-halo)]",
   variants: {
     disabled: { true: "cursor-not-allowed opacity-50", false: "" },
-    invalid: { true: "border-destructive focus-within:border-destructive", false: "" },
+    invalid: { true: "border-destructive focus-within:border-destructive focus-within:shadow-[var(--invalid-halo)]", false: "" },
   },
   defaultVariants: { disabled: false, invalid: false },
 });

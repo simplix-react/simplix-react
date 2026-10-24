@@ -19,7 +19,7 @@ export const sheetOverlayStyle = defineSlotStyle({
  */
 export const sheetContentStyle = defineSlotStyle({
   slot: "sheet-content",
-  base: "bg-background gap-4 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 focus:outline-none",
+  base: "bg-background gap-4 shadow-lg transition ease-[var(--ease-spring)] data-[state=open]:duration-[var(--dur-slow)] data-[state=closed]:duration-[var(--dur-base)] data-[state=closed]:ease-[var(--ease)] focus:outline-none",
   variants: {
     side: {
       right: "border-l",
@@ -34,7 +34,7 @@ export const sheetContentStyle = defineSlotStyle({
 /** The close button in the corner of a sheet. */
 export const sheetCloseStyle = defineSlotStyle({
   slot: "sheet-close",
-  base: "data-[state=open]:bg-secondary rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:outline-hidden",
+  base: "size-8 inline-grid place-items-center rounded-md opacity-70 transition-[opacity,background-color,transform] duration-[var(--dur-fast)] hover:opacity-100 hover:bg-accent active:scale-[0.98] focus:outline-hidden focus-visible:shadow-[var(--focus-halo)]",
   variants: {},
   defaultVariants: {},
 });
@@ -42,7 +42,7 @@ export const sheetCloseStyle = defineSlotStyle({
 /** The top block of a sheet. */
 export const sheetHeaderStyle = defineSlotStyle({
   slot: "sheet-header",
-  base: "gap-1.5 p-4",
+  base: "gap-1 text-left px-5 pt-5 pb-4 pe-14 border-b",
   variants: {},
   defaultVariants: {},
 });
@@ -50,7 +50,7 @@ export const sheetHeaderStyle = defineSlotStyle({
 /** The bottom block of a sheet, holding its actions. */
 export const sheetFooterStyle = defineSlotStyle({
   slot: "sheet-footer",
-  base: "mt-auto gap-2 p-4",
+  base: "mt-auto gap-2 px-5 py-3 border-t bg-muted/50",
   variants: {},
   defaultVariants: {},
 });
@@ -58,7 +58,7 @@ export const sheetFooterStyle = defineSlotStyle({
 /** The sheet title. */
 export const sheetTitleStyle = defineSlotStyle({
   slot: "sheet-title",
-  base: "text-foreground font-semibold",
+  base: "text-foreground text-lg leading-6 font-semibold",
   variants: {},
   defaultVariants: {},
 });

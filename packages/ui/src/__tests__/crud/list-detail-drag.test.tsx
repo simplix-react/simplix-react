@@ -148,7 +148,8 @@ describe("ListDetail divider collapse behavior", () => {
     );
 
     const separator = container.querySelector("[role='separator']") as HTMLElement;
-    expect(drawnClasses(separator ?? null)).toContain("opacity-0");
+    // Compared as class tokens: the grip's own `before:opacity-0` is not the divider's.
+    expect(drawnClasses(separator ?? null).split(/\s+/)).toContain("opacity-0");
     expect(separator?.className).toContain("pointer-events-none");
   });
 
@@ -161,7 +162,7 @@ describe("ListDetail divider collapse behavior", () => {
     );
 
     const separator = container.querySelector("[role='separator']") as HTMLElement;
-    expect(drawnClasses(separator ?? null)).not.toContain("opacity-0");
+    expect(drawnClasses(separator ?? null).split(/\s+/)).not.toContain("opacity-0");
     expect(separator?.className).not.toContain("pointer-events-none");
   });
 

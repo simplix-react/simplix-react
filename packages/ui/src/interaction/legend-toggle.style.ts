@@ -3,7 +3,7 @@ import { defineSlotStyle } from "../design/slot-style";
 /** The row of series a chart's reader can switch on and off. */
 export const legendToggleStyle = defineSlotStyle({
   slot: "legend-toggle",
-  base: "gap-1",
+  base: "gap-0.5",
   variants: {},
   defaultVariants: {},
 });
@@ -11,7 +11,7 @@ export const legendToggleStyle = defineSlotStyle({
 /** One series in the legend: its swatch and name, pressed while the series shows. */
 export const legendToggleItemStyle = defineSlotStyle({
   slot: "legend-toggle-item",
-  base: "gap-1.5 rounded-md px-2 py-1 text-xs text-foreground [transition:opacity_var(--dur-fast)_var(--ease),background-color_var(--dur-fast)_var(--ease)] hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+  base: "gap-1.5 rounded-md px-2 text-xs text-foreground [transition:opacity_var(--dur-fast)_var(--ease),background-color_var(--dur-fast)_var(--ease),scale_var(--dur-fast)_var(--ease)] hover:bg-accent active:scale-[0.98] focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)] h-6 py-0",
   variants: {
     shown: { true: "", false: "opacity-45 [&>[data-swatch]]:bg-transparent" },
   },

@@ -1,10 +1,10 @@
 import { defineSlotStyle } from "../../design/slot-style";
 
-/** The toolbar row itself, which holds the leading and the trailing group. */
+/** The toolbar row itself, which holds the leading and the trailing group: inset and ruled off from the table under it. */
 export const crudFilterBarStyle = defineSlotStyle({
   slot: "crud-filter-bar",
   as: "part",
-  base: "",
+  base: "gap-2 border-b px-3 py-2.5",
   variants: {},
   defaultVariants: {},
 });
@@ -17,7 +17,7 @@ export const crudFilterBarStyle = defineSlotStyle({
  */
 export const crudFilterBarLeadingStyle = defineSlotStyle({
   slot: "crud-filter-bar-leading",
-  base: "gap-1 [&>[data-preview]]:gap-1.5 [&>[data-preview]]:font-semibold",
+  base: "gap-2 [&>[data-preview]]:gap-1.5 [&>[data-preview]]:font-semibold",
   variants: {},
   defaultVariants: {},
 });
@@ -35,7 +35,7 @@ export const crudFilterBarLeadingStyle = defineSlotStyle({
  */
 export const crudFilterBarTrailingStyle = defineSlotStyle({
   slot: "crud-filter-bar-trailing",
-  base: "ml-auto gap-1 [&>[data-filter-chip]]:gap-1 [&>[data-filter-chip]]:rounded-md [&>[data-filter-chip]]:border-input [&>[data-filter-chip]]:pl-2 [&>[data-filter-chip]]:pr-1 [&>[data-filter-chip]]:text-xs [&>[data-filter-chip]]:font-normal [&>[data-filter-chip]>svg]:text-muted-foreground [&>[data-filter-chip]>span:first-child]:text-muted-foreground [&>[data-filter-more]]:rounded-md [&>[data-filter-more]]:border-input [&>[data-filter-more]]:px-2 [&>[data-filter-more]]:text-xs [&>[data-filter-more]]:font-normal",
+  base: "ml-auto gap-2 [&>[data-filter-chip]]:gap-1 [&>[data-filter-chip]]:rounded-md [&>[data-filter-chip]]:border-input [&>[data-filter-chip]]:pl-2 [&>[data-filter-chip]]:pr-1 [&>[data-filter-chip]]:text-xs [&>[data-filter-chip]]:font-normal [&>[data-filter-chip]>svg]:text-muted-foreground [&>[data-filter-chip]>span:first-child]:text-muted-foreground [&>[data-filter-more]]:rounded-md [&>[data-filter-more]]:border-input [&>[data-filter-more]]:px-2 [&>[data-filter-more]]:text-xs [&>[data-filter-more]]:font-normal",
   variants: {},
   defaultVariants: {},
 });
@@ -129,7 +129,8 @@ export const crudFilterBarColumnStyle = defineSlotStyle({
 /** A vertical rule between columns or between the buttons of a segment. */
 export const crudFilterBarDividerStyle = defineSlotStyle({
   slot: "crud-filter-bar-divider",
-  base: "bg-border",
+  // The filter and column controls stand apart by their gap, without a rule between them.
+  base: "!hidden bg-border",
   variants: {
     inset: { true: "mx-0.5", false: "" },
   },
@@ -213,7 +214,7 @@ export const crudFilterBarNoOptionsStyle = defineSlotStyle({
 /** The button that opens the option list of a dropdown-style faceted field. */
 export const crudFilterBarDropdownTriggerStyle = defineSlotStyle({
   slot: "crud-filter-bar-dropdown-trigger",
-  base: "gap-1 rounded-md border border-input bg-background px-3 text-sm focus:border-foreground focus:outline-none",
+  base: "gap-1 rounded-md border border-input bg-background px-3 text-sm focus:border-foreground focus-visible:outline-none",
   variants: {},
   defaultVariants: {},
 });

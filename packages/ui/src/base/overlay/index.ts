@@ -1,5 +1,6 @@
 export {
   Dialog,
+  DialogBody,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -12,6 +13,7 @@ export {
   useDialogMaximized,
 } from "./dialog";
 export type {
+  DialogBodyProps,
   DialogContentProps,
   DialogDescriptionProps,
   DialogFooterProps,

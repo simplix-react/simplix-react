@@ -3,7 +3,7 @@ import { defineSlotStyle } from "../../design/slot-style";
 /** The icon picker's default trigger button. Drawn by `theme/designs/classic.css`; see {@link defineSlotStyle}. */
 export const iconPickerTriggerStyle = defineSlotStyle({
   slot: "icon-picker-trigger",
-  base: "gap-2 rounded-md border px-3 text-sm transition-colors hover:bg-accent hover:text-accent-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50",
+  base: "gap-2 rounded-md border px-3 text-sm transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-50 focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]",
   variants: {},
   defaultVariants: {},
 });
@@ -74,7 +74,7 @@ export const iconPickerGridStyle = defineSlotStyle({
 /** One icon button. */
 export const iconPickerIconStyle = defineSlotStyle({
   slot: "icon-picker-icon",
-  base: "rounded-md border transition-colors hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1",
+  base: "rounded-md border transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]",
   variants: {
     selected: {
       true: "border-primary bg-primary/10",

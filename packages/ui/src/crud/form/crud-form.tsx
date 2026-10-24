@@ -23,6 +23,7 @@ import { XIcon } from "../shared/icons";
 import type { SectionShellProps } from "../shared/section-shell";
 import { type FieldVariant, FieldVariantContext } from "../shared/types";
 import { useBeforeUnload } from "./use-before-unload";
+import { useScrollEdges } from "./use-scroll-edges";
 
 // ── Form Root ──
 
@@ -84,6 +85,9 @@ function FormRoot({
   const { Button } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   useBeforeUnload(!!warnOnUnsavedChanges);
+  const isPage = variant === "page";
+  // Panel variant only: the page variant does not scroll its own body.
+  const { ref: bodyRef, edges } = useScrollEdges<HTMLDivElement>(!isPage);
 
   const handleSubmit = useCallback(
     (e: FormEvent<HTMLFormElement>) => {
@@ -99,12 +103,10 @@ function FormRoot({
     [onSubmit],
   );
 
-  const isPage = variant === "page";
-
   const content = (
     <form onSubmit={handleSubmit} className={cn("flex flex-col w-full", !isPage && "flex-1 min-h-0", className)} data-testid="crud-form" data-submitting={isSubmitting || undefined}>
       {(onClose || header) && (
-        <Flex data-crud-slot="header" justify={header ? "between" : "end"} align="center" className="shrink-0" {...partAttributes(crudFormHeaderStyle, { page: isPage })}>
+        <Flex data-crud-slot="header" justify={header ? "between" : "end"} align="center" className="shrink-0" {...partAttributes(crudFormHeaderStyle, { page: isPage, scrolled: edges.above })}>
           {header}
           {onClose && (
             // Icon-only: without this the button has no accessible name at all, and a screen
@@ -119,13 +121,13 @@ function FormRoot({
           and the body scrollbar; header/body/footer share it so their edges
           stay aligned. Page variant: the document owns the scroll, so the body
           neither scrolls nor insets. */}
-      <div data-crud-slot="body" className={cn(!isPage && "flex-1 min-h-0 overflow-auto [scrollbar-gutter:stable]")} {...slotAttributes(crudFormBodyStyle, { page: isPage })}>
+      <div ref={bodyRef} data-crud-slot="body" className={cn(!isPage && "flex-1 min-h-0 overflow-auto [scrollbar-gutter:stable]")} {...slotAttributes(crudFormBodyStyle, { page: isPage })}>
         <Stack gap="sm" className="relative" {...partAttributes(crudFormContentStyle, {})}>
           {children}
         </Stack>
       </div>
       {footer && (
-        <div data-crud-slot="footer" className="shrink-0" {...slotAttributes(crudFormFooterStyle, { page: isPage })}>{footer}</div>
+        <div data-crud-slot="footer" className="shrink-0" {...slotAttributes(crudFormFooterStyle, { page: isPage, overflow: edges.below })}>{footer}</div>
       )}
     </form>
   );

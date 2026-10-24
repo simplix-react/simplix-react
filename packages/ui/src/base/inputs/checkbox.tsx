@@ -27,8 +27,9 @@ export const CheckboxBase = forwardRef<HTMLButtonElement, CheckboxProps>(
       {...rest}
       {...slotAttributes(checkboxStyle, {})}
     >
+      {/* The mark grows in when the box is checked; the duration token is 0 under reduced motion. */}
       <CheckboxPrimitive.Indicator
-        className="flex items-center justify-center"
+        className="flex items-center justify-center animate-in zoom-in-50 fade-in-0"
         {...slotAttributes(checkboxIndicatorStyle, {})}
       >
         {rest.checked === "indeterminate" ? (

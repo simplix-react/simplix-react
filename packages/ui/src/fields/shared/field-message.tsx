@@ -32,7 +32,12 @@ export function FieldMessage({ variant, children, className }: FieldMessageProps
 
   return (
     <p
-      className={cn(hasIcon(variant) && "flex items-center", className)}
+      // Error and warning arrive on validation, so they ease in from just above rather than pop;
+      // the duration token is 0 under reduced motion.
+      className={cn(
+        hasIcon(variant) && "flex items-center animate-in fade-in-0 slide-in-from-top-1",
+        className,
+      )}
       {...slotAttributes(fieldMessageStyle, { variant, icon: hasIcon(variant) })}
       role={role}
     >

@@ -31,7 +31,7 @@ export const treeMoveRowStyle = defineSlotStyle({
 /** The button that expands or collapses a branch. */
 export const treeMoveToggleStyle = defineSlotStyle({
   slot: "tree-move-toggle",
-  base: "rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+  base: "rounded-sm focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]",
   variants: {
     branch: { true: "text-muted-foreground hover:text-foreground", false: "" },
   },
@@ -41,7 +41,7 @@ export const treeMoveToggleStyle = defineSlotStyle({
 /** The button that chooses a row as the new parent. */
 export const treeMovePickStyle = defineSlotStyle({
   slot: "tree-move-pick",
-  base: "gap-1 rounded-sm text-start focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+  base: "gap-1 rounded-sm text-start focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]",
   variants: {},
   defaultVariants: {},
 });

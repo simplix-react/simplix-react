@@ -3,7 +3,7 @@ import { defineSlotStyle } from "../../design/slot-style";
 /** The switch track's classic look. Drawn by `theme/designs/classic.css`; see {@link defineSlotStyle}. */
 export const switchStyle = defineSlotStyle({
   slot: "switch",
-  base: "inline-flex shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input",
+  base: "inline-flex shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input focus-visible:shadow-[var(--focus-halo)]",
   variants: {
     size: {
       default: "h-6 w-11",

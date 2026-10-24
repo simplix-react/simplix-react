@@ -57,15 +57,17 @@ export const crudListToolbarStyle = defineSlotStyle({
 /** The sort arrow beside a sortable column header; an unsorted column draws it faint. */
 export const crudListSortIconStyle = defineSlotStyle({
   slot: "crud-list-sort-icon",
-  base: "ml-1",
-  variants: { sorted: { true: "opacity-100", false: "opacity-30" } },
+  base: "ml-0 size-3 transition-opacity duration-[var(--dur-fast)]",
+  // Faint until its header is pointed at.
+  variants: { sorted: { true: "opacity-100", false: "opacity-30 [button:hover>&]:opacity-90" } },
   defaultVariants: { sorted: false },
 });
 
 /** The button a sortable column header is. */
 export const crudListSortButtonStyle = defineSlotStyle({
   slot: "crud-list-sort-button",
-  base: "font-semibold hover:text-foreground",
+  // A header that sorts is a small button: a hover ground and the shared press.
+  base: "-ml-1.5 h-6 gap-1 rounded-md px-1.5 font-semibold transition-colors duration-[var(--dur-fast)] hover:bg-[var(--hover-bg-strong)] hover:text-foreground active:scale-[0.98]",
   variants: { sorted: { true: "text-foreground", false: "" } },
   defaultVariants: { sorted: false },
 });
@@ -82,7 +84,7 @@ export const crudListRequiredMarkStyle = defineSlotStyle({
 export const crudListSelectAllRowStyle = defineSlotStyle({
   slot: "crud-list-select-all-row",
   as: "part",
-  base: "px-1",
+  base: "px-1 pb-1",
   variants: {},
   defaultVariants: {},
 });
@@ -98,7 +100,8 @@ export const crudListSelectAllStyle = defineSlotStyle({
 /** The wrapper that fades a card or table view in when the mode changes. */
 export const crudListViewStyle = defineSlotStyle({
   slot: "crud-list-view",
-  base: " duration-200",
+  // A list too narrow for its table draws each row as a card, inset in the list card.
+  base: "duration-[var(--dur-base)] [&:not(:has(table))]:p-2.5",
   variants: {},
   defaultVariants: {},
 });
@@ -115,7 +118,7 @@ export const crudListCardEmptyStyle = defineSlotStyle({
 export const crudListCardHeaderStyle = defineSlotStyle({
   slot: "crud-list-card-header",
   as: "part",
-  base: "border-b px-2 py-1.5",
+  base: "border-b-0 px-3 pt-3 pb-1",
   variants: {},
   defaultVariants: {},
 });
@@ -123,7 +126,8 @@ export const crudListCardHeaderStyle = defineSlotStyle({
 /** The pager under a list. */
 export const crudListPaginationStyle = defineSlotStyle({
   slot: "crud-list-pagination",
-  base: "gap-2 border-t px-3.5 py-2.5",
+  // The page size and the range at the start, the page numbers at the end.
+  base: "gap-4 border-t px-3 py-2",
   variants: {
     framed: { true: "bg-card", false: "bg-muted/60" },
     // Everything fits on one page, so the pager has nowhere to go; a design may leave it out.
@@ -159,7 +163,7 @@ export const crudListPageEllipsisStyle = defineSlotStyle({
 /** A pager button: previous, next, or a page number. */
 export const crudListPageButtonStyle = defineSlotStyle({
   slot: "crud-list-page-button",
-  base: "rounded-md border border-border bg-card text-xs font-medium text-secondary-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50",
+  base: "rounded-md border border-border bg-card text-xs font-medium text-secondary-foreground transition-[background-color,color,scale] duration-[var(--dur-fast)] hover:bg-muted hover:text-foreground active:scale-[0.98] disabled:opacity-50",
   variants: {
     numbered: { true: "px-2", false: "" },
     // The page being shown takes the primary colours; it comes after the base so it overrides
@@ -214,10 +218,26 @@ export const crudListEmptyStyle = defineSlotStyle({
   defaultVariants: {},
 });
 
+/** The glyph above the empty placeholder's sentence: what kind of empty it is. */
+export const crudListEmptyIconStyle = defineSlotStyle({
+  slot: "crud-list-empty-icon",
+  base: "mb-2 size-5 text-muted-foreground opacity-60",
+  variants: {},
+  defaultVariants: {},
+});
+
+/** The block under the empty placeholder's sentence that holds the action filling the list. */
+export const crudListEmptyActionStyle = defineSlotStyle({
+  slot: "crud-list-empty-action",
+  base: "mt-3",
+  variants: {},
+  defaultVariants: {},
+});
+
 /** The text of the empty placeholder. */
 export const crudListEmptyTextStyle = defineSlotStyle({
   slot: "crud-list-empty-text",
-  base: "text-sm text-muted-foreground",
+  base: "text-center text-sm text-muted-foreground",
   variants: {},
   defaultVariants: {},
 });
@@ -247,7 +267,8 @@ export const crudListRowStyle = defineSlotStyle({
   base: "",
   variants: {
     selected: { true: "bg-muted", false: "" },
-    active: { true: "bg-muted/50", false: "" },
+    // The open record: tinted, with the accent rule at its start.
+    active: { true: "bg-muted/50 shadow-[inset_2px_0_0_var(--primary)]", false: "" },
     // The row the keyboard stands on (j / k); Enter opens it and x selects it.
     focused: { true: "shadow-[inset_0_0_0_1.5px_var(--ring)]", false: "" },
   },
@@ -281,10 +302,10 @@ export const crudListPageSizeStyle = defineSlotStyle({
   defaultVariants: {},
 });
 
-/** How many records a group heading holds, beside its label. The classic design leaves it out. */
+/** How many records a group heading holds, beside its label. */
 export const crudListGroupCountStyle = defineSlotStyle({
   slot: "crud-list-group-count",
-  base: "hidden",
+  base: "ml-1.5 inline font-medium tabular-nums after:content-[attr(data-count)]",
   variants: {},
   defaultVariants: {},
 });
@@ -292,15 +313,15 @@ export const crudListGroupCountStyle = defineSlotStyle({
 /** What sits at the start of the pager: the page-size picker and the range on show. */
 export const crudListPaginationLeadStyle = defineSlotStyle({
   slot: "crud-list-pagination-lead",
-  base: "gap-1",
+  base: "mr-auto gap-2",
   variants: {},
   defaultVariants: {},
 });
 
-/** The rows on show out of all of them, 「1-10 / 10」. The classic design leaves it out. */
+/** The rows on show out of all of them, 「1-10 / 10」. */
 export const crudListPaginationRangeStyle = defineSlotStyle({
   slot: "crud-list-pagination-range",
-  base: "hidden",
+  base: "inline tabular-nums",
   variants: {},
   defaultVariants: {},
 });
@@ -309,39 +330,40 @@ export const crudListPaginationRangeStyle = defineSlotStyle({
 export const crudListSearchInputStyle = defineSlotStyle({
   slot: "crud-list-search-input",
   as: "part",
-  base: "",
+  // Inset past the magnifier at the start and the key hint at the end.
+  base: "pl-[34px] pr-8",
   variants: {},
   defaultVariants: {},
 });
 
-/** The magnifier at the start of the search field. The classic design leaves it out. */
+/** The magnifier at the start of the search field. */
 export const crudListSearchIconStyle = defineSlotStyle({
   slot: "crud-list-search-icon",
-  base: "hidden",
+  base: "block size-4 text-muted-foreground",
   variants: {},
   defaultVariants: {},
 });
 
-/** The key that moves the focus into the search field, drawn at its end. The classic design leaves it out. */
+/** The key that moves the focus into the search field, drawn at its end. */
 export const crudListSearchKeyStyle = defineSlotStyle({
   slot: "crud-list-search-key",
-  base: "hidden",
+  base: "inline-grid h-[18px] min-w-[18px] place-items-center rounded-sm border bg-muted px-1 font-sans text-[11px] leading-none text-muted-foreground",
   variants: {},
   defaultVariants: {},
 });
 
-/** The sort mark of a column not sorted yet, as one chevron. A design may draw the pair instead. */
+/** The sort mark of a column not sorted yet, as one chevron. Every design draws the pair instead. */
 export const crudListSortSingleStyle = defineSlotStyle({
   slot: "crud-list-sort-single",
-  base: "",
+  base: "hidden",
   variants: {},
   defaultVariants: {},
 });
 
-/** The sort mark of a column not sorted yet, as a pair of chevrons. The classic design leaves it out. */
+/** The sort mark of a column not sorted yet, as a pair of chevrons. */
 export const crudListSortPairStyle = defineSlotStyle({
   slot: "crud-list-sort-pair",
-  base: "hidden",
+  base: "inline",
   variants: {},
   defaultVariants: {},
 });

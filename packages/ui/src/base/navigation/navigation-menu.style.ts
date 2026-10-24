@@ -19,7 +19,7 @@ export const navigationMenuTriggerSlotStyle = defineSlotStyle({
 /** The arrow of a trigger; it turns over while the panel is open. */
 export const navigationMenuTriggerCaretStyle = defineSlotStyle({
   slot: "navigation-menu-trigger-caret",
-  base: "ml-1 transition duration-300 group-data-[state=open]:rotate-180",
+  base: "ml-1 transition duration-[var(--dur-base)] ease-[var(--ease)] group-data-[state=open]:rotate-180",
   variants: {},
   defaultVariants: {},
 });
@@ -27,7 +27,7 @@ export const navigationMenuTriggerCaretStyle = defineSlotStyle({
 /** The panel a trigger opens. */
 export const navigationMenuContentStyle = defineSlotStyle({
   slot: "navigation-menu-content",
-  base: "p-2 pr-2.5 group-data-[viewport=false]/navigation-menu:bg-popover group-data-[viewport=false]/navigation-menu:text-popover-foreground group-data-[viewport=false]/navigation-menu:mt-1.5 group-data-[viewport=false]/navigation-menu:rounded-md group-data-[viewport=false]/navigation-menu:border group-data-[viewport=false]/navigation-menu:shadow group-data-[viewport=false]/navigation-menu:duration-200 **:data-[slot=navigation-menu-link]:focus:ring-0 **:data-[slot=navigation-menu-link]:focus:outline-none",
+  base: "p-2 pr-2.5 group-data-[viewport=false]/navigation-menu:bg-popover group-data-[viewport=false]/navigation-menu:text-popover-foreground group-data-[viewport=false]/navigation-menu:mt-1.5 group-data-[viewport=false]/navigation-menu:rounded-md group-data-[viewport=false]/navigation-menu:border group-data-[viewport=false]/navigation-menu:shadow group-data-[viewport=false]/navigation-menu:duration-[var(--dur-base)] **:data-[slot=navigation-menu-link]:focus:ring-0 **:data-[slot=navigation-menu-link]:focus:outline-none",
   variants: {},
   defaultVariants: {},
 });

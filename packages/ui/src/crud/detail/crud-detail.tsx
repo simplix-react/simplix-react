@@ -1,6 +1,6 @@
 import { useTranslation } from "@simplix-react/i18n/react";
 import { DetailPlacementContext } from "../shared/detail-placement";
-import type { ReactNode } from "react";
+import { createContext, useContext, useRef, type ReactNode } from "react";
 
 import { Flex } from "../../primitives/flex";
 import { Grid } from "../../primitives/grid";
@@ -14,7 +14,9 @@ import { type FieldVariant, FieldVariantContext } from "../shared/types";
 import {
   crudDetailActionFooterRowStyle,
   crudDetailActionFooterStyle,
+  crudDetailActionsGroupStyle,
   crudDetailActionsStyle,
+  crudDetailCloseActionStyle,
   crudDetailAuditStyle,
   crudDetailBodyStyle,
   crudDetailContentStyle,
@@ -27,6 +29,8 @@ import {
 import { DetailAuditFooter, type AuditData } from "./crud-detail-audit-footer";
 import { DetailPagedList } from "./crud-detail-list";
 import { DetailPagedTable } from "./crud-detail-table";
+import { useScrollEdges } from "../form/use-scroll-edges";
+import { useFieldReflow } from "./use-field-reflow";
 
 // Entry and exit motion is tw-animate-css, which a design stylesheet cannot @apply; it stays
 // on the element, the same in every design.
@@ -121,10 +125,20 @@ export interface CrudDetailProps {
   children?: ReactNode;
 }
 
+/**
+ * Whether the detail's header already draws a close control. A footer 「닫기」 beside it is the same
+ * verb twice, and a design may hide the second one; the button still renders so every design keeps
+ * the choice.
+ */
+const HeaderCloseContext = createContext(false);
+
 function DetailRoot({ isLoading, onClose, header, footer, variant = "default", auditData, displayZone, fieldVariant, className, children }: CrudDetailProps) {
   const { Button } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const isDialog = variant === "dialog";
+  // The strips above and below the body mark content hidden past them, so a reader sees there is
+  // more to scroll before reaching for the wheel.
+  const { ref: bodyRef, edges } = useScrollEdges<HTMLDivElement>(true);
   // Header / body / footer share one horizontal padding so their edges stay
   // aligned. Side panels sit flush to the panel width (the enclosing
   // `ListDetail.Detail` already insets from the divider); dialogs keep an
@@ -134,22 +148,21 @@ function DetailRoot({ isLoading, onClose, header, footer, variant = "default", a
   const content = (
     <div className={cn("flex flex-col flex-1 min-h-0 w-full", className)} data-testid="crud-detail">
       {(onClose || header) && (
-        <Flex data-crud-slot="header" justify={header ? "between" : "end"} align="center" className="shrink-0" {...partAttributes(crudDetailHeaderStyle, { dialog: isDialog })}>
+        <Flex data-crud-slot="header" justify={header ? "between" : "end"} align="center" className="shrink-0" {...partAttributes(crudDetailHeaderStyle, { dialog: isDialog, scrolled: edges.above })}>
           {header}
           {onClose && (
             // Icon-only: without this the button has no accessible name at all, and a screen
             // reader announces the one way out of the panel as an unlabelled button.
             //
-            // Outlined rather than ghost. Closing the panel is the only way back out of this
-            // screen, and a control the reader has to hunt for by hovering is not a way out —
-            // a ghost glyph in a corner reads as decoration until it responds.
+            // The designs draw it as the 32px corner button every panel and overlay shares, at the
+            // body's inset, so the way out sits in the same place on every surface.
             <Button type="button" variant="outline" size="icon-xs" aria-label={t("common.close")} onClick={onClose}>
               <XIcon className="h-3 w-3" aria-hidden />
             </Button>
           )}
         </Flex>
       )}
-      <div data-crud-slot="body" className="flex flex-col flex-1 min-h-0 overflow-auto" {...slotAttributes(crudDetailBodyStyle, { dialog: isDialog })}>
+      <div ref={bodyRef} data-crud-slot="body" className="flex flex-col flex-1 min-h-0 overflow-auto" {...slotAttributes(crudDetailBodyStyle, { dialog: isDialog })}>
         <DetailPlacementContext.Provider value={true}>
         <Stack gap="sm" className="relative" {...partAttributes(crudDetailContentStyle, {})}>
           {isLoading && (
@@ -172,7 +185,9 @@ function DetailRoot({ isLoading, onClose, header, footer, variant = "default", a
         )}
       </div>
       {footer && (
-        <div data-crud-slot="footer" className="shrink-0" {...slotAttributes(crudDetailFooterStyle, { dialog: isDialog })}>{footer}</div>
+        <div data-crud-slot="footer" className="shrink-0" {...slotAttributes(crudDetailFooterStyle, { dialog: isDialog, overflow: edges.below })}>
+          <HeaderCloseContext.Provider value={Boolean(onClose)}>{footer}</HeaderCloseContext.Provider>
+        </div>
       )}
     </div>
   );
@@ -280,18 +295,21 @@ function DetailSection({ layout = "single-column", ...props }: CrudDetailSection
   const { SectionShell } = useFlatUIComponents();
   const columns = detailLayoutColumns[layout];
   const body = cn(detailLayoutTracks[layout], DETAIL_FIELD_PAIR);
+  // Fields glide to their new places when the section switches between one and two columns.
+  const gridRef = useRef<HTMLDivElement>(null);
+  useFieldReflow(gridRef);
   return (
     <SectionShell {...props}>
       {columns === 1 ? (
         // Rows keep the tight rhythm a stacked section reads at. The column gap is the one a
         // field draws between its own label and value, so the two agree and the tracks measure to
         // the labels exactly.
-        <div className={cn("grid", body)} {...partAttributes(crudDetailSectionBodyStyle, { single: true })}>{props.children}</div>
+        <div ref={gridRef} className={cn("grid", body)} {...partAttributes(crudDetailSectionBodyStyle, { single: true })}>{props.children}</div>
       ) : (
         // The wide gutter stays between the section's columns: a field overrides it with its own
         // narrower one across the pair it holds, so a label sits close to its value while the
         // columns stay far apart.
-        <Grid columns={columns} gapX="lg" gapY="xs" divider className={body} {...partAttributes(crudDetailSectionBodyStyle, { single: false })}>
+        <Grid ref={gridRef} columns={columns} gapX="lg" gapY="xs" divider className={body} {...partAttributes(crudDetailSectionBodyStyle, { single: false })}>
           {props.children}
         </Grid>
       )}
@@ -405,6 +423,7 @@ function useStandardDetailActions({ onClose, onBack, onDelete, onEdit, isPending
   const { Button } = useFlatUIComponents();
   const { t } = useTranslation("simplix/ui");
   const hasLeft = Boolean(onBack || onClose);
+  const headerHasClose = useContext(HeaderCloseContext);
 
   // Close and Back leave the record, and they are the only way back out of the panel — so they
   // are drawn as ordinary buttons, with a border the reader can find without hovering. A ghost
@@ -417,13 +436,13 @@ function useStandardDetailActions({ onClose, onBack, onDelete, onEdit, isPending
       {backLabel ?? t("common.back")}
     </Button>
   ) : onClose ? (
-    <Button type="button" size="sm" variant="outline" onClick={onClose}>
+    <Button type="button" size="sm" variant="outline" onClick={onClose} {...partAttributes(crudDetailCloseActionStyle, { redundant: headerHasClose })}>
       {closeLabel ?? t("common.close")}
     </Button>
   ) : null;
 
   const rightGroup = (
-    <Flex gap="sm">
+    <Flex gap="sm" {...partAttributes(crudDetailActionsGroupStyle, {})}>
       {onDelete && (
         // Named like the row's other actions: an icon-only button reaches
         // assistive technology as an unnamed button, and the reader is left
@@ -432,6 +451,7 @@ function useStandardDetailActions({ onClose, onBack, onDelete, onEdit, isPending
           type="button"
           size="sm"
           variant="outline"
+          data-action="delete"
           onClick={onDelete}
           disabled={isPending || deleteDisabled}
           title={deleteDisabled ? deleteDisabledReason : undefined}

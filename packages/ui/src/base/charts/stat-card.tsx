@@ -27,8 +27,8 @@ export interface StatCardProps {
    * set it smaller than the figure. Classic draws it in the figure's own type.
    */
   unit?: ReactNode;
-  /** Optional supporting text below the value. */
-  description?: string;
+  /** Optional supporting text below the value; a node so a caller can set parts of it apart. */
+  description?: ReactNode;
   /** Optional icon rendered in the header's trailing slot. */
   icon?: ReactNode;
   /** Extra content rendered next to the title (e.g. a badge). */

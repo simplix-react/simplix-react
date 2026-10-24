@@ -3,7 +3,7 @@ import { defineSlotStyle } from "../../design/slot-style";
 /** The select trigger's classic look. Drawn by `theme/designs/classic.css`; see {@link defineSlotStyle}. */
 export const selectTriggerStyle = defineSlotStyle({
   slot: "select-trigger",
-  base: "rounded-md border border-input bg-background placeholder:text-muted-foreground focus:outline-none focus:border-foreground disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+  base: "rounded-md border border-input bg-background placeholder:text-muted-foreground focus:border-foreground focus-visible:shadow-[var(--focus-halo)] disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 focus-visible:outline-none",
   variants: {
     size: {
       default: "h-8 px-3 py-1.5 text-sm",
@@ -19,7 +19,7 @@ export const selectTriggerStyle = defineSlotStyle({
 /** The select dropdown panel's classic look. */
 export const selectContentStyle = defineSlotStyle({
   slot: "select-content",
-  base: "rounded-md border bg-popover text-popover-foreground shadow-md",
+  base: "rounded-[var(--radius-overlay)] border bg-popover text-popover-foreground shadow-md duration-[var(--dur-base)] ease-[var(--ease-spring)] data-[state=closed]:ease-[var(--ease)]",
   variants: {
     position: {
       popper: "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",

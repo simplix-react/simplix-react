@@ -3,7 +3,7 @@ import { defineSlotStyle } from "../../design/slot-style";
 /** The menu panel. */
 export const dropdownMenuContentStyle = defineSlotStyle({
   slot: "dropdown-menu-content",
-  base: "bg-popover text-popover-foreground rounded-md border p-1 shadow-md",
+  base: "bg-popover text-popover-foreground rounded-[var(--radius-overlay)] border p-1 shadow-md duration-[var(--dur-base)] ease-[var(--ease-spring)] data-[state=closed]:ease-[var(--ease)]",
   variants: {},
   defaultVariants: {},
 });
@@ -67,7 +67,7 @@ export const dropdownMenuSubTriggerCaretStyle = defineSlotStyle({
 /** The submenu panel. */
 export const dropdownMenuSubContentStyle = defineSlotStyle({
   slot: "dropdown-menu-sub-content",
-  base: "bg-popover text-popover-foreground rounded-md border p-1 shadow-lg",
+  base: "bg-popover text-popover-foreground rounded-[var(--radius-overlay)] border p-1 shadow-lg duration-[var(--dur-base)] ease-[var(--ease-spring)] data-[state=closed]:ease-[var(--ease)]",
   variants: {},
   defaultVariants: {},
 });

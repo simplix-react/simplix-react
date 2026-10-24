@@ -112,6 +112,13 @@ if (modules.__spec) {
     process.exit(1);
   }
 }
+// slotAttributes writes each axis as `data-<axis>` verbatim, and HTML lowercases attribute names,
+// so an axis with an uppercase letter is an invalid attribute in React and its rules never match.
+const casedAxes = CLASSIC_SLOTS.flatMap((style) => Object.keys(style.variants).filter((axis) => /[A-Z]/.test(axis)).map((axis) => `${style.slot}: ${axis}`));
+if (casedAxes.length) {
+  console.error("a variant axis is written in lowercase (it becomes a data- attribute):\n  " + casedAxes.join("\n  "));
+  process.exit(1);
+}
 const seen = new Set();
 for (const style of CLASSIC_SLOTS) {
   if (seen.has(style.slot)) {
@@ -251,8 +258,32 @@ if (option("--compiled")) {
   const designRoot = postcss.parse(builtDesign);
   const drawnProps = props(designRoot);
   let reverts = "";
+  // Shorthands and logical properties are compared as the physical longhands they set, so a
+  // design's py-3 (padding-block) covers classic's pt-* (padding-top), and a design that sets only
+  // padding-top under classic's padding-block reverts padding-bottom alone rather than its own value.
+  const sides = (base, suffix = "") => ["top", "right", "bottom", "left"].map((d) => `${base}-${d}${suffix}`);
+  const box = (base, suffix = "") => {
+    const [top, right, bottom, left] = sides(base, suffix);
+    return { [`${base}${suffix}`]: [top, right, bottom, left], [`${base}-block${suffix}`]: [top, bottom], [`${base}-inline${suffix}`]: [left, right],
+      [`${base}-block-start${suffix}`]: [top], [`${base}-block-end${suffix}`]: [bottom], [`${base}-inline-start${suffix}`]: [left], [`${base}-inline-end${suffix}`]: [right] };
+  };
+  const corners = ["border-top-left-radius", "border-top-right-radius", "border-bottom-right-radius", "border-bottom-left-radius"];
+  const LONGHANDS = {
+    ...box("padding"), ...box("margin"), ...box("scroll-margin"), ...box("scroll-padding"), ...box("border", "-width"), ...box("border", "-style"), ...box("border", "-color"),
+    inset: ["top", "right", "bottom", "left"], "inset-block": ["top", "bottom"], "inset-inline": ["left", "right"],
+    "inset-inline-start": ["left"], "inset-inline-end": ["right"], "inset-block-start": ["top"], "inset-block-end": ["bottom"],
+    "border-radius": corners, "border-start-start-radius": [corners[0]], "border-start-end-radius": [corners[1]],
+    "border-end-end-radius": [corners[2]], "border-end-start-radius": [corners[3]],
+    gap: ["row-gap", "column-gap"], overflow: ["overflow-x", "overflow-y"],
+  };
+  const longhands = (prop) => LONGHANDS[prop] ?? [prop];
   for (const [k, { rule, props: classicProps }] of props(postcss.parse(builtClassic))) {
-    const missing = [...classicProps].filter((p) => !drawnProps.get(k)?.props.has(p));
+    const covered = new Set([...(drawnProps.get(k)?.props ?? [])].flatMap(longhands));
+    const missing = [...classicProps].flatMap((p) => {
+      const parts = longhands(p);
+      const open = parts.filter((l) => !covered.has(l));
+      return open.length === parts.length ? [p] : open;
+    });
     if (!missing.length) continue;
     const chain = [];
     for (let n = rule.parent; n && n.type !== "root"; n = n.parent) if (n.type === "atrule") chain.unshift(n);

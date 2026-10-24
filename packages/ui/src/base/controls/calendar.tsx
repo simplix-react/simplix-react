@@ -454,11 +454,11 @@ export const CalendarBase = forwardRef<HTMLDivElement, CalendarProps>(
                         {...slotAttributes(calendarDayStyle, {
                           today: isToday,
                           selected: isSelected,
-                          inRange,
+                          inrange: inRange,
                           start: isStart,
                           end: isEnd,
-                          weekSelected: mode === "week" && inSelectedWeek && !isStart && !isEnd,
-                          weekHover: inHoverWeek,
+                          weekselected: mode === "week" && inSelectedWeek && !isStart && !isEnd,
+                          weekhover: inHoverWeek,
                         })}
                       >
                         {date.getDate()}

@@ -28,7 +28,7 @@ export const errorBoundaryMessageStyle = defineSlotStyle({
 /** The retry button. */
 export const errorBoundaryRetryStyle = defineSlotStyle({
   slot: "error-boundary-retry",
-  base: "rounded-md px-4 text-sm font-medium border border-input bg-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+  base: "rounded-md px-4 text-sm font-medium border border-input bg-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]",
   variants: {},
   defaultVariants: {},
 });

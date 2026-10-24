@@ -7,7 +7,7 @@ export const alertBannerStyle = defineSlotStyle({
   variants: {
     density: {
       default: "px-4 py-3",
-      sm: "px-3 py-2",
+      sm: "py-2.5 ps-4 pe-2.5",
       hint: "p-2.5",
     },
     /** A borderless banner replaces the tone surface with a transparent one. */

@@ -8,7 +8,7 @@ import { defineSlotStyle } from "../../design/slot-style";
  */
 export const popoverContentStyle = defineSlotStyle({
   slot: "popover-content",
-  base: "rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none",
+  base: "rounded-[var(--radius-overlay)] border bg-popover p-4 text-popover-foreground shadow-md outline-none duration-[var(--dur-base)] ease-[var(--ease-spring)] data-[state=closed]:ease-[var(--ease)]",
   variants: {
     /** Drops the panel padding, for a body that draws its own. */
     flush: { true: "p-0", false: "" },

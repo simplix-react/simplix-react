@@ -22,7 +22,7 @@ export const crudFilterChipStyle = defineSlotStyle({
 /** The button inside a chip that opens the chip's picker. */
 export const crudFilterChipTriggerStyle = defineSlotStyle({
   slot: "crud-filter-chip-trigger",
-  base: "gap-2 rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+  base: "gap-2 rounded-sm focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]",
   variants: {},
   defaultVariants: {},
 });
