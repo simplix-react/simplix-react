@@ -1693,6 +1693,9 @@
   [data-slot="wizard-step-marker"][data-state="pending"][data-s-wizard-step-marker] {
     @apply border-muted-foreground/30 text-muted-foreground;
   }
+  [data-slot="wizard-step-marker"][data-state="rejected"][data-s-wizard-step-marker] {
+    @apply border-destructive bg-destructive/10 text-destructive;
+  }
   [data-slot="wizard-step-title"][data-slot][data-s-wizard-step-title] {
     @apply text-sm font-medium;
   }

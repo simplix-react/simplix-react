@@ -12,8 +12,8 @@ export type {
   UseAutosaveReturn,
 } from "./use-autosave";
 
-export { Wizard } from "./wizard";
-export type { WizardProps, WizardStepProps } from "./wizard";
+export { StepIndicator, Wizard } from "./wizard";
+export type { StepIndicatorProps, WizardProps, WizardStepProps } from "./wizard";
 
 export { prepareValues } from "./prepare-values";
 export type { DeclaredFields, I18nFieldPairs } from "./prepare-values";

@@ -372,7 +372,7 @@ export type {
   UseServerSearchOptionsReturn,
 } from "./crud/list";
 
-export { CrudForm, SaveButton, useAutosave, useBeforeUnload, useCrudFormSubmit, useIsDirty, useUnsavedChanges, Wizard } from "./crud/form";
+export { CrudForm, SaveButton, useAutosave, useBeforeUnload, useCrudFormSubmit, useIsDirty, useUnsavedChanges, StepIndicator, Wizard } from "./crud/form";
 export { adaptOrvalCreate, adaptOrvalDelete, adaptOrvalOrder, adaptOrvalUpdate, useInvalidateEntity } from "./crud/form";
 export { groupValidationErrors } from "./crud/form/group-validation-errors";
 export { prepareValues } from "./crud/form";
@@ -391,6 +391,7 @@ export type {
   UseUnsavedChangesOptions,
   SaveButtonProps,
   UseUnsavedChangesReturn,
+  StepIndicatorProps,
   WizardProps,
   WizardStepProps,
 } from "./crud/form";

@@ -17,6 +17,7 @@ export const wizardStepMarkerStyle = defineSlotStyle({
       active: "border-primary bg-primary text-primary-foreground",
       completed: "border-primary bg-primary/10 text-primary",
       pending: "border-muted-foreground/30 text-muted-foreground",
+      rejected: "border-destructive bg-destructive/10 text-destructive",
     },
   },
   defaultVariants: { state: "pending" },

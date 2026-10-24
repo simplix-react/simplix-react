@@ -47,27 +47,40 @@ function WizardStep({ children }: WizardStepProps) {
 
 // ── Step indicator ──
 
-interface StepIndicatorProps {
-  steps: { title: string; description?: string }[];
+/** Props for {@link StepIndicator}. */
+export interface StepIndicatorProps {
+  /** The steps in order: what each is, and an optional second line (who holds it, when it closed). */
+  steps: readonly { title: string; description?: string }[];
+  /** The step in hand; every step before it is done. Pass `steps.length` when all are done. */
   currentStep: number;
+  /** A step that was turned back: drawn as rejected instead of in hand. */
+  rejectedStep?: number;
+  /** Names the list for assistive technology; the wizard's own label when absent. */
+  label?: string;
 }
 
-function StepIndicator({ steps, currentStep }: StepIndicatorProps) {
+/**
+ * The steps of a procedure as a wizard draws them: a numbered marker per step joined by a line,
+ * the done steps ticked, the one in hand filled, the rest outlined, so the order and the place in
+ * it read at a glance. One line that scrolls sideways when it is wider than its box.
+ */
+export function StepIndicator({ steps, currentStep, rejectedStep, label }: StepIndicatorProps) {
   const { t } = useTranslation("simplix/ui");
   return (
-    <nav aria-label={t("wizard.steps")}>
+    <nav aria-label={label ?? t("wizard.steps")} className="min-w-0 overflow-x-auto">
       <ol className="flex items-center" {...slotAttributes(wizardStepsStyle, {})}>
         {steps.map((step, index) => {
-          const isActive = index === currentStep;
-          const isCompleted = index < currentStep;
+          const isRejected = index === rejectedStep;
+          const isActive = index === currentStep && !isRejected;
+          const isCompleted = index < currentStep && !isRejected;
 
           return (
-            <li key={step.title} className="flex items-center">
+            <li key={`${index}-${step.title}`} className="flex shrink-0 items-center">
               <Flex gap="xs" align="center">
                 <span
                   className="inline-flex h-8 w-8 items-center justify-center"
                   {...slotAttributes(wizardStepMarkerStyle, {
-                    state: isActive ? "active" : isCompleted ? "completed" : "pending",
+                    state: isRejected ? "rejected" : isActive ? "active" : isCompleted ? "completed" : "pending",
                   })}
                   aria-current={isActive ? "step" : undefined}
                 >
@@ -91,7 +104,7 @@ function StepIndicator({ steps, currentStep }: StepIndicatorProps) {
                     index + 1
                   )}
                 </span>
-                <Stack gap="none" className="min-w-0">
+                <Stack gap="none" className="min-w-0 whitespace-nowrap">
                   <span
                     {...slotAttributes(wizardStepTitleStyle, { active: isActive })}
                   >
