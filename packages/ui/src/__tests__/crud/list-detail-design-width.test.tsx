@@ -35,3 +35,17 @@ describe("ListDetail width under a design that names one", () => {
     expect(columns({ listWidth: 500 })).toBe("500px 17px 1fr");
   });
 });
+
+describe("ListDetail switching presentation", () => {
+  it("re-renders from a panel to a drawer and back without changing its hooks", () => {
+    const tree = (variant: "panel" | "drawer") => (
+      <ListDetail variant={variant} activePanel="detail">
+        <ListDetail.List>List</ListDetail.List>
+        <ListDetail.Detail>Detail</ListDetail.Detail>
+      </ListDetail>
+    );
+    const { rerender } = render(tree("panel"));
+    expect(() => rerender(tree("drawer"))).not.toThrow();
+    expect(() => rerender(tree("panel"))).not.toThrow();
+  });
+});

@@ -239,6 +239,26 @@ export function ListDetailRoot({ variant: variantProp, activePanel: activePanelP
 
   const contextValue: ListDetailContextValue = { variant, activePanel, setActivePanel, dialogHeight };
 
+  const effectiveListWidth = dragListWidth ?? listWidth;
+  const effectiveDetailWidth = dragDetailWidth ?? detailWidth;
+  const isDetailOpen = activePanel === "detail";
+  // The columns animate only while the detail opens or closes. Any other change of width (the
+  // design naming its own, the stylesheet arriving after the first paint, a new viewport) is
+  // applied at once: run through the transition it reads as the panel resizing by itself.
+  // Set during render, so the transition is on in the same paint as the columns it animates.
+  // Declared before the dialog and drawer branch, so every variant runs the same hooks.
+  const [toggling, setToggling] = useState(false);
+  const [seenOpen, setSeenOpen] = useState(isDetailOpen);
+  if (seenOpen !== isDetailOpen) {
+    setSeenOpen(isDetailOpen);
+    setToggling(true);
+  }
+  useEffect(() => {
+    if (!toggling) return;
+    const timer = window.setTimeout(() => setToggling(false), 400);
+    return () => window.clearTimeout(timer);
+  }, [toggling, isDetailOpen]);
+
   // Both overlay shapes hang off the same root, modal, with Radix's own behaviour: the backdrop is
   // drawn, it takes the clicks, and pressing it closes the detail.
   //
@@ -278,24 +298,6 @@ export function ListDetailRoot({ variant: variantProp, activePanel: activePanelP
     );
   }
 
-  const effectiveListWidth = dragListWidth ?? listWidth;
-  const effectiveDetailWidth = dragDetailWidth ?? detailWidth;
-  const isDetailOpen = activePanel === "detail";
-  // The columns animate only while the detail opens or closes. Any other change of width (the
-  // design naming its own, the stylesheet arriving after the first paint, a new viewport) is
-  // applied at once: run through the transition it reads as the panel resizing by itself.
-  // Set during render, so the transition is on in the same paint as the columns it animates.
-  const [toggling, setToggling] = useState(false);
-  const [seenOpen, setSeenOpen] = useState(isDetailOpen);
-  if (seenOpen !== isDetailOpen) {
-    setSeenOpen(isDetailOpen);
-    setToggling(true);
-  }
-  useEffect(() => {
-    if (!toggling) return;
-    const timer = window.setTimeout(() => setToggling(false), 400);
-    return () => window.clearTimeout(timer);
-  }, [toggling, isDetailOpen]);
   const listCol = effectiveListWidth != null ? `${effectiveListWidth}px` : "1fr";
   const detailCol = effectiveListWidth != null ? "1fr" : `${effectiveDetailWidth}px`;
   // **Which box scrolls depends on whether the detail is open, and the two states are opposite.**
