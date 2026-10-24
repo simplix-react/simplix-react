@@ -1294,6 +1294,9 @@
   [data-slot="tabs-list"][data-variant="underline"][data-s-tabs-list] {
     @apply mt-2 gap-1 shadow-[inset_0_-1px_0_0_var(--border)];
   }
+  [data-slot="tabs-scroll-arrow"][data-slot][data-s-tabs-scroll-arrow] {
+    @apply inline-flex size-8 shrink-0 items-center justify-center self-center rounded-md text-muted-foreground;
+  }
   [data-slot="tabs-trigger"][data-slot][data-s-tabs-trigger] {
     @apply text-sm font-medium transition-all;
   }
@@ -4385,6 +4388,9 @@
   }
   :where([data-slot="tabs-list"][data-variant="full"])[data-s-tabs-list] {
     @apply [&>[role=tab]]:flex-none;
+  }
+  :where([data-slot="tabs-scroll-arrow"])[data-s-tabs-scroll-arrow] {
+    @apply hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring;
   }
   :where([data-slot="tabs-trigger"])[data-s-tabs-trigger] {
     @apply focus-visible:outline-none disabled:opacity-50 focus-visible:shadow-[var(--focus-halo)];

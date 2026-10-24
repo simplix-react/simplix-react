@@ -93,3 +93,19 @@ export const tabsContentStyle = defineSlotStyle({
   },
   defaultVariants: { padded: false },
 });
+
+/** The box around a strip that scrolls with arrows: the strip and the arrow at each end that hides tabs. */
+export const tabsScrollerStyle = defineSlotStyle({
+  slot: "tabs-scroller",
+  base: "",
+  variants: {},
+  defaultVariants: {},
+});
+
+/** An arrow at the end of a scrolling strip that hides tabs; it moves the strip toward that end. */
+export const tabsScrollArrowStyle = defineSlotStyle({
+  slot: "tabs-scroll-arrow",
+  base: "inline-flex size-8 shrink-0 items-center justify-center self-center rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+  variants: { side: { start: "", end: "" } },
+  defaultVariants: { side: "end" },
+});

@@ -416,5 +416,9 @@
   "wizard": {
     "steps": "入力ステップ",
     "stepLabel": "ステップ {{step}}: {{title}}"
+  },
+  "tabs": {
+    "scrollPrevious": "前のタブ",
+    "scrollNext": "次のタブ"
   }
 }

@@ -5,13 +5,17 @@ import {
   forwardRef,
   useCallback,
   useContext,
+  useEffect,
   useLayoutEffect,
   useRef,
+  useState,
 } from "react";
+import { useTranslation } from "@simplix-react/i18n/react";
 
 import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
-import { tabsContentStyle, tabsInkStyle, tabsListStyle, tabsTriggerStyle } from "./tabs.style";
+import { arrowStep, overflowEdges, type OverflowEdges } from "./tab-overflow";
+import { tabsContentStyle, tabsInkStyle, tabsListStyle, tabsScrollArrowStyle, tabsScrollerStyle, tabsTriggerStyle } from "./tabs.style";
 
 // Root - pass through
 export const Tabs = TabsPrimitive.Root;
@@ -53,10 +57,19 @@ export interface TabsListProps
    * @default "default"
    */
   variant?: TabsVariant;
+  /**
+   * Keeps the strip on one line when its tabs are wider than it: the strip scrolls sideways, an
+   * arrow appears at each end that hides tabs and moves the strip most of a view per press, and
+   * the chosen tab is scrolled into sight. Without it, a strip too wide for its box is clipped,
+   * and a reader cannot tell that tabs past the edge exist.
+   *
+   * @default false
+   */
+  scrollArrows?: boolean;
 }
 
 export const TabsList = forwardRef<HTMLDivElement, TabsListProps>(
-  ({ className, variant = "default", children, ...rest }, ref) => {
+  ({ className, variant = "default", scrollArrows = false, children, ...rest }, ref) => {
     const list = useRef<HTMLDivElement | null>(null);
     const ink = useRef<HTMLSpanElement | null>(null);
     const setList = useCallback(
@@ -68,11 +81,18 @@ export const TabsList = forwardRef<HTMLDivElement, TabsListProps>(
       [ref],
     );
     useTabInk(list, ink);
-    return (
-      <TabsVariantContext.Provider value={variant}>
+    const edges = useOverflowEdges(list, scrollArrows);
+    const { t } = useTranslation("simplix/ui");
+    const strip = (
         <TabsPrimitive.List
           ref={setList}
-          className={cn("relative", listLayout[variant], className)}
+          className={cn(
+            "relative",
+            listLayout[variant],
+            // Scrolled by the arrows and by touch; the scrollbar itself is hidden because the arrows say there is more.
+            scrollArrows && "min-w-0 flex-1 overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+            className,
+          )}
           {...rest}
           {...slotAttributes(tabsListStyle, { variant })}
         >
@@ -86,10 +106,72 @@ export const TabsList = forwardRef<HTMLDivElement, TabsListProps>(
             {...slotAttributes(tabsInkStyle, { variant })}
           />
         </TabsPrimitive.List>
+    );
+    if (!scrollArrows) return <TabsVariantContext.Provider value={variant}>{strip}</TabsVariantContext.Provider>;
+    const move = (direction: -1 | 1) => {
+      const node = list.current;
+      if (node) node.scrollBy({ left: direction * arrowStep(node.clientWidth), behavior: "smooth" });
+    };
+    return (
+      <TabsVariantContext.Provider value={variant}>
+        <div className="relative flex min-w-0 items-end" {...slotAttributes(tabsScrollerStyle, {})}>
+          {edges.start ? (
+            <button type="button" aria-label={t("tabs.scrollPrevious")} onClick={() => move(-1)} {...slotAttributes(tabsScrollArrowStyle, { side: "start" })}>
+              <ChevronIcon direction="left" />
+            </button>
+          ) : null}
+          {strip}
+          {edges.end ? (
+            <button type="button" aria-label={t("tabs.scrollNext")} onClick={() => move(1)} {...slotAttributes(tabsScrollArrowStyle, { side: "end" })}>
+              <ChevronIcon direction="right" />
+            </button>
+          ) : null}
+        </div>
       </TabsVariantContext.Provider>
     );
   },
 );
+
+/**
+ * Which ends of the strip hide tabs, kept current as the strip scrolls or changes size, and the
+ * chosen tab brought into sight whenever it changes.
+ */
+function useOverflowEdges(list: { readonly current: HTMLDivElement | null }, enabled: boolean): OverflowEdges {
+  const [edges, setEdges] = useState<OverflowEdges>({ start: false, end: false });
+  useEffect(() => {
+    const strip = list.current;
+    if (!enabled || !strip) return;
+    const read = () => setEdges(overflowEdges(strip.scrollLeft, strip.clientWidth, strip.scrollWidth));
+    const reveal = () => {
+      const chosen = strip.querySelector<HTMLElement>('[role="tab"][data-state="active"]');
+      chosen?.scrollIntoView({ block: "nearest", inline: "nearest" });
+      read();
+    };
+    reveal();
+    strip.addEventListener("scroll", read, { passive: true });
+    const sizes = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(read);
+    sizes?.observe(strip);
+    const states = new MutationObserver(reveal);
+    states.observe(strip, { attributes: true, subtree: true, attributeFilter: ["data-state"] });
+    return () => {
+      strip.removeEventListener("scroll", read);
+      sizes?.disconnect();
+      states.disconnect();
+    };
+  }, [list, enabled]);
+  return edges;
+}
+
+function ChevronIcon({ direction }: { readonly direction: "left" | "right" }) {
+  return (
+    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+      <path
+        d={direction === "left" ? "M8.84 3.14a.5.5 0 0 1 .02.7L5.44 7.5l3.42 3.66a.5.5 0 1 1-.73.68l-3.75-4a.5.5 0 0 1 0-.68l3.75-4a.5.5 0 0 1 .71-.02Z" : "M6.16 3.14a.5.5 0 0 1 .7.02l3.75 4a.5.5 0 0 1 0 .68l-3.75 4a.5.5 0 1 1-.73-.68L9.56 7.5 6.14 3.84a.5.5 0 0 1 .02-.7Z"}
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
 
 /**
  * Keeps the ink under the chosen trigger: its offset and width are written as `--x` and `--w` on

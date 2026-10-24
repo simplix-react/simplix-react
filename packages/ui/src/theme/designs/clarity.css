@@ -1306,6 +1306,9 @@
   [data-slot="tabs-list"][data-variant="underline"][data-s-tabs-list] {
     @apply mt-2 gap-1 shadow-[inset_0_-1px_0_0_var(--border)];
   }
+  [data-slot="tabs-scroll-arrow"][data-slot][data-s-tabs-scroll-arrow] {
+    @apply inline-flex size-8 shrink-0 items-center justify-center self-center rounded-[var(--radius-control)] text-muted-foreground;
+  }
   [data-slot="tabs-trigger"][data-slot][data-s-tabs-trigger] {
     @apply text-sm font-medium transition-all duration-[var(--dur-base)] ease-[var(--ease)];
   }
@@ -4454,6 +4457,9 @@
   }
   :where([data-slot="tabs-list"][data-variant="full"])[data-s-tabs-list] {
     @apply [&>[role=tab]]:flex-none;
+  }
+  :where([data-slot="tabs-scroll-arrow"])[data-s-tabs-scroll-arrow] {
+    @apply hover:bg-[var(--hover-bg-strong)] hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_oklch,var(--primary)_45%,transparent)];
   }
   :where([data-slot="tabs-trigger"])[data-s-tabs-trigger] {
     @apply disabled:opacity-50 focus-visible:shadow-[var(--focus-halo)] focus-visible:outline-none focus-visible:ring-0 focus-visible:shadow-[var(--focus-halo)]!;

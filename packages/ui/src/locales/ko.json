@@ -416,5 +416,9 @@
   "wizard": {
     "steps": "입력 단계",
     "stepLabel": "{{step}}단계: {{title}}"
+  },
+  "tabs": {
+    "scrollPrevious": "이전 탭",
+    "scrollNext": "다음 탭"
   }
 }

@@ -416,5 +416,9 @@
   "wizard": {
     "steps": "Form steps",
     "stepLabel": "Step {{step}}: {{title}}"
+  },
+  "tabs": {
+    "scrollPrevious": "Previous tabs",
+    "scrollNext": "More tabs"
   }
 }
