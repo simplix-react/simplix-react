@@ -34,12 +34,11 @@ export interface UIDefaults {
    * to work. A screen that hardcodes one takes that choice away from every installation, which is
    * why it belongs here.
    *
-   * <p><b>`"dialog"` is deliberately not one of these.</b> A centred modal capped at `max-w-2xl`
-   * is a different claim — that the record is a short interruption rather than the thing being
-   * worked on — and a screen that wants it says so on its own `variant`. An installation-wide
-   * switch between a panel and a drawer never turns a working surface into an interruption.
+   * <p>`"dialog"` opens the record as a centred modal capped at `max-w-2xl`: the record reads as a
+   * short interruption rather than the thing being worked on, so it suits an installation whose
+   * records are brief. A screen can still choose its own presentation on `variant`.
    */
-  detailPresentation: "panel" | "drawer";
+  detailPresentation: "panel" | "drawer" | "dialog";
   /**
    * How tightly tables and lists set their rows when the screen does not say.
    *

@@ -34,10 +34,8 @@ import {
  * How the detail appears.
  *
  * <p>`"panel"` beside the list, `"drawer"` slid in from the right edge over the full height,
- * `"dialog"` as a centred modal. The first two are the same screen said two ways and an
- * installation picks between them through `UIProvider`'s `detailPresentation`; the third is a
- * screen's own decision, because a centred modal claims the record is an interruption rather than
- * the thing being worked on.
+ * `"dialog"` as a centred modal. An installation picks one through `UIProvider`'s
+ * `detailPresentation`, and a screen can set its own on `variant`.
  */
 export type ListDetailVariant = "panel" | "dialog" | "drawer";
 
