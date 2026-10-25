@@ -103,7 +103,7 @@ export type { ColorTheme } from "./theme-manifest";
 
 // ── Application helpers: zones and dates, clipboard, list and form state ──
 export { APP_TIME_ZONE, configureAppTimeZone, getAppTimeZone, useAppTimeZone } from "./datetime/app-timezone";
-export { browserZoneLabel, withBrowserZone, zoneLabel } from "./datetime/browser-zone-label";
+export { browserZoneLabel, offsetAsUtc, withBrowserZone, zoneLabel } from "./datetime/browser-zone-label";
 export { daysUntilDay } from "./datetime/days-until";
 export { elapsedSpan, elapsedSpanBetween, elapsedSpanOf } from "./datetime/elapsed-span";
 export type { ElapsedSpan, ElapsedUnit } from "./datetime/elapsed-span";
