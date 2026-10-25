@@ -50,7 +50,7 @@ function WizardStep({ children }: WizardStepProps) {
 /** Props for {@link StepIndicator}. */
 export interface StepIndicatorProps {
   /** The steps in order: what each is, and an optional second line (who holds it, when it closed). */
-  steps: readonly { title: string; description?: string }[];
+  steps: readonly { title: string; description?: string; detail?: ReactNode }[];
   /** The step in hand; every step before it is done. Pass `steps.length` when all are done. */
   currentStep: number;
   /** A step that was turned back: drawn as rejected instead of in hand. */
@@ -123,6 +123,7 @@ export function StepIndicator({ steps, currentStep, rejectedStep, label, orienta
                       {step.description}
                     </span>
                   )}
+                  {step.detail}
                 </Stack>
               </Flex>
               {index < steps.length - 1 && (
