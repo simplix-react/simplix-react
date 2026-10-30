@@ -40,7 +40,7 @@ export interface UnboundTypeParam {
 
 /** A generic type named with no type arguments, so every parameter was filled with `unknown`. */
 export interface FilledTypeArguments {
-  /** Where the name is written — `SomeDTO.someField`, or `Child extends` for a heritage clause. */
+  /** Where the name is written - `SomeDTO.someField`, or `Child extends` for a heritage clause. */
   site: string;
   target: string;
   params: string[];
@@ -71,7 +71,7 @@ export interface ModelGenResult {
  *
  * The rule is not cosmetic: the CRUD scaffolder builds the same path from a list DTO's name to
  * read which fields the list projection returns, and a directory organised any other way makes it
- * read nothing — every field of the form DTO then becomes a list column.
+ * read nothing - every field of the form DTO then becomes a list column.
  */
 export function modelFileBase(typeName: string): string {
   return typeName.charAt(0).toLowerCase() + typeName.slice(1);
@@ -184,7 +184,7 @@ class ModelEmitter {
     const lines = [HEADER, ""];
 
     // A domain whose closure reaches no enum still gets the module, because the barrel re-exports
-    // it unconditionally and a file holding only a comment is not a module — TypeScript rejects
+    // it unconditionally and a file holding only a comment is not a module - TypeScript rejects
     // the re-export with TS2306 rather than ignoring it, and the domain package stops compiling.
     if (declared.length === 0) {
       lines.push("export {};", "");

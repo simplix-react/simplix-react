@@ -57,7 +57,7 @@ export default defineConfig({
 
   // ── API ────────────────────────────────────────────────────
   api: {
-    /** API base path — used for basePath in code generation */
+    /** API base path - used for basePath in code generation */
     baseUrl: "/api",
   },
 
@@ -397,9 +397,9 @@ function HomePage() {
       }
       log.info("");
       log.info("Next steps:");
-      log.step("simplix add-domain <name>  — Add a domain package");
-      log.step("simplix add-module <name>  — Add an FSD module");
-      log.step("simplix validate           — Validate project structure");
+      log.step("simplix add-domain <name>  - Add a domain package");
+      log.step("simplix add-module <name>  - Add an FSD module");
+      log.step("simplix validate           - Validate project structure");
     } catch (err) {
       spinner.fail("Failed to create project");
       log.error(String(err));

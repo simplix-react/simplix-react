@@ -35,7 +35,7 @@ export interface HookGenOptions {
   naming: OpenApiNamingStrategy;
 }
 
-/** One entity's hooks, keyed by the CRUD role each answers — what `crud.config.ts` records. */
+/** One entity's hooks, keyed by the CRUD role each answers - what `crud.config.ts` records. */
 export interface EntityHooks {
   tag: string;
   entity: string;
@@ -157,7 +157,7 @@ class HookEmitter {
   /**
    * A read.
    *
-   * The path parameters come first, then the options, then the query client — the positions the
+   * The path parameters come first, then the options, then the query client - the positions the
    * generated widgets call it at. `useGetXForEdit(id, { query: { gcTime: 0 } })` is how an edit
    * form asks for an uncached record, so options anywhere else are silently ignored and the form
    * serves whatever the cache holds.
@@ -221,8 +221,8 @@ ${args.join("\n")}
   /**
    * A write.
    *
-   * Everything it is called with rides in one variables object — the path parameters beside
-   * `data`, never inside it — because that is what the CRUD adapters build: a create sends
+   * Everything it is called with rides in one variables object - the path parameters beside
+   * `data`, never inside it - because that is what the CRUD adapters build: a create sends
    * `{ data }`, an update `{ [pathParam]: id, data }` and a delete `{ [pathParam]: id }`.
    */
   private mutationHook(

@@ -313,7 +313,7 @@ export async function repointMockSeeds(
       "m",
     );
     if (metaImport.test(body)) {
-      // Already pointing here — rewrite it in place, so a second run over the same file changes
+      // Already pointing here - rewrite it in place, so a second run over the same file changes
       // nothing and `moved` stays false.
       body = body.replace(metaImport, wantedImport);
     } else {

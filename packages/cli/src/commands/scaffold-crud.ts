@@ -238,7 +238,7 @@ export function parseZodType(zodExpr: string): Omit<FieldInfo, "name" | "label" 
     };
   }
 
-  // z.array(z.string()) / zod.array(zod.string()) — string array treated as text
+  // z.array(z.string()) / zod.array(zod.string()) - string array treated as text
   if (/(?:z|zod)\.array\(\s*(?:z|zod)\.string\(\)\s*\)/.test(trimmed)) {
     return {
       tsType: "string",
@@ -249,7 +249,7 @@ export function parseZodType(zodExpr: string): Omit<FieldInfo, "name" | "label" 
     };
   }
 
-  // z.record(z.string(), z.string()) — i18n map field
+  // z.record(z.string(), z.string()) - i18n map field
   if (/(?:z|zod)\.record\(\s*(?:z|zod)\.string\(\)\s*,\s*(?:z|zod)\.string\(\)\s*\)/.test(trimmed)) {
     return {
       tsType: "Record<string, string>",
@@ -398,7 +398,7 @@ export function parseSchemaFields(content: string, entityName: string): FieldInf
       "igs",
     ),
     // Orval Body: UpdatePetBody / AdminUserAccountRestUpdateBody = zod.object(
-    // Only match Body (request) types — Response types contain envelope fields
+    // Only match Body (request) types - Response types contain envelope fields
     // (type, message, body, timestamp, errorCode, errorDetail) not entity fields.
     new RegExp(
       `(?:export\\s+)?(?:const|let)\\s+\\w*${EntityPascal}\\w*Body\\s*=\\s*(?:z|zod)\\.object\\(`,
@@ -409,7 +409,7 @@ export function parseSchemaFields(content: string, entityName: string): FieldInf
   // Try each pattern; find ALL matches and pick the result with the most fields.
   // This ensures we pick the best schema (e.g. UpdateBody with 20 fields over
   // ChangePasswordBody with 2 fields).
-  // Skip search/filter request bodies (e.g. EventRestSearchBody) — they contain
+  // Skip search/filter request bodies (e.g. EventRestSearchBody) - they contain
   // query parameters (conditions, page, size), not entity fields.
   const searchBodyRe = /Search\w*Body/i;
   let bestFields: FieldInfo[] = [];
@@ -485,7 +485,7 @@ function parseZodObjectBody(content: string, match: RegExpExecArray): FieldInfo[
     if (seen.has(name)) continue;
     seen.add(name);
 
-    // Skip nested object types — not rendered as scalar fields
+    // Skip nested object types - not rendered as scalar fields
     if (/^(?:z|zod)\.object\(/.test(zodExpr) || /(?:z|zod)\.array\(\s*(?:z|zod)\.object\(/.test(zodExpr)) continue;
 
     const parsed = parseZodType(zodExpr);
@@ -549,7 +549,7 @@ interface SchemaResult {
  * The scaffold's field set comes from the write schema, which is the union of what a record
  * holds; a list projection is deliberately narrower. Emitting a column for a field the list
  * never returns produces a screen that does not compile, and the author only finds out after
- * the generator has reported success — so the columns are limited to what the row type has.
+ * the generator has reported success - so the columns are limited to what the row type has.
  *
  * <p>The declared type is kept because it is where an enum field names its enum: the write
  * schema knows only the constants, while the row type says which enum they belong to, and a
@@ -603,8 +603,8 @@ export async function findSchemaFile(
     // The `.extend(` alternative is what makes an inherited DTO discoverable. SimpliX Meta-driven
     // generator preserves the Java inheritance chain, so a type with a parent is emitted as
     // `ChildSchema = ParentSchema.extend({ ...own fields... })` and never writes `z.object` under
-    // its own name. Without this, an entity whose every DTO extends another — 27 of the capture's
-    // 139 — is found by nothing here, and the scaffold falls back to its placeholder field set
+    // its own name. Without this, an entity whose every DTO extends another - 27 of the capture's
+    // 139 - is found by nothing here, and the scaffold falls back to its placeholder field set
     // with no warning, reporting success while emitting an id/name form.
     //
     // Orval's own zod output inlines inheritance and contains no `.extend(` at all, so the
@@ -980,7 +980,7 @@ async function generatePages(
   // generated page beside it can be rewritten without reading anything a person put there.
   //
   // <p><b>Refreshed, never created.</b> A page that departs from nothing has nothing to put in
-  // this file, and a scaffold that writes one anyway leaves an empty hook per page — fifty-eight
+  // this file, and a scaffold that writes one anyway leaves an empty hook per page - fifty-eight
   // of them in one console, each saying "this screen is different" while saying nothing. So the
   // file is rendered only where the author already made one, and a page needing its first
   // departure gets it by copying the template.
@@ -1003,7 +1003,7 @@ async function generatePages(
       // A page is scaffolded and then written on, so carrying the marker proves only where the
       // file came from. What decides whether this run may discard it is the fingerprint: matching
       // means nobody has touched the file since it was laid down, and rewriting it loses nothing.
-      // A page that has been edited — or that predates the stamp, and so can prove nothing — is
+      // A page that has been edited - or that predates the stamp, and so can prove nothing - is
       // somebody's work and is left alone.
       if (!writeOnce.has(fileName) && isUntouchedRender(held)) {
         await writeFileWithDir(filePath, stamped);
@@ -1012,8 +1012,8 @@ async function generatePages(
       }
       log.warn(
         held.includes(GENERATED_PAGE_MARKER) && !writeOnce.has(fileName)
-          ? `Skipping pages/${entityKebab}/${fileName} — edited since it was generated`
-          : `Skipping pages/${entityKebab}/${fileName} — file already exists`,
+          ? `Skipping pages/${entityKebab}/${fileName} - edited since it was generated`
+          : `Skipping pages/${entityKebab}/${fileName} - file already exists`,
       );
       continue;
     }
@@ -1028,7 +1028,7 @@ async function generatePages(
  * Guarantees the module has a permission-subject map for the generated page to read.
  *
  * The page gates its create action on `useCan("create", SUBJECTS.<entity>)`, and only the
- * backend knows which group guards the entity's endpoints — so the map is declared, never
+ * backend knows which group guards the entity's endpoints - so the map is declared, never
  * guessed. Creating it empty makes the missing entry a compile error on the generated page,
  * which is where the author is already looking.
  */
@@ -1048,7 +1048,7 @@ async function ensureSubjectsFile(moduleDir: string): Promise<void> {
       "",
     ].join("\n"),
   );
-  log.info("Created shared/auth/subjects.ts — add the entity's permission group to it");
+  log.info("Created shared/auth/subjects.ts - add the entity's permission group to it");
 }
 
 async function updatePagesIndex(
@@ -1228,8 +1228,8 @@ async function ensurePackageJsonPagesExport(moduleDir: string): Promise<void> {
   if (exports["./pages"]) return;
 
   // `source` first, and first in the object. A dev server resolves a workspace package through
-  // `resolve.conditions: ["source"]`, so an entry without it falls through to `import` — the built
-  // output — and every source edit under `./pages` is invisible in the browser while HMR reports a
+  // `resolve.conditions: ["source"]`, so an entry without it falls through to `import` - the built
+  // output - and every source edit under `./pages` is invisible in the browser while HMR reports a
   // successful update. Nothing errors; the screen simply goes on showing the code as it was at the
   // last build. The module's own three entries are written with it by the template, so a module
   // acquires exactly one entry that is wrong at the moment somebody scaffolds its first page.
@@ -2108,7 +2108,7 @@ export const scaffoldCrudCommand = new Command("scaffold")
       for (const [fileName, content] of Object.entries(files)) {
         const filePath = join(outputDir, fileName);
         if (await pathExists(filePath)) {
-          log.warn(`Skipping ${fileName} — file already exists`);
+          log.warn(`Skipping ${fileName} - file already exists`);
           continue;
         }
         await writeFileWithDir(filePath, content);
@@ -2150,7 +2150,7 @@ export const scaffoldCrudCommand = new Command("scaffold")
             `empty and was not written. A generated page is a list with a detail panel or a ` +
             `creation hub, and ${entity} offers neither: its operations are ` +
             `${active.length > 0 ? active.join(", ") : "none"}. The widgets in ` +
-            `${relativeOutput} are generated — write the page against them by hand, or give the ` +
+            `${relativeOutput} are generated - write the page against them by hand, or give the ` +
             `entity the get operation its detail panel reads.`,
           );
           process.exit(1);
@@ -2178,7 +2178,7 @@ export const scaffoldCrudCommand = new Command("scaffold")
         // named here rather than left to be discovered as endpoints nobody calls.
         log.warn(
           `${entity}: the backend offers ${metaSource.unreachableRoles.join(", ")}, which no ` +
-          "generated screen reaches — a multi-select toolbar is written by hand.",
+          "generated screen reaches - a multi-select toolbar is written by hand.",
         );
       }
 
@@ -2202,7 +2202,7 @@ export const scaffoldCrudCommand = new Command("scaffold")
       log.info(`Fields detected: ${fields.map((f) => f.name).join(", ")}`);
       log.info("");
       log.info("FSD Architecture:");
-      log.step("packages/            → domain logic (schemas, hooks) — no UI");
+      log.step("packages/            → domain logic (schemas, hooks) - no UI");
       log.step("modules/src/widgets/ → CRUD widgets");
       log.step("modules/src/pages/   → page components (auto-generated)");
       log.step("modules/src/shared/  → shared UI, lib, config");

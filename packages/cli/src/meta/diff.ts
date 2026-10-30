@@ -110,7 +110,7 @@ export function compareSurfaces(
       subject: from.join(", "),
       message:
         `the orval output names it ${from.join(", ")} and the meta output ${to.join(", ")}` +
-        (rename.reason ? ` — ${rename.reason}` : ""),
+        (rename.reason ? ` - ${rename.reason}` : ""),
     });
   }
 

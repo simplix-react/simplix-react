@@ -44,9 +44,9 @@ export interface AccessGenResult {
  *
  * SimpliX Meta carries `@PreAuthorize` already taken apart, so nothing here parses SpEL: a permission
  * arrives as the group and the action it names, and only an expression the annotation built out of
- * several of them arrives as text. Nothing generated reads these constants — whether a screen
+ * several of them arrives as text. Nothing generated reads these constants - whether a screen
  * hides a control it may not use, or shows it and lets the server refuse, is the application's
- * decision — so they are emitted and left for it to adopt.
+ * decision - so they are emitted and left for it to adopt.
  */
 export function generateAccessFiles(
   domain: ResolvedDomain,
@@ -87,7 +87,7 @@ export function generateAccessFiles(
  * The operations of an entity that can each own a constant.
  *
  * A name two operations of one entity resolve to keeps the first: one name is one declaration, and
- * a module that declares the same name twice does not compile — which would take the whole package
+ * a module that declares the same name twice does not compile - which would take the whole package
  * with it rather than the one rule. The collision itself is already reported by the endpoint
  * generator, which names its request functions the same way.
  */
@@ -148,10 +148,10 @@ function accessTypes(): string {
 /**
  * What an operation requires of the caller, as \`@PreAuthorize\` states it.
  *
- * - \`permission\` — the caller holds \`action\` on \`group\`.
- * - \`authenticated\` — any signed-in caller.
- * - \`public\` — no caller identity at all.
- * - \`expression\` — a SpEL expression nothing on this side evaluates; \`raw\` is it as written.
+ * - \`permission\`: the caller holds \`action\` on \`group\`.
+ * - \`authenticated\`: any signed-in caller.
+ * - \`public\`: no caller identity at all.
+ * - \`expression\`: a SpEL expression nothing on this side evaluates; \`raw\` is it as written.
  */
 export type AccessRule =
   | { kind: 'permission'; group: string; action: string }

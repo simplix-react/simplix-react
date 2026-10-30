@@ -55,7 +55,7 @@ export async function runOrval(
 
   const orval = await tryImportOrval(targetDir);
   if (!orval) {
-    spinner.warn("Orval not found — skipping code generation.");
+    spinner.warn("Orval not found - skipping code generation.");
     console.log("  Install orval and run manually:");
     console.log("  pnpm install");
     console.log(`  cd packages/${dirName} && npx orval`);
@@ -127,7 +127,7 @@ export async function runOrval(
       await orval.generate(zodConfig as Record<string, unknown>, targetDir);
     } else {
       // No spec info at all — cannot generate
-      spinner.warn("Missing spec info — skipping Orval code generation.");
+      spinner.warn("Missing spec info - skipping Orval code generation.");
     }
   } catch (err) {
     spinner.warn("Orval code generation failed.");

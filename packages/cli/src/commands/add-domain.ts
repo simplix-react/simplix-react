@@ -78,7 +78,7 @@ export const addDomainCommand = new Command("add-domain")
       const absSpecPath = resolve(rootDir, openapiSpec!);
       if (!(await pathExists(absSpecPath))) {
         log.warn(
-          `OpenAPI spec not found: ${openapiSpec} — skipping OpenAPI generation.`,
+          `OpenAPI spec not found: ${openapiSpec} - skipping OpenAPI generation.`,
         );
         useOrval = false;
       }

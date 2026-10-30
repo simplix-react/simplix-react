@@ -29,8 +29,8 @@ export const PRIMITIVES: Record<
 /**
  * How a mapped container is spelled in TypeScript, given its arguments already rendered.
  *
- * `undefined` means the container carries no type of its own — it is unwrapped before the client
- * sees it, or the profile maps it to nothing — and the caller decides what stands in its place:
+ * `undefined` means the container carries no type of its own - it is unwrapped before the client
+ * sees it, or the profile maps it to nothing - and the caller decides what stands in its place:
  * the argument it held, or the empty type at a position that has one.
  */
 export function containerTypeExpression(
@@ -51,8 +51,8 @@ export function containerTypeExpression(
 }
 
 /**
- * One identifier out of however a tag is spelled. A tag is free text — the capture holds
- * `Auth Token` and `OAuth2 Social Login` beside the dotted ones — and a space in the name would
+ * One identifier out of however a tag is spelled. A tag is free text - the capture holds
+ * `Auth Token` and `OAuth2 Social Login` beside the dotted ones - and a space in the name would
  * write a module no import specifier can reach.
  */
 export function camelJoin(text: string): string {
@@ -84,7 +84,7 @@ export function memberName(name: string): string {
 /**
  * The body a response carries, with the containers the mutator strips taken off.
  *
- * Which containers those are is the spec profile's decision, carried on the resolved domain — a
+ * Which containers those are is the spec profile's decision, carried on the resolved domain - a
  * name compared here by hand would be one backend's envelope written into a generator.
  */
 export function payloadOf(ref: TypeRef | undefined, domain: ResolvedDomain): TypeRef | undefined {

@@ -11,7 +11,7 @@ export const PROJECT_TEMPLATE_DIR = ".simplix/templates";
  * The templates a project has taken over, keyed by the name of the bundled template each replaces.
  *
  * <p>A generated page is the one artifact a project rewrites the moment it is emitted: the CLI
- * knows the entity's operations and nothing about the chrome this console puts around them — its
+ * knows the entity's operations and nothing about the chrome this console puts around them - its
  * status tiles, its notice cards, its tab strip. Shipping that chrome in the CLI would put one
  * product's decisions in every product's generator, so the project states them here and the CLI
  * renders what it finds.
@@ -40,7 +40,7 @@ export async function loadProjectTemplates(root: string): Promise<ProjectTemplat
 }
 
 /**
- * The template to render for `name` — the project's where it has one, the bundled one otherwise.
+ * The template to render for `name` - the project's where it has one, the bundled one otherwise.
  *
  * @param name the bundled template's file name without its extension, e.g. `crud-page`
  * @param bundled the template the CLI ships under that name
@@ -57,7 +57,7 @@ export function templateFor(
  * The name of the template a project supplies for a page's hand-written parts.
  *
  * <p>Rendered to `page.blocks.tsx` beside the generated page, and only where that file is already
- * there — it is the author's file, and its existence is what lets the generated page be rewritten
+ * there - it is the author's file, and its existence is what lets the generated page be rewritten
  * on every run rather than skipped once it is on disk. A page that departs from nothing gets no
  * such file: an empty hook per page states a difference that is not there, and a reader counting
  * departures then has to open every one to learn they are all the same.
@@ -68,7 +68,7 @@ export const PAGE_BLOCKS_TEMPLATE = "page.blocks";
  * What a generated page says about itself on its first line.
  *
  * <p><b>It records where the file came from, not what may be done to it.</b> A page is scaffolded
- * and then written on — that is the intended life of one — so the marker outliving the first
+ * and then written on - that is the intended life of one - so the marker outliving the first
  * render is the normal case and says only that the generator laid the file down. What decides
  * whether a re-run may overwrite it is {@link GENERATED_HASH_MARKER}, never this.
  */
@@ -78,7 +78,7 @@ export const GENERATED_PAGE_MARKER = "@simplix-generated";
  * The fingerprint of the render a generated file was laid down as.
  *
  * <p>Stamped on the line under the marker and checked before any re-run rewrites the file: the
- * hash of what is on disk now, taken the same way, either matches — nobody has touched it since —
+ * hash of what is on disk now, taken the same way, either matches - nobody has touched it since  - 
  * or it does not, and the file is somebody's work. Without it the generator has no way to tell
  * an untouched scaffold from a screen a person spent a week on, and the two look identical from
  * the outside: both carry the marker, both compile, and only one may be discarded.
@@ -93,7 +93,7 @@ export const GENERATED_HASH_MARKER = "@simplix-render";
  * The fingerprint of one rendered page, over everything but the fingerprint line itself.
  *
  * @param source the file's content, rendered or read back from disk
- * @returns twelve hex characters — enough to separate renders, short enough to read
+ * @returns twelve hex characters - enough to separate renders, short enough to read
  */
 export function renderFingerprint(source: string): string {
   const withoutStamp = source

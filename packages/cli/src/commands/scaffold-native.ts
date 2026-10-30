@@ -338,7 +338,7 @@ export async function runNativeScaffold(
     const hookDelete = crudConfig?.delete ? toHookName(crudConfig.delete) : null;
 
     if (!hookList && !ops.hasList) {
-      log.warn("Entity has no list operation — list screen will be skipped.");
+      log.warn("Entity has no list operation - list screen will be skipped.");
     }
 
     const updatePathParam = crudConfig?.update
@@ -537,7 +537,7 @@ export async function runNativeScaffold(
     if (appDir) {
       log.info(`  apps/${appName}/app/${entityKebab}/`);
     } else {
-      log.info("  (no Expo app found — route files skipped; pass --app <dir>)");
+      log.info("  (no Expo app found - route files skipped; pass --app <dir>)");
     }
   } catch (error) {
     spinner.fail("Failed to generate native screen set");

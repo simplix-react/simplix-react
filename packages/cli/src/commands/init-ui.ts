@@ -86,7 +86,7 @@ export const initUiCommand = new Command("init-ui")
 
       log.info("");
       log.info("Generated:");
-      log.step("src/lib/simplix-ui.ts — UIComponents configuration");
+      log.step("src/lib/simplix-ui.ts - UIComponents configuration");
       log.info("");
       log.info("Next steps:");
       log.step(

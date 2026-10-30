@@ -19,9 +19,9 @@ interface MockResolvedOperation {
 
 /**
  * Generates mock files for an Orval domain package:
- * - `mock/seeds.ts`              — typed seed arrays (only on first creation)
- * - `generated/mock/handlers.ts` — per-entity MSW handler factories (always regenerated)
- * - `mock/index.ts`              — store wiring + user overrides (only on first creation)
+ * - `mock/seeds.ts`              - typed seed arrays (only on first creation)
+ * - `generated/mock/handlers.ts` - per-entity MSW handler factories (always regenerated)
+ * - `mock/index.ts`              - store wiring + user overrides (only on first creation)
  */
 export async function generateMockFiles(
   targetDir: string,
@@ -31,7 +31,7 @@ export async function generateMockFiles(
 ): Promise<void> {
   // 1. Generate seeds.ts if it doesn't exist.
   //    Skip entities whose seed type (modelType ?? pascalName) is not an actual
-  //    generated model — these are list/action pseudo-entities with no entity DTO,
+  //    generated model - these are list/action pseudo-entities with no entity DTO,
   //    and a seed would import a non-existent type. When the model set can't be
   //    read, keep all entities (preserves behavior for non-Orval/standard specs).
   const seedsPath = join(targetDir, "src/mock/seeds.ts");
@@ -125,7 +125,7 @@ const MOCK_GENERATED_MARKER = "// Generated handlers";
  * A generated mock/index.ts is safe to regenerate only when it is still in the
  * pristine generated shape: both section markers are present and the override
  * region between them holds no developer-authored handlers. Any custom override
- * — or an unrecognized structure — is preserved untouched so regeneration never
+ * - or an unrecognized structure - is preserved untouched so regeneration never
  * clobbers hand-written wiring.
  */
 function canRegenerateMockEntry(content: string): boolean {
@@ -214,8 +214,8 @@ function generateHandlersFileCode(
       imports.push(`import { buildEmbeddedTree } from "@simplix-react/mock";`);
     }
 
-    // Two entities can share a model type — an avatar read by its owner and by an
-    // administrator is the same attachment — and naming it twice in one import is a
+    // Two entities can share a model type - an avatar read by its owner and by an
+    // administrator is the same attachment - and naming it twice in one import is a
     // duplicate declaration the generated file cannot compile with.
     const typeNames = [...new Set(storeEntities.map((e) => e.modelType ?? e.pascalName))].join(", ");
     imports.push(`import type { ${typeNames} } from "../model";`);
@@ -267,8 +267,8 @@ function generateMockEntryCode(
   if (hasStores) {
     imports.push('import { createMockEntityStore } from "@simplix-react/mock";');
 
-    // Two entities can share a model type — an avatar read by its owner and by an
-    // administrator is the same attachment — and naming it twice in one import is a
+    // Two entities can share a model type - an avatar read by its owner and by an
+    // administrator is the same attachment - and naming it twice in one import is a
     // duplicate declaration the generated file cannot compile with.
     const typeNames = [...new Set(storeEntities.map((e) => e.modelType ?? e.pascalName))].join(", ");
     imports.push(`import type { ${typeNames} } from "../generated/model";`);
@@ -607,7 +607,7 @@ function generateUpdateHandler(
     return `    http.${method}("${pattern}", async ({ request, params }) => HttpResponse.json(${store}.update(${idExpr}, await request.json() as ${pascalName}))),`;
   }
 
-  // Body-based update (PUT /pet — no path param). A singleton resource declares no identifier,
+  // Body-based update (PUT /pet - no path param). A singleton resource declares no identifier,
   // so the key is read through a cast and the write falls through to a create when there is none.
   const keyLine = hasId
     ? `      const key = body.${idField}!;`
@@ -749,7 +749,7 @@ function findIdField(entity: ExtractedEntity): string {
 /**
  * Whether the entity actually declares the field {@link findIdField} named.
  *
- * A singleton resource — a settings document read and written whole — carries no identifier at
+ * A singleton resource - a settings document read and written whole - carries no identifier at
  * all, and `findIdField` falls back to `"id"` for it. Emitting `body.id` against such a DTO
  * produces a handler that does not compile, so the body-update path asks this first.
  */

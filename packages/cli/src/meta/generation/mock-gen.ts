@@ -13,7 +13,7 @@ export const MOCK_DIR = "mock";
 /** Where the model declarations live, seen from a module of {@link MOCK_DIR}. */
 const MODEL_DIR = "../model";
 
-/** The meta output root, seen from `src/mock/` — where the entry and the seeds are written. */
+/** The meta output root, seen from `src/mock/` - where the entry and the seeds are written. */
 const DEFAULT_META_ROOT = "../generated-meta";
 
 /** Rows per seed array. */
@@ -51,7 +51,7 @@ export const MOCK_GENERATED_MARKER = "// Generated handlers";
 
 /**
  * Whether an existing `src/mock/index.ts` may be rewritten: both markers are present and the
- * region between them — where a developer adds handler overrides — is empty.
+ * region between them - where a developer adds handler overrides - is empty.
  *
  * A file missing either marker is left alone, which is also why {@link generateMockFiles} always
  * emits both: an entry written without them is frozen at its first version and never picks up an
@@ -117,7 +117,7 @@ export interface MockGenResult {
   files: Map<string, string>;
   /**
    * `src/mock/index.ts`: the stores, their reset and the handler spreads. Rewritten on every run
-   * unless the file on disk holds a handler override — see {@link canRegenerateMockEntry}.
+   * unless the file on disk holds a handler override - see {@link canRegenerateMockEntry}.
    */
   entry: string;
   /**
@@ -145,8 +145,8 @@ export interface MockGenResult {
  * stores start from.
  *
  * Every operation of the domain gets a handler, whatever its role: a route MSW does not answer is
- * passed through to a server that is not running, and a custom action — a quarter of this
- * application's operations — has no CRUD role at all. What an operation cannot answer from the
+ * passed through to a server that is not running, and a custom action - a quarter of this
+ * application's operations - has no CRUD role at all. What an operation cannot answer from the
  * store it answers with an empty body.
  *
  * Nothing here reads the filesystem. Which DTO a store carries, which field identifies a record
@@ -298,11 +298,11 @@ class MockEntity {
    *
    * An entity owns several DTOs and the store is typed with one of them: the record a detail
    * screen reads. That is the payload of a GET that returns one object rather than a page of
-   * them, preferring the route whose last segment is the identifier — an entity whose edit form
+   * them, preferring the route whose last segment is the identifier - an entity whose edit form
    * is declared before its detail would otherwise be stored as the form.
    *
-   * The response is the signal rather than the role, because an owned singleton — a policy at
-   * `/safety-zone/{id}/policy` — has no `get` role at all and still returns the type the screens
+   * The response is the signal rather than the role, because an owned singleton - a policy at
+   * `/safety-zone/{id}/policy` - has no `get` role at all and still returns the type the screens
    * read.
    */
   private deriveStoreType(): ResolvedType | undefined {
@@ -317,7 +317,7 @@ class MockEntity {
     }
 
     // No route addresses one record. What a list answers with is what this entity holds; another
-    // GET returning a bare reference is a sub-resource or a census — a different shape under the
+    // GET returning a bare reference is a sub-resource or a census - a different shape under the
     // same tag. `notification.NotificationCentre` has both, and reading the first bare reference
     // typed its store by the census while its rows are notifications.
     const gets = this.targets.filter((one) => one.operation.method === "GET");
@@ -357,7 +357,7 @@ class MockEntity {
   /**
    * The identifier, taken from the route that has to name one: a delete addresses exactly one
    * record, and so does a read of one. Both state the parameter's type as well, which is what
-   * decides whether the handler reads `Number(params.x)` or `String(params.x)` — and reading a
+   * decides whether the handler reads `Number(params.x)` or `String(params.x)` - and reading a
    * string identifier as a number produces `NaN`, whose lookup misses and falls through to the
    * first row of the store for every request.
    */
@@ -368,7 +368,7 @@ class MockEntity {
     }
 
     // No route addresses a single record. A census or a singleton is read and written whole, and
-    // the DTO's own key — when it declares one — is all that is left to store rows under.
+    // the DTO's own key - when it declares one - is all that is left to store rows under.
     const fields = this.storeType?.allFields ?? [];
     const declared =
       fields.find((field) => field.name.toLowerCase() === "id") ??
@@ -394,7 +394,7 @@ function sortByRouteShape(targets: EndpointTarget[]): EndpointTarget[] {
     const leftParams = left.operation.request.path.length > 0;
     const rightParams = right.operation.request.path.length > 0;
     if (leftParams !== rightParams) return leftParams ? 1 : -1;
-    // Same shape, so MSW does not care which comes first — but everything downstream that takes
+    // Same shape, so MSW does not care which comes first - but everything downstream that takes
     // the first match does. A backend hands its operations over in hash order, so returning 0
     // here leaves that order in place and the same application generates a different store type
     // after a restart. Path then method is a total order over a set that cannot hold duplicates.
@@ -446,8 +446,8 @@ class MockEmitter {
       if (this.entities.some((one) => one.targets.some((target) => target.role === "tree"))) {
         imports.push("import { buildEmbeddedTree } from '@simplix-react/mock';");
       }
-      // Two entities can carry the same DTO — a record read by its owner and by an administrator
-      // is one record — and naming it twice in one import is a duplicate declaration.
+      // Two entities can carry the same DTO - a record read by its owner and by an administrator
+      // is one record - and naming it twice in one import is a duplicate declaration.
       const names = [...new Set(backed.map((one) => one.storeTypeName))].sort();
       imports.push(`import type { ${names.join(", ")} } from '${MODEL_DIR}';`);
     }
@@ -509,7 +509,7 @@ ${entries.join("\n")}
       case "tree":
         return this.treeHandler(entity, open);
       default:
-        // A custom action — an escalation, a revocation, a dismissal — which is what a quarter of
+        // A custom action - an escalation, a revocation, a dismissal - which is what a quarter of
         // this application's operations are. A read addressed by a path parameter is a
         // sub-resource of the entity and is answered from its store; anything else has nothing in
         // the store to answer with, and a route left unhandled is passed through to a server that
@@ -553,8 +553,8 @@ ${entries.join("\n")}
   /**
    * The query key a list narrows itself by, and the field it reads.
    *
-   * A searchable route states no parameter of its own — its filters are the ones its search DTO
-   * declares — so the key is built the way the client builds it, `field.operator`. Either way the
+   * A searchable route states no parameter of its own - its filters are the ones its search DTO
+   * declares - so the key is built the way the client builds it, `field.operator`. Either way the
    * field has to be one the store's DTO declares, or the emitted predicate reads a property that
    * is not there.
    */
@@ -588,8 +588,8 @@ ${entries.join("\n")}
   /**
    * A read addressed by a path parameter.
    *
-   * The parameter is the identifier on a detail route and something else on a sub-resource one —
-   * `/emergency-contact/{emergencyContactId}/on-call` reads the cells of a contact — and there
+   * The parameter is the identifier on a detail route and something else on a sub-resource one  - 
+   * `/emergency-contact/{emergencyContactId}/on-call` reads the cells of a contact - and there
    * the store can only be narrowed when its DTO declares a field of that name. Where it does not,
    * the whole list is the answer: a filter that matches nothing followed by a fallback to the
    * first row shows one arbitrary record for every parent.
@@ -633,8 +633,8 @@ ${entries.join("\n")}
       )}),`;
     }
 
-    // A multi-update carries the key in the body. A DTO that declares none — a settings document
-    // read and written whole — is read through a cast, and the write falls through to a create.
+    // A multi-update carries the key in the body. A DTO that declares none - a settings document
+    // read and written whole - is read through a cast, and the write falls through to a create.
     const declared = entity.hasDeclaredIdField;
     const keyLine = declared
       ? `      const key = body.${entity.idField}!;`
@@ -892,7 +892,7 @@ ${entries.join("\n")}
   private stringSeed(field: FieldMeta, index: number, entityName: string): string {
     const name = field.name.toLowerCase();
     // The backend states the format as a constraint, which is what a name can only be read as a
-    // hint of. It states it on what it validates — the DTOs a request carries — and a store is
+    // hint of. It states it on what it validates - the DTOs a request carries - and a store is
     // typed with the DTO a response carries, so the name is still the only reading left there.
     if (field.constraints?.some((one) => one.kind === "email") || name.includes("email")) {
       return `user${index}@example.com`;

@@ -49,7 +49,7 @@ function generateFieldValue(
 ): string | undefined {
   const name = field.name.toLowerCase();
 
-  // ID field — respect actual type (string for UUID, number for integer)
+  // ID field - respect actual type (string for UUID, number for integer)
   if (name === "id") {
     if (field.type === "string") {
       if (field.format === "uuid") {
@@ -60,7 +60,7 @@ function generateFieldValue(
     return String(index);
   }
 
-  // Enum fields — cycle through values
+  // Enum fields - cycle through values
   if (field.enum && field.enum.length > 0) {
     const val = field.enum[(index - 1) % field.enum.length];
     return `"${val}"`;
@@ -78,7 +78,7 @@ function generateFieldValue(
     case "array":
       return generateArrayValue(field, index);
     case "object":
-      // Skip relation/nested object fields — they are not part of flat DetailDTOs
+      // Skip relation/nested object fields - they are not part of flat DetailDTOs
       return undefined;
     default:
       if (!field.required) return undefined;
@@ -204,7 +204,7 @@ export function generateOrvalSeedFile(entities: ExtractedEntity[]): string {
   const typeImports = validEntities.map((e) => e.modelType ?? e.pascalName).join(", ");
   const lines: string[] = [
     `/**`,
-    ` * Mock seed data — auto-generated from OpenAPI schema.`,
+    ` * Mock seed data - auto-generated from OpenAPI schema.`,
     ` *`,
     ` * Values are generated based on field types and naming conventions.`,
     ` * Customize this file to use realistic data for your project.`,

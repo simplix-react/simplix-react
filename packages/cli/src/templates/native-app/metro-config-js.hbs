@@ -54,16 +54,16 @@ try {
     };
   }
 } catch {
-  // Framework packages not installed yet — nothing to map.
+  // Framework packages not installed yet - nothing to map.
 }
 
 // Modules that must exist exactly once at runtime (React renderer, native
-// modules, query/mock state). Files bundled from outside the app directory —
-// a linked framework checkout AND sibling workspace packages/modules — would
+// modules, query/mock state). Files bundled from outside the app directory  - 
+// a linked framework checkout AND sibling workspace packages/modules - would
 // otherwise resolve these from their own node_modules and ship a second copy
 // (a version drift there means two Reacts in one bundle and "Cannot read
 // property 'useState' of null"). Imports of these from any non-app origin are
-// re-anchored to the app's dependency graph — Metro's equivalent of Vite's
+// re-anchored to the app's dependency graph - Metro's equivalent of Vite's
 // resolve.dedupe. Every listed name must be a direct app dependency.
 const SINGLETON_MODULES = [
   "react",

@@ -7,7 +7,7 @@ import common{{pascalCase this}} from "../locales/common/{{this}}.json";
 {{/unless}}
 {{/each}}
 
-// Metro has no import.meta.glob — app translations register through static
+// Metro has no import.meta.glob - app translations register through static
 // imports keyed by the same "/locales/{namespace}/{locale}.json" pattern.
 export const i18n = createNativeI18n({
   defaultLocale: "{{defaultLocale}}",

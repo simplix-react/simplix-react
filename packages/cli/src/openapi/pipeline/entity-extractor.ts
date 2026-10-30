@@ -894,7 +894,7 @@ function deduplicateEntities(entities: ExtractedEntity[]): ExtractedEntity[] {
       const incomingTags = entity.tags.join(", ");
       if (existingTags !== incomingTags) {
         log.warn(
-          `Entity "${entity.name}" resolved from multiple tags [${existingTags}] + [${incomingTags}] — operations will be merged`,
+          `Entity "${entity.name}" resolved from multiple tags [${existingTags}] + [${incomingTags}] - operations will be merged`,
         );
       }
       // Merge operations

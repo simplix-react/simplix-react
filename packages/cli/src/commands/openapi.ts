@@ -403,7 +403,7 @@ export function resolveMetaSource(
   }
   throw new Error(
     `SimpliX Meta has no source: \`meta.source\` is unset for "${specSource}", and it cannot ` +
-      `be derived — deriving it needs a spec served over HTTP and a profile carrying ` +
+      `be derived - deriving it needs a spec served over HTTP and a profile carrying ` +
       `\`metaEndpoint\`` +
       (metaEndpoint ? "" : ", which this spec's profile does not") +
       `. Set \`meta.source\` in simplix.config.ts.`,
@@ -464,10 +464,10 @@ function reportMetaResolution(resolved: ResolvedMeta): void {
     );
   }
   if (resolved.missingTypes.length > 0) {
-    log.warn(`DTO meta: undeclared types referenced — ${resolved.missingTypes.join(", ")}.`);
+    log.warn(`DTO meta: undeclared types referenced - ${resolved.missingTypes.join(", ")}.`);
   }
   if (resolved.missingEnums.length > 0) {
-    log.warn(`DTO meta: undeclared enums referenced — ${resolved.missingEnums.join(", ")}.`);
+    log.warn(`DTO meta: undeclared enums referenced - ${resolved.missingEnums.join(", ")}.`);
   }
   if (resolved.unmappedContainers.length > 0) {
     log.warn(
@@ -760,7 +760,7 @@ async function generateDomainPackage(opts: DomainPackageOpts): Promise<void> {
       }
       for (const one of seeds.retyped) {
         log.warn(
-          `DTO meta: ${one.name} is typed ${one.to} rather than ${one.from} — the rows under it ` +
+          `DTO meta: ${one.name} is typed ${one.to} rather than ${one.from} - the rows under it ` +
             "were written against the other shape.",
         );
       }

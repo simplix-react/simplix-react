@@ -41,7 +41,7 @@ interface RawPayload {
 
 /** Both failure modes below are usually this one setting, so they say so in the same words. */
 const ENABLE_HINT =
-  "Check that the backend is running and was started with `simplix.dev.meta.enabled=true` — " +
+  "Check that the backend is running and was started with `simplix.dev.meta.enabled=true` - " +
   "the endpoint is not registered otherwise.";
 
 function isHttpSource(source: string): boolean {
@@ -142,7 +142,7 @@ function assertVersion(meta: DtoMeta): void {
   if (meta.version > SUPPORTED_META_VERSION) {
     throw new Error(
       `SimpliX Meta version ${meta.version} is newer than this CLI understands ` +
-        `(supported: ${SUPPORTED_META_VERSION}). Upgrade @simplix-react/cli to read it — ` +
+        `(supported: ${SUPPORTED_META_VERSION}). Upgrade @simplix-react/cli to read it - ` +
         `generating from it now would silently drop whatever the newer version added.`,
     );
   }

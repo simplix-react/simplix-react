@@ -25,13 +25,13 @@ function buildBaseZodType(schema: SchemaObject): string {
     return `z.enum([${values}])`;
   }
 
-  // allOf — merge all sub-schemas
+  // allOf - merge all sub-schemas
   if (schema.allOf?.length) {
     const merged = mergeAllOfSchemas(schema.allOf);
     return toZodType(merged);
   }
 
-  // oneOf / anyOf — z.union
+  // oneOf / anyOf - z.union
   if (schema.oneOf?.length || schema.anyOf?.length) {
     const variants = (schema.oneOf ?? schema.anyOf)!;
     if (variants.length === 1) return toZodType(variants[0]);
@@ -164,7 +164,7 @@ export function generateZodSchemas(entities: ExtractedEntity[]): string {
     }
     lines.push("");
 
-    // Operation input schemas — unified naming: ${opName}${PascalName}Schema
+    // Operation input schemas - unified naming: ${opName}${PascalName}Schema
     for (const op of entity.operations) {
       if (!op.bodySchema) continue;
       const schemaName = `${op.name}${entity.pascalName}Schema`;

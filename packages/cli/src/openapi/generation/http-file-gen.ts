@@ -83,7 +83,7 @@ function generateSampleBodyFromSchema(schema: SchemaObject): string {
   return JSON.stringify(obj, null, 2);
 }
 
-// Samples are fixed constants so regenerating a .http file is deterministic — a
+// Samples are fixed constants so regenerating a .http file is deterministic - a
 // wall-clock date-time sample would rewrite the file on every generation.
 const STRING_FORMAT_SAMPLES: Record<string, () => unknown> = {
   email: () => "user@example.com",

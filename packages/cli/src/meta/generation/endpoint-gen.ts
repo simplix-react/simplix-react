@@ -30,7 +30,7 @@ const REQUEST_MODULE = "_request";
 export interface EndpointGenOptions {
   /**
    * Contributed by the spec profile: what an operation's request function, hook and CRUD role are
-   * called. The names are not cosmetic — module code imports hooks by name and `crud.config.ts`
+   * called. The names are not cosmetic - module code imports hooks by name and `crud.config.ts`
    * drives the scaffolder off the same ones.
    */
   naming: OpenApiNamingStrategy;
@@ -142,7 +142,7 @@ export function resolveEndpoints(
 /**
  * The first target of each name, in the order the document states them.
  *
- * Two operations can resolve to one name — `user.Avatar` serves the same read at
+ * Two operations can resolve to one name - `user.Avatar` serves the same read at
  * `/{userId}-avatar-{size}.{ext}` and `/{userId}-avatar.{ext}`, and the strategy names both
  * `getAllAvatars`. Emitting each declares the constant twice and the module does not compile, so
  * the later ones are dropped where declarations are written and reported through
@@ -169,7 +169,7 @@ export function dedupeByName(targets: EndpointTarget[]): EndpointTarget[] {
 export function entityNameOf(tag: string): string {
   const last = tag.slice(tag.lastIndexOf(".") + 1);
   // A controller that declares no `@Tag` is tagged with its class name, and the suffix would reach
-  // the entity and every hook of it — `useUpdateLocaleCurrentUserRestController`. `RestController`
+  // the entity and every hook of it - `useUpdateLocaleCurrentUserRestController`. `RestController`
   // goes first: taking `Controller` off `CurrentUserRestController` would leave `CurrentUserRest`.
   // `simplixBootNaming.resolveEntityName` strips the same two in the same order, and a test holds
   // the two derivations against each other over every tag the capture states.
@@ -220,7 +220,7 @@ function barrel(entities: EndpointEntity[]): string {
 /**
  * The helpers the emitted URL builders are written against.
  *
- * A list route reads an array parameter as one occurrence per member — `sort=a&sort=b` — which
+ * A list route reads an array parameter as one occurrence per member - `sort=a&sort=b` - which
  * is how the backend's own binder reads it; joining them into one occurrence sorts by a field
  * named after both.
  */
@@ -230,8 +230,8 @@ function requestHelpers(): string {
 /** The query string of a request, with an array parameter written once per member. */
 /**
  * Parameters repeated once per member instead of joined. Only \`sort\` is: searchable-jpa reads a
- * multi-value filter as one comma-separated field — its own parameter documentation says "Enter
- * multiple values separated by comma" — so exploding \`orgId.in\` into \`orgId.in=A&orgId.in=B\`
+ * multi-value filter as one comma-separated field, and its own parameter documentation says "Enter
+ * multiple values separated by comma", so exploding \`orgId.in\` into \`orgId.in=A&orgId.in=B\`
  * sends a shape the server does not read, and the filter comes back unapplied rather than failing.
  */
 const EXPLODED_PARAMS = new Set(['sort']);

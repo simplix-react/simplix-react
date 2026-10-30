@@ -22,7 +22,7 @@ import { modelFileBase } from "./model-gen.js";
 /** Directory the search metadata modules land in, relative to a generated package's meta root. */
 export const SEARCH_DIR = "search";
 
-/** Directory the params types land in — beside the DTOs, which is where both halves look. */
+/** Directory the params types land in - beside the DTOs, which is where both halves look. */
 const MODEL_DIR = "model";
 
 /** Module the emitted metadata is typed against, inside {@link SEARCH_DIR}. */
@@ -101,7 +101,7 @@ interface SearchRoute {
  *
  * The metadata is exported for screens written by hand: nothing generated reads it. What the
  * generated client does depend on is the params type, which both the request function and its
- * hook import from the model directory — a searchable route states no query parameter of its own,
+ * hook import from the model directory - a searchable route states no query parameter of its own,
  * so the filters its DTO defines are the only description of what it accepts.
  */
 export function generateSearchFiles(
@@ -185,7 +185,7 @@ function filterTypes(): string {
 
   return `${HEADER}
 
-/** How a filter key names its operator — the values of the framework's \`SearchOperator\`. */
+/** How a filter key names its operator: the values of the framework's \`SearchOperator\`. */
 export type SearchOperatorValue =
 ${operators};
 
@@ -249,7 +249,7 @@ class SearchEmitter {
 
     // What the route states of its own comes first, as it does in the OpenAPI document. Eight of
     // the searchable routes carry parameters beside their filters and every one of them is a
-    // control on a screen — the window a census is bucketed over, the tab an inbox is narrowed
+    // control on a screen - the window a census is bucketed over, the tab an inbox is narrowed
     // to. The list renders without them, which is why dropping them fails quietly.
     for (const param of route.target.operation.request.query) {
       members.push(this.ownParam(param, imports, route.target.operation.id));
