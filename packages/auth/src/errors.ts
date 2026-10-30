@@ -5,7 +5,8 @@ export type AuthErrorCode =
   | "TOKEN_EXPIRED"
   | "REFRESH_FAILED"
   | "UNAUTHENTICATED"
-  | "SCHEME_ERROR";
+  | "SCHEME_ERROR"
+  | "SIGN_IN_FAILED";
 
 /**
  * Error thrown by auth operations.

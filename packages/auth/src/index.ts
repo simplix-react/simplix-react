@@ -37,6 +37,14 @@ export type { AutoRefreshSchedulerOptions } from "./helpers/auto-refresh-schedul
 export { createCrossTabSync } from "./helpers/cross-tab-sync.js";
 export type { CrossTabSyncOptions } from "./helpers/cross-tab-sync.js";
 export { openOAuth2Popup } from "./helpers/oauth2-popup.js";
+export { createOidcClient } from "./helpers/oidc-client.js";
+export type {
+  OidcClient,
+  OidcClientOptions,
+  OidcDiscovery,
+  OidcPendingStorage,
+  OidcTokens,
+} from "./helpers/oidc-client.js";
 export type { OAuth2PopupOptions, OAuth2PopupResult } from "./helpers/oauth2-popup.js";
 
 // ── Remember-me token storage ──
