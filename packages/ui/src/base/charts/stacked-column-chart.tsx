@@ -106,7 +106,7 @@ export function StackedColumnChart({ label, categories, series, hidden, highligh
           const x = L + cw * i + (cw - bw) / 2;
           let acc = 0;
           return (
-            <g key={category} onMouseMove={move(i)} onMouseLeave={leave}>
+            <g key={i} onMouseMove={move(i)} onMouseLeave={leave}>
               <rect x={L + cw * i} y={T} width={cw} height={H - T - B} rx={4} {...slotAttributes(plotColumnHitStyle, { hot: hot === i })} />
               {shown.map((s) => {
                 const v = s.values[i] ?? 0;

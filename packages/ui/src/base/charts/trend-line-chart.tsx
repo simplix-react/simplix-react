@@ -127,7 +127,7 @@ export function TrendLineChart({ label, categories, series, domain, hidden, load
           );
         })}
         {categories.map((c, i) => (
-          <text key={c} x={x(i)} y={H - 6} textAnchor="middle" {...slotAttributes(plotAxisStyle, {})}>
+          <text key={i} x={x(i)} y={H - 6} textAnchor="middle" {...slotAttributes(plotAxisStyle, {})}>
             {c}
           </text>
         ))}
