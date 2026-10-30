@@ -15,6 +15,7 @@ import {
   overlayServerTranslations,
   prepareMetaContext,
   type MetaContext,
+  writeMetaSnapshot,
 } from "./openapi.js";
 import { metaEntities, META_DIR, writeMetaOutput } from "../meta/write.js";
 import { resolveSpecConfig } from "../openapi/orchestration/resolve-spec-config.js";
@@ -143,6 +144,12 @@ export const metaCommand = new Command("meta")
       generated += 1;
     }
 
-    if (meta.snapshotPath) log.info(`SimpliX Meta snapshot: ${meta.snapshotPath}`);
+    // Written once every domain has been generated, as `simplix openapi` does, so `--offline` and
+    // the next run's change gate read what this run read.
+    if (await writeMetaSnapshot(meta, flags.offline === true)) {
+      log.info(`SimpliX Meta snapshot written: ${meta.snapshotPath}`);
+    } else if (meta.snapshotPath) {
+      log.info(`SimpliX Meta snapshot read: ${meta.snapshotPath}`);
+    }
     log.info(`Generated ${generated} domain package(s) from SimpliX Meta.`);
   });

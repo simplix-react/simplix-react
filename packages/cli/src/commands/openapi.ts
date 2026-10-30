@@ -277,11 +277,23 @@ export const openapiCommand = new Command("openapi")
     // The SimpliX Meta snapshot is written once every domain has been generated. Writing it per domain
     // makes the first domain's write the second domain's comparison, so a run that regenerates
     // one package reports every later one as up-to-date.
-    if (meta?.snapshotPath && !flags.offline) {
-      await writeFileWithDir(meta.snapshotPath, JSON.stringify(meta.document, null, 2) + "\n");
-      log.step(`DTO meta snapshot: ${relative(process.cwd(), meta.snapshotPath)}`);
+    if (meta && (await writeMetaSnapshot(meta, flags.offline === true))) {
+      log.step(`DTO meta snapshot: ${relative(process.cwd(), meta.snapshotPath!)}`);
     }
   });
+
+/**
+ * Write the SimpliX Meta a live run fetched to the configured `meta.snapshot`, which is what
+ * `--offline` and the next run's change gate read.
+ *
+ * An offline run read that file and writes nothing back, and a configuration with no snapshot has
+ * nowhere to write. Answers whether the file was written.
+ */
+export async function writeMetaSnapshot(meta: MetaContext, offline: boolean): Promise<boolean> {
+  if (offline || !meta.snapshotPath) return false;
+  await writeFileWithDir(meta.snapshotPath, JSON.stringify(meta.document, null, 2) + "\n");
+  return true;
+}
 
 // ── DTO meta pipeline ────────────────────────────────────────
 
