@@ -15,6 +15,7 @@ import { useTranslation } from "@simplix-react/i18n/react";
 
 import { DialogContent } from "../../base/overlay/dialog";
 import { SheetContent } from "../../base/overlay/sheet";
+import { useMediaQuery } from "../../hooks/use-media-query";
 import { useUIDefaults } from "../../provider/ui-defaults-context";
 import { partAttributes, slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
@@ -37,6 +38,9 @@ import {
  * `detailPresentation`, and a screen can set its own on `variant`.
  */
 export type ListDetailVariant = "panel" | "dialog" | "drawer";
+
+/** Below the `md` breakpoint, where the panel layout stacks the detail over the list. */
+const PHONE_WIDTH = "(max-width: 767px)";
 
 export interface ListDetailContextValue {
   variant: ListDetailVariant;
@@ -205,7 +209,11 @@ export function ListDetailRoot({ variant: variantProp, activePanel: activePanelP
   // screen naming `"panel"` because the scaffold wrote it there takes the choice away from every
   // installation without meaning to.
   const uiDefaults = useUIDefaults();
-  const variant = variantProp ?? uiDefaults.detailPresentation;
+  // On a phone the detail is the page, whatever was asked for: a drawer covers the whole width
+  // anyway and a dialog leaves a margin nothing can use, and both hide the way back behind a
+  // backdrop. The panel variant's narrow layout already opens the detail in place of the list.
+  const onAPhone = useMediaQuery(PHONE_WIDTH);
+  const variant = onAPhone ? "panel" : (variantProp ?? uiDefaults.detailPresentation);
   const designDetailWidth = useDesignDetailWidth();
   const detailWidth = detailWidthProp ?? designDetailWidth ?? DETAIL_PANEL_WIDTH;
 
