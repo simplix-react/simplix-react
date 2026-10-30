@@ -8,6 +8,7 @@ import type { FetchFn } from "@simplix-react/contract";
 import { createFetch } from "@simplix-react/contract";
 import { getRequestLocale } from "@simplix-react/api";
 import {
+  AuthError,
   createAuth,
   createAuthFetch,
   createCrossTabSync,
@@ -33,6 +34,18 @@ export interface BootAuthOptions {
   autoSchedule?: boolean;
   /** Cross-tab logout/token sync. Defaults to true. */
   crossTabSync?: boolean;
+  /**
+   * Tokens come from an external issuer, such as an OpenID Connect provider, instead of the Boot
+   * token endpoints. Refreshing and revoking go through it, and `authClient.loginFn` refuses,
+   * since signing in happens at the issuer.
+   */
+  tokenClient?: ExternalTokenClient;
+}
+
+/** Refreshes and revokes tokens issued by an external issuer. */
+export interface ExternalTokenClient {
+  refresh(refreshToken: string): Promise<TokenPair>;
+  revoke?(refreshToken: string | null): Promise<void>;
 }
 
 export interface BootAuthClient {
@@ -93,6 +106,9 @@ export function createBootAuth(options: BootAuthOptions = {}): BootAuthResult {
     const refreshToken = store.get("refresh_token");
     if (!refreshToken) {
       throw new Error("No refresh token available");
+    }
+    if (options.tokenClient) {
+      return options.tokenClient.refresh(refreshToken);
     }
     const raw = await baseFetch<SpringTokenResponse>(
       `${basePath}/auth/token/refresh`,
@@ -170,6 +186,9 @@ export function createBootAuth(options: BootAuthOptions = {}): BootAuthResult {
 
   const authClient: BootAuthClient = {
     loginFn: async (username, password) => {
+      if (options.tokenClient) {
+        throw new AuthError("SCHEME_ERROR", "Sign-in happens at the external issuer");
+      }
       const locale = getRequestLocale();
       const raw = await baseFetch<SpringTokenResponse>(
         `${basePath}/auth/token/issue`,
@@ -188,6 +207,10 @@ export function createBootAuth(options: BootAuthOptions = {}): BootAuthResult {
     refreshFn,
     revokeFn: async () => {
       const refreshToken = store.get("refresh_token");
+      if (options.tokenClient) {
+        await options.tokenClient.revoke?.(refreshToken);
+        return;
+      }
       await (auth.fetchFn as FetchFn)<void>(
         `${basePath}/auth/token/revoke`,
         {

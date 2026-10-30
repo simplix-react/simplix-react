@@ -12,6 +12,7 @@ export {
   type BootAuthOptions,
   type BootAuthClient,
   type BootAuthResult,
+  type ExternalTokenClient,
 } from "./boot-auth.js";
 export { pageOf, springPageSchema, type SpringPage } from "./page.js";
 export {
