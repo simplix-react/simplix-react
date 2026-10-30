@@ -87,12 +87,12 @@ const OVERLAY_MOTION =
 const CONTENT_MOTION =
   "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95";
 
-// A banded dialog on a phone-width window is a bottom sheet: pinned to the bottom edge at full
-// width, square at the bottom, rising from below instead of zooming. The position is written as
-// `top` + `translate` on both sides of the breakpoint (50%/-50% centred, 100%/-100% docked) so a
-// window resized across it glides between the two rather than jumping.
-const SHEET_BELOW_SM =
-  "max-sm:top-full max-sm:translate-y-[-100%] max-sm:max-w-full max-sm:rounded-b-none max-sm:max-h-[calc(100dvh-1rem)] transition-[top,translate,max-width,border-radius] max-sm:data-[state=open]:zoom-in-100 max-sm:data-[state=closed]:zoom-out-100 max-sm:data-[state=open]:slide-in-from-bottom-8 max-sm:data-[state=closed]:slide-out-to-bottom-8";
+// On a phone-width window every dialog stands the same distance from all four edges of the
+// viewport: a frame inset by one gap, a column whose body takes the overflow while the header and
+// the footer stay put. A sheet docked to the bottom met the side edges and the bottom edge with no
+// gap at all, and a centred dialog left a top and a bottom gap that changed with its content.
+const INSET_BELOW_SM =
+  "max-sm:inset-4 max-sm:w-auto max-sm:max-w-none max-sm:max-h-none max-sm:translate-x-0 max-sm:translate-y-0 max-sm:flex max-sm:flex-col";
 
 /**
  * Splits a dialog's children into its bands. A dialog is banded when a {@link DialogHeader} or a
@@ -182,7 +182,7 @@ export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(
               // and footer stay put.
               column ? "flex max-h-[calc(100dvh-2rem)] flex-col" : "grid",
               CONTENT_MOTION,
-              column && !isMaximized && SHEET_BELOW_SM,
+              !isMaximized && INSET_BELOW_SM,
               className,
             )}
             // Maximized: pin every edge a uniform gap from the viewport (not %-based vw/vh,
