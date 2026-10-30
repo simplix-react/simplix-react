@@ -6,6 +6,7 @@ import type {
 } from "@simplix-react/auth";
 import type { FetchFn } from "@simplix-react/contract";
 import { createFetch } from "@simplix-react/contract";
+import { getRequestLocale } from "@simplix-react/api";
 import {
   createAuth,
   createAuthFetch,
@@ -169,12 +170,16 @@ export function createBootAuth(options: BootAuthOptions = {}): BootAuthResult {
 
   const authClient: BootAuthClient = {
     loginFn: async (username, password) => {
+      const locale = getRequestLocale();
       const raw = await baseFetch<SpringTokenResponse>(
         `${basePath}/auth/token/issue`,
         {
           method: "POST",
+          // The sign-in request bypasses the locale-aware mutator, so the refusal it may carry
+          // would otherwise arrive in the browser's language rather than the one on screen.
           headers: {
             Authorization: `Basic ${btoa(`${username}:${password}`)}`,
+            ...(locale ? { "Accept-Language": locale } : {}),
           },
         },
       );
