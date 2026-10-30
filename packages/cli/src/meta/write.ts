@@ -1,5 +1,5 @@
 import type { EntityField, ExtractedEntity } from "../openapi/types.js";
-import { readFile } from "node:fs/promises";
+import { readFile, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { domainIndexTs } from "../templates/domain/index.js";
 import { pathExists, writeFileWithDir } from "../utils/fs.js";
@@ -118,6 +118,7 @@ export async function writeMetaOutput(options: WriteMetaOptions): Promise<WriteM
   }
   files.set("index.ts", rootBarrel(files));
 
+  await rm(root, { recursive: true, force: true });
   const written: string[] = [];
   for (const path of [...files.keys()].sort()) {
     await writeFileWithDir(join(root, path), files.get(path) ?? "");

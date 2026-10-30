@@ -151,6 +151,16 @@ describe("the meta output lands in src/generated-meta/", () => {
     expect(await exists(dir, `${META_DIR}/index.ts`)).toBe(true);
   });
 
+  it("removes a module whose DTO the backend no longer sends", async () => {
+    const stale = `${META_DIR}/model/retiredThingDTO.ts`;
+    await writeFile(join(dir, stale), "export interface RetiredThingDTO {}\n", "utf-8");
+
+    await writeMetaOutput({ targetDir: dir, domain: org, naming: simplixBootNaming });
+
+    expect(await exists(dir, stale)).toBe(false);
+    expect(await exists(dir, `${META_DIR}/index.ts`)).toBe(true);
+  });
+
   it("leaves the Orval output alone", async () => {
     expect(await read(dir, "src/generated/model/organizationDTO.ts")).toBe(
       "export interface OrganizationDTO {}\n",
