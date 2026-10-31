@@ -26,8 +26,10 @@ export const GENERATED_BASE_DIR = ".simplix/generated";
  * - `conflict`: edited, and the template change collides with the edits; nothing was written
  *   unless conflict markers were asked for
  * - `no-base`: edited, and no stored base exists to merge against; the file was kept
+ * - `removed`: absent while a base is stored, so somebody deleted it after it was laid down; a
+ *   regeneration leaves it deleted (see {@link withRemovalsHonoured})
  */
-export type GeneratedOutcome = "written" | "merged" | "current" | "conflict" | "no-base";
+export type GeneratedOutcome = "written" | "merged" | "current" | "conflict" | "no-base" | "removed";
 
 /** One file's outcome, as collected for the report. */
 export interface GeneratedWrite {
@@ -41,6 +43,22 @@ export interface GeneratedWrite {
 
 let outcomes: GeneratedWrite[] = [];
 let conflictMarkers = false;
+let honourRemovals = false;
+
+/**
+ * Runs `body` with every deleted generated file left deleted: a file that is absent while its base
+ * is stored was laid down once and removed since, so a regeneration must not bring it back. A
+ * file with no stored base is new to the templates and is still written.
+ */
+export async function withRemovalsHonoured<T>(body: () => Promise<T>): Promise<T> {
+  const before = honourRemovals;
+  honourRemovals = true;
+  try {
+    return await body();
+  } finally {
+    honourRemovals = before;
+  }
+}
 
 /** Runs `body` with conflicting merges written into the file with markers instead of left alone. */
 export async function withConflictMarkers<T>(body: () => Promise<T>): Promise<T> {
@@ -128,6 +146,10 @@ export async function mergeThreeWay(base: string, ours: string, theirs: string):
 export async function writeStampedGenerated(filePath: string, stamped: string): Promise<{ outcome: GeneratedOutcome; held: string }> {
   const note = (entry: Omit<GeneratedWrite, "path">) => outcomes.push({ path: resolve(filePath), ...entry });
   if (!(await pathExists(filePath))) {
+    if (honourRemovals && (await readBase(filePath)) !== undefined) {
+      note({ outcome: "removed" });
+      return { outcome: "removed", held: "" };
+    }
     await writeFileWithDir(filePath, stamped);
     await recordBase(filePath, stamped);
     note({ outcome: "written" });

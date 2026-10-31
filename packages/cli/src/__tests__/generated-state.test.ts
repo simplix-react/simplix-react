@@ -91,6 +91,20 @@ describe("generated-state report", () => {
     expect(await readFile(pagePath(), "utf-8")).toContain("<<<<<<< edited");
   });
 
+  it("writes a file new to the templates, and leaves a deleted one deleted while its origin holds another", async () => {
+    const storyPath = join(root, "stories/web-about.stories.tsx");
+    await setStory("s1");
+    await regenerateAll(root);
+    expect(await readFile(storyPath, "utf-8")).toContain('"s1"');
+    await rm(pagePath());
+    await setTemplate("v2");
+    await setStory("s2");
+    const { writes } = await regenerateAll(root);
+    expect(writes.find((w) => w.path === pagePath())?.outcome).toBe("removed");
+    await expect(readFile(pagePath(), "utf-8")).rejects.toThrow();
+    expect(await readFile(storyPath, "utf-8")).toContain('"s2"');
+  });
+
   it("reports an edited file with no stored base as no-base and keeps it", async () => {
     const edited = (await readFile(pagePath(), "utf-8")) + "export const extra = 1;\n";
     await writeFile(pagePath(), edited);

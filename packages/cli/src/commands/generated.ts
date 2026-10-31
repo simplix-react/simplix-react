@@ -7,7 +7,7 @@ import { assertOutputDirs } from "../config/output-dirs.js";
 import { reportConfigError } from "../config/report-config-error.js";
 import { captureWrites, findProjectRoot, lastKeptRenders } from "../utils/fs.js";
 import { log, withSilentLog } from "../utils/logger.js";
-import { takeGeneratedOutcomes, withConflictMarkers, type GeneratedWrite } from "../utils/generated-merge.js";
+import { takeGeneratedOutcomes, withConflictMarkers, withRemovalsHonoured, type GeneratedWrite } from "../utils/generated-merge.js";
 import { GENERATED_PAGE_MARKER, isUntouchedRender, renderOrigin } from "../utils/project-templates.js";
 
 /**
@@ -166,7 +166,7 @@ export async function generatedReport(
       const render = await renderOf();
       const base = withRenders ? render?.kept.get(resolve(file)) : undefined;
       const write = render?.outcomes.get(resolve(file));
-      const merge = origin === undefined ? "no-origin" : write && write.outcome !== "written" ? write.outcome : undefined;
+      const merge = origin === undefined ? "no-origin" : write && write.outcome !== "written" && write.outcome !== "removed" ? write.outcome : undefined;
       entries.push({
         path,
         state: "edited",
@@ -191,12 +191,16 @@ export async function generatedReport(
 /**
  * Regenerates every recorded origin for real: each untouched file is rewritten, and the template
  * change is merged three-way into each edited one. A conflicting merge is left unwritten unless
- * `writeConflicts` asks for conflict markers.
+ * `writeConflicts` asks for conflict markers. A generated file somebody deleted stays deleted.
  *
  * @returns the origins run and what each generated file's write came to
  */
 export async function regenerateAll(rootDir: string, writeConflicts = false): Promise<{ origins: string[]; writes: GeneratedWrite[] }> {
   if (writeConflicts) return withConflictMarkers(() => regenerateAll(rootDir, false));
+  return withRemovalsHonoured(() => regenerateOrigins(rootDir));
+}
+
+async function regenerateOrigins(rootDir: string): Promise<{ origins: string[]; writes: GeneratedWrite[] }> {
   const entries = await generatedReport(rootDir);
   takeGeneratedOutcomes();
   const origins = [...new Set(entries.map((e) => e.origin).filter((o): o is string => o !== undefined))];
