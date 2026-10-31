@@ -558,9 +558,9 @@ function columnOf(list: string, field: string): string {
 
 describe("the field an entity declares as its name", () => {
   const holidayRow = () => sourceOf("system", "common.main.system.Holiday");
-  const declaring = (nameField: string): DtoMeta => ({
+  const declaring = (...nameFields: string[]): DtoMeta => ({
     ...meta,
-    entities: { Holiday: { nameField } },
+    entities: { Holiday: { nameFields } },
   });
 
   it("is the screen's record name ahead of the guess from field names", () => {
@@ -570,6 +570,21 @@ describe("the field an entity declares as its name", () => {
 
     withNameField(declaring("siteId"), "Holiday", source);
     expect(source.displayNameField).toBe("siteId");
+    expect(source.displayNameFields).toEqual(["siteId"]);
+  });
+
+  it("keeps every declared part of the name in the declared order", () => {
+    const source = holidayRow();
+    withNameField(declaring("holidayName", "siteId"), "Holiday", source);
+    expect(source.displayNameField).toBe("holidayName");
+    expect(source.displayNameFields).toEqual(["holidayName", "siteId"]);
+  });
+
+  it("leaves the guess alone where one declared part is not drawn by the row", () => {
+    const source = holidayRow();
+    withNameField(declaring("holidayName", "statuteBasis"), "Holiday", source);
+    expect(source.displayNameField).toBe("holidayName");
+    expect(source.displayNameFields).toBeUndefined();
   });
 
   it("leaves the guess alone where the entity declares none", () => {

@@ -74,8 +74,10 @@ export interface MetaScaffoldSource {
   rowIdField: string;
   /** The collection the entity's routes hang off, which is what a cache invalidation names. */
   entityPath: string;
-  /** The field a record is named by on a screen: the one its entity declares as `nameField`, else inferred from the field names. */
+  /** The field a record is named by on a screen: the first its entity declares in `nameFields`, else inferred from the field names. */
   displayNameField?: string;
+  /** Every field the record is named by, in order, when its entity declares them; a screen joins them with a space. */
+  displayNameFields?: string[];
   /** The field a reorder writes, as the reorder's own body declares it. */
   orderField?: string;
   updatePathParam?: string;
@@ -162,15 +164,18 @@ export async function loadMetaScaffoldSource(
 }
 
 /**
- * Names the record by the field its entity declares, ahead of the guess `buildMetaScaffoldSource`
- * makes from the field names. A declared field the list row does not draw is not used: a delete
- * confirmation reading it would name every record `undefined`, and the guess still names them.
+ * Names the record by the fields its entity declares, in order, ahead of the guess
+ * `buildMetaScaffoldSource` makes from the field names. A declaration naming a field the list row
+ * does not draw is not used: a delete confirmation reading it would name every record by a part
+ * that is never there, and the guess still names them.
  */
 export function withNameField(document: DtoMeta, entityName: string, source: MetaScaffoldSource): void {
-  const declared = document.entities?.[entityName]?.nameField;
-  if (declared === undefined) return;
+  const declared = document.entities?.[entityName]?.nameFields;
+  if (declared === undefined || declared.length === 0) return;
   const drawn = source.rowFields ?? source.fields;
-  if (drawn.some((one) => one.name === declared)) source.displayNameField = declared;
+  if (!declared.every((name) => drawn.some((one) => one.name === name))) return;
+  source.displayNameField = declared[0];
+  source.displayNameFields = [...declared];
 }
 
 /**

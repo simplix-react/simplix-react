@@ -289,6 +289,14 @@ export function relationsOf(source: { readonly relationFields?: readonly string[
  * A field the form's DTO requires is in the form, a system field (an order) included: left out,
  * every create the form sends is refused for the missing value.
  */
+/**
+ * The fields a detail draws as values: every field but the record's own key, which the audit
+ * strip carries and which says nothing about what the record is.
+ */
+export function detailFieldsOf(fields: readonly FieldInfo[], rowIdField: string): FieldInfo[] {
+  return fields.filter((f) => f.name !== rowIdField);
+}
+
 export function withRequiredInForm(f: FieldInfo): FieldInfo {
   return f.isSystemField && f.required ? { ...f, isSystemField: false } : f;
 }
@@ -2459,7 +2467,7 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       fields: withContractKinds(fields.map(withRequiredInForm), rowIdField, contractOptions),
       // A detail draws what the get route answers with, which holds what the server derives
       // (a standing, a display name, a last-seen time) and no request body states.
-      detailFields: withContractKinds(withStatedLengths(metaSource?.detailFields ?? fields, byName), rowIdField, contractOptions),
+      detailFields: withContractKinds(withStatedLengths(detailFieldsOf(metaSource?.detailFields ?? fields, rowIdField), byName), rowIdField, contractOptions),
       // The enum the detail header draws as the record's standing.
       statusField: withContractKinds(metaSource?.detailFields ?? fields, undefined, contractOptions).find(
         (f) => f.contractKind === "enum" && /(^|[a-z])(status|state|standing)$/i.test(f.name),
@@ -2504,6 +2512,8 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       treeParentIdField,
       treeSortOrderField,
       displayNameField,
+      // Every part of the record's name in order; one field when the entity declares no more.
+      displayNameFields: metaSource?.displayNameFields ?? (displayNameField ? [displayNameField] : []),
       treeDisplayNameField,
       treeSearchFields,
       treeDisplayFields,

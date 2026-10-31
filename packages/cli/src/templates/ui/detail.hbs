@@ -57,7 +57,7 @@ export function {{EntityPascal}}Detail({ {{entity}}Id, onClose, onBack{{#if hasU
   if (!displayData) return <QueryFallback isLoading={isLoading} notFoundMessage="{{EntityPascal}} not found." />;
 
 {{#if displayNameField}}
-  const header = onClose ? <Heading level={4} tone="muted">{String(displayData.{{displayNameField}} ?? "")}</Heading> : undefined;
+  const header = onClose ? <Heading level={4} tone="muted">{ {{recordName "displayData" displayNameFields}} }</Heading> : undefined;
 {{else}}
   const header = onClose ? <Heading level={4} tone="muted">{t("{{entity}}.detailHeader")}</Heading> : undefined;
 {{/if}}
@@ -153,7 +153,7 @@ export function {{EntityPascal}}Detail({ {{entity}}Id, onClose, onBack{{#if hasU
         onConfirm={() => deleteMutation.mutate({{entity}}Id, { onSuccess: onDeleted })}
         title={t("{{entity}}.delete{{EntityPascal}}Title")}
 {{#if displayNameField}}
-        description={t("{{entity}}.delete{{EntityPascal}}Desc", { name: String(displayData.{{displayNameField}} ?? "") })}
+        description={t("{{entity}}.delete{{EntityPascal}}Desc", { name: {{recordName "displayData" displayNameFields}} })}
 {{else}}
         description={t("{{entity}}.delete{{EntityPascal}}DescSimple")}
 {{/if}}

@@ -22,7 +22,7 @@ vi.mock("../config/config-loader.js", async () => {
     JSON.stringify({
       ...fixture,
       entities: {
-        Holiday: { nameField: "siteId" },
+        Holiday: { nameFields: ["siteId", "holidayName"] },
         HolidayCalendar: {
           holders: [{ entity: "Holiday", field: "holidayCalendarId", operators: ["EQUALS"] }],
         },
@@ -54,12 +54,13 @@ describe("a record's name as the committed SimpliX Meta declares it", () => {
     // The guess for Holiday is `holidayName`; the snapshot declares `siteId`.
     const source = await loadMetaScaffoldSource("/unused", "holiday");
     expect(source?.displayNameField).toBe("siteId");
+    expect(source?.displayNameFields).toEqual(["siteId", "holidayName"]);
   });
 
   it("names a holder's sub-list rows the same way", async () => {
     const holders = await loadMetaHolders("/unused", "holidayCalendar");
     expect(holders.map((one) => one.entity)).toEqual(["holiday"]);
-    expect(holders[0]?.source.displayNameField).toBe("siteId");
+    expect(holders[0]?.source.displayNameFields).toEqual(["siteId", "holidayName"]);
   });
 
   it("keeps the guess for an entity the snapshot declares nothing for", async () => {

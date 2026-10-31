@@ -52,6 +52,16 @@ Handlebars.registerHelper("ifIncludes", function (
   return options.inverse(this);
 });
 
+/**
+ * The expression naming a record held in `target` by `fields`, in order: one field reads as a
+ * string, several are joined by a space with the empty parts left out.
+ */
+Handlebars.registerHelper("recordName", (target: string, fields: unknown) => {
+  const names = Array.isArray(fields) ? fields.filter((one): one is string => typeof one === "string") : [];
+  if (names.length <= 1) return `String(${target}.${names[0] ?? "id"} ?? "")`;
+  return `[${names.map((name) => `${target}.${name}`).join(", ")}].filter((part) => part != null && part !== "").map(String).join(" ")`;
+});
+
 export function renderTemplate(
   template: string,
   data: Record<string, unknown>,

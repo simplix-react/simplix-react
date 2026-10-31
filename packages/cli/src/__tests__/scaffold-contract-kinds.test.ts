@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { detectI18nFieldPairs, orderAndCategorizeFields, projectRowFields, withRequiredInForm, withStatedLengths, importsSubjects, readsWidgetsNamespace, resolvesFrom, withContractKinds, type FieldInfo } from "../commands/scaffold-crud.js";
+import { detailFieldsOf, detectI18nFieldPairs, orderAndCategorizeFields, projectRowFields, withRequiredInForm, withStatedLengths, importsSubjects, readsWidgetsNamespace, resolvesFrom, withContractKinds, type FieldInfo } from "../commands/scaffold-crud.js";
 import { relationFieldsOf, stringShape } from "../meta/scaffold-source.js";
 
 function field(name: string, tsType = "string"): FieldInfo {
@@ -155,5 +155,12 @@ describe("the relations SimpliX Meta states", () => {
     const document = { entities: { Role: { holders: [{ entity: "UserAccount", field: "roleIds", operators: ["IN"] }] }, Team: { holders: [{ entity: "Other", field: "teamId", operators: ["EQUALS"] }] } } };
     const source = { fields: [{ ...field("positionId"), referenceNamePath: "position.positionName" }, field("providerVoiceId")] };
     expect(relationFieldsOf(document as never, "UserAccount", source as never)).toEqual(["positionId", "roleIds"]);
+  });
+});
+
+describe("the fields a detail draws", () => {
+  it("leaves out the record's own key and keeps the rest in order", () => {
+    const fields = [field("releaseArtifactId"), field("artifactName"), field("holderId")];
+    expect(detailFieldsOf(fields, "releaseArtifactId").map((f) => f.name)).toEqual(["artifactName", "holderId"]);
   });
 });

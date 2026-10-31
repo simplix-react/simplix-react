@@ -173,3 +173,17 @@ describe("loadTemplate", () => {
     expect(result).toBe("test");
   });
 });
+
+describe("recordName helper", () => {
+  it("reads one field as a string", () => {
+    expect(renderTemplate('{{recordName "row" fields}}', { fields: ["artifactName"] })).toBe('String(row.artifactName ?? "")');
+  });
+
+  it("joins several fields in order with a space, leaving out the empty parts", () => {
+    const expression = renderTemplate('{{recordName "row" fields}}', { fields: ["artifactName", "releaseVersion"] });
+    expect(expression).toBe('[row.artifactName, row.releaseVersion].filter((part) => part != null && part !== "").map(String).join(" ")');
+    const name = new Function("row", `return ${expression};`) as (row: Record<string, unknown>) => string;
+    expect(name({ artifactName: "model", releaseVersion: "1.2.0" })).toBe("model 1.2.0");
+    expect(name({ artifactName: "model", releaseVersion: "" })).toBe("model");
+  });
+});

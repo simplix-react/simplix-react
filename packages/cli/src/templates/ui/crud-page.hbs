@@ -164,7 +164,7 @@ export function {{EntityPascal}}CrudPage({ variant = "panel", search, onNavigate
 {{/if}}
 {{#if hasDelete}}
 {{#if displayNameField}}
-              { type: "delete", onClick: (row) => requestDelete({ id: row.{{rowIdField}}!, name: String(row.{{displayNameField}} ?? "") }) },
+              { type: "delete", onClick: (row) => requestDelete({ id: row.{{rowIdField}}!, name: {{recordName "row" displayNameFields}} }) },
 {{else}}
               { type: "delete", onClick: (row) => requestDelete({ id: row.{{rowIdField}}!, name: "" }) },
 {{/if}}
