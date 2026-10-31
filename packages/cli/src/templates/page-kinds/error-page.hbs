@@ -1,0 +1,21 @@
+/**
+ * @simplix-generated page/error-page
+ *
+ * What the reader sees when a route fails, is missing or is refused. The way back goes in
+ * `./page.blocks.tsx`; this file is rewritten on every run while its fingerprint matches.
+ */
+import { Container, EmptyState } from "@simplix-react/ui";
+import { useTranslation } from "@simplix-react/i18n/react";
+
+import { usePageBlocks } from "./page.blocks";
+
+/** {{NamePascal}} - a route that cannot be shown. */
+export function {{NamePascal}}Page() {
+  const { t } = useTranslation("{{namespace}}");
+  const blocks = usePageBlocks();
+  return (
+    <Container size="md">
+      <EmptyState title={t("{{nameCamel}}.title")} description={t("{{nameCamel}}.description")} action={blocks.action} />
+    </Container>
+  );
+}

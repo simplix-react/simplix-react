@@ -1,0 +1,65 @@
+/** A field as the story fixtures read it: its name, its contract kind, and its options. */
+export interface FixtureField {
+  readonly name: string;
+  readonly contractKind?: string;
+  readonly options?: readonly string[];
+  readonly nameField?: string;
+  readonly tsType?: string;
+}
+
+/**
+ * Sample rows for a generated story, one value per field drawn from its contract kind.
+ *
+ * <p>The values say only which field they belong to and which row they sit in, so a frame built on
+ * them shows the screen's composition and nothing that reads as real data; a story that needs
+ * believable rows is customised after it is generated.
+ *
+ * @param fields the fields the list and detail draw
+ * @param rowIdField the field that identifies a row
+ * @param entityKebab the entity's kebab name, the prefix of each row's id
+ * @param count how many rows
+ */
+export function fixtureRows(
+  fields: readonly FixtureField[],
+  rowIdField: string,
+  entityKebab: string,
+  count = 3,
+): Record<string, unknown>[] {
+  const byName = new Map<string, FixtureField>();
+  for (const f of fields) if (!byName.has(f.name)) byName.set(f.name, f);
+  return Array.from({ length: count }, (_, at) => {
+    const n = at + 1;
+    const row: Record<string, unknown> = {};
+    for (const f of byName.values()) {
+      if (f.name === rowIdField) continue;
+      row[f.name] = sampleValue(f, n);
+      if (f.contractKind === "reference" && f.nameField && !byName.has(f.nameField)) row[f.nameField] = `${f.nameField} ${n}`;
+    }
+    row[rowIdField] = byName.get(rowIdField)?.tsType === "number" ? n : `${entityKebab}-${n}`;
+    return row;
+  });
+}
+
+function sampleValue(f: FixtureField, n: number): unknown {
+  const day = String(n).padStart(2, "0");
+  switch (f.contractKind) {
+    case "enum":
+      return f.options && f.options.length > 0 ? f.options[(n - 1) % f.options.length] : `VALUE_${n}`;
+    case "boolean":
+      return n % 2 === 1;
+    case "instant":
+      return `2026-01-${day}T09:00:00Z`;
+    case "date":
+      return `2026-01-${day}`;
+    case "time":
+      return `09:${day}`;
+    case "number":
+      return n * 10;
+    case "reference":
+      return `${f.name}-${n}`;
+    case "email":
+      return `${f.name.toLowerCase()}${n}@example.test`;
+    default:
+      return f.tsType === "number" ? n * 10 : `${f.name} ${n}`;
+  }
+}

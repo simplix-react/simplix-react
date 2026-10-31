@@ -627,21 +627,23 @@ describe("generateAccessFiles states what each operation requires of the caller"
         generated[kind as AccessMeta["kind"]] += count;
       }
     }
-    // One constant fewer than the 621 claimed operations: two operations of `public.user.Avatar`
-    // resolve to the same name, and one name is one declaration.
-    expect(generated).toEqual({ permission: 547, authenticated: 53, public: 16, expression: 4 });
+    // One constant per claimed operation: the two operations of `public.user.Avatar` the strategy
+    // gives one name are named apart, and each is declared.
+    expect(generated).toEqual({ permission: 547, authenticated: 53, public: 17, expression: 4 });
     const declared = Object.values(generated).reduce((sum, count) => sum + count, 0);
-    expect(declared).toBe(620);
+    expect(declared).toBe(621);
     expect(resolved.unmatched.flatMap((one) => one.operations)).toHaveLength(694 - 621);
   });
 
   it("declares one constant per name where two operations resolve to the same one", () => {
     // A module that declares a name twice does not compile, and it would take the whole package
-    // with it rather than the one rule. The endpoint generator reports the collision itself.
+    // with it rather than the one rule. The two operations the strategy gives one name are named
+    // apart by the endpoint resolution, so each has its own rule.
     const user = generateAccessFiles(domainOf("user"), { naming: simplixBootNaming });
     const avatar = fileOf(user.files, "access/avatar.ts");
     expect([...avatar.matchAll(/^export const (\w+)/gm)].map((match) => match[1])).toEqual([
       "getAllAvatarsAccess",
+      "getAvatarAvatarAccess",
     ]);
   });
 });

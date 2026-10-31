@@ -1,5 +1,5 @@
-import { readFile, readdir, writeFile } from "node:fs/promises";
-import { basename, join, resolve } from "node:path";
+import { readFile, readdir } from "node:fs/promises";
+import { basename, dirname, join, relative, resolve } from "node:path";
 
 import { Command } from "commander";
 import ora from "ora";
@@ -8,28 +8,28 @@ import { findCrudConfigForEntity } from "../config/crud-config-loader.js";
 import { loadConfig } from "../config/config-loader.js";
 import {
   crudPageTemplate,
-  detailTemplate,
-  featureIndexTemplate,
-  formTemplate,
   hubPageTemplate,
-  listTemplate,
   pageIndexTemplate,
   treeCrudPageTemplate,
-  treeTemplate,
 } from "../templates/ui/index.js";
 import type { EntityField, ExtractedEntity, OpenAPISnapshot, QueryParam } from "../openapi/types.js";
 import { toEntityName, toKebabCase, toPascalCase } from "../utils/case.js";
-import { pathExists, readJsonFile, writeFileWithDir, findProjectRoot } from "../utils/fs.js";
+import { noteKeptRender, pathExists, readJsonFile, writeFileWithDir, findProjectRoot } from "../utils/fs.js";
 import {
   GENERATED_PAGE_MARKER,
-  isUntouchedRender,
+  resolveKitPackageDir,
   stampFingerprint,
+  writeGenerated,
   loadProjectTemplates,
   PAGE_BLOCKS_TEMPLATE,
+  STORY_TEMPLATE,
   templateFor,
   type ProjectTemplates,
 } from "../utils/project-templates.js";
 import { log } from "../utils/logger.js";
+import { writeStampedGenerated } from "../utils/generated-merge.js";
+import { fixtureRows } from "../utils/story-fixtures.js";
+import { renderWidgetBlocks, renderWidgetFiles } from "./scaffold-widgets.js";
 import { renderTemplate } from "../utils/template.js";
 import { depVersion } from "../versions.js";
 
@@ -67,10 +67,146 @@ export interface FieldInfo {
    * none, because a sort the backend does not implement moves the arrow and leaves the rows.
    */
   sortable?: boolean;
+  /**
+   * Locale → the field the backend orders this one by in that language (`searchable.sortAlias`):
+   * a translated name the server cannot sort directly is sorted through its per-language key.
+   */
+  sortAlias?: Record<string, string>;
   /** `CrudList.Column`'s `format`, for a field SimpliX Meta types as a moment, a day or a time. */
   columnFormat?: "date" | "datetime" | "time";
   /** `CrudList.Column`'s `display`, for a field whose rendering SimpliX Meta settles. */
   columnDisplay?: "boolean";
+  /**
+   * What the contract says the field is, for a template that draws and edits by kind: `enum`,
+   * `boolean`, `date`, `instant`, `time`, `number`, `reference`, `longText`, `email` or `text`.
+   * Set by {@link withContractKinds} from the fields above.
+   */
+  contractKind?: string;
+  /** For a `reference`: the peek kind it opens, the referenced entity's name. */
+  peekKind?: string;
+  /** For a `reference`: the field beside it that carries the referenced record's name. */
+  nameField?: string;
+  /** The field is a reference's name, drawn by that reference rather than on its own. */
+  isReferenceName?: boolean;
+  /** One of the audit stamps or the soft-delete flag, which a generated screen never draws (they are the record's metadata). */
+  isAuditField?: boolean;
+  /** For a key whose record arrives nested beside it: the path to that record's name (`position.name`). */
+  referenceNamePath?: string;
+  /** For such a key: the peek kind the nested record's type names. */
+  referencePeekKind?: string;
+  /** The record's own identifier, which a list leaves out and a detail draws with a copy control. */
+  isIdentifier?: boolean;
+  /** A code the reader types or compares (SimpliX Meta's `format: "code"`), drawn in the monospaced face. */
+  isCode?: boolean;
+  /** A key that is not a reference with a name, which no generated screen draws. */
+  isOpaqueId?: boolean;
+}
+
+/** The stamps and the soft-delete flag every record carries and no generated field draws. */
+export const AUDIT_FIELDS = ["createdBy", "createdAt", "updatedBy", "updatedAt", "deleted", "deletedAt", "deletedTimestamp"];
+
+/** A filter a generated list offers, in the kit's terms, from a searchable field SimpliX Meta declares. */
+export interface ContractFilterInfo {
+  kind: "choice" | "toggle" | "dateRange" | "number";
+  field: string;
+  enumTypeName?: string;
+  options?: string[];
+  /** For a period: whether the field is a calendar day rather than a moment. */
+  dateOnly?: boolean;
+}
+
+const FILTER_KIND: Record<string, ContractFilterInfo["kind"]> = {
+  FacetedFilter: "choice",
+  ToggleFilter: "toggle",
+  DateRangeFilter: "dateRange",
+  NumberFilter: "number",
+};
+
+/**
+ * The searchable fields as the kit's list filters: an enum as a choice, a boolean as a toggle, a
+ * moment or a day as a period, a number as a number. One per field, in the order they arrive.
+ */
+export function contractFiltersOf(filters: readonly FilterFieldInfo[], fields: readonly FieldInfo[]): ContractFilterInfo[] {
+  const seen = new Set<string>();
+  const out: ContractFilterInfo[] = [];
+  for (const filter of filters) {
+    const kind = FILTER_KIND[filter.component];
+    // The audit stamps and the soft-delete flag are not what an operator searches by.
+    if (!kind || seen.has(filter.field) || AUDIT_FIELDS.includes(filter.field)) continue;
+    if (kind === "choice" && !(filter.options && filter.options.length > 0)) continue;
+    seen.add(filter.field);
+    const one: ContractFilterInfo = { kind, field: filter.field };
+    const enumTypeName = fields.find((f) => f.name === filter.field)?.enumTypeName;
+    if (enumTypeName) one.enumTypeName = enumTypeName;
+    if (kind === "choice") one.options = [...(filter.options ?? [])];
+    if (kind === "dateRange") one.dateOnly = fields.find((f) => f.name === filter.field)?.columnFormat === "date";
+    out.push(one);
+  }
+  return out;
+}
+
+/** The contract kind one field is drawn and edited by, read from what codegen already settled. */
+export function contractKindOf(field: FieldInfo): string {
+  if (field.isForeignKey) return "reference";
+  // The map half of an i18n pair: one text per content language, beside the plain field it fills.
+  if (field.baseFieldName && field.tsType === "Record<string, string>") return "i18nText";
+  if (field.component === "Select" && field.options.length > 0) return "enum";
+  if (field.columnDisplay === "boolean" || field.tsType === "boolean") return "boolean";
+  if (field.columnFormat === "datetime") return "instant";
+  if (field.columnFormat === "date") return "date";
+  if (field.columnFormat === "time") return "time";
+  if (field.tsType === "number") return "number";
+  if (field.formComponent === "TextareaField" || field.component === "Textarea") return "longText";
+  if (field.inputType === "email") return "email";
+  return "text";
+}
+
+/**
+ * Stamps every field with its contract kind, and a reference with the peek it opens and the
+ * sibling field that names its record (`<entity>Name`, or `<entity>DisplayName`), where one exists.
+ */
+export function withContractKinds(input: readonly FieldInfo[], rowIdField?: string): FieldInfo[] {
+  // The record's own key ends in `Id` like a foreign key, but it names this record, never another:
+  // read as a reference it would draw a peek at itself and swallow `<entity>Name` as its label.
+  const fields = input.map((f) => (f.name === rowIdField && f.isForeignKey ? { ...f, isForeignKey: false, fkEntityField: null } : f));
+  const names = new Set(fields.map((f) => f.name));
+  const referenceNames = new Set(
+    fields.flatMap((f) =>
+      f.isForeignKey && f.fkEntityField ? [`${f.fkEntityField}Name`, `${f.fkEntityField}DisplayName`, f.fkEntityField] : [],
+    ),
+  );
+  return fields.map((f) => {
+    const stamped = stampContractKind(f, names, referenceNames, fields);
+    const isIdentifier = f.name === rowIdField;
+    // A key nobody reads (an attachment id, a list of role ids, an external key) says nothing on a
+    // screen; the record's own identifier is drawn once, in its detail, with a copy control.
+    const isOpaqueId = !isIdentifier && stamped.contractKind !== "reference" && /[a-z](Id|Ids)$/.test(f.name);
+    return { ...stamped, isIdentifier, isOpaqueId };
+  });
+}
+
+function stampContractKind(
+  f: FieldInfo,
+  names: ReadonlySet<string>,
+  referenceNames: ReadonlySet<string>,
+  fields: readonly FieldInfo[],
+): FieldInfo {
+  {
+    const contractKind = contractKindOf(f);
+    // A reference's name is drawn by the reference itself, so it is not a field of its own.
+    const isReferenceName = referenceNames.has(f.name);
+    const isAuditField = AUDIT_FIELDS.includes(f.name);
+    if (contractKind !== "reference" || !f.fkEntityField) return { ...f, contractKind, isReferenceName, isAuditField };
+    // SimpliX Meta names no reference target, so an `…Id` is a reference only where the record also
+    // carries the referenced record's name; any other `…Id` (an external key, the row's own id) is text.
+    const nameField =
+      f.referenceNamePath ??
+      [`${f.fkEntityField}Name`, `${f.fkEntityField}DisplayName`, f.fkEntityField].find(
+        (n) => names.has(n) && fields.find((one) => one.name === n)?.tsType === "string",
+      );
+    if (!nameField) return { ...f, contractKind: "text", isReferenceName, isAuditField };
+    return { ...f, contractKind, peekKind: f.referencePeekKind ?? f.fkEntityField, nameField, isReferenceName, isAuditField };
+  }
 }
 
 /** Fields that exist in the data model but should not be displayed or edited by users. */
@@ -838,9 +974,38 @@ interface PkgJson {
  * Ensure the module's package.json has the required dependencies
  * for scaffold-generated files to compile.
  */
+/**
+ * The dependency a module needs on the UI kit its templates come from: `workspace:*` where the kit
+ * is a package of this workspace, its own version otherwise. None where the setting names a path.
+ */
+async function kitDependency(rootDir: string, from: string | undefined): Promise<{ name: string; spec: string } | null> {
+  if (!from || from.startsWith(".") || from.startsWith("/")) return null;
+  const dir = await resolveKitPackageDir(rootDir, from);
+  if (!dir) return null;
+  const installed = dir.startsWith(join(rootDir, "node_modules"));
+  if (!installed) return { name: from, spec: "workspace:*" };
+  const manifest = await readJsonFile<{ version?: string }>(join(dir, "package.json"));
+  return { name: from, spec: manifest.version ? `^${manifest.version}` : "*" };
+}
+
+/** Whether `name` resolves from `dir` the way Node resolves a bare import: a `node_modules/<name>` on the way up. */
+export async function resolvesFrom(dir: string, name: string): Promise<boolean> {
+  let at = resolve(dir);
+  for (;;) {
+    if (await pathExists(join(at, "node_modules", name, "package.json"))) return true;
+    const up = dirname(at);
+    if (up === at) return false;
+    at = up;
+  }
+}
+
 async function ensureModuleDeps(
   moduleDir: string,
   domainPackageName: string | null,
+  /** The UI kit whose templates drew the files, which then import it. */
+  kit: { readonly name: string; readonly spec: string } | null = null,
+  /** What the screen's files hold once this run is done; a dependency is added only for one of them that imports it. */
+  held: readonly string[] = [],
 ): Promise<string[]> {
   const pkgPath = join(moduleDir, "package.json");
   if (!(await pathExists(pkgPath))) return [];
@@ -850,26 +1015,40 @@ async function ensureModuleDeps(
   const devDeps = pkg.devDependencies ?? {};
   const added: string[] = [];
 
+  // A package the module already resolves (declared, or reached through a declared umbrella and
+  // the install's hoisting) is not missing, and adding it would change the lockfile for nothing.
+  // One no file of the screen imports is not needed either: a screen drawn from a kit that never
+  // reaches the framework package directly must not hand the module a dependency on it.
+  const needed = (name: string) => held.some((content) => importsPackage(content, name));
+  const missing = async (name: string) => needed(name) && !deps[name] && !(await resolvesFrom(moduleDir, name));
+
   // @simplix-react/ui
-  if (!deps["@simplix-react/ui"]) {
+  if (await missing("@simplix-react/ui")) {
     deps["@simplix-react/ui"] = "catalog:";
     added.push(`@simplix-react/ui@catalog:`);
   }
 
   // @simplix-react/i18n
-  if (!deps["@simplix-react/i18n"]) {
+  if (await missing("@simplix-react/i18n")) {
     deps["@simplix-react/i18n"] = "catalog:";
     added.push(`@simplix-react/i18n@catalog:`);
   }
 
+  if (kit && (await missing(kit.name))) {
+    deps[kit.name] = kit.spec;
+    added.push(`${kit.name}@${kit.spec}`);
+  }
+
   // Domain package (workspace:*)
-  if (domainPackageName && !deps[domainPackageName]) {
+  if (domainPackageName && needed(domainPackageName) && !deps[domainPackageName]) {
     deps[domainPackageName] = "workspace:*";
     added.push(`${domainPackageName}@workspace:*`);
   }
 
-  // @types/react
-  if (!devDeps["@types/react"]) {
+  // @types/react: a file of the screen that draws JSX or imports React needs it, and a module that
+  // already resolves it (declared in either list, or hoisted) is left alone.
+  const drawsJsx = held.some((content) => importsPackage(content, "react") || /<\/[A-Za-z]|\/>/.test(content));
+  if (drawsJsx && !devDeps["@types/react"] && !deps["@types/react"] && !(await resolvesFrom(moduleDir, "@types/react"))) {
     devDeps["@types/react"] = depVersion("@types/react");
     added.push(`@types/react@${devDeps["@types/react"]} (dev)`);
   }
@@ -877,7 +1056,7 @@ async function ensureModuleDeps(
   if (added.length > 0) {
     pkg.dependencies = deps;
     pkg.devDependencies = devDeps;
-    await writeFile(pkgPath, JSON.stringify(pkg, null, 2) + "\n", "utf-8");
+    await writeFileWithDir(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
   }
 
   return added;
@@ -891,6 +1070,8 @@ async function updateWidgetsIndex(
   moduleDir: string,
   entityKebab: string,
   ctx: { EntityPascal: string; hasList: boolean; hasForm: boolean; hasDetail: boolean; hasTree?: boolean },
+  /** The entity's own rendered `index.ts`; where given, the module barrel re-exports exactly what it does. */
+  featureIndex?: string,
 ): Promise<void> {
   const widgetsIndexPath = join(moduleDir, "src", "widgets", "index.ts");
   if (!(await pathExists(widgetsIndexPath))) {
@@ -904,16 +1085,22 @@ async function updateWidgetsIndex(
 
   // Build export lines
   const lines: string[] = [];
-  if (ctx.hasTree) {
+  const rendered = featureIndex
+    ?.split("\n")
+    .filter((line) => /^export (type )?\{[^}]*\} from "\.\/[^"]+";$/.test(line.trim()))
+    .map((line) => line.trim().replace(/from "\.\/[^"]+";$/, `from "./${entityKebab}";`));
+  if (rendered && rendered.length > 0) {
+    lines.push(...rendered);
+  } else if (ctx.hasTree) {
     lines.push(`export { ${ctx.EntityPascal}Tree, use${ctx.EntityPascal}Tree } from "./${entityKebab}";`);
   } else if (ctx.hasList) {
     lines.push(`export { ${ctx.EntityPascal}List, ${ctx.EntityPascal}ListToolbar, use${ctx.EntityPascal}List } from "./${entityKebab}";`);
   }
-  if (ctx.hasForm) {
+  if (!rendered?.length && ctx.hasForm) {
     lines.push(`export { ${ctx.EntityPascal}Form } from "./${entityKebab}";`);
     lines.push(`export type { ${ctx.EntityPascal}FormValues } from "./${entityKebab}";`);
   }
-  if (ctx.hasDetail) {
+  if (!rendered?.length && ctx.hasDetail) {
     lines.push(`export { ${ctx.EntityPascal}Detail } from "./${entityKebab}";`);
   }
   if (lines.length === 0) return;
@@ -924,7 +1111,7 @@ async function updateWidgetsIndex(
   // Append new exports
   const trimmed = content.trimEnd();
   const newContent = trimmed + (trimmed.length > 0 ? "\n" : "") + lines.join("\n") + "\n";
-  await writeFile(widgetsIndexPath, newContent, "utf-8");
+  await writeFileWithDir(widgetsIndexPath, newContent);
   log.info(`Updated widgets/index.ts with ${ctx.EntityPascal} exports`);
 }
 
@@ -934,6 +1121,13 @@ async function updateWidgetsIndex(
 interface GeneratedPages {
   /** Page files written by this run. */
   written: string[];
+  /**
+   * What the page files hold once this run is done: the render for a file this run wrote, the
+   * author's content for a file it kept. The module updates read what the screen needs from
+   * these and never from a render that was thrown away, since a kept page that no longer
+   * imports a module file must not bring that file back.
+   */
+  onDisk: string[];
   /**
    * Page files whose template rendered to nothing.
    *
@@ -951,14 +1145,12 @@ async function generatePages(
   ctx: Record<string, unknown>,
   /** What the project has taken over; empty where it has taken nothing over. */
   templates: ProjectTemplates = new Map(),
+  /** The arguments that reproduce this render, recorded after each fingerprint. */
+  origin?: string,
 ): Promise<GeneratedPages> {
   const pagesDir = join(moduleDir, "src", "pages", entityKebab);
   const generated: string[] = [];
   const empty: string[] = [];
-
-  if (ctx.hasCreate) {
-    await ensureSubjectsFile(moduleDir);
-  }
 
   const pageFiles: Record<string, string> = {};
 
@@ -986,46 +1178,81 @@ async function generatePages(
   // departure gets it by copying the template.
   const blocks = templates.get(PAGE_BLOCKS_TEMPLATE);
   const writeOnce = new Set<string>();
-  if (blocks !== undefined && (await pathExists(join(pagesDir, `${PAGE_BLOCKS_TEMPLATE}.tsx`)))) {
+  // A page template that imports its blocks needs the file to exist, so it is laid down once.
+  const pageImportsBlocks = Object.values(pageFiles).some((content) => content.includes(`./${PAGE_BLOCKS_TEMPLATE}"`));
+  if (blocks !== undefined && (pageImportsBlocks || (await pathExists(join(pagesDir, `${PAGE_BLOCKS_TEMPLATE}.tsx`))))) {
     pageFiles[`${PAGE_BLOCKS_TEMPLATE}.tsx`] = renderTemplate(blocks, ctx);
     writeOnce.add(`${PAGE_BLOCKS_TEMPLATE}.tsx`);
   }
 
+  const onDisk: string[] = [];
+
   for (const [fileName, content] of Object.entries(pageFiles)) {
     const filePath = join(pagesDir, fileName);
-    const stamped = content.includes(GENERATED_PAGE_MARKER) ? stampFingerprint(content) : content;
+    const stamped = content.includes(GENERATED_PAGE_MARKER) ? stampFingerprint(content, origin) : content;
     if (stamped.trim().length === 0) {
       empty.push(fileName);
       continue;
     }
-    if (await pathExists(filePath)) {
-      const held = await readFile(filePath, "utf-8");
+    if (stamped !== content && !writeOnce.has(fileName)) {
       // A page is scaffolded and then written on, so carrying the marker proves only where the
-      // file came from. What decides whether this run may discard it is the fingerprint: matching
-      // means nobody has touched the file since it was laid down, and rewriting it loses nothing.
-      // A page that has been edited - or that predates the stamp, and so can prove nothing - is
-      // somebody's work and is left alone.
-      if (!writeOnce.has(fileName) && isUntouchedRender(held)) {
-        await writeFileWithDir(filePath, stamped);
-        generated.push(fileName);
-        continue;
-      }
-      log.warn(
-        held.includes(GENERATED_PAGE_MARKER) && !writeOnce.has(fileName)
-          ? `Skipping pages/${entityKebab}/${fileName} - edited since it was generated`
-          : `Skipping pages/${entityKebab}/${fileName} - file already exists`,
-      );
+      // file came from. Untouched, it is rewritten; edited, the template change is merged into it
+      // three-way against the render last written, and a conflict leaves it alone.
+      const { outcome, held } = await writeStampedGenerated(filePath, stamped);
+      if (outcome === "written" || outcome === "merged") generated.push(fileName);
+      if (outcome !== "written") log.warn(`pages/${entityKebab}/${fileName}: ${outcome}`);
+      onDisk.push(held);
+      continue;
+    }
+    if (await pathExists(filePath)) {
+      noteKeptRender(filePath, stamped);
+      onDisk.push(await readFile(filePath, "utf-8"));
+      log.warn(`Skipping pages/${entityKebab}/${fileName} - file already exists`);
       continue;
     }
     await writeFileWithDir(filePath, stamped);
     generated.push(fileName);
+    onDisk.push(stamped);
   }
 
-  return { written: generated, empty };
+  return { written: generated, empty, onDisk };
+}
+
+/** Whether a file imports the module's hand-kept permission map. */
+export function importsSubjects(content: string): boolean {
+  return content.includes("shared/auth/subjects");
+}
+
+/** Whether a file reads the module's own widgets catalog (`<namespace>/widgets`). */
+export function readsWidgetsNamespace(content: string, moduleNamespace: string): boolean {
+  return content.includes(`"${moduleNamespace}/widgets"`);
 }
 
 /**
- * Guarantees the module has a permission-subject map for the generated page to read.
+ * Whether a file translates a key under the entity's block of the widgets catalogue
+ * (`t("<entity>.save<Entity>")`), the keys the bundled templates read and
+ * {@link updateLocaleJsons} defaults.
+ */
+export function readsEntityKeys(content: string, entity: string): boolean {
+  const escaped = entity.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`\\bt\\(\\s*["'\`]${escaped}\\.`).test(content);
+}
+
+/** Whether a file imports package `name` or a subpath of it. */
+export function importsPackage(content: string, name: string): boolean {
+  const escaped = name.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&");
+  return new RegExp(`(?:from\\s+|import\\s+|import\\(\\s*)["']${escaped}(?:["']|\\/)`).test(content);
+}
+
+/** The module paths a permission map import `../../shared/auth/subjects` resolves to. */
+const SUBJECTS_CANDIDATES = ["subjects.ts", "subjects.tsx", join("subjects", "index.ts"), join("subjects", "index.tsx")];
+
+/**
+ * Guarantees the module has a permission-subject map for a generated page to read.
+ *
+ * Called only when a file the screen holds after this run imports the map, and then only when no
+ * file the import can resolve to exists: a module that keeps its map as `subjects.tsx` or in a
+ * folder is not handed a second, empty one.
  *
  * The page gates its create action on `useCan("create", SUBJECTS.<entity>)`, and only the
  * backend knows which group guards the entity's endpoints - so the map is declared, never
@@ -1033,8 +1260,11 @@ async function generatePages(
  * which is where the author is already looking.
  */
 async function ensureSubjectsFile(moduleDir: string): Promise<void> {
-  const subjectsPath = join(moduleDir, "src", "shared", "auth", "subjects.ts");
-  if (await pathExists(subjectsPath)) return;
+  const authDir = join(moduleDir, "src", "shared", "auth");
+  for (const candidate of SUBJECTS_CANDIDATES) {
+    if (await pathExists(join(authDir, candidate))) return;
+  }
+  const subjectsPath = join(authDir, "subjects.ts");
   await writeFileWithDir(
     subjectsPath,
     [
@@ -1081,7 +1311,7 @@ async function updatePagesIndex(
   const line = `export { ${exports.join(", ")} } from "./${entityKebab}";`;
   content = content.replace(/^export \{\};\s*$/m, "");
   const trimmed = content.trimEnd();
-  await writeFile(pagesIndexPath, trimmed + (trimmed.length > 0 ? "\n" : "") + line + "\n", "utf-8");
+  await writeFileWithDir(pagesIndexPath, trimmed + (trimmed.length > 0 ? "\n" : "") + line + "\n");
   log.info("Updated pages/index.ts");
 }
 
@@ -1092,8 +1322,20 @@ async function updateModuleIndex(moduleDir: string): Promise<void> {
   const content = await readFile(indexPath, "utf-8");
   if (content.includes('"./pages"')) return;
 
-  await writeFile(indexPath, content.trimEnd() + '\nexport * from "./pages";\n', "utf-8");
+  await writeFileWithDir(indexPath, content.trimEnd() + '\nexport * from "./pages";\n');
   log.info("Updated src/index.ts with pages export");
+}
+
+/** Source text with its block and line comments removed, for a check that reads code and not prose. */
+export function withoutComments(source: string): string {
+  return source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|\s)\/\/.*$/gm, "$1");
+}
+
+async function ensureWidgetsLocaleFiles(moduleDir: string, locales: string[]): Promise<void> {
+  for (const locale of locales) {
+    const jsonPath = join(moduleDir, "src", "locales", "widgets", `${locale}.json`);
+    if (!(await pathExists(jsonPath))) await writeFileWithDir(jsonPath, "{}\n");
+  }
 }
 
 async function updateLocalesIndex(
@@ -1105,8 +1347,9 @@ async function updateLocalesIndex(
 
   let content = await readFile(localesIndexPath, "utf-8");
 
-  // widgets mapping already exists → skip (check both quoted and unquoted key forms)
-  if (/\bwidgets\s*[:{]/.test(content)) return;
+  // widgets mapping already exists → skip (check both quoted and unquoted key forms). A comment
+  // that names the catalogue (`widgets: ...`) is not a registration, so the code is read without it.
+  if (/\bwidgets\s*[:{]/.test(withoutComments(content))) return;
 
   // Build lazy import lines for each locale
   const importLines = locales.map(
@@ -1136,7 +1379,7 @@ async function updateLocalesIndex(
   const newInner = innerContent.trimEnd() + "\n" + widgetsEntry + "\n  ";
   content = content.slice(0, openBrace + 1) + newInner + content.slice(closeBrace);
 
-  await writeFile(localesIndexPath, content, "utf-8");
+  await writeFileWithDir(localesIndexPath, content);
   log.info("Updated locales/index.ts with widgets component");
 }
 
@@ -1199,7 +1442,7 @@ async function updateLocaleJsons(
     entityKeys.no = "No";
 
     json[entityName] = entityKeys;
-    await writeFile(jsonPath, JSON.stringify(json, null, 2) + "\n", "utf-8");
+    await writeFileWithDir(jsonPath, JSON.stringify(json, null, 2) + "\n");
   }
   log.info("Updated locale JSON files with entity translations");
 }
@@ -1215,7 +1458,7 @@ async function ensureTsupPagesEntry(moduleDir: string): Promise<void> {
     '"widgets/index": "src/widgets/index.ts"',
     '"widgets/index": "src/widgets/index.ts",\n    "pages/index": "src/pages/index.ts"',
   );
-  await writeFile(tsupPath, content, "utf-8");
+  await writeFileWithDir(tsupPath, content);
   log.info("Updated tsup.config.ts with pages entry");
 }
 
@@ -1239,7 +1482,7 @@ async function ensurePackageJsonPagesExport(moduleDir: string): Promise<void> {
     import: "./dist/pages/index.js",
   };
   pkg.exports = exports;
-  await writeFile(pkgPath, JSON.stringify(pkg, null, 2) + "\n", "utf-8");
+  await writeFileWithDir(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
   log.info("Updated package.json with pages export");
 }
 
@@ -1646,571 +1889,693 @@ export const scaffoldCrudCommand = new Command("scaffold")
     "--app <dir>",
     "Target Expo app under apps/ for route files (with --native)",
   )
-  .action(async (entityArg: string, options: { module?: string; output?: string; native?: boolean; app?: string }) => {
-    // Every source below is keyed by the entity's canonical spelling — the crud config's key, the
-    // contract's key, the snapshot's `name`, the tag the meta source resolves. Normalising here is
-    // what makes the argument's case a matter of taste rather than a matter of which half of the
-    // output comes out wired.
-    const entity = toEntityName(entityArg);
-    if (options.native) {
-      // Dynamic import keeps the module graph acyclic (scaffold-native reuses
-      // the metadata pipeline exported from this file).
-      const { runNativeScaffold } = await import("./scaffold-native.js");
-      await runNativeScaffold(entity, { module: options.module, app: options.app });
+  .action(runScaffold);
+
+/** The options `simplix scaffold` takes. */
+export interface ScaffoldOptions {
+  /** Draw no progress spinner: the run is observed in capture mode. */
+  quiet?: boolean;
+  module?: string;
+  output?: string;
+  native?: boolean;
+  app?: string;
+}
+
+/**
+ * Generates one entity's widgets and pages: the body of `simplix scaffold <entity>`.
+ *
+ * <p>Exported so the generated-state report can run the same render in capture mode.
+ */
+export async function runScaffold(entityArg: string, options: ScaffoldOptions): Promise<void> {
+  // Every source below is keyed by the entity's canonical spelling: the crud config's key, the
+  // contract's key, the snapshot's `name`, the tag the meta source resolves. Normalising here is
+  // what makes the argument's case a matter of taste rather than a matter of which half of the
+  // output comes out wired.
+  const entity = toEntityName(entityArg);
+  if (options.native) {
+    // Dynamic import keeps the module graph acyclic (scaffold-native reuses
+    // the metadata pipeline exported from this file).
+    const { runNativeScaffold } = await import("./scaffold-native.js");
+    await runNativeScaffold(entity, { module: options.module, app: options.app });
+    return;
+  }
+  const rootDir = await findProjectRoot(process.cwd());
+  const entityKebab = toKebabCase(entity);
+  const EntityPascal = toPascalCase(entity);
+
+  // Resolve output directory
+  let outputDir: string;
+  let relativeOutput: string;
+  let moduleDir: string | null = null;
+
+  if (options.output) {
+    // Explicit output overrides everything
+    outputDir = resolve(rootDir, options.output);
+    relativeOutput = options.output;
+  } else if (options.module) {
+    // FSD module specified → features/<entity>/
+    moduleDir = resolve(rootDir, "modules", options.module);
+    outputDir = resolve(moduleDir, "src", "widgets", entityKebab);
+    relativeOutput = join("modules", options.module, "src", "widgets", entityKebab);
+  } else {
+    // Auto-detect: find available modules
+    const moduleDirs = await findModuleDirs(rootDir);
+    if (moduleDirs.length === 1) {
+      // Single module → use it
+      moduleDir = resolve(rootDir, "modules", moduleDirs[0]);
+      outputDir = resolve(moduleDir, "src", "widgets", entityKebab);
+      relativeOutput = join("modules", moduleDirs[0], "src", "widgets", entityKebab);
+      log.info(`Auto-detected module: ${moduleDirs[0]}`);
+    } else if (moduleDirs.length > 1) {
+      log.error("Multiple modules found. Specify --module <dir>:");
+      for (const dir of moduleDirs) {
+        log.step(dir);
+      }
+      process.exit(1);
+      return;
+    } else {
+      log.error(
+        "No modules/ directory found. Create a module first:\n" +
+        "  simplix add-module <name>",
+      );
+      process.exit(1);
       return;
     }
-    const rootDir = await findProjectRoot(process.cwd());
-    const entityKebab = toKebabCase(entity);
-    const EntityPascal = toPascalCase(entity);
+  }
 
-    // Resolve output directory
-    let outputDir: string;
-    let relativeOutput: string;
-    let moduleDir: string | null = null;
+  const spinner = ora({ text: `Searching for ${entity} schema...`, isSilent: options.quiet === true }).start();
 
-    if (options.output) {
-      // Explicit output overrides everything
-      outputDir = resolve(rootDir, options.output);
-      relativeOutput = options.output;
-    } else if (options.module) {
-      // FSD module specified → features/<entity>/
-      moduleDir = resolve(rootDir, "modules", options.module);
-      outputDir = resolve(moduleDir, "src", "widgets", entityKebab);
-      relativeOutput = join("modules", options.module, "src", "widgets", entityKebab);
-    } else {
-      // Auto-detect: find available modules
-      const moduleDirs = await findModuleDirs(rootDir);
-      if (moduleDirs.length === 1) {
-        // Single module → use it
-        moduleDir = resolve(rootDir, "modules", moduleDirs[0]);
-        outputDir = resolve(moduleDir, "src", "widgets", entityKebab);
-        relativeOutput = join("modules", moduleDirs[0], "src", "widgets", entityKebab);
-        log.info(`Auto-detected module: ${moduleDirs[0]}`);
-      } else if (moduleDirs.length > 1) {
-        log.error("Multiple modules found. Specify --module <dir>:");
-        for (const dir of moduleDirs) {
-          log.step(dir);
-        }
-        process.exit(1);
-        return;
-      } else {
+  try {
+    // A domain whose package exports the DTO meta output is read from SimpliX Meta, which states what
+    // the emitted zod text cannot: which DTO a form is, what a parent contributes to it, and
+    // whether the backend can order a list by a column. The dynamic import keeps the module
+    // graph acyclic: the source is written against the contracts declared here.
+    const { loadMetaScaffoldSource } = await import("../meta/scaffold-source.js");
+    const metaSource = await loadMetaScaffoldSource(rootDir, entity);
+    const { loadMetaHolders } = await import("../meta/scaffold-source.js");
+    const metaHolders = metaSource ? await loadMetaHolders(rootDir, entity) : [];
+
+    const schemaResult = await findSchemaFile(rootDir, entity);
+
+    // Load snapshot early so it can serve as field fallback
+    const extractedEntity = await findEntityFromSnapshot(rootDir, entity);
+
+    let fields: FieldInfo[];
+    let packageName: string | null = null;
+    if (metaSource) {
+      spinner.text = `Read ${entity} from SimpliX Meta (${metaSource.domain})`;
+      fields = metaSource.fields;
+      packageName = schemaResult?.packageName ?? null;
+
+      if (fields.length === 0) {
+        // A placeholder id/name pair here would be a widget set built on two invented fields,
+        // reported as a successful scaffold. SimpliX Meta states what the entity holds, and for these
+        // it states nothing a screen can render.
+        spinner.fail(`No renderable fields for ${entity}`);
         log.error(
-          "No modules/ directory found. Create a module first:\n" +
-          "  simplix add-module <name>",
+          `SimpliX Meta states no scalar field for "${entity}" (${metaSource.tag}): it ` +
+          "carries no request body and answers with no record. Write the screen by hand, or " +
+          "add the DTO the entity is read and written as.",
         );
         process.exit(1);
         return;
+      }
+    } else if (schemaResult) {
+      spinner.text = `Found schema at ${schemaResult.path}`;
+      fields = parseSchemaFields(schemaResult.content, entity);
+      packageName = schemaResult.packageName;
+
+      if (fields.length === 0 && extractedEntity?.fields.length) {
+        // Fallback: use snapshot fields (covers read-only entities with no Body schema)
+        fields = entityFieldsToFieldInfo(extractedEntity.fields);
+      }
+      if (fields.length === 0) {
+        log.warn(
+          "Could not parse fields from schema. Generating with placeholder fields.",
+        );
+        fields = PLACEHOLDER_FIELDS;
+      }
+    } else {
+      spinner.text = "No schema found, generating with placeholder fields...";
+      fields = PLACEHOLDER_FIELDS;
+    }
+
+    // Apply mandated list-column ordering + visibility (INV#18). Run before
+    // any downstream consumer of `fields` (tree display fields, ctx) so the
+    // category/hideInList tags are available everywhere.
+    fields = orderAndCategorizeFields(fields);
+
+    // Resolve actual hook names from crud.config.ts, and from SimpliX Meta for a meta domain that
+    // has none: a hand-written entry states an intent SimpliX Meta cannot, so it wins where it exists.
+    const crudConfig = await findCrudConfigForEntity(rootDir, entity);
+    const roles = crudConfig ?? metaSource?.roles ?? null;
+
+    const ops =
+      !crudConfig && metaSource
+        ? metaSource.operations
+        : await parseEntityOperations(rootDir, entity);
+
+    const toHookName = (opId: string) =>
+      `use${opId.charAt(0).toUpperCase()}${opId.slice(1)}`;
+    const hookList = roles?.list ? toHookName(roles.list) : null;
+    const hookGet = roles?.get ? toHookName(roles.get) : null;
+    const hookGetForEdit = roles?.getForEdit ? toHookName(roles.getForEdit) : null;
+    const hookCreate = roles?.create
+      ? toHookName(roles.create)
+      : null;
+    const hookUpdate = roles?.update
+      ? toHookName(roles.update)
+      : null;
+    const hookDelete = roles?.delete
+      ? toHookName(roles.delete)
+      : null;
+    const hookOrder = roles?.order
+      ? toHookName(roles.order as string)
+      : null;
+    const hookTree = roles?.tree
+      ? toHookName(roles.tree)
+      : null;
+
+    const fieldNameList = fields.map((f) => f.name).join(", ");
+    const hasEnumFields = fields.some((f) => f.component === "Select");
+    const hasDateFields = fields.some((f) => f.component === "Date");
+    const hasBooleanFields = fields.some((f) => f.component === "Boolean");
+    const hasTextareaFields = fields.some((f) => f.component === "Textarea");
+
+    // Detect path param names for update/delete mutations. SimpliX Meta states them outright; the
+    // Orval path reads them back out of the generated mutation.
+    const updatePathParam = metaSource
+      ? metaSource.updatePathParam ?? null
+      : crudConfig?.update
+        ? await findMutationPathParam(rootDir, crudConfig.update)
+        : null;
+    const deletePathParam = metaSource
+      ? metaSource.deletePathParam ?? `${entity}Id`
+      : crudConfig?.delete
+        ? await findMutationPathParam(rootDir, crudConfig.delete)
+        : `${entity}Id`;
+
+    // Resolve row ID field from the entity's get operation path param.
+    // e.g. "/sites/:id" → "id", "/users/:username" → "username"
+    const getOp = extractedEntity?.operations.find((o) => o.role === "get");
+    const pathParamMatch = getOp?.path.match(/:(\w+)(?:\/|$)/);
+    const rowIdField = metaSource?.rowIdField ?? pathParamMatch?.[1] ?? "id";
+    const filterFields = metaSource
+      ? metaSource.filters
+      : extractedEntity
+        ? parseFilterParams(extractedEntity.queryParams, extractedEntity.fields)
+        : [];
+
+    // Detect orderField from the order operation's own body
+    let orderField: string | null = metaSource?.orderField ?? null;
+    if (!orderField && hookOrder && extractedEntity) {
+      const orderOp = extractedEntity.operations.find(
+        (o) => o.role === "order",
+      );
+      // bodySchema is { type: "array", items: { properties: { id, displayOrder } } }
+      const itemProps = orderOp?.bodySchema?.items?.properties;
+      if (itemProps) {
+        const nonIdField = Object.keys(itemProps).find(
+          (k) => k !== "id" && k !== rowIdField,
+        );
+        orderField = nonIdField ?? null;
       }
     }
 
-    const spinner = ora(`Searching for ${entity} schema...`).start();
+    // Separate text filters for UnifiedTextFilter grouping (legacy Toolbar)
+    const textFilters = filterFields.filter((f) => f.component === "TextFilter");
+    const nonTextFilters = filterFields.filter((f) => f.component !== "TextFilter");
 
-    try {
-      // A domain whose package exports the DTO meta output is read from SimpliX Meta, which states what
-      // the emitted zod text cannot: which DTO a form is, what a parent contributes to it, and
-      // whether the backend can order a list by a column. The dynamic import keeps the module
-      // graph acyclic — the source is written against the contracts declared here.
-      const { loadMetaScaffoldSource } = await import("../meta/scaffold-source.js");
-      const metaSource = await loadMetaScaffoldSource(rootDir, entity);
+    // Build UnifiedTextFilter field definitions (legacy Toolbar)
+    const textFilterFields: TextFilterFieldInfo[] = textFilters.map((f) => {
+      const ops = (f.textOperators ?? [f.operator]).map((op) => SUFFIX_TO_ENUM_KEY[op] ?? op);
+      const defaultOp = SUFFIX_TO_ENUM_KEY[f.operator] ?? f.operator;
+      return { field: f.field, operators: ops, defaultOperator: defaultOp };
+    });
 
-      const schemaResult = await findSchemaFile(rootDir, entity);
+    // Build unified FilterBar definitions
+    interface FilterBarDefItem {
+      type: string;
+      field: string;
+      operators?: string[];
+      defaultOperator?: string;
+      options?: string[];
+      isText?: boolean;
+      isNumber?: boolean;
+      isFaceted?: boolean;
+      isToggle?: boolean;
+      isDateRange?: boolean;
+      isCountry?: boolean;
+      isTimezone?: boolean;
+    }
 
-      // Load snapshot early so it can serve as field fallback
-      const extractedEntity = await findEntityFromSnapshot(rootDir, entity);
-
-      let fields: FieldInfo[];
-      let packageName: string | null = null;
-      if (metaSource) {
-        spinner.text = `Read ${entity} from SimpliX Meta (${metaSource.domain})`;
-        fields = metaSource.fields;
-        packageName = schemaResult?.packageName ?? null;
-
-        if (fields.length === 0) {
-          // A placeholder id/name pair here would be a widget set built on two invented fields,
-          // reported as a successful scaffold. SimpliX Meta states what the entity holds, and for these
-          // it states nothing a screen can render.
-          spinner.fail(`No renderable fields for ${entity}`);
-          log.error(
-            `SimpliX Meta states no scalar field for "${entity}" (${metaSource.tag}): it ` +
-            "carries no request body and answers with no record. Write the screen by hand, or " +
-            "add the DTO the entity is read and written as.",
-          );
-          process.exit(1);
-          return;
+    const filterBarDefs: FilterBarDefItem[] = [];
+    for (const f of filterFields) {
+      switch (f.component) {
+        case "TextFilter": {
+          const ops = (f.textOperators ?? [f.operator]).map((op) => SUFFIX_TO_ENUM_KEY[op] ?? op);
+          const defaultOp = SUFFIX_TO_ENUM_KEY[f.operator] ?? f.operator;
+          filterBarDefs.push({ type: "text", field: f.field, operators: ops, defaultOperator: defaultOp, isText: true });
+          break;
         }
-      } else if (schemaResult) {
-        spinner.text = `Found schema at ${schemaResult.path}`;
-        fields = parseSchemaFields(schemaResult.content, entity);
-        packageName = schemaResult.packageName;
-
-        if (fields.length === 0 && extractedEntity?.fields.length) {
-          // Fallback: use snapshot fields (covers read-only entities with no Body schema)
-          fields = entityFieldsToFieldInfo(extractedEntity.fields);
+        case "NumberFilter": {
+          const op = SUFFIX_TO_ENUM_KEY[f.operator] ?? "GREATER_THAN_OR_EQUAL";
+          filterBarDefs.push({ type: "number", field: f.field, operators: [op], defaultOperator: op, isNumber: true });
+          break;
         }
-        if (fields.length === 0) {
-          log.warn(
-            "Could not parse fields from schema. Generating with placeholder fields.",
-          );
-          fields = PLACEHOLDER_FIELDS;
-        }
-      } else {
-        spinner.text = "No schema found, generating with placeholder fields...";
-        fields = PLACEHOLDER_FIELDS;
+        case "FacetedFilter":
+          filterBarDefs.push({ type: "faceted", field: f.field, options: f.options, isFaceted: true });
+          break;
+        case "ToggleFilter":
+          filterBarDefs.push({ type: "toggle", field: f.field, isToggle: true });
+          break;
+        case "DateRangeFilter":
+          filterBarDefs.push({ type: "dateRange", field: f.field, isDateRange: true });
+          break;
+        case "CountryFilter":
+          filterBarDefs.push({ type: "country", field: f.field, isCountry: true });
+          break;
+        case "TimezoneFilter":
+          filterBarDefs.push({ type: "timezone", field: f.field, isTimezone: true });
+          break;
       }
+    }
 
-      // Apply mandated list-column ordering + visibility (INV#18). Run before
-      // any downstream consumer of `fields` (tree display fields, ctx) so the
-      // category/hideInList tags are available everywhere.
-      fields = orderAndCategorizeFields(fields);
+    // ── Display name field detection (for all entities) ──
+    // The delete confirmation names the record with it, so a positional guess puts a foreign
+    // key (identical on every row) into the dialog. A field SimpliX Meta pairs with an `…I18n`
+    // sibling is the human-facing text by construction, and the meta source answers with it.
+    const commonNameFields = ["name", "title", "label", "displayName"];
+    const displayNameField = metaSource?.displayNameField
+      ?? fields.find((f) =>
+        commonNameFields.includes(f.name) && f.tsType === "string",
+      )?.name
+      ?? fields.find((f) =>
+        f.tsType === "string" && f.name !== rowIdField,
+      )?.name
+      ?? null;
 
-      // Resolve actual hook names from crud.config.ts, and from SimpliX Meta for a meta domain that
-      // has none: a hand-written entry states an intent SimpliX Meta cannot, so it wins where it exists.
-      const crudConfig = await findCrudConfigForEntity(rootDir, entity);
-      const roles = crudConfig ?? metaSource?.roles ?? null;
+    // ── Tree entity detection ──
+    const hasTree = ops.hasTree || !!hookTree;
 
-      const ops =
-        !crudConfig && metaSource
-          ? metaSource.operations
-          : await parseEntityOperations(rootDir, entity);
+    let treeParentIdField: string | null = null;
+    let treeSortOrderField: string | null = null;
+    let treeDisplayNameField: string | null = null;
+    let treeSearchFields: string[] = [];
+    let treeDisplayFields: FieldInfo[] = [];
 
-      const toHookName = (opId: string) =>
-        `use${opId.charAt(0).toUpperCase()}${opId.slice(1)}`;
-      const hookList = roles?.list ? toHookName(roles.list) : null;
-      const hookGet = roles?.get ? toHookName(roles.get) : null;
-      const hookGetForEdit = roles?.getForEdit ? toHookName(roles.getForEdit) : null;
-      const hookCreate = roles?.create
-        ? toHookName(roles.create)
-        : null;
-      const hookUpdate = roles?.update
-        ? toHookName(roles.update)
-        : null;
-      const hookDelete = roles?.delete
-        ? toHookName(roles.delete)
-        : null;
-      const hookOrder = roles?.order
-        ? toHookName(roles.order as string)
-        : null;
-      const hookTree = roles?.tree
-        ? toHookName(roles.tree)
-        : null;
+    if (hasTree) {
+      // Detect parentId field
+      treeParentIdField = fields.find((f) => f.name === "parentId")?.name
+        ?? fields.find((f) => f.name.toLowerCase().includes("parent") && f.name.toLowerCase().endsWith("id"))?.name
+        ?? "parentId";
 
-      const fieldNameList = fields.map((f) => f.name).join(", ");
-      const hasEnumFields = fields.some((f) => f.component === "Select");
-      const hasDateFields = fields.some((f) => f.component === "Date");
-      const hasBooleanFields = fields.some((f) => f.component === "Boolean");
-      const hasTextareaFields = fields.some((f) => f.component === "Textarea");
+      // Detect sort order field
+      treeSortOrderField = orderField
+        ?? fields.find((f) => ["sortOrder", "displayOrder", "orderIndex"].includes(f.name))?.name
+        ?? "sortOrder";
 
-      // Detect path param names for update/delete mutations. SimpliX Meta states them outright; the
-      // Orval path reads them back out of the generated mutation.
-      const updatePathParam = metaSource
-        ? metaSource.updatePathParam ?? null
-        : crudConfig?.update
-          ? await findMutationPathParam(rootDir, crudConfig.update)
-          : null;
-      const deletePathParam = metaSource
-        ? metaSource.deletePathParam ?? `${entity}Id`
-        : crudConfig?.delete
-          ? await findMutationPathParam(rootDir, crudConfig.delete)
-          : `${entity}Id`;
-
-      // Resolve row ID field from the entity's get operation path param.
-      // e.g. "/sites/:id" → "id", "/users/:username" → "username"
-      const getOp = extractedEntity?.operations.find((o) => o.role === "get");
-      const pathParamMatch = getOp?.path.match(/:(\w+)(?:\/|$)/);
-      const rowIdField = metaSource?.rowIdField ?? pathParamMatch?.[1] ?? "id";
-      const filterFields = metaSource
-        ? metaSource.filters
-        : extractedEntity
-          ? parseFilterParams(extractedEntity.queryParams, extractedEntity.fields)
-          : [];
-
-      // Detect orderField from the order operation's own body
-      let orderField: string | null = metaSource?.orderField ?? null;
-      if (!orderField && hookOrder && extractedEntity) {
-        const orderOp = extractedEntity.operations.find(
-          (o) => o.role === "order",
-        );
-        // bodySchema is { type: "array", items: { properties: { id, displayOrder } } }
-        const itemProps = orderOp?.bodySchema?.items?.properties;
-        if (itemProps) {
-          const nonIdField = Object.keys(itemProps).find(
-            (k) => k !== "id" && k !== rowIdField,
-          );
-          orderField = nonIdField ?? null;
-        }
-      }
-
-      // Separate text filters for UnifiedTextFilter grouping (legacy Toolbar)
-      const textFilters = filterFields.filter((f) => f.component === "TextFilter");
-      const nonTextFilters = filterFields.filter((f) => f.component !== "TextFilter");
-
-      // Build UnifiedTextFilter field definitions (legacy Toolbar)
-      const textFilterFields: TextFilterFieldInfo[] = textFilters.map((f) => {
-        const ops = (f.textOperators ?? [f.operator]).map((op) => SUFFIX_TO_ENUM_KEY[op] ?? op);
-        const defaultOp = SUFFIX_TO_ENUM_KEY[f.operator] ?? f.operator;
-        return { field: f.field, operators: ops, defaultOperator: defaultOp };
-      });
-
-      // Build unified FilterBar definitions
-      interface FilterBarDefItem {
-        type: string;
-        field: string;
-        operators?: string[];
-        defaultOperator?: string;
-        options?: string[];
-        isText?: boolean;
-        isNumber?: boolean;
-        isFaceted?: boolean;
-        isToggle?: boolean;
-        isDateRange?: boolean;
-        isCountry?: boolean;
-        isTimezone?: boolean;
-      }
-
-      const filterBarDefs: FilterBarDefItem[] = [];
-      for (const f of filterFields) {
-        switch (f.component) {
-          case "TextFilter": {
-            const ops = (f.textOperators ?? [f.operator]).map((op) => SUFFIX_TO_ENUM_KEY[op] ?? op);
-            const defaultOp = SUFFIX_TO_ENUM_KEY[f.operator] ?? f.operator;
-            filterBarDefs.push({ type: "text", field: f.field, operators: ops, defaultOperator: defaultOp, isText: true });
-            break;
-          }
-          case "NumberFilter": {
-            const op = SUFFIX_TO_ENUM_KEY[f.operator] ?? "GREATER_THAN_OR_EQUAL";
-            filterBarDefs.push({ type: "number", field: f.field, operators: [op], defaultOperator: op, isNumber: true });
-            break;
-          }
-          case "FacetedFilter":
-            filterBarDefs.push({ type: "faceted", field: f.field, options: f.options, isFaceted: true });
-            break;
-          case "ToggleFilter":
-            filterBarDefs.push({ type: "toggle", field: f.field, isToggle: true });
-            break;
-          case "DateRangeFilter":
-            filterBarDefs.push({ type: "dateRange", field: f.field, isDateRange: true });
-            break;
-          case "CountryFilter":
-            filterBarDefs.push({ type: "country", field: f.field, isCountry: true });
-            break;
-          case "TimezoneFilter":
-            filterBarDefs.push({ type: "timezone", field: f.field, isTimezone: true });
-            break;
-        }
-      }
-
-      // ── Display name field detection (for all entities) ──
-      // The delete confirmation names the record with it, so a positional guess puts a foreign
-      // key — identical on every row — into the dialog. A field SimpliX Meta pairs with an `…I18n`
-      // sibling is the human-facing text by construction, and the meta source answers with it.
+      // Display name field: prefer common name fields, then the field SimpliX Meta pairs with an
+      // `…I18n` sibling, and fall back to the first string field only when neither answers.
       const commonNameFields = ["name", "title", "label", "displayName"];
-      const displayNameField = metaSource?.displayNameField
+      treeDisplayNameField = metaSource?.displayNameField
         ?? fields.find((f) =>
           commonNameFields.includes(f.name) && f.tsType === "string",
         )?.name
         ?? fields.find((f) =>
-          f.tsType === "string" && f.name !== rowIdField,
+          f.tsType === "string" && f.name !== rowIdField && f.name !== treeParentIdField,
         )?.name
-        ?? null;
+        ?? "name";
 
-      // ── Tree entity detection ──
-      const hasTree = ops.hasTree || !!hookTree;
+      // Search fields: string fields excluding id and parentId
+      treeSearchFields = fields
+        .filter((f) => f.tsType === "string" && f.name !== rowIdField && f.name !== treeParentIdField)
+        .map((f) => f.name);
 
-      let treeParentIdField: string | null = null;
-      let treeSortOrderField: string | null = null;
-      let treeDisplayNameField: string | null = null;
-      let treeSearchFields: string[] = [];
-      let treeDisplayFields: FieldInfo[] = [];
-
-      if (hasTree) {
-        // Detect parentId field
-        treeParentIdField = fields.find((f) => f.name === "parentId")?.name
-          ?? fields.find((f) => f.name.toLowerCase().includes("parent") && f.name.toLowerCase().endsWith("id"))?.name
-          ?? "parentId";
-
-        // Detect sort order field
-        treeSortOrderField = orderField
-          ?? fields.find((f) => ["sortOrder", "displayOrder", "orderIndex"].includes(f.name))?.name
-          ?? "sortOrder";
-
-        // Display name field: prefer common name fields, then the field SimpliX Meta pairs with an
-        // `…I18n` sibling, and fall back to the first string field only when neither answers.
-        const commonNameFields = ["name", "title", "label", "displayName"];
-        treeDisplayNameField = metaSource?.displayNameField
-          ?? fields.find((f) =>
-            commonNameFields.includes(f.name) && f.tsType === "string",
-          )?.name
-          ?? fields.find((f) =>
-            f.tsType === "string" && f.name !== rowIdField && f.name !== treeParentIdField,
-          )?.name
-          ?? "name";
-
-        // Search fields: string fields excluding id and parentId
-        treeSearchFields = fields
-          .filter((f) => f.tsType === "string" && f.name !== rowIdField && f.name !== treeParentIdField)
-          .map((f) => f.name);
-
-        // Display fields: fields for tree columns (exclude id, parentId, sortOrder
-        // and any field hidden by the mandated column ordering pass so that
-        // @first resolves to the first VISIBLE tree column)
-        const filteredFields = fields.filter((f) =>
-          f.name !== rowIdField &&
-          f.name !== treeParentIdField &&
-          f.name !== treeSortOrderField &&
-          !f.hideInList,
-        );
-        const displayNameIdx = filteredFields.findIndex((f) => f.name === treeDisplayNameField);
-        if (displayNameIdx > 0) {
-          const [nameField] = filteredFields.splice(displayNameIdx, 1);
-          filteredFields.unshift(nameField);
-        }
-        treeDisplayFields = filteredFields;
+      // Display fields: fields for tree columns (exclude id, parentId, sortOrder
+      // and any field hidden by the mandated column ordering pass so that
+      // @first resolves to the first VISIBLE tree column)
+      const filteredFields = fields.filter((f) =>
+        f.name !== rowIdField &&
+        f.name !== treeParentIdField &&
+        f.name !== treeSortOrderField &&
+        !f.hideInList,
+      );
+      const displayNameIdx = filteredFields.findIndex((f) => f.name === treeDisplayNameField);
+      if (displayNameIdx > 0) {
+        const [nameField] = filteredFields.splice(displayNameIdx, 1);
+        filteredFields.unshift(nameField);
       }
-
-      const hasTreeReorder = hasTree && !!hookUpdate && !!treeSortOrderField;
-      const hasTreeMove = hasTree && !!hookUpdate && !!treeParentIdField;
-      const updateMutationKey = updatePathParam ?? rowIdField;
-
-      // ── List/tree row DTO resolution (INV#30) ──
-      // The list row is the per-operation response DTO (e.g. CompanyListDTO),
-      // NOT the entity's detail modelType. Resolve from the snapshot by role and
-      // only emit a DTO import when we can both name the type AND import it.
-      const listOp =
-        extractedEntity?.operations?.find((o) => o.role === "list") ??
-        extractedEntity?.operations?.find((o) => o.role === "search");
-      const treeOp = extractedEntity?.operations?.find((o) => o.role === "tree");
-      const metaListRowType = metaSource?.listRowType ?? null;
-      const metaTreeRowType = metaSource?.treeRowType ?? null;
-      const listRowType = metaSource
-        ? (packageName && metaListRowType ? metaListRowType : null)
-        : packageName && listOp?.responseEntityType ? listOp.responseEntityType : null;
-      const treeRowType = metaSource
-        ? (packageName && metaTreeRowType ? metaTreeRowType : null)
-        : packageName && (treeOp?.responseEntityType ?? listOp?.responseEntityType)
-          ? (treeOp?.responseEntityType ?? listOp?.responseEntityType)
-          : null;
-
-      const entityPlural = `${entity}s`;
-      // Columns and card lines render the list row, so they are limited to what the list
-      // projection returns; the full set stays available to the form and detail templates.
-      const listDtoFields = metaSource
-        ? metaSource.rowProperties ?? null
-        : await readListDtoFieldNames(rootDir, listRowType);
-      // An enum column shows a translated label only if it can name its enum, and the row type
-      // is where that name is written. Fields the row type does not declare keep no name, so
-      // their badge falls back to the constant rather than asking for a key nothing defines.
-      const withEnumType = (f: FieldInfo) => {
-        if (f.component !== "Select") return f;
-        const declared = listDtoFields?.get(f.name)?.replace(/\[\]|\s|\|\s*null|\|\s*undefined/g, "");
-        return declared && /^[A-Z]\w*$/.test(declared) ? { ...f, enumTypeName: declared } : f;
-      };
-      // A plain field is left out of the columns because its `…I18n` twin renders it. A list
-      // projection that returns the resolved text and not the map leaves neither, so the row loses
-      // the column it is named by — and the table then shows everything about a record except
-      // which record it is.
-      const projected = listDtoFields
-        ? fields.filter((f) => listDtoFields.has(f.name))
-        : fields;
-      const projectedNames = new Set(projected.map((f) => f.name));
-      const listFields = projected
-        .map((f) => (f.isI18nPair && !projectedNames.has(`${f.name}I18n`) ? { ...f, isI18nPair: false } : f))
-        .map(withEnumType);
-      const ctx = {
-        EntityPascal,
-        entityKebab,
-        entity,
-        entityPlural,
-        fields,
-        listFields,
-        packageName,
-        listRowType,
-        treeRowType,
-        hookList,
-        hookGet,
-        hookGetForEdit,
-        hookCreate,
-        hookUpdate,
-        hookDelete,
-        hookOrder,
-        hookTree,
-        orderField,
-        updatePathParam,
-        updateMutationKey,
-        deletePathParam,
-        entityPath: metaSource?.entityPath ?? extractedEntity?.path ?? `/api/v1/${entity}`,
-        fieldNameList,
-        rowIdField,
-        // The detail panel names the two stamps outright, and a record that declares neither does
-        // not compile with them. Four of this application's detail DTOs are such records.
-        hasAuditFields:
-          fields.some((f) => f.name === "createdAt") &&
-          fields.some((f) => f.name === "updatedAt"),
-        hasList: ops.hasList,
-        hasForm: ops.hasCreate || ops.hasUpdate,
-        hasDetail: ops.hasGet,
-        hasCreate: ops.hasCreate,
-        hasUpdate: ops.hasUpdate,
-        hasDelete: ops.hasDelete,
-        hasTree,
-        hasTreeReorder,
-        hasTreeMove,
-        treeParentIdField,
-        treeSortOrderField,
-        displayNameField,
-        treeDisplayNameField,
-        treeSearchFields,
-        treeDisplayFields,
-        hasEnumFields,
-        hasDateFields,
-        hasBooleanFields,
-        hasTextareaFields,
-        filters: nonTextFilters,
-        hasFilters: filterFields.length > 0,
-        filterBarDefs,
-        textFilterFields,
-        hasTextFilters: textFilterFields.length > 0,
-        firstTextField: textFilterFields[0]?.field ?? "",
-        firstTextDefaultOp: textFilterFields[0]?.defaultOperator ?? "CONTAINS",
-      };
-
-      // Resolve module namespace early (needed by tree/form templates)
-      const moduleNamespace = moduleDir ? await resolveModuleNamespace(moduleDir) : entity;
-      const hasListDetail = (hasTree || ctx.hasList) && ctx.hasDetail;
-      const moduleName = moduleDir ? basename(moduleDir) : entity;
-      // Detect i18n field presence and build pairs array for template
-      const i18nFieldPairs: { i18nFieldName: string; plainFieldName: string }[] = [];
-      for (const f of fields) {
-        if (f.baseFieldName !== null) {
-          i18nFieldPairs.push({ i18nFieldName: f.name, plainFieldName: f.baseFieldName });
-        }
-      }
-      const hasI18nFields = i18nFieldPairs.length > 0;
-      const projectConfig = await loadConfig(rootDir);
-      const i18nLocales = projectConfig.i18n?.locales ?? ["en", "ko", "ja"];
-      const fullCtx = { ...ctx, moduleNamespace, moduleName, entityIcon: "FileTextIcon", hasListDetail, hasI18nFields, i18nFieldPairs, i18nLocales };
-
-      const files: Record<string, string> = {};
-      if (hasTree) {
-        files["tree.tsx"] = renderTemplate(treeTemplate, fullCtx);
-      } else if (ops.hasList) {
-        files["list.tsx"] = renderTemplate(listTemplate, fullCtx);
-      }
-      if (ops.hasCreate || ops.hasUpdate) {
-        files["form.tsx"] = renderTemplate(formTemplate, fullCtx);
-      }
-      if (ops.hasGet) {
-        files["detail.tsx"] = renderTemplate(detailTemplate, fullCtx);
-      }
-      files["index.ts"] = renderTemplate(featureIndexTemplate, fullCtx);
-
-      spinner.text = "Generating CRUD widgets...";
-
-      for (const [fileName, content] of Object.entries(files)) {
-        const filePath = join(outputDir, fileName);
-        if (await pathExists(filePath)) {
-          log.warn(`Skipping ${fileName} - file already exists`);
-          continue;
-        }
-        await writeFileWithDir(filePath, content);
-      }
-
-      // Auto-add required dependencies to module package.json
-      if (moduleDir) {
-        const addedDeps = await ensureModuleDeps(moduleDir, packageName);
-        if (addedDeps.length > 0) {
-          log.info("Added dependencies:");
-          for (const dep of addedDeps) {
-            log.step(dep);
-          }
-        }
-
-        // Auto-update widgets/index.ts with entity exports
-        await updateWidgetsIndex(moduleDir, entityKebab, fullCtx);
-
-        // Pages generation (reuse i18nLocales loaded above)
-        const locales = i18nLocales;
-
-        // What the console draws around a generated page is the project's decision, so the
-        // project's own templates win where it has written any.
-        const projectTemplates = await loadProjectTemplates(rootDir);
-        const pages = await generatePages(moduleDir, entityKebab, fullCtx, projectTemplates);
-        if (pages.written.length > 0) {
-          log.info(`Generated ${pages.written.length} page files`);
-        }
-        if (pages.empty.length > 0) {
-          // The widgets are on disk and are what they should be; what does not exist is a screen
-          // to reach them through. Saying so here is the difference between a scaffold a person
-          // finishes by hand and one they discover when the dev server cannot resolve the import.
-          const active = Object.entries(ops)
-            .filter(([, on]) => on)
-            .map(([role]) => role.replace("has", "").toLowerCase());
-          spinner.fail(`No page generated for ${EntityPascal}`);
-          log.error(
-            `${pages.empty.map((one) => `pages/${entityKebab}/${one}`).join(", ")} rendered ` +
-            `empty and was not written. A generated page is a list with a detail panel or a ` +
-            `creation hub, and ${entity} offers neither: its operations are ` +
-            `${active.length > 0 ? active.join(", ") : "none"}. The widgets in ` +
-            `${relativeOutput} are generated - write the page against them by hand, or give the ` +
-            `entity the get operation its detail panel reads.`,
-          );
-          process.exit(1);
-          return;
-        }
-
-        // Module-level updates
-        await updatePagesIndex(moduleDir, entityKebab, fullCtx);
-        await updateModuleIndex(moduleDir);
-        await updateLocalesIndex(moduleDir, locales);
-        await updateLocaleJsons(moduleDir, entity, EntityPascal, locales, ops, hasTree);
-        await ensureTsupPagesEntry(moduleDir);
-        await ensurePackageJsonPagesExport(moduleDir);
-      }
-
-      spinner.succeed(`CRUD widgets + pages generated for ${EntityPascal}`);
-
-      const activeOps = Object.entries(ops)
-        .filter(([, v]) => v)
-        .map(([k]) => k.replace("has", "").toLowerCase());
-      log.info(`Operations: ${activeOps.join(", ")}`);
-
-      if (metaSource && metaSource.unreachableRoles.length > 0) {
-        // No generated screen offers a multi-select, so nothing sends these requests. They are
-        // named here rather than left to be discovered as endpoints nobody calls.
-        log.warn(
-          `${entity}: the backend offers ${metaSource.unreachableRoles.join(", ")}, which no ` +
-          "generated screen reaches - a multi-select toolbar is written by hand.",
-        );
-      }
-
-      const skipped: string[] = [];
-      if (!ops.hasList) skipped.push("list (no list operation)");
-      if (!ops.hasCreate && !ops.hasUpdate) skipped.push("form (no create/update)");
-      if (!ops.hasGet) skipped.push("detail (no get operation)");
-      if (skipped.length > 0) {
-        log.info(`Skipped: ${skipped.join(", ")}`);
-      }
-
-      log.info("");
-      log.info("Generated files (FSD widgets/ layer):");
-      for (const fileName of Object.keys(files)) {
-        log.step(`${relativeOutput}/${fileName}`);
-      }
-      if (packageName) {
-        log.info("");
-        log.info(`Domain package: ${packageName}`);
-      }
-      log.info(`Fields detected: ${fields.map((f) => f.name).join(", ")}`);
-      log.info("");
-      log.info("FSD Architecture:");
-      log.step("packages/            → domain logic (schemas, hooks) - no UI");
-      log.step("modules/src/widgets/ → CRUD widgets");
-      log.step("modules/src/pages/   → page components (auto-generated)");
-      log.step("modules/src/shared/  → shared UI, lib, config");
-      log.info("");
-      log.info("Next: wire up routes in your app to use the generated pages");
-    } catch (err) {
-      spinner.fail(`Failed to scaffold CRUD for ${entity}`);
-      log.error(String(err));
-      process.exit(1);
+      treeDisplayFields = filteredFields;
     }
-  });
+
+    const hasTreeReorder = hasTree && !!hookUpdate && !!treeSortOrderField;
+    const hasTreeMove = hasTree && !!hookUpdate && !!treeParentIdField;
+    const updateMutationKey = updatePathParam ?? rowIdField;
+
+    // ── List/tree row DTO resolution (INV#30) ──
+    // The list row is the per-operation response DTO (e.g. CompanyListDTO),
+    // NOT the entity's detail modelType. Resolve from the snapshot by role and
+    // only emit a DTO import when we can both name the type AND import it.
+    const listOp =
+      extractedEntity?.operations?.find((o) => o.role === "list") ??
+      extractedEntity?.operations?.find((o) => o.role === "search");
+    const treeOp = extractedEntity?.operations?.find((o) => o.role === "tree");
+    const metaListRowType = metaSource?.listRowType ?? null;
+    const metaTreeRowType = metaSource?.treeRowType ?? null;
+    const listRowType = metaSource
+      ? (packageName && metaListRowType ? metaListRowType : null)
+      : packageName && listOp?.responseEntityType ? listOp.responseEntityType : null;
+    const treeRowType = metaSource
+      ? (packageName && metaTreeRowType ? metaTreeRowType : null)
+      : packageName && (treeOp?.responseEntityType ?? listOp?.responseEntityType)
+        ? (treeOp?.responseEntityType ?? listOp?.responseEntityType)
+        : null;
+
+    const entityPlural = `${entity}s`;
+    // Columns and card lines render the list row, so they are limited to what the list
+    // projection returns; the full set stays available to the form and detail templates.
+    const listDtoFields = metaSource
+      ? metaSource.rowProperties ?? null
+      : await readListDtoFieldNames(rootDir, listRowType);
+    // An enum column shows a translated label only if it can name its enum, and the row type
+    // is where that name is written. Fields the row type does not declare keep no name, so
+    // their badge falls back to the constant rather than asking for a key nothing defines.
+    const withEnumType = (f: FieldInfo) => {
+      if (f.component !== "Select") return f;
+      const declared = listDtoFields?.get(f.name)?.replace(/\[\]|\s|\|\s*null|\|\s*undefined/g, "");
+      return declared && /^[A-Z]\w*$/.test(declared) ? { ...f, enumTypeName: declared } : f;
+    };
+    // A plain field is left out of the columns because its `…I18n` twin renders it. A list
+    // projection that returns the resolved text and not the map leaves neither, so the row loses
+    // the column it is named by, and the table then shows everything about a record except
+    // which record it is.
+    // A row the contract states is drawn from its own DTO, which carries what the server derives
+    // for a row (a standing, a last-seen time, a referenced record's name) and no request body states.
+    // A field the request body also states keeps that definition, which carries its format.
+    const byName = new Map(fields.map((f) => [f.name, f]));
+    const projected = metaSource?.rowFields
+      ? metaSource.rowFields.map((f) => byName.get(f.name) ?? f)
+      : listDtoFields ? fields.filter((f) => listDtoFields.has(f.name)) : fields;
+    const projectedNames = new Set(projected.map((f) => f.name));
+    const listFields = projected
+      .map((f) => (f.isI18nPair && !projectedNames.has(`${f.name}I18n`) ? { ...f, isI18nPair: false } : f))
+      .map(withEnumType)
+      // The first column names the row and is the card's title on a phone, so the record's
+      // display name leads and the order of the rest is kept.
+      .sort((a, b) => Number(b.name === displayNameField) - Number(a.name === displayNameField));
+    // Each entity whose records point back at this one is a sub-list in the detail, forced to the
+    // open record's key. Its columns are the holder's own row fields, drawn as its list draws them.
+    const holders = [];
+    for (const holder of metaHolders) {
+      const holderList = holder.source.roles.list;
+      const holderPackage = (await findSchemaFile(rootDir, holder.entity))?.packageName ?? null;
+      if (!holderList || !holderPackage) continue;
+      const holderFields = withContractKinds(holder.source.rowFields ?? holder.source.fields, holder.source.rowIdField)
+        .filter((f) => f.name !== holder.field);
+      holders.push({
+        entity: holder.entity,
+        EntityPascal: holder.entity.charAt(0).toUpperCase() + holder.entity.slice(1),
+        key: `${holder.entity}By${holder.field.charAt(0).toUpperCase()}${holder.field.slice(1)}`,
+        hookList: toHookName(holderList),
+        // The holder's own list rule, so the tab asks only a reader the server will answer.
+        accessList: `${holderList}Access`,
+        packageName: holderPackage,
+        filterKey: `${holder.field}.${holder.operator}`,
+        rowIdField: holder.source.rowIdField,
+        fields: holderFields,
+      });
+    }
+    // The generated access rule of each operation a control leads to (`createJobPositionAccess`),
+    // which the domain barrel exports from SimpliX Meta. Absent where the domain is not on meta.
+    const accessOf = (opId: string | undefined) => (metaSource && opId ? `${opId}Access` : null);
+    const ctx = {
+      accessCreate: accessOf(roles?.create),
+      accessUpdate: accessOf(roles?.update),
+      accessOrder: accessOf(roles?.order as string | undefined),
+      accessDelete: accessOf(roles?.delete),
+      holders,
+      EntityPascal,
+      entityKebab,
+      entity,
+      entityPlural,
+      fields: withContractKinds(fields, rowIdField),
+      // A detail draws what the get route answers with, which holds what the server derives
+      // (a standing, a display name, a last-seen time) and no request body states.
+      detailFields: withContractKinds(metaSource?.detailFields ?? fields, rowIdField),
+      // The enum the detail header draws as the record's standing.
+      statusField: withContractKinds(metaSource?.detailFields ?? fields).find(
+        (f) => f.contractKind === "enum" && /(^|[a-z])(status|state|standing)$/i.test(f.name),
+      )?.name,
+      listFields: withContractKinds(listFields, rowIdField),
+      packageName,
+      listRowType,
+      treeRowType,
+      hookList,
+      hookGet,
+      hookGetForEdit,
+      hookCreate,
+      hookUpdate,
+      hookDelete,
+      hookOrder,
+      hookTree,
+      orderField,
+      updatePathParam,
+      updateMutationKey,
+      deletePathParam,
+      entityPath: metaSource?.entityPath ?? extractedEntity?.path ?? `/api/v1/${entity}`,
+      fieldNameList,
+      rowIdField,
+      // The detail panel names the two stamps outright, and a record that declares neither does
+      // not compile with them. Four of this application's detail DTOs are such records.
+      // Read off the fields the detail is drawn from: a create DTO never carries the stamps.
+      hasAuditFields:
+        (metaSource?.detailFields ?? fields).some((f) => f.name === "createdAt") &&
+        (metaSource?.detailFields ?? fields).some((f) => f.name === "updatedAt"),
+      hasList: ops.hasList,
+      hasForm: ops.hasCreate || ops.hasUpdate,
+      hasDetail: ops.hasGet,
+      hasCreate: ops.hasCreate,
+      hasUpdate: ops.hasUpdate,
+      hasDelete: ops.hasDelete,
+      hasTree,
+      hasTreeReorder,
+      hasTreeMove,
+      treeParentIdField,
+      treeSortOrderField,
+      displayNameField,
+      treeDisplayNameField,
+      treeSearchFields,
+      treeDisplayFields,
+      hasEnumFields,
+      hasDateFields,
+      hasBooleanFields,
+      hasTextareaFields,
+      filters: nonTextFilters,
+      contractFilters: contractFiltersOf(nonTextFilters, [...fields, ...(metaSource?.detailFields ?? [])]),
+      hasFilters: filterFields.length > 0,
+      filterBarDefs,
+      textFilterFields,
+      hasTextFilters: textFilterFields.length > 0,
+      firstTextField: textFilterFields[0]?.field ?? "",
+      firstTextDefaultOp: textFilterFields[0]?.defaultOperator ?? "CONTAINS",
+    };
+
+    // Resolve module namespace early (needed by tree/form templates)
+    const moduleNamespace = moduleDir ? await resolveModuleNamespace(moduleDir) : entity;
+    const hasListDetail = (hasTree || ctx.hasList) && ctx.hasDetail;
+    const moduleName = moduleDir ? basename(moduleDir) : entity;
+    // Detect i18n field presence and build pairs array for template
+    const i18nFieldPairs: { i18nFieldName: string; plainFieldName: string }[] = [];
+    for (const f of fields) {
+      if (f.baseFieldName !== null) {
+        i18nFieldPairs.push({ i18nFieldName: f.name, plainFieldName: f.baseFieldName });
+      }
+    }
+    const hasI18nFields = i18nFieldPairs.length > 0;
+    const projectConfig = await loadConfig(rootDir);
+    const i18nLocales = projectConfig.i18n?.locales ?? ["en", "ko", "ja"];
+    // Sample rows a generated story draws, shared through the context so the story template
+    // reads the same fields the screen templates do.
+    const fixtureRowsJson = JSON.stringify(fixtureRows([...ctx.detailFields, ...ctx.listFields], rowIdField, entityKebab), null, 2);
+    const fullCtx = { ...ctx, moduleNamespace, moduleName, entityIcon: "FileTextIcon", hasListDetail, hasI18nFields, i18nFieldPairs, i18nLocales, fixtureRowsJson };
+
+    // The project's own templates win where it has written any, for the widgets as for the pages.
+    const projectTemplates = await loadProjectTemplates(rootDir, projectConfig.templates?.from);
+    const files = renderWidgetFiles(ops, hasTree, fullCtx, projectTemplates);
+    // The arguments that lay these files down again, recorded after each fingerprint so the
+    // generated-state report can re-render them and tell an untouched file from a stale one.
+    const origin = moduleDir
+      ? `scaffold ${entityKebab} --module ${basename(moduleDir)}`
+      : `scaffold ${entityKebab} --output ${relativeOutput}`;
+    const widgetBlocks = renderWidgetBlocks(files, fullCtx, projectTemplates);
+
+    spinner.text = "Generating CRUD widgets...";
+
+    // What the screen's widget files hold once this run is done: a render this run wrote, or the
+    // author's file where it kept one. The module-level support files (dependencies, the subjects
+    // map, the widgets catalogue) are judged against this and never against a render that was
+    // thrown away, so an edited widget that no longer needs one cannot bring it back.
+    const held: string[] = [];
+    for (const [fileName, content] of Object.entries(files)) {
+      const filePath = join(outputDir, fileName);
+      // A widget whose template stamps it is rewritten while nobody has touched it, as a page is.
+      const stamped = content.includes(GENERATED_PAGE_MARKER) ? stampFingerprint(content, origin) : content;
+      if (stamped !== content) {
+        const outcome = await writeStampedGenerated(filePath, stamped);
+        if (outcome.outcome !== "written") log.warn(`${fileName}: ${outcome.outcome}`);
+        held.push(outcome.held);
+        continue;
+      }
+      if (await pathExists(filePath)) {
+        held.push(await readFile(filePath, "utf-8"));
+        log.warn(`Skipping ${fileName} - file already exists`);
+        continue;
+      }
+      await writeFileWithDir(filePath, stamped);
+      held.push(stamped);
+    }
+    for (const [fileName, content] of Object.entries(widgetBlocks)) {
+      const filePath = join(outputDir, fileName);
+      if (!(await pathExists(filePath))) {
+        await writeFileWithDir(filePath, content);
+        held.push(content);
+      } else {
+        noteKeptRender(filePath, content);
+        held.push(await readFile(filePath, "utf-8"));
+      }
+    }
+
+    // The design reference's frame for this screen, from the story template beside the page
+    // template, rendered with the same context. Tracked like a screen file: rewritten while
+    // untouched, kept once customised.
+    const storyTemplate = projectTemplates.get(STORY_TEMPLATE);
+    const storiesDir = projectConfig.templates?.storiesDir;
+    if (storyTemplate !== undefined && storiesDir) {
+      const storyPath = resolve(rootDir, storiesDir, `${entityKebab}.stories.tsx`);
+      const named = (pattern: string | undefined) => pattern?.replaceAll("{entity}", entityKebab).replaceAll("{Entity}", EntityPascal);
+      const storyCtx = { ...fullCtx, storyId: named(projectConfig.templates?.story?.id), storyTitle: named(projectConfig.templates?.story?.title) ?? `Generated/${EntityPascal}` };
+      const outcome = await writeGenerated(storyPath, renderTemplate(storyTemplate, storyCtx), origin);
+      log.info(`${outcome} story ${relative(rootDir, storyPath)}`);
+    }
+
+    if (moduleDir) {
+      // Auto-update widgets/index.ts with entity exports
+      await updateWidgetsIndex(moduleDir, entityKebab, fullCtx, files["index.ts"]);
+
+      // Pages generation (reuse i18nLocales loaded above)
+      const locales = i18nLocales;
+
+      const pages = await generatePages(moduleDir, entityKebab, fullCtx, projectTemplates, origin);
+      if (pages.written.length > 0) {
+        log.info(`Generated ${pages.written.length} page files`);
+      }
+      if (pages.empty.length > 0) {
+        // The widgets are on disk and are what they should be; what does not exist is a screen
+        // to reach them through. Saying so here is the difference between a scaffold a person
+        // finishes by hand and one they discover when the dev server cannot resolve the import.
+        const active = Object.entries(ops)
+          .filter(([, on]) => on)
+          .map(([role]) => role.replace("has", "").toLowerCase());
+        spinner.fail(`No page generated for ${EntityPascal}`);
+        log.error(
+          `${pages.empty.map((one) => `pages/${entityKebab}/${one}`).join(", ")} rendered ` +
+          `empty and was not written. A generated page is a list with a detail panel or a ` +
+          `creation hub, and ${entity} offers neither: its operations are ` +
+          `${active.length > 0 ? active.join(", ") : "none"}. The widgets in ` +
+          `${relativeOutput} are generated - write the page against them by hand, or give the ` +
+          `entity the get operation its detail panel reads.`,
+        );
+        process.exit(1);
+        return;
+      }
+
+      // Module-level updates
+      await updatePagesIndex(moduleDir, entityKebab, fullCtx);
+      await updateModuleIndex(moduleDir);
+
+      // Everything the module holds beside the screen's own files is judged against what the
+      // screen's files hold after this run (see `held`), and is touched only where it is missing.
+      const screenFiles = [...held, ...pages.onDisk];
+
+      // Dependencies the screen's files import and the module does not yet resolve.
+      const addedDeps = await ensureModuleDeps(moduleDir, packageName, await kitDependency(rootDir, projectConfig.templates?.from), screenFiles);
+      if (addedDeps.length > 0) {
+        log.info("Added dependencies:");
+        for (const dep of addedDeps) {
+          log.step(dep);
+        }
+      }
+
+      // The subjects map is laid down only for a file that imports it: a page gated on the
+      // generated access rules reads no hand-kept permission map, and a module that keeps its own
+      // elsewhere is not handed an empty second one.
+      if (screenFiles.some(importsSubjects)) {
+        await ensureSubjectsFile(moduleDir);
+      }
+
+      // The widgets catalogue is registered, and its files laid down, only where a file reads it:
+      // a registration naming files nobody wrote fails the module's translation load, and one
+      // nobody reads is an entry the author has to take out again after every run.
+      if (screenFiles.some((content) => readsWidgetsNamespace(content, moduleNamespace))) {
+        await ensureWidgetsLocaleFiles(moduleDir, locales);
+        await updateLocalesIndex(moduleDir, locales);
+      }
+      // The entity's default keys go into the catalogue only for a file that reads them. A file that
+      // reads the catalogue for keys of its own (`page.note`) leaves the entity's block out, and
+      // putting it in is a change to a file the author keeps.
+      if (screenFiles.some((content) => readsEntityKeys(content, entity))) {
+        await updateLocaleJsons(moduleDir, entity, EntityPascal, locales, ops, hasTree);
+      }
+      await ensureTsupPagesEntry(moduleDir);
+      await ensurePackageJsonPagesExport(moduleDir);
+    }
+
+    spinner.succeed(`CRUD widgets + pages generated for ${EntityPascal}`);
+
+    const activeOps = Object.entries(ops)
+      .filter(([, v]) => v)
+      .map(([k]) => k.replace("has", "").toLowerCase());
+    log.info(`Operations: ${activeOps.join(", ")}`);
+
+    if (metaSource && metaSource.unreachableRoles.length > 0) {
+      // No generated screen offers a multi-select, so nothing sends these requests. They are
+      // named here rather than left to be discovered as endpoints nobody calls.
+      log.warn(
+        `${entity}: the backend offers ${metaSource.unreachableRoles.join(", ")}, which no ` +
+        "generated screen reaches - a multi-select toolbar is written by hand.",
+      );
+    }
+
+    const skipped: string[] = [];
+    if (!ops.hasList) skipped.push("list (no list operation)");
+    if (!ops.hasCreate && !ops.hasUpdate) skipped.push("form (no create/update)");
+    if (!ops.hasGet) skipped.push("detail (no get operation)");
+    if (skipped.length > 0) {
+      log.info(`Skipped: ${skipped.join(", ")}`);
+    }
+
+    log.info("");
+    log.info("Generated files (FSD widgets/ layer):");
+    for (const fileName of Object.keys(files)) {
+      log.step(`${relativeOutput}/${fileName}`);
+    }
+    if (packageName) {
+      log.info("");
+      log.info(`Domain package: ${packageName}`);
+    }
+    log.info(`Fields detected: ${fields.map((f) => f.name).join(", ")}`);
+    log.info("");
+    log.info("FSD Architecture:");
+    log.step("packages/            → domain logic (schemas, hooks) - no UI");
+    log.step("modules/src/widgets/ → CRUD widgets");
+    log.step("modules/src/pages/   → page components (auto-generated)");
+    log.step("modules/src/shared/  → shared UI, lib, config");
+    log.info("");
+    log.info("Next: wire up routes in your app to use the generated pages");
+  } catch (err) {
+    spinner.fail(`Failed to scaffold CRUD for ${entity}`);
+    log.error(String(err));
+    process.exit(1);
+  }
+}

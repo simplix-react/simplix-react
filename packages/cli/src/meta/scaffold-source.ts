@@ -4,6 +4,7 @@ import {
   detectI18nFieldPairs,
   getDefaultValue,
   SYSTEM_FIELDS,
+  AUDIT_FIELDS,
   type EntityOperations,
   type FieldInfo,
   type FilterFieldInfo,
@@ -54,6 +55,10 @@ export interface MetaScaffoldSource {
   fieldSource?: FieldSource;
   /** Inherited fields first, own fields last — the order a generated column list follows. */
   fields: FieldInfo[];
+  /** The record a detail reads, from the DTO its get route answers with; absent when none is stated. */
+  detailFields?: FieldInfo[];
+  /** One list row, from the DTO the list route answers with, which holds what the server derives for a row; absent when none is stated. */
+  rowFields?: FieldInfo[];
   operations: EntityOperations;
   /** Role → the hook's name without its `use` prefix, the shape `crud.config.ts` records. */
   roles: CrudEntityConfig;
@@ -89,6 +94,9 @@ const COMMON_NAME_FIELDS = ["name", "title", "label", "displayName"];
 /** How long a `@Size(min = …)` has to be before a text field becomes a text area. */
 const TEXTAREA_MIN_LENGTH = 100;
 
+/** How long a `@Size(max = …)` has to allow before a text field becomes a text area: room for paragraphs. */
+const TEXTAREA_MAX_LENGTH = 500;
+
 /**
  * Read one entity out of the committed SimpliX Meta, or `null` when nothing states it.
  *
@@ -106,7 +114,10 @@ export async function loadMetaScaffoldSource(
   const config = await loadConfig(rootDir);
 
   for (const spec of config.openapi ?? []) {
-    const exported = new Set(spec.meta?.export ?? []);
+    // A config that names a meta source and no OpenAPI `spec` puts every domain on SimpliX Meta;
+    // `meta.export` narrows that only where the two halves are both declared.
+    const metaOnly = spec.meta !== undefined && spec.spec === undefined;
+    const exported = new Set(spec.meta?.export ?? (metaOnly ? Object.keys(spec.domains ?? {}) : []));
     if (exported.size === 0) continue;
 
     const naming = resolveSpecConfig(spec).naming;
@@ -130,6 +141,55 @@ export async function loadMetaScaffoldSource(
   }
 
   return null;
+}
+
+/** One entity whose records point back at the scaffolded one, as SimpliX Meta's `holders` state it. */
+export interface MetaHolderSource {
+  /** The holding entity as the contract names it (`userAccount`). */
+  entity: string;
+  /** The holder's field that carries the scaffolded record's key (`positionId`). */
+  field: string;
+  /** The search operator the forced narrowing uses, lower-case (`equals`). */
+  operator: string;
+  source: MetaScaffoldSource;
+}
+
+/**
+ * The entities that hold `entity`, each with the scaffold source its own list is drawn from.
+ *
+ * <p>A holder whose tag no exported domain carries, or whose search takes neither `EQUALS` nor
+ * `IN`, is left out: the sub-list could not be asked for.
+ */
+export async function loadMetaHolders(rootDir: string, entity: string): Promise<MetaHolderSource[]> {
+  const config = await loadConfig(rootDir);
+  for (const spec of config.openapi ?? []) {
+    const metaOnly = spec.meta !== undefined && spec.spec === undefined;
+    const exported = new Set(spec.meta?.export ?? (metaOnly ? Object.keys(spec.domains ?? {}) : []));
+    if (exported.size === 0) continue;
+    const naming = resolveSpecConfig(spec).naming;
+    if (!naming) continue;
+    const document = await readCommittedMeta(rootDir, spec);
+    if (!document) continue;
+    const pascal = entity.charAt(0).toUpperCase() + entity.slice(1);
+    const holders = document.entities?.[pascal]?.holders ?? [];
+    if (holders.length === 0) continue;
+    const containerTypes = spec.profile ? getSpecProfile(spec.profile)?.containerTypes : undefined;
+    const resolved = resolveMeta(document, { domains: spec.domains, containerTypes: containerTypes ?? {} });
+    const out: MetaHolderSource[] = [];
+    for (const holder of holders) {
+      const operator = holder.operators.includes("EQUALS") ? "equals" : holder.operators.includes("IN") ? "in" : undefined;
+      if (!operator) continue;
+      for (const domain of resolved.domains.values()) {
+        if (!exported.has(domain.name)) continue;
+        const tag = domain.entities.find((one) => one.tag.split(".").pop() === holder.entity)?.tag;
+        if (tag === undefined) continue;
+        out.push({ entity: entityNameOf(tag), field: holder.field, operator, source: buildMetaScaffoldSource({ domain, tag, naming }) });
+        break;
+      }
+    }
+    return out;
+  }
+  return [];
 }
 
 /**
@@ -208,9 +268,12 @@ export function buildMetaScaffoldSource(
   };
 
   if (chosen) source.fieldSource = { type: chosen.type.name, origin: chosen.origin };
+  const record = recordTypeOf(domain, targets);
+  if (record && scalarCount(record) > 0) source.detailFields = fieldInfos(domain, record, searchDto);
   if (listRow) source.listRowType = listRow.name;
   if (treeRow) source.treeRowType = treeRow.name;
   if (listRow) source.rowProperties = propertiesOf(listRow);
+  if (listRow && scalarCount(listRow) > 0) source.rowFields = fieldInfos(domain, listRow, searchDto);
 
   const display = displayNameOf(fields, rowIdField);
   if (display !== undefined) source.displayNameField = display;
@@ -367,11 +430,49 @@ function fieldInfos(
     if (shape.columnFormat !== undefined) one.columnFormat = shape.columnFormat;
     if (shape.columnDisplay !== undefined) one.columnDisplay = shape.columnDisplay;
     if (sortable) one.sortable = sortable.get(field.name) ?? false;
+    const alias = sortAliasOf(domain, searchDto, field.name);
+    if (alias) one.sortAlias = alias;
+    if (field.format === "code") one.isCode = true;
     fields.push(one);
+  }
+
+  // A key whose record also arrives nested beside it (`positionId` next to `position`) names that
+  // record, so the key is drawn by the nested record's name and opens it.
+  for (const one of fields) {
+    if (!one.isForeignKey || !one.fkEntityField) continue;
+    const nested = type.allFields.find((field) => field.name === one.fkEntityField);
+    const nestedType = nested ? typeOf(domain, nested.type) : undefined;
+    if (!nestedType) continue;
+    const name = referenceNameOf(nestedType);
+    if (!name) continue;
+    one.referenceNamePath = `${one.fkEntityField}.${name}`;
+    // The peek a reference opens is named after the referenced entity, which the nested DTO names
+    // with any `DTO` / `Dto` suffix removed.
+    const entityName = nestedType.name.replace(/(Detail|List)?(DTO|Dto)$/, "");
+    one.referencePeekKind = entityName.charAt(0).toLowerCase() + entityName.slice(1);
   }
 
   detectI18nFieldPairs(fields);
   return fields;
+}
+
+/**
+ * The field a nested record is named by: a common name field, then a field whose name ends in
+ * `Name`, then the first plain text field that is neither a key nor an audit stamp.
+ */
+function referenceNameOf(type: ResolvedType): string | undefined {
+  const text = type.allFields
+    .filter((field) => !AUDIT_FIELDS.includes(field.name) && !field.name.toLowerCase().endsWith("id"))
+    .filter((field) => {
+      const shape = shapeOf(field, NO_ENUM_VALUES);
+      return shape?.tsType === "string" && shape.columnFormat === undefined;
+    })
+    .map((field) => field.name);
+  return (
+    text.find((one) => COMMON_NAME_FIELDS.includes(one)) ??
+    text.find((one) => one.endsWith("Name")) ??
+    text[0]
+  );
 }
 
 /** What a field is rendered with, or `undefined` for one no scalar control can carry. */
@@ -489,7 +590,7 @@ function shapeOfRef(
 }
 
 /** A string long enough to be written in is written in a text area. */
-function stringShape(field: FieldMeta): FieldShape {
+export function stringShape(field: FieldMeta): FieldShape {
   for (const constraint of field.constraints ?? []) {
     if (constraint.kind === "email") return { ...textShape(), inputType: "email" };
     if (
@@ -497,6 +598,9 @@ function stringShape(field: FieldMeta): FieldShape {
       typeof constraint.value === "number" &&
       constraint.value >= TEXTAREA_MIN_LENGTH
     ) {
+      return { ...textShape(), formComponent: "TextareaField" };
+    }
+    if (constraint.kind === "maxLength" && typeof constraint.value === "number" && constraint.value >= TEXTAREA_MAX_LENGTH) {
       return { ...textShape(), formComponent: "TextareaField" };
     }
   }
@@ -614,6 +718,17 @@ function identifierOf(targets: EndpointTarget[], fields: FieldInfo[]): string {
 
 function lastPathParamOf(targets: EndpointTarget[], role: string): string | undefined {
   return targets.find((one) => one.role === role)?.operation.request.path.at(-1)?.name;
+}
+
+/**
+ * The per-language sort keys the search DTO names for `name` (`searchable.sortAlias`), when it
+ * names any. A translated name is not sortable itself; its alias for the reader's language is.
+ */
+function sortAliasOf(domain: ResolvedDomain, searchDto: string | undefined, name: string): Record<string, string> | undefined {
+  if (searchDto === undefined) return undefined;
+  const field = domain.types.get(searchDto)?.allFields.find((one) => one.name === name);
+  const alias = field?.searchable?.sortAlias;
+  return alias && Object.keys(alias).length > 0 ? { ...alias } : undefined;
 }
 
 /**

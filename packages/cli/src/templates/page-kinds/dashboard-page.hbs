@@ -1,0 +1,27 @@
+/**
+ * @simplix-generated page/dashboard-page
+ *
+ * A page of figures and panels. The panels go in `./page.blocks.tsx`; this file is rewritten on
+ * every run while its fingerprint matches.
+ */
+import { Container, Grid, Heading, Stack, Text } from "@simplix-react/ui";
+import { useTranslation } from "@simplix-react/i18n/react";
+
+import { usePageBlocks } from "./page.blocks";
+
+/** {{NamePascal}} - figures and panels. */
+export function {{NamePascal}}Page() {
+  const { t } = useTranslation("{{namespace}}");
+  const blocks = usePageBlocks();
+  return (
+    <Container size="full">
+      <Stack gap="md">
+        <Heading level={2}>{t("{{nameCamel}}.title")}</Heading>
+        <Text tone="muted">{t("{{nameCamel}}.description")}</Text>
+        <Grid columns={3} gap="md">
+          {blocks.panels}
+        </Grid>
+      </Stack>
+    </Container>
+  );
+}

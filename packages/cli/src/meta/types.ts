@@ -54,6 +54,8 @@ export interface SearchableMeta {
   sortable: boolean;
   entityField?: string;
   sortField?: string;
+  /** Locale → the field the list is ordered by when this one is sorted in that language. */
+  sortAlias?: Record<string, string>;
 }
 
 /** One serialized property of a DTO. `name` is the wire name after Jackson. */
@@ -67,6 +69,8 @@ export interface FieldMeta {
   label?: string;
   constraints?: ConstraintMeta[];
   searchable?: SearchableMeta;
+  /** How a screen draws the value beyond its type: `"code"` for a field marked `@CodeValue`. */
+  format?: string;
 }
 
 /**
@@ -136,10 +140,36 @@ export interface OperationMeta {
 }
 
 /** Root SimpliX Meta document served by `GET /dev/meta/dto`. */
+/** A record a field of another entity points back at this one through (an account's `positionId`). */
+export interface EntityHolderMeta {
+  entity: string;
+  field: string;
+  operators: string[];
+  searchOperation?: string;
+}
+
+/** What SimpliX Meta says about one entity beyond its DTOs: what it is called and who holds it. */
+export interface EntityMeta {
+  javaClass?: string;
+  idField?: string;
+  labelKey?: string;
+  pluralKey?: string;
+  /** Locale → the entity's name, singular. */
+  label?: Record<string, string>;
+  /** Locale → the entity's name, plural. */
+  plural?: Record<string, string>;
+  descriptionKey?: string;
+  /** Locale → one sentence saying what the screen over this entity is for (the page description). */
+  description?: Record<string, string>;
+  holders?: EntityHolderMeta[];
+}
+
 export interface DtoMeta {
   version: number;
   enums: Record<string, EnumMeta>;
   types: Record<string, TypeMeta>;
   operations: OperationMeta[];
+  /** Keyed by the entity's simple name, the last segment of its tag. */
+  entities?: Record<string, EntityMeta>;
   extensions?: Record<string, unknown>;
 }

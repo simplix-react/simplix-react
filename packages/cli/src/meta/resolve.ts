@@ -82,6 +82,17 @@ export interface ResolvedDomain {
 export interface UnmatchedTag {
   tag: string;
   operations: OperationMeta[];
+  /** The domain whose patterns share the longest prefix with the tag, or null where none shares one. */
+  closest: ClosestDomain | null;
+}
+
+/** The domain a tag no domain claims is nearest to, by the dot-separated prefix its patterns share. */
+export interface ClosestDomain {
+  domain: string;
+  /** The leading segments shared with the domain's patterns, e.g. `user.admin`. */
+  prefix: string;
+  /** How many of the domain's literal patterns share that prefix with the tag. */
+  patterns: number;
 }
 
 /** A configured pattern that matches no tag in the document — an entity that answers nothing. */
@@ -189,7 +200,7 @@ export function resolveMeta(meta: DtoMeta, options: ResolveMetaOptions): Resolve
 
   return {
     domains,
-    unmatched: collectUnmatched(operationsByTag, tagOwner),
+    unmatched: collectUnmatched(operationsByTag, tagOwner, domainEntries),
     deadPatterns: collectDeadPatterns(domainEntries, [...operationsByTag.keys()]),
     contestedTags: collectContestedTags(domainEntries, [...operationsByTag.keys()]),
     frameworkTypes: collectFrameworkTypes(domains),
@@ -232,10 +243,78 @@ function assignTagsToDomains(
 function collectUnmatched(
   operationsByTag: Map<string, OperationMeta[]>,
   tagOwner: Map<string, string>,
+  domainEntries: readonly [string, string[]][],
 ): UnmatchedTag[] {
   return [...operationsByTag.entries()]
     .filter(([tag]) => !tagOwner.has(tag))
-    .map(([tag, operations]) => ({ tag, operations }));
+    .map(([tag, operations]) => ({ tag, operations, closest: closestDomain(tag, domainEntries) }));
+}
+
+/** The fewest leading segments a tag must share with a domain's pattern for that domain to be named as its closest. */
+export const CLOSEST_DOMAIN_MIN_SEGMENTS = 2;
+
+/**
+ * A matcher for `meta.ignoreTags`: each pattern is a glob over the dot-separated tag, where `*`
+ * matches any run within one segment and `**` any run across segments. The whole tag must match.
+ */
+export function ignoredTagMatcher(patterns: readonly string[]): (tag: string) => boolean {
+  const regexes = patterns.map((pattern) => {
+    const body = pattern
+      .split("**")
+      .map((part) => part.split("*").map((text) => text.replace(/[.+?^${}()|[\]\\]/g, "\\$&")).join("[^.]*"))
+      .join(".*");
+    return new RegExp(`^${body}$`);
+  });
+  return (tag) => regexes.some((regex) => regex.test(tag));
+}
+
+/** How many leading dot-separated segments two names have in common. */
+function sharedSegments(left: readonly string[], right: readonly string[]): number {
+  let shared = 0;
+  while (shared < left.length && shared < right.length && left[shared] === right[shared]) shared += 1;
+  return shared;
+}
+
+/**
+ * The domain whose patterns share the longest leading run of dot-separated segments with `tag`.
+ *
+ * Only literal patterns are compared: a `/…/` pattern is a regular expression with no prefix to
+ * read, and one that matched the tag would have claimed it. Where two domains share a prefix of
+ * the same length, the one with more patterns under it is nearer, and then the one configured
+ * first. A tag that shares fewer than {@link CLOSEST_DOMAIN_MIN_SEGMENTS} leading segments with
+ * every pattern has no closest domain: one shared segment (`dev`, `public`) is a namespace many
+ * unrelated tags live under, not evidence of where this one belongs.
+ */
+export function closestDomain(tag: string, domains: readonly [string, string[]][]): ClosestDomain | null {
+  const segments = tag.split(".");
+  let best: { domain: string; depth: number; patterns: number } | null = null;
+  for (const [domain, patterns] of domains) {
+    let depth = 0;
+    let count = 0;
+    for (const pattern of patterns) {
+      if (/^\/.+\/$/.test(pattern)) continue;
+      const shared = sharedSegments(segments, pattern.split("."));
+      if (shared > depth) {
+        depth = shared;
+        count = 1;
+      } else if (shared === depth && shared > 0) {
+        count += 1;
+      }
+    }
+    if (depth < CLOSEST_DOMAIN_MIN_SEGMENTS) continue;
+    if (!best || depth > best.depth || (depth === best.depth && count > best.patterns)) {
+      best = { domain, depth, patterns: count };
+    }
+  }
+  return best ? { domain: best.domain, prefix: segments.slice(0, best.depth).join("."), patterns: best.patterns } : null;
+}
+
+/** The warning `simplix meta` prints for a tag no domain claims: the tag, what it costs, and where it likely belongs. */
+export function unclaimedTagMessage(one: UnmatchedTag): string {
+  const head = `Tag '${one.tag}' is claimed by no domain in simplix.config.ts, so its ${one.operations.length} operation(s) generate nothing.`;
+  if (!one.closest) return `${head} No domain pattern shares a prefix with it.`;
+  const { domain, prefix, patterns } = one.closest;
+  return `${head} Closest domain: "${domain}" (shares '${prefix}' with ${patterns} of its patterns); add '${one.tag}' to that domain.`;
 }
 
 function collectDeadPatterns(

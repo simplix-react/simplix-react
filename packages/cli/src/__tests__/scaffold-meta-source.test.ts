@@ -204,6 +204,38 @@ describe("what a template cannot know and SimpliX Meta states", () => {
     }
   });
 
+  it("sorts a translated name through the per-language key the search DTO names", () => {
+    // The fixture predates `sortAlias`, so the alias is stated on a copy of the document.
+    const copy: DtoMeta = JSON.parse(JSON.stringify(meta));
+    const search = Object.values(copy.types).find((type) =>
+      (type.fields ?? []).some((field) => field.name === "holidayName" && field.searchable),
+    );
+    const name = search?.fields?.find((field) => field.name === "holidayName");
+    expect(name?.searchable).toBeDefined();
+    if (name?.searchable) name.searchable.sortAlias = { en: "holidayNameSortEn", ko: "holidayNameSortKo" };
+    const domain = resolveMeta(copy, { domains: smartSafetyDomains, containerTypes }).domains.get("system");
+    if (!domain) throw new Error("the fixture has no system domain");
+    const source = buildMetaScaffoldSource({ domain, tag: "common.main.system.Holiday", naming: simplixBootNaming });
+    expect(source.fields.find((one) => one.name === "holidayName")?.sortAlias).toEqual({ en: "holidayNameSortEn", ko: "holidayNameSortKo" });
+    // Without an alias in the document, none is invented.
+    expect(holiday().fields.find((one) => one.name === "holidayName")?.sortAlias).toBeUndefined();
+  });
+
+  it("marks a field the contract formats as code, and no other", () => {
+    // The fixture predates `format`, so the mark is stated on a copy of the document.
+    const copy: DtoMeta = JSON.parse(JSON.stringify(meta));
+    for (const type of Object.values(copy.types)) {
+      for (const field of type.fields ?? []) if (field.name === "holidayName") field.format = "code";
+    }
+    const domain = resolveMeta(copy, { domains: smartSafetyDomains, containerTypes }).domains.get("system");
+    if (!domain) throw new Error("the fixture has no system domain");
+    const source = buildMetaScaffoldSource({ domain, tag: "common.main.system.Holiday", naming: simplixBootNaming });
+    expect(source.fields.find((one) => one.name === "holidayName")?.isCode).toBe(true);
+    expect(source.fields.filter((one) => one.isCode).map((one) => one.name)).toEqual(["holidayName"]);
+    // Without the format in the document, nothing is drawn as code.
+    expect(holiday().fields.some((one) => one.isCode)).toBe(false);
+  });
+
   it("offers a sort only where the backend implements one", () => {
     const fields = holiday().fields;
     const sortable = (name: string) => fields.find((one) => one.name === name)?.sortable;
@@ -291,6 +323,22 @@ describe("what a template cannot know and SimpliX Meta states", () => {
     expect(source.fields.map((one) => one.name)).toContain("holidayNameI18n");
     expect(source.rowProperties?.has("holidayNameI18n")).toBe(false);
     expect(source.rowProperties?.has("holidayName")).toBe(true);
+  });
+
+  it("draws a row from the list DTO, which states what no write body does", () => {
+    const withRows = everySource().filter((one) => one.listRowType && one.rowFields);
+    expect(withRows.length).toBeGreaterThan(0);
+    for (const source of withRows) {
+      // Every row field is a property the list DTO declares, and every scalar it declares is a row field.
+      const names = new Set(source.rowFields?.map((one) => one.name));
+      for (const name of names) expect(source.rowProperties?.has(name)).toBe(true);
+    }
+    // A field only the list answers with is a column the write body could never have produced.
+    const derived = withRows.some((source) => {
+      const written = new Set(source.fields.map((one) => one.name));
+      return source.rowFields?.some((one) => !written.has(one.name));
+    });
+    expect(derived).toBe(true);
   });
 });
 

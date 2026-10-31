@@ -17,6 +17,8 @@ import {
   type MetaContext,
   writeMetaSnapshot,
 } from "./openapi.js";
+import { writeEntityLabels } from "../meta/entity-labels.js";
+import { ignoredTagMatcher, unclaimedTagMessage } from "../meta/resolve.js";
 import { metaEntities, META_DIR, writeMetaOutput } from "../meta/write.js";
 import { resolveSpecConfig } from "../openapi/orchestration/resolve-spec-config.js";
 import { findProjectRoot, pathExists, writeFileWithDir } from "../utils/fs.js";
@@ -31,6 +33,7 @@ interface MetaFlags {
   domain?: string;
   offline?: boolean;
   force?: boolean;
+  strict?: boolean;
 }
 
 export const metaCommand = new Command("meta")
@@ -38,6 +41,7 @@ export const metaCommand = new Command("meta")
   .option("-d, --domain <name>", "Domain to generate (defaults to every configured domain)")
   .option("--offline", "Read SimpliX Meta from meta.snapshot instead of the server")
   .option("-f, --force", "Rewrite crud.config.ts even where one already exists")
+  .option("--strict", "Exit non-zero, generating nothing, when a tag in SimpliX Meta is claimed by no domain")
   .action(async (flags: MetaFlags) => {
     const rootDir = await findProjectRoot(process.cwd());
     if (!rootDir) {
@@ -83,11 +87,26 @@ export const metaCommand = new Command("meta")
       process.exit(1);
     }
 
-    for (const one of meta.resolved.unmatched) {
-      log.warn(`${one.operations.length} operation(s) under '${one.tag}' match no domain.`);
+    // A tag no domain claims generates nothing, so a new controller is invisible to the frontend
+    // until its tag is listed. Every one is named with the domain it most likely belongs to, except
+    // the tags `meta.ignoreTags` leaves unclaimed on purpose.
+    const ignored = ignoredTagMatcher(specConfig.meta.ignoreTags ?? []);
+    const unclaimed = meta.resolved.unmatched.filter((one) => !ignored(one.tag));
+    const skipped = meta.resolved.unmatched.length - unclaimed.length;
+    if (skipped > 0) log.info(`${skipped} unclaimed tag(s) skipped by meta.ignoreTags.`);
+    for (const one of unclaimed) {
+      log.warn(unclaimedTagMessage(one));
     }
     for (const one of meta.resolved.deadPatterns) {
       log.warn(`Domain "${one.domain}" pattern "${one.pattern}" matches no tag.`);
+    }
+    if (flags.strict === true && unclaimed.length > 0) {
+      // Refused before anything is written, so a failed run leaves the packages as they were.
+      log.error(
+        `--strict: ${unclaimed.length} tag(s) are claimed by no domain (${unclaimed.map((one) => one.tag).join(", ")}). ` +
+          "Nothing was generated; list each tag under a domain in simplix.config.ts, or under meta.ignoreTags.",
+      );
+      process.exit(1);
     }
 
     const wanted = flags.domain ? [flags.domain] : [...meta.resolved.domains.keys()];
@@ -138,6 +157,8 @@ export const metaCommand = new Command("meta")
         if (origin && downloader) {
           await overlayServerTranslations(targetDir, entities, locales, origin, downloader);
         }
+        // Last, so a server overlay that carries no entity names cannot drop the ones SimpliX Meta states.
+        await writeEntityLabels(targetDir, domain, meta.document, locales);
       }
 
       log.success(`${prefix ? `${prefix}/` : ""}${dirName}: wrote ${written.written.length} file(s) to ${META_DIR}/.`);

@@ -262,7 +262,7 @@ describe("every operation of a domain gets a handler, not only the CRUD roles", 
     expect(operations).toBe(621);
   });
 
-  it("answers the 138 operations whose role is none of the fourteen", () => {
+  it("answers the 139 operations whose role is none of the fourteen", () => {
     let outside = 0;
     for (const domain of resolved.domains.values()) {
       for (const entity of resolveEndpoints(domain, simplixBootNaming)) {
@@ -271,7 +271,7 @@ describe("every operation of a domain gets a handler, not only the CRUD roles", 
         }
       }
     }
-    expect(outside).toBe(138);
+    expect(outside).toBe(139);
 
     // A custom action carries no role the switch knows, and a route MSW does not answer is passed
     // through to a server that is not running.

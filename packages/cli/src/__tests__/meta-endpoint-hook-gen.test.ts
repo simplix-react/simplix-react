@@ -400,11 +400,11 @@ describe("generateEndpointFiles writes the request half", () => {
     expect(toQueryString(undefined)).toBe("");
   });
 
-  it("declares a name once where two operations resolve to it, and reports both", () => {
+  it("declares each name once where two operations resolve to one, and keeps both", () => {
     // `user.Avatar` serves the same read at `/{userId}-avatar-{size}.{ext}` and
-    // `/{userId}-avatar.{ext}`, and the strategy names both `getAllAvatars`. Emitting each
-    // declares the constant twice and the package stops compiling, so the later one is dropped
-    // and the report names every operation that wanted it.
+    // `/{userId}-avatar.{ext}`, and the strategy names both `getAllAvatars`. Emitting each under
+    // that name declares the constant twice and the package stops compiling, so the later one is
+    // named from its own operation id and both stay callable.
     const user = resolved.domains.get("user");
     const avatars = generateEndpointFiles(user!, { naming: simplixBootNaming });
     const module = avatars.files.get("endpoints/avatar.ts") ?? "";
@@ -421,8 +421,9 @@ describe("generateEndpointFiles writes the request half", () => {
       expect(ts.transpileModule(emitted, { reportDiagnostics: true }).diagnostics ?? []).toEqual([]);
     }
 
-    const clash = avatars.duplicateExports.find((one) => one.name === "getAllAvatars");
-    expect(clash?.operations.length).toBeGreaterThan(1);
+    expect(module).toContain("export const getAllAvatars");
+    expect(module).toContain("export const getAvatarAvatar");
+    expect(avatars.duplicateExports).toEqual([]);
   });
 
   it("names an entity the way the profile's strategy does, for every tag in the capture", () => {
@@ -469,20 +470,12 @@ describe("generateEndpointFiles writes the request half", () => {
 });
 
 describe("generateEndpointFiles says what it could not name once", () => {
-  it("reports a name two operations of one domain both take", () => {
+  it("reports nothing where one entity's operations collided and were named apart", () => {
     // `public.user.Avatar` serves the image and its thumbnail from paths whose parameters sit
     // inside a segment, and the strategy reads no action out of either: both resolve to
-    // `getAllAvatars`, which declares the same const twice.
+    // `getAllAvatars`. The later one takes its operation id's name, so no name is left to report.
     const user = generateEndpointFiles(domainOf("user"), { naming: simplixBootNaming });
-    expect(user.duplicateExports).toEqual([
-      {
-        name: "getAllAvatars",
-        operations: [
-          "PublicUserAvatarRest_getAvatarThumbnail",
-          "PublicUserAvatarRest_getAvatar",
-        ],
-      },
-    ]);
+    expect(user.duplicateExports).toEqual([]);
   });
 
   it("sends a file as a form body rather than as text in the query string", () => {
@@ -556,5 +549,50 @@ describe("both generators produce well-formed TypeScript", () => {
       "import type { ErrorType, customFetch } from '../../mutator';",
     );
     expect(organization).toContain("import {\n  useMutation,\n  useQuery,\n} from '@tanstack/react-query';");
+  });
+});
+
+describe("resolveEndpoints keeps every operation of an entity reachable", () => {
+  // A controller whose paths never spell its entity: the strategy reads all three GETs as the
+  // entity's base read, and only the first may keep that name.
+  const get = (method: string, path: string) => ({
+    id: `CurrentUserRest_${method}`,
+    method: "GET",
+    path,
+    tag: "CurrentUserRestController",
+    summary: method,
+    request: { query: [], path: [] },
+    response: { kind: "container", name: "SimpliXApiResponse", args: [] },
+    access: { kind: "authenticated" },
+  });
+  const domain = {
+    ...org,
+    entities: [
+      {
+        tag: "CurrentUserRestController",
+        operations: [
+          get("getCurrentUser", "/api/v1/user/me"),
+          get("getAvatar", "/api/v1/user/me/avatar"),
+          get("getNotificationCatalogue", "/api/v1/user/me/notification-catalogue"),
+        ],
+      },
+    ],
+  } as unknown as ResolvedDomain;
+
+  it("names a later operation from its own id rather than dropping it", () => {
+    const [entity] = resolveEndpoints(domain, simplixBootNaming);
+    expect(entity.targets.map((one) => [one.name, one.role])).toEqual([
+      ["getAllCurrentUsers", "getAll"],
+      ["getAvatarCurrentUser", "getAvatar"],
+      ["getNotificationCatalogueCurrentUser", "getNotificationCatalogue"],
+    ]);
+  });
+
+  it("writes a hook for each and reports no duplicate", () => {
+    const hooks = [...generateHookFiles(domain, { naming: simplixBootNaming }).files.values()].join("\n");
+    expect(hooks).toContain("export function useGetAllCurrentUsers");
+    expect(hooks).toContain("export function useGetAvatarCurrentUser");
+    expect(hooks).toContain("export function useGetNotificationCatalogueCurrentUser");
+    expect(generateEndpointFiles(domain, { naming: simplixBootNaming }).duplicateExports).toEqual([]);
   });
 });

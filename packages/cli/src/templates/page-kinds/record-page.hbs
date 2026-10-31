@@ -1,0 +1,25 @@
+/**
+ * @simplix-generated page/record-page
+ *
+ * One record shown on its own page, with no list beside it. What the page shows goes in
+ * `./page.blocks.tsx`; this file is rewritten on every run while its fingerprint matches.
+ */
+import { Container, Heading, Stack, Text } from "@simplix-react/ui";
+import { useTranslation } from "@simplix-react/i18n/react";
+
+import { usePageBlocks } from "./page.blocks";
+
+/** {{NamePascal}} - one record on its own page. */
+export function {{NamePascal}}Page() {
+  const { t } = useTranslation("{{namespace}}");
+  const blocks = usePageBlocks();
+  return (
+    <Container size="full">
+      <Stack gap="md">
+        <Heading level={2}>{t("{{nameCamel}}.title")}</Heading>
+        <Text tone="muted">{t("{{nameCamel}}.description")}</Text>
+        {blocks.body}
+      </Stack>
+    </Container>
+  );
+}

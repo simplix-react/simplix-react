@@ -1,0 +1,24 @@
+/**
+ * @simplix-generated page/static-page
+ *
+ * A page whose content is fixed: a sign-in hand-off, a notice, a legal page. The content goes in
+ * `./page.blocks.tsx`; this file is rewritten on every run while its fingerprint matches.
+ */
+import { Container, Heading, Stack } from "@simplix-react/ui";
+import { useTranslation } from "@simplix-react/i18n/react";
+
+import { usePageBlocks } from "./page.blocks";
+
+/** {{NamePascal}} - a page with fixed content. */
+export function {{NamePascal}}Page() {
+  const { t } = useTranslation("{{namespace}}");
+  const blocks = usePageBlocks();
+  return (
+    <Container size="md">
+      <Stack gap="md">
+        <Heading level={2}>{t("{{nameCamel}}.title")}</Heading>
+        {blocks.body}
+      </Stack>
+    </Container>
+  );
+}

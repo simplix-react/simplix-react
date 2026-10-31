@@ -97,6 +97,33 @@ export interface SimplixConfig {
     environments?: Record<string, SimplixHttpEnvironment>;
   };
 
+  /**
+   * Where the page and widget templates come from, beneath the project's own
+   * `.simplix/templates`.
+   *
+   * @remarks
+   * `from` names a UI kit package (resolved from the project root, then from the workspace's
+   * packages) or a directory path. The kit's `package.json` says where its templates are under
+   * `simplix.templates`; a path is read as the template directory itself. Without this setting the
+   * CLI looks for one dependency of the project root that declares `simplix.templates`.
+   */
+  templates?: {
+    from?: string;
+    /**
+     * Where generated Storybook stories are written, relative to the project root: the design
+     * reference's screens directory. A template with a `.stories` sibling (`list.stories.hbs`)
+     * renders one story per scaffolded entity there. Without it no story is generated.
+     */
+    storiesDir?: string;
+    /**
+     * The board story's id and title, as patterns over `{entity}` (kebab case) and `{Entity}`
+     * (Pascal case), so the design reference's own navigation can link to a generated frame
+     * (`{ id: "backoffice-{entity}", title: "Back office/{Entity}" }`). Absent, the story keeps
+     * Storybook's title-derived id under `Generated/{Entity}`.
+     */
+    story?: { readonly id?: string; readonly title?: string };
+  };
+
   /** Code generation options */
   codegen?: {
     /** Prepend auto-generated header comment to generated files (default: true) */
@@ -133,6 +160,12 @@ export interface OpenAPIMetaConfig {
   snapshot?: string;
   /** Domains whose barrel exports the meta output instead of the orval output. */
   export?: string[];
+  /**
+   * Tags no domain claims on purpose (a development controller, an API browser), as glob patterns
+   * over the dot-separated tag: `*` matches within one segment, `**` across segments. A tag matched
+   * here is neither warned about nor refused by `--strict`.
+   */
+  ignoreTags?: string[];
 }
 
 /** Per-spec OpenAPI configuration */

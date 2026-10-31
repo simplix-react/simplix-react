@@ -130,13 +130,62 @@ export function resolveEndpoints(
     }
     owners.set(file, resolved.tag);
 
-    const targets = resolved.operations.map((operation) =>
-      target(domain, operation, entity, naming),
+    const targets = withOwnNames(
+      domain,
+      entity,
+      naming,
+      resolved.operations.map((operation) => target(domain, operation, entity, naming)),
     );
     entities.push({ tag: resolved.tag, entity, file, targets });
   }
 
   return entities;
+}
+
+/**
+ * Give each operation of one entity a name of its own where the strategy gave two the same one.
+ *
+ * A strategy reads an operation from its path, and a controller whose paths never spell its
+ * entity - `CurrentUserRestController` at `/user/me`, `/user/me/avatar` and
+ * `/user/me/notification-catalogue` - has every GET read as the entity's base read. Keeping only
+ * the first would leave the others with no request function and no hook, so the route exists on
+ * the server and nothing in the package can call it. The first keeps the strategy's name; each
+ * later one is named from its own operation id (`CurrentUserRest_getNotificationCatalogue` →
+ * `getNotificationCatalogueCurrentUser`, role `getNotificationCatalogue`), which is the form the
+ * strategy gives a custom action. Where that name is taken too, the target keeps the strategy's
+ * and {@link dedupeByName} drops it, as before.
+ */
+function withOwnNames(
+  domain: ResolvedDomain,
+  entity: string,
+  naming: OpenApiNamingStrategy,
+  targets: EndpointTarget[],
+): EndpointTarget[] {
+  const taken = new Set(targets.map((one) => one.name));
+  const seen = new Set<string>();
+  const entityPascal = entity.charAt(0).toUpperCase() + entity.slice(1);
+  return targets.map((one) => {
+    if (!seen.has(one.name)) {
+      seen.add(one.name);
+      return one;
+    }
+    const own = ownAction(one.operation.id);
+    const name = `${own}${entityPascal}`;
+    if (!own || taken.has(name)) return one;
+    taken.add(name);
+    seen.add(name);
+    return target(domain, one.operation, entity, {
+      ...naming,
+      resolveOperation: () => ({ role: own, hookName: name }),
+    });
+  });
+}
+
+/** The method half of an operation id, `Controller_method` → `method`, in camel case. */
+function ownAction(operationId: string): string {
+  const method = operationId.slice(operationId.lastIndexOf("_") + 1).replace(/[^A-Za-z0-9]/g, "");
+  if (!/^[A-Za-z]/.test(method)) return "";
+  return method.charAt(0).toLowerCase() + method.slice(1);
 }
 
 /**
@@ -341,12 +390,11 @@ function collectDuplicateExports(
   naming: OpenApiNamingStrategy,
 ): DuplicateExport[] {
   const byName = new Map<string, string[]>();
-  // Resolved again without the deduplication, so the report names every operation that wanted the
-  // name rather than only the one that kept it.
-  for (const resolved of domain.entities) {
-    const entity = entityNameOf(resolved.tag);
-    for (const operation of resolved.operations) {
-      const one = target(domain, operation, entity, naming);
+  // Every target, before the deduplication, so the report names every operation that wanted the
+  // name rather than only the one that kept it. Names {@link withOwnNames} already separated are
+  // not reported: each of those operations has its own function and hook.
+  for (const resolved of resolveEndpoints(domain, naming)) {
+    for (const one of resolved.targets) {
       const held = byName.get(one.name);
       if (held) held.push(one.operation.id);
       else byName.set(one.name, [one.operation.id]);
