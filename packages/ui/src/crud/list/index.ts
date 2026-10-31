@@ -19,6 +19,8 @@ export type {
 } from "./crud-list";
 
 export { adaptOrvalList, SEARCHABLE_KEYWORD_PARAM } from "./adapt-orval-list";
+export { listSearchParams } from "./list-search-params";
+export type { ListSearchParamsOptions } from "./list-search-params";
 export type { OrvalListHookLike, AdaptOrvalListOptions } from "./adapt-orval-list";
 
 export { adaptOrvalGet } from "./adapt-orval-get";

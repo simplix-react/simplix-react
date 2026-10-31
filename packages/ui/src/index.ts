@@ -337,7 +337,8 @@ export type {
 } from "./crud/shared";
 
 // CRUD layout components
-export { adaptOrvalGet, adaptOrvalList, SEARCHABLE_KEYWORD_PARAM, CardList, CrudList, useCrudList, useKeyboardNav, useMediaQuery, useOrvalOptions, useServerSearchOptions } from "./crud/list";
+export { adaptOrvalGet, adaptOrvalList, listSearchParams, SEARCHABLE_KEYWORD_PARAM, CardList, CrudList, useCrudList, useKeyboardNav, useMediaQuery, useOrvalOptions, useServerSearchOptions } from "./crud/list";
+export type { ListSearchParamsOptions } from "./crud/list";
 export type {
   ActionType,
   ActionVariant,
