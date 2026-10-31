@@ -2463,6 +2463,9 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       hookOrder,
       hookTree,
       orderField,
+      // A list that reorders by drag owns the order: the form leaves the field out and a create
+      // sends the default, an edit the record's own.
+      formOrderField: hookOrder && orderField ? orderField : undefined,
       updatePathParam,
       updateMutationKey,
       deletePathParam,
