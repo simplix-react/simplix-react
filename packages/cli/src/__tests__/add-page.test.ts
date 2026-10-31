@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { PAGE_KINDS, pageStoryFile, parsePageKind, renderPageKind, renderPageKindStory } from "../commands/add-page.js";
+import { PAGE_KINDS, addPageArgs, pageStoryFile, parsePageKind, renderPageKind, renderPageKindStory } from "../commands/add-page.js";
 import { isUntouchedRender } from "../utils/project-templates.js";
 
 describe("add-page", () => {
@@ -43,6 +43,11 @@ describe("add-page", () => {
     expect(renderPageKindStory("app-shell", "portal", "common", templates, "portal", "top-bar")).toBe("bar frame Portal/Portal");
     expect(renderPageKindStory("app-shell", "portal", "common", templates, "portal")).toBeUndefined();
     expect(() => renderPageKind("app-shell", "portal", "common", new Map([["app-shell", "console"]]), undefined, "top-bar")).toThrow(/must supply app-shell.top-bar.hbs/);
+  });
+
+  it("reads an origin back with its owner and its variant", () => {
+    expect(addPageArgs("app-shell portal --app stagevoice-portal --variant top-bar".split(" "))).toEqual({ kind: "app-shell", name: "portal", flags: { app: "stagevoice-portal", variant: "top-bar" } });
+    expect(addPageArgs("static-page me --module shared/account".split(" "))).toEqual({ kind: "static-page", name: "me", flags: { module: "shared/account" } });
   });
 
   it("refuses the sign-in page when no kit or project template draws one", () => {

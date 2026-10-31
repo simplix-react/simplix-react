@@ -90,10 +90,8 @@ async function captureOrigin(origin: readonly string[]): Promise<Map<string, str
     return withSilentLog(() => captureWrites(() => runScaffold(entity, { module: flag("--module"), output: flag("--output"), quiet: true })));
   }
   if (command === "add-page") {
-    const { runAddPage } = await import("./add-page.js");
-    const [kind, name, ownerFlag, owner, variantFlag, variant] = args;
-    const shape = variantFlag === "--variant" && variant ? { variant } : {};
-    const flags = ownerFlag === "--module" ? { module: owner, ...shape } : { app: owner, ...shape };
+    const { addPageArgs, runAddPage } = await import("./add-page.js");
+    const { kind, name, flags } = addPageArgs(args);
     return withSilentLog(() => captureWrites(() => runAddPage(kind, name, flags)));
   }
   throw new Error(`Unknown origin "${origin.join(" ")}"`);
@@ -213,9 +211,9 @@ async function regenerateOrigins(rootDir: string): Promise<{ origins: string[]; 
       const at = (name: string) => (args.indexOf(name) >= 0 ? args[args.indexOf(name) + 1] : undefined);
       await runScaffold(args[0], { module: at("--module"), output: at("--output") });
     } else if (command === "add-page") {
-      const { runAddPage } = await import("./add-page.js");
-      const [kind, name, ownerFlag, owner] = args;
-      await runAddPage(kind, name, ownerFlag === "--module" ? { module: owner } : { app: owner });
+      const { addPageArgs, runAddPage } = await import("./add-page.js");
+      const { kind, name, flags } = addPageArgs(args);
+      await runAddPage(kind, name, flags);
     }
   }
   return { origins, writes: takeGeneratedOutcomes() };

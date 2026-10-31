@@ -87,6 +87,18 @@ export function pageStoryFile(name: string, flags: { module?: string; app?: stri
   return `${flags.app ? `${toKebabCase(flags.app)}-` : ""}${toKebabCase(name)}.stories.tsx`;
 }
 
+/**
+ * The kind, name and flags an `add-page` origin records (`<kind> <name> --module|--app <owner>
+ * [--variant <shape>]`), read back so a regeneration reproduces the same render.
+ */
+export function addPageArgs(args: readonly string[]): { kind: string; name: string; flags: { module?: string; app?: string; variant?: string } } {
+  const [kind = "", name = "", ownerFlag, owner] = args;
+  const at = args.indexOf("--variant");
+  const variant = at >= 0 ? args[at + 1] : undefined;
+  const flags = ownerFlag === "--module" ? { module: owner } : { app: owner };
+  return { kind, name, flags: variant ? { ...flags, variant } : flags };
+}
+
 export const addPageCommand = new Command("add-page")
   .description("Generate a page of one kind from the project's, the UI kit's or the bundled template")
   .argument("<kind>", `Page kind: ${PAGE_KINDS.join(", ")}`)
