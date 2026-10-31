@@ -16,6 +16,66 @@ function createMockWrapper(generators?: Record<string, () => unknown>, intervalM
   };
 }
 
+type ESEventListener = (event: MessageEvent | Event) => void;
+
+class MockEventSource {
+  static instances: MockEventSource[] = [];
+
+  url: string;
+  readyState = 1;
+  onerror: ((e: Event) => void) | null = null;
+  private eventListeners = new Map<string, Set<ESEventListener>>();
+
+  constructor(url: string) {
+    this.url = url;
+    MockEventSource.instances.push(this);
+  }
+
+  addEventListener(type: string, listener: ESEventListener) {
+    if (!this.eventListeners.has(type)) {
+      this.eventListeners.set(type, new Set());
+    }
+    this.eventListeners.get(type)!.add(listener);
+  }
+
+  removeEventListener(type: string, listener: ESEventListener) {
+    this.eventListeners.get(type)?.delete(listener);
+  }
+
+  close() {
+    this.readyState = 2;
+  }
+
+  __emit(type: string, data?: string) {
+    const listeners = this.eventListeners.get(type);
+    if (listeners) {
+      const event = data !== undefined
+        ? new MessageEvent(type, { data })
+        : new Event(type);
+      listeners.forEach((cb) => cb(event));
+    }
+  }
+
+  static reset() {
+    MockEventSource.instances = [];
+  }
+
+  static get latest(): MockEventSource | undefined {
+    return MockEventSource.instances[MockEventSource.instances.length - 1];
+  }
+}
+
+/** A provider on a (mocked) EventSource, so a test can drive heartbeats. */
+function createRealEsWrapper() {
+  return function Wrapper({ children }: { children: ReactNode }) {
+    return (
+      <StreamProvider heartbeatTimeoutMs={999_999} subscriptionSync={false}>
+        {children}
+      </StreamProvider>
+    );
+  };
+}
+
 describe("useStreamSubscription", () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -101,7 +161,7 @@ describe("useStreamSubscription", () => {
   it("throws when used outside StreamProvider", () => {
     expect(() => {
       renderHook(() => useStreamSubscription("test"));
-    }).toThrow("useStreamContext must be used within a StreamProvider");
+    }).toThrow("useStreamApi must be used within a StreamProvider");
   });
 
   it("respects subscribe=false option (does not register subscription)", () => {
@@ -146,6 +206,35 @@ describe("useStreamSubscription", () => {
 
     // The subscription was registered with params (verified indirectly by receiving data)
     expect(result.current).toEqual({ value: "hello" });
+  });
+
+  describe("on a live connection", () => {
+    let originalEventSource: typeof EventSource;
+
+    beforeEach(() => {
+      MockEventSource.reset();
+      originalEventSource = globalThis.EventSource;
+      globalThis.EventSource = MockEventSource as unknown as typeof EventSource;
+    });
+
+    afterEach(() => {
+      globalThis.EventSource = originalEventSource;
+    });
+
+    it("does not re-render its caller on heartbeats", () => {
+      let renders = 0;
+      renderHook(() => { renders += 1; useStreamSubscription("my-resource"); }, { wrapper: createRealEsWrapper() });
+      // Move the clock first: a heartbeat stamped with the mount time equals the initial state and renders nothing.
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+      const settled = renders;
+      act(() => {
+        MockEventSource.latest!.__emit("heartbeat");
+        vi.advanceTimersByTime(1100);
+      });
+      expect(renders).toBe(settled);
+    });
   });
 
   it("cleans up on unmount", () => {

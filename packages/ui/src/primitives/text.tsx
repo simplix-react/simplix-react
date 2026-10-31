@@ -43,17 +43,14 @@ export interface TextProps
  * ```
  */
 export const TextBase = forwardRef<HTMLParagraphElement, TextProps>(
-  ({ className, size, tone, font, as, children, ...rest }, ref) => {
+  ({ className, size, tone, font, weight, align, as, children, ...rest }, ref) => {
     const Tag = as ?? (font === "mono" ? "code" : "p");
     return (
       <Tag
         ref={ref as ComponentPropsWithRef<typeof Tag>["ref"]}
         className={className}
         {...(rest as ComponentPropsWithRef<ElementType>)}
-        // align and weight are declared but not drawn, and reach the element as attributes: the
-        // class-string form of this primitive never read them, and a <p align> still aligns.
-        // Drawing them changes the classic look, which is decided apart from the move to slots.
-        {...slotAttributes(textStyle, { size, tone, font })}
+        {...slotAttributes(textStyle, { size, tone, font, weight, align })}
       >
         {children}
       </Tag>

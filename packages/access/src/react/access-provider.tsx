@@ -35,8 +35,14 @@ export interface AuthLike {
  * Props for {@link AccessProvider}.
  */
 export interface AccessProviderProps extends PropsWithChildren {
-  /** The access policy instance to provide to the tree. */
-  policy: AccessPolicy;
+  /**
+   * The access policy instance to provide to the tree.
+   *
+   * @remarks
+   * Typed with `string` actions and subjects, as the context and hooks expose it,
+   * so a policy built over any action or subject union can be provided.
+   */
+  policy: AccessPolicy<string, string>;
   /**
    * Optional auth instance for automatic synchronization.
    *

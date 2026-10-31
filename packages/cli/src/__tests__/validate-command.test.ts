@@ -178,7 +178,7 @@ describe("validatePackageRules", () => {
     expect(result.warnings).toContain('Missing "type": "module" in package.json');
   });
 
-  it("warns when react dep exists but no peerDep", async () => {
+  it("warns when react sits in dependencies instead of peerDependencies", async () => {
     await writeFile(
       join(tempDir, "package.json"),
       JSON.stringify({ name: "test", type: "module", dependencies: { react: "^18.0.0" } }),
@@ -186,7 +186,9 @@ describe("validatePackageRules", () => {
 
     const result = makeResult();
     await validatePackageRules(tempDir, result);
-    expect(result.warnings).toContain("Uses react but missing react in peerDependencies");
+    expect(result.warnings).toContain(
+      "react in dependencies; a shared package takes it as a peer dependency",
+    );
   });
 
   it("auto-fixes missing type module", async () => {

@@ -1,0 +1,15 @@
+import { bearerScheme, createAuth, localStorageStore } from "@simplix-react/auth";
+
+const store = localStorageStore("{{kebabCase projectName}}:");
+
+// Sends the stored access token as a Bearer header on every request made
+// through auth.fetchFn. Add a `refresh` option to bearerScheme to renew it.
+export const auth = createAuth({
+  schemes: [
+    bearerScheme({
+      store,
+      token: () => store.get("access_token"),
+    }),
+  ],
+  store,
+});

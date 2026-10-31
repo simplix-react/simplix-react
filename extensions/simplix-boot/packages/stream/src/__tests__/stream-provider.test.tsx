@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { createElement, type ComponentProps, type ReactNode } from "react";
 
-import { StreamProvider, useStreamContext } from "../stream-provider";
+import { StreamProvider, useStreamApi, useStreamContext, useStreamStatus } from "../stream-provider";
 import type { StreamProtocol } from "../types";
 
 // ── Mock EventSource ──
@@ -107,6 +107,55 @@ describe("StreamProvider", () => {
 
       expect(result.current).toBeDefined();
       expect(result.current.connectionStatus).toBeDefined();
+    });
+  });
+
+  describe("narrow hooks", () => {
+    it("throw outside a StreamProvider naming the hook that was called", () => {
+      expect(() => renderHook(() => useStreamApi())).toThrow("useStreamApi must be used within a StreamProvider");
+      expect(() => renderHook(() => useStreamStatus())).toThrow("useStreamStatus must be used within a StreamProvider");
+    });
+
+    it("do not re-render their caller on heartbeats, while useStreamContext still does", () => {
+      let apiRenders = 0;
+      let statusRenders = 0;
+      let contextRenders = 0;
+      const wrapper = createWrapper();
+      renderHook(() => { apiRenders += 1; return useStreamApi(); }, { wrapper });
+      renderHook(() => { statusRenders += 1; return useStreamStatus(); }, { wrapper });
+      renderHook(() => { contextRenders += 1; return useStreamContext(); }, { wrapper });
+      // Move the clock first: a heartbeat stamped with the mount time equals the initial state and renders nothing.
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+      const settled = { api: apiRenders, status: statusRenders, context: contextRenders };
+
+      for (const es of MockEventSource.instances) {
+        act(() => {
+          es.__emit("heartbeat");
+        });
+      }
+      act(() => {
+        vi.advanceTimersByTime(1100);
+      });
+
+      expect(apiRenders).toBe(settled.api);
+      expect(statusRenders).toBe(settled.status);
+      expect(contextRenders).toBeGreaterThan(settled.context);
+    });
+
+    it("keep the subscribe functions by reference and hand a new status value when the connection moves", () => {
+      const { result: api, rerender: rerenderApi } = renderHook(() => useStreamApi(), { wrapper: createWrapper() });
+      const first = api.current;
+      rerenderApi();
+      expect(api.current).toBe(first);
+
+      const { result: status } = renderHook(() => useStreamStatus(), { wrapper: createWrapper() });
+      const before = status.current.connectionStatus;
+      act(() => {
+        MockEventSource.latest!.__triggerError();
+      });
+      expect(status.current.connectionStatus).not.toBe(before);
     });
   });
 

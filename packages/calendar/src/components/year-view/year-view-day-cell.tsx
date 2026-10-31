@@ -26,7 +26,7 @@ const MAX_INDICATORS = 3;
 export function YearViewDayCell({ day, date, items }: YearViewDayCellProps) {
   const { setSelectedDate } = useCalendarDate();
   const { setCurrentView } = useCalendarView();
-  const { onCellClick } = useCalendarData();
+  const { onCellClick, renderYearDayContent } = useCalendarData();
 
   const itemCount = items.length;
 
@@ -55,18 +55,21 @@ export function YearViewDayCell({ day, date, items }: YearViewDayCellProps) {
         {day}
       </div>
 
-      {itemCount > 0 && (
-        <div className="mt-0.5 flex gap-0.5">
-          {itemCount <= MAX_INDICATORS ? (
-            items.map((item) => <div key={item.id} className={cn("size-1.5 rounded-full", DOT_COLORS[item.color])} />)
-          ) : (
-            <>
-              <div className={cn("size-1.5 rounded-full", DOT_COLORS[items[0].color])} />
-              <span className="text-[7px] text-muted-foreground">+{itemCount - 1}</span>
-            </>
+      {/* The consumer slot replaces the indicator row outright, its own layout included. */}
+      {renderYearDayContent
+        ? renderYearDayContent(date, items)
+        : itemCount > 0 && (
+            <div className="mt-0.5 flex gap-0.5">
+              {itemCount <= MAX_INDICATORS ? (
+                items.map((item) => <div key={item.id} className={cn("size-1.5 rounded-full", DOT_COLORS[item.color])} />)
+              ) : (
+                <>
+                  <div className={cn("size-1.5 rounded-full", DOT_COLORS[items[0].color])} />
+                  <span className="text-[7px] text-muted-foreground">+{itemCount - 1}</span>
+                </>
+              )}
+            </div>
           )}
-        </div>
-      )}
     </button>
   );
 }

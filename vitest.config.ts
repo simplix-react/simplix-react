@@ -19,6 +19,11 @@ export default defineConfig({
     },
   ],
   test: {
+    // The generator suites transpile every emitted file of all 13 captured domains
+    // through the TypeScript compiler in one test — 2.5s to 7s each on an idle machine,
+    // and longer while the rest of the suite runs beside them. Vitest's 5s default cut
+    // them off mid-transpile; they assert syntax, never speed.
+    testTimeout: 30_000,
     projects: [
       "packages/!(cli)",
       {

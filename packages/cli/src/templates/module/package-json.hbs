@@ -4,26 +4,26 @@
   "description": "{{PascalName}} module for {{projectName}}",
   "type": "module",
   "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "./src/index.ts",
   "exports": {
     ".": {
       "source": "./src/index.ts",
-      "types": "./dist/index.d.ts",
+      "types": "./src/index.ts",
       "import": "./dist/index.js"
     },
     "./features": {
       "source": "./src/features/index.ts",
-      "types": "./dist/features/index.d.ts",
+      "types": "./src/features/index.ts",
       "import": "./dist/features/index.js"
     },
     "./widgets": {
       "source": "./src/widgets/index.ts",
-      "types": "./dist/widgets/index.d.ts",
+      "types": "./src/widgets/index.ts",
       "import": "./dist/widgets/index.js"
     }{{#if enableI18n}},
     "./locales": {
       "source": "./src/locales/index.ts",
-      "types": "./dist/locales/index.d.ts",
+      "types": "./src/locales/index.ts",
       "import": "./dist/locales/index.js"
     }{{/if}}
   },

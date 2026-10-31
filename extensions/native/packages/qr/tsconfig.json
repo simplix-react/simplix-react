@@ -1,4 +1,7 @@
 {
   "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "types": ["nativewind/types"]
+  },
   "include": ["src"]
 }

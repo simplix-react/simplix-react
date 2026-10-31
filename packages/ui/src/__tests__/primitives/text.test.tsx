@@ -97,6 +97,23 @@ describe("Text", () => {
     expect(screen.getByText("label text").tagName).toBe("LABEL");
   });
 
+  it("applies the weight it is given in place of the base weight", () => {
+    render(<Text data-testid="t" weight="semibold">heavy</Text>);
+    const el = screen.getByTestId("t");
+    expect(drawnClasses(el)).toContain("font-semibold");
+    // The base rule declares font-normal; the weight rule follows it in classic.css at the same
+    // specificity, so the drawn weight is the one the attribute names.
+    expect(el.getAttribute("data-weight")).toBe("semibold");
+    expect(el.hasAttribute("weight")).toBe(false);
+  });
+
+  it("applies the alignment it is given", () => {
+    render(<Text data-testid="t" align="center">centred</Text>);
+    const el = screen.getByTestId("t");
+    expect(drawnClasses(el)).toContain("text-center");
+    expect(el.hasAttribute("align")).toBe(false);
+  });
+
   it("merges custom className", () => {
     render(
       <Text data-testid="t" className="extra">

@@ -2,6 +2,7 @@ import { defineConfig } from "tsup";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { parse as parseYaml } from "yaml";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const packagesDir = join(__dirname, "..");
@@ -48,6 +49,7 @@ const CONSUMER_DEPS: Record<string, string> = {
   "@tanstack/react-form": "^1.28.5",
   "@tanstack/react-query": "^5.90.21",
   "@tanstack/react-router": "^1.167.4",
+  "@tanstack/router-cli": "^1.166.13",
   "@tanstack/router-plugin": "^1.166.13",
   "@types/react": "^19.2.14",
   "@types/react-dom": "^19.2.3",
@@ -59,6 +61,7 @@ const CONSUMER_DEPS: Record<string, string> = {
   "react-dom": "^19.2.4",
   "tailwindcss": "^4.2.1",
   "turbo": "^2.8.17",
+  "typescript": "^7.0.2",
   "vite": "^8.0.0",
   "vitest": "^4.1.0",
 };
@@ -69,8 +72,22 @@ for (const pkg of FRAMEWORK_PKGS) {
   Object.assign(depVersions, data.dependencies, data.devDependencies);
 }
 
+// Step 1b: resolve catalog references, which a generated project's catalog does not carry
+const catalog: Record<string, string> =
+  parseYaml(readFileSync(join(packagesDir, "..", "pnpm-workspace.yaml"), "utf-8")).catalog ?? {};
+
+for (const [name, version] of Object.entries(depVersions)) {
+  if (version !== "catalog:") continue;
+  if (!catalog[name]) throw new Error(`catalog has no entry for ${name}`);
+  depVersions[name] = catalog[name];
+}
+
 // Step 2: consumer deps override (specific versions for generated consumer projects)
 Object.assign(depVersions, CONSUMER_DEPS);
+
+// Expo apps stay on TypeScript 5: the Expo CLI reads tsconfig paths through the compiler API,
+// which TypeScript 7 does not ship. Templates read it as {{deps.typescriptExpo}}.
+depVersions["typescript-expo"] = "~5.9.3";
 
 // Step 3: remove internal packages and workspace refs
 for (const key of Object.keys(depVersions)) {

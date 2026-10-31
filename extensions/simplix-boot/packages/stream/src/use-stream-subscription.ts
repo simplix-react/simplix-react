@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useStreamContext } from "./stream-provider";
+import { useStreamApi } from "./stream-provider";
 import type { SubscriptionRequest } from "./types";
 
 // Registry keys must stay unique across every React root that shares the
@@ -40,7 +40,7 @@ export function useStreamSubscription<T = unknown>(
   options?: StreamSubscriptionOptions,
 ): T | null {
   const { params, subscribe: shouldSubscribe = true } = options ?? {};
-  const { addEventListener, registerSubscription, unregisterSubscription } = useStreamContext();
+  const { addEventListener, registerSubscription, unregisterSubscription } = useStreamApi();
   const [data, setData] = useState<T | null>(null);
   const idRef = useRef<string | null>(null);
   idRef.current ??= `stream-subscription:${++nextSubscriptionKey}`;

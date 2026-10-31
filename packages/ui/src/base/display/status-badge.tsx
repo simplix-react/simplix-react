@@ -1,4 +1,9 @@
-import { type ComponentPropsWithRef, type ReactNode, forwardRef } from "react";
+import {
+  type CSSProperties,
+  type ComponentPropsWithRef,
+  type ReactNode,
+  forwardRef,
+} from "react";
 
 import { type IconComponent, type StatusTone } from "../status-tone";
 import { useStatusTones } from "../status-tone-context";
@@ -17,7 +22,10 @@ export interface StatusBadgeProps
   icon?: IconComponent;
   /** Render a leading {@link StatusDot} of the same tone. */
   showDot?: boolean;
-  /** Animate the leading dot/icon (passes `animation="ping"` to the inner dot). */
+  /**
+   * Animate the badge. With a leading dot, the dot pings (`animation="ping"`); with a leading
+   * icon, the whole badge glows in its tone and keeps glowing for as long as it stands.
+   */
   pulse?: boolean;
   /** `filled` solid badge or `outline` bordered badge (default `outline`). */
   appearance?: "filled" | "outline";
@@ -32,7 +40,8 @@ export interface StatusBadgeProps
  * `appearance="filled"` uses the tone's soft filled background; `outline` draws
  * a tone-colored border over a transparent background. A leading icon adopts the
  * tone's standalone icon color in outline mode; a leading dot mirrors the tone
- * (and pulses when `pulse` is set).
+ * (and pulses when `pulse` is set). An icon has no ring of its own, so `pulse` with an icon glows
+ * the badge itself.
  *
  * @example
  * ```tsx
@@ -51,6 +60,7 @@ export const StatusBadge = forwardRef<HTMLSpanElement, StatusBadgeProps>(
       appearance = "outline",
       size = "sm",
       className,
+      style,
       ...rest
     },
     ref,
@@ -58,6 +68,15 @@ export const StatusBadge = forwardRef<HTMLSpanElement, StatusBadgeProps>(
     const token = useStatusTones()[tone];
     const appearanceClass = appearance === "filled" ? token.badge : token.outline;
     const iconTone = appearance === "outline" ? token.icon : undefined;
+    // The glow reads the tone's own color in each scheme (theme/base.css picks one by `.dark`).
+    const glow = Boolean(Icon) && pulse;
+    const glowStyle = glow
+      ? ({
+          "--status-glow-light": token.chart,
+          "--status-glow-dark": token.chartDark,
+          ...style,
+        } as CSSProperties)
+      : style;
 
     return (
       <span
@@ -65,8 +84,10 @@ export const StatusBadge = forwardRef<HTMLSpanElement, StatusBadgeProps>(
         className={cn(
           "inline-flex items-center justify-center whitespace-nowrap",
           appearanceClass,
+          glow && "animate-status-glow",
           className,
         )}
+        style={glowStyle}
         {...rest}
         {...slotAttributes(statusBadgeStyle, { size, appearance, tone })}
       >
