@@ -164,7 +164,11 @@ export function ComboboxField<T extends string = string>({
       {...variantProps}
     >
       {({ id, labelId }) => (
+        // Modal, so the search box holds its own focus scope: a non-modal popover portalled out of a
+        // dialog leaves focus to the dialog's trap, which pulls it back to the trigger on every press
+        // and closes the list, so a picker inside a dialog could never be searched.
         <Popover
+          modal
           open={open}
           onOpenChange={(v) => {
             if (disabled) return;
@@ -251,7 +255,12 @@ export function ComboboxField<T extends string = string>({
             flush
             className="w-[var(--radix-popover-trigger-width)]"
             align="start"
-            onOpenAutoFocus={(e) => e.preventDefault()}
+            // Opening puts the reader in the search box, so typing straight after the press narrows
+            // the list instead of landing on the trigger.
+            onOpenAutoFocus={(e) => {
+              e.preventDefault();
+              (e.currentTarget as HTMLElement | null)?.querySelector<HTMLInputElement>('input[type="search"]')?.focus();
+            }}
           >
             <Stack gap="none" {...partAttributes(comboboxPanelStyle, {})}>
               <Input
