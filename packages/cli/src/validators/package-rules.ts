@@ -12,11 +12,19 @@ import type { ValidationResult } from "../commands/validate.js";
  *   a package without building it
  * - tsup emits no declarations
  */
+/**
+ * The package checks `--fix` can be scoped to: `exports` repairs each entry's `source` and
+ * `types`, `dependencies` moves React to peers and sets `"type": "module"`, `tsup` drops `dts`.
+ */
+export type PackageFixCheck = "exports" | "dependencies" | "tsup";
+
 export async function validatePackageRules(
   pkgDir: string,
   result: ValidationResult,
-  options?: { fix?: boolean },
+  options?: { fix?: boolean; checks?: ReadonlySet<PackageFixCheck> },
 ): Promise<void> {
+  // Without a named set a fix covers every check here; `simplix validate` always names one.
+  const fixing = (check: PackageFixCheck) => options?.fix === true && (options.checks === undefined || options.checks.has(check));
   const pkgJsonPath = join(pkgDir, "package.json");
   if (!(await pathExists(pkgJsonPath))) return;
 
@@ -51,7 +59,7 @@ export async function validatePackageRules(
     (name) => (name in deps || (name === "react" && name in devDeps)) && !(name in peerDeps),
   );
   if (moving.length > 0 || needsPeer.length > 0) {
-    if (options?.fix) {
+    if (fixing("dependencies")) {
       for (const name of moving) {
         text = removeField(text, "dependencies", name);
         if (!(name in devDeps)) text = setField(text, "devDependencies", name, deps[name]);
@@ -77,7 +85,7 @@ export async function validatePackageRules(
   if (pkg["type"] === "module") {
     result.passes.push('"type": "module"');
   } else {
-    if (options?.fix) {
+    if (fixing("dependencies")) {
       text = setTopLevelType(text);
       result.passes.push('Auto-fixed: added "type": "module"');
     } else {
@@ -89,10 +97,10 @@ export async function validatePackageRules(
     await writeFile(pkgJsonPath, text, "utf-8");
   }
 
-  await validateEntrySources(pkgJsonPath, result, options);
-  await validateSourceTypes(pkgJsonPath, result, options);
+  await validateEntrySources(pkgJsonPath, result, { fix: fixing("exports") });
+  await validateSourceTypes(pkgJsonPath, result, { fix: fixing("exports") });
   if (await pathExists(tsupTs)) {
-    await validateTsupDeclarations(tsupTs, result, options);
+    await validateTsupDeclarations(tsupTs, result, { fix: fixing("tsup") });
   }
 }
 

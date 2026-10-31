@@ -236,7 +236,7 @@ simplix validate [options]
 
 | Option | Description | Default |
 | --- | --- | --- |
-| `--fix` | Auto-fix issues where possible | `false` |
+| `--fix [checks]` | Auto-fix the named checks, comma separated (`exports`, `dependencies`, `tsup`, `i18n`, `fsd`, `root`, `tsconfig`, `expo`, or `all`). A bare `--fix` repairs package exports only | off |
 
 **Example:**
 
@@ -244,8 +244,11 @@ simplix validate [options]
 # Validate only
 simplix validate
 
-# Validate and auto-fix
+# Repair package exports (each entry's `source` and `types`)
 simplix validate --fix
+
+# Also repair i18n keys and the workspace root (turbo.json, scripts, TypeScript catalog)
+simplix validate --fix exports,i18n,root
 ```
 
 **Validation rules:**
@@ -260,12 +263,13 @@ The validator applies different rule sets to packages and modules:
 | **Import** | modules/ | No cross-module direct imports (must use package exports) |
 | **i18n** | modules/ | Missing keys across locales, extra keys, empty values, interpolation variable (`{{var}}`) consistency |
 
-Auto-fixable issues (with `--fix`):
+Auto-fixable issues, by the check `--fix` names:
 
-- Missing `"type": "module"` in `package.json`
-- Missing React `peerDependencies`
-- Missing i18n keys (copies from reference locale)
-- Extra i18n keys (removes from target locale)
+- `exports`: an entry without `source`, and `types` that does not name the source
+- `dependencies`: missing `"type": "module"`, React not declared as a peer
+- `tsup`: `dts` in `tsup.config.ts`
+- `i18n`: missing keys (copied from the reference locale) and extra keys (removed). Plural keys follow each locale's CLDR categories, so a Korean catalogue holds only `_other`
+- `root`, `tsconfig`, `expo`: turbo.json, root scripts and the TypeScript catalog pin; `baseUrl`; an Expo app's TypeScript version
 
 **Output format:**
 

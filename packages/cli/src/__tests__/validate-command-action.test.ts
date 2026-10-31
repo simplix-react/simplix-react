@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { mkdtemp, rm, mkdir, writeFile } from "node:fs/promises";
+import { mkdtemp, rm, mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
@@ -13,6 +13,9 @@ vi.mock("../utils/logger.js", () => ({
     step: vi.fn(),
   },
 }));
+
+// Inject the globals tsup provides at build time; the root checks compare against them.
+(globalThis as Record<string, unknown>).__DEP_VERSIONS__ = { typescript: "^7.0.2", "typescript-expo": "~5.9.3" };
 
 let tempDir: string;
 let originalCwd: string;
@@ -125,21 +128,55 @@ describe("validateCommand action", () => {
     ).rejects.toThrow("process.exit(1)");
   });
 
-  it("supports --fix flag", async () => {
+  it("repairs package exports with a bare --fix and leaves versions, tsconfig, scripts and manifests alone", async () => {
     const { validateCommand } = await import("../commands/validate.js");
 
-    // Create a package with missing "type": "module"
+    const workspace = "packages:\n  - packages/*\ncatalog:\n  typescript: ^5.9.3\n";
+    const tsconfig = JSON.stringify({ compilerOptions: { baseUrl: ".", strict: true } }, null, 2);
+    const rootPkg = JSON.stringify({ name: "test-monorepo", scripts: { dev: "turbo run dev", build: "turbo run build" } }, null, 2);
+    await writeFile(join(tempDir, "pnpm-workspace.yaml"), workspace);
+    await writeFile(join(tempDir, "tsconfig.json"), tsconfig);
+    await writeFile(join(tempDir, "package.json"), rootPkg);
     const pkgDir = join(tempDir, "packages/fixable-pkg");
-    await mkdir(pkgDir, { recursive: true });
+    await mkdir(join(pkgDir, "src"), { recursive: true });
+    await writeFile(join(pkgDir, "src/index.ts"), "export {};\n");
+    await writeFile(join(pkgDir, "tsup.config.ts"), "export default { entry: [\"src/index.ts\"], dts: true };\n");
     await writeFile(
       join(pkgDir, "package.json"),
-      JSON.stringify({ name: "@test/fixable-pkg" }),
+      JSON.stringify({ name: "@test/fixable-pkg", exports: { ".": { types: "./dist/index.d.ts", import: "./dist/index.js" } } }, null, 2),
     );
 
-    await validateCommand.parseAsync(["node", "simplix", "--fix"]);
+    await validateCommand.parseAsync(["node", "simplix", "--fix"]).catch(() => undefined);
 
-    // After fix, the package.json should have "type": "module"
-    // (exact behavior depends on the validator, but the flag should be passed)
+    const pkg = JSON.parse(await readFile(join(pkgDir, "package.json"), "utf-8")) as {
+      type?: string;
+      exports: Record<string, { source?: string; types?: string }>;
+    };
+    expect(pkg.exports["."]).toMatchObject({ source: "./src/index.ts", types: "./src/index.ts" });
+    expect(pkg.type).toBeUndefined();
+    expect(await readFile(join(tempDir, "pnpm-workspace.yaml"), "utf-8")).toBe(workspace);
+    expect(await readFile(join(tempDir, "tsconfig.json"), "utf-8")).toBe(tsconfig);
+    expect(await readFile(join(tempDir, "package.json"), "utf-8")).toBe(rootPkg);
+    expect(await readFile(join(pkgDir, "tsup.config.ts"), "utf-8")).toContain("dts: true");
+  });
+
+  it("repairs only the checks --fix names", async () => {
+    const { validateCommand } = await import("../commands/validate.js");
+
+    const pkgDir = join(tempDir, "packages/fixable-pkg");
+    await mkdir(pkgDir, { recursive: true });
+    await writeFile(join(pkgDir, "package.json"), JSON.stringify({ name: "@test/fixable-pkg" }));
+
+    await validateCommand.parseAsync(["node", "simplix", "--fix", "dependencies"]).catch(() => undefined);
+
+    expect(JSON.parse(await readFile(join(pkgDir, "package.json"), "utf-8"))).toMatchObject({ type: "module" });
+  });
+
+  it("names the known checks when --fix is given an unknown one", async () => {
+    const { parseFixChecks } = await import("../commands/validate.js");
+    expect(() => parseFixChecks("exports,versions")).toThrow(/Unknown --fix check versions/);
+    expect(parseFixChecks(true)).toEqual(new Set(["exports"]));
+    expect(parseFixChecks("all").has("root")).toBe(true);
   });
 
   it("handles empty project (no packages, modules, or apps)", async () => {
