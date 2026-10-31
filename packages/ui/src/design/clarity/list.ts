@@ -55,8 +55,12 @@ export const listSlots: Record<string, string> = {
     "table-cell": "text-(length:--fs-cell) leading-(--lh-cell) [&:has(>input[type=checkbox])]:pl-3.5 [&:has(>input[type=checkbox])]:pr-0",
     "table-cell density=compact": "h-[46px] py-0",
     "crud-list-sort-button": "-ml-1.5 h-6 gap-1 rounded-[var(--radius-control)] px-1.5 font-(--fw-strong) transition-colors duration-[var(--dur-fast)] hover:bg-[var(--hover-bg-strong)] hover:text-foreground active:scale-[0.98]",
-    "crud-list-sort-icon": "ml-0 size-3 transition-opacity duration-[var(--dur-fast)]",
-    "crud-list-sort-icon sorted=false": "opacity-45 [button:hover>&]:opacity-90",
+    "crud-list-sort-icon": "ml-0 size-3 transition-colors duration-[var(--dur-fast)]",
+    // An unsorted column's arrow is drawn in a token ink, never faded: a fade multiplies the ink by an
+    // opacity, which leaves it under the 3:1 an icon needs on the table head. It takes the ink of the
+    // header text until the button is pointed at, then the strong ink. The opacity overrides name 100
+    // so the base's fade does not survive the merge.
+    "crud-list-sort-icon sorted=false": "opacity-100 text-muted-foreground [button:hover>&]:opacity-100 [button:hover>&]:text-foreground",
     "crud-list-sort-single": "hidden",
     "crud-list-sort-pair": "inline",
     // The row marks: hovered, selected, the open record (an accent rule at its start), the keyboard's row.

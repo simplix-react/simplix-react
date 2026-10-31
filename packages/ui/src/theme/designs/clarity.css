@@ -1832,13 +1832,13 @@
     @apply text-foreground;
   }
   [data-slot="crud-list-sort-icon"][data-slot][data-s-crud-list-sort-icon] {
-    @apply ml-0 size-3 transition-opacity duration-[var(--dur-fast)];
+    @apply ml-0 size-3 transition-colors duration-[var(--dur-fast)];
   }
   [data-slot="crud-list-sort-icon"][data-sorted="true"][data-s-crud-list-sort-icon] {
     @apply opacity-100;
   }
   [data-slot="crud-list-sort-icon"][data-sorted="false"][data-s-crud-list-sort-icon] {
-    @apply opacity-45;
+    @apply opacity-100 text-muted-foreground;
   }
   [data-slot="crud-list-sort-pair"][data-slot][data-s-crud-list-sort-pair] {
     @apply inline;
@@ -4702,7 +4702,7 @@
     @apply hover:bg-[var(--hover-bg-strong)] hover:text-foreground active:scale-[0.98];
   }
   :where([data-slot="crud-list-sort-icon"][data-sorted="false"])[data-s-crud-list-sort-icon] {
-    @apply [button:hover>&]:opacity-90;
+    @apply [button:hover>&]:opacity-100 [button:hover>&]:text-foreground;
   }
   :where([data-slot="crud-list-view"])[data-s-crud-list-view] {
     @apply [&:not(:has(table))]:p-2.5;
