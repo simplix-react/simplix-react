@@ -91,8 +91,9 @@ async function captureOrigin(origin: readonly string[]): Promise<Map<string, str
   }
   if (command === "add-page") {
     const { runAddPage } = await import("./add-page.js");
-    const [kind, name, ownerFlag, owner] = args;
-    const flags = ownerFlag === "--module" ? { module: owner } : { app: owner };
+    const [kind, name, ownerFlag, owner, variantFlag, variant] = args;
+    const shape = variantFlag === "--variant" && variant ? { variant } : {};
+    const flags = ownerFlag === "--module" ? { module: owner, ...shape } : { app: owner, ...shape };
     return withSilentLog(() => captureWrites(() => runAddPage(kind, name, flags)));
   }
   throw new Error(`Unknown origin "${origin.join(" ")}"`);

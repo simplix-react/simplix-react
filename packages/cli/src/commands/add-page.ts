@@ -44,13 +44,22 @@ export function parsePageKind(raw: string): PageKind {
   return kind;
 }
 
+/**
+ * The template name a kind draws from: `<kind>` itself, or `<kind>.<variant>` where the kit or the
+ * project ships another shape of the same kind (a shell with no menu column beside the console's).
+ */
+export function pageTemplateName(kind: PageKind, variant?: string): string {
+  return variant ? `${kind}.${toKebabCase(variant)}` : kind;
+}
+
 /** The files one page of `kind` renders to, keyed by their name inside the page's directory. */
-export function renderPageKind(kind: PageKind, name: string, namespace: string, templates: ProjectTemplates, origin?: string): Record<string, string> {
-  const bundled = BUNDLED[kind];
-  const source = templates.get(kind) ?? bundled;
-  if (source === undefined) throw new Error(`No template draws "${kind}": the UI kit or .simplix/templates must supply ${kind}.hbs`);
+export function renderPageKind(kind: PageKind, name: string, namespace: string, templates: ProjectTemplates, origin?: string, variant?: string): Record<string, string> {
+  const template = pageTemplateName(kind, variant);
+  // A variant is only ever the kit's or the project's, so it never falls back to the bundled shape.
+  const source = templates.get(template) ?? (variant ? undefined : BUNDLED[kind]);
+  if (source === undefined) throw new Error(`No template draws "${template}": the UI kit or .simplix/templates must supply ${template}.hbs`);
   const ctx = { NamePascal: toPascalCase(name), nameCamel: toCamelCase(name), nameKebab: toKebabCase(name), namespace, kind };
-  const blocks = templateFor(templates, `${kind}.blocks`, templateFor(templates, "page-kind.blocks", pageKindBlocksTemplate));
+  const blocks = templateFor(templates, `${template}.blocks`, templateFor(templates, "page-kind.blocks", pageKindBlocksTemplate));
   return { "page.tsx": stampFingerprint(renderTemplate(source, ctx), origin), "page.blocks.tsx": renderTemplate(blocks, ctx) };
 }
 
@@ -60,8 +69,8 @@ export function renderPageKind(kind: PageKind, name: string, namespace: string, 
  *
  * <p>Rendered with the page's own context, so the frame and the page start from one description.
  */
-export function renderPageKindStory(kind: PageKind, name: string, namespace: string, templates: ProjectTemplates, app?: string): string | undefined {
-  const source = templates.get(`${kind}.stories`);
+export function renderPageKindStory(kind: PageKind, name: string, namespace: string, templates: ProjectTemplates, app?: string, variant?: string): string | undefined {
+  const source = templates.get(`${pageTemplateName(kind, variant)}.stories`);
   if (source === undefined) return undefined;
   // `storyTitle` carries the owning app for the same reason the file name does: two apps' pages of
   // one name would otherwise be one story id on the board.
@@ -84,6 +93,7 @@ export const addPageCommand = new Command("add-page")
   .argument("<name>", "Page name (e.g. my-profile, home, not-found)")
   .option("--module <name>", "Module that owns the page (modules/<name>/src/pages/<page>); a grouped module is <group>/<name>")
   .option("--app <name>", "App that owns the page (apps/<name>/src/pages/<page>)")
+  .option("--variant <name>", "Another shape of the kind, drawn from <kind>.<variant>.hbs (e.g. app-shell --variant top-bar)")
   .action(reportConfigError(runAddPage));
 
 /**
@@ -91,7 +101,7 @@ export const addPageCommand = new Command("add-page")
  *
  * <p>Exported so the generated-state report can run the same render in capture mode.
  */
-export async function runAddPage(rawKind: string, name: string, flags: { module?: string; app?: string }): Promise<void> {
+export async function runAddPage(rawKind: string, name: string, flags: { module?: string; app?: string; variant?: string }): Promise<void> {
     const rootDir = await findProjectRoot(process.cwd());
     const kind = parsePageKind(rawKind);
     if (Boolean(flags.module) === Boolean(flags.app)) {
@@ -106,8 +116,9 @@ export async function runAddPage(rawKind: string, name: string, flags: { module?
     // The module's i18n namespace is its package name, which a grouped module spells with its group.
     const namespace = module ? `${await resolveModuleNamespace(owner)}/pages` : "common";
     const dir = kind === "app-shell" ? join(owner, "src", "app", "layouts") : join(owner, "src", "pages", toKebabCase(name));
-    const origin = `add-page ${kind} ${toKebabCase(name)} ${module ? `--module ${module.path}` : `--app ${flags.app}`}`;
-    for (const [file, content] of Object.entries(renderPageKind(kind, name, namespace, templates, origin))) {
+    const variant = flags.variant ? toKebabCase(flags.variant) : undefined;
+    const origin = `add-page ${kind} ${toKebabCase(name)} ${module ? `--module ${module.path}` : `--app ${flags.app}`}${variant ? ` --variant ${variant}` : ""}`;
+    for (const [file, content] of Object.entries(renderPageKind(kind, name, namespace, templates, origin, variant))) {
       const path = join(dir, kind === "app-shell" && file === "page.tsx" ? "root-layout.tsx" : kind === "app-shell" ? "root-layout.blocks.tsx" : file);
       // The blocks are the author's and written once; the page is rewritten while untouched and
       // merged into once edited.
@@ -128,7 +139,7 @@ export async function runAddPage(rawKind: string, name: string, flags: { module?
     if (module && kind !== "app-shell") await ensurePageEntrypoints(owner, toKebabCase(name), `${toPascalCase(name)}Page`);
     // The design reference's frame, tracked like the page: rewritten while untouched, kept once
     // customised.
-    const story = renderPageKindStory(kind, name, namespace, templates, flags.app);
+    const story = renderPageKindStory(kind, name, namespace, templates, flags.app, variant);
     const storiesDir = config.templates?.storiesDir;
     if (story !== undefined && storiesDir) {
       const fallback = pageStoryFile(name, flags);

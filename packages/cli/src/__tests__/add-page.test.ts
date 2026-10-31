@@ -30,6 +30,21 @@ describe("add-page", () => {
     expect(renderPageKind("app-shell", "admin", "common", new Map([["app-shell", "shell {{NamePascal}}"]]))["page.tsx"]).toContain("shell Admin");
   });
 
+  it("draws a variant of a kind from its own templates, and never from the plain kind's", () => {
+    const templates = new Map([
+      ["app-shell", "console {{NamePascal}}"],
+      ["app-shell.top-bar", "bar {{NamePascal}}"],
+      ["app-shell.top-bar.blocks", "bar blocks"],
+      ["app-shell.top-bar.stories", "bar frame {{storyTitle}}"],
+    ]);
+    const files = renderPageKind("app-shell", "portal", "common", templates, undefined, "top-bar");
+    expect(files["page.tsx"]).toContain("bar Portal");
+    expect(files["page.blocks.tsx"]).toBe("bar blocks");
+    expect(renderPageKindStory("app-shell", "portal", "common", templates, "portal", "top-bar")).toBe("bar frame Portal/Portal");
+    expect(renderPageKindStory("app-shell", "portal", "common", templates, "portal")).toBeUndefined();
+    expect(() => renderPageKind("app-shell", "portal", "common", new Map([["app-shell", "console"]]), undefined, "top-bar")).toThrow(/must supply app-shell.top-bar.hbs/);
+  });
+
   it("refuses the sign-in page when no kit or project template draws one", () => {
     expect(parsePageKind("auth")).toBe("auth-page");
     expect(() => renderPageKind("auth-page", "sign-in", "common", new Map())).toThrow(/must supply auth-page.hbs/);
