@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { detectI18nFieldPairs, orderAndCategorizeFields, importsSubjects, readsWidgetsNamespace, resolvesFrom, withContractKinds, type FieldInfo } from "../commands/scaffold-crud.js";
+import { detectI18nFieldPairs, orderAndCategorizeFields, projectRowFields, importsSubjects, readsWidgetsNamespace, resolvesFrom, withContractKinds, type FieldInfo } from "../commands/scaffold-crud.js";
 import { stringShape } from "../meta/scaffold-source.js";
 
 function field(name: string, tsType = "string"): FieldInfo {
@@ -53,6 +53,13 @@ describe("a relation in a list", () => {
   it("opens the peek the project names for its stem", () => {
     const out = withContractKinds([field("accountId"), field("ownerId"), field("ownerName")], "accountId", { owner: "userAccount" });
     expect(out.find((f) => f.name === "ownerId")?.peekKind).toBe("userAccount");
+  });
+
+  it("keeps the row's nested reference where the request body states the same key as text", () => {
+    const stated = orderAndCategorizeFields([field("accountId"), field("positionId")]);
+    const row = [field("accountId"), { ...field("positionId"), referenceNamePath: "position.positionName", referencePeekKind: "jobPosition" }];
+    const out = withContractKinds(projectRowFields(row, new Map(stated.map((f) => [f.name, f]))), "accountId");
+    expect(out.find((f) => f.name === "positionId")).toMatchObject({ contractKind: "reference", peekKind: "jobPosition", nameField: "position.positionName", hideInList: false });
   });
 
   it("stays hidden while it is a bare key with no name beside it", () => {

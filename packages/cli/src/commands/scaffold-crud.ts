@@ -223,6 +223,18 @@ function stampContractKind(
   }
 }
 
+/**
+ * The list row's fields, each taking the definition the request body states where it states one.
+ * The row alone names a reference by its nested record, so the row's reading of a reference wins.
+ */
+export function projectRowFields(rowFields: readonly FieldInfo[], stated: ReadonlyMap<string, FieldInfo>): FieldInfo[] {
+  return rowFields.map((f) => {
+    const one = stated.get(f.name);
+    if (!one) return f;
+    return f.referenceNamePath ? { ...one, referenceNamePath: f.referenceNamePath, referencePeekKind: f.referencePeekKind } : one;
+  });
+}
+
 /** Fields that exist in the data model but should not be displayed or edited by users. */
 export const SYSTEM_FIELDS = ["id", "displayOrder", "sortOrder"];
 
@@ -2334,7 +2346,7 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     // A field the request body also states keeps that definition, which carries its format.
     const byName = new Map(fields.map((f) => [f.name, f]));
     const projected = metaSource?.rowFields
-      ? metaSource.rowFields.map((f) => byName.get(f.name) ?? f)
+      ? projectRowFields(metaSource.rowFields, byName)
       : listDtoFields ? fields.filter((f) => listDtoFields.has(f.name)) : fields;
     const projectedNames = new Set(projected.map((f) => f.name));
     const listFields = projected
