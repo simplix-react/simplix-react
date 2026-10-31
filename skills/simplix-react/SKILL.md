@@ -1,23 +1,25 @@
 ---
 name: simplix-react
-description: Package-first React framework that derives a type-safe client, React Query hooks, TanStack Form hooks, and MSW mocks from one Zod/OpenAPI contract per domain. Use this skill whenever working in a simplix-react repo — recognizable by a `simplix.config.ts` at the root or packages scoped `@simplix-react/*` / `@simplix-react-ext/*`. Triggers include defining or editing contracts with `defineApi`, deriving hooks via `deriveEntityHooks` / `deriveEntityFormHooks`, wiring MSW mocks, configuring `simplix.config.ts`, running the `simplix` CLI, or writing tests with `@simplix-react/testing`. ALWAYS consult this skill before hand-writing fetch / React Query / form code, or before manually creating a new domain, module, or package — simplix-react is framework-first and requires CLI scaffolding (`simplix init` / `add-domain` / `add-module` / `openapi` / `scaffold`) plus OpenAPI codegen, package/module (FSD) separation, and contract-driven derivation rather than hand-rolled files.
+description: Package-first React framework that derives a type-safe client, React Query hooks, TanStack Form hooks, and MSW mocks from one Zod/OpenAPI contract per domain. Use this skill whenever working in a simplix-react repo - recognizable by a `simplix.config.ts` at the root or packages scoped `@simplix-react/*` / `@simplix-react-ext/*`. Triggers include defining or editing contracts with `defineApi`, deriving hooks via `deriveEntityHooks` / `deriveEntityFormHooks`, wiring MSW mocks, configuring `simplix.config.ts`, running the `simplix` CLI, or writing tests with `@simplix-react/testing`. ALWAYS consult this skill before hand-writing fetch / React Query / form code, or before manually creating a new domain, module, or package - simplix-react is framework-first and requires CLI scaffolding (`simplix init` / `add-domain` / `add-module` / `openapi` / `scaffold`) plus OpenAPI codegen, package/module (FSD) separation, and contract-driven derivation rather than hand-rolled files.
 ---
 
 # simplix-react
 
 > Define once. Derive everything.
 
-You author ONE contract per domain — Zod schemas plus an `operations` map, usually generated from an OpenAPI spec — and the framework DERIVES the type-safe client, TanStack Query hooks, TanStack Form hooks, and MSW mock handlers from it. Generated domain code lives in reusable `packages/`; feature/UI code lives in Feature-Sliced Design (FSD) `modules/`.
+You author ONE contract per domain - Zod schemas plus an `operations` map, usually generated from an OpenAPI spec - and the framework DERIVES the type-safe client, TanStack Query hooks, TanStack Form hooks, and MSW mock handlers from it. Generated domain code lives in reusable `packages/`; feature/UI code lives in Feature-Sliced Design (FSD) `modules/`.
 
 ## Work the framework's way (read first)
 
-Three rules govern every change. They exist because simplix-react's value is a single source of truth — the contract. Bypassing it forks that source and the derivation silently drifts.
+Three rules govern every change. They exist because simplix-react's value is a single source of truth - the contract. Bypassing it forks that source and the derivation silently drifts.
 
-1. **Framework-first — derive, don't hand-roll.** Need fetching, caching, a form, or a mock for something the contract describes? Derive it (`deriveEntityHooks`, `deriveEntityFormHooks`, `deriveMockHandlers`). Do not write bespoke `fetch` / `useQuery` / form state for it. Extend through the seams (`options.fetchFn`, `createFetch`, `customizeApi`), not by rewriting derived output.
+1. **Framework-first - derive, don't hand-roll.** Need fetching, caching, a form, or a mock for something the contract describes? Derive it (`deriveEntityHooks`, `deriveEntityFormHooks`, `deriveMockHandlers`). Do not write bespoke `fetch` / `useQuery` / form state for it. Extend through the seams (`options.fetchFn`, `createFetch`, `customizeApi`), not by rewriting derived output.
 
-2. **Package-first & module separation.** Reusable, contract-derived code (contracts, schemas, hooks, mocks) belongs in `packages/` — never copied into an app. Feature/UI code belongs in FSD `modules/` and obeys the layer rule `features/ → widgets/ → shared/`: `features/` must not import from `widgets/`, and `shared/` must not import from `features/` or `widgets/`. `simplix validate` enforces this.
+2. **Package-first & module separation.** Reusable, contract-derived code (contracts, schemas, hooks, mocks) belongs in `packages/` - never copied into an app. Feature/UI code belongs in FSD `modules/` and obeys the layer rule `features/ → widgets/ → shared/`: `features/` must not import from `widgets/`, and `shared/` must not import from `features/` or `widgets/`. `simplix validate` enforces this.
 
-3. **CLI + OpenAPI codegen first — scaffold, don't hand-create.** Generate new projects, domains, modules, and CRUD UI with the `simplix` CLI rather than authoring files by hand. When an OpenAPI spec exists, generation is the source of truth — refine with `customizeApi`, never by editing generated files.
+3. **CLI + OpenAPI codegen first - scaffold, don't hand-create.** Generate new projects, domains, modules, and CRUD UI with the `simplix` CLI rather than authoring files by hand. When an OpenAPI spec exists, generation is the source of truth - refine with `customizeApi`, never by editing generated files.
+
+4. **Every screen follows four fixed steps, and an existing screen is rewritten through them, never patched toward them.** (1) Write the template on the UI kit, which ships its templates next to the parts they wire; a project's `.simplix/templates/*.hbs` overrides one only for what is specific to that project. (2) Scaffold the screen with the `simplix` CLI from those templates. (3) Customise the scaffolded screen to the design reference (a Storybook board, where one exists); an edited file is no longer rewritten and the generated-state report lists it. (4) Bring the reference into agreement with the result, generating its frame from the kit's Storybook template where none exists (a generated story may be customised and is tracked like a screen file), and measure the agreement rather than judging it by eye. A part more than one screen needs goes into the kit, then into its template, never into one screen. A screen the CLI cannot generate is a generator gap to close generically, not a reason to hand-build it. Details: [CLI & Scaffolding Workflow](./references/cli-workflow.md#workflow-a-screen-from-kit-templates). A change asked for on one screen is lifted once it works there: into the template, then the kit, then the framework, whichever is the first that owns it. Every screen it reaches is then found, regenerated or fixed, and checked.
 
 ### "I need to…" → do this
 
@@ -27,14 +29,15 @@ Three rules govern every change. They exist because simplix-react's value is a s
 | Add a domain from an API spec | `simplix openapi <spec>` | hand-write contract + schemas |
 | Add a domain by hand | `simplix add-domain <name>`, then fill `operations` | put a contract inside an app |
 | Add a feature module | `simplix add-module <name>` | put features in `packages/` |
-| Generate CRUD UI for an entity | `simplix scaffold <entity>` | hand-build list/form/detail |
+| Generate CRUD UI for an entity | `simplix scaffold <entity>`, from the UI kit's templates | hand-build list/form/detail, or compose kit parts by hand |
+| Generate a non-CRUD page | `simplix add-page <record\|dashboard\|static\|error\|app-shell> <name> --module <m>` (or `--app <a>`) | hand-build the page |
 | Adjust a generated contract | `customizeApi(base, patch)` | edit generated files |
 | Fetch / mutate data | `deriveEntityHooks` → `useList` / `useGet` / … | `useQuery` + manual `fetch` |
 | Build a create/edit form | `deriveEntityFormHooks` → `useCreateForm` / `useUpdateForm` | hand-managed form state |
 | Mock the API (dev & tests) | `deriveMockHandlers` + `setupMockWorker` | hand-written MSW handlers |
 | Start a native (Expo) app | `simplix add-app <name> --native` | hand-create the Expo shell |
 | Generate native entity screens | `simplix scaffold <entity> --native` | hand-build EntityList/detail/form |
-| Check structure / FSD / imports | `simplix validate` | — |
+| Check structure / FSD / imports | `simplix validate` | - |
 
 Full command reference and step-by-step walkthroughs: [CLI & Scaffolding Workflow](./references/cli-workflow.md).
 
@@ -93,27 +96,27 @@ export const shopApi = defineApi({
 
 Entry point. Returns `{ config, client, queryKeys }`.
 
-- `config.domain: string` — query-key namespace
-- `config.basePath: string` — URL prefix prepended to every operation path
-- `config.entities: Record<string, EntityDefinition>` — operations-based entities
-- `config.operations?: Record<string, OperationDefinition>` — standalone (non-entity) RPC operations
-- `config.queryBuilder?: QueryBuilder` — list-param serializer (omit and filters/sort/pagination are NOT added to the URL)
-- `options.fetchFn?: FetchFn` — custom fetch (default `defaultFetch`)
+- `config.domain: string` - query-key namespace
+- `config.basePath: string` - URL prefix prepended to every operation path
+- `config.entities: Record<string, EntityDefinition>` - operations-based entities
+- `config.operations?: Record<string, OperationDefinition>` - standalone (non-entity) RPC operations
+- `config.queryBuilder?: QueryBuilder` - list-param serializer (omit and filters/sort/pagination are NOT added to the URL)
+- `options.fetchFn?: FetchFn` - custom fetch (default `defaultFetch`)
 
 ### EntityDefinition
 
 ```ts
 interface EntityDefinition<TSchema, TOperations> {
-  schema: TSchema;                         // Zod schema — full entity shape
+  schema: TSchema;                         // Zod schema - full entity shape
   identity?: string[];                     // identity field(s) for cache keys; default ["id"]
-  operations: TOperations;                 // Record<string, EntityOperationDef> — REQUIRED
+  operations: TOperations;                 // Record<string, EntityOperationDef> - REQUIRED
   parent?: EntityParent;                   // nested URL: { param, path }
   queries?: Record<string, EntityQuery>;   // named query scopes by parent relation
   filterSchema?: z.ZodType;                // list filter validation
 }
 ```
 
-There is no `path`, `createSchema`, or `updateSchema` on the entity — per-CRUD paths and DTO schemas live inside each `operations` entry.
+There is no `path`, `createSchema`, or `updateSchema` on the entity - per-CRUD paths and DTO schemas live inside each `operations` entry.
 
 ### EntityOperationDef
 
@@ -132,7 +135,7 @@ interface EntityOperationDef<TInput, TOutput> {
 }
 ```
 
-`CrudRole` is `"list" | "get" | "getForEdit" | "create" | "update" | "delete" | "order" | "tree" | "subtree" | "multiUpdate" | "batchUpdate" | "batchDelete" | "search"`. `CRUD_OPERATIONS` is an exported preset of method defaults — `list`/`get` → GET, `create` → POST, `update` → PATCH, `delete` → DELETE — spread it to avoid repeating `method`:
+`CrudRole` is `"list" | "get" | "getForEdit" | "create" | "update" | "delete" | "order" | "tree" | "subtree" | "multiUpdate" | "batchUpdate" | "batchDelete" | "search"`. `CRUD_OPERATIONS` is an exported preset of method defaults - `list`/`get` → GET, `create` → POST, `update` → PATCH, `delete` → DELETE - spread it to avoid repeating `method`:
 
 ```ts
 import { CRUD_OPERATIONS } from "@simplix-react/contract";
@@ -180,7 +183,7 @@ export const petApi = customizeApi(generatedPetApi, {
 
 `ApiPatch` is `{ entities?: Record<string, EntityPatch> }`; `EntityPatch` is `{ operations?: Record<string, EntityOperationDef | null> }` where `null` removes an operation and an object adds or replaces it.
 
-## Deriving hooks — deriveEntityHooks(contract)
+## Deriving hooks - deriveEntityHooks(contract)
 
 Generates per-entity hooks and a `useMutation` per standalone operation. Returns `DerivedEntityHooksResult`.
 
@@ -192,7 +195,7 @@ export const hooks = deriveEntityHooks(shopApi);
 Entity hooks (one set per entity, by operation role):
 
 ```ts
-hooks.product.useList(parentId?, params?, options?);        // overloaded — see api-patterns.md
+hooks.product.useList(parentId?, params?, options?);        // overloaded - see api-patterns.md
 hooks.product.useGet(id, options?);                         // id: EntityId
 hooks.product.useCreate(parentId?, options?);
 hooks.product.useUpdate(options?);                          // { id: EntityId; dto } variable; { optimistic? }
@@ -203,9 +206,9 @@ hooks.product.useTree(params?, options?);                   // only for a "tree"
 
 `EntityId` is `string | Record<string, string>` (composite keys). A `tree`-role operation derives `useTree`; any custom (non-CRUD) operation on the entity derives a `use<OperationName>` hook (GET → query, otherwise mutation). Standalone operations expose `hooks.<operation>.useMutation(options?)`, which auto-invalidates the keys returned by the operation's `invalidates`.
 
-> **Type note.** Derived hooks and the client are fully typed from the contract — `hooks.product.useList()` is `UseQueryResult<Product[]>`, `useCreate()` is `UseMutationResult<Product, Error, CreateInput>`, and `shopApi.client.product.get(id)` is `Promise<Product>`. No casts needed. To keep that inference, define operations **inline** in `defineApi` — extracting one into a `const … satisfies OperationDefinition` widens its generics and de-types the derived hook. See [API Patterns → Type inference](./references/api-patterns.md#simplix-reactreact).
+> **Type note.** Derived hooks and the client are fully typed from the contract - `hooks.product.useList()` is `UseQueryResult<Product[]>`, `useCreate()` is `UseMutationResult<Product, Error, CreateInput>`, and `shopApi.client.product.get(id)` is `Promise<Product>`. No casts needed. To keep that inference, define operations **inline** in `defineApi` - extracting one into a `const … satisfies OperationDefinition` widens its generics and de-types the derived hook. See [API Patterns → Type inference](./references/api-patterns.md#simplix-reactreact).
 
-## Deriving forms — deriveEntityFormHooks(contract, hooks)
+## Deriving forms - deriveEntityFormHooks(contract, hooks)
 
 Derives TanStack Form hooks from the same contract. Takes the contract AND the React Query hooks. Each entity gets `useCreateForm` / `useUpdateForm` based on whether it has `create` / `update` operations.
 
@@ -297,8 +300,8 @@ export default defineConfig({
 
 ## Related packages
 
-- `@simplix-react/auth` — request-layer auth (Bearer / API Key / OAuth2 / custom schemes, token stores, auto-refresh) wired through `options.fetchFn`. See its package README.
-- `@simplix-react/access` — CASL-based authorization (`createAccessPolicy`, `useCan`, `Can`, `requireAccess`). See its package README.
+- `@simplix-react/auth` - request-layer auth (Bearer / API Key / OAuth2 / custom schemes, token stores, auto-refresh) wired through `options.fetchFn`. See its package README.
+- `@simplix-react/access` - CASL-based authorization (`createAccessPolicy`, `useCan`, `Can`, `requireAccess`). See its package README.
 
 ## When to use this skill
 
@@ -313,8 +316,8 @@ export default defineConfig({
 
 ## References
 
-- [CLI & Scaffolding Workflow](./references/cli-workflow.md) — `simplix` commands and step-by-step domain/module scaffolding
-- [API Patterns](./references/api-patterns.md) — full signatures and type details for every package
-- [Recipes](./references/recipes.md) — complete, copy-ready code examples
-- [Configuration](./references/configuration.md) — `simplix.config.ts` option reference
-- [React Native](./references/react-native.md) — `simplix-react-native` invariants, mobile screen grammar, standard-kit registry, `add-app --native` / `scaffold --native`
+- [CLI & Scaffolding Workflow](./references/cli-workflow.md) - `simplix` commands and step-by-step domain/module scaffolding
+- [API Patterns](./references/api-patterns.md) - full signatures and type details for every package
+- [Recipes](./references/recipes.md) - complete, copy-ready code examples
+- [Configuration](./references/configuration.md) - `simplix.config.ts` option reference
+- [React Native](./references/react-native.md) - `simplix-react-native` invariants, mobile screen grammar, standard-kit registry, `add-app --native` / `scaffold --native`
