@@ -29,6 +29,7 @@ describe("generated-state report", () => {
     // A story directory is configured throughout; only the story test supplies a story template.
     await writeFile(join(root, "simplix.config.ts"), 'export default { templates: { storiesDir: "stories" } };\n');
     await mkdir(join(root, TEMPLATE_DIR), { recursive: true });
+    await mkdir(join(root, "stories"));
     await setTemplate("v1");
     // The roots the generators resolve against are the real paths the OS reports for the cwd.
     root = await realpath(root);

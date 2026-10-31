@@ -7,6 +7,7 @@ import ora from "ora";
 
 import { findCrudConfigForEntity } from "../config/crud-config-loader.js";
 import { loadConfig } from "../config/config-loader.js";
+import { assertOutputDirs, reportOutputDirError } from "../config/output-dirs.js";
 import {
   crudPageTemplate,
   hubPageTemplate,
@@ -1902,7 +1903,7 @@ export const scaffoldCrudCommand = new Command("scaffold")
     "--app <dir>",
     "Target Expo app under apps/ for route files (with --native)",
   )
-  .action(runScaffold);
+  .action(reportOutputDirError(runScaffold));
 
 /** The options `simplix scaffold` takes. */
 export interface ScaffoldOptions {
@@ -1933,6 +1934,8 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     return;
   }
   const rootDir = await findProjectRoot(process.cwd());
+  // Refused before anything is written: the screen's story goes to the configured directory.
+  await assertOutputDirs(rootDir, await loadConfig(rootDir));
   const entityKebab = toKebabCase(entity);
   const EntityPascal = toPascalCase(entity);
 

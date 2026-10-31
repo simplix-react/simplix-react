@@ -29,6 +29,7 @@ describe("simplix generated --adopt", () => {
     root = await mkdtemp(join(tmpdir(), "simplix-adopt-"));
     await writeFile(join(root, "simplix.config.ts"), 'export default { templates: { storiesDir: "stories", story: { id: "board-{entity}", title: "Board/{Entity}" } } };\n');
     await mkdir(join(root, TEMPLATE_DIR), { recursive: true });
+    await mkdir(join(root, "stories"));
     await setTemplate("v1");
     await setStory("s1");
     root = await realpath(root);

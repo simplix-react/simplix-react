@@ -113,6 +113,8 @@ export interface SimplixConfig {
      * Where generated Storybook stories are written, relative to the project root: the design
      * reference's screens directory. A template with a `.stories` sibling (`list.stories.hbs`)
      * renders one story per scaffolded entity there. Without it no story is generated.
+     * The directory must exist: `simplix generated` and the commands that write there refuse a
+     * path that does not resolve to one, naming the option and the resolved path.
      */
     storiesDir?: string;
     /**

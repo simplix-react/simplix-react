@@ -274,3 +274,32 @@ describe("what a scaffold writes beside the screen", () => {
     expect(await readFile(join(root, MODULE, "src/locales/index.ts"), "utf-8")).toContain('import("./widgets/ko.json")');
   });
 });
+
+describe("the configured story directory", () => {
+  const storyTemplate = "/**\n * @simplix-generated story/crud-page\n */\nexport default { title: \"Generated/{{EntityPascal}}\" };\n";
+
+  async function configure(storiesDir: string): Promise<void> {
+    await put("simplix.config.ts", `export default { templates: { storiesDir: ${JSON.stringify(storiesDir)} } };\n`);
+    await put(".simplix/templates/crud-page.stories.hbs", storyTemplate);
+  }
+
+  it("refuses a directory that does not exist before it writes anything", async () => {
+    await useKitShapedTemplates();
+    await configure("board/screens");
+    const before = await snapshot();
+
+    await expect(scaffold()).rejects.toThrow(/templates\.storiesDir "board\/screens" resolves to .*board\/screens, which does not exist/);
+
+    expect(await snapshot()).toEqual(before);
+  });
+
+  it("writes the screen's story into a directory that exists", async () => {
+    await useKitShapedTemplates();
+    await configure("board/screens");
+    await mkdir(join(root, "board/screens"), { recursive: true });
+
+    await scaffold();
+
+    expect((await snapshot()).get("board/screens/product.stories.tsx")).toContain("Generated/Product");
+  });
+});

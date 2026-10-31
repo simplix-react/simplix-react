@@ -3,6 +3,7 @@ import { readFile, readdir, realpath } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
 
 import { loadConfig } from "../config/config-loader.js";
+import { assertOutputDirs, reportOutputDirError } from "../config/output-dirs.js";
 import { captureWrites, findProjectRoot, lastKeptRenders } from "../utils/fs.js";
 import { log, withSilentLog } from "../utils/logger.js";
 import { takeGeneratedOutcomes, withConflictMarkers, type GeneratedWrite } from "../utils/generated-merge.js";
@@ -105,12 +106,18 @@ export interface GeneratedFiles {
   readonly held: ReadonlyMap<string, string>;
 }
 
-/** Reads every generated file under the project root and the configured story directory. */
+/**
+ * Reads every generated file under the project root and the configured story directory.
+ *
+ * @throws {OutputDirError} when the configured story directory is not an existing directory
+ */
 export async function collectGenerated(projectRoot: string): Promise<GeneratedFiles> {
   // The generators resolve the root from the working directory, which the OS reports through
   // symbolic links resolved; walking the same spelling is what lets their paths match.
   const rootDir = await realpath(projectRoot);
   const config = await loadConfig(rootDir);
+  // A directory that is not there holds no generated files, which reads as a clean report.
+  await assertOutputDirs(rootDir, config);
   const roots = [rootDir, ...(config.templates?.storiesDir ? [resolve(rootDir, config.templates.storiesDir)] : [])];
   const files: string[] = [];
   for (const root of roots) await walk(root, files);
@@ -221,7 +228,7 @@ export const generatedCommand = new Command("generated")
     "Record the current render of an edited file as its merge base, after printing the diff between the two, so every difference is read as a customisation; a file with no origin gets one when it can be inferred",
   )
   .option("-y, --yes", "With --adopt, record without asking once the diffs are printed (a run with no terminal needs it)")
-  .action(async (flags: { all?: boolean; writeConflicts?: boolean; check?: boolean; json?: boolean; share?: boolean; adopt?: string[]; yes?: boolean }) => {
+  .action(reportOutputDirError(async (flags: { all?: boolean; writeConflicts?: boolean; check?: boolean; json?: boolean; share?: boolean; adopt?: string[]; yes?: boolean }) => {
     const callerDir = process.cwd();
     const rootDir = await findProjectRoot(process.cwd());
     if (resolve(process.cwd()) !== rootDir) process.chdir(rootDir);
@@ -303,4 +310,4 @@ export const generatedCommand = new Command("generated")
       log.error("Edited generated files are behind the templates: run `simplix generated --all`, and resolve each conflict (or pass --write-conflicts).");
       process.exitCode = 1;
     }
-  });
+  }));
