@@ -3715,7 +3715,7 @@
     @apply border-t px-4 pt-3 pb-3 border-[var(--border)] [&_[data-slot=button][data-size=sm]]:h-8 [&_[data-slot=button][data-size=sm]]:px-3 [&_[data-slot=button][data-size=sm]]:text-[13px];
   }
   :where([data-part="crud-detail-actions-group"])[data-part][data-p-crud-detail-actions-group] {
-    @apply ml-auto flex-1 justify-end [&>[data-variant=destructive]]:order-first [&>[data-variant=destructive]]:mr-auto [&>[data-action=delete]]:order-first [&>[data-action=delete]]:mr-auto;
+    @apply ml-auto min-w-0 flex-1 flex-wrap justify-end [&>[data-variant=destructive]]:order-first [&>[data-variant=destructive]]:mr-auto [&>[data-action=delete]]:order-first [&>[data-action=delete]]:mr-auto;
   }
   :where([data-part="crud-detail-actions"])[data-part][data-p-crud-detail-actions] {
     @apply border-t px-4 pt-3 pb-3 border-[var(--border)] [&_[data-slot=button][data-variant=destructive]]:bg-transparent [&_[data-slot=button][data-variant=destructive]]:text-[var(--destructive-text)] [&_[data-slot=button][data-variant=destructive]]:shadow-none [&_[data-slot=button][data-variant=destructive]:focus-visible]:shadow-[var(--focus-halo)] [&_[data-slot=button][data-variant=destructive]:hover]:bg-[var(--danger-soft)] [&_[data-slot=button][data-size=sm]]:h-8 [&_[data-slot=button][data-size=sm]]:px-3 [&_[data-slot=button][data-size=sm]]:text-[13px];

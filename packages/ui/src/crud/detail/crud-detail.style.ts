@@ -145,8 +145,10 @@ export const crudDetailActionsGroupStyle = defineSlotStyle({
   slot: "crud-detail-actions-group",
   as: "part",
   // A destructive verb (a destructive button, or the standard delete) stands alone at the far
-  // start; every other verb sits at the end, the primary one last.
-  base: "ml-auto flex-1 justify-end [&>[data-variant=destructive]]:order-first [&>[data-variant=destructive]]:mr-auto [&>[data-action=delete]]:order-first [&>[data-action=delete]]:mr-auto",
+  // start; every other verb sits at the end, the primary one last. The group wraps on its own:
+  // the row around it can only move the group whole, so a group that cannot break pushes its
+  // last verbs past the panel edge, where nothing scrolls them back.
+  base: "ml-auto min-w-0 flex-1 flex-wrap justify-end [&>[data-variant=destructive]]:order-first [&>[data-variant=destructive]]:mr-auto [&>[data-action=delete]]:order-first [&>[data-action=delete]]:mr-auto",
   variants: {},
   defaultVariants: {},
 });

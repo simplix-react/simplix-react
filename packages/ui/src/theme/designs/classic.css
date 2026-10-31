@@ -3697,7 +3697,7 @@
     @apply border-t px-4 pt-3 pb-3;
   }
   :where([data-part="crud-detail-actions-group"])[data-part][data-p-crud-detail-actions-group] {
-    @apply ml-auto flex-1 justify-end [&>[data-variant=destructive]]:order-first [&>[data-variant=destructive]]:mr-auto [&>[data-action=delete]]:order-first [&>[data-action=delete]]:mr-auto;
+    @apply ml-auto min-w-0 flex-1 flex-wrap justify-end [&>[data-variant=destructive]]:order-first [&>[data-variant=destructive]]:mr-auto [&>[data-action=delete]]:order-first [&>[data-action=delete]]:mr-auto;
   }
   :where([data-part="crud-detail-actions"])[data-part][data-p-crud-detail-actions] {
     @apply border-t px-4 pt-3 pb-3;
