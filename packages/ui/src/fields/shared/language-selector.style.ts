@@ -89,24 +89,95 @@ export const languageNameStyle = defineSlotStyle({
 });
 
 /**
- * The frame holding a field's control with the language selector drawn inside it, at the inline
- * end of an input (vertically centred) or the bottom inline-end corner of a textarea.
+ * The frame holding a field's control with the language selector drawn inside it. The selector
+ * takes the control's inline-end segment (an input) or column (a textarea), and the fill bar runs
+ * along the control's bottom edge.
  */
 export const languageInsetStyle = defineSlotStyle({
   slot: "field-language-inset",
-  base: "",
+  base: "flex flex-col rounded-md",
   variants: {
     control: { input: "", textarea: "" },
   },
   defaultVariants: { control: "input" },
 });
 
-/** The box that places the selector inside the control. */
+/**
+ * The layer laid over the control's padding box, inside its border, that holds the selector and
+ * the fill bar and clips them to the control's rounded corners.
+ */
+export const languageInsetOverlayStyle = defineSlotStyle({
+  slot: "field-language-inset-overlay",
+  base: "pointer-events-none inset-px overflow-hidden rounded-md",
+  variants: {},
+  defaultVariants: {},
+});
+
+/** The box that places the selector at the inline end of the control, its full height. */
 export const languageInsetAnchorStyle = defineSlotStyle({
   slot: "field-language-inset-anchor",
-  base: "",
+  base: "pointer-events-auto inset-y-0 end-0",
   variants: {
-    control: { input: "end-1.5 top-1/2 -translate-y-1/2", textarea: "end-5 bottom-1.5" },
+    control: { input: "", textarea: "" },
   },
   defaultVariants: { control: "input" },
+});
+
+/**
+ * The input's language segment: the select trigger filling the selector's box. Keyboard focus is a
+ * background tint, never a border or a ring.
+ */
+export const languageInsetTriggerStyle = defineSlotStyle({
+  slot: "field-language-inset-trigger",
+  as: "part",
+  base: "!h-full !min-h-0 w-full !rounded-none border-0 !bg-muted/50 !px-2 !py-0 gap-1.5 text-(length:--fs-2xs) leading-none shadow-none hover:!bg-muted focus:!shadow-none focus-visible:!shadow-none focus-visible:!bg-muted [&>svg:not([data-slot=field-language-mark])]:hidden",
+  variants: {},
+  defaultVariants: {},
+});
+
+/** The textarea's language column: one row per language, scrolling when they outgrow the control. */
+export const languageListStyle = defineSlotStyle({
+  slot: "field-language-list",
+  base: "h-full overflow-y-auto overscroll-contain bg-muted/50 pb-0.5",
+  variants: {},
+  defaultVariants: {},
+});
+
+/** One language's row in the textarea's column. */
+export const languageOptionStyle = defineSlotStyle({
+  slot: "field-language-option",
+  base: "w-full gap-1.5 px-2 py-1.5 text-(length:--fs-2xs) leading-none text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:bg-muted disabled:cursor-not-allowed disabled:opacity-50",
+  variants: {
+    current: { true: "text-foreground", false: "" },
+  },
+  defaultVariants: { current: false },
+});
+
+/** The mark ending the input's segment (a chevron) or a column row (a check on the current one). */
+export const languageMarkStyle = defineSlotStyle({
+  slot: "field-language-mark",
+  base: "size-3 shrink-0 text-muted-foreground",
+  variants: {
+    shown: { true: "", false: "invisible" },
+  },
+  defaultVariants: { shown: true },
+});
+
+/** The per-language fill indicator along the bottom of the whole control. */
+export const languageFillBarStyle = defineSlotStyle({
+  slot: "field-language-fill-bar",
+  base: "pointer-events-none inset-x-0 bottom-0 h-0.5 gap-px",
+  variants: {},
+  defaultVariants: {},
+});
+
+/** One language's segment in the fill bar: green where the language has text. */
+export const languageFillStyle = defineSlotStyle({
+  slot: "field-language-fill",
+  base: "transition-colors",
+  variants: {
+    filled: { true: "bg-green-500", false: "bg-border" },
+    current: { true: "", false: "opacity-50" },
+  },
+  defaultVariants: { filled: false, current: false },
 });

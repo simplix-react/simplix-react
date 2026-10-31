@@ -5,7 +5,7 @@ import { useFlatUIComponents } from "../../provider/ui-provider";
 import { FieldWrapper } from "../shared/field-wrapper";
 import { getFilledLanguages } from "../shared/filled-languages";
 import { LanguageInset } from "../shared/language-inset";
-import { LanguageSelector, type LanguageSelectorPlacement } from "../shared/language-selector";
+import { LanguageFillBar, LanguageSelector, type LanguageSelectorPlacement } from "../shared/language-selector";
 import { useUIDefaults } from "../../provider/ui-defaults-context";
 import { InlineIconPickerTrigger } from "../shared/inline-icon-picker-trigger";
 import { ColorPicker } from "../../base/inputs/color-picker";
@@ -97,6 +97,7 @@ export function I18nTextField({
       filledLanguages={filledLanguages}
       disabled={disabled}
       placement={placement}
+      control="input"
     />
   ) : undefined;
   const insetSelector = placement === "inset" ? languageSelector : undefined;
@@ -142,7 +143,11 @@ export function I18nTextField({
             />
         );
         return insetSelector ? (
-          <LanguageInset control="input" selector={insetSelector}>
+          <LanguageInset
+            control="input"
+            selector={insetSelector}
+            bar={<LanguageFillBar languages={languages} value={currentLang} filledLanguages={filledLanguages} />}
+          >
             {renderControl}
           </LanguageInset>
         ) : (

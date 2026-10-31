@@ -95,3 +95,91 @@ describe("language selector look", () => {
     expect(languageTriggerStyle.base).toMatch(/focus-visible:!shadow-none/);
   });
 });
+
+const manyLanguages = [
+  { code: "en", name: "English" },
+  { code: "ko", name: "한국어" },
+  { code: "ja", name: "日本語" },
+  { code: "de", name: "Deutsch" },
+  { code: "fr", name: "Français" },
+  { code: "pt", name: "Português" },
+] as never;
+
+function renderInset(kind: "input" | "textarea", onLanguageChange = vi.fn(), selected = "en") {
+  const props = {
+    label: "Name",
+    value: { en: "Hello", ko: "", ja: "", de: "", fr: "", pt: "" },
+    onChange: () => {},
+    languages: manyLanguages,
+    selectedLanguage: selected,
+    onLanguageChange,
+    languageSelectorPlacement: "inset" as const,
+  };
+  return render(kind === "input" ? <I18nTextField {...props} /> : <I18nTextareaField {...props} />);
+}
+
+describe.each(["input", "textarea"] as const)("inset placement (%s)", (kind) => {
+  it("lays the fill bar across the control with one segment per language", () => {
+    const { container } = renderInset(kind);
+    const bar = container.querySelector('[data-slot="field-language-fill-bar"]');
+    const overlay = container.querySelector('[data-slot="field-language-inset-overlay"]');
+    expect(bar).not.toBeNull();
+    expect(bar?.parentElement).toBe(overlay);
+    expect(bar?.getAttribute("aria-hidden")).toBe("true");
+    const segments = bar?.querySelectorAll('[data-slot="field-language-fill"]') ?? [];
+    expect(segments).toHaveLength(6);
+    expect(segments[0].getAttribute("data-filled")).toBe("true");
+    expect(segments[0].getAttribute("data-current")).toBe("true");
+    expect(segments[1].getAttribute("data-filled")).toBe("false");
+    // The bar is not inside the selector's segment, so it is not limited to its width.
+    expect(container.querySelector('[data-slot="field-language-inset-anchor"]')?.contains(bar ?? null)).toBe(false);
+  });
+
+  it("draws no step buttons and no divider borders", () => {
+    const { container } = renderInset(kind);
+    expect(container.querySelector('[data-slot="field-language-step"]')).toBeNull();
+    expect(container.querySelector('[data-slot="field-language-segments"]')).toBeNull();
+  });
+});
+
+describe("inset placement, input", () => {
+  it("is one select trigger with an accessible name, showing the current name in full", () => {
+    const { container, getByRole } = renderInset("input", vi.fn(), "ko");
+    const trigger = getByRole("combobox", { name: "field.selectLanguage" });
+    expect(container.querySelector('[data-slot="field-language-inset-anchor"]')?.contains(trigger)).toBe(true);
+    const visible = [...trigger.querySelectorAll("span.whitespace-nowrap")].filter((n) => !n.classList.contains("invisible"));
+    expect(visible.map((n) => n.textContent)).toEqual(["한국어"]);
+    expect(trigger.querySelectorAll("span.whitespace-nowrap.truncate")).toHaveLength(0);
+  });
+});
+
+describe("inset placement, textarea", () => {
+  it("stacks the languages as a radio group with the current one checked and tabbable", () => {
+    const { getByRole, getAllByRole } = renderInset("textarea", vi.fn(), "ja");
+    const group = getByRole("radiogroup", { name: "field.selectLanguage" });
+    expect(group.getAttribute("data-slot")).toBe("field-language-list");
+    const radios = getAllByRole("radio");
+    expect(radios.map((r) => r.textContent)).toEqual(["English", "한국어", "日本語", "Deutsch", "Français", "Português"]);
+    expect(radios.map((r) => r.getAttribute("aria-checked"))).toEqual(["false", "false", "true", "false", "false", "false"]);
+    expect(radios.map((r) => r.tabIndex)).toEqual([-1, -1, 0, -1, -1, -1]);
+  });
+
+  it("moves the language with the arrow keys, Home and End, wrapping at either end", async () => {
+    const { fireEvent } = await import("@testing-library/react");
+    const change = vi.fn();
+    const { getAllByRole } = renderInset("textarea", change, "en");
+    const radios = getAllByRole("radio");
+    fireEvent.keyDown(radios[0], { key: "ArrowDown" });
+    fireEvent.keyDown(radios[0], { key: "ArrowUp" });
+    fireEvent.keyDown(radios[0], { key: "End" });
+    fireEvent.keyDown(radios[0], { key: "Home" });
+    fireEvent.keyDown(radios[0], { key: "ArrowRight" });
+    fireEvent.click(radios[4]);
+    expect(change.mock.calls.map((c) => c[0])).toEqual(["ko", "pt", "pt", "en", "ko", "fr"]);
+  });
+
+  it("keeps the textarea from resizing, since the column takes its corner", () => {
+    const { container } = renderInset("textarea");
+    expect(container.querySelector("textarea")?.className).toMatch(/resize-none/);
+  });
+});

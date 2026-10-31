@@ -34,6 +34,7 @@ export const CLARITY_REPLACE: Record<string, string> = {
   "bg-muted/40": "bg-[var(--table-head)]",
   "bg-muted/50": "bg-[var(--surface-2)]",
   "bg-muted/30": "bg-[var(--surface-2)]",
+  "!bg-muted/50": "!bg-[var(--surface-2)]",
   "hover:bg-muted/40": "hover:bg-[var(--hover-bg)]",
   "hover:bg-muted/50": "hover:bg-[var(--hover-bg)]",
   "hover:bg-accent": "hover:bg-[var(--hover-bg-strong)]",

@@ -6,7 +6,7 @@ import { cn } from "../../utils/cn";
 import { FieldWrapper } from "../shared/field-wrapper";
 import { getFilledLanguages } from "../shared/filled-languages";
 import { LanguageInset } from "../shared/language-inset";
-import { LanguageSelector, type LanguageSelectorPlacement } from "../shared/language-selector";
+import { LanguageFillBar, LanguageSelector, type LanguageSelectorPlacement } from "../shared/language-selector";
 import { useUIDefaults } from "../../provider/ui-defaults-context";
 import { resizeClasses } from "../shared/textarea-utils";
 import type { I18nValue } from "./i18n-text-field";
@@ -25,6 +25,7 @@ export interface I18nTextareaFieldProps extends CommonFieldProps {
   placeholder?: string | I18nValue;
   maxLength?: number;
   rows?: number;
+  /** How the textarea resizes. Under the `inset` placement it does not, as the column takes its corner. */
   resize?: "none" | "vertical" | "both";
   textareaProps?: React.ComponentProps<"textarea">;
 }
@@ -77,6 +78,7 @@ export function I18nTextareaField({
       filledLanguages={filledLanguages}
       disabled={disabled}
       placement={placement}
+      control="textarea"
     />
   ) : undefined;
   const insetSelector = placement === "inset" ? languageSelector : undefined;
@@ -109,11 +111,16 @@ export function I18nTextareaField({
               aria-label={variantProps.layout === "hidden" ? label : undefined}
               {...textareaProps}
               style={reserve ? { ...textareaProps?.style, ...reserve } : textareaProps?.style}
-              className={cn(resizeClasses[resize], textareaProps?.className)}
+              // The inset column takes the inline-end edge the resize grip sits on, so it keeps none.
+              className={cn(resizeClasses[insetSelector ? "none" : resize], textareaProps?.className)}
             />
         );
         return insetSelector ? (
-          <LanguageInset control="textarea" selector={insetSelector}>
+          <LanguageInset
+            control="textarea"
+            selector={insetSelector}
+            bar={<LanguageFillBar languages={languages} value={currentLang} filledLanguages={filledLanguages} />}
+          >
             {renderControl}
           </LanguageInset>
         ) : (
