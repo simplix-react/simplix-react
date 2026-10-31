@@ -2724,7 +2724,7 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     log.step("modules/src/pages/   → page components (auto-generated)");
     log.step("modules/src/shared/  → shared UI, lib, config");
     log.info("");
-    log.info("Next: wire up routes in your app to use the generated pages");
+    if (!routeTarget) log.info("Next: wire up routes in your app to use the generated pages");
   } catch (err) {
     spinner.fail(`Failed to scaffold CRUD for ${entity}`);
     // A config file that cannot be loaded is the project's to fix: reportConfigError prints it once.

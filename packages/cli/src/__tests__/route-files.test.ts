@@ -49,7 +49,7 @@ describe("writing a list screen's route", () => {
 
   it("writes the route, its menu entry and its label, once", async () => {
     const templates = new Map([
-      ["route.tanstack", "/**\n * @simplix-generated route/test\n */\nexport const path = \"/{{routePath}}\"; // {{modulePackage}} {{accessList}}\n"],
+      ["route.tanstack", "/**\n * @simplix-generated route/test\n */\nexport const path = \"/{{routePath}}\"; // {{modulePackage}} {{accessList}} {{moduleLocales}}\n"],
       ["menu-entry.tanstack", '  { key: "{{menuKey}}", href: "/{{routePath}}", gate: {{{menuGate}}} },\n'],
     ]);
     const input = {
@@ -67,7 +67,7 @@ describe("writing a list screen's route", () => {
     };
     const first = await writeRoute(input);
     expect(first).toMatchObject({ outcome: "written", menuInserted: true, labelled: ["app/locales/en.json"] });
-    expect(await readFile(join(root, "app/routes/catalog-voices.tsx"), "utf-8")).toContain('"/catalog-voices"; // @app/admin-voice listCatalogVoicesAccess');
+    expect(await readFile(join(root, "app/routes/catalog-voices.tsx"), "utf-8")).toContain('"/catalog-voices"; // @app/admin-voice listCatalogVoicesAccess false');
     expect(await readFile(join(root, "app/menu.ts"), "utf-8")).toContain('{ key: "catalogVoices", href: "/catalog-voices", gate: { action: "list", subject: "SPEECH_ADMIN" } }');
     expect(JSON.parse(await readFile(join(root, "app/locales/en.json"), "utf-8"))).toEqual({ shell: { menu: { catalogVoices: "Catalog voices" } } });
 

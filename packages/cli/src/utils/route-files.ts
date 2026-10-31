@@ -68,8 +68,11 @@ export async function writeRoute(input: RouteInput): Promise<RouteWrite> {
   const file = resolve(input.rootDir, input.target.dir, `${routePath}.tsx`);
   if (template === undefined) return { file, outcome: "no-template", labelled: [] };
 
-  const modulePackage = (await readJsonFile<{ name?: string }>(join(input.moduleDir, "package.json"))).name ?? "";
-  const routeCtx = { ...input.ctx, routePath, modulePackage, accessList: input.accessList };
+  const manifest = await readJsonFile<{ name?: string; exports?: Record<string, unknown> }>(join(input.moduleDir, "package.json"));
+  const modulePackage = manifest.name ?? "";
+  // A module that exports its catalogs registers them when its screen is first routed to.
+  const moduleLocales = manifest.exports?.["./locales"] !== undefined;
+  const routeCtx = { ...input.ctx, routePath, modulePackage, moduleLocales, accessList: input.accessList };
   const outcome = await writeGenerated(file, renderTemplate(template, routeCtx), input.origin);
 
   const menu = input.target.menu;
