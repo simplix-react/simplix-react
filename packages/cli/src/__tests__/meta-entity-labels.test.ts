@@ -56,3 +56,34 @@ describe("serverEntityOf", () => {
     expect(serverEntityOf({ tag: "portal.Mine", operations: mixed }, known)).toBeUndefined();
   });
 });
+
+describe("a field's keyed label from SimpliX Meta", () => {
+  let dir: string;
+  beforeEach(async () => {
+    dir = await mkdtemp(join(tmpdir(), "field-labels-"));
+    await mkdir(join(dir, "src/locales"), { recursive: true });
+    await writeFile(join(dir, "src/locales/en.json"), JSON.stringify({ backgroundJob: { fields: { count: "Count", status: "Status" } } }));
+    await writeFile(join(dir, "src/locales/ko.json"), JSON.stringify({ backgroundJob: { fields: { count: "Count", status: "상태" } } }));
+  });
+  afterEach(async () => rm(dir, { recursive: true, force: true }));
+
+  const field = (name: string, labels?: Record<string, string>) => ({
+    name, type: { kind: "number" }, required: false, nullable: true, ...(labels ? { labelKey: "field.x", labels } : {}),
+  });
+  const domain = {
+    entities: [{ tag: "admin.jobs.BackgroundJob", patterns: [], operations: [] }],
+    types: new Map([
+      ["StatusCount", { owner: "admin.jobs.BackgroundJob", allFields: [field("count", { en: "Count", ko: "건수" }), field("status")] }],
+      ["Other", { owner: "admin.other.Thing", allFields: [field("count", { ko: "다른 건수" })] }],
+    ]),
+  } as unknown as ResolvedDomain;
+  const document = { version: 1, enums: {}, types: {}, operations: [] } as DtoMeta;
+
+  it("is written under fields in every locale it resolves in, even for an entity the server does not name", async () => {
+    await writeEntityLabels(dir, domain, document, ["en", "ko"]);
+    const ko = JSON.parse(await readFile(join(dir, "src/locales/ko.json"), "utf-8"));
+    const en = JSON.parse(await readFile(join(dir, "src/locales/en.json"), "utf-8"));
+    expect(ko.backgroundJob).toEqual({ fields: { count: "건수", status: "상태" } });
+    expect(en.backgroundJob).toEqual({ fields: { count: "Count", status: "Status" } });
+  });
+});

@@ -69,6 +69,8 @@ export interface FieldMeta {
   description?: string;
   labelKey?: string;
   label?: string;
+  /** The text `labelKey` resolves to per language code, for the locales the server declares it in. */
+  labels?: Record<string, string>;
   constraints?: ConstraintMeta[];
   searchable?: SearchableMeta;
   /** How a screen draws the value beyond its type: `"code"` for a field marked `@CodeValue`. */

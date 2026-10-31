@@ -16,15 +16,6 @@ export const ENTITY_DESCRIPTION_KEY = "_description";
 type Catalog = Record<string, unknown>;
 
 /**
- * Writes what SimpliX Meta calls each entity of a domain into the domain's locale catalogs, as
- * `<entity>._label`, `<entity>._plural` and `<entity>._description` beside the field labels, so a
- * screen titles and describes itself from the same `entity/<entity>` namespace as its field labels.
- *
- * <p>Only those keys are written; every other key of the catalog is kept as it is. A locale
- * SimpliX Meta names no label for is left without one, so the reader sees the missing key rather
- * than another language's word.
- */
-/**
  * The server entity whose labels a Meta entity carries: the one its tag names, or, for a second
  * surface over an entity that already has one (a tag `portal.order.MyOrder` whose operations all
  * name `Order`), the one its operations name. Undefined when neither names a single entity.
@@ -46,6 +37,38 @@ export function serverEntityOf(
   return named.length === 1 && known.has(named[0]!) ? named[0] : undefined;
 }
 
+/**
+ * The label each field of an entity's DTOs declares through a keyed `@FieldLabel`, in one locale.
+ * The first DTO to name a field decides it, in the order the domain lists its types.
+ *
+ * @param domain the domain whose types are read
+ * @param tag the entity tag the types belong to
+ * @param locale the locale to read
+ * @returns field name to label
+ */
+function fieldLabelsOf(domain: ResolvedDomain, tag: string, locale: string): Map<string, string> {
+  const labels = new Map<string, string>();
+  for (const type of domain.types?.values() ?? []) {
+    if (type.owner !== tag) continue;
+    for (const field of type.allFields) {
+      const label = field.labels?.[locale];
+      if (label !== undefined && !labels.has(field.name)) labels.set(field.name, label);
+    }
+  }
+  return labels;
+}
+
+/**
+ * Writes what SimpliX Meta calls each entity of a domain into the domain's locale catalogs, as
+ * `<entity>._label`, `<entity>._plural` and `<entity>._description` beside the field labels, so a
+ * screen titles and describes itself from the same `entity/<entity>` namespace as its field labels.
+ *
+ * <p>A field whose `@FieldLabel` names a key also gets that key's text under `fields`, which
+ * labels a field only a DTO declares (a count, a derived name) in every locale the server
+ * translates it in. Only those keys are written; every other key of the catalog is kept as it is.
+ * A locale SimpliX Meta names no label for is left without one, so the reader sees the missing key
+ * rather than another language's word.
+ */
 export async function writeEntityLabels(
   targetDir: string,
   domain: ResolvedDomain,
@@ -62,19 +85,32 @@ export async function writeEntityLabels(
     for (const entity of domain.entities) {
       const source = serverEntityOf(entity, new Set(Object.keys(entities)));
       const meta = source === undefined ? undefined : entities[source];
-      if (!meta) continue;
+      const labels = fieldLabelsOf(domain, entity.tag, locale);
+      if (!meta && labels.size === 0) continue;
       const key = entityNameOf(entity.tag);
       const node = (typeof catalog[key] === "object" && catalog[key] !== null ? catalog[key] : {}) as Catalog;
-      const names: ReadonlyArray<readonly [string, string | undefined]> = [
-        [ENTITY_LABEL_KEY, meta.label?.[locale]],
-        [ENTITY_PLURAL_KEY, meta.plural?.[locale]],
-        [ENTITY_DESCRIPTION_KEY, meta.description?.[locale]],
-      ];
+      const names: ReadonlyArray<readonly [string, string | undefined]> = meta
+        ? [
+            [ENTITY_LABEL_KEY, meta.label?.[locale]],
+            [ENTITY_PLURAL_KEY, meta.plural?.[locale]],
+            [ENTITY_DESCRIPTION_KEY, meta.description?.[locale]],
+          ]
+        : [];
       for (const [catalogKey, value] of names) {
         if (value !== undefined && node[catalogKey] !== value) {
           node[catalogKey] = value;
           changed = true;
         }
+      }
+      if (labels.size > 0) {
+        const fields = (typeof node.fields === "object" && node.fields !== null ? node.fields : {}) as Catalog;
+        for (const [field, value] of labels) {
+          if (fields[field] !== value) {
+            fields[field] = value;
+            changed = true;
+          }
+        }
+        node.fields = fields;
       }
       catalog[key] = node;
     }
