@@ -1326,6 +1326,34 @@ async function updateModuleIndex(moduleDir: string): Promise<void> {
   log.info("Updated src/index.ts with pages export");
 }
 
+/**
+ * Makes a page that `add-page --module` wrote importable: the module's `./pages` export and tsup
+ * entry, and a line in `pages/index.ts` naming the page's component.
+ *
+ * <p>`scaffold` does the same for a crud page. Without it a page of any other kind was written
+ * into a module whose package exposes no `./pages`, so the route that has to mount it could not
+ * import it, and the only way on was to hand-edit the package the generator owns.
+ *
+ * @param moduleDir the module that owns the page
+ * @param pageKebab the page's directory under `src/pages/`
+ * @param componentName the component `page.tsx` exports
+ */
+export async function ensurePageEntrypoints(moduleDir: string, pageKebab: string, componentName: string): Promise<void> {
+  const pagesIndexPath = join(moduleDir, "src", "pages", "index.ts");
+  if (!(await pathExists(pagesIndexPath))) {
+    await writeFileWithDir(pagesIndexPath, '// Side-effect: register module translations\nimport "../locales";\n');
+  }
+  const content = await readFile(pagesIndexPath, "utf-8");
+  if (!content.includes(`"./${pageKebab}/page"`) && !content.includes(`"./${pageKebab}"`)) {
+    const trimmed = content.replace(/^export \{\};\s*$/m, "").trimEnd();
+    const line = `export { ${componentName} } from "./${pageKebab}/page";`;
+    await writeFileWithDir(pagesIndexPath, trimmed + (trimmed.length > 0 ? "\n" : "") + line + "\n");
+    log.info("Updated pages/index.ts");
+  }
+  await ensureTsupPagesEntry(moduleDir);
+  await ensurePackageJsonPagesExport(moduleDir);
+}
+
 /** Source text with its block and line comments removed, for a check that reads code and not prose. */
 export function withoutComments(source: string): string {
   return source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|\s)\/\/.*$/gm, "$1");

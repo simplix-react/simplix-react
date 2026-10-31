@@ -1,6 +1,6 @@
 import { Command } from "commander";
 import { moduleDirOf } from "../utils/module-path.js";
-import { resolveModuleNamespace, resolveModuleOption } from "./scaffold-crud.js";
+import { ensurePageEntrypoints, resolveModuleNamespace, resolveModuleOption } from "./scaffold-crud.js";
 import { join, relative, resolve } from "node:path";
 
 import { loadConfig } from "../config/config-loader.js";
@@ -123,6 +123,8 @@ export async function runAddPage(rawKind: string, name: string, flags: { module?
       const { outcome } = await writeStampedGenerated(path, content);
       log.step(`${outcome.padEnd(8)} ${path}`);
     }
+    // A page in a module is mounted by an app's route, which imports it through the package.
+    if (module && kind !== "app-shell") await ensurePageEntrypoints(owner, toKebabCase(name), `${toPascalCase(name)}Page`);
     // The design reference's frame, tracked like the page: rewritten while untouched, kept once
     // customised.
     const story = renderPageKindStory(kind, name, namespace, templates, flags.app);
