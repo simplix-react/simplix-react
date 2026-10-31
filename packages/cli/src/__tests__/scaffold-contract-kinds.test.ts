@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { detectI18nFieldPairs, orderAndCategorizeFields, projectRowFields, importsSubjects, readsWidgetsNamespace, resolvesFrom, withContractKinds, type FieldInfo } from "../commands/scaffold-crud.js";
-import { stringShape } from "../meta/scaffold-source.js";
+import { detectI18nFieldPairs, orderAndCategorizeFields, projectRowFields, withRequiredInForm, importsSubjects, readsWidgetsNamespace, resolvesFrom, withContractKinds, type FieldInfo } from "../commands/scaffold-crud.js";
+import { relationFieldsOf, stringShape } from "../meta/scaffold-source.js";
 
 function field(name: string, tsType = "string"): FieldInfo {
   const isForeignKey = tsType === "string" && name.endsWith("Id") && name !== "id";
@@ -51,7 +51,7 @@ describe("a relation in a list", () => {
   });
 
   it("opens the peek the project names for its stem", () => {
-    const out = withContractKinds([field("accountId"), field("ownerId"), field("ownerName")], "accountId", { owner: "userAccount" });
+    const out = withContractKinds([field("accountId"), field("ownerId"), field("ownerName")], "accountId", { peeks: { owner: "userAccount" } });
     expect(out.find((f) => f.name === "ownerId")?.peekKind).toBe("userAccount");
   });
 
@@ -118,5 +118,38 @@ describe("a dependency the scaffold would add", () => {
     expect(await resolvesFrom(join(root, "modules/a"), "@scope/ui")).toBe(true);
     expect(await resolvesFrom(join(root, "modules/a"), "@scope/absent")).toBe(false);
     await rm(root, { recursive: true, force: true });
+  });
+});
+
+describe("a key the contract does not state", () => {
+  it("is text the operator enters where SimpliX Meta states the relations", () => {
+    const out = withContractKinds([field("catalogVoiceId"), field("providerVoiceId"), field("attachmentId")], "catalogVoiceId", {
+      relationFields: new Set(["attachmentId"]),
+    });
+    expect(out.find((f) => f.name === "providerVoiceId")?.isOpaqueId).toBe(false);
+    expect(out.find((f) => f.name === "attachmentId")?.isOpaqueId).toBe(true);
+  });
+
+  it("is still read from its name where no relations are stated", () => {
+    const out = withContractKinds([field("catalogVoiceId"), field("providerVoiceId")], "catalogVoiceId");
+    expect(out.find((f) => f.name === "providerVoiceId")?.isOpaqueId).toBe(true);
+  });
+});
+
+describe("a system field the form's DTO requires", () => {
+  it("is in the form", () => {
+    expect(withRequiredInForm({ ...field("sortOrder", "number"), isSystemField: true, required: true }).isSystemField).toBe(false);
+  });
+
+  it("stays out of the form while it is optional", () => {
+    expect(withRequiredInForm({ ...field("sortOrder", "number"), isSystemField: true }).isSystemField).toBe(true);
+  });
+});
+
+describe("the relations SimpliX Meta states", () => {
+  it("are the holders naming the entity and its nested references", () => {
+    const document = { entities: { Role: { holders: [{ entity: "UserAccount", field: "roleIds", operators: ["IN"] }] }, Team: { holders: [{ entity: "Other", field: "teamId", operators: ["EQUALS"] }] } } };
+    const source = { fields: [{ ...field("positionId"), referenceNamePath: "position.positionName" }, field("providerVoiceId")] };
+    expect(relationFieldsOf(document as never, "UserAccount", source as never)).toEqual(["positionId", "roleIds"]);
   });
 });

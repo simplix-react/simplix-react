@@ -105,6 +105,8 @@ export interface FieldInfo {
   isCode?: boolean;
   /** A key that is not a reference with a name, which no generated screen draws. */
   isOpaqueId?: boolean;
+  /** Whether the DTO the field was read from requires it (`@NotNull`), as SimpliX Meta states. */
+  required?: boolean;
 }
 
 /** The stamps and the soft-delete flag every record carries and no generated field draws. */
@@ -170,12 +172,23 @@ export function contractKindOf(field: FieldInfo): string {
  * Stamps every field with its contract kind, and a reference with the peek it opens and the
  * sibling field that names its record (`<entity>Name`, or `<entity>DisplayName`), where one exists.
  */
+/** What the contract states beyond the fields themselves. */
+export interface ContractKindOptions {
+  /** Reference stem to peek kind, from `references.peeks` in the project's config. */
+  readonly peeks?: Readonly<Record<string, string>>;
+  /**
+   * The fields SimpliX Meta states are keys of another record (its `holders`). Given, a key is
+   * opaque only when the contract says so; absent (an OpenAPI source), a name ending in `Id` is.
+   */
+  readonly relationFields?: ReadonlySet<string>;
+}
+
 export function withContractKinds(
   input: readonly FieldInfo[],
   rowIdField?: string,
-  /** Reference stem to peek kind, from `references.peeks` in the project's config. */
-  peeks?: Readonly<Record<string, string>>,
+  options: ContractKindOptions = {},
 ): FieldInfo[] {
+  const { peeks, relationFields } = options;
   // The record's own key ends in `Id` like a foreign key, but it names this record, never another:
   // read as a reference it would draw a peek at itself and swallow `<entity>Name` as its label.
   const fields = input.map((f) => (f.name === rowIdField && f.isForeignKey ? { ...f, isForeignKey: false, fkEntityField: null } : f));
@@ -190,7 +203,10 @@ export function withContractKinds(
     const isIdentifier = f.name === rowIdField;
     // A key nobody reads (an attachment id, a list of role ids, an external key) says nothing on a
     // screen; the record's own identifier is drawn once, in its detail, with a copy control.
-    const isOpaqueId = !isIdentifier && stamped.contractKind !== "reference" && /[a-z](Id|Ids)$/.test(f.name);
+    // A typed value that merely ends in `Id` (a provider's voice id) is text the operator enters,
+    // so where the contract states its relations, only those are keys.
+    const isKey = relationFields ? relationFields.has(f.name) : /[a-z](Id|Ids)$/.test(f.name);
+    const isOpaqueId = !isIdentifier && stamped.contractKind !== "reference" && isKey;
     // A relation is hidden from lists while it is a bare key; one whose record carries the
     // referenced name is a reference column, drawn as that name with the peek it opens.
     const hideInList = stamped.contractKind === "reference" && stamped.nameField ? false : stamped.hideInList;
@@ -233,6 +249,19 @@ export function projectRowFields(rowFields: readonly FieldInfo[], stated: Readon
     if (!one) return f;
     return f.referenceNamePath ? { ...one, referenceNamePath: f.referenceNamePath, referencePeekKind: f.referencePeekKind } : one;
   });
+}
+
+/** The relation keys a SimpliX Meta source states, or `undefined` for a source that states none. */
+export function relationsOf(source: { readonly relationFields?: readonly string[] } | null | undefined): ReadonlySet<string> | undefined {
+  return source?.relationFields ? new Set(source.relationFields) : undefined;
+}
+
+/**
+ * A field the form's DTO requires is in the form, a system field (an order) included: left out,
+ * every create the form sends is refused for the missing value.
+ */
+export function withRequiredInForm(f: FieldInfo): FieldInfo {
+  return f.isSystemField && f.required ? { ...f, isSystemField: false } : f;
 }
 
 /** Fields that exist in the data model but should not be displayed or edited by users. */
@@ -2043,6 +2072,7 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     // graph acyclic: the source is written against the contracts declared here.
     const { loadMetaScaffoldSource } = await import("../meta/scaffold-source.js");
     const metaSource = await loadMetaScaffoldSource(rootDir, entity);
+    const contractOptions: ContractKindOptions = { peeks: referencePeeks, relationFields: relationsOf(metaSource) };
     const { loadMetaHolders } = await import("../meta/scaffold-source.js");
     const metaHolders = metaSource ? await loadMetaHolders(rootDir, entity) : [];
 
@@ -2362,7 +2392,7 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       const holderList = holder.source.roles.list;
       const holderPackage = (await findSchemaFile(rootDir, holder.entity))?.packageName ?? null;
       if (!holderList || !holderPackage) continue;
-      const holderFields = withContractKinds(holder.source.rowFields ?? holder.source.fields, holder.source.rowIdField, referencePeeks)
+      const holderFields = withContractKinds(holder.source.rowFields ?? holder.source.fields, holder.source.rowIdField, { peeks: referencePeeks, relationFields: relationsOf(holder.source) })
         .filter((f) => f.name !== holder.field);
       holders.push({
         entity: holder.entity,
@@ -2394,15 +2424,15 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       entityKebab,
       entity,
       entityPlural,
-      fields: withContractKinds(fields, rowIdField, referencePeeks),
+      fields: withContractKinds(fields.map(withRequiredInForm), rowIdField, contractOptions),
       // A detail draws what the get route answers with, which holds what the server derives
       // (a standing, a display name, a last-seen time) and no request body states.
-      detailFields: withContractKinds(metaSource?.detailFields ?? fields, rowIdField, referencePeeks),
+      detailFields: withContractKinds(metaSource?.detailFields ?? fields, rowIdField, contractOptions),
       // The enum the detail header draws as the record's standing.
-      statusField: withContractKinds(metaSource?.detailFields ?? fields, undefined, referencePeeks).find(
+      statusField: withContractKinds(metaSource?.detailFields ?? fields, undefined, contractOptions).find(
         (f) => f.contractKind === "enum" && /(^|[a-z])(status|state|standing)$/i.test(f.name),
       )?.name,
-      listFields: withContractKinds(listFields, rowIdField, referencePeeks),
+      listFields: withContractKinds(listFields, rowIdField, contractOptions),
       packageName,
       listRowType,
       treeRowType,

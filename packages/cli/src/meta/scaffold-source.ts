@@ -85,6 +85,11 @@ export interface MetaScaffoldSource {
   keywordSearch: boolean;
   /** Roles SimpliX Meta states that no generated screen reaches, reported rather than generated. */
   unreachableRoles: string[];
+  /**
+   * The entity's fields that hold another record's key, as the referenced entities' `holders`
+   * state them, plus every key whose record arrives nested beside it.
+   */
+  relationFields?: string[];
 }
 
 /** Roles the UI templates offer no affordance for: nothing generated sends these requests. */
@@ -138,11 +143,28 @@ export async function loadMetaScaffoldSource(
       if (!exported.has(domain.name)) continue;
       const tag = domain.entities.find((one) => entityNameOf(one.tag) === entity)?.tag;
       if (tag === undefined) continue;
-      return buildMetaScaffoldSource({ domain, tag, naming });
+      const source = buildMetaScaffoldSource({ domain, tag, naming });
+      source.relationFields = relationFieldsOf(document, tag.split(".").pop() ?? tag, source);
+      return source;
     }
   }
 
   return null;
+}
+
+/**
+ * The fields of `holderEntity` that hold another record's key: every `holders` entry naming it,
+ * and every key the source already reads as a nested reference.
+ */
+export function relationFieldsOf(document: DtoMeta, holderEntity: string, source: MetaScaffoldSource): string[] {
+  const out = new Set<string>();
+  for (const entity of Object.values(document.entities ?? {})) {
+    for (const holder of entity.holders ?? []) if (holder.entity === holderEntity) out.add(holder.field);
+  }
+  for (const one of [...source.fields, ...(source.detailFields ?? []), ...(source.rowFields ?? [])]) {
+    if (one.referenceNamePath) out.add(one.name);
+  }
+  return [...out].sort();
 }
 
 /** One entity whose records point back at the scaffolded one, as SimpliX Meta's `holders` state it. */
@@ -185,7 +207,9 @@ export async function loadMetaHolders(rootDir: string, entity: string): Promise<
         if (!exported.has(domain.name)) continue;
         const tag = domain.entities.find((one) => one.tag.split(".").pop() === holder.entity)?.tag;
         if (tag === undefined) continue;
-        out.push({ entity: entityNameOf(tag), field: holder.field, operator, source: buildMetaScaffoldSource({ domain, tag, naming }) });
+        const source = buildMetaScaffoldSource({ domain, tag, naming });
+        source.relationFields = relationFieldsOf(document, holder.entity, source);
+        out.push({ entity: entityNameOf(tag), field: holder.field, operator, source });
         break;
       }
     }
@@ -443,6 +467,7 @@ function fieldInfos(
     const alias = sortAliasOf(domain, searchDto, field.name);
     if (alias) one.sortAlias = alias;
     if (field.format === "code") one.isCode = true;
+    if (field.required) one.required = true;
     fields.push(one);
   }
 
