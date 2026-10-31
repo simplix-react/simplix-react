@@ -8,6 +8,7 @@ import { toPascalCase } from "../utils/case.js";
 import { renderTemplate } from "../utils/template.js";
 import { loadConfig } from "../config/config-loader.js";
 import { withVersions } from "../versions.js";
+import { ModulePathError, parseModulePath, type ModulePath } from "../utils/module-path.js";
 import {
   modulePackageJson,
   moduleTsupConfig,
@@ -67,9 +68,22 @@ export const addModuleCommand = new Command("add-module")
     const locales = config.i18n?.locales ?? ["en", "ko", "ja"];
     const prefix = config.packages?.prefix ?? baseName;
 
-    const dirName = prefix ? `${prefix}-${name}` : name;
-    const modulePkgName = scope ? `${scope}/${dirName}` : dirName;
-    const targetDir = join(rootDir, "modules", dirName);
+    // A grouped name (`admin/user`) lands in `modules/admin/user`, and its package name and i18n
+    // namespace carry the group (`admin-user`) so two groups may each hold a module of one name.
+    let module: ModulePath;
+    try {
+      module = parseModulePath(name, config.modules?.groups);
+    } catch (error) {
+      if (!(error instanceof ModulePathError)) throw error;
+      log.error(error.message);
+      process.exit(1);
+    }
+    const leafName = prefix ? `${prefix}-${module.leaf}` : module.leaf;
+    const dirName = module.group ? `${module.group}/${leafName}` : leafName;
+    const baseModuleName = module.group ? `${module.group}-${module.leaf}` : module.leaf;
+    const qualifiedName = prefix ? `${prefix}-${baseModuleName}` : baseModuleName;
+    const modulePkgName = scope ? `${scope}/${qualifiedName}` : qualifiedName;
+    const targetDir = join(rootDir, "modules", ...dirName.split("/"));
 
     if (await pathExists(targetDir)) {
       log.error(`Module "${dirName}" already exists.`);
@@ -80,14 +94,15 @@ export const addModuleCommand = new Command("add-module")
 
     try {
       const ctx = withVersions({
-        moduleName: name,
+        moduleName: baseModuleName,
         modulePkgName,
         projectName: baseName,
         scope,
         enableI18n,
         locales,
-        PascalName: toPascalCase(name),
-        namespace: prefix ? `${prefix}-${name}` : name,
+        PascalName: toPascalCase(baseModuleName),
+        namespace: qualifiedName,
+        rootRelative: dirName.split("/").map(() => "..").concat("..").join("/"),
       });
 
       const files: Record<string, string> = {

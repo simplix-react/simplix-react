@@ -195,6 +195,29 @@ describe("scaffoldCrudCommand action", () => {
     expect(await pathExists(join(tempDir, "modules/mod1/src/widgets/product/index.ts"))).toBe(false);
   });
 
+  it("targets a grouped module inside its group", async () => {
+    const { loadConfig } = await import("../config/config-loader.js");
+    const base = await vi.mocked(loadConfig)(tempDir);
+    vi.mocked(loadConfig).mockResolvedValue({ ...base, modules: { groups: ["admin", "shared"] } });
+    try {
+      const { scaffoldCrudCommand } = await import("../commands/scaffold-crud.js");
+      for (const path of ["admin/user", "shared/account"]) {
+        const modDir = join(tempDir, `modules/${path}`);
+        await mkdir(join(modDir, "src/widgets"), { recursive: true });
+        await writeFile(join(modDir, "package.json"), JSON.stringify({ name: `@test/${path.replace("/", "-")}`, dependencies: {} }));
+        await writeFile(join(modDir, "src/widgets/index.ts"), "export {};\n");
+      }
+      await mkdir(join(tempDir, "packages"), { recursive: true });
+
+      await scaffoldCrudCommand.parseAsync(["node", "simplix", "product", "--module", "admin/user"]);
+
+      expect(await pathExists(join(tempDir, "modules/admin/user/src/widgets/product/index.ts"))).toBe(true);
+      expect(await pathExists(join(tempDir, "modules/shared/account/src/widgets/product"))).toBe(false);
+    } finally {
+      vi.mocked(loadConfig).mockResolvedValue(base);
+    }
+  });
+
   it("skips existing widget files", async () => {
     const { scaffoldCrudCommand } = await import("../commands/scaffold-crud.js");
     const { log } = await import("../utils/logger.js");

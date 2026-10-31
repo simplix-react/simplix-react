@@ -1,4 +1,6 @@
 import { Command } from "commander";
+import { moduleDirOf } from "../utils/module-path.js";
+import { resolveModuleNamespace, resolveModuleOption } from "./scaffold-crud.js";
 import { join, relative, resolve } from "node:path";
 
 import { loadConfig } from "../config/config-loader.js";
@@ -78,7 +80,7 @@ export const addPageCommand = new Command("add-page")
   .description("Generate a page of one kind from the project's, the UI kit's or the bundled template")
   .argument("<kind>", `Page kind: ${PAGE_KINDS.join(", ")}`)
   .argument("<name>", "Page name (e.g. my-profile, home, not-found)")
-  .option("--module <name>", "Module that owns the page (modules/<name>/src/pages/<page>)")
+  .option("--module <name>", "Module that owns the page (modules/<name>/src/pages/<page>); a grouped module is <group>/<name>")
   .option("--app <name>", "App that owns the page (apps/<name>/src/pages/<page>)")
   .action(runAddPage);
 
@@ -94,12 +96,14 @@ export async function runAddPage(rawKind: string, name: string, flags: { module?
       log.error("Name exactly one owner: --module <name> or --app <name>");
       process.exit(1);
     }
-    const owner = flags.module ? join(rootDir, "modules", flags.module) : join(rootDir, "apps", flags.app ?? "");
+    const module = flags.module ? await resolveModuleOption(rootDir, flags.module) : undefined;
+    const owner = module ? moduleDirOf(rootDir, module) : join(rootDir, "apps", flags.app ?? "");
     const config = await loadConfig(rootDir);
     const templates = await loadProjectTemplates(rootDir, config.templates?.from);
-    const namespace = flags.module ? `${flags.module}/pages` : "common";
+    // The module's i18n namespace is its package name, which a grouped module spells with its group.
+    const namespace = module ? `${await resolveModuleNamespace(owner)}/pages` : "common";
     const dir = kind === "app-shell" ? join(owner, "src", "app", "layouts") : join(owner, "src", "pages", toKebabCase(name));
-    const origin = `add-page ${kind} ${toKebabCase(name)} ${flags.module ? `--module ${flags.module}` : `--app ${flags.app}`}`;
+    const origin = `add-page ${kind} ${toKebabCase(name)} ${module ? `--module ${module.path}` : `--app ${flags.app}`}`;
     for (const [file, content] of Object.entries(renderPageKind(kind, name, namespace, templates, origin))) {
       const path = join(dir, kind === "app-shell" && file === "page.tsx" ? "root-layout.tsx" : kind === "app-shell" ? "root-layout.blocks.tsx" : file);
       // The blocks are the author's and written once; the page is rewritten while untouched and

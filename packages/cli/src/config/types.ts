@@ -124,6 +124,15 @@ export interface SimplixConfig {
     story?: { readonly id?: string; readonly title?: string };
   };
 
+  /**
+   * How UI modules are laid out under `modules/`. `groups` names directories that hold modules
+   * rather than being one (`["admin", "portal", "shared"]`), so `--module admin/user` addresses
+   * `modules/admin/user` and every other value names a module directly under `modules/`.
+   */
+  modules?: {
+    groups?: string[];
+  };
+
   /** Code generation options */
   codegen?: {
     /** Prepend auto-generated header comment to generated files (default: true) */

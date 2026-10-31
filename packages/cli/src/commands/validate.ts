@@ -1,4 +1,6 @@
 import { Command } from "commander";
+import { loadConfig } from "../config/config-loader.js";
+import { findModulePaths } from "../utils/module-path.js";
 import { join, relative } from "node:path";
 import { readdir } from "node:fs/promises";
 import { log } from "../utils/logger.js";
@@ -42,7 +44,8 @@ export const validateCommand = new Command("validate")
     const appsDir = join(rootDir, "apps");
 
     const packages = await discoverDirs(packagesDir);
-    const modules = await discoverDirs(modulesDir);
+    const groups = (await loadConfig(rootDir)).modules?.groups ?? [];
+    const modules = (await findModulePaths(rootDir, groups)).map((path) => join(modulesDir, ...path.split("/")));
     const apps = await discoverDirs(appsDir);
 
     // Validate each package

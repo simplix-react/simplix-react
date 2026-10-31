@@ -210,4 +210,25 @@ describe("addModuleCommand action (interactive)", () => {
     const targetDir = join(tempDir, "modules/myapp-monitoring");
     expect(await pathExists(targetDir)).toBe(true);
   });
+
+  it("lays a grouped module inside its group and carries the group in its package name and namespace", async () => {
+    const { loadConfig } = await import("../config/config-loader.js");
+    vi.mocked(loadConfig).mockResolvedValueOnce({ i18n: { locales: ["en", "ko"] }, packages: { prefix: "" }, modules: { groups: ["admin", "shared"] } });
+    const { addModuleCommand } = await import("../commands/add-module.js");
+
+    await addModuleCommand.parseAsync(["node", "simplix", "admin/user", "-y"]);
+
+    const targetDir = join(tempDir, "modules/admin/user");
+    const pkgJson = JSON.parse(await readFile(join(targetDir, "package.json"), "utf-8"));
+    expect(pkgJson.name).toBe("@test/admin-user");
+    const tsconfig = JSON.parse(await readFile(join(targetDir, "tsconfig.json"), "utf-8"));
+    expect(tsconfig.extends).toBe("../../../config/typescript/react.json");
+    expect(await readFile(join(targetDir, "src/locales/index.ts"), "utf-8")).toContain('"admin-user"');
+  });
+
+  it("refuses a group the config does not declare", async () => {
+    const { addModuleCommand } = await import("../commands/add-module.js");
+    await expect(addModuleCommand.parseAsync(["node", "simplix", "ops/user", "-y"])).rejects.toThrow("process.exit(1)");
+    expect(await pathExists(join(tempDir, "modules/ops"))).toBe(false);
+  });
 });

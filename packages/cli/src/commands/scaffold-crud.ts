@@ -1,4 +1,5 @@
 import { readFile, readdir } from "node:fs/promises";
+import { findModulePaths, moduleDirOf, modulePathOf, ModulePathError, parseModulePath, type ModulePath } from "../utils/module-path.js";
 import { basename, dirname, join, relative, resolve } from "node:path";
 
 import { Command } from "commander";
@@ -789,14 +790,10 @@ export async function resolvePackageName(
   return null;
 }
 
+/** Every module of the project as its `--module` spelling, grouped ones as `<group>/<module>`. */
 export async function findModuleDirs(rootDir: string): Promise<string[]> {
-  const modulesDir = join(rootDir, "modules");
-  if (!(await pathExists(modulesDir))) return [];
-
-  const entries = await readdir(modulesDir, { withFileTypes: true });
-  return entries
-    .filter((e) => e.isDirectory() && !e.name.startsWith("."))
-    .map((e) => e.name);
+  const config = await loadConfig(rootDir);
+  return findModulePaths(rootDir, config.modules?.groups);
 }
 
 export interface EntityOperations {
@@ -1486,6 +1483,22 @@ async function ensurePackageJsonPagesExport(moduleDir: string): Promise<void> {
   log.info("Updated package.json with pages export");
 }
 
+/**
+ * Resolves a `--module` value against the project's `modules.groups`, ending the run with the
+ * reason when it names an undeclared group or a group itself.
+ */
+export async function resolveModuleOption(rootDir: string, value: string): Promise<ModulePath> {
+  const config = await loadConfig(rootDir);
+  try {
+    return parseModulePath(value, config.modules?.groups);
+  } catch (error) {
+    if (!(error instanceof ModulePathError)) throw error;
+    log.error(error.message);
+    process.exit(1);
+    throw error;
+  }
+}
+
 export async function resolveModuleNamespace(moduleDir: string): Promise<string> {
   const pkgPath = join(moduleDir, "package.json");
   if (!(await pathExists(pkgPath))) return "unknown";
@@ -1933,18 +1946,19 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     outputDir = resolve(rootDir, options.output);
     relativeOutput = options.output;
   } else if (options.module) {
-    // FSD module specified → features/<entity>/
-    moduleDir = resolve(rootDir, "modules", options.module);
+    // FSD module specified → features/<entity>/; a grouped path's group comes from the config.
+    const module = await resolveModuleOption(rootDir, options.module);
+    moduleDir = moduleDirOf(rootDir, module);
     outputDir = resolve(moduleDir, "src", "widgets", entityKebab);
-    relativeOutput = join("modules", options.module, "src", "widgets", entityKebab);
+    relativeOutput = join("modules", ...module.path.split("/"), "src", "widgets", entityKebab);
   } else {
     // Auto-detect: find available modules
     const moduleDirs = await findModuleDirs(rootDir);
     if (moduleDirs.length === 1) {
       // Single module → use it
-      moduleDir = resolve(rootDir, "modules", moduleDirs[0]);
+      moduleDir = resolve(rootDir, "modules", ...moduleDirs[0].split("/"));
       outputDir = resolve(moduleDir, "src", "widgets", entityKebab);
-      relativeOutput = join("modules", moduleDirs[0], "src", "widgets", entityKebab);
+      relativeOutput = join("modules", ...moduleDirs[0].split("/"), "src", "widgets", entityKebab);
       log.info(`Auto-detected module: ${moduleDirs[0]}`);
     } else if (moduleDirs.length > 1) {
       log.error("Multiple modules found. Specify --module <dir>:");
@@ -2406,7 +2420,7 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     // The arguments that lay these files down again, recorded after each fingerprint so the
     // generated-state report can re-render them and tell an untouched file from a stale one.
     const origin = moduleDir
-      ? `scaffold ${entityKebab} --module ${basename(moduleDir)}`
+      ? `scaffold ${entityKebab} --module ${modulePathOf(rootDir, moduleDir)}`
       : `scaffold ${entityKebab} --output ${relativeOutput}`;
     const widgetBlocks = renderWidgetBlocks(files, fullCtx, projectTemplates);
 

@@ -16,6 +16,7 @@ import {
   entityFieldsToFieldInfo,
   findEntityFromSnapshot,
   findModuleDirs,
+  resolveModuleOption,
   findMutationPathParam,
   findSchemaFile,
   orderAndCategorizeFields,
@@ -237,7 +238,7 @@ export async function runNativeScaffold(
   // ── Resolve target module ──
   let moduleName: string;
   if (options.module) {
-    moduleName = options.module;
+    moduleName = (await resolveModuleOption(rootDir, options.module)).path;
   } else {
     const moduleDirs = await findModuleDirs(rootDir);
     if (moduleDirs.length === 1) {
@@ -256,7 +257,7 @@ export async function runNativeScaffold(
       return;
     }
   }
-  const moduleDir = resolve(rootDir, "modules", moduleName);
+  const moduleDir = resolve(rootDir, "modules", ...moduleName.split("/"));
   if (!(await pathExists(moduleDir))) {
     log.error(`Module "${moduleName}" not found under modules/.`);
     process.exit(1);

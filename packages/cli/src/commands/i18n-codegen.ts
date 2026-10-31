@@ -1,5 +1,7 @@
 import { Command } from "commander";
-import { join, basename } from "node:path";
+import { loadConfig } from "../config/config-loader.js";
+import { findModulePaths } from "../utils/module-path.js";
+import { join, basename, dirname } from "node:path";
 import { readdir, readFile, writeFile, watch } from "node:fs/promises";
 import { log } from "../utils/logger.js";
 import { pathExists, findProjectRoot } from "../utils/fs.js";
@@ -61,12 +63,11 @@ async function discoverLocaleDirs(modulesDir: string): Promise<string[]> {
 
   if (!(await pathExists(modulesDir))) return dirs;
 
-  const moduleEntries = await readdir(modulesDir, { withFileTypes: true });
-
-  for (const moduleEntry of moduleEntries) {
-    if (!moduleEntry.isDirectory() || moduleEntry.name.startsWith(".")) continue;
-
-    const localesRoot = join(modulesDir, moduleEntry.name, "src", "locales");
+  // A grouped module sits one level down (`modules/admin/user`); the config names the groups.
+  const rootDir = dirname(modulesDir);
+  const groups = (await loadConfig(rootDir)).modules?.groups ?? [];
+  for (const modulePath of await findModulePaths(rootDir, groups)) {
+    const localesRoot = join(modulesDir, ...modulePath.split("/"), "src", "locales");
     if (!(await pathExists(localesRoot))) continue;
 
     // Recursively find directories containing .json locale files
