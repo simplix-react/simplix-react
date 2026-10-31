@@ -60,6 +60,34 @@ describe("validateI18nRules", () => {
     expect(result.errors.some((e) => e.includes('Missing key "farewell"'))).toBe(true);
   });
 
+  it("asks a locale only for the plural categories its CLDR rules use", async () => {
+    const localesDir = join(tempDir, "src/locales");
+    await mkdir(localesDir, { recursive: true });
+    await writeFile(join(localesDir, "en.json"), JSON.stringify({ count_one: "{{count}} position", count_other: "{{count}} positions" }));
+    await writeFile(join(localesDir, "ko.json"), JSON.stringify({ count_other: "직책 {{count}}개" }));
+    await writeFile(join(localesDir, "ru.json"), JSON.stringify({ count_one: "one", count_other: "other" }));
+
+    const result = makeResult();
+    await validateI18nRules(tempDir, result, { fix: true });
+
+    // Korean uses only `other`: its catalogue is complete and is not written.
+    expect(JSON.parse(await readFile(join(localesDir, "ko.json"), "utf-8"))).toEqual({ count_other: "직책 {{count}}개" });
+    expect(result.passes.some((p) => p.includes("ko.json") && p.includes("Auto-fixed"))).toBe(false);
+    // Russian also uses `few` and `many`, filled from the reference's `other`.
+    expect(JSON.parse(await readFile(join(localesDir, "ru.json"), "utf-8"))).toMatchObject({ count_few: "{{count}} positions", count_many: "{{count}} positions" });
+  });
+
+  it("reports an English-only plural form in a Korean catalogue as extra", async () => {
+    const localesDir = join(tempDir, "src/locales");
+    await mkdir(localesDir, { recursive: true });
+    await writeFile(join(localesDir, "en.json"), JSON.stringify({ count_one: "one", count_other: "other" }));
+    await writeFile(join(localesDir, "ko.json"), JSON.stringify({ count_one: "one", count_other: "기타" }));
+
+    const result = makeResult();
+    await validateI18nRules(tempDir, result);
+    expect(result.warnings.some((w) => w.includes('Extra key "count_one"'))).toBe(true);
+  });
+
   it("reports extra keys in non-reference locale", async () => {
     const localesDir = join(tempDir, "src/locales");
     await mkdir(localesDir, { recursive: true });

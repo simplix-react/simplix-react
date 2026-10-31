@@ -29,10 +29,12 @@ export async function validateI18nRules(
       if (locale === refLocale) continue;
 
       const localeKeys = flattenKeys(content);
-      const refKeySet = new Set(refKeys.map((k) => k.key));
+      const expected = expectedKeysFor(refKeys.map((k) => k.key), locale);
+      const refKeySet = new Set(expected.keys());
       const localeKeySet = new Set(localeKeys.map((k) => k.key));
 
       const localeModified = applyKeyChecks(
+        expected,
         refKeySet,
         localeKeySet,
         refData,
@@ -65,6 +67,45 @@ export async function validateI18nRules(
   }
 }
 
+const PLURAL_SUFFIX = /^(.*?)(_ordinal)?_(zero|one|two|few|many|other)$/;
+
+/**
+ * The keys a locale's catalogue must hold, each mapped to the reference key its value comes from.
+ *
+ * <p>A plural key (`<base>_<category>`, or `<base>_ordinal_<category>`, whose `_other` form the
+ * reference holds) is expanded to the plural categories the locale's own CLDR rules use, not the
+ * reference's: Korean has only `other`, so an English `_one` is never asked of it, and a Russian
+ * catalogue is asked for `_few` and `_many`, filled from the reference's `_other`.
+ *
+ * @param refKeys the flattened keys of the reference catalogue
+ * @param locale the locale whose catalogue is checked
+ */
+export function expectedKeysFor(refKeys: readonly string[], locale: string): Map<string, string> {
+  const present = new Set(refKeys);
+  const expected = new Map<string, string>();
+  const categoriesOf = (ordinal: boolean): readonly string[] => {
+    try {
+      return new Intl.PluralRules(locale, { type: ordinal ? "ordinal" : "cardinal" }).resolvedOptions().pluralCategories;
+    } catch (err) {
+      if (err instanceof RangeError) return ["other"];
+      throw err;
+    }
+  };
+  for (const key of refKeys) {
+    const plural = PLURAL_SUFFIX.exec(key);
+    const stem = plural ? `${plural[1]}${plural[2] ?? ""}` : undefined;
+    if (!plural || stem === undefined || !present.has(`${stem}_other`)) {
+      expected.set(key, key);
+      continue;
+    }
+    for (const category of categoriesOf(plural[2] !== undefined)) {
+      const target = `${stem}_${category}`;
+      if (!expected.has(target)) expected.set(target, present.has(target) ? target : `${stem}_other`);
+    }
+  }
+  return expected;
+}
+
 async function loadLocaleFiles(
   groupPath: string,
   localeFiles: string[],
@@ -81,6 +122,7 @@ async function loadLocaleFiles(
 }
 
 function applyKeyChecks(
+  expected: Map<string, string>,
   refKeySet: Set<string>,
   localeKeySet: Set<string>,
   refData: Record<string, unknown>,
@@ -94,6 +136,7 @@ function applyKeyChecks(
   let modified = false;
 
   modified = checkMissingKeys(
+    expected,
     refKeySet,
     localeKeySet,
     refData,
@@ -119,6 +162,7 @@ function applyKeyChecks(
 }
 
 function checkMissingKeys(
+  expected: Map<string, string>,
   refKeySet: Set<string>,
   localeKeySet: Set<string>,
   refData: Record<string, unknown>,
@@ -135,7 +179,7 @@ function checkMissingKeys(
     if (localeKeySet.has(key)) continue;
 
     if (options?.fix) {
-      const refValue = getNestedValue(refData, key);
+      const refValue = getNestedValue(refData, expected.get(key) ?? key);
       setNestedValue(content, key, refValue);
       modified = true;
       result.passes.push(
