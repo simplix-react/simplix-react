@@ -162,6 +162,31 @@ export interface SimplixConfig {
 
   /** OpenAPI code generation — array of per-spec configurations */
   openapi?: OpenAPISpecConfig[];
+
+  /** What the project checks run over; each command also takes its roots as arguments. */
+  checks?: SimplixChecksConfig;
+}
+
+/** Inputs of `simplix cycles` and `simplix meta-removals`, relative to the project root. */
+export interface SimplixChecksConfig {
+  cycles?: {
+    /** Directories whose source files are the nodes of the import graph. */
+    roots?: string[];
+  };
+  metaRemovals?: {
+    /** Directories whose source files are searched for names the snapshot lost. */
+    roots?: string[];
+    /**
+     * The SimpliX Meta snapshot to compare. Absent, the one `openapi[].meta.snapshot` the config
+     * declares is used.
+     */
+    snapshot?: string;
+    /**
+     * A JSON file `{ "acknowledged": ["field Owner.name", ...] }` listing removals that are
+     * intended. Absent, nothing is acknowledged.
+     */
+    acknowledged?: string;
+  };
 }
 
 /**

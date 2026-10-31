@@ -16,6 +16,8 @@ import { scaffoldCrudCommand } from "./commands/scaffold-crud.js";
 import { addPageCommand } from "./commands/add-page.js";
 import { generatedCommand } from "./commands/generated.js";
 import { kitFenceCommand } from "./commands/kit-fence.js";
+import { cyclesCommand } from "./commands/cycles.js";
+import { metaRemovalsCommand } from "./commands/meta-removals.js";
 import { frameworkVersion } from "./versions.js";
 import { findProjectRoot, pathExists } from "./utils/fs.js";
 import { loadConfig } from "./config/config-loader.js";
@@ -97,5 +99,7 @@ program.addCommand(generatedCommand);
 program.addCommand(kitFenceCommand);
 program.addCommand(metaCommand);
 program.addCommand(metaDiffCommand);
+program.addCommand(cyclesCommand);
+program.addCommand(metaRemovalsCommand);
 
 program.parse();
