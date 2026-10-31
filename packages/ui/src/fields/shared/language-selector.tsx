@@ -17,12 +17,23 @@ import {
 } from "./language-selector.style";
 
 
+/**
+ * Where an i18n field draws its language selector.
+ *
+ * - `label` - beside the field's label, above the control.
+ * - `inset` - inside the control: at the inline end of an input, vertically centred, and in the
+ *   bottom inline-end corner of a textarea.
+ */
+export type LanguageSelectorPlacement = "label" | "inset";
+
 export interface LanguageSelectorProps {
   languages: LocaleConfig[];
   value: LocaleCode;
   onChange: (language: LocaleCode) => void;
   filledLanguages?: LocaleCode[];
   disabled?: boolean;
+  /** Where the selector is drawn, which picks its look; see {@link LanguageSelectorPlacement}. */
+  placement?: LanguageSelectorPlacement;
   className?: string;
 }
 
@@ -74,6 +85,7 @@ export function LanguageSelector({
   onChange,
   filledLanguages = [],
   disabled,
+  placement = "label",
   className,
 }: LanguageSelectorProps) {
   const { Select, SelectTrigger, SelectContent, SelectItem } =
@@ -102,7 +114,7 @@ export function LanguageSelector({
   return (
     <div
       className={cn("flex flex-col overflow-hidden", className)}
-      {...slotAttributes(languageSelectorStyle, {})}
+      {...slotAttributes(languageSelectorStyle, { placement })}
     >
       <div className="flex items-center">
         <button
@@ -119,7 +131,7 @@ export function LanguageSelector({
         <Select value={value} onValueChange={onChange} disabled={disabled}>
           <SelectTrigger
             aria-label={t("field.selectLanguage")}
-            className="!h-auto !min-h-0 w-[80px] [&>svg]:hidden justify-center"
+            className="!h-auto !min-h-0 w-20 [&>svg]:hidden justify-center"
             {...partAttributes(languageTriggerStyle, {})}
           >
             <span

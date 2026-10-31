@@ -424,6 +424,7 @@ export { TreeSelectField } from "./fields/form/tree-select-field";
 export type { TreeSelectFieldProps } from "./fields/form/tree-select-field";
 export { TreeMultiSelectField } from "./fields/form/tree-multi-select-field";
 export type { TreeMultiSelectFieldProps } from "./fields/form/tree-multi-select-field";
+export type { LanguageSelectorPlacement } from "./fields/form";
 
 // Icon field
 export { IconField } from "./fields/form/icon-field";

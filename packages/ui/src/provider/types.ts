@@ -99,7 +99,11 @@ export interface SheetComponents {
 }
 
 export interface PopoverComponents {
-  Root: ComponentType<{ children?: React.ReactNode; open?: boolean; onOpenChange?: (open: boolean) => void }>;
+  /**
+   * `modal` gives the popover its own focus scope and blocks the page behind it: what a popover
+   * holding a text input needs inside a dialog, whose focus trap otherwise takes the input's focus.
+   */
+  Root: ComponentType<{ children?: React.ReactNode; open?: boolean; onOpenChange?: (open: boolean) => void; modal?: boolean }>;
   Trigger: ComponentType<{ children?: React.ReactNode; asChild?: boolean }>;
   /**
    * Positions the popover against something other than its trigger. A field whose

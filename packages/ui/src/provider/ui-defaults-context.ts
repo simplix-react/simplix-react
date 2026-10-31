@@ -1,6 +1,7 @@
 import { createContext, useContext } from "react";
 
 import type { ActionVariant } from "../crud/shared/row-actions";
+import type { LanguageSelectorPlacement } from "../fields/shared/language-selector";
 
 /**
  * Prop defaults a product sets once for its whole console.
@@ -54,6 +55,15 @@ export interface UIDefaults {
    * columns need; `"table"` and `"cards"` hold one shape at every width.
    */
   listPresentation: "auto" | "table" | "cards";
+  /**
+   * Where an i18n text field or textarea draws its language selector when the field does not say.
+   *
+   * <p>`"label"` is the framework's own default: the selector sits beside the label, above the
+   * control. `"inset"` draws it inside the control, at the inline end of an input and in the
+   * bottom inline-end corner of a textarea, with the text kept clear of it. A form-wide look,
+   * so an installation picks it once at its root; a field can still set its own.
+   */
+  languageSelectorPlacement: LanguageSelectorPlacement;
 }
 
 /** What a product gets when it declares nothing. */
@@ -62,6 +72,7 @@ export const UI_DEFAULTS: UIDefaults = {
   detailPresentation: "panel",
   density: "default",
   listPresentation: "auto",
+  languageSelectorPlacement: "label",
 };
 
 export const UIDefaultsContext = createContext<UIDefaults>(UI_DEFAULTS);

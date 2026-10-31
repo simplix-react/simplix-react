@@ -1,10 +1,12 @@
 import type { LocaleCode, LocaleConfig } from "@simplix-react/i18n";
-import { useState, type ReactNode } from "react";
+import { type CSSProperties, useState, type ReactNode } from "react";
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { FieldWrapper } from "../shared/field-wrapper";
 import { getFilledLanguages } from "../shared/filled-languages";
-import { LanguageSelector } from "../shared/language-selector";
+import { LanguageInset } from "../shared/language-inset";
+import { LanguageSelector, type LanguageSelectorPlacement } from "../shared/language-selector";
+import { useUIDefaults } from "../../provider/ui-defaults-context";
 import { InlineIconPickerTrigger } from "../shared/inline-icon-picker-trigger";
 import { ColorPicker } from "../../base/inputs/color-picker";
 
@@ -16,6 +18,11 @@ export interface I18nTextFieldProps extends CommonFieldProps {
   languages: LocaleConfig[];
   selectedLanguage?: LocaleCode;
   onLanguageChange?: (language: LocaleCode) => void;
+  /**
+   * Where the language selector is drawn. Omitted, the installation's choice applies
+   * (`UIProvider` `defaults.languageSelectorPlacement`, `"label"` unless set).
+   */
+  languageSelectorPlacement?: LanguageSelectorPlacement;
   placeholder?: string | I18nValue;
   maxLength?: number;
   type?: "text" | "email" | "url" | "tel";
@@ -43,6 +50,7 @@ export function I18nTextField({
   languages,
   selectedLanguage,
   onLanguageChange,
+  languageSelectorPlacement,
   placeholder,
   maxLength,
   type = "text",
@@ -72,6 +80,9 @@ export function I18nTextField({
   const currentLang = selectedLanguage ?? internalLang;
   const handleLangChange = onLanguageChange ?? setInternalLang;
 
+  const uiDefaults = useUIDefaults();
+  const placement = languageSelectorPlacement ?? uiDefaults.languageSelectorPlacement;
+
   const filledLanguages = getFilledLanguages(value);
 
   // Per-locale placeholder: undefined when key absent (no placeholder shown for that locale).
@@ -85,8 +96,10 @@ export function I18nTextField({
       onChange={handleLangChange}
       filledLanguages={filledLanguages}
       disabled={disabled}
+      placement={placement}
     />
   ) : undefined;
+  const insetSelector = placement === "inset" ? languageSelector : undefined;
 
   const resolvedPrefix = prefixControl ?? (onIconChange ? (
     <InlineIconPickerTrigger value={iconValue} onChange={onIconChange} disabled={disabled} />
@@ -99,7 +112,7 @@ export function I18nTextField({
     <FieldWrapper
       label={label}
       labelKey={labelKey}
-      labelExtra={languageSelector}
+      labelExtra={placement === "label" ? languageSelector : undefined}
       error={error}
       warning={warning}
       description={description}
@@ -110,22 +123,32 @@ export function I18nTextField({
       className={className}
       {...variantProps}
     >
-      {({ id }) => (
-        <Input
-          id={id}
-          type={type}
-          value={value?.[currentLang] ?? ""}
-          onChange={(e) => onChange({ ...value, [currentLang]: e.target.value })}
-          placeholder={currentPlaceholder}
-          maxLength={maxLength}
-          required={required}
-          disabled={disabled}
-          aria-invalid={!!error}
-          aria-label={variantProps.layout === "hidden" ? label : undefined}
-          {...inputProps}
-          className={inputProps?.className}
-        />
-      )}
+      {({ id }) => {
+        const renderControl = (reserve?: CSSProperties) => (
+            <Input
+              id={id}
+              type={type}
+              value={value?.[currentLang] ?? ""}
+              onChange={(e) => onChange({ ...value, [currentLang]: e.target.value })}
+              placeholder={currentPlaceholder}
+              maxLength={maxLength}
+              required={required}
+              disabled={disabled}
+              aria-invalid={!!error}
+              aria-label={variantProps.layout === "hidden" ? label : undefined}
+              {...inputProps}
+              style={reserve ? { ...inputProps?.style, ...reserve } : inputProps?.style}
+              className={inputProps?.className}
+            />
+        );
+        return insetSelector ? (
+          <LanguageInset control="input" selector={insetSelector}>
+            {renderControl}
+          </LanguageInset>
+        ) : (
+          renderControl()
+        );
+      }}
     </FieldWrapper>
   );
 }

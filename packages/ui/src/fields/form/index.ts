@@ -83,6 +83,7 @@ export type { TimezoneFieldProps } from "./timezone-field";
 
 export { I18nTextField } from "./i18n-text-field";
 export type { I18nTextFieldProps, I18nValue } from "./i18n-text-field";
+export type { LanguageSelectorPlacement } from "../shared/language-selector";
 
 export { I18nTextareaField } from "./i18n-textarea-field";
 export type { I18nTextareaFieldProps } from "./i18n-textarea-field";

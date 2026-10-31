@@ -1,11 +1,13 @@
 import type { LocaleCode, LocaleConfig } from "@simplix-react/i18n";
-import { useState } from "react";
+import { type CSSProperties, useState } from "react";
 import type { CommonFieldProps } from "../../crud/shared/types";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import { cn } from "../../utils/cn";
 import { FieldWrapper } from "../shared/field-wrapper";
 import { getFilledLanguages } from "../shared/filled-languages";
-import { LanguageSelector } from "../shared/language-selector";
+import { LanguageInset } from "../shared/language-inset";
+import { LanguageSelector, type LanguageSelectorPlacement } from "../shared/language-selector";
+import { useUIDefaults } from "../../provider/ui-defaults-context";
 import { resizeClasses } from "../shared/textarea-utils";
 import type { I18nValue } from "./i18n-text-field";
 
@@ -15,6 +17,11 @@ export interface I18nTextareaFieldProps extends CommonFieldProps {
   languages: LocaleConfig[];
   selectedLanguage?: LocaleCode;
   onLanguageChange?: (language: LocaleCode) => void;
+  /**
+   * Where the language selector is drawn. Omitted, the installation's choice applies
+   * (`UIProvider` `defaults.languageSelectorPlacement`, `"label"` unless set).
+   */
+  languageSelectorPlacement?: LanguageSelectorPlacement;
   placeholder?: string | I18nValue;
   maxLength?: number;
   rows?: number;
@@ -28,6 +35,7 @@ export function I18nTextareaField({
   languages,
   selectedLanguage,
   onLanguageChange,
+  languageSelectorPlacement,
   placeholder,
   maxLength,
   rows,
@@ -52,6 +60,9 @@ export function I18nTextareaField({
   const currentLang = selectedLanguage ?? internalLang;
   const handleLangChange = onLanguageChange ?? setInternalLang;
 
+  const uiDefaults = useUIDefaults();
+  const placement = languageSelectorPlacement ?? uiDefaults.languageSelectorPlacement;
+
   const filledLanguages = getFilledLanguages(value);
 
   // Per-locale placeholder: undefined when key absent (no placeholder shown for that locale).
@@ -65,14 +76,16 @@ export function I18nTextareaField({
       onChange={handleLangChange}
       filledLanguages={filledLanguages}
       disabled={disabled}
+      placement={placement}
     />
   ) : undefined;
+  const insetSelector = placement === "inset" ? languageSelector : undefined;
 
   return (
     <FieldWrapper
       label={label}
       labelKey={labelKey}
-      labelExtra={languageSelector}
+      labelExtra={placement === "label" ? languageSelector : undefined}
       error={error}
       warning={warning}
       description={description}
@@ -81,22 +94,32 @@ export function I18nTextareaField({
       className={className}
       {...variantProps}
     >
-      {({ id }) => (
-        <Textarea
-          id={id}
-          value={value?.[currentLang] ?? ""}
-          onChange={(e) => onChange({ ...value, [currentLang]: e.target.value })}
-          placeholder={currentPlaceholder}
-          maxLength={maxLength}
-          rows={rows}
-          required={required}
-          disabled={disabled}
-          aria-invalid={!!error}
-          aria-label={variantProps.layout === "hidden" ? label : undefined}
-          {...textareaProps}
-          className={cn(resizeClasses[resize], textareaProps?.className)}
-        />
-      )}
+      {({ id }) => {
+        const renderControl = (reserve?: CSSProperties) => (
+            <Textarea
+              id={id}
+              value={value?.[currentLang] ?? ""}
+              onChange={(e) => onChange({ ...value, [currentLang]: e.target.value })}
+              placeholder={currentPlaceholder}
+              maxLength={maxLength}
+              rows={rows}
+              required={required}
+              disabled={disabled}
+              aria-invalid={!!error}
+              aria-label={variantProps.layout === "hidden" ? label : undefined}
+              {...textareaProps}
+              style={reserve ? { ...textareaProps?.style, ...reserve } : textareaProps?.style}
+              className={cn(resizeClasses[resize], textareaProps?.className)}
+            />
+        );
+        return insetSelector ? (
+          <LanguageInset control="textarea" selector={insetSelector}>
+            {renderControl}
+          </LanguageInset>
+        ) : (
+          renderControl()
+        );
+      }}
     </FieldWrapper>
   );
 }
