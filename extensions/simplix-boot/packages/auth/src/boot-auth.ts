@@ -35,6 +35,12 @@ export interface BootAuthOptions {
   /** Cross-tab logout/token sync. Defaults to true. */
   crossTabSync?: boolean;
   /**
+   * Called after another tab of the same app signed out and this tab's tokens were cleared with it.
+   * The clear changes no route, so a screen left open keeps drawing the account until its next
+   * request; this is where the app sends it to its sign-in screen.
+   */
+  onExternalLogout?: () => void;
+  /**
    * Tokens come from an external issuer, such as an OpenID Connect provider, instead of the Boot
    * token endpoints. Refreshing and revoking go through it, and `authClient.loginFn` refuses,
    * since signing in happens at the issuer.
@@ -178,7 +184,10 @@ export function createBootAuth(options: BootAuthOptions = {}): BootAuthResult {
   if (options.crossTabSync ?? true) {
     const crossTab = createCrossTabSync({
       storageKey: `${options.storePrefix ?? "simplix:"}access_token`,
-      onExternalLogout: () => auth.clear(),
+      onExternalLogout: () => {
+        auth.clear();
+        options.onExternalLogout?.();
+      },
       onExternalTokenUpdate: () => {},
     });
     crossTab.start();
