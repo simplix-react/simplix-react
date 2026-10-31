@@ -42,6 +42,12 @@ export function composeSchemes(...schemes: AuthScheme[]): AuthScheme {
       return schemes.some((s) => s.isAuthenticated());
     },
 
+    tokensChanged() {
+      for (const scheme of schemes) {
+        scheme.tokensChanged?.();
+      }
+    },
+
     clear() {
       for (const scheme of schemes) {
         scheme.clear();

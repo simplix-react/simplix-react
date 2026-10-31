@@ -10,6 +10,7 @@ import { getRequestLocale } from "@simplix-react/api";
 import {
   AuthError,
   createAuth,
+  createActivityTracker,
   createAuthFetch,
   createCrossTabSync,
   bearerScheme,
@@ -32,8 +33,13 @@ export interface BootAuthOptions {
   rawFetchOptions?: { baseUrl?: string };
   /** Background token auto-refresh. Defaults to true. */
   autoSchedule?: boolean;
-  /** Cross-tab logout/token sync. Defaults to true. */
+  /** Cross-tab logout/token sync and a cross-tab single-flight refresh. Defaults to true. */
   crossTabSync?: boolean;
+  /**
+   * Background refresh runs only while the user is active on the page, so an idle page reaches
+   * the issuer's idle timeout and an active one never does. Defaults to true in a browser.
+   */
+  activityAware?: boolean;
   /**
    * Called after another tab of the same app signed out and this tab's tokens were cleared with it.
    * The clear changes no route, so a screen left open keeps drawing the account until its next
@@ -138,6 +144,13 @@ export function createBootAuth(options: BootAuthOptions = {}): BootAuthResult {
     userOnRefreshFailure(error);
   };
 
+  const prefix = options.storePrefix ?? "simplix:";
+  const crossTab = options.crossTabSync ?? true;
+  const activity =
+    (options.activityAware ?? true) && typeof window !== "undefined"
+      ? createActivityTracker()
+      : undefined;
+
   // Extract bearer scheme for reuse
   const scheme = bearerScheme({
     store,
@@ -147,6 +160,10 @@ export function createBootAuth(options: BootAuthOptions = {}): BootAuthResult {
       refreshBeforeExpiry: options.refreshBeforeExpiry ?? 60,
       autoSchedule: options.autoSchedule ?? true,
       minIntervalSeconds: 30,
+      activity,
+      // Tabs of one app share the store, so they share one refresh: rotation-enforcing issuers
+      // refuse the second exchange of a refresh token, which would sign the other tab out.
+      lockName: crossTab ? `${prefix}refresh` : undefined,
       // The refresh's own error goes on, so a caller can read why it was refused - an issuer's
       // answer rides on it - rather than a message saying only that it was.
       onScheduledRefreshFailed: (error) =>
@@ -185,16 +202,17 @@ export function createBootAuth(options: BootAuthOptions = {}): BootAuthResult {
   }
 
   // Cross-tab sync
-  if (options.crossTabSync ?? true) {
-    const crossTab = createCrossTabSync({
-      storageKey: `${options.storePrefix ?? "simplix:"}access_token`,
+  if (crossTab) {
+    const sync = createCrossTabSync({
+      storageKey: `${prefix}access_token`,
       onExternalLogout: () => {
         auth.clear();
         options.onExternalLogout?.();
       },
-      onExternalTokenUpdate: () => {},
+      // Another tab refreshed: re-time this tab's schedule against the expiry it stored.
+      onExternalTokenUpdate: () => scheme.tokensChanged?.(),
     });
-    crossTab.start();
+    sync.start();
   }
 
   const authClient: BootAuthClient = {

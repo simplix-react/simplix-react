@@ -21,8 +21,12 @@ export class AutoRefreshScheduler {
 
   constructor(private readonly options: AutoRefreshSchedulerOptions = {}) {}
 
+  /**
+   * Starts the schedule. `refreshFn` may resolve `null` to say it skipped this refresh; the
+   * schedule then stops until the next `start`.
+   */
   start(
-    refreshFn: () => Promise<TokenPair>,
+    refreshFn: () => Promise<TokenPair | null>,
     getExpiresAt: () => number | null,
   ): void {
     this.stop();
@@ -41,7 +45,7 @@ export class AutoRefreshScheduler {
   }
 
   private schedule(
-    refreshFn: () => Promise<TokenPair>,
+    refreshFn: () => Promise<TokenPair | null>,
     getExpiresAt: () => number | null,
   ): void {
     const expiresAt = getExpiresAt();
@@ -63,9 +67,15 @@ export class AutoRefreshScheduler {
       this.timerId = null;
       try {
         this.lastRefreshAt = Date.now();
-        await refreshFn();
-        this.schedule(refreshFn, getExpiresAt);
+        const pair = await refreshFn();
+        if (pair !== null) this.schedule(refreshFn, getExpiresAt);
       } catch (error) {
+        // A request that never reached the issuer says nothing about the session: try again
+        // after the minimum interval rather than reporting a failure that would end it.
+        if (error instanceof TypeError) {
+          this.schedule(refreshFn, getExpiresAt);
+          return;
+        }
         this.options.onRefreshFailed?.(error);
       }
     }, delay);

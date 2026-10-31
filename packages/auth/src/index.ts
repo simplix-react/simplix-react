@@ -9,6 +9,8 @@ export type {
   ApiKeySchemeOptions,
   OAuth2SchemeOptions,
   CustomSchemeOptions,
+  ActivitySource,
+  RefreshLock,
 } from "./types.js";
 
 // Errors
@@ -34,6 +36,8 @@ export { sessionStorageStore } from "./stores/session-storage-store.js";
 // Helpers
 export { AutoRefreshScheduler } from "./helpers/auto-refresh-scheduler.js";
 export type { AutoRefreshSchedulerOptions } from "./helpers/auto-refresh-scheduler.js";
+export { createActivityTracker } from "./helpers/activity-tracker.js";
+export type { ActivityTrackerOptions } from "./helpers/activity-tracker.js";
 export { createCrossTabSync } from "./helpers/cross-tab-sync.js";
 export type { CrossTabSyncOptions } from "./helpers/cross-tab-sync.js";
 export { openOAuth2Popup } from "./helpers/oauth2-popup.js";

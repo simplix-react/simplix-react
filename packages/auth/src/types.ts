@@ -34,7 +34,37 @@ export interface AuthScheme {
 
   /** Clears all stored credentials for this scheme. */
   clear(): void;
+
+  /**
+   * Called after new tokens were stored from outside the scheme: a sign-in on this page, or a
+   * refresh made by another tab. A scheme with a background refresh re-arms it here, since the
+   * expiry it was timed against has moved.
+   */
+  tokensChanged?(): void;
 }
+
+// ── Session refresh helpers ──
+
+/**
+ * Reports when the user last did something on the page.
+ *
+ * @see {@link createActivityTracker} for the browser implementation.
+ */
+export interface ActivitySource {
+  /** Epoch milliseconds of the most recent activity. */
+  lastActivityAt(): number;
+  /**
+   * Subscribes to activity.
+   * @returns An unsubscribe function.
+   */
+  onActivity(listener: () => void): () => void;
+}
+
+/**
+ * Runs `run` while holding the named lock, so one refresh happens at a time across every tab
+ * that shares the token store. The browser default is the Web Locks API.
+ */
+export type RefreshLock = <T>(name: string, run: () => Promise<T>) => Promise<T>;
 
 // ── Token Store ──
 
@@ -168,8 +198,25 @@ export interface BearerSchemeOptions {
     /** Minimum interval between scheduled refreshes in seconds. Defaults to `30`. */
     minIntervalSeconds?: number;
 
-    /** Called when a scheduled background refresh fails. */
+    /**
+     * Called when a scheduled background refresh is refused. A refresh that never reached the
+     * issuer (a `TypeError` from `fetch`: offline, a laptop waking up) is retried after
+     * `minIntervalSeconds` instead, since the session itself may still be alive.
+     */
     onScheduledRefreshFailed?: (error: unknown) => void;
+
+    /**
+     * Makes the background refresh activity-aware: a scheduled refresh runs only when the user was
+     * active since the tokens were last stored, and otherwise waits for the next activity. An idle
+     * page then lets the issuer's idle timeout end the session, and an active one never meets it.
+     */
+    activity?: ActivitySource;
+
+    /** Lock that serialises refreshes across tabs. Defaults to the Web Locks API where present. */
+    lock?: RefreshLock;
+
+    /** Lock name, unique per token store. Without it, refreshes are serialised within the tab only. */
+    lockName?: string;
   };
 }
 

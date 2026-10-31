@@ -59,6 +59,11 @@ export function createAuth(config: AuthConfig): AuthInstance {
       if (store) {
         storeTokenPair(store, tokens);
       }
+      // The expiry a background refresh was timed against has moved (or did not exist before a
+      // sign-in on this page), so each scheme re-arms against the stored tokens.
+      for (const scheme of schemes) {
+        scheme.tokensChanged?.();
+      }
 
       notify();
     },
