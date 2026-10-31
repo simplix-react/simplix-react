@@ -235,6 +235,8 @@
     "month": "月",
     "previousMonth": "前の月",
     "nextMonth": "次の月",
+    "previousYear": "前の年",
+    "nextYear": "次の年",
     "previousDay": "前の日",
     "nextDay": "次の日"
   },

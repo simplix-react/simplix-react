@@ -52,7 +52,7 @@ describe("Calendar", () => {
 
   it("navigates to previous month", () => {
     render(<Calendar month={new Date(2024, 1, 1)} />);
-    const prevBtn = screen.getByLabelText("Previous month");
+    const prevBtn = screen.getByLabelText("date.previousMonth");
     fireEvent.click(prevBtn);
     // After clicking prev, header should show January
     // The component uses Intl.DateTimeFormat, so look for month name
@@ -62,7 +62,7 @@ describe("Calendar", () => {
 
   it("navigates to next month", () => {
     render(<Calendar month={new Date(2024, 0, 1)} />);
-    const nextBtn = screen.getByLabelText("Next month");
+    const nextBtn = screen.getByLabelText("date.nextMonth");
     fireEvent.click(nextBtn);
     const header = screen.getByText(/February|2024/i);
     expect(header).toBeDefined();
@@ -106,8 +106,8 @@ describe("Calendar", () => {
 
   it("hides navigation when hideNavigation is true", () => {
     render(<Calendar hideNavigation />);
-    expect(screen.queryByLabelText("Previous month")).toBeNull();
-    expect(screen.queryByLabelText("Next month")).toBeNull();
+    expect(screen.queryByLabelText("date.previousMonth")).toBeNull();
+    expect(screen.queryByLabelText("date.nextMonth")).toBeNull();
   });
 
   it("hides header when hideHeader is true", () => {
@@ -173,8 +173,8 @@ describe("Calendar", () => {
       />,
     );
     // Month mode uses year navigation
-    expect(screen.getByLabelText("Previous year")).toBeDefined();
-    expect(screen.getByLabelText("Next year")).toBeDefined();
+    expect(screen.getByLabelText("date.previousYear")).toBeDefined();
+    expect(screen.getByLabelText("date.nextYear")).toBeDefined();
     // Month names should be rendered
     expect(screen.getByText("Jan")).toBeDefined();
     expect(screen.getByText("Dec")).toBeDefined();
@@ -204,7 +204,7 @@ describe("Calendar", () => {
         onMonthChange={onMonthChange}
       />,
     );
-    fireEvent.click(screen.getByLabelText("Next month"));
+    fireEvent.click(screen.getByLabelText("date.nextMonth"));
     expect(onMonthChange).toHaveBeenCalledOnce();
   });
 

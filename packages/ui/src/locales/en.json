@@ -235,6 +235,8 @@
     "month": "Month",
     "previousMonth": "Previous month",
     "nextMonth": "Next month",
+    "previousYear": "Previous year",
+    "nextYear": "Next year",
     "previousDay": "Previous day",
     "nextDay": "Next day"
   },

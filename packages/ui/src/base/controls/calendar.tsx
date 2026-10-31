@@ -205,7 +205,7 @@ export const CalendarBase = forwardRef<HTMLDivElement, CalendarProps>(
     },
     ref,
   ) => {
-    const { locale: i18nLocale } = useTranslation("simplix/ui");
+    const { t, locale: i18nLocale } = useTranslation("simplix/ui");
     const locale = localeProp ?? i18nLocale;
 
     const [uncontrolledMonth, setUncontrolledMonth] = useState(() => {
@@ -300,8 +300,8 @@ export const CalendarBase = forwardRef<HTMLDivElement, CalendarProps>(
 
     // Month mode: year-only navigation
     const isMonthMode = mode === "month";
-    const prevLabel = isMonthMode ? "Previous year" : "Previous month";
-    const nextLabel = isMonthMode ? "Next year" : "Next month";
+    const prevLabel = isMonthMode ? t("date.previousYear") : t("date.previousMonth");
+    const nextLabel = isMonthMode ? t("date.nextYear") : t("date.nextMonth");
     const handlePrev = isMonthMode ? () => navigateYear(-1) : () => navigateMonth(-1);
     const handleNext = isMonthMode ? () => navigateYear(1) : () => navigateMonth(1);
 

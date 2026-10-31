@@ -235,6 +235,8 @@
     "month": "월",
     "previousMonth": "이전 달",
     "nextMonth": "다음 달",
+    "previousYear": "이전 해",
+    "nextYear": "다음 해",
     "previousDay": "이전 날",
     "nextDay": "다음 날"
   },
