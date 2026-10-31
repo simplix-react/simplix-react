@@ -35,6 +35,7 @@
     "maximize": "최대화",
     "restore": "이전 크기로 복원",
     "detail": "상세",
+    "detailWidth": "상세 너비",
     "showPassword": "비밀번호 보기",
     "hidePassword": "비밀번호 숨기기"
   },

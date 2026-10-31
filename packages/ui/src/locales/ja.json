@@ -35,6 +35,7 @@
     "maximize": "最大化",
     "restore": "元のサイズに戻す",
     "detail": "詳細",
+    "detailWidth": "詳細の幅",
     "showPassword": "パスワードを表示",
     "hidePassword": "パスワードを非表示"
   },

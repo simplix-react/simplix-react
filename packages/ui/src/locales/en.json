@@ -35,6 +35,7 @@
     "maximize": "Maximize",
     "restore": "Restore",
     "detail": "Detail",
+    "detailWidth": "Detail width",
     "showPassword": "Show password",
     "hidePassword": "Hide password"
   },

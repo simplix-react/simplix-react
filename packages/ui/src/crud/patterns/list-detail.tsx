@@ -19,10 +19,10 @@ import { useMediaQuery } from "../../hooks/use-media-query";
 import { useUIDefaults } from "../../provider/ui-defaults-context";
 import { partAttributes, slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
+import { type DetailResizeControl, DetailResizeHandle, clampWidth, useViewportWidth } from "./detail-resize";
 import {
   crudListDetailDrawerStyle,
   crudListDetailDetailStyle,
-  crudListDetailDividerStyle,
   crudListDetailDrawerBodyStyle,
   crudListDetailListStyle,
   crudListDetailRootStyle,
@@ -49,6 +49,8 @@ export interface ListDetailContextValue {
   dialogHeight?: string;
   /** The detail's width in px, which the drawer and the dialog cap themselves at as the panel does. */
   detailWidth?: number;
+  /** What the detail's resize handle reads and moves, in every variant. */
+  resize?: DetailResizeControl;
 }
 
 const ListDetailContext = createContext<ListDetailContextValue>({
@@ -121,6 +123,30 @@ export interface ListDetailBaseProps {
   onClose?: () => void;
   /** Fixed dialog height (e.g. `"60vh"`, `"500px"`). When set, the dialog uses a fixed height with internal scrolling. When omitted, height fits content up to `max-h-[85vh]`. Only applies to `"dialog"` variant. */
   dialogHeight?: string;
+  /**
+   * The narrowest width (px) the reader can drag the detail to, in every variant. Defaults to 280.
+   * A detail opened at a width below it is drawn at it, unless the window has no room for that
+   * beside the list's minimum.
+   */
+  minDetailWidth?: number;
+  /**
+   * The widest width (px) the reader can drag the detail to, in every variant. Without one the
+   * room the variant leaves is the limit: the window less a margin for a drawer and a dialog, the
+   * section less the list's minimum for a panel.
+   */
+  maxDetailWidth?: number;
+  /** The narrowest width (px) the list keeps beside a panel. Defaults to 280. */
+  minListWidth?: number;
+  /**
+   * Called with the width the reader chose once a drag ends, and after each key press on the
+   * handle, so a product can remember it. The width is the detail's, in every variant.
+   */
+  onDetailWidthChange?: (width: number) => void;
+  /**
+   * Called when the reader double-presses the handle. The detail returns to `detailWidth`, so a
+   * product that remembers a chosen width forgets it here.
+   */
+  onDetailWidthReset?: () => void;
   className?: string;
   children: ReactNode;
 }
@@ -172,6 +198,15 @@ export const DETAIL_PANEL_WIDTH = 768;
 const MIN_PANEL_WIDTH = 280;
 
 /**
+ * What a drawer leaves of the window beside it, in px, so a strip of the list stays in sight to
+ * press on and close the drawer with.
+ */
+const DRAWER_GUTTER = 64;
+
+/** What a dialog leaves of the window on both sides together; the frame's own `calc(100% - 2rem)`. */
+const DIALOG_GUTTER = 32;
+
+/**
  * The custom property through which the theme names the detail column's width, in px, for a
  * screen that names none. theme/base.css sets it for every design; a design or an application may
  * override it.
@@ -203,7 +238,21 @@ function useDesignDetailWidth(): number | undefined {
   return width;
 }
 
-export function ListDetailRoot({ variant: variantProp, activePanel: activePanelProp, detailWidth: detailWidthProp, listWidth, onClose, dialogHeight, className, children }: ListDetailProps) {
+export function ListDetailRoot({
+  variant: variantProp,
+  activePanel: activePanelProp,
+  detailWidth: detailWidthProp,
+  listWidth,
+  minDetailWidth,
+  maxDetailWidth,
+  minListWidth,
+  onDetailWidthChange,
+  onDetailWidthReset,
+  onClose,
+  dialogHeight,
+  className,
+  children,
+}: ListDetailProps) {
   // The installation's answer when the screen does not give one. A screen that names a variant
   // wins — that is the escape hatch for the one surface whose shape is genuinely its own — but a
   // screen naming `"panel"` because the scaffold wrote it there takes the choice away from every
@@ -219,53 +268,91 @@ export function ListDetailRoot({ variant: variantProp, activePanel: activePanelP
 
   const [activePanelState, setActivePanel] = useState<"list" | "detail">("list");
   const activePanel = activePanelProp ?? activePanelState;
-  const [dragDetailWidth, setDragDetailWidth] = useState<number | null>(null);
+  // The width the reader dragged the detail to, kept for the presentation it was dragged in: a
+  // width chosen for a panel says nothing about how wide a drawer should be.
+  const [chosenWidths, setChosenWidths] = useState<Partial<Record<ListDetailVariant, number>>>({});
+  const chosenWidth = chosenWidths[variant] ?? null;
   const [dragListWidth, setDragListWidth] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
+  // The panel's section, kept as state so the observer below follows it: a list-detail that opened
+  // as a drawer has no such section until the reader switches to the panel, and an effect that
+  // looked once at mount would never see it.
+  const [sectionEl, setSectionEl] = useState<HTMLElement | null>(null);
   // The section's width, so a detail column wider than the room beside a usable list gives way
   // instead of squeezing the list under its minimum. The tracks transition, so the panel narrows
   // smoothly as the window does.
   const [sectionWidth, setSectionWidth] = useState<number | null>(null);
   useEffect(() => {
-    const el = sectionRef.current;
-    if (!el || typeof ResizeObserver === "undefined") return;
+    if (!sectionEl || typeof ResizeObserver === "undefined") return;
     const observer = new ResizeObserver(([entry]) => {
       if (entry) setSectionWidth(entry.contentRect.width);
     });
-    observer.observe(el);
+    observer.observe(sectionEl);
     return () => observer.disconnect();
-  }, []);
+  }, [sectionEl]);
+  const viewportWidth = useViewportWidth();
 
-  const handleDrag = useCallback(
-    (newListWidth: number) => {
-      const el = sectionRef.current;
-      if (!el) return;
-      const totalWidth = el.offsetWidth;
-      const maxListWidth = totalWidth - DIVIDER_TRACK - MIN_PANEL_WIDTH;
-      const clamped = Math.max(MIN_PANEL_WIDTH, Math.min(maxListWidth, newListWidth));
-      setDragDetailWidth(totalWidth - clamped - DIVIDER_TRACK);
-      if (listWidth != null) setDragListWidth(clamped);
+  // The widest the detail can be drawn: what the product allows, and no more than the variant has
+  // room for. A panel leaves the list its minimum; a drawer and a dialog leave a margin of the
+  // window. The room wins over the product's narrowest, so a narrow window keeps the list usable
+  // and draws the detail narrower than the product would like; only the framework's own floor
+  // stops it, and a bound that contradicts itself draws at the widest.
+  const minList = minListWidth ?? MIN_PANEL_WIDTH;
+  const room =
+    variant === "drawer"
+      ? viewportWidth - DRAWER_GUTTER
+      : variant === "dialog"
+        ? viewportWidth - DIALOG_GUTTER
+        : sectionWidth != null
+          ? sectionWidth - DIVIDER_TRACK - minList
+          : Number.POSITIVE_INFINITY;
+  const maxDetail = Math.max(MIN_PANEL_WIDTH, Math.min(maxDetailWidth ?? Number.POSITIVE_INFINITY, room));
+  const minDetail = Math.min(minDetailWidth ?? MIN_PANEL_WIDTH, maxDetail);
+  const effectiveDetailWidth = clampWidth(chosenWidth ?? detailWidth, minDetail, maxDetail);
+
+  const resizeDetail = useCallback(
+    (target: number) => {
+      const width = clampWidth(target, minDetail, maxDetail);
+      setChosenWidths((current) => (current[variant] === width ? current : { ...current, [variant]: width }));
+      // A list pinned to a width leaves the detail whatever remains, so the detail's width is
+      // moved by moving the list's.
+      if (listWidth != null && sectionWidth != null) setDragListWidth(sectionWidth - DIVIDER_TRACK - width);
     },
-    [listWidth],
+    [listWidth, maxDetail, minDetail, sectionWidth, variant],
   );
-
-  const handleDragStart = useCallback(() => setIsDragging(true), []);
+  const handleResizeStart = useCallback(() => setIsDragging(true), []);
+  const handleResizeEnd = useCallback(() => setIsDragging(false), []);
   // Back to the width the screen or the design names.
-  const handleDragReset = useCallback(() => {
-    setDragDetailWidth(null);
+  const handleResizeReset = useCallback(() => {
+    setChosenWidths((current) => {
+      const { [variant]: _dropped, ...rest } = current;
+      return rest;
+    });
     setDragListWidth(null);
-  }, []);
-  const handleDragEnd = useCallback(() => setIsDragging(false), []);
+    onDetailWidthReset?.();
+  }, [onDetailWidthReset, variant]);
 
-  const contextValue: ListDetailContextValue = { variant, activePanel, setActivePanel, dialogHeight, detailWidth };
+  // A chosen width is reported once the drag that chose it has ended, so a product that remembers
+  // it writes once per drag rather than once per pointer move; a key press is not a drag, so it
+  // reports at once.
+  const onDetailWidthChangeRef = useRef(onDetailWidthChange);
+  onDetailWidthChangeRef.current = onDetailWidthChange;
+  useEffect(() => {
+    if (chosenWidth != null && !isDragging) onDetailWidthChangeRef.current?.(chosenWidth);
+  }, [chosenWidth, isDragging]);
 
   const effectiveListWidth = dragListWidth ?? listWidth;
-  const roomForDetail = sectionWidth != null ? sectionWidth - DIVIDER_TRACK - MIN_PANEL_WIDTH : null;
-  const effectiveDetailWidth =
-    roomForDetail != null && roomForDetail >= MIN_PANEL_WIDTH
-      ? Math.min(dragDetailWidth ?? detailWidth, roomForDetail)
-      : (dragDetailWidth ?? detailWidth);
+  const resize: DetailResizeControl = {
+    width: effectiveListWidth != null && sectionWidth != null ? sectionWidth - DIVIDER_TRACK - effectiveListWidth : effectiveDetailWidth,
+    min: minDetail,
+    max: maxDetail,
+    onResize: resizeDetail,
+    onResizeStart: handleResizeStart,
+    onResizeEnd: handleResizeEnd,
+    onReset: handleResizeReset,
+  };
+  const contextValue: ListDetailContextValue = { variant, activePanel, setActivePanel, dialogHeight, detailWidth: effectiveDetailWidth, resize };
+
   const isDetailOpen = activePanel === "detail";
   // The columns animate only while the detail opens or closes. Any other change of width (the
   // design naming its own, the stylesheet arriving after the first paint, a new viewport) is
@@ -374,13 +461,13 @@ export function ListDetailRoot({ variant: variantProp, activePanel: activePanelP
   return (
     <ListDetailContext.Provider value={contextValue}>
       <section
-        ref={sectionRef}
+        ref={setSectionEl}
         className={sectionClassName}
         style={gridCols ? { gridTemplateColumns: gridCols } : undefined}
         {...slotAttributes(crudListDetailRootStyle, { dragging: isDragging || !toggling })}
       >
         {children}
-        <Divider onDrag={handleDrag} onDragStart={handleDragStart} onDragEnd={handleDragEnd} onReset={handleDragReset} />
+        <DetailResizeHandle control={resize} grows="left" collapsed={!isDetailOpen} className="md:order-2 md:z-[1] self-stretch md:translate-x-1/2" />
       </section>
     </ListDetailContext.Provider>
   );
@@ -396,82 +483,11 @@ ListDetailRoot.displayName = "ListDetail";
 // │||│   each side (17px total)
 // │||│   cursor: col-resize
 // └──┘
-
-interface DividerProps {
-  onDrag: (newListWidth: number) => void;
-  onDragStart: () => void;
-  onDragEnd: () => void;
-  /** A double press returns the columns to the width they opened at. */
-  onReset: () => void;
-}
-
-function Divider({ onDrag, onDragStart, onDragEnd, onReset }: DividerProps) {
-  const { activePanel } = useListDetail();
-  const collapsed = activePanel !== "detail";
-  const dragging = useRef(false);
-  const startX = useRef(0);
-  const startListWidth = useRef(0);
-
-  const handlePointerDown = useCallback(
-    (e: React.PointerEvent) => {
-      // What a `pointerdown` does by default is begin a text selection, and a divider dragged
-      // across two panels of text then paints every word between where it started and where it
-      // stopped — still selected once the pointer is released. `setPointerCapture` routes the
-      // events here and says nothing about selection, so this is the line that stops it.
-      //
-      // It also suppresses the focus the press would have given, and this element is a keyboard
-      // control (arrow keys resize it), so the focus is taken by hand.
-      e.preventDefault();
-      (e.currentTarget as HTMLElement).focus();
-      dragging.current = true;
-      startX.current = e.clientX;
-      const section = (e.currentTarget as HTMLElement).closest("section");
-      const listPanel = section?.querySelector<HTMLElement>("[data-panel='list']");
-      startListWidth.current = listPanel?.offsetWidth ?? 0;
-      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-      onDragStart();
-    },
-    [onDragStart],
-  );
-
-  const handlePointerMove = useCallback(
-    (e: React.PointerEvent) => {
-      if (!dragging.current) return;
-      onDrag(startListWidth.current + (e.clientX - startX.current));
-    },
-    [onDrag],
-  );
-
-  const handlePointerUp = useCallback(() => {
-    dragging.current = false;
-    onDragEnd();
-  }, [onDragEnd]);
-
-  return (
-    <output
-      role="separator"
-      aria-orientation="vertical"
-      tabIndex={collapsed ? -1 : 0}
-      className={cn(
-        "md:order-2 box-content cursor-col-resize select-none self-stretch",
-        "max-md:hidden",
-        collapsed && "pointer-events-none",
-      )}
-      {...slotAttributes(crudListDetailDividerStyle, { collapsed })}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onDoubleClick={onReset}
-      onKeyDown={(e) => {
-        const section = (e.currentTarget as HTMLElement).closest("section");
-        const listPanel = section?.querySelector<HTMLElement>("[data-panel='list']");
-        const w = listPanel?.offsetWidth ?? 0;
-        if (e.key === "ArrowLeft") onDrag(w - 20);
-        if (e.key === "ArrowRight") onDrag(w + 20);
-      }}
-    />
-  );
-}
+//
+// The handle itself is `DetailResizeHandle`, shared with the drawer and the dialog; the panel
+// places it as the grid's middle track and moves it half its width right, so its centre line is
+// the detail card's left edge. A grid paints its items in `order`, so the card (order 3) would
+// cover the half of the handle that reaches over it; the handle takes a `z-index` above it.
 
 // ── List panel ──
 //
@@ -543,7 +559,7 @@ ListPanel.displayName = "ListDetail.List";
 //   pointer-events-none              └────────────────────────────┘
 
 const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }, ref) => {
-  const { variant, activePanel, dialogHeight, detailWidth = DETAIL_PANEL_WIDTH } = useListDetail();
+  const { variant, activePanel, dialogHeight, detailWidth = DETAIL_PANEL_WIDTH, resize } = useListDetail();
   const { t } = useTranslation("simplix/ui");
 
   if (variant === "drawer") {
@@ -574,10 +590,10 @@ const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }
         // narrowest of the three presentations - the one the reader was most likely looking at
         // fitted the least. The inline `maxWidth` below replaces it; an inline style outranks any
         // class, so nothing has to be unset here.
-        // `w-3/4` from the sheet still governs below the `sm` breakpoint, where three quarters of
-        // a phone is the right answer and 768 is not; this caps it everywhere above, at the same
-        // width the panel gives the detail, so a screen that widens its detail widens it in all three.
-        style={{ maxWidth: detailWidth }}
+        // The sheet's `w-3/4` is a phone's answer, and a phone never reaches a drawer (the detail is
+        // the page there), so the width is the detail's own, set inline: the same width the panel
+        // gives the detail, which a reader can drag.
+        style={{ width: detailWidth, maxWidth: detailWidth }}
       >
         <DialogPrimitive.Title className="sr-only">{t("common.detail")}</DialogPrimitive.Title>
         {/* The same slot padding the dialog variant pushes down, for the same reason: the header
@@ -585,6 +601,13 @@ const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }
         <div className="contents" {...slotAttributes(crudListDetailDrawerBodyStyle, {})}>
           {children}
         </div>
+        {/* Last in the DOM, so the first control of the detail takes the focus the drawer moves
+            into itself as it opens, rather than this handle. It is centred on the sheet's outer
+            edge, one px outside the border the offsets are measured from, and runs the sheet's
+            full height, which is the window's. Its grip is drawn at rest: nothing beside the edge
+            of a drawer says it can be dragged, where the panel's divider sits between two cards
+            that do. */}
+        {resize ? <DetailResizeHandle control={resize} grows="left" className="absolute inset-y-0 -left-px z-[3] w-[3px] -translate-x-1/2 before:opacity-100" /> : null}
       </SheetContent>
     );
   }
@@ -600,11 +623,22 @@ const DetailPanel = forwardRef<HTMLElement, PanelProps>(({ children, className }
         frame="column"
         flush
         showCloseButton={false}
-        className={cn("overflow-hidden sm:max-w-[var(--detail-dialog-width)]", !dialogHeight && "max-h-[85vh]", className)}
-        style={{ "--detail-dialog-width": `${detailWidth}px`, ...(dialogHeight ? { height: dialogHeight } : {}) } as React.CSSProperties}
+        className={cn("sm:max-w-[var(--detail-open-width)]", !dialogHeight && "max-h-[85vh]", className)}
+        style={{ "--detail-open-width": `${detailWidth}px`, ...(dialogHeight ? { height: dialogHeight } : {}) } as React.CSSProperties}
       >
         <DialogPrimitive.Title className="sr-only">{t("common.detail")}</DialogPrimitive.Title>
-        {children}
+        {/* The clip that rounds the detail's corners sits on this wrapper, not on the dialog, so the
+            handles can straddle the dialog's side edges instead of being cut at them. */}
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[inherit]">{children}</div>
+        {/* Last in the DOM for the reason the drawer's is. A centred dialog grows on both sides, so
+            each edge under the pointer keeps up with it at two px of width for each px dragged;
+            the right edge is the keyboard's. */}
+        {resize ? (
+          <>
+            <DetailResizeHandle control={resize} grows="left" ratio={2} pointerOnly className="absolute -inset-y-px -left-px z-[3] w-[3px] -translate-x-1/2 before:opacity-100" />
+            <DetailResizeHandle control={resize} grows="right" ratio={2} className="absolute -inset-y-px -right-px z-[3] w-[3px] translate-x-1/2 before:opacity-100" />
+          </>
+        ) : null}
       </DialogContent>
     );
   }
