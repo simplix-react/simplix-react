@@ -390,6 +390,23 @@ describe("FilterBar popover form fields", () => {
     expect(screen.getByLabelText("filter.clearField")).toBeTruthy();
   });
 
+  it("sends a picked range as whole days in the browser zone", () => {
+    const state = createMockState();
+    render(<FilterBar filters={[dateRangeFilter]} state={state} />);
+    openPopover();
+    const now = new Date();
+    const day = (n: number) => {
+      const found = screen.getAllByRole("button").find((one) => one.textContent === String(n) && !one.closest("[data-outside]"));
+      if (!found) throw new Error(`no day ${n} in the calendar`);
+      return found;
+    };
+    fireEvent.click(day(10));
+    fireEvent.click(day(12));
+    const sent = vi.mocked(state.setValues).mock.calls.at(-1)?.[0] as Record<string, string | undefined>;
+    expect(sent["createdAt.greaterThanOrEqualTo"]).toBe(new Date(now.getFullYear(), now.getMonth(), 10, 0, 0, 0, 0).toISOString());
+    expect(sent["createdAt.lessThanOrEqualTo"]).toBe(new Date(now.getFullYear(), now.getMonth(), 12, 23, 59, 59, 999).toISOString());
+  });
+
   it("clears dateRange via clear button", () => {
     const gteKey = "createdAt.greaterThanOrEqualTo";
     const lteKey = "createdAt.lessThanOrEqualTo";

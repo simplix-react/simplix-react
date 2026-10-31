@@ -1156,7 +1156,7 @@ function DateRangeFormField({
               ? serializeInstant(startOfDay(range.from), def.displayZone)
               : def.dateOnly
                 ? toLocalDateString(range.from)
-                : range.from.toISOString())
+                : startOfDay(range.from).toISOString())
           : undefined,
         [lteKey]: range.to
           ? (def.displayZone
@@ -1165,7 +1165,8 @@ function DateRangeFormField({
               ? serializeInstant(endOfDay(range.to), def.displayZone)
               : def.dateOnly
                 ? toLocalDateString(range.to)
-                : range.to.toISOString())
+                // The browser zone's end of the picked day, so a one-day range is a day long.
+                : endOfDay(range.to).toISOString())
           : undefined,
       });
     },
