@@ -13,8 +13,16 @@ describe("buildEntityKeyMap", () => {
       { pascalName: "Pet", name: "pet" },
       { pascalName: "AccessPoint", name: "accessPoint" },
     ]);
-    expect(result.get("Pet")).toBe("pet");
-    expect(result.get("AccessPoint")).toBe("accessPoint");
+    expect(result.get("Pet")).toEqual(["pet"]);
+    expect(result.get("AccessPoint")).toEqual(["accessPoint"]);
+  });
+
+  it("maps one server entity to every domain entity that reads it", () => {
+    const result = buildEntityKeyMap([
+      { pascalName: "Pet", name: "pet" },
+      { pascalName: "Pet", name: "myPet" },
+    ]);
+    expect(result.get("Pet")).toEqual(["pet", "myPet"]);
   });
 
   it("returns empty map for empty input", () => {
@@ -35,7 +43,7 @@ describe("transformToLocaleData", () => {
         },
       },
     };
-    const entityKeyMap = new Map([["Pet", "pet"]]);
+    const entityKeyMap = new Map([["Pet", ["pet"]]]);
 
     const result = transformToLocaleData(serverData, entityKeyMap, ["en", "ko"]);
 
@@ -57,7 +65,7 @@ describe("transformToLocaleData", () => {
         },
       },
     };
-    const entityKeyMap = new Map([["Pet", "pet"]]);
+    const entityKeyMap = new Map([["Pet", ["pet"]]]);
 
     const result = transformToLocaleData(serverData, entityKeyMap, ["en"]);
     expect(result.size).toBe(0);
@@ -74,7 +82,7 @@ describe("transformToLocaleData", () => {
         },
       },
     };
-    const entityKeyMap = new Map([["Pet", "pet"]]);
+    const entityKeyMap = new Map([["Pet", ["pet"]]]);
 
     const result = transformToLocaleData(serverData, entityKeyMap, ["en"]);
     expect(result.get("en")).toEqual({
@@ -94,7 +102,7 @@ describe("transformToLocaleData", () => {
         },
       },
     };
-    const entityKeyMap = new Map<string, string>();
+    const entityKeyMap = new Map<string, string[]>();
 
     const result = transformToLocaleData(serverData, entityKeyMap, ["en", "ko"]);
 
@@ -120,7 +128,7 @@ describe("transformToLocaleData", () => {
         },
       },
     };
-    const entityKeyMap = new Map([["Pet", "pet"]]);
+    const entityKeyMap = new Map([["Pet", ["pet"]]]);
 
     const result = transformToLocaleData(serverData, entityKeyMap, ["en", "ja"]);
     expect(result.has("en")).toBe(true);
@@ -129,7 +137,7 @@ describe("transformToLocaleData", () => {
 
   it("returns empty map when no data matches", () => {
     const serverData = { entities: {} };
-    const entityKeyMap = new Map<string, string>();
+    const entityKeyMap = new Map<string, string[]>();
     const result = transformToLocaleData(serverData, entityKeyMap, ["en"]);
     expect(result.size).toBe(0);
   });
@@ -146,7 +154,7 @@ describe("transformToLocaleData", () => {
         },
       },
     };
-    const entityKeyMap = new Map<string, string>();
+    const entityKeyMap = new Map<string, string[]>();
 
     const result = transformToLocaleData(serverData, entityKeyMap, ["en"]);
 
@@ -169,7 +177,7 @@ describe("transformToLocaleData", () => {
         },
       },
     };
-    const entityKeyMap = new Map<string, string>();
+    const entityKeyMap = new Map<string, string[]>();
 
     const result = transformToLocaleData(serverData, entityKeyMap, ["en"]);
 
@@ -194,7 +202,7 @@ describe("transformToLocaleData", () => {
         },
       },
     };
-    const entityKeyMap = new Map([["Pet", "pet"]]);
+    const entityKeyMap = new Map([["Pet", ["pet"]]]);
 
     const result = transformToLocaleData(serverData, entityKeyMap, ["en"]);
 

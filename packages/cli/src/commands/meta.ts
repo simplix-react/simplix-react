@@ -18,7 +18,7 @@ import {
   type MetaContext,
   writeMetaSnapshot,
 } from "./openapi.js";
-import { writeEntityLabels } from "../meta/entity-labels.js";
+import { serverEntityOf, writeEntityLabels } from "../meta/entity-labels.js";
 import { ignoredTagMatcher, unclaimedTagMessage } from "../meta/resolve.js";
 import { metaEntities, META_DIR, writeMetaOutput } from "../meta/write.js";
 import { resolveSpecConfig } from "../openapi/orchestration/resolve-spec-config.js";
@@ -156,7 +156,14 @@ export const metaCommand = new Command("meta")
         const origin = metaOrigin(specConfig.spec ?? specConfig.meta?.source);
         const downloader = resolved.i18nDownloader;
         if (origin && downloader) {
-          await overlayServerTranslations(targetDir, entities, locales, origin, downloader);
+          // The server keys its translations by entity class, so a second surface over an entity
+          // asks for that entity's labels under its own domain name.
+          const known = new Set(Object.keys(meta.document.entities ?? {}));
+          const byServerName = entities.map((one, index) => {
+            const source = domain.entities[index] ? serverEntityOf(domain.entities[index], known) : undefined;
+            return source ? { ...one, pascalName: source } : one;
+          });
+          await overlayServerTranslations(targetDir, byServerName, locales, origin, downloader);
         }
         // Last, so a server overlay that carries no entity names cannot drop the ones SimpliX Meta states.
         await writeEntityLabels(targetDir, domain, meta.document, locales);

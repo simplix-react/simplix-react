@@ -77,14 +77,16 @@ interface EntityKeyInfo {
 }
 
 /**
- * Map server entity keys (PascalCase) → domain entity keys (camelCase).
+ * Map server entity keys (PascalCase) → the domain entity keys (camelCase) that read them. One
+ * server entity can feed several domain entities: a second surface over an entity (`myOrder`
+ * beside `order`) asks for the same entity's labels.
  */
 export function buildEntityKeyMap(
   entities: EntityKeyInfo[],
-): Map<string, string> {
-  const map = new Map<string, string>();
+): Map<string, string[]> {
+  const map = new Map<string, string[]>();
   for (const entity of entities) {
-    map.set(entity.pascalName, entity.name);
+    map.set(entity.pascalName, [...(map.get(entity.pascalName) ?? []), entity.name]);
   }
   return map;
 }
@@ -97,7 +99,7 @@ export function buildEntityKeyMap(
  */
 export function transformToLocaleData(
   serverData: I18nMessagesResponse,
-  entityKeyMap: Map<string, string>,
+  entityKeyMap: Map<string, string[]>,
   locales: string[],
 ): Map<string, Record<string, unknown>> {
   const result = new Map<string, Record<string, unknown>>();
@@ -107,8 +109,8 @@ export function transformToLocaleData(
 
     // Transform entity fields
     for (const [pascalKey, entityMessages] of Object.entries(serverData.entities ?? {})) {
-      const entityName = entityKeyMap.get(pascalKey);
-      if (!entityName) continue;
+      const entityNames = entityKeyMap.get(pascalKey);
+      if (!entityNames) continue;
 
       const fields: Record<string, string> = {};
       for (const [fieldName, fieldData] of Object.entries(entityMessages.fields)) {
@@ -119,7 +121,7 @@ export function transformToLocaleData(
       }
 
       if (Object.keys(fields).length > 0) {
-        localeData[entityName] = { fields };
+        for (const entityName of entityNames) localeData[entityName] = { fields };
       }
     }
 

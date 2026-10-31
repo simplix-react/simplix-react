@@ -24,6 +24,28 @@ type Catalog = Record<string, unknown>;
  * SimpliX Meta names no label for is left without one, so the reader sees the missing key rather
  * than another language's word.
  */
+/**
+ * The server entity whose labels a Meta entity carries: the one its tag names, or, for a second
+ * surface over an entity that already has one (a tag `portal.order.MyOrder` whose operations all
+ * name `Order`), the one its operations name. Undefined when neither names a single entity.
+ *
+ * @param entity the domain entity, its tag and operations
+ * @param known the entity names the document declares
+ * @returns the server entity's simple name
+ */
+export function serverEntityOf(
+  entity: Pick<ResolvedDomain["entities"][number], "tag" | "operations">,
+  known: ReadonlySet<string>,
+): string | undefined {
+  const simpleName = entity.tag.split(".").pop() ?? entity.tag;
+  if (known.has(simpleName)) return simpleName;
+  // Every operation the server documents names the entity class it serves; the type declares only
+  // what the generators read, so the field is read through a widened view here.
+  const operations = entity.operations as ReadonlyArray<{ readonly entity?: string }>;
+  const named = [...new Set(operations.map((one) => one.entity).filter((one): one is string => Boolean(one)))];
+  return named.length === 1 && known.has(named[0]!) ? named[0] : undefined;
+}
+
 export async function writeEntityLabels(
   targetDir: string,
   domain: ResolvedDomain,
@@ -38,8 +60,8 @@ export async function writeEntityLabels(
     const catalog = JSON.parse(await readFile(path, "utf-8")) as Catalog;
     let changed = false;
     for (const entity of domain.entities) {
-      const simpleName = entity.tag.split(".").pop() ?? entity.tag;
-      const meta = entities[simpleName];
+      const source = serverEntityOf(entity, new Set(Object.keys(entities)));
+      const meta = source === undefined ? undefined : entities[source];
       if (!meta) continue;
       const key = entityNameOf(entity.tag);
       const node = (typeof catalog[key] === "object" && catalog[key] !== null ? catalog[key] : {}) as Catalog;
