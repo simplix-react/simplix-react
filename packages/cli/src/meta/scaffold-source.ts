@@ -150,6 +150,7 @@ export async function loadMetaScaffoldSource(
       const source = buildMetaScaffoldSource({ domain, tag, naming });
       const entityName = tag.split(".").pop() ?? tag;
       source.relationFields = relationFieldsOf(document, entityName, source);
+      withReferenceKeys(document, source);
       const plural = document.entities?.[entityName]?.plural;
       if (plural) source.plural = plural;
       return source;
@@ -157,6 +158,20 @@ export async function loadMetaScaffoldSource(
   }
 
   return null;
+}
+
+/**
+ * Gives each reference matched on another field of its target than the identifier that field as
+ * `peekBy`; one matched on the identifier needs none.
+ */
+export function withReferenceKeys(document: DtoMeta, source: MetaScaffoldSource): void {
+  for (const one of [...source.fields, ...(source.detailFields ?? []), ...(source.rowFields ?? [])]) {
+    const match = one.referenceMatch;
+    if (match === undefined || one.referencePeekKind === undefined) continue;
+    const pascal = one.referencePeekKind.charAt(0).toUpperCase() + one.referencePeekKind.slice(1);
+    const idField = document.entities?.[pascal]?.idField;
+    if (idField !== undefined && match !== idField) one.peekBy = match;
+  }
 }
 
 /**
@@ -169,7 +184,7 @@ export function relationFieldsOf(document: DtoMeta, holderEntity: string, source
     for (const holder of entity.holders ?? []) if (holder.entity === holderEntity) out.add(holder.field);
   }
   for (const one of [...source.fields, ...(source.detailFields ?? []), ...(source.rowFields ?? [])]) {
-    if (one.referenceNamePath) out.add(one.name);
+    if (one.referenceNamePath || one.referenceMatch !== undefined) out.add(one.name);
   }
   return [...out].sort();
 }
@@ -478,6 +493,17 @@ function fieldInfos(
     if (field.format === "code") one.isCode = true;
     if (field.required) one.required = true;
     if (field.defaultValue !== undefined) one.defaultLiteral = JSON.stringify(field.defaultValue);
+    // A key the contract names as another entity's, whatever its own name: drawn by that record's
+    // name and opening its peek. A reference matched on another field than the identifier says so.
+    if (field.reference && !field.reference.many && shape.tsType === "string") {
+      const target = field.reference.entity.charAt(0).toLowerCase() + field.reference.entity.slice(1);
+      one.isForeignKey = true;
+      // A key named `<stem>Id` keeps its stem, which is what its name field is named after
+      // (`userId` beside `userName`); any other name is named after the referenced entity.
+      one.fkEntityField = one.fkEntityField ?? target;
+      one.referencePeekKind = target;
+      one.referenceMatch = field.reference.idField;
+    }
     const maxLength = field.constraints?.find((one) => one.kind === "maxLength")?.value;
     if (typeof maxLength === "number") one.maxLength = maxLength;
     fields.push(one);

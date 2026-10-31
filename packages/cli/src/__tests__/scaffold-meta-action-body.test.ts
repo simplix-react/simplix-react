@@ -4,7 +4,8 @@ import { describe, expect, it } from "vitest";
 import type { DtoMeta } from "../meta/types.js";
 import type { OpenApiNamingStrategy } from "../openapi/naming/naming-strategy.js";
 import { resolveMeta } from "../meta/resolve.js";
-import { buildMetaScaffoldSource } from "../meta/scaffold-source.js";
+import { buildMetaScaffoldSource, withReferenceKeys } from "../meta/scaffold-source.js";
+import { withContractKinds } from "../commands/scaffold-crud.js";
 
 const namingModule = fileURLToPath(
   new URL("../../../../extensions/simplix-boot/packages/cli-plugin/src/naming.ts", import.meta.url),
@@ -20,7 +21,7 @@ const meta = {
   version: 1,
   enums: {},
   types: {
-    WalletDetailDTO: { javaClass: "x.WalletDetailDTO", typeParams: [], fields: [text("walletId"), text("ownerName"), count("balance"), count("held"), { name: "active", type: { kind: "boolean" }, required: true, nullable: false, defaultValue: true }] },
+    WalletDetailDTO: { javaClass: "x.WalletDetailDTO", typeParams: [], fields: [text("walletId"), text("ownerName"), count("balance"), count("held"), { name: "active", type: { kind: "boolean" }, required: true, nullable: false, defaultValue: true }, { ...text("voiceCode"), reference: { entity: "CatalogVoice", idField: "voiceCode", many: false } }, text("catalogVoiceName"), { ...text("ownerId"), reference: { entity: "UserAccount", idField: "userId", many: false } }] },
     WalletAdjustDTO: { javaClass: "x.WalletAdjustDTO", typeParams: [], fields: [count("amount"), text("reason")] },
   },
   operations: [
@@ -65,5 +66,20 @@ describe("a field SimpliX Meta states a default for", () => {
     const source = buildMetaScaffoldSource({ domain, tag: "admin.Wallet", naming: simplixBootNaming });
     expect(source.fields.find((one) => one.name === "active")?.defaultLiteral).toBe("true");
     expect(source.fields.find((one) => one.name === "balance")?.defaultLiteral).toBeUndefined();
+  });
+});
+
+describe("a key SimpliX Meta names as a reference", () => {
+  it("is a reference column whatever its suffix, opening the referenced entity by the field it matches", () => {
+    const resolved = resolveMeta(meta, { domains: { wallet: ["admin.Wallet"] }, containerTypes: { SimpliXApiResponse: { unwrap: true } } });
+    const domain = resolved.domains.get("wallet");
+    if (!domain) throw new Error("no wallet domain");
+    const source = buildMetaScaffoldSource({ domain, tag: "admin.Wallet", naming: simplixBootNaming });
+    withReferenceKeys({ ...meta, entities: { CatalogVoice: { idField: "catalogVoiceId" }, UserAccount: { idField: "userId" } } } as DtoMeta, source);
+    const out = withContractKinds(source.fields, "walletId");
+    expect(out.find((f) => f.name === "voiceCode")).toMatchObject({ contractKind: "reference", peekKind: "catalogVoice", nameField: "catalogVoiceName", peekBy: "voiceCode" });
+    // Matched on the target's identifier, the reference needs no `peekBy`, and its stem still names its name field.
+    expect(out.find((f) => f.name === "ownerId")).toMatchObject({ contractKind: "reference", peekKind: "userAccount", nameField: "ownerName" });
+    expect(out.find((f) => f.name === "ownerId")?.peekBy).toBeUndefined();
   });
 });

@@ -106,6 +106,10 @@ export interface FieldInfo {
   isCode?: boolean;
   /** A key that is not a reference with a name, which no generated screen draws. */
   isOpaqueId?: boolean;
+  /** The referenced field SimpliX Meta's `reference.idField` names, for a key the contract names as a reference. */
+  referenceMatch?: string;
+  /** For a reference matched on another field of the target than its identifier: that field. */
+  peekBy?: string;
   /** The value a new record starts the field with, as a TypeScript literal (SimpliX Meta's `defaultValue`). */
   defaultLiteral?: string;
   /** The longest value the contract allows (`@Size(max)`), where it states one. */
@@ -268,7 +272,11 @@ export function projectRowFields(rowFields: readonly FieldInfo[], stated: Readon
   return rowFields.map((f) => {
     const one = stated.get(f.name);
     if (!one) return f;
-    return f.referenceNamePath ? { ...one, referenceNamePath: f.referenceNamePath, referencePeekKind: f.referencePeekKind } : one;
+    if (f.referenceNamePath) return { ...one, referenceNamePath: f.referenceNamePath, referencePeekKind: f.referencePeekKind };
+    if (f.referenceMatch !== undefined) {
+      return { ...one, isForeignKey: true, fkEntityField: f.fkEntityField, referencePeekKind: f.referencePeekKind, referenceMatch: f.referenceMatch, ...(f.peekBy ? { peekBy: f.peekBy } : {}) };
+    }
+    return one;
   });
 }
 
