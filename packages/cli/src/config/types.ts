@@ -147,6 +147,21 @@ export interface SimplixConfig {
   };
 
   /**
+   * The route file a list screen is reached through, by module group (`admin` for
+   * `--module admin/<name>`). Absent, no route is written.
+   *
+   * @remarks
+   * `dir` is the app's file-route directory, relative to the project root. `template` names the
+   * route template (default `route`; the console-clarity kit ships `route.tanstack` for TanStack
+   * file routes). The path is the entity's plural in kebab case unless `paths` names another
+   * (`{ "job-position": "positions" }`). `menu` inserts the screen's menu entry, rendered from the
+   * `menu-entry` template beside the route template, on the line before `marker` in `file` when no
+   * entry for the path exists yet; `catalogs` names, per locale, the JSON catalog the entry's
+   * label goes into under `keyPath`, written from the entity's plural name in SimpliX Meta.
+   */
+  routes?: Readonly<Record<string, RouteTarget>>;
+
+  /**
    * How references are drawn.
    *
    * @remarks
@@ -314,3 +329,18 @@ export interface CrudEntityConfig {
 
 /** Entity name → CRUD config mapping for a domain package */
 export type CrudMap = Record<string, CrudEntityConfig>;
+
+/** Where one module group's list screens are routed (see `SimplixConfig.routes`). */
+export interface RouteTarget {
+  readonly dir: string;
+  readonly template?: string;
+  readonly paths?: Readonly<Record<string, string>>;
+  readonly menu?: {
+    readonly file: string;
+    readonly marker: string;
+    /** The icon the entry names; the menu file must import it. */
+    readonly icon?: string;
+    readonly catalogs?: Readonly<Record<string, string>>;
+    readonly keyPath?: string;
+  };
+}

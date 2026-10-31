@@ -24,7 +24,7 @@ import {
   resolveEndpoints,
   type EndpointTarget,
 } from "./generation/endpoint-gen.js";
-import type { DtoMeta, FieldMeta, TypeRef } from "./types.js";
+import type { AccessMeta, DtoMeta, FieldMeta, TypeRef } from "./types.js";
 import { resolveMeta, type ResolvedDomain, type ResolvedType } from "./resolve.js";
 
 /**
@@ -90,6 +90,10 @@ export interface MetaScaffoldSource {
    * state them, plus every key whose record arrives nested beside it.
    */
   relationFields?: string[];
+  /** What the list (or search) operation requires of the caller, as SimpliX Meta states it. */
+  listAccess?: AccessMeta;
+  /** Locale → the entity's plural name, as SimpliX Meta states it. */
+  plural?: Record<string, string>;
 }
 
 /** Roles the UI templates offer no affordance for: nothing generated sends these requests. */
@@ -144,7 +148,10 @@ export async function loadMetaScaffoldSource(
       const tag = domain.entities.find((one) => entityNameOf(one.tag) === entity)?.tag;
       if (tag === undefined) continue;
       const source = buildMetaScaffoldSource({ domain, tag, naming });
-      source.relationFields = relationFieldsOf(document, tag.split(".").pop() ?? tag, source);
+      const entityName = tag.split(".").pop() ?? tag;
+      source.relationFields = relationFieldsOf(document, entityName, source);
+      const plural = document.entities?.[entityName]?.plural;
+      if (plural) source.plural = plural;
       return source;
     }
   }
@@ -265,6 +272,7 @@ export function buildMetaScaffoldSource(
     if (roles[target.role] === undefined) roles[target.role] = target.name;
   }
 
+  const listTarget = targets.find((one) => one.role === "list") ?? targets.find((one) => one.role === "search");
   const searchDto = searchDtoOf(domain, targets);
   const chosen = chooseFieldType(domain, targets);
   const fields = chosen ? fieldInfos(domain, chosen.type, searchDto) : [];
@@ -292,6 +300,7 @@ export function buildMetaScaffoldSource(
     filters: searchDto ? filtersOf(domain, searchDto) : [],
     keywordSearch: searchDto ? hasKeywordSearch(domain.types.get(searchDto)?.allFields ?? []) : false,
     unreachableRoles: UNREACHABLE_ROLES.filter((role) => roles[role] !== undefined),
+    ...(listTarget ? { listAccess: listTarget.operation.access } : {}),
   };
 
   if (chosen) source.fieldSource = { type: chosen.type.name, origin: chosen.origin };

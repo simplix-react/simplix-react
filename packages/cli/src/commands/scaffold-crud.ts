@@ -36,6 +36,7 @@ import { writeStampedGenerated } from "../utils/generated-merge.js";
 import { fixtureRows } from "../utils/story-fixtures.js";
 import { renderWidgetBlocks, renderWidgetFiles } from "./scaffold-widgets.js";
 import { renderTemplate } from "../utils/template.js";
+import { writeRoute } from "../utils/route-files.js";
 import { depVersion } from "../versions.js";
 
 // ── Zod type to component mapping ──
@@ -2588,6 +2589,26 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       const storyCtx = { ...fullCtx, storyId: named(projectConfig.templates?.story?.id), storyTitle: named(projectConfig.templates?.story?.title) ?? `Generated/${EntityPascal}` };
       const outcome = await writeGenerated(storyPath, renderTemplate(storyTemplate, storyCtx), origin);
       log.info(`${outcome} story ${relative(rootDir, storyPath)}`);
+    }
+
+    // The route the list is reached through, where the module's group names an app to route it in.
+    const routeGroup = moduleDir ? modulePathOf(rootDir, moduleDir).split("/")[0] : undefined;
+    const routeTarget = routeGroup !== undefined && modulePathOf(rootDir, moduleDir!).includes("/") ? projectConfig.routes?.[routeGroup] : undefined;
+    if (moduleDir && routeTarget && ctx.hasList) {
+      const route = await writeRoute({
+        rootDir,
+        moduleDir,
+        target: routeTarget,
+        templates: projectTemplates,
+        ctx: fullCtx,
+        entityKebab,
+        entityPlural: ctx.entityPlural,
+        accessList: accessOf((roles?.list ?? roles?.search) as string | undefined) ?? undefined,
+        listAccess: metaSource?.listAccess,
+        plural: metaSource?.plural,
+        origin,
+      });
+      log.info(`${route.outcome} route ${relative(rootDir, route.file)}${route.menuInserted ? ", menu entry added" : ""}`);
     }
 
     if (moduleDir) {
