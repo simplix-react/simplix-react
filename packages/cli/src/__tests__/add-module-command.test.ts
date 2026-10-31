@@ -36,6 +36,17 @@ describe("add-module templates", () => {
     expect(result).toContain('"type": "module"');
   });
 
+  it("renders the configured module dependencies after the template's own", () => {
+    const result = renderTemplate(
+      modulePackageJson,
+      makeCtx({ deps: { lucideReact: "^0.4.0" }, moduleDependencies: [{ name: "@test/identity-ui", range: "workspace:*" }] }),
+    );
+    expect(JSON.parse(result).dependencies).toEqual({
+      "lucide-react": "^0.4.0",
+      "@test/identity-ui": "workspace:*",
+    });
+  });
+
   it("renders module tsup.config", () => {
     const result = renderTemplate(moduleTsupConfig, makeCtx());
     expect(result).toContain("tsup");

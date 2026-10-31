@@ -24,6 +24,37 @@ import {
   moduleLocalesIndexTs,
 } from "../templates/module/index.js";
 
+interface ModuleDependency {
+  name: string;
+  range: string;
+}
+
+class ModuleDependencyError extends Error {}
+
+/** An npm package name, scoped or not; nothing that would break out of the JSON string it is written into. */
+const PACKAGE_NAME = /^(?:@[a-z0-9][\w.-]*\/)?[a-z0-9][\w.-]*$/;
+
+/**
+ * The configured `modules.dependencies` as the sorted rows the `package.json` template writes.
+ * A name or range that is not a plain string is refused before any file is written, because a
+ * module whose manifest does not parse stops every install in the workspace.
+ */
+function moduleDependenciesOf(configured: Readonly<Record<string, string>> | undefined): ModuleDependency[] {
+  const rows: ModuleDependency[] = [];
+  for (const [name, range] of Object.entries(configured ?? {})) {
+    if (!PACKAGE_NAME.test(name)) {
+      throw new ModuleDependencyError(`modules.dependencies: "${name}" is not a package name.`);
+    }
+    if (typeof range !== "string" || range.trim() === "" || /["\\\s]/.test(range)) {
+      throw new ModuleDependencyError(
+        `modules.dependencies: "${name}" needs a version range written as a plain string (for example "workspace:*").`,
+      );
+    }
+    rows.push({ name, range });
+  }
+  return rows.sort((a, b) => a.name.localeCompare(b.name));
+}
+
 export const addModuleCommand = new Command("add-module")
   .description("Add a new FSD module")
   .argument("<name>", "Module name (e.g., editor, maps, monitoring)")
@@ -79,6 +110,14 @@ export const addModuleCommand = new Command("add-module")
       log.error(error.message);
       process.exit(1);
     }
+    let moduleDependencies: ModuleDependency[];
+    try {
+      moduleDependencies = moduleDependenciesOf(config.modules?.dependencies);
+    } catch (error) {
+      if (!(error instanceof ModuleDependencyError)) throw error;
+      log.error(error.message);
+      process.exit(1);
+    }
     const leafName = prefix ? `${prefix}-${module.leaf}` : module.leaf;
     const dirName = module.group ? `${module.group}/${leafName}` : leafName;
     const baseModuleName = module.group ? `${module.group}-${module.leaf}` : module.leaf;
@@ -104,6 +143,7 @@ export const addModuleCommand = new Command("add-module")
         PascalName: toPascalCase(baseModuleName),
         namespace: qualifiedName,
         rootRelative: dirName.split("/").map(() => "..").concat("..").join("/"),
+        moduleDependencies,
       });
 
       const files: Record<string, string> = {

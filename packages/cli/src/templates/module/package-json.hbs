@@ -37,7 +37,8 @@
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
-    "lucide-react": "{{deps.lucideReact}}"
+    "lucide-react": "{{deps.lucideReact}}"{{#each moduleDependencies}},
+    "{{name}}": "{{range}}"{{/each}}
   },
   "peerDependencies": {
     "react": ">=18.0.0",

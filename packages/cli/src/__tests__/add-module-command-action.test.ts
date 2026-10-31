@@ -226,6 +226,55 @@ describe("addModuleCommand action (interactive)", () => {
     expect(await readFile(join(targetDir, "src/locales/index.ts"), "utf-8")).toContain('"admin-user"');
   });
 
+  it("declares no dependency of its own beyond the template's when the config lists none", async () => {
+    const { addModuleCommand } = await import("../commands/add-module.js");
+
+    await addModuleCommand.parseAsync(["node", "simplix", "monitoring", "-y"]);
+
+    const pkgJson = JSON.parse(await readFile(join(tempDir, "modules/myapp-monitoring/package.json"), "utf-8"));
+    expect(Object.keys(pkgJson.dependencies)).toEqual(["lucide-react"]);
+  });
+
+  it("writes the configured dependencies into the module's package.json, sorted by name", async () => {
+    const { loadConfig } = await import("../config/config-loader.js");
+    vi.mocked(loadConfig).mockResolvedValueOnce({
+      i18n: { locales: ["en", "ko"] },
+      packages: { prefix: "myapp" },
+      modules: { dependencies: { "@test/identity-ui": "workspace:*", "@test/api-client": "workspace:^" } },
+    });
+    const { addModuleCommand } = await import("../commands/add-module.js");
+
+    await addModuleCommand.parseAsync(["node", "simplix", "monitoring", "-y"]);
+
+    const raw = await readFile(join(tempDir, "modules/myapp-monitoring/package.json"), "utf-8");
+    const pkgJson = JSON.parse(raw);
+    expect(Object.keys(pkgJson.dependencies)).toEqual(["lucide-react", "@test/api-client", "@test/identity-ui"]);
+    expect(pkgJson.dependencies["@test/identity-ui"]).toBe("workspace:*");
+    expect(pkgJson.dependencies["@test/api-client"]).toBe("workspace:^");
+    expect(pkgJson.peerDependencies).toBeDefined();
+  });
+
+  it("refuses a dependency that is not a package name or has no plain range, before writing anything", async () => {
+    const { loadConfig } = await import("../config/config-loader.js");
+    const { addModuleCommand } = await import("../commands/add-module.js");
+
+    vi.mocked(loadConfig).mockResolvedValueOnce({
+      i18n: { locales: ["en"] },
+      packages: { prefix: "myapp" },
+      modules: { dependencies: { 'bad"name': "workspace:*" } },
+    });
+    await expect(addModuleCommand.parseAsync(["node", "simplix", "monitoring", "-y"])).rejects.toThrow("process.exit(1)");
+
+    vi.mocked(loadConfig).mockResolvedValueOnce({
+      i18n: { locales: ["en"] },
+      packages: { prefix: "myapp" },
+      modules: { dependencies: { "@test/identity-ui": 'workspace:*", "x": "y' } },
+    });
+    await expect(addModuleCommand.parseAsync(["node", "simplix", "monitoring", "-y"])).rejects.toThrow("process.exit(1)");
+
+    expect(await pathExists(join(tempDir, "modules/myapp-monitoring"))).toBe(false);
+  });
+
   it("refuses a group the config does not declare", async () => {
     const { addModuleCommand } = await import("../commands/add-module.js");
     await expect(addModuleCommand.parseAsync(["node", "simplix", "ops/user", "-y"])).rejects.toThrow("process.exit(1)");

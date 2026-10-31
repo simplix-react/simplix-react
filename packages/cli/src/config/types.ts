@@ -141,9 +141,17 @@ export interface SimplixConfig {
    * How UI modules are laid out under `modules/`. `groups` names directories that hold modules
    * rather than being one (`["admin", "portal", "shared"]`), so `--module admin/user` addresses
    * `modules/admin/user` and every other value names a module directly under `modules/`.
+   * `dependencies` is what `add-module` puts in each new module's `package.json`.
    */
   modules?: {
     groups?: string[];
+    /**
+     * Packages every module `add-module` writes declares as a dependency, by name → version range
+     * (`{ "@acme/identity-ui": "workspace:*" }`). A package all the project's screens import, such
+     * as the one holding its signed-in subject, belongs here so each new module resolves it
+     * without a hand edit. Absent or empty, a module declares none of its own.
+     */
+    dependencies?: Readonly<Record<string, string>>;
   };
 
   /**
