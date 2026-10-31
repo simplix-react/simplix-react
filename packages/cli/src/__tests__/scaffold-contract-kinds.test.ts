@@ -50,6 +50,11 @@ describe("a relation in a list", () => {
     expect(reference).toMatchObject({ contractKind: "reference", peekKind: "user", nameField: "userName", hideInList: false });
   });
 
+  it("opens the peek the project names for its stem", () => {
+    const out = withContractKinds([field("accountId"), field("ownerId"), field("ownerName")], "accountId", { owner: "userAccount" });
+    expect(out.find((f) => f.name === "ownerId")?.peekKind).toBe("userAccount");
+  });
+
   it("stays hidden while it is a bare key with no name beside it", () => {
     const out = withContractKinds(orderAndCategorizeFields([field("accountId"), field("tenantId")]), "accountId");
     expect(out.find((f) => f.name === "tenantId")).toMatchObject({ contractKind: "text", hideInList: true });

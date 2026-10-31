@@ -147,6 +147,19 @@ export interface SimplixConfig {
   };
 
   /**
+   * How references are drawn.
+   *
+   * @remarks
+   * `peeks` names the peek a reference opens, keyed by the reference's stem (`user` for `userId`
+   * beside `userName`), where the contract does not name the referenced entity: a key whose record
+   * arrives nested is named by that record's type, a flat key only by its own name, which need not
+   * be the entity the app registers a peek for (`{ user: "userAccount", owner: "userAccount" }`).
+   */
+  references?: {
+    peeks?: Readonly<Record<string, string>>;
+  };
+
+  /**
    * How generated files are written.
    *
    * @remarks

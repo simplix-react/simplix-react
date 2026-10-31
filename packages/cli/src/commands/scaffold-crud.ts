@@ -170,7 +170,12 @@ export function contractKindOf(field: FieldInfo): string {
  * Stamps every field with its contract kind, and a reference with the peek it opens and the
  * sibling field that names its record (`<entity>Name`, or `<entity>DisplayName`), where one exists.
  */
-export function withContractKinds(input: readonly FieldInfo[], rowIdField?: string): FieldInfo[] {
+export function withContractKinds(
+  input: readonly FieldInfo[],
+  rowIdField?: string,
+  /** Reference stem to peek kind, from `references.peeks` in the project's config. */
+  peeks?: Readonly<Record<string, string>>,
+): FieldInfo[] {
   // The record's own key ends in `Id` like a foreign key, but it names this record, never another:
   // read as a reference it would draw a peek at itself and swallow `<entity>Name` as its label.
   const fields = input.map((f) => (f.name === rowIdField && f.isForeignKey ? { ...f, isForeignKey: false, fkEntityField: null } : f));
@@ -181,7 +186,7 @@ export function withContractKinds(input: readonly FieldInfo[], rowIdField?: stri
     ),
   );
   return fields.map((f) => {
-    const stamped = stampContractKind(f, names, referenceNames, fields);
+    const stamped = stampContractKind(f, names, referenceNames, fields, peeks);
     const isIdentifier = f.name === rowIdField;
     // A key nobody reads (an attachment id, a list of role ids, an external key) says nothing on a
     // screen; the record's own identifier is drawn once, in its detail, with a copy control.
@@ -198,6 +203,7 @@ function stampContractKind(
   names: ReadonlySet<string>,
   referenceNames: ReadonlySet<string>,
   fields: readonly FieldInfo[],
+  peeks?: Readonly<Record<string, string>>,
 ): FieldInfo {
   {
     const contractKind = contractKindOf(f);
@@ -213,7 +219,7 @@ function stampContractKind(
         (n) => names.has(n) && fields.find((one) => one.name === n)?.tsType === "string",
       );
     if (!nameField) return { ...f, contractKind: "text", isReferenceName, isAuditField };
-    return { ...f, contractKind, peekKind: f.referencePeekKind ?? f.fkEntityField, nameField, isReferenceName, isAuditField };
+    return { ...f, contractKind, peekKind: f.referencePeekKind ?? peeks?.[f.fkEntityField] ?? f.fkEntityField, nameField, isReferenceName, isAuditField };
   }
 }
 
@@ -1969,7 +1975,9 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
   }
   const rootDir = await findProjectRoot(process.cwd());
   // Refused before anything is written: the screen's story goes to the configured directory.
-  await assertOutputDirs(rootDir, await loadConfig(rootDir));
+  const scaffoldConfig = await loadConfig(rootDir);
+  await assertOutputDirs(rootDir, scaffoldConfig);
+  const referencePeeks = scaffoldConfig.references?.peeks;
   const entityKebab = toKebabCase(entity);
   const EntityPascal = toPascalCase(entity);
 
@@ -2342,7 +2350,7 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       const holderList = holder.source.roles.list;
       const holderPackage = (await findSchemaFile(rootDir, holder.entity))?.packageName ?? null;
       if (!holderList || !holderPackage) continue;
-      const holderFields = withContractKinds(holder.source.rowFields ?? holder.source.fields, holder.source.rowIdField)
+      const holderFields = withContractKinds(holder.source.rowFields ?? holder.source.fields, holder.source.rowIdField, referencePeeks)
         .filter((f) => f.name !== holder.field);
       holders.push({
         entity: holder.entity,
@@ -2374,15 +2382,15 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       entityKebab,
       entity,
       entityPlural,
-      fields: withContractKinds(fields, rowIdField),
+      fields: withContractKinds(fields, rowIdField, referencePeeks),
       // A detail draws what the get route answers with, which holds what the server derives
       // (a standing, a display name, a last-seen time) and no request body states.
-      detailFields: withContractKinds(metaSource?.detailFields ?? fields, rowIdField),
+      detailFields: withContractKinds(metaSource?.detailFields ?? fields, rowIdField, referencePeeks),
       // The enum the detail header draws as the record's standing.
-      statusField: withContractKinds(metaSource?.detailFields ?? fields).find(
+      statusField: withContractKinds(metaSource?.detailFields ?? fields, undefined, referencePeeks).find(
         (f) => f.contractKind === "enum" && /(^|[a-z])(status|state|standing)$/i.test(f.name),
       )?.name,
-      listFields: withContractKinds(listFields, rowIdField),
+      listFields: withContractKinds(listFields, rowIdField, referencePeeks),
       packageName,
       listRowType,
       treeRowType,
