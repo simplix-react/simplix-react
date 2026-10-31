@@ -90,9 +90,11 @@ export const crudDetailSectionBodyStyle = defineSlotStyle({
   // The field grid: label over value, 24px between columns, 16px between rows, 4px from label to
   // value, no column rules (a rule drawn per row breaks between rows and leaves a lone last field
   // half-ruled). Values sit on a 22px line so text, badges and copy controls align; long values
-  // wrap. A lone last field keeps its column. The empty value is the shared dash, quiet.
+  // wrap, and a value with no break opportunity (a comma-joined key list, a URL) breaks anywhere:
+  // the value is a flex row, so its text is a flex item whose min-content width is the whole
+  // token under `break-words`, and the field pushed past the detail's edge. A lone last field keeps its column. The empty value is the shared dash, quiet.
   base:
-    "pl-0 !gap-x-6 !gap-y-4 [&>.grid-column-rule]:!ml-0 [&>.grid-column-rule]:!border-l-0 [&>.grid-column-rule]:!pl-0 [&_[data-slot=field-detail-wrapper]]:!flex [&_[data-slot=field-detail-wrapper]]:!flex-col [&_[data-slot=field-detail-wrapper]]:!gap-1 [&_[data-slot=field-detail-wrapper]]:!py-0 [&_[data-slot=field-detail-wrapper]]:min-w-0 [&_[data-slot=field-detail-value]]:flex [&_[data-slot=field-detail-value]]:min-h-[22px] [&_[data-slot=field-detail-value]]:min-w-0 [&_[data-slot=field-detail-value]]:flex-wrap [&_[data-slot=field-detail-value]]:items-center [&_[data-slot=field-detail-value]]:gap-1.5 [&_[data-slot=field-detail-value]]:break-words [&_[data-slot=empty-value]]:font-normal [&_[data-slot=empty-value]]:text-[var(--muted-2)]",
+    "pl-0 !gap-x-6 !gap-y-4 [&>.grid-column-rule]:!ml-0 [&>.grid-column-rule]:!border-l-0 [&>.grid-column-rule]:!pl-0 [&_[data-slot=field-detail-wrapper]]:!flex [&_[data-slot=field-detail-wrapper]]:!flex-col [&_[data-slot=field-detail-wrapper]]:!gap-1 [&_[data-slot=field-detail-wrapper]]:!py-0 [&_[data-slot=field-detail-wrapper]]:min-w-0 [&_[data-slot=field-detail-value]]:flex [&_[data-slot=field-detail-value]]:min-h-[22px] [&_[data-slot=field-detail-value]]:min-w-0 [&_[data-slot=field-detail-value]]:flex-wrap [&_[data-slot=field-detail-value]]:items-center [&_[data-slot=field-detail-value]]:gap-1.5 [&_[data-slot=field-detail-value]]:wrap-anywhere [&_[data-slot=empty-value]]:font-normal [&_[data-slot=empty-value]]:text-[var(--muted-2)]",
   variants: {
     // One column or two: the field grid's gaps are the same in both.
     single: { true: "", false: "" },
