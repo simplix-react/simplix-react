@@ -74,6 +74,7 @@ export async function writeRoute(input: RouteInput): Promise<RouteWrite> {
   const moduleLocales = manifest.exports?.["./locales"] !== undefined;
   const routeCtx = { ...input.ctx, routePath, modulePackage, moduleLocales, accessList: input.accessList };
   const outcome = await writeGenerated(file, renderTemplate(template, routeCtx), input.origin);
+  await ensureAppDependencies(resolve(input.rootDir, input.target.dir), [String(input.ctx.packageName ?? ""), modulePackage]);
 
   const menu = input.target.menu;
   if (!menu) return { file, outcome, labelled: [] };
@@ -92,7 +93,8 @@ export async function writeRoute(input: RouteInput): Promise<RouteWrite> {
   }
 
   const labelled: string[] = [];
-  for (const [locale, catalog] of Object.entries(menu.catalogs ?? {})) {
+  // An entry already in the menu already has its label, under whatever key its author chose.
+  for (const [locale, catalog] of menuInserted ? Object.entries(menu.catalogs ?? {}) : []) {
     const label = input.plural?.[locale] ?? input.plural?.["en"];
     if (label === undefined) continue;
     const path = resolve(input.rootDir, catalog);
@@ -110,4 +112,27 @@ export async function writeRoute(input: RouteInput): Promise<RouteWrite> {
     labelled.push(catalog);
   }
   return { file, outcome, menuInserted, labelled };
+}
+
+/**
+ * Declares each package the route imports in the app that owns the route directory (the nearest
+ * `package.json` above it), so the import resolves once the workspace is installed.
+ *
+ * @returns the packages added
+ */
+export async function ensureAppDependencies(routeDir: string, packages: readonly string[]): Promise<string[]> {
+  let dir = routeDir;
+  while (!(await pathExists(join(dir, "package.json")))) {
+    const parent = resolve(dir, "..");
+    if (parent === dir) return [];
+    dir = parent;
+  }
+  const path = join(dir, "package.json");
+  const manifest = await readJsonFile<{ dependencies?: Record<string, string>; devDependencies?: Record<string, string> }>(path);
+  const declared = { ...manifest.dependencies, ...manifest.devDependencies };
+  const missing = packages.filter((name) => name !== "" && declared[name] === undefined);
+  if (missing.length === 0) return [];
+  manifest.dependencies = { ...manifest.dependencies, ...Object.fromEntries(missing.map((name) => [name, "workspace:*"])) };
+  await writeFileWithDir(path, `${JSON.stringify(manifest, null, 2)}\n`);
+  return missing;
 }
