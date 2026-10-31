@@ -83,7 +83,7 @@ export const calendarWeekdayStyle = defineSlotStyle({
  */
 export const calendarDayStyle = defineSlotStyle({
   slot: "calendar-day",
-  base: "rounded-md text-lg font-normal text-foreground/80 md:text-[15px] hover:bg-accent hover:text-accent-foreground focus-visible:outline-none disabled:opacity-50 focus-visible:shadow-[var(--focus-halo)]",
+  base: "rounded-md text-lg font-normal text-foreground/80 md:text-(length:--fs-title-sm) md:leading-(--lh-title-sm) hover:bg-accent hover:text-accent-foreground focus-visible:outline-none disabled:opacity-50 focus-visible:shadow-[var(--focus-halo)]",
   variants: {
     today: { true: "bg-accent/50 font-semibold", false: "" },
     // Single mode selection.

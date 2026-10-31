@@ -152,7 +152,7 @@ export const timeRangePresetStyle = defineSlotStyle({
 /** The dashed frame of the selected span and of the live drag preview. */
 export const timeRangeSelectionBoxStyle = defineSlotStyle({
   slot: "time-range-selection-box",
-  base: "rounded-[2px]",
+  base: "rounded-[var(--radius-2xs)]",
   variants: {},
   defaultVariants: {},
 });
@@ -200,7 +200,7 @@ export const timeRangeLabelsStyle = defineSlotStyle({
 /** One time axis label. */
 export const timeRangeLabelStyle = defineSlotStyle({
   slot: "time-range-label",
-  base: "text-[11px] text-muted-foreground tabular-nums",
+  base: "text-(length:--fs-label) leading-(--lh-label) text-muted-foreground tabular-nums",
   variants: {},
   defaultVariants: {},
 });

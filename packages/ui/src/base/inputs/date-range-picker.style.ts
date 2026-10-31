@@ -37,7 +37,7 @@ export const dateRangePickerPresetsHeaderStyle = defineSlotStyle({
 /** The presets column title. */
 export const dateRangePickerPresetsTitleStyle = defineSlotStyle({
   slot: "date-range-picker-presets-title",
-  base: "text-[11px] font-semibold uppercase tracking-wider text-muted-foreground",
+  base: "text-(length:--fs-label) leading-(--lh-label) font-semibold uppercase tracking-wider text-muted-foreground",
   variants: {},
   defaultVariants: {},
 });

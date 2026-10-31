@@ -200,7 +200,7 @@ export function PhoneField({
             <PopoverContent flush className="w-72" align="start">
               <Command filter={filterFn}>
                 <CommandInput placeholder={t("field.searchCountry")} className="h-8" />
-                <CommandList className="max-h-[200px]">
+                <CommandList className="max-h-50">
                   <CommandEmpty>{t("filter.noResultsFound")}</CommandEmpty>
                   <CommandGroup>
                     {options.map((option) => (

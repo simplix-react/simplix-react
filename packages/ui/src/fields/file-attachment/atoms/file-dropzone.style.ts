@@ -58,7 +58,7 @@ export const fileDropzoneExtensionsStyle = defineSlotStyle({
 /** The title line of the extensions tooltip. */
 export const fileDropzoneExtensionsTitleStyle = defineSlotStyle({
   slot: "file-dropzone-extensions-title",
-  base: "mb-0.5 text-[10px] font-semibold uppercase tracking-wide opacity-75",
+  base: "mb-0.5 text-(length:--fs-2xs) leading-(--lh-2xs) font-semibold uppercase tracking-wide opacity-75",
   variants: {},
   defaultVariants: {},
 });

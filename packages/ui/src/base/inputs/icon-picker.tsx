@@ -324,7 +324,7 @@ const IconPicker = forwardRef<
           )}
         </PopoverTrigger>
         <PopoverContent
-          className="w-[560px] max-w-[calc(100vw-32px)]"
+          className="w-140 max-w-[calc(100vw-32px)]"
           {...partAttributes(iconPickerPopoverStyle, {})}
         >
           <div className="flex" {...slotAttributes(iconPickerBodyStyle, {})}>

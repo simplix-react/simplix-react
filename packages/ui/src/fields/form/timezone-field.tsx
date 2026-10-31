@@ -144,7 +144,7 @@ export function TimezoneField({
             >
               <Command filter={filterFn}>
                 <CommandInput placeholder={placeholder ?? t("field.searchTimezone")} className="h-8" />
-                <CommandList className="max-h-[200px]">
+                <CommandList className="max-h-50">
                   <CommandEmpty>{t("filter.noResultsFound")}</CommandEmpty>
                   {[...groups.entries()].map(([region, opts]) => (
                     <CommandGroup key={region} heading={region}>

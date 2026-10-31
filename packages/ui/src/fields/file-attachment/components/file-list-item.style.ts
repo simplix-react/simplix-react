@@ -64,7 +64,7 @@ export const fileListItemErrorIconStyle = defineSlotStyle({
 /** The error message text. */
 export const fileListItemErrorMessageStyle = defineSlotStyle({
   slot: "file-list-item-error-message",
-  base: "text-[11px] text-destructive",
+  base: "text-(length:--fs-label) leading-(--lh-label) text-destructive",
   variants: {},
   defaultVariants: {},
 });

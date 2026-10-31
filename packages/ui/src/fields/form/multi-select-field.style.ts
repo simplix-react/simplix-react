@@ -23,7 +23,7 @@ export const multiSelectChipsStyle = defineSlotStyle({
 export const multiSelectChipStyle = defineSlotStyle({
   slot: "field-multiselect-chip",
   as: "part",
-  base: "gap-0.5 pr-0.5 text-[11px] py-0",
+  base: "gap-0.5 pr-0.5 text-(length:--fs-label) leading-(--lh-label) py-0",
   variants: {},
   defaultVariants: {},
 });

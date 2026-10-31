@@ -19,7 +19,7 @@ export const cropModalIconStyle = defineSlotStyle({
 /** The dialog title. */
 export const cropModalTitleStyle = defineSlotStyle({
   slot: "crop-modal-title",
-  base: "text-[14px] font-semibold text-foreground leading-[1.3] tracking-[-0.005em] m-0",
+  base: "text-(length:--fs-body) font-semibold text-foreground leading-[1.3] tracking-[-0.005em] m-0",
   variants: {},
   defaultVariants: {},
 });
@@ -75,7 +75,7 @@ export const cropModalMetaStyle = defineSlotStyle({
 /** The dimensions chip. */
 export const cropModalDimensionsStyle = defineSlotStyle({
   slot: "crop-modal-dimensions",
-  base: "gap-[5px] px-2 rounded-full bg-card border border-border text-[11.5px] text-secondary-foreground leading-none font-medium tabular-nums",
+  base: "gap-[5px] px-2 rounded-full bg-card border border-border text-(length:--fs-badge) text-secondary-foreground leading-none font-medium tabular-nums",
   variants: {},
   defaultVariants: {},
 });
@@ -107,7 +107,7 @@ export const cropModalRatiosStyle = defineSlotStyle({
 /** One aspect ratio button. */
 export const cropModalRatioStyle = defineSlotStyle({
   slot: "crop-modal-ratio",
-  base: "px-2 text-[11px] font-semibold rounded-full border-none font-[inherit] leading-none tracking-[-0.005em] transition-[background,color]",
+  base: "px-2 text-(length:--fs-label) font-semibold rounded-full border-none font-[inherit] leading-none tracking-[-0.005em] transition-[background,color]",
   variants: {
     selected: {
       true: "bg-primary text-primary-foreground",
@@ -128,7 +128,7 @@ export const cropModalActionsStyle = defineSlotStyle({
 /** The cancel button. */
 export const cropModalCancelStyle = defineSlotStyle({
   slot: "crop-modal-cancel",
-  base: "px-4 rounded text-[13px] font-semibold border border-border bg-card text-secondary-foreground font-[inherit] transition-[background,border-color,color] hover:border-[var(--border-strong,var(--border))]",
+  base: "px-4 rounded text-(length:--fs-body-sm) leading-(--lh-body-sm) font-semibold border border-border bg-card text-secondary-foreground font-[inherit] transition-[background,border-color,color] hover:border-[var(--border-strong,var(--border))]",
   variants: {},
   defaultVariants: {},
 });
@@ -136,7 +136,7 @@ export const cropModalCancelStyle = defineSlotStyle({
 /** The save button. */
 export const cropModalSaveStyle = defineSlotStyle({
   slot: "crop-modal-save",
-  base: "px-4 rounded text-[13px] font-semibold border-none bg-primary text-primary-foreground font-[inherit] transition-[background] hover:bg-[var(--primary-hover,var(--primary))]",
+  base: "px-4 rounded text-(length:--fs-body-sm) leading-(--lh-body-sm) font-semibold border-none bg-primary text-primary-foreground font-[inherit] transition-[background] hover:bg-[var(--primary-hover,var(--primary))]",
   variants: {},
   defaultVariants: {},
 });

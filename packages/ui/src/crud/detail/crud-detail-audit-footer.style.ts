@@ -42,7 +42,7 @@ export const crudDetailAuditTooltipStyle = defineSlotStyle({
 /** The full id line in the tooltip. */
 export const crudDetailAuditTooltipIdStyle = defineSlotStyle({
   slot: "crud-detail-audit-tooltip-id",
-  base: "whitespace-nowrap font-mono text-[11px]",
+  base: "whitespace-nowrap font-mono text-(length:--fs-label) leading-(--lh-label)",
   variants: {},
   defaultVariants: {},
 });
@@ -50,7 +50,7 @@ export const crudDetailAuditTooltipIdStyle = defineSlotStyle({
 /** The copy hint line in the tooltip. */
 export const crudDetailAuditTooltipHintStyle = defineSlotStyle({
   slot: "crud-detail-audit-tooltip-hint",
-  base: "text-muted-foreground text-[11px]",
+  base: "text-muted-foreground text-(length:--fs-label) leading-(--lh-label)",
   variants: {},
   defaultVariants: {},
 });

@@ -109,7 +109,7 @@ export function TableDropdownMenu({ children, ...props }: TableDropdownMenuProps
           {children || <Table className="h-3.5 w-3.5" />}
         </ToolbarButton>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="min-w-[180px]">
+      <DropdownMenuContent align="start" className="min-w-45">
         {/* Table - Insert with grid picker */}
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>

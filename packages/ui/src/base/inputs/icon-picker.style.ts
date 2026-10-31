@@ -48,7 +48,7 @@ export const iconPickerCategoryStyle = defineSlotStyle({
 /** The icon count pill in a category button. */
 export const iconPickerCategoryCountStyle = defineSlotStyle({
   slot: "icon-picker-category-count",
-  base: "rounded-full bg-muted px-1.5 text-[10px]",
+  base: "rounded-full bg-muted px-1.5 text-(length:--fs-2xs) leading-(--lh-2xs)",
   variants: {
     spaced: { true: "ml-1", false: "" },
   },

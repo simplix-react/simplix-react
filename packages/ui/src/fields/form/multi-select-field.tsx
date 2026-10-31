@@ -196,7 +196,7 @@ export function MultiSelectField<T extends string = string>({
                 }}
                 placeholder={value.length === 0 ? selectPlaceholder : ""}
                 disabled={disabled}
-                className="min-w-[60px] flex-1"
+                className="min-w-15 flex-1"
                 {...slotAttributes(multiSelectInputStyle, {})}
               />
               </span>

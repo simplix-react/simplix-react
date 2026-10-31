@@ -78,7 +78,7 @@ export function TimezoneFormField({
       </Flex>
       <Command filter={filterFn}>
         <CommandInput placeholder={label} className="h-8" />
-        <CommandList className="max-h-[160px]">
+        <CommandList className="max-h-40">
           <CommandEmpty>{t("filter.noResultsFound")}</CommandEmpty>
           {[...groups.entries()].map(([region, opts]) => (
             <CommandGroup key={region} heading={region}>

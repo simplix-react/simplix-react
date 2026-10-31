@@ -3,7 +3,7 @@ import { defineSlotStyle } from "../../design/slot-style";
 /** The button's classic look. Drawn by `theme/designs/classic.css`; see {@link defineSlotStyle}. */
 export const buttonStyle = defineSlotStyle({
   slot: "button",
-  base: "inline-flex items-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-[color,background-color,border-color,box-shadow,scale] duration-[var(--dur-fast)] ease-[var(--ease)] enabled:active:scale-[0.98] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 focus-visible:shadow-[var(--focus-halo)]",
+  base: "inline-flex items-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-[color,background-color,border-color,box-shadow,scale] duration-[var(--dur-fast)] ease-[var(--ease)] enabled:active:scale-(--press-scale) focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 focus-visible:shadow-[var(--focus-halo)]",
 
     variants: {
       variant: {

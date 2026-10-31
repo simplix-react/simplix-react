@@ -11,7 +11,7 @@ export const cellFlagRowStyle = defineSlotStyle({
 /** The box a country flag is clipped to. */
 export const cellFlagStyle = defineSlotStyle({
   slot: "cell-flag",
-  base: "rounded-[1px]",
+  base: "rounded-[var(--radius-2xs)]",
   variants: {},
   defaultVariants: {},
 });

@@ -298,7 +298,7 @@ export function Carousel({
                         className="flex items-center"
                         {...slotAttributes(carouselBadgeRowStyle, {})}
                       >
-                        <span className="min-w-[32px]" {...slotAttributes(carouselBadgeLabelStyle, {})}>
+                        <span className="min-w-8" {...slotAttributes(carouselBadgeLabelStyle, {})}>
                           {row.label}
                         </span>
                         {row.value}

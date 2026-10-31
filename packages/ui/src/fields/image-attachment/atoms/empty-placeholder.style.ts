@@ -27,7 +27,7 @@ export const emptyPlaceholderIconStyle = defineSlotStyle({
 /** The placeholder title. */
 export const emptyPlaceholderTitleStyle = defineSlotStyle({
   slot: "empty-placeholder-title",
-  base: "text-[13.5px] font-semibold text-secondary-foreground",
+  base: "text-(length:--fs-cell) leading-(--lh-cell) font-semibold text-secondary-foreground",
   variants: {},
   defaultVariants: {},
 });
@@ -35,7 +35,7 @@ export const emptyPlaceholderTitleStyle = defineSlotStyle({
 /** The placeholder description. */
 export const emptyPlaceholderDescriptionStyle = defineSlotStyle({
   slot: "empty-placeholder-description",
-  base: "text-[12px] text-muted-foreground",
+  base: "text-(length:--fs-caption) leading-(--lh-caption) text-muted-foreground",
   variants: {},
   defaultVariants: {},
 });

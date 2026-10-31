@@ -298,7 +298,7 @@ export function DateRangePicker({
         value={month.getFullYear().toString()}
         options={yearOptions}
         onChange={onYearChange}
-        className="w-[80px]"
+        className="w-20"
       />
     );
     const monthSelect = (
@@ -306,7 +306,7 @@ export function DateRangePicker({
         value={month.getMonth().toString()}
         options={monthOptions}
         onChange={onMonthChange}
-        className="w-[72px]"
+        className="w-18"
       />
     );
     return yearFirst ? <>{yearSelect}{monthSelect}</> : <>{monthSelect}{yearSelect}</>;

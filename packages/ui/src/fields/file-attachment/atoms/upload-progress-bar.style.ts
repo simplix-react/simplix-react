@@ -27,7 +27,7 @@ export const uploadProgressBarFillStyle = defineSlotStyle({
 /** The percentage label. */
 export const uploadProgressBarLabelStyle = defineSlotStyle({
   slot: "upload-progress-bar-label",
-  base: "text-[10.5px] tabular-nums text-muted-foreground",
+  base: "text-(length:--fs-xs) leading-(--lh-xs) tabular-nums text-muted-foreground",
   variants: {},
   defaultVariants: {},
 });

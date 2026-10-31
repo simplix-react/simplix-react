@@ -23,7 +23,7 @@ export const plotGridStyle = defineSlotStyle({
 /** A value or category written on an axis; the highlighted category is drawn in the text colour. */
 export const plotAxisStyle = defineSlotStyle({
   slot: "plot-axis",
-  base: "fill-muted-foreground text-[11px] tabular-nums",
+  base: "fill-muted-foreground text-(length:--fs-label) leading-(--lh-label) tabular-nums",
   variants: {
     highlighted: { true: "fill-foreground font-semibold", false: "" },
   },
@@ -131,7 +131,7 @@ export const plotTooltipRowStyle = defineSlotStyle({
 /** The swatch of a series in the tooltip, drawn the way its marks are. */
 export const plotSwatchStyle = defineSlotStyle({
   slot: "plot-swatch",
-  base: "rounded-[2px] bg-[var(--series)]",
+  base: "rounded-[var(--radius-2xs)] bg-[var(--series)]",
   variants: {
     fill: {
       solid: "",

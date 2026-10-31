@@ -310,7 +310,7 @@ export function CropModal({ open, file, onClose, onSave, initialRatio = -1 }: Cr
           {/* Custom close button (mimics .fa-imv-close) */}
           <button
             type="button"
-            className="absolute top-[13px] right-[14px] w-[28px] h-[28px] grid place-items-center cursor-pointer z-[2]"
+            className="absolute top-[13px] right-[14px] w-7 h-7 grid place-items-center cursor-pointer z-[2]"
             aria-label={t('file.crop.close')}
             onClick={onClose}
             {...slotAttributes(cropModalCloseStyle, {})}
@@ -326,7 +326,7 @@ export function CropModal({ open, file, onClose, onSave, initialRatio = -1 }: Cr
 
         {/* Body - dark stage */}
         <div
-          className="flex items-center justify-center overflow-hidden flex-1 min-h-[360px]"
+          className="flex items-center justify-center overflow-hidden flex-1 min-h-90"
           {...slotAttributes(cropModalBodyStyle, {})}
         >
           <div

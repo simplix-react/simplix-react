@@ -119,7 +119,7 @@ export function StatCard({
             into a tile arrives at the size it was drawn. Nothing is rendered where there is no plot
             — the figure is left-aligned either way, so an empty box would reserve a column that
             already looks reserved, on the 94% of tiles that carry no plot at all. */}
-        {chart && <div className={cn("w-[84px] shrink-0", loading && "invisible")}>{chart}</div>}
+        {chart && <div className={cn("w-21 shrink-0", loading && "invisible")}>{chart}</div>}
       </div>
       {(description || trend) && (
         <div className={cn("flex items-baseline justify-between", loading && "invisible")} {...slotAttributes(statCardFooterStyle, {})}>

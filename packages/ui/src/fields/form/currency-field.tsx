@@ -148,7 +148,7 @@ export function CurrencyField({
           >
             <Command filter={filterFn}>
               <CommandInput placeholder={placeholder ?? t("field.searchCurrency")} className="h-8" />
-              <CommandList className="max-h-[200px]">
+              <CommandList className="max-h-50">
                 <CommandEmpty>{t("filter.noResultsFound")}</CommandEmpty>
                 <CommandGroup>
                   {options.map((option) => (

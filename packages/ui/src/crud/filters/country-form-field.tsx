@@ -69,7 +69,7 @@ export function CountryFormField({
       </Flex>
       <Command filter={filterFn}>
         <CommandInput placeholder={label} className="h-8" />
-        <CommandList className="max-h-[160px]">
+        <CommandList className="max-h-40">
           <CommandEmpty>{t("filter.noResultsFound")}</CommandEmpty>
           <CommandGroup>
             {options.map((option) => {

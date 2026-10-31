@@ -127,6 +127,24 @@
   --radius-surface: calc(var(--radius) + 2px);
   --radius-overlay: calc(var(--radius) + 4px);
   --radius-badge: 999px;
+  /* Small marks: key caps, checkboxes and dense-row buttons take xs, marks smaller still 2xs. */
+  --radius-xs: calc(var(--radius) - 4px);
+  --radius-2xs: calc(var(--radius) - 6px);
+
+  /* ── drawn edges: shadows that draw a line or a ring rather than a lift ──
+     Built from the colour tokens, so a design that recolours --border or --primary moves them. */
+  --shadow-rule-below: inset 0 -1px 0 0 var(--border);
+  --shadow-row-mark: inset 2px 0 0 0 var(--primary);
+  --shadow-outline: 0 0 0 1px var(--border);
+  --shadow-cutout: 0 0 0 2px var(--card);
+  --shadow-avatar-ring: 0 0 0 3px var(--card), 0 0 0 4px var(--border);
+
+  /* ── controls at rest, disabled and pressed ──
+     A disabled button of every variant stands on one neutral ground with a quieter label, never a
+     faded copy of itself; a pressed one shrinks to --press-scale, which is 1 under reduced motion. */
+  --control-disabled: var(--muted);
+  --ink-disabled: var(--muted-foreground);
+  --press-scale: 0.97;
 
   /* ── the important card under the lead fill ── */
   --lead: var(--primary);
@@ -146,6 +164,25 @@
   --fw-medium: 500;
   --fw-semibold: 600;
   --fw-bold: 700;
+  /* in-between weights the dense designs draw with; a theme maps them onto its fonts */
+  --fw-book: 450;
+  --fw-strong: 550;
+  --fw-heavy: 650;
+
+  /* ── type steps: every font size a design draws, so a theme can map each to its scale ── */
+  --fs-3xs: 9.5px;
+  --fs-2xs: 10px;
+  --fs-xs: 10.5px;
+  --fs-label: 11px;
+  --fs-badge: 11.5px;
+  --fs-caption: 12px;
+  --fs-control: 12.5px;
+  --fs-body-sm: 13px;
+  --fs-cell: 13.5px;
+  --fs-body: 14px;
+  --fs-title-sm: 15px;
+  --fs-title-md: 15.5px;
+  --fs-title: 17px;
 
   /* ── vertical rhythm (chrome / structural heights) ── */
   --h-topnav: 56px;
@@ -155,6 +192,8 @@
   --h-btn: 40px;
   --h-btn-sm: 32px;
   --h-icon-btn: 36px;
+  /* a control drawn inside a table row or a strip */
+  --h-row: 24px;
 
   /* ── canon mnemonic aliases (themed vars → adapt to light/dark automatically) ── */
   --bg: var(--background);
@@ -376,5 +415,36 @@
     --dur-fast: 0ms;
     --dur-base: 0ms;
     --dur-slow: 0ms;
+    --press-scale: 1;
+  }
+}
+
+/* Focus stays visible under forced colors (Windows High Contrast).
+ *
+ * Forced colors replaces every background with a system colour and drops box-shadow, so the ways
+ * a design shows focus (a background tint, a ring or halo drawn as a shadow, a border that only
+ * changes colour) vanish, and a slot that took the outline away for them leaves nothing to see.
+ * One outline, drawn in a system colour, goes on every element the keyboard is on. It is a base
+ * rule and not a per-slot class so that a slot written later, in this package or in a kit or an
+ * app, is covered without remembering to ask.
+ *
+ * The outline is important because the rule has to win over whatever removed the outline: a
+ * utility (outline-none), a slot rule in any layer and any selector an app wrote. Nothing changes
+ * outside forced colors, where each design keeps drawing focus its own way.
+ *
+ * The outline sits inside the border box (a negative offset). One drawn outside is cut off by any
+ * ancestor that clips, and the row action strips, tab lists, filter segments, menu rows and inner
+ * fields of a bordered control all do.
+ *
+ * Two kinds of row hold a keyboard position without holding focus: a combobox option (the input
+ * keeps focus and the cursor moves through aria-activedescendant) and a command-palette item.
+ * Both paint the cursor with a background only, so they are matched by the attribute that carries
+ * the cursor. */
+@media (forced-colors: active) {
+  :focus-visible,
+  [role="option"][data-highlighted]:not([data-highlighted="false"]),
+  [cmdk-item][data-selected="true"] {
+    outline: 2px solid Highlight !important;
+    outline-offset: -2px;
   }
 }

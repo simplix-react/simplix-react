@@ -19,24 +19,24 @@ export const detailSlots: Record<string, string> = {
   "crud-list-detail-drawer": "border-[var(--border)] bg-card shadow-[var(--shadow-3)]",
 
   // The head's close control on the control radius; the scroll edge in the cool shadow.
-  "crud-detail-header": "[&_[data-slot=button][data-size=icon-xs]]:rounded-[var(--radius-control)]",
+  "crud-detail-header": "[&_[data-slot=button][data-size=icon-xs]]:rounded-[var(--radius-control)] [&_[data-slot=button][data-size=icon-xs]]:bg-[var(--surface-2)] [&_[data-slot=button][data-size=icon-xs]:hover]:bg-[color-mix(in_oklch,var(--surface-2),var(--foreground)_7%)]",
   "crud-detail-header scrolled=true": "shadow-[0_8px_12px_-12px_oklch(0.2_0.03_265/0.45)]",
 
   // Tabs: a hairline under the strip, the chosen trigger ruled in the accent at 600. Detail list
   // rows on the control radius and hairlines.
   "crud-detail-body":
-    "[&_[data-slot=tabs-list][data-variant=underline]]:border-[var(--border)] [&_[data-slot=tabs-trigger][data-variant=underline]]:rounded-t-[var(--radius-control)] [&_[data-slot=tabs-trigger][data-variant=underline]]:text-[13px] [&_[data-slot=tabs-trigger][data-variant=underline][data-state=active]]:border-primary [&_[data-slot=tabs-trigger][data-variant=underline][data-state=active]]:text-foreground [&_[data-slot=tabs-trigger][data-variant=underline][data-state=active]]:font-[600] " +
+    "[&_[data-slot=tabs-list][data-variant=underline]]:border-[var(--border)] [&_[data-slot=tabs-trigger][data-variant=underline]]:rounded-t-[var(--radius-control)] [&_[data-slot=tabs-trigger][data-variant=underline]]:text-(length:--fs-body-sm) leading-(--lh-body-sm) [&_[data-slot=tabs-trigger][data-variant=underline][data-state=active]]:border-primary [&_[data-slot=tabs-trigger][data-variant=underline][data-state=active]]:text-foreground [&_[data-slot=tabs-trigger][data-variant=underline][data-state=active]]:font-(--fw-semibold) " +
     "[&_[data-slot=detail-list]]:rounded-[var(--radius-control)] [&_[data-slot=detail-list]]:border-[var(--border)] [&_[data-slot=detail-list-row]]:border-[var(--border)] [&_[data-slot=detail-list-footer]]:border-[var(--border)]",
 
   // Sections: a 13.5px title, the rule between sections a hairline.
-  "crud-detail-content": "[&_[data-slot=section-shell-title]]:text-[13.5px] [&_[data-slot=section-shell-title]]:font-[650] [&_[data-slot=section-shell-title]]:tracking-[-0.01em] [&_[data-slot=section-shell][data-variant=flat]]:border-[var(--border)]",
+  "crud-detail-content": "[&_[data-slot=section-shell-title]]:text-(length:--fs-cell) leading-(--lh-cell) [&_[data-slot=section-shell-title]]:font-(--fw-heavy) [&_[data-slot=section-shell-title]]:tracking-[-0.01em] [&_[data-slot=section-shell][data-variant=flat]]:border-[var(--border)]",
   // The field grid's type (language.md, [detail] field grid): an 11.5px label, a 13.5px value.
   "crud-detail-section-body":
-    "[&_[data-slot=field-detail-label]]:!text-[11.5px] [&_[data-slot=field-detail-label]]:font-[500] [&_[data-slot=field-detail-label]]:leading-4 [&_[data-slot=field-detail-label]]:text-muted-foreground [&_[data-slot=field-detail-value]]:!text-[13.5px] [&_[data-slot=field-detail-value]]:font-medium [&_[data-slot=field-detail-value]]:leading-5",
+    "[&_[data-slot=field-detail-label]]:!text-(length:--fs-badge) [&_[data-slot=field-detail-label]]:font-(--fw-medium) [&_[data-slot=field-detail-label]]:leading-4 [&_[data-slot=field-detail-label]]:text-muted-foreground [&_[data-slot=field-detail-value]]:!text-(length:--fs-cell) [&_[data-slot=field-detail-value]]:font-medium [&_[data-slot=field-detail-value]]:leading-5",
 
   // The audit block: a hairline, 11.5px stamps, the id as an 11px mono chip on the control radius.
-  "crud-detail-audit-footer": "border-[var(--border)] text-[11.5px] text-[var(--muted-2)]",
-  "crud-detail-audit-id": "rounded-[var(--radius-control)] text-[11px] leading-4 tracking-[0.02em] tabular-nums text-muted-foreground",
+  "crud-detail-audit-footer": "border-[var(--border)] text-(length:--fs-badge) leading-(--lh-badge) text-[var(--muted-2)]",
+  "crud-detail-audit-id": "rounded-[var(--radius-control)] text-(length:--fs-label) leading-4 tracking-[0.02em] tabular-nums text-muted-foreground",
   "crud-detail-audit-copied": "text-[var(--success-text)]",
   "crud-detail-audit-tooltip":
     "rounded-[var(--radius-control)] border-0 bg-[var(--popover-strong)] text-[var(--popover-strong-foreground)] shadow-[var(--shadow-3)]",
@@ -44,11 +44,11 @@ export const detailSlots: Record<string, string> = {
   "crud-detail-audit-tooltip-hint": "text-[var(--popover-strong-foreground)] opacity-70",
   "crud-detail-audit-date": "text-muted-foreground",
 
-  // The finishing row: the destructive verb drawn as red text; the footer's scroll edge in the
+  // The finishing row: the destructive verb drawn on a soft red ground beside the committing one; the footer's scroll edge in the
   // cool shadow.
   "crud-detail-footer overflow=true": "shadow-[0_-8px_12px_-12px_oklch(0.2_0.03_265/0.45)]",
   "crud-detail-actions":
-    "border-[var(--border)] [&_[data-slot=button][data-variant=destructive]]:bg-transparent [&_[data-slot=button][data-variant=destructive]]:text-[var(--destructive-text)] [&_[data-slot=button][data-variant=destructive]]:shadow-none [&_[data-slot=button][data-variant=destructive]:focus-visible]:shadow-[var(--focus-halo)] [&_[data-slot=button][data-variant=destructive]:hover]:bg-[var(--danger-soft)] [&_[data-slot=button][data-size=sm]]:h-8 [&_[data-slot=button][data-size=sm]]:px-3 [&_[data-slot=button][data-size=sm]]:text-[13px]",
-  "crud-detail-action-footer": "border-[var(--border)] [&_[data-slot=button][data-size=sm]]:h-8 [&_[data-slot=button][data-size=sm]]:px-3 [&_[data-slot=button][data-size=sm]]:text-[13px]",
+    "border-[var(--border)] [&_[data-slot=button][data-variant=destructive]]:bg-[var(--danger-soft)] [&_[data-slot=button][data-variant=destructive]]:text-[var(--destructive-text)] [&_[data-slot=button][data-variant=destructive]]:shadow-none [&_[data-slot=button][data-variant=destructive]:focus-visible]:shadow-[var(--focus-halo)] [&_[data-slot=button][data-variant=destructive]:hover]:bg-[color-mix(in_oklch,var(--danger-soft),var(--destructive)_14%)] [&_[data-slot=button][data-size=sm]]:h-8 [&_[data-slot=button][data-size=sm]]:px-3 [&_[data-slot=button][data-size=sm]]:text-(length:--fs-body-sm) leading-(--lh-body-sm)",
+  "crud-detail-action-footer": "border-[var(--border)] [&_[data-slot=button][data-size=sm]]:h-8 [&_[data-slot=button][data-size=sm]]:px-3 [&_[data-slot=button][data-size=sm]]:text-(length:--fs-body-sm) leading-(--lh-body-sm)",
   "crud-detail-action-footer-row": "border-[var(--border)]",
 };

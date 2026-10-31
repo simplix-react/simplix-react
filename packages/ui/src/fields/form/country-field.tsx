@@ -146,7 +146,7 @@ export function CountryField({
             >
               <Command filter={filterFn}>
                 <CommandInput placeholder={placeholder ?? t("field.searchCountry")} className="h-8" />
-                <CommandList className="max-h-[200px]">
+                <CommandList className="max-h-50">
                   <CommandEmpty>{t("filter.noResultsFound")}</CommandEmpty>
                   <CommandGroup>
                     {options.map((option) => (

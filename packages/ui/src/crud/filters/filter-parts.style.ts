@@ -47,7 +47,7 @@ export const crudFilterOperatorTriggerStyle = defineSlotStyle({
  */
 export const crudFilterOperatorMenuStyle = defineSlotStyle({
   slot: "crud-filter-operator-menu",
-  base: "[&_[data-current=true]]:bg-accent [&_[data-current]>svg]:mr-2 [&_[data-slot=badge]]:ml-auto [&_[data-slot=badge]]:text-[10px]",
+  base: "[&_[data-current=true]]:bg-accent [&_[data-current]>svg]:mr-2 [&_[data-slot=badge]]:ml-auto [&_[data-slot=badge]]:text-(length:--fs-2xs) leading-(--lh-2xs)",
   variants: {},
   defaultVariants: {},
 });

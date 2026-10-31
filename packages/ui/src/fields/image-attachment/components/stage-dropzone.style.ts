@@ -43,7 +43,7 @@ export const stageDropzoneIconStyle = defineSlotStyle({
 /** The drop title. */
 export const stageDropzoneTitleStyle = defineSlotStyle({
   slot: "stage-dropzone-title",
-  base: "text-[15.5px] font-bold text-foreground tracking-[-0.01em] leading-[1.35]",
+  base: "text-(length:--fs-title-md) font-bold text-foreground tracking-[-0.01em] leading-[1.35]",
   variants: {},
   defaultVariants: {},
 });
@@ -51,7 +51,7 @@ export const stageDropzoneTitleStyle = defineSlotStyle({
 /** The constraints row. */
 export const stageDropzoneConstraintsStyle = defineSlotStyle({
   slot: "stage-dropzone-constraints",
-  base: "gap-[10px] text-[11.5px] text-muted-foreground",
+  base: "gap-[10px] text-(length:--fs-badge) leading-(--lh-badge) text-muted-foreground",
   variants: {},
   defaultVariants: {},
 });
@@ -91,7 +91,7 @@ export const stageDropzoneExtensionsStyle = defineSlotStyle({
 /** The extensions tooltip. */
 export const stageDropzoneTooltipStyle = defineSlotStyle({
   slot: "stage-dropzone-tooltip",
-  base: "bg-foreground text-white text-[11.5px] leading-[1.5] py-[7px] px-[11px] rounded text-left font-medium tracking-[.01em] opacity-0 transition-[opacity,transform] group-hover:opacity-100 group-focus-within:opacity-100",
+  base: "bg-foreground text-white text-(length:--fs-badge) leading-[1.5] py-[7px] px-[11px] rounded text-left font-medium tracking-[.01em] opacity-0 transition-[opacity,transform] group-hover:opacity-100 group-focus-within:opacity-100",
   variants: {},
   defaultVariants: {},
 });
@@ -99,7 +99,7 @@ export const stageDropzoneTooltipStyle = defineSlotStyle({
 /** The tooltip title. */
 export const stageDropzoneTooltipTitleStyle = defineSlotStyle({
   slot: "stage-dropzone-tooltip-title",
-  base: "font-semibold text-white mb-[3px] text-[10.5px] opacity-75 tracking-[.04em] uppercase",
+  base: "font-semibold text-white mb-[3px] text-(length:--fs-xs) leading-(--lh-xs) opacity-75 tracking-[.04em] uppercase",
   variants: {},
   defaultVariants: {},
 });
@@ -115,7 +115,7 @@ export const stageDropzoneTooltipArrowStyle = defineSlotStyle({
 /** The call to action button. */
 export const stageDropzoneCtaStyle = defineSlotStyle({
   slot: "stage-dropzone-cta",
-  base: "mt-[2px] px-[18px] rounded bg-primary text-primary-foreground border-none text-[12.5px] font-semibold transition-[background] hover:bg-[var(--primary-hover,var(--primary))] font-[inherit]",
+  base: "mt-[2px] px-[18px] rounded bg-primary text-primary-foreground border-none text-(length:--fs-control) leading-(--lh-control) font-semibold transition-[background] hover:bg-[var(--primary-hover,var(--primary))] font-[inherit]",
   variants: {},
   defaultVariants: {},
 });

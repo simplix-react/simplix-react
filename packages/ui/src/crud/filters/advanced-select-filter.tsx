@@ -179,7 +179,7 @@ export function AdvancedSelectFilter({
             </button>
           )}
         </span>
-        <PopoverContent flush className="w-[200px]" align="start">
+        <PopoverContent flush className="w-50" align="start">
           <Command>
             <CommandInput placeholder={`Search ${label ?? ""}...`} />
             <CommandList>

@@ -77,7 +77,7 @@ export function ImageViewerModal({
 
         {/* Preview area */}
         <div {...slotAttributes(imageViewerModalBodyStyle, {})}>
-          <div className="flex min-h-[200px] items-center justify-center overflow-hidden" {...slotAttributes(imageViewerModalPreviewStyle, {})}>
+          <div className="flex min-h-50 items-center justify-center overflow-hidden" {...slotAttributes(imageViewerModalPreviewStyle, {})}>
             {preview}
           </div>
         </div>

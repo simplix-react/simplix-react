@@ -63,7 +63,7 @@ export const fieldSelectedValueStyle = defineSlotStyle({
 /** A country flag glyph inside a field; the flag component renders a bare `<svg>` and writes no slot. */
 export const fieldFlagStyle = defineSlotStyle({
   slot: "field-flag",
-  base: "rounded-[1px]",
+  base: "rounded-[var(--radius-2xs)]",
   variants: {
     spaced: { true: "mr-2", false: "" },
   },

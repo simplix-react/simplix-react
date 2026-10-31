@@ -66,7 +66,7 @@ export const carouselEmptyIconStyle = defineSlotStyle({
 /** The empty stage title. */
 export const carouselEmptyTitleStyle = defineSlotStyle({
   slot: "carousel-empty-title",
-  base: "text-[13.5px] font-semibold text-secondary-foreground",
+  base: "text-(length:--fs-cell) leading-(--lh-cell) font-semibold text-secondary-foreground",
   variants: {},
   defaultVariants: {},
 });
@@ -74,7 +74,7 @@ export const carouselEmptyTitleStyle = defineSlotStyle({
 /** The empty stage description. */
 export const carouselEmptyDescriptionStyle = defineSlotStyle({
   slot: "carousel-empty-description",
-  base: "text-[12px] text-muted-foreground",
+  base: "text-(length:--fs-caption) leading-(--lh-caption) text-muted-foreground",
   variants: {},
   defaultVariants: {},
 });
@@ -98,7 +98,7 @@ export const carouselProgressFillStyle = defineSlotStyle({
 /** The percentage above the progress track. */
 export const carouselProgressLabelStyle = defineSlotStyle({
   slot: "carousel-progress-label",
-  base: "font-mono text-[11px] font-semibold text-white tracking-[.01em] tabular-nums",
+  base: "font-mono text-(length:--fs-label) leading-(--lh-label) font-semibold text-white tracking-[.01em] tabular-nums",
   variants: {},
   defaultVariants: {},
 });
@@ -114,7 +114,7 @@ export const carouselErrorBodyStyle = defineSlotStyle({
 /** The error message over the stage. */
 export const carouselErrorMessageStyle = defineSlotStyle({
   slot: "carousel-error-message",
-  base: "text-[12.5px] font-semibold text-white tracking-[.01em]",
+  base: "text-(length:--fs-control) leading-(--lh-control) font-semibold text-white tracking-[.01em]",
   variants: {},
   defaultVariants: {},
 });
@@ -142,7 +142,7 @@ export const carouselDotStyle = defineSlotStyle({
   variants: {
     // The active dot widens and squares its corners, which replaces the round shape and width.
     active: {
-      true: "bg-white w-[16px] rounded-[3px]",
+      true: "bg-white w-4 rounded-[var(--radius-xs)]",
       false: "bg-white/45 w-[6px] rounded-full",
     },
   },
@@ -160,7 +160,7 @@ export const carouselBottomStyle = defineSlotStyle({
 /** The file name badge; the glass background has no token. */
 export const carouselFileBadgeStyle = defineSlotStyle({
   slot: "carousel-file-badge",
-  base: "bg-[rgba(20,22,30,.62)] backdrop-blur-[8px] text-white gap-[6px] px-[11px] py-[6px] rounded text-[11.5px] tracking-[.01em] font-medium shadow-[0_1px_2px_rgba(0,0,0,.18)]",
+  base: "bg-[rgba(20,22,30,.62)] backdrop-blur-[8px] text-white gap-[6px] px-[11px] py-[6px] rounded text-(length:--fs-badge) leading-(--lh-badge) tracking-[.01em] font-medium shadow-[0_1px_2px_rgba(0,0,0,.18)]",
   variants: {},
   defaultVariants: {},
 });
@@ -176,7 +176,7 @@ export const carouselFileBadgeIconStyle = defineSlotStyle({
 /** The file name in the badge. */
 export const carouselFileNameStyle = defineSlotStyle({
   slot: "carousel-file-name",
-  base: "font-mono text-[11px] font-semibold tracking-[.005em]",
+  base: "font-mono text-(length:--fs-label) leading-(--lh-label) font-semibold tracking-[.005em]",
   variants: {},
   defaultVariants: {},
 });
@@ -184,7 +184,7 @@ export const carouselFileNameStyle = defineSlotStyle({
 /** The metadata tooltip over the file name badge; same glass background as the badge. */
 export const carouselBadgeTooltipStyle = defineSlotStyle({
   slot: "carousel-badge-tooltip",
-  base: "bg-[rgba(20,22,30,.62)] backdrop-blur-[8px] text-white text-[11.5px] leading-[1.5] py-[7px] px-[11px] rounded text-left font-[500] tracking-[.01em] opacity-0 group-hover:opacity-100 transition-[opacity,transform]",
+  base: "bg-[rgba(20,22,30,.62)] backdrop-blur-[8px] text-white text-(length:--fs-badge) leading-[1.5] py-[7px] px-[11px] rounded text-left font-(--fw-medium) tracking-[.01em] opacity-0 group-hover:opacity-100 transition-[opacity,transform]",
   variants: {},
   defaultVariants: {},
 });
@@ -192,7 +192,7 @@ export const carouselBadgeTooltipStyle = defineSlotStyle({
 /** The tooltip title. */
 export const carouselBadgeTitleStyle = defineSlotStyle({
   slot: "carousel-badge-title",
-  base: "font-mono font-semibold text-white mb-[3px] text-[10.5px] opacity-75 tracking-[.04em] uppercase",
+  base: "font-mono font-semibold text-white mb-[3px] text-(length:--fs-xs) leading-(--lh-xs) opacity-75 tracking-[.04em] uppercase",
   variants: {},
   defaultVariants: {},
 });
@@ -200,7 +200,7 @@ export const carouselBadgeTitleStyle = defineSlotStyle({
 /** One metadata row in the tooltip. */
 export const carouselBadgeRowStyle = defineSlotStyle({
   slot: "carousel-badge-row",
-  base: "gap-[6px] font-mono text-[10.5px] text-white/90 tabular-nums leading-[1.5]",
+  base: "gap-[6px] font-mono text-(length:--fs-xs) text-white/90 tabular-nums leading-[1.5]",
   variants: {},
   defaultVariants: {},
 });
@@ -208,7 +208,7 @@ export const carouselBadgeRowStyle = defineSlotStyle({
 /** The label of a metadata row. */
 export const carouselBadgeLabelStyle = defineSlotStyle({
   slot: "carousel-badge-label",
-  base: "text-white/60 uppercase tracking-[.06em] text-[9.5px] font-semibold",
+  base: "text-white/60 uppercase tracking-[.06em] text-(length:--fs-3xs) leading-(--lh-3xs) font-semibold",
   variants: {},
   defaultVariants: {},
 });

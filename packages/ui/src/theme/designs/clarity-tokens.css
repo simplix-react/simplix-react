@@ -174,3 +174,11 @@
   --focus-halo: 0 0 0 3px var(--primary-soft);
   --invalid-halo: 0 0 0 3px var(--danger-soft);
 }
+
+/* ── controls: the heights clarity draws buttons and inputs at; a product theme moves them ── */
+[data-design='clarity'] {
+  --h-btn: 32px;
+  --h-btn-sm: 28px;
+  --h-icon-btn: 32px;
+  --h-input: 32px;
+}

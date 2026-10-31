@@ -202,7 +202,7 @@ export function RowActionCell<T>({
                       labelled variant's, so every reason written for an icon strip — which is the
                       default variant — was on the screen nowhere. The label still leads it: a bare
                       sentence explains a control the reader cannot name. */}
-                  <TooltipContent>{reason ? `${label} — ${reason}` : label}</TooltipContent>
+                  <TooltipContent>{reason ? `${label}: ${reason}` : label}</TooltipContent>
                 </Tooltip>
               );
             })}
@@ -215,7 +215,7 @@ export function RowActionCell<T>({
   // outline / ghost variant
   return (
     <TooltipProvider>
-      <Flex gap="xs" justify="end">
+      <Flex gap="xs" justify="end" wrap>
         {visible.map((action, i) => {
           const label = action.label ?? t(ACTION_LABEL_KEYS[action.type]);
           const resolvedIcon = typeof action.icon === "function" ? action.icon(row) : action.icon;

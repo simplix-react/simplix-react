@@ -1,8 +1,9 @@
-import { readFileSync, readdirSync } from "node:fs";
-import { join } from "node:path";
+import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
+
+import { sourceFiles } from "./helpers/source-files";
 
 /** This package's `src`, resolved from this file rather than from the working directory. */
 const SRC = fileURLToPath(new URL("..", import.meta.url));
@@ -42,19 +43,6 @@ const DECLARED = /(?:\/\/|^\s*\/?\*)[^\n]*outline-none/m;
  * above and this is what reaches it.
  */
 const LINES_ABOVE = 6;
-
-/** Every source file this package ships. */
-function sources(dir: string, out: string[] = []): string[] {
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const path = join(dir, entry.name);
-    if (entry.isDirectory()) {
-      if (entry.name !== "node_modules" && entry.name !== "__tests__") sources(path, out);
-    } else if (/\.tsx?$/.test(entry.name)) {
-      out.push(path);
-    }
-  }
-  return out;
-}
 
 /**
  * The doc comment directly above the declaration that starts at `at`, however long it is.
@@ -114,7 +102,7 @@ function classRegions(text: string): { region: string; line: number }[] {
 describe("focus is visible wherever the browser's outline is taken away", () => {
   it("every style that writes outline-none either shows focus another way or says why not", () => {
     const bare: string[] = [];
-    for (const file of sources(SRC)) {
+    for (const file of sourceFiles(SRC)) {
       const text = readFileSync(file, "utf8");
       for (const { region, line } of classRegions(text)) {
         if (!STRIPS_FOCUS.test(region)) continue;

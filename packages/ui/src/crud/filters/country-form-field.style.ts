@@ -16,7 +16,7 @@ export const crudFilterListFieldStyle = defineSlotStyle({
 /** The flag in front of a country's name. */
 export const crudCountryFlagStyle = defineSlotStyle({
   slot: "crud-country-flag",
-  base: "mr-2 [&>*]:rounded-[1px]",
+  base: "mr-2 [&>*]:rounded-[var(--radius-2xs)]",
   variants: {},
   defaultVariants: {},
 });

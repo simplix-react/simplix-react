@@ -11,7 +11,7 @@ export const tooltipContentStyle = defineSlotStyle({
 /** The arrow pointing from the bubble to its trigger. */
 export const tooltipArrowStyle = defineSlotStyle({
   slot: "tooltip-arrow",
-  base: "bg-foreground fill-foreground rounded-[2px]",
+  base: "bg-foreground fill-foreground rounded-[var(--radius-2xs)]",
   variants: {},
   defaultVariants: {},
 });

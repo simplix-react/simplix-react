@@ -19,13 +19,13 @@ const menuRow =
 
 export const formSlots: Record<string, string> = {
   // ── Labelled fields: 12.5/550 labels six pixels above a 36px control ──
-  label: "text-[12.5px] font-[550] leading-4 text-foreground",
+  label: "text-(length:--fs-control) font-(--fw-strong) leading-4 text-foreground",
   "field-wrapper layout=top": "gap-1.5",
   "field-wrapper layout=trailing": "gap-1.5",
   "field-wrapper size=sm":
-    "[&_label]:text-[12.5px] [&_input]:h-9 [&_input]:text-[13.5px] [&_[data-slot=select-trigger]]:h-9 [&_[data-slot=date-picker-trigger]]:h-9 [&_[data-slot=field-multiselect-box]]:min-h-9",
+    "[&_label]:text-(length:--fs-control) leading-(--lh-control) [&_input]:h-9 [&_input]:text-(length:--fs-cell) leading-(--lh-cell) [&_[data-slot=select-trigger]]:h-9 [&_[data-slot=date-picker-trigger]]:h-9 [&_[data-slot=field-multiselect-box]]:min-h-9",
   "field-required": "ml-0.5 font-normal text-[var(--destructive-text)]",
-  "field-message": "text-[11.5px] leading-4",
+  "field-message": "text-(length:--fs-badge) leading-4",
   "field-message variant=error": "text-[var(--destructive-text)]",
   "field-message variant=warning": "text-[var(--warning-text)]",
   "field-message variant=info": "text-[var(--info-text)]",
@@ -46,7 +46,7 @@ export const formSlots: Record<string, string> = {
 
   // ── Choices: a 1.5px box that fills with the accent; the switch thumb springs across ──
   checkbox:
-    "rounded-[4px] border-[1.5px] border-[var(--border-strong)] bg-card transition-[background-color,border-color,box-shadow] duration-[var(--dur-fast)] enabled:hover:border-[var(--muted-2)] focus-visible:ring-0 focus-visible:shadow-[var(--focus-halo)] focus-visible:border-[var(--ring)] data-[state=checked]:border-[var(--primary)] data-[state=indeterminate]:border-[var(--primary)]",
+    "rounded-[var(--radius-xs)] border-[1.5px] border-[var(--border-strong)] bg-card transition-[background-color,border-color,box-shadow] duration-[var(--dur-fast)] enabled:hover:border-[var(--muted-2)] focus-visible:ring-0 focus-visible:shadow-[var(--focus-halo)] focus-visible:border-[var(--ring)] data-[state=checked]:border-[var(--primary)] data-[state=indeterminate]:border-[var(--primary)]",
   "radio-group-item":
     "border-[1.5px] border-[var(--border-strong)] bg-card transition-[border-color,box-shadow] duration-[var(--dur-fast)] enabled:hover:border-[var(--muted-2)] focus-visible:ring-0 focus-visible:shadow-[var(--focus-halo)] data-[state=checked]:border-[var(--primary)]",
   switch:
@@ -56,34 +56,34 @@ export const formSlots: Record<string, string> = {
   // ── Option panels and menus ──
   "select-content": overlay,
   "select-viewport": "p-[5px]",
-  "select-item": `${menuRow} text-[13.5px] data-[state=checked]:font-[550] data-[state=checked]:text-[var(--primary-text)]`,
-  "select-label": "text-[11.5px] font-semibold text-muted-foreground",
+  "select-item": `${menuRow} text-(length:--fs-cell) leading-(--lh-cell) data-[state=checked]:font-(--fw-strong) data-[state=checked]:text-[var(--primary-text)]`,
+  "select-label": "text-(length:--fs-badge) leading-(--lh-badge) font-semibold text-muted-foreground",
   "select-separator": "bg-[var(--border)]",
   "popover-content": overlay,
   "dropdown-menu-content": `${overlay} p-[5px]`,
   "dropdown-menu-sub-content": `${overlay} p-[5px]`,
-  "dropdown-menu-item": `${menuRow} text-[13.5px]`,
-  "dropdown-menu-checkbox-item": `${menuRow} text-[13.5px]`,
-  "dropdown-menu-radio-item": `${menuRow} text-[13.5px]`,
-  "dropdown-menu-sub-trigger": `${menuRow} text-[13.5px] data-[state=open]:bg-[var(--surface-2)]`,
-  "dropdown-menu-label": "text-[11.5px] font-semibold text-muted-foreground",
+  "dropdown-menu-item": `${menuRow} text-(length:--fs-cell) leading-(--lh-cell)`,
+  "dropdown-menu-checkbox-item": `${menuRow} text-(length:--fs-cell) leading-(--lh-cell)`,
+  "dropdown-menu-radio-item": `${menuRow} text-(length:--fs-cell) leading-(--lh-cell)`,
+  "dropdown-menu-sub-trigger": `${menuRow} text-(length:--fs-cell) leading-(--lh-cell) data-[state=open]:bg-[var(--surface-2)]`,
+  "dropdown-menu-label": "text-(length:--fs-badge) leading-(--lh-badge) font-semibold text-muted-foreground",
   "dropdown-menu-separator": "bg-[var(--border)] mx-1 my-[5px]",
-  "tooltip-content": "rounded-[var(--radius-control)] bg-[var(--popover-strong)] px-2 py-[5px] text-[11.5px] text-[var(--popover-strong-foreground)] shadow-[var(--shadow-2)]",
+  "tooltip-content": "rounded-[var(--radius-control)] bg-[var(--popover-strong)] px-2 py-[5px] text-(length:--fs-badge) leading-(--lh-badge) text-[var(--popover-strong-foreground)] shadow-[var(--shadow-2)]",
   "tooltip-arrow": "bg-[var(--popover-strong)] fill-[var(--popover-strong)]",
 
   // ── The form in a panel or a page: a 15/600 head, a 16px inset, the footer ruled off ──
-  "crud-form-header": "border-[var(--border)] pt-3.5 pb-3 transition-shadow duration-[var(--dur-base)] ease-[var(--ease)] [&_[data-slot=heading]]:text-[15px] [&_[data-slot=heading]]:font-semibold [&_[data-slot=heading]]:leading-6 [&_[data-slot=heading]]:text-foreground [&_[data-slot=button][data-size=icon-xs]]:size-8 [&_[data-slot=button][data-size=icon-xs]_svg]:!size-4",
+  "crud-form-header": "border-[var(--border)] pt-3.5 pb-3 transition-shadow duration-[var(--dur-base)] ease-[var(--ease)] [&_[data-slot=heading]]:text-(length:--fs-title-sm) [&_[data-slot=heading]]:font-semibold [&_[data-slot=heading]]:leading-6 [&_[data-slot=heading]]:text-foreground [&_[data-slot=button][data-size=icon-xs]]:size-8 [&_[data-slot=button][data-size=icon-xs]_svg]:!size-4",
   "crud-form-header page=false": "px-4",
   // Fields scrolled under the head and more fields waiting below the footer each cast a soft edge.
   "crud-form-header scrolled=true": "relative z-[1] shadow-[0_8px_12px_-12px_oklch(0.2_0.03_265/0.45)]",
   "crud-form-body page=false":
-    "px-4 [&_[data-part=crud-form-content]>[data-slot=section-shell]]:border-0 [&_[data-part=crud-form-content]>[data-slot=section-shell]]:bg-transparent [&_[data-part=crud-form-content]>[data-slot=section-shell]]:shadow-none [&_[data-part=crud-form-content]>[data-slot=section-shell]>[data-slot=section-shell-body]]:px-0 [&_[data-part=crud-form-content]>[data-slot=section-shell]>[data-slot=section-shell-header]]:border-0 [&_[data-part=crud-form-content]>[data-slot=section-shell]>[data-slot=section-shell-header]]:bg-transparent [&_[data-part=crud-form-content]>[data-slot=section-shell]>[data-slot=section-shell-header]]:px-0 [&_[data-part=crud-form-content]>[data-slot=section-shell]_[data-slot=section-shell-title]]:text-[13.5px] [&_[data-part=crud-form-content]>[data-slot=section-shell]_[data-slot=section-shell-title]]:font-[650] [&_[data-part=crud-form-content]>[data-slot=section-shell]_[data-slot=section-shell-title]]:tracking-[-0.01em]",
+    "px-4 [&_[data-part=crud-form-content]>[data-slot=section-shell]]:border-0 [&_[data-part=crud-form-content]>[data-slot=section-shell]]:bg-transparent [&_[data-part=crud-form-content]>[data-slot=section-shell]]:shadow-none [&_[data-part=crud-form-content]>[data-slot=section-shell]>[data-slot=section-shell-body]]:px-0 [&_[data-part=crud-form-content]>[data-slot=section-shell]>[data-slot=section-shell-header]]:border-0 [&_[data-part=crud-form-content]>[data-slot=section-shell]>[data-slot=section-shell-header]]:bg-transparent [&_[data-part=crud-form-content]>[data-slot=section-shell]>[data-slot=section-shell-header]]:px-0 [&_[data-part=crud-form-content]>[data-slot=section-shell]_[data-slot=section-shell-title]]:text-(length:--fs-cell) leading-(--lh-cell) [&_[data-part=crud-form-content]>[data-slot=section-shell]_[data-slot=section-shell-title]]:font-(--fw-heavy) [&_[data-part=crud-form-content]>[data-slot=section-shell]_[data-slot=section-shell-title]]:tracking-[-0.01em]",
   "crud-form-content": "py-3 gap-4",
   "crud-form-footer": "transition-shadow duration-[var(--dur-base)] ease-[var(--ease)]",
   "crud-form-footer page=false": "px-4",
   "crud-form-footer overflow=true": "relative z-[1] shadow-[0_-8px_12px_-12px_oklch(0.2_0.03_265/0.45)]",
   // Footer and dialog action buttons are one height, 32px, in every footer.
-  "crud-form-actions": "gap-1.5 border-[var(--border)] py-3 [&_[data-slot=button][data-size=sm]]:h-8 [&_[data-slot=button][data-size=sm]]:px-3 [&_[data-slot=button][data-size=sm]]:text-[13px]",
+  "crud-form-actions": "gap-1.5 border-[var(--border)] py-3 [&_[data-slot=button][data-size=sm]]:h-8 [&_[data-slot=button][data-size=sm]]:px-3 [&_[data-slot=button][data-size=sm]]:text-(length:--fs-body-sm) leading-(--lh-body-sm)",
 
   // ── Dialogs, alert panels and sheets: the bands, spacing and motion are the shared declarations;
   // clarity draws them as a card on the tinted scrim with a 17/650 title, hairlines in --border
@@ -92,30 +92,30 @@ export const formSlots: Record<string, string> = {
   "dialog-content": "rounded-[var(--radius-overlay)] border-[var(--border)] bg-card shadow-[var(--shadow-3)]",
   "dialog-header": "border-[var(--border)]",
   "dialog-header scrolled=true": "shadow-[0_8px_12px_-12px_oklch(0.2_0.03_265/0.45)]",
-  "dialog-title": "text-[17px] font-[650] tracking-[-0.02em]",
-  "dialog-description": "text-[13.5px] leading-5 text-secondary-foreground",
-  "dialog-footer": "border-[var(--border)] bg-[var(--surface-2)] [&_[data-slot=button][data-size=sm]]:h-8 [&_[data-slot=button][data-size=sm]]:px-3 [&_[data-slot=button][data-size=sm]]:text-[13px]",
+  "dialog-title": "text-(length:--fs-title) leading-(--lh-title) font-(--fw-heavy) tracking-[-0.02em]",
+  "dialog-description": "text-(length:--fs-cell) leading-5 text-secondary-foreground",
+  "dialog-footer": "border-[var(--border)] bg-[var(--surface-2)] [&_[data-slot=button][data-size=sm]]:h-8 [&_[data-slot=button][data-size=sm]]:px-3 [&_[data-slot=button][data-size=sm]]:text-(length:--fs-body-sm) leading-(--lh-body-sm)",
   "dialog-footer overflow=true": "shadow-[0_-8px_12px_-12px_oklch(0.2_0.03_265/0.45)]",
-  "dialog-corner-button": "rounded-[var(--radius-control)] text-muted-foreground opacity-100 hover:bg-[var(--hover-bg-strong)] hover:text-foreground",
+  "dialog-corner-button": "rounded-[var(--radius-control)] bg-[var(--surface-2)] text-muted-foreground opacity-100 hover:bg-[color-mix(in_oklch,var(--surface-2),var(--foreground)_7%)] hover:text-foreground",
 
   "alert-panel-overlay": "bg-[var(--scrim)] backdrop-blur-[2px]",
   "alert-panel-content": "rounded-[var(--radius-overlay)] border-[var(--border)] bg-card shadow-[var(--shadow-3)]",
-  "alert-panel-title": "text-[17px] font-[650] tracking-[-0.02em] border-[var(--border)]",
+  "alert-panel-title": "text-(length:--fs-title) leading-(--lh-title) font-(--fw-heavy) tracking-[-0.02em] border-[var(--border)]",
   "alert-panel-title scrolled=true": "shadow-[0_8px_12px_-12px_oklch(0.2_0.03_265/0.45)]",
-  "alert-panel-description": "text-[13.5px] leading-[1.6] text-secondary-foreground whitespace-pre-line",
-  "alert-panel-footer": "border-[var(--border)] bg-[var(--surface-2)] [&_[data-slot=button][data-size=sm]]:h-8 [&_[data-slot=button][data-size=sm]]:px-3 [&_[data-slot=button][data-size=sm]]:text-[13px]",
+  "alert-panel-description": "text-(length:--fs-cell) leading-[1.6] text-secondary-foreground whitespace-pre-line",
+  "alert-panel-footer": "border-[var(--border)] bg-[var(--surface-2)] [&_[data-slot=button][data-size=sm]]:h-8 [&_[data-slot=button][data-size=sm]]:px-3 [&_[data-slot=button][data-size=sm]]:text-(length:--fs-body-sm) leading-(--lh-body-sm)",
   "alert-panel-footer overflow=true": "shadow-[0_-8px_12px_-12px_oklch(0.2_0.03_265/0.45)]",
-  "alert-panel-cancel": "rounded-[var(--radius-control)] text-[13px] transition-[background-color,box-shadow,transform] duration-[var(--dur-fast)] ease-[var(--ease)] focus-visible:ring-0 focus-visible:shadow-[var(--focus-halo)] border-[var(--border-strong)] bg-card shadow-[var(--shadow-1)] hover:bg-[var(--surface-2)] hover:text-foreground",
-  "alert-panel-action": "rounded-[var(--radius-control)] text-[13px] transition-[background-color,box-shadow,transform] duration-[var(--dur-fast)] ease-[var(--ease)] focus-visible:ring-0 focus-visible:shadow-[var(--focus-halo)] shadow-[var(--shadow-btn)] hover:bg-[var(--primary-hover)]",
+  "alert-panel-cancel": "rounded-[var(--radius-control)] text-(length:--fs-body-sm) leading-(--lh-body-sm) transition-[background-color,box-shadow,transform] duration-[var(--dur-fast)] ease-[var(--ease)] focus-visible:ring-0 focus-visible:shadow-[var(--focus-halo)] border-[var(--border-strong)] bg-card shadow-[var(--shadow-1)] hover:bg-[var(--surface-2)] hover:text-foreground",
+  "alert-panel-action": "rounded-[var(--radius-control)] text-(length:--fs-body-sm) leading-(--lh-body-sm) transition-[background-color,box-shadow,transform] duration-[var(--dur-fast)] ease-[var(--ease)] focus-visible:ring-0 focus-visible:shadow-[var(--focus-halo)] shadow-[var(--shadow-btn)] hover:bg-[var(--primary-hover)]",
   "alert-panel-action tone=danger": "bg-[var(--destructive)] text-white hover:bg-[color-mix(in_oklch,var(--destructive),black_8%)]",
 
   "sheet-overlay": "bg-[var(--scrim)] backdrop-blur-[2px]",
   "sheet-content": "bg-card border-[var(--border)] shadow-[var(--shadow-3)]",
-  "sheet-close": "rounded-[var(--radius-control)] text-muted-foreground opacity-100 hover:bg-[var(--hover-bg-strong)] hover:text-foreground focus-visible:ring-0 focus-visible:shadow-[var(--focus-halo)] data-[state=open]:bg-transparent",
+  "sheet-close": "rounded-[var(--radius-control)] bg-[var(--surface-2)] text-muted-foreground opacity-100 hover:bg-[color-mix(in_oklch,var(--surface-2),var(--foreground)_7%)] hover:text-foreground focus-visible:ring-0 focus-visible:shadow-[var(--focus-halo)] data-[state=open]:bg-transparent",
   "sheet-header": "border-[var(--border)]",
-  "sheet-title": "text-[17px] font-[650] tracking-[-0.02em]",
-  "sheet-description": "text-[13.5px] text-secondary-foreground",
-  "sheet-footer": "border-[var(--border)] bg-[var(--surface-2)] [&_[data-slot=button][data-size=sm]]:h-8 [&_[data-slot=button][data-size=sm]]:px-3 [&_[data-slot=button][data-size=sm]]:text-[13px]",
+  "sheet-title": "text-(length:--fs-title) leading-(--lh-title) font-(--fw-heavy) tracking-[-0.02em]",
+  "sheet-description": "text-(length:--fs-cell) leading-(--lh-cell) text-secondary-foreground",
+  "sheet-footer": "border-[var(--border)] bg-[var(--surface-2)] [&_[data-slot=button][data-size=sm]]:h-8 [&_[data-slot=button][data-size=sm]]:px-3 [&_[data-slot=button][data-size=sm]]:text-(length:--fs-body-sm) leading-(--lh-body-sm)",
 
   // ── Toasts: the dark strong overlay, a tinted glyph, a spring in and a slide out ──
   toast: "rounded-[var(--radius-overlay)] border-0 bg-[var(--popover-strong)] py-2.5 ps-3.5 pe-2 text-[var(--popover-strong-foreground)] shadow-[var(--shadow-3)] backdrop-blur-none duration-[var(--dur-base)] ease-[var(--ease-spring)]",
@@ -129,7 +129,7 @@ export const formSlots: Record<string, string> = {
   "toast-icon type=warning": "text-[var(--toast-warn)]",
   "toast-icon type=error": "text-[var(--toast-danger)]",
   "toast-icon type=info": "text-[var(--toast-info)]",
-  "toast-message": "text-[13px] font-medium",
+  "toast-message": "text-(length:--fs-body-sm) leading-(--lh-body-sm) font-medium",
   "toast-action": "rounded-[var(--radius-sm)] bg-white/12 px-2 py-1 text-[var(--popover-strong-foreground)] no-underline hover:bg-white/20 hover:no-underline",
   "toast-dismiss": "opacity-60 hover:opacity-100",
 };

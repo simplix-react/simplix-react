@@ -329,7 +329,7 @@ export function DatePicker({
       value={viewMonth.getFullYear().toString()}
       options={yearOptions}
       onChange={handleYearChange}
-      className="w-auto min-w-[76px]"
+      className="w-auto min-w-19"
     />
   );
 
@@ -338,7 +338,7 @@ export function DatePicker({
       value={viewMonth.getMonth().toString()}
       options={monthOptions}
       onChange={handleMonthChange}
-      className="w-auto min-w-[68px]"
+      className="w-auto min-w-17"
     />
   );
 

@@ -11,7 +11,7 @@ export const detailProfileStyle = defineSlotStyle({
 /** The square mark at the strip's start. */
 export const detailProfileMarkStyle = defineSlotStyle({
   slot: "detail-profile-mark",
-  base: "rounded-[12px] bg-primary text-primary-foreground",
+  base: "rounded-[var(--radius-surface)] bg-primary text-primary-foreground",
   variants: {},
   defaultVariants: {},
 });
@@ -53,7 +53,7 @@ export const detailProfileMetaStyle = defineSlotStyle({
 /** The code chip in the meta row. */
 export const detailProfileCodeStyle = defineSlotStyle({
   slot: "detail-profile-code",
-  base: "rounded-[3px] bg-surface-3 px-1.5 py-px font-mono text-xs text-fg-soft",
+  base: "rounded-[var(--radius-xs)] bg-surface-3 px-1.5 py-px font-mono text-xs text-fg-soft",
   variants: {},
   defaultVariants: {},
 });

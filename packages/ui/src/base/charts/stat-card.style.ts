@@ -14,7 +14,7 @@ export const statCardStyle = defineSlotStyle({
   // above a taller neighbour. In a parent that does not stretch, `h-full` resolves to auto
   // and nothing changes, so this costs a lone tile nothing.
   // A figure tile: the title, the figure and its foot down a 124px card that lifts when pointed at.
-  base: "h-full rounded-lg border px-4 text-card-foreground shadow-sm flex min-h-[124px] flex-col gap-1 py-3.5 transition-[box-shadow,border-color,translate,scale] duration-[var(--dur-fast)] ease-[var(--ease)] hover:-translate-y-px hover:shadow-md active:translate-y-0 active:scale-[0.98]",
+  base: "h-full rounded-lg border px-4 text-card-foreground shadow-sm flex min-h-31 flex-col gap-1 py-3.5 transition-[box-shadow,border-color,translate,scale] duration-[var(--dur-fast)] ease-[var(--ease)] hover:-translate-y-px hover:shadow-md active:translate-y-0 active:scale-[0.98]",
   variants: {
     /** A tinted card takes its surface from the status tone the caller passes as a class. */
     tinted: { true: "", false: "bg-card" },

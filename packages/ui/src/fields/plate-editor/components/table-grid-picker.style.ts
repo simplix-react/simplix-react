@@ -19,7 +19,7 @@ export const plateTableGridCellsStyle = defineSlotStyle({
 /** One grid cell. */
 export const plateTableGridCellStyle = defineSlotStyle({
   slot: "plate-table-grid-cell",
-  base: "border rounded-[2px] transition-colors",
+  base: "border rounded-[var(--radius-2xs)] transition-colors",
   variants: {
     // The highlighted colours replace the resting ones, so each sits in its own value.
     highlighted: {

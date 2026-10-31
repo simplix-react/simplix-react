@@ -54,7 +54,7 @@ export function NavButton({ direction, onClick, label }: { direction: "prev" | "
   return (
     <button
       type="button"
-      className="shrink-0 flex items-center justify-center w-6 h-[20px]"
+      className="shrink-0 flex items-center justify-center w-6 h-5"
       onClick={onClick}
       aria-label={label}
       {...slotAttributes(timeRangeNavButtonStyle, {})}
