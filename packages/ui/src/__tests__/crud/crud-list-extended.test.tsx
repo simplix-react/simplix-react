@@ -286,6 +286,23 @@ describe("CrudList.Table (extended coverage)", () => {
   });
 });
 
+describe("CrudList.Column align", () => {
+  it("sets an end-aligned column's header and cells against the end edge, and leaves the others alone", () => {
+    render(
+      <CrudList>
+        <CrudList.Table data={[{ id: 1, name: "Alice", balance: 1200 }]}>
+          <CrudList.Column field="name" header="Name" />
+          <CrudList.Column field="balance" header="Balance" align="end" />
+        </CrudList.Table>
+      </CrudList>,
+    );
+    expect(screen.getByText("Balance").closest("th")?.className).toContain("text-end");
+    expect(screen.getByText("1200").closest("td")?.className).toContain("text-end");
+    expect(screen.getByText("Name").closest("th")?.className).not.toContain("text-end");
+    expect(screen.getByText("Alice").closest("td")?.className).not.toContain("text-end");
+  });
+});
+
 describe("CrudList.Column minTableWidth", () => {
   // The mocked width is module state, so a narrow case left behind leaks into every describe after
   // this one — the pagination suite goes compact and fails on a control it never touched.

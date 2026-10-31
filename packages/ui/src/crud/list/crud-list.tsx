@@ -25,6 +25,7 @@ import {
   sizedCellProps,
   writeColumnWidths,
   type ColumnSizing,
+  columnAlignClass,
   headerWidthStyle,
 } from "./column-widths";
 import {useFlatUIComponents} from "../../provider/ui-provider";
@@ -457,6 +458,12 @@ export interface ListColumnProps<T> {
    * its columns need therefore never draws a table that scrolls sideways.
    */
   minTableWidth?: number;
+  /**
+   * Where the header and the cells set their content. `"end"` is for a figure whose digits a reader
+   * compares down the column (an amount, a balance, a count): it sits against the end edge in
+   * tabular numerals, so the place values line up. Absent, the content starts at the start edge.
+   */
+  align?: "start" | "end";
   display?: "badge" | "boolean" | "country" | "phone";
   format?: "date" | "datetime" | "time" | "relative";
   /**
@@ -798,7 +805,7 @@ function ReorderableTable<T>({
             return (
               <TableHead
                 key={header.id}
-                className={cn("truncate", sizable && "relative")}
+                className={cn("truncate", sizable && "relative", columnAlignClass(header.column.columnDef.meta as ColumnSizing | undefined))}
                 style={headerWidthStyle(
                   readerWidth,
                   header.column.getSize(),
@@ -1380,7 +1387,7 @@ function ListTable<T>({
             defaultDisplayZone,
           }),
         size: declaredWidth,
-        meta: { flexible, fixed: colDef.width !== undefined } satisfies ColumnSizing,
+        meta: { flexible, fixed: colDef.width !== undefined, ...(colDef.align ? { align: colDef.align } : {}) } satisfies ColumnSizing,
       });
     }
 
@@ -1707,7 +1714,7 @@ function ListTable<T>({
                       return (
                         <TableHead
                           key={header.id}
-                          className={cn("truncate", sizable && "relative")}
+                          className={cn("truncate", sizable && "relative", columnAlignClass(header.column.columnDef.meta as ColumnSizing | undefined))}
                           style={headerWidthStyle(
                             readerWidth,
                             header.column.getSize(),
@@ -1768,7 +1775,7 @@ function ListTable<T>({
                             {row.getVisibleCells().map((cell) => (
                               <TableCell
                                 key={cell.id}
-                                className="truncate"
+                                className={cn("truncate", columnAlignClass(cell.column.columnDef.meta as ColumnSizing | undefined))}
                                 {...rowClickIgnoreForColumn(cell.column.id)}
                                 {...sizedCellProps(
                                   cell.column.id,

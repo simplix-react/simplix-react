@@ -149,6 +149,13 @@ export interface ColumnSizing {
   readonly flexible?: boolean;
   /** A width: the column is that wide and neither its content nor the spare room moves it. */
   readonly fixed?: boolean;
+  /** Where the header and the cells set their content; absent is the start edge. */
+  readonly align?: "start" | "end";
+}
+
+/** The class a header or a cell takes for its column's alignment: an end-aligned column sets figures in tabular numerals. */
+export function columnAlignClass(meta: ColumnSizing | undefined): string | undefined {
+  return meta?.align === "end" ? "text-end tabular-nums" : undefined;
 }
 
 /**

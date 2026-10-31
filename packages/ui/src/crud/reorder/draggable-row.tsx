@@ -5,7 +5,7 @@ import type { Row } from "@tanstack/react-table";
 
 import { partAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
-import { type ColumnWidths, sizedCellProps } from "../list/column-widths";
+import { type ColumnSizing, type ColumnWidths, columnAlignClass, sizedCellProps } from "../list/column-widths";
 import { useFlatUIComponents } from "../../provider/ui-provider";
 import type { ReorderConfig } from "../shared";
 import { rowClickHandler, rowClickIgnoreForColumn, rowClickIgnoreProps } from "../shared";
@@ -76,12 +76,12 @@ export function DraggableRow<T>({
       {row.getVisibleCells().map((cell) => (
         <TableCell
           key={cell.id}
-          className="truncate"
+          className={cn("truncate", columnAlignClass(cell.column.columnDef.meta as ColumnSizing | undefined))}
           {...rowClickIgnoreForColumn(cell.column.id)}
           {...sizedCellProps(
             cell.column.id,
             columnWidths ?? {},
-            cell.column.columnDef.meta as { flexible?: boolean } | undefined,
+            cell.column.columnDef.meta as ColumnSizing | undefined,
           )}
         >
           {flexRender(cell.column.columnDef.cell, cell.getContext())}
