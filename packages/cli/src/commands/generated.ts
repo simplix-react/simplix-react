@@ -224,7 +224,7 @@ export const generatedCommand = new Command("generated")
   .description(
     "Report every generated file as untouched, edited or stale against the current templates, and what a regeneration merges into each edited one",
   )
-  .option("--all", "Regenerate every scaffolded screen and page first: untouched files are rewritten, edited ones merged three-way")
+  .option("--all", "Regenerate every scaffolded screen and page first: untouched files are rewritten, edited ones merged three-way, and a deleted one stays deleted while its base under .simplix/generated is kept")
   .option("--write-conflicts", "With --all, write conflict markers into a file whose merge conflicts instead of leaving it alone")
   .option("--check", "Exit non-zero when a file is stale, an edited file would take a merge, or a merge conflicts")
   .option("--json", "Print the report as JSON")
