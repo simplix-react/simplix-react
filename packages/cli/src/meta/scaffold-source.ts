@@ -468,6 +468,7 @@ function fieldInfos(
     if (alias) one.sortAlias = alias;
     if (field.format === "code") one.isCode = true;
     if (field.required) one.required = true;
+    if (field.defaultValue !== undefined) one.defaultLiteral = JSON.stringify(field.defaultValue);
     const maxLength = field.constraints?.find((one) => one.kind === "maxLength")?.value;
     if (typeof maxLength === "number") one.maxLength = maxLength;
     fields.push(one);

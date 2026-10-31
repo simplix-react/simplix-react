@@ -66,6 +66,8 @@ export interface FieldMeta {
   type: TypeRef;
   required: boolean;
   nullable: boolean;
+  /** The value a new record starts the field with: a scalar, or an enum constant by name. */
+  defaultValue?: string | number | boolean;
   description?: string;
   labelKey?: string;
   label?: string;

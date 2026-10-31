@@ -105,6 +105,8 @@ export interface FieldInfo {
   isCode?: boolean;
   /** A key that is not a reference with a name, which no generated screen draws. */
   isOpaqueId?: boolean;
+  /** The value a new record starts the field with, as a TypeScript literal (SimpliX Meta's `defaultValue`). */
+  defaultLiteral?: string;
   /** The longest value the contract allows (`@Size(max)`), where it states one. */
   maxLength?: number;
   /** Whether the DTO the field was read from requires it (`@NotNull`), as SimpliX Meta states. */

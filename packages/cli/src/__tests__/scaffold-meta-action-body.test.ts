@@ -20,7 +20,7 @@ const meta = {
   version: 1,
   enums: {},
   types: {
-    WalletDetailDTO: { javaClass: "x.WalletDetailDTO", typeParams: [], fields: [text("walletId"), text("ownerName"), count("balance"), count("held")] },
+    WalletDetailDTO: { javaClass: "x.WalletDetailDTO", typeParams: [], fields: [text("walletId"), text("ownerName"), count("balance"), count("held"), { name: "active", type: { kind: "boolean" }, required: true, nullable: false, defaultValue: true }] },
     WalletAdjustDTO: { javaClass: "x.WalletAdjustDTO", typeParams: [], fields: [count("amount"), text("reason")] },
   },
   operations: [
@@ -54,5 +54,16 @@ describe("the DTO a scaffold reads an entity from", () => {
     const source = buildMetaScaffoldSource({ domain, tag: "admin.Wallet", naming: simplixBootNaming });
     expect(source.fieldSource).toEqual({ type: "WalletDetailDTO", origin: "response" });
     expect(source.fields.map((one) => one.name)).not.toContain("reason");
+  });
+});
+
+describe("a field SimpliX Meta states a default for", () => {
+  it("carries the default as a literal the form template writes", () => {
+    const resolved = resolveMeta(meta, { domains: { wallet: ["admin.Wallet"] }, containerTypes: { SimpliXApiResponse: { unwrap: true } } });
+    const domain = resolved.domains.get("wallet");
+    if (!domain) throw new Error("no wallet domain");
+    const source = buildMetaScaffoldSource({ domain, tag: "admin.Wallet", naming: simplixBootNaming });
+    expect(source.fields.find((one) => one.name === "active")?.defaultLiteral).toBe("true");
+    expect(source.fields.find((one) => one.name === "balance")?.defaultLiteral).toBeUndefined();
   });
 });
