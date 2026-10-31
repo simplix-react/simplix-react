@@ -1,6 +1,7 @@
 /**
- * Thrown when `simplix.config.ts` exists but cannot be loaded: a syntax error, an import that does
- * not resolve, or an expression that throws while the file evaluates.
+ * Thrown when a config file the project wrote, `simplix.config.ts` or a package's
+ * `crud.config.ts`, exists but cannot be loaded: a syntax error, an import that does not resolve,
+ * or an expression that throws while the file evaluates.
  *
  * <p>Running on the default config instead would make every command generate against settings the
  * project did not choose and report success, so a config that is there and broken stops the run.
@@ -8,7 +9,7 @@
  * error itself.
  */
 export class ConfigLoadError extends Error {
-  /** Absolute path of the config file that failed to load. */
+  /** Path of the config file that failed to load. */
   readonly path: string;
 
   constructor(path: string, cause: unknown) {

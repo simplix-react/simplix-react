@@ -3,7 +3,7 @@ import { ConfigLoadError } from "./config-load-error.js";
 import { OutputDirError } from "./output-dirs.js";
 
 /**
- * Prints a problem in `simplix.config.ts` and fails the run with a non-zero exit code.
+ * Prints a problem in the project's config and fails the run with a non-zero exit code.
  *
  * <p>A config file that cannot be loaded ({@link ConfigLoadError}) and a configured output
  * directory that is not there ({@link OutputDirError}) are the project's to fix, so each is printed
@@ -20,7 +20,7 @@ export function failOnConfigError(err: unknown): boolean {
 }
 
 /**
- * Wraps a command action so a problem in `simplix.config.ts` prints its message and fails the run
+ * Wraps a command action so a problem in the project's config prints its message and fails the run
  * with a non-zero exit code instead of surfacing as an unhandled rejection with a stack. Any other
  * error passes through untouched.
  */

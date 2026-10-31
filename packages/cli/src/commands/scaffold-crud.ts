@@ -5,6 +5,7 @@ import { basename, dirname, join, relative, resolve } from "node:path";
 import { Command } from "commander";
 import ora from "ora";
 
+import { ConfigLoadError } from "../config/config-load-error.js";
 import { findCrudConfigForEntity } from "../config/crud-config-loader.js";
 import { loadConfig } from "../config/config-loader.js";
 import { assertOutputDirs } from "../config/output-dirs.js";
@@ -2593,6 +2594,8 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     log.info("Next: wire up routes in your app to use the generated pages");
   } catch (err) {
     spinner.fail(`Failed to scaffold CRUD for ${entity}`);
+    // A config file that cannot be loaded is the project's to fix: reportConfigError prints it once.
+    if (err instanceof ConfigLoadError) throw err;
     log.error(String(err));
     process.exit(1);
   }

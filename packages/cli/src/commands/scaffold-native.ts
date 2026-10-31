@@ -2,6 +2,7 @@ import ora from "ora";
 import { join, resolve } from "node:path";
 import { readdir, readFile } from "node:fs/promises";
 
+import { ConfigLoadError } from "../config/config-load-error.js";
 import { findCrudConfigForEntity } from "../config/crud-config-loader.js";
 import { toKebabCase, toPascalCase } from "../utils/case.js";
 import {
@@ -542,6 +543,8 @@ export async function runNativeScaffold(
     }
   } catch (error) {
     spinner.fail("Failed to generate native screen set");
+    // A config file that cannot be loaded is the project's to fix: reportConfigError prints it once.
+    if (error instanceof ConfigLoadError) throw error;
     log.error(error instanceof Error ? error.message : String(error));
     process.exit(1);
   }
