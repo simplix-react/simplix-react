@@ -2432,6 +2432,9 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
         accessList: `${holderList}Access`,
         packageName: holderPackage,
         filterKey: `${holder.field}.${holder.operator}`,
+        // A holder that names this record by another field than its key (a voice code) is
+        // forced to that field of the open record, not to its key.
+        matchField: [...(holder.source.rowFields ?? []), ...holder.source.fields, ...(holder.source.detailFields ?? [])].find((f) => f.name === holder.field)?.peekBy,
         rowIdField: holder.source.rowIdField,
         fields: holderFields,
         // Whether the holder's list route takes a keyword search, which its tab's search box sends.

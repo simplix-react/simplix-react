@@ -230,6 +230,7 @@ export async function loadMetaHolders(rootDir: string, entity: string): Promise<
         const tag = domain.entities.find((one) => one.tag.split(".").pop() === holder.entity)?.tag;
         if (tag === undefined) continue;
         const source = buildMetaScaffoldSource({ domain, tag, naming });
+        withReferenceKeys(document, source);
         source.relationFields = relationFieldsOf(document, holder.entity, source);
         out.push({ entity: entityNameOf(tag), field: holder.field, operator, source });
         break;
