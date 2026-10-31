@@ -186,7 +186,10 @@ export function withContractKinds(input: readonly FieldInfo[], rowIdField?: stri
     // A key nobody reads (an attachment id, a list of role ids, an external key) says nothing on a
     // screen; the record's own identifier is drawn once, in its detail, with a copy control.
     const isOpaqueId = !isIdentifier && stamped.contractKind !== "reference" && /[a-z](Id|Ids)$/.test(f.name);
-    return { ...stamped, isIdentifier, isOpaqueId };
+    // A relation is hidden from lists while it is a bare key; one whose record carries the
+    // referenced name is a reference column, drawn as that name with the peek it opens.
+    const hideInList = stamped.contractKind === "reference" && stamped.nameField ? false : stamped.hideInList;
+    return { ...stamped, isIdentifier, isOpaqueId, ...(hideInList !== undefined ? { hideInList } : {}) };
   });
 }
 

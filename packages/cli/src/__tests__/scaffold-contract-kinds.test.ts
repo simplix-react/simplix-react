@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { detectI18nFieldPairs, importsSubjects, readsWidgetsNamespace, resolvesFrom, withContractKinds, type FieldInfo } from "../commands/scaffold-crud.js";
+import { detectI18nFieldPairs, orderAndCategorizeFields, importsSubjects, readsWidgetsNamespace, resolvesFrom, withContractKinds, type FieldInfo } from "../commands/scaffold-crud.js";
 import { stringShape } from "../meta/scaffold-source.js";
 
 function field(name: string, tsType = "string"): FieldInfo {
@@ -40,6 +40,19 @@ describe("the record's own key", () => {
     expect(reference?.contractKind).toBe("reference");
     expect(reference?.nameField).toBe("positionName");
     expect(out.find((f) => f.name === "positionName")?.isReferenceName).toBe(true);
+  });
+});
+
+describe("a relation in a list", () => {
+  it("is a reference column with its peek where the row carries the referenced name", () => {
+    const out = withContractKinds(orderAndCategorizeFields([field("accountId"), field("userId"), field("userName")]), "accountId");
+    const reference = out.find((f) => f.name === "userId");
+    expect(reference).toMatchObject({ contractKind: "reference", peekKind: "user", nameField: "userName", hideInList: false });
+  });
+
+  it("stays hidden while it is a bare key with no name beside it", () => {
+    const out = withContractKinds(orderAndCategorizeFields([field("accountId"), field("tenantId")]), "accountId");
+    expect(out.find((f) => f.name === "tenantId")).toMatchObject({ contractKind: "text", hideInList: true });
   });
 });
 
