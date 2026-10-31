@@ -105,6 +105,8 @@ export interface FieldInfo {
   isCode?: boolean;
   /** A key that is not a reference with a name, which no generated screen draws. */
   isOpaqueId?: boolean;
+  /** The longest value the contract allows (`@Size(max)`), where it states one. */
+  maxLength?: number;
   /** Whether the DTO the field was read from requires it (`@NotNull`), as SimpliX Meta states. */
   required?: boolean;
 }
@@ -172,13 +174,16 @@ export function contractKindOf(field: FieldInfo): string {
  * Stamps every field with its contract kind, and a reference with the peek it opens and the
  * sibling field that names its record (`<entity>Name`, or `<entity>DisplayName`), where one exists.
  */
+/** The text length of a UUID key, the longest a key's value runs. */
+const KEY_LENGTH = 36;
+
 /** What the contract states beyond the fields themselves. */
 export interface ContractKindOptions {
   /** Reference stem to peek kind, from `references.peeks` in the project's config. */
   readonly peeks?: Readonly<Record<string, string>>;
   /**
-   * The fields SimpliX Meta states are keys of another record (its `holders`). Given, a key is
-   * opaque only when the contract says so; absent (an OpenAPI source), a name ending in `Id` is.
+   * The fields SimpliX Meta states are keys of another record (its `holders`), which are keys
+   * whatever their name or length.
    */
   readonly relationFields?: ReadonlySet<string>;
 }
@@ -203,9 +208,11 @@ export function withContractKinds(
     const isIdentifier = f.name === rowIdField;
     // A key nobody reads (an attachment id, a list of role ids, an external key) says nothing on a
     // screen; the record's own identifier is drawn once, in its detail, with a copy control.
-    // A typed value that merely ends in `Id` (a provider's voice id) is text the operator enters,
-    // so where the contract states its relations, only those are keys.
-    const isKey = relationFields ? relationFields.has(f.name) : /[a-z](Id|Ids)$/.test(f.name);
+    // A key is a relation the contract states, or a value ending in `Id` whose length the contract
+    // does not allow past a key's. One it allows longer (a provider's voice id, `@Size(max = 200)`)
+    // is a value the operator types, and is text.
+    const typedValue = f.maxLength !== undefined && f.maxLength > KEY_LENGTH;
+    const isKey = relationFields?.has(f.name) === true || (/[a-z](Id|Ids)$/.test(f.name) && !typedValue);
     const isOpaqueId = !isIdentifier && stamped.contractKind !== "reference" && isKey;
     // A relation is hidden from lists while it is a bare key; one whose record carries the
     // referenced name is a reference column, drawn as that name with the peek it opens.

@@ -468,6 +468,8 @@ function fieldInfos(
     if (alias) one.sortAlias = alias;
     if (field.format === "code") one.isCode = true;
     if (field.required) one.required = true;
+    const maxLength = field.constraints?.find((one) => one.kind === "maxLength")?.value;
+    if (typeof maxLength === "number") one.maxLength = maxLength;
     fields.push(one);
   }
 

@@ -122,17 +122,15 @@ describe("a dependency the scaffold would add", () => {
 });
 
 describe("a key the contract does not state", () => {
-  it("is text the operator enters where SimpliX Meta states the relations", () => {
-    const out = withContractKinds([field("catalogVoiceId"), field("providerVoiceId"), field("attachmentId")], "catalogVoiceId", {
-      relationFields: new Set(["attachmentId"]),
-    });
+  it("is text the operator enters where the contract allows it longer than a key", () => {
+    const out = withContractKinds([field("catalogVoiceId"), { ...field("providerVoiceId"), maxLength: 200 }, { ...field("traceId"), maxLength: 36 }], "catalogVoiceId");
     expect(out.find((f) => f.name === "providerVoiceId")?.isOpaqueId).toBe(false);
-    expect(out.find((f) => f.name === "attachmentId")?.isOpaqueId).toBe(true);
+    expect(out.find((f) => f.name === "traceId")?.isOpaqueId).toBe(true);
   });
 
-  it("is still read from its name where no relations are stated", () => {
-    const out = withContractKinds([field("catalogVoiceId"), field("providerVoiceId")], "catalogVoiceId");
-    expect(out.find((f) => f.name === "providerVoiceId")?.isOpaqueId).toBe(true);
+  it("is a key whatever its length where SimpliX Meta states it as a relation", () => {
+    const out = withContractKinds([field("accountId"), { ...field("externalRefId"), maxLength: 200 }], "accountId", { relationFields: new Set(["externalRefId"]) });
+    expect(out.find((f) => f.name === "externalRefId")?.isOpaqueId).toBe(true);
   });
 });
 
