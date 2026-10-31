@@ -52,7 +52,28 @@ export function metaSurfaces(meta: MetaDocument): Map<string, string> {
   return out;
 }
 
-/** Removed surfaces whose name still appears in the given sources and that nobody acknowledged. */
+function escape(text: string): string {
+  return text.replace(/[^\w]/g, "\\$&");
+}
+
+/** The suffixes a transfer type adds to the entity it carries: `ReleaseArtifactCreateDTO` → `ReleaseArtifact`. */
+const TRANSFER_SUFFIX = /(?:Create|Update|Patch|Search|Summary|Detail|List)?(?:DTO|Dto|Request|Response)$/;
+
+/**
+ * What a file must name to reach a field of `owner`: the type itself, or its entity's stem inside
+ * an identifier (`useReleaseArtifactCreate`, `releaseArtifactKeys`). A field name is often a
+ * common word (`active`, `name`), so a file naming it without naming its owner is not a user.
+ */
+function ownerMention(owner: string): RegExp {
+  const stem = owner.replace(TRANSFER_SUFFIX, "") || owner;
+  const camel = stem.charAt(0).toLowerCase() + stem.slice(1);
+  return new RegExp(`\\b${escape(owner)}\\b|${escape(stem)}|\\b${escape(camel)}`);
+}
+
+/**
+ * Removed surfaces whose name still appears in the given sources and that nobody acknowledged. A
+ * removed field counts only in a file that also names its owner (see {@link ownerMention}).
+ */
 export function findMetaRemovals(
   before: MetaDocument,
   after: MetaDocument,
@@ -63,8 +84,9 @@ export function findMetaRemovals(
   const removals: MetaRemoval[] = [];
   for (const [key, name] of metaSurfaces(before)) {
     if (now.has(key) || acknowledged.has(key)) continue;
-    const word = new RegExp(`\\b${name.replace(/[^\w]/g, "\\$&")}\\b`);
-    const users = sources.filter((s) => word.test(s.text)).map((s) => s.path);
+    const word = new RegExp(`\\b${escape(name)}\\b`);
+    const owner = key.startsWith("field ") ? ownerMention(key.slice("field ".length, key.lastIndexOf("."))) : undefined;
+    const users = sources.filter((s) => word.test(s.text) && (owner === undefined || owner.test(s.text))).map((s) => s.path);
     if (users.length > 0) removals.push({ key, users });
   }
   return removals;

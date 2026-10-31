@@ -126,7 +126,7 @@ describe("findMetaRemovals", () => {
     operations: [],
     enums: { JobStatus: { values: [{ name: "DONE" }] } },
   };
-  const sources = [{ path: "screen.tsx", text: "row.category; api.AuditRest_search(); status === 'DEAD'" }];
+  const sources = [{ path: "screen.tsx", text: "useAuditEventList(); row.category; api.AuditRest_search(); status === 'DEAD'" }];
 
   it("passes a reorder", () => {
     expect(findMetaRemovals(before, reordered, sources, new Set())).toEqual([]);
@@ -141,6 +141,18 @@ describe("findMetaRemovals", () => {
   it("passes an acknowledged removal", () => {
     const ack = new Set(["field AuditEventListDTO.category", "operation AuditRest_search", "enumValue JobStatus.DEAD"]);
     expect(findMetaRemovals(before, dropped, sources, ack)).toEqual([]);
+  });
+  it("counts a removed field only where its owner is named too", () => {
+    const fieldOnly = { types: { ReleaseArtifactCreateDTO: { fields: [{ name: "active" }, { name: "version" }] } } };
+    const fieldGone = { types: { ReleaseArtifactCreateDTO: { fields: [{ name: "version" }] } } };
+    const files = [
+      { path: "user-list.tsx", text: "const active = row.active;" },
+      { path: "release-form.tsx", text: "const create = useReleaseArtifactCreate(); create.mutate({ active: true });" },
+      { path: "release-dto.ts", text: "export type X = ReleaseArtifactCreateDTO & { active: boolean };" },
+    ];
+    expect(findMetaRemovals(fieldOnly, fieldGone, files, new Set())).toEqual([
+      { key: "field ReleaseArtifactCreateDTO.active", users: ["release-form.tsx", "release-dto.ts"] },
+    ]);
   });
   it("passes a removal nothing names", () => {
     expect(findMetaRemovals(before, dropped, [{ path: "x.ts", text: "nothing" }], new Set())).toEqual([]);
