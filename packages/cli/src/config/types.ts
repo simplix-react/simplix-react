@@ -335,6 +335,8 @@ export interface RouteTarget {
   readonly dir: string;
   readonly template?: string;
   readonly paths?: Readonly<Record<string, string>>;
+  /** Entities (kebab case) whose list is reached only inside another screen, so gets no route. */
+  readonly except?: readonly string[];
   readonly menu?: {
     readonly file: string;
     readonly marker: string;

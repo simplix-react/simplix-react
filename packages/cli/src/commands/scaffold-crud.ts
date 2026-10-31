@@ -2594,7 +2594,7 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     // The route the list is reached through, where the module's group names an app to route it in.
     const routeGroup = moduleDir ? modulePathOf(rootDir, moduleDir).split("/")[0] : undefined;
     const routeTarget = routeGroup !== undefined && modulePathOf(rootDir, moduleDir!).includes("/") ? projectConfig.routes?.[routeGroup] : undefined;
-    if (moduleDir && routeTarget && ctx.hasList) {
+    if (moduleDir && routeTarget && ctx.hasList && !routeTarget.except?.includes(entityKebab)) {
       const route = await writeRoute({
         rootDir,
         moduleDir,
