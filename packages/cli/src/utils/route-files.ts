@@ -45,12 +45,31 @@ export function menuTemplateOf(routeTemplate: string): string {
   return routeTemplate.replace(/^route/, "menu-entry");
 }
 
+/** The menu entry a list screen registers: its key, the path it routes, and its gate expression. */
+export interface MenuEntryTarget {
+  readonly key: string;
+  readonly href: string;
+  /** The gate expression, or `"undefined"` when the screen has none. */
+  readonly gate: string;
+}
+
 /**
- * Inserts `entry` on the line before the first line holding `marker`, unless `text` already
- * routes `href`; returns `undefined` when nothing is inserted.
+ * Registers a list screen in a menu file and returns the new text, or `undefined` when nothing
+ * changes. An entry already holding the key keeps its place: it gets the `href` (and the gate)
+ * it lacks, so a placeholder drawn under its own group is completed rather than duplicated. A key
+ * with no entry, where nothing routes `href` either, is inserted on the line before the marker.
  */
-export function insertMenuEntry(text: string, marker: string, href: string, entry: string): string | undefined {
-  if (text.includes(`href: "${href}"`)) return undefined;
+export function insertMenuEntry(text: string, marker: string, target: MenuEntryTarget, entry: string): string | undefined {
+  const keyed = new RegExp(`\\{([^{}]*?\\bkey:\\s*"${target.key.replace(/[^\w]/g, "\\$&")}")([^{}]*?)(\\s*)\\}`);
+  const found = keyed.exec(text);
+  if (found) {
+    const [whole, head, tail, close] = found;
+    if (/\bhref:/.test(head + tail)) return undefined;
+    const gate = target.gate !== "undefined" && !/\bgate:/.test(head + tail) ? `, gate: ${target.gate}` : "";
+    const filled = `{${head}, href: "${target.href}"${tail}${gate}${close}}`;
+    return text.slice(0, found.index) + filled + text.slice(found.index + whole.length);
+  }
+  if (text.includes(`href: "${target.href}"`)) return undefined;
   const lines = text.split("\n");
   const at = lines.findIndex((line) => line.includes(marker));
   if (at < 0) throw new Error(`The menu file has no line holding the marker "${marker}"`);
@@ -85,7 +104,7 @@ export async function writeRoute(input: RouteInput): Promise<RouteWrite> {
     const permission = input.listAccess?.kind === "permission" ? input.listAccess : undefined;
     const gate = permission ? `{ action: "${permission.action}", subject: "${permission.group}" }` : "undefined";
     const entry = renderTemplate(menuTemplate, { ...routeCtx, menuKey: input.entityPlural, menuIcon: menu.icon ?? "CircleIcon", menuGate: gate });
-    const inserted = insertMenuEntry(await readFile(menuFile, "utf-8"), menu.marker, `/${routePath}`, entry);
+    const inserted = insertMenuEntry(await readFile(menuFile, "utf-8"), menu.marker, { key: input.entityPlural, href: `/${routePath}`, gate }, entry);
     if (inserted !== undefined) {
       await writeFileWithDir(menuFile, inserted);
       menuInserted = true;

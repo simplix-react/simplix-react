@@ -21,17 +21,41 @@ describe("a menu entry", () => {
   const menu = 'const ENTRIES = [\n  { key: "a", href: "/a" },\n  // @simplix-menu admin\n];\n';
 
   it("goes on the line before the marker", () => {
-    expect(insertMenuEntry(menu, "@simplix-menu admin", "/b", '  { key: "b", href: "/b" },\n')).toBe(
+    expect(insertMenuEntry(menu, "@simplix-menu admin", { key: "b", href: "/b", gate: "undefined" }, '  { key: "b", href: "/b" },\n')).toBe(
       'const ENTRIES = [\n  { key: "a", href: "/a" },\n  { key: "b", href: "/b" },\n  // @simplix-menu admin\n];\n',
     );
   });
 
   it("is left alone when the path already has one", () => {
-    expect(insertMenuEntry(menu, "@simplix-menu admin", "/a", "x")).toBeUndefined();
+    expect(insertMenuEntry(menu, "@simplix-menu admin", { key: "other", href: "/a", gate: "undefined" }, "x")).toBeUndefined();
+  });
+
+  it("completes a placeholder holding the key where it stands instead of inserting a second entry", () => {
+    const grouped =
+      '[\n  { key: "ops", entries: [\n    { key: "a", href: "/a" },\n    // @simplix-menu admin\n  ] },\n' +
+      '  { key: "releases", entries: [{ key: "files", icon: PackageIcon }] },\n]\n';
+    const out = insertMenuEntry(grouped, "@simplix-menu admin", { key: "files", href: "/files", gate: "RELEASES" }, '    { key: "files", href: "/files" },\n');
+    expect(out).toBe(grouped.replace('{ key: "files", icon: PackageIcon }', '{ key: "files", href: "/files", icon: PackageIcon, gate: RELEASES }'));
+  });
+
+  it("keeps a placeholder's own gate and leaves a keyed entry that already routes alone", () => {
+    const placeholder = '[{ key: "files", icon: I, gate: SYSTEM },\n// @simplix-menu admin\n]';
+    expect(insertMenuEntry(placeholder, "@simplix-menu admin", { key: "files", href: "/files", gate: "RELEASES" }, "x")).toBe(
+      '[{ key: "files", href: "/files", icon: I, gate: SYSTEM },\n// @simplix-menu admin\n]',
+    );
+    const routed = '[{ key: "files", href: "/release-files", icon: I },\n// @simplix-menu admin\n]';
+    expect(insertMenuEntry(routed, "@simplix-menu admin", { key: "files", href: "/files", gate: "undefined" }, "x")).toBeUndefined();
+  });
+
+  it("does not take a group whose key matches for an entry", () => {
+    const text = '[{ key: "files", entries: [{ key: "x", href: "/x" }] },\n// @simplix-menu admin\n]';
+    expect(insertMenuEntry(text, "@simplix-menu admin", { key: "files", href: "/files", gate: "undefined" }, '{ key: "files", href: "/files" },')).toBe(
+      '[{ key: "files", entries: [{ key: "x", href: "/x" }] },\n{ key: "files", href: "/files" },\n// @simplix-menu admin\n]',
+    );
   });
 
   it("refuses a menu file with no marker", () => {
-    expect(() => insertMenuEntry("[]", "@simplix-menu admin", "/b", "x")).toThrow(/marker/);
+    expect(() => insertMenuEntry("[]", "@simplix-menu admin", { key: "b", href: "/b", gate: "undefined" }, "x")).toThrow(/marker/);
   });
 });
 
