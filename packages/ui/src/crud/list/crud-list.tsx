@@ -119,6 +119,7 @@ import { closestCenter, DndContext } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import type { ReorderConfig } from "../shared";
 import { useReorder, DragHandleHeader, DraggableRow, DraggableCard } from "../reorder";
+import { stabilizeColumnRenderers } from "../shared/stable-column-renderers";
 import {useContainerWidth} from "./use-container-width";
 import { useColumnMotion } from "./use-column-motion";
 
@@ -1402,7 +1403,7 @@ function ListTable<T>({
       });
     }
 
-    return cols;
+    return stabilizeColumnRenderers(cols);
   }, [
     columnDefs,
     selectable,
@@ -1434,6 +1435,9 @@ function ListTable<T>({
     columns: tanstackColumns,
     state: { sorting, columnVisibility },
     getCoreRowModel: getCoreRowModel(),
+    // Keyed by the row's own id when the screen names one, so a row arriving on top does not shift
+    // every other row's key (and with it the cell ids) by one. Selection stays by `row.index`.
+    getRowId: rowId ? (row) => rowId(row) : undefined,
     manualSorting: true,
   });
 
