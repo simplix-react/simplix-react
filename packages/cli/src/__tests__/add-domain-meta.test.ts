@@ -10,6 +10,7 @@ import { describe, expect, it } from "vitest";
 (globalThis as Record<string, unknown>).__DEP_VERSIONS__ = {};
 
 const { addDomainCommand } = await import("../commands/add-domain.js");
+const { registerSpecProfile } = await import("../openapi/plugin-registry.js");
 
 /**
  * A project that generates from SimpliX Meta has dropped Orval, so a domain scaffolded into it
@@ -80,6 +81,25 @@ describe("add-domain in a SimpliX Meta project", () => {
 
     const mutator = await readFile(join(dir, "packages/acme-domain-pet/src/mutator.ts"), "utf-8");
     expect(mutator).toContain("customFetch");
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("writes the mutator of the spec profile, so the envelope is unwrapped", async () => {
+    registerSpecProfile("enveloped", { mutatorStrategy: "boot" } as Parameters<typeof registerSpecProfile>[1]);
+    const dir = await project(`export default {
+  openapi: [
+    {
+      domains: { pet: ["shop.Pet"] },
+      profile: "enveloped",
+      meta: { source: "http://localhost:8082/api/v1/dev/meta/dto" },
+    },
+  ],
+};
+`);
+    await run(dir, "pet");
+
+    const mutator = await readFile(join(dir, "packages/acme-domain-pet/src/mutator.ts"), "utf-8");
+    expect(mutator).toContain('getMutator("boot")');
     await rm(dir, { recursive: true, force: true });
   });
 });

@@ -159,6 +159,10 @@ export const addDomainCommand = new Command("add-domain")
         PascalName: toPascalCase(name),
       });
 
+      // The spec profile decides which mutator unwraps the backend's envelope; a package written
+      // without it hands React Query the envelope, and every field of the domain reads undefined.
+      const mutatorStrategy = specConfig?.profile ? getSpecProfile(specConfig.profile)?.mutatorStrategy : undefined;
+
       // Scaffolding files (common to both modes)
       const files: Record<string, string> = {
         "package.json": renderTemplate(domainPackageJson, ctx),
@@ -170,7 +174,7 @@ export const addDomainCommand = new Command("add-domain")
       if (useMeta) {
         // SimpliX Meta: the same mutator the generated request functions call, and a codegen
         // script that reads no document. Nothing here names Orval.
-        files["src/mutator.ts"] = generateDomainMutatorContent(name);
+        files["src/mutator.ts"] = generateDomainMutatorContent(name, mutatorStrategy);
 
         const pkgJson = JSON.parse(files["package.json"]);
         if (!pkgJson.dependencies) pkgJson.dependencies = {};
@@ -188,7 +192,7 @@ export const addDomainCommand = new Command("add-domain")
         files["package.json"] = JSON.stringify(pkgJson, null, 2) + "\n";
       } else if (useOrval) {
         // OpenAPI mode: skeleton with mutator + orval config
-        files["src/mutator.ts"] = generateDomainMutatorContent(name);
+        files["src/mutator.ts"] = generateDomainMutatorContent(name, mutatorStrategy);
 
         // Inject OpenAPI-specific dependencies + codegen script
         const pkgJson = JSON.parse(files["package.json"]);
