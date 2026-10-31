@@ -810,6 +810,4 @@ export { createEntitySearch } from "./crud/entity/entity-search";
 export type { EntitySearch, EntitySearchConfig } from "./crud/entity/entity-search";
 export { adaptForcedList, filtersOutsideForced, forcedScope, withForced } from "./crud/entity/forced-list";
 export type { UnderForced } from "./crud/entity/forced-list";
-export { useCursorPages } from "./crud/entity/cursor-pages";
-export type { CursorPages, CursorPagesOptions } from "./crud/entity/cursor-pages";
 export { dismissAllErrors, dismissError, dispatchError, useErrorStore } from "./hooks/error-store";
