@@ -289,12 +289,16 @@ export function buildMetaScaffoldSource(
   return source;
 }
 
+/** The roles whose body is the record as it is written: the create and the update. */
+const FORM_ROLES = new Set(["create", "update"]);
+
 /**
  * The DTO an entity's screens are built from.
  *
  * A request body states what may be written, so it is the form, and the widest one is the record:
- * an entity's create and update bodies differ by the identifier the update addresses, and its
- * custom actions carry narrower bodies still. The comparison counts inherited fields, because the
+ * an entity's create and update bodies differ by the identifier the update addresses. A custom
+ * action's body is never the form, so an entity written only through actions is read from the
+ * record it answers with. The comparison counts inherited fields, because the
  * SimpliX Meta's `fields` are a type's own and a child that adds one field to a parent's twenty is the
  * widest body an entity has while declaring the fewest.
  *
@@ -311,6 +315,9 @@ function chooseFieldType(
 ): { type: ResolvedType; origin: "request" | "response" } | undefined {
   let widest: ResolvedType | undefined;
   for (const target of targets) {
+    // A custom action's body (an adjust, an approve) states what that one command takes, not
+    // what the record is; read as the form, it names the record by the action's reason field.
+    if (!FORM_ROLES.has(target.role)) continue;
     const declared = typeOf(domain, innermostRef(target.operation.request.body));
     if (!declared) continue;
     if (!widest || scalarCount(declared) > scalarCount(widest)) widest = declared;

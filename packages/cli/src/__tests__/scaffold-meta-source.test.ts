@@ -156,7 +156,9 @@ describe("the DTO an entity's screens are built from", () => {
       if (source.fieldSource) byOrigin[source.fieldSource.origin] += 1;
       else neither.push(source.entity);
     }
-    expect(byOrigin).toEqual({ request: 74, response: 50 });
+    // An entity written only through custom actions (a drawing's new version, a site's shift
+    // replacement) is read from the record it answers with: an action's body is not the form.
+    expect(byOrigin).toEqual({ request: 60, response: 64 });
     // Both are binary surfaces: an avatar and a download are bytes, and SimpliX Meta states no field a
     // screen could render. They are refused rather than given an invented id/name pair.
     expect(neither.sort()).toEqual(["avatar", "exportDownload"]);
