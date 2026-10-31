@@ -545,8 +545,9 @@ class EndpointEmitter {
   private operation(target: EndpointTarget, imports: FileImports): string {
     const parts: string[] = [];
     if (target.paramsType && target.paramsDeclared) parts.push(this.paramsType(target, imports));
-    const resolves =
-      `The type \`${target.name}\` resolves to, once the mutator has stripped the envelope.`;
+    const resolves = isBinary(target)
+      ? `The bytes \`${target.name}\` resolves to: the body is no envelope, so the fetch hands it back as a Blob.`
+      : `The type \`${target.name}\` resolves to, once the mutator has stripped the envelope.`;
     const response = this.types.response(target.operation.response, imports);
     parts.push(`${docLine(resolves)}export type ${target.responseType} = ${response};\n`);
     parts.push(...this.url(target, imports));
@@ -649,6 +650,10 @@ ${docLine(route)}export const get${name}Url = (${withParams}): string => {
         "    headers: { 'Content-Type': 'application/json', ...options?.headers },",
         `    body: JSON.stringify(${target.body.argument}),`,
       );
+    } else if (isBinary(target)) {
+      // A route that writes its own body (a CSV export, a file) may declare a non-JSON media
+      // type, which a request asking for JSON alone is refused against.
+      init.push("    headers: { Accept: '*/*', ...options?.headers },");
     } else if (target.multipart) {
       // The boundary belongs to whoever writes the body: naming the content type by hand omits it.
       init.push("    body: toFormData(params),");
@@ -669,6 +674,11 @@ ${init.join("\n")}
       (param) => `${param.name}: ${this.types.value(param.type, imports)}`,
     );
   }
+}
+
+/** Whether the route answers with bytes rather than an envelope, as SimpliX Meta's `binary` says. */
+function isBinary(target: EndpointTarget): boolean {
+  return target.operation.response?.kind === "binary";
 }
 
 /** A doc comment on its own line, or nothing at all when there is nothing to say. */

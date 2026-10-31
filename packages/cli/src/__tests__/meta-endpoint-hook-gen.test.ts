@@ -488,6 +488,32 @@ describe("generateEndpointFiles says what it could not name once", () => {
     expect(avatar).not.toContain("toQueryString(params)");
   });
 
+  it("fetches a binary response as a Blob, asking for any media type", () => {
+    // A CSV export writes its own body; unwrapping it as an envelope fails on the first byte.
+    const exporting = resolveMeta(meta, { domains: smartSafetyDomains, containerTypes }).domains.get("org");
+    if (!exporting) throw new Error("the fixture has no domain named org");
+    const entity = exporting.entities.find((one) =>
+      one.operations.some((op) => op.method === "GET" && op.request.path.length === 1),
+    );
+    if (!entity) throw new Error("the fixture has no read by id");
+    const read = entity.operations.find((op) => op.method === "GET" && op.request.path.length === 1);
+    if (!read) throw new Error("the fixture has no read by id");
+    const json = generateEndpointFiles(exporting, { naming: simplixBootNaming });
+    // The fixture's operations are shared with every other test, so the change is put back.
+    const original = read.response;
+    read.response = { kind: "binary" };
+    const binary = generateEndpointFiles(exporting, { naming: simplixBootNaming });
+    read.response = original;
+    const changed = [...binary.files].filter(([path, content]) => json.files.get(path) !== content);
+    expect(changed).toHaveLength(1);
+    const content = changed[0]![1];
+    expect(content).toMatch(/export type \w+Response = Blob;/);
+    expect(content).toContain("the fetch hands it back as a Blob");
+    expect(content).toContain("    headers: { Accept: '*/*', ...options?.headers },");
+    const before = json.files.get(changed[0]![0]) ?? "";
+    expect(before).not.toContain("Accept: '*/*'");
+  });
+
   it("refuses to write one entity's module over another's", () => {
     const collided = resolveMeta(meta, {
       domains: { two: ["org.Organization", "party.roster.Organization"] },
