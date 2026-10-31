@@ -37,3 +37,30 @@ export function useCan(action: string, subject: string): boolean {
 function emptySubscribe(_listener: () => void): () => void {
   return () => {};
 }
+
+/**
+ * Returns what `decide` answers when handed the policy's `can`, re-evaluated whenever the policy
+ * changes.
+ *
+ * For a rule that names several permissions at once - any of them, or all of them - where
+ * {@link useCan} would need one call per permission and so a varying number of hooks.
+ *
+ * When used outside an {@link AccessProvider}, `decide` is handed a `can` that always answers
+ * `true`, matching {@link useCan}.
+ *
+ * @param decide - Combines the answers of `can` into one; must be pure.
+ * @returns What `decide` answered against the current policy.
+ *
+ * @example
+ * ```tsx
+ * import { useCanWith } from "@simplix-react/access/react";
+ *
+ * const canReview = useCanWith((can) => can("approve", "Order") || can("edit", "Order"));
+ * ```
+ */
+export function useCanWith(decide: (can: (action: string, subject: string) => boolean) => boolean): boolean {
+  const policy = useContext(AccessContext);
+  const snapshot = () => decide(policy ? (action, subject) => policy.can(action, subject) : () => true);
+
+  return useSyncExternalStore(policy ? policy.subscribe : emptySubscribe, snapshot, snapshot);
+}

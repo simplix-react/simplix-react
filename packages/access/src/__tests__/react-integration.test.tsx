@@ -7,7 +7,7 @@ import { createStaticAdapter } from "../adapters/static-adapter.js";
 import { AccessDeniedError } from "../errors.js";
 import { AccessProvider } from "../react/access-provider.js";
 import { useAccess } from "../react/use-access.js";
-import { useCan } from "../react/use-can.js";
+import { useCan, useCanWith } from "../react/use-can.js";
 import { Can } from "../react/can.js";
 import { useMenuFilter } from "../react/use-menu-filter.js";
 import { requireAccess } from "../react/route-guard.js";
@@ -215,6 +215,31 @@ describe("useCan", () => {
       policy.setRules([{ action: "view", subject: "Pet" }]);
     });
 
+    expect(result.current).toBe(true);
+  });
+});
+
+describe("useCanWith", () => {
+  const anyOf = (can: (action: string, subject: string) => boolean) => can("edit", "Pet") || can("edit", "Order");
+
+  it("combines several checks against one policy", () => {
+    const policy = createPolicy([{ action: "edit", subject: "Order" }]);
+    const { result } = renderHook(() => useCanWith(anyOf), { wrapper: createWrapper(policy) });
+    expect(result.current).toBe(true);
+  });
+
+  it("answers false when the combination does not hold, and follows policy changes", () => {
+    const policy = createPolicy([{ action: "view", subject: "Pet" }]);
+    const { result } = renderHook(() => useCanWith(anyOf), { wrapper: createWrapper(policy) });
+    expect(result.current).toBe(false);
+    act(() => {
+      policy.setRules([{ action: "edit", subject: "Pet" }]);
+    });
+    expect(result.current).toBe(true);
+  });
+
+  it("hands decide a can that allows everything without an AccessProvider", () => {
+    const { result } = renderHook(() => useCanWith((can) => can("delete", "Pet") && can("delete", "Order")));
     expect(result.current).toBe(true);
   });
 });

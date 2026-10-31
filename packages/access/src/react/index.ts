@@ -1,6 +1,6 @@
 export { AccessProvider, useAccessContext } from "./access-provider.js";
 export type { AccessProviderProps, AuthLike } from "./access-provider.js";
-export { useCan } from "./use-can.js";
+export { useCan, useCanWith } from "./use-can.js";
 export { useAccess } from "./use-access.js";
 export { Can } from "./can.js";
 export type { CanProps } from "./can.js";
