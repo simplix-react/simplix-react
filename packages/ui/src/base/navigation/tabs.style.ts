@@ -14,7 +14,7 @@ export const tabsListStyle = defineSlotStyle({
       default: "rounded-lg border border-input bg-card px-1 py-0.5 text-muted-foreground",
       // The page's own tab strip: tabs standing on a hairline from the start, the chosen one marked
       // by the ink that slides under it.
-      full: "mt-0 h-auto justify-start gap-0.5 p-0 text-muted-foreground shadow-[inset_0_-1px_0_0_var(--border)] [&>[role=tab]]:flex-none",
+      full: "mt-0 h-auto justify-start gap-0.5 p-0 text-muted-foreground shadow-[var(--shadow-rule-below)] [&>[role=tab]]:flex-none",
       // Bottom-baseline track for the `bookmark` list variant. The line is an inset shadow (not a
       // border) so the active tab's `bg-card` covers it without relying on overflow - the cutout
       // survives `overflow-x-auto` horizontal scroll.
@@ -25,7 +25,7 @@ export const tabsListStyle = defineSlotStyle({
       // surface that already has tabs above it, and the thing that has to read as quieter is the
       // line as much as the triggers. Full width so the baseline runs the width of the panel and
       // the tabs sit on it from the start, which is where a reader looks for a second level.
-      underline: "mt-2 gap-1 shadow-[inset_0_-1px_0_0_var(--border)]",
+      underline: "mt-2 gap-1 shadow-[var(--shadow-rule-below)]",
     },
   },
   defaultVariants: { variant: "default" },

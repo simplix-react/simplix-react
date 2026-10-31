@@ -149,14 +149,27 @@ function useOverflowEdges(list: { readonly current: HTMLDivElement | null }, ena
     };
     reveal();
     strip.addEventListener("scroll", read, { passive: true });
-    const sizes = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(read);
-    sizes?.observe(strip);
+    // The strip's box keeps its width while a tab inside it grows (a web font arriving, a count
+    // filling in), so the tabs are observed too: either change moves the scroll width and can push
+    // the chosen tab out of sight.
+    const sizes = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(reveal);
+    const observeAll = () => {
+      sizes?.observe(strip);
+      for (const tab of strip.children) sizes?.observe(tab);
+    };
+    observeAll();
     const states = new MutationObserver(reveal);
     states.observe(strip, { attributes: true, subtree: true, attributeFilter: ["data-state"] });
+    const members = new MutationObserver(() => {
+      observeAll();
+      reveal();
+    });
+    members.observe(strip, { childList: true });
     return () => {
       strip.removeEventListener("scroll", read);
       sizes?.disconnect();
       states.disconnect();
+      members.disconnect();
     };
   }, [list, enabled]);
   return edges;
