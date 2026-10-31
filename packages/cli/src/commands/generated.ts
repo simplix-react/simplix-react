@@ -219,13 +219,35 @@ async function regenerateOrigins(rootDir: string): Promise<{ origins: string[]; 
   return { origins, writes: takeGeneratedOutcomes() };
 }
 
+/**
+ * Why a report fails, one sentence each; empty when it passes. A stale file, a conflicting merge
+ * and an edited file with no base or no origin fail every run, since each leaves a template change
+ * unapplied. `check` also fails an edited file that would merge cleanly but has not been merged.
+ */
+export function generatedFailures(entries: readonly GeneratedEntry[], options: { check: boolean; conflicted: boolean }): string[] {
+  const failures: string[] = [];
+  if (entries.some((e) => e.state === "stale")) {
+    failures.push("Stale generated files: run `simplix generated --all` to rewrite them from the current templates.");
+  }
+  if (options.conflicted || entries.some((e) => e.merge === "conflict")) {
+    failures.push("Edited generated files conflict with the templates: resolve each conflict (or run `simplix generated --all --write-conflicts`).");
+  }
+  if (entries.some((e) => e.merge === "no-base" || e.merge === "no-origin")) {
+    failures.push("Edited generated files have no base or no origin: record each with `simplix generated --adopt <path...>`.");
+  }
+  if (options.check && entries.some((e) => e.merge === "merged")) {
+    failures.push("Edited generated files are behind the templates: run `simplix generated --all`.");
+  }
+  return failures;
+}
+
 export const generatedCommand = new Command("generated")
   .description(
     "Report every generated file as untouched, edited or stale against the current templates, and what a regeneration merges into each edited one",
   )
   .option("--all", "Regenerate every scaffolded screen and page first: untouched files are rewritten, edited ones merged three-way, and a deleted one stays deleted while its base under .simplix/generated is kept")
   .option("--write-conflicts", "With --all, write conflict markers into a file whose merge conflicts instead of leaving it alone")
-  .option("--check", "Exit non-zero when a file is stale, an edited file would take a merge, or a merge conflicts")
+  .option("--check", "Also exit non-zero when an edited file would take a clean merge (a stale file, a conflict, and a file with no base or origin always fail)")
   .option("--json", "Print the report as JSON")
   .option("--share", "Report, per screen, the lines in blocks and edited files against the generated lines, and the customisations two screens repeat")
   .option(
@@ -303,16 +325,8 @@ export const generatedCommand = new Command("generated")
           `${count("stale")} stale, ${count("unchecked")} unchecked`,
       );
     }
-    if (entries.some((e) => e.merge === "no-base" || e.merge === "no-origin")) {
-      log.warn("An edited file with no base or no origin takes no template change: read its diff and record it with `simplix generated --adopt <path...>`.");
-    }
-    const stale = entries.some((e) => e.state === "stale");
-    if (stale) {
-      log.error("Stale generated files: run `simplix generated --all` to rewrite them from the current templates.");
-      process.exitCode = 1;
-    }
-    if (flags.check && (conflicted || entries.some((e) => e.merge === "conflict" || e.merge === "merged"))) {
-      log.error("Edited generated files are behind the templates: run `simplix generated --all`, and resolve each conflict (or pass --write-conflicts).");
+    for (const failure of generatedFailures(entries, { check: flags.check === true, conflicted })) {
+      log.error(failure);
       process.exitCode = 1;
     }
   }));

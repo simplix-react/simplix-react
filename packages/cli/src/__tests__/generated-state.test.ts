@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { generatedReport, regenerateAll } from "../commands/generated.js";
+import { generatedFailures, generatedReport, regenerateAll, type GeneratedEntry } from "../commands/generated.js";
 import { shareReport } from "../commands/generated-share.js";
 import { runAddPage } from "../commands/add-page.js";
 import { captureWrites, writeFileWithDir } from "../utils/fs.js";
@@ -268,5 +268,24 @@ describe("generated files under a project formatter", () => {
     const { writes } = await regenerateAll(root);
     expect(writes.find((w) => w.path === pagePath())?.outcome).toBe("merged");
     expect(await readFile(pagePath(), "utf-8")).toContain("return 'v2';");
+  });
+});
+
+describe("the generated report's exit", () => {
+  const entry = (over: Partial<GeneratedEntry>): GeneratedEntry => ({ path: "a.tsx", state: "edited", ...over });
+  const fails = (entries: GeneratedEntry[], check = false) => generatedFailures(entries, { check, conflicted: false }).length > 0;
+
+  it("fails without --check on a conflict, a stale file, and an edited file with no base or no origin", () => {
+    expect(fails([entry({ merge: "conflict" })])).toBe(true);
+    expect(fails([entry({ state: "stale" })])).toBe(true);
+    expect(fails([entry({ merge: "no-base" })])).toBe(true);
+    expect(fails([entry({ merge: "no-origin" })])).toBe(true);
+    expect(generatedFailures([], { check: false, conflicted: true })).toHaveLength(1);
+  });
+
+  it("passes untouched and current files, and fails a clean pending merge only under --check", () => {
+    expect(fails([entry({ state: "untouched" }), entry({ merge: "current" })])).toBe(false);
+    expect(fails([entry({ merge: "merged" })])).toBe(false);
+    expect(fails([entry({ merge: "merged" })], true)).toBe(true);
   });
 });
