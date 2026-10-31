@@ -2352,6 +2352,8 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
         filterKey: `${holder.field}.${holder.operator}`,
         rowIdField: holder.source.rowIdField,
         fields: holderFields,
+        // Whether the holder's list route takes a keyword search, which its tab's search box sends.
+        hasKeywordSearch: holder.source.keywordSearch,
       });
     }
     // The generated access rule of each operation a control leads to (`createJobPositionAccess`),
@@ -2363,6 +2365,8 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       accessOrder: accessOf(roles?.order as string | undefined),
       accessDelete: accessOf(roles?.delete),
       holders,
+      // Whether any holder's tab sends a keyword search, which is what imports the search key.
+      holdersKeywordSearch: holders.some((one) => one.hasKeywordSearch),
       EntityPascal,
       entityKebab,
       entity,
