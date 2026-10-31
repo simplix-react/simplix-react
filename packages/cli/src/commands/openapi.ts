@@ -1249,7 +1249,15 @@ export async function overlayServerTranslations(
   ) => Promise<Map<string, Record<string, unknown>> | undefined>,
 ): Promise<void> {
   const localeDataMap = await i18nDownloader(serverOrigin, entities, locales);
-  if (!localeDataMap) return;
+  if (!localeDataMap) {
+    // The locale files are already written from the contract's own words, which are the base
+    // locale's: every other locale now reads in that language until the server answers.
+    log.warn(
+      `No server translations from ${serverOrigin}: the locale files hold the base locale's words in every ` +
+        `locale (${locales.join(", ")}). Run again once the server answers.`,
+    );
+    return;
+  }
 
   // Filter enums: only keep enums that have a generated model file in this domain
   const knownTypes = await resolveKnownModelTypes(targetDir);
