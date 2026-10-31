@@ -21,9 +21,9 @@ export interface AccessGenOptions {
 }
 
 /**
- * An operation guarded by a SpEL expression. SimpliX Meta carries it as written, because there is no
- * structure left in it to carry: the expression calls a bean, or joins two permissions with a
- * word. Nothing on this side can evaluate it, so a screen that reads one asks the server.
+ * An operation guarded by a SpEL expression. SimpliX Meta carries it as written, and for a flat
+ * chain of one operator also the permission terms a screen can decide and whether a term only the
+ * server can decide is left over.
  */
 export interface AccessExpression {
   operation: string;
@@ -134,8 +134,18 @@ function literal(target: EndpointTarget): string {
   switch (access.kind) {
     case "permission":
       return `{ kind: "permission", group: ${JSON.stringify(access.group)}, action: ${JSON.stringify(access.action)} }`;
-    case "expression":
-      return `{ kind: "expression", raw: ${JSON.stringify(access.raw)} }`;
+    case "expression": {
+      const parts = [`kind: "expression"`, `raw: ${JSON.stringify(access.raw)}`];
+      if (access.operator) parts.push(`operator: ${JSON.stringify(access.operator)}`);
+      if (access.permissions?.length) {
+        const terms = access.permissions.map(
+          (term) => `{ group: ${JSON.stringify(term.group)}, action: ${JSON.stringify(term.action)} }`,
+        );
+        parts.push(`permissions: [${terms.join(", ")}]`);
+      }
+      if (access.residual !== undefined) parts.push(`residual: ${access.residual}`);
+      return `{ ${parts.join(", ")} }`;
+    }
     default:
       return `{ kind: ${JSON.stringify(access.kind)} }`;
   }
@@ -151,12 +161,20 @@ function accessTypes(): string {
  * - \`permission\`: the caller holds \`action\` on \`group\`.
  * - \`authenticated\`: any signed-in caller.
  * - \`public\`: no caller identity at all.
- * - \`expression\`: a SpEL expression nothing on this side evaluates; \`raw\` is it as written.
+ * - \`expression\`: a SpEL expression; \`raw\` is it as written. A flat chain of one \`operator\`
+ *   also carries its \`permissions\` terms, which a client can decide, and \`residual\` when a term
+ *   only the server can decide (a bean call) is left over.
  */
 export type AccessRule =
   | { kind: 'permission'; group: string; action: string }
   | { kind: 'authenticated' }
   | { kind: 'public' }
-  | { kind: 'expression'; raw: string };
+  | {
+      kind: 'expression';
+      raw: string;
+      operator?: 'or' | 'and';
+      permissions?: ReadonlyArray<{ group: string; action: string }>;
+      residual?: boolean;
+    };
 `;
 }

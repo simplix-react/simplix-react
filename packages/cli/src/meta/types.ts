@@ -104,12 +104,30 @@ export interface EnumMeta {
   values: EnumValueMeta[];
 }
 
-/** Structured `@PreAuthorize` so the frontend never parses SpEL. */
+/** One `hasPermission('GROUP', 'action')` term SimpliX Meta found inside an access expression. */
+export interface PermissionTermMeta {
+  group: string;
+  action: string;
+}
+
+/**
+ * Structured `@PreAuthorize` so the frontend never parses SpEL.
+ *
+ * An expression that is a flat chain of one operator also carries that `operator`, the
+ * `permissions` terms in it, and `residual` when another term (a bean call, say) is left for the
+ * server to decide.
+ */
 export type AccessMeta =
   | { kind: "permission"; group: string; action: string }
   | { kind: "authenticated" }
   | { kind: "public" }
-  | { kind: "expression"; raw: string };
+  | {
+      kind: "expression";
+      raw: string;
+      operator?: "or" | "and";
+      permissions?: PermissionTermMeta[];
+      residual?: boolean;
+    };
 
 /** A query or path parameter of an operation. */
 export interface ParamMeta {

@@ -631,6 +631,32 @@ describe("generateAccessFiles states what each operation requires of the caller"
     expect(user.expressions.map((one) => one.operation)).toContain("AdminUserAccountRest_get");
   });
 
+  it("carries the decidable terms of a chain and whether a server-only term is left", () => {
+    const domain = domainOf("user");
+    const operation = domain.operations.find((one) => one.id === "AdminUserAccountRest_get");
+    if (!operation) throw new Error("the fixture has no AdminUserAccountRest_get");
+    const written = operation.access;
+    try {
+      operation.access = {
+        kind: "expression",
+        raw: "hasPermission('USER_ADMIN', 'view') or @userAccountService.hasOwnerPermission('view', #userId, null)",
+        operator: "or",
+        permissions: [{ group: "USER_ADMIN", action: "view" }],
+        residual: true,
+      };
+      const file = fileOf(generateAccessFiles(domain, { naming: simplixBootNaming }).files, "access/userAccount.ts");
+      expect(file).toContain(
+        `operator: "or", permissions: [{ group: "USER_ADMIN", action: "view" }], residual: true }`,
+      );
+      operation.access = { kind: "expression", raw: "hasPermission('A', 'edit') or hasPermission('B', 'edit')", operator: "or", permissions: [{ group: "A", action: "edit" }, { group: "B", action: "edit" }], residual: false };
+      expect(fileOf(generateAccessFiles(domain, { naming: simplixBootNaming }).files, "access/userAccount.ts")).toContain(
+        `permissions: [{ group: "A", action: "edit" }, { group: "B", action: "edit" }], residual: false }`,
+      );
+    } finally {
+      operation.access = written;
+    }
+  });
+
   it("tallies the kinds the document states and the kinds the domains reach", () => {
     const document: Record<AccessMeta["kind"], number> = {
       permission: 0,
