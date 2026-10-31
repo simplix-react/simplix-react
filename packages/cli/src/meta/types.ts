@@ -160,6 +160,8 @@ export interface EntityHolderMeta {
 export interface EntityMeta {
   javaClass?: string;
   idField?: string;
+  /** The field a record is named by on a screen, as the entity declares it; absent when it declares none. */
+  nameField?: string;
   labelKey?: string;
   pluralKey?: string;
   /** Locale → the entity's name, singular. */

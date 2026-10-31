@@ -12,7 +12,7 @@ import type { ContainerMapping } from "../openapi/orchestration/spec-profile.js"
 import { registerSpecProfile } from "../openapi/plugin-registry.js";
 import { entityNameOf } from "../meta/generation/endpoint-gen.js";
 import { resolveMeta, type ResolvedDomain } from "../meta/resolve.js";
-import { buildMetaScaffoldSource, type MetaScaffoldSource } from "../meta/scaffold-source.js";
+import { buildMetaScaffoldSource, withNameField, type MetaScaffoldSource } from "../meta/scaffold-source.js";
 import { smartSafetyDomains } from "../meta/__fixtures__/smart-safety-domains.js";
 import { pathExists } from "../utils/fs.js";
 
@@ -555,6 +555,40 @@ function columnOf(list: string, field: string): string {
   const end = list.indexOf("/>", at);
   return list.slice(at, end);
 }
+
+describe("the field an entity declares as its name", () => {
+  const holidayRow = () => sourceOf("system", "common.main.system.Holiday");
+  const declaring = (nameField: string): DtoMeta => ({
+    ...meta,
+    entities: { Holiday: { nameField } },
+  });
+
+  it("is the screen's record name ahead of the guess from field names", () => {
+    const source = holidayRow();
+    expect(source.displayNameField).toBe("holidayName");
+    expect(source.rowFields?.some((one) => one.name === "siteId")).toBe(true);
+
+    withNameField(declaring("siteId"), "Holiday", source);
+    expect(source.displayNameField).toBe("siteId");
+  });
+
+  it("leaves the guess alone where the entity declares none", () => {
+    const source = holidayRow();
+    withNameField(meta, "Holiday", source);
+    withNameField({ ...meta, entities: { Holiday: {} } }, "Holiday", source);
+    withNameField(declaring("siteId"), "SomeOtherEntity", source);
+    expect(source.displayNameField).toBe("holidayName");
+  });
+
+  it("leaves the guess alone where the list row does not draw the declared field", () => {
+    const source = holidayRow();
+    // `statuteBasis` is on the detail record only, so a delete confirmation reading it from a row
+    // would name every record `undefined`.
+    expect(source.rowFields?.some((one) => one.name === "statuteBasis")).toBe(false);
+    withNameField(declaring("statuteBasis"), "Holiday", source);
+    expect(source.displayNameField).toBe("holidayName");
+  });
+});
 
 /** Guards the entity-name rule the whole lookup rests on: a tag's last segment, initial lowered. */
 describe("an entity is its tag's last segment", () => {

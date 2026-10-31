@@ -74,7 +74,7 @@ export interface MetaScaffoldSource {
   rowIdField: string;
   /** The collection the entity's routes hang off, which is what a cache invalidation names. */
   entityPath: string;
-  /** The field a record is named by on a screen. */
+  /** The field a record is named by on a screen: the one its entity declares as `nameField`, else inferred from the field names. */
   displayNameField?: string;
   /** The field a reorder writes, as the reorder's own body declares it. */
   orderField?: string;
@@ -151,6 +151,7 @@ export async function loadMetaScaffoldSource(
       const entityName = tag.split(".").pop() ?? tag;
       source.relationFields = relationFieldsOf(document, entityName, source);
       withReferenceKeys(document, source);
+      withNameField(document, entityName, source);
       const plural = document.entities?.[entityName]?.plural;
       if (plural) source.plural = plural;
       return source;
@@ -158,6 +159,18 @@ export async function loadMetaScaffoldSource(
   }
 
   return null;
+}
+
+/**
+ * Names the record by the field its entity declares, ahead of the guess `buildMetaScaffoldSource`
+ * makes from the field names. A declared field the list row does not draw is not used: a delete
+ * confirmation reading it would name every record `undefined`, and the guess still names them.
+ */
+export function withNameField(document: DtoMeta, entityName: string, source: MetaScaffoldSource): void {
+  const declared = document.entities?.[entityName]?.nameField;
+  if (declared === undefined) return;
+  const drawn = source.rowFields ?? source.fields;
+  if (drawn.some((one) => one.name === declared)) source.displayNameField = declared;
 }
 
 /**
@@ -231,6 +244,7 @@ export async function loadMetaHolders(rootDir: string, entity: string): Promise<
         if (tag === undefined) continue;
         const source = buildMetaScaffoldSource({ domain, tag, naming });
         withReferenceKeys(document, source);
+        withNameField(document, holder.entity, source);
         source.relationFields = relationFieldsOf(document, holder.entity, source);
         out.push({ entity: entityNameOf(tag), field: holder.field, operator, source });
         break;
