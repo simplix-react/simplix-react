@@ -55,13 +55,10 @@ describe("i18nCodegenCommand watch mode", () => {
     // Fire and forget — the watcher never resolves
     void i18nCodegenCommand.parseAsync(["node", "simplix", "--watch"]);
 
-    // Give it a moment to enter watch mode
-    await new Promise((r) => setTimeout(r, 100));
-
-    // The watch mode logs "Watching for i18n file changes..."
-    expect(consoleSpy).toHaveBeenCalledWith(
-      expect.stringContaining("Watching"),
-    );
+    // The command generates every module first and only then logs "Watching for i18n file
+    // changes...", so the test waits for the log rather than for a fixed time a loaded machine
+    // can outrun.
+    await vi.waitFor(() => expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("Watching")), { timeout: 5000, interval: 20 });
 
     consoleSpy.mockRestore();
 
