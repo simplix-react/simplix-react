@@ -71,6 +71,7 @@ import {
   crudListEmptyCellStyle,
   crudListRowStyle,
   crudListGroupRowStyle,
+  crudListCardGroupStyle,
   crudListGroupCellStyle,
   crudListPageSizeStyle,
   crudListGroupCountStyle,
@@ -146,7 +147,7 @@ function EmptyReasonCard({ reason, bordered = true }: { reason: Exclude<EmptyRea
   const { t } = useTranslation("simplix/ui");
   const config = emptyReasonConfig[reason];
   return (
-    <div className="flex min-h-[280px] flex-col items-center justify-center" {...slotAttributes(crudListReasonStyle, { bordered })}>
+    <div className="flex min-h-70 flex-col items-center justify-center" {...slotAttributes(crudListReasonStyle, { bordered })}>
       <div className="[&_svg]:size-8" {...slotAttributes(crudListReasonIconStyle, { tone: config.tone })}>
         {config.icon}
       </div>
@@ -592,8 +593,9 @@ export interface ListTableProps<T> {
    * member of a band sorted away from the rest, which is the usual case rather than the odd one.
    *
    * Grouping is a property of the page in front of the reader: it applies to the rows this page
-   * holds, and says nothing about the ones on the next. It does not apply in card mode, where
-   * the rows are no longer a table.
+   * holds, and says nothing about the ones on the next. Cards draw the same headings above each
+   * group, so a list narrowed to cards keeps its bands. A reorderable list draws none, since its
+   * order is one sequence across every group.
    */
   groupBy?: ListGroupConfig<T>;
   className?: string;
@@ -837,13 +839,13 @@ function ReorderableTable<T>({
 
   if (emptyReason && data.length === 0) {
     if (emptyReason === "no-data" && emptyState) {
-      return <EmptyState className="min-h-[280px]" {...emptyState} />;
+      return <EmptyState className="min-h-70" {...emptyState} />;
     }
     if (emptyReason !== "no-data") {
       return <EmptyReasonCard reason={emptyReason} />;
     }
     return (
-      <div className="flex min-h-[280px] items-center justify-center" {...slotAttributes(crudListEmptyMessageStyle, {})}>
+      <div className="flex min-h-70 items-center justify-center" {...slotAttributes(crudListEmptyMessageStyle, {})}>
         {emptyMessages[emptyReason]}
       </div>
     );
@@ -975,13 +977,13 @@ function ReorderableCardList<T>({
 
   if (emptyReason && data.length === 0) {
     if (emptyReason === "no-data" && emptyState) {
-      return <EmptyState className="min-h-[280px]" {...emptyState} />;
+      return <EmptyState className="min-h-70" {...emptyState} />;
     }
     if (emptyReason !== "no-data") {
       return <EmptyReasonCard reason={emptyReason} />;
     }
     return (
-      <div className="flex min-h-[280px] items-center justify-center" {...slotAttributes(crudListEmptyMessageStyle, {})}>
+      <div className="flex min-h-70 items-center justify-center" {...slotAttributes(crudListEmptyMessageStyle, {})}>
         {emptyMessages[emptyReason]}
       </div>
     );
@@ -1278,7 +1280,8 @@ function ListTable<T>({
             <>
               {label}
               <span aria-hidden="true" {...slotAttributes(crudListRequiredMarkStyle, {})}>
-                *
+                {/* U+2060 keeps the mark on its label's last line. */}
+                {"⁠*"}
               </span>
             </>
           ) : (
@@ -1471,7 +1474,7 @@ function ListTable<T>({
     if (emptyReason === "no-data" && emptyState) {
       return (
         <div ref={containerRef} className="w-full">
-          <EmptyState className="min-h-[280px]" {...emptyState} />
+          <EmptyState className="min-h-70" {...emptyState} />
         </div>
       );
     }
@@ -1543,7 +1546,8 @@ function ListTable<T>({
                 ))
               : emptyReason && data.length === 0
                 ? <div className="flex h-24 items-center justify-center" {...slotAttributes(crudListCardEmptyStyle, {})}>{emptyMessages[emptyReason]}</div>
-              : data.map((row, index) => {
+              : (() => {
+                  const drawCard = (row: T, index: number) => {
                   const rid = rowId?.(row) ?? String(index);
                   const isSelected = selectedIndices?.has(index);
                   const isActive = activeRowId != null && rid === activeRowId;
@@ -1560,9 +1564,10 @@ function ListTable<T>({
                       data-testid={`list-row-${rid}`}
                     >
                       {cardTitle && (
-                        <Flex align="center" justify="between" {...partAttributes(crudListCardHeaderStyle, {})}>
+                        <Flex align="center" justify="between" wrap gap="xs" {...partAttributes(crudListCardHeaderStyle, {})}>
                           <div className="min-w-0 flex-1">{createElement(cardTitle, { row, index })}</div>
-                          <Flex gap="xs" align="center" className="shrink-0" {...rowClickIgnoreProps} {...partAttributes(crudCardActionsStyle, {})}>
+                          {/* Wraps under the title rather than past the card's edge when labelled actions outgrow the row. */}
+                          <Flex gap="xs" align="center" wrap justify="end" className="ml-auto min-w-0 max-w-full" {...rowClickIgnoreProps} {...partAttributes(crudCardActionsStyle, {})}>
                             {slots?.rowActions
                               ? slots.rowActions({ row })
                               : actions && actions.length > 0 && (
@@ -1587,7 +1592,29 @@ function ListTable<T>({
                       )}
                     </div>
                   );
-                })}
+                  };
+                  // Cards group under the same headings the table draws, so a narrow list keeps
+                  // the bands a wide one shows.
+                  const modelRows = table.getRowModel().rows;
+                  const grouped = groupRows(modelRows, groupBy);
+                  if (!grouped) return data.map(drawCard);
+                  return grouped.map((group) => (
+                    <Fragment key={group.key ?? "\u0000ungrouped"}>
+                      {group.label !== null && group.label !== undefined && (
+                        <div
+                          role="heading"
+                          aria-level={3}
+                          data-testid={`list-group-${group.key ?? "ungrouped"}`}
+                          {...partAttributes(crudListCardGroupStyle, {})}
+                        >
+                          {group.label}
+                          <span data-count={group.rows.length} {...slotAttributes(crudListGroupCountStyle, {})} />
+                        </div>
+                      )}
+                      {group.rows.map((row) => drawCard(row.original, row.index))}
+                    </Fragment>
+                  ));
+                })()}
           </Stack>
         </div>
       ) : (
@@ -1821,7 +1848,7 @@ function ListPagination({
         value={String(pageSize)}
         onValueChange={(v) => onPageSizeChange(Number(v))}
       >
-        <SelectTrigger size="xs" className="w-[64px]" aria-label={t("list.pageSize")} {...partAttributes(crudListPageSizeStyle, {})}>
+        <SelectTrigger size="xs" className="w-16" aria-label={t("list.pageSize")} {...partAttributes(crudListPageSizeStyle, {})}>
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

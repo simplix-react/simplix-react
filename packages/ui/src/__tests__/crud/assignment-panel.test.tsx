@@ -103,7 +103,7 @@ describe("AssignmentPanel", () => {
         <div>Body</div>
       </AssignmentPanel>,
     );
-    expect(container.querySelector("[data-slot='crud-assignment-panel-required']")?.textContent).toBe("*");
+    expect(container.querySelector("[data-slot='crud-assignment-panel-required']")?.textContent).toBe("\u2060*");
   });
 });
 
@@ -224,7 +224,7 @@ describe("AssignmentPanel.Table", () => {
       </AssignmentPanel>,
     );
     const mark = container.querySelector("th [data-slot='crud-list-required-mark']");
-    expect(mark?.textContent).toBe("*");
+    expect(mark?.textContent).toBe("\u2060*");
   });
 
   it("leaves an unmarked column header without the marker", () => {

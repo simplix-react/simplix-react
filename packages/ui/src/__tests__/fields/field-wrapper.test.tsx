@@ -66,14 +66,14 @@ describe("FieldWrapper", () => {
         input
       </FieldWrapper>,
     );
-    const asterisk = screen.getByText("*");
+    const asterisk = screen.getByText("\u2060*");
     expect(asterisk).toBeDefined();
     expect(asterisk.getAttribute("aria-hidden")).toBe("true");
   });
 
   it("does not show asterisk when required=false", () => {
     render(<FieldWrapper label="Email">input</FieldWrapper>);
-    expect(screen.queryByText("*")).toBeNull();
+    expect(screen.queryByText("\u2060*")).toBeNull();
   });
 
   // ── Error message ──

@@ -115,7 +115,8 @@ function AssignmentPanelRoot({ title, count, required, action, children }: Assig
             {title}
             {required && (
               <span aria-hidden="true" {...slotAttributes(crudAssignmentPanelRequiredStyle, {})}>
-                *
+                {/* U+2060 keeps the mark on its label's last line. */}
+                {"\u2060*"}
               </span>
             )}
           </Text>

@@ -37,6 +37,7 @@ import {
   crudFilterBarPopoverHeaderStyle,
   crudFilterBarRangeTextStyle,
   crudFilterBarSegmentStyle,
+  crudFilterBarTriggerLabelStyle,
   crudFilterBarToggleFieldStyle,
   crudFilterBarToggleLeaderStyle,
   crudFilterBarTrailingStyle,
@@ -568,7 +569,7 @@ export function FilterBar({ filters, state, leading, trailing, maxBadges, onPrev
               {...slotAttributes(crudFilterBarTriggerStyle, { active: hasActiveFilters })}
             >
               <FunnelIcon className="h-3.5 w-3.5" />
-              <span>{t("filter.label")}</span>
+              <span {...slotAttributes(crudFilterBarTriggerLabelStyle, {})}>{t("filter.label")}</span>
               {hasActiveFilters && (
                 <Badge className="h-4 min-w-[1rem] justify-center">
                   {activeDefs.length}
@@ -580,7 +581,7 @@ export function FilterBar({ filters, state, leading, trailing, maxBadges, onPrev
             flush
             className={cn(
               "flex max-h-[min(70vh,var(--radix-popover-content-available-height,70vh))] flex-col",
-              columnCount === 3 ? "w-[800px]" : twoColumn ? "w-[560px]" : "w-[320px]",
+              columnCount === 3 ? "w-200" : twoColumn ? "w-140" : "w-80",
             )}
             align="end"
             collisionPadding={16}
@@ -650,6 +651,7 @@ export function FilterBar({ filters, state, leading, trailing, maxBadges, onPrev
               <button
                 type="button"
                 aria-label={t("list.toggleColumns")}
+                title={t("list.toggleColumns")}
                 className="inline-grid h-full w-7 place-items-center [&_svg]:size-3.5"
                 {...slotAttributes(crudFilterBarColumnsButtonStyle, {})}
               >
@@ -954,7 +956,7 @@ function FacetedFormField({
         className="h-8"
         {...(serverSearch ? { value: query, onValueChange: setQuery } : {})}
       />
-      <CommandList className="max-h-[160px]">
+      <CommandList className="max-h-40">
         {def.loading ? (
           <div
             className="flex items-center justify-center"

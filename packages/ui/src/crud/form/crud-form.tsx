@@ -66,6 +66,12 @@ export interface CrudFormProps {
   variant?: "panel" | "page";
   fieldVariant?: FieldVariant;
   warnOnUnsavedChanges?: boolean;
+  /**
+   * Turns off the browser's own constraint check (`noValidate`) for a form that validates its
+   * values itself. Without it the browser stops the submit on a `required` field with its own
+   * bubble, in the browser's language and style, before the form's handler can mark the field.
+   */
+  noValidate?: boolean;
   className?: string;
   children?: ReactNode;
 }
@@ -79,6 +85,7 @@ function FormRoot({
   variant = "panel",
   fieldVariant,
   warnOnUnsavedChanges,
+  noValidate,
   className,
   children,
 }: CrudFormProps) {
@@ -104,7 +111,7 @@ function FormRoot({
   );
 
   const content = (
-    <form onSubmit={handleSubmit} className={cn("flex flex-col w-full", !isPage && "flex-1 min-h-0", className)} data-testid="crud-form" data-submitting={isSubmitting || undefined}>
+    <form onSubmit={handleSubmit} noValidate={noValidate} className={cn("flex flex-col w-full", !isPage && "flex-1 min-h-0", className)} data-testid="crud-form" data-submitting={isSubmitting || undefined}>
       {(onClose || header) && (
         <Flex data-crud-slot="header" justify={header ? "between" : "end"} align="center" className="shrink-0" {...partAttributes(crudFormHeaderStyle, { page: isPage, scrolled: edges.above })}>
           {header}

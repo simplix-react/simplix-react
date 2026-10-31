@@ -79,7 +79,7 @@ export const crudFilterBarViewButtonStyle = defineSlotStyle({
  */
 export const crudFilterBarTriggerStyle = defineSlotStyle({
   slot: "crud-filter-bar-trigger",
-  base: "gap-1.5 rounded px-2 text-sm transition-colors hover:bg-muted [&>[data-slot=badge]]:rounded-full [&>[data-slot=badge]]:bg-primary [&>[data-slot=badge]]:px-1 [&>[data-slot=badge]]:text-[10px] [&>[data-slot=badge]]:font-bold [&>[data-slot=badge]]:leading-none [&>[data-slot=badge]]:text-primary-foreground",
+  base: "gap-1.5 rounded px-2 text-sm transition-colors hover:bg-muted [&>[data-slot=badge]]:rounded-full [&>[data-slot=badge]]:bg-primary [&>[data-slot=badge]]:px-1 [&>[data-slot=badge]]:text-(length:--fs-2xs) [&>[data-slot=badge]]:font-bold [&>[data-slot=badge]]:leading-none [&>[data-slot=badge]]:text-primary-foreground",
   variants: {
     active: {
       true: "text-primary",
@@ -122,6 +122,17 @@ export const crudFilterBarFieldsStyle = defineSlotStyle({
 export const crudFilterBarColumnStyle = defineSlotStyle({
   slot: "crud-filter-bar-column",
   base: "[&>*+*]:mt-4",
+  variants: {},
+  defaultVariants: {},
+});
+
+/**
+ * The filter trigger's word. A design that draws the trigger icon-only hides it from sight and
+ * keeps the trigger's accessible name and tooltip.
+ */
+export const crudFilterBarTriggerLabelStyle = defineSlotStyle({
+  slot: "crud-filter-bar-trigger-label",
+  base: "",
   variants: {},
   defaultVariants: {},
 });

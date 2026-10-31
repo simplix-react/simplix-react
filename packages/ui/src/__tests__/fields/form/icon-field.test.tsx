@@ -91,7 +91,7 @@ describe("IconField", () => {
         iconsList={stubIconsList}
       />
     );
-    expect(screen.getByText("*")).toBeDefined();
+    expect(screen.getByText("\u2060*")).toBeDefined();
   });
 
   it("TC-IF-5: description prop renders description text", () => {

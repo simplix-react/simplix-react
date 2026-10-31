@@ -76,9 +76,11 @@ export function EmptyState({
           {icon}
         </div>
       )}
-      <p {...slotAttributes(emptyStateTitleStyle, { size })}>{title}</p>
+      {/* `break-keep`: a centred sentence that wraps inside a Korean word reads as two words, and
+          the narrow widths where it wraps at all are where it happens. Latin text is unaffected. */}
+      <p className="break-keep" {...slotAttributes(emptyStateTitleStyle, { size })}>{title}</p>
       {description && (
-        <p className="w-full" {...slotAttributes(emptyStateDescriptionStyle, { size })}>{description}</p>
+        <p className="w-full break-keep" {...slotAttributes(emptyStateDescriptionStyle, { size })}>{description}</p>
       )}
       {action && <div {...slotAttributes(emptyStateActionStyle, { size })}>{action}</div>}
       {footer && (

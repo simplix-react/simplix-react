@@ -141,7 +141,8 @@ export function FieldWrapper({
       {label}
       {required && (
         <span aria-hidden="true" {...slotAttributes(fieldRequiredStyle, {})}>
-          *
+          {/* U+2060 keeps the mark on its label's last line. */}
+          {"\u2060*"}
         </span>
       )}
     </Label>

@@ -268,7 +268,7 @@ export const crudListRowStyle = defineSlotStyle({
   variants: {
     selected: { true: "bg-muted", false: "" },
     // The open record: tinted, with the accent rule at its start.
-    active: { true: "bg-muted/50 shadow-[inset_2px_0_0_var(--primary)]", false: "" },
+    active: { true: "bg-muted/50 shadow-[var(--shadow-row-mark)]", false: "" },
     // The row the keyboard stands on (j / k); Enter opens it and x selects it.
     focused: { true: "shadow-[inset_0_0_0_1.5px_var(--ring)]", false: "" },
   },
@@ -289,6 +289,15 @@ export const crudListGroupCellStyle = defineSlotStyle({
   slot: "crud-list-group-cell",
   as: "part",
   base: "bg-muted/40 py-1 text-xs font-semibold text-muted-foreground",
+  variants: {},
+  defaultVariants: {},
+});
+
+/** A group heading between cards, drawn where the table draws its group row. */
+export const crudListCardGroupStyle = defineSlotStyle({
+  slot: "crud-list-card-group",
+  as: "part",
+  base: "px-1 pt-2 pb-0.5 text-xs font-semibold text-muted-foreground first:pt-0",
   variants: {},
   defaultVariants: {},
 });
@@ -347,7 +356,7 @@ export const crudListSearchIconStyle = defineSlotStyle({
 /** The key that moves the focus into the search field, drawn at its end. */
 export const crudListSearchKeyStyle = defineSlotStyle({
   slot: "crud-list-search-key",
-  base: "inline-grid h-[18px] min-w-[18px] place-items-center rounded-sm border bg-muted px-1 font-sans text-[11px] leading-none text-muted-foreground",
+  base: "inline-grid h-[18px] min-w-[18px] place-items-center rounded-sm border bg-muted px-1 font-sans text-(length:--fs-label) leading-none text-muted-foreground",
   variants: {},
   defaultVariants: {},
 });
