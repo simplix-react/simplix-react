@@ -258,4 +258,15 @@ describe("generated files under a project formatter", () => {
     expect(merged).toContain("export const c = 4;");
     expect(await generatedReport(root)).toEqual([expect.objectContaining({ state: "edited", merge: "current" })]);
   });
+
+  it("merges an edited file whose stamp line differs from its base's without a conflict", async () => {
+    const edited = (await readFile(pagePath(), "utf-8"))
+      .replace(/@simplix-render [0-9a-f]{12}/, "@simplix-render 000000000000")
+      .replace("export const c = 3;", "export const c = 4;");
+    await writeFile(pagePath(), edited);
+    await setTemplate("v2");
+    const { writes } = await regenerateAll(root);
+    expect(writes.find((w) => w.path === pagePath())?.outcome).toBe("merged");
+    expect(await readFile(pagePath(), "utf-8")).toContain("return 'v2';");
+  });
 });

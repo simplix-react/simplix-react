@@ -5,7 +5,7 @@ import { join, relative, resolve, sep } from "node:path";
 import { promisify } from "node:util";
 
 import { findProjectRoot, noteKeptRender, pathExists, writeFileWithDir } from "./fs.js";
-import { GENERATED_HASH_MARKER, isUntouchedRender, renderFingerprint } from "./project-templates.js";
+import { carryStamp, GENERATED_HASH_MARKER, isUntouchedRender, renderFingerprint } from "./project-templates.js";
 
 const run = promisify(execFile);
 
@@ -190,7 +190,9 @@ export async function writeStampedGenerated(filePath: string, stamped: string): 
     note({ outcome: "no-base" });
     return { outcome: "no-base", held: ours };
   }
-  const { text, hunks } = await mergeThreeWay(base, ours, stamped);
+  // The stamp line names the render a file was read against and is not content: every side takes
+  // the fresh render's, so a fingerprint that moved never collides with one an edit carried.
+  const { text, hunks } = await mergeThreeWay(carryStamp(base, stamped), carryStamp(ours, stamped), stamped);
   if (hunks.length > 0) {
     if (conflictMarkers) {
       await writeFileWithDir(filePath, text);
@@ -200,7 +202,7 @@ export async function writeStampedGenerated(filePath: string, stamped: string): 
     return { outcome: "conflict", held: conflictMarkers ? text : ours };
   }
   await recordBase(filePath, stamped);
-  if (text === ours) {
+  if (text === ours || text === carryStamp(ours, stamped)) {
     note({ outcome: "current" });
     return { outcome: "current", held: ours };
   }
