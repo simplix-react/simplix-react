@@ -1,7 +1,6 @@
 import { stat } from "node:fs/promises";
 import { resolve } from "node:path";
 
-import { log } from "../utils/logger.js";
 import type { SimplixConfig } from "./types.js";
 
 /**
@@ -92,20 +91,4 @@ export async function findOutputDirProblems(rootDir: string, config: SimplixConf
 export async function assertOutputDirs(rootDir: string, config: SimplixConfig): Promise<void> {
   const problems = await findOutputDirProblems(rootDir, config);
   if (problems.length > 0) throw new OutputDirError(problems);
-}
-
-/**
- * Wraps a command action so an {@link OutputDirError} prints its message and fails the run with a
- * non-zero exit code instead of surfacing as an unhandled rejection with a stack.
- */
-export function reportOutputDirError<A extends unknown[]>(run: (...args: A) => Promise<void>): (...args: A) => Promise<void> {
-  return async (...args: A) => {
-    try {
-      await run(...args);
-    } catch (err) {
-      if (!(err instanceof OutputDirError)) throw err;
-      log.error(err.message);
-      process.exitCode = 1;
-    }
-  };
 }

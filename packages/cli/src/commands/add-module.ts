@@ -7,6 +7,7 @@ import { log } from "../utils/logger.js";
 import { toPascalCase } from "../utils/case.js";
 import { renderTemplate } from "../utils/template.js";
 import { loadConfig } from "../config/config-loader.js";
+import { reportConfigError } from "../config/report-config-error.js";
 import { withVersions } from "../versions.js";
 import { ModulePathError, parseModulePath, type ModulePath } from "../utils/module-path.js";
 import {
@@ -28,7 +29,7 @@ export const addModuleCommand = new Command("add-module")
   .argument("<name>", "Module name (e.g., editor, maps, monitoring)")
   .option("--no-i18n", "Skip i18n locales setup")
   .option("-y, --yes", "Accept all defaults (non-interactive)")
-  .action(async (name: string, flags: Record<string, unknown>) => {
+  .action(reportConfigError(async (name: string, flags: Record<string, unknown>) => {
     const rootDir = await findProjectRoot(process.cwd());
     const rootPkg = await readJsonFile<{ name: string }>(
       join(rootDir, "package.json"),
@@ -153,4 +154,4 @@ export const addModuleCommand = new Command("add-module")
       log.error(String(err));
       process.exit(1);
     }
-  });
+  }));

@@ -1,5 +1,6 @@
 import { Command } from "commander";
 import { loadConfig } from "../config/config-loader.js";
+import { reportConfigError } from "../config/report-config-error.js";
 import { findModulePaths } from "../utils/module-path.js";
 import { join, basename, dirname } from "node:path";
 import { readdir, readFile, writeFile, watch } from "node:fs/promises";
@@ -10,7 +11,7 @@ import pc from "picocolors";
 export const i18nCodegenCommand = new Command("i18n-codegen")
   .description("Generate TypeScript types from i18n JSON files")
   .option("--watch", "Watch for file changes", false)
-  .action(async (flags: { watch: boolean }) => {
+  .action(reportConfigError(async (flags: { watch: boolean }) => {
     const rootDir = await findProjectRoot(process.cwd());
     const modulesDir = join(rootDir, "modules");
 
@@ -44,7 +45,7 @@ export const i18nCodegenCommand = new Command("i18n-codegen")
         });
       }
     }
-  });
+  }));
 
 async function generateAll(modulesDir: string): Promise<number> {
   const localeDirs = await discoverLocaleDirs(modulesDir);

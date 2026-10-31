@@ -8,6 +8,7 @@ import { log } from "../utils/logger.js";
 import { toPascalCase } from "../utils/case.js";
 import { renderTemplate } from "../utils/template.js";
 import { loadConfig } from "../config/config-loader.js";
+import { reportConfigError } from "../config/report-config-error.js";
 import { findSpecBySource } from "../config/types.js";
 import type { OpenAPIMetaConfig, OpenAPISpecConfig, SimplixConfig } from "../config/types.js";
 import { loadOpenAPISpec, isSpecUrl } from "../openapi/pipeline/parser.js";
@@ -105,7 +106,7 @@ export const openapiCommand = new Command("openapi")
   .option("--no-http", "Skip .http file generation")
   .option("--offline", "Read SimpliX Meta from meta.snapshot instead of the server")
   .option("-y, --yes", "Auto-confirm without prompts")
-  .action(async (specSource: string, flags: OpenAPIFlags) => {
+  .action(reportConfigError(async (specSource: string, flags: OpenAPIFlags) => {
     const rootDir = await findProjectRoot(process.cwd());
 
     // 1. Validate project root
@@ -280,7 +281,7 @@ export const openapiCommand = new Command("openapi")
     if (meta && (await writeMetaSnapshot(meta, flags.offline === true))) {
       log.step(`DTO meta snapshot: ${relative(process.cwd(), meta.snapshotPath!)}`);
     }
-  });
+  }));
 
 /**
  * Write the SimpliX Meta a live run fetched to the configured `meta.snapshot`, which is what

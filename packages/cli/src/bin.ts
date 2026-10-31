@@ -19,6 +19,7 @@ import { kitFenceCommand } from "./commands/kit-fence.js";
 import { frameworkVersion } from "./versions.js";
 import { findProjectRoot, pathExists } from "./utils/fs.js";
 import { loadConfig } from "./config/config-loader.js";
+import { failOnConfigError } from "./config/report-config-error.js";
 
 // ── Load extension plugins ──
 // Plugins register spec profiles and schema adapters needed for correct code generation.
@@ -66,7 +67,14 @@ async function loadConfiguredPlugins(): Promise<void> {
   }
 }
 
-await loadConfiguredPlugins();
+// A config file that exists but cannot be loaded ends the run here, before any command runs on
+// settings the project did not choose. A project with no config file loads the defaults.
+try {
+  await loadConfiguredPlugins();
+} catch (err) {
+  if (!failOnConfigError(err)) throw err;
+  process.exit(1);
+}
 
 const program = new Command();
 

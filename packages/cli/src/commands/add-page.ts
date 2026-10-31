@@ -4,7 +4,8 @@ import { resolveModuleNamespace, resolveModuleOption } from "./scaffold-crud.js"
 import { join, relative, resolve } from "node:path";
 
 import { loadConfig } from "../config/config-loader.js";
-import { assertOutputDirs, reportOutputDirError } from "../config/output-dirs.js";
+import { assertOutputDirs } from "../config/output-dirs.js";
+import { reportConfigError } from "../config/report-config-error.js";
 import {
   dashboardPageTemplate,
   errorPageTemplate,
@@ -18,7 +19,6 @@ import { log } from "../utils/logger.js";
 import { GENERATED_PAGE_MARKER, loadProjectTemplates, stampFingerprint, templateFor, writeGenerated, type ProjectTemplates } from "../utils/project-templates.js";
 import { renderTemplate } from "../utils/template.js";
 import { writeStampedGenerated } from "../utils/generated-merge.js";
-import { readFile } from "node:fs/promises";
 
 /** The page kinds `add-page` generates, each the name of the template that draws it. */
 export const PAGE_KINDS = ["record-page", "dashboard-page", "static-page", "error-page", "auth-page", "app-shell"] as const;
@@ -83,7 +83,7 @@ export const addPageCommand = new Command("add-page")
   .argument("<name>", "Page name (e.g. my-profile, home, not-found)")
   .option("--module <name>", "Module that owns the page (modules/<name>/src/pages/<page>); a grouped module is <group>/<name>")
   .option("--app <name>", "App that owns the page (apps/<name>/src/pages/<page>)")
-  .action(reportOutputDirError(runAddPage));
+  .action(reportConfigError(runAddPage));
 
 /**
  * Generates one page of a kind: the body of `simplix add-page <kind> <name>`.

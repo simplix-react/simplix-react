@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { readFile } from "node:fs/promises";
 
 import { loadConfig } from "../config/config-loader.js";
+import { reportConfigError } from "../config/report-config-error.js";
 import {
   findProjectRoot,
   pathExists,
@@ -82,7 +83,7 @@ export const addAppCommand = new Command("add-app")
   .argument("<name>", "App name (e.g., visitor-kiosk)")
   .option("--native", "Generate an Expo (React Native) app with expo-router")
   .option("-y, --yes", "Accept all defaults (non-interactive)")
-  .action(async (name: string, flags: Record<string, unknown>) => {
+  .action(reportConfigError(async (name: string, flags: Record<string, unknown>) => {
     if (!flags.native) {
       log.error(
         "add-app currently generates native apps only. Use --native, or `simplix init` for the web app shell.",
@@ -169,4 +170,4 @@ export const addAppCommand = new Command("add-app")
       log.error(error instanceof Error ? error.message : String(error));
       process.exit(1);
     }
-  });
+  }));

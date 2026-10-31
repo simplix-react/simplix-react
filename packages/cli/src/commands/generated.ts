@@ -3,7 +3,8 @@ import { readFile, readdir, realpath } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
 
 import { loadConfig } from "../config/config-loader.js";
-import { assertOutputDirs, reportOutputDirError } from "../config/output-dirs.js";
+import { assertOutputDirs } from "../config/output-dirs.js";
+import { reportConfigError } from "../config/report-config-error.js";
 import { captureWrites, findProjectRoot, lastKeptRenders } from "../utils/fs.js";
 import { log, withSilentLog } from "../utils/logger.js";
 import { takeGeneratedOutcomes, withConflictMarkers, type GeneratedWrite } from "../utils/generated-merge.js";
@@ -109,6 +110,7 @@ export interface GeneratedFiles {
 /**
  * Reads every generated file under the project root and the configured story directory.
  *
+ * @throws {ConfigLoadError} when `simplix.config.ts` exists but cannot be loaded
  * @throws {OutputDirError} when the configured story directory is not an existing directory
  */
 export async function collectGenerated(projectRoot: string): Promise<GeneratedFiles> {
@@ -228,7 +230,7 @@ export const generatedCommand = new Command("generated")
     "Record the current render of an edited file as its merge base, after printing the diff between the two, so every difference is read as a customisation; a file with no origin gets one when it can be inferred",
   )
   .option("-y, --yes", "With --adopt, record without asking once the diffs are printed (a run with no terminal needs it)")
-  .action(reportOutputDirError(async (flags: { all?: boolean; writeConflicts?: boolean; check?: boolean; json?: boolean; share?: boolean; adopt?: string[]; yes?: boolean }) => {
+  .action(reportConfigError(async (flags: { all?: boolean; writeConflicts?: boolean; check?: boolean; json?: boolean; share?: boolean; adopt?: string[]; yes?: boolean }) => {
     const callerDir = process.cwd();
     const rootDir = await findProjectRoot(process.cwd());
     if (resolve(process.cwd()) !== rootDir) process.chdir(rootDir);

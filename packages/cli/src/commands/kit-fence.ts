@@ -3,6 +3,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 import { loadConfig } from "../config/config-loader.js";
+import { reportConfigError } from "../config/report-config-error.js";
 import { findProjectRoot } from "../utils/fs.js";
 import { log } from "../utils/logger.js";
 import { resolveKitPackageDir } from "../utils/project-templates.js";
@@ -72,7 +73,7 @@ export const kitFenceCommand = new Command("kit-fence")
   .description("Check that the lint config refuses exactly the framework imports the UI kit fences (simplix.fence)")
   .option("--lint <file>", "The lint config holding the fence", ".oxlintrc.json")
   .option("--write", "Write the kit's fence into the lint config instead of checking it")
-  .action(async (flags: { lint: string; write?: boolean }) => {
+  .action(reportConfigError(async (flags: { lint: string; write?: boolean }) => {
     const rootDir = await findProjectRoot(process.cwd());
     const config = await loadConfig(rootDir);
     const kit = config.templates?.from;
@@ -100,4 +101,4 @@ export const kitFenceCommand = new Command("kit-fence")
     for (const d of differences) log.error(d);
     log.error(`${flags.lint} disagrees with ${kit}'s simplix.fence; run \`simplix kit-fence --write\``);
     process.exitCode = 1;
-  });
+  }));

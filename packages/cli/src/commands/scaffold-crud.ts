@@ -7,7 +7,8 @@ import ora from "ora";
 
 import { findCrudConfigForEntity } from "../config/crud-config-loader.js";
 import { loadConfig } from "../config/config-loader.js";
-import { assertOutputDirs, reportOutputDirError } from "../config/output-dirs.js";
+import { assertOutputDirs } from "../config/output-dirs.js";
+import { reportConfigError } from "../config/report-config-error.js";
 import {
   crudPageTemplate,
   hubPageTemplate,
@@ -1903,7 +1904,7 @@ export const scaffoldCrudCommand = new Command("scaffold")
     "--app <dir>",
     "Target Expo app under apps/ for route files (with --native)",
   )
-  .action(reportOutputDirError(runScaffold));
+  .action(reportConfigError(runScaffold));
 
 /** The options `simplix scaffold` takes. */
 export interface ScaffoldOptions {

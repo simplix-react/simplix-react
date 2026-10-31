@@ -7,6 +7,7 @@ import { log } from "../utils/logger.js";
 import { toPascalCase } from "../utils/case.js";
 import { renderTemplate } from "../utils/template.js";
 import { loadConfig } from "../config/config-loader.js";
+import { reportConfigError } from "../config/report-config-error.js";
 import { withVersions } from "../versions.js";
 import { isSpecUrl } from "../openapi/pipeline/parser.js";
 import { findSpecForDomain } from "../config/types.js";
@@ -33,7 +34,7 @@ export const addDomainCommand = new Command("add-domain")
   .argument("<name>", "Domain name (e.g., inventory, topology)")
   .option("--no-i18n", "Skip i18n translations setup")
   .option("-y, --yes", "Accept all defaults (non-interactive)")
-  .action(async (name: string, flags: Record<string, unknown>) => {
+  .action(reportConfigError(async (name: string, flags: Record<string, unknown>) => {
     const rootDir = await findProjectRoot(process.cwd());
     const rootPkg = await readJsonFile<{ name: string }>(
       join(rootDir, "package.json"),
@@ -279,4 +280,4 @@ export const addDomainCommand = new Command("add-domain")
       log.error(String(err));
       process.exit(1);
     }
-  });
+  }));

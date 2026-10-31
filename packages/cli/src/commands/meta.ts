@@ -8,6 +8,7 @@
 import { join } from "node:path";
 import { Command } from "commander";
 import { loadConfig } from "../config/config-loader.js";
+import { reportConfigError } from "../config/report-config-error.js";
 import {
   crudRolesFromHooks,
   generateCrudConfigContent,
@@ -42,7 +43,7 @@ export const metaCommand = new Command("meta")
   .option("--offline", "Read SimpliX Meta from meta.snapshot instead of the server")
   .option("-f, --force", "Rewrite crud.config.ts even where one already exists")
   .option("--strict", "Exit non-zero, generating nothing, when a tag in SimpliX Meta is claimed by no domain")
-  .action(async (flags: MetaFlags) => {
+  .action(reportConfigError(async (flags: MetaFlags) => {
     const rootDir = await findProjectRoot(process.cwd());
     if (!rootDir) {
       log.error("No simplix.config.ts found. Run this from inside a SimpliX project.");
@@ -173,4 +174,4 @@ export const metaCommand = new Command("meta")
       log.info(`SimpliX Meta snapshot read: ${meta.snapshotPath}`);
     }
     log.info(`Generated ${generated} domain package(s) from SimpliX Meta.`);
-  });
+  }));

@@ -1,5 +1,6 @@
 import { Command } from "commander";
 import { loadConfig } from "../config/config-loader.js";
+import { reportConfigError } from "../config/report-config-error.js";
 import { findModulePaths } from "../utils/module-path.js";
 import { join, relative } from "node:path";
 import { readdir } from "node:fs/promises";
@@ -27,7 +28,7 @@ export interface ValidationResult {
 export const validateCommand = new Command("validate")
   .description("Validate project structure, FSD rules, imports, and i18n")
   .option("--fix", "Auto-fix issues where possible", false)
-  .action(async (flags: { fix: boolean }) => {
+  .action(reportConfigError(async (flags: { fix: boolean }) => {
     const rootDir = await findProjectRoot(process.cwd());
 
     if (!(await pathExists(join(rootDir, "package.json")))) {
@@ -151,7 +152,7 @@ export const validateCommand = new Command("validate")
     if (totalErrors > 0) {
       process.exit(1);
     }
-  });
+  }));
 
 async function discoverDirs(parentDir: string): Promise<string[]> {
   if (!(await pathExists(parentDir))) return [];
