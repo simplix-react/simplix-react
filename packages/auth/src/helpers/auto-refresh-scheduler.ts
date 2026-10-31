@@ -5,8 +5,8 @@ export interface AutoRefreshSchedulerOptions {
   refreshBeforeExpirySeconds?: number;
   /** Minimum interval between refreshes in seconds. Defaults to `30`. */
   minIntervalSeconds?: number;
-  /** Called when a scheduled refresh fails. */
-  onRefreshFailed?: () => void;
+  /** Called when a scheduled refresh fails, with what the refresh threw. */
+  onRefreshFailed?: (error: unknown) => void;
 }
 
 /**
@@ -65,8 +65,8 @@ export class AutoRefreshScheduler {
         this.lastRefreshAt = Date.now();
         await refreshFn();
         this.schedule(refreshFn, getExpiresAt);
-      } catch {
-        this.options.onRefreshFailed?.();
+      } catch (error) {
+        this.options.onRefreshFailed?.(error);
       }
     }, delay);
   }

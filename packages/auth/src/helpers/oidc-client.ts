@@ -172,7 +172,9 @@ export function createOidcClient(options: OidcClientOptions): OidcClient {
       body,
     });
     if (!response.ok) {
-      throw new AuthError(code, `OIDC token request refused: ${response.status}`);
+      throw new AuthError(code, `OIDC token request refused: ${response.status}`, {
+        issuerError: await issuerErrorOf(response),
+      });
     }
     return toTokens((await response.json()) as TokenResponse);
   }
@@ -257,4 +259,23 @@ export function createOidcClient(options: OidcClientOptions): OidcClient {
       return url.toString();
     },
   };
+}
+
+/**
+ * The `error` and `error_description` of a refused token request, so a caller can tell one
+ * refusal from another - an ended session and a disabled account are both `invalid_grant`, and
+ * only the description separates them.
+ */
+async function issuerErrorOf(response: Response): Promise<{ error: string; description?: string } | undefined> {
+  try {
+    const body = (await response.json()) as { error?: unknown; error_description?: unknown };
+    if (typeof body.error !== "string") return undefined;
+    return {
+      error: body.error,
+      description: typeof body.error_description === "string" ? body.error_description : undefined,
+    };
+  } catch (unreadable) {
+    if (unreadable instanceof SyntaxError) return undefined;
+    throw unreadable;
+  }
 }

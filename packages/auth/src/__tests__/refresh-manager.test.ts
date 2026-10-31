@@ -132,4 +132,15 @@ describe("RefreshManager", () => {
 
     expect(refreshFn).toHaveBeenCalledOnce();
   });
+
+  it("keeps the issuer's refusal on the error it throws", async () => {
+    const refused = new AuthError("REFRESH_FAILED", "refused", {
+      issuerError: { error: "invalid_grant", description: "User disabled" },
+    });
+    const manager = new RefreshManager([createMockScheme({ refresh: vi.fn().mockRejectedValue(refused) })]);
+    await expect(manager.refresh()).rejects.toMatchObject({
+      issuerError: { error: "invalid_grant", description: "User disabled" },
+      cause: refused,
+    });
+  });
 });

@@ -54,8 +54,14 @@ export class RefreshManager {
       }
     }
 
+    // The issuer's refusal is kept on the error the caller receives, not only inside its cause:
+    // it is what tells an ended session from a disabled account.
+    const refused = errors.find(
+      (error): error is AuthError => error instanceof AuthError && error.issuerError !== undefined,
+    );
     throw new AuthError("REFRESH_FAILED", "All refresh attempts failed", {
       cause: errors[0],
+      issuerError: refused?.issuerError,
     });
   }
 }

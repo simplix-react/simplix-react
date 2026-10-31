@@ -40,6 +40,12 @@ describe("createOidcClient", () => {
         if (body.get("grant_type") === "refresh_token" && body.get("refresh_token") === "dead") {
           return json({ error: "invalid_grant" }, 400);
         }
+        if (body.get("grant_type") === "refresh_token" && body.get("refresh_token") === "disabled") {
+          return json({ error: "invalid_grant", error_description: "User disabled" }, 400);
+        }
+        if (body.get("grant_type") === "refresh_token" && body.get("refresh_token") === "html") {
+          return new Response("<html>bad gateway</html>", { status: 502 });
+        }
         return json({ access_token: "access", refresh_token: "refresh", id_token: "id", expires_in: 300 });
       }
       return json({}, 404);
@@ -119,6 +125,20 @@ describe("createOidcClient", () => {
     const oidc = client();
     await expect(oidc.refresh("good")).resolves.toMatchObject({ accessToken: "access" });
     await expect(oidc.refresh("dead")).rejects.toMatchObject({ code: "REFRESH_FAILED" });
+  });
+
+  it("keeps the issuer's error and description on a refused refresh", async () => {
+    const oidc = client();
+    await expect(oidc.refresh("disabled")).rejects.toMatchObject({
+      code: "REFRESH_FAILED",
+      issuerError: { error: "invalid_grant", description: "User disabled" },
+    });
+    await expect(oidc.refresh("dead")).rejects.toMatchObject({
+      issuerError: { error: "invalid_grant", description: undefined },
+    });
+    // A refusal with no OAuth body, such as a proxy's error page, carries no issuer error.
+    const proxied = await oidc.refresh("html").catch((error: unknown) => error);
+    expect(proxied).toMatchObject({ code: "REFRESH_FAILED", issuerError: undefined });
   });
 
   it("builds the sign-out address with the ID token and the return address", async () => {

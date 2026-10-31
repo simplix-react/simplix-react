@@ -201,12 +201,15 @@ describe("AutoRefreshScheduler", () => {
         onRefreshFailed,
       });
 
-      const refreshFn = vi.fn().mockRejectedValue(new Error("network error"));
+      const failure = new Error("network error");
+      const refreshFn = vi.fn().mockRejectedValue(failure);
       const expiresAt = Date.now() + 30 * 1000;
       scheduler.start(refreshFn, () => expiresAt);
 
       await vi.advanceTimersByTimeAsync(0);
       expect(onRefreshFailed).toHaveBeenCalledOnce();
+      // What the refresh threw, so the caller can read why it was refused.
+      expect(onRefreshFailed).toHaveBeenCalledWith(failure);
     });
 
     it("stops scheduling after refresh failure", async () => {

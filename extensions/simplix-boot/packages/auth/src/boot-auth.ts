@@ -147,8 +147,12 @@ export function createBootAuth(options: BootAuthOptions = {}): BootAuthResult {
       refreshBeforeExpiry: options.refreshBeforeExpiry ?? 60,
       autoSchedule: options.autoSchedule ?? true,
       minIntervalSeconds: 30,
-      onScheduledRefreshFailed: () =>
-        onRefreshFailure(new Error("Scheduled token refresh failed")),
+      // The refresh's own error goes on, so a caller can read why it was refused - an issuer's
+      // answer rides on it - rather than a message saying only that it was.
+      onScheduledRefreshFailed: (error) =>
+        onRefreshFailure(
+          error instanceof Error ? error : new Error("Scheduled token refresh failed", { cause: error }),
+        ),
     },
   });
 

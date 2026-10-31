@@ -169,7 +169,7 @@ export interface BearerSchemeOptions {
     minIntervalSeconds?: number;
 
     /** Called when a scheduled background refresh fails. */
-    onScheduledRefreshFailed?: () => void;
+    onScheduledRefreshFailed?: (error: unknown) => void;
   };
 }
 

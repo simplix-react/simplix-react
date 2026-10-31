@@ -295,10 +295,21 @@ describe("createBootAuth", () => {
 
     const schemeArgs = vi.mocked(bearerScheme).mock.calls[0][0];
     const mockScheme = vi.mocked(bearerScheme).mock.results[0].value;
-    schemeArgs.refresh!.onScheduledRefreshFailed!();
+    schemeArgs.refresh!.onScheduledRefreshFailed!(undefined);
 
     expect(mockScheme.clear).toHaveBeenCalled();
     expect(onRefreshFailure).toHaveBeenCalledWith(expect.any(Error));
+  });
+
+  it("hands the scheduled refresh's own error to onRefreshFailure", () => {
+    const onRefreshFailure = vi.fn();
+    createBootAuth({ onRefreshFailure });
+
+    const schemeArgs = vi.mocked(bearerScheme).mock.calls.at(-1)![0];
+    const refused = new Error("refused");
+    schemeArgs.refresh!.onScheduledRefreshFailed!(refused);
+
+    expect(onRefreshFailure).toHaveBeenCalledWith(refused);
   });
 
   it("onRefreshFailure clears scheme and calls user callback", () => {
