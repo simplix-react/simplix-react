@@ -3,6 +3,7 @@ import { renderHook } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 
 import { adaptOrvalList } from "../adapt-orval-list";
+import { SEARCHABLE_KEYWORD_PARAM } from "../build-searchable-params";
 
 function createMockOrvalHook(responseData: unknown) {
   return vi.fn().mockReturnValue({
@@ -93,6 +94,20 @@ describe("adaptOrvalList", () => {
     expect(callArgs["name.contains"]).toBeUndefined();
     expect(callArgs["role.in"]).toBeUndefined();
     expect(callArgs["tags.in"]).toBeUndefined();
+  });
+
+  it("sends the search text under the searchKey it is given", () => {
+    const useApiHook = createMockOrvalHook({ content: [], totalElements: 0 });
+    const useAdapted = adaptOrvalList(useApiHook, { searchKey: SEARCHABLE_KEYWORD_PARAM });
+
+    renderHook(() =>
+      useAdapted({ pagination: { type: "offset", page: 1, limit: 10 }, filters: { _search: "  kim ", "status.equals": "active" } }),
+    );
+
+    const callArgs = useApiHook.mock.calls[0][0];
+    expect(callArgs.keyword).toBe("kim");
+    expect(callArgs["status.equals"]).toBe("active");
+    expect(callArgs._search).toBeUndefined();
   });
 
   it("passes default staleTime and gcTime query options", () => {

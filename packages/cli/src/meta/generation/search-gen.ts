@@ -2,6 +2,8 @@ import type { FilterFieldInfo } from "../../commands/scaffold-crud.js";
 import type { OpenApiNamingStrategy } from "../../openapi/naming/naming-strategy.js";
 import {
   deriveFilterFields,
+  hasKeywordSearch,
+  KEYWORD_PARAM,
   readSearchFields,
   searchOperatorOf,
   SEARCH_OPERATORS,
@@ -205,6 +207,8 @@ export interface SearchField {
   labelKey?: string;
   /** The enum's values, in declaration order, when \`kind\` is \`enum\`. */
   options?: string[];
+  /** Present when the route's keyword search matches this field. */
+  keyword?: true;
 }
 
 /** One filter control, and the parameter it writes. */
@@ -255,7 +259,14 @@ class SearchEmitter {
       members.push(this.ownParam(param, imports, route.target.operation.id));
     }
 
-    for (const field of this.searchableFields(route.searchDto)) {
+    const searchable = this.searchableFields(route.searchDto);
+    if (hasKeywordSearch(searchable)) {
+      members.push(
+        `  ${jsDoc("Free text matched by containment against every keyword field, any of which may hold it.")}\n  ${KEYWORD_PARAM}?: string;`,
+      );
+    }
+
+    for (const field of searchable) {
       for (const name of field.searchable?.operators ?? []) {
         // An operator the framework has no member for is reported by the metadata pass over the
         // same fields; here it is simply not a parameter the client can build.
@@ -430,6 +441,7 @@ function searchFieldLiteral(field: SearchField): string {
   if (field.options) {
     parts.push(`options: [${field.options.map((one) => JSON.stringify(one)).join(", ")}]`);
   }
+  if (field.keyword) parts.push("keyword: true");
   return `  { ${parts.join(", ")} },`;
 }
 

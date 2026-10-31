@@ -17,7 +17,7 @@ import { isSpecUrl } from "../openapi/pipeline/parser.js";
 import { getSpecProfile } from "../openapi/plugin-registry.js";
 import { pathExists } from "../utils/fs.js";
 import { fetchMeta } from "./fetch.js";
-import { deriveFilterFields, readSearchFields } from "./filter-source.js";
+import { deriveFilterFields, hasKeywordSearch, readSearchFields } from "./filter-source.js";
 import { innermostRef, payloadOf, refNameOf } from "./generation/emit.js";
 import {
   entityNameOf,
@@ -81,6 +81,8 @@ export interface MetaScaffoldSource {
   updatePathParam?: string;
   deletePathParam?: string;
   filters: FilterFieldInfo[];
+  /** Whether the list route takes a keyword search, which is what the list's search box sends. */
+  keywordSearch: boolean;
   /** Roles SimpliX Meta states that no generated screen reaches, reported rather than generated. */
   unreachableRoles: string[];
 }
@@ -264,6 +266,7 @@ export function buildMetaScaffoldSource(
     rowIdField,
     entityPath: basePathOf(targets),
     filters: searchDto ? filtersOf(domain, searchDto) : [],
+    keywordSearch: searchDto ? hasKeywordSearch(domain.types.get(searchDto)?.allFields ?? []) : false,
     unreachableRoles: UNREACHABLE_ROLES.filter((role) => roles[role] !== undefined),
   };
 

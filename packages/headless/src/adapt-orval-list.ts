@@ -32,6 +32,8 @@ export interface AdaptOrvalListOptions {
    *  Use this to convert generic filter formats to backend-specific formats
    *  (e.g., searchable-jpa BETWEEN operator, date format conversion). */
   transformFilters?: (filters: Record<string, unknown>) => Record<string, unknown>;
+  /** The `field.operator` key the list's free text is sent under; see `buildSearchableParams`. */
+  searchKey?: string;
 }
 
 /**
@@ -69,6 +71,7 @@ export function adaptOrvalList<T>(
   return (params?: Record<string, unknown>): ListHookResult<T> => {
     const apiParams = buildSearchableParams(params as SearchableListParams | undefined, {
       transformFilters: options?.transformFilters,
+      searchKey: options?.searchKey,
     });
 
     const query = useApiHook(apiParams, { query: queryOpts });

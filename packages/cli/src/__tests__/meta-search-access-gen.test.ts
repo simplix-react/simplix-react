@@ -378,6 +378,34 @@ describe("a searchable route's params are its filters, its own query and the pag
   });
 });
 
+describe("a route's keyword search is stated only where its search DTO marks keyword fields", () => {
+  /** The fixture with `orgName` marked as a keyword field on every search DTO that declares it. */
+  function withKeywordOrgName(): ResolvedDomain {
+    const copy: DtoMeta = structuredClone(meta);
+    for (const [name, type] of Object.entries(copy.types)) {
+      if (!name.endsWith("SearchDTO")) continue;
+      for (const field of type.fields ?? []) {
+        if (field.name === "orgName" && field.searchable) field.searchable.keyword = true;
+      }
+    }
+    const domain = resolveMeta(copy, { domains: smartSafetyDomains, containerTypes }).domains.get("org");
+    if (!domain) throw new Error("the fixture has no domain named org");
+    return domain;
+  }
+
+  it("declares no keyword parameter on a route without keyword fields", () => {
+    const params = fileOf(orgSearch.files, "model/listOrganizationsParams.ts");
+    expect(membersOf(params)).not.toContain("keyword");
+    expect(fileOf(orgSearch.files, "search/organization.ts")).not.toContain("keyword: true");
+  });
+
+  it("declares the keyword parameter and marks the field where the DTO opts it in", () => {
+    const files = generateSearchFiles(withKeywordOrgName(), { naming: simplixBootNaming }).files;
+    expect(fileOf(files, "model/listOrganizationsParams.ts")).toContain("  keyword?: string;");
+    expect(fileOf(files, "search/organization.ts")).toMatch(/name: "orgName"[^}]*keyword: true/);
+  });
+});
+
 describe("a filter's control comes from the field's type, which SimpliX Meta states", () => {
   it("does not open a facet on a field with nothing to put in it", () => {
     // Rule 2c of the OpenAPI path makes any field with an `.in` parameter a faceted filter and

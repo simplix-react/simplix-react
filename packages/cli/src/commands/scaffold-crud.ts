@@ -2421,6 +2421,9 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       filters: nonTextFilters,
       contractFilters: contractFiltersOf(nonTextFilters, [...fields, ...(metaSource?.detailFields ?? [])]),
       hasFilters: filterFields.length > 0,
+      // The list's search box sends its text as the keyword search, which only a route whose
+      // search DTO marks keyword fields accepts; any other route answers it with a parse error.
+      hasKeywordSearch: metaSource?.keywordSearch ?? false,
       filterBarDefs,
       textFilterFields,
       hasTextFilters: textFilterFields.length > 0,

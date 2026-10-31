@@ -6,7 +6,7 @@ export type { ResolveEmptyReasonInput } from "./resolve-empty-reason";
 export type { CrudMutation } from "./crud-mutation";
 
 // ── Searchable param serialization ──
-export { buildSearchableParams } from "./build-searchable-params";
+export { buildSearchableParams, SEARCHABLE_KEYWORD_PARAM } from "./build-searchable-params";
 export type { SearchableListParams, BuildSearchableParamsOptions } from "./build-searchable-params";
 
 // ── Orval adapters ──

@@ -109,6 +109,19 @@ export interface SearchField {
   labelKey?: string;
   /** The enum's values, in declaration order, when {@link kind} is `enum`. */
   options?: string[];
+  /** Present when the route's keyword search matches this field. */
+  keyword?: true;
+}
+
+/**
+ * The query parameter searchable-jpa reads the keyword search from. It carries no operator suffix,
+ * and a route accepts it only when its search DTO marks a field `keyword = true`.
+ */
+export const KEYWORD_PARAM = "keyword";
+
+/** Whether a search DTO's fields give its route a keyword search. */
+export function hasKeywordSearch(fields: readonly FieldMeta[]): boolean {
+  return fields.some((field) => field.searchable?.keyword === true);
 }
 
 /** An operator searchable-jpa supports that the framework enum has no member for. */
@@ -157,6 +170,7 @@ export function readSearchFields(
       sortable: field.searchable.sortable,
     };
     if (field.labelKey !== undefined) one.labelKey = field.labelKey;
+    if (field.searchable.keyword === true) one.keyword = true;
     const options = field.type.kind === "enum" ? enumValues(field.type.name) : undefined;
     if (options) one.options = options;
     read.push(one);

@@ -56,6 +56,8 @@ export interface SearchableMeta {
   sortField?: string;
   /** Locale → the field the list is ordered by when this one is sorted in that language. */
   sortAlias?: Record<string, string>;
+  /** Whether the route's keyword search matches this field; absent when it does not. */
+  keyword?: boolean;
 }
 
 /** One serialized property of a DTO. `name` is the wire name after Jackson. */

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildSearchableParams } from "../build-searchable-params";
+import { buildSearchableParams, SEARCHABLE_KEYWORD_PARAM } from "../build-searchable-params";
 
 describe("buildSearchableParams", () => {
   it("sends a sort when the state names a field and a direction", () => {
@@ -27,5 +27,46 @@ describe("buildSearchableParams", () => {
 
   it("sends no sort when there is no sort state at all", () => {
     expect(buildSearchableParams({}).sort).toBeUndefined();
+  });
+
+  describe("free text", () => {
+    it("is dropped when no searchKey is given, since the server refuses a key without an operator", () => {
+      const params = buildSearchableParams({ filters: { _search: "kim" } });
+      expect(params).toEqual({});
+    });
+
+    it("goes out trimmed under the searchKey", () => {
+      const params = buildSearchableParams({ filters: { _search: " kim " } }, { searchKey: SEARCHABLE_KEYWORD_PARAM });
+      expect(params).toEqual({ keyword: "kim" });
+    });
+
+    it("is not sent when it is blank", () => {
+      const params = buildSearchableParams({ filters: { _search: "   " } }, { searchKey: SEARCHABLE_KEYWORD_PARAM });
+      expect(params).toEqual({});
+    });
+
+    it("sits beside the committed filters", () => {
+      const params = buildSearchableParams(
+        { filters: { _search: "kim", "status.in": ["ACTIVE"] } },
+        { searchKey: SEARCHABLE_KEYWORD_PARAM },
+      );
+      expect(params).toEqual({ keyword: "kim", "status.in": ["ACTIVE"] });
+    });
+
+    it("yields to a filter the reader committed on the same key", () => {
+      const params = buildSearchableParams(
+        { filters: { _search: "kim", "username.contains": "lee" } },
+        { searchKey: "username.contains" },
+      );
+      expect(params).toEqual({ "username.contains": "lee" });
+    });
+
+    it("survives a transformFilters that does not pass _search through", () => {
+      const params = buildSearchableParams(
+        { filters: { _search: "kim", "a.equals": "1" } },
+        { searchKey: SEARCHABLE_KEYWORD_PARAM, transformFilters: ({ _search, ...rest }) => rest },
+      );
+      expect(params).toEqual({ keyword: "kim", "a.equals": "1" });
+    });
   });
 });
