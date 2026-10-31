@@ -322,6 +322,31 @@ describe("CrudList.Column minTableWidth", () => {
     expect(screen.queryByText("alice@example.test")).toBeNull();
   });
 
+  it("drops a tier whose drawn table is wider than its container, below the declared threshold too", () => {
+    // jsdom lays nothing out, so the table reports the width its columns would need: 900px, over a
+    // declared threshold of 800 in a 850px container. The column must go, not scroll sideways.
+    mockContainerWidth = 850;
+    const rect = vi.spyOn(HTMLTableElement.prototype, "getBoundingClientRect").mockReturnValue({ width: 900 } as DOMRect);
+    try {
+      render(withWidths());
+      expect(screen.getByText("Name")).toBeTruthy();
+      expect(screen.queryByText("Email")).toBeNull();
+    } finally {
+      rect.mockRestore();
+    }
+  });
+
+  it("keeps the tier when the drawn table fits its container", () => {
+    mockContainerWidth = 850;
+    const rect = vi.spyOn(HTMLTableElement.prototype, "getBoundingClientRect").mockReturnValue({ width: 840 } as DOMRect);
+    try {
+      render(withWidths());
+      expect(screen.getByText("Email")).toBeTruthy();
+    } finally {
+      rect.mockRestore();
+    }
+  });
+
   it("draws everything while the table is still unmeasured", () => {
     // 0 is 「the observer has not answered yet」, not 「a table of no width」. Reading it as the
     // latter would blank every optional column on the first paint of every list.

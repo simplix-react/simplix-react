@@ -8,7 +8,7 @@ import {
   useReactTable,
   type VisibilityState,
 } from "@tanstack/react-table";
-import {createElement, Fragment, type ReactNode, type Ref, useCallback, useEffect, useMemo, useRef, useState,} from "react";
+import {createElement, Fragment, type ReactNode, type Ref, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState,} from "react";
 
 import {
   type BadgeVariants,
@@ -447,6 +447,13 @@ export interface ListColumnProps<T> {
    * `cardTitle` / `cardContent`, where there are no columns to drop; this decides what the table
    * holds while it is still a table. The two thresholds are read against the same measurement, so
    * a `minTableWidth` below `cardBreakpoint` can never fire.
+   *
+   * <p><b>The number is a floor and an order, not the whole answer.</b> Columns sharing one value
+   * are dropped together, and a larger value is dropped first. The width a set really needs depends
+   * on cell padding, the row-action column and the header labels, none of which the declaring
+   * screen can see, so the list measures the drawn table: when it is wider than its container, the
+   * tier with the largest value is raised to the measured width and drops. A threshold below what
+   * its columns need therefore never draws a table that scrolls sideways.
    */
   minTableWidth?: number;
   display?: "badge" | "boolean" | "country" | "phone";
@@ -1149,11 +1156,17 @@ function ListTable<T>({
 
   const columnCtx = useCrudListColumns();
 
+  // What each column tier and the card breakpoint were measured to need, keyed by the declared
+  // `minTableWidth` (`"card"` for the breakpoint). It only grows, so a column dropped for want of
+  // room comes back only once the container holds the width it was measured at, never earlier.
+  const [measuredNeed, setMeasuredNeed] = useState<Readonly<Record<string, number>>>({});
+  const effectiveCardBreakpoint = cardBreakpoint ? Math.max(cardBreakpoint, measuredNeed.card ?? 0) : cardBreakpoint;
+
   const responsiveCardMode = !!(
-    cardBreakpoint &&
+    effectiveCardBreakpoint &&
     hasCard &&
     containerWidth > 0 &&
-    containerWidth < cardBreakpoint
+    containerWidth < effectiveCardBreakpoint
   );
   const manualGrid = !!(gridView && hasCard && columnCtx?.viewMode === "grid");
   const isCardMode = manualGrid || responsiveCardMode;
@@ -1185,10 +1198,30 @@ function ListTable<T>({
   const columnDefs = useMemo(
     () =>
       declaredColumnDefs.filter(
-        (d) => d.minTableWidth == null || containerWidth === 0 || containerWidth >= d.minTableWidth,
+        (d) =>
+          d.minTableWidth == null ||
+          containerWidth === 0 ||
+          containerWidth >= Math.max(d.minTableWidth, measuredNeed[String(d.minTableWidth)] ?? 0),
       ),
-    [declaredColumnDefs, containerWidth],
+    [declaredColumnDefs, containerWidth, measuredNeed],
   );
+
+  // A drawn table wider than its container means the declared thresholds were too low for the set
+  // on screen: the widest tier still drawn learns the measured width and drops on the next render.
+  // With no tier left to drop, the card breakpoint learns it instead. Skipped while the reader has
+  // resized a column, because a table they widened on purpose is meant to scroll.
+  const hasReaderWidths = Object.keys(columnWidths).length > 0;
+  useLayoutEffect(() => {
+    if (isCardMode || hasReaderWidths || containerWidth === 0) return;
+    const table = containerRef.current?.querySelector("table");
+    if (!table) return;
+    const need = Math.ceil(table.getBoundingClientRect().width);
+    if (need <= containerWidth + 1) return;
+    const tiers = columnDefs.map((d) => d.minTableWidth).filter((w): w is number => w != null);
+    const key = tiers.length > 0 ? String(Math.max(...tiers)) : hasCard && cardBreakpoint ? "card" : null;
+    if (key === null || (measuredNeed[key] ?? 0) >= need) return;
+    setMeasuredNeed((current) => ({ ...current, [key]: need }));
+  });
 
   // Register columns to context for FilterBar's Columns dropdown
   const derivedColumns = useMemo(
