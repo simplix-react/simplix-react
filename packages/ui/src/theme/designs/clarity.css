@@ -191,7 +191,7 @@
     @apply text-secondary-foreground bg-[var(--surface-2)];
   }
   [data-slot="button"][data-variant="link"][data-s-button] {
-    @apply underline-offset-4 bg-[var(--primary-soft)] text-primary no-underline;
+    @apply underline-offset-4 bg-[var(--primary-soft)] text-[var(--primary-text)] no-underline;
   }
   [data-slot="button"][data-tone="muted"][data-s-button] {
     @apply text-muted-foreground;

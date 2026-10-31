@@ -16,7 +16,9 @@ export const listSlots: Record<string, string> = {
     "button variant=destructive": "bg-[var(--destructive)] text-white hover:bg-[color-mix(in_oklch,var(--destructive),black_8%)]",
     "button variant=outline": "border-[var(--border-strong)] bg-card shadow-[var(--shadow-1)] hover:bg-[var(--surface-2)] hover:text-foreground",
     "button variant=ghost": `text-secondary-foreground hover:text-foreground ${NEUTRAL_FILL}`,
-    "button variant=link": "bg-[var(--primary-soft)] text-primary no-underline hover:bg-[color-mix(in_oklch,var(--primary-soft),var(--primary)_10%)] hover:no-underline",
+    // A link sits on the primary soft ground, where the primary itself falls under 4.5:1, so its
+    // label takes the primary's text shade.
+    "button variant=link": "bg-[var(--primary-soft)] text-[var(--primary-text)] no-underline hover:bg-[color-mix(in_oklch,var(--primary-soft),var(--primary)_10%)] hover:no-underline",
     "button size=link": "h-auto rounded-[var(--radius-control)] px-1.5 py-0.5 text-xs",
     "button size=default": "h-(--h-btn) px-3",
     "button size=sm": "h-(--h-btn-sm) px-2.5 text-(length:--fs-control) leading-(--lh-control)",
