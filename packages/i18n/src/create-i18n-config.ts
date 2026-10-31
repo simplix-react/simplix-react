@@ -134,19 +134,23 @@ export function createI18nConfig(
   const loadModuleTranslations = async (
     mod: ModuleTranslations,
   ): Promise<void> => {
-    for (const locale of mod.locales) {
-      const translations = await mod.load(locale);
-      for (const [componentPath, data] of Object.entries(translations)) {
-        const namespace = `${mod.namespace}/${componentPath}`;
-        adapter.addResources(locale, namespace, data);
-      }
-    }
+    // Every locale at once: each load is a round of dynamic imports, and awaiting them in turn
+    // makes the first render wait for the sum of their latencies rather than the longest one.
+    await Promise.all(
+      mod.locales.map(async (locale) => {
+        const translations = await mod.load(locale);
+        for (const [componentPath, data] of Object.entries(translations)) {
+          const namespace = `${mod.namespace}/${componentPath}`;
+          adapter.addResources(locale, namespace, data);
+        }
+      }),
+    );
   };
 
   const loadDomainTranslations = async (
     config: DomainTranslationConfig,
   ): Promise<void> => {
-    for (const [locale, loader] of Object.entries(config.locales)) {
+    await Promise.all(Object.entries(config.locales).map(async ([locale, loader]) => {
       const mod = await loader();
       const json =
         (mod as Record<string, unknown>).default ?? (mod as unknown);
@@ -167,7 +171,7 @@ export function createI18nConfig(
           );
         }
       }
-    }
+    }));
   };
 
   const i18nReady = (async () => {
@@ -209,18 +213,21 @@ export function createI18nConfig(
       ...getModuleTranslationRegistry().values(),
     ];
 
+    // Started together and awaited together. The first render waits on this promise, and over a
+    // slow link (a dev server reached through a tunnel, a phone on a mobile network) loading the
+    // registry one entry after another held a blank page for as long as the latencies summed to.
+    const pending: Promise<void>[] = [];
     for (const mod of allModuleTranslations) {
       if (loadedModules.has(mod)) continue;
       loadedModules.add(mod);
-      await loadModuleTranslations(mod);
+      pending.push(loadModuleTranslations(mod));
     }
-
-    // Load domain translations from the global registry
     for (const [, config] of getDomainTranslationRegistry()) {
       if (loadedDomains.has(config)) continue;
       loadedDomains.add(config);
-      await loadDomainTranslations(config);
+      pending.push(loadDomainTranslations(config));
     }
+    await Promise.all(pending);
   })();
 
   return { adapter, i18nReady };
