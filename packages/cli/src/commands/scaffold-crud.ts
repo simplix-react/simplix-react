@@ -1,4 +1,5 @@
 import { readFile, readdir } from "node:fs/promises";
+import { storyFileFor } from "../utils/story-file.js";
 import { findModulePaths, moduleDirOf, modulePathOf, ModulePathError, parseModulePath, type ModulePath } from "../utils/module-path.js";
 import { basename, dirname, join, relative, resolve } from "node:path";
 
@@ -2502,7 +2503,7 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     const storyTemplate = projectTemplates.get(STORY_TEMPLATE);
     const storiesDir = projectConfig.templates?.storiesDir;
     if (storyTemplate !== undefined && storiesDir) {
-      const storyPath = resolve(rootDir, storiesDir, `${entityKebab}.stories.tsx`);
+      const storyPath = resolve(rootDir, storiesDir, storyFileFor(projectConfig.templates?.story, entityKebab, `${entityKebab}.stories.tsx`));
       const named = (pattern: string | undefined) => pattern?.replaceAll("{entity}", entityKebab).replaceAll("{Entity}", EntityPascal);
       const storyCtx = { ...fullCtx, storyId: named(projectConfig.templates?.story?.id), storyTitle: named(projectConfig.templates?.story?.title) ?? `Generated/${EntityPascal}` };
       const outcome = await writeGenerated(storyPath, renderTemplate(storyTemplate, storyCtx), origin);

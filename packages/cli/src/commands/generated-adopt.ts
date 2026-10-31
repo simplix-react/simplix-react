@@ -11,6 +11,7 @@ import { readBase, recordBase } from "../utils/generated-merge.js";
 import { GENERATED_PAGE_MARKER, carryStamp, isUntouchedRender, renderOrigin } from "../utils/project-templates.js";
 import { log } from "../utils/logger.js";
 import { pageStoryFile } from "./add-page.js";
+import { storyFileFor, storyKeyFor, type StoryNaming } from "../utils/story-file.js";
 import { collectGenerated, renderOriginNow } from "./generated.js";
 
 const run = promisify(execFile);
@@ -32,7 +33,7 @@ export interface StoryOriginInput {
   /** The generated files that do carry an origin. */
   readonly sources: readonly OriginSource[];
   /** `templates.story` from the project's config: the id and title patterns over `{entity}` and `{Entity}`. */
-  readonly pattern?: { readonly id?: string; readonly title?: string };
+  readonly pattern?: StoryNaming;
 }
 
 /** The origin a story was laid down by, or why it cannot be told. */
@@ -101,6 +102,20 @@ export function inferStoryOrigin(input: StoryOriginInput): InferredOrigin {
   const id = metaValue(input.text, "id");
   const title = metaValue(input.text, "title");
   const entities = new Set<string>();
+  // A file the config maps a scaffold key to is that key's story, whatever id and title the board
+  // gave it: the mapping is how a frame drawn under the board's own name is claimed.
+  const mapped = storyKeyFor(input.pattern, file);
+  if (mapped !== undefined) {
+    for (const source of input.sources) {
+      const words = source.origin.split(/\s+/);
+      if (words[0] === "scaffold" && words[1] === mapped) found.add(source.origin);
+      const page = pageOrigin(source.origin);
+      if (page && pageStoryFile(page.name, page.owner) === `${mapped}.stories.tsx`) found.add(source.origin);
+    }
+    if (found.size === 1) return { origin: [...found][0] };
+    if (found.size > 1) return { manual: `more than one origin fits (${[...found].join("; ")})` };
+    return { manual: `templates.story.files maps "${mapped}" to it, and no generated file carries that origin` };
+  }
   if (input.pattern?.id && id) {
     const entity = patternMatcher(input.pattern.id)(id);
     if (entity) entities.add(entity);
@@ -112,7 +127,8 @@ export function inferStoryOrigin(input: StoryOriginInput): InferredOrigin {
   if (entities.size > 1) return { manual: `the story id and title name different entities (${[...entities].join(", ")})` };
   if (entities.size === 1) {
     const [entity] = entities;
-    if (file !== `${entity}.stories.tsx`) return { manual: `its id or title names "${entity}", but scaffold writes that entity's story to ${entity}.stories.tsx` };
+    const expected = storyFileFor(input.pattern, entity, `${entity}.stories.tsx`);
+    if (file !== expected) return { manual: `its id or title names "${entity}", but scaffold writes that entity's story to ${expected}` };
     for (const source of input.sources) {
       if (source.origin.split(/\s+/).slice(0, 2).join(" ") === `scaffold ${entity}`) found.add(source.origin);
     }
@@ -129,6 +145,16 @@ export function inferStoryOrigin(input: StoryOriginInput): InferredOrigin {
   if (found.size === 1) return { origin: [...found][0] };
   if (found.size > 1) return { manual: `more than one origin fits (${[...found].join("; ")})` };
   return { manual: "its id and title match no templates.story pattern, and no page's story has this file name and title" };
+}
+
+/**
+ * A hand-drawn frame with the render's leading comment, which carries the marker and the stamp,
+ * placed above it. The frame's own text is kept whole beneath.
+ */
+function withRenderHeader(text: string, render: string): string {
+  const end = render.startsWith("/**") ? render.indexOf("*/") : -1;
+  if (end < 0) return text;
+  return `${render.slice(0, end + 2)}\n${text}`;
 }
 
 /** One file's adoption: ready to record, or the reason it was refused. */
@@ -198,7 +224,12 @@ export async function planAdopt(projectRoot: string, files: readonly string[]): 
       continue;
     }
     const text = held.get(file) ?? (await readFile(file, "utf-8"));
-    if (!text.includes(GENERATED_PAGE_MARKER)) {
+    // A frame the board drew by hand carries no marker; one the config maps a scaffold key to is
+    // still that key's story, and adopting it gives it the render's header.
+    const mappedFrame =
+      !text.includes(GENERATED_PAGE_MARKER) && storiesDir !== undefined && dirname(file) === storiesDir &&
+      storyKeyFor(config.templates?.story, basename(file)) !== undefined;
+    if (!text.includes(GENERATED_PAGE_MARKER) && !mappedFrame) {
       refuse(`not a generated file: it carries no ${GENERATED_PAGE_MARKER} marker`);
       continue;
     }
@@ -238,7 +269,7 @@ export async function planAdopt(projectRoot: string, files: readonly string[]): 
       refuse(`"${origin}" does not render this file`, { origin });
       continue;
     }
-    const adopted = carryStamp(text, render);
+    const adopted = mappedFrame ? withRenderHeader(text, render) : carryStamp(text, render);
     items.push({ path, file, origin, inferred, render, adopted, diff: await hunksBetween(render, adopted) });
   }
   return items;

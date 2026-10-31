@@ -18,6 +18,7 @@ import { findProjectRoot, noteKeptRender, pathExists, writeFileWithDir } from ".
 import { log } from "../utils/logger.js";
 import { GENERATED_PAGE_MARKER, loadProjectTemplates, stampFingerprint, templateFor, writeGenerated, type ProjectTemplates } from "../utils/project-templates.js";
 import { renderTemplate } from "../utils/template.js";
+import { storyFileFor } from "../utils/story-file.js";
 import { writeStampedGenerated } from "../utils/generated-merge.js";
 
 /** The page kinds `add-page` generates, each the name of the template that draws it. */
@@ -130,7 +131,8 @@ export async function runAddPage(rawKind: string, name: string, flags: { module?
     const story = renderPageKindStory(kind, name, namespace, templates, flags.app);
     const storiesDir = config.templates?.storiesDir;
     if (story !== undefined && storiesDir) {
-      const storyPath = resolve(rootDir, storiesDir, pageStoryFile(name, flags));
+      const fallback = pageStoryFile(name, flags);
+      const storyPath = resolve(rootDir, storiesDir, storyFileFor(config.templates?.story, fallback.slice(0, -".stories.tsx".length), fallback));
       const outcome = await writeGenerated(storyPath, story, origin);
       log.info(`${outcome} story ${relative(rootDir, storyPath)}`);
     }

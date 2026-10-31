@@ -123,7 +123,18 @@ export interface SimplixConfig {
      * (`{ id: "backoffice-{entity}", title: "Back office/{Entity}" }`). Absent, the story keeps
      * Storybook's title-derived id under `Generated/{Entity}`.
      */
-    story?: { readonly id?: string; readonly title?: string };
+    story?: {
+      readonly id?: string;
+      readonly title?: string;
+      /**
+       * The file a scaffold writes its story to, relative to `storiesDir`, by scaffold key: an
+       * entity's kebab name for `scaffold` (`{ "background-job": "jobs.stories.tsx" }`), a page
+       * story's default file name without `.stories.tsx` for `add-page`. A board that already
+       * draws the screen maps it here, so the generated story is that frame rather than a second
+       * one beside it; `simplix generated --adopt` then records the frame's merge base.
+       */
+      readonly files?: Readonly<Record<string, string>>;
+    };
   };
 
   /**
