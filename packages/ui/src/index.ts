@@ -789,6 +789,8 @@ export {
   configureAttachmentTransport,
   getAttachmentTransport,
 } from "./fields/file-attachment";
+// Saving bytes the client holds (an export, a report) as a file
+export { saveBlob } from "./fields/file-attachment/download-attachment";
 export type { AttachmentTransport } from "./fields/file-attachment";
 
 // App-level config provider (host-injected queries; reserved `filePolicy` key

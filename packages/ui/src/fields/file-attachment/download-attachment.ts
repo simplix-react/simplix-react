@@ -40,6 +40,24 @@ export async function downloadAttachment({
 
   if (!href) return
 
+  saveHref(href, name)
+  if (isObjectUrl) URL.revokeObjectURL(href)
+}
+
+/**
+ * Saves bytes the client already holds (a CSV export, a generated report) to disk under
+ * `fileName`, through the same `<a download>` an attachment uses.
+ */
+export function saveBlob(blob: Blob, fileName: string): void {
+  const href = URL.createObjectURL(blob)
+  try {
+    saveHref(href, fileName)
+  } finally {
+    URL.revokeObjectURL(href)
+  }
+}
+
+function saveHref(href: string, name: string): void {
   const anchor = document.createElement('a')
   anchor.href = href
   anchor.download = name
@@ -47,5 +65,4 @@ export async function downloadAttachment({
   document.body.appendChild(anchor)
   anchor.click()
   anchor.remove()
-  if (isObjectUrl) URL.revokeObjectURL(href)
 }
