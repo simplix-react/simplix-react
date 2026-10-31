@@ -41,7 +41,27 @@ export interface GeneratedWrite {
   readonly markersWritten?: boolean;
 }
 
+/** The project's formatter, run over every render before it is written, recorded or compared. */
+export type GeneratedFormatter = (source: string, filePath: string) => string | Promise<string>;
+
 let outcomes: GeneratedWrite[] = [];
+let formatter: GeneratedFormatter | undefined;
+
+/** Puts the project's formatter in force for every later generated write; undefined removes it. */
+export function setGeneratedFormatter(format: GeneratedFormatter | undefined): void {
+  formatter = format;
+}
+
+/**
+ * Runs the project's formatter over a stamped render and stamps the result with its own
+ * fingerprint, so a file formatted on disk still reads as the untouched render it is.
+ */
+async function formatRender(filePath: string, stamped: string): Promise<string> {
+  if (formatter === undefined) return stamped;
+  const formatted = await formatter(stamped, resolve(filePath));
+  const fingerprint = renderFingerprint(formatted);
+  return formatted.replace(new RegExp(`(${GENERATED_HASH_MARKER}\\s+)[0-9a-f]{12}`), `$1${fingerprint}`);
+}
 let conflictMarkers = false;
 let honourRemovals = false;
 
@@ -144,6 +164,7 @@ export async function mergeThreeWay(base: string, ours: string, theirs: string):
  * @returns the outcome and what the file holds after this call
  */
 export async function writeStampedGenerated(filePath: string, stamped: string): Promise<{ outcome: GeneratedOutcome; held: string }> {
+  stamped = await formatRender(filePath, stamped);
   const note = (entry: Omit<GeneratedWrite, "path">) => outcomes.push({ path: resolve(filePath), ...entry });
   if (!(await pathExists(filePath))) {
     if (honourRemovals && (await readBase(filePath)) !== undefined) {

@@ -46,6 +46,12 @@ describe("generated-state report", () => {
     expect(await readFile(pagePath(), "utf-8")).toMatch(/@simplix-render [0-9a-f]{12} add-page static-page about --app web/);
   });
 
+  it("writes and records the render as the template produced it when no formatter is configured", async () => {
+    const held = await readFile(pagePath(), "utf-8");
+    expect(held).toContain('return "v1";');
+    expect(await readFile(basePath(), "utf-8")).toBe(held);
+  });
+
   it("reports an untouched file as untouched while the template still renders it", async () => {
     expect(await generatedReport(root)).toEqual([
       { path: "apps/web/src/pages/about/page.tsx", state: "untouched", origin: "add-page static-page about --app web" },
@@ -203,5 +209,53 @@ describe("captureWrites", () => {
     const sink = await captureWrites(() => writeFileWithDir(target, "x"));
     expect(sink.get(target)).toBe("x");
     await expect(readFile(target, "utf-8")).rejects.toThrow();
+  });
+});
+
+describe("generated files under a project formatter", () => {
+  let root: string;
+  let cwd: string;
+  const pagePath = () => join(root, "apps/web/src/pages/about/page.tsx");
+  // Three lines apart, so an edit at the end of the file and a template change in the body merge.
+  const template = (body: string) =>
+    `/**\n * @simplix-generated page/static-page\n */\nexport function {{NamePascal}}Page() {\n  return "${body}";\n}\n\nexport const a = 1;\n\nexport const b = 2;\n\nexport const c = 3;\n`;
+  const setTemplate = (body: string) => writeFile(join(root, TEMPLATE_DIR, "static-page.hbs"), template(body));
+
+  beforeEach(async () => {
+    cwd = process.cwd();
+    root = await realpath(await mkdtemp(join(tmpdir(), "simplix-generated-format-")));
+    // A formatter that rewrites double quotes as single ones, the way a project's formatter would
+    // rewrite a template's spelling before the file is committed.
+    await writeFile(
+      join(root, "simplix.config.ts"),
+      "export default { generated: { format: (source: string) => source.replace(/\"/g, \"'\") } };\n",
+    );
+    await mkdir(join(root, TEMPLATE_DIR), { recursive: true });
+    await setTemplate("v1");
+    process.chdir(root);
+    await runAddPage("static", "about", { app: "web" });
+  });
+
+  afterEach(async () => {
+    process.chdir(cwd);
+    await rm(root, { recursive: true, force: true });
+  });
+
+  it("writes and records the formatted render, and reports it untouched", async () => {
+    const held = await readFile(pagePath(), "utf-8");
+    expect(held).toContain("return 'v1';");
+    expect(await readFile(join(root, ".simplix/generated/apps/web/src/pages/about/page.tsx"), "utf-8")).toBe(held);
+    expect((await generatedReport(root))[0]?.state).toBe("untouched");
+  });
+
+  it("merges a template change into an edited, formatted file without a conflict", async () => {
+    await writeFile(pagePath(), (await readFile(pagePath(), "utf-8")).replace("export const c = 3;", "export const c = 4;"));
+    await setTemplate("v2");
+    const { writes } = await regenerateAll(root);
+    expect(writes.find((w) => w.path === pagePath())?.outcome).toBe("merged");
+    const merged = await readFile(pagePath(), "utf-8");
+    expect(merged).toContain("return 'v2';");
+    expect(merged).toContain("export const c = 4;");
+    expect(await generatedReport(root)).toEqual([expect.objectContaining({ state: "edited", merge: "current" })]);
   });
 });

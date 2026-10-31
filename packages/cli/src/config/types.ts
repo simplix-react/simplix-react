@@ -146,6 +146,21 @@ export interface SimplixConfig {
     groups?: string[];
   };
 
+  /**
+   * How generated files are written.
+   *
+   * @remarks
+   * `format` runs the project's own formatter over every render before it is written, recorded as
+   * the merge base under `.simplix/generated`, or compared with the file on disk. A project that
+   * formats generated files before committing them sets it, so an untouched file stays untouched
+   * after formatting and a three-way merge reads the edits against the text they were made on.
+   * It receives the render and the path the file goes to, and returns the formatted text. Without
+   * it a render is used exactly as the template produced it.
+   */
+  generated?: {
+    format?: (source: string, filePath: string) => string | Promise<string>;
+  };
+
   /** Code generation options */
   codegen?: {
     /** Prepend auto-generated header comment to generated files (default: true) */

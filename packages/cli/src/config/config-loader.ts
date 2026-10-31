@@ -1,6 +1,7 @@
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { pathExists } from "../utils/fs.js";
+import { setGeneratedFormatter } from "../utils/generated-merge.js";
 import { ConfigLoadError } from "./config-load-error.js";
 import type { SimplixConfig } from "./types.js";
 
@@ -22,6 +23,7 @@ export async function loadConfig(rootDir: string): Promise<SimplixConfig> {
   const configPath = join(rootDir, CONFIG_FILENAME);
 
   if (!(await pathExists(configPath))) {
+    setGeneratedFormatter(undefined);
     return getDefaultConfig();
   }
 
@@ -45,6 +47,9 @@ export async function loadConfig(rootDir: string): Promise<SimplixConfig> {
       ? (loaded as { default: SimplixConfig }).default
       : (loaded as SimplixConfig);
 
+  // Every command that writes or compares a generated file loads the config first, so the
+  // formatter it names is in force for all of them.
+  setGeneratedFormatter(config.generated?.format);
   return { ...getDefaultConfig(), ...config };
 }
 
