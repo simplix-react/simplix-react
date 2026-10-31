@@ -289,3 +289,20 @@ describe("useEntityTranslation", () => {
     expect(result.current.enumLabel).toBe(first.enumLabel);
   });
 });
+
+describe("I18nProvider page language", () => {
+  it("writes the active locale to <html lang> and follows a locale change", async () => {
+    document.documentElement.lang = "en";
+    const adapter = createMockAdapter();
+    await adapter.setLocale("ko");
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <I18nProvider adapter={adapter}>{children}</I18nProvider>
+    );
+    renderHook(() => useI18nAdapter(), { wrapper });
+    expect(document.documentElement.lang).toBe("ko");
+    await act(async () => {
+      await adapter.setLocale("ja");
+    });
+    expect(document.documentElement.lang).toBe("ja");
+  });
+});

@@ -1,4 +1,4 @@
-import { createContext, type ReactNode, useContext } from "react";
+import { createContext, type ReactNode, useContext, useEffect } from "react";
 import type { II18nAdapter } from "../adapter.js";
 import { sharedState } from "../utils/shared-state.js";
 
@@ -45,6 +45,17 @@ export interface I18nProviderProps {
  * ```
  */
 export function I18nProvider({ children, adapter }: I18nProviderProps) {
+  // The page's language is the active locale's: assistive technology picks its voice from
+  // `<html lang>`, and a Korean page announced as English is read with the wrong pronunciation.
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const html = document.documentElement;
+    const apply = (locale: string) => {
+      if (html.lang !== locale) html.lang = locale;
+    };
+    apply(adapter.locale);
+    return adapter.onLocaleChange(apply);
+  }, [adapter]);
   return (
     <I18nContext.Provider value={adapter}>{children}</I18nContext.Provider>
   );
