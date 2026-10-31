@@ -250,6 +250,17 @@ function stampContractKind(
  * The list row's fields, each taking the definition the request body states where it states one.
  * The row alone names a reference by its nested record, so the row's reading of a reference wins.
  */
+/**
+ * Each field with the length the request body states for it, where its own DTO states none: a
+ * read DTO carries no `@Size`, and the length is what tells a typed value from a key.
+ */
+export function withStatedLengths(fields: readonly FieldInfo[], stated: ReadonlyMap<string, FieldInfo>): FieldInfo[] {
+  return fields.map((f) => {
+    const length = stated.get(f.name)?.maxLength;
+    return f.maxLength === undefined && length !== undefined ? { ...f, maxLength: length } : f;
+  });
+}
+
 export function projectRowFields(rowFields: readonly FieldInfo[], stated: ReadonlyMap<string, FieldInfo>): FieldInfo[] {
   return rowFields.map((f) => {
     const one = stated.get(f.name);
@@ -2434,7 +2445,7 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       fields: withContractKinds(fields.map(withRequiredInForm), rowIdField, contractOptions),
       // A detail draws what the get route answers with, which holds what the server derives
       // (a standing, a display name, a last-seen time) and no request body states.
-      detailFields: withContractKinds(metaSource?.detailFields ?? fields, rowIdField, contractOptions),
+      detailFields: withContractKinds(withStatedLengths(metaSource?.detailFields ?? fields, byName), rowIdField, contractOptions),
       // The enum the detail header draws as the record's standing.
       statusField: withContractKinds(metaSource?.detailFields ?? fields, undefined, contractOptions).find(
         (f) => f.contractKind === "enum" && /(^|[a-z])(status|state|standing)$/i.test(f.name),

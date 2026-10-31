@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { detectI18nFieldPairs, orderAndCategorizeFields, projectRowFields, withRequiredInForm, importsSubjects, readsWidgetsNamespace, resolvesFrom, withContractKinds, type FieldInfo } from "../commands/scaffold-crud.js";
+import { detectI18nFieldPairs, orderAndCategorizeFields, projectRowFields, withRequiredInForm, withStatedLengths, importsSubjects, readsWidgetsNamespace, resolvesFrom, withContractKinds, type FieldInfo } from "../commands/scaffold-crud.js";
 import { relationFieldsOf, stringShape } from "../meta/scaffold-source.js";
 
 function field(name: string, tsType = "string"): FieldInfo {
@@ -126,6 +126,12 @@ describe("a key the contract does not state", () => {
     const out = withContractKinds([field("catalogVoiceId"), { ...field("providerVoiceId"), maxLength: 200 }, { ...field("traceId"), maxLength: 36 }], "catalogVoiceId");
     expect(out.find((f) => f.name === "providerVoiceId")?.isOpaqueId).toBe(false);
     expect(out.find((f) => f.name === "traceId")?.isOpaqueId).toBe(true);
+  });
+
+  it("takes the request body's length in a detail whose DTO states none", () => {
+    const stated = new Map([["providerVoiceId", { ...field("providerVoiceId"), maxLength: 200 }]]);
+    const out = withContractKinds(withStatedLengths([field("catalogVoiceId"), field("providerVoiceId")], stated), "catalogVoiceId");
+    expect(out.find((f) => f.name === "providerVoiceId")?.isOpaqueId).toBe(false);
   });
 
   it("is a key whatever its length where SimpliX Meta states it as a relation", () => {
