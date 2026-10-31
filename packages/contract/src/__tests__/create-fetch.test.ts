@@ -26,6 +26,34 @@ describe("createFetch", () => {
     expect(result).toEqual({ id: "1", name: "Test" });
   });
 
+  it("returns a Blob for a body declared as anything but JSON", async () => {
+    const blob = new Blob(["id,name\n1,Test\n"], { type: "text/csv" });
+    const json = vi.fn();
+    fetchMock.mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: new Headers({ "content-type": "text/csv;charset=UTF-8" }),
+      blob: () => Promise.resolve(blob),
+      json,
+    });
+
+    const result = await createFetch()("/api/items/export");
+    expect(result).toBe(blob);
+    expect(json).not.toHaveBeenCalled();
+  });
+
+  it("parses a JSON or +json body as JSON", async () => {
+    for (const type of ["application/json;charset=UTF-8", "application/problem+json"]) {
+      fetchMock.mockResolvedValue({
+        ok: true,
+        status: 200,
+        headers: new Headers({ "content-type": type }),
+        json: () => Promise.resolve({ id: "1" }),
+      });
+      expect(await createFetch()("/api/items/1")).toEqual({ id: "1" });
+    }
+  });
+
   it("applies custom transformResponse", async () => {
     fetchMock.mockResolvedValue({
       ok: true,

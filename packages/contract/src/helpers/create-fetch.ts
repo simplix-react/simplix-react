@@ -92,6 +92,13 @@ export function createFetch(options: CreateFetchOptions = {}): FetchFn {
       return undefined as T;
     }
 
+    // A body the server declares as anything but JSON (a CSV export, a file) is handed back as
+    // bytes; parsing it as JSON fails on the first character. No declared type is read as JSON.
+    const contentType = res.headers?.get?.("content-type") ?? "";
+    if (contentType !== "" && !isJsonType(contentType)) {
+      return (await res.blob()) as T;
+    }
+
     const json = await res.json();
 
     if (transformResponse) {
@@ -100,4 +107,10 @@ export function createFetch(options: CreateFetchOptions = {}): FetchFn {
 
     return json as T;
   };
+}
+
+/** `application/json` and every `+json` structured suffix (`application/problem+json`). */
+function isJsonType(contentType: string): boolean {
+  const essence = contentType.split(";")[0]!.trim().toLowerCase();
+  return essence === "application/json" || essence.endsWith("+json");
 }
