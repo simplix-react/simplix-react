@@ -180,6 +180,21 @@ export interface SimplixConfig {
    * arrives nested is named by that record's type, a flat key only by its own name, which need not
    * be the entity the app registers a peek for (`{ user: "userAccount", owner: "userAccount" }`).
    */
+  /**
+   * What a scaffold decides where SimpliX Meta is silent.
+   *
+   * @remarks
+   * `defaultSortFields` names the fields a generated list may open sorted by, in order of
+   * preference, each newest first unless it gives a direction
+   * (`["occurredAt", "createdAt", { field: "sortOrder", direction: "asc" }]`). An entity whose
+   * Meta declares `defaultSort` uses that instead; a list whose row carries none of them, or
+   * carries one the backend cannot order by, opens in the server's order. The row's key is
+   * never used. Defaults to none.
+   */
+  scaffold?: {
+    readonly defaultSortFields?: readonly (string | { readonly field: string; readonly direction?: "asc" | "desc" })[];
+  };
+
   references?: {
     peeks?: Readonly<Record<string, string>>;
   };

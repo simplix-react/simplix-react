@@ -206,6 +206,8 @@ export interface EntityMeta {
   /** Locale → one sentence saying what the screen over this entity is for (the page description). */
   description?: Record<string, string>;
   holders?: EntityHolderMeta[];
+  /** The order the entity's list opens in, where its backend declares one. */
+  defaultSort?: { field: string; direction?: "asc" | "desc" };
 }
 
 export interface DtoMeta {

@@ -46,8 +46,8 @@ export function use{{EntityPascal}}List() {
       defaultPageSize: 10,
 {{#if orderField}}
       defaultSort: { field: "{{orderField}}", direction: "asc" },
-{{else}}
-      defaultSort: { field: "{{rowIdField}}", direction: "desc" },
+{{else if defaultSort}}
+      defaultSort: { field: "{{defaultSort.field}}", direction: "{{defaultSort.direction}}" },
 {{/if}}
 {{#if hasFilters}}
       filterMode: "deferred",

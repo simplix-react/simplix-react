@@ -9,6 +9,7 @@ import ora from "ora";
 import { ConfigLoadError } from "../config/config-load-error.js";
 import { findCrudConfigForEntity } from "../config/crud-config-loader.js";
 import { loadConfig } from "../config/config-loader.js";
+import { chooseDefaultSort } from "../meta/default-sort.js";
 import { assertOutputDirs } from "../config/output-dirs.js";
 import { reportConfigError } from "../config/report-config-error.js";
 import {
@@ -2504,6 +2505,8 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
         matchField: [...(holder.source.rowFields ?? []), ...holder.source.fields, ...(holder.source.detailFields ?? [])].find((f) => f.name === holder.field)?.peekBy,
         rowIdField: holder.source.rowIdField,
         fields: holderFields,
+        // The order the holder's own list opens in, so its tab reads the same rows first.
+        defaultSort: chooseDefaultSort({ declared: holder.source.defaultSort, candidates: scaffoldConfig.scaffold?.defaultSortFields, fields: holderFields, rowIdField: holder.source.rowIdField }),
         // Whether the holder's list route takes a keyword search, which its tab's search box sends.
         hasKeywordSearch: holder.source.keywordSearch,
       });
@@ -2545,6 +2548,8 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       hookOrder,
       hookTree,
       orderField,
+      // The order the list opens in when no reorder owns it: never the row's key.
+      defaultSort: chooseDefaultSort({ declared: metaSource?.defaultSort, candidates: scaffoldConfig.scaffold?.defaultSortFields, fields: listFields, rowIdField }),
       // A list that reorders by drag owns the order: the form leaves the field out and a create
       // sends the default, an edit the record's own.
       formOrderField: hookOrder && orderField ? orderField : undefined,

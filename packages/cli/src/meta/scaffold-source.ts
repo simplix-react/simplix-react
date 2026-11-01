@@ -80,6 +80,8 @@ export interface MetaScaffoldSource {
   displayNameFields?: string[];
   /** The field a reorder writes, as the reorder's own body declares it. */
   orderField?: string;
+  /** The order the entity declares its list opens in. */
+  defaultSort?: { field: string; direction?: "asc" | "desc" };
   updatePathParam?: string;
   deletePathParam?: string;
   filters: FilterFieldInfo[];
@@ -154,6 +156,8 @@ export async function loadMetaScaffoldSource(
       source.relationFields = relationFieldsOf(document, entityName, source);
       withReferenceKeys(document, source);
       withNameField(document, entityName, source);
+      const defaultSort = document.entities?.[entityName]?.defaultSort;
+      if (defaultSort) source.defaultSort = defaultSort;
       const plural = document.entities?.[entityName]?.plural;
       if (plural) source.plural = plural;
       return source;
