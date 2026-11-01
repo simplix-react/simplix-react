@@ -120,6 +120,11 @@ export interface FieldInfo {
   money?: { currency: string; scale: number };
   /** A value the client writes and no response returns (SimpliX Meta's `format: "secret"`), such as a provider key. */
   secret?: boolean;
+  /**
+   * A figure SimpliX Meta's `format` names (`credits`, `bytes`, `duration` on a number, `excerpt` on
+   * a text), which the kit draws by that kind rather than as a plain number or text.
+   */
+  figureKind?: "credits" | "bytes" | "duration" | "excerpt";
   /** A key that is not a reference with a name, which no generated screen draws. */
   isOpaqueId?: boolean;
   /** The referenced field SimpliX Meta's `reference.idField` names, for a key the contract names as a reference. */
@@ -195,6 +200,7 @@ export function contractKindOf(field: FieldInfo): string {
   if (field.columnFormat === "time") return "time";
   if (field.secret && field.tsType === "string") return "secret";
   if (field.money && field.tsType === "number") return "money";
+  if (field.figureKind) return field.figureKind;
   if (field.tsType === "number") return "number";
   if (field.formComponent === "TextareaField" || field.component === "Textarea") return "longText";
   if (field.inputType === "email") return "email";

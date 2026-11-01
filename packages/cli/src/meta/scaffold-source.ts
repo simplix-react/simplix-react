@@ -525,6 +525,8 @@ function fieldInfos(
     if (field.format === "code") one.isCode = true;
     if (field.format === "money" && field.money && shape.tsType === "number") one.money = { ...field.money };
     if (field.format === "secret" && shape.tsType === "string") one.secret = true;
+    const figure = figureKindOf(field.format, shape.tsType);
+    if (figure) one.figureKind = figure;
     if (field.required) one.required = true;
     if (field.defaultValue !== undefined) one.defaultLiteral = JSON.stringify(field.defaultValue);
     // A key the contract names as another entity's, whatever its own name: drawn by that record's
@@ -890,4 +892,11 @@ function basePathOf(targets: EndpointTarget[]): string {
     base.push(segment);
   }
   return `/${base.join("/")}`;
+}
+
+/** The figure kind a field's SimpliX Meta `format` names, where its type can carry it. */
+export function figureKindOf(format: string | undefined, tsType: string): FieldInfo["figureKind"] {
+  if (tsType === "number" && (format === "credits" || format === "bytes" || format === "duration")) return format;
+  if (tsType === "string" && format === "excerpt") return "excerpt";
+  return undefined;
 }
