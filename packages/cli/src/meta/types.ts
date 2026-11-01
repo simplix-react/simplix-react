@@ -79,7 +79,8 @@ export interface FieldMeta {
   searchable?: SearchableMeta;
   /**
    * How a screen draws the value beyond its type: `"code"` for a field marked `@CodeValue`,
-   * `"money"` for one marked `@MoneyValue`.
+   * `"money"` for one marked `@MoneyValue`, `"secret"` for one a client writes and no response
+   * returns (`@JsonProperty(access = WRITE_ONLY)`).
    */
   format?: string;
   /** For a `"money"` field: the currency and the decimal places its stored whole number carries. */

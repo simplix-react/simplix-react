@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { contractFiltersOf, type FieldInfo, type FilterFieldInfo } from "../commands/scaffold-crud.js";
+import { contractFiltersOf, contractKindOf, type FieldInfo, type FilterFieldInfo } from "../commands/scaffold-crud.js";
 
 const amount = { name: "amountUsdMicros", tsType: "number", money: { currency: "USD", scale: 6 } } as FieldInfo;
 const units = { name: "units", tsType: "number" } as FieldInfo;
@@ -16,5 +16,12 @@ describe("money list filters", () => {
       { kind: "number", field: "amountUsdMicros", money: { currency: "USD", scale: 6 } },
       { kind: "number", field: "units" },
     ]);
+  });
+});
+
+describe("secret fields", () => {
+  it("are their own contract kind, so a form offers them empty and never shows the stored value", () => {
+    expect(contractKindOf({ name: "apiKey", tsType: "string", secret: true, options: [] } as unknown as FieldInfo)).toBe("secret");
+    expect(contractKindOf({ name: "apiKey", tsType: "string", options: [] } as unknown as FieldInfo)).toBe("text");
   });
 });
