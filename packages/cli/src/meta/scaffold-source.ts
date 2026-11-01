@@ -82,6 +82,10 @@ export interface MetaScaffoldSource {
   orderField?: string;
   /** The order the entity declares its list opens in. */
   defaultSort?: { field: string; direction?: "asc" | "desc" };
+  /** The fields the entity's status counts are read by, as its Meta states them. */
+  statusCounts?: string[];
+  /** The figures the entity's aggregates read answers with, in order. */
+  aggregates?: { field: string; op: string }[];
   updatePathParam?: string;
   deletePathParam?: string;
   filters: FilterFieldInfo[];
@@ -158,6 +162,9 @@ export async function loadMetaScaffoldSource(
       withNameField(document, entityName, source);
       const defaultSort = document.entities?.[entityName]?.defaultSort;
       if (defaultSort && !source.defaultSort) source.defaultSort = defaultSort;
+      const figures = document.entities?.[entityName];
+      if (figures?.statusCounts?.length) source.statusCounts = [...figures.statusCounts];
+      if (figures?.aggregates?.length) source.aggregates = figures.aggregates.map((one) => ({ ...one }));
       const plural = document.entities?.[entityName]?.plural;
       if (plural) source.plural = plural;
       return source;

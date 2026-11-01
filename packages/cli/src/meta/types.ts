@@ -210,6 +210,10 @@ export interface EntityMeta {
   holders?: EntityHolderMeta[];
   /** The order the entity's list opens in, where its backend declares one. */
   defaultSort?: { field: string; direction?: "asc" | "desc" };
+  /** The fields GET <base>/status-counts?field= accepts, where the entity counts any. */
+  statusCounts?: string[];
+  /** The figures GET <base>/aggregates answers with, in its order, where the entity computes any. */
+  aggregates?: { field: string; op: string }[];
 }
 
 export interface DtoMeta {

@@ -10,6 +10,7 @@ import { ConfigLoadError } from "../config/config-load-error.js";
 import { findCrudConfigForEntity } from "../config/crud-config-loader.js";
 import { loadConfig } from "../config/config-loader.js";
 import { chooseDefaultSort } from "../meta/default-sort.js";
+import { figureTilesOf } from "../meta/figure-tiles.js";
 import { assertOutputDirs } from "../config/output-dirs.js";
 import { reportConfigError } from "../config/report-config-error.js";
 import {
@@ -2542,6 +2543,14 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
         (f) => f.contractKind === "enum" && /(^|[a-z])(status|state|standing)$/i.test(f.name),
       )?.name,
       listFields: withContractKinds(listFields, rowIdField, contractOptions),
+      // The default figure tiles, from what the entity's Meta says it counts and sums.
+      figureTiles: figureTilesOf({
+        statusCounts: metaSource?.statusCounts,
+        aggregates: metaSource?.aggregates,
+        hooks: { statusCounts: roles?.statusCounts ? toHookName(roles.statusCounts) : null, aggregates: roles?.aggregates ? toHookName(roles.aggregates) : null },
+        fields: withContractKinds([...listFields, ...(metaSource?.detailFields ?? fields)], rowIdField, contractOptions),
+        rowIdField,
+      }),
       packageName,
       listRowType,
       treeRowType,
