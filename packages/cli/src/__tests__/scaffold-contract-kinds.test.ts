@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { detailFieldsOf, detectI18nFieldPairs, orderAndCategorizeFields, projectRowFields, withRequiredInForm, withStatedLengths, importsSubjects, readsWidgetsNamespace, resolvesFrom, withContractKinds, type FieldInfo } from "../commands/scaffold-crud.js";
+import { detailFieldsOf, nameFieldsOf, detectI18nFieldPairs, orderAndCategorizeFields, projectRowFields, withRequiredInForm, withStatedLengths, importsSubjects, readsWidgetsNamespace, resolvesFrom, withContractKinds, type FieldInfo } from "../commands/scaffold-crud.js";
 import { relationFieldsOf, stringShape } from "../meta/scaffold-source.js";
 
 function field(name: string, tsType = "string"): FieldInfo {
@@ -162,5 +162,15 @@ describe("the fields a detail draws", () => {
   it("leaves out the record's own key and keeps the rest in order", () => {
     const fields = [field("releaseArtifactId"), field("artifactName"), field("holderId")];
     expect(detailFieldsOf(fields, "releaseArtifactId").map((f) => f.name)).toEqual(["artifactName", "holderId"]);
+  });
+});
+
+describe("the fields a record is named by", () => {
+  it("follows the order of the names and takes each from the first table stating it", () => {
+    const detail = [field("createdAt"), field("jobType")];
+    expect(nameFieldsOf(["jobType", "createdAt", "unknown"], [...detail, field("jobType", "number")]).map((f) => [f.name, f.tsType])).toEqual([
+      ["jobType", "string"],
+      ["createdAt", "string"],
+    ]);
   });
 });

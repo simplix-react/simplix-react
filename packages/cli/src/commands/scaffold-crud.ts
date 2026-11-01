@@ -291,6 +291,14 @@ export function relationsOf(source: { readonly relationFields?: readonly string[
  * every create the form sends is refused for the missing value.
  */
 /**
+ * The field of each name part, in the order the names give, from the first table that states it;
+ * a name no table states is left out rather than drawn as an unknown kind.
+ */
+export function nameFieldsOf(names: readonly string[], fields: readonly FieldInfo[]): FieldInfo[] {
+  return names.map((name) => fields.find((f) => f.name === name)).filter((f): f is FieldInfo => f !== undefined);
+}
+
+/**
  * The fields a detail draws as values: every field but the record's own key, which the audit
  * strip carries and which says nothing about what the record is.
  */
@@ -2324,6 +2332,8 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       )?.name
       ?? null;
 
+    const nameFieldNames = metaSource?.displayNameFields ?? (displayNameField ? [displayNameField] : []);
+
     // ── Tree entity detection ──
     const hasTree = ops.hasTree || !!hookTree;
 
@@ -2524,7 +2534,10 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       treeSortOrderField,
       displayNameField,
       // Every part of the record's name in order; one field when the entity declares no more.
-      displayNameFields: metaSource?.displayNameFields ?? (displayNameField ? [displayNameField] : []),
+      displayNameFields: nameFieldNames,
+      // The same parts with their contract kinds, so a screen draws an enum by its label and a
+      // time in the installation's zone when it names the record.
+      nameContractFields: withContractKinds(nameFieldsOf(nameFieldNames, [...(metaSource?.detailFields ?? []), ...fields, ...listFields]), rowIdField, contractOptions),
       treeDisplayNameField,
       treeSearchFields,
       treeDisplayFields,
