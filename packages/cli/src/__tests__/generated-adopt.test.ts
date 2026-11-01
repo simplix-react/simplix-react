@@ -8,6 +8,10 @@ import { applyAdopt, inferStoryOrigin, planAdopt, runAdopt } from "../commands/g
 import { generatedReport, regenerateAll } from "../commands/generated.js";
 import { carryStamp } from "../utils/project-templates.js";
 
+/** The report without the blocks files, which are tracked too and are not what these cases are about. */
+const pageReport = async (root: string) => (await generatedReport(root)).filter((entry) => !entry.path.endsWith(".blocks.tsx"));
+
+
 const TEMPLATE_DIR = ".simplix/templates";
 const page = (body: string) => `/**\n * @simplix-generated page/static-page\n */\nexport function {{NamePascal}}Page() {\n  return "${body}";\n}\n`;
 const story = (body: string) =>
@@ -46,7 +50,7 @@ describe("simplix generated --adopt", () => {
     await edit(pagePath(), "export const extra = 1;");
     await noBase();
     await setTemplate("v2");
-    expect((await generatedReport(root))[0]).toMatchObject({ merge: "no-base" });
+    expect((await pageReport(root))[0]).toMatchObject({ merge: "no-base" });
 
     const [item] = await planAdopt(root, [pagePath()]);
     expect(item?.refusal).toBeUndefined();
@@ -67,7 +71,7 @@ describe("simplix generated --adopt", () => {
     // The edits are untouched, and the file now reads as laid down from the base it was adopted against.
     const adopted = await readFile(pagePath(), "utf-8");
     expect(adopted).toContain("export const extra = 1;");
-    expect((await generatedReport(root))[0]).toMatchObject({ state: "edited", merge: "current" });
+    expect((await pageReport(root))[0]).toMatchObject({ state: "edited", merge: "current" });
 
     await setTemplate("v3");
     const { writes } = await regenerateAll(root);
@@ -118,7 +122,7 @@ describe("simplix generated --adopt", () => {
     await edit(pagePath(), "export const extra = 1;");
     await noBase();
     await writeFile(pagePath(), (await readFile(pagePath(), "utf-8")).replace(/ add-page static-page about --app web/, ""));
-    expect((await generatedReport(root))[0]).toMatchObject({ state: "edited", merge: "no-origin" });
+    expect((await pageReport(root))[0]).toMatchObject({ state: "edited", merge: "no-origin" });
     const [item] = await planAdopt(root, [pagePath()]);
     expect(item?.refusal).toMatch(/^manual: it records no origin/);
     expect(await runAdopt(root, [pagePath()], { yes: true })).toBe(1);
@@ -132,7 +136,7 @@ describe("simplix generated --adopt", () => {
     await writeFile(storyPath(), stamped + "export const Extra = {};\n");
     await noBase();
     await setStory("s2");
-    expect((await generatedReport(root)).find((e) => e.path === "stories/web-about.stories.tsx")).toMatchObject({ state: "edited", merge: "no-origin" });
+    expect((await pageReport(root)).find((e) => e.path === "stories/web-about.stories.tsx")).toMatchObject({ state: "edited", merge: "no-origin" });
 
     const [item] = await planAdopt(root, [storyPath()]);
     expect(item?.refusal).toBeUndefined();
@@ -144,7 +148,7 @@ describe("simplix generated --adopt", () => {
     const held = await readFile(storyPath(), "utf-8");
     expect(held).toMatch(/@simplix-render [0-9a-f]{12} add-page static-page about --app web/);
     expect(held).toContain("export const Extra = {};");
-    expect((await generatedReport(root)).find((e) => e.path === "stories/web-about.stories.tsx")).toMatchObject({ state: "edited", merge: "current" });
+    expect((await pageReport(root)).find((e) => e.path === "stories/web-about.stories.tsx")).toMatchObject({ state: "edited", merge: "current" });
 
     await setStory("s3");
     await regenerateAll(root);

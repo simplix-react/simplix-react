@@ -61,7 +61,7 @@ export function renderPageKind(kind: PageKind, name: string, namespace: string, 
   if (source === undefined) throw new Error(`No template draws "${template}": the UI kit or .simplix/templates must supply ${template}.hbs`);
   const ctx = { NamePascal: toPascalCase(name), nameCamel: toCamelCase(name), nameKebab: toKebabCase(name), namespace, kind };
   const blocks = templateFor(templates, `${template}.blocks`, templateFor(templates, "page-kind.blocks", pageKindBlocksTemplate));
-  return { "page.tsx": stampFingerprint(renderTemplate(source, ctx), origin), "page.blocks.tsx": renderTemplate(blocks, ctx) };
+  return { "page.tsx": stampFingerprint(renderTemplate(source, ctx), origin), "page.blocks.tsx": stampFingerprint(renderTemplate(blocks, ctx), origin) };
 }
 
 /**
@@ -143,9 +143,9 @@ export async function runAddPage(rawKind: string, name: string, flags: { module?
     const origin = `add-page ${kind} ${toKebabCase(name)} ${module ? `--module ${module.path}` : `--app ${flags.app}`}${variant ? ` --variant ${variant}` : ""}`;
     for (const [file, content] of Object.entries(renderPageKind(kind, name, namespace, templates, origin, variant))) {
       const path = join(dir, kind === "app-shell" && file === "page.tsx" ? "root-layout.tsx" : kind === "app-shell" ? "root-layout.blocks.tsx" : file);
-      // The blocks are the author's and written once; the page is rewritten while untouched and
-      // merged into once edited.
-      if (file.endsWith(".blocks.tsx") || !content.includes(GENERATED_PAGE_MARKER)) {
+      // The page and its blocks are both tracked: rewritten while untouched, merged into once edited.
+      // A project template without the marker is still laid down once.
+      if (!content.includes(GENERATED_PAGE_MARKER)) {
         if (await pathExists(path)) {
           noteKeptRender(path, content);
           log.warn(`Keeping ${path}`);

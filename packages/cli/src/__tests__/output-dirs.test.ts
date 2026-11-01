@@ -8,6 +8,10 @@ import { generatedCommand, generatedReport, regenerateAll } from "../commands/ge
 import { assertOutputDirs, findOutputDirProblems, OutputDirError } from "../config/output-dirs.js";
 import { log } from "../utils/logger.js";
 
+/** The report without the blocks files, which are tracked too and are not what these cases are about. */
+const pageReport = async (root: string) => (await generatedReport(root)).filter((entry) => !entry.path.endsWith(".blocks.tsx"));
+
+
 const TEMPLATE_DIR = ".simplix/templates";
 const PAGE_TEMPLATE = `/**\n * @simplix-generated page/static-page\n */\nexport function {{NamePascal}}Page() {\n  return "v1";\n}\n`;
 
@@ -54,14 +58,14 @@ describe("configured output directories", () => {
     it("reports an existing storiesDir as before", async () => {
       await project("board/screens", true);
       await runAddPage("static", "about", { app: "web" });
-      expect(await generatedReport(root)).toEqual([
+      expect(await pageReport(root)).toEqual([
         { path: "apps/web/src/pages/about/page.tsx", state: "untouched", origin: "add-page static-page about --app web" },
       ]);
     });
 
     it("checks nothing for a project that configures no storiesDir", async () => {
       await project(undefined, false);
-      expect(await generatedReport(root)).toEqual([]);
+      expect(await pageReport(root)).toEqual([]);
     });
 
     it("refuses a regeneration before it writes anything", async () => {

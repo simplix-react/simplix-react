@@ -8,6 +8,10 @@ import { shareReport } from "../commands/generated-share.js";
 import { runAddPage } from "../commands/add-page.js";
 import { captureWrites, writeFileWithDir } from "../utils/fs.js";
 
+/** The report without the blocks files, which are tracked too and are not what these cases are about. */
+const pageReport = async (root: string) => (await generatedReport(root)).filter((entry) => !entry.path.endsWith(".blocks.tsx"));
+
+
 const TEMPLATE_DIR = ".simplix/templates";
 const page = (body: string) => `/**\n * @simplix-generated page/static-page\n */\nexport function {{NamePascal}}Page() {\n  return "${body}";\n}\n`;
 
@@ -53,7 +57,7 @@ describe("generated-state report", () => {
   });
 
   it("reports an untouched file as untouched while the template still renders it", async () => {
-    expect(await generatedReport(root)).toEqual([
+    expect(await pageReport(root)).toEqual([
       { path: "apps/web/src/pages/about/page.tsx", state: "untouched", origin: "add-page static-page about --app web" },
     ]);
   });
@@ -61,18 +65,18 @@ describe("generated-state report", () => {
   it("reports an untouched file as stale once the template changes, and --all rewrites it", async () => {
     await setTemplate("v2");
     const before = await readFile(pagePath(), "utf-8");
-    expect((await generatedReport(root))[0]?.state).toBe("stale");
+    expect((await pageReport(root))[0]?.state).toBe("stale");
     // The report itself writes nothing.
     expect(await readFile(pagePath(), "utf-8")).toBe(before);
     await regenerateAll(root);
     expect(await readFile(pagePath(), "utf-8")).toContain('"v2"');
-    expect((await generatedReport(root))[0]?.state).toBe("untouched");
+    expect((await pageReport(root))[0]?.state).toBe("untouched");
   });
 
   it("merges a template change into an edited file and keeps the edits", async () => {
     await writeFile(pagePath(), (await readFile(pagePath(), "utf-8")) + "export const extra = 1;\n");
     await setTemplate("v2");
-    expect((await generatedReport(root))[0]).toMatchObject({ state: "edited", merge: "merged" });
+    expect((await pageReport(root))[0]).toMatchObject({ state: "edited", merge: "merged" });
     const { writes } = await regenerateAll(root);
     expect(writes.find((w) => w.path.endsWith("about/page.tsx"))?.outcome).toBe("merged");
     const merged = await readFile(pagePath(), "utf-8");
@@ -80,14 +84,28 @@ describe("generated-state report", () => {
     expect(merged).toContain("export const extra = 1;");
     // The new render is the base now, so the next run has nothing left to merge.
     expect(await readFile(basePath(), "utf-8")).toContain('"v2"');
-    expect((await generatedReport(root))[0]).toMatchObject({ state: "edited", merge: "current" });
+    expect((await pageReport(root))[0]).toMatchObject({ state: "edited", merge: "current" });
+  });
+
+  it("tracks the page's blocks: stamped, and a template change merged into a screen's edit", async () => {
+    const blocks = (body: string) => `/**\n * @simplix-generated blocks/static-page.blocks\n */\nexport function usePageBlocks() {\n  return { title: "${body}" };\n}\n`;
+    const blocksPath = join(root, "apps/web/src/pages/about/page.blocks.tsx");
+    await writeFile(join(root, TEMPLATE_DIR, "static-page.blocks.hbs"), blocks("b1"));
+    await regenerateAll(root);
+    expect(await readFile(blocksPath, "utf-8")).toMatch(/@simplix-render [0-9a-f]{12} add-page static-page about --app web/);
+    await writeFile(blocksPath, (await readFile(blocksPath, "utf-8")) + "export const own = 1;\n");
+    await writeFile(join(root, TEMPLATE_DIR, "static-page.blocks.hbs"), blocks("b2"));
+    await regenerateAll(root);
+    const merged = await readFile(blocksPath, "utf-8");
+    expect(merged).toContain('"b2"');
+    expect(merged).toContain("export const own = 1;");
   });
 
   it("reports a conflicting edit with its hunks and leaves the file alone", async () => {
     const edited = (await readFile(pagePath(), "utf-8")).replace('"v1"', '"customised"');
     await writeFile(pagePath(), edited);
     await setTemplate("v2");
-    const [entry] = await generatedReport(root);
+    const [entry] = await pageReport(root);
     expect(entry).toMatchObject({ state: "edited", merge: "conflict" });
     expect(entry?.hunks?.[0]).toMatch(/<<<<<<< edited\n[\s\S]*"customised"[\s\S]*=======\n[\s\S]*"v2"[\s\S]*>>>>>>> template/);
     const { writes } = await regenerateAll(root);
@@ -116,7 +134,7 @@ describe("generated-state report", () => {
     await writeFile(pagePath(), edited);
     await rm(join(root, ".simplix/generated"), { recursive: true });
     await setTemplate("v2");
-    expect((await generatedReport(root))[0]).toMatchObject({ state: "edited", merge: "no-base" });
+    expect((await pageReport(root))[0]).toMatchObject({ state: "edited", merge: "no-base" });
     await regenerateAll(root);
     expect(await readFile(pagePath(), "utf-8")).toBe(edited);
   });
@@ -151,7 +169,7 @@ describe("generated-state report", () => {
   it("reports a file stamped without an origin as unchecked", async () => {
     const text = (await readFile(pagePath(), "utf-8")).replace(/ add-page static-page about --app web/, "");
     await writeFile(pagePath(), text);
-    expect((await generatedReport(root))[0]?.state).toBe("unchecked");
+    expect((await pageReport(root))[0]?.state).toBe("unchecked");
   });
 });
 
@@ -245,7 +263,7 @@ describe("generated files under a project formatter", () => {
     const held = await readFile(pagePath(), "utf-8");
     expect(held).toContain("return 'v1';");
     expect(await readFile(join(root, ".simplix/generated/apps/web/src/pages/about/page.tsx"), "utf-8")).toBe(held);
-    expect((await generatedReport(root))[0]?.state).toBe("untouched");
+    expect((await pageReport(root))[0]?.state).toBe("untouched");
   });
 
   it("merges a template change into an edited, formatted file without a conflict", async () => {
@@ -256,7 +274,7 @@ describe("generated files under a project formatter", () => {
     const merged = await readFile(pagePath(), "utf-8");
     expect(merged).toContain("return 'v2';");
     expect(merged).toContain("export const c = 4;");
-    expect(await generatedReport(root)).toEqual([expect.objectContaining({ state: "edited", merge: "current" })]);
+    expect(await pageReport(root)).toEqual([expect.objectContaining({ state: "edited", merge: "current" })]);
   });
 
   it("merges an edited file whose stamp line differs from its base's without a conflict", async () => {

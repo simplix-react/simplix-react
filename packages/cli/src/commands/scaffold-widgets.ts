@@ -47,8 +47,8 @@ export function renderWidgetFiles(
 
 /**
  * The hand-written companions of the widgets just rendered: `<widget>.blocks.tsx` for each widget
- * whose template in force has a `<widget>.blocks` sibling. These are the author's files, so the
- * caller writes each only where it is absent.
+ * whose template in force has a `<widget>.blocks` sibling. They are tracked like the widgets: a
+ * template carrying the generated marker is stamped, rewritten while untouched and merged once edited.
  */
 export function renderWidgetBlocks(
   widgets: Readonly<Record<string, string>>,

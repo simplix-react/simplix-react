@@ -8,6 +8,10 @@ import { generatedReport } from "../commands/generated.js";
 import { findModulePaths, modulePathOf, parseModulePath } from "../utils/module-path.js";
 import { pathExists } from "../utils/fs.js";
 
+/** The report without the blocks files, which are tracked too and are not what these cases are about. */
+const pageReport = async (root: string) => (await generatedReport(root)).filter((entry) => !entry.path.endsWith(".blocks.tsx"));
+
+
 const GROUPS = ["admin", "portal", "shared"];
 
 describe("parseModulePath", () => {
@@ -87,7 +91,7 @@ describe("add-page into a grouped module", () => {
     expect(text).toContain('ns = "admin-user/pages"');
     expect(await pathExists(join(root, ".simplix/generated/modules/admin/user/src/pages/about/page.tsx"))).toBe(true);
 
-    const report = await generatedReport(root);
+    const report = await pageReport(root);
     expect(report.map((entry) => [entry.state, entry.origin])).toEqual([["untouched", "add-page static-page about --module admin/user"]]);
   });
 

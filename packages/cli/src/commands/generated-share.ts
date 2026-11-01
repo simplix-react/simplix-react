@@ -94,15 +94,19 @@ export async function shareReport(
   };
 
   const dirs = new Set<string>();
+  const tracked = new Set<string>();
   for (const e of entries) {
     const file = resolve(rootDir, e.path);
     const screen = screenOf(e.path);
     const held = await readFile(file, "utf-8");
     dirs.add(dirname(file));
+    tracked.add(file);
     if (e.state === "edited" && e.render !== undefined) {
       const added = addedLines(held, e.render);
       at(screen).generated += e.render.split("\n").length;
-      at(screen).customised += added.length;
+      // A tracked blocks file's own lines are the screen's blocks, read against its render.
+      if (BLOCKS_FILE.test(e.path)) at(screen).blocks += added.length;
+      else at(screen).customised += added.length;
       remember(screen, added);
     } else if (e.state === "edited") {
       // No render to read it against (stamped before origins were recorded): all of it is the
@@ -116,6 +120,7 @@ export async function shareReport(
     for (const name of await readdir(dir)) {
       if (!BLOCKS_FILE.test(name)) continue;
       const file = join(dir, name);
+      if (tracked.has(file)) continue;
       const held = await readFile(file, "utf-8");
       const stub = keptRenders.get(file);
       // A blocks file starts as its template's stub; only what was written into it is the screen's.

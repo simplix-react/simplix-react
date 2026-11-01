@@ -1307,22 +1307,14 @@ async function generatePages(
   // Index barrel
   pageFiles["index.ts"] = renderTemplate(templateFor(templates, "page-index", pageIndexTemplate), ctx);
 
-  // A template a project supplies to hold the page's hand-written parts. Written once and never
-  // again: it is the file the author edits, and the whole point of it existing is that the
-  // generated page beside it can be rewritten without reading anything a person put there.
-  //
-  // <p><b>Refreshed, never created.</b> A page that departs from nothing has nothing to put in
-  // this file, and a scaffold that writes one anyway leaves an empty hook per page - fifty-eight
-  // of them in one console, each saying "this screen is different" while saying nothing. So the
-  // file is rendered only where the author already made one, and a page needing its first
-  // departure gets it by copying the template.
+  // The page's blocks, rendered from the kit's blocks template beside the page template. It is
+  // tracked as the page is: stamped, rewritten while untouched and merged three ways once a screen
+  // has written inside its keys, so a template change reaches every screen. A page template that
+  // does not import its blocks gets none, since nothing would read them.
   const blocks = templates.get(PAGE_BLOCKS_TEMPLATE);
-  const writeOnce = new Set<string>();
-  // A page template that imports its blocks needs the file to exist, so it is laid down once.
   const pageImportsBlocks = Object.values(pageFiles).some((content) => content.includes(`./${PAGE_BLOCKS_TEMPLATE}"`));
   if (blocks !== undefined && (pageImportsBlocks || (await pathExists(join(pagesDir, `${PAGE_BLOCKS_TEMPLATE}.tsx`))))) {
     pageFiles[`${PAGE_BLOCKS_TEMPLATE}.tsx`] = renderTemplate(blocks, ctx);
-    writeOnce.add(`${PAGE_BLOCKS_TEMPLATE}.tsx`);
   }
 
   const onDisk: string[] = [];
@@ -1334,7 +1326,7 @@ async function generatePages(
       empty.push(fileName);
       continue;
     }
-    if (stamped !== content && !writeOnce.has(fileName)) {
+    if (stamped !== content) {
       // A page is scaffolded and then written on, so carrying the marker proves only where the
       // file came from. Untouched, it is rewritten; edited, the template change is merged into it
       // three-way against the render last written, and a conflict leaves it alone.
@@ -2676,7 +2668,14 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     }
     for (const [fileName, content] of Object.entries(widgetBlocks)) {
       const filePath = join(outputDir, fileName);
-      if (!(await pathExists(filePath))) {
+      // Widget blocks are tracked like the widget: a stamped template is rewritten while untouched
+      // and merged once edited; an unstamped project template is still laid down once.
+      const stamped = content.includes(GENERATED_PAGE_MARKER) ? stampFingerprint(content, origin) : content;
+      if (stamped !== content) {
+        const outcome = await writeStampedGenerated(filePath, stamped);
+        if (outcome.outcome !== "written") log.warn(`${fileName}: ${outcome.outcome}`);
+        held.push(outcome.held);
+      } else if (!(await pathExists(filePath))) {
         await writeFileWithDir(filePath, content);
         held.push(content);
       } else {

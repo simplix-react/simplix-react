@@ -168,13 +168,11 @@ export function templateFor(
 }
 
 /**
- * The name of the template a project supplies for a page's hand-written parts.
+ * The name of the template a page's blocks are rendered from.
  *
- * <p>Rendered to `page.blocks.tsx` beside the generated page, and only where that file is already
- * there - it is the author's file, and its existence is what lets the generated page be rewritten
- * on every run rather than skipped once it is on disk. A page that departs from nothing gets no
- * such file: an empty hook per page states a difference that is not there, and a reader counting
- * departures then has to open every one to learn they are all the same.
+ * <p>Rendered to `page.blocks.tsx` beside the generated page wherever the page imports it, and
+ * tracked as the page is: a screen writes inside the keys the template lays down, and a template
+ * change is merged into every screen three ways.
  */
 export const PAGE_BLOCKS_TEMPLATE = "page.blocks";
 
