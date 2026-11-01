@@ -679,12 +679,21 @@ export function FilterBar({ filters, state, leading, trailing, maxBadges, onPrev
               {columnCtx.columns.map((col) => (
                 <DropdownMenuCheckboxItem
                   key={col.field}
-                  checked={!columnCtx.hiddenColumns.has(col.field)}
+                  checked={!col.dropped && !columnCtx.hiddenColumns.has(col.field)}
                   onCheckedChange={(checked) => {
                     const next = new Set(columnCtx.hiddenColumns);
                     if (checked) next.delete(col.field);
                     else next.add(col.field);
                     columnCtx.setHiddenColumns(next);
+                    // A column the width dropped is brought back by drawing it anyway; switching it
+                    // off again hands it back to the width.
+                    const shown = new Set(columnCtx.shownColumns);
+                    if (checked && col.dropped) {
+                      shown.add(col.field);
+                      columnCtx.setShownColumns(shown);
+                    } else if (!checked && shown.delete(col.field)) {
+                      columnCtx.setShownColumns(shown);
+                    }
                   }}
                 >
                   {col.label}

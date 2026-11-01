@@ -3,6 +3,8 @@ import { type Dispatch, type SetStateAction, createContext, useContext } from "r
 export interface ColumnInfo {
   field: string;
   label: string;
+  /** The column is declared but not drawn, because the list is narrower than the width it needs. */
+  dropped?: boolean;
 }
 
 export type CrudListViewMode = "list" | "grid";
@@ -12,6 +14,9 @@ export interface CrudListColumnContextValue {
   setColumns: Dispatch<SetStateAction<ColumnInfo[]>>;
   hiddenColumns: Set<string>;
   setHiddenColumns: Dispatch<SetStateAction<Set<string>>>;
+  /** Columns the reader switched on that the list's width would have dropped; they are drawn anyway. */
+  shownColumns: Set<string>;
+  setShownColumns: Dispatch<SetStateAction<Set<string>>>;
   /** Effective card-mode mirror (responsive OR manual grid) — used to hide the column toggle. */
   isCardMode: boolean;
   setIsCardMode: Dispatch<SetStateAction<boolean>>;

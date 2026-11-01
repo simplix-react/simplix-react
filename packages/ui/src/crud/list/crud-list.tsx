@@ -189,6 +189,7 @@ export interface ListProps {
 function ListRoot({ className, children, ref }: ListProps) {
   const [columns, setColumns] = useState<ColumnInfo[]>([]);
   const [hiddenColumns, setHiddenColumns] = useState<Set<string>>(new Set());
+  const [shownColumns, setShownColumns] = useState<Set<string>>(new Set());
   const [isCardMode, setIsCardMode] = useState(false);
   const [viewMode, setViewMode] = useState<CrudListViewMode>("list");
   const [canGridView, setCanGridView] = useState(false);
@@ -197,10 +198,10 @@ function ListRoot({ className, children, ref }: ListProps) {
 
   const columnCtx = useMemo(
     () => ({
-      columns, setColumns, hiddenColumns, setHiddenColumns, isCardMode, setIsCardMode,
+      columns, setColumns, hiddenColumns, setHiddenColumns, shownColumns, setShownColumns, isCardMode, setIsCardMode,
       viewMode, setViewMode, canGridView, setCanGridView, responsiveCardMode, setResponsiveCardMode,
     }),
-    [columns, hiddenColumns, isCardMode, viewMode, canGridView, responsiveCardMode],
+    [columns, hiddenColumns, shownColumns, isCardMode, viewMode, canGridView, responsiveCardMode],
   );
 
   return (
@@ -1203,15 +1204,19 @@ function ListTable<T>({
   // columns dropdown are all deciding from one list. `containerWidth` is 0 until the observer has
   // measured, and an unmeasured table draws everything — the same rule `responsiveCardMode` uses,
   // and the one that matches a column with no `minTableWidth` at all.
+  // A column the reader switched on in the columns menu is drawn whatever the width: the list then
+  // scrolls sideways, which is what asking for a column it has no room for means.
+  const shownColumns = columnCtx?.shownColumns;
   const columnDefs = useMemo(
     () =>
       declaredColumnDefs.filter(
         (d) =>
           d.minTableWidth == null ||
           containerWidth === 0 ||
-          containerWidth >= Math.max(d.minTableWidth, measuredNeed[String(d.minTableWidth)] ?? 0),
+          containerWidth >= Math.max(d.minTableWidth, measuredNeed[String(d.minTableWidth)] ?? 0) ||
+          (d.field !== undefined && shownColumns?.has(d.field) === true),
       ),
-    [declaredColumnDefs, containerWidth, measuredNeed],
+    [declaredColumnDefs, containerWidth, measuredNeed, shownColumns],
   );
 
   // A drawn table wider than its container means the declared thresholds were too low for the set
@@ -1219,8 +1224,9 @@ function ListTable<T>({
   // With no tier left to drop, the card breakpoint learns it instead. Skipped while the reader has
   // resized a column, because a table they widened on purpose is meant to scroll.
   const hasReaderWidths = Object.keys(columnWidths).length > 0;
+  const hasReaderColumns = (shownColumns?.size ?? 0) > 0;
   useLayoutEffect(() => {
-    if (isCardMode || hasReaderWidths || containerWidth === 0) return;
+    if (isCardMode || hasReaderWidths || hasReaderColumns || containerWidth === 0) return;
     const table = containerRef.current?.querySelector("table");
     if (!table) return;
     const need = Math.ceil(table.getBoundingClientRect().width);
@@ -1231,12 +1237,13 @@ function ListTable<T>({
     setMeasuredNeed((current) => ({ ...current, [key]: need }));
   });
 
-  // Register columns to context for FilterBar's Columns dropdown
+  // Register every declared column to context for FilterBar's Columns dropdown, the ones dropped for
+  // want of width included, so a reader can bring a dropped column back.
   const derivedColumns = useMemo(
-    () => columnDefs
+    () => declaredColumnDefs
       .filter((d): d is ListColumnProps<T> & { field: string } => !!d.field)
-      .map((d) => ({ field: d.field, label: d.header ?? d.field })),
-    [columnDefs],
+      .map((d) => ({ field: d.field, label: d.header ?? d.field, dropped: !columnDefs.includes(d) })),
+    [declaredColumnDefs, columnDefs],
   );
 
   useEffect(() => {
