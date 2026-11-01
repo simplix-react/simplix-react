@@ -3,7 +3,7 @@
 
 import { hideGridRect, toHex6 } from "../../charts/apexcharts/use-chart-theme";
 import { decodeInstant, serializeInstant } from "../../../utils/rfc3339-date";
-import { HEATMAP_THEMES, type HeatmapColorTheme } from "./themes";
+import { heatmapColors, type HeatmapColorTheme } from "./themes";
 import { BOUNDARY_CLIP, CUSTOM_PRESET_KEY, type TimeRange, type WindowPreset } from "./types";
 
 // ── Date / bucket math ──
@@ -293,6 +293,9 @@ export function buildColorScaleRanges(steps: number[], basePalette: string[], ef
 export interface ChartTheme {
   fontFamily: string;
   background: string;
+  muted: string;
+  primary: string;
+  ring: string;
 }
 
 export interface BuildChartParams {
@@ -333,8 +336,7 @@ export function buildChartOptions(params: BuildChartParams): {
   const scaleFactor = bucketMinutes / colorStepBaseMinutes;
   const steps = computeColorSteps(effectiveMax, colorStepsProp, scaleFactor);
 
-  const palette = HEATMAP_THEMES[colorTheme] ?? HEATMAP_THEMES.slate;
-  const basePalette = isDark ? palette.dark : palette.light;
+  const basePalette = heatmapColors(colorTheme, isDark, { muted: toHex6(theme.muted), primary: toHex6(theme.primary), ring: toHex6(theme.ring) }).ramp;
 
   const options: ApexCharts.ApexOptions = {
     chart: {

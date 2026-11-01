@@ -3,7 +3,7 @@ import { useTranslation } from "@simplix-react/i18n/react";
 
 import { cn } from "../../../utils/cn";
 import { partAttributes, slotAttributes } from "../../../design/slot-style";
-import { useChartTheme } from "../../charts/apexcharts/use-chart-theme";
+import { toHex6, useChartTheme } from "../../charts/apexcharts/use-chart-theme";
 import { useMediaQuery } from "../../../hooks/use-media-query";
 import { Popover, PopoverContent, PopoverTrigger } from "../../overlay";
 import {
@@ -48,7 +48,7 @@ import {
   snapSelectionToBuckets,
   snapToFloor,
 } from "./helpers";
-import { HEATMAP_THEMES } from "./themes";
+import { heatmapColors } from "./themes";
 import {
   CUSTOM_PRESET_KEY,
   DEFAULT_PRESETS,
@@ -62,7 +62,7 @@ import {
 } from "./types";
 
 // Public re-exports (preserve the package surface previously owned by this file).
-export { HEATMAP_THEMES } from "./themes";
+export { HEATMAP_THEMES, heatmapColors, tokenRamp } from "./themes";
 export type { HeatmapColorTheme, HeatmapPalette } from "./themes";
 export type { TimeRange, TimeRangeSelectorProps, TimeRangeValue, WindowPreset } from "./types";
 
@@ -172,10 +172,10 @@ export function TimeRangeSelector({
     return getBucketCount(activePreset);
   }, [viewFrom, viewTo, activePreset]);
 
-  const accentColor = useMemo(() => {
-    const palette = HEATMAP_THEMES[colorTheme] ?? HEATMAP_THEMES.slate;
-    return isDark ? palette.accent.dark : palette.accent.light;
-  }, [colorTheme, isDark]);
+  const accentColor = useMemo(
+    () => heatmapColors(colorTheme, isDark, { muted: toHex6(theme.muted), primary: toHex6(theme.primary), ring: toHex6(theme.ring) }).accent,
+    [colorTheme, isDark, theme],
+  );
 
   // ── Counts data ──
   const [counts, setCounts] = useState<number[]>([]);
@@ -276,7 +276,7 @@ export function TimeRangeSelector({
         colorStepsProp,
         colorStepBaseMinutes,
         isDark,
-        theme: { fontFamily: theme.fontFamily, background: theme.background },
+        theme: { fontFamily: theme.fontFamily, background: theme.background, muted: theme.muted, primary: theme.primary, ring: theme.ring },
         animationsEnabled: !reducedMotion,
       }),
     [counts, bucketCount, viewFrom, activePreset, locale, hour12, displayZone, maxCount, colorTheme, colorStepsProp, colorStepBaseMinutes, isDark, theme, reducedMotion],

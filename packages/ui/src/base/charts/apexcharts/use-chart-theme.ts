@@ -46,6 +46,10 @@ function resolveTheme() {
     border,
     borderLight: isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)",
     background: bg,
+    // The theme's own ramp ends and selection mark, for a chart drawn in the product's colours.
+    muted: resolveColor("--muted", "#f4f4f5"),
+    primary: resolveColor("--primary", "#18181b"),
+    ring: resolveColor("--ring", "#3b82f6"),
     fontFamily: "inherit",
     tooltipTheme: (isDark ? "dark" : "light") as "dark" | "light",
   };

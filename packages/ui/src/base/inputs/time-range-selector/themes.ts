@@ -1,7 +1,12 @@
 // Heatmap color themes + foreground-contrast helpers for the time range selector.
 
 /** Heatmap color theme key. */
-export type HeatmapColorTheme = "slate" | "blue" | "emerald" | "violet" | "amber" | "rose";
+/**
+ * Heatmap color theme key. `tokens` draws the ramp from the theme's own `--muted` (an empty slice)
+ * up to its `--primary`, and the selection in its `--ring`, so the strip follows the product theme
+ * in light and dark; the named themes are fixed palettes.
+ */
+export type HeatmapColorTheme = "tokens" | "slate" | "blue" | "emerald" | "violet" | "amber" | "rose";
 
 /** A pair of light/dark palettes for heatmap rendering. */
 export interface HeatmapPalette {
@@ -12,7 +17,7 @@ export interface HeatmapPalette {
 }
 
 /** Built-in heatmap color themes. All use muted/desaturated tones to avoid conflicting with alert colors. */
-export const HEATMAP_THEMES: Record<HeatmapColorTheme, HeatmapPalette> = {
+export const HEATMAP_THEMES: Record<Exclude<HeatmapColorTheme, "tokens">, HeatmapPalette> = {
   slate: {
     light: ["#f1f5f9", "#cbd5e1", "#94a3b8", "#64748b", "#475569", "#1e293b"],
     dark:  ["#1e293b", "#334155", "#475569", "#64748b", "#94a3b8", "#e2e8f0"],
@@ -44,6 +49,43 @@ export const HEATMAP_THEMES: Record<HeatmapColorTheme, HeatmapPalette> = {
     accent: { light: "#0d9488", dark: "#5eead4" },
   },
 };
+
+/** How many colours a heatmap ramp holds, the empty slice first. */
+const RAMP_STEPS = 6;
+
+/** `#rrggbb` of one channel triple. */
+function hexOf(rgb: readonly number[]): string {
+  return `#${rgb.map((c) => Math.round(c).toString(16).padStart(2, "0")).join("")}`;
+}
+
+/** The channels of a `#rrggbb` colour. */
+function channelsOf(hex: string): number[] {
+  const h = hex.replace("#", "");
+  return [0, 2, 4].map((at) => parseInt(h.slice(at, at + 2), 16));
+}
+
+/**
+ * The heatmap ramp from the theme's tokens: the empty slice in `muted`, then even steps mixed toward
+ * `primary`, ending on it.
+ *
+ * @param muted the theme's muted surface, `#rrggbb`
+ * @param primary the theme's primary, `#rrggbb`
+ */
+export function tokenRamp(muted: string, primary: string): string[] {
+  const from = channelsOf(muted);
+  const to = channelsOf(primary);
+  return Array.from({ length: RAMP_STEPS }, (_, step) => {
+    const t = step / (RAMP_STEPS - 1);
+    return hexOf(from.map((c, i) => c + (to[i]! - c) * t));
+  });
+}
+
+/** The palette a heatmap draws with: a named one, or the theme's own ramp and selection mark. */
+export function heatmapColors(theme: HeatmapColorTheme, isDark: boolean, tokens: { readonly muted: string; readonly primary: string; readonly ring: string }): { ramp: string[]; accent: string } {
+  if (theme === "tokens") return { ramp: tokenRamp(tokens.muted, tokens.primary), accent: tokens.ring };
+  const palette = HEATMAP_THEMES[theme] ?? HEATMAP_THEMES.slate;
+  return { ramp: isDark ? palette.dark : palette.light, accent: isDark ? palette.accent.dark : palette.accent.light };
+}
 
 /** WCAG relative luminance (0..1) of a `#rrggbb` hex color. */
 function relativeLuminance(hex: string): number {
