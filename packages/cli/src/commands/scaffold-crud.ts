@@ -448,6 +448,28 @@ export function parseZodType(zodExpr: string): Omit<FieldInfo, "name" | "label" 
     };
   }
 
+  // z.record(z.string(), z.string()) - i18n map field
+  if (/(?:z|zod)\.record\(\s*(?:z|zod)\.string\(\)\s*,\s*(?:z|zod)\.string\(\)\s*\)/.test(trimmed)) {
+    return {
+      tsType: "Record<string, string>",
+      formComponent: "I18nTextField",
+      inputType: "text",
+      component: "I18nText",
+      options: [],
+    };
+  }
+
+  // z.record(z.string(), any other value) - a structured value, drawn as JSON
+  if (/^(?:z|zod)\.record\(\s*(?:z|zod)\.string\(\)\s*,/.test(trimmed)) {
+    return {
+      tsType: "Record<string, unknown>",
+      formComponent: "TextareaField",
+      inputType: "text",
+      component: "Text",
+      options: [],
+    };
+  }
+
   // z.string() / zod.string() variants
   if (/(?:z|zod)\.string\(\)/.test(trimmed)) {
     if (trimmed.includes(".email()")) {
@@ -492,28 +514,6 @@ export function parseZodType(zodExpr: string): Omit<FieldInfo, "name" | "label" 
     return {
       tsType: "string",
       formComponent: "TextField",
-      inputType: "text",
-      component: "Text",
-      options: [],
-    };
-  }
-
-  // z.record(z.string(), z.string()) - i18n map field
-  if (/(?:z|zod)\.record\(\s*(?:z|zod)\.string\(\)\s*,\s*(?:z|zod)\.string\(\)\s*\)/.test(trimmed)) {
-    return {
-      tsType: "Record<string, string>",
-      formComponent: "I18nTextField",
-      inputType: "text",
-      component: "I18nText",
-      options: [],
-    };
-  }
-
-  // z.record(z.string(), <anything but a string>) - a structured value, drawn as JSON
-  if (/^(?:z|zod)\.record\(\s*(?:z|zod)\.string\(\)\s*,/.test(trimmed)) {
-    return {
-      tsType: "Record<string, unknown>",
-      formComponent: "TextareaField",
       inputType: "text",
       component: "Text",
       options: [],
