@@ -7,6 +7,7 @@ import { assertOutputDirs } from "../config/output-dirs.js";
 import { reportConfigError } from "../config/report-config-error.js";
 import { captureWrites, findProjectRoot, lastKeptRenders } from "../utils/fs.js";
 import { log, withSilentLog } from "../utils/logger.js";
+import { runAfterGenerate } from "../utils/generated-after.js";
 import { takeGeneratedOutcomes, withConflictMarkers, withRemovalsHonoured, type GeneratedWrite } from "../utils/generated-merge.js";
 import { GENERATED_PAGE_MARKER, isUntouchedRender, renderOrigin } from "../utils/project-templates.js";
 
@@ -281,13 +282,15 @@ export const generatedCommand = new Command("generated")
     }
     let conflicted = false;
     if (flags.all) {
-      const { writes } = await regenerateAll(rootDir, flags.writeConflicts === true);
+      const { origins, writes } = await regenerateAll(rootDir, flags.writeConflicts === true);
       for (const w of writes) {
         if (w.outcome === "written") continue;
         log.step(`${w.outcome.padEnd(9)} ${relative(rootDir, w.path)}${w.markersWritten ? "  (conflict markers written)" : ""}`);
         for (const hunk of w.hunks ?? []) process.stdout.write(hunk);
         if (w.outcome === "conflict" && !w.markersWritten) conflicted = true;
       }
+      // Once per regeneration, however many origins it ran, and only when one ran.
+      if (origins.length > 0) await runAfterGenerate(rootDir);
     }
     const kept = new Map<string, string>();
     const entries = await generatedReport(rootDir, flags.share === true, kept);

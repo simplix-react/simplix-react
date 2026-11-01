@@ -4,7 +4,7 @@ import { join, relative } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { regenerateAll } from "../commands/generated.js";
-import { runScaffold } from "../commands/scaffold-crud.js";
+import { runScaffold, scaffoldCrudCommand } from "../commands/scaffold-crud.js";
 import { withSilentLog } from "../utils/logger.js";
 
 vi.mock("ora", () => ({
@@ -301,5 +301,21 @@ describe("the configured story directory", () => {
     await scaffold();
 
     expect((await snapshot()).get("board/screens/product.stories.tsx")).toContain("Generated/Product");
+  });
+});
+
+describe("the commands run after a scaffold", () => {
+  const afterLog = () => readFile(join(root, "after.log"), "utf-8").catch(() => undefined);
+
+  it("run once the command has written the screen, and not for the generator call a report makes", async () => {
+    await useKitShapedTemplates();
+    await put("simplix.config.ts", 'export default { generated: { after: [{ command: "node mark.cjs" }] } };\n');
+    await put("mark.cjs", 'require("node:fs").appendFileSync("after.log", "x");\n');
+
+    await scaffold();
+    expect(await afterLog()).toBeUndefined();
+
+    await withSilentLog(() => scaffoldCrudCommand.parseAsync(["node", "simplix", "product", "--module", "mymod"]));
+    expect(await afterLog()).toBe("x");
   });
 });

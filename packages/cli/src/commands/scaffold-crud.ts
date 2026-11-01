@@ -36,6 +36,7 @@ import { writeStampedGenerated } from "../utils/generated-merge.js";
 import { fixtureRows } from "../utils/story-fixtures.js";
 import { renderWidgetBlocks, renderWidgetFiles } from "./scaffold-widgets.js";
 import { renderTemplate } from "../utils/template.js";
+import { runAfterGenerate } from "../utils/generated-after.js";
 import { logSubjectWrite, writeRoute } from "../utils/route-files.js";
 import { depVersion } from "../versions.js";
 
@@ -2021,7 +2022,7 @@ export const scaffoldCrudCommand = new Command("scaffold")
     "--app <dir>",
     "Target Expo app under apps/ for route files (with --native)",
   )
-  .action(reportConfigError(runScaffold));
+  .action(reportConfigError(scaffoldAction));
 
 /** The options `simplix scaffold` takes. */
 export interface ScaffoldOptions {
@@ -2031,6 +2032,16 @@ export interface ScaffoldOptions {
   output?: string;
   native?: boolean;
   app?: string;
+}
+
+/**
+ * `simplix scaffold <entity>`: generates the entity's files, then runs the project's
+ * `generated.after` commands. The commands belong here and not in {@link runScaffold}, which the
+ * generated-state report runs in capture mode and a regeneration runs once per origin.
+ */
+async function scaffoldAction(entityArg: string, options: ScaffoldOptions): Promise<void> {
+  await runScaffold(entityArg, options);
+  await runAfterGenerate(await findProjectRoot(process.cwd()));
 }
 
 /**

@@ -19,6 +19,7 @@ import { log } from "../utils/logger.js";
 import { GENERATED_PAGE_MARKER, loadProjectTemplates, stampFingerprint, templateFor, writeGenerated, type ProjectTemplates } from "../utils/project-templates.js";
 import { renderTemplate } from "../utils/template.js";
 import { storyFileFor } from "../utils/story-file.js";
+import { runAfterGenerate } from "../utils/generated-after.js";
 import { writeStampedGenerated } from "../utils/generated-merge.js";
 
 /** The page kinds `add-page` generates, each the name of the template that draws it. */
@@ -106,7 +107,17 @@ export const addPageCommand = new Command("add-page")
   .option("--module <name>", "Module that owns the page (modules/<name>/src/pages/<page>); a grouped module is <group>/<name>")
   .option("--app <name>", "App that owns the page (apps/<name>/src/pages/<page>)")
   .option("--variant <name>", "Another shape of the kind, drawn from <kind>.<variant>.hbs (e.g. app-shell --variant top-bar)")
-  .action(reportConfigError(runAddPage));
+  .action(reportConfigError(addPageAction));
+
+/**
+ * `simplix add-page <kind> <name>`: generates the page, then runs the project's
+ * `generated.after` commands. The commands belong here and not in {@link runAddPage}, which the
+ * generated-state report runs in capture mode and a regeneration runs once per origin.
+ */
+async function addPageAction(rawKind: string, name: string, flags: { module?: string; app?: string; variant?: string }): Promise<void> {
+  await runAddPage(rawKind, name, flags);
+  await runAfterGenerate(await findProjectRoot(process.cwd()));
+}
 
 /**
  * Generates one page of a kind: the body of `simplix add-page <kind> <name>`.

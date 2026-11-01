@@ -114,7 +114,7 @@ describe("configured output directories", () => {
       await project(undefined, false);
       await writeFile(join(root, "screens"), "");
       const problems = await findOutputDirProblems(root, { templates: { storiesDir: "screens" } });
-      expect(problems).toEqual([{ option: "templates.storiesDir", configured: "screens", path: join(root, "screens"), reason: "not-a-directory" }]);
+      expect(problems).toEqual([{ option: "templates.storiesDir", configured: "screens", path: join(root, "screens"), reason: "not-a-directory", consequence: expect.any(String) }]);
       await expect(assertOutputDirs(root, { templates: { storiesDir: "screens" } })).rejects.toThrow(/is not a directory/);
     });
 
@@ -129,6 +129,14 @@ describe("configured output directories", () => {
       expect(await findOutputDirProblems(root, { templates: { storiesDir: abs } })).toMatchObject([{ path: abs, reason: "missing" }]);
       await mkdir(abs);
       expect(await findOutputDirProblems(root, { templates: { storiesDir: abs } })).toEqual([]);
+    });
+
+    it("checks the directory each after step runs in, naming the step", async () => {
+      await mkdir(join(root, "board"));
+      const config = { generated: { after: [{ command: "a" }, { cwd: "board", command: "b" }, { cwd: "gone", command: "c" }] } };
+      const problems = await findOutputDirProblems(root, config);
+      expect(problems).toMatchObject([{ option: "generated.after[2].cwd", configured: "gone", path: join(root, "gone"), reason: "missing" }]);
+      await expect(assertOutputDirs(root, config)).rejects.toThrow(/generated\.after\[2\]\.cwd "gone" resolves to .*gone, which does not exist\. The command would fail/);
     });
 
     it("passes a config that names no output directory", async () => {

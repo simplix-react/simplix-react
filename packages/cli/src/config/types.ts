@@ -194,9 +194,16 @@ export interface SimplixConfig {
    * after formatting and a three-way merge reads the edits against the text they were made on.
    * It receives the render and the path the file goes to, and returns the formatted text. Without
    * it a render is used exactly as the template produced it.
+   *
+   * `after` lists commands that bring something derived from the generated files up to date (a
+   * design reference's catalogs, an index). They run once, in order, after `simplix scaffold`,
+   * `simplix add-page` and `simplix generated --all` have written their files, never from a
+   * report-only `simplix generated`. A step that exits non-zero ends the run: the remaining steps
+   * are skipped, the exit code is reported and the command fails. Without it nothing runs.
    */
   generated?: {
     format?: (source: string, filePath: string) => string | Promise<string>;
+    after?: readonly GeneratedAfterStep[];
   };
 
   /** Code generation options */
@@ -339,6 +346,14 @@ export interface CrudEntityConfig {
 
 /** Entity name → CRUD config mapping for a domain package */
 export type CrudMap = Record<string, CrudEntityConfig>;
+
+/** One command run after a generator has written its files (see `SimplixConfig.generated`). */
+export interface GeneratedAfterStep {
+  /** The directory the command runs in, relative to the project root. Absent, the project root. */
+  readonly cwd?: string;
+  /** The command line, run through the shell. */
+  readonly command: string;
+}
 
 /**
  * How a menu entry's gate names the permission group its list endpoint requires.
