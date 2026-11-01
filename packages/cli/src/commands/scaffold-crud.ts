@@ -37,6 +37,7 @@ import { log } from "../utils/logger.js";
 import { writeStampedGenerated } from "../utils/generated-merge.js";
 import { fixtureRows } from "../utils/story-fixtures.js";
 import { formFieldsOf } from "../utils/form-fields.js";
+import { scaffoldRoles } from "../utils/scaffold-roles.js";
 import { renderWidgetBlocks, renderWidgetFiles } from "./scaffold-widgets.js";
 import { renderTemplate } from "../utils/template.js";
 import { pageKindBlocksTemplate } from "../templates/page-kinds/index.js";
@@ -2251,9 +2252,10 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     fields = orderAndCategorizeFields(fields);
 
     // Resolve actual hook names from crud.config.ts, and from SimpliX Meta for a meta domain that
-    // has none: a hand-written entry states an intent SimpliX Meta cannot, so it wins where it exists.
+    // has none: a hand-written entry wins for every role it names, and a figure role it leaves out
+    // comes from Meta.
     const crudConfig = await findCrudConfigForEntity(rootDir, entity);
-    const roles = crudConfig ?? metaSource?.roles ?? null;
+    const roles = scaffoldRoles(crudConfig, metaSource?.roles);
 
     const ops =
       !crudConfig && metaSource
