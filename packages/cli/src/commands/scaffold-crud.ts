@@ -36,6 +36,7 @@ import {
 import { log } from "../utils/logger.js";
 import { writeStampedGenerated } from "../utils/generated-merge.js";
 import { fixtureRows } from "../utils/story-fixtures.js";
+import { formFieldsOf } from "../utils/form-fields.js";
 import { renderWidgetBlocks, renderWidgetFiles } from "./scaffold-widgets.js";
 import { renderTemplate } from "../utils/template.js";
 import { pageKindBlocksTemplate } from "../templates/page-kinds/index.js";
@@ -2658,10 +2659,12 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     const hasI18nFields = i18nFieldPairs.length > 0;
     const projectConfig = await loadConfig(rootDir);
     const i18nLocales = projectConfig.i18n?.locales ?? ["en", "ko", "ja"];
+    // The fields a form writes, read by the form widget and by the story's form panel alike.
+    const formFields = formFieldsOf(ctx.fields, ctx.formOrderField);
     // Sample rows a generated story draws, shared through the context so the story template
     // reads the same fields the screen templates do.
-    const fixtureRowsJson = JSON.stringify(fixtureRows([...ctx.detailFields, ...ctx.listFields], rowIdField, entityKebab), null, 2);
-    const fullCtx = { ...ctx, moduleNamespace, moduleName, entityIcon: "FileTextIcon", hasListDetail, hasI18nFields, i18nFieldPairs, i18nLocales, fixtureRowsJson };
+    const fixtureRowsJson = JSON.stringify(fixtureRows([...ctx.detailFields, ...ctx.listFields, ...formFields], rowIdField, entityKebab, 3, i18nLocales), null, 2);
+    const fullCtx = { ...ctx, formFields, moduleNamespace, moduleName, entityIcon: "FileTextIcon", hasListDetail, hasI18nFields, i18nFieldPairs, i18nLocales, fixtureRowsJson };
 
     // The project's own templates win where it has written any, for the widgets as for the pages.
     const projectTemplates = await loadProjectTemplates(rootDir, projectConfig.templates?.from);

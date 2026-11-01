@@ -5,6 +5,8 @@ export interface FixtureField {
   readonly options?: readonly string[];
   readonly nameField?: string;
   readonly tsType?: string;
+  /** The plain field a multilingual map fills, set on the map's own field. */
+  readonly baseFieldName?: string | null;
 }
 
 /**
@@ -18,12 +20,15 @@ export interface FixtureField {
  * @param rowIdField the field that identifies a row
  * @param entityKebab the entity's kebab name, the prefix of each row's id
  * @param count how many rows
+ * @param locales the languages a multilingual field holds a value in, every one the project ships,
+ *   so the frame draws a translated record as the screen draws one
  */
 export function fixtureRows(
   fields: readonly FixtureField[],
   rowIdField: string,
   entityKebab: string,
   count = 3,
+  locales: readonly string[] = [],
 ): Record<string, unknown>[] {
   const byName = new Map<string, FixtureField>();
   for (const f of fields) if (!byName.has(f.name)) byName.set(f.name, f);
@@ -32,7 +37,10 @@ export function fixtureRows(
     const row: Record<string, unknown> = {};
     for (const f of byName.values()) {
       if (f.name === rowIdField) continue;
-      row[f.name] = sampleValue(f, n);
+      row[f.name] =
+        f.contractKind === "i18nText" && f.baseFieldName && locales.length > 0
+          ? Object.fromEntries(locales.map((locale) => [locale, `${f.baseFieldName} ${n}`]))
+          : sampleValue(f, n);
       if (f.contractKind === "reference" && f.nameField && !byName.has(f.nameField)) row[f.nameField] = `${f.nameField} ${n}`;
     }
     row[rowIdField] = byName.get(rowIdField)?.tsType === "number" ? n : `${entityKebab}-${n}`;
