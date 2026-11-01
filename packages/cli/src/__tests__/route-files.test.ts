@@ -38,10 +38,18 @@ describe("a menu entry", () => {
     expect(out).toBe(grouped.replace('{ key: "files", icon: PackageIcon }', '{ key: "files", href: "/files", icon: PackageIcon, gate: RELEASES }'));
   });
 
-  it("keeps a placeholder's own gate and leaves a keyed entry that already routes alone", () => {
+  it("gives a placeholder the screen's gate in place of its own and leaves a keyed entry that already routes alone", () => {
     const placeholder = '[{ key: "files", icon: I, gate: SYSTEM },\n// @simplix-menu admin\n]';
     expect(insertMenuEntry(placeholder, "@simplix-menu admin", { key: "files", href: "/files", gate: "RELEASES" }, "x")).toBe(
-      '[{ key: "files", href: "/files", icon: I, gate: SYSTEM },\n// @simplix-menu admin\n]',
+      '[{ key: "files", href: "/files", icon: I, gate: RELEASES },\n// @simplix-menu admin\n]',
+    );
+    // A placeholder with no gate of its own and a screen with none stay without one.
+    expect(insertMenuEntry('[{ key: "files", icon: I },\n// @simplix-menu admin\n]', "@simplix-menu admin", { key: "files", href: "/files", gate: "undefined" }, "x")).toBe(
+      '[{ key: "files", href: "/files", icon: I },\n// @simplix-menu admin\n]',
+    );
+    const gateFirst = '[{ key: "files", gate: SYSTEM, icon: I },\n// @simplix-menu admin\n]';
+    expect(insertMenuEntry(gateFirst, "@simplix-menu admin", { key: "files", href: "/files", gate: "RELEASES" }, "x")).toBe(
+      '[{ key: "files", href: "/files", icon: I, gate: RELEASES },\n// @simplix-menu admin\n]',
     );
     const routed = '[{ key: "files", href: "/release-files", icon: I },\n// @simplix-menu admin\n]';
     expect(insertMenuEntry(routed, "@simplix-menu admin", { key: "files", href: "/files", gate: "undefined" }, "x")).toBeUndefined();
@@ -63,8 +71,9 @@ describe("a menu entry", () => {
     expect(placeMenuEntry(menu, "@simplix-menu admin", target, '  { key: "files", href: "/files" },\n')?.gated).toBe(false);
     const completed = '[{ key: "files", icon: I },\n// @simplix-menu admin\n]';
     expect(placeMenuEntry(completed, "@simplix-menu admin", target, entry)?.gated).toBe(true);
+    // A placeholder's own gate gives way, so the screen's gate (and the table key it reads) is written.
     const own = '[{ key: "files", icon: I, gate: SYSTEM },\n// @simplix-menu admin\n]';
-    expect(placeMenuEntry(own, "@simplix-menu admin", target, entry)?.gated).toBe(false);
+    expect(placeMenuEntry(own, "@simplix-menu admin", target, entry)?.gated).toBe(true);
   });
 
   it("refuses a menu file with no marker", () => {
@@ -166,12 +175,15 @@ describe("writing a list screen's route", () => {
       expect(await readFile(join(root, "app/subjects.ts"), "utf-8")).toContain('catalogVoice: "CATALOG"');
     });
 
-    it("leaves the table alone for an entry that keeps a gate of its own", async () => {
+    it("gives a placeholder carrying its own gate the screen's gate and adds the key that gate reads", async () => {
       await writeFile(join(root, "app/menu.ts"), '[\n  { key: "catalogVoices", icon: I, gate: SPEECH },\n  // @simplix-menu admin\n]\n');
       const out = await writeRoute(base({ gate }));
       expect(out.menuInserted).toBe(true);
-      expect(out.subject).toBeUndefined();
-      expect(await readFile(join(root, "app/subjects.ts"), "utf-8")).toBe(TABLE);
+      const menuText = await readFile(join(root, "app/menu.ts"), "utf-8");
+      expect(menuText).not.toContain("SPEECH");
+      expect(menuText).toContain("SUBJECTS.catalogVoice");
+      expect(out.subject).toEqual({ file: "app/subjects.ts", key: "catalogVoice", outcome: "added" });
+      expect(await readFile(join(root, "app/subjects.ts"), "utf-8")).toContain("catalogVoice:");
     });
 
     it("adds no subject for a list the server does not guard by a permission", async () => {

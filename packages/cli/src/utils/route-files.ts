@@ -75,9 +75,11 @@ export interface MenuPlacement {
 
 /**
  * Registers a list screen in a menu file, or returns `undefined` when nothing changes. An entry
- * already holding the key keeps its place: it gets the `href` (and the gate) it lacks, so a
- * placeholder drawn under its own group is completed rather than duplicated. A key with no entry,
- * where nothing routes `href` either, is inserted on the line before the marker.
+ * already holding the key keeps its place: it gets the `href` it lacks and the screen's gate, so a
+ * placeholder drawn under its own group is completed rather than duplicated. A placeholder routes
+ * nowhere, so a gate it carries stood for a screen that did not exist yet and gives way to the gate
+ * of the screen it now opens, which reads the list permission the server enforces. A key with no
+ * entry, where nothing routes `href` either, is inserted on the line before the marker.
  */
 export function placeMenuEntry(text: string, marker: string, target: MenuEntryTarget, entry: string): MenuPlacement | undefined {
   const keyed = new RegExp(`\\{([^{}]*?\\bkey:\\s*"${target.key.replace(/[^\w]/g, "\\$&")}")([^{}]*?)(\\s*)\\}`);
@@ -85,9 +87,11 @@ export function placeMenuEntry(text: string, marker: string, target: MenuEntryTa
   if (found) {
     const [whole, head, tail, close] = found;
     if (/\bhref:/.test(head + tail)) return undefined;
-    const gated = target.gate !== "undefined" && !/\bgate:/.test(head + tail);
+    const gated = target.gate !== "undefined";
+    // The placeholder's own gate is dropped: an expression without braces, up to the next comma.
+    const strip = (part: string) => (gated ? part.replace(/,?\s*\bgate:\s*[^,{}]+/, "") : part);
     const gate = gated ? `, gate: ${target.gate}` : "";
-    const filled = `{${head}, href: "${target.href}"${tail}${gate}${close}}`;
+    const filled = `{${strip(head)}, href: "${target.href}"${strip(tail)}${gate}${close}}`;
     return { text: text.slice(0, found.index) + filled + text.slice(found.index + whole.length), gated };
   }
   if (text.includes(`href: "${target.href}"`)) return undefined;
