@@ -175,6 +175,8 @@ export function contractKindOf(field: FieldInfo): string {
   if (field.isForeignKey) return "reference";
   // The map half of an i18n pair: one text per content language, beside the plain field it fills.
   if (field.baseFieldName && field.tsType === "Record<string, string>") return "i18nText";
+  // A structured value (a map or an object) is drawn as JSON, never through `String()`.
+  if (/^(Record<.*>|object|\{.*\})$/.test(field.tsType)) return "json";
   if (field.component === "Select" && field.options.length > 0) return "enum";
   if (field.columnDisplay === "boolean" || field.tsType === "boolean") return "boolean";
   if (field.columnFormat === "datetime") return "instant";

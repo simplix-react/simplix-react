@@ -25,3 +25,11 @@ describe("secret fields", () => {
     expect(contractKindOf({ name: "apiKey", tsType: "string", options: [] } as unknown as FieldInfo)).toBe("text");
   });
 });
+
+describe("structured fields", () => {
+  it("are drawn as JSON, while an i18n map and plain text keep their own kinds", () => {
+    expect(contractKindOf({ name: "payload", tsType: "Record<string, unknown>", options: [] } as unknown as FieldInfo)).toBe("json");
+    expect(contractKindOf({ name: "nameI18n", tsType: "Record<string, string>", baseFieldName: "name", options: [] } as unknown as FieldInfo)).toBe("i18nText");
+    expect(contractKindOf({ name: "note", tsType: "string", options: [] } as unknown as FieldInfo)).toBe("text");
+  });
+});
