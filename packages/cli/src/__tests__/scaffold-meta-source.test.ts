@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { parseSchemaFields } from "../commands/scaffold-crud.js";
+import { contractKindOf, parseSchemaFields } from "../commands/scaffold-crud.js";
 import type { DtoMeta } from "../meta/types.js";
 import type { OpenApiNamingStrategy } from "../openapi/naming/naming-strategy.js";
 import type { ContainerMapping } from "../openapi/orchestration/spec-profile.js";
@@ -236,6 +236,27 @@ describe("what a template cannot know and SimpliX Meta states", () => {
     expect(source.fields.filter((one) => one.isCode).map((one) => one.name)).toEqual(["holidayName"]);
     // Without the format in the document, nothing is drawn as code.
     expect(holiday().fields.some((one) => one.isCode)).toBe(false);
+  });
+
+  it("carries a money field's currency and scale, and only on a number", () => {
+    // The fixture predates `money`, so the format is stated on a copy of the document.
+    const copy: DtoMeta = JSON.parse(JSON.stringify(meta));
+    for (const type of Object.values(copy.types)) {
+      for (const field of type.fields ?? []) {
+        if (field.name === "calendarYear" || field.name === "holidayName") {
+          field.format = "money";
+          field.money = { currency: "USD", scale: 6 };
+        }
+      }
+    }
+    const domain = resolveMeta(copy, { domains: smartSafetyDomains, containerTypes }).domains.get("system");
+    if (!domain) throw new Error("the fixture has no system domain");
+    const calendar = buildMetaScaffoldSource({ domain, tag: "common.main.system.HolidayCalendar", naming: simplixBootNaming });
+    const year = calendar.fields.find((one) => one.name === "calendarYear");
+    expect(year?.money).toEqual({ currency: "USD", scale: 6 });
+    expect(year && contractKindOf(year)).toBe("money");
+    const holidays = buildMetaScaffoldSource({ domain, tag: "common.main.system.Holiday", naming: simplixBootNaming });
+    expect(holidays.fields.find((one) => one.name === "holidayName")?.money).toBeUndefined();
   });
 
   it("offers a sort only where the backend implements one", () => {

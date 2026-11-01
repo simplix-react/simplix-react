@@ -105,6 +105,8 @@ export interface FieldInfo {
   isIdentifier?: boolean;
   /** A code the reader types or compares (SimpliX Meta's `format: "code"`), drawn in the monospaced face. */
   isCode?: boolean;
+  /** An amount of money (SimpliX Meta's `format: "money"`): its currency and the decimal places its stored whole number carries. */
+  money?: { currency: string; scale: number };
   /** A key that is not a reference with a name, which no generated screen draws. */
   isOpaqueId?: boolean;
   /** The referenced field SimpliX Meta's `reference.idField` names, for a key the contract names as a reference. */
@@ -172,6 +174,7 @@ export function contractKindOf(field: FieldInfo): string {
   if (field.columnFormat === "datetime") return "instant";
   if (field.columnFormat === "date") return "date";
   if (field.columnFormat === "time") return "time";
+  if (field.money && field.tsType === "number") return "money";
   if (field.tsType === "number") return "number";
   if (field.formComponent === "TextareaField" || field.component === "Textarea") return "longText";
   if (field.inputType === "email") return "email";

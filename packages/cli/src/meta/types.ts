@@ -77,8 +77,13 @@ export interface FieldMeta {
   labels?: Record<string, string>;
   constraints?: ConstraintMeta[];
   searchable?: SearchableMeta;
-  /** How a screen draws the value beyond its type: `"code"` for a field marked `@CodeValue`. */
+  /**
+   * How a screen draws the value beyond its type: `"code"` for a field marked `@CodeValue`,
+   * `"money"` for one marked `@MoneyValue`.
+   */
   format?: string;
+  /** For a `"money"` field: the currency and the decimal places its stored whole number carries. */
+  money?: { currency: string; scale: number };
 }
 
 /**

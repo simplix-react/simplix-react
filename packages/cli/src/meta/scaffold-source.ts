@@ -511,6 +511,7 @@ function fieldInfos(
     const alias = sortAliasOf(domain, searchDto, field.name);
     if (alias) one.sortAlias = alias;
     if (field.format === "code") one.isCode = true;
+    if (field.format === "money" && field.money && shape.tsType === "number") one.money = { ...field.money };
     if (field.required) one.required = true;
     if (field.defaultValue !== undefined) one.defaultLiteral = JSON.stringify(field.defaultValue);
     // A key the contract names as another entity's, whatever its own name: drawn by that record's
