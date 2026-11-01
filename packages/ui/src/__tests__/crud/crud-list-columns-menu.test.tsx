@@ -55,7 +55,7 @@ const computedList = () => (
     <FilterBar filters={[]} state={state} />
     <CrudList.Table data={data}>
       <CrudList.Column field="name" header="Name" />
-      <CrudList.Column id="contact" header="Contact" minTableWidth={800}>
+      <CrudList.Column<(typeof data)[number]> id="contact" header="Contact" minTableWidth={800}>
         {({ row }) => `${row.name} <${row.email}>`}
       </CrudList.Column>
     </CrudList.Table>
