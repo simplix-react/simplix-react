@@ -211,6 +211,36 @@ describe("what a scaffold writes beside the screen", () => {
     expect(outsideTheScreen(await snapshot())).toEqual(outsideTheScreen(settled));
   });
 
+  it("lays down no description key for a page that reads the screen's own", async () => {
+    await useKitShapedTemplates();
+    // A page states its line by the catalogue holding `screen.<entity>.description`; it asks
+    // whether the key exists, so a catalogue without it is a screen without a line, not a gap.
+    await put(
+      ".simplix/templates/crud-page.hbs",
+      [
+        "/**\n * @simplix-generated page/crud-page\n */",
+        'import { useTranslation } from "@simplix-react/i18n/react";',
+        "export function {{EntityPascal}}CrudPage() {",
+        '  const { t, exists } = useTranslation("mymod/widgets");',
+        '  const descriptionKey = "screen.{{entity}}.description";',
+        "  return <p>{exists(descriptionKey) ? t(descriptionKey) : null}</p>;",
+        "}",
+        "",
+      ].join("\n"),
+    );
+    for (const locale of ["en", "ko"]) await put(`${MODULE}/src/locales/widgets/${locale}.json`, '{\n  "page": {\n    "note": "A note"\n  }\n}\n');
+    await put(
+      `${MODULE}/src/locales/index.ts`,
+      'export const translations = {\n  components: {\n    widgets: {\n      en: () => import("./widgets/en.json"),\n    },\n  },\n};\n',
+    );
+
+    await scaffold();
+
+    for (const locale of ["en", "ko"]) {
+      expect(await readFile(join(root, MODULE, "src/locales/widgets", `${locale}.json`), "utf-8")).toBe('{\n  "page": {\n    "note": "A note"\n  }\n}\n');
+    }
+  });
+
   it("adds the entity's default keys to the catalogue for a file that reads them", async () => {
     await put(`${MODULE}/src/locales/widgets/en.json`, '{\n  "page": {}\n}\n');
     await scaffold();

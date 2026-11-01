@@ -1378,29 +1378,6 @@ export function readsEntityKeys(content: string, entity: string): boolean {
   return new RegExp(`\\bt\\(\\s*["'\`]${escaped}\\.`).test(content);
 }
 
-/** Whether a file reads the screen's own description key, `screen.<entity>.description`. */
-export function readsScreenDescription(content: string, entity: string): boolean {
-  return content.includes(`"screen.${entity}.description"`);
-}
-
-/**
- * Lays down the screen's description key in every locale of the module's widgets catalogue, empty,
- * where it is missing. An empty description draws none, so a screen states its line by filling the
- * value in each language; a value already there is never touched.
- */
-export async function ensureScreenDescriptionKey(moduleDir: string, entity: string, locales: readonly string[]): Promise<void> {
-  for (const locale of locales) {
-    const jsonPath = join(moduleDir, "src", "locales", "widgets", `${locale}.json`);
-    if (!(await pathExists(jsonPath))) continue;
-    const json = JSON.parse((await readFile(jsonPath, "utf-8")) || "{}") as Record<string, unknown>;
-    const screen = (json.screen ??= {}) as Record<string, { description?: string }>;
-    const own = (screen[entity] ??= {});
-    if (typeof own.description === "string") continue;
-    own.description = "";
-    await writeFileWithDir(jsonPath, `${JSON.stringify(json, null, 2)}\n`);
-  }
-}
-
 /** Whether a file imports package `name` or a subpath of it. */
 export function importsPackage(content: string, name: string): boolean {
   const escaped = name.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&");
@@ -2825,9 +2802,6 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       // putting it in is a change to a file the author keeps.
       if (screenFiles.some((content) => readsEntityKeys(content, entity))) {
         await updateLocaleJsons(moduleDir, entity, EntityPascal, locales, ops, hasTree);
-      }
-      if (screenFiles.some((content) => readsScreenDescription(content, entity))) {
-        await ensureScreenDescriptionKey(moduleDir, entity, locales);
       }
       await ensureTsupPagesEntry(moduleDir);
       await ensurePackageJsonPagesExport(moduleDir);
