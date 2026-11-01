@@ -1,12 +1,14 @@
 import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 
-import type { RouteTarget } from "../config/types.js";
+import type { MenuGateConfig, RouteTarget } from "../config/types.js";
 import type { AccessMeta } from "../meta/types.js";
-import { toKebabCase } from "./case.js";
+import { toCamelCase, toKebabCase } from "./case.js";
 import { pathExists, readJsonFile, writeFileWithDir } from "./fs.js";
 import type { GeneratedOutcome } from "./generated-merge.js";
+import { log } from "./logger.js";
 import { writeGenerated } from "./project-templates.js";
+import { ensureTableEntry } from "./subjects-table.js";
 import { renderTemplate } from "./template.js";
 
 /** What routing one list screen came to. */
@@ -15,8 +17,19 @@ export interface RouteWrite {
   readonly outcome: GeneratedOutcome | "no-template";
   /** Whether a menu entry was inserted; `false` where one for the path already existed. */
   readonly menuInserted?: boolean;
+  /** What became of the subjects table entry the inserted gate reads, where the config names a table. */
+  readonly subject?: SubjectWrite;
   /** Catalog files a label was added to. */
   readonly labelled: readonly string[];
+}
+
+/** What routing a list screen did to the subjects table its menu gate reads. */
+export interface SubjectWrite {
+  /** The table file, relative to the project root. */
+  readonly file: string;
+  /** The property the gate reads, or `undefined` where the rendered expression is not a member of the table. */
+  readonly key?: string;
+  readonly outcome: "added" | "present" | "no-file" | "no-table" | "inline-table" | "not-a-member";
 }
 
 export interface RouteInput {
@@ -53,27 +66,73 @@ export interface MenuEntryTarget {
   readonly gate: string;
 }
 
+/** A menu file with a screen registered in it. */
+export interface MenuPlacement {
+  readonly text: string;
+  /** Whether the target's gate expression is now in the file because of this placement. */
+  readonly gated: boolean;
+}
+
 /**
- * Registers a list screen in a menu file and returns the new text, or `undefined` when nothing
- * changes. An entry already holding the key keeps its place: it gets the `href` (and the gate)
- * it lacks, so a placeholder drawn under its own group is completed rather than duplicated. A key
- * with no entry, where nothing routes `href` either, is inserted on the line before the marker.
+ * Registers a list screen in a menu file, or returns `undefined` when nothing changes. An entry
+ * already holding the key keeps its place: it gets the `href` (and the gate) it lacks, so a
+ * placeholder drawn under its own group is completed rather than duplicated. A key with no entry,
+ * where nothing routes `href` either, is inserted on the line before the marker.
  */
-export function insertMenuEntry(text: string, marker: string, target: MenuEntryTarget, entry: string): string | undefined {
+export function placeMenuEntry(text: string, marker: string, target: MenuEntryTarget, entry: string): MenuPlacement | undefined {
   const keyed = new RegExp(`\\{([^{}]*?\\bkey:\\s*"${target.key.replace(/[^\w]/g, "\\$&")}")([^{}]*?)(\\s*)\\}`);
   const found = keyed.exec(text);
   if (found) {
     const [whole, head, tail, close] = found;
     if (/\bhref:/.test(head + tail)) return undefined;
-    const gate = target.gate !== "undefined" && !/\bgate:/.test(head + tail) ? `, gate: ${target.gate}` : "";
+    const gated = target.gate !== "undefined" && !/\bgate:/.test(head + tail);
+    const gate = gated ? `, gate: ${target.gate}` : "";
     const filled = `{${head}, href: "${target.href}"${tail}${gate}${close}}`;
-    return text.slice(0, found.index) + filled + text.slice(found.index + whole.length);
+    return { text: text.slice(0, found.index) + filled + text.slice(found.index + whole.length), gated };
   }
   if (text.includes(`href: "${target.href}"`)) return undefined;
   const lines = text.split("\n");
   const at = lines.findIndex((line) => line.includes(marker));
   if (at < 0) throw new Error(`The menu file has no line holding the marker "${marker}"`);
-  return [...lines.slice(0, at), entry.replace(/\n$/, ""), ...lines.slice(at)].join("\n");
+  return { text: [...lines.slice(0, at), entry.replace(/\n$/, ""), ...lines.slice(at)].join("\n"), gated: target.gate !== "undefined" && entry.includes(target.gate) };
+}
+
+/** {@link placeMenuEntry}, returning only the new text. */
+export function insertMenuEntry(text: string, marker: string, target: MenuEntryTarget, entry: string): string | undefined {
+  return placeMenuEntry(text, marker, target, entry)?.text;
+}
+
+/** The subject expression of a menu gate: the configured template, else the group as a string literal. */
+export function menuSubject(gate: MenuGateConfig | undefined, ctx: Readonly<Record<string, unknown>>, group: string): string {
+  return gate ? renderTemplate(gate.subject, { ...ctx, group }) : `"${group}"`;
+}
+
+/**
+ * Adds the property a menu gate reads to the subjects table, where the rendered expression is
+ * `<table name>.<key>`. A table that already has the key keeps its value.
+ */
+async function ensureSubject(rootDir: string, table: NonNullable<MenuGateConfig["table"]>, expression: string, group: string, label: string | undefined): Promise<SubjectWrite> {
+  const file = table.file;
+  const name = table.name ?? "SUBJECTS";
+  const key = new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\.([A-Za-z_$][\\w$]*)$`).exec(expression.trim())?.[1];
+  if (key === undefined) return { file, outcome: "not-a-member" };
+  const path = resolve(rootDir, file);
+  if (!(await pathExists(path))) return { file, key, outcome: "no-file" };
+  const result = ensureTableEntry(await readFile(path, "utf-8"), name, key, group, label === undefined ? undefined : `${label}.`);
+  if (result.outcome !== "added") return { file, key, outcome: result.outcome };
+  await writeFileWithDir(path, result.text);
+  return { file, key, outcome: "added" };
+}
+
+/** Says what routing did to the subjects table; an outcome that leaves a gate unresolved is a warning. */
+export function logSubjectWrite(write: SubjectWrite): void {
+  const where = `menu.gate.table "${write.file}"`;
+  const entry = write.key === undefined ? "the gate's property" : `"${write.key}"`;
+  if (write.outcome === "added") log.info(`Added ${entry} to ${write.file}`);
+  else if (write.outcome === "no-file") log.warn(`${where} does not exist: add ${entry} to the subjects table by hand`);
+  else if (write.outcome === "no-table") log.warn(`${write.file} declares no object of the configured name: add ${entry} to the subjects table by hand`);
+  else if (write.outcome === "inline-table") log.warn(`${write.file} lists its entries on one line: add ${entry} to the subjects table by hand`);
+  else if (write.outcome === "not-a-member") log.warn(`menu.gate.subject renders an expression that is not a member of the table in ${write.file}: the table was left as it is`);
 }
 
 /**
@@ -99,15 +158,22 @@ export async function writeRoute(input: RouteInput): Promise<RouteWrite> {
   if (!menu) return { file, outcome, labelled: [] };
   const menuTemplate = input.templates.get(menuTemplateOf(templateName));
   let menuInserted = false;
+  let subjectWrite: SubjectWrite | undefined;
   if (menuTemplate !== undefined) {
     const menuFile = resolve(input.rootDir, menu.file);
     const permission = input.listAccess?.kind === "permission" ? input.listAccess : undefined;
-    const gate = permission ? `{ action: "${permission.action}", subject: "${permission.group}" }` : "undefined";
+    const subject = permission ? menuSubject(menu.gate, { ...routeCtx, entityCamel: toCamelCase(input.entityKebab) }, permission.group) : undefined;
+    const gate = permission ? `{ action: "${permission.action}", subject: ${subject} }` : "undefined";
     const entry = renderTemplate(menuTemplate, { ...routeCtx, menuKey: input.entityPlural, menuIcon: menu.icon ?? "CircleIcon", menuGate: gate });
-    const inserted = insertMenuEntry(await readFile(menuFile, "utf-8"), menu.marker, { key: input.entityPlural, href: `/${routePath}`, gate }, entry);
-    if (inserted !== undefined) {
-      await writeFileWithDir(menuFile, inserted);
+    const placed = placeMenuEntry(await readFile(menuFile, "utf-8"), menu.marker, { key: input.entityPlural, href: `/${routePath}`, gate }, entry);
+    if (placed !== undefined) {
+      await writeFileWithDir(menuFile, placed.text);
       menuInserted = true;
+      // The table gains the property only for a gate this run put into the menu: an entry that kept
+      // a gate of its own reads nothing from it.
+      if (placed.gated && permission && subject !== undefined && menu.gate?.table) {
+        subjectWrite = await ensureSubject(input.rootDir, menu.gate.table, subject, permission.group, input.plural?.["en"]);
+      }
     }
   }
 
@@ -130,7 +196,7 @@ export async function writeRoute(input: RouteInput): Promise<RouteWrite> {
     await writeFileWithDir(path, `${JSON.stringify(data, null, 2)}\n`);
     labelled.push(catalog);
   }
-  return { file, outcome, menuInserted, labelled };
+  return { file, outcome, menuInserted, ...(subjectWrite ? { subject: subjectWrite } : {}), labelled };
 }
 
 /**

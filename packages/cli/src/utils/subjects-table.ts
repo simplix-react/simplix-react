@@ -1,0 +1,129 @@
+/** What reading the object literal of a table declaration found. */
+interface LiteralScan {
+  /** Index of the closing brace. */
+  readonly close: number;
+  /** The property names at the literal's top level. */
+  readonly keys: ReadonlySet<string>;
+  /** The last significant character before the closing brace, outside comments (`{` when empty). */
+  readonly last: string;
+  /** Index of that character. */
+  readonly lastAt: number;
+}
+
+/** Index of the character that ends the string literal starting at `from`, or -1 when it never ends. */
+function stringEnd(text: string, from: number): number {
+  const quote = text[from];
+  for (let i = from + 1; i < text.length; i++) {
+    if (text[i] === "\\") i++;
+    else if (text[i] === quote) return i;
+  }
+  return -1;
+}
+
+/**
+ * Reads the object literal opening at `open`: where it closes, which properties it has at its top
+ * level, and what its last significant character is. Comments and nested values are skipped, so a
+ * brace or a colon inside either is not mistaken for structure.
+ */
+function scanLiteral(text: string, open: number): LiteralScan | undefined {
+  const keys = new Set<string>();
+  let depth = 0;
+  let key = "";
+  let inKey = true;
+  let last = "{";
+  let lastAt = open;
+  for (let i = open; i < text.length; i++) {
+    const c = text[i];
+    if (c === "/" && text[i + 1] === "/") {
+      const end = text.indexOf("\n", i);
+      if (end < 0) return undefined;
+      i = end;
+      continue;
+    }
+    if (c === "/" && text[i + 1] === "*") {
+      const end = text.indexOf("*/", i + 2);
+      if (end < 0) return undefined;
+      i = end + 1;
+      continue;
+    }
+    if (c === '"' || c === "'" || c === "`") {
+      const end = stringEnd(text, i);
+      if (end < 0) return undefined;
+      if (depth === 1 && inKey) key += text.slice(i + 1, end);
+      i = end;
+      last = c;
+      lastAt = end;
+      continue;
+    }
+    if (c === "{" || c === "[" || c === "(") {
+      depth++;
+      if (depth > 1) {
+        last = c;
+        lastAt = i;
+      }
+      continue;
+    }
+    if (c === "}" || c === "]" || c === ")") {
+      depth--;
+      if (depth === 0) return { close: i, keys, last, lastAt };
+      last = c;
+      lastAt = i;
+      continue;
+    }
+    if (/\s/.test(c)) continue;
+    if (depth === 1) {
+      if (c === ":" && inKey) {
+        keys.add(key);
+        inKey = false;
+      } else if (c === ",") {
+        inKey = true;
+        key = "";
+      } else if (inKey) {
+        key += c;
+      }
+    }
+    last = c;
+    lastAt = i;
+  }
+  return undefined;
+}
+
+/** What {@link ensureTableEntry} did to the table's source. */
+export type TableEntryOutcome =
+  | { readonly outcome: "added"; readonly text: string }
+  | { readonly outcome: "present" }
+  /** The source holds no `export const <name> = { ... }`. */
+  | { readonly outcome: "no-table" }
+  /** The literal closes on a line that also holds entries, which this does not rewrite. */
+  | { readonly outcome: "inline-table" };
+
+/**
+ * Adds `key: "<value>"` to the exported object `name` in a source text, before its closing brace,
+ * under a doc comment when `doc` is given. A key the object already has is left as it is, with
+ * its own value.
+ *
+ * @param text the source of the file declaring the table
+ * @param name the exported object's name
+ * @param key the property to add
+ * @param value the string the property holds
+ * @param doc the text of a one-line doc comment above the entry, or undefined for none
+ */
+export function ensureTableEntry(text: string, name: string, key: string, value: string, doc?: string): TableEntryOutcome {
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const declaration = new RegExp(`export\\s+const\\s+${escaped}\\b(?:\\s*:[^=]+)?\\s*=\\s*\\{`).exec(text);
+  if (!declaration) return { outcome: "no-table" };
+  const open = declaration.index + declaration[0].length - 1;
+  const scan = scanLiteral(text, open);
+  if (!scan) return { outcome: "no-table" };
+  if (scan.keys.has(key)) return { outcome: "present" };
+
+  const lineStart = text.lastIndexOf("\n", scan.close - 1) + 1;
+  if (lineStart <= open || text.slice(lineStart, scan.close).trim() !== "") return { outcome: "inline-table" };
+
+  const indent = `${/^[ \t]*/.exec(text.slice(lineStart))?.[0] ?? ""}  `;
+  const entry = `${doc === undefined ? "" : `${indent}/** ${doc} */\n`}${indent}${key}: ${JSON.stringify(value)},\n`;
+  // The property before the new one gets the comma it lacks, after its value rather than after a trailing comment.
+  const needsComma = scan.last !== "," && scan.last !== "{";
+  const before = needsComma ? `${text.slice(0, scan.lastAt + 1)},${text.slice(scan.lastAt + 1, lineStart)}` : text.slice(0, lineStart);
+  return { outcome: "added", text: `${before}${entry}${text.slice(lineStart)}` };
+}

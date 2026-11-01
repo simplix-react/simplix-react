@@ -166,6 +166,8 @@ export interface SimplixConfig {
    * `menu-entry` template beside the route template, on the line before `marker` in `file` when no
    * entry for the path exists yet; `catalogs` names, per locale, the JSON catalog the entry's
    * label goes into under `keyPath`, written from the entity's plural name in SimpliX Meta.
+   * `menu.gate` names how the entry's gate refers to the permission group, for a project that
+   * keeps its groups in one table instead of writing them inline.
    */
   routes?: Readonly<Record<string, RouteTarget>>;
 
@@ -338,6 +340,33 @@ export interface CrudEntityConfig {
 /** Entity name → CRUD config mapping for a domain package */
 export type CrudMap = Record<string, CrudEntityConfig>;
 
+/**
+ * How a menu entry's gate names the permission group its list endpoint requires.
+ *
+ * @remarks
+ * Without it the gate is `{ action: "list", subject: "<GROUP>" }` with the group as a string
+ * literal. A project that reads every group from one table (`SUBJECTS`) states the expression
+ * instead, so the menu and the screens it leads to move with the table.
+ */
+export interface MenuGateConfig {
+  /**
+   * The `subject` expression, a Handlebars template over the route's render context, which also
+   * holds `entityCamel` (the entity's name in camel case) and `group` (the permission group).
+   */
+  readonly subject: string;
+  /**
+   * The table the expression reads from. A scaffold that inserts an entry whose expression is
+   * `<name>.<key>` adds `<key>: "<group>"` to the table when it has no such key; a key it already
+   * has keeps its value.
+   */
+  readonly table?: {
+    /** The file declaring `export const <name> = { ... }`, relative to the project root. */
+    readonly file: string;
+    /** The exported object's name. Default `SUBJECTS`. */
+    readonly name?: string;
+  };
+}
+
 /** Where one module group's list screens are routed (see `SimplixConfig.routes`). */
 export interface RouteTarget {
   readonly dir: string;
@@ -352,5 +381,7 @@ export interface RouteTarget {
     readonly icon?: string;
     readonly catalogs?: Readonly<Record<string, string>>;
     readonly keyPath?: string;
+    /** How the entry's gate names its permission group; absent, the group is written as a string literal. */
+    readonly gate?: MenuGateConfig;
   };
 }

@@ -36,7 +36,7 @@ import { writeStampedGenerated } from "../utils/generated-merge.js";
 import { fixtureRows } from "../utils/story-fixtures.js";
 import { renderWidgetBlocks, renderWidgetFiles } from "./scaffold-widgets.js";
 import { renderTemplate } from "../utils/template.js";
-import { writeRoute } from "../utils/route-files.js";
+import { logSubjectWrite, writeRoute } from "../utils/route-files.js";
 import { depVersion } from "../versions.js";
 
 // ── Zod type to component mapping ──
@@ -2630,6 +2630,7 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
         origin,
       });
       log.info(`${route.outcome} route ${relative(rootDir, route.file)}${route.menuInserted ? ", menu entry added" : ""}`);
+      if (route.subject) logSubjectWrite(route.subject);
     }
 
     if (moduleDir) {
