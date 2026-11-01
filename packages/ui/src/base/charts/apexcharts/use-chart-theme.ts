@@ -12,11 +12,19 @@ function resolveColor(varName: string, fallback: string): string {
 
   const ctx = document.createElement("canvas").getContext("2d");
   if (!ctx) return fallback;
-  // If already a CSS color function (oklch, hsl, rgb, etc.), use directly.
-  // Otherwise wrap in hsl() for legacy bare HSL values like "240 10% 3.9%".
-  const colorValue = /^(oklch|hsl|rgb|hwb|lab|lch|color)\(/i.test(raw) ? raw : `hsl(${raw})`;
-  ctx.fillStyle = colorValue;
+  // A value the canvas refuses leaves its previous fill (black), so the fallback is set first.
+  ctx.fillStyle = fallback;
+  ctx.fillStyle = cssColorOf(raw);
   return ctx.fillStyle;
+}
+
+/**
+ * The CSS colour a custom property's value names. Only a legacy bare HSL triple ("240 10% 3.9%")
+ * is wrapped in `hsl()`; a hex value, a colour function or a keyword is a colour already, and
+ * wrapping it makes the canvas refuse it.
+ */
+export function cssColorOf(raw: string): string {
+  return /^-?[\d.]+(deg|rad|turn)?\s+[\d.]+%\s+[\d.]+%(\s*\/\s*[\d.]+%?)?$/.test(raw) ? `hsl(${raw})` : raw;
 }
 
 /** Convert any color resolved by Canvas2D to #rrggbb (stripping alpha). */
