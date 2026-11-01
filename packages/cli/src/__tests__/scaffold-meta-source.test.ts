@@ -223,6 +223,23 @@ describe("what a template cannot know and SimpliX Meta states", () => {
     expect(holiday().fields.find((one) => one.name === "holidayName")?.sortAlias).toBeUndefined();
   });
 
+  it("draws a map of anything but text as JSON, and keeps a map of text as translations", () => {
+    // The fixture states no structured map, so one is set on a copy of the document.
+    const copy: DtoMeta = JSON.parse(JSON.stringify(meta));
+    for (const type of Object.values(copy.types)) {
+      const name = (type.fields ?? []).find((field) => field.name === "holidayName");
+      if (name) name.type = { kind: "container", name: "Map", args: [{ kind: "unknown" }] } as never;
+    }
+    const domain = resolveMeta(copy, { domains: smartSafetyDomains, containerTypes }).domains.get("system");
+    if (!domain) throw new Error("the fixture has no system domain");
+    const source = buildMetaScaffoldSource({ domain, tag: "common.main.system.Holiday", naming: simplixBootNaming });
+    const field = source.fields.find((one) => one.name === "holidayName");
+    expect(field?.tsType).toBe("Record<string, unknown>");
+    expect(field && contractKindOf(field)).toBe("json");
+    const translations = holiday().fields.find((one) => one.tsType === "Record<string, string>");
+    expect(translations && contractKindOf(translations)).toBe("i18nText");
+  });
+
   it("marks a field the contract formats as code, and no other", () => {
     // The fixture predates `format`, so the mark is stated on a copy of the document.
     const copy: DtoMeta = JSON.parse(JSON.stringify(meta));

@@ -668,6 +668,17 @@ function shapeOfRef(
           options: [],
         };
       }
+      // Any other map is a structured value (a stored provider payload), drawn as JSON rather than
+      // as its value type, which would print `[object Object]`.
+      if (ref.name === "Map") {
+        return {
+          tsType: "Record<string, unknown>",
+          formComponent: "TextareaField",
+          inputType: "text",
+          component: "Text",
+          options: [],
+        };
+      }
       // A collection is edited and shown as its element: `List<String>` is text and
       // `List<SomeEnum>` is a choice, while a list of records is not a scalar field at all.
       if (ref.args.length === 1) return shapeOfRef(ref.args[0], field, enumValues);
