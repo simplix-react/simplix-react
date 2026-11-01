@@ -59,6 +59,9 @@ function sampleValue(f: FixtureField, n: number): unknown {
       return `${f.name}-${n}`;
     case "email":
       return `${f.name.toLowerCase()}${n}@example.test`;
+    // A structured value is an object, so the frame draws what the screen draws for one.
+    case "json":
+      return { id: `${f.name}-${n}`, sequence: n };
     default:
       return f.tsType === "number" ? n * 10 : `${f.name} ${n}`;
   }
