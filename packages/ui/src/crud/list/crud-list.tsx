@@ -161,6 +161,11 @@ function EmptyReasonCard({ reason, bordered = true }: { reason: Exclude<EmptyRea
 
 // ── List Root ──
 
+/** What a declared column is known by in the columns menu and in the widths a reader keeps: its `id`, else its `field`. */
+function columnKey(def: { readonly id?: string; readonly field?: string }): string | undefined {
+  return def.id ?? def.field;
+}
+
 /**
  * Props for the {@link CrudList} compound component root.
  *
@@ -395,6 +400,14 @@ function SortIcon({ direction }: { direction: "asc" | "desc" | null }) {
 /** Declarative column definition for List.Table. Not rendered directly. */
 export interface ListColumnProps<T> {
   field?: keyof T & string;
+  /**
+   * What tells a column with no `field` apart: the columns menu lists it, and a width the reader
+   * sets is kept under it. A column with a `field` is known by that and needs none.
+   *
+   * Without one, a computed column (a cell built from several fields) has no stable identity: its
+   * position changes whenever a narrower pane drops a column before it, so the menu cannot name it.
+   */
+  id?: string;
   header?: string;
   /**
    * Marks the header with the required asterisk, for an editable column whose cells the user
@@ -1214,7 +1227,7 @@ function ListTable<T>({
           d.minTableWidth == null ||
           containerWidth === 0 ||
           containerWidth >= Math.max(d.minTableWidth, measuredNeed[String(d.minTableWidth)] ?? 0) ||
-          (d.field !== undefined && shownColumns?.has(d.field) === true),
+          (columnKey(d) !== undefined && shownColumns?.has(columnKey(d)!) === true),
       ),
     [declaredColumnDefs, containerWidth, measuredNeed, shownColumns],
   );
@@ -1241,8 +1254,8 @@ function ListTable<T>({
   // want of width included, so a reader can bring a dropped column back.
   const derivedColumns = useMemo(
     () => declaredColumnDefs
-      .filter((d): d is ListColumnProps<T> & { field: string } => !!d.field)
-      .map((d) => ({ field: d.field, label: d.header ?? d.field, dropped: !columnDefs.includes(d) })),
+      .filter((d) => columnKey(d) !== undefined)
+      .map((d) => ({ field: columnKey(d)!, label: d.header ?? columnKey(d)!, dropped: !columnDefs.includes(d) })),
     [declaredColumnDefs, columnDefs],
   );
 
@@ -1312,7 +1325,7 @@ function ListTable<T>({
       // setting the column's intrinsic width, so spare table width lands here.
       const flexible = colDef.width === undefined && colDef.minWidth !== undefined;
       cols.push({
-        id: colDef.field ?? `_col_${i}`,
+        id: columnKey(colDef) ?? `_col_${i}`,
         accessorFn: colDef.field
           ? (row) => (row as Record<string, unknown>)[colDef.field!]
           : () => null,
@@ -1343,7 +1356,7 @@ function ListTable<T>({
           // declared number it would go on ellipsizing at the old edge inside a column the
           // reader has just widened — they would drag, watch the column grow, and watch the
           // text not grow with it.
-          const readerWidth = columnWidths[colDef.field ?? `_col_${i}`];
+          const readerWidth = columnWidths[columnKey(colDef) ?? `_col_${i}`];
           const headerStyle =
             readerWidth !== undefined
               ? { width: "100%", maxWidth: "100%" }

@@ -49,6 +49,19 @@ const list = () => (
   </CrudList>
 );
 
+/** A computed column has no field, so it is known by its id. */
+const computedList = () => (
+  <CrudList>
+    <FilterBar filters={[]} state={state} />
+    <CrudList.Table data={data}>
+      <CrudList.Column field="name" header="Name" />
+      <CrudList.Column id="contact" header="Contact" minTableWidth={800}>
+        {({ row }) => `${row.name} <${row.email}>`}
+      </CrudList.Column>
+    </CrudList.Table>
+  </CrudList>
+);
+
 function openMenu() {
   fireEvent.keyDown(screen.getByLabelText("list.toggleColumns"), { key: "Enter" });
 }
@@ -87,5 +100,15 @@ describe("the columns menu", () => {
     fireEvent.click(screen.getByRole("menuitemcheckbox", { name: "Email" }));
     expect(screen.queryByText("alice@example.test")).toBeNull();
     expect(screen.getByText("kept")).toBeTruthy();
+  });
+
+  it("offers a column that has no field by its id, and draws it when switched on at a narrow width", () => {
+    mockContainerWidth = 520;
+    render(computedList());
+    expect(screen.queryByText("Alice <alice@example.test>")).toBeNull();
+    openMenu();
+    expect(screen.getAllByRole("menuitemcheckbox").map((item) => `${item.textContent}:${item.getAttribute("aria-checked")}`)).toEqual(["Name:true", "Contact:false"]);
+    fireEvent.click(screen.getByRole("menuitemcheckbox", { name: "Contact" }));
+    expect(screen.getByText("Alice <alice@example.test>")).toBeTruthy();
   });
 });
