@@ -289,6 +289,23 @@ export function FilterBar({ filters, state, leading, trailing, maxBadges, onPrev
     return init;
   });
 
+  // A value committed under an operator other than the one the control stands on (a status card,
+  // a restored address) is followed: the control moves to that operator, so the badge, the
+  // popover and the request read one key instead of the badge looking under the default.
+  useEffect(() => {
+    const vals = state.committedValues;
+    const filled = (key: string) => vals[key] != null && vals[key] !== "";
+    const moved: Record<string, SearchOperator> = {};
+    for (const def of filters) {
+      if ((def.type !== "text" && def.type !== "number") || !def.operators) continue;
+      const current = operators[def.field] ?? def.defaultOperator;
+      if (filled(makeFilterKey(def.field, current))) continue;
+      const committed = def.operators.find((op) => filled(makeFilterKey(def.field, op)));
+      if (committed && committed !== current) moved[def.field] = committed;
+    }
+    if (Object.keys(moved).length > 0) setOperators((prev) => ({ ...prev, ...moved }));
+  }, [state.committedValues, filters, operators]);
+
   // ── Badge helpers ──
 
   const getFilterKey = useCallback(

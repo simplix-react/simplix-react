@@ -134,6 +134,20 @@ describe("FilterBar", () => {
     expect(screen.getByText("Name:")).toBeTruthy();
   });
 
+  it("shows a value committed under an operator other than the default", () => {
+    const numberFilter: FilterDef = {
+      type: "number",
+      field: "httpStatus",
+      label: "Status",
+      operators: [SearchOperator.EQUALS, SearchOperator.GREATER_THAN_OR_EQUAL],
+      defaultOperator: SearchOperator.EQUALS,
+    } as FilterDef;
+    const state = createMockState({ "httpStatus.greaterThanOrEqualTo": 500 }, { "httpStatus.greaterThanOrEqualTo": 500 });
+    render(<FilterBar filters={[numberFilter]} state={state} />);
+    expect(screen.getByText("Status:")).toBeTruthy();
+    expect(screen.getByText("500")).toBeTruthy();
+  });
+
   it("carries the whole value in the badge's title, since the chip clips it", () => {
     const long = "2024\uB144 3\uC6D4 3\uC77C \u2013 2024\uB144 3\uC6D4 27\uC77C";
     const state = createMockState({ "name.contains": long }, { "name.contains": long });
