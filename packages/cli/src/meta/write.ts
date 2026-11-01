@@ -7,7 +7,7 @@ import { renderTemplate } from "../utils/template.js";
 import type { OpenApiNamingStrategy } from "../openapi/naming/naming-strategy.js";
 import type { MetaExtensionOutput } from "../openapi/orchestration/spec-profile.js";
 import { HEADER } from "./generation/emit.js";
-import { serverEntityOf } from "./entity-labels.js";
+import { ownedTypesOf } from "./entity-labels.js";
 import { generateAccessFiles } from "./generation/access-gen.js";
 import { generateEndpointFiles, entityNameOf } from "./generation/endpoint-gen.js";
 import { generateHookFiles, type EntityHooks } from "./generation/hook-gen.js";
@@ -473,27 +473,9 @@ function collectWarnings(results: GeneratorResults): string[] {
  * from as well.
  */
 export function metaEntities(domain: ResolvedDomain, document?: DtoMeta): ExtractedEntity[] {
-  const declared = document?.entities ?? {};
-  const known = new Set(Object.keys(declared));
-  const entityClasses = new Map(Object.entries(declared).map(([key, one]) => [one.javaClass, key]));
   return domain.entities.map((entity) => {
     const name = entityNameOf(entity.tag);
-    const own = serverEntityOf(entity, known);
-    // A field typed as another entity is a reference: the parent's screens read the reference's
-    // own label from the parent DTO and draw the referenced record through its own catalog, so
-    // neither that entity class nor the ancestors it brought along lend their fields here.
-    const mine = [...domain.types.values()].filter((type) => type.owner === entity.tag);
-    const isForeign = (type: (typeof mine)[number]) => {
-      const declaredAs = entityClasses.get(type.meta.javaClass);
-      return declaredAs !== undefined && declaredAs !== own;
-    };
-    const foreign = new Set(mine.filter(isForeign).map((type) => type.name));
-    // An ancestor a DTO of the entity's own also extends is still reached for that DTO.
-    const sharedAncestors = new Set(mine.filter((type) => !isForeign(type)).flatMap((type) => type.ancestors));
-    for (const type of mine.filter(isForeign)) {
-      for (const ancestor of type.ancestors) if (!sharedAncestors.has(ancestor)) foreign.add(ancestor);
-    }
-    const owned = mine.filter((type) => !foreign.has(type.name));
+    const owned = ownedTypesOf(domain, entity, document);
     const seen = new Set<string>();
     const fields: EntityField[] = [];
 

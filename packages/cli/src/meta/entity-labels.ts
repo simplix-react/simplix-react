@@ -3,7 +3,7 @@ import { join } from "node:path";
 
 import { pathExists, writeFileWithDir } from "../utils/fs.js";
 import { entityNameOf } from "./generation/endpoint-gen.js";
-import type { ResolvedDomain } from "./resolve.js";
+import type { ResolvedDomain, ResolvedType } from "./resolve.js";
 import type { DtoMeta } from "./types.js";
 
 /** The key a domain catalog holds an entity's singular name under, beside its `fields`. */
@@ -38,18 +38,57 @@ export function serverEntityOf(
 }
 
 /**
+ * The types an entity's catalog is written from: every type its operations reach, less another
+ * entity class a DTO holds as a reference and the ancestors only that class brought along. The
+ * parent's screens read the reference's own label from the parent DTO and draw the referenced
+ * record through its own catalog, so those fields are not the parent's to label.
+ *
+ * @param domain the domain whose types are read
+ * @param entity the domain entity
+ * @param document the SimpliX Meta document, which declares the entity classes; without it every
+ *   reached type counts
+ * @returns the entity's own types, in the order the domain lists them
+ */
+export function ownedTypesOf(
+  domain: ResolvedDomain,
+  entity: Pick<ResolvedDomain["entities"][number], "tag" | "operations">,
+  document: DtoMeta | undefined,
+): ResolvedType[] {
+  const declared = document?.entities ?? {};
+  const own = serverEntityOf(entity, new Set(Object.keys(declared)));
+  const entityClasses = new Map(Object.entries(declared).map(([key, one]) => [one.javaClass, key]));
+  const mine = [...(domain.types?.values() ?? [])].filter((type) => type.owner === entity.tag);
+  const isForeign = (type: (typeof mine)[number]) => {
+    const declaredAs = entityClasses.get(type.meta.javaClass);
+    return declaredAs !== undefined && declaredAs !== own;
+  };
+  const foreign = new Set(mine.filter(isForeign).map((type) => type.name));
+  // An ancestor a DTO of the entity's own also extends is still reached for that DTO.
+  const sharedAncestors = new Set(mine.filter((type) => !isForeign(type)).flatMap((type) => type.ancestors));
+  for (const type of mine.filter(isForeign)) {
+    for (const ancestor of type.ancestors) if (!sharedAncestors.has(ancestor)) foreign.add(ancestor);
+  }
+  return mine.filter((type) => !foreign.has(type.name));
+}
+
+/**
  * The label each field of an entity's DTOs declares through a keyed `@FieldLabel`, in one locale.
  * The first DTO to name a field decides it, in the order the domain lists its types.
  *
  * @param domain the domain whose types are read
- * @param tag the entity tag the types belong to
+ * @param entity the entity the types belong to
+ * @param document the SimpliX Meta document, which declares the entity classes
  * @param locale the locale to read
  * @returns field name to label
  */
-function fieldLabelsOf(domain: ResolvedDomain, tag: string, locale: string): Map<string, string> {
+function fieldLabelsOf(
+  domain: ResolvedDomain,
+  entity: ResolvedDomain["entities"][number],
+  document: DtoMeta,
+  locale: string,
+): Map<string, string> {
   const labels = new Map<string, string>();
-  for (const type of domain.types?.values() ?? []) {
-    if (type.owner !== tag) continue;
+  for (const type of ownedTypesOf(domain, entity, document)) {
     for (const field of type.allFields) {
       const label = field.labels?.[locale];
       if (label !== undefined && !labels.has(field.name)) labels.set(field.name, label);
@@ -85,7 +124,7 @@ export async function writeEntityLabels(
     for (const entity of domain.entities) {
       const source = serverEntityOf(entity, new Set(Object.keys(entities)));
       const meta = source === undefined ? undefined : entities[source];
-      const labels = fieldLabelsOf(domain, entity.tag, locale);
+      const labels = fieldLabelsOf(domain, entity, document, locale);
       if (!meta && labels.size === 0) continue;
       const key = entityNameOf(entity.tag);
       const node = (typeof catalog[key] === "object" && catalog[key] !== null ? catalog[key] : {}) as Catalog;
