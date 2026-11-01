@@ -42,6 +42,12 @@ import { depVersion } from "../versions.js";
 
 // ── Zod type to component mapping ──
 
+/** A reference whose target a sibling field picks: that field, and the peek each of its values opens. */
+export interface ReferenceKinds {
+  readonly field: string;
+  readonly kinds: ReadonlyArray<{ readonly value: string; readonly peekKind: string }>;
+}
+
 export interface FieldInfo {
   name: string;
   capitalizedName: string;
@@ -91,6 +97,8 @@ export interface FieldInfo {
   contractKind?: string;
   /** For a `reference`: the peek kind it opens, the referenced entity's name. */
   peekKind?: string;
+  /** For a `reference` by kind: the field whose value picks the peek, and the peek each value opens. */
+  peekKinds?: ReferenceKinds;
   /** For a `reference`: the field beside it that carries the referenced record's name. */
   nameField?: string;
   /** The field is a reference's name, drawn by that reference rather than on its own. */
@@ -101,6 +109,8 @@ export interface FieldInfo {
   referenceNamePath?: string;
   /** For such a key: the peek kind the nested record's type names. */
   referencePeekKind?: string;
+  /** For a key SimpliX Meta states as a reference by kind: the kind field and the peek of each served kind. */
+  referenceKinds?: ReferenceKinds;
   /** The record's own identifier, which a list leaves out and a detail draws with a copy control. */
   isIdentifier?: boolean;
   /** A code the reader types or compares (SimpliX Meta's `format: "code"`), drawn in the monospaced face. */
@@ -262,6 +272,7 @@ function stampContractKind(
         (n) => names.has(n) && fields.find((one) => one.name === n)?.tsType === "string",
       );
     if (!nameField) return { ...f, contractKind: "text", isReferenceName, isAuditField };
+    if (f.referenceKinds) return { ...f, contractKind, peekKinds: f.referenceKinds, nameField, isReferenceName, isAuditField };
     return { ...f, contractKind, peekKind: f.referencePeekKind ?? peeks?.[f.fkEntityField] ?? f.fkEntityField, nameField, isReferenceName, isAuditField };
   }
 }
@@ -286,6 +297,7 @@ export function projectRowFields(rowFields: readonly FieldInfo[], stated: Readon
     const one = stated.get(f.name);
     if (!one) return f;
     if (f.referenceNamePath) return { ...one, referenceNamePath: f.referenceNamePath, referencePeekKind: f.referencePeekKind };
+    if (f.referenceKinds) return { ...one, isForeignKey: true, fkEntityField: f.fkEntityField, referenceKinds: f.referenceKinds };
     if (f.referenceMatch !== undefined) {
       return { ...one, isForeignKey: true, fkEntityField: f.fkEntityField, referencePeekKind: f.referencePeekKind, referenceMatch: f.referenceMatch, ...(f.peekBy ? { peekBy: f.peekBy } : {}) };
     }

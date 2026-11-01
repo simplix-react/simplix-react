@@ -83,3 +83,24 @@ describe("a key SimpliX Meta names as a reference", () => {
     expect(out.find((f) => f.name === "ownerId")?.peekBy).toBeUndefined();
   });
 });
+
+describe("a key SimpliX Meta names as a reference by kind", () => {
+  it("opens the peek of each served kind and leaves a kind with no served entity without one", () => {
+    const byKind = structuredClone(meta) as typeof meta;
+    const detail = byKind.types.WalletDetailDTO.fields;
+    const owner = detail.findIndex((one) => one.name === "ownerId");
+    detail[owner] = { ...text("ownerId"), reference: { many: false, kindField: "ownerType", kinds: { TEAM: "Team", USER: "UserAccount" } } } as never;
+    const resolved = resolveMeta(byKind as never, { domains: { wallet: ["admin.Wallet"] }, containerTypes: { SimpliXApiResponse: { unwrap: true } } });
+    const domain = resolved.domains.get("wallet");
+    if (!domain) throw new Error("no wallet domain");
+    const source = buildMetaScaffoldSource({ domain, tag: "admin.Wallet", naming: simplixBootNaming });
+    withReferenceKeys({ ...byKind, entities: { CatalogVoice: { idField: "catalogVoiceId" }, UserAccount: { idField: "userId" } } } as DtoMeta, source);
+    const out = withContractKinds(source.fields, "walletId", { peeks: { owner: "userAccount" } });
+    expect(out.find((f) => f.name === "ownerId")).toMatchObject({
+      contractKind: "reference",
+      nameField: "ownerName",
+      peekKinds: { field: "ownerType", kinds: [{ value: "USER", peekKind: "userAccount" }] },
+    });
+    expect(out.find((f) => f.name === "ownerId")?.peekKind).toBeUndefined();
+  });
+});

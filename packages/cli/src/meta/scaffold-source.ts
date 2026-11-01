@@ -184,6 +184,14 @@ export function withNameField(document: DtoMeta, entityName: string, source: Met
  */
 export function withReferenceKeys(document: DtoMeta, source: MetaScaffoldSource): void {
   for (const one of [...source.fields, ...(source.detailFields ?? []), ...(source.rowFields ?? [])]) {
+    // A kind whose entity SimpliX Meta serves no surface for has no peek to open, so its records
+    // are drawn by name alone.
+    if (one.referenceKinds) {
+      const served = one.referenceKinds.kinds.filter(
+        (kind) => document.entities?.[kind.peekKind.charAt(0).toUpperCase() + kind.peekKind.slice(1)] !== undefined,
+      );
+      one.referenceKinds = { ...one.referenceKinds, kinds: served };
+    }
     const match = one.referenceMatch;
     if (match === undefined || one.referencePeekKind === undefined) continue;
     const pascal = one.referencePeekKind.charAt(0).toUpperCase() + one.referencePeekKind.slice(1);
@@ -517,7 +525,18 @@ function fieldInfos(
     if (field.defaultValue !== undefined) one.defaultLiteral = JSON.stringify(field.defaultValue);
     // A key the contract names as another entity's, whatever its own name: drawn by that record's
     // name and opening its peek. A reference matched on another field than the identifier says so.
-    if (field.reference && !field.reference.many && shape.tsType === "string") {
+    if (field.reference?.kindField && field.reference.kinds && shape.tsType === "string") {
+      // The kind field's value picks the entity per record, so the key opens a peek per kind.
+      one.isForeignKey = true;
+      one.fkEntityField = one.fkEntityField ?? field.name;
+      one.referenceKinds = {
+        field: field.reference.kindField,
+        kinds: Object.entries(field.reference.kinds).map(([value, entity]) => ({
+          value,
+          peekKind: entity.charAt(0).toLowerCase() + entity.slice(1),
+        })),
+      };
+    } else if (field.reference?.entity && !field.reference.many && shape.tsType === "string") {
       const target = field.reference.entity.charAt(0).toLowerCase() + field.reference.entity.slice(1);
       one.isForeignKey = true;
       // A key named `<stem>Id` keeps its stem, which is what its name field is named after

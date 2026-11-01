@@ -62,6 +62,22 @@ describe("a relation in a list", () => {
     expect(out.find((f) => f.name === "positionId")).toMatchObject({ contractKind: "reference", peekKind: "jobPosition", nameField: "position.positionName", hideInList: false });
   });
 
+  it("opens the peek its kind field picks, over the project's peek for its stem", () => {
+    const referenceKinds = { field: "ownerType", kinds: [{ value: "USER", peekKind: "userAccount" }] };
+    const out = withContractKinds([field("accountId"), { ...field("ownerId"), referenceKinds }, field("ownerName")], "accountId", { peeks: { owner: "team" } });
+    const reference = out.find((f) => f.name === "ownerId");
+    expect(reference).toMatchObject({ contractKind: "reference", nameField: "ownerName", peekKinds: referenceKinds });
+    expect(reference?.peekKind).toBeUndefined();
+  });
+
+  it("keeps a reference by kind where the request body states the key as text", () => {
+    const referenceKinds = { field: "ownerType", kinds: [{ value: "USER", peekKind: "userAccount" }] };
+    const stated = [field("accountId"), field("ownerId"), field("ownerName")];
+    const row = [field("accountId"), { ...field("ownerId"), referenceKinds }, field("ownerName")];
+    const out = withContractKinds(projectRowFields(row, new Map(stated.map((f) => [f.name, f]))), "accountId");
+    expect(out.find((f) => f.name === "ownerId")?.peekKinds).toEqual(referenceKinds);
+  });
+
   it("stays hidden while it is a bare key with no name beside it", () => {
     const out = withContractKinds(orderAndCategorizeFields([field("accountId"), field("tenantId")]), "accountId");
     expect(out.find((f) => f.name === "tenantId")).toMatchObject({ contractKind: "text", hideInList: true });

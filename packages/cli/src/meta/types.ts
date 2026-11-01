@@ -66,8 +66,18 @@ export interface FieldMeta {
   type: TypeRef;
   required: boolean;
   nullable: boolean;
-  /** The entity the field points at, and the field of it the value matches (its identifier unless stated). */
-  reference?: { entity: string; idField: string; many: boolean };
+  /**
+   * The entity the field points at, and the field of it the value matches (its identifier unless
+   * stated). A reference by kind (`@ReferencesByKind`) states no `entity`: `kindField` names the
+   * sibling field whose value picks the target, and `kinds` maps each value to an entity name.
+   */
+  reference?: {
+    entity?: string;
+    idField?: string;
+    many: boolean;
+    kindField?: string;
+    kinds?: Record<string, string>;
+  };
   /** The value a new record starts the field with: a scalar, or an enum constant by name. */
   defaultValue?: string | number | boolean;
   description?: string;
