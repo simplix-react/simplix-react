@@ -1018,6 +1018,72 @@ function mergeLocaleJson(
   return result;
 }
 
+/** The keys of an entity block the generators write: its field labels and its entity labels. */
+const GENERATED_ENTITY_KEYS = new Set(["fields", "_label", "_plural", "_description"]);
+
+/**
+ * Drops the labels a domain package's locale file holds for things the generators no longer
+ * write, so a removed entity, field or enum does not keep its words forever.
+ *
+ * Only the generator's own shapes are touched: a top-level block whose keys are all generator keys
+ * (`fields`, `_label`, `_plural`, `_description`) is an entity block, and is dropped when no
+ * generated entity has that name; inside a generated entity, a field label is dropped when the
+ * entity no longer carries the field; under `enums`, a type is dropped when the domain neither
+ * declares it nor generates it. Every other key is somebody's own and is kept, and nothing is
+ * pruned when the domain's declared types cannot be read.
+ *
+ * @param content the merged locale file
+ * @param entities the entities generated this run
+ * @param generated the generated skeleton, whose enum names count as declared
+ * @param knownTypes the types the domain package declares, or `undefined` when none can be read
+ * @returns the dotted paths of the dropped keys
+ */
+export function pruneStaleGeneratedKeys(
+  content: Record<string, unknown>,
+  entities: ExtractedEntity[],
+  generated: Record<string, unknown>,
+  knownTypes: ReadonlySet<string> | undefined,
+): string[] {
+  if (!knownTypes) return [];
+  const dropped: string[] = [];
+  const isObject = (value: unknown): value is Record<string, unknown> =>
+    value !== null && typeof value === "object" && !Array.isArray(value);
+  const byName = new Map(entities.map((one) => [one.name, one]));
+
+  for (const [key, value] of Object.entries(content)) {
+    if (key === "enums" || !isObject(value)) continue;
+    const keys = Object.keys(value);
+    if (keys.length === 0 || !keys.every((one) => GENERATED_ENTITY_KEYS.has(one))) continue;
+    const entity = byName.get(key);
+    if (!entity) {
+      delete content[key];
+      dropped.push(key);
+      continue;
+    }
+    const fields = value["fields"];
+    if (!isObject(fields) || entity.fields.length === 0) continue;
+    const own = new Set(entity.fields.map((one) => one.name));
+    for (const field of Object.keys(fields)) {
+      if (own.has(field)) continue;
+      delete fields[field];
+      dropped.push(`${key}.fields.${field}`);
+    }
+  }
+
+  const enums = content["enums"];
+  if (isObject(enums)) {
+    const generatedEnums = isObject(generated["enums"]) ? Object.keys(generated["enums"]) : [];
+    const declared = new Set([...knownTypes, ...generatedEnums]);
+    for (const name of Object.keys(enums)) {
+      if (declared.has(name)) continue;
+      delete enums[name];
+      dropped.push(`enums.${name}`);
+    }
+    if (Object.keys(enums).length === 0) delete content["enums"];
+  }
+  return dropped;
+}
+
 export async function generateLocaleFiles(
   targetDir: string,
   entities: ExtractedEntity[],
@@ -1025,6 +1091,7 @@ export async function generateLocaleFiles(
 ): Promise<void> {
   const generated = buildLocaleJson(entities);
   const localesDir = join(targetDir, "src/locales");
+  const knownTypes = await resolveKnownModelTypes(targetDir);
 
   for (const locale of locales) {
     const filePath = join(localesDir, `${locale}.json`);
@@ -1034,6 +1101,10 @@ export async function generateLocaleFiles(
       const existing = await readJsonFile<Record<string, unknown>>(filePath)
         .catch(() => ({}));
       content = mergeLocaleJson(existing, generated);
+      const dropped = pruneStaleGeneratedKeys(content, entities, generated, knownTypes);
+      if (dropped.length > 0) {
+        log.info(`${locale}.json: dropped ${dropped.length} label(s) the generators no longer write (${dropped.join(", ")}).`);
+      }
     } else {
       content = generated;
     }
