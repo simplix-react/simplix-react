@@ -86,6 +86,11 @@ export interface MetaScaffoldSource {
   statusCounts?: string[];
   /** The figures the entity's aggregates read answers with, in order. */
   aggregates?: { field: string; op: string }[];
+  /**
+   * The list's time range counts: the field its search operation's Meta names as its time axis,
+   * and the request function of the `GET <base>/counts` beside it. Absent unless both exist.
+   */
+  timeBuckets?: { field: string; fetch: string };
   updatePathParam?: string;
   deletePathParam?: string;
   filters: FilterFieldInfo[];
@@ -361,6 +366,8 @@ export function buildMetaScaffoldSource(
     // a portal's) can open in different orders, and the entity holds only one.
     ...(listTarget?.operation.defaultSort ? { defaultSort: listTarget.operation.defaultSort } : {}),
   };
+  const timeBuckets = timeBucketsOf(targets, listTarget);
+  if (timeBuckets) source.timeBuckets = timeBuckets;
 
   if (chosen) source.fieldSource = { type: chosen.type.name, origin: chosen.origin };
   const record = recordTypeOf(domain, targets);
@@ -892,6 +899,19 @@ function orderFieldOf(domain: ResolvedDomain, targets: EndpointTarget[]): string
  * It is the segments every one of the entity's routes shares, stopping where a path parameter
  * begins — the actions are spelled differently per route and the collection is not.
  */
+/**
+ * The list's time range counts, from the search operation that declares a time axis and the
+ * `GET .../counts` read under the same path as that search.
+ */
+export function timeBucketsOf(targets: readonly EndpointTarget[], listTarget: EndpointTarget | undefined): { field: string; fetch: string } | undefined {
+  const declaring = [listTarget, ...targets].find((one) => one?.operation.timeAxis);
+  const field = declaring?.operation.timeAxis;
+  if (!declaring || !field) return undefined;
+  const base = declaring.operation.path.replace(/\/search$/, "");
+  const counts = targets.find((one) => one.operation.method === "GET" && one.operation.path === `${base}/counts`);
+  return counts ? { field, fetch: counts.name } : undefined;
+}
+
 function basePathOf(targets: EndpointTarget[]): string {
   const paths = targets.map((one) => one.operation.path.split("/").filter(Boolean));
   if (paths.length === 0) return "/";

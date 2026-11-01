@@ -2551,6 +2551,8 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
         fields: withContractKinds([...listFields, ...(metaSource?.detailFields ?? fields)], rowIdField, contractOptions),
         rowIdField,
       }),
+      // The time range counts, wired by the page template wherever the blocks switch the region on.
+      timeBuckets: metaSource?.timeBuckets,
       packageName,
       listRowType,
       treeRowType,

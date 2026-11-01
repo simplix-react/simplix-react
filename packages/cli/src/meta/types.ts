@@ -181,6 +181,8 @@ export interface OperationMeta {
   request: RequestMeta;
   /** The order this operation's list opens in, as its own controller declares it. */
   defaultSort?: { field: string; direction?: "asc" | "desc" };
+  /** The field this search operation's `GET <base>/counts` slices a window on, as its controller declares it. */
+  timeAxis?: string;
 }
 
 /** Root SimpliX Meta document served by `GET /dev/meta/dto`. */
