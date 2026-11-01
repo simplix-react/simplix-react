@@ -2472,12 +2472,15 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       ? projectRowFields(metaSource.rowFields, byName)
       : listDtoFields ? fields.filter((f) => listDtoFields.has(f.name)) : fields;
     const projectedNames = new Set(projected.map((f) => f.name));
+    const namesRow = (f: FieldInfo) =>
+      f.name === displayNameField || (f.fkEntityField != null && [`${f.fkEntityField}Name`, `${f.fkEntityField}DisplayName`].includes(displayNameField ?? ""));
     const listFields = projected
       .map((f) => (f.isI18nPair && !projectedNames.has(`${f.name}I18n`) ? { ...f, isI18nPair: false } : f))
       .map(withEnumType)
       // The first column names the row and is the card's title on a phone, so the record's
       // display name leads and the order of the rest is kept.
-      .sort((a, b) => Number(b.name === displayNameField) - Number(a.name === displayNameField));
+      // A reference drawn by the display name (`ownerId` shown as `ownerName`) is that column.
+      .sort((a, b) => Number(namesRow(b)) - Number(namesRow(a)));
     // Each entity whose records point back at this one is a sub-list in the detail, forced to the
     // open record's key. Its columns are the holder's own row fields, drawn as its list draws them.
     const holders = [];
