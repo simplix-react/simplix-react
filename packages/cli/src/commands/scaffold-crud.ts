@@ -1307,13 +1307,13 @@ async function generatePages(
   // Index barrel
   pageFiles["index.ts"] = renderTemplate(templateFor(templates, "page-index", pageIndexTemplate), ctx);
 
-  // The page's blocks, rendered from the kit's blocks template beside the page template. It is
-  // tracked as the page is: stamped, rewritten while untouched and merged three ways once a screen
-  // has written inside its keys, so a template change reaches every screen. A page template that
-  // does not import its blocks gets none, since nothing would read them.
+  // The page's blocks, rendered from the kit's blocks template only where the page template itself
+  // imports them, and then tracked as the page is. Where the page template lays down the whole
+  // screen, a blocks file beside it is the screen's own departure, written by hand, and is left
+  // alone even when the customised page reads it.
   const blocks = templates.get(PAGE_BLOCKS_TEMPLATE);
   const pageImportsBlocks = Object.values(pageFiles).some((content) => content.includes(`./${PAGE_BLOCKS_TEMPLATE}"`));
-  if (blocks !== undefined && (pageImportsBlocks || (await pathExists(join(pagesDir, `${PAGE_BLOCKS_TEMPLATE}.tsx`))))) {
+  if (blocks !== undefined && pageImportsBlocks) {
     pageFiles[`${PAGE_BLOCKS_TEMPLATE}.tsx`] = renderTemplate(blocks, ctx);
   }
 
