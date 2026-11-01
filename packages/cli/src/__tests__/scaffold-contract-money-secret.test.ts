@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { contractFiltersOf, contractKindOf, type FieldInfo, type FilterFieldInfo } from "../commands/scaffold-crud.js";
+import { contractFiltersOf, contractKindOf, parseZodType, type FieldInfo, type FilterFieldInfo } from "../commands/scaffold-crud.js";
 
 const amount = { name: "amountUsdMicros", tsType: "number", money: { currency: "USD", scale: 6 } } as FieldInfo;
 const units = { name: "units", tsType: "number" } as FieldInfo;
@@ -31,5 +31,13 @@ describe("structured fields", () => {
     expect(contractKindOf({ name: "payload", tsType: "Record<string, unknown>", options: [] } as unknown as FieldInfo)).toBe("json");
     expect(contractKindOf({ name: "nameI18n", tsType: "Record<string, string>", baseFieldName: "name", options: [] } as unknown as FieldInfo)).toBe("i18nText");
     expect(contractKindOf({ name: "note", tsType: "string", options: [] } as unknown as FieldInfo)).toBe("text");
+  });
+});
+
+describe("a record schema", () => {
+  it("of anything but strings is a structured value, and of strings stays the i18n map", () => {
+    expect(parseZodType("z.record(z.string(), z.unknown()).optional()").tsType).toBe("Record<string, unknown>");
+    expect(parseZodType("z.record(z.string(), z.string()).optional()").tsType).toBe("Record<string, string>");
+    expect(contractKindOf({ name: "payload", ...parseZodType("z.record(z.string(), z.unknown())") } as unknown as FieldInfo)).toBe("json");
   });
 });

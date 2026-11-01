@@ -509,6 +509,17 @@ export function parseZodType(zodExpr: string): Omit<FieldInfo, "name" | "label" 
     };
   }
 
+  // z.record(z.string(), <anything but a string>) - a structured value, drawn as JSON
+  if (/^(?:z|zod)\.record\(\s*(?:z|zod)\.string\(\)\s*,/.test(trimmed)) {
+    return {
+      tsType: "Record<string, unknown>",
+      formComponent: "TextareaField",
+      inputType: "text",
+      component: "Text",
+      options: [],
+    };
+  }
+
   // Default fallback
   return {
     tsType: "string",
