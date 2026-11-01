@@ -157,7 +157,7 @@ export async function loadMetaScaffoldSource(
       withReferenceKeys(document, source);
       withNameField(document, entityName, source);
       const defaultSort = document.entities?.[entityName]?.defaultSort;
-      if (defaultSort) source.defaultSort = defaultSort;
+      if (defaultSort && !source.defaultSort) source.defaultSort = defaultSort;
       const plural = document.entities?.[entityName]?.plural;
       if (plural) source.plural = plural;
       return source;
@@ -262,6 +262,8 @@ export async function loadMetaHolders(rootDir: string, entity: string): Promise<
         const source = buildMetaScaffoldSource({ domain, tag, naming });
         withReferenceKeys(document, source);
         withNameField(document, holder.entity, source);
+        const holderSort = document.entities?.[holder.entity]?.defaultSort;
+        if (holderSort && !source.defaultSort) source.defaultSort = holderSort;
         source.relationFields = relationFieldsOf(document, holder.entity, source);
         out.push({ entity: entityNameOf(tag), field: holder.field, operator, source });
         break;
@@ -348,6 +350,9 @@ export function buildMetaScaffoldSource(
     keywordSearch: searchDto ? hasKeywordSearch(domain.types.get(searchDto)?.allFields ?? []) : false,
     unreachableRoles: UNREACHABLE_ROLES.filter((role) => roles[role] !== undefined),
     ...(listTarget ? { listAccess: listTarget.operation.access } : {}),
+    // The list's own operation names its order first: two lists over one entity (an operator's and
+    // a portal's) can open in different orders, and the entity holds only one.
+    ...(listTarget?.operation.defaultSort ? { defaultSort: listTarget.operation.defaultSort } : {}),
   };
 
   if (chosen) source.fieldSource = { type: chosen.type.name, origin: chosen.origin };

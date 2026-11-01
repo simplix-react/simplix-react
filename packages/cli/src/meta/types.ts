@@ -179,6 +179,8 @@ export interface OperationMeta {
   response?: TypeRef;
   access: AccessMeta;
   request: RequestMeta;
+  /** The order this operation's list opens in, as its own controller declares it. */
+  defaultSort?: { field: string; direction?: "asc" | "desc" };
 }
 
 /** Root SimpliX Meta document served by `GET /dev/meta/dto`. */

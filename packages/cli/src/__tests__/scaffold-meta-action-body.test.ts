@@ -104,3 +104,35 @@ describe("a key SimpliX Meta names as a reference by kind", () => {
     expect(out.find((f) => f.name === "ownerId")?.peekKind).toBeUndefined();
   });
 });
+
+describe("the order a scaffolded list opens in", () => {
+  const listed = (defaultSort?: { field: string; direction: "asc" | "desc" }) =>
+    ({
+      ...meta,
+      operations: [
+        ...meta.operations,
+        {
+          id: "WalletRest_search",
+          method: "GET",
+          path: "/api/v1/wallet/search",
+          tag: "admin.Wallet",
+          request: { query: [], path: [] },
+          response: { kind: "container", name: "SimpliXApiResponse", args: [{ kind: "container", name: "Page", args: [{ kind: "ref", name: "WalletDetailDTO" }] }] },
+          ...(defaultSort ? { defaultSort } : {}),
+        },
+      ],
+    }) as unknown as DtoMeta;
+  const sourceOf = (document: DtoMeta) => {
+    const domain = resolveMeta(document, { domains: { wallet: ["admin.Wallet"] }, containerTypes: { SimpliXApiResponse: { unwrap: true } } }).domains.get("wallet");
+    if (!domain) throw new Error("no wallet domain");
+    return buildMetaScaffoldSource({ domain, tag: "admin.Wallet", naming: simplixBootNaming });
+  };
+
+  it("takes the order the list's own operation declares", () => {
+    expect(sourceOf(listed({ field: "balance", direction: "desc" })).defaultSort).toEqual({ field: "balance", direction: "desc" });
+  });
+
+  it("states none of its own where the operation declares none, leaving the entity's to apply", () => {
+    expect(sourceOf(listed()).defaultSort).toBeUndefined();
+  });
+});

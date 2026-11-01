@@ -32,9 +32,42 @@ export async function readKitFence(rootDir: string, kit: string): Promise<Fenced
 
 type Override = { files?: string[]; rules?: Record<string, unknown> };
 
-/** The override in a lint config that holds the fence, found by its rule. */
-function fenceOverride(config: { overrides?: Override[] }): Override | undefined {
-  return config.overrides?.find((o) => o.rules !== undefined && RULE in o.rules);
+/**
+ * Every override in a lint config that holds the rule the fence is written in.
+ *
+ * <p>A later override for the same files replaces the rule an earlier one set, so a config that
+ * narrows imports per group (`modules/admin/**` beside `modules/**`) carries the fence in each of
+ * them, and a fence written into the first alone reaches none of the files the later ones match.
+ */
+export function fenceOverrides(config: { overrides?: Override[] }): Override[] {
+  return config.overrides?.filter((o) => o.rules !== undefined && RULE in o.rules) ?? [];
+}
+
+/**
+ * Writes the kit's fence as the restricted paths of every override holding the rule, keeping
+ * whatever else each one restricts (its `patterns`).
+ *
+ * @returns how many overrides were written
+ */
+export function writeFence(config: { overrides?: Override[] }, fence: readonly FencedImport[]): number {
+  const overrides = fenceOverrides(config);
+  for (const override of overrides) {
+    const rule = override.rules?.[RULE];
+    const options = Array.isArray(rule) && rule[1] && typeof rule[1] === "object" ? (rule[1] as Record<string, unknown>) : {};
+    (override.rules as Record<string, unknown>)[RULE] = ["error", { ...options, paths: [...fence] }];
+  }
+  return overrides.length;
+}
+
+/**
+ * Each override whose restricted paths disagree with the kit's fence, with how it disagrees.
+ *
+ * @returns one line per disagreement, naming the override's files; empty when every one agrees
+ */
+export function compareFenceOverrides(config: { overrides?: Override[] }, fence: readonly FencedImport[]): string[] {
+  const overrides = fenceOverrides(config);
+  if (overrides.length === 0) return compareFence(fence, []);
+  return overrides.flatMap((override) => compareFence(fence, pathsOf(override)).map((d) => `${(override.files ?? []).join(", ")}: ${d}`));
 }
 
 function pathsOf(override: Override | undefined): FencedImport[] {
@@ -85,15 +118,14 @@ export const kitFenceCommand = new Command("kit-fence")
     const fence = await readKitFence(rootDir, kit);
     const lintPath = join(rootDir, flags.lint);
     const lint = JSON.parse(await readFile(lintPath, "utf-8")) as { overrides?: Override[] };
-    const override = fenceOverride(lint);
     if (flags.write) {
-      if (!override?.rules) throw new Error(`${flags.lint} has no override holding ${RULE}; add one naming the screen files first`);
-      override.rules[RULE] = ["error", { paths: fence }];
+      const written = writeFence(lint, fence);
+      if (written === 0) throw new Error(`${flags.lint} has no override holding ${RULE}; add one naming the screen files first`);
       await writeFile(lintPath, JSON.stringify(lint, null, 2) + "\n", "utf-8");
-      log.success(`${flags.lint}: fence written from ${kit}`);
+      log.success(`${flags.lint}: fence written from ${kit} into ${written} overrides`);
       return;
     }
-    const differences = compareFence(fence, pathsOf(override));
+    const differences = compareFenceOverrides(lint, fence);
     if (differences.length === 0) {
       log.success(`kit fence: ${flags.lint} refuses what ${kit} fences`);
       return;
