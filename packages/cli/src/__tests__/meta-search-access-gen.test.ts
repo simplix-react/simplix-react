@@ -318,6 +318,24 @@ describe("a searchable route's params are its filters, its own query and the pag
     expect(params).toContain("  sort?: string[];");
   });
 
+  it("makes every filter member optional, so a bag of request conditions assigns to the type without a cast", () => {
+    // A screen hands the list's conditions (`Record<string, unknown>`, in the server's filter
+    // grammar) to the aggregates and status-count reads of the same entity. TypeScript assigns
+    // such a bag to a type whose members are all optional and refuses it for one required member,
+    // so a required filter key would put a cast on every one of those calls.
+    let filters = 0;
+    for (const domain of resolved.domains.values()) {
+      for (const [path, content] of generateSearchFiles(domain, { naming: simplixBootNaming }).files) {
+        if (!path.startsWith("model/") || !path.endsWith("Params.ts")) continue;
+        for (const match of content.matchAll(/^ {2}"([A-Za-z0-9_]+\.[A-Za-z0-9_]+)"(\??): /gm)) {
+          filters += 1;
+          expect(match[2], `${path} ${match[1]}`).toBe("?");
+        }
+      }
+    }
+    expect(filters).toBeGreaterThan(0);
+  });
+
   it("keeps the query parameters the eight dual routes state of their own", () => {
     // Seventy-eight of the 86 searchable routes state an empty query and eight do not. Each of
     // those eight is a control on a screen — the window a census is bucketed over, the tab an
