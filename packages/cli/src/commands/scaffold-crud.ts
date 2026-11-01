@@ -132,6 +132,8 @@ export interface ContractFilterInfo {
   options?: string[];
   /** For a period: whether the field is a calendar day rather than a moment. */
   dateOnly?: boolean;
+  /** For a number that is an amount of money: its currency and scale, so the filter takes currency units. */
+  money?: { currency: string; scale: number };
 }
 
 const FILTER_KIND: Record<string, ContractFilterInfo["kind"]> = {
@@ -159,6 +161,8 @@ export function contractFiltersOf(filters: readonly FilterFieldInfo[], fields: r
     if (enumTypeName) one.enumTypeName = enumTypeName;
     if (kind === "choice") one.options = [...(filter.options ?? [])];
     if (kind === "dateRange") one.dateOnly = fields.find((f) => f.name === filter.field)?.columnFormat === "date";
+    const money = fields.find((f) => f.name === filter.field)?.money;
+    if (kind === "number" && money) one.money = { ...money };
     out.push(one);
   }
   return out;
@@ -2475,6 +2479,7 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     }
     // The generated access rule of each operation a control leads to (`createJobPositionAccess`),
     // which the domain barrel exports from SimpliX Meta. Absent where the domain is not on meta.
+    const contractFilters = contractFiltersOf(nonTextFilters, [...fields, ...(metaSource?.detailFields ?? [])]);
     const accessOf = (opId: string | undefined) => (metaSource && opId ? `${opId}Access` : null);
     const ctx = {
       accessCreate: accessOf(roles?.create),
@@ -2549,7 +2554,8 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       hasBooleanFields,
       hasTextareaFields,
       filters: nonTextFilters,
-      contractFilters: contractFiltersOf(nonTextFilters, [...fields, ...(metaSource?.detailFields ?? [])]),
+      contractFilters,
+      hasMoneyFilter: contractFilters.some((filter) => filter.money !== undefined),
       hasFilters: filterFields.length > 0,
       // The list's search box sends its text as the keyword search, which only a route whose
       // search DTO marks keyword fields accepts; any other route answers it with a parse error.
