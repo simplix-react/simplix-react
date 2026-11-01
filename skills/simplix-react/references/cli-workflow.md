@@ -152,6 +152,28 @@ An existing screen is regenerated, and its old files are read only as the list o
 
 An edited file with no stored base gets one when its recorded fingerprint is the fingerprint of the current render, since that render is then the one it was laid down as. The report exits non-zero for a stale file; with `--check` it also exits non-zero for an edited file that would take a merge or that conflicts. An edited file with no base, or a story stamped with no origin, is adopted after a reviewed diff: `simplix generated --adopt <path...>` prints the diff between the file and its current render, a person confirms that every difference is a deliberate customisation (a template change the diff shows is brought into the file first), and `--yes` or the prompt then records that render as the base, writing the origin into a story that lacked one when its file name and title identify the command that made it.
 
+### Routes, menu gates and follow-up commands
+
+`routes.<group>` in `simplix.config.ts` makes `simplix scaffold` write the list screen's route and register its menu entry before the `menu.marker` line of `menu.file`. The entry's gate is `{ action, subject }` read from the list endpoint's permission, with the group as a string literal. A project that reads every group from one table sets `menu.gate`:
+
+```ts
+menu: {
+  file: "apps/admin/src/shell/menu.ts",
+  marker: "@simplix-menu admin",
+  gate: { subject: "SUBJECTS.{{entityCamel}}", table: { file: "packages/identity/src/subjects.ts", name: "SUBJECTS" } },
+},
+```
+
+`subject` is a Handlebars template over the route's render context plus `entityCamel` and `group`. When the rendered expression is `<table.name>.<key>` and the scaffold put that gate into the menu, `table.file` gains `<key>: "<group>"` if it has no such key; a key it already has keeps its value. A scaffold that finds an entry already holding its own gate leaves the table alone.
+
+`generated.after` lists commands that bring what is derived from the generated files up to date, such as a design reference's catalogs:
+
+```ts
+generated: { after: [{ cwd: "../board", command: "node scripts/entity-catalogs.mjs" }] },
+```
+
+They run once, in order, after `simplix scaffold`, `simplix add-page` and `simplix generated --all` have written their files (`cwd` is relative to the project root and must exist). A report-only `simplix generated` does not run them. Each exit code is reported; a step that fails skips the ones after it and fails the command.
+
 ## Workflow: verify
 
 ```bash
