@@ -91,7 +91,7 @@ describe("a field's keyed label from SimpliX Meta", () => {
     const holding = {
       ...domain,
       types: new Map([
-        ...domain.types,
+        ...(domain.types as Map<string, unknown>),
         ["Job", { name: "Job", meta: { javaClass: "x.Job" }, ancestors: [], owner: "admin.jobs.BackgroundJob", allFields: [field("retries", { en: "Retries", ko: "재시도" })] }],
       ]),
     } as unknown as ResolvedDomain;

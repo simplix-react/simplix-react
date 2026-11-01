@@ -1274,6 +1274,17 @@ export async function overlayServerTranslations(
     }
   }
 
+  // The server labels every property of an entity class, a reference's nested record included;
+  // only the fields the entity's own DTOs carry are the entity's to label.
+  for (const [, localeData] of localeDataMap) {
+    for (const entity of entities) {
+      const block = localeData[entity.name] as { fields?: Record<string, unknown> } | undefined;
+      if (!block?.fields || entity.fields.length === 0) continue;
+      const own = new Set(entity.fields.map((one) => one.name));
+      for (const key of Object.keys(block.fields)) if (!own.has(key)) delete block.fields[key];
+    }
+  }
+
   const localesDir = join(targetDir, "src/locales");
   for (const locale of locales) {
     const overlay = localeDataMap.get(locale);
