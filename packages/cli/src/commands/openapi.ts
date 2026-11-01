@@ -1027,10 +1027,11 @@ const GENERATED_ENTITY_KEYS = new Set(["fields", "_label", "_plural", "_descript
  *
  * Only the generator's own shapes are touched: a top-level block whose keys are all generator keys
  * (`fields`, `_label`, `_plural`, `_description`) is an entity block, and is dropped when no
- * generated entity has that name; inside a generated entity, a field label is dropped when the
- * entity no longer carries the field; under `enums`, a type is dropped when the domain neither
- * declares it nor generates it. Every other key is somebody's own and is kept, and nothing is
- * pruned when the domain's declared types cannot be read.
+ * generated entity has that name; under `enums`, a type is dropped when the domain neither
+ * declares it nor generates it. Field labels inside a generated entity are kept even when no DTO
+ * carries the field, since a screen may label a value it derives under the entity's name. Every
+ * other key is somebody's own and is kept, and nothing is pruned when the domain's declared types
+ * cannot be read.
  *
  * @param content the merged locale file
  * @param entities the entities generated this run
@@ -1048,26 +1049,15 @@ export function pruneStaleGeneratedKeys(
   const dropped: string[] = [];
   const isObject = (value: unknown): value is Record<string, unknown> =>
     value !== null && typeof value === "object" && !Array.isArray(value);
-  const byName = new Map(entities.map((one) => [one.name, one]));
+  const names = new Set(entities.map((one) => one.name));
 
   for (const [key, value] of Object.entries(content)) {
     if (key === "enums" || !isObject(value)) continue;
     const keys = Object.keys(value);
     if (keys.length === 0 || !keys.every((one) => GENERATED_ENTITY_KEYS.has(one))) continue;
-    const entity = byName.get(key);
-    if (!entity) {
-      delete content[key];
-      dropped.push(key);
-      continue;
-    }
-    const fields = value["fields"];
-    if (!isObject(fields) || entity.fields.length === 0) continue;
-    const own = new Set(entity.fields.map((one) => one.name));
-    for (const field of Object.keys(fields)) {
-      if (own.has(field)) continue;
-      delete fields[field];
-      dropped.push(`${key}.fields.${field}`);
-    }
+    if (names.has(key)) continue;
+    delete content[key];
+    dropped.push(key);
   }
 
   const enums = content["enums"];

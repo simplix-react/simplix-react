@@ -13,15 +13,18 @@ const entity = (name: string, fields: Array<{ name: string; enum?: string[]; enu
   ({ name, pascalName: name[0]!.toUpperCase() + name.slice(1), fields }) as never;
 
 describe("labels the generators no longer write", () => {
-  it("drop a removed entity's block, a removed field and an undeclared enum", () => {
+  it("drop a removed entity's block and an undeclared enum, and keep a field label no DTO carries", () => {
     const content = {
       grant: { fields: { roleId: "역할", removedField: "지운 필드" }, _label: "부여" },
       session: { fields: { startedAt: "시작" } },
       enums: { GrantStatus: { ACTIVE: "사용" }, signInOptionType: { SUCCESS: "Success" } },
     };
     const dropped = pruneStaleGeneratedKeys(content, [entity("grant", [{ name: "roleId" }])], {}, new Set(["GrantStatus"]));
-    expect(content).toEqual({ grant: { fields: { roleId: "역할" }, _label: "부여" }, enums: { GrantStatus: { ACTIVE: "사용" } } });
-    expect(dropped).toEqual(["grant.fields.removedField", "session", "enums.signInOptionType"]);
+    expect(content).toEqual({
+      grant: { fields: { roleId: "역할", removedField: "지운 필드" }, _label: "부여" },
+      enums: { GrantStatus: { ACTIVE: "사용" } },
+    });
+    expect(dropped).toEqual(["session", "enums.signInOptionType"]);
   });
 
   it("keep every key that is not in a generator's shape", () => {
