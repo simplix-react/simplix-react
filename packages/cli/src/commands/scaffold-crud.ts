@@ -38,6 +38,7 @@ import { writeStampedGenerated } from "../utils/generated-merge.js";
 import { fixtureRows } from "../utils/story-fixtures.js";
 import { renderWidgetBlocks, renderWidgetFiles } from "./scaffold-widgets.js";
 import { renderTemplate } from "../utils/template.js";
+import { pageKindBlocksTemplate } from "../templates/page-kinds/index.js";
 import { runAfterGenerate } from "../utils/generated-after.js";
 import { logSubjectWrite, writeRoute } from "../utils/route-files.js";
 import { depVersion } from "../versions.js";
@@ -1287,6 +1288,8 @@ async function generatePages(
   templates: ProjectTemplates = new Map(),
   /** The arguments that reproduce this render, recorded after each fingerprint. */
   origin?: string,
+  /** Lay down a page.blocks.tsx departure file, once, because the author asked for one. */
+  withBlocks = false,
 ): Promise<GeneratedPages> {
   const pagesDir = join(moduleDir, "src", "pages", entityKebab);
   const generated: string[] = [];
@@ -1315,6 +1318,9 @@ async function generatePages(
   const pageImportsBlocks = Object.values(pageFiles).some((content) => content.includes(`./${PAGE_BLOCKS_TEMPLATE}"`));
   if (blocks !== undefined && pageImportsBlocks) {
     pageFiles[`${PAGE_BLOCKS_TEMPLATE}.tsx`] = renderTemplate(blocks, ctx);
+  } else if (withBlocks) {
+    // Asked for by the author: a hand-written departure file, laid down once and never rendered again.
+    pageFiles[`${PAGE_BLOCKS_TEMPLATE}.tsx`] = renderTemplate(pageKindBlocksTemplate, { ...ctx, NamePascal: `${String(ctx.EntityPascal)}Crud` });
   }
 
   const onDisk: string[] = [];
@@ -2088,6 +2094,7 @@ export const scaffoldCrudCommand = new Command("scaffold")
     "--app <dir>",
     "Target Expo app under apps/ for route files (with --native)",
   )
+  .option("--blocks", "Also lay down a page.blocks.tsx departure file beside the page, once, for the author to write")
   .action(reportConfigError(scaffoldAction));
 
 /** The options `simplix scaffold` takes. */
@@ -2098,6 +2105,8 @@ export interface ScaffoldOptions {
   output?: string;
   native?: boolean;
   app?: string;
+  /** Lay down a page.blocks.tsx departure file beside the page, once, at the author's request. */
+  blocks?: boolean;
 }
 
 /**
@@ -2662,7 +2671,8 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     const origin = moduleDir
       ? `scaffold ${entityKebab} --module ${modulePathOf(rootDir, moduleDir)}`
       : `scaffold ${entityKebab} --output ${relativeOutput}`;
-    const widgetBlocks = renderWidgetBlocks(files, fullCtx, projectTemplates);
+    // A widget is laid down whole; its blocks files are written only when the author asks.
+    const widgetBlocks = options.blocks ? renderWidgetBlocks(files, fullCtx, projectTemplates) : {};
 
     spinner.text = "Generating CRUD widgets...";
 
@@ -2748,7 +2758,7 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       // Pages generation (reuse i18nLocales loaded above)
       const locales = i18nLocales;
 
-      const pages = await generatePages(moduleDir, entityKebab, fullCtx, projectTemplates, origin);
+      const pages = await generatePages(moduleDir, entityKebab, fullCtx, projectTemplates, origin, options.blocks === true);
       if (pages.written.length > 0) {
         log.info(`Generated ${pages.written.length} page files`);
       }

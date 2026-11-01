@@ -54,14 +54,17 @@ export function pageTemplateName(kind: PageKind, variant?: string): string {
 }
 
 /** The files one page of `kind` renders to, keyed by their name inside the page's directory. */
-export function renderPageKind(kind: PageKind, name: string, namespace: string, templates: ProjectTemplates, origin?: string, variant?: string): Record<string, string> {
+export function renderPageKind(kind: PageKind, name: string, namespace: string, templates: ProjectTemplates, origin?: string, variant?: string, withBlocks = false): Record<string, string> {
   const template = pageTemplateName(kind, variant);
   // A variant is only ever the kit's or the project's, so it never falls back to the bundled shape.
   const source = templates.get(template) ?? (variant ? undefined : BUNDLED[kind]);
   if (source === undefined) throw new Error(`No template draws "${template}": the UI kit or .simplix/templates must supply ${template}.hbs`);
   const ctx = { NamePascal: toPascalCase(name), nameCamel: toCamelCase(name), nameKebab: toKebabCase(name), namespace, kind };
+  const page = { "page.tsx": stampFingerprint(renderTemplate(source, ctx), origin) };
+  // The page is laid down whole; a departure file beside it is written only when the author asks.
+  if (!withBlocks) return page;
   const blocks = templateFor(templates, `${template}.blocks`, templateFor(templates, "page-kind.blocks", pageKindBlocksTemplate));
-  return { "page.tsx": stampFingerprint(renderTemplate(source, ctx), origin), "page.blocks.tsx": stampFingerprint(renderTemplate(blocks, ctx), origin) };
+  return { ...page, "page.blocks.tsx": renderTemplate(blocks, ctx) };
 }
 
 /**
@@ -107,6 +110,7 @@ export const addPageCommand = new Command("add-page")
   .option("--module <name>", "Module that owns the page (modules/<name>/src/pages/<page>); a grouped module is <group>/<name>")
   .option("--app <name>", "App that owns the page (apps/<name>/src/pages/<page>)")
   .option("--variant <name>", "Another shape of the kind, drawn from <kind>.<variant>.hbs (e.g. app-shell --variant top-bar)")
+  .option("--blocks", "Also lay down a page.blocks.tsx departure file beside the page, once, for the author to write")
   .action(reportConfigError(addPageAction));
 
 /**
@@ -114,7 +118,7 @@ export const addPageCommand = new Command("add-page")
  * `generated.after` commands. The commands belong here and not in {@link runAddPage}, which the
  * generated-state report runs in capture mode and a regeneration runs once per origin.
  */
-async function addPageAction(rawKind: string, name: string, flags: { module?: string; app?: string; variant?: string }): Promise<void> {
+async function addPageAction(rawKind: string, name: string, flags: { module?: string; app?: string; variant?: string; blocks?: boolean }): Promise<void> {
   await runAddPage(rawKind, name, flags);
   await runAfterGenerate(await findProjectRoot(process.cwd()));
 }
@@ -124,7 +128,7 @@ async function addPageAction(rawKind: string, name: string, flags: { module?: st
  *
  * <p>Exported so the generated-state report can run the same render in capture mode.
  */
-export async function runAddPage(rawKind: string, name: string, flags: { module?: string; app?: string; variant?: string }): Promise<void> {
+export async function runAddPage(rawKind: string, name: string, flags: { module?: string; app?: string; variant?: string; blocks?: boolean }): Promise<void> {
     const rootDir = await findProjectRoot(process.cwd());
     const kind = parsePageKind(rawKind);
     if (Boolean(flags.module) === Boolean(flags.app)) {
@@ -141,10 +145,10 @@ export async function runAddPage(rawKind: string, name: string, flags: { module?
     const dir = kind === "app-shell" ? join(owner, "src", "app", "layouts") : join(owner, "src", "pages", toKebabCase(name));
     const variant = flags.variant ? toKebabCase(flags.variant) : undefined;
     const origin = `add-page ${kind} ${toKebabCase(name)} ${module ? `--module ${module.path}` : `--app ${flags.app}`}${variant ? ` --variant ${variant}` : ""}`;
-    for (const [file, content] of Object.entries(renderPageKind(kind, name, namespace, templates, origin, variant))) {
+    for (const [file, content] of Object.entries(renderPageKind(kind, name, namespace, templates, origin, variant, flags.blocks === true))) {
       const path = join(dir, kind === "app-shell" && file === "page.tsx" ? "root-layout.tsx" : kind === "app-shell" ? "root-layout.blocks.tsx" : file);
-      // The page and its blocks are both tracked: rewritten while untouched, merged into once edited.
-      // A project template without the marker is still laid down once.
+      // The page is tracked: rewritten while untouched, merged into once edited. A departure file or a
+      // project template without the marker is laid down once and left to its author.
       if (!content.includes(GENERATED_PAGE_MARKER)) {
         if (await pathExists(path)) {
           noteKeptRender(path, content);

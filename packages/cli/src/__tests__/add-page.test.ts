@@ -11,18 +11,25 @@ describe("add-page", () => {
     expect(() => parsePageKind("wizard")).toThrow(/Unknown page kind/);
   });
 
-  it.each(PAGE_KINDS.filter((kind) => kind !== "app-shell" && kind !== "auth-page"))("renders %s from the bundled template, stamped and with its blocks", (kind) => {
+  it.each(PAGE_KINDS.filter((kind) => kind !== "app-shell" && kind !== "auth-page"))("renders %s from the bundled template, stamped and with no blocks file", (kind) => {
     const files = renderPageKind(kind, "my-profile", "user-self/pages", new Map());
     expect(files["page.tsx"]).toContain("export function MyProfilePage()");
     expect(files["page.tsx"]).toContain('useTranslation("user-self/pages")');
     expect(isUntouchedRender(files["page.tsx"]!)).toBe(true);
+    expect(files["page.blocks.tsx"]).toBeUndefined();
+    expect(files["page.tsx"]).not.toContain("page.blocks");
+  });
+
+  it("lays down a hand-written departure file only when the author asks for one", () => {
+    const files = renderPageKind("static-page", "my-profile", "user-self/pages", new Map(), undefined, undefined, true);
     expect(files["page.blocks.tsx"]).toContain("export function usePageBlocks()");
+    expect(files["page.blocks.tsx"]).not.toContain("@simplix-generated");
   });
 
   it("draws a kind from the templates in force over the bundled one", () => {
     const files = renderPageKind("dashboard-page", "home", "common", new Map([["dashboard-page", "/** @simplix-generated x */\nkit {{NamePascal}}"], ["dashboard-page.blocks", "kit blocks"]]));
     expect(files["page.tsx"]).toContain("kit Home");
-    expect(files["page.blocks.tsx"]).toBe("kit blocks");
+    expect(files["page.blocks.tsx"]).toBeUndefined();
   });
 
   it("refuses the app shell when no kit or project template draws one", () => {
@@ -39,7 +46,7 @@ describe("add-page", () => {
     ]);
     const files = renderPageKind("app-shell", "portal", "common", templates, undefined, "top-bar");
     expect(files["page.tsx"]).toContain("bar Portal");
-    expect(files["page.blocks.tsx"]).toBe("bar blocks");
+    expect(files["page.blocks.tsx"]).toBeUndefined();
     expect(renderPageKindStory("app-shell", "portal", "common", templates, "portal", "top-bar")).toBe("bar frame Portal/Portal");
     expect(renderPageKindStory("app-shell", "portal", "common", templates, "portal")).toBeUndefined();
     expect(() => renderPageKind("app-shell", "portal", "common", new Map([["app-shell", "console"]]), undefined, "top-bar")).toThrow(/must supply app-shell.top-bar.hbs/);

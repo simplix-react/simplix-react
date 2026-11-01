@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { readFile, readdir, realpath } from "node:fs/promises";
+import { readFile, readdir, realpath, stat } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
 
 import { loadConfig } from "../config/config-loader.js";
@@ -221,12 +221,19 @@ async function regenerateOrigins(rootDir: string): Promise<{ origins: string[]; 
 }
 
 /**
- * Why a report fails, one sentence each; empty when it passes. A stale file, a conflicting merge
- * and an edited file with no base or no origin fail every run, since each leaves a template change
- * unapplied. `check` also fails an edited file that would merge cleanly but has not been merged.
+ * Why a report fails, one sentence each; empty when it passes.
+ *
+ * <p>Only a screen that did not start from a template fails: a page file with no generated marker.
+ * A stale file and a conflicting or unrecorded merge are the normal state of a page customised by
+ * hand after a later template change, so they are reported and fail only under `check`, which also
+ * fails an edited file a clean merge would still move.
  */
-export function generatedFailures(entries: readonly GeneratedEntry[], options: { check: boolean; conflicted: boolean }): string[] {
+export function generatedFailures(entries: readonly GeneratedEntry[], options: { check: boolean; conflicted: boolean; unstarted?: readonly string[] }): string[] {
   const failures: string[] = [];
+  if ((options.unstarted ?? []).length > 0) {
+    failures.push(`Pages that did not start from a template (no ${GENERATED_PAGE_MARKER} marker): ${options.unstarted?.join(", ")}. Lay each down with \`simplix scaffold\` or \`simplix add-page\` and reapply its customisation.`);
+  }
+  if (!options.check) return failures;
   if (entries.some((e) => e.state === "stale")) {
     failures.push("Stale generated files: run `simplix generated --all` to rewrite them from the current templates.");
   }
@@ -236,10 +243,41 @@ export function generatedFailures(entries: readonly GeneratedEntry[], options: {
   if (entries.some((e) => e.merge === "no-base" || e.merge === "no-origin")) {
     failures.push("Edited generated files have no base or no origin: record each with `simplix generated --adopt <path...>`.");
   }
-  if (options.check && entries.some((e) => e.merge === "merged")) {
+  if (entries.some((e) => e.merge === "merged")) {
     failures.push("Edited generated files are behind the templates: run `simplix generated --all`.");
   }
   return failures;
+}
+
+/** The file names the generators lay a page down as, under `src/pages/<page>/`. */
+const PAGE_FILES = new Set(["page.tsx", "crud-page.tsx", "list-page.tsx"]);
+
+/**
+ * Page files under the project's `modules/` and `apps/` that carry no generated marker, as paths
+ * relative to the root: a screen built by hand rather than started from its type's template.
+ */
+export async function unstartedPages(rootDir: string): Promise<string[]> {
+  const found: string[] = [];
+  const walk = async (dir: string): Promise<void> => {
+    let names: string[];
+    try {
+      names = await readdir(dir);
+    } catch (err) {
+      if ((err as NodeJS.ErrnoException).code === "ENOENT") return;
+      throw err;
+    }
+    for (const name of names) {
+      if (name === "node_modules" || name === "dist" || name.startsWith(".")) continue;
+      const path = join(dir, name);
+      if ((await stat(path)).isDirectory()) await walk(path);
+      else if ((PAGE_FILES.has(name) && /[\\/]src[\\/]pages[\\/][^\\/]+[\\/][^\\/]+$/.test(path)) || /[\\/]src[\\/]app[\\/]layouts[\\/]root-layout\.tsx$/.test(path)) {
+        if (!(await readFile(path, "utf-8")).includes(GENERATED_PAGE_MARKER)) found.push(relative(rootDir, path));
+      }
+    }
+  };
+  await walk(join(rootDir, "modules"));
+  await walk(join(rootDir, "apps"));
+  return found.sort();
 }
 
 export const generatedCommand = new Command("generated")
@@ -248,7 +286,7 @@ export const generatedCommand = new Command("generated")
   )
   .option("--all", "Regenerate every scaffolded screen and page first: untouched files are rewritten, edited ones merged three-way, and a deleted one stays deleted while its base under .simplix/generated is kept")
   .option("--write-conflicts", "With --all, write conflict markers into a file whose merge conflicts instead of leaving it alone")
-  .option("--check", "Also exit non-zero when an edited file would take a clean merge (a stale file, a conflict, and a file with no base or origin always fail)")
+  .option("--check", "Also exit non-zero on a stale file, a conflict, a file with no base or origin, and an edited file a clean merge would still move (without it only a page that did not start from a template fails)")
   .option("--json", "Print the report as JSON")
   .option("--share", "Report, per screen, the lines in blocks and edited files against the generated lines, and the customisations two screens repeat")
   .option(
@@ -328,7 +366,8 @@ export const generatedCommand = new Command("generated")
           `${count("stale")} stale, ${count("unchecked")} unchecked`,
       );
     }
-    for (const failure of generatedFailures(entries, { check: flags.check === true, conflicted })) {
+    const unstarted = await unstartedPages(rootDir);
+    for (const failure of generatedFailures(entries, { check: flags.check === true, conflicted, unstarted })) {
       log.error(failure);
       process.exitCode = 1;
     }

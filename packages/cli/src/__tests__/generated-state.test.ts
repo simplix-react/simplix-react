@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { generatedFailures, generatedReport, regenerateAll, type GeneratedEntry } from "../commands/generated.js";
+import { generatedFailures, generatedReport, regenerateAll, unstartedPages, type GeneratedEntry } from "../commands/generated.js";
 import { shareReport } from "../commands/generated-share.js";
 import { runAddPage } from "../commands/add-page.js";
 import { captureWrites, writeFileWithDir } from "../utils/fs.js";
@@ -85,20 +85,6 @@ describe("generated-state report", () => {
     // The new render is the base now, so the next run has nothing left to merge.
     expect(await readFile(basePath(), "utf-8")).toContain('"v2"');
     expect((await pageReport(root))[0]).toMatchObject({ state: "edited", merge: "current" });
-  });
-
-  it("tracks the page's blocks: stamped, and a template change merged into a screen's edit", async () => {
-    const blocks = (body: string) => `/**\n * @simplix-generated blocks/static-page.blocks\n */\nexport function usePageBlocks() {\n  return { title: "${body}" };\n}\n`;
-    const blocksPath = join(root, "apps/web/src/pages/about/page.blocks.tsx");
-    await writeFile(join(root, TEMPLATE_DIR, "static-page.blocks.hbs"), blocks("b1"));
-    await regenerateAll(root);
-    expect(await readFile(blocksPath, "utf-8")).toMatch(/@simplix-render [0-9a-f]{12} add-page static-page about --app web/);
-    await writeFile(blocksPath, (await readFile(blocksPath, "utf-8")) + "export const own = 1;\n");
-    await writeFile(join(root, TEMPLATE_DIR, "static-page.blocks.hbs"), blocks("b2"));
-    await regenerateAll(root);
-    const merged = await readFile(blocksPath, "utf-8");
-    expect(merged).toContain('"b2"');
-    expect(merged).toContain("export const own = 1;");
   });
 
   it("reports a conflicting edit with its hunks and leaves the file alone", async () => {
@@ -293,17 +279,29 @@ describe("the generated report's exit", () => {
   const entry = (over: Partial<GeneratedEntry>): GeneratedEntry => ({ path: "a.tsx", state: "edited", ...over });
   const fails = (entries: GeneratedEntry[], check = false) => generatedFailures(entries, { check, conflicted: false }).length > 0;
 
-  it("fails without --check on a conflict, a stale file, and an edited file with no base or no origin", () => {
-    expect(fails([entry({ merge: "conflict" })])).toBe(true);
-    expect(fails([entry({ state: "stale" })])).toBe(true);
-    expect(fails([entry({ merge: "no-base" })])).toBe(true);
-    expect(fails([entry({ merge: "no-origin" })])).toBe(true);
-    expect(generatedFailures([], { check: false, conflicted: true })).toHaveLength(1);
+  it("fails only on a page that did not start from a template", () => {
+    expect(generatedFailures([], { check: false, conflicted: false, unstarted: ["modules/a/src/pages/x/page.tsx"] })).toHaveLength(1);
+    expect(fails([entry({ merge: "conflict" }), entry({ state: "stale" }), entry({ merge: "no-base" }), entry({ merge: "no-origin" }), entry({ merge: "merged" })])).toBe(false);
+    expect(generatedFailures([], { check: false, conflicted: true })).toHaveLength(0);
   });
 
-  it("passes untouched and current files, and fails a clean pending merge only under --check", () => {
-    expect(fails([entry({ state: "untouched" }), entry({ merge: "current" })])).toBe(false);
-    expect(fails([entry({ merge: "merged" })])).toBe(false);
-    expect(fails([entry({ merge: "merged" })], true)).toBe(true);
+  it("fails a stale file, a conflict, a missing base or origin and a pending merge under --check", () => {
+    for (const over of [{ merge: "conflict" as const }, { state: "stale" as const }, { merge: "no-base" as const }, { merge: "no-origin" as const }, { merge: "merged" as const }]) {
+      expect(fails([entry(over)], true)).toBe(true);
+    }
+    expect(fails([entry({ state: "untouched" }), entry({ merge: "current" })], true)).toBe(false);
+  });
+});
+
+describe("pages that did not start from a template", () => {
+  it("lists a page file with no generated marker and leaves a generated one and other files alone", async () => {
+    const root = await mkdtemp(join(tmpdir(), "simplix-unstarted-"));
+    await mkdir(join(root, "modules/a/src/pages/hand"), { recursive: true });
+    await mkdir(join(root, "modules/a/src/pages/made"), { recursive: true });
+    await writeFile(join(root, "modules/a/src/pages/hand/page.tsx"), "export const x = 1;\n");
+    await writeFile(join(root, "modules/a/src/pages/hand/helper.tsx"), "export const y = 1;\n");
+    await writeFile(join(root, "modules/a/src/pages/made/crud-page.tsx"), "/** @simplix-generated page/x */\n");
+    expect(await unstartedPages(root)).toEqual(["modules/a/src/pages/hand/page.tsx"]);
+    await rm(root, { recursive: true, force: true });
   });
 });
