@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { figureTilesOf } from "../meta/figure-tiles.js";
+import { figureTilesOf, withTileFilters } from "../meta/figure-tiles.js";
 
 const fields = [
   { name: "status", contractKind: "enum", enumTypeName: "JobStatus", options: ["QUEUED", "FAILED"] },
@@ -29,5 +29,25 @@ describe("figureTilesOf", () => {
     expect(figureTilesOf({ hooks, fields, rowIdField: "jobId" })).toBeUndefined();
     expect(figureTilesOf({ statusCounts: ["status"], hooks: {}, fields, rowIdField: "jobId" })).toBeUndefined();
     expect(figureTilesOf({ statusCounts: ["exceptionType"], hooks, fields, rowIdField: "jobId" })).toBeUndefined();
+  });
+});
+
+describe("the list filters beside the figure tiles", () => {
+  const status = { hook: "useCounts", field: "standing", enumName: "Standing", options: ["ACTIVE", "SUSPENDED"] };
+
+  it("add a choice on the field a status tile narrows, so the filter bar shows a pressed tile", () => {
+    expect(withTileFilters([{ kind: "dateRange" as const, field: "lastSeenAt" }], { status })).toEqual([
+      { kind: "dateRange", field: "lastSeenAt" },
+      { kind: "choice", field: "standing", enumTypeName: "Standing", options: ["ACTIVE", "SUSPENDED"] },
+    ]);
+  });
+
+  it("leave a field the contract already filters by as it is", () => {
+    const filters = [{ kind: "choice" as const, field: "standing", enumTypeName: "Standing", options: ["ACTIVE"] }];
+    expect(withTileFilters(filters, { status })).toEqual(filters);
+  });
+
+  it("add nothing without a status tile", () => {
+    expect(withTileFilters([], undefined)).toEqual([]);
   });
 });

@@ -66,3 +66,27 @@ export function figureTilesOf(input: FigureTilesInput): FigureTiles | undefined 
   if (!status && !aggregates) return undefined;
   return { ...(status ? { status } : {}), ...(aggregates ? { aggregates } : {}) };
 }
+
+/** A list filter as the templates render it: its kind, field, and for a choice its enum and values. */
+export interface TileFilterInfo {
+  kind: "choice" | "toggle" | "dateRange" | "number";
+  field: string;
+  enumTypeName?: string;
+  options?: string[];
+}
+
+/**
+ * The list's filters with one for every field a figure tile narrows.
+ *
+ * <p>A status tile writes its value as the list's own `<field>.in` filter, so the filter bar has to
+ * offer that field: otherwise a pressed tile narrows the rows while the bar shows no active value
+ * and cannot clear it. A field the contract already filters by is left as it is.
+ *
+ * @param filters the filters the contract's searchable fields give the list
+ * @param tiles the figure tiles the page draws
+ */
+export function withTileFilters<F extends TileFilterInfo>(filters: readonly F[], tiles: FigureTiles | undefined): (F | TileFilterInfo)[] {
+  const status = tiles?.status;
+  if (!status || filters.some((filter) => filter.field === status.field)) return [...filters];
+  return [...filters, { kind: "choice", field: status.field, enumTypeName: status.enumName, options: [...status.options] }];
+}

@@ -10,7 +10,7 @@ import { ConfigLoadError } from "../config/config-load-error.js";
 import { findCrudConfigForEntity } from "../config/crud-config-loader.js";
 import { loadConfig } from "../config/config-loader.js";
 import { chooseDefaultSort } from "../meta/default-sort.js";
-import { figureTilesOf } from "../meta/figure-tiles.js";
+import { figureTilesOf, withTileFilters } from "../meta/figure-tiles.js";
 import { assertOutputDirs } from "../config/output-dirs.js";
 import { reportConfigError } from "../config/report-config-error.js";
 import {
@@ -2661,6 +2661,8 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     const hasI18nFields = i18nFieldPairs.length > 0;
     const projectConfig = await loadConfig(rootDir);
     const i18nLocales = projectConfig.i18n?.locales ?? ["en", "ko", "ja"];
+    // Every field a figure tile narrows is a filter of the list too, so the bar shows the press.
+    ctx.contractFilters = withTileFilters(ctx.contractFilters, ctx.figureTiles);
     // The fields a form writes, read by the form widget and by the story's form panel alike.
     const formFields = formFieldsOf(ctx.fields, ctx.formOrderField);
     // Sample rows a generated story draws, shared through the context so the story template
