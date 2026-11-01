@@ -149,7 +149,7 @@ export const metaCommand = new Command("meta")
 
       // The locale overlay and the i18n download read a name and a field list, both of which
       // SimpliX Meta states, so neither needs an OpenAPI document behind it.
-      const entities = metaEntities(domain);
+      const entities = metaEntities(domain, meta.document);
       if (await pathExists(join(targetDir, "src/translations.ts"))) {
         await generateLocaleFiles(targetDir, entities, locales);
         // A URL spec carries its own origin, which is all the download needs.

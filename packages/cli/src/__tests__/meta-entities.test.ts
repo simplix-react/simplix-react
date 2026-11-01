@@ -61,4 +61,28 @@ describe("metaEntities", () => {
       .map(([name]) => name);
     expect(empty).toEqual([]);
   });
+  it("leaves out the fields of another entity a DTO holds as a reference", () => {
+    // A detail DTO naming its referenced record by the entity class itself reaches that class and
+    // its ancestors; the parent's screens read only the reference's own label.
+    const withReference: DtoMeta = structuredClone(meta);
+    const detail = withReference.types.OrganizationDetailDTO!;
+    const text = detail.fields.find((one) => one.type.kind === "string")!.type;
+    withReference.types.Region = {
+      javaClass: "example.region.Region",
+      typeParams: [],
+      fields: [{ ...detail.fields[0]!, name: "regionCode", type: text }],
+    } as DtoMeta["types"][string];
+    detail.fields.push({ ...detail.fields[0]!, name: "region", type: { kind: "ref", name: "Region" } });
+    withReference.entities = { Region: { javaClass: "example.region.Region" } } as DtoMeta["entities"];
+    const domain = resolveMeta(withReference, { domains: smartSafetyDomains, containerTypes }).domains.get("org")!;
+
+    const fieldsOf = (document?: DtoMeta) =>
+      metaEntities(domain, document)
+        .find((one) => one.name === "organization")
+        ?.fields.map((one) => one.name) ?? [];
+    expect(fieldsOf(withReference)).toContain("region");
+    expect(fieldsOf(withReference)).not.toContain("regionCode");
+    // Without the document every reached type lends its fields, which is the leak.
+    expect(fieldsOf()).toContain("regionCode");
+  });
 });
