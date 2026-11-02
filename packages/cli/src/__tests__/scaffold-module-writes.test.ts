@@ -416,6 +416,13 @@ describe("the list's design decisions", () => {
     expect(await snapshot()).toEqual(before);
   });
 
+  it("refuses a text filter the entity does not search by before writing anything (the run reports the reason and exits)", async () => {
+    await useDecisionAwareList();
+    const before = await snapshot();
+    await expect(withSilentLog(() => runScaffold("product", { module: "mymod", quiet: true, textFilter: "provider" }))).rejects.toThrow(/process\.exit\(1\)/);
+    expect(await snapshot()).toEqual(before);
+  });
+
   it("accepts the three flags on the command", async () => {
     await useDecisionAwareList();
     await withSilentLog(() => scaffoldCrudCommand.parseAsync(["node", "simplix", "product", "--module", "mymod", "--list-presentation", "cards", "--view-toggle", "--card-title", "name"]));

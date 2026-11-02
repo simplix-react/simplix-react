@@ -157,8 +157,10 @@ export const AUDIT_FIELDS = ["createdBy", "createdAt", "updatedBy", "updatedAt",
 
 /** A filter a generated list offers, in the kit's terms, from a searchable field SimpliX Meta declares. */
 export interface ContractFilterInfo {
-  kind: "choice" | "toggle" | "dateRange" | "number" | "reference";
+  kind: "choice" | "toggle" | "dateRange" | "number" | "reference" | "text";
   field: string;
+  /** For a text: the operators the endpoint accepts on the field, as the search DTO states them, first one the default. */
+  operators?: string[];
   enumTypeName?: string;
   options?: string[];
   /** For a period: whether the field is a calendar day rather than a moment. */
@@ -245,6 +247,40 @@ export function contractFiltersOf(filters: readonly FilterFieldInfo[], fields: r
     out.push(one);
   }
   return out;
+}
+
+/**
+ * The text filters a design names, in the order it names them: a text the reader types a part of
+ * (a provider, a plan code). The generator leaves text fields to the keyword search, so a screen
+ * whose question is asked by one of them says so (`--text-filter`). A name that is not a
+ * searchable text field of the entity is refused rather than dropped, since a filter the design
+ * asked for and the list does not offer is a gap nobody would see.
+ *
+ * @param filters the searchable fields of the entity's list route
+ * @param named the field names the design's filters name as text
+ * @param entity the entity, for the message
+ */
+export function textContractFiltersOf(filters: readonly FilterFieldInfo[], named: readonly string[], entity: string): ContractFilterInfo[] {
+  const out: ContractFilterInfo[] = [];
+  const seen = new Set<string>();
+  for (const name of named) {
+    if (seen.has(name)) continue;
+    seen.add(name);
+    const filter = filters.find((candidate) => candidate.component === "TextFilter" && candidate.field === name);
+    if (!filter) {
+      const offered = filters.filter((candidate) => candidate.component === "TextFilter").map((candidate) => candidate.field);
+      throw new Error(`--text-filter names "${name}", which is not a searchable text field of ${entity} (text fields: ${offered.length > 0 ? offered.join(", ") : "none"})`);
+    }
+    const one: ContractFilterInfo = { kind: "text", field: name };
+    if (filter.textOperators && filter.textOperators.length > 0) one.operators = [...filter.textOperators];
+    out.push(one);
+  }
+  return out;
+}
+
+/** The names a `--text-filter` value carries: comma separated, blanks dropped. */
+export function textFilterNames(value: string | undefined): string[] {
+  return (value ?? "").split(",").map((name) => name.trim()).filter((name) => name !== "");
 }
 
 /** The contract kind one field is drawn and edited by, read from what codegen already settled. */
@@ -2170,6 +2206,7 @@ export const scaffoldCrudCommand = new Command("scaffold")
   .option("--list-presentation <kind>", `How the list draws its rows, as its design decided it: ${LIST_PRESENTATIONS.join(" or ")} (default table)`)
   .option("--view-toggle", "Offer the reader a switch between the table and the cards, as the design decided it")
   .option("--card-title <column>", "The key of the column that titles a card, as the design decided it; default the first column")
+  .option("--text-filter <fields>", "Comma separated text fields the design's filters name; each gets a filter the reader types a part of (the generator otherwise leaves text fields to the keyword search)")
   .action(reportConfigError(scaffoldAction));
 
 /** The options `simplix scaffold` takes. */
@@ -2192,6 +2229,8 @@ export interface ScaffoldOptions {
   viewToggle?: boolean;
   /** The key of the column that titles a card; the first column when absent. */
   cardTitle?: string;
+  /** Comma separated text fields the design's filters name, each offered as a filter the reader types a part of. */
+  textFilter?: string;
 }
 
 /**
@@ -2208,15 +2247,17 @@ export function scaffoldOptionsFromOrigin(args: readonly string[]): ScaffoldOpti
     listPresentation: at("--list-presentation"),
     viewToggle: args.includes("--view-toggle") ? true : undefined,
     cardTitle: at("--card-title"),
+    textFilter: at("--text-filter"),
   };
 }
 
 /** The origin flags that carry the list's design decisions, so a regeneration renders the same list. */
-function listOriginFlags(options: ScaffoldOptions): string {
+export function listOriginFlags(options: ScaffoldOptions): string {
   return [
     options.listPresentation === "cards" ? " --list-presentation cards" : "",
     options.viewToggle ? " --view-toggle" : "",
     options.cardTitle ? ` --card-title ${options.cardTitle}` : "",
+    textFilterNames(options.textFilter).length > 0 ? ` --text-filter ${textFilterNames(options.textFilter).join(",")}` : "",
   ].join("");
 }
 
@@ -2676,6 +2717,7 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     const contractFilters = [
       ...referenceFiltersOf(filterFields, filterSourceFields, referencePickers),
       ...contractFiltersOf(nonTextFilters, filterSourceFields, defaultSort?.field),
+      ...textContractFiltersOf(filterFields, textFilterNames(options.textFilter), entity),
     ];
     const listFacets = facetsOf(contractFilters, filterSourceFields, referencePickers);
     // The generated access rule of each operation a control leads to (`createJobPositionAccess`),
