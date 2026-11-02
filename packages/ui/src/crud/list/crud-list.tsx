@@ -1248,8 +1248,9 @@ function ListTable<T>({
   const frame = useTableCardFrame();
   const framed = !!frame?.framed && !isCardMode;
 
-  // Declare grid as a selectable view so the FilterBar can auto-show the toggle.
-  useEffect(() => {
+  // Declare grid as a selectable view so the FilterBar can auto-show the toggle. A layout effect, so
+  // the toolbar draws the toggle in the first paint instead of adding it a frame later.
+  useLayoutEffect(() => {
     columnCtx?.setCanGridView(!!gridView && hasCard);
   }, [gridView, hasCard, columnCtx?.setCanGridView]);
 
