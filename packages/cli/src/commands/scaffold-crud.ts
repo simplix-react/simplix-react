@@ -117,6 +117,12 @@ export interface FieldInfo {
   referenceNamePath?: string;
   /** For such a key: the peek kind the nested record's type names. */
   referencePeekKind?: string;
+  /**
+   * How `referenceNamePath` was settled: `declared` when SimpliX Meta names the field (the key's
+   * `reference.nameField`, else the referenced entity's `nameFields`), `inferred` when it was
+   * guessed from the nested type's field names, which a serializer may not write out.
+   */
+  referenceNameSource?: "declared" | "inferred";
   /** For a key SimpliX Meta states as a reference by kind: the kind field and the peek of each served kind. */
   referenceKinds?: ReferenceKinds;
   /** The record's own identifier, which a list leaves out and a detail draws with a copy control. */
@@ -324,6 +330,37 @@ export function projectRowFields(rowFields: readonly FieldInfo[], stated: Readon
 /** The relation keys a SimpliX Meta source states, or `undefined` for a source that states none. */
 export function relationsOf(source: { readonly relationFields?: readonly string[] } | null | undefined): ReadonlySet<string> | undefined {
   return source?.relationFields ? new Set(source.relationFields) : undefined;
+}
+
+/** A form field edited through a search of the referenced entity. */
+export interface FormPicker {
+  readonly field: string;
+  readonly hook: string;
+  readonly from: string;
+}
+
+/**
+ * The form fields that reference an entity the project names a search hook for
+ * (`scaffold.referencePickers`, by peek kind).
+ */
+export function pickersOf(
+  formFields: readonly Pick<FieldInfo, "name" | "contractKind" | "peekKind">[],
+  configured: Readonly<Record<string, { readonly hook: string; readonly from: string }>> | undefined,
+): FormPicker[] {
+  if (!configured) return [];
+  const out: FormPicker[] = [];
+  for (const f of formFields) {
+    const picker = f.contractKind === "reference" && f.peekKind ? configured[f.peekKind] : undefined;
+    if (picker) out.push({ field: f.name, hook: picker.hook, from: picker.from });
+  }
+  return out;
+}
+
+/** One import per module, naming each hook once, for the pickers a form uses. */
+export function pickerImportsOf(pickers: readonly FormPicker[]): { from: string; hooks: string }[] {
+  const byModule = new Map<string, Set<string>>();
+  for (const one of pickers) byModule.set(one.from, (byModule.get(one.from) ?? new Set()).add(one.hook));
+  return [...byModule].map(([from, hooks]) => ({ from, hooks: [...hooks].sort().join(", ") }));
 }
 
 /**
@@ -2106,7 +2143,14 @@ export interface ScaffoldOptions {
  */
 async function scaffoldAction(entityArg: string, options: ScaffoldOptions): Promise<void> {
   await runScaffold(entityArg, options);
-  await runAfterGenerate(await findProjectRoot(process.cwd()));
+  const rootDir = await findProjectRoot(process.cwd());
+  // The files are judged against SimpliX Meta before the project's steps run: a name path that
+  // draws a key, a form that cannot create, or long text drawn on one line compiles and renders.
+  if (!options.native) {
+    const { runScreenCheck } = await import("./check-screen.js");
+    await runScreenCheck(rootDir, [toKebabCase(toEntityName(entityArg))]);
+  }
+  await runAfterGenerate(rootDir);
 }
 
 /**
@@ -2657,10 +2701,14 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     ctx.contractFilters = withTileFilters(ctx.contractFilters, ctx.figureTiles);
     // The fields a form writes, read by the form widget and by the story's form panel alike.
     const formFields = formFieldsOf(ctx.fields, ctx.formOrderField);
+    // A reference the form edits is picked from a search of the referenced entity, where the
+    // project names one for that entity; a key it names none for is a typed id, which
+    // `simplix check-screen` reports.
+    const formPickers = pickersOf(formFields, scaffoldConfig.scaffold?.referencePickers);
     // Sample rows a generated story draws, shared through the context so the story template
     // reads the same fields the screen templates do.
     const fixtureRowsJson = JSON.stringify(fixtureRows([...ctx.detailFields, ...ctx.listFields, ...formFields], rowIdField, entityKebab, 3, i18nLocales), null, 2);
-    const fullCtx = { ...ctx, formFields, moduleNamespace, moduleName, entityIcon: "FileTextIcon", hasListDetail, hasI18nFields, i18nFieldPairs, i18nLocales, fixtureRowsJson };
+    const fullCtx = { ...ctx, formFields, formPickers, formPickerImports: pickerImportsOf(formPickers), moduleNamespace, moduleName, entityIcon: "FileTextIcon", hasListDetail, hasI18nFields, i18nFieldPairs, i18nLocales, fixtureRowsJson };
 
     // The project's own templates win where it has written any, for the widgets as for the pages.
     const projectTemplates = await loadProjectTemplates(rootDir, projectConfig.templates?.from);
@@ -2857,6 +2905,13 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       log.info(`Domain package: ${packageName}`);
     }
     log.info(`Fields detected: ${fields.map((f) => f.name).join(", ")}`);
+    for (const [key, path] of Object.entries(metaSource?.inferredReferenceNames ?? {})) {
+      // Loud on purpose: the path resolves against the model, but nothing says the serializer writes it.
+      log.warn(
+        `${entity}: "${key}" is drawn by "${path}", guessed from the nested record's field names. ` +
+        "The referenced entity declares no `nameFields`; declare them in the backend so the name is not a guess.",
+      );
+    }
     log.info("");
     log.info("FSD Architecture:");
     log.step("packages/            → domain logic (schemas, hooks) - no UI");

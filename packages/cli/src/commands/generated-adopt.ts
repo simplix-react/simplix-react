@@ -202,8 +202,14 @@ async function hunksBetween(from: string, to: string): Promise<string> {
  *
  * @param projectRoot the project root, which must also be the working directory
  * @param files absolute paths of the generated files to adopt
+ * @param options `rebase` also takes a file that already has a base: the screen's content is kept
+ *   against the current templates, and the template change that conflicted with it is declined
  */
-export async function planAdopt(projectRoot: string, files: readonly string[]): Promise<AdoptItem[]> {
+export async function planAdopt(
+  projectRoot: string,
+  files: readonly string[],
+  options: { readonly rebase?: boolean } = {},
+): Promise<AdoptItem[]> {
   const { rootDir, config, held } = await collectGenerated(projectRoot);
   const storiesAt = config.templates?.storiesDir ? resolve(rootDir, config.templates.storiesDir) : undefined;
   const storiesDir = storiesAt !== undefined && (await pathExists(storiesAt)) ? await realpath(storiesAt) : storiesAt;
@@ -237,7 +243,7 @@ export async function planAdopt(projectRoot: string, files: readonly string[]): 
       refuse("untouched: it is still what the generator wrote, so there is nothing to adopt");
       continue;
     }
-    if ((await readBase(file)) !== undefined) {
+    if (options.rebase !== true && (await readBase(file)) !== undefined) {
       refuse("it already has a base: `simplix generated --all` merges the template change into it");
       continue;
     }
@@ -307,9 +313,9 @@ async function askConfirmation(count: number): Promise<boolean> {
 export async function runAdopt(
   projectRoot: string,
   files: readonly string[],
-  options: { readonly yes: boolean; readonly confirm?: (count: number) => Promise<boolean> },
+  options: { readonly yes: boolean; readonly rebase?: boolean; readonly confirm?: (count: number) => Promise<boolean> },
 ): Promise<number> {
-  const items = await planAdopt(projectRoot, files);
+  const items = await planAdopt(projectRoot, files, { rebase: options.rebase === true });
   for (const item of items) {
     if (item.refusal !== undefined) {
       log.error(`refused ${item.path}: ${item.refusal}`);

@@ -195,10 +195,16 @@ export interface SimplixConfig {
    * both `recipientEmail` and `recipientEmailMasked` is drawn with the masked one only, since
    * SimpliX Meta marks no personal data and the pairing is the only statement of which form a
    * screen may show. Defaults to none.
+   *
+   * `referencePickers` maps a peek kind (the referenced entity's name in camel case) to the hook
+   * that searches that entity for a form's picker, and the module it is imported from. A form field
+   * that references an entity listed here is edited through that picker; a required reference to
+   * an entity not listed is reported by `simplix check-screen`, since its id would be typed by hand.
    */
   scaffold?: {
     readonly defaultSortFields?: readonly (string | { readonly field: string; readonly direction?: "asc" | "desc" })[];
     readonly maskedSuffix?: string;
+    readonly referencePickers?: Readonly<Record<string, { readonly hook: string; readonly from: string }>>;
   };
 
   references?: {

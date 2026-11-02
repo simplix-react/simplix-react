@@ -19,4 +19,10 @@ describe("story fixture rows", () => {
     const [row] = fixtureRows([{ name: "nameI18n", contractKind: "i18nText", baseFieldName: "name" }], "planId", "plan", 1);
     expect(row.nameI18n).toBe("nameI18n 1");
   });
+
+  it("writes a reference named by a nested path as a nested record, never as a key spelled with a dot", () => {
+    const [row] = fixtureRows([{ name: "userId", contractKind: "reference", nameField: "user.username" }], "noteId", "note", 1);
+    expect(row).toMatchObject({ user: { username: "username 1" } });
+    expect(Object.keys(row!)).not.toContain("user.username");
+  });
 });

@@ -77,6 +77,8 @@ export interface FieldMeta {
     many: boolean;
     kindField?: string;
     kinds?: Record<string, string>;
+    /** The field of the referenced record a screen names it by, where the reference states one. */
+    nameField?: string;
   };
   /** The value a new record starts the field with: a scalar, or an enum constant by name. */
   defaultValue?: string | number | boolean;

@@ -41,11 +41,32 @@ export function fixtureRows(
         f.contractKind === "i18nText" && f.baseFieldName && locales.length > 0
           ? Object.fromEntries(locales.map((locale) => [locale, `${f.baseFieldName} ${n}`]))
           : sampleValue(f, n);
-      if (f.contractKind === "reference" && f.nameField && !byName.has(f.nameField)) row[f.nameField] = `${f.nameField} ${n}`;
+      if (f.contractKind === "reference" && f.nameField && !byName.has(f.nameField)) setPath(row, f.nameField, `${f.nameField.split(".").pop()} ${n}`);
     }
     row[rowIdField] = byName.get(rowIdField)?.tsType === "number" ? n : `${entityKebab}-${n}`;
     return row;
   });
+}
+
+/**
+ * Writes a value at a dotted path, creating the nested records on the way: a reference named by
+ * `user.username` is a row whose `user` is a record, never a row with a key spelled `user.username`
+ * that no reader of the contract resolves.
+ */
+function setPath(row: Record<string, unknown>, path: string, value: unknown): void {
+  const parts = path.split(".");
+  let at = row;
+  for (const part of parts.slice(0, -1)) {
+    const next = at[part];
+    if (typeof next === "object" && next !== null) {
+      at = next as Record<string, unknown>;
+      continue;
+    }
+    const created: Record<string, unknown> = {};
+    at[part] = created;
+    at = created;
+  }
+  at[parts[parts.length - 1]!] = value;
 }
 
 function sampleValue(f: FixtureField, n: number): unknown {

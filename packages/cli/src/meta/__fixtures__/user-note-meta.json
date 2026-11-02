@@ -1,0 +1,1161 @@
+{
+ "version": 1,
+ "enums": {
+  "NoteType": {
+   "labeled": true,
+   "values": [
+    {
+     "name": "ADMIN",
+     "labelKey": "enums.NoteType.ADMIN"
+    },
+    {
+     "name": "SECURITY",
+     "labelKey": "enums.NoteType.SECURITY"
+    },
+    {
+     "name": "HR",
+     "labelKey": "enums.NoteType.HR"
+    },
+    {
+     "name": "COMPLIANCE",
+     "labelKey": "enums.NoteType.COMPLIANCE"
+    },
+    {
+     "name": "CUSTOMER",
+     "labelKey": "enums.NoteType.CUSTOMER"
+    }
+   ]
+  }
+ },
+ "types": {
+  "UserNoteUpdateFormDTO": {
+   "javaClass": "dev.simplecore.stagevoice.web.admin.user.dto.UserNoteDTOs$UserNoteUpdateFormDTO",
+   "extends": "UserNoteUpdateDTO",
+   "typeParams": [],
+   "fields": [
+    {
+     "name": "createdBy",
+     "type": {
+      "kind": "string"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Created by"
+    },
+    {
+     "name": "createdAt",
+     "type": {
+      "kind": "instant"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Created at"
+    },
+    {
+     "name": "updatedBy",
+     "type": {
+      "kind": "string"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Updated by"
+    },
+    {
+     "name": "updatedAt",
+     "type": {
+      "kind": "instant"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Updated at"
+    }
+   ],
+   "entity": "UserNote"
+  },
+  "UserNoteCreateDTO": {
+   "javaClass": "dev.simplecore.stagevoice.web.admin.user.dto.UserNoteDTOs$UserNoteCreateDTO",
+   "typeParams": [],
+   "fields": [
+    {
+     "name": "userId",
+     "type": {
+      "kind": "string"
+     },
+     "required": true,
+     "nullable": false,
+     "description": "User ID this note is about Foreign key to users table",
+     "labelKey": "entities.UserNote.userId",
+     "constraints": [
+      {
+       "kind": "notBlank"
+      },
+      {
+       "kind": "maxLength",
+       "value": 36
+      }
+     ],
+     "reference": {
+      "entity": "UserAccount",
+      "idField": "userId",
+      "many": false
+     },
+     "labels": {
+      "en": "User",
+      "ko": "사용자"
+     }
+    },
+    {
+     "name": "noteType",
+     "type": {
+      "kind": "enum",
+      "name": "NoteType"
+     },
+     "required": true,
+     "nullable": false,
+     "description": "Note type for categorization and access control - ADMIN",
+     "labelKey": "entities.UserNote.noteType",
+     "labels": {
+      "en": "Note Type",
+      "ko": "메모 유형"
+     }
+    },
+    {
+     "name": "content",
+     "type": {
+      "kind": "string"
+     },
+     "required": true,
+     "nullable": false,
+     "description": "Note content Stores the actual note text Use TEXT type for unlimited length",
+     "labelKey": "entities.UserNote.content",
+     "constraints": [
+      {
+       "kind": "notBlank"
+      }
+     ],
+     "labels": {
+      "en": "Content",
+      "ko": "내용"
+     }
+    },
+    {
+     "name": "authorId",
+     "type": {
+      "kind": "string"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Author who created this note Foreign key to users table Tracks who added the note for accountability",
+     "labelKey": "entities.UserNote.authorId",
+     "constraints": [
+      {
+       "kind": "maxLength",
+       "value": 36
+      }
+     ],
+     "labels": {
+      "en": "Author",
+      "ko": "작성자"
+     }
+    },
+    {
+     "name": "pinned",
+     "type": {
+      "kind": "boolean"
+     },
+     "required": true,
+     "nullable": false,
+     "description": "Is this note pinned for visibility? Pinned notes appear at the top of note lists",
+     "labelKey": "entities.UserNote.pinned",
+     "labels": {
+      "en": "Pinned",
+      "ko": "고정됨"
+     },
+     "defaultValue": false
+    }
+   ],
+   "entity": "UserNote"
+  },
+  "UserNoteSearchDTO": {
+   "javaClass": "dev.simplecore.stagevoice.web.admin.user.dto.UserNoteDTOs$UserNoteSearchDTO",
+   "typeParams": [],
+   "fields": [
+    {
+     "name": "noteId",
+     "type": {
+      "kind": "string"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "UserNote ID",
+     "labelKey": "entities.UserNote.noteId",
+     "searchable": {
+      "operators": [
+       "EQUALS",
+       "IN"
+      ],
+      "sortable": true
+     },
+     "labels": {
+      "en": "Note ID",
+      "ko": "메모 ID"
+     }
+    },
+    {
+     "name": "userId",
+     "type": {
+      "kind": "string"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "User ID this note is about Foreign key to users table",
+     "labelKey": "entities.UserNote.userId",
+     "searchable": {
+      "operators": [
+       "EQUALS",
+       "IN"
+      ],
+      "sortable": true,
+      "entityField": "userId"
+     },
+     "reference": {
+      "entity": "UserAccount",
+      "idField": "userId",
+      "many": false
+     },
+     "labels": {
+      "en": "User",
+      "ko": "사용자"
+     }
+    },
+    {
+     "name": "noteType",
+     "type": {
+      "kind": "enum",
+      "name": "NoteType"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Note type for categorization and access control - ADMIN: System administrators only - SECURITY: Security team - HR: HR department - COMPLIANCE: Compliance officers",
+     "labelKey": "entities.UserNote.noteType",
+     "searchable": {
+      "operators": [
+       "EQUALS",
+       "IN"
+      ],
+      "sortable": true,
+      "entityField": "noteType"
+     },
+     "labels": {
+      "en": "Note Type",
+      "ko": "메모 유형"
+     }
+    },
+    {
+     "name": "content",
+     "type": {
+      "kind": "string"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Note content Stores the actual note text Use TEXT type for unlimited length",
+     "labelKey": "entities.UserNote.content",
+     "searchable": {
+      "operators": [
+       "CONTAINS"
+      ],
+      "sortable": false,
+      "entityField": "content"
+     },
+     "labels": {
+      "en": "Content",
+      "ko": "내용"
+     }
+    },
+    {
+     "name": "authorId",
+     "type": {
+      "kind": "string"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Author who created this note Foreign key to users table Tracks who added the note for accountability",
+     "labelKey": "entities.UserNote.authorId",
+     "searchable": {
+      "operators": [
+       "EQUALS"
+      ],
+      "sortable": true,
+      "entityField": "authorId"
+     },
+     "labels": {
+      "en": "Author",
+      "ko": "작성자"
+     }
+    },
+    {
+     "name": "pinned",
+     "type": {
+      "kind": "boolean"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Is this note pinned for visibility? Pinned notes appear at the top of note lists",
+     "labelKey": "entities.UserNote.pinned",
+     "searchable": {
+      "operators": [
+       "EQUALS"
+      ],
+      "sortable": false,
+      "entityField": "pinned"
+     },
+     "labels": {
+      "en": "Pinned",
+      "ko": "고정됨"
+     },
+     "defaultValue": false
+    },
+    {
+     "name": "createdBy",
+     "type": {
+      "kind": "string"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Created by",
+     "searchable": {
+      "operators": [
+       "EQUALS",
+       "CONTAINS"
+      ],
+      "sortable": false,
+      "entityField": "createdBy"
+     }
+    },
+    {
+     "name": "createdAt",
+     "type": {
+      "kind": "instant"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Created at",
+     "searchable": {
+      "operators": [
+       "GREATER_THAN_OR_EQUAL_TO",
+       "LESS_THAN_OR_EQUAL_TO",
+       "BETWEEN"
+      ],
+      "sortable": true,
+      "entityField": "createdAt"
+     }
+    },
+    {
+     "name": "updatedBy",
+     "type": {
+      "kind": "string"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Updated by",
+     "searchable": {
+      "operators": [
+       "EQUALS",
+       "CONTAINS"
+      ],
+      "sortable": false,
+      "entityField": "updatedBy"
+     }
+    },
+    {
+     "name": "updatedAt",
+     "type": {
+      "kind": "instant"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Updated at",
+     "searchable": {
+      "operators": [
+       "GREATER_THAN_OR_EQUAL_TO",
+       "LESS_THAN_OR_EQUAL_TO",
+       "BETWEEN"
+      ],
+      "sortable": true,
+      "entityField": "updatedAt"
+     }
+    }
+   ],
+   "entity": "UserNote"
+  },
+  "UserNoteBatchUpdateDTO": {
+   "javaClass": "dev.simplecore.stagevoice.web.admin.user.dto.UserNoteDTOs$UserNoteBatchUpdateDTO",
+   "typeParams": [],
+   "fields": [
+    {
+     "name": "noteIds",
+     "type": {
+      "kind": "container",
+      "name": "List",
+      "args": [
+       {
+        "kind": "string"
+       }
+      ]
+     },
+     "required": false,
+     "nullable": true,
+     "description": "UserNote ID list",
+     "labelKey": "entities.UserNote.noteId",
+     "labels": {
+      "en": "Note ID",
+      "ko": "메모 ID"
+     }
+    },
+    {
+     "name": "noteType",
+     "type": {
+      "kind": "enum",
+      "name": "NoteType"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Note type for categorization and access control - ADMIN",
+     "labelKey": "entities.UserNote.noteType",
+     "labels": {
+      "en": "Note Type",
+      "ko": "메모 유형"
+     }
+    },
+    {
+     "name": "pinned",
+     "type": {
+      "kind": "boolean"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Is this note pinned for visibility? Pinned notes appear at the top of note lists",
+     "labelKey": "entities.UserNote.pinned",
+     "labels": {
+      "en": "Pinned",
+      "ko": "고정됨"
+     },
+     "defaultValue": false
+    }
+   ],
+   "entity": "UserNote"
+  },
+  "UserNoteUpdateDTO": {
+   "javaClass": "dev.simplecore.stagevoice.web.admin.user.dto.UserNoteDTOs$UserNoteUpdateDTO",
+   "extends": "UserNoteCreateDTO",
+   "typeParams": [],
+   "fields": [
+    {
+     "name": "noteId",
+     "type": {
+      "kind": "string"
+     },
+     "required": true,
+     "nullable": false,
+     "description": "UserNote ID",
+     "labelKey": "entities.UserNote.noteId",
+     "constraints": [
+      {
+       "kind": "notBlank"
+      }
+     ],
+     "labels": {
+      "en": "Note ID",
+      "ko": "메모 ID"
+     }
+    }
+   ],
+   "entity": "UserNote"
+  },
+  "UserNoteDetailDTO": {
+   "javaClass": "dev.simplecore.stagevoice.web.admin.user.dto.UserNoteDTOs$UserNoteDetailDTO",
+   "typeParams": [],
+   "fields": [
+    {
+     "name": "noteId",
+     "type": {
+      "kind": "string"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Unique note identifier"
+    },
+    {
+     "name": "userId",
+     "type": {
+      "kind": "string"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "User account ID",
+     "reference": {
+      "entity": "UserAccount",
+      "idField": "userId",
+      "many": false
+     }
+    },
+    {
+     "name": "user",
+     "type": {
+      "kind": "ref",
+      "name": "UserAccount"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "User account information"
+    },
+    {
+     "name": "noteType",
+     "type": {
+      "kind": "enum",
+      "name": "NoteType"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Note type for categorization and access control - ADMIN"
+    },
+    {
+     "name": "content",
+     "type": {
+      "kind": "string"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Note content Stores the actual note text Use TEXT type for unlimited length"
+    },
+    {
+     "name": "authorId",
+     "type": {
+      "kind": "string"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Author who created this note Foreign key to users table Tracks who added the note for accountability"
+    },
+    {
+     "name": "pinned",
+     "type": {
+      "kind": "boolean"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Is this note pinned for visibility? Pinned notes appear at the top of note lists",
+     "defaultValue": false
+    },
+    {
+     "name": "createdBy",
+     "type": {
+      "kind": "string"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Created by"
+    },
+    {
+     "name": "createdAt",
+     "type": {
+      "kind": "instant"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Created at"
+    },
+    {
+     "name": "updatedBy",
+     "type": {
+      "kind": "string"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Updated by"
+    },
+    {
+     "name": "updatedAt",
+     "type": {
+      "kind": "instant"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Updated at"
+    }
+   ],
+   "entity": "UserNote"
+  },
+  "UserNoteListDTO": {
+   "javaClass": "dev.simplecore.stagevoice.web.admin.user.dto.UserNoteDTOs$UserNoteListDTO",
+   "typeParams": [],
+   "fields": [
+    {
+     "name": "noteId",
+     "type": {
+      "kind": "string"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Unique note identifier"
+    },
+    {
+     "name": "userId",
+     "type": {
+      "kind": "string"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "User account ID",
+     "reference": {
+      "entity": "UserAccount",
+      "idField": "userId",
+      "many": false
+     }
+    },
+    {
+     "name": "user",
+     "type": {
+      "kind": "ref",
+      "name": "UserAccount"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "User account information"
+    },
+    {
+     "name": "noteType",
+     "type": {
+      "kind": "enum",
+      "name": "NoteType"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Note type for categorization and access control - ADMIN"
+    },
+    {
+     "name": "content",
+     "type": {
+      "kind": "string"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Note content Stores the actual note text Use TEXT type for unlimited length"
+    },
+    {
+     "name": "authorId",
+     "type": {
+      "kind": "string"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Author who created this note Foreign key to users table Tracks who added the note for accountability"
+    },
+    {
+     "name": "pinned",
+     "type": {
+      "kind": "boolean"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Is this note pinned for visibility? Pinned notes appear at the top of note lists",
+     "defaultValue": false
+    },
+    {
+     "name": "createdBy",
+     "type": {
+      "kind": "string"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Created by"
+    },
+    {
+     "name": "createdAt",
+     "type": {
+      "kind": "instant"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Created at"
+    },
+    {
+     "name": "updatedBy",
+     "type": {
+      "kind": "string"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Updated by"
+    },
+    {
+     "name": "updatedAt",
+     "type": {
+      "kind": "instant"
+     },
+     "required": false,
+     "nullable": true,
+     "description": "Updated at"
+    }
+   ],
+   "entity": "UserNote"
+  },
+  "UserAccount": {
+   "javaClass": "dev.simplecore.stagevoice.domain.user.entity.UserAccount",
+   "extends": "BaseEntity",
+   "typeParams": [],
+   "fields": [
+    {
+     "name": "userId",
+     "type": {
+      "kind": "string"
+     },
+     "required": false,
+     "nullable": true
+    },
+    {
+     "name": "username",
+     "type": {
+      "kind": "string"
+     },
+     "required": false,
+     "nullable": true,
+     "format": "code"
+    },
+    {
+     "name": "nativeName",
+     "type": {
+      "kind": "string"
+     },
+     "required": false,
+     "nullable": true
+    },
+    {
+     "name": "englishName",
+     "type": {
+      "kind": "string"
+     },
+     "required": false,
+     "nullable": true
+    },
+    {
+     "name": "email",
+     "type": {
+      "kind": "string"
+     },
+     "required": false,
+     "nullable": true,
+     "format": "code"
+    },
+    {
+     "name": "displayName",
+     "type": {
+      "kind": "string"
+     },
+     "required": false,
+     "nullable": true
+    }
+   ]
+  }
+ },
+ "operations": [
+  {
+   "id": "AdminUserNoteRest_multiUpdate",
+   "method": "PATCH",
+   "path": "/api/v1/admin/user/note",
+   "tag": "user.admin.UserNote",
+   "summary": "Update Multiple UserNote",
+   "request": {
+    "body": {
+     "kind": "container",
+     "name": "List",
+     "args": [
+      {
+       "kind": "ref",
+       "name": "UserNoteUpdateDTO"
+      }
+     ]
+    },
+    "contentType": "json",
+    "query": [],
+    "path": []
+   },
+   "response": {
+    "kind": "container",
+    "name": "SimpliXApiResponse",
+    "args": [
+     {
+      "kind": "container",
+      "name": "List",
+      "args": [
+       {
+        "kind": "ref",
+        "name": "UserNoteDetailDTO"
+       }
+      ]
+     }
+    ]
+   },
+   "access": {
+    "kind": "permission",
+    "group": "USER_ADMIN",
+    "action": "edit"
+   },
+   "entity": "UserNote"
+  },
+  {
+   "id": "AdminUserNoteRest_batchDelete",
+   "method": "DELETE",
+   "path": "/api/v1/admin/user/note/batch",
+   "tag": "user.admin.UserNote",
+   "summary": "Delete multiple UserNotes",
+   "request": {
+    "query": [
+     {
+      "name": "noteIds",
+      "type": {
+       "kind": "container",
+       "name": "List",
+       "args": [
+        {
+         "kind": "string"
+        }
+       ]
+      },
+      "required": true
+     }
+    ],
+    "path": []
+   },
+   "response": {
+    "kind": "container",
+    "name": "SimpliXApiResponse",
+    "args": []
+   },
+   "access": {
+    "kind": "permission",
+    "group": "USER_ADMIN",
+    "action": "delete"
+   },
+   "entity": "UserNote"
+  },
+  {
+   "id": "AdminUserNoteRest_batchUpdate",
+   "method": "PATCH",
+   "path": "/api/v1/admin/user/note/batch",
+   "tag": "user.admin.UserNote",
+   "summary": "Batch Update UserNotes",
+   "request": {
+    "body": {
+     "kind": "ref",
+     "name": "UserNoteBatchUpdateDTO"
+    },
+    "contentType": "json",
+    "query": [],
+    "path": []
+   },
+   "response": {
+    "kind": "container",
+    "name": "SimpliXApiResponse",
+    "args": []
+   },
+   "access": {
+    "kind": "permission",
+    "group": "USER_ADMIN",
+    "action": "edit"
+   },
+   "entity": "UserNote"
+  },
+  {
+   "id": "AdminUserNoteRest_create",
+   "method": "POST",
+   "path": "/api/v1/admin/user/note/create",
+   "tag": "user.admin.UserNote",
+   "summary": "Create UserNote",
+   "request": {
+    "body": {
+     "kind": "ref",
+     "name": "UserNoteCreateDTO"
+    },
+    "contentType": "json",
+    "query": [],
+    "path": []
+   },
+   "response": {
+    "kind": "container",
+    "name": "SimpliXApiResponse",
+    "args": [
+     {
+      "kind": "ref",
+      "name": "UserNoteDetailDTO"
+     }
+    ]
+   },
+   "access": {
+    "kind": "permission",
+    "group": "USER_ADMIN",
+    "action": "create"
+   },
+   "entity": "UserNote"
+  },
+  {
+   "id": "AdminUserNoteRest_simpleSearch",
+   "method": "GET",
+   "path": "/api/v1/admin/user/note/search",
+   "tag": "user.admin.UserNote",
+   "summary": "Search UserNote list (GET)",
+   "request": {
+    "query": [],
+    "path": [],
+    "searchDto": "UserNoteSearchDTO"
+   },
+   "response": {
+    "kind": "container",
+    "name": "SimpliXApiResponse",
+    "args": [
+     {
+      "kind": "container",
+      "name": "Page",
+      "args": [
+       {
+        "kind": "ref",
+        "name": "UserNoteListDTO"
+       }
+      ]
+     }
+    ]
+   },
+   "access": {
+    "kind": "permission",
+    "group": "USER_ADMIN",
+    "action": "list"
+   },
+   "entity": "UserNote",
+   "defaultSort": {
+    "field": "createdAt",
+    "direction": "desc"
+   }
+  },
+  {
+   "id": "AdminUserNoteRest_search",
+   "method": "POST",
+   "path": "/api/v1/admin/user/note/search",
+   "tag": "user.admin.UserNote",
+   "summary": "Search UserNote list (POST)",
+   "request": {
+    "query": [],
+    "path": [],
+    "searchDto": "UserNoteSearchDTO"
+   },
+   "response": {
+    "kind": "container",
+    "name": "SimpliXApiResponse",
+    "args": [
+     {
+      "kind": "container",
+      "name": "Page",
+      "args": [
+       {
+        "kind": "ref",
+        "name": "UserNoteListDTO"
+       }
+      ]
+     }
+    ]
+   },
+   "access": {
+    "kind": "permission",
+    "group": "USER_ADMIN",
+    "action": "list"
+   },
+   "entity": "UserNote",
+   "defaultSort": {
+    "field": "createdAt",
+    "direction": "desc"
+   }
+  },
+  {
+   "id": "AdminUserNoteRest_delete",
+   "method": "DELETE",
+   "path": "/api/v1/admin/user/note/{noteId}",
+   "tag": "user.admin.UserNote",
+   "summary": "Delete UserNote",
+   "request": {
+    "query": [],
+    "path": [
+     {
+      "name": "noteId",
+      "type": {
+       "kind": "string"
+      },
+      "required": true
+     }
+    ]
+   },
+   "response": {
+    "kind": "container",
+    "name": "SimpliXApiResponse",
+    "args": []
+   },
+   "access": {
+    "kind": "permission",
+    "group": "USER_ADMIN",
+    "action": "delete"
+   },
+   "entity": "UserNote"
+  },
+  {
+   "id": "AdminUserNoteRest_get",
+   "method": "GET",
+   "path": "/api/v1/admin/user/note/{noteId}",
+   "tag": "user.admin.UserNote",
+   "summary": "Get UserNote",
+   "request": {
+    "query": [],
+    "path": [
+     {
+      "name": "noteId",
+      "type": {
+       "kind": "string"
+      },
+      "required": true
+     }
+    ]
+   },
+   "response": {
+    "kind": "container",
+    "name": "SimpliXApiResponse",
+    "args": [
+     {
+      "kind": "ref",
+      "name": "UserNoteDetailDTO"
+     }
+    ]
+   },
+   "access": {
+    "kind": "permission",
+    "group": "USER_ADMIN",
+    "action": "view"
+   },
+   "entity": "UserNote"
+  },
+  {
+   "id": "AdminUserNoteRest_update",
+   "method": "PUT",
+   "path": "/api/v1/admin/user/note/{noteId}",
+   "tag": "user.admin.UserNote",
+   "summary": "Update UserNote",
+   "request": {
+    "body": {
+     "kind": "ref",
+     "name": "UserNoteUpdateDTO"
+    },
+    "contentType": "json",
+    "query": [],
+    "path": [
+     {
+      "name": "noteId",
+      "type": {
+       "kind": "string"
+      },
+      "required": true
+     }
+    ]
+   },
+   "response": {
+    "kind": "container",
+    "name": "SimpliXApiResponse",
+    "args": [
+     {
+      "kind": "ref",
+      "name": "UserNoteDetailDTO"
+     }
+    ]
+   },
+   "access": {
+    "kind": "permission",
+    "group": "USER_ADMIN",
+    "action": "edit"
+   },
+   "entity": "UserNote"
+  },
+  {
+   "id": "AdminUserNoteRest_updateForm",
+   "method": "GET",
+   "path": "/api/v1/admin/user/note/{noteId}/edit",
+   "tag": "user.admin.UserNote",
+   "summary": "Get UserNote for Update",
+   "request": {
+    "query": [],
+    "path": [
+     {
+      "name": "noteId",
+      "type": {
+       "kind": "string"
+      },
+      "required": true
+     }
+    ]
+   },
+   "response": {
+    "kind": "container",
+    "name": "SimpliXApiResponse",
+    "args": [
+     {
+      "kind": "ref",
+      "name": "UserNoteUpdateFormDTO"
+     }
+    ]
+   },
+   "access": {
+    "kind": "permission",
+    "group": "USER_ADMIN",
+    "action": "view"
+   },
+   "entity": "UserNote"
+  }
+ ],
+ "entities": {
+  "UserNote": {
+   "javaClass": "dev.simplecore.stagevoice.domain.user.entity.UserNote",
+   "idField": "noteId",
+   "labelKey": "entities.UserNote",
+   "pluralKey": "entities.UserNote._plural",
+   "descriptionKey": "entities.UserNote._description",
+   "label": {
+    "en": "User Note",
+    "ko": "사용자 메모"
+   },
+   "plural": {
+    "en": "User notes",
+    "ko": "사용자 메모"
+   },
+   "defaultSort": {
+    "field": "createdAt",
+    "direction": "desc"
+   }
+  },
+  "UserAccount": {
+   "idField": "userId",
+   "nameFields": [
+    "username"
+   ],
+   "label": {
+    "en": "User account"
+   },
+   "plural": {
+    "en": "User accounts"
+   },
+   "holders": [
+    {
+     "entity": "UserNote",
+     "field": "userId",
+     "operators": [
+      "EQUALS",
+      "IN"
+     ]
+    }
+   ]
+  }
+ }
+}

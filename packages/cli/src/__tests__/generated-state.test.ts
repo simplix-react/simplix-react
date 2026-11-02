@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { generatedFailures, generatedReport, regenerateAll, unstartedPages, type GeneratedEntry } from "../commands/generated.js";
+import { entriesNamedBy, generatedFailures, generatedReport, regenerateAll, unstartedPages, type GeneratedEntry } from "../commands/generated.js";
 import { shareReport } from "../commands/generated-share.js";
 import { runAddPage } from "../commands/add-page.js";
 import { captureWrites, writeFileWithDir } from "../utils/fs.js";
@@ -303,5 +303,27 @@ describe("pages that did not start from a template", () => {
     await writeFile(join(root, "modules/a/src/pages/made/crud-page.tsx"), "/** @simplix-generated page/x */\n");
     expect(await unstartedPages(root)).toEqual(["modules/a/src/pages/hand/page.tsx"]);
     await rm(root, { recursive: true, force: true });
+  });
+});
+
+describe("naming the files a report is about", () => {
+  const entry = (path: string) => ({ path, state: "untouched" }) as GeneratedEntry;
+  const entries = [entry("modules/a/src/widgets/note/list.tsx"), entry("modules/a/src/widgets/note/form.tsx"), entry("modules/a/src/widgets/other/list.tsx")];
+
+  it("keeps a file by its path and a directory by everything under it", () => {
+    const one = entriesNamedBy(entries, "/root", "/root", ["modules/a/src/widgets/note/list.tsx"]);
+    expect(one.kept.map((e) => e.path)).toEqual(["modules/a/src/widgets/note/list.tsx"]);
+    const dir = entriesNamedBy(entries, "/root", "/root", ["modules/a/src/widgets/note"]);
+    expect(dir.kept.map((e) => e.path)).toEqual(["modules/a/src/widgets/note/list.tsx", "modules/a/src/widgets/note/form.tsx"]);
+  });
+
+  it("reads a path from the directory it was typed in, and does not match a longer sibling name", () => {
+    const typed = entriesNamedBy(entries, "/root", "/root/modules/a", ["src/widgets/note"]);
+    expect(typed.kept).toHaveLength(2);
+    expect(entriesNamedBy(entries, "/root", "/root", ["modules/a/src/widgets/not"]).kept).toEqual([]);
+  });
+
+  it("reports a path that names no generated file", () => {
+    expect(entriesNamedBy(entries, "/root", "/root", ["modules/b"]).unmatched).toEqual(["modules/b"]);
   });
 });

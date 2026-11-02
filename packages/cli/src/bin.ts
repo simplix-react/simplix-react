@@ -12,6 +12,7 @@ import { i18nCodegenCommand } from "./commands/i18n-codegen.js";
 import { metaCommand } from "./commands/meta.js";
 import { metaDiffCommand } from "./commands/meta-diff.js";
 import { metaInfoCommand } from "./commands/meta-info.js";
+import { checkScreenCommand } from "./commands/check-screen.js";
 import { openapiCommand } from "./commands/openapi.js";
 import { scaffoldCrudCommand } from "./commands/scaffold-crud.js";
 import { addPageCommand } from "./commands/add-page.js";
@@ -101,6 +102,7 @@ program.addCommand(kitFenceCommand);
 program.addCommand(metaCommand);
 program.addCommand(metaDiffCommand);
 program.addCommand(metaInfoCommand);
+program.addCommand(checkScreenCommand);
 program.addCommand(cyclesCommand);
 program.addCommand(metaRemovalsCommand);
 

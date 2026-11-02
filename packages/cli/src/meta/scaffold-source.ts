@@ -105,6 +105,10 @@ export interface MetaScaffoldSource {
   relationFields?: string[];
   /** What the list (or search) operation requires of the caller, as SimpliX Meta states it. */
   listAccess?: AccessMeta;
+  /** The reference name paths Meta does not declare and the scaffold guessed, as `key → path`. */
+  inferredReferenceNames?: Record<string, string>;
+  /** The fields the create body requires, which the form must carry. */
+  createRequired?: string[];
   /** Locale → the entity's plural name, as SimpliX Meta states it. */
   plural?: Record<string, string>;
 }
@@ -164,6 +168,7 @@ export async function loadMetaScaffoldSource(
       const entityName = tag.split(".").pop() ?? tag;
       source.relationFields = relationFieldsOf(document, entityName, source);
       withReferenceKeys(document, source);
+      source.inferredReferenceNames = withReferenceNames(document, source);
       withNameField(document, entityName, source);
       const defaultSort = document.entities?.[entityName]?.defaultSort;
       if (defaultSort && !source.defaultSort) source.defaultSort = defaultSort;
@@ -214,6 +219,46 @@ export function withReferenceKeys(document: DtoMeta, source: MetaScaffoldSource)
     const idField = document.entities?.[pascal]?.idField;
     if (idField !== undefined && match !== idField) one.peekBy = match;
   }
+}
+
+/**
+ * Settles the name path of every reference against what SimpliX Meta declares.
+ *
+ * <p>A key whose record arrives nested is named by the field its referenced entity declares in
+ * `nameFields`, ahead of the guess made from the nested type's field names: the nested type lists
+ * every property of the entity, including ones the serializer leaves out of a nested record, so a
+ * guessed path can resolve against the model and still draw nothing. A key the request body states
+ * (a form's) has no nested record beside it, so it takes the path its record's row states for the
+ * same key.
+ *
+ * @param document the committed SimpliX Meta
+ * @param source the entity's scaffold source, changed in place
+ * @returns the paths that stayed guesses, as `field → path`, for the scaffold to report
+ */
+export function withReferenceNames(document: DtoMeta, source: MetaScaffoldSource): Record<string, string> {
+  const inferred: Record<string, string> = {};
+  const record = [...(source.rowFields ?? []), ...(source.detailFields ?? [])];
+  for (const one of [...source.fields, ...(source.detailFields ?? []), ...(source.rowFields ?? [])]) {
+    if (one.referenceNamePath === undefined && one.isForeignKey && one.referencePeekKind !== undefined) {
+      const nested = record.find((other) => other.name === one.name && other.referenceNamePath !== undefined);
+      if (nested?.referenceNamePath !== undefined) {
+        one.referenceNamePath = nested.referenceNamePath;
+        one.referenceNameSource = nested.referenceNameSource;
+      }
+    }
+    if (one.referenceNamePath === undefined || one.fkEntityField === null || one.referencePeekKind === undefined) continue;
+    if (one.referenceNameSource === "declared" && one.referenceNamePath.split(".")[0] === one.fkEntityField) continue;
+    const pascal = one.referencePeekKind.charAt(0).toUpperCase() + one.referencePeekKind.slice(1);
+    const declared = document.entities?.[pascal]?.nameFields?.[0];
+    if (declared !== undefined) {
+      one.referenceNamePath = `${one.fkEntityField}.${declared}`;
+      one.referenceNameSource = "declared";
+    } else if (one.referenceNameSource !== "declared") {
+      one.referenceNameSource = "inferred";
+      inferred[one.name] = one.referenceNamePath;
+    }
+  }
+  return inferred;
 }
 
 /**
@@ -379,6 +424,14 @@ export function buildMetaScaffoldSource(
 
   const display = displayNameOf(fields, rowIdField);
   if (display !== undefined) source.displayNameField = display;
+
+  const created = targets.find((one) => one.role === "create");
+  const createBody = created ? typeOf(domain, innermostRef(created.operation.request.body)) : undefined;
+  if (createBody) {
+    source.createRequired = createBody.allFields
+      .filter((one) => one.required && shapeOf(one, NO_ENUM_VALUES) !== undefined)
+      .map((one) => one.name);
+  }
 
   const order = orderFieldOf(domain, targets);
   if (order !== undefined) source.orderField = order;
@@ -582,9 +635,14 @@ function fieldInfos(
     const nested = type.allFields.find((field) => field.name === one.fkEntityField);
     const nestedType = nested ? typeOf(domain, nested.type) : undefined;
     if (!nestedType) continue;
-    const name = referenceNameOf(nestedType);
+    // The key's own reference names the field, then the referenced entity's declared name fields
+    // are read in `withReferenceNames`; only a guess from the nested type's field names is
+    // marked as one, since a serializer may leave such a field out of the nested record.
+    const stated = type.allFields.find((field) => field.name === one.name)?.reference?.nameField;
+    const name = stated ?? referenceNameOf(nestedType);
     if (!name) continue;
     one.referenceNamePath = `${one.fkEntityField}.${name}`;
+    one.referenceNameSource = stated === undefined ? "inferred" : "declared";
     // The peek a reference opens is named after the referenced entity, which the nested DTO names
     // with any `DTO` / `Dto` suffix removed.
     const entityName = nestedType.name.replace(/(Detail|List)?(DTO|Dto)$/, "");

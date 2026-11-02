@@ -1,6 +1,6 @@
 import { Command } from "commander";
 import { readFile, readdir, realpath, stat } from "node:fs/promises";
-import { join, relative, resolve } from "node:path";
+import { join, relative, resolve, sep } from "node:path";
 
 import { loadConfig } from "../config/config-loader.js";
 import { assertOutputDirs } from "../config/output-dirs.js";
@@ -280,10 +280,33 @@ export async function unstartedPages(rootDir: string): Promise<string[]> {
   return found.sort();
 }
 
+/**
+ * The entries a path list names: a file by its path, a directory by every generated file under it.
+ *
+ * @param entries the whole report
+ * @param rootDir the project root the entries' paths are relative to
+ * @param callerDir the directory the paths were typed in
+ * @param named the paths as typed
+ * @returns the entries kept, and the paths that matched none
+ */
+export function entriesNamedBy(
+  entries: readonly GeneratedEntry[],
+  rootDir: string,
+  callerDir: string,
+  named: readonly string[],
+): { kept: GeneratedEntry[]; unmatched: string[] } {
+  const wanted = named.map((one) => ({ typed: one, path: relative(rootDir, resolve(callerDir, one)).split(sep).join("/") }));
+  const matches = (entryPath: string, path: string) => entryPath === path || entryPath.startsWith(`${path}/`);
+  const kept = entries.filter((e) => wanted.some((one) => matches(e.path, one.path)));
+  const unmatched = wanted.filter((one) => !entries.some((e) => matches(e.path, one.path))).map((one) => one.typed);
+  return { kept, unmatched };
+}
+
 export const generatedCommand = new Command("generated")
   .description(
     "Report every generated file as untouched, edited or stale against the current templates, and what a regeneration merges into each edited one",
   )
+  .argument("[paths...]", "Report only the generated files at these paths, or under these directories")
   .option("--all", "Regenerate every scaffolded screen and page first: untouched files are rewritten, edited ones merged three-way, and a deleted one stays deleted while its base under .simplix/generated is kept")
   .option("--write-conflicts", "With --all, write conflict markers into a file whose merge conflicts instead of leaving it alone")
   .option("--check", "Also exit non-zero on a stale file, a conflict, a file with no base or origin, and an edited file a clean merge would still move (without it only a page that did not start from a template fails)")
@@ -294,7 +317,8 @@ export const generatedCommand = new Command("generated")
     "Record the current render of an edited file as its merge base, after printing the diff between the two, so every difference is read as a customisation; a file with no origin gets one when it can be inferred",
   )
   .option("-y, --yes", "With --adopt, record without asking once the diffs are printed (a run with no terminal needs it)")
-  .action(reportConfigError(async (flags: { all?: boolean; writeConflicts?: boolean; check?: boolean; json?: boolean; share?: boolean; adopt?: string[]; yes?: boolean }) => {
+  .option("--rebase", "With --adopt, also take a file that already has a base: its content is kept as the intended one against the current templates, and a template change that conflicts with it is declined")
+  .action(reportConfigError(async (paths: string[], flags: { all?: boolean; writeConflicts?: boolean; check?: boolean; json?: boolean; share?: boolean; adopt?: string[]; yes?: boolean; rebase?: boolean }) => {
     const callerDir = process.cwd();
     const rootDir = await findProjectRoot(process.cwd());
     if (resolve(process.cwd()) !== rootDir) process.chdir(rootDir);
@@ -305,11 +329,21 @@ export const generatedCommand = new Command("generated")
         return;
       }
       const { runAdopt } = await import("./generated-adopt.js");
-      process.exitCode = await runAdopt(rootDir, flags.adopt.map((one) => resolve(callerDir, one)), { yes: flags.yes === true });
+      process.exitCode = await runAdopt(rootDir, flags.adopt.map((one) => resolve(callerDir, one)), { yes: flags.yes === true, rebase: flags.rebase === true });
+      return;
+    }
+    if (flags.rebase) {
+      log.error("--rebase applies to --adopt.");
+      process.exitCode = 1;
       return;
     }
     if (flags.yes) {
       log.error("--yes applies to --adopt.");
+      process.exitCode = 1;
+      return;
+    }
+    if (paths.length > 0 && (flags.all || flags.share)) {
+      log.error("Paths narrow the report only: run them without --all or --share.");
       process.exitCode = 1;
       return;
     }
@@ -327,11 +361,25 @@ export const generatedCommand = new Command("generated")
         for (const hunk of w.hunks ?? []) process.stdout.write(hunk);
         if (w.outcome === "conflict" && !w.markersWritten) conflicted = true;
       }
+      // A template change reaches every screen it generated: they are judged against Meta once more.
+      if (origins.length > 0) {
+        const { runScreenCheck } = await import("./check-screen.js");
+        await runScreenCheck(rootDir, []);
+      }
       // Once per regeneration, however many origins it ran, and only when one ran.
       if (origins.length > 0) await runAfterGenerate(rootDir);
     }
     const kept = new Map<string, string>();
-    const entries = await generatedReport(rootDir, flags.share === true, kept);
+    const everything = await generatedReport(rootDir, flags.share === true, kept);
+    let entries = everything;
+    if (paths.length > 0) {
+      const named = entriesNamedBy(everything, rootDir, callerDir, paths);
+      for (const one of named.unmatched) {
+        log.error(`no generated file at or under ${one}`);
+        process.exitCode = 1;
+      }
+      entries = named.kept;
+    }
     if (flags.share) {
       const { shareReport } = await import("./generated-share.js");
       const report = await shareReport(await realpath(rootDir), entries, kept);
@@ -366,7 +414,8 @@ export const generatedCommand = new Command("generated")
           `${count("stale")} stale, ${count("unchecked")} unchecked`,
       );
     }
-    const unstarted = await unstartedPages(rootDir);
+    const allUnstarted = await unstartedPages(rootDir);
+    const unstarted = paths.length > 0 ? allUnstarted.filter((one) => entriesNamedBy([{ path: one } as GeneratedEntry], rootDir, callerDir, paths).kept.length > 0) : allUnstarted;
     for (const failure of generatedFailures(entries, { check: flags.check === true, conflicted, unstarted })) {
       log.error(failure);
       process.exitCode = 1;

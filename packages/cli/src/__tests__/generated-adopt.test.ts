@@ -79,6 +79,24 @@ describe("simplix generated --adopt", () => {
     expect(await readFile(pagePath(), "utf-8")).toMatch(/"v3"[\s\S]*export const extra = 1;/);
   });
 
+  it("keeps an edited file against a template change that conflicts with it, when it is asked to rebase", async () => {
+    await edit(pagePath(), "export const extra = 1;");
+    await setTemplate("v2");
+    const refused = await planAdopt(root, [pagePath()]);
+    expect(refused[0]?.refusal).toMatch(/already has a base/);
+
+    const [item] = await planAdopt(root, [pagePath()], { rebase: true });
+    expect(item?.refusal).toBeUndefined();
+    // The reader sees the template change the screen declines, and the edit it keeps.
+    expect(item?.diff).toContain('-  return "v2";');
+    expect(item?.diff).toContain('+  return "v1";');
+
+    expect(await runAdopt(root, [pagePath()], { yes: true, rebase: true })).toBe(0);
+    expect(await readFile(basePath("apps/web/src/pages/about/page.tsx"), "utf-8")).toContain('"v2"');
+    expect((await pageReport(root))[0]).toMatchObject({ state: "edited", merge: "current" });
+    expect(await readFile(pagePath(), "utf-8")).toContain('"v1"');
+  });
+
   it("prints the diff and records nothing without a confirmation", async () => {
     await edit(pagePath(), "export const extra = 1;");
     await noBase();
