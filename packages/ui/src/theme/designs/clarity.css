@@ -4807,7 +4807,7 @@
     @apply [&>svg]:text-muted-foreground;
   }
   :where([data-slot="row-actions-strip"])[data-s-row-actions-strip] {
-    @apply [@media(hover:none)]:opacity-100 [@media(hover:none)]:translate-x-0 [tr:hover_&]:ease-[var(--ease-spring)] [tr:focus-within_&]:ease-[var(--ease-spring)] [tr:hover_&]:opacity-100 [tr:hover_&]:translate-x-0 [tr:focus-within_&]:opacity-100 [tr:focus-within_&]:translate-x-0 [tr[data-part-active=true]_&]:opacity-100 [tr[data-part-active=true]_&]:translate-x-0 [tr[data-part-focused=true]_&]:opacity-100 [tr[data-part-focused=true]_&]:translate-x-0;
+    @apply [@media(hover:none)]:opacity-100 [@media(hover:none)]:translate-x-0 [[data-slot=crud-card]_&]:opacity-100 [[data-slot=crud-card]_&]:translate-x-0 [tr:hover_&]:ease-[var(--ease-spring)] [tr:focus-within_&]:ease-[var(--ease-spring)] [tr:hover_&]:opacity-100 [tr:hover_&]:translate-x-0 [tr:focus-within_&]:opacity-100 [tr:focus-within_&]:translate-x-0 [tr[data-part-active=true]_&]:opacity-100 [tr[data-part-active=true]_&]:translate-x-0 [tr[data-part-focused=true]_&]:opacity-100 [tr[data-part-focused=true]_&]:translate-x-0;
   }
   :where([data-slot="section-shell"][data-variant="flat"])[data-s-section-shell] {
     @apply first:pt-0 last:border-b-0 last:pb-0;
