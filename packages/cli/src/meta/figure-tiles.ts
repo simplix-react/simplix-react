@@ -69,7 +69,7 @@ export function figureTilesOf(input: FigureTilesInput): FigureTiles | undefined 
 
 /** A list filter as the templates render it: its kind, field, and for a choice its enum and values. */
 export interface TileFilterInfo {
-  kind: "choice" | "toggle" | "dateRange" | "number";
+  kind: "choice" | "toggle" | "dateRange" | "number" | "reference";
   field: string;
   enumTypeName?: string;
   options?: string[];

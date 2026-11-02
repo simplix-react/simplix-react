@@ -200,11 +200,13 @@ export interface SimplixConfig {
    * that searches that entity for a form's picker, and the module it is imported from. A form field
    * that references an entity listed here is edited through that picker; a required reference to
    * an entity not listed is reported by `simplix check-screen`, since its id would be typed by hand.
+   * `facet` names the hook (from the same module, made by `createEntityFacet`) that searches the
+   * entity for a list filter: a list over a key of that entity is filtered by the record's name.
    */
   scaffold?: {
     readonly defaultSortFields?: readonly (string | { readonly field: string; readonly direction?: "asc" | "desc" })[];
     readonly maskedSuffix?: string;
-    readonly referencePickers?: Readonly<Record<string, { readonly hook: string; readonly from: string }>>;
+    readonly referencePickers?: Readonly<Record<string, { readonly hook: string; readonly from: string; readonly facet?: string }>>;
   };
 
   references?: {

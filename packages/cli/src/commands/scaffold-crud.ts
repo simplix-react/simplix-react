@@ -157,7 +157,7 @@ export const AUDIT_FIELDS = ["createdBy", "createdAt", "updatedBy", "updatedAt",
 
 /** A filter a generated list offers, in the kit's terms, from a searchable field SimpliX Meta declares. */
 export interface ContractFilterInfo {
-  kind: "choice" | "toggle" | "dateRange" | "number";
+  kind: "choice" | "toggle" | "dateRange" | "number" | "reference";
   field: string;
   enumTypeName?: string;
   options?: string[];
@@ -165,6 +165,52 @@ export interface ContractFilterInfo {
   dateOnly?: boolean;
   /** For a number that is an amount of money: its currency and scale, so the filter takes currency units. */
   money?: { currency: string; scale: number };
+}
+
+/**
+ * The filters over a key of another record, for each entity the project names a facet hook for
+ * (`scaffold.referencePickers[kind].facet`): the list is filtered by that record's name, never by
+ * its id. A searchable key is the filters the list's search DTO states for it, whatever their
+ * component.
+ */
+export function referenceFiltersOf(
+  filters: readonly FilterFieldInfo[],
+  fields: readonly FieldInfo[],
+  configured: Readonly<Record<string, { readonly facet?: string }>> | undefined,
+): ContractFilterInfo[] {
+  if (!configured) return [];
+  const seen = new Set<string>();
+  const out: ContractFilterInfo[] = [];
+  for (const filter of filters) {
+    if (seen.has(filter.field)) continue;
+    const kind = fields.find((f) => f.name === filter.field)?.referencePeekKind;
+    if (kind === undefined || configured[kind]?.facet === undefined) continue;
+    seen.add(filter.field);
+    out.push({ kind: "reference", field: filter.field });
+  }
+  return out;
+}
+
+/** The facet hooks a list calls, one per reference filter, as the project names them. */
+export interface ListFacet {
+  readonly field: string;
+  readonly hook: string;
+  readonly from: string;
+}
+
+export function facetsOf(
+  filters: readonly ContractFilterInfo[],
+  fields: readonly FieldInfo[],
+  configured: Readonly<Record<string, { readonly hook: string; readonly from: string; readonly facet?: string }>> | undefined,
+): ListFacet[] {
+  const out: ListFacet[] = [];
+  for (const filter of filters) {
+    if (filter.kind !== "reference") continue;
+    const kind = fields.find((f) => f.name === filter.field)?.referencePeekKind;
+    const picker = kind === undefined ? undefined : configured?.[kind];
+    if (picker?.facet) out.push({ field: filter.field, hook: picker.facet, from: picker.from });
+  }
+  return out;
 }
 
 const FILTER_KIND: Record<string, ContractFilterInfo["kind"]> = {
@@ -2582,7 +2628,15 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     // The order the list opens in when no reorder owns it: never the row's key. A stamp it names
     // keeps its column and its period filter (see withSortKeyShown).
     const defaultSort = chooseDefaultSort({ declared: metaSource?.defaultSort, candidates: scaffoldConfig.scaffold?.defaultSortFields, fields: listFields, rowIdField });
-    const contractFilters = contractFiltersOf(nonTextFilters, [...fields, ...(metaSource?.detailFields ?? [])], defaultSort?.field);
+    const filterSourceFields = [...fields, ...(metaSource?.detailFields ?? [])];
+    const referencePickers = scaffoldConfig.scaffold?.referencePickers;
+    // A reference leads: relations come right after the identifier in the mandated column order,
+    // and the record a list is read by is the first thing an operator narrows to.
+    const contractFilters = [
+      ...referenceFiltersOf(filterFields, filterSourceFields, referencePickers),
+      ...contractFiltersOf(nonTextFilters, filterSourceFields, defaultSort?.field),
+    ];
+    const listFacets = facetsOf(contractFilters, filterSourceFields, referencePickers);
     // The generated access rule of each operation a control leads to (`createJobPositionAccess`),
     // which the domain barrel exports from SimpliX Meta. Absent where the domain is not on meta.
     const accessOf = (opId: string | undefined) => (metaSource && opId ? `${opId}Access` : null);
@@ -2676,6 +2730,8 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       // The list's search box sends its text as the keyword search, which only a route whose
       // search DTO marks keyword fields accepts; any other route answers it with a parse error.
       hasKeywordSearch: metaSource?.keywordSearch ?? false,
+      listFacets,
+      listFacetImports: pickerImportsOf(listFacets),
       filterBarDefs,
       textFilterFields,
       hasTextFilters: textFilterFields.length > 0,
