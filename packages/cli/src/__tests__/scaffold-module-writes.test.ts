@@ -3,8 +3,9 @@ import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { regenerateAll } from "../commands/generated.js";
-import { runScaffold, scaffoldCrudCommand } from "../commands/scaffold-crud.js";
+import { generatedReport, regenerateAll } from "../commands/generated.js";
+import { applyOriginChange, planOriginChange } from "../commands/generated-origin.js";
+import { listDecision, runScaffold, scaffoldCrudCommand, scaffoldOptionsFromOrigin } from "../commands/scaffold-crud.js";
 import { withSilentLog } from "../utils/logger.js";
 
 vi.mock("ora", () => ({
@@ -378,27 +379,43 @@ describe("the list's design decisions", () => {
       ].join("\n"),
     );
   }
-  const decided = () => withSilentLog(() => runScaffold("product", { module: "mymod", quiet: true, listPresentation: "cards", viewToggle: true, cardTitle: "name" }));
+  const decided = () => withSilentLog(() => runScaffold("product", { module: "mymod", quiet: true, listPresentation: "cards", cardTitle: "name" }));
   const listText = async () => (await snapshot()).get(LIST_PATH) ?? "";
+  const switchLines = (text: string) => text.match(/\n\s+viewToggle\n/g)?.length ?? 0;
 
-  it("hands the presentation, the switch and the card title to the template, and records them in the origin", async () => {
+  it("hands the presentation and the card title to the template, with the switch a cards list always has, and records them in the origin", async () => {
     await useDecisionAwareList();
     await decided();
     const text = await listText();
     expect(text).toContain('presentation="cards"');
-    expect(text).toMatch(/\n\s+viewToggle\n/);
+    // No flag asked for the switch: a list drawn as cards has it.
+    expect(switchLines(text)).toBe(1);
     expect(text).toContain('cardTitle="name"');
-    expect(text).toMatch(/@simplix-render [0-9a-f]{12} scaffold product --module mymod --list-presentation cards --view-toggle --card-title name/);
+    expect(text).toMatch(/@simplix-render [0-9a-f]{12} scaffold product --module mymod --list-presentation cards --card-title name\n/);
   });
 
-  it("draws a plain table list, with a plain origin, when nothing is decided", async () => {
+  it("offers a table list the switch only when it is asked for, and records the flag", async () => {
     await useDecisionAwareList();
-    await scaffold();
+    await withSilentLog(() => runScaffold("product", { module: "mymod", quiet: true, viewToggle: true }));
     const text = await listText();
     expect(text).not.toContain("presentation=");
-    expect(text).not.toContain("viewToggle");
-    expect(text).not.toContain("cardTitle");
-    expect(text).toMatch(/@simplix-render [0-9a-f]{12} scaffold product --module mymod\n/);
+    expect(switchLines(text)).toBe(1);
+    expect(text).toMatch(/@simplix-render [0-9a-f]{12} scaffold product --module mymod --view-toggle\n/);
+  });
+
+  it("replays an origin recorded before the standard, with both flags, as the same cards list", async () => {
+    await useDecisionAwareList();
+    await withSilentLog(() => runScaffold("product", { module: "mymod", quiet: true, listPresentation: "cards", viewToggle: true, cardTitle: "name" }));
+    const text = await listText();
+    expect(switchLines(text)).toBe(1);
+    expect(text).toMatch(/scaffold product --module mymod --list-presentation cards --card-title name\n/);
+  });
+
+  it("keeps the flags a regeneration reads out of a cards origin and a table origin the same as they were typed", () => {
+    expect(scaffoldOptionsFromOrigin(["product", "--module", "mymod", "--list-presentation", "cards", "--card-title", "name"])).toMatchObject({ listPresentation: "cards", cardTitle: "name" });
+    expect(listDecision({ listPresentation: "cards" })).toEqual({ listCards: true, viewToggle: true });
+    expect(listDecision({ viewToggle: true })).toEqual({ listCards: false, viewToggle: true });
+    expect(listDecision({})).toEqual({ listCards: false, viewToggle: false });
   });
 
   it("renders the same list again from its origin, so a regeneration keeps the decisions", async () => {
@@ -423,9 +440,103 @@ describe("the list's design decisions", () => {
     expect(await snapshot()).toEqual(before);
   });
 
-  it("accepts the three flags on the command", async () => {
+  it("accepts a cards list without a switch flag", async () => {
     await useDecisionAwareList();
-    await withSilentLog(() => scaffoldCrudCommand.parseAsync(["node", "simplix", "product", "--module", "mymod", "--list-presentation", "cards", "--view-toggle", "--card-title", "name"]));
-    expect(await listText()).toContain('cardTitle="name"');
+    await withSilentLog(() => scaffoldCrudCommand.parseAsync(["node", "simplix", "product", "--module", "mymod", "--list-presentation", "cards", "--card-title", "name"]));
+    const cards = await listText();
+    expect(cards).toContain('cardTitle="name"');
+    expect(switchLines(cards)).toBe(1);
+  });
+
+  it("refuses the switch flag on a cards list before writing anything", async () => {
+    await useDecisionAwareList();
+    const before = await snapshot();
+    await expect(withSilentLog(() => scaffoldCrudCommand.parseAsync(["node", "simplix", "product", "--module", "mymod", "--list-presentation", "cards", "--view-toggle", "--card-title", "name"]))).rejects.toThrow(/--view-toggle is for a table list/);
+    expect(await snapshot()).toEqual(before);
+  });
+});
+
+describe("recording the origin a list was designed with", () => {
+  const LIST_PATH = `${MODULE}/src/widgets/product/list.tsx`;
+  const CARDS_ORIGIN = "scaffold product --module mymod --list-presentation cards --card-title name";
+  const originOf = async () => /@simplix-render [0-9a-f]{12} (.+)/.exec((await snapshot()).get(LIST_PATH) ?? "")?.[1];
+  const entryOf = async () => (await generatedReport(root)).find((entry) => entry.path === LIST_PATH);
+
+  /** A list template that draws the cards decision the way a UI kit's does. */
+  async function useDecisionAwareList(): Promise<void> {
+    await useKitShapedTemplates();
+    await put(
+      ".simplix/templates/list.hbs",
+      [
+        "/**\n * @simplix-generated widget/list\n */",
+        "export function {{EntityPascal}}List() {",
+        "  return (",
+        "    <RecordList",
+        "{{#if listCards}}",
+        '      presentation="cards"',
+        "      viewToggle",
+        "{{/if}}",
+        "{{#if cardTitle}}",
+        '      cardTitle="{{cardTitle}}"',
+        "{{/if}}",
+        "    />",
+        "  );",
+        "}",
+        "",
+      ].join("\n"),
+    );
+  }
+
+  /** A table list a person turned into the cards list its design asks for, by hand. */
+  async function editIntoCards(): Promise<void> {
+    const path = join(root, LIST_PATH);
+    const text = await readFile(path, "utf-8");
+    await writeFile(path, text.replace("    <RecordList\n", '    <RecordList\n      presentation="cards"\n      viewToggle\n      cardTitle="name"\n'), "utf-8");
+  }
+
+  it("moves the origin of an edited list to the cards decision and leaves its edits and its merge a no-op", async () => {
+    await useDecisionAwareList();
+    await scaffold();
+    await editIntoCards();
+    expect(await originOf()).toMatch(/^scaffold product --module mymod$/);
+
+    const changes = await planOriginChange(root, root, [join(root, LIST_PATH)], CARDS_ORIGIN);
+    expect(changes).toHaveLength(1);
+    expect(changes[0]?.refusal).toBeUndefined();
+    await applyOriginChange(changes);
+
+    expect(await originOf()).toBe(CARDS_ORIGIN);
+    const text = (await snapshot()).get(LIST_PATH) ?? "";
+    expect(text).toContain('cardTitle="name"');
+    expect(text.match(/presentation="cards"/g)).toHaveLength(1);
+    // Still the author's file, and a regeneration from the new origin changes nothing in it.
+    expect(await entryOf()).toMatchObject({ state: "edited", origin: CARDS_ORIGIN, merge: "current" });
+    await withSilentLog(() => regenerateAll(root));
+    expect((await snapshot()).get(LIST_PATH)).toBe(text);
+  });
+
+  it("leaves a list that was not edited into cards showing the move the new origin makes", async () => {
+    await useDecisionAwareList();
+    await scaffold();
+    // An untouched table list given the cards origin is stale: the render now draws cards.
+    const [change] = await planOriginChange(root, root, [join(root, LIST_PATH)], CARDS_ORIGIN);
+    await applyOriginChange([change!]);
+    expect(await entryOf()).toMatchObject({ state: "stale", origin: CARDS_ORIGIN });
+  });
+
+  it("refuses an origin that does not render the file, and writes nothing", async () => {
+    await useDecisionAwareList();
+    await scaffold();
+    const before = await snapshot();
+    const [change] = await planOriginChange(root, root, [join(root, LIST_PATH)], "scaffold product --output elsewhere --list-presentation cards");
+    expect(change?.refusal).toMatch(/does not render this file/);
+    await applyOriginChange([change!]);
+    expect(await snapshot()).toEqual(before);
+  });
+
+  it("names the paths that hold no generated file", async () => {
+    await useDecisionAwareList();
+    await scaffold();
+    await expect(planOriginChange(root, root, [join(root, "modules/none")], CARDS_ORIGIN)).rejects.toThrow(/no generated file at or under/);
   });
 });

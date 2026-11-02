@@ -312,8 +312,12 @@ export const generatedCommand = new Command("generated")
     "Record the current render of an edited file as its merge base, after printing the diff between the two, so every difference is read as a customisation; a file with no origin gets one when it can be inferred",
   )
   .option("-y, --yes", "With --adopt, record without asking once the diffs are printed (a run with no terminal needs it)")
+  .option(
+    "--origin <command>",
+    "Record <command> (the arguments after `simplix`, e.g. `scaffold user --module admin --list-presentation cards`) as the origin of the generated files at the given paths: only their stamp line changes, so a regeneration renders them from it and merges into their edits. The command must render each file",
+  )
   .option("--rebase", "With --adopt, also take a file that already has a base: its content is kept as the intended one against the current templates, and a template change that conflicts with it is declined")
-  .action(reportConfigError(async (paths: string[], flags: { all?: boolean; writeConflicts?: boolean; check?: boolean; json?: boolean; share?: boolean; adopt?: string[]; yes?: boolean; rebase?: boolean }) => {
+  .action(reportConfigError(async (paths: string[], flags: { all?: boolean; writeConflicts?: boolean; check?: boolean; json?: boolean; share?: boolean; adopt?: string[]; yes?: boolean; rebase?: boolean; origin?: string }) => {
     const callerDir = process.cwd();
     const rootDir = await findProjectRoot(process.cwd());
     if (resolve(process.cwd()) !== rootDir) process.chdir(rootDir);
@@ -325,6 +329,33 @@ export const generatedCommand = new Command("generated")
       }
       const { runAdopt } = await import("./generated-adopt.js");
       process.exitCode = await runAdopt(rootDir, flags.adopt.map((one) => resolve(callerDir, one)), { yes: flags.yes === true, rebase: flags.rebase === true });
+      return;
+    }
+    if (flags.origin !== undefined) {
+      if (flags.all || flags.check || flags.share || flags.writeConflicts || flags.rebase || flags.yes) {
+        log.error("--origin stands alone: run it with paths and without --all, --check, --share, --write-conflicts, --rebase or --yes.");
+        process.exitCode = 1;
+        return;
+      }
+      if (paths.length === 0) {
+        log.error("--origin takes the generated files, or the directories holding them, to record the origin in.");
+        process.exitCode = 1;
+        return;
+      }
+      const { applyOriginChange, planOriginChange } = await import("./generated-origin.js");
+      const changes = await planOriginChange(rootDir, callerDir, paths, flags.origin);
+      for (const change of changes) {
+        if (change.refusal !== undefined) log.error(`refused ${change.path}: ${change.refusal}`);
+        else log.step(`origin ${change.path}  (${change.from ?? "none"} -> ${change.to})`);
+      }
+      const refused = changes.filter((change) => change.refusal !== undefined).length;
+      if (refused > 0) {
+        log.error(`Nothing recorded: ${refused} file(s) refused. Name only the files this origin renders.`);
+        process.exitCode = 1;
+        return;
+      }
+      await applyOriginChange(changes);
+      log.info(`recorded the origin in ${changes.length} file(s)`);
       return;
     }
     if (flags.rebase) {

@@ -2204,7 +2204,7 @@ export const scaffoldCrudCommand = new Command("scaffold")
   .option("--menu-group <key>", "The menu group the screen's entry joins (its key in the menu file), at the end of the group; default: before the menu marker")
   .option("--menu-icon <name>", "The icon the screen's menu entry draws; imported into the menu file when it is not yet")
   .option("--list-presentation <kind>", `How the list draws its rows, as its design decided it: ${LIST_PRESENTATIONS.join(" or ")} (default table)`)
-  .option("--view-toggle", "Offer the reader a switch between the table and the cards, as the design decided it")
+  .option("--view-toggle", "Offer a table list the reader's switch to the cards, as the design decided it (a cards list always has its switch and refuses the flag)")
   .option("--card-title <column>", "The key of the column that titles a card, as the design decided it; default the first column")
   .option("--text-filter <fields>", "Comma separated text fields the design's filters name; each gets a filter the reader types a part of (the generator otherwise leaves text fields to the keyword search)")
   .action(reportConfigError(scaffoldAction));
@@ -2251,11 +2251,37 @@ export function scaffoldOptionsFromOrigin(args: readonly string[]): ScaffoldOpti
   };
 }
 
+/**
+ * What the list's design decisions come to once the standard is applied: a list drawn as cards
+ * always offers the switch to the table, so the switch is a decision only for a table list.
+ *
+ * @param options the scaffold options as typed or as an origin records them
+ */
+export function listDecision(options: ScaffoldOptions): { readonly listCards: boolean; readonly viewToggle: boolean } {
+  const listCards = options.listPresentation === "cards";
+  return { listCards, viewToggle: listCards || options.viewToggle === true };
+}
+
+/**
+ * Refuses the combination the standard leaves no room for: `--view-toggle` on a cards list, whose
+ * switch is not a decision. An origin recorded before the standard may carry both flags and is
+ * replayed without this check.
+ *
+ * @param options the scaffold options as typed on the command line
+ * @throws Error when the list is drawn as cards and the switch is asked for as well
+ */
+export function assertListFlags(options: ScaffoldOptions): void {
+  if (options.listPresentation === "cards" && options.viewToggle === true) {
+    throw new Error("--view-toggle is for a table list: a list drawn as cards always offers the switch to the table, so leave the flag out");
+  }
+}
+
 /** The origin flags that carry the list's design decisions, so a regeneration renders the same list. */
 export function listOriginFlags(options: ScaffoldOptions): string {
+  const { listCards, viewToggle } = listDecision(options);
   return [
-    options.listPresentation === "cards" ? " --list-presentation cards" : "",
-    options.viewToggle ? " --view-toggle" : "",
+    listCards ? " --list-presentation cards" : "",
+    viewToggle && !listCards ? " --view-toggle" : "",
     options.cardTitle ? ` --card-title ${options.cardTitle}` : "",
     textFilterNames(options.textFilter).length > 0 ? ` --text-filter ${textFilterNames(options.textFilter).join(",")}` : "",
   ].join("");
@@ -2267,6 +2293,7 @@ export function listOriginFlags(options: ScaffoldOptions): string {
  * generated-state report runs in capture mode and a regeneration runs once per origin.
  */
 async function scaffoldAction(entityArg: string, options: ScaffoldOptions): Promise<void> {
+  assertListFlags(options);
   await runScaffold(entityArg, options);
   const rootDir = await findProjectRoot(process.cwd());
   // The files are judged against SimpliX Meta before the project's steps run: a name path that
@@ -2815,8 +2842,7 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       hasKeywordSearch: metaSource?.keywordSearch ?? false,
       // The list's design decisions: cards instead of a table, the table/cards switch, and the
       // column that titles a card.
-      listCards: options.listPresentation === "cards",
-      viewToggle: options.viewToggle === true,
+      ...listDecision(options),
       cardTitle: options.cardTitle ?? "",
       listFacets,
       listFacetImports: pickerImportsOf(listFacets),
