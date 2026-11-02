@@ -167,9 +167,7 @@ function EmptyReasonCard({ reason, bordered = true }: { reason: Exclude<EmptyRea
  * `--card-min-width`, each taking an equal share of the row. The count follows the list's own width,
  * so a detail panel opening beside the list reflows the cards, and a width under one card's
  * minimum draws one column. Columns no card reaches collapse (`auto-fit`), so fewer cards than
- * columns still share the whole row instead of leaving it half empty. A card is no wider than the
- * theme's `--card-max-width` and starts at the left of its cell, so a lone card stays at that width
- * instead of filling the row.
+ * columns still share the whole row instead of leaving it half empty.
  */
 export const CARD_GRID_TEMPLATE = "repeat(auto-fit, minmax(min(100%, var(--card-min-width, 20rem)), 1fr))";
 

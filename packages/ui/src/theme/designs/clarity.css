@@ -1940,7 +1940,7 @@
     @apply px-5 py-4;
   }
   [data-slot="crud-card"][data-slot][data-s-crud-card] {
-    @apply w-full max-w-[var(--card-max-width,none)] justify-self-start border rounded-[var(--radius-surface)] border-[var(--border)] bg-card transition-[border-color,box-shadow,translate] duration-[var(--dur-fast)] ease-[var(--ease)];
+    @apply border rounded-[var(--radius-surface)] border-[var(--border)] bg-card transition-[border-color,box-shadow,translate] duration-[var(--dur-fast)] ease-[var(--ease)];
   }
   [data-slot="crud-card"][data-selected="true"][data-s-crud-card] {
     @apply ring-2 ring-primary;

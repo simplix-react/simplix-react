@@ -16,17 +16,11 @@ export const crudCardBodyStyle = defineSlotStyle({
   defaultVariants: { density: "default", titled: false },
 });
 
-/**
- * A card in a reorderable or selectable card list.
- *
- * <p>A card takes its cell and no more than the theme's `--card-max-width` (no limit when the theme
- * sets none), starting at the cell's left edge: the fit grid shares a row among the cards there
- * are, so a lone card or a pair would otherwise stretch across the whole row.
- */
+/** A card in a reorderable or selectable card list. */
 export const crudCardStyle = defineSlotStyle({
   slot: "crud-card",
   // Pointed at, a card lifts 1px with a shadow.
-  base: "w-full max-w-[var(--card-max-width,none)] justify-self-start rounded-lg border transition-[background-color,border-color,box-shadow,translate] duration-[var(--dur-fast)] ease-[var(--ease)] hover:bg-muted/50 hover:shadow-md hover:-translate-y-px",
+  base: "rounded-lg border transition-[background-color,border-color,box-shadow,translate] duration-[var(--dur-fast)] ease-[var(--ease)] hover:bg-muted/50 hover:shadow-md hover:-translate-y-px",
   variants: {
     selected: { true: "ring-2 ring-primary", false: "" },
     active: { true: "bg-muted/50", false: "" },

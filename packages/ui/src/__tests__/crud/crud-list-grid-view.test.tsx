@@ -22,8 +22,6 @@ vi.mock("../../crud/list/use-container-width", () => ({
 import { FilterBar } from "../../crud/filters/filter-bar";
 import { useFilterBarState } from "../../crud/filters/use-filter-bar-state";
 import { CARD_GRID_TEMPLATE, CrudList, type ListProps } from "../../crud/list/crud-list";
-import { crudCardStyle } from "../../crud/shared/crud-card.style";
-import { slotClassNames } from "../../design/slot-style";
 
 interface Item {
   id: number;
@@ -112,17 +110,6 @@ describe("CrudList view mode", () => {
   it("draws the fit grid from the card minimum width token, falling back to a stated default", () => {
     expect(CARD_GRID_TEMPLATE).toContain("minmax(min(100%, var(--card-min-width, 20rem)), 1fr)");
     expect(CARD_GRID_TEMPLATE.startsWith("repeat(auto-fit,")).toBe(true);
-  });
-
-  it("holds a card to the theme's maximum width at the left of its cell, so a lone card does not fill the row", () => {
-    const base = slotClassNames(crudCardStyle)();
-    expect(base).toContain("max-w-[var(--card-max-width,none)]");
-    expect(base).toContain("justify-self-start");
-    expect(base).toContain("w-full");
-    render(<Harness defaultViewMode="grid" data={[items[0]!]} />);
-    const card = grid()!.querySelector("[data-slot='crud-card']") as HTMLElement | null;
-    expect(card).not.toBeNull();
-    expect(grid()!.children.length).toBe(1);
   });
 
   it("offers no toggle when grid is only the default, so the default is the one view", () => {
