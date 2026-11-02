@@ -13,10 +13,15 @@ export const languageSelectorStyle = defineSlotStyle({
   defaultVariants: { placement: "label" },
 });
 
-/** The previous / next buttons at either end of the language row. */
+/**
+ * The previous / next buttons at either end of the language row. Every focusable part of the selector
+ * shows keyboard focus with the inset halo: the parts sit inside the field's clipped box, where an
+ * outward ring is cut, and a tint alone can equal the ground (the inset trigger's rest and focus fills
+ * are one colour in the dark scheme).
+ */
 export const languageStepStyle = defineSlotStyle({
   slot: "field-language-step",
-  base: "border-input hover:bg-muted-foreground/10 focus-visible:outline-none focus-visible:bg-muted-foreground/20 disabled:opacity-50 disabled:cursor-not-allowed",
+  base: "border-input hover:bg-muted-foreground/10 focus-visible:outline-none focus-visible:bg-muted-foreground/20 focus-visible:shadow-[var(--focus-halo-inset)] disabled:opacity-50 disabled:cursor-not-allowed",
   variants: {
     side: { prev: "border-r", next: "border-l" },
   },
@@ -35,7 +40,7 @@ export const languageChevronStyle = defineSlotStyle({
 export const languageTriggerStyle = defineSlotStyle({
   slot: "field-language-trigger",
   as: "part",
-  base: "border-0 !bg-transparent dark:!bg-transparent !p-0 !py-0 text-(length:--fs-2xs) leading-none shadow-none [&>span]:leading-none focus-visible:!shadow-none focus-visible:!bg-muted-foreground/20 dark:focus-visible:!bg-muted-foreground/20",
+  base: "border-0 !bg-transparent dark:!bg-transparent !p-0 !py-0 text-(length:--fs-2xs) leading-none shadow-none [&>span]:leading-none focus-visible:!shadow-[var(--focus-halo-inset)] focus-visible:!bg-muted-foreground/20 dark:focus-visible:!bg-muted-foreground/20",
   variants: {},
   defaultVariants: {},
 });
@@ -124,13 +129,13 @@ export const languageInsetAnchorStyle = defineSlotStyle({
 });
 
 /**
- * The input's language segment: the select trigger filling the selector's box. Keyboard focus is a
- * background tint, never a border or a ring.
+ * The input's language segment: the select trigger filling the selector's box. Keyboard focus is the
+ * inset halo over the segment's fill, never a border.
  */
 export const languageInsetTriggerStyle = defineSlotStyle({
   slot: "field-language-inset-trigger",
   as: "part",
-  base: "!h-full !min-h-0 w-full !rounded-none border-0 !bg-muted/50 !px-2 !py-0 gap-1.5 text-(length:--fs-2xs) leading-none shadow-none hover:!bg-muted focus:!shadow-none focus-visible:!shadow-none focus-visible:!bg-muted [&>svg:not([data-slot=field-language-mark])]:hidden",
+  base: "!h-full !min-h-0 w-full !rounded-none border-0 !bg-muted/50 !px-2 !py-0 gap-1.5 text-(length:--fs-2xs) leading-none shadow-none hover:!bg-muted focus:!shadow-none focus-visible:!shadow-[var(--focus-halo-inset)] focus-visible:!bg-muted [&>svg:not([data-slot=field-language-mark])]:hidden",
   variants: {},
   defaultVariants: {},
 });
@@ -146,7 +151,7 @@ export const languageListStyle = defineSlotStyle({
 /** One language's row in the textarea's column. */
 export const languageOptionStyle = defineSlotStyle({
   slot: "field-language-option",
-  base: "w-full gap-1.5 px-2 py-1.5 text-(length:--fs-2xs) leading-none text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:bg-muted disabled:cursor-not-allowed disabled:opacity-50",
+  base: "w-full gap-1.5 px-2 py-1.5 text-(length:--fs-2xs) leading-none text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:bg-muted focus-visible:shadow-[var(--focus-halo-inset)] disabled:cursor-not-allowed disabled:opacity-50",
   variants: {
     current: { true: "text-foreground", false: "" },
   },

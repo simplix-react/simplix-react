@@ -349,6 +349,9 @@ export function buildChartOptions(params: BuildChartParams): {
         : { enabled: false },
       selection: { enabled: false },
       zoom: { enabled: false },
+      // The heatmap surface around the chart is the one keyboard stop (its own keys move the range) and
+      // draws the focus ring; the chart's own keyboard walk would add a second, ringless stop inside it.
+      accessibility: { keyboard: { enabled: false } },
       events: {
         mounted: hideGridRect,
         updated: hideGridRect,

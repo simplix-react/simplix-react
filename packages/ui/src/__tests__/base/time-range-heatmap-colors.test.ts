@@ -23,3 +23,21 @@ describe("the time range heatmap's colours", () => {
     expect(heatmapColors("slate", false, tokens)).toEqual({ ramp: HEATMAP_THEMES.slate.light, accent: HEATMAP_THEMES.slate.accent.light });
   });
 });
+
+describe("the time range heatmap's chart", () => {
+  it("leaves the keyboard to the heatmap surface, so the chart is no second stop", async () => {
+    const { buildChartOptions } = await import("../../base/inputs/time-range-selector/helpers");
+    const { options } = buildChartOptions({
+      counts: [1, 2],
+      bucketCount: 2,
+      viewFrom: new Date("2026-01-01T00:00:00Z"),
+      bucketMinutes: 60,
+      colorTheme: "tokens",
+      colorStepBaseMinutes: 60,
+      isDark: false,
+      theme: { background: "#ffffff", muted: "#eef2f2", primary: "#0f766e", ring: "#2dd4bf" } as never,
+      animationsEnabled: false,
+    });
+    expect(options.chart?.accessibility?.keyboard?.enabled).toBe(false);
+  });
+});

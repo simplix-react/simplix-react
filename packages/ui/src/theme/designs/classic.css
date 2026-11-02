@@ -4027,13 +4027,13 @@
     @apply pr-10;
   }
   :where([data-part="field-language-inset-trigger"])[data-part][data-p-field-language-inset-trigger] {
-    @apply !h-full !min-h-0 w-full !rounded-none border-0 !bg-muted/50 !px-2 !py-0 gap-1.5 text-(length:--fs-2xs) leading-none shadow-none hover:!bg-muted focus:!shadow-none focus-visible:!shadow-none focus-visible:!bg-muted [&>svg:not([data-slot=field-language-mark])]:hidden;
+    @apply !h-full !min-h-0 w-full !rounded-none border-0 !bg-muted/50 !px-2 !py-0 gap-1.5 text-(length:--fs-2xs) leading-none shadow-none hover:!bg-muted focus:!shadow-none focus-visible:!shadow-[var(--focus-halo-inset)] focus-visible:!bg-muted [&>svg:not([data-slot=field-language-mark])]:hidden;
   }
   :where([data-part="field-language-item"])[data-part][data-p-field-language-item] {
     @apply text-xs;
   }
   :where([data-part="field-language-trigger"])[data-part][data-p-field-language-trigger] {
-    @apply border-0 !bg-transparent dark:!bg-transparent !p-0 !py-0 text-(length:--fs-2xs) leading-none shadow-none [&>span]:leading-none focus-visible:!shadow-none focus-visible:!bg-muted-foreground/20 dark:focus-visible:!bg-muted-foreground/20;
+    @apply border-0 !bg-transparent dark:!bg-transparent !p-0 !py-0 text-(length:--fs-2xs) leading-none shadow-none [&>span]:leading-none focus-visible:!shadow-[var(--focus-halo-inset)] focus-visible:!bg-muted-foreground/20 dark:focus-visible:!bg-muted-foreground/20;
   }
   :where([data-slot="plot-skeleton-bar"])[data-s-plot-skeleton-bar] {
     @apply motion-reduce:animate-none;
@@ -4645,7 +4645,7 @@
     @apply hover:bg-muted disabled:opacity-50;
   }
   :where([data-slot="column-resize-handle"])[data-s-column-resize-handle] {
-    @apply hover:bg-current/25 focus-visible:bg-current/40 focus-visible:outline-none;
+    @apply hover:bg-current/25 focus-visible:bg-current/40 focus-visible:outline-none focus-visible:shadow-[var(--focus-halo-inset)];
   }
   :where([data-slot="crud-list-bulk-action"])[data-s-crud-list-bulk-action] {
     @apply hover:bg-muted;
@@ -4972,13 +4972,13 @@
     @apply hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)];
   }
   :where([data-slot="field-language-option"])[data-s-field-language-option] {
-    @apply hover:bg-muted focus-visible:outline-none focus-visible:bg-muted disabled:cursor-not-allowed disabled:opacity-50;
+    @apply hover:bg-muted focus-visible:outline-none focus-visible:bg-muted focus-visible:shadow-[var(--focus-halo-inset)] disabled:cursor-not-allowed disabled:opacity-50;
   }
   :where([data-slot="field-language-segment"])[data-s-field-language-segment] {
     @apply focus-visible:outline-none focus-visible:bg-foreground/60 disabled:cursor-not-allowed;
   }
   :where([data-slot="field-language-step"])[data-s-field-language-step] {
-    @apply hover:bg-muted-foreground/10 focus-visible:outline-none focus-visible:bg-muted-foreground/20 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply hover:bg-muted-foreground/10 focus-visible:outline-none focus-visible:bg-muted-foreground/20 focus-visible:shadow-[var(--focus-halo-inset)] disabled:opacity-50 disabled:cursor-not-allowed;
   }
   :where([data-slot="field-select-trigger"])[data-s-field-select-trigger] {
     @apply focus-visible:border-foreground focus-visible:shadow-[var(--focus-halo)] focus-visible:outline-none;

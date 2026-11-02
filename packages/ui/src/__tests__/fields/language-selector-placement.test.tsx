@@ -90,9 +90,16 @@ describe.each(["input", "textarea"] as const)("language selector placement (%s)"
 
 describe("language selector look", () => {
   it("marks the current segment without a ring", async () => {
-    const { languageSegmentStyle, languageTriggerStyle } = await import("../../fields/shared/language-selector.style");
+    const { languageSegmentStyle } = await import("../../fields/shared/language-selector.style");
     expect(languageSegmentStyle.variants.current.true).not.toMatch(/ring/);
-    expect(languageTriggerStyle.base).toMatch(/focus-visible:!shadow-none/);
+  });
+
+  it("draws the inset halo on every focusable part under keyboard focus, never a bare tint", async () => {
+    const styles = await import("../../fields/shared/language-selector.style");
+    for (const style of [styles.languageStepStyle, styles.languageTriggerStyle, styles.languageInsetTriggerStyle, styles.languageOptionStyle]) {
+      expect(style.base).toMatch(/focus-visible:!?shadow-\[var\(--focus-halo-inset\)\]/);
+      expect(style.base).not.toMatch(/focus-visible:!?shadow-none/);
+    }
   });
 });
 
