@@ -26,11 +26,12 @@ function runStep(cwd: string, step: GeneratedAfterStep): Promise<AfterOutcome> {
 }
 
 /**
- * Runs the follow-up commands in order and stops at the first that does not exit with 0.
+ * Runs the follow-up commands in order and stops at the first that does not exit with 0, unless that step
+ * states `onFailure: "continue"`.
  *
  * @param rootDir the project root the steps' `cwd` is relative to
  * @param steps the commands from `generated.after`
- * @returns one outcome per command that was started; commands after a failure are not in the list
+ * @returns one outcome per command that was started; commands after a stopping failure are not in the list
  */
 export async function runAfterSteps(rootDir: string, steps: readonly GeneratedAfterStep[]): Promise<AfterOutcome[]> {
   const outcomes: AfterOutcome[] = [];
@@ -44,6 +45,10 @@ export async function runAfterSteps(rootDir: string, steps: readonly GeneratedAf
       continue;
     }
     const why = outcome.error ?? (outcome.signal ? `was ended by ${outcome.signal}` : `exited ${outcome.exitCode}`);
+    if (step.onFailure === "continue") {
+      log.error(`after: ${step.command} ${why}; the later steps run anyway`);
+      continue;
+    }
     const skipped = steps.length - outcomes.length;
     log.error(`after: ${step.command} ${why}${skipped > 0 ? `; ${skipped} later step(s) skipped` : ""}`);
     break;

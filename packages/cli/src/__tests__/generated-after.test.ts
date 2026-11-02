@@ -65,6 +65,29 @@ describe("commands run after a generation", () => {
       expect(error).toHaveBeenCalledWith('after: node -e "process.exit(3)" exited 3; 1 later step(s) skipped');
     });
 
+    it("run the steps after a failure that states onFailure continue, and report every outcome", async () => {
+      const error = vi.spyOn(log, "error").mockImplementation(() => undefined);
+      const out = await runAfterSteps(root, [
+        { command: "node mark.cjs a" },
+        { command: 'node -e "process.exit(3)"', onFailure: "continue" },
+        { command: "node mark.cjs c" },
+      ]);
+      expect(out.map((one) => one.exitCode)).toEqual([0, 3, 0]);
+      expect(await marks()).toBe("ac");
+      expect(error).toHaveBeenCalledWith('after: node -e "process.exit(3)" exited 3; the later steps run anyway');
+    });
+
+    it("still stop at a failure that states nothing, even after a continuing one", async () => {
+      vi.spyOn(log, "error").mockImplementation(() => undefined);
+      const out = await runAfterSteps(root, [
+        { command: 'node -e "process.exit(3)"', onFailure: "continue" },
+        { command: 'node -e "process.exit(4)"' },
+        { command: "node mark.cjs c" },
+      ]);
+      expect(out.map((one) => one.exitCode)).toEqual([3, 4]);
+      expect(await marks()).toBeUndefined();
+    });
+
     it("report a command that a signal ended and a directory that is gone", async () => {
       const error = vi.spyOn(log, "error").mockImplementation(() => undefined);
       const [killed] = await runAfterSteps(root, [{ command: `node -e "process.kill(process.pid, 'SIGKILL')"` }]);
@@ -88,6 +111,14 @@ describe("commands run after a generation", () => {
       vi.spyOn(log, "error").mockImplementation(() => undefined);
       await project('[{ command: "node -e \\"process.exit(2)\\"" }]');
       await runAfterGenerate(root);
+      expect(process.exitCode).toBe(1);
+    });
+
+    it("fails the run after a continuing step failed even though every step ran", async () => {
+      vi.spyOn(log, "error").mockImplementation(() => undefined);
+      await project('[{ command: "node -e \\"process.exit(2)\\"", onFailure: "continue" }, { command: "node mark.cjs" }]');
+      expect(await runAfterGenerate(root)).toMatchObject([{ exitCode: 2 }, { exitCode: 0 }]);
+      expect(await marks()).toBe("x");
       expect(process.exitCode).toBe(1);
     });
 

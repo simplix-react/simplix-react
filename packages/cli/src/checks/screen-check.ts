@@ -25,6 +25,10 @@ export interface ReferenceFact {
 export interface ScreenFacts {
   /** The fields the create body requires and a form can carry, less the order a list's drag owns. */
   readonly createRequired: readonly string[];
+  /** The fields the create body requires that no generated control draws (a list of records, a nested record). */
+  readonly createStructured: readonly string[];
+  /** Fields of the list row that hold another record's key (`...Id`), that the create body requires, and that Meta declares no reference for. */
+  readonly bareKeys: readonly string[];
   /** Field → the longest value the contract allows, where it states one. */
   readonly maxLengths: Readonly<Record<string, number>>;
   /** Field → whether it is a boolean, which a switch always holds a value for. */
@@ -70,10 +74,19 @@ export function formEntriesOf(text: string): FormEntry[] {
 
 /** What a form's field table must hold for the create body, and how it must draw it. */
 export function formProblems(file: string, text: string, facts: ScreenFacts): ScreenProblem[] {
-  const entries = formEntriesOf(text);
-  if (entries.length === 0) return [];
   const problems: ScreenProblem[] = [];
   const error = (message: string) => problems.push({ file, severity: "error", message });
+  // A required list of records or nested record has no generated control, so the form writes it by hand
+  // and the file names it where it builds the request; a file that never names it cannot send it.
+  for (const name of facts.createStructured) {
+    if (!new RegExp(`\\b${name}\\b`).test(text)) {
+      error(
+        `the create body requires "${name}", a list or nested record that no generated control draws, and the form never names it, so the server refuses every save; build it in the form's submit`,
+      );
+    }
+  }
+  const entries = formEntriesOf(text);
+  if (entries.length === 0) return problems;
   for (const name of facts.createRequired) {
     const entry = entries.find((one) => one.name === name);
     // A multilingual entry carries the plain field it fills, and is marked on its own field.
@@ -95,6 +108,24 @@ export function formProblems(file: string, text: string, facts: ScreenFacts): Sc
       "the form edits a reference and passes the contract no `searches`, so the key is typed as text; " +
         "name the picker for that entity in `scaffold.referencePickers` and regenerate, or pass the search",
     );
+  }
+  return problems;
+}
+
+/**
+ * A list row field that holds another record's key (`userAccountId`) and has no reference Meta declares:
+ * the scaffold draws no name for it, so the list shows no column for it (or shows the key as text).
+ * A column is a `key:` or `name:` entry of the file; a filter alone (`field:`) does not draw the value.
+ */
+export function listProblems(file: string, text: string, facts: ScreenFacts): ScreenProblem[] {
+  const problems: ScreenProblem[] = [];
+  for (const name of facts.bareKeys) {
+    if (new RegExp(`\\b(?:key|name):\\s*"${name}"`).test(text)) continue;
+    problems.push({
+      file,
+      severity: "warning",
+      message: `the list row carries "${name}", another record's key, and Meta declares no reference (nested record and name field) for it, so the list draws no column for it; raise the reference in the backend, or draw its name through a lookup`,
+    });
   }
   return problems;
 }

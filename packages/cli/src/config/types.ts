@@ -382,6 +382,12 @@ export interface GeneratedAfterStep {
   readonly cwd?: string;
   /** The command line, run through the shell. */
   readonly command: string;
+  /**
+   * What the run does when this command does not exit with 0: `stop` (the default) skips the steps after it, since a
+   * later step may read what this one writes; `continue` runs them anyway, for a gate whose verdict no later step
+   * depends on (a design check beside a typecheck). The run still exits 1 when any step failed.
+   */
+  readonly onFailure?: "stop" | "continue";
 }
 
 /**

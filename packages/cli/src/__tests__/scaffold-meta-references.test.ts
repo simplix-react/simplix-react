@@ -1,7 +1,7 @@
 import { fileURLToPath } from "node:url";
 import { describe, expect, it, vi } from "vitest";
 
-import { formProblems, nameFieldProblems, flatKeyProblems, type ScreenFacts } from "../checks/screen-check.js";
+import { formProblems, listProblems, nameFieldProblems, flatKeyProblems, type ScreenFacts } from "../checks/screen-check.js";
 import { factsOf } from "../commands/check-screen.js";
 import { formFieldsOf } from "../utils/form-fields.js";
 import {
@@ -148,6 +148,8 @@ describe("the picker a form edits a reference through", () => {
 
 const facts: ScreenFacts = {
   createRequired: ["userId", "noteType", "content", "pinned"],
+  createStructured: [],
+  bareKeys: [],
   maxLengths: { content: 4000 },
   booleans: new Set(["pinned"]),
   references: [{ key: "userId", nested: "user", path: "user.username", source: "declared" }],
@@ -190,6 +192,42 @@ describe("the check over a form", () => {
   });
 });
 
+describe("the check over a required list of records", () => {
+  const structured: ScreenFacts = { ...facts, createRequired: [], createStructured: ["axes"] };
+  const submit = "await create.mutateAsync({ data: { ...written, axes: [{ axisId, targetId }] } });";
+
+  it("reports a form that never names the list the create body requires", () => {
+    const problems = formProblems("form.tsx", "export function Form() { return null; }", structured);
+    expect(problems).toEqual([expect.objectContaining({ severity: "error", message: expect.stringContaining('requires "axes"') })]);
+  });
+
+  it("reports it for a form with a field table too, and not for a name that only contains the word", () => {
+    const text = table(['{ name: "reason", kind: "text", required: true }']) + "const taxes = 1;";
+    expect(formProblems("form.tsx", text, structured)).toHaveLength(1);
+  });
+
+  it("passes a form that builds the list in its submit", () => {
+    expect(formProblems("form.tsx", submit, structured)).toEqual([]);
+  });
+});
+
+describe("the check over a list that draws no name for a key", () => {
+  const keyed: ScreenFacts = { ...facts, bareKeys: ["userAccountId", "roleId"] };
+
+  it("warns, without failing, once for each key the list neither draws nor has a reference for", () => {
+    const text = 'const Filters = [{ kind: "reference", field: "userAccountId" }];\nconst Columns = [{ key: "roleId", header: "Role" }];';
+    expect(listProblems("list.tsx", text, keyed)).toEqual([
+      expect.objectContaining({ severity: "warning", message: expect.stringContaining('"userAccountId"') }),
+    ]);
+  });
+
+  it("is quiet when every key has a column, or the entity has none", () => {
+    const text = '[{ key: "userAccountId" }, { name: "roleId", kind: "reference" }]';
+    expect(listProblems("list.tsx", text, keyed)).toEqual([]);
+    expect(listProblems("list.tsx", "", facts)).toEqual([]);
+  });
+});
+
 describe("the check over a name path", () => {
   it("reports the path that resolves against the model and is not the declared one", () => {
     const problems = nameFieldProblems("list.tsx", '{ name: "userId", kind: "reference", nameField: "user.displayName" }', facts);
@@ -226,6 +264,9 @@ describe("the facts a screen is judged against", () => {
     expect(read.createRequired).toEqual(["userId", "noteType", "content", "pinned"]);
     expect(read.references).toEqual([{ key: "userId", nested: "user", path: "user.username", source: "declared" }]);
     expect(read.booleans.has("pinned")).toBe(true);
+    expect(read.createStructured).toEqual([]);
+    // `userId` has a declared reference; `authorId` is no part of the create body.
+    expect(read.bareKeys).toEqual([]);
   });
 });
 

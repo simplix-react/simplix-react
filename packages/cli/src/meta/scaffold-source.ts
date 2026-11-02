@@ -109,6 +109,12 @@ export interface MetaScaffoldSource {
   inferredReferenceNames?: Record<string, string>;
   /** The fields the create body requires, which the form must carry. */
   createRequired?: string[];
+  /**
+   * The fields the create body requires that no generated control draws: a list of records or a nested
+   * record (`axes: { axisId, targetId }[]`). The scaffolded form has no entry for them, so the screen
+   * must write them by hand.
+   */
+  createStructured?: string[];
   /** Locale → the entity's plural name, as SimpliX Meta states it. */
   plural?: Record<string, string>;
 }
@@ -430,6 +436,9 @@ export function buildMetaScaffoldSource(
   if (createBody) {
     source.createRequired = createBody.allFields
       .filter((one) => one.required && shapeOf(one, NO_ENUM_VALUES) !== undefined)
+      .map((one) => one.name);
+    source.createStructured = createBody.allFields
+      .filter((one) => one.required && shapeOf(one, NO_ENUM_VALUES) === undefined)
       .map((one) => one.name);
   }
 

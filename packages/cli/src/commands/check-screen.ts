@@ -6,6 +6,7 @@ import { Command } from "commander";
 import {
   flatKeyProblems,
   formProblems,
+  listProblems,
   nameFieldProblems,
   type ReferenceFact,
   type ScreenFacts,
@@ -74,6 +75,18 @@ export function factsOf(source: MetaScaffoldSource, holders: readonly MetaScaffo
   for (const one of source.fields) if (one.maxLength !== undefined) maxLengths[one.name] = one.maxLength;
   return {
     // A list that reorders by drag owns the order: a create sends the default.
+    createStructured: source.createStructured ?? [],
+    // Only a key the create body requires: it is what the record is about (the account and the role of a
+    // grant). A provider's external id or an attachment's key is no part of the question a list answers.
+    bareKeys: (source.rowFields ?? source.fields)
+      .filter(
+        (one) =>
+          /[a-z](Id|Ids)$/.test(one.name) &&
+          one.name !== source.rowIdField &&
+          one.referenceNamePath === undefined &&
+          (source.createRequired ?? []).includes(one.name),
+      )
+      .map((one) => one.name),
     createRequired: (source.createRequired ?? []).filter((name) => !(source.roles.order !== undefined && name === source.orderField)),
     maxLengths,
     booleans: new Set(source.fields.filter((one) => one.tsType === "boolean").map((one) => one.name)),
@@ -105,6 +118,7 @@ export async function checkScreen(rootDir: string, entity: string, directories: 
       const file = relative(rootDir, path);
       problems.push(...nameFieldProblems(file, text, facts));
       if (name === "form.tsx") problems.push(...formProblems(file, text, facts));
+      if (name === "list.tsx") problems.push(...listProblems(file, text, facts));
     }
   }
   const config = await loadConfig(rootDir);
@@ -160,7 +174,7 @@ interface CheckScreenFlags {
 export const checkScreenCommand = new Command("check-screen")
   .description(
     "Judge the generated screens' files against the committed SimpliX Meta: the form carries and marks what the create body " +
-      "requires, long text follows its length, a reference is drawn by the name field its entity declares, and a frame's sample " +
+      "requires (a required list of records is named by the form), long text follows its length, a reference is drawn by the name field its entity declares, and a frame's sample " +
       "rows nest it. Exits 1 on an error. Without an entity, every screen read from Meta is judged.",
   )
   .argument("[entity...]", "Entities in any case (emailLog, email-log); default: every screen under modules/")

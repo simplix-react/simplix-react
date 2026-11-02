@@ -2961,6 +2961,12 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       log.info(`Domain package: ${packageName}`);
     }
     log.info(`Fields detected: ${fields.map((f) => f.name).join(", ")}`);
+    if ((metaSource?.createStructured ?? []).length > 0) {
+      log.warn(
+        `${entity}: the create body requires ${metaSource?.createStructured?.map((one) => `"${one}"`).join(", ")}, which no generated control draws. ` +
+          "The form file must build it in its submit; `check-screen` fails until it names it.",
+      );
+    }
     for (const [key, path] of Object.entries(metaSource?.inferredReferenceNames ?? {})) {
       // Loud on purpose: the path resolves against the model, but nothing says the serializer writes it.
       log.warn(

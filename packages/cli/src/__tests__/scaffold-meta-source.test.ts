@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { factsOf } from "../commands/check-screen.js";
 import { contractKindOf, parseSchemaFields } from "../commands/scaffold-crud.js";
 import type { DtoMeta } from "../meta/types.js";
 import type { OpenApiNamingStrategy } from "../openapi/naming/naming-strategy.js";
@@ -379,6 +380,28 @@ describe("what a template cannot know and SimpliX Meta states", () => {
       return source.rowFields?.some((one) => !written.has(one.name));
     });
     expect(derived).toBe(true);
+  });
+});
+
+describe("what a create body requires that no control draws", () => {
+  const grants = () => sourceOf("auth", "common.auth.RoleScopeGrant");
+
+  it("names a required list of records, which the scaffolded form has no entry for", () => {
+    const source = grants();
+    expect(source.createStructured).toEqual(["axes"]);
+    expect(source.createRequired).not.toContain("axes");
+    expect(source.createRequired).toEqual(expect.arrayContaining(["userAccountId", "roleId", "reason"]));
+  });
+
+  it("names none for a body of scalar fields", () => {
+    expect(sourceOf("org", "org.Organization").createStructured).toEqual([]);
+  });
+
+  it("reads the list row's bare keys as the facts the list check judges", () => {
+    const facts = factsOf(grants());
+    expect(facts.createStructured).toEqual(["axes"]);
+    expect(facts.bareKeys).toEqual(expect.arrayContaining(["userAccountId", "roleId"]));
+    expect(facts.bareKeys).not.toContain("roleScopeGrantId");
   });
 });
 
