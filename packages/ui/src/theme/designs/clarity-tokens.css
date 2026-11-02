@@ -142,6 +142,8 @@
   --popover-strong-foreground: oklch(0.97 0.004 265);
   /* The record panel is a narrow card beside a wide list (list-detail reads it). */
   --detail-panel-width: 440px;
+  /* The narrowest a card is drawn in a list's grid view: a row holds as many cards as fit at this width. */
+  --card-min-width: 20rem;
 }
 
 [data-design='clarity'].dark {

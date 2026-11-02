@@ -8,7 +8,7 @@ import {
   useReactTable,
   type VisibilityState,
 } from "@tanstack/react-table";
-import {createElement, Fragment, type ReactNode, type Ref, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState,} from "react";
+import {createElement, Fragment, type Dispatch, type ReactNode, type Ref, type SetStateAction, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState,} from "react";
 
 import {
   type BadgeVariants,
@@ -30,7 +30,7 @@ import {
 } from "./column-widths";
 import {useFlatUIComponents} from "../../provider/ui-provider";
 import {useUIDefaults} from "../../provider/ui-defaults-context";
-import {Flex, Stack} from "../../primitives";
+import {Flex, Grid, Stack} from "../../primitives";
 import {cn} from "../../utils/cn";
 import { slotAttributes, partAttributes } from "../../design/slot-style";
 import {
@@ -161,6 +161,14 @@ function EmptyReasonCard({ reason, bordered = true }: { reason: Exclude<EmptyRea
 
 // ── List Root ──
 
+/**
+ * The columns of the card grid: every column that holds a card no narrower than the theme's
+ * `--card-min-width`, each taking an equal share of the row. The count follows the list's own width,
+ * so a detail panel opening beside the list reflows the cards, and a width under one card's
+ * minimum draws one column.
+ */
+export const CARD_GRID_TEMPLATE = "repeat(auto-fill, minmax(min(100%, var(--card-min-width, 20rem)), 1fr))";
+
 /** What a declared column is known by in the columns menu and in the widths a reader keeps: its `id`, else its `field`. */
 function columnKey(def: { readonly id?: string; readonly field?: string }): string | undefined {
   return def.id ?? def.field;
@@ -189,14 +197,40 @@ export interface ListProps {
    * `useContainerWidth`.
    */
   ref?: Ref<HTMLDivElement>;
+  /**
+   * The view the list opens in: `"grid"` draws the rows as cards in a fit grid on the first render,
+   * `"list"` (the default) as the table. It only takes effect on a table that declares card slots
+   * (`cardTitle` / `cardContent`); it is read once, so a later change of the prop moves nothing.
+   *
+   * <p>A table that also sets `gridView` offers the list/grid toggle and the reader's pick replaces
+   * this default; one that does not offers no toggle, so the default is the only view.
+   */
+  defaultViewMode?: CrudListViewMode;
+  /**
+   * Called with the view the reader switched to through the toggle, so the caller can remember it
+   * and hand it back as {@link defaultViewMode} on the next visit.
+   */
+  onViewModeChange?: (mode: CrudListViewMode) => void;
 }
 
-function ListRoot({ className, children, ref }: ListProps) {
+function ListRoot({ className, children, ref, defaultViewMode, onViewModeChange }: ListProps) {
   const [columns, setColumns] = useState<ColumnInfo[]>([]);
   const [hiddenColumns, setHiddenColumns] = useState<Set<string>>(new Set());
   const [shownColumns, setShownColumns] = useState<Set<string>>(new Set());
   const [isCardMode, setIsCardMode] = useState(false);
-  const [viewMode, setViewMode] = useState<CrudListViewMode>("list");
+  const [viewMode, setViewModeState] = useState<CrudListViewMode>(defaultViewMode ?? "list");
+  const viewModeRef = useRef(viewMode);
+  // The callback is read at call time, so a caller passing a fresh function each render does not
+  // change the setter the toolbar holds.
+  const onViewModeChangeRef = useRef(onViewModeChange);
+  onViewModeChangeRef.current = onViewModeChange;
+  const setViewMode: Dispatch<SetStateAction<CrudListViewMode>> = useCallback((next) => {
+    const resolved = typeof next === "function" ? next(viewModeRef.current) : next;
+    if (resolved === viewModeRef.current) return;
+    viewModeRef.current = resolved;
+    setViewModeState(resolved);
+    onViewModeChangeRef.current?.(resolved);
+  }, []);
   const [canGridView, setCanGridView] = useState(false);
   const [responsiveCardMode, setResponsiveCardMode] = useState(false);
   const inDetail = useInDetail();
@@ -206,7 +240,7 @@ function ListRoot({ className, children, ref }: ListProps) {
       columns, setColumns, hiddenColumns, setHiddenColumns, shownColumns, setShownColumns, isCardMode, setIsCardMode,
       viewMode, setViewMode, canGridView, setCanGridView, responsiveCardMode, setResponsiveCardMode,
     }),
-    [columns, hiddenColumns, shownColumns, isCardMode, viewMode, canGridView, responsiveCardMode],
+    [columns, hiddenColumns, shownColumns, isCardMode, viewMode, setViewMode, canGridView, responsiveCardMode],
   );
 
   return (
@@ -555,6 +589,9 @@ export interface ListTableProps<T> {
    * Declares grid as a user-selectable view (requires `cardTitle`/`cardContent`).
    * When set, the FilterBar auto-shows a list/grid toggle. Independent of the
    * responsive `cardBreakpoint` fallback.
+   *
+   * <p>Which view the list opens in is the root's `defaultViewMode`. In grid view the cards sit in a
+   * fit grid: as many columns as hold a card no narrower than `--card-min-width`.
    */
   gridView?: boolean;
   /** Render prop for the card title area. Displayed with a bottom border, inline with action buttons. */
@@ -1190,8 +1227,20 @@ function ListTable<T>({
     containerWidth > 0 &&
     containerWidth < effectiveCardBreakpoint
   );
-  const manualGrid = !!(gridView && hasCard && columnCtx?.viewMode === "grid");
+  // Grid view comes from the toggle (offered by `gridView`) or from the root's `defaultViewMode`;
+  // either way the cards need slots to draw.
+  const manualGrid = !!(hasCard && columnCtx?.viewMode === "grid");
   const isCardMode = manualGrid || responsiveCardMode;
+  // Grid view lays the cards, their skeletons and group headings out in the fit grid; the
+  // responsive fallback keeps one column, since it is chosen for want of width.
+  const inCardGrid = (cards: ReactNode): ReactNode =>
+    manualGrid ? (
+      <Grid template={CARD_GRID_TEMPLATE} gap="sm" data-testid="list-card-grid">
+        {cards}
+      </Grid>
+    ) : (
+      cards
+    );
 
   // Inside a CrudList.TableCard the table is the scroll region with a sticky
   // header; base Table owns the overflow so this wrapper must not also scroll.
@@ -1599,15 +1648,17 @@ function ListTable<T>({
                 cardContent={cardContent ?? (() => null)}
               />
             ) : isLoading && data.length === 0
-              ? Array.from({ length: 3 }, (_, i) => (
-                  <div key={`card-skeleton-${i}`} {...slotAttributes(crudCardSkeletonStyle, { density: density ?? "default" })}>
-                    <Stack gap="xs">
-                      <Skeleton className="h-5 w-2/3" />
-                      <Skeleton className="h-4 w-1/2" />
-                      <Skeleton className="h-4 w-1/3" />
-                    </Stack>
-                  </div>
-                ))
+              ? inCardGrid(
+                  Array.from({ length: 3 }, (_, i) => (
+                    <div key={`card-skeleton-${i}`} {...slotAttributes(crudCardSkeletonStyle, { density: density ?? "default" })}>
+                      <Stack gap="xs">
+                        <Skeleton className="h-5 w-2/3" />
+                        <Skeleton className="h-4 w-1/2" />
+                        <Skeleton className="h-4 w-1/3" />
+                      </Stack>
+                    </div>
+                  )),
+                )
               : emptyReason && data.length === 0
                 ? <div className="flex h-24 items-center justify-center" {...slotAttributes(crudListCardEmptyStyle, {})}>{emptyMessages[emptyReason]}</div>
               : (() => {
@@ -1661,13 +1712,15 @@ function ListTable<T>({
                   // the bands a wide one shows.
                   const modelRows = table.getRowModel().rows;
                   const grouped = groupRows(modelRows, groupBy);
-                  if (!grouped) return data.map(drawCard);
-                  return grouped.map((group) => (
+                  if (!grouped) return inCardGrid(data.map(drawCard));
+                  return inCardGrid(grouped.map((group) => (
                     <Fragment key={group.key ?? "\u0000ungrouped"}>
                       {group.label !== null && group.label !== undefined && (
                         <div
                           role="heading"
                           aria-level={3}
+                          // A heading takes the whole grid row, so the cards under it start a new one.
+                          className={manualGrid ? "col-span-full" : undefined}
                           data-testid={`list-group-${group.key ?? "ungrouped"}`}
                           {...partAttributes(crudListCardGroupStyle, {})}
                         >
@@ -1677,7 +1730,7 @@ function ListTable<T>({
                       )}
                       {group.rows.map((row) => drawCard(row.original, row.index))}
                     </Fragment>
-                  ));
+                  )));
                 })()}
           </Stack>
         </div>

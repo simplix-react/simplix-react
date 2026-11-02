@@ -119,6 +119,8 @@
   /* ── layout shared by every design ──
      The record panel is a narrow column beside a wide list (list-detail reads it). */
   --detail-panel-width: 440px;
+  /* The narrowest a card is drawn in a list's grid view: a row holds as many cards as fit at this width. */
+  --card-min-width: 20rem;
 
   /* ── radius by use ──
      Controls take the base radius, surfaces a step more, overlays a step more again, badges are
