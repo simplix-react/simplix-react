@@ -5,10 +5,12 @@ import { formProblems, nameFieldProblems, flatKeyProblems, type ScreenFacts } fr
 import { factsOf } from "../commands/check-screen.js";
 import { formFieldsOf } from "../utils/form-fields.js";
 import {
+  facetsOf,
   orderAndCategorizeFields,
   pickerImportsOf,
   pickersOf,
   projectRowFields,
+  referenceFiltersOf,
   withContractKinds,
   withRequiredInForm,
 } from "../commands/scaffold-crud.js";
@@ -224,5 +226,29 @@ describe("the facts a screen is judged against", () => {
     expect(read.createRequired).toEqual(["userId", "noteType", "content", "pinned"]);
     expect(read.references).toEqual([{ key: "userId", nested: "user", path: "user.username", source: "declared" }]);
     expect(read.booleans.has("pinned")).toBe(true);
+  });
+});
+
+describe("the filter over a key of another record", () => {
+  const filters = [
+    { filterKey: "userId.equals", component: "TextFilter", label: "User", field: "userId", operator: "equals", valueType: "string" as const },
+    { filterKey: "content.contains", component: "TextFilter", label: "Content", field: "content", operator: "contains", valueType: "string" as const },
+  ];
+  const fields = [
+    { name: "userId", referencePeekKind: "userAccount" },
+    { name: "content" },
+  ] as unknown as Parameters<typeof referenceFiltersOf>[1];
+  const configured = { userAccount: { hook: "useUserAccountSearch", from: "@app/identity-ui", facet: "useUserIdFacet" } };
+
+  it("replaces the id's text filter with a reference filter where the project names a facet", () => {
+    const found = referenceFiltersOf(filters, fields, configured);
+    expect(found).toEqual([{ kind: "reference", field: "userId" }]);
+    expect(facetsOf(found, fields, configured)).toEqual([{ field: "userId", hook: "useUserIdFacet", from: "@app/identity-ui" }]);
+  });
+
+  it("offers none where no facet is named, or for a key that references nothing", () => {
+    expect(referenceFiltersOf(filters, fields, undefined)).toEqual([]);
+    expect(referenceFiltersOf(filters, fields, { userAccount: { hook: "useUserAccountSearch" } })).toEqual([]);
+    expect(referenceFiltersOf([filters[1]!], fields, configured)).toEqual([]);
   });
 });
