@@ -19,7 +19,7 @@ export const calendarHeaderStyle = defineSlotStyle({
 /** The previous and next buttons. */
 export const calendarNavButtonStyle = defineSlotStyle({
   slot: "calendar-nav-button",
-  base: "rounded-md text-sm hover:bg-accent hover:text-accent-foreground",
+  base: "rounded-md text-sm hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]",
   variants: {},
   defaultVariants: {},
 });

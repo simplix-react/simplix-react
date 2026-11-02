@@ -44,7 +44,8 @@ export const numberInputSpinnerStyle = defineSlotStyle({
 /** One step button of the spinner. */
 export const numberInputStepStyle = defineSlotStyle({
   slot: "number-input-step",
-  base: "px-0.5 hover:bg-accent hover:text-accent-foreground transition-colors duration-[var(--dur-fast)] active:bg-muted",
+  // The spinner sits inside the bordered control, which clips, so its halo is drawn inside the button.
+  base: "[--focus-halo:var(--focus-halo-inset)] focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)] px-0.5 hover:bg-accent hover:text-accent-foreground transition-colors duration-[var(--dur-fast)] active:bg-muted",
   variants: {
     direction: {
       increase: "",

@@ -159,7 +159,7 @@ export function SectionShell({
   const cardInner = collapsible ? (
     <CollapsiblePrimitive.Root open={open} onOpenChange={setOpen}>
       {showHeader && header}
-      <CollapsiblePrimitive.Content className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down" {...slotAttributes(sectionShellCollapseStyle, {})}>
+      <CollapsiblePrimitive.Content className="-m-[var(--focus-gutter)] overflow-hidden p-[var(--focus-gutter)] data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down" {...slotAttributes(sectionShellCollapseStyle, {})}>
         {body}
       </CollapsiblePrimitive.Content>
     </CollapsiblePrimitive.Root>
@@ -173,7 +173,9 @@ export function SectionShell({
   const section = (
     <section
       className={cn(
-        isCard && "overflow-hidden",
+        // The card clips its rounded corners; the clip edge sits one gutter outside the padding box so
+        // the halo of a control on the section's edge is not shaved off.
+        isCard && "overflow-clip [overflow-clip-margin:var(--focus-gutter)]",
         (variant === "flat" || isLined) && "flex flex-col",
         className,
       )}

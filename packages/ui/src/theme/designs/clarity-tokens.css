@@ -174,6 +174,7 @@
   --toast-warn: oklch(0.86 0.13 82);
   --toast-danger: oklch(0.76 0.15 25);
   --focus-halo: 0 0 0 3px var(--primary-soft);
+  --focus-halo-inset: inset 0 0 0 3px var(--primary-soft);
   --invalid-halo: 0 0 0 3px var(--danger-soft);
 }
 

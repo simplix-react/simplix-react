@@ -7,7 +7,7 @@ import { defineSlotStyle } from "../../design/slot-style";
  */
 export const rowActionsStripStyle = defineSlotStyle({
   slot: "row-actions-strip",
-  base: "rounded-md border opacity-0 translate-x-1 transition-[opacity,translate] duration-[var(--dur-base)] ease-[var(--ease)] [tr:hover_&]:ease-[var(--ease-spring)] [tr:focus-within_&]:ease-[var(--ease-spring)] [tr:hover_&]:opacity-100 [tr:hover_&]:translate-x-0 [tr:focus-within_&]:opacity-100 [tr:focus-within_&]:translate-x-0 [tr[data-part-active=true]_&]:opacity-100 [tr[data-part-active=true]_&]:translate-x-0 [tr[data-part-focused=true]_&]:opacity-100 [tr[data-part-focused=true]_&]:translate-x-0 [@media(hover:none)]:opacity-100 [@media(hover:none)]:translate-x-0",
+  base: "[--focus-halo:var(--focus-halo-inset)] rounded-md border opacity-0 translate-x-1 transition-[opacity,translate] duration-[var(--dur-base)] ease-[var(--ease)] [tr:hover_&]:ease-[var(--ease-spring)] [tr:focus-within_&]:ease-[var(--ease-spring)] [tr:hover_&]:opacity-100 [tr:hover_&]:translate-x-0 [tr:focus-within_&]:opacity-100 [tr:focus-within_&]:translate-x-0 [tr[data-part-active=true]_&]:opacity-100 [tr[data-part-active=true]_&]:translate-x-0 [tr[data-part-focused=true]_&]:opacity-100 [tr[data-part-focused=true]_&]:translate-x-0 [@media(hover:none)]:opacity-100 [@media(hover:none)]:translate-x-0",
   variants: {},
   defaultVariants: {},
 });

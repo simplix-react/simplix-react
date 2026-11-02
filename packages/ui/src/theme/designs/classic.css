@@ -941,7 +941,7 @@
     @apply border-l border-input;
   }
   [data-slot="number-input-step"][data-slot][data-s-number-input-step] {
-    @apply px-0.5 transition-colors duration-[var(--dur-fast)];
+    @apply [--focus-halo:var(--focus-halo-inset)] px-0.5 transition-colors duration-[var(--dur-fast)];
   }
   [data-slot="number-input-step"][data-direction="decrease"][data-s-number-input-step] {
     @apply border-t border-input;
@@ -1282,6 +1282,9 @@
   [data-slot="tabs-ink"][data-variant="full"][data-s-tabs-ink] {
     @apply block h-0.5 w-[var(--w)] translate-x-[var(--x)] bg-primary transition-[translate,width] duration-[var(--dur-slow)] ease-[var(--ease)];
   }
+  [data-slot="tabs-list"][data-slot][data-s-tabs-list] {
+    @apply [--focus-halo:var(--focus-halo-inset)];
+  }
   [data-slot="tabs-list"][data-variant="default"][data-s-tabs-list] {
     @apply rounded-lg border border-input bg-card px-1 py-0.5 text-muted-foreground;
   }
@@ -1565,7 +1568,7 @@
     @apply text-xs text-foreground;
   }
   [data-slot="crud-filter-bar-segment"][data-slot][data-s-crud-filter-bar-segment] {
-    @apply rounded-md border border-input bg-card p-0.5;
+    @apply [--focus-halo:var(--focus-halo-inset)] rounded-md border border-input bg-card p-0.5;
   }
   [data-slot="crud-filter-bar-segment"][data-spaced="true"][data-s-crud-filter-bar-segment] {
     @apply gap-0.5;
@@ -2027,7 +2030,7 @@
     @apply animate-spin rounded-full border-2 border-primary border-t-transparent;
   }
   [data-slot="row-actions-strip"][data-slot][data-s-row-actions-strip] {
-    @apply rounded-md border opacity-0 translate-x-1 transition-[opacity,translate] duration-[var(--dur-base)] ease-[var(--ease)];
+    @apply [--focus-halo:var(--focus-halo-inset)] rounded-md border opacity-0 translate-x-1 transition-[opacity,translate] duration-[var(--dur-base)] ease-[var(--ease)];
   }
   [data-slot="section-shell-body"][data-variant="card"][data-s-section-shell-body] {
     @apply px-4 py-2;
@@ -4102,7 +4105,7 @@
     @apply hover:bg-primary hover:text-primary-foreground;
   }
   :where([data-slot="calendar-nav-button"])[data-s-calendar-nav-button] {
-    @apply hover:bg-accent hover:text-accent-foreground;
+    @apply hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)];
   }
   :where([data-slot="calendar-weekday"])[data-s-calendar-weekday] {
     @apply md:text-xs;
@@ -4306,7 +4309,7 @@
     @apply placeholder:text-muted-foreground;
   }
   :where([data-slot="number-input-step"])[data-s-number-input-step] {
-    @apply hover:bg-accent hover:text-accent-foreground active:bg-muted;
+    @apply focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)] hover:bg-accent hover:text-accent-foreground active:bg-muted;
   }
   :where([data-slot="number-input"])[data-s-number-input] {
     @apply focus-within:border-foreground has-[[aria-invalid=true]]:border-destructive focus-within:shadow-[var(--focus-halo)] has-[[aria-invalid=true]]:shadow-[var(--invalid-halo)];
@@ -4507,7 +4510,7 @@
     @apply [&_[data-slot=tabs-list][data-variant=underline]]:mb-1 [&_[data-slot=tabs-list][data-variant=underline]]:gap-1 [&_[data-slot=tabs-trigger][data-variant=underline]]:px-2.5 [&_[data-slot=tabs-trigger][data-variant=underline]]:transition-[color,background-color,border-color] [&_[data-slot=tabs-trigger][data-variant=underline]]:duration-[var(--dur-fast)] [&_[data-slot=tabs-trigger][data-variant=underline]:hover]:bg-[var(--hover-bg)] [&_[data-slot=detail-list-row]]:px-3 [&_[data-slot=detail-list-row]]:transition-colors [&_[data-slot=detail-list-row]]:duration-[var(--dur-fast)] [&_[data-slot=detail-list-row]:hover]:bg-[var(--surface-2)] [&_[data-slot=detail-list-row]:focus-visible]:ring-0 [&_[data-slot=detail-list-row]:focus-visible]:shadow-[var(--focus-halo)];
   }
   :where([data-slot="crud-chip-filter-chip"])[data-s-crud-chip-filter-chip] {
-    @apply active:scale-[0.98];
+    @apply active:scale-[0.98] focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)];
   }
   :where([data-slot="crud-chip-filter-chip"][data-state="idle"])[data-s-crud-chip-filter-chip] {
     @apply hover:bg-accent hover:text-accent-foreground;
@@ -4552,7 +4555,7 @@
     @apply [&>*+*]:mt-4;
   }
   :where([data-slot="crud-filter-bar-columns-button"])[data-s-crud-filter-bar-columns-button] {
-    @apply hover:bg-muted hover:text-foreground;
+    @apply hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)];
   }
   :where([data-slot="crud-filter-bar-divider"])[data-s-crud-filter-bar-divider] {
     @apply !hidden;
@@ -4585,10 +4588,13 @@
     @apply [&>[data-filter-chip]]:gap-1 [&>[data-filter-chip]]:rounded-md [&>[data-filter-chip]]:border-input [&>[data-filter-chip]]:pl-2 [&>[data-filter-chip]]:pr-1 [&>[data-filter-chip]]:text-xs [&>[data-filter-chip]]:font-normal [&>[data-filter-chip]>svg]:text-muted-foreground [&>[data-filter-chip]>span:first-child]:text-muted-foreground [&>[data-filter-more]]:rounded-md [&>[data-filter-more]]:border-input [&>[data-filter-more]]:px-2 [&>[data-filter-more]]:text-xs [&>[data-filter-more]]:font-normal;
   }
   :where([data-slot="crud-filter-bar-trigger"])[data-s-crud-filter-bar-trigger] {
-    @apply hover:bg-muted [&>[data-slot=badge]]:rounded-full [&>[data-slot=badge]]:bg-primary [&>[data-slot=badge]]:px-1 [&>[data-slot=badge]]:text-(length:--fs-2xs) [&>[data-slot=badge]]:font-bold [&>[data-slot=badge]]:leading-none [&>[data-slot=badge]]:text-primary-foreground;
+    @apply focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)] hover:bg-muted [&>[data-slot=badge]]:rounded-full [&>[data-slot=badge]]:bg-primary [&>[data-slot=badge]]:px-1 [&>[data-slot=badge]]:text-(length:--fs-2xs) [&>[data-slot=badge]]:font-bold [&>[data-slot=badge]]:leading-none [&>[data-slot=badge]]:text-primary-foreground;
   }
   :where([data-slot="crud-filter-bar-trigger"][data-active="false"])[data-s-crud-filter-bar-trigger] {
     @apply hover:text-foreground;
+  }
+  :where([data-slot="crud-filter-bar-view-button"])[data-s-crud-filter-bar-view-button] {
+    @apply focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)];
   }
   :where([data-slot="crud-filter-bar-view-button"][data-active="false"])[data-s-crud-filter-bar-view-button] {
     @apply hover:text-foreground;
@@ -4651,13 +4657,13 @@
     @apply after:content-[attr(data-count)];
   }
   :where([data-slot="crud-list-page-button"])[data-s-crud-list-page-button] {
-    @apply hover:bg-muted hover:text-foreground active:scale-[0.98] disabled:opacity-50;
+    @apply hover:bg-muted hover:text-foreground active:scale-[0.98] disabled:opacity-50 focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)];
   }
   :where([data-slot="crud-list-page-button"][data-current="true"])[data-s-crud-list-page-button] {
     @apply hover:bg-primary hover:text-primary-foreground;
   }
   :where([data-slot="crud-list-sort-button"])[data-s-crud-list-sort-button] {
-    @apply hover:bg-[var(--hover-bg-strong)] hover:text-foreground active:scale-[0.98];
+    @apply hover:bg-[var(--hover-bg-strong)] hover:text-foreground active:scale-[0.98] focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)];
   }
   :where([data-slot="crud-list-sort-icon"][data-sorted="false"])[data-s-crud-list-sort-icon] {
     @apply [button:hover>&]:opacity-90;

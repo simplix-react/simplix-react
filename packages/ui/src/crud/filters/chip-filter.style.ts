@@ -3,7 +3,7 @@ import { defineSlotStyle } from "../../design/slot-style";
 /** A pill of a chip row ({@link ChipFilter}, {@link ChoiceChips}). Drawn by `theme/designs/classic.css`. */
 export const crudChipFilterChipStyle = defineSlotStyle({
   slot: "crud-chip-filter-chip",
-  base: "gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-[background-color,border-color,color,scale] duration-[var(--dur-fast)] active:scale-[0.98]",
+  base: "gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-[background-color,border-color,color,scale] duration-[var(--dur-fast)] active:scale-[0.98] focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]",
   variants: {
     state: {
       idle: "border-transparent bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground",

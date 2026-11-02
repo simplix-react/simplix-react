@@ -3,7 +3,9 @@ import { defineSlotStyle } from "../../design/slot-style";
 /** The strip that holds the triggers. */
 export const tabsListStyle = defineSlotStyle({
   slot: "tabs-list",
-  base: "",
+  // The strip scrolls sideways, which clips its triggers on both axes, so their halo is drawn
+  // inside them.
+  base: "[--focus-halo:var(--focus-halo-inset)]",
   variants: {
     variant: {
       // Vertical padding is half the horizontal one so the 28px trigger fits inside the 34px

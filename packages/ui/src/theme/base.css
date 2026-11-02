@@ -114,6 +114,15 @@
      A 3px halo outside the element; form controls also take the ring colour on their border. A
      design changes the halo's colour, never its shape. */
   --focus-halo: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent);
+  /* The same halo drawn inside the border box, for a control whose halo an ancestor would clip: a
+     part that clips and groups controls (a tab strip, a segmented group, a menu) points --focus-halo
+     here for everything inside it. A theme keeps it the same ring as --focus-halo, turned inward. */
+  --focus-halo-inset: inset 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent);
+  /* How far --focus-halo reaches outside the border box: the gutter a part that clips its content
+     leaves around it (-m-[var(--focus-gutter)] p-[var(--focus-gutter)]), so the layout stays put
+     and the halo of the control on its edge is not shaved off. A theme whose halo reaches further
+     sets it to the same distance. */
+  --focus-gutter: 3px;
   --invalid-halo: 0 0 0 3px color-mix(in oklab, var(--destructive) 20%, transparent);
 
   /* ── layout shared by every design ──
@@ -472,5 +481,39 @@
   [cmdk-item][data-selected="true"] {
     outline: 2px solid Highlight !important;
     outline-offset: -2px;
+  }
+}
+
+/* ── a focused control draws above its neighbours ──
+ *
+ * The halo is a box-shadow outside the border box, and a sibling later in the tree that paints a
+ * background (a button of a toolbar, a segment, a menu row) covers the halo of the control beside
+ * it: in a row of buttons set two pixels apart the focused one shows its ring cut flat on the sides
+ * that touch a neighbour. A flex or grid item and a positioned element take a z-index without
+ * changing the layout, so the control that holds focus is raised one step above them. It sits in
+ * the base layer so a utility that sets a z-index (z-10 on a sticky header, z-50 on an overlay)
+ * still wins, and an element that is none of those keeps drawing in tree order. */
+@layer base {
+  :where(
+    button,
+    a[href],
+    input,
+    select,
+    textarea,
+    summary,
+    [role="button"],
+    [role="tab"],
+    [role="menuitem"],
+    [role="menuitemcheckbox"],
+    [role="menuitemradio"],
+    [role="option"],
+    [role="switch"],
+    [role="checkbox"],
+    [role="radio"],
+    [role="link"],
+    [role="combobox"],
+    [tabindex]
+  ):focus-visible {
+    z-index: 1;
   }
 }

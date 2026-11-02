@@ -67,7 +67,7 @@ export const crudListSortIconStyle = defineSlotStyle({
 export const crudListSortButtonStyle = defineSlotStyle({
   slot: "crud-list-sort-button",
   // A header that sorts is a small button: a hover ground and the shared press.
-  base: "-ml-1.5 h-6 gap-1 rounded-md px-1.5 font-semibold transition-colors duration-[var(--dur-fast)] hover:bg-[var(--hover-bg-strong)] hover:text-foreground active:scale-[0.98]",
+  base: "-ml-1.5 h-6 gap-1 rounded-md px-1.5 font-semibold transition-colors duration-[var(--dur-fast)] hover:bg-[var(--hover-bg-strong)] hover:text-foreground active:scale-[0.98] focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]",
   variants: { sorted: { true: "text-foreground", false: "" } },
   defaultVariants: { sorted: false },
 });
@@ -165,7 +165,7 @@ export const crudListPageEllipsisStyle = defineSlotStyle({
 /** A pager button: previous, next, or a page number. */
 export const crudListPageButtonStyle = defineSlotStyle({
   slot: "crud-list-page-button",
-  base: "rounded-md border border-border bg-card text-xs font-medium text-secondary-foreground transition-[background-color,color,scale] duration-[var(--dur-fast)] hover:bg-muted hover:text-foreground active:scale-[0.98] disabled:opacity-50",
+  base: "rounded-md border border-border bg-card text-xs font-medium text-secondary-foreground transition-[background-color,color,scale] duration-[var(--dur-fast)] hover:bg-muted hover:text-foreground active:scale-[0.98] disabled:opacity-50 focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]",
   variants: {
     numbered: { true: "px-2", false: "" },
     // The page being shown takes the primary colours; it comes after the base so it overrides

@@ -51,7 +51,7 @@ export const crudFilterBarChipRemoveStyle = defineSlotStyle({
 /** A bordered group of toolbar buttons (the view toggle, the filter trigger with the columns toggle). */
 export const crudFilterBarSegmentStyle = defineSlotStyle({
   slot: "crud-filter-bar-segment",
-  base: "rounded-md border border-input bg-card p-0.5",
+  base: "[--focus-halo:var(--focus-halo-inset)] rounded-md border border-input bg-card p-0.5",
   variants: {
     spaced: { true: "gap-0.5", false: "" },
   },
@@ -61,7 +61,7 @@ export const crudFilterBarSegmentStyle = defineSlotStyle({
 /** One button of the list/grid view toggle. */
 export const crudFilterBarViewButtonStyle = defineSlotStyle({
   slot: "crud-filter-bar-view-button",
-  base: "rounded transition-colors",
+  base: "rounded transition-colors focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]",
   variants: {
     active: {
       true: "bg-muted text-foreground",
@@ -79,7 +79,7 @@ export const crudFilterBarViewButtonStyle = defineSlotStyle({
  */
 export const crudFilterBarTriggerStyle = defineSlotStyle({
   slot: "crud-filter-bar-trigger",
-  base: "gap-1.5 rounded px-2 text-sm transition-colors hover:bg-muted [&>[data-slot=badge]]:rounded-full [&>[data-slot=badge]]:bg-primary [&>[data-slot=badge]]:px-1 [&>[data-slot=badge]]:text-(length:--fs-2xs) [&>[data-slot=badge]]:font-bold [&>[data-slot=badge]]:leading-none [&>[data-slot=badge]]:text-primary-foreground",
+  base: "gap-1.5 rounded px-2 text-sm transition-colors focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)] hover:bg-muted [&>[data-slot=badge]]:rounded-full [&>[data-slot=badge]]:bg-primary [&>[data-slot=badge]]:px-1 [&>[data-slot=badge]]:text-(length:--fs-2xs) [&>[data-slot=badge]]:font-bold [&>[data-slot=badge]]:leading-none [&>[data-slot=badge]]:text-primary-foreground",
   variants: {
     active: {
       true: "text-primary",
@@ -103,7 +103,7 @@ export const crudFilterBarClearButtonStyle = defineSlotStyle({
 /** The button that opens the column-visibility menu. */
 export const crudFilterBarColumnsButtonStyle = defineSlotStyle({
   slot: "crud-filter-bar-columns-button",
-  base: "rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
+  base: "rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]",
   variants: {},
   defaultVariants: {},
 });
