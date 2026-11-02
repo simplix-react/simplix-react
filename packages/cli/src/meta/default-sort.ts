@@ -46,3 +46,22 @@ export function chooseDefaultSort(input: DefaultSortInput): DefaultSort | undefi
   }
   return undefined;
 }
+
+/**
+ * The fields of a list with the one it opens sorted by shown even when it is an audit stamp.
+ *
+ * <p>A generated list leaves the record stamps out of its columns and filters: the detail's audit
+ * strip carries them. An entity whose rows are events (a log, a ledger) is read by when a row was
+ * written, and its default sort names that stamp; the column the order reads off and the period
+ * filter that narrows it are then the list's own, so the stamp keeps both.
+ *
+ * @param fields the list's fields, each with its audit flag
+ * @param sort the order the list opens in
+ * @returns the fields, the sorted-by one no longer flagged as an audit stamp
+ */
+export function withSortKeyShown<F extends { readonly name: string; readonly isAuditField?: boolean }>(
+  fields: readonly F[],
+  sort: DefaultSort | undefined,
+): F[] {
+  return fields.map((field) => (sort && field.name === sort.field && field.isAuditField ? { ...field, isAuditField: false } : field));
+}

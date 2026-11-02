@@ -19,6 +19,16 @@ describe("money list filters", () => {
   });
 });
 
+describe("audit stamp filters", () => {
+  const stamp = { name: "createdAt", tsType: "string" } as FieldInfo;
+  const period = { filterKey: "createdAt.between", component: "DateRangeFilter", label: "createdAt", field: "createdAt" } as FilterFieldInfo;
+  it("are left out, except the stamp the list opens sorted by", () => {
+    expect(contractFiltersOf([period], [stamp])).toEqual([]);
+    expect(contractFiltersOf([period], [stamp], "createdAt")).toEqual([{ kind: "dateRange", field: "createdAt", dateOnly: false }]);
+    expect(contractFiltersOf([period], [stamp], "occurredAt")).toEqual([]);
+  });
+});
+
 describe("secret fields", () => {
   it("are their own contract kind, so a form offers them empty and never shows the stored value", () => {
     expect(contractKindOf({ name: "apiKey", tsType: "string", secret: true, options: [] } as unknown as FieldInfo)).toBe("secret");

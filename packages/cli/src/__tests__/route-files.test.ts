@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { ensureAppDependencies, insertMenuEntry, menuSubject, menuTemplateOf, placeMenuEntry, routePathOf, writeRoute } from "../utils/route-files.js";
+import { ensureAppDependencies, ensureIconImport, insertMenuEntry, menuSubject, menuTemplateOf, placeMenuEntry, routePathOf, writeRoute } from "../utils/route-files.js";
 
 describe("a list screen's route path", () => {
   it("is the entity's plural in kebab case unless the target names another", () => {
@@ -78,6 +78,75 @@ describe("a menu entry", () => {
 
   it("refuses a menu file with no marker", () => {
     expect(() => insertMenuEntry("[]", "@simplix-menu admin", { key: "b", href: "/b", gate: "undefined" }, "x")).toThrow(/marker/);
+  });
+});
+
+describe("a menu entry placed in a named group", () => {
+  const entry = '      { key: "mail", href: "/mail", icon: MailIcon },\n';
+  const target = { key: "mail", href: "/mail", gate: "undefined" };
+  const menu = [
+    "export const MENU = [",
+    "  {",
+    '    key: "people",',
+    "    icon: UsersIcon,",
+    "    entries: [",
+    '      { key: "users", href: "/users", icon: UsersIcon },',
+    "    ],",
+    "  },",
+    "  {",
+    '    key: "ops",',
+    "    icon: ActivityIcon,",
+    "    entries: [",
+    '      { key: "jobs", href: "/jobs", icon: ListIcon },',
+    "      // @simplix-menu admin",
+    "    ],",
+    "  },",
+    "  {",
+    '    key: "system",',
+    "    icon: SettingsIcon,",
+    '    entries: [{ key: "system", href: "/system", icon: SettingsIcon }],',
+    "  },",
+    "];",
+    "",
+  ].join("\n");
+
+  it("goes at the end of that group, not before the marker of another", () => {
+    const out = placeMenuEntry(menu, "@simplix-menu admin", target, entry, "people")?.text ?? "";
+    expect(out).toContain('{ key: "users", href: "/users", icon: UsersIcon },\n      { key: "mail", href: "/mail", icon: MailIcon },\n    ],');
+    expect(out.indexOf('key: "mail"')).toBeLessThan(out.indexOf('key: "ops"'));
+  });
+  it("goes before the marker when the group holds it", () => {
+    const out = placeMenuEntry(menu, "@simplix-menu admin", target, entry, "ops")?.text ?? "";
+    expect(out).toContain('icon: ListIcon },\n      { key: "mail", href: "/mail", icon: MailIcon },\n      // @simplix-menu admin');
+  });
+  it("opens out a group written on one line, and takes the group over an entry sharing its key", () => {
+    const out = placeMenuEntry(menu, "@simplix-menu admin", target, entry, "system")?.text ?? "";
+    expect(out).toContain('    entries: [\n      { key: "system", href: "/system", icon: SettingsIcon },\n      { key: "mail", href: "/mail", icon: MailIcon },\n    ],');
+  });
+  it("refuses a group the menu does not have", () => {
+    expect(() => placeMenuEntry(menu, "@simplix-menu admin", target, entry, "nowhere")).toThrow(/no group "nowhere"/);
+  });
+  it("still goes before the marker when no group is named", () => {
+    const out = placeMenuEntry(menu, "@simplix-menu admin", target, entry)?.text ?? "";
+    expect(out).toContain('icon: ListIcon },\n      { key: "mail", href: "/mail", icon: MailIcon },\n      // @simplix-menu admin');
+  });
+});
+
+describe("an icon the menu file draws", () => {
+  const file = 'import {\n  ActivityIcon,\n  FileTextIcon,\n  type LucideIcon,\n} from "lucide-react";\nimport { x } from "y";\n';
+  it("joins the import of the configured icon, in order", () => {
+    const out = ensureIconImport(file, "MailIcon", "FileTextIcon");
+    expect(out).toContain("  FileTextIcon,\n  type LucideIcon,\n  MailIcon,\n}");
+  });
+  it("is left alone when an import already brings it in", () => {
+    expect(ensureIconImport(file, "ActivityIcon", "FileTextIcon")).toBe(file);
+  });
+  it("joins a one-line import", () => {
+    expect(ensureIconImport('import { FileTextIcon } from "lucide-react";\n', "MailIcon", "FileTextIcon")).toBe('import { FileTextIcon, MailIcon } from "lucide-react";\n');
+  });
+  it("refuses when there is no import of the configured icon to join", () => {
+    expect(() => ensureIconImport(file, "MailIcon", "CircleIcon")).toThrow(/import it by hand/);
+    expect(() => ensureIconImport(file, "MailIcon", undefined)).toThrow(/import it by hand/);
   });
 });
 

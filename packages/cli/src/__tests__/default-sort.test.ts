@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { chooseDefaultSort } from "../meta/default-sort.js";
+import { chooseDefaultSort, withSortKeyShown } from "../meta/default-sort.js";
 
 const fields = [
   { name: "jobId", sortable: true },
@@ -33,5 +33,21 @@ describe("chooseDefaultSort", () => {
   });
   it("does not take a candidate whose sortability is unknown", () => {
     expect(chooseDefaultSort({ candidates: ["createdAt"], fields: [{ name: "createdAt" }], rowIdField: "jobId" })).toBeUndefined();
+  });
+});
+
+describe("withSortKeyShown", () => {
+  const stamped = [
+    { name: "subject", isAuditField: false },
+    { name: "createdAt", isAuditField: true },
+    { name: "updatedAt", isAuditField: true },
+  ];
+  it("lifts the audit flag from the field the list opens sorted by", () => {
+    const out = withSortKeyShown(stamped, { field: "createdAt", direction: "desc" });
+    expect(out.map((one) => one.isAuditField)).toEqual([false, false, true]);
+  });
+  it("leaves every stamp flagged when the sort names none of them", () => {
+    expect(withSortKeyShown(stamped, { field: "subject", direction: "asc" })).toEqual(stamped);
+    expect(withSortKeyShown(stamped, undefined)).toEqual(stamped);
   });
 });

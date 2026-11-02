@@ -190,9 +190,15 @@ export interface SimplixConfig {
    * Meta declares `defaultSort` uses that instead; a list whose row carries none of them, or
    * carries one the backend cannot order by, opens in the server's order. The row's key is
    * never used. Defaults to none.
+   *
+   * `maskedSuffix` names the suffix of a masked form of a field (`"Masked"`): a record carrying
+   * both `recipientEmail` and `recipientEmailMasked` is drawn with the masked one only, since
+   * SimpliX Meta marks no personal data and the pairing is the only statement of which form a
+   * screen may show. Defaults to none.
    */
   scaffold?: {
     readonly defaultSortFields?: readonly (string | { readonly field: string; readonly direction?: "asc" | "desc" })[];
+    readonly maskedSuffix?: string;
   };
 
   references?: {

@@ -46,6 +46,16 @@ export interface RouteInput {
   readonly listAccess?: AccessMeta;
   readonly plural?: Readonly<Record<string, string>>;
   readonly origin: string;
+  /** Where the screen's menu entry sits and what it draws, as the screen's design decided it. */
+  readonly menu?: MenuChoice;
+}
+
+/** The menu placement a design decides for a screen. */
+export interface MenuChoice {
+  /** The key of the menu group the entry joins, at the end of its entries; absent, the entry goes before the marker. */
+  readonly group?: string;
+  /** The icon the entry draws, imported by the menu file; absent, the configured one. */
+  readonly icon?: string;
 }
 
 /** The URL path a list screen is routed at: the configured one, else the entity's plural in kebab case. */
@@ -81,7 +91,7 @@ export interface MenuPlacement {
  * of the screen it now opens, which reads the list permission the server enforces. A key with no
  * entry, where nothing routes `href` either, is inserted on the line before the marker.
  */
-export function placeMenuEntry(text: string, marker: string, target: MenuEntryTarget, entry: string): MenuPlacement | undefined {
+export function placeMenuEntry(text: string, marker: string, target: MenuEntryTarget, entry: string, group?: string): MenuPlacement | undefined {
   const keyed = new RegExp(`\\{([^{}]*?\\bkey:\\s*"${target.key.replace(/[^\w]/g, "\\$&")}")([^{}]*?)(\\s*)\\}`);
   const found = keyed.exec(text);
   if (found) {
@@ -95,10 +105,86 @@ export function placeMenuEntry(text: string, marker: string, target: MenuEntryTa
     return { text: text.slice(0, found.index) + filled + text.slice(found.index + whole.length), gated };
   }
   if (text.includes(`href: "${target.href}"`)) return undefined;
+  const gated = target.gate !== "undefined" && entry.includes(target.gate);
+  if (group !== undefined) return { text: insertIntoGroup(text, marker, group, entry), gated };
   const lines = text.split("\n");
   const at = lines.findIndex((line) => line.includes(marker));
   if (at < 0) throw new Error(`The menu file has no line holding the marker "${marker}"`);
-  return { text: [...lines.slice(0, at), entry.replace(/\n$/, ""), ...lines.slice(at)].join("\n"), gated: target.gate !== "undefined" && entry.includes(target.gate) };
+  return { text: [...lines.slice(0, at), entry.replace(/\n$/, ""), ...lines.slice(at)].join("\n"), gated };
+}
+
+/** The offset of the bracket closing the one at `open`, counting nesting and skipping string literals. */
+function closingBracket(text: string, open: number): number {
+  const pairs: Record<string, string> = { "[": "]", "{": "}", "(": ")" };
+  const stack: string[] = [];
+  for (let at = open; at < text.length; at += 1) {
+    const char = text[at];
+    if (char === '"' || char === "'" || char === "`") {
+      const end = text.indexOf(char, at + 1);
+      if (end < 0) break;
+      at = end;
+    } else if (pairs[char]) stack.push(pairs[char]);
+    else if (char === stack[stack.length - 1]) {
+      stack.pop();
+      if (stack.length === 0) return at;
+    }
+  }
+  return -1;
+}
+
+/**
+ * Puts an entry at the end of the named group's entries: before the marker line when the group
+ * holds it (the marker stays last), else before the line closing the array. A group written on one
+ * line is opened out first.
+ */
+function insertIntoGroup(text: string, marker: string, group: string, entry: string): string {
+  // A group is the object whose `key` is followed by its `entries` before any brace closes: an
+  // entry that happens to share the key closes its brace first.
+  let entriesAt = -1;
+  for (const found of text.matchAll(new RegExp(`\\bkey:\\s*"${group.replace(/[^\w]/g, "\\$&")}"`, "g"))) {
+    const next = text.indexOf("entries:", found.index);
+    if (next >= 0 && !/[{}]/.test(text.slice(found.index, next))) {
+      entriesAt = next;
+      break;
+    }
+  }
+  const open = entriesAt < 0 ? -1 : text.indexOf("[", entriesAt);
+  const close = open < 0 ? -1 : closingBracket(text, open);
+  if (close < 0) throw new Error(`The menu file has no group "${group}" with an entries array`);
+  const body = text.slice(open + 1, close);
+  const line = entry.replace(/\n$/, "");
+  if (!body.includes("\n")) {
+    const indent = /^[ \t]*/.exec(text.slice(text.lastIndexOf("\n", entriesAt) + 1))?.[0] ?? "";
+    const items = body.trim().replace(/,$/, "");
+    const lines = [...(items ? [`${indent}  ${items},`] : []), line];
+    return `${text.slice(0, open + 1)}\n${lines.join("\n")}\n${indent}${text.slice(close)}`;
+  }
+  const markerAt = body.split("\n").findIndex((one) => one.includes(marker));
+  const inGroup = text.slice(0, open + 1).split("\n").length - 1;
+  const lines = text.split("\n");
+  const closeLine = text.slice(0, close).split("\n").length - 1;
+  const at = markerAt >= 0 ? inGroup + markerAt : closeLine;
+  return [...lines.slice(0, at), line, ...lines.slice(at)].join("\n");
+}
+
+/**
+ * Makes an icon importable in the menu file: when no import brings it in, the name joins the import
+ * that brings in `anchor`, the icon the project's menu already uses.
+ */
+export function ensureIconImport(text: string, icon: string, anchor: string | undefined): string {
+  const imports = [...text.matchAll(/import\s*(?:type\s*)?\{([^}]*)\}\s*from\s*["'][^"']+["'];?/g)];
+  const names = (match: RegExpMatchArray) => (match[1] ?? "").split(",").map((one) => one.trim().replace(/^type\s+/, "")).filter(Boolean);
+  if (imports.some((match) => names(match).includes(icon))) return text;
+  const home = anchor === undefined ? undefined : imports.find((match) => names(match).includes(anchor));
+  if (!home || home.index === undefined) throw new Error(`The menu file imports no icon "${icon}" and no import of "${anchor ?? "the configured icon"}" to add it to: import it by hand`);
+  const list = home[1] ?? "";
+  const multiline = list.includes("\n");
+  const at = home.index + home[0].indexOf("{") + 1;
+  const items = list.split(",").map((one) => one.trim()).filter(Boolean);
+  const sorted = [...items, icon].sort((a, b) => a.replace(/^type\s+/, "").toLowerCase().localeCompare(b.replace(/^type\s+/, "").toLowerCase()));
+  const indent = multiline ? (/\n([ \t]*)\S/.exec(list)?.[1] ?? "  ") : "";
+  const rendered = multiline ? `\n${sorted.map((one) => `${indent}${one},`).join("\n")}\n` : ` ${sorted.join(", ")} `;
+  return text.slice(0, at) + rendered + text.slice(at + list.length);
 }
 
 /** {@link placeMenuEntry}, returning only the new text. */
@@ -168,10 +254,13 @@ export async function writeRoute(input: RouteInput): Promise<RouteWrite> {
     const permission = input.listAccess?.kind === "permission" ? input.listAccess : undefined;
     const subject = permission ? menuSubject(menu.gate, { ...routeCtx, entityCamel: toCamelCase(input.entityKebab) }, permission.group) : undefined;
     const gate = permission ? `{ action: "${permission.action}", subject: ${subject} }` : "undefined";
-    const entry = renderTemplate(menuTemplate, { ...routeCtx, menuKey: input.entityPlural, menuIcon: menu.icon ?? "CircleIcon", menuGate: gate });
-    const placed = placeMenuEntry(await readFile(menuFile, "utf-8"), menu.marker, { key: input.entityPlural, href: `/${routePath}`, gate }, entry);
+    const icon = input.menu?.icon ?? menu.icon ?? "CircleIcon";
+    const entry = renderTemplate(menuTemplate, { ...routeCtx, menuKey: input.entityPlural, menuIcon: icon, menuGate: gate });
+    const placed = placeMenuEntry(await readFile(menuFile, "utf-8"), menu.marker, { key: input.entityPlural, href: `/${routePath}`, gate }, entry, input.menu?.group);
     if (placed !== undefined) {
-      await writeFileWithDir(menuFile, placed.text);
+      // A decided icon the menu file does not import yet joins the import of the configured one.
+      const withIcon = input.menu?.icon === undefined ? placed.text : ensureIconImport(placed.text, input.menu.icon, menu.icon);
+      await writeFileWithDir(menuFile, withIcon);
       menuInserted = true;
       // The table gains the property only for a gate this run put into the menu: an entry that kept
       // a gate of its own reads nothing from it.

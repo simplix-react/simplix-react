@@ -9,7 +9,8 @@ import ora from "ora";
 import { ConfigLoadError } from "../config/config-load-error.js";
 import { findCrudConfigForEntity } from "../config/crud-config-loader.js";
 import { loadConfig } from "../config/config-loader.js";
-import { chooseDefaultSort } from "../meta/default-sort.js";
+import { chooseDefaultSort, withSortKeyShown } from "../meta/default-sort.js";
+import { withUnmaskedFlagged } from "../meta/personal-data.js";
 import { figureTilesOf, withTileFilters } from "../meta/figure-tiles.js";
 import { assertOutputDirs } from "../config/output-dirs.js";
 import { reportConfigError } from "../config/report-config-error.js";
@@ -110,6 +111,8 @@ export interface FieldInfo {
   isReferenceName?: boolean;
   /** One of the audit stamps or the soft-delete flag, which a generated screen never draws (they are the record's metadata). */
   isAuditField?: boolean;
+  /** The record also carries a masked form of this field (`scaffold.maskedSuffix`); a generated screen draws the masked one only. */
+  isUnmasked?: boolean;
   /** For a key whose record arrives nested beside it: the path to that record's name (`position.name`). */
   referenceNamePath?: string;
   /** For such a key: the peek kind the nested record's type names. */
@@ -168,14 +171,16 @@ const FILTER_KIND: Record<string, ContractFilterInfo["kind"]> = {
 /**
  * The searchable fields as the kit's list filters: an enum as a choice, a boolean as a toggle, a
  * moment or a day as a period, a number as a number. One per field, in the order they arrive.
+ * The audit stamp named by `keep` (the list's default sort) is offered like any other field.
  */
-export function contractFiltersOf(filters: readonly FilterFieldInfo[], fields: readonly FieldInfo[]): ContractFilterInfo[] {
+export function contractFiltersOf(filters: readonly FilterFieldInfo[], fields: readonly FieldInfo[], keep?: string): ContractFilterInfo[] {
   const seen = new Set<string>();
   const out: ContractFilterInfo[] = [];
   for (const filter of filters) {
     const kind = FILTER_KIND[filter.component];
-    // The audit stamps and the soft-delete flag are not what an operator searches by.
-    if (!kind || seen.has(filter.field) || AUDIT_FIELDS.includes(filter.field)) continue;
+    // The audit stamps and the soft-delete flag are not what an operator searches by, except the
+    // stamp the list opens sorted by (`keep`): a log is read by when its rows were written.
+    if (!kind || seen.has(filter.field) || (AUDIT_FIELDS.includes(filter.field) && filter.field !== keep)) continue;
     if (kind === "choice" && !(filter.options && filter.options.length > 0)) continue;
     seen.add(filter.field);
     const one: ContractFilterInfo = { kind, field: filter.field };
@@ -2074,6 +2079,8 @@ export const scaffoldCrudCommand = new Command("scaffold")
     "Target Expo app under apps/ for route files (with --native)",
   )
   .option("--blocks", "Also lay down a page.blocks.tsx departure file beside the page, once, for the author to write")
+  .option("--menu-group <key>", "The menu group the screen's entry joins (its key in the menu file), at the end of the group; default: before the menu marker")
+  .option("--menu-icon <name>", "The icon the screen's menu entry draws; imported into the menu file when it is not yet")
   .action(reportConfigError(scaffoldAction));
 
 /** The options `simplix scaffold` takes. */
@@ -2086,6 +2093,10 @@ export interface ScaffoldOptions {
   app?: string;
   /** Lay down a page.blocks.tsx departure file beside the page, once, at the author's request. */
   blocks?: boolean;
+  /** The menu group the screen's entry joins, as its design decided it. */
+  menuGroup?: string;
+  /** The icon the screen's menu entry draws, as its design decided it. */
+  menuIcon?: string;
 }
 
 /**
@@ -2495,6 +2506,7 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       .sort((a, b) => Number(namesRow(b)) - Number(namesRow(a)));
     // Each entity whose records point back at this one is a sub-list in the detail, forced to the
     // open record's key. Its columns are the holder's own row fields, drawn as its list draws them.
+    const maskedSuffix = scaffoldConfig.scaffold?.maskedSuffix;
     const holders = [];
     for (const holder of metaHolders) {
       const holderList = holder.source.roles.list;
@@ -2502,6 +2514,7 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       if (!holderList || !holderPackage) continue;
       const holderFields = withContractKinds(holder.source.rowFields ?? holder.source.fields, holder.source.rowIdField, { peeks: referencePeeks, relationFields: relationsOf(holder.source) })
         .filter((f) => f.name !== holder.field);
+      const holderSort = chooseDefaultSort({ declared: holder.source.defaultSort, candidates: scaffoldConfig.scaffold?.defaultSortFields, fields: holderFields, rowIdField: holder.source.rowIdField });
       holders.push({
         entity: holder.entity,
         EntityPascal: holder.entity.charAt(0).toUpperCase() + holder.entity.slice(1),
@@ -2515,16 +2528,19 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
         // forced to that field of the open record, not to its key.
         matchField: [...(holder.source.rowFields ?? []), ...holder.source.fields, ...(holder.source.detailFields ?? [])].find((f) => f.name === holder.field)?.peekBy,
         rowIdField: holder.source.rowIdField,
-        fields: holderFields,
+        fields: withUnmaskedFlagged(withSortKeyShown(holderFields, holderSort), maskedSuffix),
         // The order the holder's own list opens in, so its tab reads the same rows first.
-        defaultSort: chooseDefaultSort({ declared: holder.source.defaultSort, candidates: scaffoldConfig.scaffold?.defaultSortFields, fields: holderFields, rowIdField: holder.source.rowIdField }),
+        defaultSort: holderSort,
         // Whether the holder's list route takes a keyword search, which its tab's search box sends.
         hasKeywordSearch: holder.source.keywordSearch,
       });
     }
+    // The order the list opens in when no reorder owns it: never the row's key. A stamp it names
+    // keeps its column and its period filter (see withSortKeyShown).
+    const defaultSort = chooseDefaultSort({ declared: metaSource?.defaultSort, candidates: scaffoldConfig.scaffold?.defaultSortFields, fields: listFields, rowIdField });
+    const contractFilters = contractFiltersOf(nonTextFilters, [...fields, ...(metaSource?.detailFields ?? [])], defaultSort?.field);
     // The generated access rule of each operation a control leads to (`createJobPositionAccess`),
     // which the domain barrel exports from SimpliX Meta. Absent where the domain is not on meta.
-    const contractFilters = contractFiltersOf(nonTextFilters, [...fields, ...(metaSource?.detailFields ?? [])]);
     const accessOf = (opId: string | undefined) => (metaSource && opId ? `${opId}Access` : null);
     const ctx = {
       accessCreate: accessOf(roles?.create),
@@ -2541,12 +2557,12 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       fields: withContractKinds(fields.map(withRequiredInForm), rowIdField, contractOptions),
       // A detail draws what the get route answers with, which holds what the server derives
       // (a standing, a display name, a last-seen time) and no request body states.
-      detailFields: withContractKinds(withStatedLengths(detailFieldsOf(metaSource?.detailFields ?? fields, rowIdField), byName), rowIdField, contractOptions),
+      detailFields: withUnmaskedFlagged(withContractKinds(withStatedLengths(detailFieldsOf(metaSource?.detailFields ?? fields, rowIdField), byName), rowIdField, contractOptions), maskedSuffix),
       // The enum the detail header draws as the record's standing.
       statusField: withContractKinds(metaSource?.detailFields ?? fields, undefined, contractOptions).find(
         (f) => f.contractKind === "enum" && /(^|[a-z])(status|state|standing)$/i.test(f.name),
       )?.name,
-      listFields: withContractKinds(listFields, rowIdField, contractOptions),
+      listFields: withUnmaskedFlagged(withSortKeyShown(withContractKinds(listFields, rowIdField, contractOptions), defaultSort), maskedSuffix),
       // The default figure tiles, from what the entity's Meta says it counts and sums.
       figureTiles: figureTilesOf({
         statusCounts: metaSource?.statusCounts,
@@ -2569,8 +2585,7 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       hookOrder,
       hookTree,
       orderField,
-      // The order the list opens in when no reorder owns it: never the row's key.
-      defaultSort: chooseDefaultSort({ declared: metaSource?.defaultSort, candidates: scaffoldConfig.scaffold?.defaultSortFields, fields: listFields, rowIdField }),
+      defaultSort,
       // A list that reorders by drag owns the order: the form leaves the field out and a create
       // sends the default, an edit the record's own.
       formOrderField: hookOrder && orderField ? orderField : undefined,
@@ -2730,6 +2745,7 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
         listAccess: metaSource?.listAccess,
         plural: metaSource?.plural,
         origin,
+        menu: { group: options.menuGroup, icon: options.menuIcon },
       });
       log.info(`${route.outcome} route ${relative(rootDir, route.file)}${route.menuInserted ? ", menu entry added" : ""}`);
       if (route.subject) logSubjectWrite(route.subject);
