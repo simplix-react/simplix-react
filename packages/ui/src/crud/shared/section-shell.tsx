@@ -173,9 +173,7 @@ export function SectionShell({
   const section = (
     <section
       className={cn(
-        // The card clips its rounded corners; the clip edge sits one gutter outside the padding box so
-        // the halo of a control on the section's edge is not shaved off.
-        isCard && "overflow-clip [overflow-clip-margin:var(--focus-gutter)]",
+        isCard && "overflow-hidden",
         (variant === "flat" || isLined) && "flex flex-col",
         className,
       )}

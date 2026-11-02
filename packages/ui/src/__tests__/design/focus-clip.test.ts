@@ -56,8 +56,13 @@ describe("a part that clips the controls it groups draws their ring inside", () 
 describe("a part that only bounds its content leaves a gutter for the ring", () => {
   const source = readFileSync(resolve(__dirname, "../../crud/shared/section-shell.tsx"), "utf8");
 
-  it("clips a section card one gutter outside its padding box", () => {
-    expect(source).toContain("overflow-clip [overflow-clip-margin:var(--focus-gutter)]");
+  it("clips the form's unpainted section one gutter outside its padding box", () => {
+    expect(clarityCss).toMatch(/\[data-slot="crud-form-body"\][^{]*\[data-slot="section-shell"\][^{]*\{[^}]*overflow-clip-margin:\s*var\(--focus-gutter\)/);
+  });
+
+  it("keeps clipping a painted section card at its padding box, where its corners round", () => {
+    expect(source).toContain('isCard && "overflow-hidden"');
+    expect(source).not.toContain("overflow-clip-margin");
   });
 
   it("pads the collapsing body by the gutter and takes the room back", () => {
