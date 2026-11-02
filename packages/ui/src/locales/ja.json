@@ -425,5 +425,8 @@
   "tabs": {
     "scrollPrevious": "前のタブ",
     "scrollNext": "次のタブ"
+  },
+  "codeInput": {
+    "digit": "{{length}}桁中{{position}}桁目"
   }
 }

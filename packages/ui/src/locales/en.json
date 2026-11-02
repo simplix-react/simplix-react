@@ -425,5 +425,8 @@
   "tabs": {
     "scrollPrevious": "Previous tabs",
     "scrollNext": "More tabs"
+  },
+  "codeInput": {
+    "digit": "Digit {{position}} of {{length}}"
   }
 }

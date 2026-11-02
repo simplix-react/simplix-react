@@ -425,5 +425,8 @@
   "tabs": {
     "scrollPrevious": "이전 탭",
     "scrollNext": "다음 탭"
+  },
+  "codeInput": {
+    "digit": "{{length}}자리 중 {{position}}번째 숫자"
   }
 }

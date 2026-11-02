@@ -1,6 +1,11 @@
 export { Checkbox, CheckboxBase } from "./checkbox";
 export type { CheckboxProps } from "./checkbox";
 
+export { CodeInput } from "./code-input";
+export type { CodeInputProps } from "./code-input";
+export { codeBackspace, codeFocusable, codePaste, codeType } from "./code-input-model";
+export type { CodeEdit } from "./code-input-model";
+
 export { ColorPicker } from "./color-picker";
 export type { ColorPickerProps, PresetColor } from "./color-picker";
 

@@ -211,6 +211,7 @@ Unstyled Radix UI primitives with Tailwind CSS styling. Used internally by field
 
 - `Button` (with CVA variants: `variant`, `size`)
 - `Input`, `Textarea`, `Label`, `Badge`, `Switch`, `Checkbox`
+- `CodeInput` (a one-time code entered one digit per cell: typing moves on, Backspace steps back, a paste or an autofill fills every cell; `codeType`, `codeBackspace` and `codePaste` are its editing rules)
 - `Select` (Root, Trigger, Value, Content, Item, Group, Label, Separator)
 - `RadioGroup` (Root, Item)
 - `Calendar` (date picker grid)
