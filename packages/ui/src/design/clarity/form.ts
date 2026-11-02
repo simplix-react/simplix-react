@@ -132,4 +132,8 @@ export const formSlots: Record<string, string> = {
   "toast-message": "text-(length:--fs-body-sm) leading-(--lh-body-sm) font-medium",
   "toast-action": "rounded-[var(--radius-sm)] bg-white/12 px-2 py-1 text-[var(--popover-strong-foreground)] no-underline hover:bg-white/20 hover:no-underline",
   "toast-dismiss": "opacity-60 hover:opacity-100",
+  // A window preset that is not the current one still stands on a ground, as every action button
+  // does in clarity; the current one is filled with the accent.
+  "time-range-preset active=false": "bg-[var(--surface-2)]",
+  "time-range-nav-button": "bg-[var(--surface-2)]",
 };
