@@ -86,7 +86,8 @@
     "clearDateRange": "날짜 범위 지우기",
     "clearDate": "날짜 지우기",
     "removeFilter": "{{label}} 필터 제거",
-    "clearField": "{{label}} 지우기"
+    "clearField": "{{label}} 지우기",
+    "clearAll": "필터 지우기"
   },
   "timeRange": {
     "previous": "이전",

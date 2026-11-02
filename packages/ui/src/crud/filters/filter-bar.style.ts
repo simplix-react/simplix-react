@@ -89,6 +89,17 @@ export const crudFilterBarTriggerStyle = defineSlotStyle({
   defaultVariants: { active: false },
 });
 
+/**
+ * The button that removes every active filter at once. It stands in the trigger's segment, right
+ * after the trigger, and is drawn only while a filter is active.
+ */
+export const crudFilterBarClearButtonStyle = defineSlotStyle({
+  slot: "crud-filter-bar-clear-button",
+  base: "rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
+  variants: {},
+  defaultVariants: {},
+});
+
 /** The button that opens the column-visibility menu. */
 export const crudFilterBarColumnsButtonStyle = defineSlotStyle({
   slot: "crud-filter-bar-columns-button",

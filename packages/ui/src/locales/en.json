@@ -86,7 +86,8 @@
     "clearDateRange": "Clear date range",
     "clearDate": "Clear date",
     "removeFilter": "Remove {{label}} filter",
-    "clearField": "Clear {{label}}"
+    "clearField": "Clear {{label}}",
+    "clearAll": "Clear filters"
   },
   "timeRange": {
     "previous": "Previous",

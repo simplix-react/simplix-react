@@ -1513,6 +1513,9 @@
   [data-slot="crud-filter-bar-chip-remove"][data-slot][data-s-crud-filter-bar-chip-remove] {
     @apply ml-0.5 rounded-sm text-muted-foreground;
   }
+  [data-slot="crud-filter-bar-clear-button"][data-slot][data-s-crud-filter-bar-clear-button] {
+    @apply rounded text-muted-foreground transition-colors;
+  }
   [data-slot="crud-filter-bar-columns-button"][data-slot][data-s-crud-filter-bar-columns-button] {
     @apply rounded text-muted-foreground transition-colors;
   }
@@ -4541,6 +4544,9 @@
   }
   :where([data-slot="crud-filter-bar-chip-remove"])[data-s-crud-filter-bar-chip-remove] {
     @apply hover:text-foreground;
+  }
+  :where([data-slot="crud-filter-bar-clear-button"])[data-s-crud-filter-bar-clear-button] {
+    @apply hover:bg-muted hover:text-foreground;
   }
   :where([data-slot="crud-filter-bar-column"])[data-s-crud-filter-bar-column] {
     @apply [&>*+*]:mt-4;

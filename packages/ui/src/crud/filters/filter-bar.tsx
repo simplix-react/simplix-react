@@ -13,13 +13,14 @@ import { parseDate } from "../../utils/parse-date";
 import { decodeInstant, serializeInstant } from "../../utils/rfc3339-date";
 import { useCrudListColumns } from "../shared/column-context";
 import { ListTotalBadge } from "../shared/list-total-badge";
-import { CheckIcon, ColumnsIcon, EyeIcon, FunnelIcon, LayoutGridIcon, RowsIcon, SpinnerIcon, XIcon } from "../shared/icons";
+import { CheckIcon, ColumnsIcon, EyeIcon, FunnelIcon, FunnelXIcon, LayoutGridIcon, RowsIcon, SpinnerIcon, XIcon } from "../shared/icons";
 import { CountryFormField } from "./country-form-field";
 import { FieldClearButton } from "./field-clear-button";
 import { operatorConfig } from "./filter-icons";
 import {
   crudFilterBarCalendarStyle,
   crudFilterBarChipRemoveStyle,
+  crudFilterBarClearButtonStyle,
   crudFilterBarColumnStyle,
   crudFilterBarColumnsButtonStyle,
   crudFilterBarDividerStyle,
@@ -448,8 +449,12 @@ export function FilterBar({ filters, state, leading, trailing, maxBadges, onPrev
 
   // ── Clear all ──
 
+  // The one clear function: the popover's Clear and the trigger's clear button both run it. The
+  // keyword search is not a filter of the popover, so its text survives the clear.
   const clearAll = useCallback(() => {
+    const keyword = state.search;
     state.clear();
+    if (keyword !== "") state.setSearch(keyword);
     // Reset operators to defaults
     const init: Record<string, SearchOperator> = {};
     for (const def of filters) {
@@ -661,6 +666,18 @@ export function FilterBar({ filters, state, leading, trailing, maxBadges, onPrev
             </div>
           </PopoverContent>
         </Popover>
+        {hasActiveFilters && (
+          <button
+            type="button"
+            onClick={clearAll}
+            aria-label={t("filter.clearAll")}
+            title={t("filter.clearAll")}
+            className="inline-grid h-full w-7 place-items-center [&_svg]:size-3.5"
+            {...slotAttributes(crudFilterBarClearButtonStyle, {})}
+          >
+            <FunnelXIcon className="h-3.5 w-3.5" />
+          </button>
+        )}
         {showColumnsToggle && <span aria-hidden className="h-4 w-px" {...slotAttributes(crudFilterBarDividerStyle, { inset: true })} />}
         {showColumnsToggle && columnCtx && (
           <DropdownMenu>

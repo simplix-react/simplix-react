@@ -86,7 +86,8 @@
     "clearDateRange": "日付範囲をクリア",
     "clearDate": "日付をクリア",
     "removeFilter": "{{label}} フィルターを削除",
-    "clearField": "{{label}} をクリア"
+    "clearField": "{{label}} をクリア",
+    "clearAll": "フィルターをクリア"
   },
   "timeRange": {
     "previous": "前へ",

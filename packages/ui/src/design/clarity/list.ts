@@ -104,6 +104,7 @@ export const listSlots: Record<string, string> = {
     "crud-filter-bar-trigger-label": "sr-only",
     "crud-filter-bar-trigger active=false": "text-foreground hover:text-foreground",
     "crud-filter-bar-divider": "!hidden",
+    "crud-filter-bar-clear-button": "w-8 rounded-none bg-card text-foreground hover:bg-[var(--surface-2)]",
     "crud-filter-bar-columns-button": "w-8 rounded-none bg-card text-foreground hover:bg-[var(--surface-2)]",
     // The pager: the page size and the range at the start, the page numbers at the end.
     "crud-list-pagination": "gap-4 border-[var(--border)] px-3 py-2 text-(length:--fs-control) leading-(--lh-control) text-muted-foreground",
