@@ -176,7 +176,7 @@ export interface ContractFilterInfo {
 export function referenceFiltersOf(
   filters: readonly FilterFieldInfo[],
   fields: readonly FieldInfo[],
-  configured: Readonly<Record<string, { readonly facet?: string }>> | undefined,
+  configured: Readonly<Record<string, { readonly hook?: string; readonly from?: string; readonly facet?: string }>> | undefined,
 ): ContractFilterInfo[] {
   if (!configured) return [];
   const seen = new Set<string>();

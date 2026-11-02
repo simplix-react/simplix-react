@@ -248,7 +248,8 @@ describe("the filter over a key of another record", () => {
 
   it("offers none where no facet is named, or for a key that references nothing", () => {
     expect(referenceFiltersOf(filters, fields, undefined)).toEqual([]);
-    expect(referenceFiltersOf(filters, fields, { userAccount: { hook: "useUserAccountSearch" } })).toEqual([]);
+    const withoutFacet = { userAccount: { hook: "useUserAccountSearch", from: "@app/identity-ui" } };
+    expect(referenceFiltersOf(filters, fields, withoutFacet)).toEqual([]);
     expect(referenceFiltersOf([filters[1]!], fields, configured)).toEqual([]);
   });
 });
