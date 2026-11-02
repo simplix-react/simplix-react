@@ -23,7 +23,10 @@ interface OutputDirOption {
 export const OUTPUT_DIR_OPTIONS: readonly OutputDirOption[] = [
   {
     consequence: "Generated files there would go unwritten or untracked: create the directory or correct the option.",
-    read: (config) => [{ option: "templates.storiesDir", configured: config.templates?.storiesDir }],
+    read: (config) => [
+      { option: "templates.storiesDir", configured: config.templates?.storiesDir ?? undefined },
+      ...Object.entries(config.apps ?? {}).map(([app, one]) => ({ option: `apps["${app}"].templates.storiesDir`, configured: one.templates?.storiesDir ?? undefined })),
+    ],
   },
   {
     consequence: "The command would fail after every generation: create the directory or correct the option.",

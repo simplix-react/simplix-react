@@ -5,6 +5,7 @@ import { basename, dirname, join, relative, resolve } from "node:path";
 import { promisify } from "node:util";
 import prompts from "prompts";
 
+import { storyTargets, type StoryTarget } from "../utils/app-config.js";
 import { toKebabCase, toPascalCase } from "../utils/case.js";
 import { pathExists, writeFileWithDir } from "../utils/fs.js";
 import { readBase, recordBase } from "../utils/generated-merge.js";
@@ -211,8 +212,12 @@ export async function planAdopt(
   options: { readonly rebase?: boolean } = {},
 ): Promise<AdoptItem[]> {
   const { rootDir, config, held } = await collectGenerated(projectRoot);
-  const storiesAt = config.templates?.storiesDir ? resolve(rootDir, config.templates.storiesDir) : undefined;
-  const storiesDir = storiesAt !== undefined && (await pathExists(storiesAt)) ? await realpath(storiesAt) : storiesAt;
+  // Each story directory the config names (the top-level one and each app's), with the naming its stories follow.
+  const storyDirs: { dir: string; story: StoryTarget["story"] }[] = [];
+  for (const target of storyTargets(config)) {
+    const at = resolve(rootDir, target.storiesDir);
+    storyDirs.push({ dir: (await pathExists(at)) ? await realpath(at) : at, story: target.story });
+  }
   const sources: OriginSource[] = [];
   for (const [file, text] of held) {
     const origin = renderOrigin(text)?.join(" ");
@@ -232,9 +237,9 @@ export async function planAdopt(
     const text = held.get(file) ?? (await readFile(file, "utf-8"));
     // A frame the board drew by hand carries no marker; one the config maps a scaffold key to is
     // still that key's story, and adopting it gives it the render's header.
+    const storyDir = storyDirs.find((one) => dirname(file) === one.dir);
     const mappedFrame =
-      !text.includes(GENERATED_PAGE_MARKER) && storiesDir !== undefined && dirname(file) === storiesDir &&
-      storyKeyFor(config.templates?.story, basename(file)) !== undefined;
+      !text.includes(GENERATED_PAGE_MARKER) && storyDir !== undefined && storyKeyFor(storyDir.story, basename(file)) !== undefined;
     if (!text.includes(GENERATED_PAGE_MARKER) && !mappedFrame) {
       refuse(`not a generated file: it carries no ${GENERATED_PAGE_MARKER} marker`);
       continue;
@@ -251,7 +256,7 @@ export async function planAdopt(
     let origin = renderOrigin(text)?.join(" ");
     let inferred = false;
     if (origin === undefined) {
-      const found = storiesDir && dirname(file) === storiesDir ? inferStoryOrigin({ file, text, sources, pattern: config.templates?.story }) : undefined;
+      const found = storyDir !== undefined ? inferStoryOrigin({ file, text, sources, pattern: storyDir.story }) : undefined;
       if (found === undefined || "manual" in found) {
         refuse(`manual: it records no origin to render from, and ${found === undefined ? "only a story in templates.storiesDir can be traced to one" : found.manual}`);
         continue;

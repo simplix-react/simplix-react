@@ -14,8 +14,9 @@ import {
   staticPageTemplate,
 } from "../templates/page-kinds/index.js";
 import { toCamelCase, toKebabCase, toPascalCase } from "../utils/case.js";
-import { findProjectRoot, noteKeptRender, pathExists, writeFileWithDir } from "../utils/fs.js";
-import { log } from "../utils/logger.js";
+import { appFor, templatesFor, templatesOption } from "../utils/app-config.js";
+import { captureWrites, findProjectRoot, noteKeptRender, pathExists, writeFileWithDir } from "../utils/fs.js";
+import { log, withSilentLog } from "../utils/logger.js";
 import { GENERATED_PAGE_MARKER, loadProjectTemplates, stampFingerprint, templateFor, writeGenerated, type ProjectTemplates } from "../utils/project-templates.js";
 import { renderTemplate } from "../utils/template.js";
 import { storyFileFor } from "../utils/story-file.js";
@@ -104,13 +105,20 @@ export function addPageArgs(args: readonly string[]): { kind: string; name: stri
 }
 
 export const addPageCommand = new Command("add-page")
-  .description("Generate a page of one kind from the project's, the UI kit's or the bundled template")
+  .description(
+    "Generate a page of one kind from the templates of the app that owns it: .simplix/templates/<app>/, then .simplix/templates/, " +
+      "then the UI kit the app's templates.from names (apps.<app>.templates in simplix.config.ts, else the top-level templates), then the bundled template",
+  )
   .argument("<kind>", `Page kind: ${PAGE_KINDS.join(", ")}`)
   .argument("<name>", "Page name (e.g. my-profile, home, not-found)")
-  .option("--module <name>", "Module that owns the page (modules/<name>/src/pages/<page>); a grouped module is <group>/<name>")
-  .option("--app <name>", "App that owns the page (apps/<name>/src/pages/<page>)")
+  .option(
+    "--module <name>",
+    "Module that owns the page (modules/<name>/src/pages/<page>); a grouped module is <group>/<name>, drawn for the app whose apps.<app>.moduleGroups holds <group>",
+  )
+  .option("--app <name>", "App that owns the page (apps/<name>/src/pages/<page>), drawn from that app's templates and written to its storiesDir")
   .option("--variant <name>", "Another shape of the kind, drawn from <kind>.<variant>.hbs (e.g. app-shell --variant top-bar)")
   .option("--blocks", "Also lay down a page.blocks.tsx departure file beside the page, once, for the author to write")
+  .option("--dry-run", "Print every file the page would write, with its content, and write nothing (the generated.after commands do not run)")
   .action(reportConfigError(addPageAction));
 
 /**
@@ -118,8 +126,19 @@ export const addPageCommand = new Command("add-page")
  * `generated.after` commands. The commands belong here and not in {@link runAddPage}, which the
  * generated-state report runs in capture mode and a regeneration runs once per origin.
  */
-async function addPageAction(rawKind: string, name: string, flags: { module?: string; app?: string; variant?: string; blocks?: boolean }): Promise<void> {
-  await runAddPage(rawKind, name, flags);
+async function addPageAction(rawKind: string, name: string, flags: { module?: string; app?: string; variant?: string; blocks?: boolean; dryRun?: boolean }): Promise<void> {
+  const { dryRun, ...pageFlags } = flags;
+  if (dryRun) {
+    const rootDir = await findProjectRoot(process.cwd());
+    // The generator's own lines would name files as written; the captured files are the output.
+    const written = await withSilentLog(() => captureWrites(() => runAddPage(rawKind, name, pageFlags)));
+    for (const [path, content] of [...written].sort(([a], [b]) => a.localeCompare(b))) {
+      process.stdout.write(`--- ${relative(rootDir, path)}\n${content}${content.endsWith("\n") ? "" : "\n"}`);
+    }
+    log.info(`dry run: ${written.size} file(s) would be written, none was`);
+    return;
+  }
+  await runAddPage(rawKind, name, pageFlags);
   await runAfterGenerate(await findProjectRoot(process.cwd()));
 }
 
@@ -139,7 +158,10 @@ export async function runAddPage(rawKind: string, name: string, flags: { module?
     const owner = module ? moduleDirOf(rootDir, module) : join(rootDir, "apps", flags.app ?? "");
     const config = await loadConfig(rootDir);
     await assertOutputDirs(rootDir, config);
-    const templates = await loadProjectTemplates(rootDir, config.templates?.from);
+    // The app the page is drawn for decides its templates and where its frame goes.
+    const app = appFor(config, { app: flags.app, moduleGroup: module?.group });
+    const settings = templatesFor(config, app);
+    const templates = await loadProjectTemplates(rootDir, settings.from, app, templatesOption(config, "from", app));
     // The module's i18n namespace is its package name, which a grouped module spells with its group.
     const namespace = module ? `${await resolveModuleNamespace(owner)}/pages` : "common";
     const dir = kind === "app-shell" ? join(owner, "src", "app", "layouts") : join(owner, "src", "pages", toKebabCase(name));
@@ -167,10 +189,10 @@ export async function runAddPage(rawKind: string, name: string, flags: { module?
     // The design reference's frame, tracked like the page: rewritten while untouched, kept once
     // customised.
     const story = renderPageKindStory(kind, name, namespace, templates, flags.app, variant);
-    const storiesDir = config.templates?.storiesDir;
+    const storiesDir = settings.storiesDir;
     if (story !== undefined && storiesDir) {
       const fallback = pageStoryFile(name, flags);
-      const storyPath = resolve(rootDir, storiesDir, storyFileFor(config.templates?.story, fallback.slice(0, -".stories.tsx".length), fallback));
+      const storyPath = resolve(rootDir, storiesDir, storyFileFor(settings.story, fallback.slice(0, -".stories.tsx".length), fallback));
       const outcome = await writeGenerated(storyPath, story, origin);
       log.info(`${outcome} story ${relative(rootDir, storyPath)}`);
     }

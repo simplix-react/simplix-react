@@ -9,6 +9,9 @@ export type {
   CrudMap,
   SimplixHttpEnvironment,
   SimplixChecksConfig,
+  SimplixTemplatesConfig,
+  SimplixAppConfig,
+  SimplixDesignSource,
 } from "./config/types.js";
 
 // NamingStrategy types

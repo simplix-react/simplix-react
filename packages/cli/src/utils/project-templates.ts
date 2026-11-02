@@ -3,7 +3,7 @@ import { writeStampedGenerated, type GeneratedOutcome } from "./generated-merge.
 import { readdir, readFile } from "node:fs/promises";
 import { isAbsolute, join, resolve } from "node:path";
 
-import { noteKeptRender, pathExists, writeFileWithDir } from "./fs.js";
+import { pathExists } from "./fs.js";
 
 /** Where a project keeps the templates it wants used instead of the CLI's own. */
 export const PROJECT_TEMPLATE_DIR = ".simplix/templates";
@@ -113,16 +113,16 @@ async function kitTemplateDir(dir: string): Promise<string | undefined> {
  *
  * @returns the directory, or undefined where the project names no kit and depends on none
  */
-export async function resolveKitTemplateDir(root: string, from?: string): Promise<string | undefined> {
+export async function resolveKitTemplateDir(root: string, from?: string, option = "templates.from"): Promise<string | undefined> {
   if (from !== undefined) {
     if (from.startsWith(".") || isAbsolute(from)) {
       const dir = resolve(root, from);
       return (await kitTemplateDir(dir)) ?? dir;
     }
     const dir = await packageDir(root, from);
-    if (!dir) throw new Error(`templates.from names "${from}", which is neither installed at ${root} nor a workspace package`);
+    if (!dir) throw new Error(`${option} names "${from}", which is neither installed at ${root} nor a workspace package`);
     const templates = await kitTemplateDir(dir);
-    if (!templates) throw new Error(`templates.from names "${from}", whose package.json declares no simplix.${KIT_TEMPLATES_FIELD}`);
+    if (!templates) throw new Error(`${option} names "${from}", whose package.json declares no simplix.${KIT_TEMPLATES_FIELD}`);
     return templates;
   }
   const manifest = await readManifest(root);
@@ -138,18 +138,34 @@ export async function resolveKitTemplateDir(root: string, from?: string): Promis
 }
 
 /**
- * The templates in force for a project: `<root>/.simplix/templates/*.hbs` over the declared UI
- * kit's templates, each name falling through to the next layer and then to the CLI's bundled one.
+ * The directory holding one app's own templates: `.simplix/templates/<app>/`.
  *
- * <p>Returns an empty map where neither layer has a template, which is every project that has not
+ * @throws Error when the app's name is not a single directory name
+ */
+export function appTemplateDir(root: string, app: string): string {
+  if (app === "" || app === "." || app === ".." || /[\\/]/.test(app)) {
+    throw new Error(`"${app}" is not an app name: an app is one directory under apps/`);
+  }
+  return join(root, PROJECT_TEMPLATE_DIR, app);
+}
+
+/**
+ * The templates in force for a page, name by name: the app's own `.simplix/templates/<app>/*.hbs`,
+ * then the project's `.simplix/templates/*.hbs`, then the declared UI kit's templates, each name
+ * falling through to the next layer and finally to the CLI's bundled one.
+ *
+ * <p>Returns an empty map where no layer has a template, which is every project that has not
  * taken one over and draws with no kit that ships any.
  *
- * @param from the `templates.from` setting of the project's `simplix.config.ts`
+ * @param from the `templates.from` setting in force for the page (the app's, else the top-level one)
+ * @param app the app the page is generated for; undefined reads no app layer
+ * @param option how the config spells `from`, for the error a kit that cannot be found raises
  */
-export async function loadProjectTemplates(root: string, from?: string): Promise<ProjectTemplates> {
-  const kitDir = await resolveKitTemplateDir(root, from);
+export async function loadProjectTemplates(root: string, from?: string, app?: string, option?: string): Promise<ProjectTemplates> {
+  const kitDir = await resolveKitTemplateDir(root, from, option);
   const found = kitDir ? await readTemplateDir(kitDir) : new Map<string, string>();
   for (const [name, source] of await readTemplateDir(join(root, PROJECT_TEMPLATE_DIR))) found.set(name, source);
+  if (app !== undefined) for (const [name, source] of await readTemplateDir(appTemplateDir(root, app))) found.set(name, source);
   return found;
 }
 

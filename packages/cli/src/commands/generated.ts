@@ -2,9 +2,11 @@ import { Command } from "commander";
 import { readFile, readdir, realpath, stat } from "node:fs/promises";
 import { join, relative, resolve, sep } from "node:path";
 
+import { designProblems } from "../checks/design-source.js";
 import { loadConfig } from "../config/config-loader.js";
 import { assertOutputDirs } from "../config/output-dirs.js";
 import { reportConfigError } from "../config/report-config-error.js";
+import { storyTargets } from "../utils/app-config.js";
 import { captureWrites, findProjectRoot, lastKeptRenders } from "../utils/fs.js";
 import { log, withSilentLog } from "../utils/logger.js";
 import { runAfterGenerate } from "../utils/generated-after.js";
@@ -94,7 +96,7 @@ async function captureOrigin(origin: readonly string[]): Promise<Map<string, str
   throw new Error(`Unknown origin "${origin.join(" ")}"`);
 }
 
-/** The generated files of a project, found by their marker: the project root and the story directory. */
+/** The generated files of a project, found by their marker: the project root and the story directories. */
 export interface GeneratedFiles {
   /** The project root with symbolic links resolved, the spelling the generators' paths use. */
   readonly rootDir: string;
@@ -104,7 +106,8 @@ export interface GeneratedFiles {
 }
 
 /**
- * Reads every generated file under the project root and the configured story directory.
+ * Reads every generated file under the project root and every configured story directory (the
+ * top-level one and each app's).
  *
  * @throws {ConfigLoadError} when `simplix.config.ts` exists but cannot be loaded
  * @throws {OutputDirError} when the configured story directory is not an existing directory
@@ -116,7 +119,7 @@ export async function collectGenerated(projectRoot: string): Promise<GeneratedFi
   const config = await loadConfig(rootDir);
   // A directory that is not there holds no generated files, which reads as a clean report.
   await assertOutputDirs(rootDir, config);
-  const roots = [rootDir, ...(config.templates?.storiesDir ? [resolve(rootDir, config.templates.storiesDir)] : [])];
+  const roots = [rootDir, ...storyTargets(config).map((one) => resolve(rootDir, one.storiesDir))];
   const files: string[] = [];
   for (const root of roots) await walk(root, files);
 
@@ -218,13 +221,14 @@ async function regenerateOrigins(rootDir: string): Promise<{ origins: string[]; 
 /**
  * Why a report fails, one sentence each; empty when it passes.
  *
- * <p>Only a screen that did not start from a template fails: a page file with no generated marker.
+ * <p>Only a screen that did not start from a template fails, and a routed screen with no entry or
+ * row in its app's design source (`design`, the design gate's findings).
  * A stale file and a conflicting or unrecorded merge are the normal state of a page customised by
  * hand after a later template change, so they are reported and fail only under `check`, which also
  * fails an edited file a clean merge would still move.
  */
-export function generatedFailures(entries: readonly GeneratedEntry[], options: { check: boolean; conflicted: boolean; unstarted?: readonly string[] }): string[] {
-  const failures: string[] = [];
+export function generatedFailures(entries: readonly GeneratedEntry[], options: { check: boolean; conflicted: boolean; unstarted?: readonly string[]; design?: readonly string[] }): string[] {
+  const failures: string[] = [...(options.design ?? [])];
   if ((options.unstarted ?? []).length > 0) {
     failures.push(`Pages that did not start from a template (no ${GENERATED_PAGE_MARKER} marker): ${options.unstarted?.join(", ")}. Lay each down with \`simplix scaffold\` or \`simplix add-page\` and reapply its customisation.`);
   }
@@ -442,7 +446,9 @@ export const generatedCommand = new Command("generated")
     }
     const allUnstarted = await unstartedPages(rootDir);
     const unstarted = paths.length > 0 ? allUnstarted.filter((one) => entriesNamedBy([{ path: one } as GeneratedEntry], rootDir, callerDir, paths).kept.length > 0) : allUnstarted;
-    for (const failure of generatedFailures(entries, { check: flags.check === true, conflicted, unstarted })) {
+    // The design gate judges the apps' routes, so a report narrowed to paths leaves it out.
+    const design = paths.length > 0 ? [] : (await designProblems(rootDir, await loadConfig(rootDir))).problems;
+    for (const failure of generatedFailures(entries, { check: flags.check === true, conflicted, unstarted, design })) {
       log.error(failure);
       process.exitCode = 1;
     }

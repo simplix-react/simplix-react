@@ -99,43 +99,38 @@ export interface SimplixConfig {
 
   /**
    * Where the page and widget templates come from, beneath the project's own
-   * `.simplix/templates`.
+   * `.simplix/templates`. An app listed in {@link SimplixConfig.apps} may override each key.
+   */
+  templates?: SimplixTemplatesConfig;
+
+  /**
+   * Settings that differ between the apps of one workspace, keyed by the app's directory name under
+   * `apps/` (`"acme-admin"`).
    *
    * @remarks
-   * `from` names a UI kit package (resolved from the project root, then from the workspace's
-   * packages) or a directory path. The kit's `package.json` says where its templates are under
-   * `simplix.templates`; a path is read as the template directory itself. Without this setting the
-   * CLI looks for one dependency of the project root that declares `simplix.templates`.
+   * Two apps in one frontend workspace can be drawn by different UI kits and designed in different
+   * references: an operator console from a console kit on a mockup board, a customer site from a
+   * site kit on a Storybook of its own. A page generated for an app reads that app's settings:
+   * `simplix add-page --app <name>` names the app outright, and `--module <group>/<name>` (as
+   * `simplix scaffold --module` does) reaches the app whose `moduleGroups` holds the group. A page
+   * no app claims, and every page of a project without this block, reads the top-level
+   * `templates` alone.
+   *
+   * @example
+   * ```ts
+   * apps: {
+   *   "acme-admin": {
+   *     design: { source: "screen-design", manifest: "design/screen-design.json" },
+   *   },
+   *   "acme-site": {
+   *     moduleGroups: ["site"],
+   *     templates: { from: "@acme-kits/site-clarity" },
+   *     design: { source: "story-manifest", manifest: "design/site-design-manifest.json" },
+   *   },
+   * }
+   * ```
    */
-  templates?: {
-    from?: string;
-    /**
-     * Where generated Storybook stories are written, relative to the project root: the design
-     * reference's screens directory. A template with a `.stories` sibling (`list.stories.hbs`)
-     * renders one story per scaffolded entity there. Without it no story is generated.
-     * The directory must exist: `simplix generated` and the commands that write there refuse a
-     * path that does not resolve to one, naming the option and the resolved path.
-     */
-    storiesDir?: string;
-    /**
-     * The board story's id and title, as patterns over `{entity}` (kebab case) and `{Entity}`
-     * (Pascal case), so the design reference's own navigation can link to a generated frame
-     * (`{ id: "backoffice-{entity}", title: "Back office/{Entity}" }`). Absent, the story keeps
-     * Storybook's title-derived id under `Generated/{Entity}`.
-     */
-    story?: {
-      readonly id?: string;
-      readonly title?: string;
-      /**
-       * The file a scaffold writes its story to, relative to `storiesDir`, by scaffold key: an
-       * entity's kebab name for `scaffold` (`{ "background-job": "jobs.stories.tsx" }`), a page
-       * story's default file name without `.stories.tsx` for `add-page`. A board that already
-       * draws the screen maps it here, so the generated story is that frame rather than a second
-       * one beside it; `simplix generated --adopt` then records the frame's merge base.
-       */
-      readonly files?: Readonly<Record<string, string>>;
-    };
-  };
+  apps?: Readonly<Record<string, SimplixAppConfig>>;
 
   /**
    * How UI modules are laid out under `modules/`. `groups` names directories that hold modules
@@ -254,6 +249,94 @@ export interface SimplixConfig {
 
   /** What the project checks run over; each command also takes its roots as arguments. */
   checks?: SimplixChecksConfig;
+}
+
+/**
+ * Where page and widget templates come from, and where the generated design-reference stories go.
+ *
+ * @remarks
+ * `from` names a UI kit package (resolved from the project root, then from the workspace's
+ * packages) or a directory path. The kit's `package.json` says where its templates are under
+ * `simplix.templates`; a path is read as the template directory itself. Without this setting the
+ * CLI looks for one dependency of the project root that declares `simplix.templates`.
+ *
+ * Under an app of {@link SimplixConfig.apps}, each key set here replaces the top-level key of the
+ * same name for that app's pages, and each key left out falls back to it.
+ */
+export interface SimplixTemplatesConfig {
+  from?: string;
+  /**
+   * Where generated Storybook stories are written, relative to the project root: the design
+   * reference's screens directory. A template with a `.stories` sibling (`list.stories.hbs`)
+   * renders one story per scaffolded entity there. Without it no story is generated.
+   * The directory must exist: `simplix generated` and the commands that write there refuse a
+   * path that does not resolve to one, naming the option and the resolved path.
+   * An app sets `null` to write no stories where the top level names a directory: its design
+   * reference is not the one the top-level stories go to.
+   */
+  storiesDir?: string | null;
+  /**
+   * The board story's id and title, as patterns over `{entity}` (kebab case) and `{Entity}`
+   * (Pascal case), so the design reference's own navigation can link to a generated frame
+   * (`{ id: "backoffice-{entity}", title: "Back office/{Entity}" }`). Absent, the story keeps
+   * Storybook's title-derived id under `Generated/{Entity}`.
+   */
+  story?: {
+    readonly id?: string;
+    readonly title?: string;
+    /**
+     * The file a scaffold writes its story to, relative to `storiesDir`, by scaffold key: an
+     * entity's kebab name for `scaffold` (`{ "background-job": "jobs.stories.tsx" }`), a page
+     * story's default file name without `.stories.tsx` for `add-page`. A board that already
+     * draws the screen maps it here, so the generated story is that frame rather than a second
+     * one beside it; `simplix generated --adopt` then records the frame's merge base.
+     */
+    readonly files?: Readonly<Record<string, string>>;
+  };
+}
+
+/** One app's own settings (see {@link SimplixConfig.apps}). */
+export interface SimplixAppConfig {
+  /**
+   * Module groups (from `modules.groups`) whose modules hold this app's screens, so a page or a
+   * scaffold for `--module <group>/<name>` is drawn from this app's templates. A group belongs to
+   * at most one app; a group no app names keeps the top-level templates.
+   */
+  readonly moduleGroups?: readonly string[];
+  /**
+   * The app's templates. Read in this order, name by name: the project's
+   * `.simplix/templates/<app>/`, the project's `.simplix/templates/`, the kit `from` names (this
+   * app's, else the top-level one), then the CLI's bundled template.
+   */
+  readonly templates?: SimplixTemplatesConfig;
+  /** Where the app's screens are designed before they are made; absent, no design gate runs for the app. */
+  readonly design?: SimplixDesignSource;
+}
+
+/**
+ * The design reference an app's routed screens are checked against by `simplix generated` and
+ * `simplix check-screen`: every routed screen of the app needs its design before it is made.
+ *
+ * @remarks
+ * The kind names the manifest's shape:
+ *
+ * - `screen-design`: `{ "screens": [{ "app": "<app>", "route": "/path", ... }] }`, one design entry
+ *   per routed screen of every app the file covers, matched on the app's name and the route.
+ * - `story-manifest`: `{ "rows": [{ "route": "/path", "state": "...", "stories": { "<width>":
+ *   ["<story id>", ...] }, "fixture": "..." }], "exempt": [{ "route": "/path", "reason": "..." }] }`,
+ *   the file of one app: a route is designed by a row naming at least one story id. A route that
+ *   draws nothing to design (a sign-in callback) is listed under `exempt` with its reason.
+ *
+ * Routes are read from the app's TanStack file routes: every `.ts`/`.tsx` file under `routes`
+ * whose name does not start with `__`, by the path its `createFileRoute("...")` call names. That
+ * path is the route's id, so a manifest names `login_.complete.tsx` as `"/login_/complete"`.
+ */
+export interface SimplixDesignSource {
+  readonly source: "screen-design" | "story-manifest";
+  /** The manifest, relative to the project root. */
+  readonly manifest: string;
+  /** The app's file-route directory, relative to the project root. Default `apps/<app>/src/routes`. */
+  readonly routes?: string;
 }
 
 /** Inputs of `simplix cycles` and `simplix meta-removals`, relative to the project root. */

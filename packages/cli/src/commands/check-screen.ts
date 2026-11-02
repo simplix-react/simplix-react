@@ -12,7 +12,9 @@ import {
   type ScreenFacts,
   type ScreenProblem,
 } from "../checks/screen-check.js";
+import { designProblems } from "../checks/design-source.js";
 import { loadConfig } from "../config/config-loader.js";
+import { appFor, templatesFor } from "../utils/app-config.js";
 import { reportConfigError } from "../config/report-config-error.js";
 import type { MetaScaffoldSource } from "../meta/scaffold-source.js";
 import { loadMetaHolders, loadMetaScaffoldSource } from "../meta/scaffold-source.js";
@@ -50,6 +52,16 @@ export function screenDirectories(rootDir: string): Map<string, string[]> {
   const modules = join(rootDir, "modules");
   if (existsSync(modules)) walk(modules, 0);
   return out;
+}
+
+/**
+ * The group of the module a screen directory sits in: `admin` for
+ * `modules/admin/user/src/widgets/user`, undefined for an ungrouped `modules/user/src/widgets/user`.
+ */
+export function moduleGroupOf(rootDir: string, screenDir: string): string | undefined {
+  const parts = relative(join(rootDir, "modules"), screenDir).split(/[\\/]/);
+  const src = parts.indexOf("src");
+  return src === 2 ? parts[0] : undefined;
 }
 
 /** What SimpliX Meta settles for an entity, in the terms the checks read. */
@@ -122,10 +134,12 @@ export async function checkScreen(rootDir: string, entity: string, directories: 
     }
   }
   const config = await loadConfig(rootDir);
-  const storiesDir = config.templates?.storiesDir;
+  // The frame sits in the story directory of the app the screen's module group belongs to.
+  const settings = templatesFor(config, appFor(config, { moduleGroup: directories[0] ? moduleGroupOf(rootDir, directories[0]) : undefined }));
+  const storiesDir = settings.storiesDir;
   if (storiesDir) {
     const kebab = kebabEntity(entity);
-    const storyPath = join(rootDir, storiesDir, storyFileFor(config.templates?.story, kebab, `${kebab}.stories.tsx`));
+    const storyPath = join(rootDir, storiesDir, storyFileFor(settings.story, kebab, `${kebab}.stories.tsx`));
     const text = read(storyPath);
     if (text !== undefined) problems.push(...flatKeyProblems(relative(rootDir, storyPath), text, facts));
   }
@@ -167,6 +181,24 @@ export async function runScreenCheck(
   return { judged, problems };
 }
 
+/**
+ * Judges every app that declares a design source, prints each finding as an error and sets the
+ * exit code when there is one. Prints nothing for a project whose apps declare none.
+ *
+ * @param command the command the summary line is printed under
+ * @param summary whether a passing run prints its summary line
+ */
+export async function runDesignCheck(rootDir: string, command: string, summary = true): Promise<string[]> {
+  const { apps, routes, problems } = await designProblems(rootDir, await loadConfig(rootDir));
+  if (apps.length === 0) return [];
+  for (const one of problems) log.error(one);
+  if (problems.length > 0) process.exitCode = 1;
+  if (summary || problems.length > 0) {
+    console.log(`${command} design: ${routes} routed screen(s) of ${apps.join(", ")}, ${problems.length} without their design`);
+  }
+  return problems;
+}
+
 interface CheckScreenFlags {
   root?: string;
 }
@@ -175,7 +207,8 @@ export const checkScreenCommand = new Command("check-screen")
   .description(
     "Judge the generated screens' files against the committed SimpliX Meta: the form carries and marks what the create body " +
       "requires (a required list of records is named by the form), long text follows its length, a reference is drawn by the name field its entity declares, and a frame's sample " +
-      "rows nest it. Exits 1 on an error. Without an entity, every screen read from Meta is judged.",
+      "rows nest it. Exits 1 on an error. Without an entity, every screen read from Meta is judged, and every routed screen of an app " +
+      "that declares apps.<app>.design must have its entry or row in that design source.",
   )
   .argument("[entity...]", "Entities in any case (emailLog, email-log); default: every screen under modules/")
   .option("--root <dir>", "Project root (default: discovered from the working directory)")
@@ -183,5 +216,7 @@ export const checkScreenCommand = new Command("check-screen")
     reportConfigError(async (entities: string[], flags: CheckScreenFlags) => {
       const rootDir = flags.root ?? (await findProjectRoot(process.cwd()));
       await runScreenCheck(rootDir, entities.map(kebabEntity));
+      // The design gate judges the apps' routes, so it runs on a whole-project check only.
+      if (entities.length === 0) await runDesignCheck(rootDir, "check-screen");
     }),
   );
