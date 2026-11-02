@@ -91,9 +91,25 @@ describe("CrudList view mode", () => {
     expect(cards!.querySelectorAll("[data-testid^='list-row-']").length).toBe(items.length);
   });
 
+  it("marks the list view as a grid only in grid view, so a design can box the grid's cards and rule the stacked ones", () => {
+    const view = () => document.querySelector("[data-slot='crud-list-view']") as HTMLElement | null;
+    const { unmount } = render(<Harness defaultViewMode="grid" />);
+    expect(view()?.getAttribute("data-grid")).toBe("true");
+    unmount();
+    // The responsive fallback stacks the same cards in one column and is not the grid.
+    width.value = 300;
+    render(<Harness cardBreakpoint={500} />);
+    expect(grid()).toBeNull();
+    expect(view()?.getAttribute("data-grid")).toBe("false");
+  });
+
+  it("collapses columns no card reaches, so a few cards share the whole row", () => {
+    expect(CARD_GRID_TEMPLATE).not.toContain("auto-fill");
+  });
+
   it("draws the fit grid from the card minimum width token, falling back to a stated default", () => {
     expect(CARD_GRID_TEMPLATE).toContain("minmax(min(100%, var(--card-min-width, 20rem)), 1fr)");
-    expect(CARD_GRID_TEMPLATE.startsWith("repeat(auto-fill,")).toBe(true);
+    expect(CARD_GRID_TEMPLATE.startsWith("repeat(auto-fit,")).toBe(true);
   });
 
   it("offers no toggle when grid is only the default, so the default is the one view", () => {

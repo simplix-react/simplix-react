@@ -4795,7 +4795,7 @@
     @apply data-[state=closed]:duration-[var(--dur-base)];
   }
   :where([data-slot="crud-card"])[data-s-crud-card] {
-    @apply hover:shadow-md hover:bg-card hover:border-[var(--border-strong)] hover:shadow-[var(--shadow-2)] hover:-translate-y-px;
+    @apply hover:shadow-md hover:bg-card hover:border-[var(--border-strong)] focus-within:border-[var(--border-strong)] hover:shadow-[var(--shadow-2)] hover:-translate-y-px;
   }
   :where([data-slot="crud-select-checkbox"])[data-s-crud-select-checkbox] {
     @apply hover:border-[var(--muted-2)] active:scale-[0.98] checked:border-primary checked:bg-primary checked:bg-[url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2016'%20fill='none'%20stroke='white'%20stroke-width='2.2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M4.2%208.3l2.5%202.5L11.8%205.6'/%3E%3C/svg%3E")] indeterminate:border-primary indeterminate:bg-primary indeterminate:bg-[url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2016'%20fill='none'%20stroke='white'%20stroke-width='2.2'%20stroke-linecap='round'%3E%3Cpath%20d='M4.5%208h7'/%3E%3C/svg%3E")];

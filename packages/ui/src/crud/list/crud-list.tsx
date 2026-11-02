@@ -166,9 +166,10 @@ function EmptyReasonCard({ reason, bordered = true }: { reason: Exclude<EmptyRea
  * The columns of the card grid: every column that holds a card no narrower than the theme's
  * `--card-min-width`, each taking an equal share of the row. The count follows the list's own width,
  * so a detail panel opening beside the list reflows the cards, and a width under one card's
- * minimum draws one column.
+ * minimum draws one column. Columns no card reaches collapse (`auto-fit`), so fewer cards than
+ * columns still share the whole row instead of leaving it half empty.
  */
-export const CARD_GRID_TEMPLATE = "repeat(auto-fill, minmax(min(100%, var(--card-min-width, 20rem)), 1fr))";
+export const CARD_GRID_TEMPLATE = "repeat(auto-fit, minmax(min(100%, var(--card-min-width, 20rem)), 1fr))";
 
 /** What a declared column is known by in the columns menu and in the widths a reader keeps: its `id`, else its `field`. */
 function columnKey(def: { readonly id?: string; readonly field?: string }): string | undefined {
@@ -1612,7 +1613,7 @@ function ListTable<T>({
     >
       {isCardMode ? (
         <div key="card" className={crudListViewMotion}
-{...slotAttributes(crudListViewStyle, {})}>
+{...slotAttributes(crudListViewStyle, { grid: manualGrid })}>
           <Stack gap="sm">
             {selectable && (
               <Flex align="center" {...partAttributes(crudListSelectAllRowStyle, {})}>

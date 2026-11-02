@@ -102,8 +102,10 @@ export const crudListViewStyle = defineSlotStyle({
   slot: "crud-list-view",
   // A list too narrow for its table draws each row as a card, inset in the list card.
   base: "duration-[var(--dur-base)] [&:not(:has(table))]:p-2.5",
-  variants: {},
-  defaultVariants: {},
+  // A view drawn as the grid of cards. A design or a host that flattens the stacked cards into
+  // ruled rows leaves the grid's cards boxed, and tells the two apart by this attribute.
+  variants: { grid: { true: "", false: "" } },
+  defaultVariants: { grid: false },
 });
 
 /** The message shown in a card list that has no cards. */

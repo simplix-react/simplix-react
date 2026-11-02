@@ -81,7 +81,7 @@ export const listSlots: Record<string, string> = {
     "row-actions-strip-button ruled=true": "border-l-0",
     // A list too narrow for its table draws each row as a card (the proposal's rcard), inset in the list card.
     "crud-list-view": "[&:not(:has(table))]:p-2.5",
-    "crud-card": "rounded-[var(--radius-surface)] border-[var(--border)] bg-card hover:bg-card hover:border-[var(--border-strong)] hover:shadow-[var(--shadow-2)] hover:-translate-y-px transition-[border-color,box-shadow,translate] duration-[var(--dur-fast)] ease-[var(--ease)]",
+    "crud-card": "rounded-[var(--radius-surface)] border-[var(--border)] bg-card hover:bg-card hover:border-[var(--border-strong)] focus-within:border-[var(--border-strong)] hover:shadow-[var(--shadow-2)] hover:-translate-y-px transition-[border-color,box-shadow,translate] duration-[var(--dur-fast)] ease-[var(--ease)]",
     "crud-list-card-header": "border-b-0 px-3 pt-3 pb-1",
     "crud-card-body": "px-3 pb-3 text-(length:--fs-control) leading-(--lh-control)",
     "crud-list-select-all-row": "px-1 pb-1",
