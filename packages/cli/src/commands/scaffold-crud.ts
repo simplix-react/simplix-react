@@ -22,6 +22,7 @@ import {
 } from "../templates/ui/index.js";
 import type { EntityField, ExtractedEntity, OpenAPISnapshot, QueryParam } from "../openapi/types.js";
 import { toEntityName, toKebabCase, toPascalCase } from "../utils/case.js";
+import { appFor, templatesFor, templatesOption } from "../utils/app-config.js";
 import { noteKeptRender, pathExists, readJsonFile, writeFileWithDir, findProjectRoot } from "../utils/fs.js";
 import {
   GENERATED_PAGE_MARKER,
@@ -1604,10 +1605,10 @@ async function updateModuleIndex(moduleDir: string): Promise<void> {
  */
 export async function ensurePageEntrypoints(moduleDir: string, pageKebab: string, componentName: string): Promise<void> {
   const pagesIndexPath = join(moduleDir, "src", "pages", "index.ts");
-  if (!(await pathExists(pagesIndexPath))) {
-    await writeFileWithDir(pagesIndexPath, '// Side-effect: register module translations\nimport "../locales";\n');
-  }
-  const content = await readFile(pagesIndexPath, "utf-8");
+  // The text written is carried on rather than read back, since a run in capture mode writes nothing.
+  let content = '// Side-effect: register module translations\nimport "../locales";\n';
+  if (await pathExists(pagesIndexPath)) content = await readFile(pagesIndexPath, "utf-8");
+  else await writeFileWithDir(pagesIndexPath, content);
   if (!content.includes(`"./${pageKebab}/page"`) && !content.includes(`"./${pageKebab}"`)) {
     const trimmed = content.replace(/^export \{\};\s*$/m, "").trimEnd();
     const line = `export { ${componentName} } from "./${pageKebab}/page";`;
@@ -2881,7 +2882,11 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     const fullCtx = { ...ctx, formFields, formPickers, formPickerImports: pickerImportsOf(formPickers), moduleNamespace, moduleName, entityIcon: "FileTextIcon", hasListDetail, hasI18nFields, i18nFieldPairs, i18nLocales, fixtureRowsJson };
 
     // The project's own templates win where it has written any, for the widgets as for the pages.
-    const projectTemplates = await loadProjectTemplates(rootDir, projectConfig.templates?.from);
+    // A module in a group an app claims is drawn from that app's templates; any other from the top-level ones.
+    const modulePath = moduleDir ? modulePathOf(rootDir, moduleDir) : undefined;
+    const scaffoldApp = appFor(projectConfig, { moduleGroup: modulePath?.includes("/") ? modulePath.split("/")[0] : undefined });
+    const templateSettings = templatesFor(projectConfig, scaffoldApp);
+    const projectTemplates = await loadProjectTemplates(rootDir, templateSettings.from, scaffoldApp, templatesOption(projectConfig, "from", scaffoldApp));
     const files = renderWidgetFiles(ops, hasTree, fullCtx, projectTemplates);
     // The arguments that lay these files down again, recorded after each fingerprint so the
     // generated-state report can re-render them and tell an untouched file from a stale one.
@@ -2938,11 +2943,11 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     // template, rendered with the same context. Tracked like a screen file: rewritten while
     // untouched, kept once customised.
     const storyTemplate = projectTemplates.get(STORY_TEMPLATE);
-    const storiesDir = projectConfig.templates?.storiesDir;
+    const storiesDir = templateSettings.storiesDir;
     if (storyTemplate !== undefined && storiesDir) {
-      const storyPath = resolve(rootDir, storiesDir, storyFileFor(projectConfig.templates?.story, entityKebab, `${entityKebab}.stories.tsx`));
+      const storyPath = resolve(rootDir, storiesDir, storyFileFor(templateSettings.story, entityKebab, `${entityKebab}.stories.tsx`));
       const named = (pattern: string | undefined) => pattern?.replaceAll("{entity}", entityKebab).replaceAll("{Entity}", EntityPascal);
-      const storyCtx = { ...fullCtx, storyId: named(projectConfig.templates?.story?.id), storyTitle: named(projectConfig.templates?.story?.title) ?? `Generated/${EntityPascal}` };
+      const storyCtx = { ...fullCtx, storyId: named(templateSettings.story?.id), storyTitle: named(templateSettings.story?.title) ?? `Generated/${EntityPascal}` };
       const outcome = await writeGenerated(storyPath, renderTemplate(storyTemplate, storyCtx), origin);
       log.info(`${outcome} story ${relative(rootDir, storyPath)}`);
     }
@@ -3009,7 +3014,7 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       const screenFiles = [...held, ...pages.onDisk];
 
       // Dependencies the screen's files import and the module does not yet resolve.
-      const addedDeps = await ensureModuleDeps(moduleDir, packageName, await kitDependency(rootDir, projectConfig.templates?.from), screenFiles);
+      const addedDeps = await ensureModuleDeps(moduleDir, packageName, await kitDependency(rootDir, templateSettings.from), screenFiles);
       if (addedDeps.length > 0) {
         log.info("Added dependencies:");
         for (const dep of addedDeps) {
