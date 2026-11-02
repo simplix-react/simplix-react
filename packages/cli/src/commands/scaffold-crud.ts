@@ -2142,6 +2142,9 @@ const PLACEHOLDER_FIELDS: FieldInfo[] = [
   },
 ];
 
+/** How a generated list can draw its rows: as a table, or as a grid of cards. */
+const LIST_PRESENTATIONS = ["table", "cards"] as const;
+
 export const scaffoldCrudCommand = new Command("scaffold")
   .description("Generate CRUD widgets into an FSD module's widgets/ layer")
   .argument("<entity>", "Entity name (e.g., product, user)")
@@ -2164,6 +2167,9 @@ export const scaffoldCrudCommand = new Command("scaffold")
   .option("--blocks", "Also lay down a page.blocks.tsx departure file beside the page, once, for the author to write")
   .option("--menu-group <key>", "The menu group the screen's entry joins (its key in the menu file), at the end of the group; default: before the menu marker")
   .option("--menu-icon <name>", "The icon the screen's menu entry draws; imported into the menu file when it is not yet")
+  .option("--list-presentation <kind>", `How the list draws its rows, as its design decided it: ${LIST_PRESENTATIONS.join(" or ")} (default table)`)
+  .option("--view-toggle", "Offer the reader a switch between the table and the cards, as the design decided it")
+  .option("--card-title <column>", "The key of the column that titles a card, as the design decided it; default the first column")
   .action(reportConfigError(scaffoldAction));
 
 /** The options `simplix scaffold` takes. */
@@ -2180,6 +2186,38 @@ export interface ScaffoldOptions {
   menuGroup?: string;
   /** The icon the screen's menu entry draws, as its design decided it. */
   menuIcon?: string;
+  /** How the list draws its rows, as its design decided it; the template reads `listCards`. */
+  listPresentation?: string;
+  /** Whether the list offers the reader a switch between the table and the cards. */
+  viewToggle?: boolean;
+  /** The key of the column that titles a card; the first column when absent. */
+  cardTitle?: string;
+}
+
+/**
+ * The scaffold options an origin command records: the module or output the files go to and the
+ * list's design decisions. The menu placement is a one-time write and is not part of the render.
+ *
+ * @param args the tokens of the origin command after `scaffold`, the entity first
+ */
+export function scaffoldOptionsFromOrigin(args: readonly string[]): ScaffoldOptions {
+  const at = (name: string) => (args.indexOf(name) >= 0 ? args[args.indexOf(name) + 1] : undefined);
+  return {
+    module: at("--module"),
+    output: at("--output"),
+    listPresentation: at("--list-presentation"),
+    viewToggle: args.includes("--view-toggle") ? true : undefined,
+    cardTitle: at("--card-title"),
+  };
+}
+
+/** The origin flags that carry the list's design decisions, so a regeneration renders the same list. */
+function listOriginFlags(options: ScaffoldOptions): string {
+  return [
+    options.listPresentation === "cards" ? " --list-presentation cards" : "",
+    options.viewToggle ? " --view-toggle" : "",
+    options.cardTitle ? ` --card-title ${options.cardTitle}` : "",
+  ].join("");
 }
 
 /**
@@ -2210,6 +2248,9 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
   // what makes the argument's case a matter of taste rather than a matter of which half of the
   // output comes out wired.
   const entity = toEntityName(entityArg);
+  if (options.listPresentation !== undefined && !(LIST_PRESENTATIONS as readonly string[]).includes(options.listPresentation)) {
+    throw new Error(`--list-presentation takes ${LIST_PRESENTATIONS.join(" or ")}, not "${options.listPresentation}"`);
+  }
   if (options.native) {
     // Dynamic import keeps the module graph acyclic (scaffold-native reuses
     // the metadata pipeline exported from this file).
@@ -2730,6 +2771,11 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       // The list's search box sends its text as the keyword search, which only a route whose
       // search DTO marks keyword fields accepts; any other route answers it with a parse error.
       hasKeywordSearch: metaSource?.keywordSearch ?? false,
+      // The list's design decisions: cards instead of a table, the table/cards switch, and the
+      // column that titles a card.
+      listCards: options.listPresentation === "cards",
+      viewToggle: options.viewToggle === true,
+      cardTitle: options.cardTitle ?? "",
       listFacets,
       listFacetImports: pickerImportsOf(listFacets),
       filterBarDefs,
@@ -2771,9 +2817,9 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     const files = renderWidgetFiles(ops, hasTree, fullCtx, projectTemplates);
     // The arguments that lay these files down again, recorded after each fingerprint so the
     // generated-state report can re-render them and tell an untouched file from a stale one.
-    const origin = moduleDir
-      ? `scaffold ${entityKebab} --module ${modulePathOf(rootDir, moduleDir)}`
-      : `scaffold ${entityKebab} --output ${relativeOutput}`;
+    const origin =
+      (moduleDir ? `scaffold ${entityKebab} --module ${modulePathOf(rootDir, moduleDir)}` : `scaffold ${entityKebab} --output ${relativeOutput}`) +
+      listOriginFlags(options);
     // A widget is laid down whole; its blocks files are written only when the author asks.
     const widgetBlocks = options.blocks ? renderWidgetBlocks(files, fullCtx, projectTemplates) : {};
 

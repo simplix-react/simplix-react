@@ -349,3 +349,76 @@ describe("the commands run after a scaffold", () => {
     expect(await afterLog()).toBe("x");
   });
 });
+
+describe("the list's design decisions", () => {
+  const LIST_PATH = `${MODULE}/src/widgets/product/list.tsx`;
+  /** A list template that draws the three decisions the way a UI kit's does. */
+  async function useDecisionAwareList(): Promise<void> {
+    await useKitShapedTemplates();
+    await put(
+      ".simplix/templates/list.hbs",
+      [
+        "/**\n * @simplix-generated widget/list\n */",
+        "export function {{EntityPascal}}List() {",
+        "  return (",
+        "    <RecordList",
+        "{{#if listCards}}",
+        '      presentation="cards"',
+        "{{/if}}",
+        "{{#if viewToggle}}",
+        "      viewToggle",
+        "{{/if}}",
+        "{{#if cardTitle}}",
+        '      cardTitle="{{cardTitle}}"',
+        "{{/if}}",
+        "    />",
+        "  );",
+        "}",
+        "",
+      ].join("\n"),
+    );
+  }
+  const decided = () => withSilentLog(() => runScaffold("product", { module: "mymod", quiet: true, listPresentation: "cards", viewToggle: true, cardTitle: "name" }));
+  const listText = async () => (await snapshot()).get(LIST_PATH) ?? "";
+
+  it("hands the presentation, the switch and the card title to the template, and records them in the origin", async () => {
+    await useDecisionAwareList();
+    await decided();
+    const text = await listText();
+    expect(text).toContain('presentation="cards"');
+    expect(text).toMatch(/\n\s+viewToggle\n/);
+    expect(text).toContain('cardTitle="name"');
+    expect(text).toMatch(/@simplix-render [0-9a-f]{12} scaffold product --module mymod --list-presentation cards --view-toggle --card-title name/);
+  });
+
+  it("draws a plain table list, with a plain origin, when nothing is decided", async () => {
+    await useDecisionAwareList();
+    await scaffold();
+    const text = await listText();
+    expect(text).not.toContain("presentation=");
+    expect(text).not.toContain("viewToggle");
+    expect(text).not.toContain("cardTitle");
+    expect(text).toMatch(/@simplix-render [0-9a-f]{12} scaffold product --module mymod\n/);
+  });
+
+  it("renders the same list again from its origin, so a regeneration keeps the decisions", async () => {
+    await useDecisionAwareList();
+    await decided();
+    const first = await listText();
+    await withSilentLog(() => regenerateAll(root));
+    expect(await listText()).toBe(first);
+  });
+
+  it("refuses a presentation that is neither table nor cards before writing anything", async () => {
+    await useDecisionAwareList();
+    const before = await snapshot();
+    await expect(withSilentLog(() => runScaffold("product", { module: "mymod", quiet: true, listPresentation: "grid" }))).rejects.toThrow(/takes table or cards, not "grid"/);
+    expect(await snapshot()).toEqual(before);
+  });
+
+  it("accepts the three flags on the command", async () => {
+    await useDecisionAwareList();
+    await withSilentLog(() => scaffoldCrudCommand.parseAsync(["node", "simplix", "product", "--module", "mymod", "--list-presentation", "cards", "--view-toggle", "--card-title", "name"]));
+    expect(await listText()).toContain('cardTitle="name"');
+  });
+});

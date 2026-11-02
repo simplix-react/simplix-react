@@ -82,13 +82,9 @@ export async function renderOriginNow(origin: readonly string[]): Promise<Origin
 async function captureOrigin(origin: readonly string[]): Promise<Map<string, string>> {
   const [command, ...args] = origin;
   if (command === "scaffold") {
-    const { runScaffold } = await import("./scaffold-crud.js");
+    const { runScaffold, scaffoldOptionsFromOrigin } = await import("./scaffold-crud.js");
     const entity = args[0];
-    const flag = (name: string) => {
-      const at = args.indexOf(name);
-      return at >= 0 ? args[at + 1] : undefined;
-    };
-    return withSilentLog(() => captureWrites(() => runScaffold(entity, { module: flag("--module"), output: flag("--output"), quiet: true })));
+    return withSilentLog(() => captureWrites(() => runScaffold(entity, { ...scaffoldOptionsFromOrigin(args), quiet: true })));
   }
   if (command === "add-page") {
     const { addPageArgs, runAddPage } = await import("./add-page.js");
@@ -208,9 +204,8 @@ async function regenerateOrigins(rootDir: string): Promise<{ origins: string[]; 
     const [command, ...args] = origin.split(/\s+/);
     log.info(`simplix ${origin}`);
     if (command === "scaffold") {
-      const { runScaffold } = await import("./scaffold-crud.js");
-      const at = (name: string) => (args.indexOf(name) >= 0 ? args[args.indexOf(name) + 1] : undefined);
-      await runScaffold(args[0], { module: at("--module"), output: at("--output") });
+      const { runScaffold, scaffoldOptionsFromOrigin } = await import("./scaffold-crud.js");
+      await runScaffold(args[0], scaffoldOptionsFromOrigin(args));
     } else if (command === "add-page") {
       const { addPageArgs, runAddPage } = await import("./add-page.js");
       const { kind, name, flags } = addPageArgs(args);
