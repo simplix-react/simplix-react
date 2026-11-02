@@ -130,11 +130,34 @@ simplix scaffold product --module catalog
 Every screen, new or existing, is made in this order.
 
 1. **Template on the kit.** The UI kit ships `.hbs` templates next to the parts they wire: list frame, detail presentations, record head, empty and loading states, action dialogs. A part and its template change in one commit.
-2. **Scaffold.** `simplix scaffold <entity> --module <name>` renders, for each template name, the first template it finds: the project's `.simplix/templates/<name>.hbs`, then the kit's, then the CLI's bundled one. Keep the project folder for what is specific to the project, ideally empty. The kit is found from `templates.from` in `simplix.config.ts`, or from the one root dependency whose `package.json` declares `simplix.templates`. A page that is not CRUD is generated with `simplix add-page <record|dashboard|static|error|app-shell> <name> --module <m>` (or `--app <a>`); `app-shell` has no bundled template, so the kit or the project supplies one. Each widget has a `<widget>.blocks` file that is written once and never rewritten, and the generated widget beside it is rewritten on every run while it is untouched.
+2. **Scaffold.** `simplix scaffold <entity> --module <name>` renders, for each template name, the first template it finds: the project's `.simplix/templates/<name>.hbs`, then the kit's, then the CLI's bundled one. Keep the project folder for what is specific to the project, ideally empty. The kit is found from `templates.from` in `simplix.config.ts`, or from the one root dependency whose `package.json` declares `simplix.templates`; an app with its own kit is stated under `apps` (below). A page that is not CRUD is generated with `simplix add-page <record|dashboard|static|error|app-shell> <name> --module <m>` (or `--app <a>`); `app-shell` has no bundled template, so the kit or the project supplies one. Each widget has a `<widget>.blocks` file that is written once and never rewritten, and the generated widget beside it is rewritten on every run while it is untouched.
 3. **Customise to the design reference.** Change the scaffolded screen to match its Storybook frame. Screen-only decisions go in the block files the templates leave (`page.blocks.tsx` and the like); a generated file may be customised too. Every render the CLI writes is kept as that file's merge base in `.simplix/generated/<path>` (committed, so a fresh clone merges the same way), and a later scaffold or `simplix generated --all` merges the template change into the edited file three-way: base (the last render), ours (the edited file), theirs (the new render). A clean merge is written; a conflict is not, and is reported with its hunks until it is resolved by hand or written with conflict markers by `simplix generated --all --write-conflicts`.
 4. **Bring the reference into agreement.** Update the Storybook frame so it draws what the screen now draws, and generate a frame from the kit's Storybook template for a screen that has none. A generated story may be customised; it is merged like a screen file. Compare the two by rendered metrics, never by eye.
 
 An existing screen is regenerated, and its old files are read only as the list of behaviours (data, filters, columns, actions, confirmations, permissions, copy) to re-apply in the blocks, then deleted. Where the CLI has no page kind or no overridable template for a screen, add one to the CLI generically before building the screen.
+
+### Apps drawn by different kits
+
+A workspace whose apps are drawn by different kits, or designed in different references, states each app under `apps` in `simplix.config.ts`:
+
+```ts
+apps: {
+  "<admin-app>": {
+    design: { source: "screen-design", manifest: "<board>/screen-design.json" },
+  },
+  "<site-app>": {
+    moduleGroups: ["<site-group>"],
+    templates: { from: "@<scope>/site-kit", storiesDir: null },
+    design: { source: "story-manifest", manifest: "<site-app>-design-manifest.json" },
+  },
+},
+```
+
+- A page is drawn for the app `--app` names, or for the app whose `moduleGroups` holds the group of `--module <group>/<name>` (`scaffold` and `add-page` alike). A page no app claims reads the top-level `templates`.
+- Each key of an app's `templates` replaces the top-level key; a key left out falls back to it. `storiesDir: null` writes no stories for the app.
+- Templates are read name by name from `.simplix/templates/<app>/`, then `.simplix/templates/`, then the app's kit, then the CLI's bundled template.
+- `design` is the gate: `simplix generated` and `simplix check-screen` (with no entity) fail on a routed screen of the app with no entry (`screen-design`, `{ "screens": [{ "app", "route" }] }`) or no row naming a story (`story-manifest`, `{ "rows": [{ "route", "stories": { "<width>": ["<story id>"] } }], "exempt": [{ "route", "reason" }] }`). A route is the id its `createFileRoute("...")` call names (`login_.complete.tsx` is `"/login_/complete"`). An app with no `design` is not gated.
+- `simplix add-page ... --dry-run` prints the files a page would write, with their content, and writes nothing: the way to see which layer an app's page is drawn from before laying it down.
 
 ### The generated-state report
 

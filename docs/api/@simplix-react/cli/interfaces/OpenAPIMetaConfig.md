@@ -6,7 +6,7 @@
 
 # Interface: OpenAPIMetaConfig
 
-Defined in: [config/types.ts:126](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L126)
+Defined in: [config/types.ts:372](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L372)
 
 DTO metadata generation for one spec.
 
@@ -22,9 +22,21 @@ constraints, search operators, `@PreAuthorize` and labeled enums. It is generate
 
 > `optional` **export**: `string`[]
 
-Defined in: [config/types.ts:135](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L135)
+Defined in: [config/types.ts:381](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L381)
 
 Domains whose barrel exports the meta output instead of the orval output.
+
+***
+
+### ignoreTags?
+
+> `optional` **ignoreTags**: `string`[]
+
+Defined in: [config/types.ts:387](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L387)
+
+Tags no domain claims on purpose (a development controller, an API browser), as glob patterns
+over the dot-separated tag: `*` matches within one segment, `**` across segments. A tag matched
+here is neither warned about nor refused by `--strict`.
 
 ***
 
@@ -32,7 +44,7 @@ Domains whose barrel exports the meta output instead of the orval output.
 
 > `optional` **snapshot**: `string`
 
-Defined in: [config/types.ts:133](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L133)
+Defined in: [config/types.ts:379](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L379)
 
 Where a fetched SimpliX Meta is written for offline regeneration.
 
@@ -42,7 +54,7 @@ Where a fetched SimpliX Meta is written for offline regeneration.
 
 > `optional` **source**: `string`
 
-Defined in: [config/types.ts:131](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L131)
+Defined in: [config/types.ts:377](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L377)
 
 Endpoint URL or snapshot path. Omit it and the source is built the way the i18n download
 already builds its own: the origin of `spec` plus the profile's `metaEndpoint`.

@@ -8,6 +8,6 @@
 
 > **CrudMap** = `Record`\<`string`, [`CrudEntityConfig`](../interfaces/CrudEntityConfig.md)\>
 
-Defined in: [config/types.ts:208](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L208)
+Defined in: [config/types.ts:460](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L460)
 
 Entity name → CRUD config mapping for a domain package

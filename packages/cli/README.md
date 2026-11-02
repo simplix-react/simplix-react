@@ -711,8 +711,58 @@ export default {
 | `openapi.meta.source` | SimpliX Meta endpoint URL or snapshot path | The spec's origin plus the profile's `metaEndpoint` |
 | `openapi.meta.snapshot` | Where the fetched SimpliX Meta is committed, for `--offline` and for the change gate | `undefined` (the meta half runs every time) |
 | `openapi.meta.export` | Domains whose barrel exports `src/generated-meta/` instead of the Orval output | `[]` |
+| `templates.from` | UI kit package or template directory pages and widgets are drawn from | The one root dependency declaring `simplix.templates` |
+| `templates.storiesDir` | Directory generated design-reference stories are written to | `undefined` (no stories) |
+| `templates.story` | Story id and title patterns, and the story file per scaffold key | Storybook's title-derived id under `Generated/{Entity}` |
+| `apps.<app>.moduleGroups` | Module groups whose pages are drawn for this app | `[]` |
+| `apps.<app>.templates` | The app's `from`, `storiesDir` (`null` writes none) and `story`, each over the top-level key | The top-level `templates` |
+| `apps.<app>.design` | The design source every routed screen of the app is checked against | `undefined` (not gated) |
 
 The config file is loaded using [jiti](https://github.com/unjs/jiti), so TypeScript syntax is supported without compilation.
+
+### Apps drawn by different kits
+
+A workspace can hold apps drawn by different UI kits and designed in different references. You state each app's own settings under `apps`; a page reads them when `--app <name>` names the app, or when `--module <group>/<name>` names a group the app lists in `moduleGroups`.
+
+```ts
+// simplix.config.ts
+import { defineConfig } from "@simplix-react/cli";
+
+export default defineConfig({
+  modules: { groups: ["admin", "site", "shared"] },
+  templates: { from: "@acme-kits/console-clarity", storiesDir: "../board/screens" },
+  apps: {
+    "acme-admin": {
+      design: { source: "screen-design", manifest: "../board/screen-design.json" },
+    },
+    "acme-site": {
+      moduleGroups: ["site"],
+      templates: { from: "@acme-kits/site-clarity", storiesDir: null },
+      design: { source: "story-manifest", manifest: "site-design-manifest.json" },
+    },
+  },
+});
+```
+
+Templates are read name by name in this order:
+
+| Order | Source |
+| --- | --- |
+| 1 | `.simplix/templates/<app>/<name>.hbs` |
+| 2 | `.simplix/templates/<name>.hbs` |
+| 3 | The kit `apps.<app>.templates.from` names, else `templates.from` |
+| 4 | The CLI's bundled template |
+
+`apps.<app>.design` gates the app's routed screens. `simplix generated` and `simplix check-screen` (run without an entity) exit 1 on a TanStack file route of the app with no design:
+
+| `source` | Manifest | A route is designed by |
+| --- | --- | --- |
+| `screen-design` | `{ "screens": [{ "app": "<app>", "route": "/path", ... }] }` | an entry with the app's name and the route |
+| `story-manifest` | `{ "rows": [{ "route": "/path", "stories": { "<width>": ["<story id>"] } }], "exempt": [{ "route": "/path", "reason": "..." }] }` | a row naming at least one story, or an exemption with its reason |
+
+The route is the id the file's `createFileRoute("...")` call names, so `login_.complete.tsx` is `"/login_/complete"`. The routes are read from `apps/<app>/src/routes` unless `design.routes` names another directory.
+
+`simplix add-page <kind> <name> --app <app> --dry-run` prints every file the page would write, with its content, and writes nothing.
 
 ### defineConfig
 

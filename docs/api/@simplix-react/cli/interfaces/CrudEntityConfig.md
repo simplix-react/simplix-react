@@ -6,7 +6,7 @@
 
 # Interface: CrudEntityConfig
 
-Defined in: [config/types.ts:190](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L190)
+Defined in: [config/types.ts:442](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L442)
 
 Per-entity CRUD role → operationId mapping
 
@@ -22,7 +22,7 @@ Extended roles (e.g. order, activate, archive)
 
 > `optional` **batchDelete**: `string`
 
-Defined in: [config/types.ts:199](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L199)
+Defined in: [config/types.ts:451](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L451)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [config/types.ts:199](https://github.com/simplix-react/simplix-react
 
 > `optional` **batchUpdate**: `string`
 
-Defined in: [config/types.ts:198](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L198)
+Defined in: [config/types.ts:450](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L450)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [config/types.ts:198](https://github.com/simplix-react/simplix-react
 
 > `optional` **create**: `string`
 
-Defined in: [config/types.ts:194](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L194)
+Defined in: [config/types.ts:446](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L446)
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: [config/types.ts:194](https://github.com/simplix-react/simplix-react
 
 > `optional` **delete**: `string`
 
-Defined in: [config/types.ts:196](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L196)
+Defined in: [config/types.ts:448](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L448)
 
 ***
 
@@ -54,7 +54,7 @@ Defined in: [config/types.ts:196](https://github.com/simplix-react/simplix-react
 
 > `optional` **get**: `string`
 
-Defined in: [config/types.ts:192](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L192)
+Defined in: [config/types.ts:444](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L444)
 
 ***
 
@@ -62,7 +62,7 @@ Defined in: [config/types.ts:192](https://github.com/simplix-react/simplix-react
 
 > `optional` **getForEdit**: `string`
 
-Defined in: [config/types.ts:193](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L193)
+Defined in: [config/types.ts:445](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L445)
 
 ***
 
@@ -70,7 +70,7 @@ Defined in: [config/types.ts:193](https://github.com/simplix-react/simplix-react
 
 > `optional` **list**: `string`
 
-Defined in: [config/types.ts:191](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L191)
+Defined in: [config/types.ts:443](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L443)
 
 ***
 
@@ -78,7 +78,7 @@ Defined in: [config/types.ts:191](https://github.com/simplix-react/simplix-react
 
 > `optional` **multiUpdate**: `string`
 
-Defined in: [config/types.ts:197](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L197)
+Defined in: [config/types.ts:449](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L449)
 
 ***
 
@@ -86,7 +86,7 @@ Defined in: [config/types.ts:197](https://github.com/simplix-react/simplix-react
 
 > `optional` **search**: `string`
 
-Defined in: [config/types.ts:200](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L200)
+Defined in: [config/types.ts:452](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L452)
 
 ***
 
@@ -94,7 +94,7 @@ Defined in: [config/types.ts:200](https://github.com/simplix-react/simplix-react
 
 > `optional` **subtree**: `string`
 
-Defined in: [config/types.ts:202](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L202)
+Defined in: [config/types.ts:454](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L454)
 
 ***
 
@@ -102,7 +102,7 @@ Defined in: [config/types.ts:202](https://github.com/simplix-react/simplix-react
 
 > `optional` **tree**: `string`
 
-Defined in: [config/types.ts:201](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L201)
+Defined in: [config/types.ts:453](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L453)
 
 ***
 
@@ -110,4 +110,4 @@ Defined in: [config/types.ts:201](https://github.com/simplix-react/simplix-react
 
 > `optional` **update**: `string`
 
-Defined in: [config/types.ts:195](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L195)
+Defined in: [config/types.ts:447](https://github.com/simplix-react/simplix-react/blob/main/config/types.ts#L447)
