@@ -15,4 +15,5 @@ export { FilterActions, type FilterActionsProps } from "./filter-actions";
 export { FilterBar, type FilterBarProps, type FilterDef, type TextFilterDef, type TextFilterOptionDef, type NumberFilterDef, type FacetedFilterDef, type FacetedFilterOptionDef, type ToggleFilterDef, type DateRangeFilterDef, type CountryFilterDef, type TimezoneFilterDef } from "./filter-bar";
 export { ChipFilter, chipFilterValues, type ChipFilterProps, type ChipFilterOption } from "./chip-filter";
 export { ChoiceChips, type ChoiceChipsProps, type ChoiceChipOption } from "./choice-chips";
+export { ViewModeToggle } from "./view-mode-toggle";
 export { useFilterBarState, type UseFilterBarStateOptions } from "./use-filter-bar-state";

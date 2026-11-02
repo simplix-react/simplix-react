@@ -13,7 +13,7 @@ import { parseDate } from "../../utils/parse-date";
 import { decodeInstant, serializeInstant } from "../../utils/rfc3339-date";
 import { useCrudListColumns } from "../shared/column-context";
 import { ListTotalBadge } from "../shared/list-total-badge";
-import { CheckIcon, ColumnsIcon, EyeIcon, FunnelIcon, FunnelXIcon, LayoutGridIcon, RowsIcon, SpinnerIcon, XIcon } from "../shared/icons";
+import { CheckIcon, ColumnsIcon, EyeIcon, FunnelIcon, FunnelXIcon, SpinnerIcon, XIcon } from "../shared/icons";
 import { CountryFormField } from "./country-form-field";
 import { FieldClearButton } from "./field-clear-button";
 import { operatorConfig } from "./filter-icons";
@@ -48,6 +48,7 @@ import {
 } from "./filter-bar.style";
 import { crudFilterOptionCheckStyle, crudFilterOptionIconStyle } from "./filter-parts.style";
 import { TimezoneFormField } from "./timezone-form-field";
+import { ViewModeToggle } from "./view-mode-toggle";
 import { SearchOperator } from "./filter-types";
 import { makeFilterKey } from "./filter-utils";
 import type { CrudListFilters } from "../list/use-crud-list";
@@ -499,35 +500,7 @@ export function FilterBar({ filters, state, leading, trailing, maxBadges, onPrev
         >
           {showCount && <ListTotalBadge count={countUnknown ? undefined : count} />}
           {leading}
-          {showViewToggle && (
-            <div
-              role="group"
-              aria-label={t("filter.label")}
-              className="box-border inline-flex h-8 items-center"
-              {...slotAttributes(crudFilterBarSegmentStyle, { spaced: false })}
-            >
-              {([
-                { mode: "list", Icon: RowsIcon, label: t("list.viewList") },
-                { mode: "grid", Icon: LayoutGridIcon, label: t("list.viewGrid") },
-              ] as const).map(({ mode, Icon, label }) => {
-                const active = (columnCtx?.viewMode ?? "list") === mode;
-                return (
-                  <button
-                    key={mode}
-                    type="button"
-                    aria-pressed={active}
-                    aria-label={label}
-                    title={label}
-                    onClick={() => columnCtx?.setViewMode(mode)}
-                    className="inline-grid h-full w-7 place-items-center"
-                    {...slotAttributes(crudFilterBarViewButtonStyle, { active })}
-                  >
-                    <Icon className="h-3.5 w-3.5" />
-                  </button>
-                );
-              })}
-            </div>
-          )}
+          {showViewToggle && <ViewModeToggle />}
           {onPreview && (
             <Button variant="outline" size="sm" data-preview onClick={onPreview}>
               <EyeIcon className="h-3.5 w-3.5" />

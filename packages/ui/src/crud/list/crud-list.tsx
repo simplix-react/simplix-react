@@ -115,6 +115,7 @@ import {
   TextFilter,
   ToggleFilter,
   UnifiedTextFilter,
+  ViewModeToggle,
 } from "../filters";
 import { closestCenter, DndContext } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -2216,6 +2217,7 @@ export const CrudList = Object.assign(ListRoot, {
   ChipFilter,
   FilterActions,
   FilterBar,
+  ViewToggle: ViewModeToggle,
   // Core components
   Table: ListTable,
   TableCard: ListTableCard,

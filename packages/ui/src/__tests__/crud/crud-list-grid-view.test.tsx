@@ -45,13 +45,15 @@ interface HarnessProps extends Pick<ListProps, "defaultViewMode" | "onViewModeCh
   isLoading?: boolean;
   data?: Item[];
   groupBy?: boolean;
+  /** Draws the toggle on its own instead of through the filter bar. */
+  standaloneToggle?: boolean;
 }
 
-function Harness({ defaultViewMode, onViewModeChange, gridView, withCards = true, cardBreakpoint, isLoading, data = items, groupBy }: HarnessProps) {
+function Harness({ defaultViewMode, onViewModeChange, gridView, withCards = true, cardBreakpoint, isLoading, data = items, groupBy, standaloneToggle }: HarnessProps) {
   const state = useFilterBarState({});
   return (
     <CrudList defaultViewMode={defaultViewMode} onViewModeChange={onViewModeChange}>
-      <FilterBar filters={[]} state={state} />
+      {standaloneToggle ? <CrudList.ViewToggle /> : <FilterBar filters={[]} state={state} />}
       <CrudList.Table<Item>
         data={data}
         isLoading={isLoading}
@@ -124,6 +126,19 @@ describe("CrudList view mode", () => {
     expect(document.querySelector("table")).not.toBeNull();
     fireEvent.click(toggle()!);
     expect(onViewModeChange).toHaveBeenLastCalledWith("grid");
+  });
+
+  it("draws the toggle on its own, outside the filter bar, and it switches the view", () => {
+    render(<Harness gridView standaloneToggle />);
+    expect(screen.queryByLabelText("filter.label")).toBeNull();
+    expect(screen.getByLabelText("list.viewMode")).not.toBeNull();
+    fireEvent.click(toggle()!);
+    expect(grid()).not.toBeNull();
+  });
+
+  it("draws no standalone toggle for a table without gridView", () => {
+    render(<Harness standaloneToggle />);
+    expect(screen.queryByLabelText("list.viewMode")).toBeNull();
   });
 
   it("keeps the table when the table declares no card slots", () => {

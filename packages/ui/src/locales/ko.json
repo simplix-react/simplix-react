@@ -56,6 +56,7 @@
     "totalCount": "전체 {{count, number}}건",
     "totalCountUnknown": "전체 —건",
     "rows": "페이지당",
+    "viewMode": "보기 방식",
     "viewList": "목록",
     "viewGrid": "그리드",
     "preview": "미리보기",
