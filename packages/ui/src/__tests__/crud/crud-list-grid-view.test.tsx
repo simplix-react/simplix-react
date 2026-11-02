@@ -103,13 +103,13 @@ describe("CrudList view mode", () => {
     expect(view()?.getAttribute("data-grid")).toBe("false");
   });
 
-  it("collapses columns no card reaches, so a few cards share the whole row", () => {
-    expect(CARD_GRID_TEMPLATE).not.toContain("auto-fill");
+  it("keeps the columns no card reaches, so every card has the width the list's width decides", () => {
+    expect(CARD_GRID_TEMPLATE).not.toContain("auto-fit");
   });
 
   it("draws the fit grid from the card minimum width token, falling back to a stated default", () => {
     expect(CARD_GRID_TEMPLATE).toContain("minmax(min(100%, var(--card-min-width, 20rem)), 1fr)");
-    expect(CARD_GRID_TEMPLATE.startsWith("repeat(auto-fit,")).toBe(true);
+    expect(CARD_GRID_TEMPLATE.startsWith("repeat(auto-fill,")).toBe(true);
   });
 
   it("offers no toggle when grid is only the default, so the default is the one view", () => {
