@@ -178,13 +178,25 @@ export function ensureIconImport(text: string, icon: string, anchor: string | un
   const home = anchor === undefined ? undefined : imports.find((match) => names(match).includes(anchor));
   if (!home || home.index === undefined) throw new Error(`The menu file imports no icon "${icon}" and no import of "${anchor ?? "the configured icon"}" to add it to: import it by hand`);
   const list = home[1] ?? "";
-  const multiline = list.includes("\n");
   const at = home.index + home[0].indexOf("{") + 1;
-  const items = list.split(",").map((one) => one.trim()).filter(Boolean);
-  const sorted = [...items, icon].sort((a, b) => a.replace(/^type\s+/, "").toLowerCase().localeCompare(b.replace(/^type\s+/, "").toLowerCase()));
-  const indent = multiline ? (/\n([ \t]*)\S/.exec(list)?.[1] ?? "  ") : "";
-  const rendered = multiline ? `\n${sorted.map((one) => `${indent}${one},`).join("\n")}\n` : ` ${sorted.join(", ")} `;
-  return text.slice(0, at) + rendered + text.slice(at + list.length);
+  const key = (item: string) => item.replace(/^type\s+/, "").toLowerCase();
+  // The name goes before the first item that sorts after it, so every other line stays where it is.
+  const place = (items: readonly string[]) => {
+    const after = items.findIndex((item) => key(item) > key(icon));
+    return after < 0 ? items.length : after;
+  };
+  if (!list.includes("\n")) {
+    const items = list.split(",").map((one) => one.trim()).filter(Boolean);
+    items.splice(place(items), 0, icon);
+    return `${text.slice(0, at)} ${items.join(", ")} ${text.slice(at + list.length)}`;
+  }
+  const lines = list.split("\n");
+  const itemLines = lines.map((line, index) => ({ line, index })).filter(({ line }) => line.trim() !== "");
+  const indent = /^[ \t]*/.exec(itemLines[0]?.line ?? "")?.[0] ?? "  ";
+  const target = place(itemLines.map(({ line }) => line.trim().replace(/,$/, "")));
+  const insertAt = target < itemLines.length ? itemLines[target].index : (itemLines[itemLines.length - 1]?.index ?? 0) + 1;
+  lines.splice(insertAt, 0, `${indent}${icon},`);
+  return text.slice(0, at) + lines.join("\n") + text.slice(at + list.length);
 }
 
 /** {@link placeMenuEntry}, returning only the new text. */

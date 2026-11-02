@@ -138,6 +138,12 @@ describe("an icon the menu file draws", () => {
     const out = ensureIconImport(file, "MailIcon", "FileTextIcon");
     expect(out).toContain("  FileTextIcon,\n  type LucideIcon,\n  MailIcon,\n}");
   });
+  it("adds one line to an import that is not in order and moves no other", () => {
+    const loose = 'import {\n  Zeta,\n  Beta,\n  FileTextIcon,\n  Alpha,\n} from "lucide-react";\n';
+    const out = ensureIconImport(loose, "Gamma", "FileTextIcon");
+    expect(out.split("\n").filter((line) => line.trim() !== "  Gamma,".trim())).toEqual(loose.split("\n"));
+    expect(out.split("\n")).toHaveLength(loose.split("\n").length + 1);
+  });
   it("is left alone when an import already brings it in", () => {
     expect(ensureIconImport(file, "ActivityIcon", "FileTextIcon")).toBe(file);
   });
