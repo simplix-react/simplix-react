@@ -41,7 +41,13 @@ export type ActionVariant = "outline" | "ghost" | "icon";
 export interface RowActionDef<T> {
   type: ActionType;
   onClick: (row: T) => void;
-  label?: string;
+  /**
+   * The action's name. A function reads it from the row, so one toggle verb says what it will do
+   * to this row (Enable or Disable, Suspend or Reinstate) instead of the list carrying two
+   * actions of which one is always disabled. Pair it with an `icon` function so the glyph follows.
+   * Omitted, the type's own label is used.
+   */
+  label?: string | ((row: T) => string);
   icon?: ReactNode | ((row: T) => ReactNode);
   when?: (row: T) => boolean;
   disabled?: (row: T) => boolean;
@@ -134,6 +140,12 @@ export function getActionColumnWidth(actions: RowActionDef<unknown>[], variant: 
   return Math.max(120, actions.length * 78 + (actions.length - 1) * 8 + 24);
 }
 
+/** The name an action carries on this row: its own label, read from the row when it is a function, else the type's. */
+function actionLabel<T>(action: RowActionDef<T>, row: T, fallback: string): string {
+  if (typeof action.label === "function") return action.label(row);
+  return action.label ?? fallback;
+}
+
 /** Per-row action cluster shared by the list and tree tables. */
 export function RowActionCell<T>({
   row,
@@ -163,7 +175,7 @@ export function RowActionCell<T>({
         <Flex justify="end" align="center">
           <div className="inline-flex items-center overflow-hidden" {...slotAttributes(rowActionsStripStyle, {})}>
             {visible.map((action, i) => {
-              const label = action.label ?? t(ACTION_LABEL_KEYS[action.type]);
+              const label = actionLabel(action, row, t(ACTION_LABEL_KEYS[action.type]));
               const resolvedIcon = typeof action.icon === "function" ? action.icon(row) : action.icon;
               const icon = resolvedIcon ?? ACTION_ICONS[action.type];
               const isDisabled = action.disabled?.(row) ?? false;
@@ -217,7 +229,7 @@ export function RowActionCell<T>({
     <TooltipProvider>
       <Flex gap="xs" justify="end" wrap>
         {visible.map((action, i) => {
-          const label = action.label ?? t(ACTION_LABEL_KEYS[action.type]);
+          const label = actionLabel(action, row, t(ACTION_LABEL_KEYS[action.type]));
           const resolvedIcon = typeof action.icon === "function" ? action.icon(row) : action.icon;
           const icon = resolvedIcon ?? ACTION_ICONS[action.type];
           const isDisabled = action.disabled?.(row) ?? false;
