@@ -51,22 +51,32 @@ export interface ResolvedType {
    * position and carries the child's declaration.
    */
   allFields: FieldMeta[];
-  /** Tag of the entity that emits this declaration within its domain. */
+  /**
+   * Tag of the entity whose schema module emits this declaration: the first entity in
+   * `reachedBy`. It answers where the declaration is written once, never which entities it
+   * belongs to.
+   */
   owner: string;
+  /**
+   * Tag of every entity whose operations reach this declaration, in the domain's entity order.
+   * A DTO two entities return belongs to both: each entity's catalog labels its fields, so a
+   * per-entity question reads this list and never `owner`.
+   */
+  reachedBy: string[];
 }
 
 /** One enum inside a domain's closure. */
 export interface ResolvedEnum {
   name: string;
   meta: EnumMeta;
-  /** Tag of the entity that emits this declaration within its domain. */
-  owner: string;
+  /** Tag of every entity whose operations reach this enum, in the domain's entity order. */
+  reachedBy: string[];
 }
 
 /** Everything one domain package is generated from. */
 export interface ResolvedDomain {
   name: string;
-  /** Entities sorted by tag, which is also the order ownership was assigned in. */
+  /** Entities sorted by tag, which is also the order each declaration's `reachedBy` lists them in. */
   entities: ResolvedEntity[];
   /** Every matched operation of the domain, in SimpliX Meta order. */
   operations: OperationMeta[];
@@ -461,7 +471,13 @@ class ClosureWalker {
   private readonly types = new Map<string, ResolvedType>();
   private readonly enums = new Map<string, ResolvedEnum>();
   readonly containers = new Map<string, ContainerMapping>();
-  private owner = "";
+  private entityTag = "";
+  /**
+   * The declarations the current entity has visited. The closure registers a type once for the
+   * domain, but every entity walks it again through to its leaves, so a DTO another entity reached
+   * first still records this entity, and so does everything nested in it.
+   */
+  private visitedByEntity = new Set<string>();
 
   constructor(
     private readonly meta: DtoMeta,
@@ -471,7 +487,8 @@ class ClosureWalker {
   ) {}
 
   walkEntity(entity: ResolvedEntity): void {
-    this.owner = entity.tag;
+    this.entityTag = entity.tag;
+    this.visitedByEntity = new Set();
     for (const operation of entity.operations) {
       if (operation.response) this.walkRef(operation.response);
       if (operation.request.body) this.walkRef(operation.request.body);
@@ -514,34 +531,50 @@ class ClosureWalker {
   }
 
   private visitType(name: string): void {
-    if (this.types.has(name)) return;
-    const type = this.meta.types[name];
+    // Marked before recursing so a type reachable from its own fields terminates.
+    const key = `type:${name}`;
+    if (this.visitedByEntity.has(key)) return;
+    this.visitedByEntity.add(key);
+
+    const known = this.types.get(name);
+    const type = known?.meta ?? this.meta.types[name];
     if (!type) {
       this.reports.missingTypes.add(name);
       return;
     }
-
-    // Registered before recursing so a type reachable from its own fields terminates.
-    this.types.set(name, {
-      name,
-      meta: type,
-      ancestors: this.index.ancestors(name),
-      allFields: this.index.allFields(name),
-      owner: this.owner,
-    });
+    if (known) {
+      known.reachedBy.push(this.entityTag);
+    } else {
+      this.types.set(name, {
+        name,
+        meta: type,
+        ancestors: this.index.ancestors(name),
+        allFields: this.index.allFields(name),
+        owner: this.entityTag,
+        reachedBy: [this.entityTag],
+      });
+    }
 
     if (type.extends) this.visitType(type.extends);
     for (const field of type.fields) this.walkRef(field.type);
   }
 
   private visitEnum(name: string): void {
-    if (this.enums.has(name)) return;
+    const key = `enum:${name}`;
+    if (this.visitedByEntity.has(key)) return;
+    this.visitedByEntity.add(key);
+
+    const known = this.enums.get(name);
+    if (known) {
+      known.reachedBy.push(this.entityTag);
+      return;
+    }
     const enumMeta = this.meta.enums[name];
     if (!enumMeta) {
       this.reports.missingEnums.add(name);
       return;
     }
-    this.enums.set(name, { name, meta: enumMeta, owner: this.owner });
+    this.enums.set(name, { name, meta: enumMeta, reachedBy: [this.entityTag] });
   }
 
   private visitContainer(name: string): void {

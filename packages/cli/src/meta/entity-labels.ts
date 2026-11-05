@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { pathExists, writeFileWithDir } from "../utils/fs.js";
 import { entityNameOf } from "./generation/endpoint-gen.js";
 import type { ResolvedDomain, ResolvedType } from "./resolve.js";
-import type { DtoMeta } from "./types.js";
+import type { DtoMeta, FieldMeta } from "./types.js";
 
 /** The key a domain catalog holds an entity's singular name under, beside its `fields`. */
 export const ENTITY_LABEL_KEY = "_label";
@@ -43,11 +43,16 @@ export function serverEntityOf(
  * parent's screens read the reference's own label from the parent DTO and draw the referenced
  * record through its own catalog, so those fields are not the parent's to label.
  *
+ * <p>A DTO several entities reach (a sign-in activity two surfaces return, a status-count row
+ * every list's figures share) is each of those entities' type, so its field labels are written
+ * once into every reaching entity's catalog, never only into the first one's. Which declaration
+ * of a field name counts is `entityFieldsOf`'s question.
+ *
  * @param domain the domain whose types are read
  * @param entity the domain entity
  * @param document the SimpliX Meta document, which declares the entity classes; without it every
  *   reached type counts
- * @returns the entity's own types, in the order the domain lists them
+ * @returns the entity's types, in the order the domain lists them
  */
 export function ownedTypesOf(
   domain: ResolvedDomain,
@@ -57,7 +62,7 @@ export function ownedTypesOf(
   const declared = document?.entities ?? {};
   const own = serverEntityOf(entity, new Set(Object.keys(declared)));
   const entityClasses = new Map(Object.entries(declared).map(([key, one]) => [one.javaClass, key]));
-  const mine = [...(domain.types?.values() ?? [])].filter((type) => type.owner === entity.tag);
+  const mine = [...(domain.types?.values() ?? [])].filter((type) => type.reachedBy.includes(entity.tag));
   const isForeign = (type: (typeof mine)[number]) => {
     const declaredAs = entityClasses.get(type.meta.javaClass);
     return declaredAs !== undefined && declaredAs !== own;
@@ -72,8 +77,40 @@ export function ownedTypesOf(
 }
 
 /**
- * The label each field of an entity's DTOs declares through a keyed `@FieldLabel`, in one locale.
- * The first DTO to name a field decides it, in the order the domain lists its types.
+ * One declaration per field name across an entity's types, listed in the order the types first
+ * name them. The declaration that counts comes from the types only this entity reaches before the
+ * shared ones, each in the order given, so a shared DTO naming a field the entity's own DTO also
+ * names (a `status`, a `type`) never decides that field for it. The key order stays the domain's,
+ * so widening a set of types adds keys to a catalog without moving the ones already there.
+ *
+ * @param types the entity's types, as `ownedTypesOf` returns them
+ * @param accept which declarations may decide a field; one it refuses leaves the name to the next
+ * @returns the deciding declaration of every field name some accepted declaration carries
+ */
+export function entityFieldsOf(
+  types: readonly ResolvedType[],
+  accept: (field: FieldMeta) => boolean = () => true,
+): FieldMeta[] {
+  const exclusive = (type: ResolvedType) => type.reachedBy.length === 1;
+  const chosen = new Map<string, FieldMeta>();
+  for (const type of [...types.filter(exclusive), ...types.filter((type) => !exclusive(type))]) {
+    for (const field of type.allFields) {
+      if (!chosen.has(field.name) && accept(field)) chosen.set(field.name, field);
+    }
+  }
+  const ordered = new Map<string, FieldMeta>();
+  for (const type of types) {
+    for (const field of type.allFields) {
+      const decided = chosen.get(field.name);
+      if (decided && !ordered.has(field.name)) ordered.set(field.name, decided);
+    }
+  }
+  return [...ordered.values()];
+}
+
+/**
+ * The label each field of an entity's DTOs declares through a keyed `@FieldLabel`, in one locale,
+ * shared DTOs included, decided as `entityFieldsOf` decides a field.
  *
  * @param domain the domain whose types are read
  * @param entity the entity the types belong to
@@ -88,11 +125,10 @@ function fieldLabelsOf(
   locale: string,
 ): Map<string, string> {
   const labels = new Map<string, string>();
-  for (const type of ownedTypesOf(domain, entity, document)) {
-    for (const field of type.allFields) {
-      const label = field.labels?.[locale];
-      if (label !== undefined && !labels.has(field.name)) labels.set(field.name, label);
-    }
+  const labelled = entityFieldsOf(ownedTypesOf(domain, entity, document), (field) => field.labels?.[locale] !== undefined);
+  for (const field of labelled) {
+    const label = field.labels?.[locale];
+    if (label !== undefined) labels.set(field.name, label);
   }
   return labels;
 }

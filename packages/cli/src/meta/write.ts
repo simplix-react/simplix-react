@@ -7,7 +7,7 @@ import { renderTemplate } from "../utils/template.js";
 import type { OpenApiNamingStrategy } from "../openapi/naming/naming-strategy.js";
 import type { MetaExtensionOutput } from "../openapi/orchestration/spec-profile.js";
 import { HEADER } from "./generation/emit.js";
-import { ownedTypesOf } from "./entity-labels.js";
+import { entityFieldsOf, ownedTypesOf } from "./entity-labels.js";
 import { generateAccessFiles } from "./generation/access-gen.js";
 import { generateEndpointFiles, entityNameOf } from "./generation/endpoint-gen.js";
 import { generateHookFiles, type EntityHooks } from "./generation/hook-gen.js";
@@ -470,34 +470,30 @@ function collectWarnings(results: GeneratorResults): string[] {
  *
  * Fields come from the entity's own DTOs rather than from every type the closure reaches: a
  * locale file names what a screen shows, and the closure holds the shapes those DTOs are built
- * from as well.
+ * from as well. A DTO several entities return is each one's own (`ownedTypesOf`), so its fields
+ * are listed for every entity that reaches it, and the server translations filtered by this list
+ * keep them for each.
  */
 export function metaEntities(domain: ResolvedDomain, document?: DtoMeta): ExtractedEntity[] {
   return domain.entities.map((entity) => {
     const name = entityNameOf(entity.tag);
-    const owned = ownedTypesOf(domain, entity, document);
-    const seen = new Set<string>();
     const fields: EntityField[] = [];
 
-    for (const type of owned) {
-      for (const field of type.allFields) {
-        if (seen.has(field.name)) continue;
-        seen.add(field.name);
-        const enumName = field.type.kind === "enum" ? field.type.name : undefined;
-        const enumValues =
-          enumName === undefined
-            ? undefined
-            : domain.enums.get(enumName)?.meta.values.map((one) => one.name);
-        fields.push({
-          name: field.name,
-          snakeName: field.name.replace(/[A-Z]/g, (one) => `_${one.toLowerCase()}`),
-          type: field.type.kind,
-          zodType: field.type.kind,
-          required: field.required,
-          nullable: field.nullable,
-          ...(enumValues && enumName ? { enum: enumValues, enumTypeName: enumName } : {}),
-        });
-      }
+    for (const field of entityFieldsOf(ownedTypesOf(domain, entity, document))) {
+      const enumName = field.type.kind === "enum" ? field.type.name : undefined;
+      const enumValues =
+        enumName === undefined
+          ? undefined
+          : domain.enums.get(enumName)?.meta.values.map((one) => one.name);
+      fields.push({
+        name: field.name,
+        snakeName: field.name.replace(/[A-Z]/g, (one) => `_${one.toLowerCase()}`),
+        type: field.type.kind,
+        zodType: field.type.kind,
+        required: field.required,
+        nullable: field.nullable,
+        ...(enumValues && enumName ? { enum: enumValues, enumTypeName: enumName } : {}),
+      });
     }
 
     return {

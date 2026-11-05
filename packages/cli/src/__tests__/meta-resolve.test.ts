@@ -307,15 +307,16 @@ describe("resolveMeta against the smart-safety capture", () => {
     expect(resolved.domains.get("data-io")?.operations).toHaveLength(44);
   });
 
-  it("gives every type in a closure exactly one owning entity", () => {
+  it("records, for every declaration in a closure, each entity of the domain that reaches it once", () => {
     for (const domain of resolved.domains.values()) {
-      const tags = new Set(domain.entities.map((entity) => entity.tag));
-      for (const type of domain.types.values()) {
-        expect(tags.has(type.owner)).toBe(true);
+      const tags = domain.entities.map((entity) => entity.tag);
+      for (const declared of [...domain.types.values(), ...domain.enums.values()]) {
+        expect(declared.reachedBy.length).toBeGreaterThan(0);
+        expect(new Set(declared.reachedBy).size).toBe(declared.reachedBy.length);
+        // Listed in the domain's entity order, which the walk follows.
+        expect(declared.reachedBy).toEqual(tags.filter((tag) => declared.reachedBy.includes(tag)));
       }
-      for (const declared of domain.enums.values()) {
-        expect(tags.has(declared.owner)).toBe(true);
-      }
+      for (const type of domain.types.values()) expect(type.owner).toBe(type.reachedBy[0]);
     }
   });
 
@@ -343,9 +344,10 @@ describe("resolveMeta mechanics", () => {
     expect(regex.deadPatterns).toEqual([]);
   });
 
-  it("assigns a shared type to the alphabetically first entity, not the first in SimpliX Meta", () => {
-    // SimpliX Meta lists shop.B first and both entities reach Item — through the list response for B
-    // and through Summary's `pick` for A. Ownership follows the sorted tag order.
+  it("lists every entity that reaches a shared type, down to what the type itself reaches", () => {
+    // SimpliX Meta lists shop.B first and both entities reach Item: through the list response for B
+    // and through Summary's `pick` for A. B reaches Item after A registered it, and still walks on
+    // into Base and Colour, so those record B as well. The list follows the sorted tag order.
     const resolvedTiny = resolveMeta(tinyMeta(), {
       domains: { shop: ["shop.A", "shop.B"] },
       containerTypes,
@@ -353,11 +355,15 @@ describe("resolveMeta mechanics", () => {
     const shop = resolvedTiny.domains.get("shop");
 
     expect(shop?.entities.map((entity) => entity.tag)).toEqual(["shop.A", "shop.B"]);
+    // The schema module that emits a shared type is still the first reaching entity's.
     expect(shop?.types.get("Item")?.owner).toBe("shop.A");
-    expect(shop?.types.get("Base")?.owner).toBe("shop.A");
     expect(shop?.types.get("ItemSearch")?.owner).toBe("shop.B");
-    expect(shop?.enums.get("Colour")?.owner).toBe("shop.A");
-    expect(shop?.enums.get("Size")?.owner).toBe("shop.B");
+    expect(shop?.types.get("Item")?.reachedBy).toEqual(["shop.A", "shop.B"]);
+    expect(shop?.types.get("Base")?.reachedBy).toEqual(["shop.A", "shop.B"]);
+    expect(shop?.types.get("Summary")?.reachedBy).toEqual(["shop.A"]);
+    expect(shop?.types.get("ItemSearch")?.reachedBy).toEqual(["shop.B"]);
+    expect(shop?.enums.get("Colour")?.reachedBy).toEqual(["shop.A", "shop.B"]);
+    expect(shop?.enums.get("Size")?.reachedBy).toEqual(["shop.B"]);
     expect(shop?.entities.map((entity) => entity.patterns)).toEqual([["shop.A"], ["shop.B"]]);
   });
 
