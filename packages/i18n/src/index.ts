@@ -74,7 +74,14 @@ export type {
 // ── Application locale, figures and Korean particles ──
 export { DEFAULT_FALLBACK_LOCALE, configureFallbackLocale, getFallbackLocale, useFallbackLocale } from "./app/app-locale.js";
 export { byteSize } from "./app/byte-size.js";
-export { KOREAN_PARTICLES, koreanParticle, localeParticle } from "./app/korean-particle.js";
+export {
+  KOREAN_PARTICLE_FORMAT,
+  KOREAN_PARTICLE_NAMES,
+  KOREAN_PARTICLES,
+  formatKoreanParticle,
+  koreanParticle,
+  localeParticle,
+} from "./app/korean-particle.js";
 export type { KoreanParticle } from "./app/korean-particle.js";
 export { messageLength } from "./app/message-length.js";
 export type { MessageLength } from "./app/message-length.js";

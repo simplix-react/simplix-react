@@ -1,5 +1,6 @@
 import i18next, { type i18n as I18nextInstance } from "i18next";
 import type { II18nAdapter } from "./adapter.js";
+import { KOREAN_PARTICLE_FORMAT, formatKoreanParticle } from "./app/korean-particle.js";
 import type {
   DateTimeFormatOptions,
   LocaleCode,
@@ -136,6 +137,10 @@ export class I18nextAdapter implements II18nAdapter {
         showSupportNotice: false,
       });
     }
+
+    // Registered on an instance passed in as well as on the one created here, so every catalogue
+    // read through this adapter can write `{{value, josa(을/를)}}`.
+    this.i18n.services.formatter?.add(KOREAN_PARTICLE_FORMAT, formatKoreanParticle);
 
     this.i18n.on("languageChanged", (lng) => {
       this.notifyLocaleChange(lng);
