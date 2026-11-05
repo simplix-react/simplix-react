@@ -3,7 +3,15 @@ import type { OpenApiNamingStrategy } from "../../openapi/naming/naming-strategy
 import { readSearchFields, type SearchField } from "../filter-source.js";
 import type { FieldMeta, ParamMeta, TypeRef } from "../types.js";
 import type { ResolvedDomain, ResolvedType } from "../resolve.js";
-import { HEADER, innermostRef, payloadOf, reachableFrom, refNameOf, responseRefs } from "./emit.js";
+import {
+  HEADER,
+  innermostRef,
+  memberName,
+  payloadOf,
+  reachableFrom,
+  refNameOf,
+  responseRefs,
+} from "./emit.js";
 import { entityNameOf, resolveEndpoints, type EndpointTarget } from "./endpoint-gen.js";
 import type { LabeledEnumMapping } from "./model-gen.js";
 
@@ -18,6 +26,12 @@ const DEFAULT_META_ROOT = "../generated-meta";
 
 /** Rows per seed array. */
 const SEED_COUNT = 20;
+
+/**
+ * The seed index a response sample is built at. Fixed, so the same document generates the same
+ * handlers on every run.
+ */
+const SAMPLE_INDEX = 1;
 
 /**
  * The roles whose handler reads or writes the store. An entity with none of them answers from
@@ -38,6 +52,22 @@ const CRUD_STORE_ROLES = new Set([
   "tree",
   "subtree",
   "order",
+]);
+
+/**
+ * The roles whose responses carry the entity's own records, in whichever projection: the detail,
+ * the list row, the edit form, a tree node, what a write returns. `getAll` is left out because it
+ * is the role a parameterless read lands on whatever it returns, an aggregate included.
+ */
+const OWN_SHAPE_ROLES = new Set([
+  "list",
+  "search",
+  "get",
+  "getForEdit",
+  "tree",
+  "subtree",
+  "create",
+  "update",
 ]);
 
 /**
@@ -112,6 +142,18 @@ export interface UnmatchableParameter {
   storeType: string;
 }
 
+/**
+ * An operation the store cannot answer whose declared response no literal sample stands in for: a
+ * page, whose shape belongs to the spec profile, a binary body, or a type SimpliX Meta does not
+ * declare. Its handler answers with an empty body.
+ */
+export interface UnansweredResponse {
+  tag: string;
+  operation: string;
+  /** The declared response after the envelope, as `Page<TicketDTO>` or `binary`. */
+  response: string;
+}
+
 export interface MockGenResult {
   /** Path relative to the meta output root → file content. Holds the handler module alone. */
   files: Map<string, string>;
@@ -128,6 +170,7 @@ export interface MockGenResult {
   unresolvedStoreTypes: UnresolvedStoreType[];
   unresolvedOrderFields: UnresolvedOrderField[];
   unmatchableParameters: UnmatchableParameter[];
+  unansweredResponses: UnansweredResponse[];
   /**
    * DTO name → the fields the model declares as a labeled enum, so a preserved array whose rows
    * hold bare values can be taken into that shape.
@@ -147,7 +190,9 @@ export interface MockGenResult {
  * Every operation of the domain gets a handler, whatever its role: a route MSW does not answer is
  * passed through to a server that is not running, and a custom action - a quarter of this
  * application's operations - has no CRUD role at all. What an operation cannot answer from the
- * store it answers with an empty body.
+ * store it answers with a sample of the response it declares, built by the rules a seed row is
+ * built by; only a response no literal can stand in for, and a response that declares nothing,
+ * answer with an empty body.
  *
  * Nothing here reads the filesystem. Which DTO a store carries, which field identifies a record
  * and whether that field is a number are all read from SimpliX Meta, so a domain whose `src/generated/`
@@ -173,6 +218,7 @@ export function generateMockFiles(domain: ResolvedDomain, options: MockGenOption
       .map((entity) => ({ tag: entity.tag, roles: [...new Set(entity.storeRoles)] })),
     unresolvedOrderFields: emitter.unresolvedOrderFields,
     unmatchableParameters: emitter.unmatchableParameters,
+    unansweredResponses: emitter.unansweredResponses,
     labeledSeedFields: new Map(
       [...domain.types.values()]
         .map(
@@ -243,6 +289,11 @@ class MockEntity {
   readonly idField: string;
   /** Whether that field arrives as a number, which decides `Number(…)` against `String(…)`. */
   readonly idNumeric: boolean;
+  /**
+   * The DTOs the entity's own records are answered as: the store's, and every projection one of
+   * its CRUD routes answers with. A stored row stands in for any of them.
+   */
+  readonly ownTypes: ReadonlySet<string>;
 
   constructor(
     readonly tag: string,
@@ -259,6 +310,15 @@ class MockEntity {
     const identity = this.deriveIdentity();
     this.idField = identity.field;
     this.idNumeric = identity.numeric;
+
+    const own = new Set<string>();
+    if (this.storeType) own.add(this.storeType.name);
+    for (const one of targets) {
+      if (!OWN_SHAPE_ROLES.has(one.role)) continue;
+      const name = refNameOf(innermostRef(payloadOf(one.operation.response, domain)));
+      if (name !== undefined) own.add(name);
+    }
+    this.ownTypes = own;
   }
 
   /** Whether a store is worth wiring: something has to read it, and it has to have a type. */
@@ -419,7 +479,10 @@ function isNumericParam(param: ParamMeta): boolean {
 class MockEmitter {
   readonly unresolvedOrderFields: UnresolvedOrderField[] = [];
   readonly unmatchableParameters: UnmatchableParameter[] = [];
+  readonly unansweredResponses: UnansweredResponse[] = [];
   private readonly metaRoot: string;
+  /** The DTOs a response sample is held against, imported beside the stores' own. */
+  private readonly sampleTypes = new Set<string>();
 
   constructor(
     private readonly domain: ResolvedDomain,
@@ -446,23 +509,29 @@ class MockEmitter {
       if (this.entities.some((one) => one.targets.some((target) => target.role === "tree"))) {
         imports.push("import { buildEmbeddedTree } from '@simplix-react/mock';");
       }
-      // Two entities can carry the same DTO - a record read by its owner and by an administrator
-      // is one record - and naming it twice in one import is a duplicate declaration.
-      const names = [...new Set(backed.map((one) => one.storeTypeName))].sort();
+    }
+    // Two entities can carry the same DTO - a record read by its owner and by an administrator
+    // is one record - and a sample can be typed with a store's DTO too; naming one twice in one
+    // import is a duplicate declaration.
+    const names = [
+      ...new Set([...backed.map((one) => one.storeTypeName), ...this.sampleTypes]),
+    ].sort();
+    if (names.length > 0) {
       imports.push(`import type { ${names.join(", ")} } from '${MODEL_DIR}';`);
     }
 
     return [HEADER, "", ...imports, "", ...bodies].join("\n");
   }
 
-  /** One entity's factory. An entity with no store answers every route with an empty body. */
+  /** One entity's factory. An entity with no store answers each route from its response. */
   private factory(entity: MockEntity): string {
     const parameter = entity.backed
       ? `store: MockEntityStore<${entity.storeTypeName}>`
       : "";
     const answers = entity.backed
       ? "answering from the store the entry wires in"
-      : "answering with an empty body: no response of the entity names a DTO to hold";
+      : "answering each route with a sample of the response it declares: no CRUD route of the " +
+        "entity needs a store to answer from";
     const entries = entity.targets.map((target) => this.handler(entity, target));
 
     return `/** Handlers for \`${entity.tag}\`, ${answers}. */
@@ -480,14 +549,16 @@ ${entries.join("\n")}
     const pattern = mswPattern(target.operation.path);
     const open = `    http.${method}(${JSON.stringify(pattern)}, `;
 
-    if (!entity.backed) return `${open}() => ${this.json("{}")}),`;
+    if (!entity.backed) return this.answer(entity, target, open);
 
     switch (target.role) {
       case "list":
       case "search":
         return this.listHandler(entity, target, open);
       case "getAll":
-        return `${open}() => ${this.json("store.list()")}),`;
+        return this.declaresOtherType(entity, target)
+          ? this.answer(entity, target, open)
+          : `${open}() => ${this.json("store.list()")}),`;
       case "get":
       case "getForEdit":
       case "subtree":
@@ -503,20 +574,143 @@ ${entries.join("\n")}
       case "delete":
         return this.deleteHandler(entity, target, open);
       case "batchDelete":
-        return `${open}() => ${this.json("{}")}),`;
+        return this.answer(entity, target, open);
       case "order":
         return this.orderHandler(entity, target, open);
       case "tree":
         return this.treeHandler(entity, open);
       default:
         // A custom action - an escalation, a revocation, a dismissal - which is what a quarter of
-        // this application's operations are. A read addressed by a path parameter is a
-        // sub-resource of the entity and is answered from its store; anything else has nothing in
-        // the store to answer with, and a route left unhandled is passed through to a server that
-        // is not there.
-        return target.operation.method === "GET" && target.operation.request.path.length > 0
+        // this application's operations are. A read addressed by a path parameter that declares
+        // one of the entity's own records is a sub-resource answered from its store; anything else
+        // has nothing in the store to answer with and answers the shape its response declares,
+        // since a route left unhandled is passed through to a server that is not there.
+        return target.operation.method === "GET" &&
+          target.operation.request.path.length > 0 &&
+          !this.declaresOtherType(entity, target)
           ? this.readHandler(entity, target, open)
-          : `${open}() => ${this.json("{}")}),`;
+          : this.answer(entity, target, open);
+    }
+  }
+
+  /**
+   * An operation the store has no role in answering, answered with what its response declares.
+   *
+   * An action that returns the record it acted on - a revocation, a retry - and addresses it by
+   * the store's own identifier answers with that record, so a screen that writes the answer into
+   * its cache keeps the identifier it asked about; a keyless read of the store's own type answers
+   * with the first stored row, as a keyless detail read does. Anything else answers with a sample
+   * of the declared response, and a response no sample can stand in for is reported and answered
+   * with an empty body, as a response that declares nothing is.
+   */
+  private answer(entity: MockEntity, target: EndpointTarget, open: string): string {
+    const payload = payloadOf(target.operation.response, this.domain);
+    const param = target.operation.request.path.at(-1);
+    if (entity.backed && payload?.kind === "ref" && payload.name === entity.storeTypeName) {
+      if (param?.name === entity.idField) {
+        const key = isNumericParam(param) ? `Number(params.${param.name})` : `String(params.${param.name})`;
+        return `${open}({ params }) => ${this.json(`store.getById(${key}) ?? store.list()[0]`)}),`;
+      }
+      // A read of the one record an owner holds - the configuration in force - names no key.
+      if (target.operation.method === "GET" && param === undefined) {
+        return `${open}() => ${this.json("store.list()[0]")}),`;
+      }
+    }
+
+    const sample = this.responseSample(entity, target);
+    if (sample !== undefined) return `${open}() => ${this.json(sample)}),`;
+    if (payload === undefined) return `${open}() => ${this.json("{}")}),`;
+    const response = describeRef(payload);
+    this.unansweredResponses.push({ tag: entity.tag, operation: target.operation.id, response });
+    return `${open}() => ${this.json("{}")}), // no sample stands in for ${response}`;
+  }
+
+  /**
+   * Whether the operation declares a response that is none of the entity's own records, so a
+   * stored row would answer it in the wrong shape: an aggregate beside a list, a sign-in history
+   * under a user, the cells of a contact's rota, the names a channel offers.
+   *
+   * A projection of the entity's records - the list row a sub-list returns, the form an edit
+   * reads - is not another type: a stored row carries the values it projects, and the screen
+   * reading it gets the record it asked about. A response that declares nothing says nothing a
+   * stored row contradicts.
+   */
+  private declaresOtherType(entity: MockEntity, target: EndpointTarget): boolean {
+    const payload = payloadOf(target.operation.response, this.domain);
+    if (payload === undefined) return false;
+    const declared = refNameOf(innermostRef(payload));
+    return declared === undefined || !entity.ownTypes.has(declared);
+  }
+
+  /** A sample of what an operation declares it answers with, or nothing when it declares none. */
+  private responseSample(entity: MockEntity, target: EndpointTarget): string | undefined {
+    return this.sampleOf(payloadOf(target.operation.response, this.domain), entity.name, "    ");
+  }
+
+  /**
+   * A literal of the shape `ref` declares, built by the rules a seed row is built by and held
+   * against the model's own declaration through `satisfies`, so a sample the model disagrees with
+   * fails the project's type check rather than a screen.
+   *
+   * Which container is a sequence and which a keyed object is the spec profile's mapping, never a
+   * name compared here. A container the profile maps to neither - a page - has a shape only the
+   * profile knows, and gets no sample.
+   */
+  private sampleOf(
+    ref: TypeRef | undefined,
+    entityName: string,
+    indent: string,
+  ): string | undefined {
+    if (ref === undefined) return undefined;
+    switch (ref.kind) {
+      case "ref": {
+        const type = this.domain.types.get(ref.name);
+        if (!type) return undefined;
+        const inner = `${indent}  `;
+        const members: string[] = [];
+        for (const field of type.allFields) {
+          const value = this.seedValue(field, type, SAMPLE_INDEX, entityName, new Set([type.name]));
+          if (value !== undefined) members.push(`${inner}${memberName(field.name)}: ${value},`);
+        }
+        const literal = members.length === 0 ? "{}" : `{\n${members.join("\n")}\n${indent}}`;
+        // A generic declaration needs its arguments spelled, which a sample has no source for.
+        if ((ref.args?.length ?? 0) > 0 || type.meta.typeParams.length > 0) return literal;
+        this.sampleTypes.add(type.name);
+        return `${literal} satisfies ${type.name}`;
+      }
+      case "container": {
+        const mapping = this.domain.containers.get(ref.name);
+        if (mapping?.unwrap === true) return this.sampleOf(ref.args[0], entityName, indent);
+        if (mapping?.ts === "Array") {
+          return `[${this.sampleOf(ref.args[0], entityName, indent) ?? ""}]`;
+        }
+        if (mapping?.keyType !== undefined || mapping?.ts === "Record") return "{}";
+        return undefined;
+      }
+      case "enum": {
+        // A top-level enum is declared as its bare value union: no DTO carries it, and the
+        // labeled object is a choice the model makes per carrying type.
+        const first = this.domain.enums.get(ref.name)?.meta.values[0]?.name;
+        return first === undefined ? undefined : JSON.stringify(first);
+      }
+      case "string":
+      case "number":
+      case "boolean":
+      case "instant":
+      case "date":
+      case "time":
+        return this.seedValue(
+          { name: "value", type: ref, required: true, nullable: false },
+          undefined,
+          SAMPLE_INDEX,
+          entityName,
+          new Set(),
+        );
+      case "unknown":
+        return "{}";
+      default:
+        // A binary body is not JSON, a pick and an unbound parameter name no fields to write.
+        return undefined;
     }
   }
 
@@ -654,7 +848,7 @@ ${entries.join("\n")}
 
   private deleteHandler(entity: MockEntity, target: EndpointTarget, open: string): string {
     const param = target.operation.request.path.at(-1);
-    if (!param) return `${open}() => ${this.json("{}")}),`;
+    if (!param) return this.answer(entity, target, open);
     const key = isNumericParam(param) ? `Number(params.${param.name})` : `String(params.${param.name})`;
     return `${open}({ params }) => { store.remove(${key}); return ${this.json("null")}; }),`;
   }
@@ -674,7 +868,7 @@ ${entries.join("\n")}
 
     if (!dto || !key || !field) {
       this.unresolvedOrderFields.push({ tag: entity.tag, operation: target.operation.id });
-      return `${open}() => ${this.json("{}")}),`;
+      return this.answer(entity, target, open);
     }
 
     const keyType = key.type.kind === "number" ? "number" : "string";
@@ -689,7 +883,7 @@ ${entries.join("\n")}
       `${open}async ({ request }) => {`,
       `      const items = await request.json() as { ${key.name}: ${keyType}; ${field.name}: ${valueType} }[];`,
       `      for (const item of items) store.update(item.${key.name}, ${write});`,
-      `      return ${this.json("{}")};`,
+      `      return ${this.json(this.responseSample(entity, target) ?? "{}")};`,
       "    }),",
     ].join("\n");
   }
@@ -813,7 +1007,8 @@ ${entries.join("\n")}
    */
   private seedValue(
     field: FieldMeta,
-    carrier: ResolvedType,
+    /** The type declaring the field; absent for a top-level value, whose enum is the bare one. */
+    carrier: ResolvedType | undefined,
     index: number,
     entityName: string,
     open: Set<string>,
@@ -854,7 +1049,7 @@ ${entries.join("\n")}
 
   private enumSeed(
     name: string,
-    carrier: ResolvedType,
+    carrier: ResolvedType | undefined,
     field: FieldMeta,
     index: number,
   ): string | undefined {
@@ -863,7 +1058,7 @@ ${entries.join("\n")}
     const value = values[(index - 1) % values.length].name;
     // A labeled enum is an object on a response, so a bare string in a row annotated with the
     // DTO's own type is a value of the wrong shape rather than a different-looking one.
-    return this.model.labeledAt(carrier, field)
+    return carrier !== undefined && this.model.labeledAt(carrier, field)
       ? `{ value: ${JSON.stringify(value)}, label: ${JSON.stringify(value)} }`
       : JSON.stringify(value);
   }
@@ -921,6 +1116,23 @@ export function mswPattern(path: string): string {
   // holding one matches no request at all, and every call falls through to a server that is not
   // running.
   return `*${path.replace(/\{(\w+)\}/g, ":$1")}`;
+}
+
+/** A declared response as it reads in a report: `Page<TicketDTO>`, `binary`. */
+function describeRef(ref: TypeRef): string {
+  switch (ref.kind) {
+    case "ref":
+      return ref.args?.length ? `${ref.name}<${ref.args.map(describeRef).join(", ")}>` : ref.name;
+    case "container":
+      return `${ref.name}<${ref.args.map(describeRef).join(", ")}>`;
+    case "enum":
+    case "param":
+      return ref.name;
+    case "pick":
+      return `Pick<${ref.of}>`;
+    default:
+      return ref.kind;
+  }
 }
 
 /** A key's base, which is what a dotted filter parameter names before its operator. */

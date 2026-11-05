@@ -304,16 +304,25 @@ describe("the identifier and its type are read from SimpliX Meta, never guessed 
     expect(entry).not.toContain('auditLogSeeds, "auditEventId"');
   });
 
-  it("reads a string parameter as text — all 210 of them, and none as a number", () => {
+  it("reads a string parameter as text: all 205 of them, and none as a number", () => {
     let asText = 0;
+    let actionReads = 0;
     for (const [name] of generated) {
       const content = handlersOf(name);
       asText += [...content.matchAll(/String\(params\./g)].length;
+      // An action answering the record it acted on reads that record by the same key.
+      for (const line of content.split("\n")) {
+        if (/^ {4}http\.(post|put|patch)\(/.test(line) && line.includes("store.getById(")) {
+          expect(line).toMatch(/store\.getById\(String\(params\.\w+\)\) \?\? store\.list\(\)\[0\]/);
+          actionReads += 1;
+        }
+      }
       // 310 of the document's 311 path parameters are strings, and `Number("ORG-001")` is `NaN`:
       // the lookup misses and the fallback answers with the first row for every id.
       expect(content, name).not.toContain("Number(params.");
     }
-    expect(asText).toBe(210);
+    expect(asText).toBe(205);
+    expect(actionReads).toBe(20);
   });
 
   it("reads a numeric parameter as a number when SimpliX Meta says so", () => {
@@ -344,7 +353,7 @@ describe("the identifier and its type are read from SimpliX Meta, never guessed 
 });
 
 describe("a handler filters by a path parameter only when the store's DTO declares it", () => {
-  it("names no property the store's own type is missing — all 123 references", () => {
+  it("names no property the store's own type is missing: all 103 references", () => {
     let references = 0;
     for (const [name] of generated) {
       for (const [entity, body] of factoriesOf(handlersOf(name))) {
@@ -359,7 +368,7 @@ describe("a handler filters by a path parameter only when the store's DTO declar
         }
       }
     }
-    expect(references).toBe(123);
+    expect(references).toBe(103);
   });
 
   it("answers with the whole list where the parameter names no field of the store", () => {
@@ -372,8 +381,10 @@ describe("a handler filters by a path parameter only when the store's DTO declar
     expect(sameTarget).toContain("store.list()");
     expect(sameTarget).not.toContain("item.auditLogId");
 
+    // A route declaring another DTO answers that DTO's shape and filters nothing, so only the
+    // routes answering with stored rows are reported.
     const reported = [...generated.values()].flatMap((one) => one.unmatchableParameters);
-    expect(reported).toHaveLength(6);
+    expect(reported).toHaveLength(4);
     expect(reported).toContainEqual({
       tag: "audit.AuditLog",
       operation: "AuditLogRest_sameTarget",
@@ -383,15 +394,21 @@ describe("a handler filters by a path parameter only when the store's DTO declar
   });
 
   it("filters where the store's DTO does declare the parameter", () => {
+    const subtree = handlerFor(factoryOf("org", "Organization"), "*/api/v1/admin/org/tree/:orgId");
+    expect(subtree).toContain("store.filter((item) => String(item.orgId) === String(params.orgId))");
+    // The route returns a list of rows, so the answer is the matches rather than the first one.
+    expect(subtree).not.toContain("?? store.list()[0]");
+  });
+
+  it("answers a route declaring another DTO with that DTO, though the store declares the parameter", () => {
+    // `EmergencyContactDetailDTO` declares `emergencyContactId`, and the route returns the cells
+    // of the contact's rota: filtered contacts would answer it as contacts.
     const onCall = handlerFor(
       factoryOf("notification", "EmergencyContact"),
       "*/api/v1/admin/emergency-contact/:emergencyContactId/on-call",
     );
-    expect(onCall).toContain(
-      "store.filter((item) => String(item.emergencyContactId) === String(params.emergencyContactId))",
-    );
-    // The route returns a list of cells, so the answer is the matches rather than the first one.
-    expect(onCall).not.toContain("?? store.list()[0]");
+    expect(onCall).not.toContain("store.");
+    expect(onCall).toContain("satisfies OnCallCellDTO]");
   });
 
   it("reads one record by id where the route addresses one", () => {
@@ -451,6 +468,90 @@ describe("a reorder writes the field its own body declares", () => {
     );
     expect(handler).toContain("HttpResponse.json(wrapEnvelope({}))");
     expect(handler).not.toContain("displayOrder");
+  });
+});
+
+describe("an operation the store cannot answer answers the shape its response declares", () => {
+  const result = generateMockFiles(answerDomain("shop"), {
+    naming: simplixBootNaming,
+    labeledEnum: LABELED_ENUM,
+    envelope,
+  });
+  const handlers = result.files.get("mock/handlers.ts") ?? "";
+
+  it("answers a confirmation with a sample of its own DTO, though nothing of the entity reads a store", () => {
+    const handler = handlerFor(handlers, "*/api/v1/shop/confirmation/confirm", "POST");
+    expect(handler).not.toContain("wrapEnvelope({})");
+    expect(handler).toContain('confirmationId: "1"');
+    // A response carries a labeled enum as the object the model declares there.
+    expect(handler).toContain('status: { value: "HIGH", label: "HIGH" }');
+    expect(handler).toContain('confirmedAt: "');
+    // A required nested DTO carries its own required fields; an optional one is left out.
+    expect(handler).toContain('owner: { ownerId: "1" }');
+    expect(handler).not.toContain("reviewer");
+    expect(handler).toContain("} satisfies ConfirmationDTO))");
+    expect(factoriesOf(handlers).get("Confirmation")).toContain(
+      "export function createConfirmationHandlers() {",
+    );
+  });
+
+  it("answers a census on a backed entity with one sample row of the row's DTO", () => {
+    const handler = handlerFor(handlers, "*/api/v1/shop/ticket/status-counts", "GET");
+    expect(handler).toContain('value: "value-1"');
+    expect(handler).toContain("count: 2");
+    expect(handler).toContain("} satisfies ValueCountDTO]))");
+  });
+
+  it("answers a list of numbers with one number, and a keyed object with an empty one", () => {
+    expect(handlerFor(handlers, "*/api/v1/shop/ticket/sums", "GET")).toContain(
+      "HttpResponse.json(wrapEnvelope([10]))",
+    );
+    expect(handlerFor(handlers, "*/api/v1/shop/ticket/labels", "GET")).toContain(
+      "HttpResponse.json(wrapEnvelope({}))",
+    );
+  });
+
+  it("answers an action returning the stored record with that record, read by its identifier", () => {
+    const handler = handlerFor(handlers, "*/api/v1/shop/ticket/:ticketId/reinstate", "POST");
+    expect(handler).toContain("store.getById(Number(params.ticketId)) ?? store.list()[0]");
+  });
+
+  it("answers a sub-resource read declaring another DTO with that DTO, never with a stored row", () => {
+    const handler = handlerFor(handlers, "*/api/v1/shop/ticket/:ticketId/history", "GET");
+    expect(handler).not.toContain("store.");
+    expect(handler).toContain("} satisfies ValueCountDTO]))");
+  });
+
+  it("keeps a read of the stored record on the store, keyed or not", () => {
+    expect(handlerFor(handlers, "*/api/v1/shop/ticket/:ticketId", "GET")).toContain(
+      "store.getById(Number(params.ticketId)) ?? store.list()[0]",
+    );
+    expect(handlerFor(handlers, "*/api/v1/shop/ticket/current", "GET")).toContain(
+      "HttpResponse.json(wrapEnvelope(store.list()[0]))",
+    );
+  });
+
+  it("imports every sampled DTO once, beside the store's", () => {
+    const imported = /import type \{ ([^}]+) \} from '\.\.\/model'/.exec(handlers)?.[1];
+    expect(imported).toBe("ConfirmationDTO, TicketDTO, ValueCountDTO");
+  });
+
+  it("reports a declared response no sample can stand in for, and keeps an empty body for none", () => {
+    expect(result.unansweredResponses).toEqual([
+      { tag: "shop.Ticket", operation: "pageTicketsByOwner", response: "Page<TicketDTO>" },
+    ]);
+    expect(handlerFor(handlers, "*/api/v1/shop/ticket/by-owner", "GET")).toContain(
+      "wrapEnvelope({}))",
+    );
+    // No response declared: the empty body is the answer, not a gap.
+    expect(handlerFor(handlers, "*/api/v1/shop/ticket/:ticketId/close", "POST")).toContain(
+      "wrapEnvelope({}))",
+    );
+  });
+
+  it("transpiles", () => {
+    const transpiled = ts.transpileModule(handlers, { reportDiagnostics: true });
+    expect(transpiled.diagnostics ?? []).toEqual([]);
   });
 });
 
@@ -912,6 +1013,109 @@ function handBuiltDomain(name: string): ResolvedDomain {
   return domain;
 }
 
+/**
+ * A document whose operations answer shapes no store holds: an entity with one action and no CRUD
+ * role, returning a DTO of its own, and a backed entity carrying a census, a list of numbers, a
+ * keyed object, a page, an action returning the stored record and an action returning nothing.
+ */
+function answerDomain(name: string): ResolvedDomain {
+  const ticketId = [{ name: "ticketId", type: { kind: "number", integral: true } as TypeRef, required: true }];
+  const document: DtoMeta = {
+    version: 1,
+    enums: { Grade: { labeled: true, values: [{ name: "HIGH" }, { name: "LOW" }] } },
+    types: {
+      Owner: {
+        javaClass: "app.Owner",
+        typeParams: [],
+        fields: [{ name: "ownerId", type: { kind: "string" }, required: true, nullable: false }],
+      },
+      TicketDTO: {
+        javaClass: "app.TicketDTO",
+        typeParams: [],
+        fields: [
+          { name: "ticketId", type: { kind: "number", integral: true }, required: true, nullable: false },
+          { name: "title", type: { kind: "string" }, required: false, nullable: true },
+        ],
+      },
+      ValueCountDTO: {
+        javaClass: "app.ValueCountDTO",
+        typeParams: [],
+        fields: [
+          { name: "value", type: { kind: "string" }, required: true, nullable: false },
+          { name: "count", type: { kind: "number", integral: true }, required: true, nullable: false },
+        ],
+      },
+      ConfirmationDTO: {
+        javaClass: "app.ConfirmationDTO",
+        typeParams: [],
+        fields: [
+          { name: "confirmationId", type: { kind: "string" }, required: false, nullable: true },
+          { name: "status", type: { kind: "enum", name: "Grade" }, required: false, nullable: true },
+          { name: "confirmedAt", type: { kind: "instant" }, required: false, nullable: true },
+          { name: "owner", type: { kind: "ref", name: "Owner" }, required: true, nullable: false },
+          { name: "reviewer", type: { kind: "ref", name: "Owner" }, required: false, nullable: true },
+        ],
+      },
+    },
+    operations: [
+      operation("readTicket", "GET", "/api/v1/shop/ticket/{ticketId}", {
+        response: { kind: "ref", name: "TicketDTO" },
+        path: ticketId,
+      }),
+      operation("countTicketsByStatus", "GET", "/api/v1/shop/ticket/status-counts", {
+        response: { kind: "container", name: "List", args: [{ kind: "ref", name: "ValueCountDTO" }] },
+      }),
+      operation("sumTickets", "GET", "/api/v1/shop/ticket/sums", {
+        response: {
+          kind: "container",
+          name: "List",
+          args: [{ kind: "number", integral: true }],
+        },
+      }),
+      operation("labelTickets", "GET", "/api/v1/shop/ticket/labels", {
+        response: { kind: "container", name: "Map", args: [{ kind: "string" }] },
+      }),
+      operation("pageTicketsByOwner", "GET", "/api/v1/shop/ticket/by-owner", {
+        response: { kind: "container", name: "Page", args: [{ kind: "ref", name: "TicketDTO" }] },
+      }),
+      operation("reinstateTicket", "POST", "/api/v1/shop/ticket/{ticketId}/reinstate", {
+        response: { kind: "ref", name: "TicketDTO" },
+        path: ticketId,
+      }),
+      operation("closeTicket", "POST", "/api/v1/shop/ticket/{ticketId}/close", { path: ticketId }),
+      operation("currentTicket", "GET", "/api/v1/shop/ticket/current", {
+        response: { kind: "ref", name: "TicketDTO" },
+      }),
+      operation("ticketHistory", "GET", "/api/v1/shop/ticket/{ticketId}/history", {
+        response: { kind: "container", name: "List", args: [{ kind: "ref", name: "ValueCountDTO" }] },
+        path: ticketId,
+      }),
+      operation(
+        "confirm",
+        "POST",
+        "/api/v1/shop/confirmation/confirm",
+        {
+          response: {
+            kind: "container",
+            name: "SimpliXApiResponse",
+            args: [{ kind: "ref", name: "ConfirmationDTO" }],
+          },
+          body: { kind: "ref", name: "Owner" },
+        },
+        "shop.Confirmation",
+      ),
+    ],
+  };
+
+  const built = resolveMeta(document, {
+    domains: { [name]: ["shop.Ticket", "shop.Confirmation"] },
+    containerTypes,
+  });
+  const domain = built.domains.get(name);
+  if (!domain) throw new Error("the answer domain is missing");
+  return domain;
+}
+
 function operation(
   id: string,
   method: OperationMeta["method"],
@@ -921,12 +1125,13 @@ function operation(
     body?: TypeRef;
     path?: { name: string; type: TypeRef; required: boolean }[];
   },
+  tag = "shop.Ticket",
 ): OperationMeta {
   const built: OperationMeta = {
     id,
     method,
     path,
-    tag: "shop.Ticket",
+    tag,
     access: { kind: "authenticated" },
     request: { query: [], path: parts.path ?? [] },
   };
