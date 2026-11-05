@@ -186,7 +186,8 @@ describe("a DTO two entities reach", () => {
 
   it("lists the shared fields for the second entity's locale overlay and server translations", () => {
     const fields = metaEntities(domain, document).find((one) => one.name === "userAccount")?.fields.map((one) => one.name);
-    expect(fields).toEqual(expect.arrayContaining(["events", "ipAddress", "status"]));
+    // The domain's key order: ActivityDTO, CountDTO, EventDTO, UserAccountDTO, each field once.
+    expect(fields).toEqual(["events", "status", "ipAddress", "client"]);
     expect(fields).not.toContain("secret");
   });
 });
