@@ -135,6 +135,15 @@ export interface UnresolvedOrderField {
 }
 
 /**
+ * A batch update whose body names no list of the store's keys (`<idField>s`), so nothing says
+ * which rows it changes. Its handler writes nothing and answers what the operation declares.
+ */
+export interface UnresolvedBatchKey {
+  tag: string;
+  operation: string;
+}
+
+/**
  * A route identified by a path parameter the store's DTO does not declare, so nothing in the
  * store can be matched against it. The handler answers with the whole list rather than with one
  * arbitrary row.
@@ -174,6 +183,7 @@ export interface MockGenResult {
   seeds: string;
   unresolvedStoreTypes: UnresolvedStoreType[];
   unresolvedOrderFields: UnresolvedOrderField[];
+  unresolvedBatchKeys: UnresolvedBatchKey[];
   unmatchableParameters: UnmatchableParameter[];
   unansweredResponses: UnansweredResponse[];
   /**
@@ -222,6 +232,7 @@ export function generateMockFiles(domain: ResolvedDomain, options: MockGenOption
       .filter((entity) => entity.storeType === undefined && entity.storeRoles.length > 0)
       .map((entity) => ({ tag: entity.tag, roles: [...new Set(entity.storeRoles)] })),
     unresolvedOrderFields: emitter.unresolvedOrderFields,
+    unresolvedBatchKeys: emitter.unresolvedBatchKeys,
     unmatchableParameters: emitter.unmatchableParameters,
     unansweredResponses: emitter.unansweredResponses,
     labeledSeedFields: new Map(
@@ -489,6 +500,7 @@ function isNumericParam(param: ParamMeta): boolean {
 
 class MockEmitter {
   readonly unresolvedOrderFields: UnresolvedOrderField[] = [];
+  readonly unresolvedBatchKeys: UnresolvedBatchKey[] = [];
   readonly unmatchableParameters: UnmatchableParameter[] = [];
   readonly unansweredResponses: UnansweredResponse[] = [];
   private readonly metaRoot: string;
@@ -584,9 +596,11 @@ ${entries.join("\n")}
       case "create":
         return this.createHandler(entity, target, open);
       case "update":
-      case "multiUpdate":
-      case "batchUpdate":
         return this.updateHandler(entity, target, open);
+      case "multiUpdate":
+        return this.multiUpdateHandler(entity, target, open);
+      case "batchUpdate":
+        return this.batchUpdateHandler(entity, target, open);
       case "delete":
         return this.deleteHandler(entity, target, open);
       case "batchDelete":
@@ -890,14 +904,18 @@ ${entries.join("\n")}
     const param = target.operation.request.path.at(-1);
     if (param) {
       const key = isNumericParam(param) ? `Number(params.${param.name})` : `String(params.${param.name})`;
-      const write = `store.update(${key}, await request.json() as ${type})`;
+      // A keyed update that declares no body (a touch, a toggle the path names) changes nothing
+      // the request says, and reading JSON from an empty request throws.
+      const body = this.writtenBody(entity, target);
+      const write = `store.update(${key}, ${body ?? "{}"})`;
+      const opening = body === undefined ? `${open}({ params }) =>` : `${open}async ({ request, params }) =>`;
       if (this.answersWithStoredRow(entity, target)) {
-        return `${open}async ({ request, params }) => ${this.json(target, write)}),`;
+        return `${opening} ${this.json(target, write)}),`;
       }
       // The row is updated all the same; the answer is what the operation declares.
       const declared = this.declaredAnswer(entity, target, BLOCK_INDENT);
       return [
-        `${open}async ({ request, params }) => {`,
+        `${opening} {`,
         `      ${write};`,
         `      return ${declared.json};${declared.note}`,
         "    }),",
@@ -921,6 +939,78 @@ ${entries.join("\n")}
       `      return ${this.json(target, `${write} ?? store.create(body)`)};`,
       "    }),",
     ].join("\n");
+  }
+
+  /**
+   * A multi-update: the body is a list of rows, each carrying its key, and each row it names is
+   * updated in the store. Nothing is created: a key the store does not hold changes nothing, as
+   * the server refuses it. It answers with the rows it updated where the operation declares a
+   * list of the store's DTO, and with what it declares otherwise.
+   */
+  private multiUpdateHandler(entity: MockEntity, target: EndpointTarget, open: string): string {
+    const type = entity.storeTypeName;
+    // A DTO that declares no key is read through a cast, and a row without one changes nothing.
+    const key = entity.hasDeclaredIdField
+      ? `item.${entity.idField}!`
+      : `(item as { ${entity.idField}?: string | number }).${entity.idField}`;
+    const guard = entity.hasDeclaredIdField ? "" : `${key} === undefined ? [] : `;
+    const lines = [`${open}async ({ request }) => {`, `      const items = await request.json() as ${type}[];`];
+    if (this.answersWithStoredRows(entity, target)) {
+      lines.push(
+        `      const updated = items.flatMap((item) => ${guard}store.update(${key}, item) ?? []);`,
+        `      return ${this.json(target, "updated")};`,
+      );
+    } else {
+      const declared = this.declaredAnswer(entity, target, BLOCK_INDENT);
+      const write = entity.hasDeclaredIdField
+        ? `store.update(${key}, item);`
+        : `{ const key = ${key}; if (key !== undefined) store.update(key, item); }`;
+      lines.push(`      for (const item of items) ${write}`, `      return ${declared.json};${declared.note}`);
+    }
+    lines.push("    }),");
+    return lines.join("\n");
+  }
+
+  /**
+   * Whether a write answers with the rows it wrote: the operation declares a sequence of the
+   * store's own DTO.
+   */
+  private answersWithStoredRows(entity: MockEntity, target: EndpointTarget): boolean {
+    const payload = payloadOf(target.operation.response, this.domain);
+    if (payload?.kind !== "container" || this.domain.containers.get(payload.name)?.ts !== "Array") return false;
+    const element = payload.args[0];
+    return element?.kind === "ref" && element.name === entity.storeTypeName;
+  }
+
+  /**
+   * A batch update: one set of changes applied to every row the body's key list names
+   * (`<idField>s`, a list of the store's keys). The key list is not written onto the rows, and no
+   * row is created. A body that names no such list says nothing about which rows change, so the
+   * handler writes nothing and the operation is reported.
+   */
+  private batchUpdateHandler(entity: MockEntity, target: EndpointTarget, open: string): string {
+    const keys = this.batchKeyField(entity, target);
+    const declared = this.declaredAnswer(entity, target, BLOCK_INDENT);
+    if (!keys) {
+      this.unresolvedBatchKeys.push({ tag: entity.tag, operation: target.operation.id });
+      return `${open}() => ${declared.json}),${declared.note}`;
+    }
+    return [
+      `${open}async ({ request }) => {`,
+      `      const { ${keys.name}, ...changes } = await request.json() as { ${keys.name}?: ${keys.element}[] } & Partial<${entity.storeTypeName}>;`,
+      `      for (const key of ${keys.name} ?? []) store.update(key, changes);`,
+      `      return ${declared.json};${declared.note}`,
+      "    }),",
+    ].join("\n");
+  }
+
+  /** The field of a batch body that lists the keys of the rows it changes, and their type. */
+  private batchKeyField(entity: MockEntity, target: EndpointTarget): { name: string; element: "string" | "number" } | undefined {
+    const body = this.domain.types.get(refNameOf(innermostRef(target.operation.request.body)) ?? "");
+    const field = body?.allFields.find((one) => one.name === `${entity.idField}s`);
+    if (field?.type.kind !== "container" || this.domain.containers.get(field.type.name)?.ts !== "Array") return undefined;
+    const element = field.type.args[0]?.kind;
+    return element === "string" || element === "number" ? { name: field.name, element } : undefined;
   }
 
   /**

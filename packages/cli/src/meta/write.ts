@@ -456,6 +456,12 @@ function collectWarnings(results: GeneratorResults): string[] {
         "does not declare.",
     );
   }
+  for (const one of results.mock.unresolvedBatchKeys) {
+    warnings.push(
+      `${one.tag}.${one.operation} is a batch update whose body lists no keys of the rows it ` +
+        "changes; its handler writes nothing.",
+    );
+  }
   for (const one of results.mock.unansweredResponses) {
     warnings.push(
       `${one.tag}.${one.operation} declares ${one.response}, which no mock sample stands in for; ` +

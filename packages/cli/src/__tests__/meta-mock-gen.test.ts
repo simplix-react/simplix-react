@@ -368,7 +368,8 @@ describe("a handler filters by a path parameter only when the store's DTO declar
         }
       }
     }
-    expect(references).toBe(103);
+    // 34 of them are a multi-update reading each row's key.
+    expect(references).toBe(137);
   });
 
   it("answers with the whole list where the parameter names no field of the store", () => {
@@ -679,6 +680,71 @@ describe("a write keeps the store current and answers what its operation declare
     const session = handlerFor(handlersOf("user"), "*/api/v1/user/me/sessions/:authSessionId", "DELETE");
     expect(session).toContain("const removed = store.getById(key);");
     expect(session).toContain("return HttpResponse.json(wrapEnvelope(removed ?? null));");
+  });
+
+  it("transpiles", () => {
+    const transpiled = ts.transpileModule(handlers, { reportDiagnostics: true });
+    expect(transpiled.diagnostics ?? []).toEqual([]);
+  });
+});
+
+describe("a write addressing several rows updates each of them and answers what it declares", () => {
+  const result = generateMockFiles(bulkDomain("shop"), { naming: simplixBootNaming, labeledEnum: LABELED_ENUM, envelope });
+  const handlers = result.files.get("mock/handlers.ts") ?? "";
+
+  it("updates each row a multi-update's list names by its key and answers the rows it updated", () => {
+    const handler = handlerFor(handlers, "*/api/v1/shop/lane", "PATCH");
+    expect(handler).toContain("const items = await request.json() as LaneDTO[];");
+    expect(handler).toContain("const updated = items.flatMap((item) => store.update(item.laneId!, item) ?? []);");
+    expect(handler).toContain("return HttpResponse.json(wrapEnvelope(updated));");
+    expect(handler).not.toContain("store.create(");
+  });
+
+  it("answers a multi-update declaring another DTO with a list sample of that DTO, the rows updated all the same", () => {
+    const handler = handlerFor(handlers, "*/api/v1/shop/gate", "PATCH");
+    expect(handler).toContain("for (const item of items) store.update(item.gateId!, item);");
+    expect(handler).toContain("return HttpResponse.json(wrapEnvelope([{");
+    expect(handler).toContain("} satisfies GateReceiptDTO]));");
+    expect(handler).not.toContain("store.create(");
+  });
+
+  it("applies a batch update's changes to every row its key list names and answers the declared nothing", () => {
+    const handler = handlerFor(handlers, "*/api/v1/shop/lane/batch", "PATCH");
+    expect(handler).toContain("const { laneIds, ...changes } = await request.json() as { laneIds?: string[] } & Partial<LaneDTO>;");
+    expect(handler).toContain("for (const key of laneIds ?? []) store.update(key, changes);");
+    expect(handler).toContain("return HttpResponse.json(wrapEnvelope({}));");
+    expect(handler).not.toContain("store.create(");
+  });
+
+  it("writes nothing for a batch update whose body names no key list, and reports it", () => {
+    const handler = handlerFor(handlers, "*/api/v1/shop/gate/batch", "PATCH");
+    expect(handler).not.toContain("store.");
+    expect(handler).not.toContain("request.json()");
+    expect(handler).toContain("HttpResponse.json(wrapEnvelope({}))");
+    expect(result.unresolvedBatchKeys).toEqual([{ tag: "shop.Gate", operation: "batchUpdateGate" }]);
+  });
+
+  it("reads no JSON for a keyed update whose request declares no body", () => {
+    const handler = handlerFor(handlers, "*/api/v1/shop/lane/:laneId", "PATCH");
+    expect(handler).not.toContain("request.json()");
+    expect(handler).toContain("store.update(String(params.laneId), {})");
+  });
+
+  it("never creates a row from a bulk update, across the fixture", () => {
+    const bulk = [...generated.values()]
+      .flatMap((one) => [...factoriesOf(one.files.get("mock/handlers.ts") ?? "").values()])
+      .flatMap((factory) => factory.split(/\n(?= {4}http\.)/))
+      .filter((handler) => /^ {4}http\.patch\("[^"]*\/batch"/.test(handler) || /^ {4}http\.patch\("\*\/api\/v1\/[^":]*"/.test(handler));
+    const multi = bulk.filter((handler) => /const items = await request\.json\(\) as \w+\[\];/.test(handler));
+    const batch = bulk.filter((handler) => handler.includes("...changes } = await request.json()"));
+    // The document declares 38 of each. Four collection PATCH routes (org, gate policy, law pack,
+    // law register) are named for a segment other than their entity's, so the naming strategy
+    // reads them as custom actions, which answer their declared shape.
+    expect(multi.length).toBe(34);
+    expect(batch.length).toBe(38);
+    for (const handler of [...multi, ...batch]) expect(handler).not.toContain("store.create(");
+    for (const handler of batch) expect(handler).toContain("return HttpResponse.json(wrapEnvelope({}));");
+    expect([...generated.values()].flatMap((one) => one.unresolvedBatchKeys)).toEqual([]);
   });
 
   it("transpiles", () => {
@@ -1392,6 +1458,64 @@ function answerDomain(
   const built = resolveMeta(document, { domains: { [name]: tags }, containerTypes });
   const domain = built.domains.get(name);
   if (!domain) throw new Error("the answer domain is missing");
+  return domain;
+}
+
+/**
+ * Two entities written several rows at a time. A lane's multi-update answers the rows it wrote and
+ * its batch update names them by a key list; a gate's multi-update answers with receipts, and its
+ * batch body names no key list at all. A lane is also updated by a keyed request with no body.
+ */
+function bulkDomain(name: string): ResolvedDomain {
+  const laneId = [{ name: "laneId", type: { kind: "string" } as TypeRef, required: true }];
+  const gateId = [{ name: "gateId", type: { kind: "string" } as TypeRef, required: true }];
+  const field = (fieldName: string, type: TypeRef, required = false) => ({ name: fieldName, type, required, nullable: !required });
+  const document: DtoMeta = {
+    version: 1,
+    enums: {},
+    types: {
+      LaneDTO: { javaClass: "app.LaneDTO", typeParams: [], fields: [field("laneId", { kind: "string" }, true), field("open", { kind: "boolean" })] },
+      LaneBatchUpdateDTO: {
+        javaClass: "app.LaneBatchUpdateDTO",
+        typeParams: [],
+        fields: [field("laneIds", { kind: "container", name: "List", args: [{ kind: "string" }] }, true), field("open", { kind: "boolean" })],
+      },
+      GateDTO: { javaClass: "app.GateDTO", typeParams: [], fields: [field("gateId", { kind: "string" }, true), field("label", { kind: "string" })] },
+      GateReceiptDTO: { javaClass: "app.GateReceiptDTO", typeParams: [], fields: [field("receiptId", { kind: "string" }, true)] },
+      GateBatchUpdateDTO: { javaClass: "app.GateBatchUpdateDTO", typeParams: [], fields: [field("label", { kind: "string" })] },
+    },
+    operations: [
+      operation("readLane", "GET", "/api/v1/shop/lane/{laneId}", { response: { kind: "ref", name: "LaneDTO" }, path: laneId }, "shop.Lane"),
+      operation(
+        "multiUpdateLane",
+        "PATCH",
+        "/api/v1/shop/lane",
+        {
+          body: { kind: "container", name: "List", args: [{ kind: "ref", name: "LaneDTO" }] },
+          response: { kind: "container", name: "List", args: [{ kind: "ref", name: "LaneDTO" }] },
+        },
+        "shop.Lane",
+      ),
+      operation("batchUpdateLane", "PATCH", "/api/v1/shop/lane/batch", { body: { kind: "ref", name: "LaneBatchUpdateDTO" }, response: { kind: "container", name: "SimpliXApiResponse", args: [] }, bare: true }, "shop.Lane"),
+      operation("touchLane", "PATCH", "/api/v1/shop/lane/{laneId}", { response: { kind: "ref", name: "LaneDTO" }, path: laneId }, "shop.Lane"),
+      operation("readGate", "GET", "/api/v1/shop/gate/{gateId}", { response: { kind: "ref", name: "GateDTO" }, path: gateId }, "shop.Gate"),
+      operation(
+        "multiUpdateGate",
+        "PATCH",
+        "/api/v1/shop/gate",
+        {
+          body: { kind: "container", name: "List", args: [{ kind: "ref", name: "GateDTO" }] },
+          response: { kind: "container", name: "List", args: [{ kind: "ref", name: "GateReceiptDTO" }] },
+        },
+        "shop.Gate",
+      ),
+      operation("batchUpdateGate", "PATCH", "/api/v1/shop/gate/batch", { body: { kind: "ref", name: "GateBatchUpdateDTO" }, response: { kind: "container", name: "SimpliXApiResponse", args: [] }, bare: true }, "shop.Gate"),
+    ],
+  };
+
+  const built = resolveMeta(document, { domains: { [name]: ["shop.Lane", "shop.Gate"] }, containerTypes });
+  const domain = built.domains.get(name);
+  if (!domain) throw new Error("the bulk domain is missing");
   return domain;
 }
 
