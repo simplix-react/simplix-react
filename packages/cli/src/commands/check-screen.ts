@@ -78,7 +78,8 @@ export function factsOf(source: MetaScaffoldSource, holders: readonly MetaScaffo
     if (one.referenceNamePath === undefined || one.fkEntityField === null || references.has(one.name)) continue;
     references.set(one.name, {
       key: one.name,
-      nested: one.fkEntityField,
+      // A path a reference states runs through the record it nests, whatever the key's stem.
+      nested: one.referenceNamePath.split(".")[0] ?? one.fkEntityField,
       path: one.referenceNamePath,
       source: one.referenceNameSource ?? "declared",
     });
@@ -96,6 +97,7 @@ export function factsOf(source: MetaScaffoldSource, holders: readonly MetaScaffo
           /[a-z](Id|Ids)$/.test(one.name) &&
           one.name !== source.rowIdField &&
           one.referenceNamePath === undefined &&
+          one.referenceNameField === undefined &&
           (source.createRequired ?? []).includes(one.name),
       )
       .map((one) => one.name),

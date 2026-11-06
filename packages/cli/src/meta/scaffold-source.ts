@@ -107,6 +107,10 @@ export interface MetaScaffoldSource {
   listAccess?: AccessMeta;
   /** The reference name paths Meta does not declare and the scaffold guessed, as `key → path`. */
   inferredReferenceNames?: Record<string, string>;
+  /** Declared references the scaffold paired with a name field beside them that Meta does not state, as `key → field`. */
+  inferredReferenceNameFields?: Record<string, string>;
+  /** Keys Meta declares no reference for and the scaffold still draws as one, by their `<stem>Name` sibling, as `key → field`. */
+  undeclaredReferences?: Record<string, string>;
   /** The fields the create body requires, which the form must carry. */
   createRequired?: string[];
   /**
@@ -175,6 +179,9 @@ export async function loadMetaScaffoldSource(
       source.relationFields = relationFieldsOf(document, entityName, source);
       withReferenceKeys(document, source);
       source.inferredReferenceNames = withReferenceNames(document, source);
+      const flat = withFlatReferenceNames(document, entityName, source);
+      source.inferredReferenceNameFields = flat.inferred;
+      source.undeclaredReferences = flat.undeclared;
       withNameField(document, entityName, source);
       const defaultSort = document.entities?.[entityName]?.defaultSort;
       if (defaultSort && !source.defaultSort) source.defaultSort = defaultSort;
@@ -253,7 +260,8 @@ export function withReferenceNames(document: DtoMeta, source: MetaScaffoldSource
       }
     }
     if (one.referenceNamePath === undefined || one.fkEntityField === null || one.referencePeekKind === undefined) continue;
-    if (one.referenceNameSource === "declared" && one.referenceNamePath.split(".")[0] === one.fkEntityField) continue;
+    // A path the reference states starts at the holding row and is taken as it is.
+    if (one.referenceNameSource === "declared" && (one.referenceDeclared || one.referenceNamePath.split(".")[0] === one.fkEntityField)) continue;
     const pascal = one.referencePeekKind.charAt(0).toUpperCase() + one.referencePeekKind.slice(1);
     const declared = document.entities?.[pascal]?.nameFields?.[0];
     if (declared !== undefined) {
@@ -267,6 +275,79 @@ export function withReferenceNames(document: DtoMeta, source: MetaScaffoldSource
   return inferred;
 }
 
+/** What {@link withFlatReferenceNames} paired by a guess, for the scaffold to report. */
+export interface FlatReferenceNames {
+  /**
+   * Declared reference → the field beside it the scaffold paired as its name by the target entity's
+   * name field, which neither the reference nor the `<stem>Name` convention states.
+   */
+  readonly inferred: Record<string, string>;
+  /** Key Meta declares no reference for → the `<stem>Name` sibling it is still drawn by. */
+  readonly undeclared: Record<string, string>;
+}
+
+/**
+ * Names each reference that SimpliX Meta declares and names no record for by a field beside it on
+ * the same record, where one can be paired without the reference stating it.
+ *
+ * <p>The pairing tries the key's stem (`creditAccountName` beside `creditAccountId`), then the
+ * field the referenced entity declares its own name by (`ownerName` for an entity named by its
+ * owner), only where the row carries it, no other reference of the row targets that entity, it is
+ * not the holding record's own name and no other reference already draws it; only this second
+ * pairing is reported, since the stem is the backend's convention. A reference neither
+ * reaches keeps no name and is drawn by its id. A key that states no reference is left to the
+ * scaffold's `<stem>Name` guess and reported here as undeclared.
+ *
+ * @param document the committed SimpliX Meta
+ * @param entityName the holding entity (`CreditLedgerEntry`)
+ * @param source the entity's scaffold source, changed in place
+ */
+export function withFlatReferenceNames(document: DtoMeta, entityName: string, source: MetaScaffoldSource): FlatReferenceNames {
+  const inferred: Record<string, string> = {};
+  const undeclared: Record<string, string> = {};
+  const ownNames = new Set(document.entities?.[entityName]?.nameFields ?? []);
+  // The request body is a record of its own where it carries a name beside a key.
+  const records = [source.rowFields ?? [], source.detailFields ?? [], source.fields];
+  const unnamed = (one: FieldInfo) =>
+    one.isForeignKey && one.fkEntityField !== null && one.referenceNamePath === undefined && one.referenceNameField === undefined;
+  const pair = (one: FieldInfo, name: string, reported: boolean) => {
+    one.referenceNameField = name;
+    one.referenceNameSource = "inferred";
+    if (reported) inferred[one.name] = name;
+  };
+  for (const record of records) {
+    const text = new Set(record.filter((one) => one.tsType === "string" && !one.isForeignKey).map((one) => one.name));
+    for (const one of record) {
+      if (!unnamed(one)) continue;
+      const stem = [`${one.fkEntityField}Name`, `${one.fkEntityField}DisplayName`].find((name) => text.has(name));
+      if (stem === undefined) continue;
+      // `<stem>Name` beside `<stem>Id` is the backend's convention for a reference's name, which
+      // a reference declares a `nameField` only to depart from, so the pairing is not reported.
+      if (one.referenceDeclared) pair(one, stem, false);
+      else undeclared[one.name] = stem;
+    }
+    const claimed = new Set(record.map((one) => one.referenceNameField).filter((one): one is string => one !== undefined));
+    for (const one of record) {
+      if (!unnamed(one) || !one.referenceDeclared || one.referencePeekKind === undefined) continue;
+      const kind = one.referencePeekKind;
+      const targetName = document.entities?.[kind.charAt(0).toUpperCase() + kind.slice(1)]?.nameFields?.[0];
+      if (targetName === undefined || !text.has(targetName) || ownNames.has(targetName) || claimed.has(targetName)) continue;
+      if (record.filter((other) => other.referenceDeclared && other.referencePeekKind === kind).length !== 1) continue;
+      pair(one, targetName, true);
+      claimed.add(targetName);
+    }
+  }
+  // A request body carries no name beside its keys; its key takes the name the record settled.
+  for (const one of source.fields) {
+    if (!unnamed(one)) continue;
+    const settled = [...(source.rowFields ?? []), ...(source.detailFields ?? [])].find((other) => other.name === one.name && other.referenceNameField !== undefined);
+    if (settled === undefined) continue;
+    one.referenceNameField = settled.referenceNameField;
+    one.referenceNameSource = settled.referenceNameSource;
+  }
+  return { inferred, undeclared };
+}
+
 /**
  * The fields of `holderEntity` that hold another record's key: every `holders` entry naming it,
  * and every key the source already reads as a nested reference.
@@ -277,7 +358,7 @@ export function relationFieldsOf(document: DtoMeta, holderEntity: string, source
     for (const holder of entity.holders ?? []) if (holder.entity === holderEntity) out.add(holder.field);
   }
   for (const one of [...source.fields, ...(source.detailFields ?? []), ...(source.rowFields ?? [])]) {
-    if (one.referenceNamePath || one.referenceMatch !== undefined) out.add(one.name);
+    if (one.referenceNamePath || one.referenceMatch !== undefined || one.referenceKinds !== undefined) out.add(one.name);
   }
   return [...out].sort();
 }
@@ -324,6 +405,8 @@ export async function loadMetaHolders(rootDir: string, entity: string): Promise<
         if (tag === undefined) continue;
         const source = buildMetaScaffoldSource({ domain, tag, naming });
         withReferenceKeys(document, source);
+        // A holder's sub-list draws its references as its own list does.
+        withFlatReferenceNames(document, holder.entity, source);
         withNameField(document, holder.entity, source);
         const holderSort = document.entities?.[holder.entity]?.defaultSort;
         if (holderSort && !source.defaultSort) source.defaultSort = holderSort;
@@ -615,6 +698,7 @@ function fieldInfos(
     if (field.reference?.kindField && field.reference.kinds && shape.tsType === "string") {
       // The kind field's value picks the entity per record, so the key opens a peek per kind.
       one.isForeignKey = true;
+      one.referenceDeclared = true;
       one.fkEntityField = one.fkEntityField ?? field.name;
       one.referenceKinds = {
         field: field.reference.kindField,
@@ -626,11 +710,22 @@ function fieldInfos(
     } else if (field.reference?.entity && !field.reference.many && shape.tsType === "string") {
       const target = field.reference.entity.charAt(0).toLowerCase() + field.reference.entity.slice(1);
       one.isForeignKey = true;
+      one.referenceDeclared = true;
       // A key named `<stem>Id` keeps its stem, which is what its name field is named after
       // (`userId` beside `userName`); any other name is named after the referenced entity.
       one.fkEntityField = one.fkEntityField ?? target;
       one.referencePeekKind = target;
       one.referenceMatch = field.reference.idField;
+    }
+    // The name the reference states is a path from this record: a field beside the key
+    // (`actorName`), or a path through a record nested in it (`plan.name`).
+    const statedName = one.referenceDeclared ? field.reference?.nameField : undefined;
+    if (statedName?.includes(".")) {
+      one.referenceNamePath = statedName;
+      one.referenceNameSource = "declared";
+    } else if (statedName !== undefined && type.allFields.some((other) => other.name === statedName)) {
+      one.referenceNameField = statedName;
+      one.referenceNameSource = "declared";
     }
     const maxLength = field.constraints?.find((one) => one.kind === "maxLength")?.value;
     if (typeof maxLength === "number") one.maxLength = maxLength;
@@ -641,17 +736,18 @@ function fieldInfos(
   // record, so the key is drawn by the nested record's name and opens it.
   for (const one of fields) {
     if (!one.isForeignKey || !one.fkEntityField) continue;
+    // A name the reference states is settled already.
+    if (one.referenceNameSource === "declared") continue;
     const nested = type.allFields.find((field) => field.name === one.fkEntityField);
     const nestedType = nested ? typeOf(domain, nested.type) : undefined;
     if (!nestedType) continue;
-    // The key's own reference names the field, then the referenced entity's declared name fields
-    // are read in `withReferenceNames`; only a guess from the nested type's field names is
-    // marked as one, since a serializer may leave such a field out of the nested record.
-    const stated = type.allFields.find((field) => field.name === one.name)?.reference?.nameField;
-    const name = stated ?? referenceNameOf(nestedType);
+    // The referenced entity's declared name fields are read in `withReferenceNames`; only a guess
+    // from the nested type's field names is marked as one, since a serializer may leave such a
+    // field out of the nested record.
+    const name = referenceNameOf(nestedType);
     if (!name) continue;
     one.referenceNamePath = `${one.fkEntityField}.${name}`;
-    one.referenceNameSource = stated === undefined ? "inferred" : "declared";
+    one.referenceNameSource = "inferred";
     // The peek a reference opens is named after the referenced entity, which the nested DTO names
     // with any `DTO` / `Dto` suffix removed.
     const entityName = nestedType.name.replace(/(Detail|List)?(DTO|Dto)$/, "");

@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import type { DtoMeta } from "../meta/types.js";
 import type { OpenApiNamingStrategy } from "../openapi/naming/naming-strategy.js";
 import { resolveMeta } from "../meta/resolve.js";
-import { buildMetaScaffoldSource, withReferenceKeys } from "../meta/scaffold-source.js";
+import { buildMetaScaffoldSource, withFlatReferenceNames, withReferenceKeys } from "../meta/scaffold-source.js";
 import { withContractKinds } from "../commands/scaffold-crud.js";
 
 const namingModule = fileURLToPath(
@@ -75,7 +75,9 @@ describe("a key SimpliX Meta names as a reference", () => {
     const domain = resolved.domains.get("wallet");
     if (!domain) throw new Error("no wallet domain");
     const source = buildMetaScaffoldSource({ domain, tag: "admin.Wallet", naming: simplixBootNaming });
-    withReferenceKeys({ ...meta, entities: { CatalogVoice: { idField: "catalogVoiceId" }, UserAccount: { idField: "userId" } } } as DtoMeta, source);
+    const document = { ...meta, entities: { CatalogVoice: { idField: "catalogVoiceId" }, UserAccount: { idField: "userId" } } } as DtoMeta;
+    withReferenceKeys(document, source);
+    withFlatReferenceNames(document, "Wallet", source);
     const out = withContractKinds(source.fields, "walletId");
     expect(out.find((f) => f.name === "voiceCode")).toMatchObject({ contractKind: "reference", peekKind: "catalogVoice", nameField: "catalogVoiceName", peekBy: "voiceCode" });
     // Matched on the target's identifier, the reference needs no `peekBy`, and its stem still names its name field.
@@ -94,7 +96,9 @@ describe("a key SimpliX Meta names as a reference by kind", () => {
     const domain = resolved.domains.get("wallet");
     if (!domain) throw new Error("no wallet domain");
     const source = buildMetaScaffoldSource({ domain, tag: "admin.Wallet", naming: simplixBootNaming });
-    withReferenceKeys({ ...byKind, entities: { CatalogVoice: { idField: "catalogVoiceId" }, UserAccount: { idField: "userId" } } } as DtoMeta, source);
+    const document = { ...byKind, entities: { CatalogVoice: { idField: "catalogVoiceId" }, UserAccount: { idField: "userId" } } } as DtoMeta;
+    withReferenceKeys(document, source);
+    withFlatReferenceNames(document, "Wallet", source);
     const out = withContractKinds(source.fields, "walletId", { peeks: { owner: "userAccount" } });
     expect(out.find((f) => f.name === "ownerId")).toMatchObject({
       contractKind: "reference",

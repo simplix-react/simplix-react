@@ -127,6 +127,17 @@ export interface FieldInfo {
   referenceNameSource?: "declared" | "inferred";
   /** For a key SimpliX Meta states as a reference by kind: the kind field and the peek of each served kind. */
   referenceKinds?: ReferenceKinds;
+  /**
+   * SimpliX Meta declares the field as a reference (`reference.entity` or `reference.kindField`):
+   * it is drawn as one whether or not anything names its record, and never by the `…Id` name guess.
+   */
+  referenceDeclared?: boolean;
+  /**
+   * For a reference: the field of the same record that carries the referenced record's name
+   * (`actorName` beside `actorUserId`), as SimpliX Meta's `reference.nameField` states it or as
+   * the scaffold paired it (`referenceNameSource`).
+   */
+  referenceNameField?: string;
   /** The record's own identifier, which a list leaves out and a detail draws with a copy control. */
   isIdentifier?: boolean;
   /** A code the reader types or compares (SimpliX Meta's `format: "code"`), drawn in the monospaced face. */
@@ -180,7 +191,7 @@ export interface ContractFilterInfo {
 export function referenceFiltersOf(
   filters: readonly FilterFieldInfo[],
   fields: readonly FieldInfo[],
-  configured: Readonly<Record<string, { readonly hook?: string; readonly from?: string; readonly facet?: string }>> | undefined,
+  configured: Readonly<Record<string, { readonly hook?: string; readonly from?: string; readonly facet?: string; readonly facetFor?: string }>> | undefined,
 ): ContractFilterInfo[] {
   if (!configured) return [];
   const seen = new Set<string>();
@@ -188,7 +199,7 @@ export function referenceFiltersOf(
   for (const filter of filters) {
     if (seen.has(filter.field)) continue;
     const kind = fields.find((f) => f.name === filter.field)?.referencePeekKind;
-    if (kind === undefined || configured[kind]?.facet === undefined) continue;
+    if (kind === undefined || (configured[kind]?.facet === undefined && configured[kind]?.facetFor === undefined)) continue;
     seen.add(filter.field);
     out.push({ kind: "reference", field: filter.field });
   }
@@ -198,23 +209,45 @@ export function referenceFiltersOf(
 /** The facet hooks a list calls, one per reference filter, as the project names them. */
 export interface ListFacet {
   readonly field: string;
+  /** The hook the list calls: the project's own, or the one the list declares from `factory`. */
   readonly hook: string;
+  /**
+   * The factory the list calls once, at module scope, with the filtered column, so the facet
+   * resolves a picked record by that column (`createUserFacet("ownerUserId")`).
+   */
+  readonly factory?: string;
   readonly from: string;
 }
 
+/**
+ * The facet each reference filter reads. A facet keys the records it has picked on one column of
+ * the filtered list, so a project naming a factory (`facetFor`) gets one facet per filtered column;
+ * one naming a fixed hook (`facet`) gets that hook for every column, which resolves a picked record
+ * only on the column the hook was made for.
+ */
 export function facetsOf(
   filters: readonly ContractFilterInfo[],
   fields: readonly FieldInfo[],
-  configured: Readonly<Record<string, { readonly hook: string; readonly from: string; readonly facet?: string }>> | undefined,
+  configured: Readonly<Record<string, { readonly hook: string; readonly from: string; readonly facet?: string; readonly facetFor?: string }>> | undefined,
 ): ListFacet[] {
   const out: ListFacet[] = [];
   for (const filter of filters) {
     if (filter.kind !== "reference") continue;
     const kind = fields.find((f) => f.name === filter.field)?.referencePeekKind;
     const picker = kind === undefined ? undefined : configured?.[kind];
-    if (picker?.facet) out.push({ field: filter.field, hook: picker.facet, from: picker.from });
+    if (picker?.facetFor) {
+      const hook = `use${filter.field.charAt(0).toUpperCase()}${filter.field.slice(1)}Facet`;
+      out.push({ field: filter.field, hook, factory: picker.facetFor, from: picker.from });
+    } else if (picker?.facet) {
+      out.push({ field: filter.field, hook: picker.facet, from: picker.from });
+    }
   }
   return out;
+}
+
+/** The imports a list's facets need: the factory a declared facet is made by, else the project's hook. */
+export function facetImportsOf(facets: readonly ListFacet[]): { from: string; hooks: string }[] {
+  return pickerImportsOf(facets.map((one) => ({ field: one.field, hook: one.factory ?? one.hook, from: one.from })));
 }
 
 const FILTER_KIND: Record<string, ContractFilterInfo["kind"]> = {
@@ -334,10 +367,17 @@ export function withContractKinds(
   // read as a reference it would draw a peek at itself and swallow `<entity>Name` as its label.
   const fields = input.map((f) => (f.name === rowIdField && f.isForeignKey ? { ...f, isForeignKey: false, fkEntityField: null } : f));
   const names = new Set(fields.map((f) => f.name));
+  // The fields a reference draws its name from, and the record nested under its stem. A declared
+  // reference claims only the name it was settled with; an undeclared key also claims the siblings
+  // its name would be guessed from.
   const referenceNames = new Set(
-    fields.flatMap((f) =>
-      f.isForeignKey && f.fkEntityField ? [`${f.fkEntityField}Name`, `${f.fkEntityField}DisplayName`, f.fkEntityField] : [],
-    ),
+    fields.flatMap((f) => {
+      if (!f.isForeignKey || !f.fkEntityField) return [];
+      // The stem is the nested record only where a field of that name is not a text of its own.
+      const nested = fields.find((one) => one.name === f.fkEntityField)?.tsType === "string" ? undefined : f.fkEntityField;
+      const settled = [nested, f.referenceNameField, f.referenceNamePath?.split(".")[0]].filter((one): one is string => one !== undefined);
+      return f.referenceDeclared ? settled : [...settled, f.fkEntityField, `${f.fkEntityField}Name`, `${f.fkEntityField}DisplayName`];
+    }),
   );
   return fields.map((f) => {
     const stamped = stampContractKind(f, names, referenceNames, fields, peeks);
@@ -351,8 +391,11 @@ export function withContractKinds(
     const isKey = relationFields?.has(f.name) === true || (/[a-z](Id|Ids)$/.test(f.name) && !typedValue);
     const isOpaqueId = !isIdentifier && stamped.contractKind !== "reference" && isKey;
     // A relation is hidden from lists while it is a bare key; one whose record carries the
-    // referenced name is a reference column, drawn as that name with the peek it opens.
-    const hideInList = stamped.contractKind === "reference" && stamped.nameField ? false : stamped.hideInList;
+    // referenced name is a reference column, drawn as that name with the peek it opens. A declared
+    // reference nothing names is drawn by its id in a detail and left out of every list, a holder's
+    // sub-list included: a column of ids is nothing a reader compares down the rows.
+    const reference = stamped.contractKind === "reference";
+    const hideInList = reference && stamped.nameField ? false : reference && stamped.referenceDeclared ? true : stamped.hideInList;
     return { ...stamped, isIdentifier, isOpaqueId, ...(hideInList !== undefined ? { hideInList } : {}) };
   });
 }
@@ -370,17 +413,59 @@ function stampContractKind(
     const isReferenceName = referenceNames.has(f.name);
     const isAuditField = AUDIT_FIELDS.includes(f.name);
     if (contractKind !== "reference" || !f.fkEntityField) return { ...f, contractKind, isReferenceName, isAuditField };
-    // SimpliX Meta names no reference target, so an `…Id` is a reference only where the record also
-    // carries the referenced record's name; any other `…Id` (an external key, the row's own id) is text.
+    // A reference SimpliX Meta declares is one whether or not its record is named: one nothing names
+    // is drawn by its id, still opening its peek. The name guess below is for a source that states no
+    // references (an older Meta document, an OpenAPI one): there an `…Id` is a reference only where
+    // the record also carries the referenced record's name; any other `…Id` (an external key, the
+    // row's own id) is text.
+    const settled = f.referenceNamePath ?? f.referenceNameField;
     const nameField =
-      f.referenceNamePath ??
-      [`${f.fkEntityField}Name`, `${f.fkEntityField}DisplayName`, f.fkEntityField].find(
-        (n) => names.has(n) && fields.find((one) => one.name === n)?.tsType === "string",
-      );
-    if (!nameField) return { ...f, contractKind: "text", isReferenceName, isAuditField };
-    if (f.referenceKinds) return { ...f, contractKind, peekKinds: f.referenceKinds, nameField, isReferenceName, isAuditField };
-    return { ...f, contractKind, peekKind: f.referencePeekKind ?? peeks?.[f.fkEntityField] ?? f.fkEntityField, nameField, isReferenceName, isAuditField };
+      settled ??
+      (f.referenceDeclared
+        ? undefined
+        : [`${f.fkEntityField}Name`, `${f.fkEntityField}DisplayName`, f.fkEntityField].find(
+            (n) => names.has(n) && fields.find((one) => one.name === n)?.tsType === "string",
+          ));
+    if (!nameField && !f.referenceDeclared) return { ...f, contractKind: "text", isReferenceName, isAuditField };
+    const named = nameField ? { nameField } : {};
+    if (f.referenceKinds) {
+      const peekKinds = { ...f.referenceKinds, kinds: f.referenceKinds.kinds.map((one) => ({ ...one, peekKind: peeks?.[one.peekKind] ?? one.peekKind })) };
+      return { ...f, contractKind, peekKinds, ...named, isReferenceName, isAuditField };
+    }
+    return { ...f, contractKind, peekKind: peekKindOf(f, peeks), ...named, isReferenceName, isAuditField };
   }
+}
+
+/**
+ * The peek a reference opens: the entity the contract names (mapped by an entry of `peeks` keyed by
+ * that entity's camel-case name, where the app registers it under another kind), else the stem's
+ * entry, else the stem itself.
+ */
+function peekKindOf(f: FieldInfo, peeks: Readonly<Record<string, string>> | undefined): string | undefined {
+  if (f.referencePeekKind !== undefined) return peeks?.[f.referencePeekKind] ?? f.referencePeekKind;
+  if (f.fkEntityField === null) return undefined;
+  return peeks?.[f.fkEntityField] ?? f.fkEntityField;
+}
+
+/**
+ * The stem entries of `references.peeks` a declared reference does not read although they name
+ * another kind than the one it opens, one sentence each: the project registered its peek under the
+ * stem's word, and the generated reference opens the entity's.
+ */
+export function unreadPeekEntriesOf(fields: readonly FieldInfo[], peeks: Readonly<Record<string, string>> | undefined): string[] {
+  if (!peeks) return [];
+  const out = new Set<string>();
+  for (const f of fields) {
+    if (!f.referenceDeclared || f.fkEntityField === null || f.contractKind !== "reference") continue;
+    const stated = peeks[f.fkEntityField];
+    const opened = f.peekKind ?? f.peekKinds?.kinds.map((one) => one.peekKind).join(", ");
+    if (stated === undefined || opened === undefined || f.peekKind === stated || f.peekKinds?.kinds.some((one) => one.peekKind === stated)) continue;
+    out.add(
+      `"${f.name}" opens peek kind "${opened}", the entity SimpliX Meta declares it references; references.peeks maps its stem "${f.fkEntityField}" to "${stated}", which a declared reference does not read. ` +
+        `Register the peek as "${opened}", or key the entry by the entity (\`${f.referencePeekKind ?? f.peekKinds?.kinds[0]?.peekKind}: "${stated}"\`).`,
+    );
+  }
+  return [...out];
 }
 
 /**
@@ -402,14 +487,28 @@ export function projectRowFields(rowFields: readonly FieldInfo[], stated: Readon
   return rowFields.map((f) => {
     const one = stated.get(f.name);
     if (!one) return f;
-    if (f.referenceNamePath) return { ...one, referenceNamePath: f.referenceNamePath, referencePeekKind: f.referencePeekKind };
-    if (f.referenceKinds) return { ...one, isForeignKey: true, fkEntityField: f.fkEntityField, referenceKinds: f.referenceKinds };
-    if (f.referenceMatch !== undefined) {
-      return { ...one, isForeignKey: true, fkEntityField: f.fkEntityField, referencePeekKind: f.referencePeekKind, referenceMatch: f.referenceMatch, ...(f.peekBy ? { peekBy: f.peekBy } : {}) };
+    if (!f.isForeignKey) return one;
+    const out: FieldInfo = { ...one };
+    for (const key of ROW_REFERENCE_KEYS) {
+      if (f[key] !== undefined) (out as unknown as Record<string, unknown>)[key] = f[key];
     }
-    return one;
+    return out;
   });
 }
+
+/** What a row's reading of a reference settles, which wins over the request body's reading of the same key. */
+const ROW_REFERENCE_KEYS = [
+  "isForeignKey",
+  "fkEntityField",
+  "referenceNamePath",
+  "referenceNameSource",
+  "referencePeekKind",
+  "referenceKinds",
+  "referenceMatch",
+  "peekBy",
+  "referenceDeclared",
+  "referenceNameField",
+] as const satisfies readonly (keyof FieldInfo)[];
 
 /** The relation keys a SimpliX Meta source states, or `undefined` for a source that states none. */
 export function relationsOf(source: { readonly relationFields?: readonly string[] } | null | undefined): ReadonlySet<string> | undefined {
@@ -438,7 +537,9 @@ export async function holdersOf(metaHolders: readonly MetaHolderSource[], option
     const holderPackage = await options.packageOf(holder.entity);
     if (!holderList || !holderPackage) continue;
     const holderFields = withContractKinds(holder.source.rowFields ?? holder.source.fields, holder.source.rowIdField, { peeks: options.peeks, relationFields: relationsOf(holder.source) })
-      .filter((f) => f.name !== holder.field);
+      // The key that points at the open record, and what the holder's own list leaves out of its
+      // columns as a reference nothing names.
+      .filter((f) => f.name !== holder.field && !(f.contractKind === "reference" && f.hideInList === true));
     const holderSort = chooseDefaultSort({ declared: holder.source.defaultSort, candidates: options.defaultSortFields, fields: holderFields, rowIdField: holder.source.rowIdField });
     holders.push({
       entity: holder.entity,
@@ -1341,9 +1442,10 @@ export async function resolvesFrom(dir: string, name: string): Promise<boolean> 
   }
 }
 
-async function ensureModuleDeps(
+export async function ensureModuleDeps(
   moduleDir: string,
-  domainPackageName: string | null,
+  /** The workspace domain packages the screen's files may import: the entity's own and its holders'. */
+  domainPackageNames: readonly string[],
   /** The UI kit whose templates drew the files, which then import it. */
   kit: { readonly name: string; readonly spec: string } | null = null,
   /** What the screen's files hold once this run is done; a dependency is added only for one of them that imports it. */
@@ -1381,10 +1483,11 @@ async function ensureModuleDeps(
     added.push(`${kit.name}@${kit.spec}`);
   }
 
-  // Domain package (workspace:*)
-  if (domainPackageName && needed(domainPackageName) && !deps[domainPackageName]) {
-    deps[domainPackageName] = "workspace:*";
-    added.push(`${domainPackageName}@workspace:*`);
+  // Domain packages (workspace:*): the entity's own, and another domain's a holder's sub-list reads.
+  for (const name of new Set(domainPackageNames)) {
+    if (!needed(name) || deps[name] || devDeps[name]) continue;
+    deps[name] = "workspace:*";
+    added.push(`${name}@workspace:*`);
   }
 
   // @types/react: a file of the screen that draws JSX or imports React needs it, and a module that
@@ -2927,7 +3030,7 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       ...listDecision(options),
       cardTitle: options.cardTitle ?? "",
       listFacets,
-      listFacetImports: pickerImportsOf(listFacets),
+      listFacetImports: facetImportsOf(listFacets),
       filterBarDefs,
       textFilterFields,
       hasTextFilters: textFilterFields.length > 0,
@@ -3096,7 +3199,9 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       const screenFiles = [...held, ...pages.onDisk];
 
       // Dependencies the screen's files import and the module does not yet resolve.
-      const addedDeps = await ensureModuleDeps(moduleDir, packageName, await kitDependency(rootDir, templateSettings.from), screenFiles);
+      // The entity's own domain package and every domain package a holder's sub-list imports.
+      const domainPackages = [packageName, ...holders.map((one) => one.packageName)].filter((one): one is string => one !== null);
+      const addedDeps = await ensureModuleDeps(moduleDir, domainPackages, await kitDependency(rootDir, templateSettings.from), screenFiles);
       if (addedDeps.length > 0) {
         log.info("Added dependencies:");
         for (const dep of addedDeps) {
@@ -3173,6 +3278,20 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       log.warn(
         `${entity}: "${key}" is drawn by "${path}", guessed from the nested record's field names. ` +
         "The referenced entity declares no `nameFields`; declare them in the backend so the name is not a guess.",
+      );
+    }
+    for (const [key, name] of Object.entries(metaSource?.inferredReferenceNameFields ?? {})) {
+      log.warn(
+        `${entity}: "${key}" is drawn by "${name}", the field its referenced entity is named by: the reference states no \`nameField\`. ` +
+          "Declare it on the reference in the backend so the pairing is not a guess.",
+      );
+    }
+    const contractFields = [...fullCtx.listFields, ...fullCtx.detailFields, ...fullCtx.fields, ...holders.flatMap((one) => one.fields)];
+    for (const note of unreadPeekEntriesOf(contractFields, referencePeeks)) log.warn(`${entity}: ${note}`);
+    for (const [key, name] of Object.entries(metaSource?.undeclaredReferences ?? {})) {
+      log.warn(
+        `${entity}: "${key}" is drawn as a reference by "${name}", although SimpliX Meta declares no reference for it. ` +
+          "Declare the reference in the backend (`@References`), so its target and its peek are stated rather than guessed from the name.",
       );
     }
     log.info("");

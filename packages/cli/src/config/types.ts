@@ -167,15 +167,6 @@ export interface SimplixConfig {
   routes?: Readonly<Record<string, RouteTarget>>;
 
   /**
-   * How references are drawn.
-   *
-   * @remarks
-   * `peeks` names the peek a reference opens, keyed by the reference's stem (`user` for `userId`
-   * beside `userName`), where the contract does not name the referenced entity: a key whose record
-   * arrives nested is named by that record's type, a flat key only by its own name, which need not
-   * be the entity the app registers a peek for (`{ user: "userAccount", owner: "userAccount" }`).
-   */
-  /**
    * What a scaffold decides where SimpliX Meta is silent.
    *
    * @remarks
@@ -197,13 +188,30 @@ export interface SimplixConfig {
    * an entity not listed is reported by `simplix check-screen`, since its id would be typed by hand.
    * `facet` names the hook (from the same module, made by `createEntityFacet`) that searches the
    * entity for a list filter: a list over a key of that entity is filtered by the record's name.
+   * A facet resolves the records it has picked by one column of the filtered list, so a fixed hook
+   * serves only the column it was made for. `facetFor` names a factory instead (from the same
+   * module, taking the filtered column and returning the hook), which a generated list calls once
+   * per filtered column (`createUserFacet("ownerUserId")`); it wins over `facet`.
    */
   scaffold?: {
     readonly defaultSortFields?: readonly (string | { readonly field: string; readonly direction?: "asc" | "desc" })[];
     readonly maskedSuffix?: string;
-    readonly referencePickers?: Readonly<Record<string, { readonly hook: string; readonly from: string; readonly facet?: string }>>;
+    readonly referencePickers?: Readonly<Record<string, { readonly hook: string; readonly from: string; readonly facet?: string; readonly facetFor?: string }>>;
   };
 
+  /**
+   * How references are drawn.
+   *
+   * @remarks
+   * `peeks` names the peek a reference opens. Where the contract does not name the referenced
+   * entity it is keyed by the reference's stem (`user` for `userId` beside `userName`): a key whose
+   * record arrives nested is named by that record's type, a flat key only by its own name, which
+   * need not be the entity the app registers a peek for (`{ user: "userAccount", owner: "userAccount" }`).
+   * A reference SimpliX Meta declares names its entity, and the entity's name in camel case is the
+   * peek kind; an entry keyed by that name maps it to the kind the app registers
+   * (`{ userRole: "role" }`). A stem entry is not read for a declared reference, and the scaffold
+   * warns where one names another kind than the one the reference opens.
+   */
   references?: {
     peeks?: Readonly<Record<string, string>>;
   };

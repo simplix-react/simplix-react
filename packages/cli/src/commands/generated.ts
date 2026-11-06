@@ -1,13 +1,13 @@
 import { Command } from "commander";
 import { readFile, readdir, realpath, stat } from "node:fs/promises";
-import { join, relative, resolve, sep } from "node:path";
+import { dirname, join, relative, resolve, sep } from "node:path";
 
 import { designProblems } from "../checks/design-source.js";
 import { loadConfig } from "../config/config-loader.js";
 import { assertOutputDirs } from "../config/output-dirs.js";
 import { reportConfigError } from "../config/report-config-error.js";
 import { storyTargets } from "../utils/app-config.js";
-import { captureWrites, findProjectRoot, lastKeptRenders, writeFileWithDir } from "../utils/fs.js";
+import { captureWrites, findProjectRoot, lastKeptRenders, pathExists, writeFileWithDir } from "../utils/fs.js";
 import { log, withSilentLog } from "../utils/logger.js";
 import { runAfterGenerate } from "../utils/generated-after.js";
 import { basePathFor, takeGeneratedOutcomes, withConflictMarkers, withRemovalsHonoured, type GeneratedWrite } from "../utils/generated-merge.js";
@@ -257,6 +257,14 @@ export async function regenerateNamed(
     log.info(`simplix ${origin}  (${named.length} file(s))`);
     const capture = () => renderOriginNow(origin.split(/\s+/));
     const render = await withRemovalsHonoured(() => (writeConflicts ? withConflictMarkers(capture) : capture()));
+    // A named file may import a package its module does not declare yet (a holder's domain); the
+    // render adds it to that module's manifest, which is written with the file so the file compiles.
+    for (const [manifest, content] of await manifestsOf(rootDir, named, render.written)) {
+      const current = (await pathExists(manifest)) ? await readFile(manifest, "utf-8") : undefined;
+      if (current === content) continue;
+      await writeFileWithDir(manifest, content);
+      log.info(`  → updated   ${relative(rootDir, manifest)} (dependencies the regenerated files import)`);
+    }
     for (const file of named) {
       const content = render.written.get(file);
       if (content !== undefined) await writeFileWithDir(file, content);
@@ -268,6 +276,33 @@ export async function regenerateNamed(
     }
   }
   return { origins: [...byOrigin.keys()], writes, unrecorded };
+}
+
+/**
+ * The package manifest nearest above each file whose render the capture rewrote, with the content the
+ * render gave it. The walk stops at the first manifest on disk or in the capture, and never leaves the
+ * project root, so a file's own module is the only manifest it reaches.
+ *
+ * @param rootDir the project root
+ * @param files absolute paths of the regenerated files
+ * @param written what the render would write, by absolute path
+ */
+export async function manifestsOf(rootDir: string, files: readonly string[], written: ReadonlyMap<string, string>): Promise<Map<string, string>> {
+  const out = new Map<string, string>();
+  // The generated files are named with links resolved, so the root is too.
+  const root = await realpath(resolve(rootDir));
+  for (const file of files) {
+    for (let dir = dirname(resolve(file)); dir.startsWith(root); dir = dirname(dir)) {
+      const manifest = join(dir, "package.json");
+      const content = written.get(manifest);
+      if (content !== undefined) {
+        out.set(manifest, content);
+        break;
+      }
+      if (dir === root || (await pathExists(manifest))) break;
+    }
+  }
+  return out;
 }
 
 /**
