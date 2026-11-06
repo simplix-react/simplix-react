@@ -15,7 +15,7 @@ describe("EmptyValue", () => {
   it("draws a single hyphen-minus, never an em dash", () => {
     expect(EMPTY_VALUE_TEXT).toBe("-");
     const { container } = render(<EmptyValue />);
-    expect(container.textContent).not.toContain("—");
+    expect(container.textContent).not.toContain("\u2014");
   });
 
   it("draws what it is handed instead", () => {
