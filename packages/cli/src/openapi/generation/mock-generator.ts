@@ -2,6 +2,7 @@ import { join } from "node:path";
 import { readdir, readFile } from "node:fs/promises";
 import { writeFileWithDir, pathExists } from "../../utils/fs.js";
 import { toPascalCase } from "../../utils/case.js";
+import { queryKeyListRead } from "../../utils/mock-key-list.js";
 import { generateOrvalSeedFile } from "./seed-generator.js";
 import type { ResponseAdapterConfig, ResponseAdapterPreset } from "../adaptation/response-adapter.js";
 import { getResponseAdapterPreset } from "../plugin-registry.js";
@@ -409,9 +410,15 @@ function generateHandlerEntry(
         : generateReadByFieldHandler(method, pattern, store, parentParam!);
       break;
     }
-    case "batchDelete":
-      entry = `    http.${method}("${pattern}", () => HttpResponse.json({})),`;
+    case "batchDelete": {
+      // The rows go by the query parameter listing the store's keys (`<idField>s`). Without one
+      // nothing says which rows go, and the handler removes nothing.
+      const keys = operation.queryParams.find((param) => param.name === `${idField}s` && param.type === "array");
+      entry = keys
+        ? generateBatchDeleteHandler(method, pattern, store, keys.name)
+        : `    http.${method}("${pattern}", () => HttpResponse.json({})),`;
       break;
+    }
     case "search":
       entry = generateSearchHandler(method, pattern, store);
       break;
@@ -681,6 +688,17 @@ function generateDeleteHandler(
     : `String(params.${pathParam})`;
 
   return `    http.${method}("${pattern}", ({ params }) => { ${store}.remove(${idExpr}); return HttpResponse.json(null); }),`;
+}
+
+/** A batch delete, removing every row the query parameter `keys` names. */
+function generateBatchDeleteHandler(method: string, pattern: string, store: string, keys: string): string {
+  return [
+    `    http.${method}("${pattern}", ({ request }) => {`,
+    `      const keys = ${queryKeyListRead(keys)};`,
+    `      for (const key of keys) ${store}.remove(key);`,
+    "      return HttpResponse.json({});",
+    "    }),",
+  ].join("\n");
 }
 
 function generateDeleteByFieldHandler(

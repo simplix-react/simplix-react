@@ -231,6 +231,36 @@ describe("generateMockFiles", () => {
     const handlersPath = join(tempDir, "src/generated/mock/handlers.ts");
     const content = await readFile(handlersPath, "utf-8");
     expect(content).toContain("delete");
+    // No query parameter lists the keys, so nothing says which rows go.
+    expect(content).toContain('http.delete("*/users/batch", () => HttpResponse.json({})),');
+  });
+
+  it("removes every row a batch delete's key list names, comma-joined or repeated", async () => {
+    const entity = makeEntity({
+      operations: [
+        {
+          name: "batchDelete",
+          method: "DELETE",
+          path: "/users/batch",
+          role: "batchDelete",
+          hasInput: false,
+          queryParams: [
+            { name: "tags", type: "array", required: false },
+            { name: "ids", type: "array", required: true },
+          ],
+        },
+      ],
+    });
+
+    await generateMockFiles(tempDir, "test", [entity]);
+
+    const content = await readFile(join(tempDir, "src/generated/mock/handlers.ts"), "utf-8");
+    const handler = content.slice(content.indexOf('http.delete("*/users/batch"'));
+    expect(handler).toContain(
+      'const keys = new URL(request.url).searchParams.getAll("ids").flatMap((value) => value.split(",")).filter((key) => key !== "");',
+    );
+    expect(handler).toContain("for (const key of keys) store.remove(key);");
+    expect(handler).toContain("return HttpResponse.json({});");
   });
 
   it("handles getAll role", async () => {

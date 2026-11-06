@@ -1,4 +1,5 @@
 import { toPascalCase } from "../../utils/case.js";
+import { queryKeyListRead } from "../../utils/mock-key-list.js";
 import type { OpenApiNamingStrategy } from "../../openapi/naming/naming-strategy.js";
 import { readSearchFields, type SearchField } from "../filter-source.js";
 import type { FieldMeta, ParamMeta, TypeRef } from "../types.js";
@@ -1027,13 +1028,11 @@ ${entries.join("\n")}
   }
 
   /**
-   * A batch delete: every row the query string's key list (`<idField>s`) names is removed. The
-   * generated client writes the list as one comma-joined value, and a client exploding the array
-   * repeats the parameter, so both are read. The keys stay strings: the store matches a string
-   * against a numeric key, and an empty member is dropped, since the store matches `""` against
-   * a row keyed 0. It answers with the rows it removed where the operation declares a list of the
-   * store's DTO, and with what it declares otherwise. A query string naming no such list says
-   * nothing about which rows go, so the handler removes nothing and the operation is reported.
+   * A batch delete: every row the query string's key list (`<idField>s`) names is removed, the list
+   * read as {@link queryKeyListRead} reads it. The keys stay strings, since the store matches a
+   * string against a numeric key. It answers with the rows it removed where the operation declares
+   * a list of the store's DTO, and with what it declares otherwise. A query string naming no such
+   * list says nothing about which rows go, so the handler removes nothing and is reported.
    */
   private batchDeleteHandler(entity: MockEntity, target: EndpointTarget, open: string): string {
     const keys = this.keyList(entity, target.operation.request.query);
@@ -1042,10 +1041,7 @@ ${entries.join("\n")}
       const declared = this.declaredAnswer(entity, target);
       return `${open}() => ${declared.json}),${declared.note}`;
     }
-    const read =
-      `new URL(request.url).searchParams.getAll(${JSON.stringify(keys.name)})` +
-      '.flatMap((value) => value.split(",")).filter((key) => key !== "")';
-    const lines = [`${open}({ request }) => {`, `      const keys = ${read};`];
+    const lines = [`${open}({ request }) => {`, `      const keys = ${queryKeyListRead(keys.name)};`];
     if (this.answersWithStoredRows(entity, target)) {
       lines.push(
         "      const removed = keys.flatMap((key) => store.getById(key) ?? []);",
