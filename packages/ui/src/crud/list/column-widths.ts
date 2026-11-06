@@ -2,7 +2,7 @@
  * Where a reader's column widths live between visits.
  *
  * <p><b>Its own namespace, deliberately outside every token store's prefix.</b> A token store
- * clears by sweeping every key that starts with its prefix, and signing out calls that clear — so
+ * clears by sweeping every key that starts with its prefix, and signing out calls that clear, so
  * a preference parked beside the tokens is erased by the one act it has to outlive. An operator
  * who dragged a column wide would find it narrow again after every sign-in, with nothing anywhere
  * saying why.
@@ -30,7 +30,7 @@ export const KEYBOARD_STEP = 16;
 /**
  * Reads the widths stored for one list.
  *
- * <p>Anything unreadable is treated as nothing stored — the reader then gets the column set the
+ * <p>Anything unreadable is treated as nothing stored: the reader then gets the column set the
  * screen was designed with, which is the state they would have had anyway.
  *
  * @param listKey the list's own key
@@ -50,7 +50,7 @@ export function readColumnWidths(listKey: string): ColumnWidths {
     }
     return widths;
   } catch {
-    /* storage unavailable or the entry is not JSON — the screen's own widths stand */
+    /* storage unavailable or the entry is not JSON: the screen's own widths stand */
     return {};
   }
 }
@@ -69,7 +69,7 @@ export function writeColumnWidths(listKey: string, widths: ColumnWidths): void {
     }
     localStorage.setItem(STORE_NAMESPACE + listKey, JSON.stringify(widths));
   } catch {
-    /* storage unavailable — the widths last this visit, which beats refusing the drag */
+    /* storage unavailable: the widths last this visit, which beats refusing the drag */
   }
 }
 
@@ -77,7 +77,7 @@ export function writeColumnWidths(listKey: string, widths: ColumnWidths): void {
  * The style a sized column's header carries.
  *
  * <p>All three of `width`, `minWidth` and `maxWidth`, because an auto-layout table treats a
- * cell's width as a suggestion and discards it whenever the column's content says otherwise —
+ * cell's width as a suggestion and discards it whenever the column's content says otherwise,
  * asking for 364 and getting the content's 154 back, with the reader watching the column refuse
  * to move. Measured on a real table, one variable at a time:
  *
@@ -102,13 +102,13 @@ export function sizedHeaderStyle(width: number): {
  *
  * <p>Two cases reach this state and they want the same thing: a column the reader has sized, and
  * one the screen declared as flexible. In both, zeroing the cell's max-width stops the auto table
- * layout reading the cell's content as the column's minimum — which is what lets such a column be
+ * layout reading the cell's content as the column's minimum, which is what lets such a column be
  * dragged narrower than what it happens to hold. The cell still renders at the column's width;
  * the zero is what it offers, not what it takes.
  *
  * <p>The attribute is the other half, and it is for whatever the CALLER put inside the cell. A
  * column holding a value of known size caps that content at the width the screen was drawn to, so
- * a long value ellipsizes rather than pushing the table sideways — and that cap, left standing,
+ * a long value ellipsizes rather than pushing the table sideways, and that cap, left standing,
  * goes on ellipsizing at the old number in a column the reader has just widened. They drag, watch
  * the column grow, and watch the text not grow with it. The header's own label is released
  * inline because this component renders it; a body cell's content is the caller's, so the release
@@ -129,8 +129,12 @@ export function sizedCellProps(
 ): { style?: { maxWidth: number }; "data-column-sized"?: string } {
   const sized = widths[columnId] !== undefined || meta?.flexible === true;
   if (sized) return { style: { maxWidth: 0 }, "data-column-sized": "" };
+  // Content drawn whole (a badge, a chip) is the one thing a fixed column may not cut: its natural
+  // width reaches the table's intrinsic width, so a value wider than the declared number widens the
+  // column, and a table that then outgrows its container drops a tier or scrolls sideways.
+  if (meta?.fitContent === true) return {};
   // A fixed column keeps its content out of the table's intrinsic width for the same reason, and
-  // it is the half that makes `width` mean what it says — a column declared at a width that its
+  // it is the half that makes `width` mean what it says: a column declared at a width that its
   // longest value can still stretch is a floor wearing another prop's name. The attribute does
   // NOT come with it: releasing the caller's own caps is for a column whose width can change
   // under the reader, and this one's cannot.
@@ -151,6 +155,20 @@ export interface ColumnSizing {
   readonly fixed?: boolean;
   /** Where the header and the cells set their content; absent is the start edge. */
   readonly align?: "start" | "end";
+  /**
+   * The cells draw their content whole (a badge, a chip): the declared width is a floor, the cell
+   * never truncates, and a value wider than the floor widens the column instead of being cut. For a
+   * fixed column; a flexible one already rests on its floor and keeps truncating its free text.
+   */
+  readonly fitContent?: boolean;
+}
+
+/**
+ * The class a body cell takes for its column: a cell drawn whole keeps its content on one line at
+ * its natural width; any other cell ellipsizes at the column's edge.
+ */
+export function cellFitClass(meta: ColumnSizing | undefined): string {
+  return meta?.fitContent === true && meta.flexible !== true ? "whitespace-nowrap" : "truncate";
 }
 
 /** The class a header or a cell takes for its column's alignment: an end-aligned column sets figures in tabular numerals. */
@@ -163,15 +181,15 @@ export function columnAlignClass(meta: ColumnSizing | undefined): string | undef
  *
  * <p>Three states, and the difference between the first two is the whole difference between the
  * `width` and `minWidth` props. A column the reader has dragged and one declared with a fixed
- * `width` are pinned — all three of width/min/max, because an auto table layout reads a bare
+ * `width` are pinned, all three of width/min/max, because an auto table layout reads a bare
  * `width` as a suggestion and spends the table's spare room on whichever column resists least. A
  * column declared with a `minWidth` carries the floor alone, so that spare room lands there.
  *
  * <p><b>A column with neither gets no style, and that is the one the spare room goes to.</b> Which
  * is why the fixed case may not be recognised by comparing the size against TanStack's default:
  * `width={150}` would then be read as no width at all, and the column that asked to stay at 150
- * becomes the one that absorbs the whole remainder — 423px of it in a detail panel, next to a
- * column of unpredictable text that got none.
+ * becomes the one that absorbs the whole remainder (423px of it in a detail panel, next to a
+ * column of unpredictable text that got none).
  *
  * @param readerWidth what this reader has dragged the column to, if anything
  * @param size the column's declared size
@@ -184,9 +202,12 @@ export function headerWidthStyle(
   meta: ColumnSizing | undefined,
 ):
   | { width: number; minWidth: number; maxWidth: number }
+  | { width: number; minWidth: number }
   | { width: number }
   | undefined {
   if (readerWidth !== undefined) return sizedHeaderStyle(readerWidth);
+  // A column drawn whole holds its width as a floor: a badge wider than it widens the column.
+  if (meta?.fixed === true && meta.fitContent === true) return { width: size, minWidth: size };
   if (meta?.fixed === true) return sizedHeaderStyle(size);
   if (meta?.flexible === true) return { width: size };
   return undefined;

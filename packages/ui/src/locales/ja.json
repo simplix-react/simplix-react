@@ -422,6 +422,9 @@
     "steps": "入力ステップ",
     "stepLabel": "ステップ {{step}}: {{title}}"
   },
+  "table": {
+    "scrollRegion": "横にスクロールする表"
+  },
   "tabs": {
     "scrollPrevious": "前のタブ",
     "scrollNext": "次のタブ"

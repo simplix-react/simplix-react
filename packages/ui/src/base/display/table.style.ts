@@ -3,7 +3,11 @@ import { defineSlotStyle } from "../../design/slot-style";
 /** The scroll container around a table. */
 export const tableContainerStyle = defineSlotStyle({
   slot: "table-container",
-  base: "",
+  // While the table scrolls sideways the box is a focusable region: its ring is drawn inside its edge
+  // (a card around the table clips anything outside it), and the edge with columns past it fades so
+  // the hidden columns read as reachable, not missing. The fade is lifted while the box holds keyboard
+  // focus, since a mask would fade the ring too.
+  base: "focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:-outline-offset-2 data-[scroll-edge=end]:not-focus-visible:[mask-image:linear-gradient(to_right,black_calc(100%-2rem),transparent)] data-[scroll-edge=start]:not-focus-visible:[mask-image:linear-gradient(to_left,black_calc(100%-2rem),transparent)] data-[scroll-edge=both]:not-focus-visible:[mask-image:linear-gradient(to_right,transparent,black_2rem,black_calc(100%-2rem),transparent)]",
   variants: {
     rounded: { none: "", sm: "rounded-sm", md: "rounded-md", lg: "rounded-lg" },
     bordered: { true: "border border-border", false: "" },

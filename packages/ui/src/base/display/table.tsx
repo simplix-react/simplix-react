@@ -7,7 +7,9 @@ import {
   useContext,
   useEffect,
   useRef,
+  useState,
 } from "react";
+import { useTranslation } from "@simplix-react/i18n/react";
 
 import { slotAttributes } from "../../design/slot-style";
 import { cn } from "../../utils/cn";
@@ -66,7 +68,7 @@ function findScrollParent(el: HTMLElement): HTMLElement | null {
  * manages horizontal overflow. CSS sticky confines cells to the nearest
  * scroll container, so a horizontally scrollable wrapper would keep the
  * header from ever reaching the ancestor that scrolls vertically. Instead,
- * the thead is translated to the ancestor scrollport top on each scroll —
+ * the thead is translated to the ancestor scrollport top on each scroll, so
  * the header keeps scrolling horizontally with its columns while it floats.
  */
 function useAncestorStickyHeader(ref: RefObject<HTMLDivElement | null>, enabled: boolean) {
@@ -107,6 +109,80 @@ function useAncestorStickyHeader(ref: RefObject<HTMLDivElement | null>, enabled:
       if (thead) thead.style.transform = "";
     };
   }, [ref, enabled]);
+}
+
+// ---------------------------------------------------------------------------
+// Sideways overflow
+// ---------------------------------------------------------------------------
+
+/** Which edges of a sideways-scrolling container have content past them. */
+export type TableScrollEdge = "start" | "end" | "both";
+
+/**
+ * The edges of the container that hide part of its table, or `undefined` while the table fits.
+ *
+ * <p>A table wider than its box scrolls sideways, and on a system with overlay scrollbars nothing
+ * says so until the reader happens to scroll: the columns past the edge read as missing. The edge
+ * is therefore marked (the design fades it), and the box becomes a focusable region so a reader
+ * without a pointer can scroll it with the arrow keys. Read again on scroll and on any resize of
+ * the box or the table, since a column dropping or a row loading changes the answer.
+ */
+function useScrollEdge(ref: RefObject<HTMLDivElement | null>): TableScrollEdge | undefined {
+  const [edge, setEdge] = useState<TableScrollEdge | undefined>(undefined);
+  useEffect(() => {
+    const box = ref.current;
+    if (!box) return;
+    let settling = false;
+    const read = () => {
+      // A column sliding in or out is drawn with a transform, which overflows the box while it runs
+      // and ends without an event; the box is read again once every running animation in it ends.
+      const running = typeof box.getAnimations === "function" ? box.getAnimations({ subtree: true }).filter((a) => a.playState === "running") : [];
+      if (running.length > 0 && !settling) {
+        settling = true;
+        void Promise.allSettled(running.map((a) => a.finished)).then(() => {
+          settling = false;
+          schedule();
+        });
+      }
+      const hidden = box.scrollWidth - box.clientWidth;
+      if (hidden <= 1) return setEdge(undefined);
+      // scrollLeft is negative in a right-to-left box; its magnitude is the distance from the start.
+      const offset = Math.abs(box.scrollLeft);
+      const start = offset > 1;
+      const end = offset < hidden - 1;
+      setEdge(start && end ? "both" : start ? "start" : end ? "end" : undefined);
+    };
+    let frame = 0;
+    const observer = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(() => schedule());
+    // The table element can be replaced under the box (a loading state, a remount), so the one
+    // observed is checked on every read and the current one observed instead.
+    let table: HTMLTableElement | null = null;
+    const follow = () => {
+      const current = box.querySelector("table");
+      if (current === table) return;
+      if (table) observer?.unobserve(table);
+      table = current;
+      if (table) observer?.observe(table);
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(() => { frame = 0; follow(); read(); });
+    };
+    follow();
+    read();
+    box.addEventListener("scroll", read, { passive: true });
+    observer?.observe(box);
+    // A column dropped or a row loaded changes what overflows without always resizing the table box
+    // (a table at its container's width stays that wide), so a change of the cells is read too.
+    const cells = typeof MutationObserver === "undefined" ? undefined : new MutationObserver(schedule);
+    cells?.observe(box, { childList: true, subtree: true });
+    return () => {
+      box.removeEventListener("scroll", read);
+      observer?.disconnect();
+      cells?.disconnect();
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, [ref]);
+  return edge;
 }
 
 // ---------------------------------------------------------------------------
@@ -156,7 +232,7 @@ export type TableProps = ComponentPropsWithRef<"table"> & {
   /**
    * How the columns take their widths.
    *
-   * <p>`"auto"` — the default — sizes each column to its content, which is right for a table with
+   * <p>`"auto"` (the default) sizes each column to its content, which is right for a table with
    * room to spread. `"fixed"` divides the declared widths and gives the rest to the columns that
    * declared none, which is what a column of free text needs: under `auto` a long value has no
    * bound to be cut to, so a truncating cell never truncates and the table widens instead. In a
@@ -164,22 +240,33 @@ export type TableProps = ComponentPropsWithRef<"table"> & {
    * short label in a squeezed neighbour broken one character to a line.
    */
   layout?: "auto" | "fixed";
+  /**
+   * The name a screen reader gives the box while the table scrolls sideways, when it becomes a
+   * focusable region. Defaults to the package's generic 「table」 wording; a list passes its own.
+   */
+  scrollLabel?: string;
 };
 
 export const Table = forwardRef<HTMLTableElement, TableProps>(
   (
-    { className, variant = "default", size = "md", density, rounded = "none", maxHeight, fill, stickyHeader, layout, children, ...rest },
+    { className, variant = "default", size = "md", density, rounded = "none", maxHeight, fill, stickyHeader, layout, scrollLabel, children, ...rest },
     ref,
   ) => {
     const scrolls = maxHeight != null || fill;
     const ancestorSticky = !!stickyHeader && !scrolls;
     const containerRef = useRef<HTMLDivElement>(null);
     useAncestorStickyHeader(containerRef, ancestorSticky);
+    const { t } = useTranslation("simplix/ui");
+    const scrollEdge = useScrollEdge(containerRef);
     return (
     <TableContext.Provider value={{ variant, size, density, stickyHeader, ownScroll: scrolls }}>
       <div
         ref={containerRef}
         data-sticky-header={ancestorSticky ? "ancestor" : undefined}
+        data-scroll-edge={scrollEdge}
+        role={scrollEdge ? "region" : undefined}
+        aria-label={scrollEdge ? (scrollLabel ?? t("table.scrollRegion")) : undefined}
+        tabIndex={scrollEdge ? 0 : undefined}
         className={cn(
           tableContainerLayout({ rounded }),
           scrolls ? "overflow-auto" : "overflow-x-auto",

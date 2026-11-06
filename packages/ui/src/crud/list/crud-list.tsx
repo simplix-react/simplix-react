@@ -23,6 +23,7 @@ import {
   type ColumnWidths,
   readColumnWidths,
   sizedCellProps,
+  cellFitClass,
   writeColumnWidths,
   type ColumnSizing,
   columnAlignClass,
@@ -509,6 +510,14 @@ export interface ListColumnProps<T> {
    * its columns need therefore never draws a table that scrolls sideways.
    */
   minTableWidth?: number;
+  /**
+   * The cells draw their content whole: a badge, a chip, a control. The declared `width` becomes a
+   * floor, the cell never truncates, and a value wider than the floor widens the column instead of
+   * being cut. A table that then outgrows its container drops its widest tier, and with no tier
+   * left it scrolls sideways. On by default for a column drawn with `display="badge"` or
+   * `display="boolean"`.
+   */
+  fitContent?: boolean;
   /**
    * Where the header and the cells set their content. `"end"` is for a figure whose digits a reader
    * compares down the column (an amount, a balance, a count): it sits against the end edge in
@@ -1414,7 +1423,9 @@ function ListTable<T>({
             readerWidth !== undefined
               ? { width: "100%", maxWidth: "100%" }
               : declaredWidth
-                ? { width: declaredWidth }
+                ? // The cap keeps the label inside the cell's padding, so its ellipsis is the edge the
+                  // reader sees rather than a cut a few pixels past it.
+                  { width: declaredWidth, maxWidth: "100%" }
                 : undefined;
 
           const content =
@@ -1460,7 +1471,12 @@ function ListTable<T>({
             defaultDisplayZone,
           }),
         size: declaredWidth,
-        meta: { flexible, fixed: colDef.width !== undefined, ...(colDef.align ? { align: colDef.align } : {}) } satisfies ColumnSizing,
+        meta: {
+          flexible,
+          fixed: colDef.width !== undefined,
+          ...(colDef.align ? { align: colDef.align } : {}),
+          ...(colDef.fitContent ?? (colDef.display === "badge" || colDef.display === "boolean") ? { fitContent: true } : {}),
+        } satisfies ColumnSizing,
       });
     }
 
@@ -1852,7 +1868,7 @@ function ListTable<T>({
                             {row.getVisibleCells().map((cell) => (
                               <TableCell
                                 key={cell.id}
-                                className={cn("truncate", columnAlignClass(cell.column.columnDef.meta as ColumnSizing | undefined))}
+                                className={cn(cellFitClass(cell.column.columnDef.meta as ColumnSizing | undefined), columnAlignClass(cell.column.columnDef.meta as ColumnSizing | undefined))}
                                 {...rowClickIgnoreForColumn(cell.column.id)}
                                 {...sizedCellProps(
                                   cell.column.id,

@@ -4251,6 +4251,9 @@
   :where([data-slot="table-cell"])[data-s-table-cell] {
     @apply [&:has([role=checkbox])]:pr-0 [&:has(>input[type=checkbox])]:pl-3.5 [&:has(>input[type=checkbox])]:pr-0;
   }
+  :where([data-slot="table-container"])[data-s-table-container] {
+    @apply focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:-outline-offset-2 data-[scroll-edge=end]:not-focus-visible:[mask-image:linear-gradient(to_right,black_calc(100%-2rem),transparent)] data-[scroll-edge=start]:not-focus-visible:[mask-image:linear-gradient(to_left,black_calc(100%-2rem),transparent)] data-[scroll-edge=both]:not-focus-visible:[mask-image:linear-gradient(to_right,transparent,black_2rem,black_calc(100%-2rem),transparent)];
+  }
   :where([data-slot="table-footer"])[data-s-table-footer] {
     @apply [&>tr]:last:border-b-0;
   }

@@ -422,6 +422,9 @@
     "steps": "입력 단계",
     "stepLabel": "{{step}}단계: {{title}}"
   },
+  "table": {
+    "scrollRegion": "가로로 스크롤되는 표"
+  },
   "tabs": {
     "scrollPrevious": "이전 탭",
     "scrollNext": "다음 탭"
