@@ -1478,7 +1478,12 @@ function bulkDomain(name: string): ResolvedDomain {
       LaneBatchUpdateDTO: {
         javaClass: "app.LaneBatchUpdateDTO",
         typeParams: [],
-        fields: [field("laneIds", { kind: "container", name: "List", args: [{ kind: "string" }] }, true), field("open", { kind: "boolean" })],
+        // A list of words ahead of the key list, which only the key list's name tells apart.
+        fields: [
+          field("tags", { kind: "container", name: "List", args: [{ kind: "string" }] }),
+          field("laneIds", { kind: "container", name: "List", args: [{ kind: "string" }] }, true),
+          field("open", { kind: "boolean" }),
+        ],
       },
       GateDTO: { javaClass: "app.GateDTO", typeParams: [], fields: [field("gateId", { kind: "string" }, true), field("label", { kind: "string" })] },
       GateReceiptDTO: { javaClass: "app.GateReceiptDTO", typeParams: [], fields: [field("receiptId", { kind: "string" }, true)] },
