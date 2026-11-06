@@ -9,7 +9,8 @@ import ora from "ora";
 import { ConfigLoadError } from "../config/config-load-error.js";
 import { findCrudConfigForEntity } from "../config/crud-config-loader.js";
 import { loadConfig } from "../config/config-loader.js";
-import { chooseDefaultSort, withSortKeyShown } from "../meta/default-sort.js";
+import { chooseDefaultSort, withSortKeyShown, type DefaultSortInput } from "../meta/default-sort.js";
+import type { MetaHolderSource } from "../meta/scaffold-source.js";
 import { withUnmaskedFlagged } from "../meta/personal-data.js";
 import { figureTilesOf, withTileFilters } from "../meta/figure-tiles.js";
 import { assertOutputDirs } from "../config/output-dirs.js";
@@ -413,6 +414,79 @@ export function projectRowFields(rowFields: readonly FieldInfo[], stated: Readon
 /** The relation keys a SimpliX Meta source states, or `undefined` for a source that states none. */
 export function relationsOf(source: { readonly relationFields?: readonly string[] } | null | undefined): ReadonlySet<string> | undefined {
   return source?.relationFields ? new Set(source.relationFields) : undefined;
+}
+
+/** What {@link holdersOf} reads beside the holders: where each lives and the project's settings. */
+export interface HolderContextOptions {
+  /** The package a holder entity's generated hooks are exported from, or null where none is found. */
+  readonly packageOf: (entity: string) => Promise<string | null>;
+  readonly peeks?: ContractKindOptions["peeks"];
+  readonly defaultSortFields?: DefaultSortInput["candidates"];
+  readonly maskedSuffix?: string;
+}
+
+/**
+ * Each entity whose records point back at the scaffolded one, as the template context of the
+ * sub-list the detail draws for it: forced to the open record's key, with the holder's own row
+ * fields drawn as its list draws them. A holder with no list route, or whose package is not
+ * found, has no sub-list and is left out.
+ */
+export async function holdersOf(metaHolders: readonly MetaHolderSource[], options: HolderContextOptions) {
+  const holders = [];
+  for (const holder of metaHolders) {
+    const holderList = holder.source.roles.list;
+    const holderPackage = await options.packageOf(holder.entity);
+    if (!holderList || !holderPackage) continue;
+    const holderFields = withContractKinds(holder.source.rowFields ?? holder.source.fields, holder.source.rowIdField, { peeks: options.peeks, relationFields: relationsOf(holder.source) })
+      .filter((f) => f.name !== holder.field);
+    const holderSort = chooseDefaultSort({ declared: holder.source.defaultSort, candidates: options.defaultSortFields, fields: holderFields, rowIdField: holder.source.rowIdField });
+    holders.push({
+      entity: holder.entity,
+      EntityPascal: holder.entity.charAt(0).toUpperCase() + holder.entity.slice(1),
+      key: `${holder.entity}By${holder.field.charAt(0).toUpperCase()}${holder.field.slice(1)}`,
+      hookList: `use${holderList.charAt(0).toUpperCase()}${holderList.slice(1)}`,
+      // The holder's own list rule, so the tab asks only a reader the server will answer.
+      accessList: `${holderList}Access`,
+      packageName: holderPackage,
+      filterKey: `${holder.field}.${holder.operator}`,
+      // A holder that names this record by another field than its key (a voice code) is
+      // forced to that field of the open record, not to its key.
+      matchField: [...(holder.source.rowFields ?? []), ...holder.source.fields, ...(holder.source.detailFields ?? [])].find((f) => f.name === holder.field)?.peekBy,
+      rowIdField: holder.source.rowIdField,
+      fields: withUnmaskedFlagged(withSortKeyShown(holderFields, holderSort), options.maskedSuffix),
+      // The order the holder's own list opens in, so its tab reads the same rows first.
+      defaultSort: holderSort,
+      // Whether the holder's list route takes a keyword search, which its tab's search box sends.
+      hasKeywordSearch: holder.source.keywordSearch,
+    });
+  }
+  return holders;
+}
+
+/** One import statement of a detail's holder sub-lists: a package and the names taken from it. */
+export interface HolderImport {
+  readonly packageName: string;
+  /** The names, sorted and each once, joined as the braces of the statement hold them. */
+  readonly names: string;
+}
+
+/**
+ * The imports a detail's holder sub-lists need, one per package with each name once.
+ *
+ * <p>Two holders of the same entity (notes held by their subject and by their author) use the
+ * same list hook and the same access rule, and an import per holder names them twice, which is a
+ * duplicate binding the compiler refuses. Packages keep the order their first holder comes in;
+ * the names inside one are sorted, so the statement does not move when holders are reordered.
+ */
+export function holderImportsOf(holders: readonly { readonly packageName: string; readonly hookList: string; readonly accessList: string }[]): HolderImport[] {
+  const byPackage = new Map<string, Set<string>>();
+  for (const holder of holders) {
+    const names = byPackage.get(holder.packageName) ?? new Set<string>();
+    names.add(holder.accessList);
+    names.add(holder.hookList);
+    byPackage.set(holder.packageName, names);
+  }
+  return [...byPackage].map(([packageName, names]) => ({ packageName, names: [...names].sort().join(", ") }));
 }
 
 /** A form field edited through a search of the referenced entity. */
@@ -2734,34 +2808,12 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     // Each entity whose records point back at this one is a sub-list in the detail, forced to the
     // open record's key. Its columns are the holder's own row fields, drawn as its list draws them.
     const maskedSuffix = scaffoldConfig.scaffold?.maskedSuffix;
-    const holders = [];
-    for (const holder of metaHolders) {
-      const holderList = holder.source.roles.list;
-      const holderPackage = (await findSchemaFile(rootDir, holder.entity))?.packageName ?? null;
-      if (!holderList || !holderPackage) continue;
-      const holderFields = withContractKinds(holder.source.rowFields ?? holder.source.fields, holder.source.rowIdField, { peeks: referencePeeks, relationFields: relationsOf(holder.source) })
-        .filter((f) => f.name !== holder.field);
-      const holderSort = chooseDefaultSort({ declared: holder.source.defaultSort, candidates: scaffoldConfig.scaffold?.defaultSortFields, fields: holderFields, rowIdField: holder.source.rowIdField });
-      holders.push({
-        entity: holder.entity,
-        EntityPascal: holder.entity.charAt(0).toUpperCase() + holder.entity.slice(1),
-        key: `${holder.entity}By${holder.field.charAt(0).toUpperCase()}${holder.field.slice(1)}`,
-        hookList: toHookName(holderList),
-        // The holder's own list rule, so the tab asks only a reader the server will answer.
-        accessList: `${holderList}Access`,
-        packageName: holderPackage,
-        filterKey: `${holder.field}.${holder.operator}`,
-        // A holder that names this record by another field than its key (a voice code) is
-        // forced to that field of the open record, not to its key.
-        matchField: [...(holder.source.rowFields ?? []), ...holder.source.fields, ...(holder.source.detailFields ?? [])].find((f) => f.name === holder.field)?.peekBy,
-        rowIdField: holder.source.rowIdField,
-        fields: withUnmaskedFlagged(withSortKeyShown(holderFields, holderSort), maskedSuffix),
-        // The order the holder's own list opens in, so its tab reads the same rows first.
-        defaultSort: holderSort,
-        // Whether the holder's list route takes a keyword search, which its tab's search box sends.
-        hasKeywordSearch: holder.source.keywordSearch,
-      });
-    }
+    const holders = await holdersOf(metaHolders, {
+      packageOf: async (holderEntity) => (await findSchemaFile(rootDir, holderEntity))?.packageName ?? null,
+      peeks: referencePeeks,
+      defaultSortFields: scaffoldConfig.scaffold?.defaultSortFields,
+      maskedSuffix,
+    });
     // The order the list opens in when no reorder owns it: never the row's key. A stamp it names
     // keeps its column and its period filter (see withSortKeyShown).
     const defaultSort = chooseDefaultSort({ declared: metaSource?.defaultSort, candidates: scaffoldConfig.scaffold?.defaultSortFields, fields: listFields, rowIdField });
@@ -2784,6 +2836,8 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       accessOrder: accessOf(roles?.order as string | undefined),
       accessDelete: accessOf(roles?.delete),
       holders,
+      // One import per package naming each hook and access rule once, however many holders use it.
+      holderImports: holderImportsOf(holders),
       // Whether any holder's tab sends a keyword search, which is what imports the search key.
       holdersKeywordSearch: holders.some((one) => one.hasKeywordSearch),
       EntityPascal,
