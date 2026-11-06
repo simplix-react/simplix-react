@@ -25,7 +25,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
-    "lint": "oxlint src",
+    "lint": "oxlint src && node scripts/check-em-dash.mjs",
     "test": "vitest run --passWithNoTests",
     "clean": "rm -rf dist .turbo"
   },
