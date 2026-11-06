@@ -11,6 +11,7 @@ import { useFlatUIComponents } from '../../../provider/ui-provider'
 // CropArea is the single source - defined in lib/crop-image (plan §13-4, W2 ownership)
 import type { CropArea } from '../lib/crop-image'
 import { partAttributes, slotAttributes } from '../../../design/slot-style'
+import { EMPTY_VALUE_TEXT } from '../../../base/display/empty-value'
 import {
   cropModalActionsStyle,
   cropModalBodyStyle,
@@ -265,10 +266,10 @@ export function CropModal({ open, file, onClose, onSave, initialRatio = -1 }: Cr
     ratio === -1
       ? natural
         ? `${natural.w} × ${natural.h} px`
-        : '—'
+        : EMPTY_VALUE_TEXT
       : frame.w > 0
         ? `${Math.round(frame.w)} × ${Math.round(frame.h)} px`
-        : '—'
+        : EMPTY_VALUE_TEXT
 
   return (
     <Dialog open={open} onOpenChange={(v: boolean) => !v && onClose()}>

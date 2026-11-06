@@ -27,14 +27,14 @@ export interface InstantTextProps {
 }
 
 /**
- * Inline text for an absolute instant rendered in an explicit display zone — the
+ * Inline text for an absolute instant rendered in an explicit display zone: the
  * raw-text sibling of {@link DetailDateField} for table cells, cards, and captions
  * where a full field row does not fit.
  *
  * @example
  * ```tsx
  * <InstantText value={row.checkedInAt} displayZone={siteZone} />
- * <InstantText value={row.expiresAt} displayZone={siteZone} format="date" fallback="—" />
+ * <InstantText value={row.expiresAt} displayZone={siteZone} format="date" fallback={EMPTY_VALUE_TEXT} />
  * ```
  */
 export function InstantText({ value, displayZone, format = "datetime", fallback = null }: InstantTextProps) {

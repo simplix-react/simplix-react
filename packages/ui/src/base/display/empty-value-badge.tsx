@@ -15,7 +15,7 @@ export interface EmptyValueBadgeProps {
  * `DetailFields.*` component renders it as the default empty fallback; use it
  * directly in custom detail-style displays that bypass `DetailFields.*`. For
  * table cells and other compact non-field contexts, use {@link EmptyValue}
- * (em-dash) instead.
+ * (a hyphen) instead.
  *
  * @example
  * ```tsx
