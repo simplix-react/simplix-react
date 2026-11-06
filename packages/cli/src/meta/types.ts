@@ -77,7 +77,11 @@ export interface FieldMeta {
     many: boolean;
     kindField?: string;
     kinds?: Record<string, string>;
-    /** The field of the referenced record a screen names it by, where the reference states one. */
+    /**
+     * Where a screen reads the referenced record's name, as a path from the holding DTO the
+     * reference sits on: a property beside the key (`actorName`), or a path through a record the
+     * DTO nests (`plan.name`). Emitted on the response DTOs that resolve it; absent elsewhere.
+     */
     nameField?: string;
   };
   /** The value a new record starts the field with: a scalar, or an enum constant by name. */
