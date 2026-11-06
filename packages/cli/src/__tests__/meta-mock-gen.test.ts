@@ -44,6 +44,49 @@ const { simplixBootNaming } = (await import(namingModule)) as {
 /** What the profile's response adapter wraps a mock body in. */
 const envelope = { wrap: "wrapEnvelope", import: "@simplix-react-ext/simplix-boot-auth" };
 
+/** The store the generated entry wires in, loaded from the mock package's source by path. */
+interface TestStore<T> {
+  list(): T[];
+}
+const storeModule = fileURLToPath(new URL("../../../mock/src/mock-entity-store.ts", import.meta.url));
+const { createMockEntityStore } = (await import(storeModule)) as {
+  createMockEntityStore: <T extends object>(seeds: T[], idField?: string) => TestStore<T>;
+};
+
+/** One handler as MSW would register it: the method, the pattern and the resolver. */
+interface RegisteredRoute {
+  method: string;
+  pattern: string;
+  resolve: (input: { request: Request; params: Record<string, string> }) => unknown;
+}
+
+/**
+ * Evaluates a generated handler module so its resolvers can be called. `msw` and the envelope
+ * wrapper are stood in for by recorders: `http.<method>` records the route, `HttpResponse.json`
+ * returns `{ body }` and the wrapper returns `{ envelope }`, so a test reads the answer as data.
+ */
+function loadHandlers(content: string): Record<string, (store: unknown) => RegisteredRoute[]> {
+  const js = ts.transpileModule(content, {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+  }).outputText;
+  const http = new Proxy(
+    {},
+    { get: (_target, method: string) => (pattern: string, resolve: RegisteredRoute["resolve"]) => ({ method, pattern, resolve }) },
+  );
+  const modules: Record<string, unknown> = {
+    msw: { http, HttpResponse: { json: (body: unknown) => ({ body }) } },
+    [envelope.import]: { [envelope.wrap]: (body: unknown) => ({ envelope: body }) },
+    "@simplix-react/mock": {},
+  };
+  const exported: Record<string, (store: unknown) => RegisteredRoute[]> = {};
+  const load = new Function("exports", "require", js) as (exports: object, require: (name: string) => unknown) => void;
+  load(exported, (name) => {
+    if (!(name in modules)) throw new Error(`the generated handlers import ${name}, which the test does not stand in for`);
+    return modules[name];
+  });
+  return exported;
+}
+
 /** What the boot profile contributes: without it the model declares every enum as its value union,
  *  and a seed row annotated with that type must carry the value rather than the object. */
 const LABELED_ENUM = {
@@ -721,7 +764,7 @@ describe("a write addressing several rows updates each of them and answers what 
     expect(handler).not.toContain("store.");
     expect(handler).not.toContain("request.json()");
     expect(handler).toContain("HttpResponse.json(wrapEnvelope({}))");
-    expect(result.unresolvedBatchKeys).toEqual([{ tag: "shop.Gate", operation: "batchUpdateGate" }]);
+    expect(result.unresolvedBatchKeys).toContainEqual({ tag: "shop.Gate", operation: "batchUpdateGate", role: "batchUpdate" });
   });
 
   it("reads no JSON for a keyed update whose request declares no body", () => {
@@ -744,6 +787,89 @@ describe("a write addressing several rows updates each of them and answers what 
     expect(batch.length).toBe(38);
     for (const handler of [...multi, ...batch]) expect(handler).not.toContain("store.create(");
     for (const handler of batch) expect(handler).toContain("return HttpResponse.json(wrapEnvelope({}));");
+    expect([...generated.values()].flatMap((one) => one.unresolvedBatchKeys)).toEqual([]);
+  });
+
+  it("transpiles", () => {
+    const transpiled = ts.transpileModule(handlers, { reportDiagnostics: true });
+    expect(transpiled.diagnostics ?? []).toEqual([]);
+  });
+});
+
+describe("a batch delete removes every row its key list names and answers what it declares", () => {
+  const result = generateMockFiles(bulkDomain("shop"), { naming: simplixBootNaming, labeledEnum: LABELED_ENUM, envelope });
+  const handlers = result.files.get("mock/handlers.ts") ?? "";
+  const factories = loadHandlers(handlers);
+
+  /** Runs the batch delete of one factory against a real store and reports what is left. */
+  async function batchDelete<T extends object>(
+    factory: string,
+    seeds: T[],
+    idField: keyof T & string,
+    query: string,
+  ): Promise<{ left: unknown[]; answer: unknown }> {
+    const store = createMockEntityStore(seeds, idField);
+    const route = (factories[factory]?.(store) ?? []).find(
+      (one) => one.method === "delete" && one.pattern.endsWith("/batch"),
+    );
+    if (!route) throw new Error(`${factory} registers no batch delete`);
+    const request = new Request(`http://localhost${route.pattern.replace("*", "")}?${query}`, { method: "DELETE" });
+    const answer = await route.resolve({ request, params: {} });
+    return { left: store.list().map((row) => row[idField]), answer };
+  }
+
+  const lanes = [{ laneId: "a", open: true }, { laneId: "b", open: true }, { laneId: "c", open: false }];
+
+  it("reads the key list in the comma-joined form the generated client writes", async () => {
+    // `toQueryString` writes an array parameter as `String(value)`, which joins it with commas.
+    const query = new URLSearchParams({ laneIds: String(["a", "b"]) }).toString();
+    const { left, answer } = await batchDelete("createLaneHandlers", lanes, "laneId", query);
+    expect(left).toEqual(["c"]);
+    expect(answer).toEqual({ body: { envelope: {} } });
+  });
+
+  it("reads the key list repeated once per member, as a client exploding the array writes it", async () => {
+    const { left } = await batchDelete("createLaneHandlers", lanes, "laneId", "laneIds=a&laneIds=c");
+    expect(left).toEqual(["b"]);
+  });
+
+  it("removes nothing for an empty key list, a row keyed 0 included", async () => {
+    // An empty array is written as `dockIds=`; the store matches `""` against the number 0.
+    const docks = [{ dockId: 0, name: "zero" }, { dockId: 1, name: "one" }];
+    const { left, answer } = await batchDelete("createDockHandlers", docks, "dockId", "dockIds=");
+    expect(left).toEqual([0, 1]);
+    expect(answer).toEqual({ body: { envelope: [] } });
+  });
+
+  it("removes rows keyed by a number and answers the rows it removed where it declares the store's DTO", async () => {
+    const docks = [{ dockId: 1, name: "one" }, { dockId: 2, name: "two" }, { dockId: 3, name: "three" }];
+    const { left, answer } = await batchDelete("createDockHandlers", docks, "dockId", "dockIds=1,3");
+    expect(left).toEqual([2]);
+    expect(answer).toEqual({ body: { envelope: [{ dockId: 1, name: "one" }, { dockId: 3, name: "three" }] } });
+  });
+
+  it("removes nothing for a batch delete that names no key list, answers what it declares, and reports it", async () => {
+    const gates = [{ gateId: "g1", label: "one" }];
+    const handler = handlerFor(handlers, "*/api/v1/shop/gate/batch", "DELETE");
+    expect(handler).not.toContain("store.");
+    const { left, answer } = await batchDelete("createGateHandlers", gates, "gateId", "ids=g1");
+    expect(left).toEqual(["g1"]);
+    expect(answer).toEqual({ body: { envelope: {} } });
+    expect(result.unresolvedBatchKeys).toContainEqual({ tag: "shop.Gate", operation: "batchDeleteGate", role: "batchDelete" });
+  });
+
+  it("reads the key list and removes each row in every batch delete across the fixture", () => {
+    const removals = [...generated.values()]
+      .flatMap((one) => [...factoriesOf(one.files.get("mock/handlers.ts") ?? "").values()])
+      .flatMap((factory) => factory.split(/\n(?= {4}http\.)/))
+      .filter((handler) => /^ {4}http\.delete\("[^"]*\/batch"/.test(handler));
+    // The document declares 28, each naming its rows by `<idField>s` in the query string.
+    expect(removals.length).toBe(28);
+    for (const handler of removals) {
+      expect(handler).toContain(".searchParams.getAll(");
+      expect(handler).toContain("for (const key of keys) store.remove(key);");
+      expect(handler).toContain("return HttpResponse.json(wrapEnvelope({}));");
+    }
     expect([...generated.values()].flatMap((one) => one.unresolvedBatchKeys)).toEqual([]);
   });
 
@@ -1462,9 +1588,11 @@ function answerDomain(
 }
 
 /**
- * Two entities written several rows at a time. A lane's multi-update answers the rows it wrote and
- * its batch update names them by a key list; a gate's multi-update answers with receipts, and its
- * batch body names no key list at all. A lane is also updated by a keyed request with no body.
+ * Three entities written several rows at a time. A lane's multi-update answers the rows it wrote and
+ * its batch update and batch delete name them by a key list; a gate's multi-update answers with
+ * receipts, and neither its batch body nor its batch delete names a key list. A lane is also
+ * updated by a keyed request with no body. A dock is keyed by a number, and its batch delete
+ * answers the rows it removed.
  */
 function bulkDomain(name: string): ResolvedDomain {
   const laneId = [{ name: "laneId", type: { kind: "string" } as TypeRef, required: true }];
@@ -1488,6 +1616,7 @@ function bulkDomain(name: string): ResolvedDomain {
       GateDTO: { javaClass: "app.GateDTO", typeParams: [], fields: [field("gateId", { kind: "string" }, true), field("label", { kind: "string" })] },
       GateReceiptDTO: { javaClass: "app.GateReceiptDTO", typeParams: [], fields: [field("receiptId", { kind: "string" }, true)] },
       GateBatchUpdateDTO: { javaClass: "app.GateBatchUpdateDTO", typeParams: [], fields: [field("label", { kind: "string" })] },
+      DockDTO: { javaClass: "app.DockDTO", typeParams: [], fields: [field("dockId", { kind: "number", integral: true }, true), field("name", { kind: "string" })] },
     },
     operations: [
       operation("readLane", "GET", "/api/v1/shop/lane/{laneId}", { response: { kind: "ref", name: "LaneDTO" }, path: laneId }, "shop.Lane"),
@@ -1515,13 +1644,32 @@ function bulkDomain(name: string): ResolvedDomain {
         "shop.Gate",
       ),
       operation("batchUpdateGate", "PATCH", "/api/v1/shop/gate/batch", { body: { kind: "ref", name: "GateBatchUpdateDTO" }, response: { kind: "container", name: "SimpliXApiResponse", args: [] }, bare: true }, "shop.Gate"),
+      // A lane's batch delete names its rows by the key list the generated client writes into the
+      // query string; a gate's names them by a list of another name, which says nothing about keys.
+      operation("batchDeleteLane", "DELETE", "/api/v1/shop/lane/batch", { query: [listOf("laneIds", "string")], response: { kind: "container", name: "SimpliXApiResponse", args: [] }, bare: true }, "shop.Lane"),
+      operation("batchDeleteGate", "DELETE", "/api/v1/shop/gate/batch", { query: [listOf("ids", "string")], response: { kind: "container", name: "SimpliXApiResponse", args: [] }, bare: true }, "shop.Gate"),
+      // A dock is keyed by a number and its batch delete answers the rows it removed.
+      operation("readDock", "GET", "/api/v1/shop/dock/{dockId}", { response: { kind: "ref", name: "DockDTO" }, path: [{ name: "dockId", type: { kind: "number", integral: true }, required: true }] }, "shop.Dock"),
+      operation(
+        "batchDeleteDock",
+        "DELETE",
+        "/api/v1/shop/dock/batch",
+        { query: [listOf("dockIds", "number")], response: { kind: "container", name: "List", args: [{ kind: "ref", name: "DockDTO" }] } },
+        "shop.Dock",
+      ),
     ],
   };
 
-  const built = resolveMeta(document, { domains: { [name]: ["shop.Lane", "shop.Gate"] }, containerTypes });
+  const built = resolveMeta(document, { domains: { [name]: ["shop.Lane", "shop.Gate", "shop.Dock"] }, containerTypes });
   const domain = built.domains.get(name);
   if (!domain) throw new Error("the bulk domain is missing");
   return domain;
+}
+
+/** A query parameter carrying a list of keys, as a batch delete declares its rows. */
+function listOf(name: string, element: "string" | "number"): { name: string; type: TypeRef; required: boolean } {
+  const member: TypeRef = element === "number" ? { kind: "number", integral: true } : { kind: "string" };
+  return { name, type: { kind: "container", name: "List", args: [member] }, required: true };
 }
 
 function operation(

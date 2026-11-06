@@ -135,12 +135,14 @@ export interface UnresolvedOrderField {
 }
 
 /**
- * A batch update whose body names no list of the store's keys (`<idField>s`), so nothing says
- * which rows it changes. Its handler writes nothing and answers what the operation declares.
+ * A batch update whose body, or a batch delete whose query string, names no list of the store's
+ * keys (`<idField>s`), so nothing says which rows it changes. Its handler writes nothing and
+ * answers what the operation declares.
  */
 export interface UnresolvedBatchKey {
   tag: string;
   operation: string;
+  role: "batchUpdate" | "batchDelete";
 }
 
 /**
@@ -604,7 +606,7 @@ ${entries.join("\n")}
       case "delete":
         return this.deleteHandler(entity, target, open);
       case "batchDelete":
-        return this.answer(entity, target, open);
+        return this.batchDeleteHandler(entity, target, open);
       case "order":
         return this.orderHandler(entity, target, open);
       case "tree":
@@ -992,7 +994,7 @@ ${entries.join("\n")}
     const keys = this.batchKeyField(entity, target);
     const declared = this.declaredAnswer(entity, target, BLOCK_INDENT);
     if (!keys) {
-      this.unresolvedBatchKeys.push({ tag: entity.tag, operation: target.operation.id });
+      this.unresolvedBatchKeys.push({ tag: entity.tag, operation: target.operation.id, role: "batchUpdate" });
       return `${open}() => ${declared.json}),${declared.note}`;
     }
     return [
@@ -1007,10 +1009,55 @@ ${entries.join("\n")}
   /** The field of a batch body that lists the keys of the rows it changes, and their type. */
   private batchKeyField(entity: MockEntity, target: EndpointTarget): { name: string; element: "string" | "number" } | undefined {
     const body = this.domain.types.get(refNameOf(innermostRef(target.operation.request.body)) ?? "");
-    const field = body?.allFields.find((one) => one.name === `${entity.idField}s`);
-    if (field?.type.kind !== "container" || this.domain.containers.get(field.type.name)?.ts !== "Array") return undefined;
-    const element = field.type.args[0]?.kind;
-    return element === "string" || element === "number" ? { name: field.name, element } : undefined;
+    return this.keyList(entity, body?.allFields ?? []);
+  }
+
+  /**
+   * The member of `candidates` that lists the store's keys: named `<idField>s`, a sequence of
+   * strings or numbers. Found by name, since a body or a query string can carry other lists.
+   */
+  private keyList(
+    entity: MockEntity,
+    candidates: readonly { name: string; type: TypeRef }[],
+  ): { name: string; element: "string" | "number" } | undefined {
+    const found = candidates.find((one) => one.name === `${entity.idField}s`);
+    if (found?.type.kind !== "container" || this.domain.containers.get(found.type.name)?.ts !== "Array") return undefined;
+    const element = found.type.args[0]?.kind;
+    return element === "string" || element === "number" ? { name: found.name, element } : undefined;
+  }
+
+  /**
+   * A batch delete: every row the query string's key list (`<idField>s`) names is removed. The
+   * generated client writes the list as one comma-joined value, and a client exploding the array
+   * repeats the parameter, so both are read. The keys stay strings: the store matches a string
+   * against a numeric key, and an empty member is dropped, since the store matches `""` against
+   * a row keyed 0. It answers with the rows it removed where the operation declares a list of the
+   * store's DTO, and with what it declares otherwise. A query string naming no such list says
+   * nothing about which rows go, so the handler removes nothing and the operation is reported.
+   */
+  private batchDeleteHandler(entity: MockEntity, target: EndpointTarget, open: string): string {
+    const keys = this.keyList(entity, target.operation.request.query);
+    if (!keys) {
+      this.unresolvedBatchKeys.push({ tag: entity.tag, operation: target.operation.id, role: "batchDelete" });
+      const declared = this.declaredAnswer(entity, target);
+      return `${open}() => ${declared.json}),${declared.note}`;
+    }
+    const read =
+      `new URL(request.url).searchParams.getAll(${JSON.stringify(keys.name)})` +
+      '.flatMap((value) => value.split(",")).filter((key) => key !== "")';
+    const lines = [`${open}({ request }) => {`, `      const keys = ${read};`];
+    if (this.answersWithStoredRows(entity, target)) {
+      lines.push(
+        "      const removed = keys.flatMap((key) => store.getById(key) ?? []);",
+        "      for (const key of keys) store.remove(key);",
+        `      return ${this.json(target, "removed")};`,
+      );
+    } else {
+      const declared = this.declaredAnswer(entity, target, BLOCK_INDENT);
+      lines.push("      for (const key of keys) store.remove(key);", `      return ${declared.json};${declared.note}`);
+    }
+    lines.push("    }),");
+    return lines.join("\n");
   }
 
   /**

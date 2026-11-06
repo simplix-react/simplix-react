@@ -458,8 +458,11 @@ function collectWarnings(results: GeneratorResults): string[] {
   }
   for (const one of results.mock.unresolvedBatchKeys) {
     warnings.push(
-      `${one.tag}.${one.operation} is a batch update whose body lists no keys of the rows it ` +
-        "changes; its handler writes nothing.",
+      one.role === "batchDelete"
+        ? `${one.tag}.${one.operation} is a batch delete whose query string lists no keys of the ` +
+            "rows it removes; its handler removes nothing."
+        : `${one.tag}.${one.operation} is a batch update whose body lists no keys of the rows it ` +
+            "changes; its handler writes nothing.",
     );
   }
   for (const one of results.mock.unansweredResponses) {
