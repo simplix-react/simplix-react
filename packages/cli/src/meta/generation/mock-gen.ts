@@ -463,6 +463,12 @@ function sortByRouteShape(targets: EndpointTarget[]): EndpointTarget[] {
   });
 }
 
+/** Whether a declared response is a container the spec profile unwraps: the envelope. */
+function answersInEnvelope(ref: TypeRef | undefined, domain: ResolvedDomain): boolean {
+  if (ref === undefined) return true;
+  return ref.kind === "container" && domain.containers.get(ref.name)?.unwrap === true;
+}
+
 /** Whether a response is a collection, which decides between one row and the whole list. */
 function isCollection(ref: TypeRef | undefined, domain: ResolvedDomain): boolean {
   const payload = payloadOf(ref, domain);
@@ -483,6 +489,8 @@ class MockEmitter {
   private readonly metaRoot: string;
   /** The DTOs a response sample is held against, imported beside the stores' own. */
   private readonly sampleTypes = new Set<string>();
+  /** Whether some handler answered inside the envelope, which is what imports the wrapper. */
+  private wrapsEnvelope = false;
 
   constructor(
     private readonly domain: ResolvedDomain,
@@ -499,7 +507,7 @@ class MockEmitter {
     const backed = this.entities.filter((entity) => entity.backed);
     const imports = ["import { http, HttpResponse } from 'msw';"];
 
-    if (this.options.envelope) {
+    if (this.options.envelope && this.wrapsEnvelope) {
       imports.push(
         `import { ${this.options.envelope.wrap} } from '${this.options.envelope.import}';`,
       );
@@ -556,15 +564,20 @@ ${entries.join("\n")}
       case "search":
         return this.listHandler(entity, target, open);
       case "getAll":
+        // A collection route with no `{id}` beside it can still declare one record - a catalog,
+        // a settings document - and answering it with the list hands the screen an array.
         return this.declaresOtherType(entity, target)
           ? this.answer(entity, target, open)
-          : `${open}() => ${this.json("store.list()")}),`;
+          : `${open}() => ${this.json(
+              target,
+              isCollection(target.operation.response, this.domain) ? "store.list()" : "store.list()[0]",
+            )}),`;
       case "get":
       case "getForEdit":
       case "subtree":
         return this.readHandler(entity, target, open);
       case "create":
-        return `${open}async ({ request }) => ${this.json(
+        return `${open}async ({ request }) => ${this.json(target,
           `store.create(await request.json() as ${entity.storeTypeName})`,
         )}),`;
       case "update":
@@ -578,7 +591,7 @@ ${entries.join("\n")}
       case "order":
         return this.orderHandler(entity, target, open);
       case "tree":
-        return this.treeHandler(entity, open);
+        return this.treeHandler(entity, target, open);
       default:
         // A custom action - an escalation, a revocation, a dismissal - which is what a quarter of
         // this application's operations are. A read addressed by a path parameter that declares
@@ -609,20 +622,20 @@ ${entries.join("\n")}
     if (entity.backed && payload?.kind === "ref" && payload.name === entity.storeTypeName) {
       if (param?.name === entity.idField) {
         const key = isNumericParam(param) ? `Number(params.${param.name})` : `String(params.${param.name})`;
-        return `${open}({ params }) => ${this.json(`store.getById(${key}) ?? store.list()[0]`)}),`;
+        return `${open}({ params }) => ${this.json(target, `store.getById(${key}) ?? store.list()[0]`)}),`;
       }
       // A read of the one record an owner holds - the configuration in force - names no key.
       if (target.operation.method === "GET" && param === undefined) {
-        return `${open}() => ${this.json("store.list()[0]")}),`;
+        return `${open}() => ${this.json(target, "store.list()[0]")}),`;
       }
     }
 
     const sample = this.responseSample(entity, target);
-    if (sample !== undefined) return `${open}() => ${this.json(sample)}),`;
-    if (payload === undefined) return `${open}() => ${this.json("{}")}),`;
+    if (sample !== undefined) return `${open}() => ${this.json(target, sample)}),`;
+    if (payload === undefined) return `${open}() => ${this.json(target, "{}")}),`;
     const response = describeRef(payload);
     this.unansweredResponses.push({ tag: entity.tag, operation: target.operation.id, response });
-    return `${open}() => ${this.json("{}")}), // no sample stands in for ${response}`;
+    return `${open}() => ${this.json(target, "{}")}), // no sample stands in for ${response}`;
   }
 
   /**
@@ -728,7 +741,7 @@ ${entries.join("\n")}
       const variable = filter.key.replace(/[^A-Za-z0-9_$]/g, "_");
       lines.push(
         `      const ${variable} = url.searchParams.get(${JSON.stringify(filter.key)});`,
-        `      if (${variable}) return ${this.json(
+        `      if (${variable}) return ${this.json(target,
           `store.filter((item) => item.${filter.field} === ${variable})`,
         )};`,
       );
@@ -738,7 +751,7 @@ ${entries.join("\n")}
       '      const page = Number(url.searchParams.get("page") ?? "0");',
       '      const size = Number(url.searchParams.get("size") ?? "10");',
       '      const sort = url.searchParams.get("sort") ?? undefined;',
-      `      return ${this.json("store.listPaged(page, size, sort)")};`,
+      `      return ${this.json(target, "store.listPaged(page, size, sort)")};`,
       "    }),",
     );
     return lines.join("\n");
@@ -792,12 +805,12 @@ ${entries.join("\n")}
     const param = target.operation.request.path.at(-1);
     const many = isCollection(target.operation.response, this.domain);
     if (!param) {
-      return `${open}() => ${this.json(many ? "store.list()" : "store.list()[0]")}),`;
+      return `${open}() => ${this.json(target, many ? "store.list()" : "store.list()[0]")}),`;
     }
 
     if (param.name === entity.idField && !many) {
       const key = isNumericParam(param) ? `Number(params.${param.name})` : `String(params.${param.name})`;
-      return `${open}({ params }) => ${this.json(`store.getById(${key}) ?? store.list()[0]`)}),`;
+      return `${open}({ params }) => ${this.json(target, `store.getById(${key}) ?? store.list()[0]`)}),`;
     }
 
     if (!entity.declares(param.name)) {
@@ -807,11 +820,11 @@ ${entries.join("\n")}
         parameter: param.name,
         storeType: entity.storeTypeName,
       });
-      return `${open}() => ${this.json(many ? "store.list()" : "store.list()[0]")}),`;
+      return `${open}() => ${this.json(target, many ? "store.list()" : "store.list()[0]")}),`;
     }
 
     const matches = `store.filter((item) => String(item.${param.name}) === String(params.${param.name}))`;
-    return `${open}({ params }) => ${this.json(
+    return `${open}({ params }) => ${this.json(target,
       many ? matches : `${matches}[0] ?? store.list()[0]`,
     )}),`;
   }
@@ -822,7 +835,7 @@ ${entries.join("\n")}
     const param = target.operation.request.path.at(-1);
     if (param) {
       const key = isNumericParam(param) ? `Number(params.${param.name})` : `String(params.${param.name})`;
-      return `${open}async ({ request, params }) => ${this.json(
+      return `${open}async ({ request, params }) => ${this.json(target,
         `store.update(${key}, await request.json() as ${type})`,
       )}),`;
     }
@@ -841,7 +854,7 @@ ${entries.join("\n")}
       `${open}async ({ request }) => {`,
       `      const body = await request.json() as ${type};`,
       keyLine,
-      `      return ${this.json(`${write} ?? store.create(body)`)};`,
+      `      return ${this.json(target, `${write} ?? store.create(body)`)};`,
       "    }),",
     ].join("\n");
   }
@@ -850,7 +863,7 @@ ${entries.join("\n")}
     const param = target.operation.request.path.at(-1);
     if (!param) return this.answer(entity, target, open);
     const key = isNumericParam(param) ? `Number(params.${param.name})` : `String(params.${param.name})`;
-    return `${open}({ params }) => { store.remove(${key}); return ${this.json("null")}; }),`;
+    return `${open}({ params }) => { store.remove(${key}); return ${this.json(target, "null")}; }),`;
   }
 
   /**
@@ -883,24 +896,37 @@ ${entries.join("\n")}
       `${open}async ({ request }) => {`,
       `      const items = await request.json() as { ${key.name}: ${keyType}; ${field.name}: ${valueType} }[];`,
       `      for (const item of items) store.update(item.${key.name}, ${write});`,
-      `      return ${this.json(this.responseSample(entity, target) ?? "{}")};`,
+      `      return ${this.json(target, this.responseSample(entity, target) ?? "{}")};`,
       "    }),",
     ].join("\n");
   }
 
-  private treeHandler(entity: MockEntity, open: string): string {
+  private treeHandler(entity: MockEntity, target: EndpointTarget, open: string): string {
     const args = [
       "store.list()",
       JSON.stringify(entity.idField),
       JSON.stringify(entity.parentField),
     ];
-    return `${open}() => ${this.json(`buildEmbeddedTree(${args.join(", ")})`)}),`;
+    return `${open}() => ${this.json(target, `buildEmbeddedTree(${args.join(", ")})`)}),`;
   }
 
-  /** A response, wrapped in whatever the backend wraps its bodies in. */
-  private json(body: string): string {
+  /**
+   * A response, answered as the route declares it: inside the envelope where the operation's
+   * declared response is a container the spec profile unwraps, and as the body alone where it is
+   * not, since a handler returning its DTO without the envelope is what the server sends then.
+   *
+   * SimpliX Meta writes the handler's return type as the backend declares it, so the envelope is
+   * read from the operation and never from a path or a tag. An operation declaring nothing keeps
+   * the envelope: what a server sends for no body is not a JSON body at all, and the empty
+   * envelope is what the client unwraps to nothing.
+   */
+  private json(target: EndpointTarget, body: string): string {
     const wrap = this.options.envelope?.wrap;
-    return `HttpResponse.json(${wrap ? `${wrap}(${body})` : body})`;
+    if (!wrap || !answersInEnvelope(target.operation.response, this.domain)) {
+      return `HttpResponse.json(${body})`;
+    }
+    this.wrapsEnvelope = true;
+    return `HttpResponse.json(${wrap}(${body}))`;
   }
 
   /** `src/mock/index.ts`: the stores, their reset, and the generated handler spreads. */

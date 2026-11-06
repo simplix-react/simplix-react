@@ -533,7 +533,9 @@ describe("an operation the store cannot answer answers the shape its response de
 
   it("imports every sampled DTO once, beside the store's", () => {
     const imported = /import type \{ ([^}]+) \} from '\.\.\/model'/.exec(handlers)?.[1];
-    expect(imported).toBe("ConfirmationDTO, TicketDTO, ValueCountDTO");
+    expect(imported).toBe(
+      "CatalogDTO, ConfirmationDTO, SettingsDTO, TicketDTO, ValueCountDTO, VoucherDTO",
+    );
   });
 
   it("reports a declared response no sample can stand in for, and keeps an empty body for none", () => {
@@ -547,6 +549,66 @@ describe("an operation the store cannot answer answers the shape its response de
     expect(handlerFor(handlers, "*/api/v1/shop/ticket/:ticketId/close", "POST")).toContain(
       "wrapEnvelope({}))",
     );
+  });
+
+  it("transpiles", () => {
+    const transpiled = ts.transpileModule(handlers, { reportDiagnostics: true });
+    expect(transpiled.diagnostics ?? []).toEqual([]);
+  });
+});
+
+describe("a handler answers inside the envelope only where its route declares the envelope", () => {
+  const handlers =
+    generateMockFiles(answerDomain("shop"), { naming: simplixBootNaming, labeledEnum: LABELED_ENUM, envelope })
+      .files.get("mock/handlers.ts") ?? "";
+
+  it("answers a route declaring its DTO alone with the typed sample and no envelope", () => {
+    const handler = handlerFor(handlers, "*/api/v1/shop/confirmation/redeem", "POST");
+    expect(handler).toContain("() => HttpResponse.json({");
+    expect(handler).toContain("} satisfies ConfirmationDTO)),");
+    expect(handler).not.toContain("wrapEnvelope");
+  });
+
+  it("keeps the envelope on a sibling route of the same entity that declares it", () => {
+    const handler = handlerFor(handlers, "*/api/v1/shop/confirmation/confirm", "POST");
+    expect(handler).toContain("() => HttpResponse.json(wrapEnvelope({");
+    expect(handler).toContain("} satisfies ConfirmationDTO))),");
+  });
+
+  it("answers a bare list as the list itself", () => {
+    expect(handlerFor(handlers, "*/api/v1/shop/ticket/bare-sums", "GET")).toContain(
+      "() => HttpResponse.json([10])),",
+    );
+  });
+
+  it("answers a singleton read of the stored record with one row, enveloped or not as declared", () => {
+    expect(handlerFor(handlers, "*/api/v1/shop/catalog", "GET")).toContain(
+      "() => HttpResponse.json(store.list()[0])),",
+    );
+    expect(handlerFor(handlers, "*/api/v1/shop/settings", "GET")).toContain(
+      "() => HttpResponse.json(wrapEnvelope(store.list()[0]))),",
+    );
+  });
+
+  it("answers a store entity whose routes declare no envelope from the store, unwrapped", () => {
+    expect(handlerFor(handlers, "*/api/v1/shop/voucher/:voucherId", "GET")).toContain(
+      "HttpResponse.json(store.getById(String(params.voucherId)) ?? store.list()[0])",
+    );
+    const create = handlerFor(handlers, "*/api/v1/shop/voucher", "POST");
+    expect(create).toContain("HttpResponse.json(store.create(await request.json() as VoucherDTO))");
+    expect(create).not.toContain("wrapEnvelope");
+  });
+
+  it("imports the envelope only into a module where some route answers inside it", () => {
+    const bareOnly =
+      generateMockFiles(answerDomain("bare", ["shop.Catalog", "shop.Voucher"]), {
+        naming: simplixBootNaming,
+        labeledEnum: LABELED_ENUM,
+        envelope,
+      }).files.get("mock/handlers.ts") ?? "";
+    expect(bareOnly).toContain('http.get("*/api/v1/shop/catalog"');
+    expect(bareOnly).not.toContain("wrapEnvelope");
+    expect(handlers).toContain("import { wrapEnvelope } from '@simplix-react-ext/simplix-boot-auth';");
   });
 
   it("transpiles", () => {
@@ -1018,7 +1080,10 @@ function handBuiltDomain(name: string): ResolvedDomain {
  * role, returning a DTO of its own, and a backed entity carrying a census, a list of numbers, a
  * keyed object, a page, an action returning the stored record and an action returning nothing.
  */
-function answerDomain(name: string): ResolvedDomain {
+function answerDomain(
+  name: string,
+  tags = ["shop.Ticket", "shop.Confirmation", "shop.Catalog", "shop.Settings", "shop.Voucher"],
+): ResolvedDomain {
   const ticketId = [{ name: "ticketId", type: { kind: "number", integral: true } as TypeRef, required: true }];
   const document: DtoMeta = {
     version: 1,
@@ -1056,12 +1121,73 @@ function answerDomain(name: string): ResolvedDomain {
           { name: "reviewer", type: { kind: "ref", name: "Owner" }, required: false, nullable: true },
         ],
       },
+      CatalogDTO: {
+        javaClass: "app.CatalogDTO",
+        typeParams: [],
+        fields: [{ name: "refundDays", type: { kind: "number", integral: true }, required: true, nullable: false }],
+      },
+      SettingsDTO: {
+        javaClass: "app.SettingsDTO",
+        typeParams: [],
+        fields: [{ name: "theme", type: { kind: "string" }, required: true, nullable: false }],
+      },
+      VoucherDTO: {
+        javaClass: "app.VoucherDTO",
+        typeParams: [],
+        fields: [
+          { name: "voucherId", type: { kind: "string" }, required: true, nullable: false },
+          { name: "code", type: { kind: "string" }, required: false, nullable: true },
+        ],
+      },
     },
     operations: [
       operation("readTicket", "GET", "/api/v1/shop/ticket/{ticketId}", {
         response: { kind: "ref", name: "TicketDTO" },
         path: ticketId,
       }),
+      operation("sumTicketsBare", "GET", "/api/v1/shop/ticket/bare-sums", {
+        response: { kind: "container", name: "List", args: [{ kind: "number", integral: true }] },
+        bare: true,
+      }),
+      operation(
+        "redeem",
+        "POST",
+        "/api/v1/shop/confirmation/redeem",
+        { response: { kind: "ref", name: "ConfirmationDTO" }, bare: true },
+        "shop.Confirmation",
+      ),
+      operation(
+        "readCatalog",
+        "GET",
+        "/api/v1/shop/catalog",
+        { response: { kind: "ref", name: "CatalogDTO" }, bare: true },
+        "shop.Catalog",
+      ),
+      operation(
+        "readSettings",
+        "GET",
+        "/api/v1/shop/settings",
+        { response: { kind: "ref", name: "SettingsDTO" } },
+        "shop.Settings",
+      ),
+      operation(
+        "readVoucher",
+        "GET",
+        "/api/v1/shop/voucher/{voucherId}",
+        {
+          response: { kind: "ref", name: "VoucherDTO" },
+          path: [{ name: "voucherId", type: { kind: "string" }, required: true }],
+          bare: true,
+        },
+        "shop.Voucher",
+      ),
+      operation(
+        "createVoucher",
+        "POST",
+        "/api/v1/shop/voucher",
+        { response: { kind: "ref", name: "VoucherDTO" }, body: { kind: "ref", name: "VoucherDTO" }, bare: true },
+        "shop.Voucher",
+      ),
       operation("countTicketsByStatus", "GET", "/api/v1/shop/ticket/status-counts", {
         response: { kind: "container", name: "List", args: [{ kind: "ref", name: "ValueCountDTO" }] },
       }),
@@ -1095,11 +1221,7 @@ function answerDomain(name: string): ResolvedDomain {
         "POST",
         "/api/v1/shop/confirmation/confirm",
         {
-          response: {
-            kind: "container",
-            name: "SimpliXApiResponse",
-            args: [{ kind: "ref", name: "ConfirmationDTO" }],
-          },
+          response: { kind: "ref", name: "ConfirmationDTO" },
           body: { kind: "ref", name: "Owner" },
         },
         "shop.Confirmation",
@@ -1107,10 +1229,7 @@ function answerDomain(name: string): ResolvedDomain {
     ],
   };
 
-  const built = resolveMeta(document, {
-    domains: { [name]: ["shop.Ticket", "shop.Confirmation"] },
-    containerTypes,
-  });
+  const built = resolveMeta(document, { domains: { [name]: tags }, containerTypes });
   const domain = built.domains.get(name);
   if (!domain) throw new Error("the answer domain is missing");
   return domain;
@@ -1124,6 +1243,8 @@ function operation(
     response?: TypeRef;
     body?: TypeRef;
     path?: { name: string; type: TypeRef; required: boolean }[];
+    /** The route answers its DTO as is, as a handler returning it without the envelope declares. */
+    bare?: boolean;
   },
   tag = "shop.Ticket",
 ): OperationMeta {
@@ -1135,7 +1256,14 @@ function operation(
     access: { kind: "authenticated" },
     request: { query: [], path: parts.path ?? [] },
   };
-  if (parts.response) built.response = parts.response;
+  // SimpliX Meta writes the handler's return type as the backend declares it, so a route that
+  // answers inside the envelope carries the envelope container and one that does not carries its
+  // DTO alone. Most routes are enveloped, which is what the fixture declares unless told otherwise.
+  if (parts.response) {
+    built.response = parts.bare
+      ? parts.response
+      : { kind: "container", name: "SimpliXApiResponse", args: [parts.response] };
+  }
   if (parts.body) built.request.body = parts.body;
   return built;
 }
