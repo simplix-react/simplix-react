@@ -33,6 +33,11 @@ const SEED_COUNT = 20;
  */
 const SAMPLE_INDEX = 1;
 
+/** The indent a sample's closing brace takes on a handler written on one line. */
+const LINE_INDENT = "    ";
+/** The same inside a handler with a block body, whose `return` sits one level deeper. */
+const BLOCK_INDENT = "      ";
+
 /**
  * The roles whose handler reads or writes the store. An entity with none of them answers from
  * nothing, so it is given neither a store nor a seed array.
@@ -577,9 +582,7 @@ ${entries.join("\n")}
       case "subtree":
         return this.readHandler(entity, target, open);
       case "create":
-        return `${open}async ({ request }) => ${this.json(target,
-          `store.create(await request.json() as ${entity.storeTypeName})`,
-        )}),`;
+        return this.createHandler(entity, target, open);
       case "update":
       case "multiUpdate":
       case "batchUpdate":
@@ -630,12 +633,64 @@ ${entries.join("\n")}
       }
     }
 
-    const sample = this.responseSample(entity, target);
-    if (sample !== undefined) return `${open}() => ${this.json(target, sample)}),`;
-    if (payload === undefined) return `${open}() => ${this.json(target, "{}")}),`;
+    const declared = this.declaredAnswer(entity, target);
+    return `${open}() => ${declared.json}),${declared.note}`;
+  }
+
+  /**
+   * The answer an operation declares, as the `HttpResponse` expression and the comment its line
+   * carries: a sample of the declared response, or an empty body where the operation declares
+   * nothing or no sample stands in for what it declares, which is then reported.
+   */
+  private declaredAnswer(
+    entity: MockEntity,
+    target: EndpointTarget,
+    indent = LINE_INDENT,
+  ): { json: string; note: string } {
+    const payload = payloadOf(target.operation.response, this.domain);
+    const sample = this.responseSample(entity, target, indent);
+    if (sample !== undefined) return { json: this.json(target, sample), note: "" };
+    if (payload === undefined) return { json: this.json(target, "{}"), note: "" };
     const response = describeRef(payload);
     this.unansweredResponses.push({ tag: entity.tag, operation: target.operation.id, response });
-    return `${open}() => ${this.json(target, "{}")}), // no sample stands in for ${response}`;
+    return { json: this.json(target, "{}"), note: ` // no sample stands in for ${response}` };
+  }
+
+  /**
+   * Whether a write answers with the row it wrote: the operation declares the store's own DTO.
+   *
+   * The test is the store's DTO alone, never {@link MockEntity.ownTypes}: a create's own declared
+   * response is in that set because the create declares it, so it would vouch for itself, and a
+   * registration answering with a receipt or a deletion answering with the job that runs it would
+   * answer with a stored row of another shape.
+   */
+  private answersWithStoredRow(entity: MockEntity, target: EndpointTarget): boolean {
+    const payload = payloadOf(target.operation.response, this.domain);
+    return payload?.kind === "ref" && payload.name === entity.storeTypeName;
+  }
+
+  /**
+   * What a write reads its row from: the JSON body where the operation declares one, and nothing
+   * where it does not. A multipart upload carries a form, and `request.json()` throws on it.
+   */
+  private writtenBody(entity: MockEntity, target: EndpointTarget): string | undefined {
+    return target.operation.request.body === undefined
+      ? undefined
+      : `await request.json() as ${entity.storeTypeName}`;
+  }
+
+  /**
+   * A create, adding a row to the store either way. It answers with that row where the operation
+   * declares the store's DTO, and with a sample of what it declares otherwise: a registration that
+   * answers with a receipt hands the screen the receipt's fields, never a stored record's.
+   */
+  private createHandler(entity: MockEntity, target: EndpointTarget, open: string): string {
+    const body = this.writtenBody(entity, target);
+    const write = `store.create(${body ?? "{}"})`;
+    const opening = body === undefined ? `${open}() =>` : `${open}async ({ request }) =>`;
+    if (this.answersWithStoredRow(entity, target)) return `${opening} ${this.json(target, write)}),`;
+    const declared = this.declaredAnswer(entity, target, BLOCK_INDENT);
+    return [`${opening} {`, `      ${write};`, `      return ${declared.json};${declared.note}`, "    }),"].join("\n");
   }
 
   /**
@@ -656,8 +711,8 @@ ${entries.join("\n")}
   }
 
   /** A sample of what an operation declares it answers with, or nothing when it declares none. */
-  private responseSample(entity: MockEntity, target: EndpointTarget): string | undefined {
-    return this.sampleOf(payloadOf(target.operation.response, this.domain), entity.name, "    ");
+  private responseSample(entity: MockEntity, target: EndpointTarget, indent = LINE_INDENT): string | undefined {
+    return this.sampleOf(payloadOf(target.operation.response, this.domain), entity.name, indent);
   }
 
   /**
@@ -835,9 +890,18 @@ ${entries.join("\n")}
     const param = target.operation.request.path.at(-1);
     if (param) {
       const key = isNumericParam(param) ? `Number(params.${param.name})` : `String(params.${param.name})`;
-      return `${open}async ({ request, params }) => ${this.json(target,
-        `store.update(${key}, await request.json() as ${type})`,
-      )}),`;
+      const write = `store.update(${key}, await request.json() as ${type})`;
+      if (this.answersWithStoredRow(entity, target)) {
+        return `${open}async ({ request, params }) => ${this.json(target, write)}),`;
+      }
+      // The row is updated all the same; the answer is what the operation declares.
+      const declared = this.declaredAnswer(entity, target, BLOCK_INDENT);
+      return [
+        `${open}async ({ request, params }) => {`,
+        `      ${write};`,
+        `      return ${declared.json};${declared.note}`,
+        "    }),",
+      ].join("\n");
     }
 
     // A multi-update carries the key in the body. A DTO that declares none - a settings document
@@ -859,11 +923,35 @@ ${entries.join("\n")}
     ].join("\n");
   }
 
+  /**
+   * A delete, removing the row either way. A delete declaring nothing answers with the empty
+   * envelope; one declaring the store's DTO answers with the row it removed; one declaring another
+   * DTO - the job that carries the removal out - answers with a sample of that DTO.
+   */
   private deleteHandler(entity: MockEntity, target: EndpointTarget, open: string): string {
     const param = target.operation.request.path.at(-1);
     if (!param) return this.answer(entity, target, open);
     const key = isNumericParam(param) ? `Number(params.${param.name})` : `String(params.${param.name})`;
-    return `${open}({ params }) => { store.remove(${key}); return ${this.json(target, "null")}; }),`;
+    if (payloadOf(target.operation.response, this.domain) === undefined) {
+      return `${open}({ params }) => { store.remove(${key}); return ${this.json(target, "null")}; }),`;
+    }
+    if (this.answersWithStoredRow(entity, target)) {
+      return [
+        `${open}({ params }) => {`,
+        `      const key = ${key};`,
+        "      const removed = store.getById(key);",
+        "      store.remove(key);",
+        `      return ${this.json(target, "removed ?? null")};`,
+        "    }),",
+      ].join("\n");
+    }
+    const declared = this.declaredAnswer(entity, target, BLOCK_INDENT);
+    return [
+      `${open}({ params }) => {`,
+      `      store.remove(${key});`,
+      `      return ${declared.json};${declared.note}`,
+      "    }),",
+    ].join("\n");
   }
 
   /**

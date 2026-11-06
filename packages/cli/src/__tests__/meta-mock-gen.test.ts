@@ -534,7 +534,7 @@ describe("an operation the store cannot answer answers the shape its response de
   it("imports every sampled DTO once, beside the store's", () => {
     const imported = /import type \{ ([^}]+) \} from '\.\.\/model'/.exec(handlers)?.[1];
     expect(imported).toBe(
-      "CatalogDTO, ConfirmationDTO, SettingsDTO, TicketDTO, ValueCountDTO, VoucherDTO",
+      "CatalogDTO, ConfirmationDTO, PassDTO, PassJobDTO, PassReceiptDTO, PhotoDTO, SettingsDTO, TicketDTO, ValueCountDTO, VoucherDTO",
     );
   });
 
@@ -609,6 +609,76 @@ describe("a handler answers inside the envelope only where its route declares th
     expect(bareOnly).toContain('http.get("*/api/v1/shop/catalog"');
     expect(bareOnly).not.toContain("wrapEnvelope");
     expect(handlers).toContain("import { wrapEnvelope } from '@simplix-react-ext/simplix-boot-auth';");
+  });
+
+  it("transpiles", () => {
+    const transpiled = ts.transpileModule(handlers, { reportDiagnostics: true });
+    expect(transpiled.diagnostics ?? []).toEqual([]);
+  });
+});
+
+describe("a write keeps the store current and answers what its operation declares", () => {
+  const handlers =
+    generateMockFiles(answerDomain("shop"), { naming: simplixBootNaming, labeledEnum: LABELED_ENUM, envelope })
+      .files.get("mock/handlers.ts") ?? "";
+
+  it("adds the created row and answers a create declaring another DTO with a sample of that DTO", () => {
+    const handler = handlerFor(handlers, "*/api/v1/shop/pass/create", "POST");
+    expect(handler).toContain("store.create(await request.json() as PassDTO);");
+    expect(handler).toContain('receiptId: "1"');
+    expect(handler).toContain("} satisfies PassReceiptDTO));");
+    expect(handler).not.toContain("json(wrapEnvelope(store.create(");
+  });
+
+  it("updates the row and answers an update declaring another DTO with a sample of that DTO", () => {
+    const handler = handlerFor(handlers, "*/api/v1/shop/pass/:passId", "PUT");
+    expect(handler).toContain("store.update(String(params.passId), await request.json() as PassDTO);");
+    expect(handler).toContain("} satisfies PassReceiptDTO));");
+    expect(handler).not.toContain("json(wrapEnvelope(store.update(");
+  });
+
+  it("removes the row and answers a delete declaring another DTO with a sample of that DTO", () => {
+    const handler = handlerFor(handlers, "*/api/v1/shop/pass/:passId", "DELETE");
+    expect(handler).toContain("store.remove(String(params.passId));");
+    expect(handler).toContain('jobId: "1"');
+    // Declared bare, as a handler returning the DTO itself declares it.
+    expect(handler).toContain("return HttpResponse.json({");
+    expect(handler).toContain("} satisfies PassJobDTO);");
+    expect(handler).not.toContain("json(null)");
+  });
+
+  it("answers a delete declaring the stored DTO with the row it removed", () => {
+    const handler = handlerFor(handlers, "*/api/v1/shop/voucher/:voucherId", "DELETE");
+    expect(handler).toContain("const key = String(params.voucherId);");
+    expect(handler).toContain("const removed = store.getById(key);");
+    expect(handler).toContain("store.remove(key);");
+    expect(handler).toContain("return HttpResponse.json(removed ?? null);");
+  });
+
+  it("keeps a create and an update declaring the stored DTO on the stored row", () => {
+    expect(handlerFor(handlers, "*/api/v1/shop/voucher", "POST")).toContain(
+      "HttpResponse.json(store.create(await request.json() as VoucherDTO))",
+    );
+  });
+
+  it("reads no JSON from a multipart upload, adds a row, and answers what the upload declares", () => {
+    const handler = handlerFor(handlers, "*/api/v1/shop/photo/create", "POST");
+    expect(handler).not.toContain("request.json()");
+    expect(handler).toContain("store.create({});");
+    expect(handler).toContain("} satisfies PassReceiptDTO));");
+  });
+
+  it("keeps a delete declaring nothing on the empty envelope, across the fixture", () => {
+    const removals = [...generated.values()]
+      .map((one) => one.files.get("mock/handlers.ts") ?? "")
+      .flatMap((content) => content.split("\n"))
+      .filter((line) => /^ {4}http\.delete\(/.test(line) && line.includes("store.remove("));
+    expect(removals.length).toBe(32);
+    for (const line of removals) expect(line).toContain("return HttpResponse.json(wrapEnvelope(null)); }),");
+    // The one fixture delete declaring the stored DTO, a session, answers with the row it removed.
+    const session = handlerFor(handlersOf("user"), "*/api/v1/user/me/sessions/:authSessionId", "DELETE");
+    expect(session).toContain("const removed = store.getById(key);");
+    expect(session).toContain("return HttpResponse.json(wrapEnvelope(removed ?? null));");
   });
 
   it("transpiles", () => {
@@ -1082,9 +1152,10 @@ function handBuiltDomain(name: string): ResolvedDomain {
  */
 function answerDomain(
   name: string,
-  tags = ["shop.Ticket", "shop.Confirmation", "shop.Catalog", "shop.Settings", "shop.Voucher"],
+  tags = ["shop.Ticket", "shop.Confirmation", "shop.Catalog", "shop.Settings", "shop.Voucher", "shop.Pass", "shop.Photo"],
 ): ResolvedDomain {
   const ticketId = [{ name: "ticketId", type: { kind: "number", integral: true } as TypeRef, required: true }];
+  const passId = [{ name: "passId", type: { kind: "string" } as TypeRef, required: true }];
   const document: DtoMeta = {
     version: 1,
     enums: { Grade: { labeled: true, values: [{ name: "HIGH" }, { name: "LOW" }] } },
@@ -1138,6 +1209,35 @@ function answerDomain(
           { name: "voucherId", type: { kind: "string" }, required: true, nullable: false },
           { name: "code", type: { kind: "string" }, required: false, nullable: true },
         ],
+      },
+      PassDTO: {
+        javaClass: "app.PassDTO",
+        typeParams: [],
+        fields: [
+          { name: "passId", type: { kind: "string" }, required: true, nullable: false },
+          { name: "holder", type: { kind: "string" }, required: false, nullable: true },
+        ],
+      },
+      PassReceiptDTO: {
+        javaClass: "app.PassReceiptDTO",
+        typeParams: [],
+        fields: [
+          { name: "receiptId", type: { kind: "string" }, required: true, nullable: false },
+          { name: "issuedAt", type: { kind: "instant" }, required: false, nullable: true },
+        ],
+      },
+      PassJobDTO: {
+        javaClass: "app.PassJobDTO",
+        typeParams: [],
+        fields: [
+          { name: "jobId", type: { kind: "string" }, required: true, nullable: false },
+          { name: "state", type: { kind: "string" }, required: false, nullable: true },
+        ],
+      },
+      PhotoDTO: {
+        javaClass: "app.PhotoDTO",
+        typeParams: [],
+        fields: [{ name: "photoId", type: { kind: "string" }, required: true, nullable: false }],
       },
     },
     operations: [
@@ -1226,6 +1326,66 @@ function answerDomain(
         },
         "shop.Confirmation",
       ),
+      operation(
+        "deleteVoucher",
+        "DELETE",
+        "/api/v1/shop/voucher/{voucherId}",
+        {
+          response: { kind: "ref", name: "VoucherDTO" },
+          path: [{ name: "voucherId", type: { kind: "string" }, required: true }],
+          bare: true,
+        },
+        "shop.Voucher",
+      ),
+      // A pass is stored as itself, and its writes answer with other records: the create with a
+      // receipt, the update with a receipt, the delete with the job that removes it.
+      operation(
+        "readPass",
+        "GET",
+        "/api/v1/shop/pass/{passId}",
+        { response: { kind: "ref", name: "PassDTO" }, path: passId },
+        "shop.Pass",
+      ),
+      operation(
+        "createPass",
+        "POST",
+        "/api/v1/shop/pass/create",
+        { response: { kind: "ref", name: "PassReceiptDTO" }, body: { kind: "ref", name: "PassDTO" } },
+        "shop.Pass",
+      ),
+      operation(
+        "updatePass",
+        "PUT",
+        "/api/v1/shop/pass/{passId}",
+        { response: { kind: "ref", name: "PassReceiptDTO" }, body: { kind: "ref", name: "PassDTO" }, path: passId },
+        "shop.Pass",
+      ),
+      operation(
+        "deletePass",
+        "DELETE",
+        "/api/v1/shop/pass/{passId}",
+        { response: { kind: "ref", name: "PassJobDTO" }, path: passId, bare: true },
+        "shop.Pass",
+      ),
+      // An upload is a create whose request is a multipart form, so it carries no JSON body.
+      operation(
+        "readPhoto",
+        "GET",
+        "/api/v1/shop/photo/{photoId}",
+        { response: { kind: "ref", name: "PhotoDTO" }, path: [{ name: "photoId", type: { kind: "string" }, required: true }] },
+        "shop.Photo",
+      ),
+      operation(
+        "uploadPhoto",
+        "POST",
+        "/api/v1/shop/photo/create",
+        {
+          response: { kind: "ref", name: "PassReceiptDTO" },
+          contentType: "multipart",
+          query: [{ name: "file", type: { kind: "file" }, required: true }],
+        },
+        "shop.Photo",
+      ),
     ],
   };
 
@@ -1245,6 +1405,8 @@ function operation(
     path?: { name: string; type: TypeRef; required: boolean }[];
     /** The route answers its DTO as is, as a handler returning it without the envelope declares. */
     bare?: boolean;
+    contentType?: string;
+    query?: { name: string; type: TypeRef; required: boolean }[];
   },
   tag = "shop.Ticket",
 ): OperationMeta {
@@ -1254,8 +1416,9 @@ function operation(
     path,
     tag,
     access: { kind: "authenticated" },
-    request: { query: [], path: parts.path ?? [] },
+    request: { query: parts.query ?? [], path: parts.path ?? [] },
   };
+  if (parts.contentType) built.request.contentType = parts.contentType;
   // SimpliX Meta writes the handler's return type as the backend declares it, so a route that
   // answers inside the envelope carries the envelope container and one that does not carries its
   // DTO alone. Most routes are enveloped, which is what the fixture declares unless told otherwise.
