@@ -1,0 +1,12 @@
+import { defineConfig } from "vitest/config";
+
+// A workspace package's exports name its TypeScript under the `source` condition and its build
+// under `import`. Vitest resolves a test under `node` with the server conditions and a test under
+// `jsdom` or `happy-dom` with the client conditions, and neither default carries `source`, so
+// without these lists a test imports a linked package's last build rather than the code the apps
+// run. Each list is Vite's own default for that environment with `source` in front, written out
+// because this package does not depend on Vite itself.
+export default defineConfig({
+  resolve: { conditions: ["source", "module", "browser", "development|production"] },
+  ssr: { resolve: { conditions: ["source", "module", "node", "development|production"] } },
+});

@@ -28,6 +28,7 @@ import {
   domainMockSeedTs,
   domainTranslationsTs,
 } from "../templates/domain/index.js";
+import { packageVitestConfig } from "../templates/package/index.js";
 
 export const addDomainCommand = new Command("add-domain")
   .description("Add a new domain package (skeleton only)")
@@ -167,6 +168,7 @@ export const addDomainCommand = new Command("add-domain")
       const files: Record<string, string> = {
         "package.json": renderTemplate(domainPackageJson, ctx),
         "tsup.config.ts": domainTsupConfig,
+        "vitest.config.ts": packageVitestConfig,
         "tsconfig.json": renderTemplate(domainTsconfigJson, ctx),
         "src/index.ts": renderTemplate(domainIndexTs, ctx),
       };

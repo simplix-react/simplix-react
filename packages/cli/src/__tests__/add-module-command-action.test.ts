@@ -3,6 +3,7 @@ import { mkdtemp, rm, readFile, mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { pathExists } from "../utils/fs.js";
+import { readTestConditions } from "./vitest-config-reader.js";
 
 // Mock prompts
 vi.mock("prompts", () => ({
@@ -94,6 +95,18 @@ describe("addModuleCommand action (non-interactive)", () => {
     expect(await pathExists(join(targetDir, "tsconfig.json"))).toBe(true);
     expect(await pathExists(join(targetDir, "src/index.ts"))).toBe(true);
     expect(await pathExists(join(targetDir, "src/manifest.ts"))).toBe(true);
+  });
+
+  it("writes a test config that resolves a linked package to its source in both test environments", async () => {
+    const { addModuleCommand } = await import("../commands/add-module.js");
+
+    await addModuleCommand.parseAsync(["node", "simplix", "editor", "-y"]);
+
+    // Vitest resolves a node test with the server list and a jsdom test with the client list, and
+    // neither default carries `source`, so a test would import a linked package's last build.
+    const conditions = await readTestConditions(join(tempDir, "modules/myapp-editor/vitest.config.ts"));
+    expect(conditions.client).toEqual(["source", "module", "browser", "development|production"]);
+    expect(conditions.server).toEqual(["source", "module", "node", "development|production"]);
   });
 
   it("declares source on every export and publishes the source it names", async () => {

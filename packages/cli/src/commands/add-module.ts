@@ -23,6 +23,7 @@ import {
   moduleSharedConfigGitkeep,
   moduleLocalesIndexTs,
 } from "../templates/module/index.js";
+import { packageVitestConfig } from "../templates/package/index.js";
 
 interface ModuleDependency {
   name: string;
@@ -149,6 +150,7 @@ export const addModuleCommand = new Command("add-module")
       const files: Record<string, string> = {
         "package.json": renderTemplate(modulePackageJson, ctx),
         "tsup.config.ts": renderTemplate(moduleTsupConfig, ctx),
+        "vitest.config.ts": packageVitestConfig,
         "tsconfig.json": renderTemplate(moduleTsconfigJson, ctx),
         "src/index.ts": renderTemplate(moduleIndexTs, ctx),
         "src/manifest.ts": renderTemplate(moduleManifestTs, ctx),
