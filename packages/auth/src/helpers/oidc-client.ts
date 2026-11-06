@@ -60,7 +60,8 @@ export interface OidcClient {
    * the code with the verifier, and forgets the pending sign-in either way.
    *
    * @throws {AuthError} `SIGN_IN_FAILED` when the issuer reported an error, the state does not
-   *   match the pending sign-in, or the code exchange is refused
+   *   match the pending sign-in, or the code exchange is refused; its `signInFailure` says which,
+   *   and `issuerError` carries the issuer's `error` and `error_description`
    */
   completeSignIn(callbackUrl: string): Promise<{ tokens: OidcTokens; returnTo?: string }>;
   /**
@@ -174,6 +175,7 @@ export function createOidcClient(options: OidcClientOptions): OidcClient {
     if (!response.ok) {
       throw new AuthError(code, `OIDC token request refused: ${response.status}`, {
         issuerError: await issuerErrorOf(response),
+        ...(code === "SIGN_IN_FAILED" ? { signInFailure: "token-refused" as const } : {}),
       });
     }
     return toTokens((await response.json()) as TokenResponse);
@@ -211,7 +213,11 @@ export function createOidcClient(options: OidcClientOptions): OidcClient {
       const query = new URL(callbackUrl).searchParams;
       const error = query.get("error");
       if (error) {
-        throw new AuthError("SIGN_IN_FAILED", `The issuer refused the sign-in: ${error}`);
+        const description = query.get("error_description") ?? undefined;
+        throw new AuthError("SIGN_IN_FAILED", `The issuer refused the sign-in: ${error}`, {
+          issuerError: { error, description },
+          signInFailure: "issuer-error",
+        });
       }
       let pending: PendingSignIn | null = null;
       try {
@@ -219,9 +225,12 @@ export function createOidcClient(options: OidcClientOptions): OidcClient {
       } catch {
         pending = null;
       }
+      if (!pending || query.get("state") !== pending.state) {
+        throw new AuthError("SIGN_IN_FAILED", "No sign-in is pending for this response", { signInFailure: "not-pending" });
+      }
       const code = query.get("code");
-      if (!pending || !code || query.get("state") !== pending.state) {
-        throw new AuthError("SIGN_IN_FAILED", "No sign-in is pending for this response");
+      if (!code) {
+        throw new AuthError("SIGN_IN_FAILED", "The response carries no authorization code", { signInFailure: "malformed-response" });
       }
       const tokens = await token(
         new URLSearchParams({

@@ -43,6 +43,9 @@ describe("createOidcClient", () => {
         if (body.get("grant_type") === "refresh_token" && body.get("refresh_token") === "disabled") {
           return json({ error: "invalid_grant", error_description: "User disabled" }, 400);
         }
+        if (body.get("grant_type") === "authorization_code" && body.get("code") === "used") {
+          return json({ error: "invalid_grant", error_description: "Code not valid" }, 400);
+        }
         if (body.get("grant_type") === "refresh_token" && body.get("refresh_token") === "html") {
           return new Response("<html>bad gateway</html>", { status: 502 });
         }
@@ -110,15 +113,42 @@ describe("createOidcClient", () => {
     expect(storage.size()).toBe(0);
   });
 
-  it("refuses a response with no sign-in pending", async () => {
-    await expect(client().completeSignIn("https://app.example.test/login/complete?code=abc&state=s"))
-      .rejects.toBeInstanceOf(AuthError);
+  it("refuses a response with no sign-in pending, and says the response belongs to no sign-in started here", async () => {
+    const refused = client().completeSignIn("https://app.example.test/login/complete?code=abc&state=s");
+    await expect(refused).rejects.toBeInstanceOf(AuthError);
+    await expect(refused).rejects.toMatchObject({ code: "SIGN_IN_FAILED", signInFailure: "not-pending", issuerError: undefined });
   });
 
-  it("reports the issuer's error", async () => {
+  it("names a response for another sign-in's state as not pending here, as it names no pending at all", async () => {
     const { oidc } = await signedOut();
-    await expect(oidc.completeSignIn("https://app.example.test/login/complete?error=access_denied"))
-      .rejects.toThrow("access_denied");
+    await expect(oidc.completeSignIn("https://app.example.test/login/complete?code=abc&state=forged"))
+      .rejects.toMatchObject({ signInFailure: "not-pending" });
+  });
+
+  it("names a response that answers the pending sign-in without a code as malformed", async () => {
+    const { oidc, authorize } = await signedOut();
+    await expect(oidc.completeSignIn(`https://app.example.test/login/complete?state=${authorize.searchParams.get("state")}`))
+      .rejects.toMatchObject({ signInFailure: "malformed-response" });
+  });
+
+  it("reports the issuer's error with its description, before any pending state is looked at", async () => {
+    const { oidc } = await signedOut();
+    const refused = oidc.completeSignIn(
+      "https://app.example.test/login/complete?error=temporarily_unavailable&error_description=authentication_expired&state=s",
+    );
+    await expect(refused).rejects.toThrow("temporarily_unavailable");
+    await expect(refused).rejects.toMatchObject({
+      signInFailure: "issuer-error",
+      issuerError: { error: "temporarily_unavailable", description: "authentication_expired" },
+    });
+    await expect(client().completeSignIn("https://app.example.test/login/complete?error=access_denied"))
+      .rejects.toMatchObject({ signInFailure: "issuer-error", issuerError: { error: "access_denied", description: undefined } });
+  });
+
+  it("names a refused code exchange, keeping the issuer's words", async () => {
+    const { oidc, authorize } = await signedOut();
+    await expect(oidc.completeSignIn(`https://app.example.test/login/complete?code=used&state=${authorize.searchParams.get("state")}`))
+      .rejects.toMatchObject({ code: "SIGN_IN_FAILED", signInFailure: "token-refused", issuerError: { error: "invalid_grant", description: "Code not valid" } });
   });
 
   it("refreshes, and reports a refused refresh as REFRESH_FAILED", async () => {

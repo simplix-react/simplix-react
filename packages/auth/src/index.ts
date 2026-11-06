@@ -15,7 +15,7 @@ export type {
 
 // Errors
 export { AuthError } from "./errors.js";
-export type { AuthErrorCode } from "./errors.js";
+export type { AuthErrorCode, SignInFailure } from "./errors.js";
 
 // Factories
 export { createAuth } from "./create-auth.js";
