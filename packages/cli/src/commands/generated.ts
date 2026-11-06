@@ -7,10 +7,10 @@ import { loadConfig } from "../config/config-loader.js";
 import { assertOutputDirs } from "../config/output-dirs.js";
 import { reportConfigError } from "../config/report-config-error.js";
 import { storyTargets } from "../utils/app-config.js";
-import { captureWrites, findProjectRoot, lastKeptRenders } from "../utils/fs.js";
+import { captureWrites, findProjectRoot, lastKeptRenders, writeFileWithDir } from "../utils/fs.js";
 import { log, withSilentLog } from "../utils/logger.js";
 import { runAfterGenerate } from "../utils/generated-after.js";
-import { takeGeneratedOutcomes, withConflictMarkers, withRemovalsHonoured, type GeneratedWrite } from "../utils/generated-merge.js";
+import { basePathFor, takeGeneratedOutcomes, withConflictMarkers, withRemovalsHonoured, type GeneratedWrite } from "../utils/generated-merge.js";
 import { GENERATED_PAGE_MARKER, isUntouchedRender, renderOrigin } from "../utils/project-templates.js";
 
 /**
@@ -219,6 +219,76 @@ async function regenerateOrigins(rootDir: string): Promise<{ origins: string[]; 
 }
 
 /**
+ * Regenerates only the named generated files: each one's origin is rendered with every write
+ * captured, and only the named file and its stored base are written from that render. The origin's
+ * other files - the siblings of a screen, its story - stay as they are, and keep whatever state
+ * the report gives them.
+ *
+ * <p>The render is the one {@link regenerateAll} would write: an untouched file is rewritten, an
+ * edited one merged three-way, a conflicting merge left alone unless `writeConflicts` asks for
+ * markers.
+ *
+ * @param rootDir the project root, which must also be the working directory
+ * @param files absolute paths of generated files
+ * @param writeConflicts write conflict markers into a named file whose merge conflicts
+ * @returns the origins rendered, what each named file's write came to, and the named files that
+ *   record no origin and so could not be rendered
+ */
+export async function regenerateNamed(
+  rootDir: string,
+  files: readonly string[],
+  writeConflicts = false,
+): Promise<{ origins: string[]; writes: GeneratedWrite[]; unrecorded: string[] }> {
+  const { held } = await collectGenerated(rootDir);
+  const byOrigin = new Map<string, string[]>();
+  const unrecorded: string[] = [];
+  for (const file of files) {
+    const text = held.get(file) ?? (await readFile(file, "utf-8"));
+    const origin = renderOrigin(text)?.join(" ");
+    if (origin === undefined) {
+      unrecorded.push(file);
+      continue;
+    }
+    byOrigin.set(origin, [...(byOrigin.get(origin) ?? []), file]);
+  }
+
+  const writes: GeneratedWrite[] = [];
+  for (const [origin, named] of byOrigin) {
+    log.info(`simplix ${origin}  (${named.length} file(s))`);
+    const capture = () => renderOriginNow(origin.split(/\s+/));
+    const render = await withRemovalsHonoured(() => (writeConflicts ? withConflictMarkers(capture) : capture()));
+    for (const file of named) {
+      const content = render.written.get(file);
+      if (content !== undefined) await writeFileWithDir(file, content);
+      const basePath = await basePathFor(file);
+      const base = render.written.get(resolve(basePath));
+      if (base !== undefined) await writeFileWithDir(basePath, base);
+      const outcome = render.outcomes.get(file);
+      if (outcome !== undefined) writes.push(outcome);
+    }
+  }
+  return { origins: [...byOrigin.keys()], writes, unrecorded };
+}
+
+/**
+ * The generated files at or under the typed paths, by absolute path.
+ *
+ * @returns the files, and the typed paths no generated file lies at or under
+ */
+export async function generatedFilesNamedBy(
+  rootDir: string,
+  callerDir: string,
+  named: readonly string[],
+): Promise<{ files: string[]; unmatched: string[] }> {
+  const { rootDir: realRoot, held } = await collectGenerated(rootDir);
+  const wanted = named.map((typed) => ({ typed, path: resolve(realRoot, relative(rootDir, resolve(callerDir, typed))) }));
+  const under = (file: string, path: string) => file === path || file.startsWith(path + sep);
+  const files = [...held.keys()].filter((file) => wanted.some((one) => under(file, one.path))).sort();
+  const unmatched = wanted.filter((one) => !files.some((file) => under(file, one.path))).map((one) => one.typed);
+  return { files, unmatched };
+}
+
+/**
  * Why a report fails, one sentence each; empty when it passes.
  *
  * <p>Only a screen that did not start from a template fails, and a routed screen with no entry or
@@ -305,8 +375,8 @@ export const generatedCommand = new Command("generated")
   .description(
     "Report every generated file as untouched, edited or stale against the current templates, and what a regeneration merges into each edited one",
   )
-  .argument("[paths...]", "Report only the generated files at these paths, or under these directories")
-  .option("--all", "Regenerate every scaffolded screen and page first: untouched files are rewritten, edited ones merged three-way, and a deleted one stays deleted while its base under .simplix/generated is kept")
+  .argument("[paths...]", "Report only the generated files at these paths, or under these directories; with --all, regenerate only them")
+  .option("--all", "Regenerate every scaffolded screen and page first (only the files at the given paths, when paths are given): untouched files are rewritten, edited ones merged three-way, and a deleted one stays deleted while its base under .simplix/generated is kept")
   .option("--write-conflicts", "With --all, write conflict markers into a file whose merge conflicts instead of leaving it alone")
   .option("--check", "Also exit non-zero on a stale file, a conflict, a file with no base or origin, and an edited file a clean merge would still move (without it only a page that did not start from a template fails)")
   .option("--json", "Print the report as JSON")
@@ -372,8 +442,8 @@ export const generatedCommand = new Command("generated")
       process.exitCode = 1;
       return;
     }
-    if (paths.length > 0 && (flags.all || flags.share)) {
-      log.error("Paths narrow the report only: run them without --all or --share.");
+    if (paths.length > 0 && flags.share) {
+      log.error("Paths narrow the report and a regeneration: run them without --share.");
       process.exitCode = 1;
       return;
     }
@@ -383,7 +453,32 @@ export const generatedCommand = new Command("generated")
       return;
     }
     let conflicted = false;
-    if (flags.all) {
+    if (flags.all && paths.length > 0) {
+      const named = await generatedFilesNamedBy(rootDir, callerDir, paths);
+      if (named.unmatched.length > 0) {
+        for (const one of named.unmatched) log.error(`no generated file at or under ${one}`);
+        log.error("Nothing regenerated: name only generated files, or the directories holding them.");
+        process.exitCode = 1;
+        return;
+      }
+      const { origins, writes, unrecorded } = await regenerateNamed(rootDir, named.files, flags.writeConflicts === true);
+      for (const file of unrecorded) {
+        log.error(`not regenerated ${relative(rootDir, file)}: it records no origin; record one with \`simplix generated --origin "<command>" <path>\``);
+        process.exitCode = 1;
+      }
+      for (const w of writes) {
+        log.step(`${w.outcome.padEnd(9)} ${relative(rootDir, w.path)}${w.markersWritten ? "  (conflict markers written)" : ""}`);
+        for (const hunk of w.hunks ?? []) process.stdout.write(hunk);
+        if (w.outcome === "conflict" && !w.markersWritten) conflicted = true;
+      }
+      // The screens the named files belong to are judged against Meta, as --all judges every one.
+      const entities = [...new Set(origins.map((one) => one.split(/\s+/)).filter(([command]) => command === "scaffold").map(([, entity]) => entity))];
+      if (entities.length > 0) {
+        const { runScreenCheck } = await import("./check-screen.js");
+        await runScreenCheck(rootDir, entities);
+      }
+      if (origins.length > 0) await runAfterGenerate(rootDir);
+    } else if (flags.all) {
       const { origins, writes } = await regenerateAll(rootDir, flags.writeConflicts === true);
       for (const w of writes) {
         if (w.outcome === "written") continue;

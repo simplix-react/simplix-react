@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { entriesNamedBy, generatedFailures, generatedReport, regenerateAll, unstartedPages, type GeneratedEntry } from "../commands/generated.js";
+import { entriesNamedBy, generatedCommand, generatedFailures, generatedReport, regenerateAll, regenerateNamed, unstartedPages, type GeneratedEntry } from "../commands/generated.js";
 import { shareReport } from "../commands/generated-share.js";
 import { runAddPage } from "../commands/add-page.js";
 import { captureWrites, writeFileWithDir } from "../utils/fs.js";
@@ -156,6 +156,68 @@ describe("generated-state report", () => {
     const text = (await readFile(pagePath(), "utf-8")).replace(/ add-page static-page about --app web/, "");
     await writeFile(pagePath(), text);
     expect((await pageReport(root))[0]?.state).toBe("unchecked");
+  });
+
+  describe("a regeneration narrowed to named files", () => {
+    const storyPath = () => join(root, "stories/web-about.stories.tsx");
+    const readStoryBase = () => readFile(join(root, ".simplix/generated/stories/web-about.stories.tsx"), "utf-8");
+
+    beforeEach(async () => {
+      await setStory("s1");
+      await regenerateAll(root);
+      await setTemplate("v2");
+      await setStory("s2");
+    });
+
+    it("rewrites the named file and its base, and leaves its origin's other files as they were", async () => {
+      const storyBefore = await readFile(storyPath(), "utf-8");
+      const storyBaseBefore = await readStoryBase();
+      const { origins, writes, unrecorded } = await regenerateNamed(root, [pagePath()]);
+      expect(origins).toEqual(["add-page static-page about --app web"]);
+      expect(unrecorded).toEqual([]);
+      expect(writes.map((w) => [w.path, w.outcome])).toEqual([[pagePath(), "written"]]);
+      expect(await readFile(pagePath(), "utf-8")).toContain('"v2"');
+      expect(await readFile(basePath(), "utf-8")).toContain('"v2"');
+      expect(await readFile(storyPath(), "utf-8")).toBe(storyBefore);
+      expect(await readStoryBase()).toBe(storyBaseBefore);
+      const report = await generatedReport(root);
+      expect(report.find((e) => e.path === "apps/web/src/pages/about/page.tsx")?.state).toBe("untouched");
+      expect(report.find((e) => e.path.endsWith("web-about.stories.tsx"))?.state).toBe("stale");
+    });
+
+    it("merges into a named edited file, and writes conflict markers only when asked", async () => {
+      const edited = (await readFile(pagePath(), "utf-8")).replace('"v1"', '"customised"');
+      await writeFile(pagePath(), edited);
+      const kept = await regenerateNamed(root, [pagePath()]);
+      expect(kept.writes.map((w) => w.outcome)).toEqual(["conflict"]);
+      expect(await readFile(pagePath(), "utf-8")).toBe(edited);
+      await regenerateNamed(root, [pagePath()], true);
+      expect(await readFile(pagePath(), "utf-8")).toContain("<<<<<<< edited");
+      expect(await readFile(storyPath(), "utf-8")).toContain('"s1"');
+    });
+
+    it("names a file that records no origin instead of rendering it", async () => {
+      const text = (await readFile(pagePath(), "utf-8")).replace(/ add-page static-page about --app web/, "");
+      await writeFile(pagePath(), text);
+      const { origins, writes, unrecorded } = await regenerateNamed(root, [pagePath()]);
+      expect(origins).toEqual([]);
+      expect(writes).toEqual([]);
+      expect(unrecorded).toEqual([pagePath()]);
+      expect(await readFile(pagePath(), "utf-8")).toBe(text);
+    });
+
+    it("is what `simplix generated --all <path>` runs, and a path still refuses --share", async () => {
+      const storyBefore = await readFile(storyPath(), "utf-8");
+      await generatedCommand.parseAsync(["node", "simplix", "--all", "apps/web/src/pages/about/page.tsx"]);
+      expect(await readFile(pagePath(), "utf-8")).toContain('"v2"');
+      expect(await readFile(storyPath(), "utf-8")).toBe(storyBefore);
+      const exit = process.exitCode;
+      process.exitCode = undefined;
+      expect(exit).toBeUndefined();
+      await generatedCommand.parseAsync(["node", "simplix", "--share", "apps/web/src/pages/about/page.tsx"]);
+      expect(process.exitCode).toBe(1);
+      process.exitCode = undefined;
+    });
   });
 });
 
