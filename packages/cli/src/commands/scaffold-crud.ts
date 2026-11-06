@@ -2235,8 +2235,13 @@ export interface ScaffoldOptions {
 }
 
 /**
- * The scaffold options an origin command records: the module or output the files go to and the
- * list's design decisions. The menu placement is a one-time write and is not part of the render.
+ * The scaffold options an origin command records: the module or output the files go to, the
+ * list's design decisions and the menu placement.
+ *
+ * <p>The menu placement renders no generated file, and replaying it changes nothing while the
+ * screen's entry is in the menu file. It is recorded so the origin is the whole command that laid
+ * the screen down: a regeneration that finds the entry gone puts it back in the group and with the
+ * icon the design decided, not before the marker with the configured icon.
  *
  * @param args the tokens of the origin command after `scaffold`, the entity first
  */
@@ -2249,7 +2254,27 @@ export function scaffoldOptionsFromOrigin(args: readonly string[]): ScaffoldOpti
     viewToggle: args.includes("--view-toggle") ? true : undefined,
     cardTitle: at("--card-title"),
     textFilter: at("--text-filter"),
+    menuGroup: at("--menu-group"),
+    menuIcon: at("--menu-icon"),
   };
+}
+
+/**
+ * The origin flags that carry the menu placement. An origin is read back split on whitespace, so a
+ * value holding a space would be recorded as something no regeneration reads back.
+ *
+ * @param options the scaffold options as typed or as an origin records them
+ * @throws Error when a menu value holds whitespace
+ */
+export function menuOriginFlags(options: ScaffoldOptions): string {
+  const flags: [string, string | undefined][] = [["--menu-group", options.menuGroup], ["--menu-icon", options.menuIcon]];
+  return flags
+    .map(([flag, value]) => {
+      if (value === undefined || value === "") return "";
+      if (/\s/.test(value)) throw new Error(`${flag} takes one word (a menu group key or an icon name), not "${value}"`);
+      return ` ${flag} ${value}`;
+    })
+    .join("");
 }
 
 /**
@@ -2320,6 +2345,8 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
   if (options.listPresentation !== undefined && !(LIST_PRESENTATIONS as readonly string[]).includes(options.listPresentation)) {
     throw new Error(`--list-presentation takes ${LIST_PRESENTATIONS.join(" or ")}, not "${options.listPresentation}"`);
   }
+  // Refused before anything is written, as the origin would record a value it cannot read back.
+  menuOriginFlags(options);
   if (options.native) {
     // Dynamic import keeps the module graph acyclic (scaffold-native reuses
     // the metadata pipeline exported from this file).
@@ -2892,7 +2919,8 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     // generated-state report can re-render them and tell an untouched file from a stale one.
     const origin =
       (moduleDir ? `scaffold ${entityKebab} --module ${modulePathOf(rootDir, moduleDir)}` : `scaffold ${entityKebab} --output ${relativeOutput}`) +
-      listOriginFlags(options);
+      listOriginFlags(options) +
+      menuOriginFlags(options);
     // A widget is laid down whole; its blocks files are written only when the author asks.
     const widgetBlocks = options.blocks ? renderWidgetBlocks(files, fullCtx, projectTemplates) : {};
 

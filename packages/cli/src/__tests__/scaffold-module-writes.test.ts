@@ -411,6 +411,22 @@ describe("the list's design decisions", () => {
     expect(text).toMatch(/scaffold product --module mymod --list-presentation cards --card-title name\n/);
   });
 
+  it("records the menu placement after the list's decisions, so a regeneration places a missing entry where the design put it", async () => {
+    await useDecisionAwareList();
+    await withSilentLog(() =>
+      runScaffold("product", { module: "mymod", quiet: true, listPresentation: "cards", menuGroup: "people", menuIcon: "UsersIcon" }),
+    );
+    const text = await listText();
+    expect(text).toMatch(/@simplix-render [0-9a-f]{12} scaffold product --module mymod --list-presentation cards --menu-group people --menu-icon UsersIcon\n/);
+    const origin = /@simplix-render [0-9a-f]{12} scaffold (.+)\n/.exec(text)?.[1] ?? "";
+    expect(scaffoldOptionsFromOrigin(origin.split(" "))).toMatchObject({ module: "mymod", listPresentation: "cards", menuGroup: "people", menuIcon: "UsersIcon" });
+  });
+
+  it("refuses a menu value the origin could not read back as one word", async () => {
+    await useDecisionAwareList();
+    await expect(withSilentLog(() => runScaffold("product", { module: "mymod", quiet: true, menuGroup: "my people" }))).rejects.toThrow(/--menu-group/);
+  });
+
   it("keeps the flags a regeneration reads out of a cards origin and a table origin the same as they were typed", () => {
     expect(scaffoldOptionsFromOrigin(["product", "--module", "mymod", "--list-presentation", "cards", "--card-title", "name"])).toMatchObject({ listPresentation: "cards", cardTitle: "name" });
     expect(listDecision({ listPresentation: "cards" })).toEqual({ listCards: true, viewToggle: true });
