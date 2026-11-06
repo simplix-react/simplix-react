@@ -126,6 +126,12 @@ describe("a menu entry placed in a named group", () => {
   it("refuses a group the menu does not have", () => {
     expect(() => placeMenuEntry(menu, "@simplix-menu admin", target, entry, "nowhere")).toThrow(/no group "nowhere"/);
   });
+  it("leaves a screen whose entry is already in the menu alone, though the group its origin records is gone", () => {
+    // An origin replays its menu group on every regeneration and report, so a renamed group must
+    // not fail a screen whose entry is already placed.
+    expect(placeMenuEntry(menu, "@simplix-menu admin", { key: "users", href: "/users", gate: "undefined" }, entry, "nowhere")).toBeUndefined();
+    expect(placeMenuEntry(menu, "@simplix-menu admin", { key: "renamed", href: "/users", gate: "undefined" }, entry, "nowhere")).toBeUndefined();
+  });
   it("still goes before the marker when no group is named", () => {
     const out = placeMenuEntry(menu, "@simplix-menu admin", target, entry)?.text ?? "";
     expect(out).toContain('icon: ListIcon },\n      { key: "mail", href: "/mail", icon: MailIcon },\n      // @simplix-menu admin');
