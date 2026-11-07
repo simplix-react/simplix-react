@@ -6,7 +6,7 @@ import type {
 } from "@simplix-react/auth";
 import type { FetchFn } from "@simplix-react/contract";
 import { createFetch } from "@simplix-react/contract";
-import { getRequestLocale } from "@simplix-react/api";
+import { getRequestLocale, statusOnlyMessage } from "@simplix-react/api";
 import {
   AuthError,
   createAuth,
@@ -315,7 +315,7 @@ export function createBootAuth(options: BootAuthOptions = {}): BootAuthResult {
         ) as ApiResponseError & { status: number };
       }
     }
-    const error = new Error(`HTTP ${status}`) as Error & { status: number };
+    const error = new Error(statusOnlyMessage(status)) as Error & { status: number };
     error.status = status;
     return error;
   }

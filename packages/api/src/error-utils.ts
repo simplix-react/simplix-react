@@ -204,13 +204,34 @@ export function getErrorMessage(error: unknown): string {
  * {@link getErrorMessage}, nothing is put in its place when the error carries none, so a caller
  * can fall back to its own words: `serverMessage(caught) ?? failed`.
  *
+ * <p>Only a response's own sentence counts: the error carries the response's status (or is the
+ * envelope itself, with its `type`). A transport failure (the browser's 「Failed to fetch」) has no
+ * response, and the stand-in a client writes when the response stated nothing
+ * ({@link statusOnlyMessage}, 「HTTP 500」) is not the server speaking, so neither is returned and
+ * the caller's own words stand, in the reader's language.
+ *
  * @param error - Whatever the request threw.
- * @returns The non-empty `message` the error carries, or `undefined` when it carries none.
+ * @returns The response's non-empty sentence, or `undefined` when it stated none.
  */
 export function serverMessage(error: unknown): string | undefined {
   if (typeof error !== "object" || error === null) return undefined;
-  const { message } = error as { message?: unknown };
-  return typeof message === "string" && message.length > 0 ? message : undefined;
+  const { message, status, type } = error as { message?: unknown; status?: unknown; type?: unknown };
+  if (typeof message !== "string" || message.length === 0) return undefined;
+  if (typeof status !== "number") return typeof type === "string" ? message : undefined;
+  return message === statusOnlyMessage(status) ? undefined : message;
+}
+
+/**
+ * The message an error carries when its response stated no sentence of its own: the status alone.
+ *
+ * <p>Every client that turns a body-less response into an error writes this, so
+ * {@link serverMessage} can tell it from a sentence the server sent.
+ *
+ * @param status - The response's HTTP status.
+ * @returns `HTTP <status>`.
+ */
+export function statusOnlyMessage(status: number): string {
+  return `HTTP ${status}`;
 }
 
 /**

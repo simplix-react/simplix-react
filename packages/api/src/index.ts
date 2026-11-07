@@ -172,6 +172,7 @@ export {
   getValidationErrors,
   getErrorMessage,
   serverMessage,
+  statusOnlyMessage,
   getErrorCode,
   getHttpStatus,
   classifyError,

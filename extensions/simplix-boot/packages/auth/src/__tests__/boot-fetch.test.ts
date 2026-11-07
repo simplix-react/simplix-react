@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { serverMessage } from "@simplix-react/api";
 
 import { ApiResponseError } from "../api-response-error.js";
 import { bootResponseAdapter } from "../boot-fetch.js";
@@ -74,3 +75,16 @@ describe("bootResponseAdapter", () => {
     });
   });
 });
+
+describe("the sentence a refusal toast reads from a boot error", () => {
+  it("is the envelope's message when the server sent one", () => {
+    const error = bootResponseAdapter.toError({ type: "ERROR", message: "The breaker is already closed.", timestamp: "2026-11-07T00:00:00Z" }, 409);
+    expect(serverMessage(error)).toBe("The breaker is already closed.");
+  });
+
+  it("is absent when the response stated nothing, so the caller's own words stand", () => {
+    expect(serverMessage(bootResponseAdapter.toError(null, 500))).toBeUndefined();
+    expect(serverMessage(bootResponseAdapter.toError("Internal Server Error", 502))).toBeUndefined();
+  });
+});
+

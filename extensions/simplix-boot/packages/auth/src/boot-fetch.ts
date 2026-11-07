@@ -1,3 +1,4 @@
+import { statusOnlyMessage } from "@simplix-react/api";
 import type { FetchFn } from "@simplix-react/contract";
 import { createFetch } from "@simplix-react/contract";
 import { ApiResponseError } from "./api-response-error.js";
@@ -22,7 +23,8 @@ function toBootError(body: unknown, status: number): Error {
   return new ApiResponseError(
     status,
     "ERROR",
-    `HTTP ${status}`,
+    // No envelope, so no sentence: the status alone, which serverMessage tells from one.
+    statusOnlyMessage(status),
     new Date().toISOString(),
   );
 }

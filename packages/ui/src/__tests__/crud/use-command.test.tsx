@@ -15,7 +15,10 @@ afterEach(() => {
 });
 
 /** A refusal the way the boot mutator raises one: an Error whose message is the server's sentence. */
-class Refusal extends Error {}
+/** A server refusal as the fetch layer raises it: the response's status and its sentence. */
+class Refusal extends Error {
+  readonly status = 409;
+}
 
 /** A client whose mutation cache records which failures would have raised the app's error dialog. */
 function clientWithDialog() {
@@ -98,6 +101,21 @@ describe("useCommand", () => {
       await result.current.run({ id: "b1" });
     });
     expect(toasts()).toEqual([{ type: "error", message: "Only an open breaker can be reset." }]);
+  });
+
+  it.each([
+    ["a transport failure", () => new TypeError("Failed to fetch")],
+    ["a response that stated only its status", () => Object.assign(new Error("HTTP 500"), { status: 500 })],
+  ])("falls back to its own sentence for %s", async (_, failure) => {
+    const { wrapper } = clientWithDialog();
+    const { result } = renderHook(
+      () => useCommand(hookFor(async () => { throw failure(); }), { done: "Reset", failed: "Could not reset" }),
+      { wrapper },
+    );
+    await act(async () => {
+      await result.current.run({ id: "b1" });
+    });
+    expect(toasts()).toEqual([{ type: "error", message: "Could not reset" }]);
   });
 
   it("falls back to its own sentence when the server sent none", async () => {

@@ -5,6 +5,7 @@ import {
   getValidationErrors,
   getErrorMessage,
   serverMessage,
+  statusOnlyMessage,
   getErrorCode,
   getHttpStatus,
   classifyError,
@@ -151,7 +152,19 @@ describe("getErrorMessage", () => {
 describe("serverMessage", () => {
   it("returns the message an error carries", () => {
     expect(serverMessage(new HttpError(409, "The breaker is already closed."))).toBe("The breaker is already closed.");
-    expect(serverMessage({ message: "Out of range." })).toBe("Out of range.");
+    expect(serverMessage({ status: 400, message: "Out of range." })).toBe("Out of range.");
+    expect(serverMessage({ type: "ERROR", message: "Out of range." })).toBe("Out of range.");
+  });
+
+  it("returns undefined for a transport failure, which carries the browser's sentence and no response", () => {
+    expect(serverMessage(new TypeError("Failed to fetch"))).toBeUndefined();
+    expect(serverMessage({ message: "Out of range." })).toBeUndefined();
+  });
+
+  it("returns undefined for the status stand-in a client writes when the response stated nothing", () => {
+    expect(serverMessage(new HttpError(500, statusOnlyMessage(500)))).toBeUndefined();
+    expect(serverMessage(Object.assign(new Error("HTTP 502"), { status: 502 }))).toBeUndefined();
+    expect(serverMessage(new HttpError(500, "HTTP 500 from the gateway"))).toBe("HTTP 500 from the gateway");
   });
 
   it("returns undefined rather than a stand-in when there is no sentence", () => {
