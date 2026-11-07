@@ -24,9 +24,18 @@ const DEFAULT_QUERY_OPTIONS: Record<string, unknown> = {
   gcTime: 0,
 };
 
+/**
+ * The query meta a list read carries: its failure is drawn by the list itself (the list engine's
+ * `emptyReason` is `"error"`, which the list table draws as its error state), so an app's global
+ * error dialog leaves it alone. Told twice, the reader dismisses the modal to reach the sentence
+ * underneath it. A caller that wants the dialog as well passes `meta: { suppressErrorDialog: false }`.
+ */
+export const LIST_READ_META = { suppressErrorDialog: true } as const;
+
 export interface AdaptOrvalListOptions {
   /** Extra query options forwarded to Orval's second argument (`{ query: {...} }`).
-   *  Merged with defaults (`staleTime: 0, gcTime: 0`). */
+   *  Merged with defaults (`staleTime: 0, gcTime: 0`, `meta: LIST_READ_META`); a `meta` given here
+   *  is merged over {@link LIST_READ_META}. */
   queryOptions?: Record<string, unknown>;
   /** Transform filter key-value pairs before sending to the API.
    *  Use this to convert generic filter formats to backend-specific formats
@@ -66,7 +75,8 @@ export function adaptOrvalList<T>(
   useApiHook: OrvalListHookLike,
   options?: AdaptOrvalListOptions,
 ): ListHook<T> {
-  const queryOpts = { ...DEFAULT_QUERY_OPTIONS, ...options?.queryOptions };
+  const given = options?.queryOptions;
+  const queryOpts = { ...DEFAULT_QUERY_OPTIONS, ...given, meta: { ...LIST_READ_META, ...(given?.meta as Record<string, unknown> | undefined) } };
 
   return (params?: Record<string, unknown>): ListHookResult<T> => {
     const apiParams = buildSearchableParams(params as SearchableListParams | undefined, {

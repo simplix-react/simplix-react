@@ -14,6 +14,19 @@ function createMockOrvalHook(responseData: unknown) {
 }
 
 describe("adaptOrvalList", () => {
+  it("marks its read as one whose failure the list draws, so the global error dialog leaves it alone", () => {
+    const useApiHook = createMockOrvalHook({ content: [], totalElements: 0 });
+    renderHook(() => adaptOrvalList(useApiHook)({ pagination: { type: "offset", page: 1, limit: 10 } }));
+    expect(useApiHook.mock.calls[0]?.[1]).toEqual({ query: expect.objectContaining({ meta: { suppressErrorDialog: true } }) });
+  });
+
+  it("merges a caller's meta over the list's own, so a caller can ask for the dialog too", () => {
+    const useApiHook = createMockOrvalHook({ content: [], totalElements: 0 });
+    const options = { queryOptions: { meta: { suppressErrorDialog: false, source: "tile" } } };
+    renderHook(() => adaptOrvalList(useApiHook, options)({ pagination: { type: "offset", page: 1, limit: 10 } }));
+    expect(useApiHook.mock.calls[0]?.[1]).toEqual({ query: expect.objectContaining({ meta: { suppressErrorDialog: false, source: "tile" }, staleTime: 0 }) });
+  });
+
   it("converts 1-based page to 0-based page", () => {
     const useApiHook = createMockOrvalHook({ content: [], totalElements: 0 });
     const useAdapted = adaptOrvalList(useApiHook);
@@ -110,7 +123,7 @@ describe("adaptOrvalList", () => {
     expect(callArgs._search).toBeUndefined();
   });
 
-  it("passes default staleTime and gcTime query options", () => {
+  it("passes default staleTime, gcTime and list-read meta query options", () => {
     const useApiHook = createMockOrvalHook(undefined);
     const useAdapted = adaptOrvalList(useApiHook);
 
@@ -118,7 +131,7 @@ describe("adaptOrvalList", () => {
 
     expect(useApiHook).toHaveBeenCalledWith(
       expect.anything(),
-      { query: { staleTime: 0, gcTime: 0 } },
+      { query: { staleTime: 0, gcTime: 0, meta: { suppressErrorDialog: true } } },
     );
   });
 
@@ -132,7 +145,7 @@ describe("adaptOrvalList", () => {
 
     expect(useApiHook).toHaveBeenCalledWith(
       expect.anything(),
-      { query: { staleTime: 5000, gcTime: 0, refetchOnWindowFocus: true } },
+      { query: { staleTime: 5000, gcTime: 0, refetchOnWindowFocus: true, meta: { suppressErrorDialog: true } } },
     );
   });
 

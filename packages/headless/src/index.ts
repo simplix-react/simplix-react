@@ -10,7 +10,7 @@ export { buildSearchableParams, SEARCHABLE_KEYWORD_PARAM } from "./build-searcha
 export type { SearchableListParams, BuildSearchableParamsOptions } from "./build-searchable-params";
 
 // ── Orval adapters ──
-export { adaptOrvalList } from "./adapt-orval-list";
+export { adaptOrvalList, LIST_READ_META } from "./adapt-orval-list";
 export type { OrvalListHookLike, AdaptOrvalListOptions } from "./adapt-orval-list";
 export { adaptOrvalGet } from "./adapt-orval-get";
 export type { OrvalGetResultLike, OrvalGetQueryFields } from "./adapt-orval-get";
