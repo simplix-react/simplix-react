@@ -210,6 +210,7 @@ export const WithActiveFilters: StoryObj = {
     // Provide column context so the columns toggle renders, grouped with the
     // filter trigger in one segmented control (like the list/grid view toggle).
     const [hiddenColumns, setHiddenColumns] = useState<Set<string>>(new Set());
+    const [shownColumns, setShownColumns] = useState<Set<string>>(new Set());
     const columnCtx = useMemo<CrudListColumnContextValue>(
       () => ({
         columns: [
@@ -220,6 +221,8 @@ export const WithActiveFilters: StoryObj = {
         setColumns: () => {},
         hiddenColumns,
         setHiddenColumns,
+        shownColumns,
+        setShownColumns,
         isCardMode: false,
         setIsCardMode: () => {},
         viewMode: "list",
@@ -229,7 +232,7 @@ export const WithActiveFilters: StoryObj = {
         responsiveCardMode: false,
         setResponsiveCardMode: () => {},
       }),
-      [hiddenColumns],
+      [hiddenColumns, shownColumns],
     );
     return (
       <CrudListColumnContext.Provider value={columnCtx}>

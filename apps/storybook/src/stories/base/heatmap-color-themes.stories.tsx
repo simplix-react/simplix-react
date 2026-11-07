@@ -3,7 +3,9 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { TimeRangeSelector, HEATMAP_THEMES } from "@simplix-react/ui";
 import type { HeatmapColorTheme, TimeRangeValue } from "@simplix-react/ui";
 
-const themeKeys = Object.keys(HEATMAP_THEMES) as HeatmapColorTheme[];
+/** The named palettes: the `tokens` theme reads the design tokens and has no palette of its own. */
+type PaletteTheme = Exclude<HeatmapColorTheme, "tokens">;
+const themeKeys = Object.keys(HEATMAP_THEMES) as PaletteTheme[];
 
 const now = new Date();
 const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -37,7 +39,7 @@ function ThemeCard({ theme }: { theme: HeatmapColorTheme }) {
   );
 }
 
-function PaletteSwatches({ theme }: { theme: HeatmapColorTheme }) {
+function PaletteSwatches({ theme }: { theme: PaletteTheme }) {
   const palette = HEATMAP_THEMES[theme];
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
