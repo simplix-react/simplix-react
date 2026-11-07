@@ -8,6 +8,15 @@ import { drawnClasses } from "../helpers/drawn-classes";
 afterEach(cleanup);
 
 describe("StatCard", () => {
+  it("never cuts its figure: a value wider than the card wraps onto the lines it needs", () => {
+    render(<StatCard title="Spent" value="US$0.000096" />);
+    const figure = screen.getByText("US$0.000096").closest("[data-slot=stat-card-value]") as HTMLElement;
+    const classes = figure.className.split(/\s+/);
+    expect(classes).not.toContain("truncate");
+    expect(classes.some((name) => /^(text-ellipsis|line-clamp-|overflow-hidden$|whitespace-nowrap$)/.test(name))).toBe(false);
+    expect(classes).toContain("[overflow-wrap:anywhere]");
+  });
+
   it("renders title and value", () => {
     render(<StatCard title="Revenue" value="$1,234" />);
     expect(screen.getByText("Revenue")).toBeDefined();

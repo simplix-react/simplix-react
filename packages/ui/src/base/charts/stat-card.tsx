@@ -105,7 +105,9 @@ export function StatCard({
         {icon && <span className="shrink-0" {...slotAttributes(statCardIconStyle, {})}>{icon}</span>}
       </div>
       <div className="flex items-end justify-between" {...slotAttributes(statCardBodyStyle, {})}>
-        <p className="min-w-0 truncate" {...slotAttributes(statCardValueStyle, { tone: tone ?? "none" })}>
+        {/* The figure is the value the tile exists for, so it is never cut: a figure wider than the
+            card (a money amount at its full scale) breaks onto the next line instead. */}
+        <p className="min-w-0 [overflow-wrap:anywhere]" {...slotAttributes(statCardValueStyle, { tone: tone ?? "none" })}>
           {loading ? (
             <span aria-hidden className="inline-block align-bottom" {...slotAttributes(statCardSkeletonStyle, {})} />
           ) : (
