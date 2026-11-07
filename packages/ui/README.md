@@ -864,8 +864,10 @@ const list = useCrudList(useListJobs, {
 A list opened with filters starts on them, draws them as badges in `CrudList.FilterBar` and sends
 its first request with them. A change the reader commits is handed to `onChange`; an address that
 changes under the list (a followed link, Back) is adopted and returns the list to its first page.
-`defaultFilters` apply only where the address names none. A list without `addressedFilters` is
-unchanged. `onNavigate` is called as `onNavigate(search, { replace: true })` for a filter change, so
+`defaultFilters` apply only where the address names none. A filter over a field a tab pins is left
+out of the list but stays in the address until the reader's next filter change writes it out, and
+it applies again if the reader moves to a tab that no longer pins that field. A list without
+`addressedFilters` is unchanged. `onNavigate` is called as `onNavigate(search, { replace: true })` for a filter change, so
 the route's handler passes `replace` on:
 
 ```tsx
