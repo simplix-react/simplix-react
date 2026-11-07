@@ -6,7 +6,7 @@ import { ConfigLoadError } from "../config/config-load-error.js";
 import { findCrudConfigForEntity } from "../config/crud-config-loader.js";
 import { toKebabCase, toPascalCase } from "../utils/case.js";
 import {
-  findProjectRoot,
+  requireProjectRoot,
   pathExists,
   readJsonFile,
   writeFileWithDir,
@@ -232,7 +232,7 @@ export async function runNativeScaffold(
   entity: string,
   options: NativeScaffoldOptions,
 ): Promise<void> {
-  const rootDir = await findProjectRoot(process.cwd());
+  const rootDir = await requireProjectRoot(process.cwd());
   const entityKebab = toKebabCase(entity);
   const EntityPascal = toPascalCase(entity);
 

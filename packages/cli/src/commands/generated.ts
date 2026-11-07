@@ -7,7 +7,7 @@ import { loadConfig } from "../config/config-loader.js";
 import { assertOutputDirs } from "../config/output-dirs.js";
 import { reportConfigError } from "../config/report-config-error.js";
 import { storyTargets } from "../utils/app-config.js";
-import { captureWrites, findProjectRoot, lastKeptRenders, pathExists, writeFileWithDir } from "../utils/fs.js";
+import { captureWrites, requireProjectRoot, lastKeptRenders, pathExists, writeFileWithDir } from "../utils/fs.js";
 import { log, withSilentLog } from "../utils/logger.js";
 import { runAfterGenerate } from "../utils/generated-after.js";
 import { basePathFor, takeGeneratedOutcomes, withConflictMarkers, withRemovalsHonoured, type GeneratedWrite } from "../utils/generated-merge.js";
@@ -428,7 +428,7 @@ export const generatedCommand = new Command("generated")
   .option("--rebase", "With --adopt, also take a file that already has a base: its content is kept as the intended one against the current templates, and a template change that conflicts with it is declined")
   .action(reportConfigError(async (paths: string[], flags: { all?: boolean; writeConflicts?: boolean; check?: boolean; json?: boolean; share?: boolean; adopt?: string[]; yes?: boolean; rebase?: boolean; origin?: string }) => {
     const callerDir = process.cwd();
-    const rootDir = await findProjectRoot(process.cwd());
+    const rootDir = await requireProjectRoot(process.cwd());
     if (resolve(process.cwd()) !== rootDir) process.chdir(rootDir);
     if (flags.adopt !== undefined) {
       if (flags.all || flags.check || flags.share || flags.writeConflicts) {

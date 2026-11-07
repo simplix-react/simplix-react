@@ -22,7 +22,7 @@ import { serverEntityOf, writeEntityLabels } from "../meta/entity-labels.js";
 import { ignoredTagMatcher, unclaimedTagMessage } from "../meta/resolve.js";
 import { metaEntities, META_DIR, writeMetaOutput } from "../meta/write.js";
 import { resolveSpecConfig } from "../openapi/orchestration/resolve-spec-config.js";
-import { findProjectRoot, pathExists, writeFileWithDir } from "../utils/fs.js";
+import { requireProjectRoot, pathExists, writeFileWithDir } from "../utils/fs.js";
 import { log } from "../utils/logger.js";
 
 /** The server the i18n download talks to, taken from a URL spec. A file path names none. */
@@ -44,7 +44,7 @@ export const metaCommand = new Command("meta")
   .option("-f, --force", "Rewrite crud.config.ts even where one already exists")
   .option("--strict", "Exit non-zero, generating nothing, when a tag in SimpliX Meta is claimed by no domain")
   .action(reportConfigError(async (flags: MetaFlags) => {
-    const rootDir = await findProjectRoot(process.cwd());
+    const rootDir = await requireProjectRoot(process.cwd());
     if (!rootDir) {
       log.error("No simplix.config.ts found. Run this from inside a SimpliX project.");
       process.exit(1);

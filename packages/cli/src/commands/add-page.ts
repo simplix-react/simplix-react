@@ -15,7 +15,7 @@ import {
 } from "../templates/page-kinds/index.js";
 import { toCamelCase, toKebabCase, toPascalCase } from "../utils/case.js";
 import { appFor, templatesFor, templatesOption } from "../utils/app-config.js";
-import { captureWrites, findProjectRoot, noteKeptRender, pathExists, writeFileWithDir } from "../utils/fs.js";
+import { captureWrites, requireProjectRoot, noteKeptRender, pathExists, writeFileWithDir } from "../utils/fs.js";
 import { log, withSilentLog } from "../utils/logger.js";
 import { GENERATED_PAGE_MARKER, loadProjectTemplates, stampFingerprint, templateFor, writeGenerated, type ProjectTemplates } from "../utils/project-templates.js";
 import { renderTemplate } from "../utils/template.js";
@@ -129,7 +129,7 @@ export const addPageCommand = new Command("add-page")
 async function addPageAction(rawKind: string, name: string, flags: { module?: string; app?: string; variant?: string; blocks?: boolean; dryRun?: boolean }): Promise<void> {
   const { dryRun, ...pageFlags } = flags;
   if (dryRun) {
-    const rootDir = await findProjectRoot(process.cwd());
+    const rootDir = await requireProjectRoot(process.cwd());
     // The generator's own lines would name files as written; the captured files are the output.
     const written = await withSilentLog(() => captureWrites(() => runAddPage(rawKind, name, pageFlags)));
     for (const [path, content] of [...written].sort(([a], [b]) => a.localeCompare(b))) {
@@ -139,7 +139,7 @@ async function addPageAction(rawKind: string, name: string, flags: { module?: st
     return;
   }
   await runAddPage(rawKind, name, pageFlags);
-  await runAfterGenerate(await findProjectRoot(process.cwd()));
+  await runAfterGenerate(await requireProjectRoot(process.cwd()));
 }
 
 /**
@@ -148,7 +148,7 @@ async function addPageAction(rawKind: string, name: string, flags: { module?: st
  * <p>Exported so the generated-state report can run the same render in capture mode.
  */
 export async function runAddPage(rawKind: string, name: string, flags: { module?: string; app?: string; variant?: string; blocks?: boolean }): Promise<void> {
-    const rootDir = await findProjectRoot(process.cwd());
+    const rootDir = await requireProjectRoot(process.cwd());
     const kind = parsePageKind(rawKind);
     if (Boolean(flags.module) === Boolean(flags.app)) {
       log.error("Name exactly one owner: --module <name> or --app <name>");

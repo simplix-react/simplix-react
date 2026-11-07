@@ -6,7 +6,7 @@ import { checkCycles, edgeKind, type CycleReport } from "../checks/import-cycles
 import { describeRing, packageCycles, readPackageGraph, type PackageGraph } from "../checks/package-cycles.js";
 import { loadConfig } from "../config/config-loader.js";
 import { reportConfigError } from "../config/report-config-error.js";
-import { findProjectRoot } from "../utils/fs.js";
+import { requireProjectRoot } from "../utils/fs.js";
 import { log } from "../utils/logger.js";
 
 interface CyclesFlags {
@@ -51,7 +51,7 @@ export const cyclesCommand = new Command("cycles")
   .option("--root <dir>", "Project root (default: discovered from the working directory)")
   .action(
     reportConfigError(async (args: string[], flags: CyclesFlags) => {
-    const rootDir = flags.root ?? (await findProjectRoot(process.cwd()));
+    const rootDir = flags.root ?? (await requireProjectRoot(process.cwd()));
     const roots = args.length > 0 ? args : ((await loadConfig(rootDir)).checks?.cycles?.roots ?? []);
     if (roots.length === 0) {
       log.error("No roots: pass them as arguments or set checks.cycles.roots in simplix.config.ts");

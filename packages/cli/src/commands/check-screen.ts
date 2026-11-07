@@ -20,7 +20,7 @@ import { appFor, templatesFor } from "../utils/app-config.js";
 import { reportConfigError } from "../config/report-config-error.js";
 import type { MetaScaffoldSource } from "../meta/scaffold-source.js";
 import { loadMetaHolders, loadMetaScaffoldSource } from "../meta/scaffold-source.js";
-import { findProjectRoot } from "../utils/fs.js";
+import { requireProjectRoot } from "../utils/fs.js";
 import { log } from "../utils/logger.js";
 import { storyFileFor } from "../utils/story-file.js";
 
@@ -255,7 +255,7 @@ export const checkScreenCommand = new Command("check-screen")
   .option("--root <dir>", "Project root (default: discovered from the working directory)")
   .action(
     reportConfigError(async (entities: string[], flags: CheckScreenFlags) => {
-      const rootDir = flags.root ?? (await findProjectRoot(process.cwd()));
+      const rootDir = flags.root ?? (await requireProjectRoot(process.cwd()));
       await runScreenCheck(rootDir, entities.map(kebabEntity));
       // The design gate judges the apps' routes, so it runs on a whole-project check only.
       if (entities.length === 0) await runDesignCheck(rootDir, "check-screen");

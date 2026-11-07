@@ -25,7 +25,7 @@ import {
 import type { EntityField, ExtractedEntity, OpenAPISnapshot, QueryParam } from "../openapi/types.js";
 import { toEntityName, toKebabCase, toPascalCase } from "../utils/case.js";
 import { appFor, templatesFor, templatesOption } from "../utils/app-config.js";
-import { noteKeptRender, pathExists, readJsonFile, writeFileWithDir, findProjectRoot } from "../utils/fs.js";
+import { noteKeptRender, pathExists, readJsonFile, writeFileWithDir, requireProjectRoot } from "../utils/fs.js";
 import {
   GENERATED_PAGE_MARKER,
   resolveKitPackageDir,
@@ -2706,7 +2706,7 @@ export function listOriginFlags(options: ScaffoldOptions): string {
 async function scaffoldAction(entityArg: string, options: ScaffoldOptions): Promise<void> {
   assertListFlags(options);
   await runScaffold(entityArg, options);
-  const rootDir = await findProjectRoot(process.cwd());
+  const rootDir = await requireProjectRoot(process.cwd());
   // The files are judged against SimpliX Meta before the project's steps run: a name path that
   // draws a key, a form that cannot create, or long text drawn on one line compiles and renders.
   if (!options.native) {
@@ -2739,7 +2739,7 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     await runNativeScaffold(entity, { module: options.module, app: options.app });
     return;
   }
-  const rootDir = await findProjectRoot(process.cwd());
+  const rootDir = await requireProjectRoot(process.cwd());
   // Refused before anything is written: the screen's story goes to the configured directory.
   const scaffoldConfig = await loadConfig(rootDir);
   await assertOutputDirs(rootDir, scaffoldConfig);

@@ -11,7 +11,7 @@ import {
   type Finding,
 } from "../meta/diff.js";
 import { META_DIR } from "../meta/write.js";
-import { findProjectRoot, pathExists, readJsonFile } from "../utils/fs.js";
+import { requireProjectRoot, pathExists, readJsonFile } from "../utils/fs.js";
 import { log } from "../utils/logger.js";
 
 /** The directory the orval pipeline owns, relative to a domain package root. */
@@ -35,7 +35,7 @@ export const metaDiffCommand = new Command("meta-diff")
   .option("--expect <file>", "JSON file of renames, required-ness grounds and one-sided names")
   .option("--json", "Print the findings as JSON", false)
   .action(async (domain: string, flags: MetaDiffFlags) => {
-    const rootDir = flags.root ?? (await findProjectRoot(process.cwd()));
+    const rootDir = flags.root ?? (await requireProjectRoot(process.cwd()));
     const packageDir = flags.package
       ? join(rootDir, flags.package)
       : await findDomainPackage(rootDir, domain);

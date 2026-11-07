@@ -85,26 +85,79 @@ export function resolveFromRoot(root: string, ...segments: string[]): string {
   return join(root, ...segments);
 }
 
-/**
- * Find the monorepo project root by traversing up from `startDir`.
- * Looks for `simplix.config.ts` as the primary indicator,
- * then `pnpm-workspace.yaml` as a fallback.
- * Returns `startDir` if no marker is found (original behavior).
- */
-export async function findProjectRoot(startDir: string): Promise<string> {
-  const markers = ["simplix.config.ts", "pnpm-workspace.yaml"];
-  let dir = resolve(startDir);
+/** The file that marks a simplix-react project's root. */
+export const PROJECT_MARKER = "simplix.config.ts";
 
+/** No project root was named and none lies at or above the directory searched. */
+export class ProjectRootError extends Error {
+  constructor(readonly searched: string) {
+    super(`No ${PROJECT_MARKER} in ${searched} or any directory above it: run simplix inside the project, or name its root with --root <dir>.`);
+    this.name = "ProjectRootError";
+  }
+}
+
+/**
+ * The directory `--root` names on a command line (`--root <dir>` or `--root=<dir>`), wherever it
+ * stands, or `undefined` when it names none. Read before the commands are parsed, so the plugins
+ * the project declares load from the named root too.
+ */
+export function rootFlagOf(argv: readonly string[]): string | undefined {
+  for (let at = 0; at < argv.length; at++) {
+    const arg = argv[at] as string;
+    if (arg === "--") return undefined;
+    if (arg === "--root") return argv[at + 1];
+    if (arg.startsWith("--root=")) return arg.slice("--root=".length);
+  }
+  return undefined;
+}
+
+let rootOverride: string | undefined;
+
+/** Names the project root for the rest of the run (`simplix --root <dir>`), or clears it. */
+export function setProjectRootOverride(dir: string | undefined): void {
+  rootOverride = dir === undefined ? undefined : resolve(dir);
+}
+
+/** The nearest directory at or above `startDir` holding `marker`, or `undefined`. */
+async function nearestHolding(startDir: string, marker: string): Promise<string | undefined> {
+  let dir = resolve(startDir);
   while (true) {
-    for (const marker of markers) {
-      if (await pathExists(join(dir, marker))) {
-        return dir;
-      }
-    }
+    if (await pathExists(join(dir, marker))) return dir;
     const parent = dirname(dir);
-    if (parent === dir) break; // filesystem root
+    if (parent === dir) return undefined;
     dir = parent;
   }
+}
 
-  return resolve(startDir);
+/**
+ * The project root of a command that reads the project's config: the directory `--root` named,
+ * else the nearest directory at or above `startDir` holding `simplix.config.ts`.
+ *
+ * @remarks
+ * A `pnpm-workspace.yaml` is not taken as the root here: a sibling workspace that is not a
+ * simplix-react project (a desktop app beside the web project) has one too, and a command run from
+ * inside it would read that workspace as the project and fail on settings it never declared.
+ *
+ * @throws {@link ProjectRootError} when `--root` was not given and no directory holds the marker
+ */
+export async function requireProjectRoot(startDir: string): Promise<string> {
+  if (rootOverride !== undefined) return rootOverride;
+  const found = await nearestHolding(startDir, PROJECT_MARKER);
+  if (found === undefined) throw new ProjectRootError(resolve(startDir));
+  return found;
+}
+
+/**
+ * The project root of a command that also works before a project has a config (adding a domain,
+ * a module or an app to a workspace): the directory `--root` named, else the nearest directory
+ * holding `simplix.config.ts` at any level above `startDir`, else the nearest holding
+ * `pnpm-workspace.yaml`, else `startDir`.
+ *
+ * @remarks
+ * The config wins at any distance: a workspace file nearer to `startDir` that belongs to another
+ * workspace nested in the project is not the project.
+ */
+export async function findProjectRoot(startDir: string): Promise<string> {
+  if (rootOverride !== undefined) return rootOverride;
+  return (await nearestHolding(startDir, PROJECT_MARKER)) ?? (await nearestHolding(startDir, "pnpm-workspace.yaml")) ?? resolve(startDir);
 }

@@ -21,7 +21,7 @@ import { kitFenceCommand } from "./commands/kit-fence.js";
 import { cyclesCommand } from "./commands/cycles.js";
 import { metaRemovalsCommand } from "./commands/meta-removals.js";
 import { frameworkVersion } from "./versions.js";
-import { findProjectRoot, pathExists } from "./utils/fs.js";
+import { findProjectRoot, pathExists, rootFlagOf, setProjectRootOverride } from "./utils/fs.js";
 import { loadConfig } from "./config/config-loader.js";
 import { failOnConfigError } from "./config/report-config-error.js";
 
@@ -71,6 +71,10 @@ async function loadConfiguredPlugins(): Promise<void> {
   }
 }
 
+// `--root <dir>` names the project for every command, and is read first so the plugins it declares
+// load from it as well.
+setProjectRootOverride(rootFlagOf(process.argv.slice(2)));
+
 // A config file that exists but cannot be loaded ends the run here, before any command runs on
 // settings the project did not choose. A project with no config file loads the defaults.
 try {
@@ -85,7 +89,8 @@ const program = new Command();
 program
   .name("simplix")
   .description("CLI for scaffolding and validating simplix-react projects")
-  .version(frameworkVersion("@simplix-react/cli"));
+  .version(frameworkVersion("@simplix-react/cli"))
+  .option("--root <dir>", "The project root (default: the nearest directory at or above the working directory holding simplix.config.ts)");
 
 program.addCommand(initCommand);
 program.addCommand(addAppCommand);
@@ -106,4 +111,9 @@ program.addCommand(checkScreenCommand);
 program.addCommand(cyclesCommand);
 program.addCommand(metaRemovalsCommand);
 
-program.parse();
+// A command that finds no project, or a config it cannot load, prints one line and fails.
+try {
+  await program.parseAsync();
+} catch (err) {
+  if (!failOnConfigError(err)) throw err;
+}

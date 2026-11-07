@@ -4,7 +4,7 @@ import { loadConfig } from "../config/config-loader.js";
 import { reportConfigError } from "../config/report-config-error.js";
 import { describeEntity, formatEntityInfo } from "../meta/entity-info.js";
 import { loadMetaScaffoldSource } from "../meta/scaffold-source.js";
-import { findProjectRoot } from "../utils/fs.js";
+import { requireProjectRoot } from "../utils/fs.js";
 import { log } from "../utils/logger.js";
 
 interface MetaInfoFlags {
@@ -28,7 +28,7 @@ export const metaInfoCommand = new Command("meta-info")
   .option("--json", "Print the answer as JSON", false)
   .action(
     reportConfigError(async (entity: string, flags: MetaInfoFlags) => {
-      const rootDir = flags.root ?? (await findProjectRoot(process.cwd()));
+      const rootDir = flags.root ?? (await requireProjectRoot(process.cwd()));
       const config = await loadConfig(rootDir);
       const source = await loadMetaScaffoldSource(rootDir, camelEntity(entity));
       if (!source) {

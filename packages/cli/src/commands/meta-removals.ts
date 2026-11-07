@@ -7,7 +7,7 @@ import { findMetaRemovals, readSourceTexts, type MetaDocument } from "../checks/
 import { loadConfig } from "../config/config-loader.js";
 import { reportConfigError } from "../config/report-config-error.js";
 import type { SimplixConfig } from "../config/types.js";
-import { findProjectRoot } from "../utils/fs.js";
+import { requireProjectRoot } from "../utils/fs.js";
 import { log } from "../utils/logger.js";
 
 interface MetaRemovalsFlags {
@@ -43,7 +43,7 @@ export const metaRemovalsCommand = new Command("meta-removals")
   .option("--base <ref>", "Git revision whose snapshot is the before side", "HEAD")
   .action(
     reportConfigError(async (args: string[], flags: MetaRemovalsFlags) => {
-      const rootDir = flags.root ?? (await findProjectRoot(process.cwd()));
+      const rootDir = flags.root ?? (await requireProjectRoot(process.cwd()));
       const config = await loadConfig(rootDir);
       const settings = config.checks?.metaRemovals;
       const roots = args.length > 0 ? args : (settings?.roots ?? []);

@@ -4,7 +4,7 @@ import { join } from "node:path";
 
 import { loadConfig } from "../config/config-loader.js";
 import { reportConfigError } from "../config/report-config-error.js";
-import { findProjectRoot } from "../utils/fs.js";
+import { requireProjectRoot } from "../utils/fs.js";
 import { log } from "../utils/logger.js";
 import { resolveKitPackageDir } from "../utils/project-templates.js";
 
@@ -107,7 +107,7 @@ export const kitFenceCommand = new Command("kit-fence")
   .option("--lint <file>", "The lint config holding the fence", ".oxlintrc.json")
   .option("--write", "Write the kit's fence into the lint config instead of checking it")
   .action(reportConfigError(async (flags: { lint: string; write?: boolean }) => {
-    const rootDir = await findProjectRoot(process.cwd());
+    const rootDir = await requireProjectRoot(process.cwd());
     const config = await loadConfig(rootDir);
     const kit = config.templates?.from;
     if (!kit) {
