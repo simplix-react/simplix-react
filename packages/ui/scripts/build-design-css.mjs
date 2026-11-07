@@ -132,11 +132,21 @@ const spec = modules.__spec;
 // The classes a declaration draws under a design; classic draws them as declared.
 const requireSelf = createRequire(join(self, "package.json"));
 const { twMerge } = requireSelf("tailwind-merge");
+// A design class without a scheme variant paints both schemes, since its tokens already carry the
+// scheme. So it also replaces the declaration's `dark:` class of the same property: left in, that
+// class outranks the design in the dark scheme (it sits in the utilities layer) and pairs the
+// declaration's dark ground with the design's foreground, which nobody chose together.
+const SCHEME = "dark:";
+const sameProperty = (a, b) => twMerge(`${a} ${b}`).split(/\s+/).length === 1;
+const schemeRepainted = (cls, overrides) =>
+  cls.startsWith(SCHEME) && !cls.slice(SCHEME.length).includes(":") && overrides.some((o) => !o.includes(":") && sameProperty(cls.slice(SCHEME.length), o));
 const drawnFor = (design) => (slot, key, classes) => {
   if (!design) return classes;
-  const replaced = classes.split(/\s+/).filter(Boolean).map((c) => design.replace?.[c] ?? c).filter(Boolean).join(" ");
+  const replaced = classes.split(/\s+/).filter(Boolean).map((c) => design.replace?.[c] ?? c).filter(Boolean);
   const override = design.slots?.[key];
-  return override === undefined ? replaced : twMerge(replaced, override);
+  if (override === undefined) return replaced.join(" ");
+  const overrides = override.split(/\s+/).filter(Boolean);
+  return twMerge(replaced.filter((c) => !schemeRepainted(c, overrides)).join(" "), override);
 };
 const apply = (selector, classes) =>
   classes.trim() ? `  ${selector} {\n    @apply ${classes.trim().split(/\s+/).join(" ")};\n  }\n` : "";
