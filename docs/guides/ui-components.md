@@ -682,6 +682,48 @@ function CustomRatingField({
 }
 ```
 
+### Open a List on a Set of Filters from a Link
+
+A summary figure ("4 failed jobs") should open the list it counts, and a reload or a shared link
+should keep the reader's filters. Hold the filters in the page's address:
+
+```tsx
+// Route: read the address and pass `replace` on, so filtering does not fill the history.
+export const Route = createFileRoute("/jobs")({ validateSearch: validateCrudSearch });
+
+function JobsRoute() {
+  const search = Route.useSearch();
+  const navigate = useNavigate();
+  return (
+    <JobsPage
+      search={search}
+      onNavigate={(next, options) => navigate({ to: "/jobs", search: next, replace: options?.replace })}
+    />
+  );
+}
+
+// Page: the address's filters go into the list, the reader's changes come back out.
+function JobsPage({ search, onNavigate }: { search: CrudSearch; onNavigate: (s: CrudSearch, o?: CrudNavigateOptions) => void }) {
+  const nav = useCrudNavigation(search, onNavigate);
+  const list = useCrudList(useListJobs, {
+    filterMode: "immediate",
+    addressedFilters: { value: nav.filters, onChange: nav.setFilters, controls: filterDefs },
+  });
+  // ...
+}
+
+// Tile: the count and the link are built from one filters object.
+const failed = { "status.in": ["FAILED"] };
+const count = useListCount(useListJobs, filtersToRequestParams(failed));
+<Link to="/jobs" search={{ filters: failed }}>{count} failed</Link>
+```
+
+Create the router with `...flatSearch` so the filters read as `?filters[status.in]=FAILED` in the
+address bar. Narrow `search.filters` to the keys the list declares before passing it, and leave out a
+filter over a field a tab forces. Where a tile means a tab's own set ("Suspended" on a list whose
+tabs are statuses), link to `?tab=` instead of a filter. See `packages/ui/README.md`, "CRUD search
+params", for the full contract.
+
 ### Router Adapter
 
 The package is router-agnostic. Inject a router via `CrudProvider`:

@@ -823,6 +823,73 @@ Panel variant features:
 
 `ListDetailRoot` is the same component as `ListDetail` - exported as an alias for compound pattern composition.
 
+#### CRUD search params
+
+`CrudSearch` is the address of a CRUD page. `validateCrudSearch` reads it from a router's raw search
+object and drops anything that is not one of its members, never throwing.
+
+| Member | Type | Meaning |
+|---|---|---|
+| `id` | `string` | The open record. |
+| `mode` | `"new" \| "edit"` | Whether the open view is a form. |
+| `tab` | `string` | The open tab. |
+| `filters` | `Record<string, string \| string[]>` | The list filters, keyed by filter key (`field.operator`, such as `status.in`). |
+
+`id`, `mode` and `tab` are reserved and are dropped from inside `filters`. A value that is a number,
+a boolean, a nested object or an array holding one, and any empty value, is dropped as well; a
+one-element array stays an array. `buildCrudSearch(view, id, tab, filters)` carries `tab` and
+`filters` through every view, so a record opened from a filtered list and closed again returns to the
+same filtered list.
+
+The framework knows no entity's filter keys. A page narrows `search.filters` to the keys its list
+declares before applying them, so a stale link never sends a parameter the server refuses, and it
+leaves out a filter over a field a tab already forces.
+
+**Applying and writing back.** `useCrudList` takes `addressedFilters` to keep its committed filters
+in the address:
+
+```tsx
+const nav = useCrudNavigation(search, onNavigate);
+const list = useCrudList(useListJobs, {
+  filterMode: "immediate",
+  addressedFilters: {
+    value: nav.filters,          // what the address carries now
+    onChange: nav.setFilters,    // writes the reader's change with `replace: true`
+    controls: filterDefs,        // so a toggle's "true" reads back as a boolean
+    forced: tabParams,           // filters over a field the tab pins are not applied
+  },
+});
+```
+
+A list opened with filters starts on them, draws them as badges in `CrudList.FilterBar` and sends
+its first request with them. A change the reader commits is handed to `onChange`; an address that
+changes under the list (a followed link, Back) is adopted and returns the list to its first page.
+`defaultFilters` apply only where the address names none. A list without `addressedFilters` is
+unchanged. `onNavigate` is called as `onNavigate(search, { replace: true })` for a filter change, so
+the route's handler passes `replace` on:
+
+```tsx
+onNavigate={(next, options) => navigate({ to: "/jobs", search: next, replace: options?.replace })}
+```
+
+**One request for a count and its list.** `filtersToRequestParams(filters, { controls, forced,
+transformFilters, searchKey })` returns the request parameters the list sends for a set of filters,
+without its page window. A tile that counts what its link opens calls it for both:
+
+```tsx
+const failed = { "status.in": ["FAILED"] };
+const count = useListCount(useListJobs, filtersToRequestParams(failed));
+const href = { to: "/jobs", search: { filters: failed } };
+```
+
+**Wire form.** With `flatSearch` (the search serializer of `createRouter`), each filter is one
+bracketed parameter, an array repeated once per member:
+`/jobs?filters[status.in]=FAILED&filters[status.in]=PAUSED`. A filter written once reads back as a
+string; `decodeAddressedFilters` reads the set operators (`in`, `notIn`) as arrays either way. With
+a router's default serializer the object travels as JSON. `useUrlSync` is a separate, flat
+query-string mechanism; it writes `filters[key]` for the same keys but replaces the whole search, so
+a page that carries `id` or `tab` uses `addressedFilters` instead.
+
 ### Router Adapters
 
 The package is router-agnostic. Use `CrudProvider` to inject a router adapter.
