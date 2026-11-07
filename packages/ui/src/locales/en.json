@@ -55,6 +55,7 @@
     "noResults": "No results",
     "totalCount": "Total {{count, number}}",
     "totalCountUnknown": "Total —",
+    "rangeUnknown": "– / –",
     "rows": "Rows:",
     "viewMode": "View mode",
     "viewList": "List",

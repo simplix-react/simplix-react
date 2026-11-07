@@ -55,6 +55,7 @@
     "noResults": "結果なし",
     "totalCount": "全{{count, number}}件",
     "totalCountUnknown": "全—件",
+    "rangeUnknown": "– / –",
     "rows": "行:",
     "viewMode": "表示形式",
     "viewList": "リスト",

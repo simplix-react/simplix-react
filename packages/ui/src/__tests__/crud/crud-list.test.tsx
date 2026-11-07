@@ -629,6 +629,19 @@ describe("CrudList.Table keeps its cells in place across renders", () => {
 // ── List.Pagination ──
 
 describe("CrudList.Pagination", () => {
+  it("draws an unknown total as unknown rather than as an empty list, and offers no next page", () => {
+    render(<CrudList.Pagination page={1} pageSize={20} total={undefined} totalPages={3} onPageChange={vi.fn()} />);
+    expect(screen.queryByText("0-0 / 0")).toBeNull();
+    const range = screen.getByText("list.rangeUnknown");
+    expect(range.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByLabelText("list.nextPage")).toHaveProperty("disabled", true);
+  });
+
+  it("draws a known total of zero as the empty range", () => {
+    render(<CrudList.Pagination page={1} pageSize={20} total={0} totalPages={1} onPageChange={vi.fn()} />);
+    expect(screen.getByText("0-0 / 0").getAttribute("aria-busy")).toBeNull();
+  });
+
   it("renders page numbers", () => {
     render(
       <CrudList.Pagination

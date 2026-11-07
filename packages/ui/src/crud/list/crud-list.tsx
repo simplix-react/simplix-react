@@ -1924,7 +1924,12 @@ function ListTable<T>({
 export interface ListPaginationProps {
   page: number;
   pageSize: number;
-  total: number;
+  /**
+   * The rows the list holds across every page, or `null` / `undefined` while that is not known: the
+   * first page in flight, or a read that failed. An unknown total draws the range as unknown and
+   * offers no next page, since `0-0 / 0` reads as an empty list.
+   */
+  total: number | null | undefined;
   totalPages: number;
   onPageChange: (page: number) => void;
   onPageSizeChange?: (size: number) => void;
@@ -1999,6 +2004,7 @@ function ListPagination({
     </Flex>
   );
 
+  const known = _total != null;
   const navCell = "inline-flex h-6 items-center justify-center disabled:pointer-events-none";
 
   const prevButton = (
@@ -2019,7 +2025,7 @@ function ListPagination({
   const nextButton = (
     <button
       type="button"
-      disabled={page >= totalPages}
+      disabled={!known || page >= totalPages}
       onClick={() => onPageChange(page + 1)}
       className={cn(navCell, "w-8")}
       aria-label={t("list.nextPage")}
@@ -2032,15 +2038,15 @@ function ListPagination({
   );
 
   const pageNumbers = isCompact ? null : getPageNumbers(page, totalPages);
-  const first = _total > 0 ? (page - 1) * pageSize + 1 : 0;
-  const last = Math.min(_total, page * pageSize);
+  const first = known && _total > 0 ? (page - 1) * pageSize + 1 : 0;
+  const last = known ? Math.min(_total, page * pageSize) : 0;
 
   return (
     <div ref={containerRef} className={cn("flex w-full items-center justify-end", className)} {...slotAttributes(crudListPaginationStyle, { framed, single: totalPages <= 1 })}>
       <div className="flex items-center" {...slotAttributes(crudListPaginationLeadStyle, {})}>
         {pageSizeSelector}
-        <span {...slotAttributes(crudListPaginationRangeStyle, {})}>
-          {first}-{last} / {_total}
+        <span aria-busy={known ? undefined : true} {...slotAttributes(crudListPaginationRangeStyle, {})}>
+          {known ? `${first}-${last} / ${_total}` : t("list.rangeUnknown")}
         </span>
       </div>
       <Flex gap="sm" align="center">
