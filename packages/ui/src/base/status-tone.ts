@@ -3,8 +3,8 @@
  *
  * Single source of truth for status coloring across the UI. Each tone bundles
  * the Tailwind class strings (with their `dark:` variants) for every place a
- * status color is consumed — filled badge, outline badge, indicator dot, ping
- * ring, standalone icon, soft surface tint — plus chart hex values for chart
+ * status color is consumed (filled badge, outline badge, indicator dot, ping
+ * ring, standalone icon, soft surface tint), plus chart hex values for chart
  * libraries that cannot consume Tailwind classes.
  *
  * Tones are palette-literal (not bound to the `--success`/`--warning` theme
@@ -26,7 +26,7 @@ export type { StatusTone };
 /**
  * Structural type for an icon component (e.g. a lucide-react icon).
  *
- * Typed structurally — by the props it is rendered with — rather than nominally
+ * Typed structurally (by the props it is rendered with) rather than nominally
  * against a specific `lucide-react` version's `LucideIcon`, so components that
  * accept an icon stay compatible regardless of which lucide-react version a
  * consumer resolves.
