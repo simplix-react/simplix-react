@@ -11,3 +11,10 @@ export {
   createBootAccessPolicy,
   type BootAccessPolicyOptions,
 } from "./boot-access-policy.js";
+export {
+  createSelfAccessPolicy,
+  currentSelfAccessRefusal,
+  useSelfAccessRefusal,
+  type SelfAccessConfig,
+  type SelfAccessRefusal,
+} from "./self-access-policy.js";
