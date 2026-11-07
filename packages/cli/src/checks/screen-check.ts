@@ -48,6 +48,13 @@ export interface ScreenFacts {
    * that states none judges none.
    */
   readonly verbOnly?: ReadonlySet<string>;
+  /**
+   * The multilingual fields whose plain half the entity's DTO requires, which the form must mark
+   * `required: true` on its own entry. Read from the entity's fields, so it holds for an entity with
+   * no create operation (an update-only form) as well. Optional: a caller that states none judges
+   * only what the create body requires.
+   */
+  readonly requiredMultilingual?: ReadonlySet<string>;
 }
 
 /** What Meta's `format` settles for one field: the kind a screen draws it by, and a ledger amount's sign. */
@@ -142,6 +149,7 @@ export function formProblems(file: string, text: string, facts: ScreenFacts): Sc
       error(`"${entry.name}" moves only through a verb of the entity, as SimpliX Meta states, and the form draws it; leave it out of the form's field table and let the create send its default`);
     }
   }
+  const reported = new Set<string>();
   for (const name of facts.createRequired) {
     // The form leaves it out and its submit sends the default; a file that never names it sends nothing.
     if (verbOnly.has(name)) {
@@ -158,6 +166,7 @@ export function formProblems(file: string, text: string, facts: ScreenFacts): Sc
     if (twin) {
       if (!twin.required) {
         error(`"${twin.name}" is the multilingual entry of "${name}", which the create body requires, and its entry lacks \`required: true\``);
+        reported.add(twin.name);
       }
       continue;
     }
@@ -165,6 +174,13 @@ export function formProblems(file: string, text: string, facts: ScreenFacts): Sc
       error(`the create body requires "${name}" and the form's field table has no entry for it, so an unedited form cannot create a record`);
     } else if (!entry.required && !facts.booleans.has(name)) {
       error(`"${name}" is required by the create body and its entry lacks \`required: true\``);
+    }
+  }
+  // An entity with no create operation has no create body to read the requirement from; its fields
+  // state it, and the multilingual entry carries the mark all the same.
+  for (const entry of entries) {
+    if (entry.plainField && facts.requiredMultilingual?.has(entry.name) && !entry.required && !reported.has(entry.name)) {
+      error(`"${entry.name}" is the multilingual entry of "${entry.plainField}", which the DTO requires, and its entry lacks \`required: true\``);
     }
   }
   for (const entry of entries) {

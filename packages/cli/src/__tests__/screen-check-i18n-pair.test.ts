@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import { formProblems, type ScreenFacts } from "../checks/screen-check.js";
+import { factsOf } from "../commands/check-screen.js";
+import type { MetaScaffoldSource } from "../meta/scaffold-source.js";
 import { detectI18nFieldPairs, withContractKinds, type FieldInfo } from "../commands/scaffold-crud.js";
 import { formFieldsOf } from "../utils/form-fields.js";
 
@@ -95,5 +97,44 @@ describe("the form's field list for a required pair", () => {
     const form = formFieldsOf(withContractKinds(fields, "planId"));
     expect(form.map((one) => one.name)).toEqual(["nameI18n"]);
     expect(form[0]).toMatchObject({ contractKind: "i18nText", baseFieldName: "name", required: true });
+  });
+});
+
+describe("the check over an entity with no create body", () => {
+  const updateOnly: ScreenFacts = { ...facts, createRequired: [], requiredMultilingual: new Set(["nameI18n"]) };
+
+  it("reports an unmarked entry the entity's fields require", () => {
+    const text = table('  { name: "nameI18n", kind: "i18nText", sortable: false, plainField: "name" },');
+    expect(formProblems("form.tsx", text, updateOnly).map((one) => one.message)).toEqual([
+      '"nameI18n" is the multilingual entry of "name", which the DTO requires, and its entry lacks `required: true`',
+    ]);
+  });
+
+  it("passes the marked entry and an optional pair", () => {
+    const marked = table('  { name: "nameI18n", kind: "i18nText", sortable: false, plainField: "name", required: true },');
+    const optional = table('  { name: "descriptionI18n", kind: "i18nText", sortable: false, plainField: "description" },');
+    expect(formProblems("form.tsx", marked, updateOnly)).toEqual([]);
+    expect(formProblems("form.tsx", optional, updateOnly)).toEqual([]);
+  });
+
+  it("reports an entry once when both facts name it", () => {
+    const both: ScreenFacts = { ...facts, requiredMultilingual: new Set(["nameI18n"]) };
+    const text = table('  { name: "nameI18n", kind: "i18nText", sortable: false, plainField: "name" },');
+    expect(formProblems("form.tsx", text, both)).toHaveLength(1);
+  });
+});
+
+describe("factsOf requiredMultilingual", () => {
+  it("names the multilingual fields that carry the requirement of their plain half", () => {
+    const source = {
+      fields: [
+        { name: "name", baseFieldName: null, required: true },
+        { name: "nameI18n", baseFieldName: "name", required: true },
+        { name: "description", baseFieldName: null },
+        { name: "descriptionI18n", baseFieldName: "description" },
+      ],
+      roles: {},
+    } as unknown as MetaScaffoldSource;
+    expect([...(factsOf(source).requiredMultilingual ?? [])]).toEqual(["nameI18n"]);
   });
 });

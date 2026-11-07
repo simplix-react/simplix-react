@@ -131,6 +131,7 @@ export function factsOf(source: MetaScaffoldSource, holders: readonly MetaScaffo
     rowFields: new Set(records.map((one) => one.name)),
     figures,
     verbOnly: new Set(source.verbOnly ?? []),
+    requiredMultilingual: new Set(source.fields.filter((one) => one.baseFieldName !== null && one.required === true).map((one) => one.name)),
   };
 }
 
