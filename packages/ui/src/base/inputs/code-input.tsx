@@ -1,4 +1,4 @@
-import { type ClipboardEvent, type ComponentPropsWithoutRef, type KeyboardEvent, useRef } from "react";
+import { type ClipboardEvent, type ComponentPropsWithoutRef, type KeyboardEvent, useLayoutEffect, useRef } from "react";
 
 import { useTranslation } from "@simplix-react/i18n/react";
 
@@ -72,11 +72,32 @@ export function CodeInput({
 }: CodeInputProps) {
   const { t } = useTranslation("simplix/ui");
   const cells = useRef<(HTMLInputElement | null)[]>([]);
+  // Every edit and every focus decision reads the latest value, never the one this render closed
+  // over: digits typed or a focus moved before the parent redraws would otherwise be computed
+  // against a value that is already behind, and the earlier digits are lost.
+  const latest = useRef(value);
+  // The values handed to onValueChange that the parent has not drawn yet, oldest first.
+  const pending = useRef<string[]>([]);
+  useLayoutEffect(() => {
+    const echoed = pending.current.indexOf(value);
+    if (echoed >= 0) {
+      // The parent caught up with one of this input's own edits; later ones are still on their way.
+      pending.current = pending.current.slice(echoed + 1);
+      if (pending.current.length === 0) latest.current = value;
+      return;
+    }
+    // A value the parent set on its own (a cleared refused code, a reset) is where editing resumes.
+    pending.current = [];
+    latest.current = value;
+  }, [value]);
   const focus = (index: number) => cells.current[index]?.focus();
   const apply = (edit: CodeEdit) => {
-    if (edit.value !== value) {
+    const before = latest.current;
+    if (edit.value !== before) {
+      latest.current = edit.value;
+      pending.current.push(edit.value);
       onValueChange(edit.value);
-      if (edit.value.length === length && value.length < length) onComplete?.(edit.value);
+      if (edit.value.length === length && before.length < length) onComplete?.(edit.value);
     }
     focus(edit.focus);
   };
@@ -84,16 +105,16 @@ export function CodeInput({
     if (/^\d$/.test(event.key) && !event.ctrlKey && !event.metaKey && !event.altKey) {
       // A typed digit replaces the cell's digit; onChange is left to autofill and IME input.
       event.preventDefault();
-      apply(codeType(value, index, event.key, length));
+      apply(codeType(latest.current, index, event.key, length));
     } else if (event.key === "Backspace") {
       event.preventDefault();
-      apply(codeBackspace(value, index, length));
+      apply(codeBackspace(latest.current, index, length));
     } else if (event.key === "ArrowLeft") {
       event.preventDefault();
-      focus(codeFocusable(value, index - 1, length));
+      focus(codeFocusable(latest.current, index - 1, length));
     } else if (event.key === "ArrowRight") {
       event.preventDefault();
-      focus(codeFocusable(value, index + 1, length));
+      focus(codeFocusable(latest.current, index + 1, length));
     }
   };
   const onPaste = (event: ClipboardEvent<HTMLInputElement>) => {
@@ -121,11 +142,11 @@ export function CodeInput({
           aria-invalid={invalid || undefined}
           disabled={disabled}
           onFocus={(event) => {
-            const at = codeFocusable(value, index, length);
+            const at = codeFocusable(latest.current, index, length);
             if (at !== index) focus(at);
             else event.target.select();
           }}
-          onChange={(event) => apply(codeType(value, index, event.target.value, length))}
+          onChange={(event) => apply(codeType(latest.current, index, event.target.value, length))}
           onKeyDown={(event) => onKeyDown(index, event)}
           onPaste={onPaste}
           {...cellAttributes}

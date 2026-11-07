@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { useState } from "react";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { CodeInput } from "../../base/inputs/code-input";
@@ -74,6 +74,92 @@ describe("CodeInput", () => {
     const cells = screen.getAllByRole("textbox");
     fireEvent.paste(cells[0] as HTMLElement, { clipboardData: { getData: () => "482913" } });
     expect(cells.map((cell) => (cell as HTMLInputElement).value).join("")).toBe("482913");
+  });
+
+  it("keeps every digit typed faster than a redraw", () => {
+    const done = vi.fn();
+    render(<Controlled onComplete={done} />);
+    const cells = screen.getAllByRole("textbox") as HTMLInputElement[];
+    (cells[0] as HTMLInputElement).focus();
+    // One act() batch: no rerender between the keys, as when digits arrive faster than a redraw.
+    act(() => {
+      for (const digit of ["4", "8", "2", "9", "1", "3"]) fireEvent.keyDown(document.activeElement as HTMLElement, { key: digit });
+    });
+    expect(cells.map((cell) => cell.value).join("")).toBe("482913");
+    expect(done).toHaveBeenCalledTimes(1);
+    expect(done).toHaveBeenCalledWith("482913");
+  });
+
+  it("applies a paste and a run of Backspace across cells in one batch", () => {
+    render(<Controlled />);
+    const cells = screen.getAllByRole("textbox") as HTMLInputElement[];
+    (cells[0] as HTMLInputElement).focus();
+    act(() => {
+      fireEvent.paste(document.activeElement as HTMLElement, { clipboardData: { getData: () => "482913" } });
+      for (let press = 0; press < 4; press++) fireEvent.keyDown(document.activeElement as HTMLElement, { key: "Backspace" });
+    });
+    expect(cells.map((cell) => cell.value).join("")).toBe("48");
+    expect(document.activeElement).toBe(cells[2]);
+  });
+
+  it("keeps every digit when the parent takes the value asynchronously", async () => {
+    vi.useFakeTimers();
+    try {
+      const done = vi.fn();
+      let calls = 0;
+      function Later() {
+        const [code, setCode] = useState("");
+        // Each edit is taken 5 ms after the one before it, so the echoes are drawn one at a time.
+        return <CodeInput label="Code" value={code} onValueChange={(next) => setTimeout(() => setCode(next), 5 * ++calls)} onComplete={done} />;
+      }
+      render(<Later />);
+      const cells = screen.getAllByRole("textbox") as HTMLInputElement[];
+      (cells[0] as HTMLInputElement).focus();
+      act(() => {
+        for (const digit of ["4", "8", "2"]) fireEvent.keyDown(document.activeElement as HTMLElement, { key: digit });
+      });
+      // The first echo lands while two edits are still on their way, and the user keeps typing.
+      await act(async () => {
+        vi.advanceTimersByTime(5);
+      });
+      act(() => {
+        for (const digit of ["9", "1", "3"]) fireEvent.keyDown(document.activeElement as HTMLElement, { key: digit });
+      });
+      await act(async () => {
+        vi.runAllTimers();
+      });
+      expect(cells.map((cell) => cell.value).join("")).toBe("482913");
+      expect(done).toHaveBeenCalledTimes(1);
+      expect(done).toHaveBeenCalledWith("482913");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("starts from a value the parent sets on its own, such as a cleared refused code", () => {
+    function Clearing() {
+      const [code, setCode] = useState("");
+      return (
+        <>
+          <CodeInput label="Code" value={code} onValueChange={setCode} />
+          <button type="button" onClick={() => setCode("")}>
+            clear
+          </button>
+        </>
+      );
+    }
+    render(<Clearing />);
+    const cells = screen.getAllByRole("textbox") as HTMLInputElement[];
+    (cells[0] as HTMLInputElement).focus();
+    act(() => {
+      for (const digit of ["4", "8", "2"]) fireEvent.keyDown(document.activeElement as HTMLElement, { key: digit });
+    });
+    fireEvent.click(screen.getByRole("button", { name: "clear" }));
+    (cells[0] as HTMLInputElement).focus();
+    act(() => {
+      fireEvent.keyDown(document.activeElement as HTMLElement, { key: "7" });
+    });
+    expect(cells.map((cell) => cell.value).join("")).toBe("7");
   });
 
   it("marks every cell invalid for a refused code and passes a kit's cell attributes on", () => {
