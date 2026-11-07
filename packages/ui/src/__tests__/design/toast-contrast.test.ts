@@ -15,9 +15,15 @@ import { contrast, declarationsOf, tokenBlocks, tokenOf } from "../helpers/contr
  * nobody chose it for. The design's own tokens keep both dark, so a stray dark ground still reads
  * there; a product theme that turns the overlay light in its dark scheme is where it stops reading,
  * which is why that theme is checked too.
+ *
+ * <p>Classic's rules stand beneath every design on the page, and its dark grounds sit in the
+ * utilities layer, above any design rule in the components layer. So the dark ground is the
+ * design's own dark rule when it writes one, else classic's dark ground when classic declares one,
+ * else the design's ground for both schemes.
  */
 
 const TOKENS = fileURLToPath(new URL("../../theme/designs/clarity-tokens.css", import.meta.url));
+const CLASSIC = readFileSync(fileURLToPath(new URL("../../theme/designs/classic.css", import.meta.url)), "utf8");
 const KINDS = ["success", "warning", "error", "info"] as const;
 /** What body text needs against its ground (WCAG 1.4.3). */
 const TEXT_MINIMUM = 4.5;
@@ -49,8 +55,15 @@ function painted(kind: (typeof KINDS)[number]) {
   const lightText = last([...base, ...own], "color");
   return {
     light: { ground: lightGround, text: lightText },
-    dark: { ground: last(inDark, "background-color") ?? lightGround, text: last(inDark, "color") ?? lightText },
+    dark: { ground: last(inDark, "background-color") ?? classicDarkGround(kind) ?? lightGround, text: last(inDark, "color") ?? lightText },
   };
+}
+
+/** The dark ground classic declares for a toast kind, which every design's page carries beneath it. */
+function classicDarkGround(kind: (typeof KINDS)[number]): string | undefined {
+  const rule = new RegExp(`:where\\(\\[data-slot="toast"\\]\\[data-type="${kind}"\\]\\)\\[data-s-toast\\] \\{\\s*@apply ([^;]*);`).exec(CLASSIC);
+  const ground = rule?.[1]?.split(/\s+/).find((cls) => cls.startsWith("dark:bg-"));
+  return ground === undefined ? undefined : `classic ${ground}`;
 }
 
 const icon = (kind: (typeof KINDS)[number]) => last(declarationsOf(clarityCss, `[data-slot="toast-icon"][data-type="${kind}"][data-s-toast-icon] {`), "color");

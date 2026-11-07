@@ -4297,16 +4297,16 @@
     @apply hover:opacity-100;
   }
   :where([data-slot="toast"][data-type="success"])[data-s-toast] {
-    @apply dark:border-emerald-800;
+    @apply dark:border-emerald-800 dark:bg-[var(--popover-strong)];
   }
   :where([data-slot="toast"][data-type="warning"])[data-s-toast] {
-    @apply dark:border-amber-800;
+    @apply dark:border-amber-800 dark:bg-[var(--popover-strong)];
   }
   :where([data-slot="toast"][data-type="error"])[data-s-toast] {
-    @apply dark:border-red-800;
+    @apply dark:border-red-800 dark:bg-[var(--popover-strong)];
   }
   :where([data-slot="toast"][data-type="info"])[data-s-toast] {
-    @apply dark:border-blue-800;
+    @apply dark:border-blue-800 dark:bg-[var(--popover-strong)];
   }
   :where([data-slot="checkbox"])[data-s-checkbox] {
     @apply focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground data-[state=indeterminate]:bg-primary data-[state=indeterminate]:text-primary-foreground enabled:hover:border-[var(--muted-2)] focus-visible:ring-0 focus-visible:shadow-[var(--focus-halo)] focus-visible:border-[var(--ring)] data-[state=checked]:border-[var(--primary)] data-[state=indeterminate]:border-[var(--primary)];
