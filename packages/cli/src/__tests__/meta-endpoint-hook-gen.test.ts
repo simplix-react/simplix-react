@@ -96,14 +96,21 @@ describe("the entity path a cache invalidation names", () => {
     expect(entityPathOf([])).toBeUndefined();
   });
 
-  it("is exported exactly once by every module of every domain that has one", () => {
+  it("is exported at most once per module and under a name no other module of the domain's barrel uses", () => {
+    let exported = 0;
     for (const domain of resolved.domains.values()) {
       const files = generateEndpointFiles(domain, { naming: simplixBootNaming }).files;
+      const names: string[] = [];
       for (const [path, content] of files) {
-        const exports = content.match(/^export const \w+EntityPath = /gm) ?? [];
+        const exports = [...content.matchAll(/^export const (\w+EntityPath) = /gm)].map((m) => m[1]!);
         expect(exports.length, `${domain.name}/${path}`).toBeLessThanOrEqual(1);
+        names.push(...exports);
       }
+      // `endpoints/index.ts` re-exports every module, so one name twice breaks the whole barrel.
+      expect(new Set(names).size, domain.name).toBe(names.length);
+      exported += names.length;
     }
+    expect(exported).toBeGreaterThan(0);
   });
 });
 

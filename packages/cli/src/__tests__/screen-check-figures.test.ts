@@ -68,6 +68,24 @@ describe("factsOf figures", () => {
   });
 });
 
+describe("factsOf figures beside a holder", () => {
+  const entity = {
+    fields: [{ name: "amount", figureKind: "credits" }, { name: "heldAmount", figureKind: "credits" }],
+    roles: {},
+    rowIdField: "id",
+  } as unknown as MetaScaffoldSource;
+
+  it("does not judge a name a holder draws with another figure in the same file", () => {
+    const ledger = { fields: [{ name: "amount", figureKind: "credits", signed: true }], roles: {}, rowIdField: "entryId" } as unknown as MetaScaffoldSource;
+    expect([...(factsOf(entity, [ledger]).figures ?? new Map()).keys()]).toEqual(["heldAmount"]);
+  });
+
+  it("still judges a name a holder carries with the same figure", () => {
+    const twin = { fields: [{ name: "amount", figureKind: "credits" }], roles: {}, rowIdField: "x" } as unknown as MetaScaffoldSource;
+    expect([...(factsOf(entity, [twin]).figures ?? new Map()).keys()]).toEqual(["amount", "heldAmount"]);
+  });
+});
+
 describe("screenFileProblems", () => {
   it("judges the figure kinds of every screen file, whatever its kind", () => {
     for (const name of ["list.tsx", "detail.tsx", "form.tsx", "crud-page.tsx"]) {

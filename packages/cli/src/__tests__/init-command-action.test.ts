@@ -41,7 +41,7 @@ vi.mock("../utils/logger.js", () => ({
 vi.mock("../versions.js", () => ({
   withVersions: vi.fn((ctx: Record<string, unknown>) => ({
     ...ctx,
-    fw: { cli: "^0.1.0", contract: "^0.2.0", react: "^0.3.0", form: "^0.4.0", mock: "^0.5.0", i18n: "^0.6.0", testing: "^0.7.0", ui: "^0.8.0", api: "^0.9.0" },
+    fw: { cli: "^0.1.0", contract: "^0.2.0", react: "^0.3.0", form: "^0.4.0", mock: "^0.5.0", i18n: "^0.6.0", testing: "^0.7.0", ui: "^0.8.0", api: "^0.9.0", bootAccess: "^0.9.1" },
     fwExact: { cli: "0.1.0", contract: "0.2.0", react: "0.3.0", form: "0.4.0", mock: "0.5.0", i18n: "0.6.0", testing: "0.7.0", ui: "0.8.0", api: "0.9.0" },
     deps: { zod: "^4.0.0", typescript: "^5.9.0", tanstackReactQuery: "^5.64.0", react: "^19.0.0", typesReact: "^19.0.0" },
   })),
@@ -148,6 +148,9 @@ describe("initCommand action (non-interactive)", () => {
     expect(main).toContain('import { auth, AUTH_STORE_PREFIX } from "./app/auth";');
     expect(main).toContain('import "./polyfills";');
     expect(await readFile(join(appDir, "src/polyfills.ts"), "utf-8")).toContain("installRandomUUIDFallback();");
+    // The access policy's package is a dependency of the app that imports it, at the framework's version.
+    const appPackage = JSON.parse(await readFile(join(appDir, "package.json"), "utf-8"));
+    expect(appPackage.dependencies["@simplix-react-ext/simplix-boot-access"]).toBe("^0.9.1");
 
     for (const importer of ["src/app/providers/app-providers.tsx", "src/app/access/index.ts"]) {
       const source = await readFile(join(appDir, importer), "utf-8");

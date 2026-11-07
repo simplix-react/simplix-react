@@ -88,11 +88,24 @@ export function factsOf(source: MetaScaffoldSource, holders: readonly MetaScaffo
   }
   // A field's figure kind as Meta's format settles it, read from the entity's own records only: a
   // holder's sub-list draws the holder's fields, which are judged where the holder's screen is.
+  const figureOf = (one: MetaScaffoldSource["fields"][number]): FigureFact | undefined => {
+    const kind = one.figureKind ?? (one.money ? "money" : undefined);
+    return kind === undefined ? undefined : { kind, signed: one.signed === true };
+  };
   const figures = new Map<string, FigureFact>();
   for (const one of [...(source.rowFields ?? []), ...(source.detailFields ?? []), ...source.fields]) {
     if (figures.has(one.name)) continue;
-    const kind = one.figureKind ?? (one.money ? "money" : undefined);
-    if (kind !== undefined) figures.set(one.name, { kind, signed: one.signed === true });
+    const fact = figureOf(one);
+    if (fact) figures.set(one.name, fact);
+  }
+  // A detail's holder table draws a holder's field under the same name in the same file, so a name
+  // a holder carries with another figure (a ledger entry's signed amount beside a hold's unsigned
+  // one) cannot be told apart by a text check and is not judged.
+  for (const one of holders.flatMap((holder) => [...(holder.rowFields ?? []), ...(holder.detailFields ?? []), ...holder.fields])) {
+    const own = figures.get(one.name);
+    if (!own) continue;
+    const theirs = figureOf(one);
+    if (theirs?.kind !== own.kind || theirs.signed !== own.signed) figures.delete(one.name);
   }
   const maxLengths: Record<string, number> = {};
   for (const one of source.fields) if (one.maxLength !== undefined) maxLengths[one.name] = one.maxLength;
