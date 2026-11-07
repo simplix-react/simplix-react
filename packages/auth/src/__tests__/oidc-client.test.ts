@@ -209,6 +209,28 @@ describe("createOidcClient", () => {
     expect(storage.getItem("simplix:oidc:pending:id-token")).toBe("kept");
   });
 
+  it("names the ID token at a sign-out from another tab when the tabs share where it is kept", async () => {
+    const shared = memoryStorage();
+    const tab = (own: ReturnType<typeof memoryStorage>) =>
+      createOidcClient({ issuer: ISSUER, clientId: "backoffice", redirectUri: "https://app.example.test/login/complete", storage: own, idTokenStorage: shared, fetchFn, navigate: () => undefined });
+    const first = memoryStorage();
+    const second = memoryStorage();
+    await tab(first).refresh("refresh");
+    // The sign-in tab's pending state stays its own; the ID token reaches the other tab.
+    expect(first.getItem("simplix:oidc:pending:id-token")).toBeNull();
+    const url = new URL((await tab(second).signOutUrl())!);
+    expect(url.searchParams.get("id_token_hint")).toBe("id");
+    expect(shared.size()).toBe(0);
+  });
+
+  it("keeps the ID token beside the pending sign-in when no shared storage is named", async () => {
+    const other = memoryStorage();
+    await client().refresh("refresh");
+    const fromOtherTab = createOidcClient({ issuer: ISSUER, clientId: "backoffice", redirectUri: "https://app.example.test/login/complete", storage: other, fetchFn });
+    expect(new URL((await fromOtherTab.signOutUrl())!).searchParams.has("id_token_hint")).toBe(false);
+    expect(storage.getItem("simplix:oidc:pending:id-token")).toBe("id");
+  });
+
   it("keeps the ID token under its own storage key", async () => {
     const own = createOidcClient({ issuer: ISSUER, clientId: "portal", redirectUri: "https://app.example.test/c", storage, storageKey: "portal:oidc", fetchFn });
     await own.refresh("refresh");

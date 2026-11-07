@@ -38,6 +38,15 @@ export interface OidcClientOptions {
    * address is built.
    */
   storageKey?: string;
+  /**
+   * Where the ID token of the last exchange or refresh is kept, under `<storageKey>:id-token`.
+   * Defaults to {@link storage}. A pending sign-in belongs to the tab that started it, so the
+   * default per-tab storage is right for it; the ID token belongs to the session, which every tab
+   * shares, so an app whose sign-out may start in any tab passes a storage the tabs share
+   * (`localStorage`). Kept per tab, a sign-out from another tab names no ID token and the issuer
+   * stops at its logout confirmation, keeping the session.
+   */
+  idTokenStorage?: OidcPendingStorage;
   /** Fetch used for discovery and the token endpoint. Defaults to the global `fetch`. */
   fetchFn?: typeof fetch;
   /** Sends the browser to a URL. Defaults to `window.location.assign`. */
@@ -155,18 +164,19 @@ export function createOidcClient(options: OidcClientOptions): OidcClient {
   const storage = (): OidcPendingStorage => options.storage ?? sessionStorage;
   const navigate = options.navigate ?? ((url: string) => window.location.assign(url));
   const idTokenKey = `${storageKey}:id-token`;
+  const idTokenStorage = (): OidcPendingStorage => options.idTokenStorage ?? storage();
 
   // The ID token is kept so sign-out can name it; where storage refuses (a private window, a
   // blocked origin), sign-out goes on without it and the issuer asks the reader to confirm.
   function keepIdToken(tokens: OidcTokens): OidcTokens {
-    if (tokens.idToken) withStorage(() => storage().setItem(idTokenKey, tokens.idToken as string));
+    if (tokens.idToken) withStorage(() => idTokenStorage().setItem(idTokenKey, tokens.idToken as string));
     return tokens;
   }
 
   function takeIdToken(): string | undefined {
     return withStorage(() => {
-      const kept = storage().getItem(idTokenKey) ?? undefined;
-      storage().removeItem(idTokenKey);
+      const kept = idTokenStorage().getItem(idTokenKey) ?? undefined;
+      idTokenStorage().removeItem(idTokenKey);
       return kept;
     });
   }
