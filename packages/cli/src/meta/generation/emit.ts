@@ -10,6 +10,22 @@ export const HEADER = `/**
 /** Base name of the module every enum declaration is written into, inside the model directory. */
 export const ENUM_MODULE = "_enums";
 
+/**
+ * The module the status tone vocabulary is imported from. It is the framework package every
+ * generated domain already depends on for its mutator, so declaring the tones adds no dependency.
+ */
+export const STATUS_TONE_MODULE = "@simplix-react/api";
+
+/** The name a toned enum's value-to-tone table is exported under. */
+export function enumTonesName(enumName: string): string {
+  return `${enumName}Tones`;
+}
+
+/** The name a type's field-to-format table is exported under. */
+export function fieldFormatsName(typeName: string): string {
+  return `${typeName}FieldFormats`;
+}
+
 /** What a `TypeRef` of that kind is on the wire, once JSON has flattened it. */
 export const PRIMITIVES: Record<
   "string" | "boolean" | "unknown" | "instant" | "date" | "time" | "file" | "binary",

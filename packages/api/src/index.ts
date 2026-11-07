@@ -180,3 +180,6 @@ export {
 
 // ── Read failures ──
 export { recordIsAbsent, recordIsOutOfScope } from "./read-failed.js";
+
+// ── Status tones ──
+export type { StatusTone } from "./status-tone.js";

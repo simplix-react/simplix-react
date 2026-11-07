@@ -1,13 +1,17 @@
-import type { TypeRef } from "../types.js";
+import type { FieldMeta, TypeRef } from "../types.js";
 import type { ResolvedDomain, ResolvedType } from "../resolve.js";
 import {
   containerTypeExpression,
   ENUM_MODULE,
+  enumTonesName,
+  fieldFormatsName,
   HEADER,
+  memberName,
   PRIMITIVES,
   reachableFrom,
   requestRefs,
   responseRefs,
+  STATUS_TONE_MODULE,
 } from "./emit.js";
 
 /** Directory the model files land in, relative to a generated package's `src/generated/`. */
@@ -57,12 +61,24 @@ export interface DualDirectionType {
   enums: string[];
 }
 
+/**
+ * A declaration table (`<Enum>Tones`, `<Type>FieldFormats`) left out because a type or an enum of
+ * the domain is already exported under its name.
+ */
+export interface ShadowedDeclaration {
+  /** The name the table would have been exported under. */
+  name: string;
+  /** The enum or type whose declarations the table would have carried. */
+  of: string;
+}
+
 export interface ModelGenResult {
   /** Path relative to `src/generated/` → file content. */
   files: Map<string, string>;
   unboundTypeParams: UnboundTypeParam[];
   filledTypeArguments: FilledTypeArguments[];
   dualDirectionTypes: DualDirectionType[];
+  shadowedDeclarations: ShadowedDeclaration[];
 }
 
 /**
@@ -105,6 +121,7 @@ export function generateModelFiles(
     unboundTypeParams: emitter.unboundTypeParams,
     filledTypeArguments: emitter.filledTypeArguments,
     dualDirectionTypes: collectDualDirection(domain, responseTypes, requestTypes),
+    shadowedDeclarations: emitter.shadowedDeclarations,
   };
 }
 
@@ -132,6 +149,7 @@ interface RenderSite {
 class ModelEmitter {
   readonly unboundTypeParams: UnboundTypeParam[] = [];
   readonly filledTypeArguments: FilledTypeArguments[] = [];
+  readonly shadowedDeclarations: ShadowedDeclaration[] = [];
 
   constructor(
     private readonly domain: ResolvedDomain,
@@ -172,7 +190,62 @@ class ModelEmitter {
         : `export interface ${type.name}${params}${heritage} {\n${body.join("\n")}\n}`,
       "",
     );
+    lines.push(...this.fieldFormats(type));
     return lines.join("\n");
+  }
+
+  /**
+   * The format SimpliX Meta declares on each field of the type (money with its currency and
+   * scale, credits, an excerpt, bytes, a duration, a code), inherited fields included because a
+   * reader holds the concrete type. A type none of whose fields declares one gets no table.
+   */
+  private fieldFormats(type: ResolvedType): string[] {
+    const entries = type.allFields
+      .map((field) => [field, formatEntry(field)] as const)
+      .filter((pair): pair is readonly [FieldMeta, string] => pair[1] !== undefined)
+      .map(([field, entry]) => `  ${memberName(field.name)}: ${entry},`);
+    if (entries.length === 0) return [];
+
+    const name = fieldFormatsName(type.name);
+    if (this.isTaken(name)) {
+      this.shadowedDeclarations.push({ name, of: type.name });
+      return [];
+    }
+    return [
+      "/** The format SimpliX Meta declares on each field that has one, inherited fields included. */",
+      `export const ${name} = {`,
+      ...entries,
+      "} as const;",
+      "",
+    ];
+  }
+
+  /** Whether a type or an enum of the domain is already exported under the name. */
+  private isTaken(name: string): boolean {
+    return this.domain.types.has(name) || this.domain.enums.has(name);
+  }
+
+  /**
+   * The tone each value of an enum is drawn in, where SimpliX Meta declares any. Typed partial,
+   * since a declaration may leave values out, so a reader writes its own fallback
+   * (`<Enum>Tones[value] ?? "neutral"`) and a tone outside the vocabulary fails to compile here.
+   */
+  private enumTones(name: string, values: readonly { name: string; tone?: string }[]): string[] {
+    const toned = values.filter((value) => value.tone !== undefined);
+    if (toned.length === 0) return [];
+
+    const tonesName = enumTonesName(name);
+    if (this.isTaken(tonesName)) {
+      this.shadowedDeclarations.push({ name: tonesName, of: name });
+      return [];
+    }
+    return [
+      "/** The status tone SimpliX Meta declares for each value; a value left out declares none. */",
+      `export const ${tonesName}: Readonly<Partial<Record<${name}, StatusTone>>> = {`,
+      ...toned.map((value) => `  ${memberName(value.name)}: ${quoted(value.tone ?? "")},`),
+      "};",
+      "",
+    ];
   }
 
   /**
@@ -197,6 +270,12 @@ class ModelEmitter {
         "",
       );
     }
+    const tables = new Map(
+      declared.map((entry) => [entry.name, this.enumTones(entry.name, entry.meta.values)]),
+    );
+    if ([...tables.values()].some((table) => table.length > 0)) {
+      lines.push(`import type { StatusTone } from '${STATUS_TONE_MODULE}';`, "");
+    }
 
     for (const entry of declared) {
       const values = entry.meta.values.map((value) => `  ${value.name}: '${value.name}',`);
@@ -216,6 +295,7 @@ class ModelEmitter {
           "",
         );
       }
+      lines.push(...(tables.get(entry.name) ?? []));
     }
 
     return lines.join("\n");
@@ -357,6 +437,27 @@ function importLines(imports: FileImports): string[] {
 
 function byName(left: [string, unknown], right: [string, unknown]): number {
   return left[0] < right[0] ? -1 : left[0] > right[0] ? 1 : 0;
+}
+
+/** A string literal in the quote style the generated modules use. */
+function quoted(text: string): string {
+  return `'${text.replace(/\\/g, "\\\\").replace(/'/g, "\\'")}'`;
+}
+
+/**
+ * The literal one field contributes to its type's format table, or nothing when it declares no
+ * format and no money. Only what SimpliX Meta declares is written: `format`, and `money` with
+ * its currency and scale.
+ */
+function formatEntry(field: FieldMeta): string | undefined {
+  const parts: string[] = [];
+  if (field.format !== undefined) parts.push(`format: ${quoted(field.format)}`);
+  if (field.money !== undefined) {
+    parts.push(
+      `money: { currency: ${quoted(field.money.currency)}, scale: ${Number(field.money.scale)} }`,
+    );
+  }
+  return parts.length === 0 ? undefined : `{ ${parts.join(", ")} }`;
 }
 
 /** One line, and never a sequence that would close the comment early. */

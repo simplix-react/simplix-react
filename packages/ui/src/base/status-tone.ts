@@ -16,16 +16,12 @@
  * distinct from the typography `tone` axis on `Text`/`Heading`
  * (default/muted/primary/destructive).
  */
+import type { StatusTone } from "@simplix-react/api";
 import type { ComponentType } from "react";
 
-export type StatusTone =
-  | "success"
-  | "warning"
-  | "danger"
-  | "info"
-  | "neutral"
-  | "pending"
-  | "processing";
+// The vocabulary is declared once in `@simplix-react/api`, where a generated domain package's
+// `<Enum>Tones` reads it without depending on the UI.
+export type { StatusTone };
 
 /**
  * Structural type for an icon component (e.g. a lucide-react icon).

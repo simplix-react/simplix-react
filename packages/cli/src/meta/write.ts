@@ -420,6 +420,12 @@ function collectWarnings(results: GeneratorResults): string[] {
         `${one.params.join(", ")} were filled with unknown.`,
     );
   }
+  for (const one of results.model.shadowedDeclarations) {
+    warnings.push(
+      `${one.of}'s declaration table '${one.name}' was not written: a type or an enum of the ` +
+        "domain is already exported under that name.",
+    );
+  }
   for (const one of results.schema.serverOnlyConstraints) {
     warnings.push(
       `${one.type}.${one.field} carries the custom constraint '${one.name}', which only the ` +
