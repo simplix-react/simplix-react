@@ -14,7 +14,15 @@ export type FilterControl = Pick<FilterDef, "field" | "type">;
 
 /** Where a list keeps its committed filters when the address owns them. */
 export interface AddressedFilters {
-  /** The filters the address carries now, or `undefined` when it names none. */
+  /**
+   * The filters the address carries now, or `undefined` when it names none.
+   *
+   * <p>It must read back every key the list wrote itself through {@link AddressedFilters.onChange}:
+   * the list compares the address with its own state, and an address that lacks a key the list
+   * committed (a time range, a pressed tile) is taken for somebody else's change and replaces the
+   * list's state, so the key is lost at the reader's next filter change. A screen that narrows the
+   * address to the keys its entity declares keeps the keys it wrote itself out of the narrowing.
+   */
   readonly value: CrudSearchFilters | undefined;
   /**
    * Receives the committed filters, in the address's form, each time the reader changes them.
