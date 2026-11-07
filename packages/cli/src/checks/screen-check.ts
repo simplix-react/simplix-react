@@ -151,8 +151,16 @@ export function formProblems(file: string, text: string, facts: ScreenFacts): Sc
       continue;
     }
     const entry = entries.find((one) => one.name === name);
-    // A multilingual entry carries the plain field it fills, and is marked on its own field.
-    if (!entry && entries.some((one) => one.plainField === name)) continue;
+    // A multilingual entry carries the plain field it fills, so it is the entry the create body's
+    // requirement lands on and it is marked on its own field: a blank plain half is refused by the
+    // server, and an unmarked entry gives the operator no sign before the save.
+    const twin = entry ? undefined : entries.find((one) => one.plainField === name);
+    if (twin) {
+      if (!twin.required) {
+        error(`"${twin.name}" is the multilingual entry of "${name}", which the create body requires, and its entry lacks \`required: true\``);
+      }
+      continue;
+    }
     if (!entry) {
       error(`the create body requires "${name}" and the form's field table has no entry for it, so an unedited form cannot create a record`);
     } else if (!entry.required && !facts.booleans.has(name)) {

@@ -1046,6 +1046,10 @@ export function getDefaultValue(tsType: string): string {
  * Detect i18n field pairs in a list of FieldInfo entries.
  * Mutates fields in place: marks plain fields with isI18nPair=true,
  * sets baseFieldName on i18n fields, and inherits textarea component.
+ *
+ * <p>The plain half is the field the backend validates (`@NotBlank` on `name`) while the form
+ * edits only the i18n half, so the pair is required exactly when its plain half is: the i18n field
+ * inherits `required` here, and the generated form marks it from there.
  */
 export function detectI18nFieldPairs(fields: FieldInfo[]): void {
   for (const field of fields) {
@@ -1055,6 +1059,7 @@ export function detectI18nFieldPairs(fields: FieldInfo[]): void {
       if (plainField) {
         plainField.isI18nPair = true;
         field.baseFieldName = baseName;
+        if (plainField.required) field.required = true;
         if (plainField.formComponent === "TextareaField") {
           field.formComponent = "I18nTextareaField";
           field.component = "I18nTextarea";

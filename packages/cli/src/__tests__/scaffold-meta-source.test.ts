@@ -76,6 +76,27 @@ function allFieldsOf(dto: string): string[] {
   return merged;
 }
 
+describe("a multilingual pair is required when its plain half is", () => {
+  const pairs = () =>
+    everySource().flatMap((source) =>
+      source.fields
+        .filter((one) => one.isI18nPair)
+        .map((plain) => ({ source, plain, twin: source.fields.find((one) => one.name === `${plain.name}I18n`) })),
+    );
+
+  it("gives the i18n half the requirement the plain half states, and only that", () => {
+    const found = pairs();
+    expect(found.length).toBeGreaterThan(0);
+    for (const { plain, twin } of found) {
+      expect(twin, `${plain.name} has an i18n half`).toBeDefined();
+      expect(twin!.required === true, `${twin!.name} follows ${plain.name}`).toBe(plain.required === true);
+    }
+    // The fixture holds both shapes, so the equality above is not met by marking everything or nothing.
+    expect(found.some((one) => one.plain.required === true)).toBe(true);
+    expect(found.some((one) => one.plain.required !== true)).toBe(true);
+  });
+});
+
 describe("the DTO an entity's screens are built from", () => {
   it("compares bodies by their inherited field count, which inverts two of these three", () => {
     // An `…UpdateDTO` extends its create body and adds the identifier, so it declares one field
