@@ -715,25 +715,14 @@ describe("validateI18nRules", () => {
 });
 
 describe("validateFsdRules", () => {
-  it("passes when manifest.ts exists", async () => {
-    const srcDir = join(tempDir, "src");
-    await mkdir(srcDir, { recursive: true });
-    await writeFile(join(srcDir, "manifest.ts"), "export default {};");
-
-    const result = createResult(tempDir);
-    await validateFsdRules(tempDir, result);
-
-    expect(result.passes.some((p) => p.includes("Manifest exists"))).toBe(true);
-  });
-
-  it("errors when manifest.ts is missing", async () => {
+  it("does not require a manifest.ts", async () => {
     const srcDir = join(tempDir, "src");
     await mkdir(srcDir, { recursive: true });
 
     const result = createResult(tempDir);
     await validateFsdRules(tempDir, result);
 
-    expect(result.errors.some((e) => e.includes("Missing manifest.ts"))).toBe(true);
+    expect(result.errors).toHaveLength(0);
   });
 
   it("errors when features/ imports from widgets/", async () => {

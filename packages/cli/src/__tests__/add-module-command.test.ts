@@ -5,7 +5,6 @@ import {
   moduleTsupConfig,
   moduleTsconfigJson,
   moduleIndexTs,
-  moduleManifestTs,
   moduleFeaturesIndexTs,
   moduleWidgetsIndexTs,
   moduleLocalesIndexTs,
@@ -62,9 +61,10 @@ describe("add-module templates", () => {
     expect(result).toContain("export");
   });
 
-  it("renders module manifest.ts", () => {
-    const result = renderTemplate(moduleManifestTs, makeCtx());
-    expect(result).toContain("Editor");
+  it("re-exports no manifest from the module index, since nothing reads one", () => {
+    const result = renderTemplate(moduleIndexTs, makeCtx());
+    expect(result).not.toMatch(/Manifest/);
+    expect(result).toContain('export * from "./widgets";');
   });
 
   it("renders features index.ts as static", () => {

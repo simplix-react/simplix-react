@@ -94,7 +94,7 @@ describe("addModuleCommand action (non-interactive)", () => {
     expect(await pathExists(join(targetDir, "tsup.config.ts"))).toBe(true);
     expect(await pathExists(join(targetDir, "tsconfig.json"))).toBe(true);
     expect(await pathExists(join(targetDir, "src/index.ts"))).toBe(true);
-    expect(await pathExists(join(targetDir, "src/manifest.ts"))).toBe(true);
+    expect(await pathExists(join(targetDir, "src/manifest.ts"))).toBe(false);
   });
 
   it("writes a test config that resolves a linked package to its source in both test environments", async () => {
@@ -203,14 +203,18 @@ describe("addModuleCommand action (non-interactive)", () => {
     expect(pkgJson.name).toBe("@test/myapp-editor");
   });
 
-  it("renders manifest.ts with PascalCase module name", async () => {
+  it("writes a module index that names no manifest, so validate has nothing to warn about", async () => {
     const { addModuleCommand } = await import("../commands/add-module.js");
+    const { validateFsdRules } = await import("../validators/fsd-rules.js");
 
     await addModuleCommand.parseAsync(["node", "simplix", "editor", "-y"]);
 
     const targetDir = join(tempDir, "modules/myapp-editor");
-    const manifest = await readFile(join(targetDir, "src/manifest.ts"), "utf-8");
-    expect(manifest).toContain("Editor");
+    expect(await readFile(join(targetDir, "src/index.ts"), "utf-8")).not.toMatch(/Manifest/);
+    const result = { path: targetDir, passes: [] as string[], errors: [] as string[], warnings: [] as string[] };
+    await validateFsdRules(targetDir, result);
+    expect(result.errors).toEqual([]);
+    expect(result.warnings).toEqual([]);
   });
 });
 

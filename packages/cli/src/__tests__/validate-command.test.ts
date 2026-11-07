@@ -27,24 +27,13 @@ afterEach(async () => {
 // ── FSD Rules ───────────────────────────────────────────────
 
 describe("validateFsdRules", () => {
-  it("passes when manifest exists (module mode)", async () => {
-    const srcDir = join(tempDir, "src");
-    await mkdir(srcDir, { recursive: true });
-    await writeFile(join(srcDir, "manifest.ts"), "export default {};");
-
-    const result = makeResult();
-    await validateFsdRules(tempDir, result);
-    expect(result.passes).toContain("Manifest exists");
-    expect(result.errors.filter((e) => e.includes("manifest"))).toHaveLength(0);
-  });
-
-  it("reports error when manifest is missing (module mode)", async () => {
+  it("needs no manifest in a module", async () => {
     const srcDir = join(tempDir, "src");
     await mkdir(srcDir, { recursive: true });
 
     const result = makeResult();
     await validateFsdRules(tempDir, result);
-    expect(result.errors).toContain("Missing manifest.ts");
+    expect(result.errors).toHaveLength(0);
   });
 
   it("skips manifest check for app mode", async () => {

@@ -8,8 +8,12 @@ import type { ValidationResult } from "../commands/validate.js";
  * FSD Layer Rules:
  * - features/ cannot import from widgets/
  * - shared/ cannot import from features/ or widgets/
- * - Modules must have manifest.ts (apps are exempt)
+ * - A module declares no `ModuleManifest` stub: nothing in the framework or an app reads one, and
+ *   the `add-module` template that wrote it no longer does
  */
+/** The interface the `add-module` template used to declare in every module's `src/manifest.ts`. */
+const UNREAD_MANIFEST = /\binterface\s+ModuleManifest\b/;
+
 export async function validateFsdRules(
   moduleDir: string,
   result: ValidationResult,
@@ -18,13 +22,14 @@ export async function validateFsdRules(
   const srcDir = join(moduleDir, "src");
   if (!(await pathExists(srcDir))) return;
 
-  // Check manifest.ts exists (modules only — apps don't need a manifest)
-  if (options?.type !== "app") {
-    const manifestPath = join(srcDir, "manifest.ts");
-    if (await pathExists(manifestPath)) {
-      result.passes.push("Manifest exists");
-    } else {
-      result.errors.push("Missing manifest.ts");
+  // A manifest stub an older `add-module` wrote: declared, re-exported, read by nobody.
+  const manifestPath = join(srcDir, "manifest.ts");
+  if (await pathExists(manifestPath)) {
+    const content = await readFile(manifestPath, "utf-8");
+    if (UNREAD_MANIFEST.test(content)) {
+      result.warnings.push(
+        "src/manifest.ts declares the ModuleManifest stub nothing reads: delete it and its re-export in src/index.ts",
+      );
     }
   }
 

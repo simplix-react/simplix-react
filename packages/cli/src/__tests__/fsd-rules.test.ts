@@ -27,32 +27,37 @@ describe("validateFsdRules", () => {
     expect(result.passes).toHaveLength(0);
   });
 
-  it("passes when manifest.ts exists (module mode)", async () => {
+  it("warns about the ModuleManifest stub an older add-module wrote", async () => {
     const srcDir = join(tempDir, "src");
     await mkdir(srcDir, { recursive: true });
-    await writeFile(join(srcDir, "manifest.ts"), "export default {};");
+    await writeFile(join(srcDir, "manifest.ts"), "export interface ModuleManifest {\n  id: string;\n}\nexport const editorManifest: ModuleManifest = { id: \"editor\" };\n");
 
     const result = makeResult();
     await validateFsdRules(tempDir, result);
-    expect(result.passes).toContain("Manifest exists");
+    expect(result.warnings).toEqual([
+      "src/manifest.ts declares the ModuleManifest stub nothing reads: delete it and its re-export in src/index.ts",
+    ]);
+    expect(result.errors).toHaveLength(0);
   });
 
-  it("reports error when manifest.ts is missing (module mode)", async () => {
+  it("says nothing of a module with no manifest, which is the shape add-module writes", async () => {
     const srcDir = join(tempDir, "src");
     await mkdir(srcDir, { recursive: true });
 
     const result = makeResult();
     await validateFsdRules(tempDir, result);
-    expect(result.errors).toContain("Missing manifest.ts");
+    expect(result.errors).toHaveLength(0);
+    expect(result.warnings).toHaveLength(0);
   });
 
-  it("skips manifest check when type=app", async () => {
+  it("says nothing of a manifest.ts that is not the stub", async () => {
     const srcDir = join(tempDir, "src");
     await mkdir(srcDir, { recursive: true });
+    await writeFile(join(srcDir, "manifest.ts"), "export const routes = [\"/editor\"];\n");
 
     const result = makeResult();
-    await validateFsdRules(tempDir, result, { type: "app" });
-    expect(result.errors.filter((e) => e.includes("manifest"))).toHaveLength(0);
+    await validateFsdRules(tempDir, result);
+    expect(result.warnings).toHaveLength(0);
   });
 
   it("reports features/ importing from widgets/", async () => {

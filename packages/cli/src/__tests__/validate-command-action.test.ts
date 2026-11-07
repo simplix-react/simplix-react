@@ -117,11 +117,13 @@ describe("validateCommand action", () => {
     const { validateCommand } = await import("../commands/validate.js");
 
     const modDir = join(tempDir, "modules/bad-module");
-    await mkdir(join(modDir, "src"), { recursive: true });
+    await mkdir(join(modDir, "src/features"), { recursive: true });
     await writeFile(
       join(modDir, "package.json"),
       JSON.stringify({ name: "@test/bad-module" }),
     );
+    // A layer violation: features/ may not import from widgets/.
+    await writeFile(join(modDir, "src/features/foo.ts"), 'import { Bar } from "../widgets/bar";\n');
 
     await expect(
       validateCommand.parseAsync(["node", "simplix"]),
