@@ -117,7 +117,7 @@ export const datePickerActionStyle = defineSlotStyle({
 /** The button that clears the field. */
 export const datePickerClearStyle = defineSlotStyle({
   slot: "date-picker-clear",
-  base: "rounded-sm p-0.5 transition-colors hover:bg-muted focus-visible:outline-none [&>svg]:opacity-50 [&>svg:hover]:opacity-100 focus-visible:shadow-[var(--focus-halo)]",
+  base: "z-2 rounded-sm p-0.5 transition-colors hover:bg-muted focus-visible:outline-none [&>svg]:opacity-50 [&>svg:hover]:opacity-100 focus-visible:shadow-[var(--focus-halo)]",
   variants: {},
   defaultVariants: {},
 });

@@ -110,10 +110,15 @@ export const languageInsetStyle = defineSlotStyle({
 /**
  * The layer laid over the control's padding box, inside its border, that holds the selector and
  * the fill bar and clips them to the control's rounded corners.
+ *
+ * <p>It sits at `z-2`, one step above the keyboard-focus lift of base.css (`:focus-visible` gives a
+ * focused control `z-index: 1`). Without it the focused input is drawn over the selector, which
+ * then cannot be pressed after typing in the other language. The order is asserted in
+ * `language-inset-stacking.test.ts`.
  */
 export const languageInsetOverlayStyle = defineSlotStyle({
   slot: "field-language-inset-overlay",
-  base: "pointer-events-none inset-px overflow-hidden rounded-md",
+  base: "pointer-events-none inset-px z-2 overflow-hidden rounded-md",
   variants: {},
   defaultVariants: {},
 });

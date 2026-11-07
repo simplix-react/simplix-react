@@ -14,7 +14,7 @@ export const selectFieldTriggerStyle = defineSlotStyle({
 /** The strip of sibling buttons laid over the trigger's trailing edge. */
 export const selectFieldTriggerActionsStyle = defineSlotStyle({
   slot: "field-select-trigger-actions",
-  base: "gap-1",
+  base: "z-2 gap-1",
   variants: {},
   defaultVariants: {},
 });

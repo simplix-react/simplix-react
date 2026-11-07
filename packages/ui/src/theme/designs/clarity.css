@@ -770,7 +770,7 @@
     @apply gap-2;
   }
   [data-slot="date-picker-clear"][data-slot][data-s-date-picker-clear] {
-    @apply rounded-[calc(var(--radius-control)-2px)] p-0.5 transition-colors duration-[var(--dur-fast)] ease-[var(--ease)];
+    @apply z-2 rounded-[calc(var(--radius-control)-2px)] p-0.5 transition-colors duration-[var(--dur-fast)] ease-[var(--ease)];
   }
   [data-slot="date-picker-footer"][data-slot][data-s-date-picker-footer] {
     @apply mt-3 gap-2 border-t border-[var(--border-strong)] pt-2;
@@ -827,7 +827,7 @@
     @apply p-3;
   }
   [data-slot="date-range-picker-clear"][data-slot][data-s-date-range-picker-clear] {
-    @apply rounded-[calc(var(--radius-control)-2px)] p-0.5 transition-colors duration-[var(--dur-fast)] ease-[var(--ease)];
+    @apply z-2 rounded-[calc(var(--radius-control)-2px)] p-0.5 transition-colors duration-[var(--dur-fast)] ease-[var(--ease)];
   }
   [data-slot="date-range-picker-footer"][data-slot][data-s-date-range-picker-footer] {
     @apply gap-2 border-t pt-2 mt-2;
@@ -2594,7 +2594,7 @@
     @apply ml-0.5 rounded-[calc(var(--radius-control)-2px)];
   }
   [data-slot="field-password-toggle"][data-slot][data-s-field-password-toggle] {
-    @apply rounded-[calc(var(--radius-control)-2px)] text-muted-foreground transition-colors duration-[var(--dur-fast)] ease-[var(--ease)];
+    @apply z-2 rounded-[calc(var(--radius-control)-2px)] text-muted-foreground transition-colors duration-[var(--dur-fast)] ease-[var(--ease)];
   }
   [data-slot="field-phone-chevron"][data-slot][data-s-field-phone-chevron] {
     @apply opacity-50;
@@ -3398,7 +3398,7 @@
     @apply pointer-events-auto inset-y-0 end-0;
   }
   [data-slot="field-language-inset-overlay"][data-slot][data-s-field-language-inset-overlay] {
-    @apply pointer-events-none inset-px overflow-hidden rounded-[var(--radius-control)];
+    @apply pointer-events-none inset-px z-2 overflow-hidden rounded-[var(--radius-control)];
   }
   [data-slot="field-language-inset"][data-slot][data-s-field-language-inset] {
     @apply flex flex-col rounded-[var(--radius-control)];
@@ -3458,7 +3458,7 @@
     @apply rounded-full bg-border;
   }
   [data-slot="field-select-trigger-actions"][data-slot][data-s-field-select-trigger-actions] {
-    @apply gap-1;
+    @apply z-2 gap-1;
   }
   [data-slot="field-select-trigger"][data-slot][data-s-field-select-trigger] {
     @apply gap-1 rounded-[var(--radius-control)] border border-[var(--border-strong)] bg-background px-3 text-left text-sm;
