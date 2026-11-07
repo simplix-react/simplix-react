@@ -1806,8 +1806,9 @@ async function generatePages(
   const pageImportsBlocks = Object.values(pageFiles).some((content) => content.includes(`./${PAGE_BLOCKS_TEMPLATE}"`));
   if (blocks !== undefined && pageImportsBlocks) {
     pageFiles[`${PAGE_BLOCKS_TEMPLATE}.tsx`] = renderTemplate(blocks, ctx);
-  } else if (withBlocks) {
-    // Asked for by the author: a hand-written departure file, laid down once and never rendered again.
+  } else if (withBlocks || pageImportsBlocks) {
+    // Asked for by the author, or imported by the page while no template renders it: a hand-written
+    // departure file, laid down once and never rendered again.
     pageFiles[`${PAGE_BLOCKS_TEMPLATE}.tsx`] = renderTemplate(pageKindBlocksTemplate, { ...ctx, NamePascal: `${String(ctx.EntityPascal)}Crud` });
   }
 

@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { generatedReport, regenerateAll } from "../commands/generated.js";
+import { generatedReport, regenerateAll, regenerateNamed, reportUnresolvedImports } from "../commands/generated.js";
 import { applyOriginChange, planOriginChange } from "../commands/generated-origin.js";
 import { listDecision, runScaffold, scaffoldCrudCommand, scaffoldOptionsFromOrigin } from "../commands/scaffold-crud.js";
 import { withSilentLog } from "../utils/logger.js";
@@ -554,5 +554,72 @@ describe("recording the origin a list was designed with", () => {
     await useDecisionAwareList();
     await scaffold();
     await expect(planOriginChange(root, root, [join(root, "modules/none")], CARDS_ORIGIN)).rejects.toThrow(/no generated file at or under/);
+  });
+});
+
+describe("a page that imports its blocks file", () => {
+  const pageFile = () => join(root, MODULE, "src/pages/product/crud-page.tsx");
+  const blocksFile = () => join(root, MODULE, "src/pages/product/page.blocks.tsx");
+  const marker = "/**\n * @simplix-generated page/crud-page\n */\n";
+  const pageImportingBlocks = `${marker}import { usePageBlocks } from "./page.blocks";\n\nexport function {{EntityPascal}}CrudPage() {\n  return usePageBlocks();\n}\n`;
+  const trackedBlocks = "/**\n * @simplix-generated page/page-blocks\n */\nexport function usePageBlocks() {\n  return {};\n}\n";
+  const exists = (path: string) => readFile(path, "utf-8").then(() => true, () => false);
+
+  it("is laid down by the regeneration of the page alone, where it is missing", async () => {
+    await useKitShapedTemplates();
+    await scaffold();
+    expect(await exists(blocksFile())).toBe(false);
+    // The template now imports the blocks file, as the kit's crud page does.
+    await put(".simplix/templates/crud-page.hbs", pageImportingBlocks);
+    await put(".simplix/templates/page.blocks.hbs", trackedBlocks);
+    const { writes } = await withSilentLog(() => regenerateNamed(root, [pageFile()]));
+    expect(await readFile(pageFile(), "utf-8")).toContain('from "./page.blocks"');
+    expect(await readFile(blocksFile(), "utf-8")).toContain("@simplix-generated page/page-blocks");
+    // Tracked as the page is: stamped with its origin and given a base.
+    expect(await readFile(blocksFile(), "utf-8")).toMatch(/@simplix-render [0-9a-f]{12} scaffold product --module mymod/);
+    expect(await exists(join(root, ".simplix/generated", MODULE, "src/pages/product/page.blocks.tsx"))).toBe(true);
+    expect(writes.map((w) => relative(root, w.path))).toEqual([`${MODULE}/src/pages/product/crud-page.tsx`, `${MODULE}/src/pages/product/page.blocks.tsx`]);
+    expect(reportUnresolvedImports(root, writes)).toBe(false);
+  });
+
+  it("is never overwritten by a regeneration once the screen has one", async () => {
+    await useKitShapedTemplates();
+    await scaffold();
+    await put(".simplix/templates/crud-page.hbs", pageImportingBlocks);
+    await put(".simplix/templates/page.blocks.hbs", trackedBlocks);
+    const own = "export function usePageBlocks() {\n  return { note: true };\n}\n";
+    await put(`${MODULE}/src/pages/product/page.blocks.tsx`, own);
+    await withSilentLog(() => regenerateNamed(root, [pageFile()]));
+    expect(await readFile(blocksFile(), "utf-8")).toBe(own);
+  });
+
+  it("leaves a blocks file already there at its earlier render when only the page is named", async () => {
+    await useKitShapedTemplates();
+    await put(".simplix/templates/crud-page.hbs", pageImportingBlocks);
+    await put(".simplix/templates/page.blocks.hbs", trackedBlocks);
+    await scaffold();
+    const before = await readFile(blocksFile(), "utf-8");
+    await put(".simplix/templates/page.blocks.hbs", trackedBlocks.replace("return {};", "return { v: 2 };"));
+    await put(".simplix/templates/crud-page.hbs", pageImportingBlocks.replace("return usePageBlocks();", "return usePageBlocks() ?? null;"));
+    await withSilentLog(() => regenerateNamed(root, [pageFile()]));
+    expect(await readFile(pageFile(), "utf-8")).toContain("?? null");
+    expect(await readFile(blocksFile(), "utf-8")).toBe(before);
+  });
+
+  it("is laid down by a scaffold as the departure stub where no template renders it", async () => {
+    await useKitShapedTemplates();
+    await put(".simplix/templates/crud-page.hbs", pageImportingBlocks);
+    await scaffold();
+    expect(await readFile(blocksFile(), "utf-8")).toContain("usePageBlocks");
+  });
+
+  it("is named by the check when a regenerated page imports a file that is not there, and only then", async () => {
+    await useKitShapedTemplates();
+    await scaffold();
+    await put(`${MODULE}/src/pages/product/crud-page.tsx`, `${marker}import { usePageBlocks } from "./page.blocks";\nimport "./crud-page.css";\n`);
+    const writes = [{ path: pageFile(), outcome: "merged" as const }];
+    expect(await withSilentLog(async () => reportUnresolvedImports(root, writes))).toBe(true);
+    await put(`${MODULE}/src/pages/product/page.blocks.tsx`, "export function usePageBlocks() {}\n");
+    expect(await withSilentLog(async () => reportUnresolvedImports(root, writes))).toBe(false);
   });
 });

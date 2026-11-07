@@ -1,5 +1,5 @@
-import { existsSync, readdirSync, readFileSync, realpathSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, readdirSync, readFileSync, realpathSync, statSync } from "node:fs";
+import { dirname, join } from "node:path";
 import ts from "typescript";
 
 /*
@@ -104,6 +104,33 @@ function readVerbatimModuleSyntax(workspace: string): boolean {
   const read = ts.readConfigFile(configPath, ts.sys.readFile);
   if (read.error) throw new Error(ts.flattenDiagnosticMessageText(read.error.messageText, "\n"));
   return ts.parseJsonConfigFileContent(read.config, ts.sys, workspace).options.verbatimModuleSyntax === true;
+}
+
+/** The candidates a relative specifier names, in the order a bundler tries them. */
+export function relativeCandidates(file: string, specifier: string): string[] {
+  const at = join(dirname(file), specifier.replace(/[?#].*$/, ""));
+  return [at, ...[".tsx", ".ts", ".jsx", ".js", ".mts", ".mjs"].map((ext) => `${at}${ext}`), ...["index.tsx", "index.ts", "index.js"].map((name) => join(at, name))];
+}
+
+/**
+ * The relative imports of the given files that name no file on disk: a generated page importing a
+ * sibling its regeneration never laid down fails the whole app at its first load.
+ *
+ * @param files absolute paths of the files to read
+ * @returns each import that resolves to nothing, asset imports left out
+ */
+export function unresolvedRelativeImports(files: readonly string[]): Unresolved[] {
+  const unresolved: Unresolved[] = [];
+  for (const file of files) {
+    if (!existsSync(file)) continue;
+    for (const { specifier } of readSpecifiers(file, readFileSync(file, "utf8"), true)) {
+      if (!/^\.\.?\//.test(specifier)) continue;
+      const clean = specifier.replace(/[?#].*$/, "");
+      if (ASSET_EXTENSIONS.has(clean.slice(clean.lastIndexOf(".")))) continue;
+      if (!relativeCandidates(file, clean).some((one) => existsSync(one) && statSync(one).isFile())) unresolved.push({ file, specifier });
+    }
+  }
+  return unresolved;
 }
 
 /** Builds the import graph of the files under `roots`: file -> [{ to, kind }], plus what could not be resolved. */

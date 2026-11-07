@@ -3,6 +3,7 @@ import { readFile, readdir, realpath, stat } from "node:fs/promises";
 import { dirname, join, relative, resolve, sep } from "node:path";
 
 import { designProblems } from "../checks/design-source.js";
+import { readSpecifiers, relativeCandidates, unresolvedRelativeImports } from "../checks/import-cycles.js";
 import { loadConfig } from "../config/config-loader.js";
 import { assertOutputDirs } from "../config/output-dirs.js";
 import { reportConfigError } from "../config/report-config-error.js";
@@ -265,7 +266,10 @@ export async function regenerateNamed(
       await writeFileWithDir(manifest, content);
       log.info(`  → updated   ${relative(rootDir, manifest)} (dependencies the regenerated files import)`);
     }
-    for (const file of named) {
+    const laid = new Set<string>();
+    for (const file of [...named, ...(await newCompanionsOf(named, render.written))]) {
+      if (laid.has(file)) continue;
+      laid.add(file);
       const content = render.written.get(file);
       if (content !== undefined) await writeFileWithDir(file, content);
       const basePath = await basePathFor(file);
@@ -276,6 +280,45 @@ export async function regenerateNamed(
     }
   }
   return { origins: [...byOrigin.keys()], writes, unrecorded };
+}
+
+/**
+ * Reports each relative import of a file the regeneration reached that names no file on disk,
+ * which would leave the app blank at its first load.
+ *
+ * @returns whether any was found
+ */
+export function reportUnresolvedImports(rootDir: string, writes: readonly GeneratedWrite[]): boolean {
+  const files = writes.filter((w) => w.outcome !== "removed").map((w) => w.path);
+  const unresolved = unresolvedRelativeImports(files);
+  for (const one of unresolved) {
+    log.error(`${relative(rootDir, one.file)} imports "${one.specifier}", which the regeneration did not lay down and no file provides`);
+  }
+  return unresolved.length > 0;
+}
+
+/**
+ * The files a render lays down for the first time that a named file's new render imports by a
+ * relative path (a page's `./page.blocks`): regenerating the page alone would leave it importing
+ * a file that does not exist. A file already on disk is never among them, so nothing a screen
+ * keeps is overwritten; one the author deleted after it was generated is not in the render.
+ *
+ * @param named absolute paths of the files being regenerated
+ * @param written what the render would write, by absolute path
+ * @returns absolute paths of the companions to lay down
+ */
+export async function newCompanionsOf(named: readonly string[], written: ReadonlyMap<string, string>): Promise<string[]> {
+  const found: string[] = [];
+  for (const file of named) {
+    const content = written.get(file);
+    if (content === undefined) continue;
+    for (const { specifier } of readSpecifiers(file, content, true)) {
+      if (!/^\.\.?\//.test(specifier)) continue;
+      const target = relativeCandidates(file, specifier).find((one) => written.has(one));
+      if (target !== undefined && !(await pathExists(target)) && !found.includes(target)) found.push(target);
+    }
+  }
+  return found;
 }
 
 /**
@@ -506,6 +549,7 @@ export const generatedCommand = new Command("generated")
         for (const hunk of w.hunks ?? []) process.stdout.write(hunk);
         if (w.outcome === "conflict" && !w.markersWritten) conflicted = true;
       }
+      if (reportUnresolvedImports(rootDir, writes)) process.exitCode = 1;
       // The screens the named files belong to are judged against Meta, as --all judges every one.
       const entities = [...new Set(origins.map((one) => one.split(/\s+/)).filter(([command]) => command === "scaffold").map(([, entity]) => entity))];
       if (entities.length > 0) {
@@ -521,6 +565,7 @@ export const generatedCommand = new Command("generated")
         for (const hunk of w.hunks ?? []) process.stdout.write(hunk);
         if (w.outcome === "conflict" && !w.markersWritten) conflicted = true;
       }
+      if (reportUnresolvedImports(rootDir, writes)) process.exitCode = 1;
       // A template change reaches every screen it generated: they are judged against Meta once more.
       if (origins.length > 0) {
         const { runScreenCheck } = await import("./check-screen.js");

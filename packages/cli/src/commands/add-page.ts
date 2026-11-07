@@ -54,6 +54,11 @@ export function pageTemplateName(kind: PageKind, variant?: string): string {
   return variant ? `${kind}.${toKebabCase(variant)}` : kind;
 }
 
+/** Whether a rendered page imports its sibling departure file (`./page.blocks`). */
+export function importsPageBlocks(content: string): boolean {
+  return /from\s+["']\.\/page\.blocks(?:\.tsx?)?["']/.test(content);
+}
+
 /** The files one page of `kind` renders to, keyed by their name inside the page's directory. */
 export function renderPageKind(kind: PageKind, name: string, namespace: string, templates: ProjectTemplates, origin?: string, variant?: string, withBlocks = false): Record<string, string> {
   const template = pageTemplateName(kind, variant);
@@ -62,8 +67,9 @@ export function renderPageKind(kind: PageKind, name: string, namespace: string, 
   if (source === undefined) throw new Error(`No template draws "${template}": the UI kit or .simplix/templates must supply ${template}.hbs`);
   const ctx = { NamePascal: toPascalCase(name), nameCamel: toCamelCase(name), nameKebab: toKebabCase(name), namespace, kind };
   const page = { "page.tsx": stampFingerprint(renderTemplate(source, ctx), origin) };
-  // The page is laid down whole; a departure file beside it is written only when the author asks.
-  if (!withBlocks) return page;
+  // The page is laid down whole; a departure file beside it is written when the author asks, or
+  // when the page itself imports one, since a page importing a file nobody laid down fails the app.
+  if (!withBlocks && !importsPageBlocks(page["page.tsx"])) return page;
   const blocks = templateFor(templates, `${template}.blocks`, templateFor(templates, "page-kind.blocks", pageKindBlocksTemplate));
   return { ...page, "page.blocks.tsx": renderTemplate(blocks, ctx) };
 }
