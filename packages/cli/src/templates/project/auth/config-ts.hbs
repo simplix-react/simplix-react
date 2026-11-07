@@ -1,6 +1,9 @@
 import { bearerScheme, createAuth, localStorageStore } from "@simplix-react/auth";
 
-const store = localStorageStore("{{kebabCase projectName}}:");
+/** The prefix the session is stored under, which a stale mock worker's removal also clears. */
+export const AUTH_STORE_PREFIX = "{{kebabCase projectName}}:";
+
+const store = localStorageStore(AUTH_STORE_PREFIX);
 
 // Sends the stored access token as a Bearer header on every request made
 // through auth.fetchFn. Add a `refresh` option to bearerScheme to renew it.

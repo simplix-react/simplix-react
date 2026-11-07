@@ -1,26 +1,46 @@
+import "./polyfills";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { stopMocking } from "@simplix-react/mock";
 import "./index.css";
 import App from "./app";
 {{#if enableI18n}}
 import { i18nReady } from "./app/i18n";
 {{/if}}
+{{#if enableAuth}}
+import { auth, AUTH_STORE_PREFIX } from "./app/auth";
+{{/if}}
 
-async function enableMocking() {
-  if (import.meta.env.PROD) return;
+/**
+ * Serves the app from the mock layer when `VITE_ENABLE_MOCK=true`, so screens can be driven with
+ * no server behind them. Never in a production build: the guard fails closed on
+ * `import.meta.env.PROD` whatever the flag says.
+ *
+ * Turning the flag off is enough to be rid of the worker: a boot that installs none removes the
+ * one an earlier mock session registered, because a service worker outlives the dev server that
+ * installed it and would otherwise keep answering from fixtures.
+ *
+ * @returns whether the page is reloading, so the caller skips a render about to be replaced
+ */
+async function enableMocking(): Promise<{ reloading: boolean }> {
+  if (import.meta.env.PROD || import.meta.env.VITE_ENABLE_MOCK !== "true") {
+    return { reloading: await stopMocking({{#if enableAuth}}{ storePrefix: AUTH_STORE_PREFIX }{{/if}}) };
+  }
   const { setupMockWorker } = await import("@simplix-react/mock");
   await setupMockWorker({
     domains: [
       // (await import("{{domainPkgName}}/mock")).{{domainName}}Mock,
     ],
   });
+  return { reloading: false };
 }
 
-{{#if enableI18n}}
-Promise.all([enableMocking(), i18nReady]).then(() => {
-{{else}}
-enableMocking().then(() => {
+{{#if enableAuth}}
+// The stored session is restored before the first render, so a reload lands on the page it was
+// on rather than on the sign-in page with a good token still in storage.
 {{/if}}
+Promise.all([enableMocking(){{#if enableAuth}}, auth.rehydrate(){{/if}}{{#if enableI18n}}, i18nReady{{/if}}]).then(([mocking]) => {
+  if (mocking.reloading) return;
   const rootElement = document.getElementById("root");
   if (!rootElement) throw new Error("Root element not found");
   createRoot(rootElement).render(

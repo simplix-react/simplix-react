@@ -1,14 +1,20 @@
-import { createAccessPolicy, createApiAdapter } from "@simplix-react/access";
 {{#if enableAuth}}
+import type { AccessPolicy, DefaultActions } from "@simplix-react/access";
+import { createSelfAccessPolicy } from "@simplix-react-ext/simplix-boot-access";
 import { auth } from "../auth/index.js";
-{{/if}}
+
+// Who is signed in and what they are granted, in one read through the auth stack's own fetch.
+// The self policy carries the user across; a policy without one leaves every route guard waiting.
+export const accessPolicy: AccessPolicy<DefaultActions> = createSelfAccessPolicy({
+  endpoint: "/api/v1/user/me/permissions",
+  fetchFn: auth.fetchFn,
+});
+{{else}}
+import { createAccessPolicy, createApiAdapter } from "@simplix-react/access";
 
 export const accessPolicy = createAccessPolicy({
   adapter: createApiAdapter({
     endpoint: "/api/v1/user/me/permissions",
-{{#if enableAuth}}
-    fetchFn: auth.fetchFn,
-{{/if}}
   }),
   publicAccess: createApiAdapter({
     endpoint: "/api/v1/public/user/permissions",
@@ -19,3 +25,4 @@ export const accessPolicy = createAccessPolicy({
     revalidateOnMount: true,
   },
 });
+{{/if}}

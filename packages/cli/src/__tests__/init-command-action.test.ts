@@ -141,7 +141,13 @@ describe("initCommand action (non-interactive)", () => {
     const appDir = join(tempDir, "auth-proj/apps/auth-proj-demo");
     const auth = await readFile(join(appDir, "src/app/auth/index.ts"), "utf-8");
     expect(auth).toContain("export const auth = createAuth(");
-    expect(auth).toContain('localStorageStore("auth-proj:")');
+    expect(auth).toContain('export const AUTH_STORE_PREFIX = "auth-proj:";');
+    expect(auth).toContain("localStorageStore(AUTH_STORE_PREFIX)");
+    // The boot restores the session and clears a stale mock worker's tokens under the same prefix.
+    const main = await readFile(join(appDir, "src/main.tsx"), "utf-8");
+    expect(main).toContain('import { auth, AUTH_STORE_PREFIX } from "./app/auth";');
+    expect(main).toContain('import "./polyfills";');
+    expect(await readFile(join(appDir, "src/polyfills.ts"), "utf-8")).toContain("installRandomUUIDFallback();");
 
     for (const importer of ["src/app/providers/app-providers.tsx", "src/app/access/index.ts"]) {
       const source = await readFile(join(appDir, importer), "utf-8");

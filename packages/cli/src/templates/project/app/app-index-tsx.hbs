@@ -1,8 +1,15 @@
 import { createRouter, RouterProvider } from "@tanstack/react-router";
+import { createTanstackRouterAdapter, flatSearch, RouterContext } from "@simplix-react/ui";
 import { routeTree } from "../routeTree.gen";
 import { AppProviders } from "./providers/app-providers";
 
-const router = createRouter({ routeTree });
+const router = createRouter({
+  routeTree,
+  // Mount path the app is served from; "/" under the dev server.
+  basepath: import.meta.env.BASE_URL,
+  // A list screen keeps its URL state as plain strings, never TanStack's JSON-quoted default.
+  ...flatSearch,
+});
 
 declare module "@tanstack/react-router" {
   interface Register {
@@ -10,10 +17,16 @@ declare module "@tanstack/react-router" {
   }
 }
 
+// What the framework's screens navigate through, built from the router instance because it is
+// provided above RouterProvider, where the router's hooks have nothing to read yet.
+const routerAdapter = createTanstackRouterAdapter(router);
+
 export default function App() {
   return (
     <AppProviders>
-      <RouterProvider router={router} />
+      <RouterContext.Provider value={routerAdapter}>
+        <RouterProvider router={router} />
+      </RouterContext.Provider>
     </AppProviders>
   );
 }

@@ -21,6 +21,7 @@ import {
   indexHtml,
   indexCss,
   mainTsx,
+  polyfillsTs,
   appIndexTsx,
   appProvidersTsx,
   uiOverridesTsx,
@@ -302,6 +303,7 @@ export const initCommand = new Command("init")
             mainTsx,
             appCtx,
           ),
+          [`apps/${ctx.projectName}-demo/src/polyfills.ts`]: polyfillsTs,
           [`apps/${ctx.projectName}-demo/src/app/index.tsx`]: renderTemplate(
             appIndexTsx,
             appCtx,

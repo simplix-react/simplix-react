@@ -13,6 +13,11 @@
   },
   "dependencies": {
     "simplix-react": "catalog:",
+{{#if enableAccess}}
+{{#if enableAuth}}
+    "@simplix-react-ext/simplix-boot-access": "{{fw.bootAccess}}",
+{{/if}}
+{{/if}}
     "@tanstack/query-core": "{{deps.tanstackQueryCore}}",
     "@tanstack/react-query": "{{deps.tanstackReactQuery}}",
     "@tanstack/react-router": "{{deps.tanstackReactRouter}}",

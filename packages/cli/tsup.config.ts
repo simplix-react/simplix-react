@@ -35,6 +35,8 @@ for (const pkg of FRAMEWORK_PKGS) {
   fwVersions[pkg] = readPkg(pkg).version;
 }
 fwVersions["meta"] = readPkg("simplix-react").version;
+// The boot access extension the access template imports its self policy from.
+fwVersions["bootAccess"] = readPkg("../extensions/simplix-boot/packages/access").version;
 
 // ---------------------------------------------------------------------------
 // 2. Build unified dependency version map

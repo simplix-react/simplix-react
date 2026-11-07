@@ -1,0 +1,7 @@
+import { installClipboardFallback, installRandomUUIDFallback } from "@simplix-react/ui";
+
+// A page reached over plain HTTP at a LAN address is not a secure context, and browsers leave
+// navigator.clipboard and crypto.randomUUID out there. Each fill is installed only where the
+// browser left the API out, so a secure page keeps the real one.
+installClipboardFallback();
+installRandomUUIDFallback();
