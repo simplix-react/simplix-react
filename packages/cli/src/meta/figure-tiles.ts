@@ -5,6 +5,10 @@ export interface FigureField {
   readonly enumTypeName?: string;
   readonly options?: readonly string[];
   readonly money?: { readonly currency: string; readonly scale: number };
+  /** A ledger amount, drawn signed. */
+  readonly signed?: boolean;
+  /** The status tone of each value, as SimpliX Meta declares it. */
+  readonly tones?: Readonly<Record<string, string>>;
 }
 
 /** What the page templates draw as a generated list page's default figure tiles. */
@@ -15,11 +19,13 @@ export interface FigureTiles {
     readonly field: string;
     readonly enumName: string;
     readonly options: readonly string[];
+    /** The tone each counted value's tile is drawn in, from the field's declared tones. */
+    readonly tones?: Readonly<Record<string, string>>;
   };
   /** A tile per sum or count of the aggregates read, in its order. */
   readonly aggregates?: {
     readonly hook: string;
-    readonly figures: readonly { readonly field: string; readonly op: "sum" | "count"; readonly kind: string; readonly money?: FigureField["money"]; readonly isRowCount: boolean }[];
+    readonly figures: readonly { readonly field: string; readonly op: "sum" | "count"; readonly kind: string; readonly money?: FigureField["money"]; readonly signed?: boolean; readonly isRowCount: boolean }[];
   };
 }
 
@@ -52,7 +58,7 @@ export function figureTilesOf(input: FigureTilesInput): FigureTiles | undefined 
   const statusField = input.statusCounts?.map((name) => byName.get(name)).find((field) => field?.contractKind === "enum" && (field.options?.length ?? 0) > 0);
   const status =
     statusField && input.hooks.statusCounts && statusField.enumTypeName
-      ? { hook: input.hooks.statusCounts, field: statusField.name, enumName: statusField.enumTypeName, options: [...(statusField.options ?? [])] }
+      ? { hook: input.hooks.statusCounts, field: statusField.name, enumName: statusField.enumTypeName, options: [...(statusField.options ?? [])], ...(statusField.tones ? { tones: { ...statusField.tones } } : {}) }
       : undefined;
   const figures = (input.aggregates ?? []).flatMap((one) => {
     if (one.op !== "sum" && one.op !== "count") return [];
@@ -60,7 +66,7 @@ export function figureTilesOf(input: FigureTilesInput): FigureTiles | undefined 
     const field = byName.get(one.field);
     if (!isRowCount && !field) return [];
     if (one.op === "sum" && !["number", "money", "credits", "bytes", "duration"].includes(field?.contractKind ?? "")) return [];
-    return [{ field: one.field, op: one.op as "sum" | "count", kind: isRowCount ? "number" : one.op === "count" ? "number" : (field?.contractKind ?? "number"), ...(one.op === "sum" && field?.money ? { money: field.money } : {}), isRowCount }];
+    return [{ field: one.field, op: one.op as "sum" | "count", kind: isRowCount ? "number" : one.op === "count" ? "number" : (field?.contractKind ?? "number"), ...(one.op === "sum" && field?.money ? { money: field.money } : {}), ...(one.op === "sum" && field?.signed ? { signed: true } : {}), isRowCount }];
   });
   const aggregates = figures.length > 0 && input.hooks.aggregates ? { hook: input.hooks.aggregates, figures } : undefined;
   if (!status && !aggregates) return undefined;

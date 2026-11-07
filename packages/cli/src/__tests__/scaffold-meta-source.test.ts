@@ -277,6 +277,62 @@ describe("what a template cannot know and SimpliX Meta states", () => {
     expect(holidays.fields.find((one) => one.name === "holidayName")?.money).toBeUndefined();
   });
 
+  it("draws a signedCredits number as credits that carry their sign, and a credits number unsigned", () => {
+    const copy: DtoMeta = JSON.parse(JSON.stringify(meta));
+    for (const type of Object.values(copy.types)) {
+      for (const field of type.fields ?? []) {
+        if (field.name === "calendarYear") field.format = "signedCredits";
+      }
+    }
+    const domain = resolveMeta(copy, { domains: smartSafetyDomains, containerTypes }).domains.get("system");
+    if (!domain) throw new Error("the fixture has no system domain");
+    const year = buildMetaScaffoldSource({ domain, tag: "common.main.system.HolidayCalendar", naming: simplixBootNaming }).fields.find((one) => one.name === "calendarYear");
+    expect(year?.figureKind).toBe("credits");
+    expect(year?.signed).toBe(true);
+    expect(year && contractKindOf(year)).toBe("credits");
+
+    for (const type of Object.values(copy.types)) {
+      for (const field of type.fields ?? []) {
+        if (field.name === "calendarYear") field.format = "credits";
+      }
+    }
+    const unsigned = resolveMeta(copy, { domains: smartSafetyDomains, containerTypes }).domains.get("system");
+    const plain = buildMetaScaffoldSource({ domain: unsigned!, tag: "common.main.system.HolidayCalendar", naming: simplixBootNaming }).fields.find((one) => one.name === "calendarYear");
+    expect(plain?.figureKind).toBe("credits");
+    expect(plain?.signed).toBeUndefined();
+  });
+
+  it("carries the tones an enum's values and a boolean declare, and none where nothing is declared", () => {
+    const withEnum = everySource().find((source) => source.fields.some((one) => one.enumTypeName !== undefined));
+    const enumField = withEnum?.fields.find((one) => one.enumTypeName !== undefined);
+    if (!withEnum || !enumField?.enumTypeName) throw new Error("the fixture has no enum field");
+    expect(enumField.tones).toBeUndefined();
+
+    const copy: DtoMeta = JSON.parse(JSON.stringify(meta));
+    const values = copy.enums[enumField.enumTypeName].values;
+    values[0].tone = "success";
+    values[1].tone = "danger";
+    for (const type of Object.values(copy.types)) {
+      for (const field of type.fields ?? []) {
+        if (field.name === "businessDayExcluded") field.tones = { true: "warning", false: "neutral" };
+        if (field.name === "holidayName") field.tones = { true: "danger" };
+      }
+    }
+    const toned = resolveMeta(copy, { domains: smartSafetyDomains, containerTypes });
+    const source = buildMetaScaffoldSource({ domain: toned.domains.get(withEnum.domain)!, tag: withEnum.tag, naming: simplixBootNaming });
+    expect(source.fields.find((one) => one.name === enumField.name)?.tones).toEqual({ [values[0].name]: "success", [values[1].name]: "danger" });
+    const holiday = buildMetaScaffoldSource({ domain: toned.domains.get("system")!, tag: "common.main.system.Holiday", naming: simplixBootNaming });
+    expect(holiday.fields.find((one) => one.name === "businessDayExcluded")?.tones).toEqual({ true: "warning", false: "neutral" });
+    // A text field ignores a stray tones map: only an enum or a boolean is drawn as a badge.
+    expect(holiday.fields.find((one) => one.name === "holidayName")?.tones).toBeUndefined();
+  });
+
+  it("names the domain's entity path export only where the routes share a collection", () => {
+    const calendar = sourceOf("system", "common.main.system.HolidayCalendar");
+    expect(calendar.entityPathExport).toBe("holidayCalendarEntityPath");
+    expect(calendar.entityPath).toMatch(/^\/api\//);
+  });
+
   it("offers a sort only where the backend implements one", () => {
     const fields = holiday().fields;
     const sortable = (name: string) => fields.find((one) => one.name === name)?.sortable;

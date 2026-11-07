@@ -260,6 +260,29 @@ export function generateEndpointFiles(
   };
 }
 
+/**
+ * The collection an entity's routes hang off, which a cache invalidation names: the segments every
+ * one of its routes shares, stopping where a path parameter begins. Absent when the routes share
+ * none, since a prefix of `/` would name every read of the application.
+ */
+export function entityPathOf(targets: readonly EndpointTarget[]): string | undefined {
+  const paths = targets.map((one) => one.operation.path.split("/").filter(Boolean));
+  if (paths.length === 0) return undefined;
+  const base: string[] = [];
+  for (let at = 0; at < paths[0].length; at += 1) {
+    const segment = paths[0][at];
+    if (segment.startsWith("{")) break;
+    if (!paths.every((path) => path[at] === segment)) break;
+    base.push(segment);
+  }
+  return base.length > 0 ? `/${base.join("/")}` : undefined;
+}
+
+/** The name an entity's {@link entityPathOf} is exported under: `<entity>EntityPath`. */
+export function entityPathExportOf(entity: string): string {
+  return `${entity}EntityPath`;
+}
+
 /** The barrel over the directory, which every module of it is reachable through. */
 function barrel(entities: EndpointEntity[]): string {
   const modules = entities.map((entity) => entity.file).sort();
@@ -538,6 +561,11 @@ class EndpointEmitter {
       lines.push(`import { ${[...helpers].sort().join(", ")} } from './${REQUEST_MODULE}';`);
     }
     lines.push("");
+    const path = entityPathOf(entity.targets);
+    if (path !== undefined) {
+      const doc = docLine("The route every read of this entity is cached under; hand it to a cache invalidation instead of typing it.");
+      lines.push(`${doc}export const ${entityPathExportOf(entity.entity)} = ${JSON.stringify(path)};`, "");
+    }
     return [...lines, ...bodies].join("\n");
   }
 

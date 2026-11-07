@@ -17,7 +17,7 @@ const UNREAD_MANIFEST = /\binterface\s+ModuleManifest\b/;
 export async function validateFsdRules(
   moduleDir: string,
   result: ValidationResult,
-  options?: { fix?: boolean; type?: "module" | "app" },
+  _options?: { fix?: boolean; type?: "module" | "app" },
 ): Promise<void> {
   const srcDir = join(moduleDir, "src");
   if (!(await pathExists(srcDir))) return;

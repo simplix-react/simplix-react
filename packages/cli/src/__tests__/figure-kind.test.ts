@@ -26,3 +26,10 @@ describe("contractKindOf for a figure", () => {
     expect(contractKindOf({ name: "sizeBytes", tsType: "number", options: [] } as unknown as FieldInfo)).toBe("number");
   });
 });
+
+describe("figureKindOf for a ledger amount", () => {
+  it("draws signedCredits as credits, on a number only", () => {
+    expect(figureKindOf("signedCredits", "number")).toBe("credits");
+    expect(figureKindOf("signedCredits", "string")).toBeUndefined();
+  });
+});

@@ -21,6 +21,8 @@ import { deriveFilterFields, hasKeywordSearch, readSearchFields } from "./filter
 import { innermostRef, payloadOf, refNameOf } from "./generation/emit.js";
 import {
   entityNameOf,
+  entityPathExportOf,
+  entityPathOf,
   resolveEndpoints,
   type EndpointTarget,
 } from "./generation/endpoint-gen.js";
@@ -74,6 +76,8 @@ export interface MetaScaffoldSource {
   rowIdField: string;
   /** The collection the entity's routes hang off, which is what a cache invalidation names. */
   entityPath: string;
+  /** The name the domain exports {@link entityPath} under (`<entity>EntityPath`), where the routes share a collection. */
+  entityPathExport?: string;
   /** The field a record is named by on a screen: the first its entity declares in `nameFields`, else inferred from the field names. */
   displayNameField?: string;
   /** Every field the record is named by, in order, when its entity declares them; a screen joins them with a space. */
@@ -491,7 +495,8 @@ export function buildMetaScaffoldSource(
     },
     roles,
     rowIdField,
-    entityPath: basePathOf(targets),
+    entityPath: entityPathOf(targets) ?? "/",
+    ...(entityPathOf(targets) !== undefined ? { entityPathExport: entityPathExportOf(entity) } : {}),
     filters: searchDto ? filtersOf(domain, searchDto) : [],
     keywordSearch: searchDto ? hasKeywordSearch(domain.types.get(searchDto)?.allFields ?? []) : false,
     unreachableRoles: UNREACHABLE_ROLES.filter((role) => roles[role] !== undefined),
@@ -691,6 +696,10 @@ function fieldInfos(
     if (field.format === "secret" && shape.tsType === "string") one.secret = true;
     const figure = figureKindOf(field.format, shape.tsType);
     if (figure) one.figureKind = figure;
+    // A ledger amount: a credit drawn positive and a debit negative.
+    if (field.format === "signedCredits" && figure === "credits") one.signed = true;
+    const tones = tonesOf(domain, field, shape);
+    if (tones) one.tones = tones;
     if (field.required) one.required = true;
     if (field.defaultValue !== undefined) one.defaultLiteral = JSON.stringify(field.defaultValue);
     // A key the contract names as another entity's, whatever its own name: drawn by that record's
@@ -920,6 +929,23 @@ export function stringShape(field: FieldMeta): FieldShape {
   return textShape();
 }
 
+/**
+ * The status tone each value of a field is drawn in, as SimpliX Meta declares it: an enum's value
+ * tones, or a boolean's `tones` (`"true"`, `"false"`). A value the declaration leaves out has no
+ * entry, and the kit draws it neutral.
+ */
+function tonesOf(domain: ResolvedDomain, field: FieldMeta, shape: { enumTypeName?: string; tsType: string }): Record<string, string> | undefined {
+  const declared: Record<string, string> = {};
+  if (shape.enumTypeName !== undefined) {
+    for (const value of domain.enums.get(shape.enumTypeName)?.meta.values ?? []) {
+      if (value.tone) declared[value.name] = value.tone;
+    }
+  } else if (shape.tsType === "boolean" && field.tones) {
+    for (const [value, tone] of Object.entries(field.tones)) declared[value] = tone;
+  }
+  return Object.keys(declared).length > 0 ? declared : undefined;
+}
+
 function enumValuesOf(domain: ResolvedDomain, name: string): string[] | undefined {
   return domain.enums.get(name)?.meta.values.map((value) => value.name);
 }
@@ -1057,12 +1083,6 @@ function orderFieldOf(domain: ResolvedDomain, targets: EndpointTarget[]): string
 }
 
 /**
- * The collection an entity's routes hang off, which a cache invalidation names.
- *
- * It is the segments every one of the entity's routes shares, stopping where a path parameter
- * begins — the actions are spelled differently per route and the collection is not.
- */
-/**
  * The list's time range counts, from the search operation that declares a time axis and the
  * `GET .../counts` read under the same path as that search.
  */
@@ -1075,22 +1095,10 @@ export function timeBucketsOf(targets: readonly EndpointTarget[], listTarget: En
   return counts ? { field, fetch: counts.name } : undefined;
 }
 
-function basePathOf(targets: EndpointTarget[]): string {
-  const paths = targets.map((one) => one.operation.path.split("/").filter(Boolean));
-  if (paths.length === 0) return "/";
-
-  const base: string[] = [];
-  for (let at = 0; at < paths[0].length; at += 1) {
-    const segment = paths[0][at];
-    if (segment.startsWith("{")) break;
-    if (!paths.every((path) => path[at] === segment)) break;
-    base.push(segment);
-  }
-  return `/${base.join("/")}`;
-}
 
 /** The figure kind a field's SimpliX Meta `format` names, where its type can carry it. */
 export function figureKindOf(format: string | undefined, tsType: string): FieldInfo["figureKind"] {
+  if (tsType === "number" && format === "signedCredits") return "credits";
   if (tsType === "number" && (format === "credits" || format === "bytes" || format === "duration")) return format;
   if (tsType === "string" && format === "excerpt") return "excerpt";
   return undefined;

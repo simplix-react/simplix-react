@@ -101,6 +101,8 @@ export interface FieldMeta {
   format?: string;
   /** For a `"money"` field: the currency and the decimal places its stored whole number carries. */
   money?: { currency: string; scale: number };
+  /** For a boolean field: the status tone each of its values is drawn in (`"true"`, `"false"`). */
+  tones?: Record<string, string>;
 }
 
 /**
@@ -118,6 +120,8 @@ export interface TypeMeta {
 export interface EnumValueMeta {
   name: string;
   labelKey?: string;
+  /** The status tone a badge draws the value in (`success`, `danger`, ...), where the enum declares one. */
+  tone?: string;
 }
 
 /** Enum registry entry. `labeled` marks the `{ value, label }` wire shape used by the UI layer. */

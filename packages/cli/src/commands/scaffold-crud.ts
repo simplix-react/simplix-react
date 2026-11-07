@@ -151,6 +151,13 @@ export interface FieldInfo {
    * a text), which the kit draws by that kind rather than as a plain number or text.
    */
   figureKind?: "credits" | "bytes" | "duration" | "excerpt";
+  /** A credit amount SimpliX Meta marks `signedCredits`: a ledger amount, drawn as a signed credit or debit. */
+  signed?: boolean;
+  /**
+   * The status tone each value is drawn in, as SimpliX Meta declares it: an enum's value tones, or
+   * a boolean's `"true"` / `"false"` tones. Values left out are drawn neutral.
+   */
+  tones?: Record<string, string>;
   /** A key that is not a reference with a name, which no generated screen draws. */
   isOpaqueId?: boolean;
   /** The referenced field SimpliX Meta's `reference.idField` names, for a key the contract names as a reference. */
@@ -163,6 +170,18 @@ export interface FieldInfo {
   maxLength?: number;
   /** Whether the DTO the field was read from requires it (`@NotNull`), as SimpliX Meta states. */
   required?: boolean;
+}
+
+/**
+ * The fields a generated list draws as columns, by name in arrival order: every list field but the
+ * ones no generated screen draws (a reference's name, an audit stamp, the unmasked twin of a masked
+ * field, an opaque key, a field the list leaves to its reference, the record's own identifier).
+ * The list template's field table skips the same ones.
+ */
+export function columnsOf(fields: readonly FieldInfo[]): string[] {
+  return fields
+    .filter((f) => !f.isReferenceName && !f.isAuditField && !f.isUnmasked && !f.isOpaqueId && !f.hideInList && !f.isIdentifier)
+    .map((f) => f.name);
 }
 
 /** The stamps and the soft-delete flag every record carries and no generated field draws. */
@@ -545,6 +564,8 @@ export async function holdersOf(metaHolders: readonly MetaHolderSource[], option
       entity: holder.entity,
       EntityPascal: holder.entity.charAt(0).toUpperCase() + holder.entity.slice(1),
       key: `${holder.entity}By${holder.field.charAt(0).toUpperCase()}${holder.field.slice(1)}`,
+      // The holder's key that points at the open record, which its tab leaves out of the columns.
+      field: holder.field,
       hookList: `use${holderList.charAt(0).toUpperCase()}${holderList.slice(1)}`,
       // The holder's own list rule, so the tab asks only a reader the server will answer.
       accessList: `${holderList}Access`,
@@ -562,6 +583,62 @@ export async function holdersOf(metaHolders: readonly MetaHolderSource[], option
     });
   }
   return holders;
+}
+
+/** Where a holder's list columns come from: its widgets' column hook, the import that reaches it, and its key to this record. */
+export interface HolderColumnsHook {
+  readonly hook: string;
+  readonly from: string;
+  readonly field: string;
+}
+
+/**
+ * The column hook each holder's own list exports, parallel to `holders` (`null` where the holder has
+ * no generated list widget), so a detail's holder tab draws the holder's columns from the one place
+ * its list draws them instead of a copied field table.
+ *
+ * <p>The holder's list is found as `src/widgets/<holder>/list.tsx` exporting `use<Holder>Columns` in
+ * one of the project's modules. A holder in the open record's own module is imported from its
+ * widget folder (`../<holder>`); one in another module from that module's widgets entry
+ * (`<package>/widgets` where the package exports it, else the package).
+ *
+ * @param rootDir the project root
+ * @param holders the holders the detail draws, each with its entity and its key to this record
+ * @param ownModuleDir the module the detail is written into
+ * @param groups the module groups the project declares
+ * @returns one entry per holder, in the same order
+ */
+export async function holderColumnsHooksOf(
+  rootDir: string,
+  holders: readonly { readonly entity: string; readonly field: string }[],
+  ownModuleDir: string | undefined,
+  groups: readonly string[] | undefined,
+): Promise<(HolderColumnsHook | null)[]> {
+  const modules = (await findModulePaths(rootDir, groups)).map((path) => join(rootDir, "modules", ...path.split("/")));
+  const found: (HolderColumnsHook | null)[] = [];
+  for (const holder of holders) {
+    const kebab = toKebabCase(holder.entity);
+    const hook = `use${toPascalCase(holder.entity)}Columns`;
+    let entry: HolderColumnsHook | null = null;
+    for (const moduleDir of modules) {
+      const list = join(moduleDir, "src", "widgets", kebab, "list.tsx");
+      if (!(await pathExists(list))) continue;
+      if (!new RegExp(`export\\s+function\\s+${hook}\\b`).test(await readFile(list, "utf-8"))) continue;
+      if (ownModuleDir !== undefined && resolve(moduleDir) === resolve(ownModuleDir)) {
+        entry = { hook, from: `../${kebab}`, field: holder.field };
+        break;
+      }
+      const manifestPath = join(moduleDir, "package.json");
+      if (!(await pathExists(manifestPath))) continue;
+      const manifest = await readJsonFile<{ name?: string; exports?: Record<string, unknown> }>(manifestPath);
+      if (!manifest.name) continue;
+      const from = manifest.exports && "./widgets" in manifest.exports ? `${manifest.name}/widgets` : manifest.name;
+      entry = { hook, from, field: holder.field };
+      break;
+    }
+    found.push(entry);
+  }
+  return found;
 }
 
 /** One import statement of a detail's holder sub-lists: a package and the names taken from it. */
@@ -2384,6 +2461,7 @@ export const scaffoldCrudCommand = new Command("scaffold")
   .option("--list-presentation <kind>", `How the list draws its rows, as its design decided it: ${LIST_PRESENTATIONS.join(" or ")} (default table)`)
   .option("--view-toggle", "Offer a table list the reader's switch to the cards, as the design decided it (a cards list always has its switch and refuses the flag)")
   .option("--card-title <column>", "The key of the column that titles a card, as the design decided it; default the first column")
+  .option("--status-badge <field>", "The enum field the detail header draws as the record's badge, as the design decided it; default the field named status, state or standing")
   .option("--text-filter <fields>", "Comma separated text fields the design's filters name; each gets a filter the reader types a part of (the generator otherwise leaves text fields to the keyword search)")
   .action(reportConfigError(scaffoldAction));
 
@@ -2409,6 +2487,8 @@ export interface ScaffoldOptions {
   cardTitle?: string;
   /** Comma separated text fields the design's filters name, each offered as a filter the reader types a part of. */
   textFilter?: string;
+  /** The enum field the detail header draws as the record's badge; the status-named enum when absent. */
+  statusBadge?: string;
 }
 
 /**
@@ -2431,6 +2511,7 @@ export function scaffoldOptionsFromOrigin(args: readonly string[]): ScaffoldOpti
     viewToggle: args.includes("--view-toggle") ? true : undefined,
     cardTitle: at("--card-title"),
     textFilter: at("--text-filter"),
+    statusBadge: at("--status-badge"),
     menuGroup: at("--menu-group"),
     menuIcon: at("--menu-icon"),
   };
@@ -2479,6 +2560,25 @@ export function assertListFlags(options: ScaffoldOptions): void {
   }
 }
 
+/**
+ * The field the design names for the detail header's badge, checked against the record: it must be
+ * one of the detail's enum fields, since the badge draws a value by its label and tone.
+ *
+ * @param named the `--status-badge` value, or undefined when the design names none
+ * @param detailFields the detail's fields with their contract kinds
+ * @returns the field name, or undefined when none is named
+ * @throws Error when the named field is not an enum field of the record
+ */
+export function statusBadgeFieldOf(named: string | undefined, detailFields: readonly FieldInfo[]): string | undefined {
+  if (named === undefined || named === "") return undefined;
+  const field = detailFields.find((f) => f.name === named);
+  if (field?.contractKind !== "enum") {
+    const enums = detailFields.filter((f) => f.contractKind === "enum").map((f) => f.name);
+    throw new Error(`--status-badge ${named}: the badge draws one of the record's enum fields (${enums.join(", ") || "it has none"})`);
+  }
+  return named;
+}
+
 /** The origin flags that carry the list's design decisions, so a regeneration renders the same list. */
 export function listOriginFlags(options: ScaffoldOptions): string {
   const { listCards, viewToggle } = listDecision(options);
@@ -2487,6 +2587,7 @@ export function listOriginFlags(options: ScaffoldOptions): string {
     viewToggle && !listCards ? " --view-toggle" : "",
     options.cardTitle ? ` --card-title ${options.cardTitle}` : "",
     textFilterNames(options.textFilter).length > 0 ? ` --text-filter ${textFilterNames(options.textFilter).join(",")}` : "",
+    options.statusBadge ? ` --status-badge ${options.statusBadge}` : "",
   ].join("");
 }
 
@@ -2917,6 +3018,7 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       defaultSortFields: scaffoldConfig.scaffold?.defaultSortFields,
       maskedSuffix,
     });
+    const holderColumnsHooks = await holderColumnsHooksOf(rootDir, holders, moduleDir ?? undefined, scaffoldConfig.modules?.groups);
     // The order the list opens in when no reorder owns it: never the row's key. A stamp it names
     // keeps its column and its period filter (see withSortKeyShown).
     const defaultSort = chooseDefaultSort({ declared: metaSource?.defaultSort, candidates: scaffoldConfig.scaffold?.defaultSortFields, fields: listFields, rowIdField });
@@ -2933,12 +3035,15 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     // The generated access rule of each operation a control leads to (`createJobPositionAccess`),
     // which the domain barrel exports from SimpliX Meta. Absent where the domain is not on meta.
     const accessOf = (opId: string | undefined) => (metaSource && opId ? `${opId}Access` : null);
+    const listContractFields = withUnmaskedFlagged(withSortKeyShown(withContractKinds(listFields, rowIdField, contractOptions), defaultSort), maskedSuffix);
     const ctx = {
       accessCreate: accessOf(roles?.create),
       accessUpdate: accessOf(roles?.update),
       accessOrder: accessOf(roles?.order as string | undefined),
       accessDelete: accessOf(roles?.delete),
       holders,
+      // The column hook of each holder's own list, parallel to `holders`; a holder without one keeps no tab.
+      holderColumnsHooks,
       // One import per package naming each hook and access rule once, however many holders use it.
       holderImports: holderImportsOf(holders),
       // Whether any holder's tab sends a keyword search, which is what imports the search key.
@@ -2955,7 +3060,11 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       statusField: withContractKinds(metaSource?.detailFields ?? fields, undefined, contractOptions).find(
         (f) => f.contractKind === "enum" && /(^|[a-z])(status|state|standing)$/i.test(f.name),
       )?.name,
-      listFields: withUnmaskedFlagged(withSortKeyShown(withContractKinds(listFields, rowIdField, contractOptions), defaultSort), maskedSuffix),
+      // The enum field the design names for the header badge instead, where it names one.
+      statusBadgeField: statusBadgeFieldOf(options.statusBadge, withContractKinds(metaSource?.detailFields ?? fields, undefined, contractOptions)),
+      listFields: listContractFields,
+      // The columns the list draws, by name in the order the fields arrive; a hand edit reorders or trims the list's COLUMNS.
+      columns: columnsOf(listContractFields),
       // The default figure tiles, from what the entity's Meta says it counts and sums.
       figureTiles: figureTilesOf({
         statusCounts: metaSource?.statusCounts,
@@ -2986,6 +3095,8 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       updateMutationKey,
       deletePathParam,
       entityPath: metaSource?.entityPath ?? extractedEntity?.path ?? `/api/v1/${entity}`,
+      // The name the Meta domain exports that path under, which a template imports rather than typing the route.
+      entityPathExport: metaSource?.entityPathExport,
       fieldNameList,
       rowIdField,
       // The detail panel names the two stamps outright, and a record that declares neither does
@@ -3200,7 +3311,9 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
 
       // Dependencies the screen's files import and the module does not yet resolve.
       // The entity's own domain package and every domain package a holder's sub-list imports.
-      const domainPackages = [packageName, ...holders.map((one) => one.packageName)].filter((one): one is string => one !== null);
+      // A holder tab drawn by another module's column hook imports that module's package too.
+      const holderModules = holderColumnsHooks.flatMap((one) => (one && !one.from.startsWith(".") ? [one.from.replace(/\/widgets$/, "")] : []));
+      const domainPackages = [packageName, ...holders.map((one) => one.packageName), ...holderModules].filter((one): one is string => one !== null);
       const addedDeps = await ensureModuleDeps(moduleDir, domainPackages, await kitDependency(rootDir, templateSettings.from), screenFiles);
       if (addedDeps.length > 0) {
         log.info("Added dependencies:");

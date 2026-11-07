@@ -10,7 +10,7 @@ import type {
 import type { ContainerMapping } from "../openapi/orchestration/spec-profile.js";
 import { resolveMeta } from "../meta/resolve.js";
 import type { ResolvedDomain } from "../meta/resolve.js";
-import { generateEndpointFiles, resolveEndpoints, entityNameOf } from "../meta/generation/endpoint-gen.js";
+import { generateEndpointFiles, resolveEndpoints, entityNameOf, entityPathOf } from "../meta/generation/endpoint-gen.js";
 import { generateHookFiles } from "../meta/generation/hook-gen.js";
 import { smartSafetyDomains } from "../meta/__fixtures__/smart-safety-domains.js";
 
@@ -78,6 +78,34 @@ function declaration(content: string, name: string): string {
   const next = content.slice(at + 1).search(/^(?:\/\*\*|export )/m);
   return next < 0 ? content.slice(at) : content.slice(at, at + 1 + next);
 }
+
+describe("the entity path a cache invalidation names", () => {
+  it("is exported beside the entity's request functions, as the collection its routes share", () => {
+    expect(endpointFile("organization")).toContain('export const organizationEntityPath = "/api/v1/admin/org";');
+  });
+
+  it("stops where a path parameter begins and where the routes part", () => {
+    const at = (path: string) => ({ operation: { path } }) as Parameters<typeof entityPathOf>[0][number];
+    expect(entityPathOf([at("/api/v1/admin/usage/cost-breaker/search"), at("/api/v1/admin/usage/cost-breaker/{id}/reset")])).toBe("/api/v1/admin/usage/cost-breaker");
+    expect(entityPathOf([at("/api/v1/x/{id}"), at("/api/v1/x/{id}/edit")])).toBe("/api/v1/x");
+  });
+
+  it("is left out where the routes share nothing, since a prefix of / would refresh every read", () => {
+    const at = (path: string) => ({ operation: { path } }) as Parameters<typeof entityPathOf>[0][number];
+    expect(entityPathOf([at("/a/one"), at("/b/two")])).toBeUndefined();
+    expect(entityPathOf([])).toBeUndefined();
+  });
+
+  it("is exported exactly once by every module of every domain that has one", () => {
+    for (const domain of resolved.domains.values()) {
+      const files = generateEndpointFiles(domain, { naming: simplixBootNaming }).files;
+      for (const [path, content] of files) {
+        const exports = content.match(/^export const \w+EntityPath = /gm) ?? [];
+        expect(exports.length, `${domain.name}/${path}`).toBeLessThanOrEqual(1);
+      }
+    }
+  });
+});
 
 describe("generateHookFiles names every hook the CRUD map records", () => {
   it("emits the twelve organization hooks under the names crud.config.ts stores", () => {

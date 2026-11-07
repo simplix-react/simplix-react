@@ -51,3 +51,23 @@ describe("the list filters beside the figure tiles", () => {
     expect(withTileFilters([], undefined)).toEqual([]);
   });
 });
+
+describe("figureTilesOf with what Meta declares about tones and signs", () => {
+  const toned = [
+    { name: "status", contractKind: "enum", enumTypeName: "JobStatus", options: ["QUEUED", "FAILED"], tones: { FAILED: "danger" } },
+    { name: "amount", contractKind: "credits", signed: true },
+    { name: "held", contractKind: "credits" },
+  ];
+
+  it("draws each status tile in the tone its value declares", () => {
+    expect(figureTilesOf({ statusCounts: ["status"], hooks, fields: toned, rowIdField: "jobId" })?.status?.tones).toEqual({ FAILED: "danger" });
+  });
+
+  it("keeps a ledger sum signed and an unsigned sum plain", () => {
+    const tiles = figureTilesOf({ aggregates: [{ field: "amount", op: "sum" }, { field: "held", op: "sum" }], hooks, fields: toned, rowIdField: "jobId" });
+    expect(tiles?.aggregates?.figures).toEqual([
+      { field: "amount", op: "sum", kind: "credits", signed: true, isRowCount: false },
+      { field: "held", op: "sum", kind: "credits", isRowCount: false },
+    ]);
+  });
+});
