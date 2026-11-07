@@ -728,6 +728,9 @@ export {
   parseRfc3339,
 } from "./utils/rfc3339-date";
 export { sanitizeHtml } from "./utils/sanitize";
+// The boot fills an app installs once for a page outside a secure context (a plain-HTTP LAN
+// address), so an app's polyfills reach them through the package it already depends on.
+export { installClipboardFallback, installRandomUUIDFallback } from "@simplix-react/headless";
 // **Everything `utils/` holds, not the subset that happened to be listed.** Each file here exists
 // so this package's own components can reach a headless helper from one place, and a consumer
 // wanting the same helper has no other door — `@simplix-react/headless` is not a dependency an
