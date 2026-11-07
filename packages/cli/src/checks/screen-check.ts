@@ -36,6 +36,18 @@ export interface ScreenFacts {
   readonly references: readonly ReferenceFact[];
   /** Every field the list and detail rows carry, for a flat name field. */
   readonly rowFields: ReadonlySet<string>;
+  /**
+   * Field → the contract kind SimpliX Meta's `format` settles for it (`credits`, `bytes`,
+   * `duration`, `excerpt`, `money`) and whether a credit amount is signed. Optional: a caller that
+   * states none judges no figure.
+   */
+  readonly figures?: ReadonlyMap<string, FigureFact>;
+}
+
+/** What Meta's `format` settles for one field: the kind a screen draws it by, and a ledger amount's sign. */
+export interface FigureFact {
+  readonly kind: string;
+  readonly signed: boolean;
 }
 
 /** One finding. An error fails the check; a warning is printed. */
@@ -70,6 +82,35 @@ export function formEntriesOf(text: string): FormEntry[] {
     out.push({ name: match[1]!, kind: match[2]!, required: /\brequired:\s*true\b/.test(rest), ...(plain ? { plainField: plain } : {}) });
   }
   return out;
+}
+
+const NAMED_KIND = /\bname:\s*"([^"]+)"\s*,\s*kind:\s*"([^"]+)"([^}\n]*)/g;
+
+/**
+ * Every field-table entry of a screen file whose kind contradicts the `format` SimpliX Meta
+ * declares for the field: a credit amount drawn as a bare `number`, a ledger amount without its
+ * sign, a machine message drawn as plain text. Each compiles and renders, and is wrong only on
+ * screen (「500」 where the sibling screen says 「500 credits」), so it is read from the files.
+ *
+ * @param file the file, for the finding
+ * @param text the file's text
+ * @param facts what Meta settles for the entity
+ * @returns one error per contradicting entry
+ */
+export function figureKindProblems(file: string, text: string, facts: ScreenFacts): ScreenProblem[] {
+  const problems: ScreenProblem[] = [];
+  if (!facts.figures || facts.figures.size === 0) return problems;
+  for (const match of text.matchAll(NAMED_KIND)) {
+    const [, name, kind, rest] = match;
+    const fact = facts.figures.get(name!);
+    if (!fact) continue;
+    if (kind !== fact.kind) {
+      problems.push({ file, severity: "error", message: `${name} is drawn as kind "${kind}", but SimpliX Meta declares it as ${fact.kind}${fact.signed ? " (signed)" : ""}; regenerate the screen or write kind: "${fact.kind}"` });
+    } else if (fact.signed && !/\bsigned:\s*true\b/.test(rest ?? "")) {
+      problems.push({ file, severity: "error", message: `${name} is a ledger amount SimpliX Meta declares signed, drawn without signed: true` });
+    }
+  }
+  return problems;
 }
 
 /** What a form's field table must hold for the create body, and how it must draw it. */

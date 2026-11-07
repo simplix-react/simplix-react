@@ -4,10 +4,12 @@ import { join, relative } from "node:path";
 import { Command } from "commander";
 
 import {
+  figureKindProblems,
   flatKeyProblems,
   formProblems,
   listProblems,
   nameFieldProblems,
+  type FigureFact,
   type ReferenceFact,
   type ScreenFacts,
   type ScreenProblem,
@@ -84,6 +86,14 @@ export function factsOf(source: MetaScaffoldSource, holders: readonly MetaScaffo
       source: one.referenceNameSource ?? "declared",
     });
   }
+  // A field's figure kind as Meta's format settles it, read from the entity's own records only: a
+  // holder's sub-list draws the holder's fields, which are judged where the holder's screen is.
+  const figures = new Map<string, FigureFact>();
+  for (const one of [...(source.rowFields ?? []), ...(source.detailFields ?? []), ...source.fields]) {
+    if (figures.has(one.name)) continue;
+    const kind = one.figureKind ?? (one.money ? "money" : undefined);
+    if (kind !== undefined) figures.set(one.name, { kind, signed: one.signed === true });
+  }
   const maxLengths: Record<string, number> = {};
   for (const one of source.fields) if (one.maxLength !== undefined) maxLengths[one.name] = one.maxLength;
   return {
@@ -106,7 +116,26 @@ export function factsOf(source: MetaScaffoldSource, holders: readonly MetaScaffo
     booleans: new Set(source.fields.filter((one) => one.tsType === "boolean").map((one) => one.name)),
     references: [...references.values()],
     rowFields: new Set(records.map((one) => one.name)),
+    figures,
   };
+}
+
+/**
+ * Every check one screen file is judged by: the name paths and figure kinds of any file, the
+ * create body of a form, the bare keys of a list.
+ *
+ * @param file the file as the finding names it
+ * @param name the file's base name, which decides the checks only one kind of file gets
+ * @param text the file's text
+ * @param facts what Meta settles for the entity
+ */
+export function screenFileProblems(file: string, name: string, text: string, facts: ScreenFacts): ScreenProblem[] {
+  return [
+    ...nameFieldProblems(file, text, facts),
+    ...figureKindProblems(file, text, facts),
+    ...(name === "form.tsx" ? formProblems(file, text, facts) : []),
+    ...(name === "list.tsx" ? listProblems(file, text, facts) : []),
+  ];
 }
 
 /**
@@ -129,10 +158,7 @@ export async function checkScreen(rootDir: string, entity: string, directories: 
       const path = join(directory, name);
       const text = read(path);
       if (text === undefined) continue;
-      const file = relative(rootDir, path);
-      problems.push(...nameFieldProblems(file, text, facts));
-      if (name === "form.tsx") problems.push(...formProblems(file, text, facts));
-      if (name === "list.tsx") problems.push(...listProblems(file, text, facts));
+      problems.push(...screenFileProblems(relative(rootDir, path), name, text, facts));
     }
   }
   const config = await loadConfig(rootDir);
@@ -208,7 +234,7 @@ interface CheckScreenFlags {
 export const checkScreenCommand = new Command("check-screen")
   .description(
     "Judge the generated screens' files against the committed SimpliX Meta: the form carries and marks what the create body " +
-      "requires (a required list of records is named by the form), long text follows its length, a reference is drawn by the name field its entity declares, and a frame's sample " +
+      "requires (a required list of records is named by the form), long text follows its length, a figure is drawn by the kind its format declares, a reference is drawn by the name field its entity declares, and a frame's sample " +
       "rows nest it. Exits 1 on an error. Without an entity, every screen read from Meta is judged, and every routed screen of an app " +
       "that declares apps.<app>.design must have its entry or row in that design source.",
   )
