@@ -4,6 +4,7 @@ import {
   HttpError,
   getValidationErrors,
   getErrorMessage,
+  serverMessage,
   getErrorCode,
   getHttpStatus,
   classifyError,
@@ -144,6 +145,20 @@ describe("getErrorMessage", () => {
   it("returns default for non-string/non-Error", () => {
     expect(getErrorMessage(42)).toBe("An unknown error occurred");
     expect(getErrorMessage(null)).toBe("An unknown error occurred");
+  });
+});
+
+describe("serverMessage", () => {
+  it("returns the message an error carries", () => {
+    expect(serverMessage(new HttpError(409, "The breaker is already closed."))).toBe("The breaker is already closed.");
+    expect(serverMessage({ message: "Out of range." })).toBe("Out of range.");
+  });
+
+  it("returns undefined rather than a stand-in when there is no sentence", () => {
+    expect(serverMessage(new Error(""))).toBeUndefined();
+    expect(serverMessage({ status: 500 })).toBeUndefined();
+    expect(serverMessage("text")).toBeUndefined();
+    expect(serverMessage(null)).toBeUndefined();
   });
 });
 

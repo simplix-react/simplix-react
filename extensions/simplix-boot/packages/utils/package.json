@@ -20,7 +20,11 @@
     "test": "vitest run --passWithNoTests",
     "clean": "rm -rf dist .turbo"
   },
+  "peerDependencies": {
+    "@simplix-react/api": "workspace:*"
+  },
   "devDependencies": {
+    "@simplix-react/api": "workspace:*",
     "@simplix-react/config-typescript": "workspace:*",
     "tsup": "catalog:",
     "typescript": "catalog:",

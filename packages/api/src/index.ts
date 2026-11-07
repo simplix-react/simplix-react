@@ -171,6 +171,7 @@ export {
   type ServerErrorEvent,
   getValidationErrors,
   getErrorMessage,
+  serverMessage,
   getErrorCode,
   getHttpStatus,
   classifyError,

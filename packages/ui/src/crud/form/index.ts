@@ -34,7 +34,19 @@ export type { OrvalMutationLike } from "./adapt-orval-mutation";
 
 export { useBeforeUnload } from "./use-before-unload";
 
-export { useInvalidateEntity } from "./use-invalidate-entity";
+export { readsUnder, useInvalidateEntity } from "./use-invalidate-entity";
+
+export { OWN_REFUSAL_META, runWithToast, useCommand } from "./use-command";
+export type {
+  CommandDone,
+  CommandFailed,
+  CommandInvalidation,
+  CommandMutationHook,
+  CommandOutcome,
+  RunWithToastOptions,
+  UseCommandOptions,
+  UseCommandResult,
+} from "./use-command";
 
 export { useIsDirty } from "./use-is-dirty";
 

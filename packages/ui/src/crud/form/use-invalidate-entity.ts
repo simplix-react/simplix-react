@@ -1,5 +1,18 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { type Query, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
+
+/**
+ * Whether a query reads under an API prefix: its first key element is a string starting with it.
+ *
+ * Generated query keys lead with the route (`['/api/v1/company/4']`, `['/api/v1/company/search',
+ * params]`), so a prefix is every read of one entity.
+ *
+ * @param apiPrefix - The entity's base path, such as a generated `<entity>EntityPath`.
+ * @returns A predicate for `invalidateQueries`.
+ */
+export function readsUnder(apiPrefix: string): (query: Query) => boolean {
+  return (query) => typeof query.queryKey[0] === "string" && query.queryKey[0].startsWith(apiPrefix);
+}
 
 /**
  * Returns a stable callback that invalidates all queries whose first key
@@ -14,17 +27,14 @@ import { useCallback } from "react";
  * Works with Orval-generated query keys like:
  * - `['/api/v1/company/4']` (detail)
  * - `['/api/v1/company/search', params]` (list)
+ *
+ * A Meta-generated domain exports each entity's prefix as `<entity>EntityPath`; pass that rather
+ * than typing the route.
  */
 export function useInvalidateEntity(apiPrefix: string): () => Promise<void> {
   const queryClient = useQueryClient();
   return useCallback(
-    () => {
-      return queryClient.invalidateQueries({
-        predicate: (query) =>
-          typeof query.queryKey[0] === "string" &&
-          query.queryKey[0].startsWith(apiPrefix),
-      });
-    },
+    () => queryClient.invalidateQueries({ predicate: readsUnder(apiPrefix) }),
     [queryClient, apiPrefix],
   );
 }

@@ -48,21 +48,3 @@ export function bootPage<T>(data: unknown): BootPage<T> {
   const page = (data ?? undefined) as BootPage<T> | undefined;
   return page?.content ? page : { content: [] };
 }
-
-/**
- * The sentence the server sent with a refusal or a failure.
- *
- * <p><b>Why a screen needs it.</b> A read refused for being outside the reader's range and a read
- * that failed because the server is down both arrive as an error, and a screen that draws one
- * message for both tells a 관리감독자 to 「잠시 뒤에 다시 시도하세요」 about a workplace they will
- * never be allowed to open. The server already names the rule — 「부여받은 범위 밖의 기록입니다」 —
- * and that sentence is the only thing on hand that separates the two.
- *
- * @param error whatever the query threw
- * @returns the server's own sentence, or undefined when it sent none
- */
-export function serverMessage(error: unknown): string | undefined {
-  if (typeof error !== "object" || error === null) return undefined;
-  const { message } = error as { message?: unknown };
-  return typeof message === "string" && message.length > 0 ? message : undefined;
-}

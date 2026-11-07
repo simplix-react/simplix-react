@@ -914,6 +914,9 @@ importers:
 
   extensions/simplix-boot/packages/utils:
     devDependencies:
+      '@simplix-react/api':
+        specifier: workspace:*
+        version: link:../../../../packages/api
       '@simplix-react/config-typescript':
         specifier: workspace:*
         version: link:../../../../packages/config-typescript

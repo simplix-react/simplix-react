@@ -194,6 +194,26 @@ export function getErrorMessage(error: unknown): string {
 }
 
 /**
+ * The sentence the server sent with a refusal or a failure.
+ *
+ * @remarks
+ * A read refused for being outside the reader's range and a read that failed because the server
+ * is down both arrive as an error, and a screen that draws one message for both tells the reader
+ * to try again about a record they will never be allowed to open. The server already names the
+ * rule, and that sentence is the only thing on hand that separates the two. Unlike
+ * {@link getErrorMessage}, nothing is put in its place when the error carries none, so a caller
+ * can fall back to its own words: `serverMessage(caught) ?? failed`.
+ *
+ * @param error - Whatever the request threw.
+ * @returns The non-empty `message` the error carries, or `undefined` when it carries none.
+ */
+export function serverMessage(error: unknown): string | undefined {
+  if (typeof error !== "object" || error === null) return undefined;
+  const { message } = error as { message?: unknown };
+  return typeof message === "string" && message.length > 0 ? message : undefined;
+}
+
+/**
  * Extract an application-specific error code from any error value.
  *
  * @remarks
