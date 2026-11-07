@@ -1,5 +1,5 @@
 import { CircleAlertIcon, InboxIcon, SearchXIcon } from "lucide-react";
-import {useTranslation} from "@simplix-react/i18n/react";
+import {useGroupedFigure, useTranslation} from "@simplix-react/i18n/react";
 import {
   type ColumnDef,
   flexRender,
@@ -1745,7 +1745,7 @@ function ListTable<T>({
                           {...partAttributes(crudListCardGroupStyle, {})}
                         >
                           {group.label}
-                          <span data-count={group.rows.length} {...slotAttributes(crudListGroupCountStyle, {})} />
+                          <span data-count={group.rows.length.toLocaleString(locale)} {...slotAttributes(crudListGroupCountStyle, {})} />
                         </div>
                       )}
                       {group.rows.map((row) => drawCard(row.original, row.index))}
@@ -1901,7 +1901,7 @@ function ListTable<T>({
                               >
                                 {group.label}
                                 {/* Drawn from the attribute, so the heading's text stays its label alone. */}
-                                <span data-count={group.rows.length} {...slotAttributes(crudListGroupCountStyle, {})} />
+                                <span data-count={group.rows.length.toLocaleString(locale)} {...slotAttributes(crudListGroupCountStyle, {})} />
                               </TableCell>
                             </TableRow>
                           )}
@@ -1977,6 +1977,9 @@ function ListPagination({
   className,
 }: ListPaginationProps) {
   const { t } = useTranslation("simplix/ui");
+  // Every figure the pager draws is grouped by the reader's locale, so the range total reads the
+  // same as the total badge above the list ("1-20 / 3,820", never "1-20 / 3820").
+  const figure = useGroupedFigure();
   // Inside a TableCard the pager docks as the card footer (card bg).
   const framed = !!useTableCardFrame()?.framed;
   const { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } = useFlatUIComponents();
@@ -2046,14 +2049,14 @@ function ListPagination({
       <div className="flex items-center" {...slotAttributes(crudListPaginationLeadStyle, {})}>
         {pageSizeSelector}
         <span aria-busy={known ? undefined : true} {...slotAttributes(crudListPaginationRangeStyle, {})}>
-          {known ? `${first}-${last} / ${_total}` : t("list.rangeUnknown")}
+          {known ? `${figure(first)}-${figure(last)} / ${figure(_total)}` : t("list.rangeUnknown")}
         </span>
       </div>
       <Flex gap="sm" align="center">
         <Flex gap="xs" align="center">
         {prevButton}
         {isCompact ? (
-          <span {...slotAttributes(crudListPageStatusStyle, {})}>{page} / {totalPages}</span>
+          <span {...slotAttributes(crudListPageStatusStyle, {})}>{figure(page)} / {figure(totalPages)}</span>
         ) : (
           pageNumbers!.map((p, i) =>
             p === "ellipsis" ? (
@@ -2070,7 +2073,7 @@ function ListPagination({
                 aria-label={t("list.pageNumber", { page: p })}
                 aria-current={p === page ? "page" : undefined}
               >
-                {p}
+                {figure(p)}
               </button>
             ),
           )

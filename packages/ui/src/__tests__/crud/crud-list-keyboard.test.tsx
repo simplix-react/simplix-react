@@ -11,6 +11,7 @@ vi.mock("@simplix-react/i18n/react", () => ({
     exists: () => true,
   }),
   useLocale: () => "en",
+  useGroupedFigure: () => (figure: number | undefined) => figure?.toLocaleString("en"),
 }));
 
 // Table mode rather than cards: grouping is a property of the table, and a narrow container

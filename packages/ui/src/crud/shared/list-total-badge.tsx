@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { ListIcon } from "lucide-react";
-import { useTranslation } from "@simplix-react/i18n/react";
+import { useGroupedFigure, useTranslation } from "@simplix-react/i18n/react";
 
 import { Badge } from "../../base/display/badge";
 import { partAttributes, slotAttributes } from "../../design/slot-style";
@@ -53,7 +53,8 @@ export function ListTotalBadge({ count, children }: ListTotalBadgeProps) {
  * words around it. The sentence stays one run of text: only the figure is wrapped.
  */
 function TotalSentence({ text, count }: { text: string; count: number }) {
-  const figures = [count.toLocaleString(), String(count)];
+  const grouped = useGroupedFigure();
+  const figures = [grouped(count) ?? String(count), String(count)];
   const figure = figures.find((candidate) => text.includes(candidate));
   if (!figure) return <>{text}</>;
   const at = text.indexOf(figure);

@@ -70,7 +70,7 @@
     "pageSize": "ページサイズ",
     "previousPage": "前のページ",
     "nextPage": "次のページ",
-    "pageNumber": "{{page}} ページ",
+    "pageNumber": "{{page, number}} ページ",
     "toggleColumns": "列の表示切り替え",
     "sortByDisplayOrder": "表示順で並べ替え",
     "resizeColumn": "列幅を調整"

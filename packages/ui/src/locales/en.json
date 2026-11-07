@@ -70,7 +70,7 @@
     "pageSize": "Page size",
     "previousPage": "Previous page",
     "nextPage": "Next page",
-    "pageNumber": "Page {{page}}",
+    "pageNumber": "Page {{page, number}}",
     "toggleColumns": "Toggle columns",
     "sortByDisplayOrder": "Sort by display order",
     "resizeColumn": "Resize column"

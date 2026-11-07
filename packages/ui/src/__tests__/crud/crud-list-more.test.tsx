@@ -14,6 +14,7 @@ vi.mock("@simplix-react/i18n/react", () => ({
     exists: () => true,
   }),
   useLocale: () => "en",
+  useGroupedFigure: () => (figure: number | undefined) => figure?.toLocaleString("en"),
 }));
 
 // Mock useContainerWidth to simulate card mode
