@@ -103,6 +103,11 @@ export interface FieldMeta {
   money?: { currency: string; scale: number };
   /** For a boolean field: the status tone each of its values is drawn in (`"true"`, `"false"`). */
   tones?: Record<string, string>;
+  /**
+   * The value moves only through a verb of the entity (an enable, a withdraw) with its confirmation,
+   * never through the edit form: a screen draws it and a form leaves it out.
+   */
+  verbOnly?: boolean;
 }
 
 /**

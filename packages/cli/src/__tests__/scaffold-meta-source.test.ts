@@ -327,6 +327,24 @@ describe("what a template cannot know and SimpliX Meta states", () => {
     expect(holiday.fields.find((one) => one.name === "holidayName")?.tones).toBeUndefined();
   });
 
+  it("marks a field only a verb moves on every table, by its name on any of the entity's DTOs", () => {
+    const plain = sourceOf("system", "common.main.system.Holiday");
+    expect(plain.verbOnly).toBeUndefined();
+    expect(plain.fields.find((one) => one.name === "businessDayExcluded")?.verbOnly).toBeUndefined();
+
+    // Stated on the record the get answers with only: the form reads the create body, which says nothing.
+    const copy: DtoMeta = JSON.parse(JSON.stringify(meta));
+    for (const field of copy.types.HolidayDetailDTO?.fields ?? []) if (field.name === "businessDayExcluded") field.verbOnly = true;
+    const marked = resolveMeta(copy, { domains: smartSafetyDomains, containerTypes });
+    const source = buildMetaScaffoldSource({ domain: marked.domains.get("system")!, tag: "common.main.system.Holiday", naming: simplixBootNaming });
+    expect(source.verbOnly).toEqual(["businessDayExcluded"]);
+    for (const table of [source.fields, source.detailFields, source.rowFields]) {
+      expect(table?.find((one) => one.name === "businessDayExcluded")?.verbOnly).toBe(true);
+    }
+    expect(source.fields.filter((one) => one.verbOnly).map((one) => one.name)).toEqual(["businessDayExcluded"]);
+    expect(source.createFields).toContain("businessDayExcluded");
+  });
+
   it("names the domain's entity path export only where the routes share a collection", () => {
     const calendar = sourceOf("system", "common.main.system.HolidayCalendar");
     expect(calendar.entityPathExport).toBe("holidayCalendarEntityPath");

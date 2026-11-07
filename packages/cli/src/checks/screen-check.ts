@@ -42,6 +42,12 @@ export interface ScreenFacts {
    * states none judges no figure.
    */
   readonly figures?: ReadonlyMap<string, FigureFact>;
+  /**
+   * The fields only a verb of the entity moves (SimpliX Meta's `verbOnly`): a form never draws them,
+   * and a create body that requires one is sent its default by the form's submit. Optional: a caller
+   * that states none judges none.
+   */
+  readonly verbOnly?: ReadonlySet<string>;
 }
 
 /** What Meta's `format` settles for one field: the kind a screen draws it by, and a ledger amount's sign. */
@@ -128,7 +134,22 @@ export function formProblems(file: string, text: string, facts: ScreenFacts): Sc
   }
   const entries = formEntriesOf(text);
   if (entries.length === 0) return problems;
+  const verbOnly = facts.verbOnly ?? new Set<string>();
+  // A value only a verb moves is changed with that verb's confirmation and reason, never by a control
+  // in the edit form (frontend invariant #74).
+  for (const entry of entries) {
+    if (verbOnly.has(entry.name)) {
+      error(`"${entry.name}" moves only through a verb of the entity, as SimpliX Meta states, and the form draws it; leave it out of the form's field table and let the create send its default`);
+    }
+  }
   for (const name of facts.createRequired) {
+    // The form leaves it out and its submit sends the default; a file that never names it sends nothing.
+    if (verbOnly.has(name)) {
+      if (!new RegExp(`\\b${name}\\b`).test(text)) {
+        error(`the create body requires "${name}", which only a verb moves, and the form never sends it; regenerate the form so its create sends the default`);
+      }
+      continue;
+    }
     const entry = entries.find((one) => one.name === name);
     // A multilingual entry carries the plain field it fills, and is marked on its own field.
     if (!entry && entries.some((one) => one.plainField === name)) continue;

@@ -40,7 +40,7 @@ import {
 import { log } from "../utils/logger.js";
 import { writeStampedGenerated } from "../utils/generated-merge.js";
 import { fixtureRows } from "../utils/story-fixtures.js";
-import { formFieldsOf } from "../utils/form-fields.js";
+import { formFieldsOf, verbOnlyCreateDefaultsOf } from "../utils/form-fields.js";
 import { scaffoldRoles } from "../utils/scaffold-roles.js";
 import { renderWidgetBlocks, renderWidgetFiles } from "./scaffold-widgets.js";
 import { renderTemplate } from "../utils/template.js";
@@ -167,6 +167,11 @@ export interface FieldInfo {
   peekBy?: string;
   /** The value a new record starts the field with, as a TypeScript literal (SimpliX Meta's `defaultValue`). */
   defaultLiteral?: string;
+  /**
+   * Only a verb of the entity moves the value (SimpliX Meta's `verbOnly`): the list and the detail
+   * draw it, the form leaves it out, a create sends its default and an edit the stored value.
+   */
+  verbOnly?: boolean;
   /** The longest value the contract allows (`@Size(max)`), where it states one. */
   maxLength?: number;
   /** Whether the DTO the field was read from requires it (`@NotNull`), as SimpliX Meta states. */
@@ -2569,7 +2574,7 @@ export const scaffoldCrudCommand = new Command("scaffold")
   .option("--list-presentation <kind>", `How the list draws its rows, as its design decided it: ${LIST_PRESENTATIONS.join(" or ")} (default table)`)
   .option("--view-toggle", "Offer a table list the reader's switch to the cards, as the design decided it (a cards list always has its switch and refuses the flag)")
   .option("--card-title <column>", "The key of the column that titles a card, as the design decided it; default the first column")
-  .option("--status-badge <field>", "The enum field the detail header draws as the record's badge, as the design decided it; default the field named status, state or standing")
+  .option("--status-badge <field>", "The enum or boolean field the detail header draws as the record's badge, as the design decided it; default the field named status, state or standing")
   .option("--text-filter <fields>", "Comma separated text fields the design's filters name; each gets a filter the reader types a part of (the generator otherwise leaves text fields to the keyword search)")
   .action(reportConfigError(scaffoldAction));
 
@@ -2670,7 +2675,8 @@ export function assertListFlags(options: ScaffoldOptions): void {
 
 /**
  * The field the design names for the detail header's badge, checked against the record: it must be
- * one of the detail's enum fields, since the badge draws a value by its label and tone.
+ * one of the detail's enum or boolean fields, since the badge draws a value by its label and tone (a
+ * boolean by the entity catalog's `values.<field>.true` / `.false` and the tones Meta declares).
  *
  * @param named the `--status-badge` value, or undefined when the design names none
  * @param detailFields the detail's fields with their contract kinds
@@ -2680,9 +2686,9 @@ export function assertListFlags(options: ScaffoldOptions): void {
 export function statusBadgeFieldOf(named: string | undefined, detailFields: readonly FieldInfo[]): string | undefined {
   if (named === undefined || named === "") return undefined;
   const field = detailFields.find((f) => f.name === named);
-  if (field?.contractKind !== "enum") {
-    const enums = detailFields.filter((f) => f.contractKind === "enum").map((f) => f.name);
-    throw new Error(`--status-badge ${named}: the badge draws one of the record's enum fields (${enums.join(", ") || "it has none"})`);
+  if (field?.contractKind !== "enum" && field?.contractKind !== "boolean") {
+    const drawable = detailFields.filter((f) => f.contractKind === "enum" || f.contractKind === "boolean").map((f) => f.name);
+    throw new Error(`--status-badge ${named}: the badge draws one of the record's enum or boolean fields (${drawable.join(", ") || "it has none"})`);
   }
   return named;
 }
@@ -3282,6 +3288,8 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     ctx.contractFilters = withTileFilters(ctx.contractFilters, ctx.figureTiles);
     // The fields a form writes, read by the form widget and by the story's form panel alike.
     const formFields = formFieldsOf(ctx.fields, ctx.formOrderField);
+    // A field only a verb moves is not in the form; a create still sends the default Meta states for it.
+    const verbOnlyCreateDefaults = verbOnlyCreateDefaultsOf(ctx.fields, metaSource?.createFields, metaSource?.createRequired);
     // A reference the form edits is picked from a search of the referenced entity, where the
     // project names one for that entity; a key it names none for is a typed id, which
     // `simplix check-screen` reports.
@@ -3289,7 +3297,7 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     // Sample rows a generated story draws, shared through the context so the story template
     // reads the same fields the screen templates do.
     const fixtureRowsJson = JSON.stringify(fixtureRows([...ctx.detailFields, ...ctx.listFields, ...formFields], rowIdField, entityKebab, 3, i18nLocales), null, 2);
-    const fullCtx = { ...ctx, formFields, formPickers, formPickerImports: pickerImportsOf(formPickers), moduleNamespace, moduleName, entityIcon: "FileTextIcon", hasListDetail, hasI18nFields, i18nFieldPairs, i18nLocales, fixtureRowsJson };
+    const fullCtx = { ...ctx, formFields, verbOnlyCreateDefaults, formPickers, formPickerImports: pickerImportsOf(formPickers), moduleNamespace, moduleName, entityIcon: "FileTextIcon", hasListDetail, hasI18nFields, i18nFieldPairs, i18nLocales, fixtureRowsJson };
 
     // The project's own templates win where it has written any, for the widgets as for the pages.
     // A module in a group an app claims is drawn from that app's templates; any other from the top-level ones.

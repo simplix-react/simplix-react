@@ -35,19 +35,23 @@ describe("columnsOf", () => {
 });
 
 describe("statusBadgeFieldOf", () => {
-  const fields = [field("kind", { contractKind: "enum" }), field("name", { contractKind: "text" })];
+  const fields = [field("kind", { contractKind: "enum" }), field("name", { contractKind: "text" }), field("offered", { contractKind: "boolean" })];
 
   it("takes an enum field the design names", () => {
     expect(statusBadgeFieldOf("kind", fields)).toBe("kind");
+  });
+
+  it("takes a boolean field the design names, worded by the entity catalog and toned by Meta", () => {
+    expect(statusBadgeFieldOf("offered", fields)).toBe("offered");
   });
 
   it("is absent when the design names none", () => {
     expect(statusBadgeFieldOf(undefined, fields)).toBeUndefined();
   });
 
-  it("refuses a field that is not one of the record's enums, naming the ones that are", () => {
-    expect(() => statusBadgeFieldOf("name", fields)).toThrow("--status-badge name: the badge draws one of the record's enum fields (kind)");
-    expect(() => statusBadgeFieldOf("missing", fields)).toThrow(/enum fields \(kind\)/);
+  it("refuses a field that is neither an enum nor a boolean of the record, naming the ones that are", () => {
+    expect(() => statusBadgeFieldOf("name", fields)).toThrow("--status-badge name: the badge draws one of the record's enum or boolean fields (kind, offered)");
+    expect(() => statusBadgeFieldOf("missing", fields)).toThrow(/enum or boolean fields \(kind, offered\)/);
   });
 
   it("is recorded in the origin so a regeneration draws the same badge", () => {

@@ -117,6 +117,13 @@ export interface MetaScaffoldSource {
   undeclaredReferences?: Record<string, string>;
   /** The fields the create body requires, which the form must carry. */
   createRequired?: string[];
+  /** Every field the create body carries, which is what a create may send a default for. */
+  createFields?: string[];
+  /**
+   * The fields only a verb of the entity moves (SimpliX Meta's `verbOnly` on any of its DTOs), by
+   * name. Each is flagged `verbOnly` in `fields`, `detailFields` and `rowFields`.
+   */
+  verbOnly?: string[];
   /**
    * The fields the create body requires that no generated control draws: a list of records or a nested
    * record (`axes: { axisId, targetId }[]`). The scaffolded form has no entry for them, so the screen
@@ -530,6 +537,20 @@ export function buildMetaScaffoldSource(
       .map((one) => one.name);
   }
 
+  if (createBody) source.createFields = createBody.allFields.map((one) => one.name);
+
+  // Meta may state it on the record the get answers with and not on the request body the form is
+  // read from, or the other way round, so a name stated on any of the entity's DTOs counts on all.
+  const updated = targets.find((one) => one.role === "update");
+  const updateBody = updated ? typeOf(domain, innermostRef(updated.operation.request.body)) : undefined;
+  const verbOnly = verbOnlyNamesOf([chosen?.type, record, listRow, createBody, updateBody]);
+  if (verbOnly.length > 0) {
+    source.verbOnly = verbOnly;
+    for (const list of [source.fields, source.detailFields, source.rowFields]) {
+      for (const one of list ?? []) if (verbOnly.includes(one.name)) one.verbOnly = true;
+    }
+  }
+
   const order = orderFieldOf(domain, targets);
   if (order !== undefined) source.orderField = order;
 
@@ -539,6 +560,15 @@ export function buildMetaScaffoldSource(
   if (remove !== undefined) source.deletePathParam = remove;
 
   return source;
+}
+
+/** The field names any of the given types marks `verbOnly`, in the order they are first met. */
+export function verbOnlyNamesOf(types: ReadonlyArray<Pick<ResolvedType, "allFields"> | undefined>): string[] {
+  const names: string[] = [];
+  for (const type of types) {
+    for (const field of type?.allFields ?? []) if (field.verbOnly === true && !names.includes(field.name)) names.push(field.name);
+  }
+  return names;
 }
 
 /** The roles whose body is the record as it is written: the create and the update. */
@@ -702,6 +732,7 @@ function fieldInfos(
     if (tones) one.tones = tones;
     if (field.required) one.required = true;
     if (field.defaultValue !== undefined) one.defaultLiteral = JSON.stringify(field.defaultValue);
+    if (field.verbOnly === true) one.verbOnly = true;
     // A key the contract names as another entity's, whatever its own name: drawn by that record's
     // name and opening its peek. A reference matched on another field than the identifier says so.
     if (field.reference?.kindField && field.reference.kinds && shape.tsType === "string") {

@@ -130,6 +130,7 @@ export function factsOf(source: MetaScaffoldSource, holders: readonly MetaScaffo
     references: [...references.values()],
     rowFields: new Set(records.map((one) => one.name)),
     figures,
+    verbOnly: new Set(source.verbOnly ?? []),
   };
 }
 
