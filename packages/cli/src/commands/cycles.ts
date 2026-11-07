@@ -3,6 +3,7 @@ import { existsSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
 import { checkCycles, edgeKind, type CycleReport } from "../checks/import-cycles.js";
+import { describeRing, packageCycles, readPackageGraph, type PackageGraph } from "../checks/package-cycles.js";
 import { loadConfig } from "../config/config-loader.js";
 import { reportConfigError } from "../config/report-config-error.js";
 import { findProjectRoot } from "../utils/fs.js";
@@ -30,10 +31,21 @@ export function describeCycles(rootDir: string, result: CycleReport): { errors: 
   return { errors, summary, failed: result.cycles.length > 0 || result.unresolved.length > 0 };
 }
 
+/** The report lines for the workspace packages' dependency rings; `failed` says whether there is one. */
+export function describePackageCycles(rootDir: string, graph: PackageGraph): { errors: string[]; summary: string; failed: boolean } {
+  const rings = packageCycles(graph);
+  return {
+    errors: rings.map((ring) => `package dependency cycle\n    ${describeRing(rootDir, graph, ring)}`),
+    summary: `${graph.size} workspace package(s), ${rings.length} dependency cycle(s)`,
+    failed: rings.length > 0,
+  };
+}
+
 export const cyclesCommand = new Command("cycles")
   .description(
     "Report every import cycle among the source files under the given roots, with the edges the bundler keeps " +
-      "(a cycle makes Vite's hot update reload the whole page). Roots default to checks.cycles.roots.",
+      "(a cycle makes Vite's hot update reload the whole page), and every dependency cycle between the workspace " +
+      "packages' package.json files. Roots default to checks.cycles.roots.",
   )
   .argument("[roots...]", "Directories relative to the project root")
   .option("--root <dir>", "Project root (default: discovered from the working directory)")
@@ -59,6 +71,16 @@ export const cyclesCommand = new Command("cycles")
       process.exitCode = 1;
     } else {
       log.success(`no import cycles (${summary})`);
+    }
+    // The packages' own declarations can close a ring the files never do (a dependency a
+    // generator added that no file imports yet), and a build that orders the packages refuses it.
+    const packages = describePackageCycles(rootDir, readPackageGraph(rootDir));
+    for (const line of packages.errors) log.error(line);
+    if (packages.failed) {
+      log.error(packages.summary);
+      process.exitCode = 1;
+    } else {
+      log.success(`no package dependency cycles (${packages.summary})`);
     }
     }),
   );

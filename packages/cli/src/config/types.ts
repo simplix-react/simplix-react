@@ -192,11 +192,19 @@ export interface SimplixConfig {
    * serves only the column it was made for. `facetFor` names a factory instead (from the same
    * module, taking the filtered column and returning the hook), which a generated list calls once
    * per filtered column (`createUserFacet("ownerUserId")`); it wins over `facet`.
+   *
+   * `holders` maps a scaffolded entity (camel case, as `scaffold <entity>` names it) to the holders
+   * its detail leaves out: `exclude` lists a holding entity (`"creditAccount"`, every holder of that
+   * entity) or one holder by its key field (`"userNote.authorId"`). An excluded holder gets no tab,
+   * no import and no module dependency, so a regeneration never adds a tab a screen dropped on
+   * purpose. A holder whose module already depends on the screen's own module is left out without
+   * being listed, since its tab would close a dependency cycle.
    */
   scaffold?: {
     readonly defaultSortFields?: readonly (string | { readonly field: string; readonly direction?: "asc" | "desc" })[];
     readonly maskedSuffix?: string;
     readonly referencePickers?: Readonly<Record<string, { readonly hook: string; readonly from: string; readonly facet?: string; readonly facetFor?: string }>>;
+    readonly holders?: Readonly<Record<string, { readonly exclude?: readonly string[] }>>;
   };
 
   /**

@@ -6,6 +6,7 @@ import { basename, dirname, join, relative, resolve } from "node:path";
 import { Command } from "commander";
 import ora from "ora";
 
+import { cycleThrough, readPackageGraph, type PackageGraph } from "../checks/package-cycles.js";
 import { ConfigLoadError } from "../config/config-load-error.js";
 import { findCrudConfigForEntity } from "../config/crud-config-loader.js";
 import { loadConfig } from "../config/config-loader.js";
@@ -639,6 +640,104 @@ export async function holderColumnsHooksOf(
     found.push(entry);
   }
   return found;
+}
+
+/**
+ * The holders a screen keeps once `scaffold.holders.<entity>.exclude` is applied: an entry names a
+ * holding entity (every holder of it) or one holder as `<entity>.<field>`.
+ *
+ * @param holders the holders SimpliX Meta declares for the scaffolded entity
+ * @param exclude the screen's exclusion list
+ * @returns the holders kept, and each exclusion entry that matched no holder (a stale entry)
+ */
+export function excludeHolders<T extends { readonly entity: string; readonly field: string }>(
+  holders: readonly T[],
+  exclude: readonly string[] = [],
+): { kept: T[]; unmatched: string[] } {
+  const named = (holder: T, entry: string) => entry === holder.entity || entry === `${holder.entity}.${holder.field}`;
+  return {
+    kept: holders.filter((holder) => !exclude.some((entry) => named(holder, entry))),
+    unmatched: exclude.filter((entry) => !holders.some((holder) => named(holder, entry))),
+  };
+}
+
+/** A holder left without a tab because importing its module would close a package dependency cycle. */
+export interface CyclicHolder {
+  readonly entity: string;
+  readonly field: string;
+  /** The holder's module package. */
+  readonly module: string;
+  /** The packages from the holder's module back to the screen's own, which the tab would close into a ring. */
+  readonly ring: readonly string[];
+}
+
+/**
+ * Drops each holder whose tab would import a module that already depends, directly or through
+ * other packages, on the module the screen is written into. Such a dependency is usually
+ * deliberate (the holder's module fills a slot the screen's module offers), and the import would
+ * turn it into a cycle. The two lists stay parallel.
+ *
+ * @param holders the holders the detail draws
+ * @param hooks their column hooks, parallel to `holders`
+ * @param ownPackage the package name of the module the detail is written into
+ * @param graph the workspace's package graph
+ * @returns the holders and hooks kept, and the holders dropped with the ring each would close
+ */
+export function withoutCyclicHolders<T extends { readonly entity: string; readonly field: string }>(
+  holders: readonly T[],
+  hooks: readonly (HolderColumnsHook | null)[],
+  ownPackage: string | undefined,
+  graph: PackageGraph,
+): { holders: T[]; hooks: (HolderColumnsHook | null)[]; dropped: CyclicHolder[] } {
+  const kept: T[] = [];
+  const keptHooks: (HolderColumnsHook | null)[] = [];
+  const dropped: CyclicHolder[] = [];
+  holders.forEach((holder, at) => {
+    const hook = hooks[at] ?? null;
+    const module = hook && !hook.from.startsWith(".") ? hook.from.replace(/\/widgets$/, "") : undefined;
+    const ring = ownPackage && module ? cycleThrough(graph, ownPackage, module) : undefined;
+    if (module && ring) {
+      dropped.push({ entity: holder.entity, field: holder.field, module, ring });
+      return;
+    }
+    kept.push(holder);
+    keptHooks.push(hook);
+  });
+  return { holders: kept, hooks: keptHooks, dropped };
+}
+
+/**
+ * The holders a detail draws a tab for, each with its column hook: the ones SimpliX Meta declares,
+ * less those the screen's `scaffold.holders.<entity>.exclude` names, less those whose module
+ * already depends on the screen's own module. Each one left out is reported, and an exclusion
+ * entry that names no holder is reported as stale.
+ */
+export async function screenHoldersOf(input: {
+  readonly rootDir: string;
+  readonly entity: string;
+  readonly metaHolders: readonly MetaHolderSource[];
+  readonly moduleDir: string | undefined;
+  readonly groups: readonly string[] | undefined;
+  readonly exclude: readonly string[] | undefined;
+  readonly context: HolderContextOptions;
+}) {
+  const { rootDir, entity, moduleDir } = input;
+  // The holders the screen's design left out never come back.
+  const excluded = excludeHolders(input.metaHolders, input.exclude);
+  for (const entry of excluded.unmatched) {
+    log.warn(`scaffold.holders.${entity}.exclude names "${entry}", which is no holder of ${entity}`);
+  }
+  const all = await holdersOf(excluded.kept, input.context);
+  const manifest = moduleDir ? join(moduleDir, "package.json") : undefined;
+  const ownPackage = manifest && (await pathExists(manifest)) ? (await readJsonFile<{ name?: string }>(manifest)).name : undefined;
+  const acyclic = withoutCyclicHolders(all, await holderColumnsHooksOf(rootDir, all, moduleDir, input.groups), ownPackage, readPackageGraph(rootDir));
+  for (const one of acyclic.dropped) {
+    log.warn(
+      `${entity}'s detail draws no ${one.entity} tab (${one.field}): ${one.module} already depends on ${ownPackage} ` +
+        `(${one.ring.join(" -> ")}), so importing it would close a dependency cycle`,
+    );
+  }
+  return { holders: acyclic.holders, holderColumnsHooks: acyclic.hooks, dropped: acyclic.dropped, unmatched: excluded.unmatched };
 }
 
 /** One import statement of a detail's holder sub-lists: a package and the names taken from it. */
@@ -1485,6 +1584,7 @@ export async function parseEntityOperations(
 // ── Module dependency injection ──
 
 interface PkgJson {
+  name?: string;
   dependencies?: Record<string, string>;
   devDependencies?: Record<string, string>;
   [key: string]: unknown;
@@ -1527,6 +1627,8 @@ export async function ensureModuleDeps(
   kit: { readonly name: string; readonly spec: string } | null = null,
   /** What the screen's files hold once this run is done; a dependency is added only for one of them that imports it. */
   held: readonly string[] = [],
+  /** The workspace's package graph: a workspace dependency that would close a cycle in it is refused. */
+  graph?: PackageGraph,
 ): Promise<string[]> {
   const pkgPath = join(moduleDir, "package.json");
   if (!(await pathExists(pkgPath))) return [];
@@ -1563,6 +1665,11 @@ export async function ensureModuleDeps(
   // Domain packages (workspace:*): the entity's own, and another domain's a holder's sub-list reads.
   for (const name of new Set(domainPackageNames)) {
     if (!needed(name) || deps[name] || devDeps[name]) continue;
+    const ring = graph && pkg.name ? cycleThrough(graph, pkg.name, name) : undefined;
+    if (ring) {
+      log.warn(`${pkg.name} does not take ${name}: ${ring.join(" -> ")} already, so the dependency would close a cycle`);
+      continue;
+    }
     deps[name] = "workspace:*";
     added.push(`${name}@workspace:*`);
   }
@@ -3012,13 +3119,20 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
     // Each entity whose records point back at this one is a sub-list in the detail, forced to the
     // open record's key. Its columns are the holder's own row fields, drawn as its list draws them.
     const maskedSuffix = scaffoldConfig.scaffold?.maskedSuffix;
-    const holders = await holdersOf(metaHolders, {
-      packageOf: async (holderEntity) => (await findSchemaFile(rootDir, holderEntity))?.packageName ?? null,
-      peeks: referencePeeks,
-      defaultSortFields: scaffoldConfig.scaffold?.defaultSortFields,
-      maskedSuffix,
+    const { holders, holderColumnsHooks } = await screenHoldersOf({
+      rootDir,
+      entity,
+      metaHolders,
+      moduleDir: moduleDir ?? undefined,
+      groups: scaffoldConfig.modules?.groups,
+      exclude: scaffoldConfig.scaffold?.holders?.[entity]?.exclude,
+      context: {
+        packageOf: async (holderEntity) => (await findSchemaFile(rootDir, holderEntity))?.packageName ?? null,
+        peeks: referencePeeks,
+        defaultSortFields: scaffoldConfig.scaffold?.defaultSortFields,
+        maskedSuffix,
+      },
     });
-    const holderColumnsHooks = await holderColumnsHooksOf(rootDir, holders, moduleDir ?? undefined, scaffoldConfig.modules?.groups);
     // The order the list opens in when no reorder owns it: never the row's key. A stamp it names
     // keeps its column and its period filter (see withSortKeyShown).
     const defaultSort = chooseDefaultSort({ declared: metaSource?.defaultSort, candidates: scaffoldConfig.scaffold?.defaultSortFields, fields: listFields, rowIdField });
@@ -3314,7 +3428,7 @@ export async function runScaffold(entityArg: string, options: ScaffoldOptions): 
       // A holder tab drawn by another module's column hook imports that module's package too.
       const holderModules = holderColumnsHooks.flatMap((one) => (one && !one.from.startsWith(".") ? [one.from.replace(/\/widgets$/, "")] : []));
       const domainPackages = [packageName, ...holders.map((one) => one.packageName), ...holderModules].filter((one): one is string => one !== null);
-      const addedDeps = await ensureModuleDeps(moduleDir, domainPackages, await kitDependency(rootDir, templateSettings.from), screenFiles);
+      const addedDeps = await ensureModuleDeps(moduleDir, domainPackages, await kitDependency(rootDir, templateSettings.from), screenFiles, readPackageGraph(rootDir));
       if (addedDeps.length > 0) {
         log.info("Added dependencies:");
         for (const dep of addedDeps) {
