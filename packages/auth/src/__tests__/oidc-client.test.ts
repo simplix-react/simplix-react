@@ -103,7 +103,10 @@ describe("createOidcClient", () => {
     const sent = new URLSearchParams(String(fetchFn.mock.calls.at(-1)![1]!.body));
     expect(sent.get("code")).toBe("abc");
     expect(sent.get("code_verifier")).toBe(pending.verifier);
-    expect(storage.size()).toBe(0);
+    // The pending sign-in is forgotten; only the ID token sign-out will name is left.
+    expect(storage.getItem("simplix:oidc:pending")).toBeNull();
+    expect(storage.getItem("simplix:oidc:pending:id-token")).toBe("id");
+    expect(storage.size()).toBe(1);
   });
 
   it("refuses a response whose state is not the pending one, and forgets the pending sign-in", async () => {
@@ -175,6 +178,57 @@ describe("createOidcClient", () => {
     const url = new URL((await client().signOutUrl("id"))!);
     expect(url.searchParams.get("id_token_hint")).toBe("id");
     expect(url.searchParams.get("post_logout_redirect_uri")).toBe("https://app.example.test/login");
+  });
+
+  it("names the ID token of the sign-in at sign-out, once, with no caller keeping it", async () => {
+    const { oidc, authorize } = await signedOut();
+    await oidc.completeSignIn(`https://app.example.test/login/complete?code=abc&state=${authorize.searchParams.get("state")}`);
+
+    const first = new URL((await oidc.signOutUrl())!);
+    expect(first.searchParams.get("id_token_hint")).toBe("id");
+    const second = new URL((await oidc.signOutUrl())!);
+    expect(second.searchParams.has("id_token_hint")).toBe(false);
+    expect(storage.size()).toBe(0);
+  });
+
+  it("keeps the newest ID token a refresh hands back, and keeps the last one when a refresh is refused", async () => {
+    fetchFn.mockImplementationOnce(async () => json(DISCOVERY));
+    const oidc = client();
+    fetchFn.mockImplementationOnce(async () => json({ access_token: "a2", refresh_token: "r2", id_token: "id-2", expires_in: 300 }));
+    await oidc.refresh("refresh");
+    await expect(oidc.refresh("dead")).rejects.toMatchObject({ code: "REFRESH_FAILED" });
+    // A refused refresh is what clears the token store, and sign-out still ends the session.
+    const url = new URL((await oidc.signOutUrl())!);
+    expect(url.searchParams.get("id_token_hint")).toBe("id-2");
+  });
+
+  it("an ID token passed in wins over the kept one and leaves it kept", async () => {
+    storage.setItem("simplix:oidc:pending:id-token", "kept");
+    const url = new URL((await client().signOutUrl("passed"))!);
+    expect(url.searchParams.get("id_token_hint")).toBe("passed");
+    expect(storage.getItem("simplix:oidc:pending:id-token")).toBe("kept");
+  });
+
+  it("keeps the ID token under its own storage key", async () => {
+    const own = createOidcClient({ issuer: ISSUER, clientId: "portal", redirectUri: "https://app.example.test/c", storage, storageKey: "portal:oidc", fetchFn });
+    await own.refresh("refresh");
+    expect(storage.getItem("portal:oidc:id-token")).toBe("id");
+  });
+
+  it("signs in and out where the browser refuses storage, only without the ID token", async () => {
+    const refusing = {
+      getItem: () => null,
+      setItem: (key: string) => {
+        if (key.endsWith(":id-token")) throw new DOMException("blocked", "SecurityError");
+      },
+      removeItem: () => {
+        throw new DOMException("blocked", "SecurityError");
+      },
+    };
+    const oidc = createOidcClient({ issuer: ISSUER, clientId: "backoffice", redirectUri: "https://app.example.test/c", storage: refusing, fetchFn });
+    await expect(oidc.refresh("refresh")).resolves.toMatchObject({ idToken: "id" });
+    const url = new URL((await oidc.signOutUrl())!);
+    expect(url.searchParams.has("id_token_hint")).toBe(false);
   });
 
   it("reads the discovery document once", async () => {

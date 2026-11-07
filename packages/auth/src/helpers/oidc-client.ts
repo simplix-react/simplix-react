@@ -31,7 +31,12 @@ export interface OidcClientOptions {
   scopes?: string[];
   /** Holds the verifier and state across the redirect. Defaults to `sessionStorage`. */
   storage?: OidcPendingStorage;
-  /** Key the pending sign-in is kept under. Defaults to `"simplix:oidc:pending"`. */
+  /**
+   * Key the pending sign-in is kept under. Defaults to `"simplix:oidc:pending"`. The ID token of
+   * the last exchange or refresh is kept beside it, under `<storageKey>:id-token`, in the same
+   * storage: outside the token store, whose `clear()` a failed refresh runs before the sign-out
+   * address is built.
+   */
   storageKey?: string;
   /** Fetch used for discovery and the token endpoint. Defaults to the global `fetch`. */
   fetchFn?: typeof fetch;
@@ -70,7 +75,12 @@ export interface OidcClient {
    * @throws {AuthError} `REFRESH_FAILED` when the issuer refuses it
    */
   refresh(refreshToken: string): Promise<OidcTokens>;
-  /** The issuer's sign-out URL, or `null` when it publishes none. */
+  /**
+   * The issuer's sign-out URL, or `null` when it publishes none.
+   *
+   * @param idTokenHint - The ID token to name. Left out, the one kept from the last sign-in or
+   *   refresh is named and forgotten, so the issuer ends the session without asking to confirm.
+   */
   signOutUrl(idTokenHint?: string): Promise<string | null>;
   /** The issuer's discovery document, read once. */
   discovery(): Promise<OidcDiscovery>;
@@ -144,6 +154,22 @@ export function createOidcClient(options: OidcClientOptions): OidcClient {
   const fetchFn = options.fetchFn ?? ((input, init) => fetch(input, init));
   const storage = (): OidcPendingStorage => options.storage ?? sessionStorage;
   const navigate = options.navigate ?? ((url: string) => window.location.assign(url));
+  const idTokenKey = `${storageKey}:id-token`;
+
+  // The ID token is kept so sign-out can name it; where storage refuses (a private window, a
+  // blocked origin), sign-out goes on without it and the issuer asks the reader to confirm.
+  function keepIdToken(tokens: OidcTokens): OidcTokens {
+    if (tokens.idToken) withStorage(() => storage().setItem(idTokenKey, tokens.idToken as string));
+    return tokens;
+  }
+
+  function takeIdToken(): string | undefined {
+    return withStorage(() => {
+      const kept = storage().getItem(idTokenKey) ?? undefined;
+      storage().removeItem(idTokenKey);
+      return kept;
+    });
+  }
 
   let discovered: Promise<OidcDiscovery> | null = null;
 
@@ -242,11 +268,11 @@ export function createOidcClient(options: OidcClientOptions): OidcClient {
         }),
         "SIGN_IN_FAILED",
       );
-      return { tokens, returnTo: pending.returnTo };
+      return { tokens: keepIdToken(tokens), returnTo: pending.returnTo };
     },
 
-    refresh(refreshToken) {
-      return token(
+    async refresh(refreshToken) {
+      const tokens = await token(
         new URLSearchParams({
           grant_type: "refresh_token",
           refresh_token: refreshToken,
@@ -254,20 +280,36 @@ export function createOidcClient(options: OidcClientOptions): OidcClient {
         }),
         "REFRESH_FAILED",
       );
+      return keepIdToken(tokens);
     },
 
     async signOutUrl(idTokenHint) {
+      const hint = idTokenHint ?? takeIdToken();
       const { end_session_endpoint } = await discovery();
       if (!end_session_endpoint) return null;
       const url = new URL(end_session_endpoint);
       url.searchParams.set("client_id", options.clientId);
-      if (idTokenHint) url.searchParams.set("id_token_hint", idTokenHint);
+      if (hint) url.searchParams.set("id_token_hint", hint);
       if (options.postLogoutRedirectUri) {
         url.searchParams.set("post_logout_redirect_uri", options.postLogoutRedirectUri);
       }
       return url.toString();
     },
   };
+}
+
+/**
+ * Runs a storage access, answering `undefined` where the browser refuses storage outright: Web
+ * Storage throws a `DOMException` (`SecurityError`, `QuotaExceededError`) rather than failing
+ * quietly in a private window or on a blocked origin.
+ */
+function withStorage<T>(access: () => T): T | undefined {
+  try {
+    return access();
+  } catch (refused) {
+    if (refused instanceof DOMException) return undefined;
+    throw refused;
+  }
 }
 
 /**
