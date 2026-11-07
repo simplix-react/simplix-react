@@ -95,6 +95,8 @@ function paramsToState(params: URLSearchParams) {
  * @remarks
  * Reads initial state from URL on mount. Writes state changes to URL
  * with a 300ms debounce using `history.replaceState` (no page reload).
+ * It rewrites the whole search string, so a page that also carries `id`, `mode` or `tab` in its
+ * address keeps its filters with `addressedFilters` of `useCrudList` instead.
  *
  * @param options - {@link UseUrlSyncOptions}
  *
