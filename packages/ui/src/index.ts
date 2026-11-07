@@ -344,8 +344,8 @@ export type {
 } from "./crud/shared";
 
 // CRUD layout components
-export { adaptOrvalGet, adaptOrvalList, LIST_READ_META, listSearchParams, SEARCHABLE_KEYWORD_PARAM, CardList, CrudList, useCrudList, useKeyboardNav, useMediaQuery, useOrvalOptions, useServerSearchOptions } from "./crud/list";
-export type { ListSearchParamsOptions } from "./crud/list";
+export { adaptOrvalGet, adaptOrvalList, decodeAddressedFilters, encodeAddressedFilters, filtersToRequestParams, LIST_READ_META, listSearchParams, SEARCHABLE_KEYWORD_PARAM, CardList, CrudList, useCrudList, useKeyboardNav, useMediaQuery, useOrvalOptions, useServerSearchOptions } from "./crud/list";
+export type { AddressedFilters, DecodeAddressedFiltersOptions, FilterControl, FiltersToRequestParamsOptions, ListSearchParamsOptions } from "./crud/list";
 export type {
   ActionType,
   ActionVariant,
@@ -632,7 +632,9 @@ export type { CrudProviderProps, ReactRouterHooks, RouterAdapter, TanstackRouter
 // CRUD patterns
 export { ListDetail, ListDetailRoot, DETAIL_PANEL_WIDTH, ListDetailViewSwitch, useCrudNavigation, useCrudPageState, useFadeTransition, useListDetailState, validateCrudSearch, parseCrudSearch, buildCrudSearch } from "./crud/patterns";
 export type {
+  CrudNavigateOptions,
   CrudSearch,
+  CrudSearchFilters,
   CrudView,
   DetailView,
   ListDetailBaseProps,

@@ -115,3 +115,93 @@ describe("the open tab is addressable", () => {
     expect(buildCrudSearch("detail", "7")).toEqual({ id: "7" });
   });
 });
+
+describe("the list filters are addressable", () => {
+  // A tile reading "4 failed jobs" opens the list it counts only if the address can carry the
+  // filter, and a reader who reloads or shares the link expects to still be looking at it.
+  it("keeps a string and an array of strings, and a one-element array stays an array", () => {
+    expect(validateCrudSearch({ filters: { "status.equals": "FAILED", "kind.in": ["A", "B"], "type.in": ["A"] } }).filters).toEqual({
+      "status.equals": "FAILED",
+      "kind.in": ["A", "B"],
+      "type.in": ["A"],
+    });
+  });
+
+  it("has no filters when the search names none", () => {
+    expect(validateCrudSearch({}).filters).toBeUndefined();
+    expect(validateCrudSearch({ filters: {} }).filters).toBeUndefined();
+  });
+
+  it("drops a filters value that is not an object, without throwing", () => {
+    for (const filters of ["status.in=A", 3, true, null, ["status.in"], undefined]) {
+      expect(() => validateCrudSearch({ filters })).not.toThrow();
+      expect(validateCrudSearch({ filters }).filters).toBeUndefined();
+    }
+  });
+
+  it("drops a value that is a number, a boolean, a nested object or an array holding one", () => {
+    expect(
+      validateCrudSearch({
+        filters: {
+          "a.equals": 5,
+          "b.equals": true,
+          "c.equals": { nested: "x" },
+          "d.in": ["x", 2],
+          "e.in": [["x"]],
+          "f.equals": null,
+          "keep.equals": "kept",
+        },
+      }).filters,
+    ).toEqual({ "keep.equals": "kept" });
+  });
+
+  it("drops an empty value, an empty array and an empty member, so nothing sends a blank condition", () => {
+    expect(validateCrudSearch({ filters: { "a.equals": "", "b.in": [], "c.in": ["", "x"], "d.in": [""] } }).filters).toEqual({
+      "c.in": ["x"],
+    });
+  });
+
+  it("never lets a filter use a key that addresses the view", () => {
+    expect(validateCrudSearch({ filters: { id: "9", mode: "new", tab: "t", "status.in": ["A"] } }).filters).toEqual({
+      "status.in": ["A"],
+    });
+    expect(validateCrudSearch({ filters: { id: "9", mode: "new", tab: "t" } }).filters).toBeUndefined();
+  });
+
+  it("leaves id, mode and tab as they were read", () => {
+    expect(validateCrudSearch({ id: "7", mode: "edit", tab: "log", filters: { id: "x", "status.in": ["A"] } })).toEqual({
+      id: "7",
+      mode: "edit",
+      tab: "log",
+      filters: { "status.in": ["A"] },
+    });
+  });
+
+  it("keeps a key named __proto__ as data", () => {
+    const parsed = validateCrudSearch(JSON.parse('{"filters":{"__proto__":"x","a.equals":"y"}}'));
+    expect(Object.getPrototypeOf(parsed.filters)).toBe(Object.prototype);
+    expect(Object.keys(parsed.filters ?? {})).toEqual(["__proto__", "a.equals"]);
+  });
+
+  it("carries the filters through every view", () => {
+    const filters = { "status.in": ["FAILED"] };
+    expect(buildCrudSearch("list", undefined, undefined, filters)).toEqual({ filters });
+    expect(buildCrudSearch("detail", "7", "history", filters)).toEqual({ id: "7", tab: "history", filters });
+    expect(buildCrudSearch("edit", "7", undefined, filters)).toEqual({ id: "7", mode: "edit", filters });
+    expect(buildCrudSearch("new", undefined, "history", filters)).toEqual({ mode: "new", tab: "history", filters });
+  });
+
+  it("says nothing about filters where the page has none", () => {
+    expect(buildCrudSearch("list")).toEqual({});
+    expect(buildCrudSearch("detail", "7", "history")).toEqual({ id: "7", tab: "history" });
+    expect("filters" in buildCrudSearch("detail", "7")).toBe(false);
+  });
+
+  it("reads the filters back with the view", () => {
+    const filters = { "status.in": ["FAILED"] };
+    expect(parseCrudSearch({ filters })).toEqual({ view: "list", filters });
+    expect(parseCrudSearch({ id: "7", filters })).toEqual({ view: "detail", selectedId: "7", filters });
+    expect(parseCrudSearch({ id: "7", mode: "edit", filters })).toEqual({ view: "edit", selectedId: "7", filters });
+    expect(parseCrudSearch({ mode: "new", filters })).toEqual({ view: "new", filters });
+  });
+});

@@ -86,6 +86,58 @@ describe("useCrudNavigation", () => {
   });
 });
 
+describe("useCrudNavigation and the list filters", () => {
+  const filters = { "status.in": ["FAILED"] };
+
+  it("hands the address's filters over", () => {
+    const { result } = renderHook(() => useCrudNavigation({ filters }, vi.fn()));
+    expect(result.current.filters).toEqual(filters);
+    expect(renderHook(() => useCrudNavigation({}, vi.fn())).result.current.filters).toBeUndefined();
+  });
+
+  // Opening a record from a filtered list and closing it returns to the same filtered list.
+  it("carries them through every view", () => {
+    const onNavigate = vi.fn();
+    const { result } = renderHook(() => useCrudNavigation({ tab: "t", filters }, onNavigate));
+    act(() => result.current.showDetail("7"));
+    expect(onNavigate).toHaveBeenLastCalledWith({ id: "7", tab: "t", filters });
+    act(() => result.current.showEdit("7"));
+    expect(onNavigate).toHaveBeenLastCalledWith({ id: "7", mode: "edit", tab: "t", filters });
+    act(() => result.current.showNew());
+    expect(onNavigate).toHaveBeenLastCalledWith({ mode: "new", tab: "t", filters });
+    act(() => result.current.showList());
+    expect(onNavigate).toHaveBeenLastCalledWith({ tab: "t", filters });
+  });
+
+  it("writes new filters with replace and keeps the rest of the address", () => {
+    const onNavigate = vi.fn();
+    const { result } = renderHook(() => useCrudNavigation({ id: "7", tab: "t", filters }, onNavigate));
+    act(() => result.current.setFilters({ "kind.equals": "A" }));
+    expect(onNavigate).toHaveBeenCalledWith({ id: "7", tab: "t", filters: { "kind.equals": "A" } }, { replace: true });
+    act(() => result.current.setFilters(undefined));
+    expect(onNavigate).toHaveBeenLastCalledWith({ id: "7", tab: "t", filters: undefined }, { replace: true });
+  });
+
+  it("pushes a view change as it always did, with no second argument", () => {
+    const onNavigate = vi.fn();
+    const { result } = renderHook(() => useCrudNavigation({ filters }, onNavigate));
+    act(() => result.current.showDetail("7"));
+    expect(onNavigate.mock.calls.at(-1)).toHaveLength(1);
+  });
+
+  it("keeps its callbacks while the filters stay the same content", () => {
+    const onNavigate = vi.fn();
+    const { result, rerender } = renderHook(({ search }) => useCrudNavigation(search, onNavigate), {
+      initialProps: { search: { filters: { "status.in": ["FAILED"] } } },
+    });
+    const first = result.current.showDetail;
+    rerender({ search: { filters: { "status.in": ["FAILED"] } } });
+    expect(result.current.showDetail).toBe(first);
+    rerender({ search: { filters: { "status.in": ["PAUSED"] } } });
+    expect(result.current.showDetail).not.toBe(first);
+  });
+});
+
 describe("useCrudPageState", () => {
   function createNav(view: string, selectedId?: string) {
     return {

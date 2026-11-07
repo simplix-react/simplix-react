@@ -22,7 +22,7 @@ export { ListDetailViewSwitch } from "./list-detail-view-switch";
 export type { ListDetailViewSwitchProps } from "./list-detail-view-switch";
 
 export { validateCrudSearch, parseCrudSearch, buildCrudSearch } from "./crud-search";
-export type { CrudSearch, CrudView } from "./crud-search";
+export type { CrudNavigateOptions, CrudSearch, CrudSearchFilters, CrudView } from "./crud-search";
 
 export { useCrudNavigation, useCrudPageState } from "./use-crud-page";
 export type { UseCrudNavigationResult, UseCrudPageStateResult } from "./use-crud-page";

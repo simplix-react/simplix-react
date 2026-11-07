@@ -19,8 +19,10 @@ export type {
 } from "./crud-list";
 
 export { adaptOrvalList, LIST_READ_META, SEARCHABLE_KEYWORD_PARAM } from "./adapt-orval-list";
-export { listSearchParams } from "./list-search-params";
-export type { ListSearchParamsOptions } from "./list-search-params";
+export { filtersToRequestParams, listSearchParams } from "./list-search-params";
+export type { FiltersToRequestParamsOptions, ListSearchParamsOptions } from "./list-search-params";
+export { decodeAddressedFilters, encodeAddressedFilters } from "./addressed-filters";
+export type { AddressedFilters, DecodeAddressedFiltersOptions, FilterControl } from "./addressed-filters";
 export type { OrvalListHookLike, AdaptOrvalListOptions } from "./adapt-orval-list";
 
 export { adaptOrvalGet } from "./adapt-orval-get";

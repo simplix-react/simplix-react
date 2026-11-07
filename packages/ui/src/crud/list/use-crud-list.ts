@@ -3,6 +3,8 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { matchesFilter, resolveEmptyReason, type ListHook, type ListHookResult } from "@simplix-react/headless";
 
 import type { EmptyReason, SortState } from "../shared/types";
+import type { AddressedFilters } from "./addressed-filters";
+import { initialAddressedFilters, useAddressedFilters } from "./use-addressed-filters";
 
 const EMPTY_FILTERS: Record<string, unknown> = {};
 
@@ -22,6 +24,18 @@ export interface UseCrudListOptions {
   defaultPageSize?: number;
   /** Initial filter values. */
   defaultFilters?: Record<string, unknown>;
+  /**
+   * Keeps the committed filters in the page's address instead of in the list alone.
+   *
+   * <p>A list opened with filters in its address applies them as its starting state, the filter bar
+   * draws them as active badges and the first request carries them. Each change the reader commits
+   * is handed to {@link AddressedFilters.onChange}, which writes it into the address, and an address
+   * that changes under the list (a link, Back) is adopted by it. With this absent the filters live
+   * in the list and nothing is written anywhere.
+   *
+   * <p>`defaultFilters` stand only where the address names no filters.
+   */
+  addressedFilters?: AddressedFilters;
   /**
    * What the list is narrowed to from outside — a tab, a chip row, a parent record.
    *
@@ -162,6 +176,7 @@ export function useCrudList<T>(
     defaultSort,
     defaultPageSize = 10,
     defaultFilters,
+    addressedFilters,
     scopeKey,
   } = options ?? {};
 
@@ -169,8 +184,11 @@ export function useCrudList<T>(
 
   // ── Filter state ──
   const [search, setSearch] = useState("");
-  const [pendingFilterValues, setPendingFilterValues] = useState(defaultFilters ?? EMPTY_FILTERS);
-  const [committedFilterValues, setCommittedFilterValues] = useState(defaultFilters ?? EMPTY_FILTERS);
+  const [initialFilters] = useState(() =>
+    addressedFilters ? initialAddressedFilters(addressedFilters, defaultFilters) : (defaultFilters ?? EMPTY_FILTERS),
+  );
+  const [pendingFilterValues, setPendingFilterValues] = useState(initialFilters);
+  const [committedFilterValues, setCommittedFilterValues] = useState(initialFilters);
 
   const setFilterValue = useCallback((key: string, value: unknown) => {
     const updater = (prev: Record<string, unknown>) => ({ ...prev, [key]: value });
@@ -271,6 +289,19 @@ export function useCrudList<T>(
     // The selection is a set of row indices, which name different records under a new narrowing.
     if (selected.size > 0) setSelected(new Set());
   }
+
+  // The address owns the filters when the page says so: one that changes under the list is adopted
+  // here, on the first page and with the selection cleared like any other change of the set.
+  useAddressedFilters({
+    addressed: addressedFilters,
+    committed: committedFilterValues,
+    adopt: (values) => {
+      setPendingFilterValues(values);
+      setCommittedFilterValues(values);
+      setPage(1);
+      if (selected.size > 0) setSelected(new Set());
+    },
+  });
 
   const toggleSelection = useCallback((index: number) => {
     setSelected((prev) => {

@@ -2,6 +2,19 @@ import { useSyncExternalStore } from "react";
 
 import type { RouterAdapter } from "./router-provider";
 
+/** The search key a page's list filters travel under; see `CrudSearch.filters`. */
+const FILTERS_KEY = "filters";
+
+/** One list filter in the address: `filters[status.in]=FAILED`, an array repeated once per member. */
+const FILTER_PARAM = /^filters\[(.+)]$/;
+
+/** The text a filter value is written as, or `undefined` for a value an address cannot carry. */
+function filterText(value: unknown): string | undefined {
+  if (typeof value === "string") return value === "" ? undefined : value;
+  if (typeof value === "number" || typeof value === "boolean") return String(value);
+  return undefined;
+}
+
 /**
  * A URL's search as a flat map of strings, written and read the same way on every route.
  *
@@ -12,22 +25,55 @@ import type { RouterAdapter } from "./router-provider";
  * (`status.in=ACTIVE,PAUSED`), so the search is kept flat: empty, `null` and `undefined` values are
  * left out, everything else is written with `String()`, and parsing hands back strings.
  *
+ * The one exception is the page's list filters, `CrudSearch.filters`: an object of filter keys
+ * to a string or an array of strings. It is written as one parameter per filter in the bracket form
+ * (`filters[status.in]=FAILED`, `filters[status.in]=FAILED&filters[status.in]=PAUSED` for an
+ * array) and read back into an object. A filter held once reads back as a string even if it was
+ * written as a one-element array; the list reads a set's operators (`in`, `notIn`) as arrays either
+ * way. Writing the filters as top-level keys is not possible, because nothing could then tell
+ * a filter from the other keys a page keeps in its search.
+ *
  * @example
  * ```ts
  * const router = createRouter({ routeTree, ...flatSearch });
+ * flatSearch.stringifySearch({ filters: { "status.in": ["FAILED"] } });
+ * // "?filters%5Bstatus.in%5D=FAILED"
  * ```
  */
 export const flatSearch = {
   stringifySearch(search: Record<string, unknown>): string {
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries(search)) {
+      if (key === FILTERS_KEY && typeof value === "object" && value !== null && !Array.isArray(value)) {
+        for (const [name, held] of Object.entries(value)) {
+          const members = Array.isArray(held) ? held : [held];
+          for (const member of members) {
+            const text = filterText(member);
+            if (text !== undefined) params.append(`${FILTERS_KEY}[${name}]`, text);
+          }
+        }
+        continue;
+      }
       if (value !== undefined && value !== null && value !== "") params.set(key, String(value));
     }
     const text = params.toString();
     return text ? `?${text}` : "";
   },
-  parseSearch(searchStr: string): Record<string, string> {
-    return Object.fromEntries(new URLSearchParams(searchStr).entries());
+  parseSearch(searchStr: string): Record<string, string | Record<string, string | string[]>> {
+    const search: Record<string, string | Record<string, string | string[]>> = {};
+    const held = new Map<string, string[]>();
+    for (const [key, value] of new URLSearchParams(searchStr).entries()) {
+      const filter = FILTER_PARAM.exec(key);
+      if (filter?.[1] === undefined) {
+        search[key] = value;
+        continue;
+      }
+      held.set(filter[1], [...(held.get(filter[1]) ?? []), value]);
+    }
+    if (held.size > 0) {
+      search[FILTERS_KEY] = Object.fromEntries([...held].map(([name, members]) => [name, members.length === 1 ? (members[0] ?? "") : members]));
+    }
+    return search;
   },
 } as const;
 

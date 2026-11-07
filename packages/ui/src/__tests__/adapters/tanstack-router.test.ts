@@ -3,6 +3,7 @@ import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { createTanstackRouterAdapter, flatSearch, type TanstackRouterLike } from "../../adapters/tanstack-router";
+import { validateCrudSearch } from "../../crud/patterns/crud-search";
 
 /** A router that moves on navigate and tells its subscribers, the way TanStack Router's events do. */
 function fakeRouter(pathname = "/users", searchStr = "?page=2") {
@@ -64,5 +65,48 @@ describe("createTanstackRouterAdapter", () => {
 
     unmount();
     expect([...listeners.values()].every((set) => set.size === 0)).toBe(true);
+  });
+});
+
+describe("flatSearch carries the list filters", () => {
+  it("writes each filter as its own bracketed parameter and repeats an array once per member", () => {
+    const text = flatSearch.stringifySearch({
+      tab: "log",
+      filters: { "status.in": ["FAILED", "PAUSED"], "kind.equals": "A" },
+    });
+    const params = new URLSearchParams(text);
+    expect(params.get("tab")).toBe("log");
+    expect(params.getAll("filters[status.in]")).toEqual(["FAILED", "PAUSED"]);
+    expect(params.get("filters[kind.equals]")).toBe("A");
+    expect(text).not.toContain("object");
+  });
+
+  it("reads them back into an object, a lone value as a string", () => {
+    const text = flatSearch.stringifySearch({ id: "7", filters: { "status.in": ["FAILED", "PAUSED"], "kind.equals": "A" } });
+    expect(flatSearch.parseSearch(text)).toEqual({
+      id: "7",
+      filters: { "status.in": ["FAILED", "PAUSED"], "kind.equals": "A" },
+    });
+  });
+
+  it("round-trips through validateCrudSearch, a one-element set reading back as its one string", () => {
+    const text = flatSearch.stringifySearch({ filters: { "status.in": ["FAILED"], "commas.contains": "a,b" } });
+    expect(validateCrudSearch(flatSearch.parseSearch(text)).filters).toEqual({
+      "status.in": "FAILED",
+      "commas.contains": "a,b",
+    });
+  });
+
+  it("leaves out empty filters, an empty object and values an address cannot carry", () => {
+    expect(flatSearch.stringifySearch({ filters: {} })).toBe("");
+    expect(flatSearch.stringifySearch({ filters: undefined, tab: "x" })).toBe("?tab=x");
+    expect(flatSearch.stringifySearch({ filters: { "a.equals": "", "b.in": [], "c.equals": { x: 1 }, "d.equals": 5 } })).toBe(
+      "?filters%5Bd.equals%5D=5",
+    );
+  });
+
+  it("does not mistake a plain key for a filter", () => {
+    expect(flatSearch.parseSearch("?filters=abc&filter[x]=1")).toEqual({ filters: "abc", "filter[x]": "1" });
+    expect(validateCrudSearch(flatSearch.parseSearch("?filters=abc")).filters).toBeUndefined();
   });
 });
