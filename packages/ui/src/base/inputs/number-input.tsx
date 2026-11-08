@@ -1,5 +1,5 @@
 import { useTranslation } from "@simplix-react/i18n/react";
-import { type ComponentPropsWithRef, forwardRef, useRef } from "react";
+import { type ComponentPropsWithRef, type CSSProperties, forwardRef, useRef } from "react";
 
 import { CaretDownIcon } from "../../crud/shared/icons";
 import { cn } from "../../utils/cn";
@@ -17,7 +17,8 @@ export interface NumberInputProps extends Omit<ComponentPropsWithRef<"input">, "
   /** Unit suffix displayed between the number and the spinner (e.g. "sec", "px", "kg"). */
   suffix?: string;
   /**
-   * How many characters the longest value takes, which is what decides the control's width.
+   * How many characters the longest value takes, which is what decides the width of the typing
+   * field; the unit suffix and the spinner column are drawn beside it and add their own width.
    *
    * <p>Left out, the control fills the width it is given, right for a cell it has to fill, wrong
    * for a form, where a box the width of a sentence asks for a sentence. {@link NumberField}
@@ -60,20 +61,18 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
       onChange?.(next);
     };
 
-    // The chrome around the digits: the input's own side padding, the spinner column with its
-    // divider, and the suffix when there is one. Held in `ch` and `rem` rather than a Tailwind
-    // class because the count is only known at render: a class name assembled from a number
-    // reaches no stylesheet.
-    const width = digits === undefined
-      ? undefined
-      : `calc(${digits + (suffix?.length ?? 0)}ch + 2.75rem)`;
+    // The field is sized to its digits and nothing else: `ch` is read in the field's own font and
+    // `content-box` leaves the design's padding outside that count, so neither the spinner column,
+    // the suffix (drawn in a smaller font, and as wide as its script makes it) nor a design's
+    // padding can take room from the number. The box around it is as wide as its parts need.
+    const fieldStyle: CSSProperties | undefined =
+      digits === undefined ? rest.style : { width: `${digits}ch`, boxSizing: "content-box", ...rest.style };
 
     return (
       <div
-        style={width ? { width } : undefined}
         className={cn(
           "flex h-8 items-stretch overflow-hidden",
-          width === undefined && "w-full",
+          digits === undefined ? "w-full" : "w-fit max-w-full",
           disabled && "cursor-not-allowed",
           className,
         )}
@@ -96,12 +95,14 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
             onChange?.(clamp(v));
           }}
           className={cn(
-            "min-w-0 flex-1",
+            "min-w-0",
+            digits === undefined ? "flex-1" : "shrink",
             "disabled:cursor-not-allowed",
             // Hide the hover-only native spinners; the buttons replace them
             "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
           )}
           {...rest}
+          style={fieldStyle}
           {...slotAttributes(numberInputFieldStyle, {})}
         />
         {suffix && (

@@ -163,14 +163,34 @@ describe("NumberInput", () => {
 
   it("takes its width from the digit count instead of the row", () => {
     render(<NumberInput data-testid="num" digits={2} />);
-    const wrapper = screen.getByTestId("num").parentElement as HTMLElement;
-    expect(drawnClasses(wrapper)).not.toContain("w-full");
-    expect(wrapper.style.width).toBe("calc(2ch + 2.75rem)");
+    const field = screen.getByTestId("num");
+    const wrapper = field.parentElement as HTMLElement;
+    expect(drawnClasses(wrapper)).not.toMatch(/(^|\s)w-full(\s|$)/);
+    expect(drawnClasses(wrapper)).toContain("w-fit");
+    expect(wrapper.style.width).toBe("");
+    // The typing field is exactly its digits wide, whatever is drawn beside it.
+    expect(field.style.width).toBe("2ch");
+    expect(field.style.boxSizing).toBe("content-box");
   });
 
-  it("leaves room for the suffix inside the measured width", () => {
+  it("does not count the suffix or the spinner in the typing field's width", () => {
     render(<NumberInput data-testid="num" digits={3} suffix="kg" />);
-    const wrapper = screen.getByTestId("num").parentElement as HTMLElement;
-    expect(wrapper.style.width).toBe("calc(5ch + 2.75rem)");
+    const field = screen.getByTestId("num");
+    expect(field.style.width).toBe("3ch");
+    // The suffix sits beside the field, so a wider script cannot take room from the number.
+    expect(screen.getByText("kg").parentElement).toBe(field.parentElement);
   });
+
+  it("keeps a caller's own field style over the measured width", () => {
+    render(<NumberInput data-testid="num" digits={3} style={{ width: "12rem" }} />);
+    expect(screen.getByTestId("num").style.width).toBe("12rem");
+  });
+
+  it("fills the row when it has no digit count", () => {
+    render(<NumberInput data-testid="num" />);
+    const field = screen.getByTestId("num");
+    expect(drawnClasses(field.parentElement as HTMLElement)).toMatch(/(^|\s)w-full(\s|$)/);
+    expect(field.style.width).toBe("");
+  });
+
 });

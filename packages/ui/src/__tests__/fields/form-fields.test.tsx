@@ -261,33 +261,33 @@ describe("TextareaField", () => {
 describe("NumberField", () => {
   it("takes its width from the bounds it was given", () => {
     render(<NumberField label="Age" value={25} onChange={vi.fn()} min={0} max={150} />);
-    const wrapper = screen.getByRole("spinbutton").parentElement as HTMLElement;
-    expect(wrapper.style.width).toBe("calc(3ch + 2.75rem)");
+    const wrapper = screen.getByRole("spinbutton");
+    expect(wrapper.style.width).toBe("3ch");
   });
 
   it("counts the sign and the decimals the step declares", () => {
     render(<NumberField label="Offset" value={0} onChange={vi.fn()} min={-12} max={14} step={0.25} />);
-    const wrapper = screen.getByRole("spinbutton").parentElement as HTMLElement;
+    const wrapper = screen.getByRole("spinbutton");
     // two integer digits, one for the sign, three for ".25"
-    expect(wrapper.style.width).toBe("calc(6ch + 2.75rem)");
+    expect(wrapper.style.width).toBe("6ch");
   });
 
   it("falls back to a form-sized measure when nothing bounds it", () => {
     render(<NumberField label="Count" value={null} onChange={vi.fn()} />);
-    const wrapper = screen.getByRole("spinbutton").parentElement as HTMLElement;
-    expect(wrapper.style.width).toBe("calc(8ch + 2.75rem)");
+    const wrapper = screen.getByRole("spinbutton");
+    expect(wrapper.style.width).toBe("8ch");
   });
 
   it("reads a floor of zero as no measure at all, not as one digit", () => {
     render(<NumberField label="Minimum length" value={8} onChange={vi.fn()} min={0} />);
-    const wrapper = screen.getByRole("spinbutton").parentElement as HTMLElement;
-    expect(wrapper.style.width).toBe("calc(8ch + 2.75rem)");
+    const wrapper = screen.getByRole("spinbutton");
+    expect(wrapper.style.width).toBe("8ch");
   });
 
   it("lets a caller state the measure the bounds cannot imply", () => {
     render(<NumberField label="Year" value={2026} onChange={vi.fn()} digits={4} />);
-    const wrapper = screen.getByRole("spinbutton").parentElement as HTMLElement;
-    expect(wrapper.style.width).toBe("calc(4ch + 2.75rem)");
+    const wrapper = screen.getByRole("spinbutton");
+    expect(wrapper.style.width).toBe("4ch");
   });
 
   it("renders with label and value", () => {
