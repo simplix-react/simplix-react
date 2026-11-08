@@ -76,7 +76,8 @@ function formatPresetLabel(preset: WindowPreset, t: TFunc): string {
 
 interface PresetBarProps {
   presets: WindowPreset[];
-  activeKey: string;
+  /** The lit preset, or null while nothing is selected: the window on screen is then only a default. */
+  activeKey: string | null;
   onSelect: (preset: WindowPreset) => void;
   isCustom: boolean;
   onZoomOut: () => void;
@@ -136,13 +137,19 @@ export function PresetBar({ presets, activeKey, onSelect, isCustom, onZoomOut, t
         <select
           className="h-6"
           {...slotAttributes(timeRangePresetSelectStyle, {})}
-          value={activeKey}
+          value={activeKey ?? ""}
           onChange={(e) => {
             const picked = presets.find((p) => p.key === e.target.value);
             if (picked) onSelect(picked);
           }}
           aria-label={t("timeRange.window", { defaultValue: "Window" })}
         >
+          {/* Nothing selected: the select reads as a prompt, not as one of the windows. */}
+          {activeKey === null && (
+            <option value="" disabled hidden>
+              {t("timeRange.window", { defaultValue: "Window" })}
+            </option>
+          )}
           {presets.map((preset) => (
             <option key={preset.key} value={preset.key}>
               {formatPresetLabel(preset, t)}

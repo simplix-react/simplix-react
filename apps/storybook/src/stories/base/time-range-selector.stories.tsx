@@ -53,6 +53,16 @@ export const Default: Story = {
   },
 };
 
+/** Nothing selected: the strip shows its default window's shape, with no lit preset and no range label. */
+export const Unselected: Story = {
+  render: (args) => <TimeRangeSelectorControlled {...args} />,
+  args: {
+    value: null,
+    onChange: () => {},
+    fetchCounts: mockFetchCounts,
+  },
+};
+
 export const HourWindow: Story = {
   name: "1 Hour Window",
   render: (args) => <TimeRangeSelectorControlled {...args} />,

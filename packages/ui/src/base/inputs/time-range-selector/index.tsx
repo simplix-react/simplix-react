@@ -298,8 +298,9 @@ export function TimeRangeSelector({
     return sum;
   }, [value, viewFrom, viewTo, bucketCount, counts]);
 
-  // What the controls read when nothing is selected: the window on screen. The badge names the
-  // span being looked at either way, and the calendar edits that span.
+  // What the controls read when nothing is selected: the window on screen. The calendar edits that
+  // span and the strip's accessible summary names it; the badge and the lit preset appear only for
+  // a selection.
   const shownRange = value ?? { from: viewFrom, to: viewTo };
 
   const rangeText = formatRangeDisplay(shownRange.from, shownRange.to, locale, hour12, displayZone);
@@ -616,42 +617,46 @@ export function TimeRangeSelector({
           className="flex min-w-0 items-center"
           {...slotAttributes(timeRangeControlsStartStyle, {})}
         >
-          {/* The window, and the two things that can be done to the selection inside it —
-              one set, because all three are about the span itself. */}
-          <div className="flex items-center">
-            {/* The badge closes the group's right edge itself when nothing follows it, rather
-                than leaning on a filler element to round the corner. */}
-            <span
-              className="inline-flex h-6 items-center whitespace-nowrap"
-              {...slotAttributes(timeRangeBadgeStyle, { closed: !selectionOverlay })}
-            >
-              {rangeText}
-            </span>
-            {selectionOverlay && (
-              <>
-                <button
-                  type="button"
-                  className="inline-flex h-6 w-6 items-center justify-center"
-                  {...slotAttributes(timeRangeActionStyle, { kind: "expand" })}
-                  onClick={handleExpandToSelection}
-                  aria-label={t("timeRange.expand", { defaultValue: "Expand to selection" })}
-                  title={t("timeRange.expand", { defaultValue: "Expand to selection" })}
-                >
-                  <ExpandIcon size={9} />
-                </button>
-                <button
-                  type="button"
-                  className="inline-flex h-6 w-6 items-center justify-center"
-                  {...slotAttributes(timeRangeActionStyle, { kind: "clear" })}
-                  onClick={handleReset}
-                  aria-label={t("timeRange.clear", { defaultValue: "Clear selection" })}
-                  title={t("timeRange.clear", { defaultValue: "Clear selection" })}
-                >
-                  <ClearIcon size={9} />
-                </button>
-              </>
-            )}
-          </div>
+          {/* The selected span, and the two things that can be done to the selection inside it, as
+              one set, because all three are about the span itself. With nothing selected there is
+              no span to name: the window on screen is only the strip's default, and writing its
+              range here would read as a selection the list under it does not carry. */}
+          {value && (
+            <div className="flex items-center">
+              {/* The badge closes the group's right edge itself when nothing follows it, rather
+                  than leaning on a filler element to round the corner. */}
+              <span
+                className="inline-flex h-6 items-center whitespace-nowrap"
+                {...slotAttributes(timeRangeBadgeStyle, { closed: !selectionOverlay })}
+              >
+                {rangeText}
+              </span>
+              {selectionOverlay && (
+                <>
+                  <button
+                    type="button"
+                    className="inline-flex h-6 w-6 items-center justify-center"
+                    {...slotAttributes(timeRangeActionStyle, { kind: "expand" })}
+                    onClick={handleExpandToSelection}
+                    aria-label={t("timeRange.expand", { defaultValue: "Expand to selection" })}
+                    title={t("timeRange.expand", { defaultValue: "Expand to selection" })}
+                  >
+                    <ExpandIcon size={9} />
+                  </button>
+                  <button
+                    type="button"
+                    className="inline-flex h-6 w-6 items-center justify-center"
+                    {...slotAttributes(timeRangeActionStyle, { kind: "clear" })}
+                    onClick={handleReset}
+                    aria-label={t("timeRange.clear", { defaultValue: "Clear selection" })}
+                    title={t("timeRange.clear", { defaultValue: "Clear selection" })}
+                  >
+                    <ClearIcon size={9} />
+                  </button>
+                </>
+              )}
+            </div>
+          )}
 
           {/* Picking a window outright, rather than acting on the one already shown. */}
           <div className="flex items-center">
@@ -695,7 +700,8 @@ export function TimeRangeSelector({
 
         <PresetBar
           presets={presets}
-          activeKey={activePreset.key}
+          // A preset is lit only for a window the reader selected; the default one is not.
+          activeKey={value ? activePreset.key : null}
           onSelect={handlePresetChange}
           isCustom={isCustom}
           onZoomOut={handleZoomOut}
