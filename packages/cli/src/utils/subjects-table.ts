@@ -127,3 +127,83 @@ export function ensureTableEntry(text: string, name: string, key: string, value:
   const before = needsComma ? `${text.slice(0, scan.lastAt + 1)},${text.slice(scan.lastAt + 1, lineStart)}` : text.slice(0, lineStart);
   return { outcome: "added", text: `${before}${entry}${text.slice(lineStart)}` };
 }
+
+/** The index of the first top-level comma at or after `from`, or `limit` when none comes before it. */
+function nextTopLevelComma(text: string, from: number, limit: number): number {
+  let depth = 0;
+  for (let i = from; i < limit; i++) {
+    const c = text[i];
+    if (c === '"' || c === "'" || c === "`") {
+      const end = stringEnd(text, i);
+      if (end < 0) return limit;
+      i = end;
+    } else if (c === "{" || c === "[" || c === "(") depth++;
+    else if (c === "}" || c === "]" || c === ")") depth--;
+    else if (c === "," && depth === 0) return i;
+  }
+  return limit;
+}
+
+/**
+ * The properties of the object `name` declared in a source text whose value is a plain string
+ * literal, by property name. A property holding anything else (a nested object, an expression, a
+ * template with a substitution) is left out.
+ *
+ * @param text the source of the file declaring the object
+ * @param name the constant's name, exported or not
+ * @returns the string properties, or undefined when the source declares no object of that name
+ */
+export function tableStrings(text: string, name: string): ReadonlyMap<string, string> | undefined {
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const declaration = new RegExp(`(?:export\\s+)?const\\s+${escaped}\\b(?:\\s*:[^=]+)?\\s*=\\s*\\{`).exec(text);
+  if (!declaration) return undefined;
+  const open = declaration.index + declaration[0].length - 1;
+  const scan = scanLiteral(text, open);
+  if (!scan) return undefined;
+  const strings = new Map<string, string>();
+  let at = open + 1;
+  while (at < scan.close) {
+    while (at < scan.close && /[\s,]/.test(text[at])) at++;
+    if (text.startsWith("//", at)) {
+      const end = text.indexOf("\n", at);
+      at = end < 0 ? scan.close : end + 1;
+      continue;
+    }
+    if (text.startsWith("/*", at)) {
+      const end = text.indexOf("*/", at + 2);
+      at = end < 0 ? scan.close : end + 2;
+      continue;
+    }
+    if (at >= scan.close) break;
+    let key: string;
+    if (text[at] === '"' || text[at] === "'") {
+      const end = stringEnd(text, at);
+      if (end < 0) break;
+      key = text.slice(at + 1, end);
+      at = end + 1;
+    } else {
+      const word = /^[A-Za-z_$][\w$]*/.exec(text.slice(at, scan.close))?.[0];
+      if (word === undefined) {
+        at = nextTopLevelComma(text, at, scan.close) + 1;
+        continue;
+      }
+      key = word;
+      at += word.length;
+    }
+    while (at < scan.close && /\s/.test(text[at])) at++;
+    if (text[at] !== ":") {
+      at = nextTopLevelComma(text, at, scan.close) + 1;
+      continue;
+    }
+    at++;
+    while (at < scan.close && /\s/.test(text[at])) at++;
+    const quote = text[at];
+    if (quote === '"' || quote === "'" || quote === "`") {
+      const end = stringEnd(text, at);
+      const value = end < 0 ? undefined : text.slice(at + 1, end);
+      if (value !== undefined && !(quote === "`" && value.includes("${")) && /^\s*(,|\}|$)/.test(text.slice(end + 1, scan.close + 1))) strings.set(key, value);
+    }
+    at = nextTopLevelComma(text, at, scan.close) + 1;
+  }
+  return strings;
+}

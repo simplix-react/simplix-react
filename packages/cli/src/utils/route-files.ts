@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 
 import type { MenuGateConfig, RouteTarget } from "../config/types.js";
 import type { AccessMeta } from "../meta/types.js";
@@ -8,7 +8,7 @@ import { pathExists, readJsonFile, writeFileWithDir } from "./fs.js";
 import type { GeneratedOutcome } from "./generated-merge.js";
 import { log } from "./logger.js";
 import { writeGenerated } from "./project-templates.js";
-import { ensureTableEntry } from "./subjects-table.js";
+import { ensureTableEntry, tableStrings } from "./subjects-table.js";
 import { renderTemplate } from "./template.js";
 
 /** What routing one list screen came to. */
@@ -89,9 +89,19 @@ export interface MenuPlacement {
  * placeholder drawn under its own group is completed rather than duplicated. A placeholder routes
  * nowhere, so a gate it carries stood for a screen that did not exist yet and gives way to the gate
  * of the screen it now opens, which reads the list permission the server enforces. A key with no
- * entry, where nothing routes `href` either, is inserted on the line before the marker.
+ * entry, where nothing routes `href` either, is inserted on the line before the marker. An entry
+ * that leads to `href` under a key of the project's own is that screen's entry and is left as the
+ * project wrote it, whether it spells the path out or names it through a constant (`routed`).
  */
-export function placeMenuEntry(text: string, marker: string, target: MenuEntryTarget, entry: string, group?: string): MenuPlacement | undefined {
+export function placeMenuEntry(
+  text: string,
+  marker: string,
+  target: MenuEntryTarget,
+  entry: string,
+  group?: string,
+  /** The paths entries lead to by an expression the text does not spell out; see {@link menuHrefsOf}. */
+  routed?: ReadonlySet<string>,
+): MenuPlacement | undefined {
   const keyed = new RegExp(`\\{([^{}]*?\\bkey:\\s*"${target.key.replace(/[^\w]/g, "\\$&")}")([^{}]*?)(\\s*)\\}`);
   const found = keyed.exec(text);
   if (found) {
@@ -104,7 +114,7 @@ export function placeMenuEntry(text: string, marker: string, target: MenuEntryTa
     const filled = `{${strip(head)}, href: "${target.href}"${strip(tail)}${gate}${close}}`;
     return { text: text.slice(0, found.index) + filled + text.slice(found.index + whole.length), gated };
   }
-  if (text.includes(`href: "${target.href}"`)) return undefined;
+  if (routed?.has(target.href) || new RegExp(`\\bhref:\\s*["'\`]${target.href.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}["'\`]`).test(text)) return undefined;
   const gated = target.gate !== "undefined" && entry.includes(target.gate);
   if (group !== undefined) return { text: insertIntoGroup(text, marker, group, entry), gated };
   const lines = text.split("\n");
@@ -199,6 +209,64 @@ export function ensureIconImport(text: string, icon: string, anchor: string | un
   return text.slice(0, at) + lines.join("\n") + text.slice(at + list.length);
 }
 
+/** The paths a menu file's entries lead to, and the path expressions it could not read. */
+export interface MenuHrefs {
+  /** Paths entries lead to by a member of a constant (`href: ROUTES.users`) whose string the constant declares. */
+  readonly resolved: ReadonlySet<string>;
+  /** Each `<constant>.<member>` an entry names that no readable declaration gives a string. */
+  readonly unresolved: readonly string[];
+}
+
+/** The files a relative import specifier can name, a `.js` spelling standing for the TypeScript file. */
+function importCandidates(from: string, specifier: string): string[] {
+  const base = resolve(dirname(from), specifier.replace(/\.[cm]?js$/, ""));
+  return [`${base}.ts`, `${base}.tsx`, join(base, "index.ts"), join(base, "index.tsx")];
+}
+
+/**
+ * Reads the paths a menu file's entries lead to where an entry names its path through a member of
+ * a constant (`href: ENTITY_ROUTES.userAccount`) instead of spelling it out. The constant is read
+ * from the menu file itself or from the file a relative import brings it from, and only a member
+ * holding a plain string counts. Without this a project's own entry for a screen cannot be told
+ * from the absence of one, and the screen is added to the menu a second time.
+ *
+ * @param menuFile the menu file's path, which relative imports are read from
+ * @param text the menu file's source
+ */
+export async function menuHrefsOf(menuFile: string, text: string): Promise<MenuHrefs> {
+  const members = new Map<string, Set<string>>();
+  for (const found of text.matchAll(/\bhref:\s*([A-Za-z_$][\w$]*)\.([A-Za-z_$][\w$]*)\b/g)) {
+    members.set(found[1], (members.get(found[1]) ?? new Set()).add(found[2]));
+  }
+  // Each imported name with the module it is read from and the name that module exports it as.
+  const imported = new Map<string, { specifier: string; exported: string }>();
+  for (const found of text.matchAll(/import\s*(?:type\s*)?\{([^}]*)\}\s*from\s*["']([^"']+)["']/g)) {
+    for (const item of found[1].split(",")) {
+      const [exported, local = exported] = item.trim().replace(/^type\s+/, "").split(/\s+as\s+/);
+      if (exported !== "") imported.set(local, { specifier: found[2], exported });
+    }
+  }
+  const resolved = new Set<string>();
+  const unresolved: string[] = [];
+  for (const [name, used] of members) {
+    let strings = tableStrings(text, name);
+    const from = imported.get(name);
+    if (strings === undefined && from !== undefined && from.specifier.startsWith(".")) {
+      for (const candidate of importCandidates(menuFile, from.specifier)) {
+        if (!(await pathExists(candidate))) continue;
+        strings = tableStrings(await readFile(candidate, "utf-8"), from.exported);
+        break;
+      }
+    }
+    for (const member of used) {
+      const path = strings?.get(member);
+      if (path === undefined) unresolved.push(`${name}.${member}`);
+      else resolved.add(path);
+    }
+  }
+  return { resolved, unresolved };
+}
+
 /** {@link placeMenuEntry}, returning only the new text. */
 export function insertMenuEntry(text: string, marker: string, target: MenuEntryTarget, entry: string): string | undefined {
   return placeMenuEntry(text, marker, target, entry)?.text;
@@ -268,8 +336,13 @@ export async function writeRoute(input: RouteInput): Promise<RouteWrite> {
     const gate = permission ? `{ action: "${permission.action}", subject: ${subject} }` : "undefined";
     const icon = input.menu?.icon ?? menu.icon ?? "CircleIcon";
     const entry = renderTemplate(menuTemplate, { ...routeCtx, menuKey: input.entityPlural, menuIcon: icon, menuGate: gate });
-    const placed = placeMenuEntry(await readFile(menuFile, "utf-8"), menu.marker, { key: input.entityPlural, href: `/${routePath}`, gate }, entry, input.menu?.group);
+    const menuText = await readFile(menuFile, "utf-8");
+    const hrefs = await menuHrefsOf(menuFile, menuText);
+    const placed = placeMenuEntry(menuText, menu.marker, { key: input.entityPlural, href: `/${routePath}`, gate }, entry, input.menu?.group, hrefs.resolved);
     if (placed !== undefined) {
+      if (hrefs.unresolved.length > 0) {
+        log.warn(`${menu.file}: could not read the path of ${hrefs.unresolved.join(", ")}; if one of them already leads to /${routePath}, remove the entry just added`);
+      }
       // A decided icon the menu file does not import yet joins the import of the configured one.
       const withIcon = input.menu?.icon === undefined ? placed.text : ensureIconImport(placed.text, input.menu.icon, menu.icon);
       await writeFileWithDir(menuFile, withIcon);

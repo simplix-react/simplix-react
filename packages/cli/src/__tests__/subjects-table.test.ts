@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { ensureTableEntry } from "../utils/subjects-table.js";
+import { ensureTableEntry, tableStrings } from "../utils/subjects-table.js";
 
 const TABLE = [
   "/** The groups, {@link Subject} reads them. */",
@@ -72,5 +72,43 @@ describe("a subjects table entry", () => {
     expect(ensureTableEntry("const SUBJECTS = {};\n", "SUBJECTS", "a", "A")).toEqual({ outcome: "no-table" });
     expect(ensureTableEntry('export const SUBJECTS = { a: "A" };\n', "SUBJECTS", "b", "B")).toEqual({ outcome: "inline-table" });
     expect(ensureTableEntry("export const SUBJECTS = {\n  /* never closed\n", "SUBJECTS", "b", "B")).toEqual({ outcome: "no-table" });
+  });
+});
+
+describe("the string properties of a constant", () => {
+  const ROUTES = [
+    "/** Where each entity is listed. */",
+    "export const ENTITY_ROUTES = {",
+    '  userAccount: "/users", // accounts',
+    "  'userRole': '/roles',",
+    '  "jobPosition": "/positions",',
+    "  /* a block comment: fake: \"/nope\", */",
+    "  nested: { inner: \"/inner\" },",
+    "  computed: base + \"/x\",",
+    "  templated: `/t/${id}`,",
+    "  plain: `/plain`,",
+    '  last: "/last"',
+    "} as const satisfies Readonly<Record<string, string>>;",
+    "",
+  ].join("\n");
+
+  it("reads the properties whose value is a plain string, whatever quote spells the key and the value", () => {
+    expect(Object.fromEntries(tableStrings(ROUTES, "ENTITY_ROUTES") ?? [])).toEqual({
+      userAccount: "/users",
+      userRole: "/roles",
+      jobPosition: "/positions",
+      plain: "/plain",
+      last: "/last",
+    });
+  });
+
+  it("leaves out a nested object, an expression and a template with a substitution", () => {
+    const strings = tableStrings(ROUTES, "ENTITY_ROUTES");
+    for (const key of ["nested", "inner", "computed", "templated", "fake"]) expect(strings?.has(key)).toBe(false);
+  });
+
+  it("reads a constant that is not exported, and answers undefined for one that is not declared", () => {
+    expect(tableStrings('const R = { a: "/a" };\n', "R")?.get("a")).toBe("/a");
+    expect(tableStrings(ROUTES, "OTHER")).toBeUndefined();
   });
 });

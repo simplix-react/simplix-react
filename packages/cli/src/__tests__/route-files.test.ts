@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { ensureAppDependencies, ensureIconImport, insertMenuEntry, menuSubject, menuTemplateOf, placeMenuEntry, routePathOf, writeRoute } from "../utils/route-files.js";
+import { ensureAppDependencies, ensureIconImport, insertMenuEntry, menuHrefsOf, menuSubject, menuTemplateOf, placeMenuEntry, routePathOf, writeRoute } from "../utils/route-files.js";
 
 describe("a list screen's route path", () => {
   it("is the entity's plural in kebab case unless the target names another", () => {
@@ -28,6 +28,22 @@ describe("a menu entry", () => {
 
   it("is left alone when the path already has one", () => {
     expect(insertMenuEntry(menu, "@simplix-menu admin", { key: "other", href: "/a", gate: "undefined" }, "x")).toBeUndefined();
+  });
+
+  it("is left alone when the path is spelled with another quote", () => {
+    for (const quote of ["'", "`"]) {
+      expect(insertMenuEntry(`[\n  { key: "a", href: ${quote}/a${quote} },\n  // @simplix-menu admin\n]`, "@simplix-menu admin", { key: "other", href: "/a", gate: "undefined" }, "x")).toBeUndefined();
+    }
+    // A longer path that merely starts with it is another screen.
+    expect(insertMenuEntry('[\n  { key: "a", href: "/ab" },\n  // @simplix-menu admin\n]', "@simplix-menu admin", { key: "other", href: "/a", gate: "undefined" }, "  x")).toContain("  x\n");
+  });
+
+  it("is left alone when an entry under another key leads to the path through a constant the caller resolved", () => {
+    const text = '[\n  { key: "users", href: ROUTES.userAccount },\n  // @simplix-menu admin\n]';
+    const target = { key: "userAccounts", href: "/users", gate: "undefined" };
+    expect(insertMenuEntry(text, "@simplix-menu admin", target, "  x\n")).toContain("  x\n");
+    expect(placeMenuEntry(text, "@simplix-menu admin", target, "  x\n", undefined, new Set(["/users"]))).toBeUndefined();
+    expect(placeMenuEntry(text, "@simplix-menu admin", target, "  x\n", undefined, new Set(["/roles"]))?.text).toContain("  x\n");
   });
 
   it("completes a placeholder holding the key where it stands instead of inserting a second entry", () => {
@@ -290,6 +306,106 @@ describe("writing a list screen's route", () => {
   it("writes nothing without the route template", async () => {
     const out = await writeRoute({ rootDir: root, moduleDir: join(root, "modules/admin/voice"), target: { dir: "app/routes" }, templates: new Map(), ctx: {}, entityKebab: "voice", entityPlural: "voices", origin: "x" });
     expect(out.outcome).toBe("no-template");
+  });
+});
+
+describe("the paths a menu file's entries lead to through a constant", () => {
+  let root: string;
+  beforeEach(async () => {
+    root = await realpath(await mkdtemp(join(tmpdir(), "simplix-hrefs-")));
+    await mkdir(join(root, "app/shared"), { recursive: true });
+    await writeFile(join(root, "app/shared/routes.ts"), 'export const ENTITY_ROUTES = {\n  userAccount: "/users",\n  jobPosition: "/positions",\n} as const;\n');
+  });
+  afterEach(async () => rm(root, { recursive: true, force: true }));
+
+  const menu = (importLine: string) =>
+    `${importLine}\nexport const MENU = [\n  { key: "users", href: ENTITY_ROUTES.userAccount },\n  { key: "plain", href: "/plain" },\n  { key: "gone", href: ENTITY_ROUTES.missing },\n  // @simplix-menu admin\n];\n`;
+
+  it("reads the member from the file a relative import brings the constant from", async () => {
+    const text = menu('import { ENTITY_ROUTES } from "./shared/routes";');
+    expect(await menuHrefsOf(join(root, "app/menu.ts"), text)).toEqual({ resolved: new Set(["/users"]), unresolved: ["ENTITY_ROUTES.missing"] });
+  });
+
+  it("follows an import spelled with .js, an alias and a type modifier", async () => {
+    const aliased = menu('import { type X, ENTITY_ROUTES as R } from "./shared/routes.js";').replaceAll("ENTITY_ROUTES.", "R.");
+    expect((await menuHrefsOf(join(root, "app/menu.ts"), aliased)).resolved).toEqual(new Set(["/users"]));
+  });
+
+  it("reads a constant declared in the menu file itself", async () => {
+    const text = 'const ROUTES = { users: "/people" };\nexport const MENU = [{ key: "u", href: ROUTES.users }];\n';
+    expect((await menuHrefsOf(join(root, "app/menu.ts"), text)).resolved).toEqual(new Set(["/people"]));
+  });
+
+  it("names a constant it cannot read instead of guessing", async () => {
+    const text = 'import { ROUTES } from "@alias/routes";\nexport const MENU = [{ key: "u", href: ROUTES.users }];\n';
+    expect(await menuHrefsOf(join(root, "app/menu.ts"), text)).toEqual({ resolved: new Set(), unresolved: ["ROUTES.users"] });
+  });
+});
+
+describe("routing a screen the project already has an entry for under its own key", () => {
+  let root: string;
+  const gate = { subject: "SUBJECTS.{{entityCamel}}", table: { file: "app/subjects.ts" } };
+  const MENU = [
+    'import { ENTITY_ROUTES } from "./routes";',
+    "export const GROUPS = [",
+    '  { key: "people", entries: [',
+    '    { key: "users", href: ENTITY_ROUTES.userAccount, icon: UsersIcon },',
+    "    // @simplix-menu admin",
+    "  ] },",
+    "];",
+    "",
+  ].join("\n");
+  const SUBJECTS = 'export const SUBJECTS = {\n  other: "OTHER",\n} as const;\n';
+  const input = () => ({
+    rootDir: root,
+    moduleDir: join(root, "modules/admin/user"),
+    target: {
+      dir: "app/routes",
+      template: "route.tanstack",
+      paths: { "user-account": "users" },
+      menu: { file: "app/menu.ts", marker: "@simplix-menu admin", icon: "FileTextIcon", catalogs: { en: "app/locales/en.json" }, keyPath: "shell.menu", gate },
+    },
+    templates: new Map([
+      ["route.tanstack", 'export const path = "/{{routePath}}";\n'],
+      ["menu-entry.tanstack", '  { key: "{{menuKey}}", href: "/{{routePath}}", icon: {{menuIcon}}, gate: {{{menuGate}}} },\n'],
+    ]),
+    ctx: { packageName: "@app/domain-user", entity: "userAccount" },
+    entityKebab: "user-account",
+    entityPlural: "userAccounts",
+    listAccess: { kind: "permission", group: "USER_ADMIN", action: "list" } as const,
+    plural: { en: "User accounts" },
+    origin: "scaffold user-account --module admin/user",
+  });
+
+  beforeEach(async () => {
+    root = await realpath(await mkdtemp(join(tmpdir(), "simplix-keyed-")));
+    await mkdir(join(root, "modules/admin/user"), { recursive: true });
+    await mkdir(join(root, "app/locales"), { recursive: true });
+    await writeFile(join(root, "modules/admin/user/package.json"), JSON.stringify({ name: "@app/admin-user" }));
+    await writeFile(join(root, "app/package.json"), JSON.stringify({ name: "@app/admin", dependencies: { "@app/admin-user": "workspace:*", "@app/domain-user": "workspace:*" } }));
+    await writeFile(join(root, "app/routes.ts"), 'export const ENTITY_ROUTES = {\n  userAccount: "/users",\n} as const;\n');
+    await writeFile(join(root, "app/menu.ts"), MENU);
+    await writeFile(join(root, "app/subjects.ts"), SUBJECTS);
+    await writeFile(join(root, "app/locales/en.json"), JSON.stringify({ shell: { menu: { users: "Users" } } }));
+  });
+  afterEach(async () => rm(root, { recursive: true, force: true }));
+
+  it("leaves the menu, the subjects table and the label catalog as the project wrote them", async () => {
+    const out = await writeRoute(input());
+    expect(out).toMatchObject({ outcome: "written", menuInserted: false, labelled: [] });
+    expect(out.subject).toBeUndefined();
+    expect(await readFile(join(root, "app/menu.ts"), "utf-8")).toBe(MENU);
+    expect(await readFile(join(root, "app/subjects.ts"), "utf-8")).toBe(SUBJECTS);
+    expect(JSON.parse(await readFile(join(root, "app/locales/en.json"), "utf-8"))).toEqual({ shell: { menu: { users: "Users" } } });
+    expect(await writeRoute(input())).toMatchObject({ menuInserted: false });
+  });
+
+  it("still adds a screen no entry leads to", async () => {
+    await writeFile(join(root, "app/routes.ts"), 'export const ENTITY_ROUTES = {\n  userAccount: "/members",\n} as const;\n');
+    const out = await writeRoute(input());
+    expect(out.menuInserted).toBe(true);
+    expect(await readFile(join(root, "app/menu.ts"), "utf-8")).toContain('{ key: "userAccounts", href: "/users", icon: FileTextIcon');
+    expect(out.subject).toMatchObject({ key: "userAccount", outcome: "added" });
   });
 });
 
