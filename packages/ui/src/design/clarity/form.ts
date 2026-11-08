@@ -1,5 +1,7 @@
 /** Clarity overrides for forms and dialogs: fields, inputs, selects, toggles, validation, dialog chrome. */
 
+import { NEUTRAL_FILL } from "./list";
+
 // One control look shared by every text-like control: the strong hairline, a darker hairline on
 // hover, the accent border with a soft halo on focus, a red halo when invalid, a grey ground when
 // it cannot be edited. Border and halo ease on the fast duration.
@@ -16,6 +18,10 @@ const overlay = "rounded-[var(--radius-overlay)] border-[var(--border)] bg-popov
 // One row of a menu or a select panel: 32px, control radius, a grey ground under the pointer.
 const menuRow =
   "min-h-8 rounded-[var(--radius-control)] transition-colors duration-[var(--dur-fast)] focus:bg-[var(--surface-2)] focus:text-foreground";
+
+// A clear button inside a field stands on the neutral ground every quiet button of the design takes,
+// in the muted ink and the strong ink under the pointer.
+const clearButton = `${NEUTRAL_FILL} text-muted-foreground hover:text-foreground`;
 
 export const formSlots: Record<string, string> = {
   // ── Labelled fields: 12.5/550 labels six pixels above a 36px control ──
@@ -37,7 +43,14 @@ export const formSlots: Record<string, string> = {
   "select-trigger": `${control} focus:border-[var(--ring)]! focus:shadow-[var(--focus-halo)] data-[state=open]:border-[var(--ring)] data-[state=open]:shadow-[var(--focus-halo)] aria-[invalid=true]:border-[var(--destructive)] disabled:opacity-100 disabled:bg-[var(--surface-2)] disabled:text-muted-foreground [&[data-state=open]_[data-slot=field-chevron]]:rotate-180`,
   "field-chevron": "opacity-60 transition-transform duration-[var(--dur-base)] ease-[var(--ease)]",
   "field-multiselect-box": `${control} focus-within:border-[var(--ring)]! focus-within:shadow-[var(--focus-halo)]`,
-  "date-picker-trigger": `${control} focus-visible:ring-0 focus-visible:border-[var(--ring)]! focus-visible:shadow-[var(--focus-halo)] data-[state=open]:border-[var(--ring)]! data-[state=open]:shadow-[var(--focus-halo)] [&>svg:first-child]:opacity-60`,
+  "date-picker-trigger": `${control} focus-visible:ring-0 focus-visible:border-[var(--ring)]! focus-visible:shadow-[var(--focus-halo)] data-[state=open]:border-[var(--ring)]! data-[state=open]:shadow-[var(--focus-halo)] [&>svg:first-child]:text-muted-foreground [&>svg:first-child]:opacity-100`,
+  // The calendar glyph of the range trigger is drawn like the single date trigger's: the muted ink at full
+  // opacity, so an empty field's glyph keeps 3:1 on the field ground in both schemes.
+  "date-range-picker-trigger": "[&>svg:first-child]:text-muted-foreground [&>svg:first-child]:opacity-100",
+  // Clear buttons drawn inside a field stand on a ground, as every other button of the design does.
+  "field-clear-button": clearButton,
+  "date-picker-clear": `${clearButton} [&>svg]:opacity-100`,
+  "date-range-picker-clear": `${clearButton} [&>svg]:opacity-100`,
   "number-input": `${control} hover:border-[var(--muted-2)] focus-within:border-[var(--ring)]! focus-within:shadow-[var(--focus-halo)] has-[[aria-invalid=true]]:shadow-[var(--invalid-halo)]`,
   "number-input disabled=true": "opacity-100 bg-[var(--surface-2)] text-muted-foreground hover:border-[var(--border-strong)]",
   "number-input-spinner": "border-[var(--border)]",

@@ -63,6 +63,9 @@ export const listSlots: Record<string, string> = {
     // header text until the button is pointed at, then the strong ink. The opacity overrides name 100
     // so the base's fade does not survive the merge.
     "crud-list-sort-icon sorted=false": "opacity-100 text-muted-foreground [button:hover>&]:opacity-100 [button:hover>&]:text-foreground",
+    // The glyph above an empty list's sentence is drawn in the muted ink at full opacity: the fade the
+    // base carries leaves it under the 3:1 an icon needs on the page ground.
+    "crud-list-empty-icon": "opacity-100",
     "crud-list-sort-single": "hidden",
     "crud-list-sort-pair": "inline",
     // The row marks: hovered, selected, the open record (an accent rule at its start), the keyboard's row.

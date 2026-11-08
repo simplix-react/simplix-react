@@ -770,7 +770,7 @@
     @apply gap-2;
   }
   [data-slot="date-picker-clear"][data-slot][data-s-date-picker-clear] {
-    @apply z-2 rounded-[calc(var(--radius-control)-2px)] p-0.5 transition-colors duration-[var(--dur-fast)] ease-[var(--ease)];
+    @apply z-2 rounded-[calc(var(--radius-control)-2px)] p-0.5 transition-colors duration-[var(--dur-fast)] ease-[var(--ease)] bg-[var(--surface-2)] text-muted-foreground;
   }
   [data-slot="date-picker-footer"][data-slot][data-s-date-picker-footer] {
     @apply mt-3 gap-2 border-t border-[var(--border-strong)] pt-2;
@@ -827,7 +827,7 @@
     @apply p-3;
   }
   [data-slot="date-range-picker-clear"][data-slot][data-s-date-range-picker-clear] {
-    @apply z-2 rounded-[calc(var(--radius-control)-2px)] p-0.5 transition-colors duration-[var(--dur-fast)] ease-[var(--ease)];
+    @apply z-2 rounded-[calc(var(--radius-control)-2px)] p-0.5 transition-colors duration-[var(--dur-fast)] ease-[var(--ease)] bg-[var(--surface-2)] text-muted-foreground;
   }
   [data-slot="date-range-picker-footer"][data-slot][data-s-date-range-picker-footer] {
     @apply gap-2 border-t pt-2 mt-2;
@@ -1766,7 +1766,7 @@
     @apply mt-3;
   }
   [data-slot="crud-list-empty-icon"][data-slot][data-s-crud-list-empty-icon] {
-    @apply mb-2 size-5 text-muted-foreground opacity-60;
+    @apply mb-2 size-5 text-muted-foreground opacity-100;
   }
   [data-slot="crud-list-empty-message"][data-slot][data-s-crud-list-empty-message] {
     @apply rounded-[var(--radius-surface)] border text-sm text-muted-foreground;
@@ -3275,7 +3275,7 @@
     @apply gap-1;
   }
   [data-slot="field-clear-button"][data-slot][data-s-field-clear-button] {
-    @apply rounded-[calc(var(--radius-control)-2px)] text-muted-foreground;
+    @apply rounded-[calc(var(--radius-control)-2px)] bg-[var(--surface-2)] text-muted-foreground;
   }
   [data-slot="field-code"][data-slot][data-s-field-code] {
     @apply font-mono text-xs;
@@ -4351,7 +4351,7 @@
     @apply hover:bg-primary/90 disabled:opacity-50;
   }
   :where([data-slot="date-picker-clear"])[data-s-date-picker-clear] {
-    @apply hover:bg-muted focus-visible:outline-none [&>svg]:opacity-50 [&>svg:hover]:opacity-100 focus-visible:shadow-[var(--focus-halo)];
+    @apply focus-visible:outline-none [&>svg:hover]:opacity-100 focus-visible:shadow-[var(--focus-halo)] hover:bg-[color-mix(in_oklch,var(--surface-2),var(--foreground)_7%)] hover:text-foreground [&>svg]:opacity-100;
   }
   :where([data-slot="date-picker-nav-button"])[data-s-date-picker-nav-button] {
     @apply hover:bg-[var(--hover-bg-strong)] hover:text-accent-foreground;
@@ -4360,7 +4360,7 @@
     @apply [&>[data-slot=time-select-control]]:mt-2;
   }
   :where([data-slot="date-picker-trigger"])[data-s-date-picker-trigger] {
-    @apply focus-visible:outline-none disabled:opacity-50 data-[empty=true]:text-muted-foreground enabled:hover:border-[var(--muted-2)] focus-visible:ring-0 focus-visible:border-[var(--ring)]! focus-visible:shadow-[var(--focus-halo)] data-[state=open]:border-[var(--ring)]! data-[state=open]:shadow-[var(--focus-halo)] [&>svg:first-child]:opacity-60;
+    @apply focus-visible:outline-none disabled:opacity-50 data-[empty=true]:text-muted-foreground enabled:hover:border-[var(--muted-2)] focus-visible:ring-0 focus-visible:border-[var(--ring)]! focus-visible:shadow-[var(--focus-halo)] data-[state=open]:border-[var(--ring)]! data-[state=open]:shadow-[var(--focus-halo)] [&>svg:first-child]:text-muted-foreground [&>svg:first-child]:opacity-100;
   }
   :where([data-slot="date-range-picker-action"][data-kind="outline"])[data-s-date-range-picker-action] {
     @apply hover:bg-[var(--hover-bg-strong)];
@@ -4369,7 +4369,7 @@
     @apply hover:bg-primary/90;
   }
   :where([data-slot="date-range-picker-clear"])[data-s-date-range-picker-clear] {
-    @apply hover:bg-muted focus-visible:outline-none [&>svg]:opacity-50 [&>svg:hover]:opacity-100 focus-visible:shadow-[var(--focus-halo)];
+    @apply focus-visible:outline-none [&>svg:hover]:opacity-100 focus-visible:shadow-[var(--focus-halo)] hover:bg-[color-mix(in_oklch,var(--surface-2),var(--foreground)_7%)] hover:text-foreground [&>svg]:opacity-100;
   }
   :where([data-slot="date-range-picker-nav-button"])[data-s-date-range-picker-nav-button] {
     @apply hover:bg-[var(--hover-bg-strong)] hover:text-accent-foreground;
@@ -4378,7 +4378,7 @@
     @apply hover:bg-[var(--hover-bg-strong)];
   }
   :where([data-slot="date-range-picker-trigger"])[data-s-date-range-picker-trigger] {
-    @apply focus-visible:outline-none disabled:opacity-50 data-[empty=true]:text-muted-foreground [&>svg:first-child]:opacity-50 focus-visible:shadow-[var(--focus-halo)];
+    @apply focus-visible:outline-none disabled:opacity-50 data-[empty=true]:text-muted-foreground focus-visible:shadow-[var(--focus-halo)] [&>svg:first-child]:text-muted-foreground [&>svg:first-child]:opacity-100;
   }
   :where([data-slot="icon-picker-category"])[data-s-icon-picker-category] {
     @apply hover:bg-[var(--hover-bg-strong)] hover:text-accent-foreground;
@@ -5059,7 +5059,7 @@
     @apply [&_.field-label]:text-base [&_.field-value]:text-base;
   }
   :where([data-slot="field-clear-button"])[data-s-field-clear-button] {
-    @apply hover:text-foreground;
+    @apply hover:bg-[color-mix(in_oklch,var(--surface-2),var(--foreground)_7%)] hover:text-foreground;
   }
   :where([data-slot="field-detect-button"])[data-s-field-detect-button] {
     @apply hover:bg-[var(--hover-bg-strong)] hover:text-foreground;
