@@ -137,12 +137,13 @@ export async function collectGenerated(projectRoot: string): Promise<GeneratedFi
  * The origins the held files record, made to agree per screen (see {@link unifyOrigins}).
  *
  * @param held absolute path to content, as {@link collectGenerated} returns it
+ * @param rootDir when given, the disagreements name each file by its path from this root
  */
-export function unifiedOriginsOf(held: ReadonlyMap<string, string>): OriginUnification {
+export function unifiedOriginsOf(held: ReadonlyMap<string, string>, rootDir?: string): OriginUnification {
   const recorded: { path: string; origin: string }[] = [];
   for (const [path, text] of held) {
     const origin = renderOrigin(text)?.join(" ");
-    if (origin !== undefined) recorded.push({ path, origin });
+    if (origin !== undefined) recorded.push({ path: rootDir === undefined ? path : relative(rootDir, path), origin });
   }
   return unifyOrigins(recorded);
 }
@@ -246,7 +247,8 @@ export async function regenerateAll(rootDir: string, writeConflicts = false): Pr
 }
 
 async function regenerateOrigins(rootDir: string): Promise<{ origins: string[]; writes: GeneratedWrite[] }> {
-  const unification = unifiedOriginsOf((await collectGenerated(rootDir)).held);
+  const collected = await collectGenerated(rootDir);
+  const unification = unifiedOriginsOf(collected.held, collected.rootDir);
   assertOriginsAgree(unification);
   const entries = await generatedReport(rootDir);
   takeGeneratedOutcomes();
@@ -288,8 +290,8 @@ export async function regenerateNamed(
   files: readonly string[],
   writeConflicts = false,
 ): Promise<{ origins: string[]; writes: GeneratedWrite[]; unrecorded: string[] }> {
-  const { held } = await collectGenerated(rootDir);
-  const unification = unifiedOriginsOf(held);
+  const { held, rootDir: realRoot } = await collectGenerated(rootDir);
+  const unification = unifiedOriginsOf(held, realRoot);
   assertOriginsAgree(unification);
   const byOrigin = new Map<string, string[]>();
   const unrecorded: string[] = [];
@@ -685,8 +687,8 @@ export const generatedCommand = new Command("generated")
     // The screens whose files record different decisions, for the files this report is about.
     const collected = await collectGenerated(rootDir);
     const shown = new Set(entries.map((one) => one.path));
-    const origins = unifiedOriginsOf(collected.held).disagreements.filter((one) =>
-      one.recorded.some((entry) => entry.files.some((file) => shown.has(relative(collected.rootDir, file)))),
+    const origins = unifiedOriginsOf(collected.held, collected.rootDir).disagreements.filter((one) =>
+      one.recorded.some((entry) => entry.files.some((file) => shown.has(file))),
     );
     if (!flags.json) for (const one of origins) log.warn(describeDisagreement(one));
     const allUnstarted = await unstartedPages(rootDir);

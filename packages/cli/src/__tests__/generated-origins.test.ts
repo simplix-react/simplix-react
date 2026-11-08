@@ -51,6 +51,9 @@ describe("the files of one screen record different decisions", () => {
     await record(pagePath(), "add-page static-page about --app web --variant wide");
     const { disagreements } = unifiedOriginsOf((await collectGenerated(root)).held);
     expect(disagreements).toMatchObject([{ flag: "--variant", kind: "missing", chosen: "wide" }]);
+    // Given the root, the files are named by their paths from it.
+    const named = unifiedOriginsOf((await collectGenerated(root)).held, root).disagreements[0];
+    expect(named.recorded.map((entry) => entry.files)).toEqual([["stories/web-about.stories.tsx"], ["apps/web/src/pages/about/page.tsx"]]);
     // Stale before the run: the frame is untouched, and the screen's decision draws it another way.
     expect((await generatedReport(root)).find((entry) => entry.path.endsWith("web-about.stories.tsx"))?.state).toBe("stale");
 
