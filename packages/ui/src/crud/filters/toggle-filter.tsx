@@ -57,7 +57,7 @@ export function ToggleFilter({
           !isActive && "pointer-events-none",
         )}
         aria-label={t("filter.clearFilter")}
-        {...slotAttributes(crudFieldClearButtonStyle, { ring: true, hidden: !isActive })}
+        {...slotAttributes(crudFieldClearButtonStyle, { hidden: !isActive })}
       >
         <XIcon className="h-3 w-3" />
       </button>

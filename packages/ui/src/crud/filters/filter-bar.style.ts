@@ -43,7 +43,7 @@ export const crudFilterBarTrailingStyle = defineSlotStyle({
 /** The remove button inside an active-filter chip. */
 export const crudFilterBarChipRemoveStyle = defineSlotStyle({
   slot: "crud-filter-bar-chip-remove",
-  base: "ml-0.5 rounded-sm text-muted-foreground hover:text-foreground",
+  base: "ml-0.5 rounded-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]",
   variants: {},
   defaultVariants: {},
 });
@@ -95,7 +95,7 @@ export const crudFilterBarTriggerStyle = defineSlotStyle({
  */
 export const crudFilterBarClearButtonStyle = defineSlotStyle({
   slot: "crud-filter-bar-clear-button",
-  base: "rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
+  base: "rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]",
   variants: {},
   defaultVariants: {},
 });
@@ -236,7 +236,7 @@ export const crudFilterBarNoOptionsStyle = defineSlotStyle({
 /** The button that opens the option list of a dropdown-style faceted field. */
 export const crudFilterBarDropdownTriggerStyle = defineSlotStyle({
   slot: "crud-filter-bar-dropdown-trigger",
-  base: "gap-1 rounded-md border border-input bg-background px-3 text-sm focus:border-foreground focus-visible:outline-none",
+  base: "gap-1 rounded-md border border-input bg-background px-3 text-sm focus:border-foreground focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]",
   variants: {},
   defaultVariants: {},
 });

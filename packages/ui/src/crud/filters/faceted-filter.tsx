@@ -155,7 +155,7 @@ export function FacetedFilter({
             onClick={handleClear}
             className="inline-flex h-4 w-4 shrink-0 items-center justify-center"
             aria-label={t("filter.clearFilter")}
-            {...slotAttributes(crudFieldClearButtonStyle, { ring: true })}
+            {...slotAttributes(crudFieldClearButtonStyle, {})}
           >
             <XIcon className="h-3 w-3" />
           </button>

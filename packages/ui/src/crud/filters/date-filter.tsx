@@ -180,7 +180,7 @@ export function DateFilter({
               !hasValue && "pointer-events-none",
             )}
             aria-label={t("filter.clearDate")}
-            {...slotAttributes(crudFieldClearButtonStyle, { ring: true, hidden: !hasValue })}
+            {...slotAttributes(crudFieldClearButtonStyle, { hidden: !hasValue })}
           >
             <XIcon className="h-3 w-3" />
           </button>

@@ -30,7 +30,7 @@ export const crudFilterChipTriggerStyle = defineSlotStyle({
 /** The button that opens the menu of operators (or fields) of a filter. */
 export const crudFilterOperatorTriggerStyle = defineSlotStyle({
   slot: "crud-filter-operator-trigger",
-  base: "gap-0.5 bg-muted/50 px-2 text-muted-foreground hover:text-foreground",
+  base: "gap-0.5 bg-muted/50 px-2 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]",
   variants: {
     // `chip` draws a bordered button of its own; `joined` sits against the input's left edge.
     attach: { chip: "rounded-md border", joined: "rounded-l-md border-r" },
