@@ -61,12 +61,21 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
       onChange?.(next);
     };
 
-    // The field is sized to its digits and nothing else: `ch` is read in the field's own font and
-    // `content-box` leaves the design's padding outside that count, so neither the spinner column,
-    // the suffix (drawn in a smaller font, and as wide as its script makes it) nor a design's
-    // padding can take room from the number. The box around it is as wide as its parts need.
-    const fieldStyle: CSSProperties | undefined =
-      digits === undefined ? rest.style : { width: `${digits}ch`, boxSizing: "content-box", ...rest.style };
+    // Width: the field is sized to its digits and nothing else. `ch` is read in the field's own font
+    // and `content-box` leaves the design's padding outside that count, so neither the spinner
+    // column, the suffix (drawn in a smaller font, and as wide as its script makes it) nor a
+    // design's padding can take room from the number. The box around it is as wide as its parts need.
+    //
+    // Height: the box owns it (`h-8`) and the field takes it by stretching, so the field's height
+    // is `auto`. A design may give every input in a form its own height (`[&_input]:h-9`), and with
+    // `content-box` that height plus the field's vertical padding overflows the box and clips the
+    // digits against its lower border; `auto` lets the flex row stretch the field's border box to
+    // the box, whatever the padding. A caller's own `style` still wins over both.
+    const fieldStyle: CSSProperties = {
+      height: "auto",
+      ...(digits === undefined ? null : { width: `${digits}ch`, boxSizing: "content-box" }),
+      ...rest.style,
+    };
 
     return (
       <div

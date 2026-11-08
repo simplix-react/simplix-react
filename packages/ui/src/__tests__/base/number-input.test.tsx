@@ -193,4 +193,58 @@ describe("NumberInput", () => {
     expect(field.style.width).toBe("");
   });
 
+  describe("height contract", () => {
+    // jsdom lays nothing out, so the contract is stated on the computed style: the field takes the
+    // box's height by stretching (`height: auto`), which makes its border box equal the box's
+    // whatever vertical padding the design gives it. A browser check reads the field's and the
+    // box's getBoundingClientRect().height and expects them equal minus the box's borders.
+    const withDesignHeight = (css: string) => {
+      const sheet = document.createElement("style");
+      sheet.textContent = css;
+      document.head.append(sheet);
+      return sheet;
+    };
+
+    it("takes its height from the box and not from a height a design gives every input", () => {
+      const sheet = withDesignHeight('[data-slot="number-input-field"] { height: 36px; padding-top: 6px; padding-bottom: 6px; }');
+      try {
+        render(<NumberInput data-testid="num" digits={2} />);
+        const field = screen.getByTestId("num");
+        expect(window.getComputedStyle(field).height).toBe("auto");
+      } finally {
+        sheet.remove();
+      }
+    });
+
+    it("keeps the digits width and the stretch together, since content-box alone adds the padding to a fixed height", () => {
+      render(<NumberInput data-testid="num" digits={3} suffix="kg" />);
+      const field = screen.getByTestId("num");
+      const computed = window.getComputedStyle(field);
+      expect(computed.width).toBe("3ch");
+      expect(computed.boxSizing).toBe("content-box");
+      expect(computed.height).toBe("auto");
+    });
+
+    it("stretches a field without a digit count too", () => {
+      const sheet = withDesignHeight('[data-slot="number-input-field"] { height: 36px; }');
+      try {
+        render(<NumberInput data-testid="num" />);
+        expect(window.getComputedStyle(screen.getByTestId("num")).height).toBe("auto");
+      } finally {
+        sheet.remove();
+      }
+    });
+
+    it("leaves the box as the one place a height is set", () => {
+      render(<NumberInput data-testid="num" digits={2} />);
+      const wrapper = screen.getByTestId("num").parentElement as HTMLElement;
+      expect(drawnClasses(wrapper)).toContain("h-8");
+      expect(drawnClasses(wrapper)).toContain("items-stretch");
+    });
+
+    it("keeps a caller's own height over the stretch", () => {
+      render(<NumberInput data-testid="num" digits={2} style={{ height: "20px" }} />);
+      expect(screen.getByTestId("num").style.height).toBe("20px");
+    });
+  });
 });
