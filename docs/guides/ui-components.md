@@ -195,6 +195,13 @@ browser reports offline, and such a query exposes `isLoading: false` with
 empty when the server never answered. `CrudList` renders "the list could not be
 loaded" for that reason instead.
 
+`CrudList.Table` draws a page's own words for the two empty reasons a page can speak to.
+`emptyState` (`{ icon, title, description, action }`) replaces the table for `"no-data"`, a list with
+no rows yet. `filteredEmptyState` (the same shape) replaces the framework's "No matching items"
+card for `"no-filter"`, filters that matched nothing, so a page can say what its own filter or chip
+means. Without either, the framework's text stays; `"no-search"`, `"error"` and `"unavailable"`
+always draw the framework's card. `slots.empty` replaces all of them, whatever the reason.
+
 ### Step 3 -- Build a Create/Edit Form
 
 Use `CrudForm` with `FormFields` for explicit value/onChange field components:

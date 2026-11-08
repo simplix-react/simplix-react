@@ -161,6 +161,29 @@ function EmptyReasonCard({ reason, bordered = true }: { reason: Exclude<EmptyRea
   );
 }
 
+/** The content of a rich empty state: an illustration, a title, an explanation and an optional action. */
+interface ListEmptyStateConfig {
+  icon?: ReactNode;
+  title: string;
+  description?: string;
+  action?: ReactNode;
+}
+
+/**
+ * The rich empty state the page declared for a reason, or `undefined` where the framework's own
+ * text answers: `emptyState` for a list with no rows yet, `filteredEmptyState` for filters that
+ * matched nothing.
+ */
+function declaredEmptyState(
+  reason: EmptyReason,
+  emptyState: ListEmptyStateConfig | undefined,
+  filteredEmptyState: ListEmptyStateConfig | undefined,
+): ListEmptyStateConfig | undefined {
+  if (reason === "no-data") return emptyState;
+  if (reason === "no-filter") return filteredEmptyState;
+  return undefined;
+}
+
 // ── List Root ──
 
 /**
@@ -650,12 +673,14 @@ export interface ListTableProps<T> {
   /** When set, displays an empty-state message inside the table body. */
   emptyReason?: EmptyReason | null;
   /** Rich empty state config for "no-data" reason. Replaces the entire table with a centered illustration. */
-  emptyState?: {
-    icon?: ReactNode;
-    title: string;
-    description?: string;
-    action?: ReactNode;
-  };
+  emptyState?: ListEmptyStateConfig;
+  /**
+   * Rich empty state config for the "no-filter" reason: filters are lit and nothing matches them.
+   * Replaces the framework's "No matching items" card, so a page can say what its own filter
+   * means (for example what an empty chip is). Without it the framework's text stays.
+   * `slots.empty` still replaces either one.
+   */
+  filteredEmptyState?: ListEmptyStateConfig;
   /** Callback to compute extra class names for each table/card row. */
   rowClassName?: (row: T) => string | undefined;
   /**
@@ -777,6 +802,7 @@ interface ReorderableTableProps<T> {
   isLoading?: boolean;
   emptyReason?: EmptyReason | null;
   emptyState?: ListTableProps<T>["emptyState"];
+  filteredEmptyState?: ListTableProps<T>["filteredEmptyState"];
   variant?: TableProps["variant"];
   size?: TableProps["size"];
   density?: TableProps["density"];
@@ -805,6 +831,7 @@ function ReorderableTable<T>({
   isLoading,
   emptyReason,
   emptyState,
+  filteredEmptyState,
   variant,
   size,
   density,
@@ -916,8 +943,9 @@ function ReorderableTable<T>({
   }
 
   if (emptyReason && data.length === 0) {
-    if (emptyReason === "no-data" && emptyState) {
-      return <EmptyState className="min-h-70" {...emptyState} />;
+    const declared = declaredEmptyState(emptyReason, emptyState, filteredEmptyState);
+    if (declared) {
+      return <EmptyState className="min-h-70" {...declared} />;
     }
     if (emptyReason !== "no-data") {
       return <EmptyReasonCard reason={emptyReason} />;
@@ -983,6 +1011,7 @@ interface ReorderableCardListProps<T> {
   isLoading?: boolean;
   emptyReason?: EmptyReason | null;
   emptyState?: ListTableProps<T>["emptyState"];
+  filteredEmptyState?: ListTableProps<T>["filteredEmptyState"];
   density?: CardDensity;
   actions?: RowActionDef<T>[];
   actionVariant?: ActionVariant;
@@ -1004,6 +1033,7 @@ function ReorderableCardList<T>({
   isLoading,
   emptyReason,
   emptyState,
+  filteredEmptyState,
   density = "default",
   actions,
   actionVariant,
@@ -1054,8 +1084,9 @@ function ReorderableCardList<T>({
   }
 
   if (emptyReason && data.length === 0) {
-    if (emptyReason === "no-data" && emptyState) {
-      return <EmptyState className="min-h-70" {...emptyState} />;
+    const declared = declaredEmptyState(emptyReason, emptyState, filteredEmptyState);
+    if (declared) {
+      return <EmptyState className="min-h-70" {...declared} />;
     }
     if (emptyReason !== "no-data") {
       return <EmptyReasonCard reason={emptyReason} />;
@@ -1151,6 +1182,7 @@ function ListTable<T>({
   reorder,
   emptyReason,
   emptyState,
+  filteredEmptyState,
   rowClassName,
   groupBy,
   className,
@@ -1604,10 +1636,11 @@ function ListTable<T>({
         </div>
       );
     }
-    if (emptyReason === "no-data" && emptyState) {
+    const declared = declaredEmptyState(emptyReason, emptyState, filteredEmptyState);
+    if (declared) {
       return (
         <div ref={containerRef} className="w-full">
-          <EmptyState className="min-h-70" {...emptyState} />
+          <EmptyState className="min-h-70" {...declared} />
         </div>
       );
     }
@@ -1661,6 +1694,7 @@ function ListTable<T>({
                 isLoading={isLoading}
                 emptyReason={emptyReason}
                 emptyState={emptyState}
+                filteredEmptyState={filteredEmptyState}
                 density={density}
                 actions={actions}
                 actionVariant={actionVariant}
@@ -1776,6 +1810,7 @@ function ListTable<T>({
               isLoading={isLoading}
               emptyReason={emptyReason}
               emptyState={emptyState}
+              filteredEmptyState={filteredEmptyState}
               variant={variant}
               size={size}
               density={density}
