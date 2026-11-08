@@ -12,6 +12,7 @@ import { captureWrites, requireProjectRoot, lastKeptRenders, pathExists, writeFi
 import { log, withSilentLog } from "../utils/logger.js";
 import { runAfterGenerate } from "../utils/generated-after.js";
 import { basePathFor, takeGeneratedOutcomes, withConflictMarkers, withRemovalsHonoured, type GeneratedWrite } from "../utils/generated-merge.js";
+import { describeDisagreement, unifyOrigins, type OriginDisagreement, type OriginUnification } from "../utils/origin-flags.js";
 import { GENERATED_PAGE_MARKER, isUntouchedRender, renderOrigin } from "../utils/project-templates.js";
 
 /**
@@ -133,6 +134,47 @@ export async function collectGenerated(projectRoot: string): Promise<GeneratedFi
 }
 
 /**
+ * The origins the held files record, made to agree per screen (see {@link unifyOrigins}).
+ *
+ * @param held absolute path to content, as {@link collectGenerated} returns it
+ */
+export function unifiedOriginsOf(held: ReadonlyMap<string, string>): OriginUnification {
+  const recorded: { path: string; origin: string }[] = [];
+  for (const [path, text] of held) {
+    const origin = renderOrigin(text)?.join(" ");
+    if (origin !== undefined) recorded.push({ path, origin });
+  }
+  return unifyOrigins(recorded);
+}
+
+/** A regeneration refused because the files of a screen record different values for one decision. */
+export class OriginConflictError extends Error {
+  constructor(readonly disagreements: readonly OriginDisagreement[]) {
+    super(disagreements.map(describeDisagreement).join("\n"));
+    this.name = "OriginConflictError";
+  }
+}
+
+/** @throws {OriginConflictError} when the files of a screen record different values for one decision flag */
+function assertOriginsAgree(unification: OriginUnification): void {
+  const conflicts = unification.disagreements.filter((one) => one.kind === "conflict");
+  if (conflicts.length > 0) throw new OriginConflictError(conflicts);
+}
+
+/** Runs a regeneration; a refusal for conflicting origins is printed and answered with undefined. */
+async function unlessOriginsConflict<T>(run: () => Promise<T>): Promise<T | undefined> {
+  try {
+    return await run();
+  } catch (err) {
+    if (!(err instanceof OriginConflictError)) throw err;
+    for (const one of err.disagreements) log.error(describeDisagreement(one));
+    log.error("Nothing regenerated: record one value of each decision in every file of the screen first.");
+    process.exitCode = 1;
+    return undefined;
+  }
+}
+
+/**
  * Lists every generated file under the project root (and the configured story directory) with
  * its state against the current templates.
  *
@@ -145,6 +187,8 @@ export async function generatedReport(
   keptRenders?: Map<string, string>,
 ): Promise<GeneratedEntry[]> {
   const { rootDir, held } = await collectGenerated(projectRoot);
+  // Every file of a screen is rendered with the decisions any of its files records, once.
+  const { unified } = unifiedOriginsOf(held);
 
   const renders = new Map<string, OriginRender>();
   const entries: GeneratedEntry[] = [];
@@ -154,10 +198,11 @@ export async function generatedReport(
     const originText = origin?.join(" ");
     const renderOf = async (): Promise<OriginRender | undefined> => {
       if (!origin || !originText) return undefined;
-      let render = renders.get(originText);
+      const rendered = unified.get(originText) ?? originText;
+      let render = renders.get(rendered);
       if (!render) {
-        render = await renderOriginNow(origin);
-        renders.set(originText, render);
+        render = await renderOriginNow(rendered.split(/\s+/));
+        renders.set(rendered, render);
         for (const [path, text] of render.kept) keptRenders?.set(path, text);
       }
       return render;
@@ -201,9 +246,12 @@ export async function regenerateAll(rootDir: string, writeConflicts = false): Pr
 }
 
 async function regenerateOrigins(rootDir: string): Promise<{ origins: string[]; writes: GeneratedWrite[] }> {
+  const unification = unifiedOriginsOf((await collectGenerated(rootDir)).held);
+  assertOriginsAgree(unification);
   const entries = await generatedReport(rootDir);
   takeGeneratedOutcomes();
-  const origins = [...new Set(entries.map((e) => e.origin).filter((o): o is string => o !== undefined))];
+  // One run per screen: the origins its files record are rendered as the one they agree on.
+  const origins = [...new Set(entries.map((e) => e.origin).filter((o): o is string => o !== undefined).map((o) => unification.unified.get(o) ?? o))];
   for (const origin of origins) {
     const [command, ...args] = origin.split(/\s+/);
     log.info(`simplix ${origin}`);
@@ -241,15 +289,18 @@ export async function regenerateNamed(
   writeConflicts = false,
 ): Promise<{ origins: string[]; writes: GeneratedWrite[]; unrecorded: string[] }> {
   const { held } = await collectGenerated(rootDir);
+  const unification = unifiedOriginsOf(held);
+  assertOriginsAgree(unification);
   const byOrigin = new Map<string, string[]>();
   const unrecorded: string[] = [];
   for (const file of files) {
     const text = held.get(file) ?? (await readFile(file, "utf-8"));
-    const origin = renderOrigin(text)?.join(" ");
-    if (origin === undefined) {
+    const recorded = renderOrigin(text)?.join(" ");
+    if (recorded === undefined) {
       unrecorded.push(file);
       continue;
     }
+    const origin = unification.unified.get(recorded) ?? recorded;
     byOrigin.set(origin, [...(byOrigin.get(origin) ?? []), file]);
   }
 
@@ -375,8 +426,16 @@ export async function generatedFilesNamedBy(
  * hand after a later template change, so they are reported and fail only under `check`, which also
  * fails an edited file a clean merge would still move.
  */
-export function generatedFailures(entries: readonly GeneratedEntry[], options: { check: boolean; conflicted: boolean; unstarted?: readonly string[]; design?: readonly string[] }): string[] {
+export function generatedFailures(
+  entries: readonly GeneratedEntry[],
+  options: { check: boolean; conflicted: boolean; unstarted?: readonly string[]; design?: readonly string[]; origins?: readonly OriginDisagreement[] },
+): string[] {
   const failures: string[] = [...(options.design ?? [])];
+  // A screen whose files record different values for one decision cannot be regenerated; a flag only some
+  // of its files record is rendered into all of them, and fails only under `check`.
+  for (const one of options.origins ?? []) {
+    if (one.kind === "conflict" || options.check) failures.push(describeDisagreement(one));
+  }
   if ((options.unstarted ?? []).length > 0) {
     failures.push(`Pages that did not start from a template (no ${GENERATED_PAGE_MARKER} marker): ${options.unstarted?.join(", ")}. Lay each down with \`simplix scaffold\` or \`simplix add-page\` and reapply its customisation.`);
   }
@@ -539,7 +598,9 @@ export const generatedCommand = new Command("generated")
         process.exitCode = 1;
         return;
       }
-      const { origins, writes, unrecorded } = await regenerateNamed(rootDir, named.files, flags.writeConflicts === true);
+      const regenerated = await unlessOriginsConflict(() => regenerateNamed(rootDir, named.files, flags.writeConflicts === true));
+      if (regenerated === undefined) return;
+      const { origins, writes, unrecorded } = regenerated;
       for (const file of unrecorded) {
         log.error(`not regenerated ${relative(rootDir, file)}: it records no origin; record one with \`simplix generated --origin "<command>" <path>\``);
         process.exitCode = 1;
@@ -558,7 +619,9 @@ export const generatedCommand = new Command("generated")
       }
       if (origins.length > 0) await runAfterGenerate(rootDir);
     } else if (flags.all) {
-      const { origins, writes } = await regenerateAll(rootDir, flags.writeConflicts === true);
+      const regenerated = await unlessOriginsConflict(() => regenerateAll(rootDir, flags.writeConflicts === true));
+      if (regenerated === undefined) return;
+      const { origins, writes } = regenerated;
       for (const w of writes) {
         if (w.outcome === "written") continue;
         log.step(`${w.outcome.padEnd(9)} ${relative(rootDir, w.path)}${w.markersWritten ? "  (conflict markers written)" : ""}`);
@@ -619,11 +682,18 @@ export const generatedCommand = new Command("generated")
           `${count("stale")} stale, ${count("unchecked")} unchecked`,
       );
     }
+    // The screens whose files record different decisions, for the files this report is about.
+    const collected = await collectGenerated(rootDir);
+    const shown = new Set(entries.map((one) => one.path));
+    const origins = unifiedOriginsOf(collected.held).disagreements.filter((one) =>
+      one.recorded.some((entry) => entry.files.some((file) => shown.has(relative(collected.rootDir, file)))),
+    );
+    if (!flags.json) for (const one of origins) log.warn(describeDisagreement(one));
     const allUnstarted = await unstartedPages(rootDir);
     const unstarted = paths.length > 0 ? allUnstarted.filter((one) => entriesNamedBy([{ path: one } as GeneratedEntry], rootDir, callerDir, paths).kept.length > 0) : allUnstarted;
     // The design gate judges the apps' routes, so a report narrowed to paths leaves it out.
     const design = paths.length > 0 ? [] : (await designProblems(rootDir, await loadConfig(rootDir))).problems;
-    for (const failure of generatedFailures(entries, { check: flags.check === true, conflicted, unstarted, design })) {
+    for (const failure of generatedFailures(entries, { check: flags.check === true, conflicted, unstarted, design, origins })) {
       log.error(failure);
       process.exitCode = 1;
     }

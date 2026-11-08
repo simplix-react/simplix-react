@@ -13,7 +13,7 @@ import { GENERATED_PAGE_MARKER, carryStamp, isUntouchedRender, renderOrigin } fr
 import { log } from "../utils/logger.js";
 import { pageStoryFile } from "./add-page.js";
 import { storyFileFor, storyKeyFor, type StoryNaming } from "../utils/story-file.js";
-import { collectGenerated, renderOriginNow } from "./generated.js";
+import { collectGenerated, renderOriginNow, unifiedOriginsOf } from "./generated.js";
 
 const run = promisify(execFile);
 
@@ -224,6 +224,8 @@ export async function planAdopt(
     if (origin !== undefined) sources.push({ file, origin });
   }
   const renders = new Map<string, Awaited<ReturnType<typeof renderOriginNow>>>();
+  // The base is the render a regeneration would write, which renders each screen once with the decisions all its files record.
+  const { unified } = unifiedOriginsOf(held);
 
   const items: AdoptItem[] = [];
   for (const requested of files) {
@@ -265,6 +267,7 @@ export async function planAdopt(
       inferred = true;
     }
 
+    origin = unified.get(origin) ?? origin;
     let rendered = renders.get(origin);
     if (!rendered) {
       try {
