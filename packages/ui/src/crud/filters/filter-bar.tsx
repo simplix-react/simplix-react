@@ -905,6 +905,19 @@ function NumberFormField({
 
 // ── Faceted Form Field (inline checkbox list) ──
 
+/**
+ * The string the list's search field matches an option against.
+ *
+ * cmdk reads an item's `value` both as what the search matches and as the item's
+ * identity (the highlight follows it). The shown label comes first so the reader
+ * can find a row by what is drawn on it in any language; the option key follows
+ * so a typed key still matches, and it keeps two options that share a label apart.
+ * Selection never reads this string: `onSelect` is bound to the option itself.
+ */
+function facetedItemSearchValue(option: { label: string; value: string }): string {
+  return `${option.label} \u00b7 ${option.value}`;
+}
+
 function FacetedFormField({
   def,
   state,
@@ -990,7 +1003,7 @@ function FacetedFormField({
             return (
               <CommandItem
                 key={option.value}
-                value={option.value}
+                value={facetedItemSearchValue(option)}
                 onSelect={() => handleSelect(option.value)}
               >
                 <span
