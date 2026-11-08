@@ -129,6 +129,11 @@ function recordedFingerprint(held: string): string | undefined {
   return line === undefined ? undefined : new RegExp(`${GENERATED_HASH_MARKER}\\s+([0-9a-f]{12})`).exec(line)?.[1];
 }
 
+/** Each region of a text between the conflict markers {@link mergeThreeWay} writes, markers included. */
+export function conflictHunksOf(text: string): string[] {
+  return [...text.matchAll(/^<<<<<<< edited\n[\s\S]*?^>>>>>>> template\n?/gm)].map((m) => m[0]);
+}
+
 /** A three-way merge of `ours` and `theirs` against `base`, through `git merge-file`. */
 export async function mergeThreeWay(base: string, ours: string, theirs: string): Promise<{ text: string; hunks: string[] }> {
   const dir = await mkdtemp(join(tmpdir(), "simplix-merge-"));
@@ -144,8 +149,7 @@ export async function mergeThreeWay(base: string, ours: string, theirs: string):
       if (typeof failed.code !== "number" || failed.code < 0 || failed.stdout === undefined) throw err;
       text = failed.stdout;
     }
-    const hunks = [...text.matchAll(/^<<<<<<< edited\n[\s\S]*?^>>>>>>> template\n?/gm)].map((m) => m[0]);
-    return { text, hunks };
+    return { text, hunks: conflictHunksOf(text) };
   } finally {
     await rm(dir, { recursive: true, force: true });
   }
@@ -184,6 +188,13 @@ export async function writeStampedGenerated(filePath: string, stamped: string): 
     return { outcome: "written", held: stamped };
   }
   noteKeptRender(filePath, stamped);
+  // A file still holding the markers of an earlier merge (an earlier run, or an earlier origin of this
+  // run) is merged no further: a second merge over the markers would nest a second set in the first.
+  const unresolved = conflictHunksOf(ours);
+  if (unresolved.length > 0) {
+    note({ outcome: "conflict", hunks: unresolved, markersWritten: false });
+    return { outcome: "conflict", held: ours };
+  }
   let base = await readBase(filePath);
   if (base === undefined && recordedFingerprint(ours) === renderFingerprint(stamped)) base = stamped;
   if (base === undefined) {
