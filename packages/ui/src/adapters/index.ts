@@ -5,4 +5,4 @@ export type { ReactRouterHooks } from "./react-router";
 export { createTanstackRouterAdapter, flatSearch } from "./tanstack-router";
 export type { TanstackRouterLike } from "./tanstack-router";
 export { RouterContext, useRouter } from "./router-provider";
-export type { RouterAdapter } from "./router-provider";
+export type { RouterAdapter, RouterBlockDecision, RouterBlockRequest } from "./router-provider";

@@ -74,7 +74,7 @@ The `useCrudList` hook manages list state (search, filters, sort, pagination, se
 </CrudForm>
 ```
 
-Supporting hooks include `useIsDirty` for tracking unsaved changes, `useAutosave` for timed auto-submission, `useBeforeUnload` for browser navigation warnings, and `useUnsavedChanges` for in-app navigation guards.
+Supporting hooks include `useIsDirty` for tracking unsaved changes, `useAutosave` for timed auto-submission, `useBeforeUnload` for browser navigation warnings, and `useUnsavedChanges` for in-app navigation guards. With a router adapter that offers `useBlocker` (the TanStack adapter does when the router has a history; the React Router adapter does when given React Router's `useBlocker` on a data router), the guard also holds the browser's Back and Forward and any link the page does not wrap.
 
 #### CrudDetail
 

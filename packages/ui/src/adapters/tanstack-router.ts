@@ -1,6 +1,6 @@
-import { useSyncExternalStore } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 
-import type { RouterAdapter } from "./router-provider";
+import type { RouterAdapter, RouterBlockRequest } from "./router-provider";
 
 /** The search key a page's list filters travel under; see `CrudSearch.filters`. */
 const FILTERS_KEY = "filters";
@@ -85,6 +85,13 @@ export interface TanstackRouterLike {
   readonly state: { readonly location: { readonly pathname: string; readonly searchStr: string } };
   navigate(options: { to: string; search?: Record<string, string>; replace?: boolean }): Promise<unknown>;
   subscribe(eventType: "onBeforeLoad" | "onLoad" | "onResolved", fn: () => void): () => void;
+  /**
+   * The router's history. Its `block` registers a function asked before every navigation, and a
+   * truthy answer holds the navigation back. Without it the adapter offers no `useBlocker`.
+   */
+  readonly history?: {
+    block(blocker: { blockerFn: () => Promise<boolean> | boolean; enableBeforeUnload?: boolean }): () => void;
+  };
 }
 
 /** The router events after which the current location may have changed. */
@@ -120,6 +127,26 @@ export function createTanstackRouterAdapter(router: TanstackRouterLike): RouterA
     };
   };
   const pathname = () => router.state.location.pathname;
+  const history = router.history;
+  // The guard decides asynchronously (it asks the reader), and a truthy answer holds the
+  // navigation back: `proceed` answers false, `reset` answers true.
+  const useBlocker = history
+    ? ({ enabled, onBlocked }: RouterBlockRequest) => {
+        const latest = useRef(onBlocked);
+        latest.current = onBlocked;
+        useEffect(() => {
+          if (!enabled) return;
+          // The tab-close warning belongs to the caller, which already registers it once.
+          return history.block({
+            blockerFn: () =>
+              new Promise<boolean>((resolve) => {
+                latest.current({ proceed: () => resolve(false), reset: () => resolve(true) });
+              }),
+            enableBeforeUnload: false,
+          });
+        }, [enabled]);
+      }
+    : undefined;
   return {
     navigate: (to, options) => {
       void router.navigate({ to, replace: options?.replace });
@@ -133,5 +160,6 @@ export function createTanstackRouterAdapter(router: TanstackRouterLike): RouterA
       });
     },
     useCurrentPath: () => useSyncExternalStore(subscribe, pathname, pathname),
+    ...(useBlocker ? { useBlocker } : {}),
   };
 }

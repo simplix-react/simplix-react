@@ -627,7 +627,7 @@ export type { I18nTextProps } from "./fields/detail/i18n-text-field";
 
 // Router adapters
 export { CrudProvider, createReactRouterAdapter, createTanstackRouterAdapter, flatSearch, RouterContext, useRouter } from "./adapters";
-export type { CrudProviderProps, ReactRouterHooks, RouterAdapter, TanstackRouterLike } from "./adapters";
+export type { CrudProviderProps, ReactRouterHooks, RouterAdapter, RouterBlockDecision, RouterBlockRequest, TanstackRouterLike } from "./adapters";
 
 // CRUD patterns
 export { ListDetail, ListDetailRoot, DETAIL_PANEL_WIDTH, ListDetailViewSwitch, useCrudNavigation, useCrudPageState, useFadeTransition, useListDetailState, validateCrudSearch, parseCrudSearch, buildCrudSearch } from "./crud/patterns";
