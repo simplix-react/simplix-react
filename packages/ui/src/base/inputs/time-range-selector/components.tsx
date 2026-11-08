@@ -79,6 +79,11 @@ interface PresetBarProps {
   /** The lit preset, or null while nothing is selected: the window on screen is then only a default. */
   activeKey: string | null;
   onSelect: (preset: WindowPreset) => void;
+  /**
+   * Called when the lit preset is pressed again, which turns the selection off like pressing a lit
+   * chip does. Left out, a second press selects the same window again.
+   */
+  onClear?: () => void;
   isCustom: boolean;
   onZoomOut: () => void;
   /** Whether a span is selected — the two selection actions only mean something then. */
@@ -92,7 +97,10 @@ interface PresetBarProps {
  */
 const PRESET_ROW_MIN_PX = 620;
 
-export function PresetBar({ presets, activeKey, onSelect, isCustom, onZoomOut, t }: PresetBarProps) {
+/** Value of the compact select's entry that clears the selection; no preset key is written this way. */
+const CLEAR_OPTION = "__clear__";
+
+export function PresetBar({ presets, activeKey, onSelect, onClear, isCustom, onZoomOut, t }: PresetBarProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [compact, setCompact] = useState(false);
 
@@ -139,6 +147,11 @@ export function PresetBar({ presets, activeKey, onSelect, isCustom, onZoomOut, t
           {...slotAttributes(timeRangePresetSelectStyle, {})}
           value={activeKey ?? ""}
           onChange={(e) => {
+            // A select cannot report a second pick of the lit entry, so clearing is an entry of its own.
+            if (e.target.value === CLEAR_OPTION) {
+              onClear?.();
+              return;
+            }
             const picked = presets.find((p) => p.key === e.target.value);
             if (picked) onSelect(picked);
           }}
@@ -155,6 +168,9 @@ export function PresetBar({ presets, activeKey, onSelect, isCustom, onZoomOut, t
               {formatPresetLabel(preset, t)}
             </option>
           ))}
+          {activeKey !== null && onClear && (
+            <option value={CLEAR_OPTION}>{t("timeRange.clear", { defaultValue: "Clear selection" })}</option>
+          )}
         </select>
       </div>
     );
@@ -173,7 +189,7 @@ export function PresetBar({ presets, activeKey, onSelect, isCustom, onZoomOut, t
           type="button"
           aria-pressed={activeKey === preset.key}
           {...slotAttributes(timeRangePresetStyle, { active: activeKey === preset.key })}
-          onClick={() => onSelect(preset)}
+          onClick={() => (activeKey === preset.key && onClear ? onClear() : onSelect(preset))}
         >
           {formatPresetLabel(preset, t)}
         </button>

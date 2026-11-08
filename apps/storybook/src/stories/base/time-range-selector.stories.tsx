@@ -40,6 +40,7 @@ function TimeRangeSelectorControlled(props: React.ComponentProps<typeof TimeRang
       {...props}
       value={value}
       onChange={(range: TimeRangeValue) => setValue(range)}
+      onClear={() => setValue(null)}
     />
   );
 }

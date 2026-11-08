@@ -84,6 +84,11 @@ interface DragState {
  * via the calendar. Expanding a selection zooms the view into it (a preset-less
  * "custom" window); the Custom chip zooms back out.
  *
+ * <p>A selection is turned off the way a lit chip is: pressing the lit preset again, the clear
+ * action beside the range, Escape on the strip and the "Clear selection" entry of the narrow bar's
+ * select all call {@link TimeRangeSelectorProps.onClear}, and the host sets `value` to null.
+ * Without `onClear` they select the visible window whole, as before.
+ *
  * @example
  * ```tsx
  * <TimeRangeSelector
@@ -117,6 +122,7 @@ function presetWindowStart(preset: WindowPreset, now: Date, displayZone?: string
 export function TimeRangeSelector({
   value,
   onChange,
+  onClear,
   fetchCounts,
   maxCount,
   colorSteps: colorStepsProp,
@@ -304,7 +310,9 @@ export function TimeRangeSelector({
   const shownRange = value ?? { from: viewFrom, to: viewTo };
 
   const rangeText = formatRangeDisplay(shownRange.from, shownRange.to, locale, hour12, displayZone);
-  const ariaSummary = `${rangeText} · ${selectedCount}`;
+  // The count is the selection's: with nothing selected the strip is named by the window it shows,
+  // and the live region below stays out of the page altogether.
+  const ariaSummary = value ? `${rangeText} · ${selectedCount}` : rangeText;
 
   // ── Helpers ──
   const clampViewFrom = useCallback(
@@ -416,9 +424,15 @@ export function TimeRangeSelector({
     [value, viewFrom, viewTo, presets, onChange],
   );
 
+  // Turning the selection off. A host that answers `onClear` goes back to nothing selected; one that
+  // does not keeps the long-standing reading, the visible window selected whole.
   const handleReset = useCallback(() => {
+    if (onClear) {
+      if (value) onClear();
+      return;
+    }
     onChange({ from: viewFrom, to: viewTo, bucketMinutes: activePreset.bucketMinutes });
-  }, [viewFrom, viewTo, activePreset, onChange]);
+  }, [viewFrom, viewTo, activePreset, onChange, onClear, value]);
 
   const handleExpandToSelection = useCallback(() => {
     if (!value || value.to.getTime() <= value.from.getTime()) return;
@@ -703,6 +717,7 @@ export function TimeRangeSelector({
           // A preset is lit only for a window the reader selected; the default one is not.
           activeKey={value ? activePreset.key : null}
           onSelect={handlePresetChange}
+          onClear={onClear ? handleReset : undefined}
           isCustom={isCustom}
           onZoomOut={handleZoomOut}
           t={t}
@@ -803,8 +818,14 @@ export function TimeRangeSelector({
 
       <TimeLabels labels={timeLabels} />
 
-      {/* Assistive-tech live summary of the selected range + count */}
-      <span className="sr-only" aria-live="polite">{ariaSummary}</span>
+      {/* Assistive-tech live summary of the selected range + count. Only a selection is announced:
+          at the default there is nothing to report, and a live region on the page also changes
+          which node the modal hiding library marks (it keeps live regions exposed). */}
+      {value && (
+        <span className="sr-only" aria-live="polite">
+          {ariaSummary}
+        </span>
+      )}
     </div>
   );
 }

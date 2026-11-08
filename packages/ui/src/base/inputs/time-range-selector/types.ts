@@ -38,6 +38,16 @@ export interface TimeRangeSelectorProps {
   value: TimeRange | null;
   /** Range change callback */
   onChange: (range: TimeRangeValue) => void;
+  /**
+   * Called when the reader turns the selection off: pressing the lit preset again, the clear action
+   * beside the range, Escape on the strip, or the select's "Clear selection" entry in a narrow bar.
+   * The host answers by setting `value` to null.
+   *
+   * <p>{@link TimeRangeSelectorProps.onChange} always carries a range, so without this a selection
+   * can only be replaced by another one and a screen that narrows its list by it cannot go back to
+   * unnarrowed. Left out, those controls select the visible window as they always did.
+   */
+  onClear?: () => void;
   /** Fetch counts for the visible window. Called when view range changes. */
   fetchCounts: (from: Date, to: Date, bucketCount: number) => Promise<number[]>;
   /** Fixed max value for heatmap scale. Auto-calculated if omitted. */
