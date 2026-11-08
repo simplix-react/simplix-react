@@ -17,6 +17,13 @@ describe("StatCard", () => {
     expect(classes).toContain("[overflow-wrap:anywhere]");
   });
 
+  it("keeps the unit in one piece: the figure wraps anywhere, the unit never breaks inside", () => {
+    render(<StatCard title="Credits" value="126,640" unit="credits" />);
+    const unit = screen.getByText("credits");
+    expect(unit.getAttribute("data-slot")).toBe("stat-card-unit");
+    expect(drawnClasses(unit)).toMatch(/(^|\s)whitespace-nowrap(\s|$)/);
+  });
+
   it("renders title and value", () => {
     render(<StatCard title="Revenue" value="$1,234" />);
     expect(screen.getByText("Revenue")).toBeDefined();

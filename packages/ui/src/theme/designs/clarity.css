@@ -128,7 +128,7 @@
     @apply text-xs font-medium;
   }
   [data-slot="stat-card-unit"][data-slot][data-s-stat-card-unit] {
-    @apply ms-1 font-sans text-(length:--fs-control) leading-(--lh-control) font-medium tracking-normal text-muted-foreground;
+    @apply whitespace-nowrap ms-1 font-sans text-(length:--fs-control) leading-(--lh-control) font-medium tracking-normal text-muted-foreground;
   }
   [data-slot="stat-card-value"][data-slot][data-s-stat-card-value] {
     @apply text-[30px] leading-none font-semibold tracking-[-0.035em] tabular-nums;

@@ -125,7 +125,7 @@
     @apply text-xs font-medium;
   }
   [data-slot="stat-card-unit"][data-slot][data-s-stat-card-unit] {
-    @apply ms-1 font-sans font-medium tracking-normal text-sm text-muted-foreground;
+    @apply ms-1 whitespace-nowrap font-sans font-medium tracking-normal text-sm text-muted-foreground;
   }
   [data-slot="stat-card-value"][data-slot][data-s-stat-card-value] {
     @apply text-2xl font-bold leading-none;

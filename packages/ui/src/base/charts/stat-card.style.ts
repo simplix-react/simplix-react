@@ -85,8 +85,9 @@ export const statCardSkeletonStyle = defineSlotStyle({
 /** The unit beside the figure; classic draws it in the figure's own type. */
 export const statCardUnitStyle = defineSlotStyle({
   slot: "stat-card-unit",
-  // The unit stands apart from the figure, quieter.
-  base: "ms-1 font-sans font-medium tracking-normal text-sm text-muted-foreground",
+  // The unit stands apart from the figure, quieter, and is one word: the figure above it wraps
+  // anywhere, so without `whitespace-nowrap` a narrow card breaks inside the unit.
+  base: "ms-1 whitespace-nowrap font-sans font-medium tracking-normal text-sm text-muted-foreground",
   variants: {},
   defaultVariants: {},
 });
