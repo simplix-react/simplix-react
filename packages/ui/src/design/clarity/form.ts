@@ -152,4 +152,7 @@ export const formSlots: Record<string, string> = {
   // does in clarity; the current one is filled with the accent.
   "time-range-preset active=false": "bg-[var(--surface-2)]",
   "time-range-nav-button": "bg-[var(--surface-2)]",
+  // The retry button of the load-error overlay stands on the neutral ground of every quiet button, over the
+  // overlay's card ground.
+  "time-range-retry": `${NEUTRAL_FILL} text-foreground`,
 };

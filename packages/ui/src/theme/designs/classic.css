@@ -1085,7 +1085,7 @@
     @apply border-l border-input;
   }
   [data-slot="time-range-action"][data-slot][data-s-time-range-action] {
-    @apply border-input bg-background text-muted-foreground transition-colors;
+    @apply border-input bg-background text-muted-foreground transition-colors relative;
   }
   [data-slot="time-range-action"][data-kind="expand"][data-s-time-range-action] {
     @apply border-y border-r;
@@ -1115,7 +1115,7 @@
     @apply rounded-sm;
   }
   [data-slot="time-range-custom-chip"][data-slot][data-s-time-range-custom-chip] {
-    @apply gap-1 pl-2 pr-1 py-0.5 rounded text-xs font-medium bg-primary text-primary-foreground;
+    @apply gap-1 pl-2 pr-1 py-0.5 rounded text-xs font-medium bg-primary text-primary-foreground relative;
   }
   [data-slot="time-range-error"][data-slot][data-s-time-range-error] {
     @apply gap-2 rounded-sm bg-card/85 text-xs text-muted-foreground;
@@ -1154,7 +1154,7 @@
     @apply mx-7 mb-2;
   }
   [data-slot="time-range-nav-button"][data-slot][data-s-time-range-nav-button] {
-    @apply rounded text-muted-foreground transition-colors;
+    @apply rounded text-muted-foreground transition-colors relative;
   }
   [data-slot="time-range-now-line"][data-slot][data-s-time-range-now-line] {
     @apply bg-destructive/60;
@@ -1163,10 +1163,10 @@
     @apply gap-3;
   }
   [data-slot="time-range-preset-select"][data-slot][data-s-time-range-preset-select] {
-    @apply rounded border border-input bg-background px-1 text-xs font-medium text-muted-foreground;
+    @apply rounded border border-input bg-background px-1 text-xs font-medium text-muted-foreground relative;
   }
   [data-slot="time-range-preset"][data-slot][data-s-time-range-preset] {
-    @apply px-1.5 py-0.5 rounded text-xs font-medium transition-colors;
+    @apply px-1.5 py-0.5 rounded text-xs font-medium transition-colors relative;
   }
   [data-slot="time-range-preset"][data-active="true"][data-s-time-range-preset] {
     @apply bg-primary text-primary-foreground;
@@ -1181,7 +1181,7 @@
     @apply gap-1;
   }
   [data-slot="time-range-retry"][data-slot][data-s-time-range-retry] {
-    @apply rounded border border-input px-1.5 py-0.5 transition-colors;
+    @apply rounded border border-input bg-background px-1.5 py-0.5 transition-colors;
   }
   [data-slot="time-range-selection-box"][data-slot][data-s-time-range-selection-box] {
     @apply rounded-[var(--radius-2xs)];
@@ -4381,13 +4381,13 @@
     @apply hover:bg-accent hover:text-accent-foreground;
   }
   :where([data-slot="time-range-action"])[data-s-time-range-action] {
-    @apply hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)];
+    @apply hover:bg-accent hover:text-accent-foreground focus-visible:z-40 focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)];
   }
   :where([data-slot="time-range-custom-chip-clear"])[data-s-time-range-custom-chip-clear] {
     @apply hover:bg-primary-foreground/20;
   }
   :where([data-slot="time-range-custom-chip"])[data-s-time-range-custom-chip] {
-    @apply focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)];
+    @apply focus-visible:z-40 focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)];
   }
   :where([data-slot="time-range-error"])[data-s-time-range-error] {
     @apply [&>svg]:text-destructive;
@@ -4399,13 +4399,13 @@
     @apply focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)];
   }
   :where([data-slot="time-range-nav-button"])[data-s-time-range-nav-button] {
-    @apply hover:text-foreground focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)];
+    @apply hover:text-foreground focus-visible:z-40 focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)];
   }
   :where([data-slot="time-range-preset-select"])[data-s-time-range-preset-select] {
-    @apply focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)];
+    @apply focus-visible:z-40 focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)];
   }
   :where([data-slot="time-range-preset"])[data-s-time-range-preset] {
-    @apply focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)];
+    @apply focus-visible:z-40 focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)];
   }
   :where([data-slot="time-range-preset"][data-active="false"])[data-s-time-range-preset] {
     @apply hover:bg-accent hover:text-accent-foreground;

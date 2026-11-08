@@ -3,6 +3,14 @@ import { defineSlotStyle } from "../../../design/slot-style";
 /** The focus ring every button of the time range selector draws. */
 const FOCUS_RING = "focus-visible:outline-none focus-visible:shadow-[var(--focus-halo)]";
 
+/**
+ * The focus ring of a control that sits beside the heatmap, which lifts the control above the
+ * load-error overlay (`z-30`) while it holds the keyboard. The halo reaches a few pixels outside the
+ * control's box, into the heatmap box the overlay fills, and a control left under the overlay would
+ * have that part of its ring covered.
+ */
+const RAISED_RING = `relative focus-visible:z-40 ${FOCUS_RING}`;
+
 /** The selector card. Drawn by `theme/designs/classic.css`; see {@link defineSlotStyle}. */
 export const timeRangeSelectorStyle = defineSlotStyle({
   slot: "time-range-selector",
@@ -40,7 +48,7 @@ export const timeRangeBadgeStyle = defineSlotStyle({
 /** One button of the window and calendar groups; the kind sets which corners are rounded. */
 export const timeRangeActionStyle = defineSlotStyle({
   slot: "time-range-action",
-  base: `border-input bg-background text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground ${FOCUS_RING}`,
+  base: `border-input bg-background text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground ${RAISED_RING}`,
   variants: {
     kind: {
       expand: "border-y border-r",
@@ -89,7 +97,7 @@ export const timeRangeErrorStyle = defineSlotStyle({
 /** The retry button in the error overlay. */
 export const timeRangeRetryStyle = defineSlotStyle({
   slot: "time-range-retry",
-  base: `rounded border border-input px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground transition-colors ${FOCUS_RING}`,
+  base: `rounded border border-input bg-background px-1.5 py-0.5 hover:bg-accent hover:text-accent-foreground transition-colors ${FOCUS_RING}`,
   variants: {},
   defaultVariants: {},
 });
@@ -97,7 +105,7 @@ export const timeRangeRetryStyle = defineSlotStyle({
 /** A previous or next window arrow. */
 export const timeRangeNavButtonStyle = defineSlotStyle({
   slot: "time-range-nav-button",
-  base: `rounded text-muted-foreground hover:text-foreground transition-colors ${FOCUS_RING}`,
+  base: `rounded text-muted-foreground hover:text-foreground transition-colors ${RAISED_RING}`,
   variants: {},
   defaultVariants: {},
 });
@@ -105,7 +113,7 @@ export const timeRangeNavButtonStyle = defineSlotStyle({
 /** The chip marking a custom window. */
 export const timeRangeCustomChipStyle = defineSlotStyle({
   slot: "time-range-custom-chip",
-  base: `gap-1 pl-2 pr-1 py-0.5 rounded text-xs font-medium bg-primary text-primary-foreground ${FOCUS_RING}`,
+  base: `gap-1 pl-2 pr-1 py-0.5 rounded text-xs font-medium bg-primary text-primary-foreground ${RAISED_RING}`,
   variants: {},
   defaultVariants: {},
 });
@@ -131,7 +139,7 @@ export const timeRangePresetsStyle = defineSlotStyle({
 /** The preset select shown when the bar is narrow. */
 export const timeRangePresetSelectStyle = defineSlotStyle({
   slot: "time-range-preset-select",
-  base: `rounded border border-input bg-background px-1 text-xs font-medium text-muted-foreground ${FOCUS_RING}`,
+  base: `rounded border border-input bg-background px-1 text-xs font-medium text-muted-foreground ${RAISED_RING}`,
   variants: {},
   defaultVariants: {},
 });
@@ -139,7 +147,7 @@ export const timeRangePresetSelectStyle = defineSlotStyle({
 /** One preset button. */
 export const timeRangePresetStyle = defineSlotStyle({
   slot: "time-range-preset",
-  base: `px-1.5 py-0.5 rounded text-xs font-medium transition-colors ${FOCUS_RING}`,
+  base: `px-1.5 py-0.5 rounded text-xs font-medium transition-colors ${RAISED_RING}`,
   variants: {
     active: {
       true: "bg-primary text-primary-foreground",

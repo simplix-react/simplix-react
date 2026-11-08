@@ -27,9 +27,10 @@ export const commandInputIconStyle = defineSlotStyle({
 /**
  * The command search field.
  *
- * <p>`outline-none` with nothing put back: this field is focused the moment the palette
- * opens and is the only thing in it that takes typing, so the caret is where the
- * keyboard is. A ring around the field inside a floating panel reads as a second border.
+ * <p>`outline-none` with nothing put back in the classic design: this field is focused the moment
+ * the palette opens and is the only thing in it that takes typing, so the caret is where the
+ * keyboard is. The clarity design draws an inward halo on the row that holds the field
+ * (`command-input-wrapper`, `focus-within`) so the popover's edge does not cut it.
  */
 export const commandInputStyle = defineSlotStyle({
   slot: "command-input",
