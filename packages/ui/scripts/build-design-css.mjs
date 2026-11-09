@@ -267,7 +267,12 @@ if (option("--compiled")) {
     root.walkRules((r) => {
       const k = keyOf(r);
       const set = map.get(k) ?? { rule: r, props: new Set() };
-      r.each((d) => d.type === "decl" && set.props.add(d.prop));
+      // A block body, not an expression: postcss stops `each` when the callback returns false, and
+      // `type === "decl" && ...` is false at a nested at-rule (the @supports Tailwind writes for a
+      // color-mix colour), which hid every declaration after it and reverted properties the rule draws.
+      r.each((d) => {
+        if (d.type === "decl") set.props.add(d.prop);
+      });
       map.set(k, set);
     });
     return map;
