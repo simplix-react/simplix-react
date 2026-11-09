@@ -101,7 +101,7 @@
     @apply gap-3 mt-1.5;
   }
   [data-slot="stat-card-description"][data-slot][data-s-stat-card-description] {
-    @apply text-(length:--fs-badge) leading-(--lh-badge) text-muted-foreground;
+    @apply text-(length:--fs-badge) leading-(--lh-badge) text-muted-foreground break-keep;
   }
   [data-slot="stat-card-footer"][data-slot][data-s-stat-card-footer] {
     @apply mt-auto pt-2 gap-x-2.5;

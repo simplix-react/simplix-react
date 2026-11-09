@@ -25,7 +25,8 @@ export const pageSlots: Record<string, string> = {
         "h-[26px] w-[54px] rounded-[var(--radius-sm)] bg-[linear-gradient(90deg,var(--surface-3),var(--shimmer),var(--surface-3))] bg-[length:200%_100%]",
     "stat-card-unit": "ms-1 font-sans text-(length:--fs-control) leading-(--lh-control) font-medium tracking-normal text-muted-foreground",
     "stat-card-footer": "mt-auto pt-2 gap-x-2.5",
-    "stat-card-description": "text-(length:--fs-badge) leading-(--lh-badge) text-muted-foreground",
+    // Korean breaks at any syllable by default, so a basis line in a narrow tile split inside a word; break-keep moves the break to the spaces.
+    "stat-card-description": "text-(length:--fs-badge) leading-(--lh-badge) text-muted-foreground break-keep",
     "section-shell variant=card": "shadow-none",
     "section-shell-header variant=card": "bg-[var(--table-head)]",
     "crud-list-toolbar": "border-[var(--border)] bg-card",
