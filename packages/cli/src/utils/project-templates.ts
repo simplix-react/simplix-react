@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { writeStampedGenerated, type GeneratedOutcome } from "./generated-merge.js";
 import { readdir, readFile } from "node:fs/promises";
-import { isAbsolute, join, resolve } from "node:path";
+import { dirname, isAbsolute, join, resolve } from "node:path";
 
 import { pathExists } from "./fs.js";
 
@@ -40,7 +40,17 @@ interface PackageManifest {
   readonly dependencies?: Record<string, string>;
   readonly devDependencies?: Record<string, string>;
   readonly workspaces?: readonly string[] | { readonly packages?: readonly string[] };
-  readonly simplix?: { readonly templates?: string };
+  readonly simplix?: KitManifestFields;
+}
+
+/** What a UI kit states about its templates in the `simplix` field of its `package.json`. */
+interface KitManifestFields {
+  /** The kit's template directory, relative to the package. */
+  readonly templates?: string;
+  /** The kit whose templates this kit starts from; its own templates replace those name by name. */
+  readonly extends?: string;
+  /** The short name generated files carry for this kit (`{{@kit.id}}`), e.g. `clarity`. */
+  readonly id?: string;
 }
 
 async function readManifest(dir: string): Promise<PackageManifest | undefined> {
@@ -104,37 +114,155 @@ async function kitTemplateDir(dir: string): Promise<string | undefined> {
   return declared ? join(dir, declared) : undefined;
 }
 
+/** Whether a package manifest makes it a UI kit: it ships templates or starts from a kit that does. */
+function isKit(manifest: PackageManifest | undefined): boolean {
+  return manifest?.simplix?.[KIT_TEMPLATES_FIELD] !== undefined || manifest?.simplix?.extends !== undefined;
+}
+
+/** One kit in the chain a project draws with: the package and the template directory it declares. */
+export interface KitLayer {
+  /** The package name, from its manifest. */
+  readonly name: string;
+  /** The package directory. */
+  readonly dir: string;
+  /** The template directory the package declares, undefined where it declares none. */
+  readonly templates?: string;
+  /** The `simplix.id` the package declares. */
+  readonly id?: string;
+}
+
 /**
- * The template directory of the UI kit a project draws with.
+ * The kit a project draws with and every kit it extends, base first.
  *
- * <p>`from` is a package name or a path. Without it, the one dependency of the project root whose
- * manifest declares `simplix.templates` is taken; two such dependencies are refused, since nothing
+ * <p>Empty where the project names no kit and depends on none. A `templates.from` path that holds no
+ * manifest is one template directory with no kit around it.
+ */
+export interface KitChain {
+  readonly layers: readonly KitLayer[];
+  /** The kit `templates.from` names (the last layer), which `{{@kit.*}}` describes. */
+  readonly kit?: KitLayer;
+}
+
+/**
+ * Finds package `name` the way Node resolves it from `fromDir`: `node_modules/<name>` in that
+ * directory and each one above it. A kit's own dependency is reached from the kit, since a strict
+ * installer gives the project root no copy of it.
+ */
+async function packageDirFrom(fromDir: string, name: string): Promise<string | undefined> {
+  let dir = resolve(fromDir);
+  for (;;) {
+    const candidate = join(dir, "node_modules", name);
+    if (await readManifest(candidate)) return candidate;
+    const parent = dirname(dir);
+    if (parent === dir) return undefined;
+    dir = parent;
+  }
+}
+
+async function kitLayer(dir: string): Promise<KitLayer> {
+  const manifest = await readManifest(dir);
+  return { name: manifest?.name ?? dir, dir, templates: await kitTemplateDir(dir), id: manifest?.simplix?.id };
+}
+
+/** `kit` and every kit its `simplix.extends` names, base first. */
+async function chainFrom(root: string, kit: KitLayer): Promise<KitLayer[]> {
+  const layers = [kit];
+  const seen = new Set([kit.name]);
+  let current = kit;
+  for (;;) {
+    const parent = (await readManifest(current.dir))?.simplix?.extends;
+    if (parent === undefined) return layers;
+    if (seen.has(parent)) throw new Error(`simplix.extends of ${current.name} cycles back to "${parent}"`);
+    const dir = (await packageDirFrom(current.dir, parent)) ?? (await packageDir(root, parent));
+    if (!dir) throw new Error(`${current.name} extends "${parent}", which is not installed where ${current.name} can reach it`);
+    current = await kitLayer(dir);
+    seen.add(parent);
+    layers.unshift(current);
+  }
+}
+
+/**
+ * The kit chain a project draws with.
+ *
+ * <p>`from` is a package name or a path. Without it, the dependencies of the project root that are
+ * kits are taken, less any that another of them extends; two left over are refused, since nothing
  * says which one the project means.
  *
- * @returns the directory, or undefined where the project names no kit and depends on none
+ * @param option how the config spells `from`, for the error a kit that cannot be found raises
  */
-export async function resolveKitTemplateDir(root: string, from?: string, option = "templates.from"): Promise<string | undefined> {
+export async function resolveKitChain(root: string, from?: string, option = "templates.from"): Promise<KitChain> {
   if (from !== undefined) {
     if (from.startsWith(".") || isAbsolute(from)) {
       const dir = resolve(root, from);
-      return (await kitTemplateDir(dir)) ?? dir;
+      if (!isKit(await readManifest(dir))) return { layers: [{ name: from, dir, templates: dir }] };
+      const kit = await kitLayer(dir);
+      return { layers: await chainFrom(root, kit), kit };
     }
     const dir = await packageDir(root, from);
     if (!dir) throw new Error(`${option} names "${from}", which is neither installed at ${root} nor a workspace package`);
-    const templates = await kitTemplateDir(dir);
-    if (!templates) throw new Error(`${option} names "${from}", whose package.json declares no simplix.${KIT_TEMPLATES_FIELD}`);
-    return templates;
+    if (!isKit(await readManifest(dir))) {
+      throw new Error(`${option} names "${from}", whose package.json declares neither simplix.${KIT_TEMPLATES_FIELD} nor simplix.extends`);
+    }
+    const kit = await kitLayer(dir);
+    return { layers: await chainFrom(root, kit), kit };
   }
   const manifest = await readManifest(root);
   const names = Object.keys({ ...manifest?.dependencies, ...manifest?.devDependencies }).sort();
-  const kits: string[] = [];
+  const chains: KitLayer[][] = [];
   for (const name of names) {
     const dir = join(root, "node_modules", name);
-    const templates = await kitTemplateDir(dir);
-    if (templates) kits.push(templates);
+    if (isKit(await readManifest(dir))) chains.push(await chainFrom(root, await kitLayer(dir)));
   }
-  if (kits.length > 1) throw new Error(`More than one dependency declares simplix.${KIT_TEMPLATES_FIELD}; set templates.from in simplix.config.ts`);
-  return kits[0];
+  const extended = new Set(chains.flatMap((chain) => chain.slice(0, -1).map((layer) => layer.name)));
+  const leaves = chains.filter((chain) => !extended.has(chain[chain.length - 1].name));
+  if (leaves.length > 1) throw new Error(`More than one dependency is a UI kit; set templates.from in simplix.config.ts`);
+  const layers = leaves[0] ?? [];
+  return { layers, kit: layers[layers.length - 1] };
+}
+
+/**
+ * The template directory of the UI kit a project draws with, the kit `from` names itself and none
+ * it extends. {@link loadProjectTemplates} reads the whole chain.
+ *
+ * @returns the directory, or undefined where the project names no kit or the kit declares none
+ */
+export async function resolveKitTemplateDir(root: string, from?: string, option = "templates.from"): Promise<string | undefined> {
+  const chain = await resolveKitChain(root, from, option);
+  return chain.layers[chain.layers.length - 1]?.templates;
+}
+
+/** A kit value a template names as `{{@kit.<key>}}`. */
+const KIT_TOKEN = /\{\{@kit\.([A-Za-z]+)\}\}/g;
+
+/**
+ * The values `{{@kit.*}}` stands for, from the kit `templates.from` names.
+ *
+ * <p>`package` is its package name, `label` the name without its scope, `id` its `simplix.id`.
+ */
+function kitValues(kit: KitLayer): Record<string, string | undefined> {
+  return { package: kit.name, label: kit.name.replace(/^@[^/]+\//, ""), id: kit.id };
+}
+
+/**
+ * Writes the kit's values into every template that names one.
+ *
+ * <p>Done once, where the templates are read, so every render receives the same text whatever
+ * context it builds. A token with no value is refused: the engine would render it as nothing, and
+ * an import from `"/page"` compiles nowhere and says nothing about why.
+ */
+function bindKit(templates: Map<string, string>, kit: KitLayer | undefined): Map<string, string> {
+  const values = kit ? kitValues(kit) : {};
+  for (const [name, source] of templates) {
+    if (!source.includes("{{@kit.")) continue;
+    templates.set(name, source.replace(KIT_TOKEN, (token, key: string) => {
+      const value = values[key];
+      if (value !== undefined) return value;
+      if (!kit) throw new Error(`${name}.hbs names ${token}, and the project draws with no UI kit`);
+      if (key === "id") throw new Error(`${name}.hbs names ${token}, and ${kit.name} declares no simplix.id`);
+      throw new Error(`${name}.hbs names ${token}; a kit value is one of {{@kit.package}}, {{@kit.label}}, {{@kit.id}}`);
+    }));
+  }
+  return templates;
 }
 
 /**
@@ -151,8 +279,11 @@ export function appTemplateDir(root: string, app: string): string {
 
 /**
  * The templates in force for a page, name by name: the app's own `.simplix/templates/<app>/*.hbs`,
- * then the project's `.simplix/templates/*.hbs`, then the declared UI kit's templates, each name
- * falling through to the next layer and finally to the CLI's bundled one.
+ * then the project's `.simplix/templates/*.hbs`, then the UI kit's templates, then those of each kit
+ * it extends, each name falling through to the next layer and finally to the CLI's bundled one.
+ *
+ * <p>`{{@kit.package}}`, `{{@kit.label}}` and `{{@kit.id}}` are written into every layer's templates
+ * as the kit `from` names, so a base kit's template imports from whichever kit the project draws with.
  *
  * <p>Returns an empty map where no layer has a template, which is every project that has not
  * taken one over and draws with no kit that ships any.
@@ -162,11 +293,14 @@ export function appTemplateDir(root: string, app: string): string {
  * @param option how the config spells `from`, for the error a kit that cannot be found raises
  */
 export async function loadProjectTemplates(root: string, from?: string, app?: string, option?: string): Promise<ProjectTemplates> {
-  const kitDir = await resolveKitTemplateDir(root, from, option);
-  const found = kitDir ? await readTemplateDir(kitDir) : new Map<string, string>();
+  const chain = await resolveKitChain(root, from, option);
+  const found = new Map<string, string>();
+  for (const layer of chain.layers) {
+    if (layer.templates) for (const [name, source] of await readTemplateDir(layer.templates)) found.set(name, source);
+  }
   for (const [name, source] of await readTemplateDir(join(root, PROJECT_TEMPLATE_DIR))) found.set(name, source);
   if (app !== undefined) for (const [name, source] of await readTemplateDir(appTemplateDir(root, app))) found.set(name, source);
-  return found;
+  return bindKit(found, chain.kit);
 }
 
 /**

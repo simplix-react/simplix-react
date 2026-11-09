@@ -48,3 +48,9 @@ export {
   getResponseAdapterPreset,
   getSchemaAdapters,
 } from "./openapi/plugin-registry.js";
+
+// UI kit templates: the templates in force for a project, read the way the generator reads them, for a
+// kit's own tests to render and check every template it ships.
+export type { KitChain, KitLayer, ProjectTemplates } from "./utils/project-templates.js";
+export { loadProjectTemplates, resolveKitChain } from "./utils/project-templates.js";
+export { renderTemplate } from "./utils/template.js";

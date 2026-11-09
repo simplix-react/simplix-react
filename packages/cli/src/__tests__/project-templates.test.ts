@@ -115,3 +115,107 @@ describe("a UI kit's templates, beneath the project's", () => {
     await expect(loadProjectTemplates(await project(), "@kits/missing")).rejects.toThrow(/neither installed/);
   });
 });
+
+/** Lays down a kit package that states its own `simplix` fields, and its templates where it has any. */
+async function kitWith(dir: string, name: string, simplix: Record<string, string>, templates: Record<string, string> = {}): Promise<void> {
+  await mkdir(join(dir, "templates"), { recursive: true });
+  await writeFile(join(dir, "package.json"), JSON.stringify({ name, simplix }), "utf-8");
+  for (const [file, content] of Object.entries(templates)) await writeFile(join(dir, "templates", file), content, "utf-8");
+}
+
+describe("a UI kit that extends a base kit", () => {
+  // The base sits in the kit's own node_modules, where a strict installer puts a kit's dependency.
+  async function family(root: string, kitTemplates: Record<string, string>, kitFields: Record<string, string> = {}): Promise<void> {
+    const kitDir = join(root, "node_modules/@kits/console-clarity");
+    await kitWith(kitDir, "@kits/console-clarity", { templates: "templates", extends: "@kits/console-core", id: "clarity", ...kitFields }, kitTemplates);
+    await kitWith(join(kitDir, "node_modules/@kits/console-core"), "@kits/console-core", { templates: "templates" }, {
+      "crud-page.hbs": "base page",
+      "list.hbs": 'import { CrudPage } from "{{@kit.package}}/page";',
+      "detail.hbs": "@simplix-generated widget/{{@kit.id}}-detail laid down from the {{@kit.label}} kit",
+    });
+  }
+
+  it("reads the base kit's templates beneath the kit's own, name by name", async () => {
+    const root = await project();
+    await family(root, { "crud-page.hbs": "kit page" });
+    const found = await loadProjectTemplates(root, "@kits/console-clarity");
+    expect(templateFor(found, "crud-page", "bundled")).toBe("kit page");
+    expect(found.has("list")).toBe(true);
+  });
+
+  it("lets the project's and the app's templates win over both kits", async () => {
+    const root = await project({ "list.hbs": "project list" });
+    await family(root, { "crud-page.hbs": "kit page" });
+    await mkdir(join(root, PROJECT_TEMPLATE_DIR, "admin"), { recursive: true });
+    await writeFile(join(root, PROJECT_TEMPLATE_DIR, "admin", "crud-page.hbs"), "app page", "utf-8");
+    const found = await loadProjectTemplates(root, "@kits/console-clarity", "admin");
+    expect(templateFor(found, "crud-page", "bundled")).toBe("app page");
+    expect(templateFor(found, "list", "bundled")).toBe("project list");
+  });
+
+  it("writes the kit templates.from names into a base template's {{@kit.*}}", async () => {
+    const root = await project();
+    await family(root, {});
+    const found = await loadProjectTemplates(root, "@kits/console-clarity");
+    expect(found.get("list")).toBe('import { CrudPage } from "@kits/console-clarity/page";');
+    expect(found.get("detail")).toBe("@simplix-generated widget/clarity-detail laid down from the console-clarity kit");
+  });
+
+  it("takes a kit that declares no templates of its own and only extends a base", async () => {
+    const root = await project();
+    const kitDir = join(root, "node_modules/@kits/console-classic");
+    await mkdir(kitDir, { recursive: true });
+    await writeFile(join(kitDir, "package.json"), JSON.stringify({ name: "@kits/console-classic", simplix: { extends: "@kits/console-core", id: "classic" } }), "utf-8");
+    await kitWith(join(kitDir, "node_modules/@kits/console-core"), "@kits/console-core", { templates: "templates" }, {
+      "list.hbs": '"{{@kit.package}}/page" {{@kit.id}}',
+    });
+    expect((await loadProjectTemplates(root, "@kits/console-classic")).get("list")).toBe('"@kits/console-classic/page" classic');
+  });
+
+  it("refuses a {{@kit.id}} when the kit declares no simplix.id", async () => {
+    const root = await project();
+    await family(root, {}, { id: "" });
+    const kitDir = join(root, "node_modules/@kits/console-clarity");
+    await writeFile(join(kitDir, "package.json"), JSON.stringify({ name: "@kits/console-clarity", simplix: { templates: "templates", extends: "@kits/console-core" } }), "utf-8");
+    await expect(loadProjectTemplates(root, "@kits/console-clarity")).rejects.toThrow(/declares no simplix.id/);
+  });
+
+  it("refuses a {{@kit.*}} key no kit value answers", async () => {
+    const root = await project();
+    await family(root, { "form.hbs": "{{@kit.version}}" });
+    await expect(loadProjectTemplates(root, "@kits/console-clarity")).rejects.toThrow(/form.hbs names \{\{@kit.version\}\}/);
+  });
+
+  it("refuses a {{@kit.*}} in a project that draws with no kit", async () => {
+    await expect(loadProjectTemplates(await project({ "list.hbs": "{{@kit.package}}" }))).rejects.toThrow(/no UI kit/);
+  });
+
+  it("refuses an extends chain that cycles", async () => {
+    const root = await project();
+    await kitWith(join(root, "node_modules/@kits/a"), "@kits/a", { extends: "@kits/b" });
+    await kitWith(join(root, "node_modules/@kits/b"), "@kits/b", { extends: "@kits/a" });
+    await expect(loadProjectTemplates(root, "@kits/a")).rejects.toThrow(/cycles/);
+  });
+
+  it("refuses an extends that cannot be reached from the kit", async () => {
+    const root = await project();
+    await kitWith(join(root, "node_modules/@kits/a"), "@kits/a", { extends: "@kits/missing" });
+    await expect(loadProjectTemplates(root, "@kits/a")).rejects.toThrow(/not installed where @kits\/a can reach it/);
+  });
+
+  it("counts a root dependency on both the kit and its base as one kit", async () => {
+    const root = await project();
+    await writeFile(join(root, "package.json"), JSON.stringify({ dependencies: { "@kits/console-clarity": "1", "@kits/console-core": "1" } }), "utf-8");
+    await family(root, { "crud-page.hbs": "kit page" });
+    await kitWith(join(root, "node_modules/@kits/console-core"), "@kits/console-core", { templates: "templates" }, { "list.hbs": "root base list" });
+    expect(templateFor(await loadProjectTemplates(root), "crud-page", "bundled")).toBe("kit page");
+  });
+
+  it("still refuses two kits of different families when nothing names one", async () => {
+    const root = await project();
+    await writeFile(join(root, "package.json"), JSON.stringify({ dependencies: { "@kits/console-clarity": "1", "@kits/site": "1" } }), "utf-8");
+    await family(root, {});
+    await kitWith(join(root, "node_modules/@kits/site"), "@kits/site", { templates: "templates" });
+    await expect(loadProjectTemplates(root)).rejects.toThrow(/templates.from/);
+  });
+});

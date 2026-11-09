@@ -273,8 +273,11 @@ export interface SimplixConfig {
  * @remarks
  * `from` names a UI kit package (resolved from the project root, then from the workspace's
  * packages) or a directory path. The kit's `package.json` says where its templates are under
- * `simplix.templates`; a path is read as the template directory itself. Without this setting the
- * CLI looks for one dependency of the project root that declares `simplix.templates`.
+ * `simplix.templates`, and a kit that starts from another names it under `simplix.extends`: the
+ * base kit's templates are read beneath the kit's own, name by name, and `{{@kit.package}}`,
+ * `{{@kit.label}}` and `{{@kit.id}}` in any template are written as the kit `from` names. A path
+ * is read as the template directory itself. Without this setting the CLI looks for one dependency
+ * of the project root that is a kit, counting a kit and the base it extends as one.
  *
  * Under an app of {@link SimplixConfig.apps}, each key set here replaces the top-level key of the
  * same name for that app's pages, and each key left out falls back to it.
@@ -322,7 +325,7 @@ export interface SimplixAppConfig {
   /**
    * The app's templates. Read in this order, name by name: the project's
    * `.simplix/templates/<app>/`, the project's `.simplix/templates/`, the kit `from` names (this
-   * app's, else the top-level one), then the CLI's bundled template.
+   * app's, else the top-level one), each kit it extends, then the CLI's bundled template.
    */
   readonly templates?: SimplixTemplatesConfig;
   /** Where the app's screens are designed before they are made; absent, no design gate runs for the app. */
