@@ -35,9 +35,15 @@ export interface NumberInputProps extends Omit<ComponentPropsWithRef<"input">, "
  * The native browser spinners (which only appear on hover/focus and differ
  * across browsers) are hidden and replaced with the same spinner buttons the
  * time picker uses. Keyboard stepping (ArrowUp/ArrowDown) still works.
+ *
+ * <p><b>The bounds apply when a value is settled, not while it is typed.</b> The upper bound is
+ * held on every keystroke, since no digit added later brings a value back under it. The lower
+ * bound is held when the field loses focus, when Enter is pressed and when a spinner is pressed:
+ * a field that clamps each keystroke makes a minimum of 60 unreachable by typing, because the
+ * first digit typed is raised to 60 before the second can be typed.
  */
 export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
-  ({ className, min, max, step, onChange, disabled, suffix, digits, ...rest }, ref) => {
+  ({ className, min, max, step, onChange, onBlur, onKeyDown, disabled, suffix, digits, ...rest }, ref) => {
     const innerRef = useRef<HTMLInputElement | null>(null);
     const { t } = useTranslation("simplix/ui");
 
@@ -45,6 +51,19 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
       const minVal = typeof min === "number" ? min : -Infinity;
       const maxVal = typeof max === "number" ? max : Infinity;
       return Math.min(maxVal, Math.max(minVal, v));
+    };
+
+    // The lower bound is left out of a value that is still being typed.
+    const capped = (v: number) => Math.min(typeof max === "number" ? max : Infinity, v);
+
+    /** Raises a typed value that is below the minimum to it, once the typing is over. */
+    const settle = (el: HTMLInputElement) => {
+      const typed = parseFloat(el.value);
+      if (Number.isNaN(typed)) return;
+      const settled = clamp(typed);
+      if (settled === typed) return;
+      if (rest.value === undefined) el.value = String(settled);
+      onChange?.(settled);
     };
 
     const stepBy = (delta: number) => {
@@ -101,7 +120,16 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
           onChange={(e) => {
             const v = parseFloat(e.target.value);
             if (Number.isNaN(v)) return;
-            onChange?.(clamp(v));
+            onChange?.(capped(v));
+          }}
+          onBlur={(e) => {
+            settle(e.currentTarget);
+            onBlur?.(e);
+          }}
+          onKeyDown={(e) => {
+            // Enter submits the form that holds the field, so the value is settled before it does.
+            if (e.key === "Enter") settle(e.currentTarget);
+            onKeyDown?.(e);
           }}
           className={cn(
             "min-w-0",

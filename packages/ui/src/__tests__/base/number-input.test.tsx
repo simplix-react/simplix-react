@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { createRef } from "react";
+import { createRef, useState } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -114,11 +114,60 @@ describe("NumberInput", () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
-  it("clamps value to min", () => {
+  it("passes a value below min through while it is typed and raises it to min when focus leaves", () => {
     const onChange = vi.fn();
     render(<NumberInput data-testid="num" min={10} onChange={onChange} />);
-    fireEvent.change(screen.getByTestId("num"), { target: { value: "5" } });
-    expect(onChange).toHaveBeenCalledWith(10);
+    const input = screen.getByTestId("num");
+    fireEvent.change(input, { target: { value: "5" } });
+    expect(onChange).toHaveBeenLastCalledWith(5);
+    fireEvent.blur(input);
+    expect(onChange).toHaveBeenLastCalledWith(10);
+    expect((input as HTMLInputElement).value).toBe("10");
+  });
+
+  it("raises a typed value below min to it when Enter is pressed, before the form submits", () => {
+    const onChange = vi.fn();
+    render(<NumberInput data-testid="num" min={60} onChange={onChange} />);
+    const input = screen.getByTestId("num");
+    fireEvent.change(input, { target: { value: "30" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(onChange).toHaveBeenLastCalledWith(60);
+  });
+
+  it("lets a value be typed digit by digit past a minimum of two digits", () => {
+    function Controlled() {
+      const [value, setValue] = useState<number | null>(null);
+      return <NumberInput data-testid="num" min={60} max={86400} value={value === null ? "" : String(value)} onChange={setValue} />;
+    }
+    render(<Controlled />);
+    const input = screen.getByTestId("num") as HTMLInputElement;
+    for (const typed of ["3", "30", "300"]) {
+      fireEvent.change(input, { target: { value: typed } });
+      expect(input.value).toBe(typed);
+    }
+    fireEvent.blur(input);
+    expect(input.value).toBe("300");
+  });
+
+  it("leaves a value inside the bounds alone when focus leaves", () => {
+    const onChange = vi.fn();
+    render(<NumberInput data-testid="num" min={10} max={99} onChange={onChange} />);
+    const input = screen.getByTestId("num");
+    fireEvent.change(input, { target: { value: "42" } });
+    onChange.mockClear();
+    fireEvent.blur(input);
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it("calls the caller's own onBlur and onKeyDown", () => {
+    const onBlur = vi.fn();
+    const onKeyDown = vi.fn();
+    render(<NumberInput data-testid="num" onBlur={onBlur} onKeyDown={onKeyDown} />);
+    const input = screen.getByTestId("num");
+    fireEvent.keyDown(input, { key: "a" });
+    fireEvent.blur(input);
+    expect(onKeyDown).toHaveBeenCalledTimes(1);
+    expect(onBlur).toHaveBeenCalledTimes(1);
   });
 
   it("clamps value to max", () => {
@@ -128,11 +177,16 @@ describe("NumberInput", () => {
     expect(onChange).toHaveBeenCalledWith(100);
   });
 
-  it("clamps value to both min and max", () => {
+  it("holds the max while typing and the min once the value is settled", () => {
     const onChange = vi.fn();
     render(<NumberInput data-testid="num" min={0} max={50} onChange={onChange} />);
-    fireEvent.change(screen.getByTestId("num"), { target: { value: "-5" } });
-    expect(onChange).toHaveBeenCalledWith(0);
+    const input = screen.getByTestId("num");
+    fireEvent.change(input, { target: { value: "75" } });
+    expect(onChange).toHaveBeenLastCalledWith(50);
+    fireEvent.change(input, { target: { value: "-5" } });
+    expect(onChange).toHaveBeenLastCalledWith(-5);
+    fireEvent.blur(input);
+    expect(onChange).toHaveBeenLastCalledWith(0);
   });
 
   it("supports disabled state", () => {
