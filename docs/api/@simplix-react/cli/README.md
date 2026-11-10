@@ -261,7 +261,7 @@ The validator applies different rule sets to packages and modules:
 | **Contract** | packages/ | Entity schemas completeness (`schema`, `createSchema`, `updateSchema`), operation `input`/`output`, mock handler config |
 | **FSD** | modules/ | `manifest.ts` exists, `features/` does not import from `widgets/`, `shared/` does not import from `features/` or `widgets/` |
 | **Import** | modules/ | No cross-module direct imports (must use package exports) |
-| **i18n** | modules/ | Missing keys across locales, extra keys, empty values, interpolation variable (`{{var}}`) consistency |
+| **i18n** | modules/ | Missing keys across locales, extra keys (except those `i18n.localeOnlyKeys` lists), empty values, interpolation variable consistency (a placeholder with a formatter, `{{plan, josa(을/를)}}`, counts as its variable) |
 
 Auto-fixable issues, by the check `--fix` names:
 
@@ -717,6 +717,7 @@ export default {
 | `openapi.meta.source` | SimpliX Meta endpoint URL or snapshot path | The spec's origin plus the profile's `metaEndpoint` |
 | `openapi.meta.snapshot` | Where the fetched SimpliX Meta is committed, for `--offline` and for the change gate | `undefined` (the meta half runs every time) |
 | `openapi.meta.export` | Domains whose barrel exports `src/generated-meta/` instead of the Orval output | `[]` |
+| `i18n.localeOnlyKeys` | Keys a locale may hold that the reference locale does not, by locale code (`{ ko: ["help.particles"] }`); `simplix validate` neither reports them as extra nor removes them under `--fix` | `undefined` |
 | `templates.from` | UI kit package or template directory pages and widgets are drawn from | The one root dependency declaring `simplix.templates` |
 | `templates.storiesDir` | Directory generated design-reference stories are written to | `undefined` (no stories) |
 | `templates.story` | Story id and title patterns, and the story file per scaffold key | Storybook's title-derived id under `Generated/{Entity}` |

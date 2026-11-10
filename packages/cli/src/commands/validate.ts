@@ -84,7 +84,8 @@ export const validateCommand = new Command("validate")
     const appsDir = join(rootDir, "apps");
 
     const packages = await discoverDirs(packagesDir);
-    const groups = (await loadConfig(rootDir)).modules?.groups ?? [];
+    const config = await loadConfig(rootDir);
+    const groups = config.modules?.groups ?? [];
     const modules = (await findModulePaths(rootDir, groups)).map((path) => join(modulesDir, ...path.split("/")));
     const apps = await discoverDirs(appsDir);
 
@@ -125,7 +126,7 @@ export const validateCommand = new Command("validate")
 
       await validateFsdRules(mod, result, fix("fsd"));
       await validateImportRules(mod, result, rootDir);
-      await validateI18nRules(mod, result, fix("i18n"));
+      await validateI18nRules(mod, result, { ...fix("i18n"), localeOnlyKeys: config.i18n?.localeOnlyKeys });
       await validatePackageRules(mod, result, packageFix);
       await validateTsconfigBaseUrl(mod, result, fix("tsconfig"));
       results.push(result);

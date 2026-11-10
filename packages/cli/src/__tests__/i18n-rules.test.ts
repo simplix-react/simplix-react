@@ -145,6 +145,64 @@ describe("validateI18nRules", () => {
     expect(result.errors.filter((e) => e.includes("interpolation"))).toHaveLength(0);
   });
 
+  it("reads the variable of a placeholder that carries a formatter", async () => {
+    const localesDir = join(tempDir, "src/locales");
+    await mkdir(localesDir, { recursive: true });
+    await writeFile(join(localesDir, "en.json"), JSON.stringify({
+      kept: "You stay on {{plan}} until {{date, datetime}}",
+    }));
+    await writeFile(join(localesDir, "ko.json"), JSON.stringify({
+      kept: "{{date, datetime}}까지 {{plan, josa(을/를)}} 계속 씁니다",
+    }));
+
+    const result = makeResult();
+    await validateI18nRules(tempDir, result);
+    expect(result.errors.filter((e) => e.includes("interpolation"))).toHaveLength(0);
+  });
+
+  it("still reports a variable the formatted placeholders do not name", async () => {
+    const localesDir = join(tempDir, "src/locales");
+    await mkdir(localesDir, { recursive: true });
+    await writeFile(join(localesDir, "en.json"), JSON.stringify({
+      kept: "You stay on {{plan}} until {{date}}",
+    }));
+    await writeFile(join(localesDir, "ko.json"), JSON.stringify({
+      kept: "{{plan, josa(을/를)}} 계속 씁니다",
+    }));
+
+    const result = makeResult();
+    await validateI18nRules(tempDir, result);
+    expect(result.errors.some((e) => e.includes('Missing interpolation "{{date}}"'))).toBe(true);
+    expect(result.errors.some((e) => e.includes('"{{plan}}"'))).toBe(false);
+  });
+
+  it("does not report a key the project lists as one only this locale holds", async () => {
+    const localesDir = join(tempDir, "src/locales");
+    await mkdir(localesDir, { recursive: true });
+    await writeFile(join(localesDir, "en.json"), JSON.stringify({ title: "Help" }));
+    await writeFile(join(localesDir, "ko.json"), JSON.stringify({ title: "도움말", particles: "을 를", nest: { a: "x" }, other: "y" }));
+
+    const listed = makeResult();
+    await validateI18nRules(tempDir, listed, { localeOnlyKeys: { ko: ["particles", "nest"] } });
+    expect(listed.warnings.filter((w) => w.includes("Extra key"))).toHaveLength(1);
+    expect(listed.warnings.some((w) => w.includes('"other"'))).toBe(true);
+
+    const other = makeResult();
+    await validateI18nRules(tempDir, other, { localeOnlyKeys: { ja: ["particles"] } });
+    expect(other.warnings.filter((w) => w.includes("Extra key"))).toHaveLength(3);
+  });
+
+  it("keeps a listed locale-only key when the fix removes extra keys", async () => {
+    const localesDir = join(tempDir, "src/locales");
+    await mkdir(localesDir, { recursive: true });
+    await writeFile(join(localesDir, "en.json"), JSON.stringify({ title: "Help" }));
+    await writeFile(join(localesDir, "ko.json"), JSON.stringify({ title: "도움말", particles: "을 를", stray: "y" }));
+
+    await validateI18nRules(tempDir, makeResult(), { fix: true, localeOnlyKeys: { ko: ["particles"] } });
+    const fixed = JSON.parse(await readFile(join(localesDir, "ko.json"), "utf-8")) as Record<string, unknown>;
+    expect(fixed).toEqual({ title: "도움말", particles: "을 를" });
+  });
+
   it("auto-fixes missing keys by copying from reference", async () => {
     const localesDir = join(tempDir, "src/locales");
     await mkdir(localesDir, { recursive: true });

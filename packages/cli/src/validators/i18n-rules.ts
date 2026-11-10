@@ -3,10 +3,21 @@ import { readdir, writeFile } from "node:fs/promises";
 import { pathExists, readJsonFile } from "../utils/fs.js";
 import type { ValidationResult } from "../commands/validate.js";
 
+/** What the i18n rules take besides the module they read. */
+export interface I18nRuleOptions {
+  readonly fix?: boolean;
+  /**
+   * Keys a locale may hold that the reference locale does not, by locale code: a word list one
+   * language needs and another has no use for. A key listed here, or one beneath it, is never
+   * reported as extra and never removed by the fix.
+   */
+  readonly localeOnlyKeys?: Readonly<Record<string, readonly string[]>>;
+}
+
 export async function validateI18nRules(
   moduleDir: string,
   result: ValidationResult,
-  options?: { fix?: boolean },
+  options?: I18nRuleOptions,
 ): Promise<void> {
   const localesDir = join(moduleDir, "src", "locales");
   if (!(await pathExists(localesDir))) return;
@@ -131,7 +142,7 @@ function applyKeyChecks(
   refLocale: string,
   relGroup: string,
   result: ValidationResult,
-  options?: { fix?: boolean },
+  options?: I18nRuleOptions,
 ): boolean {
   let modified = false;
 
@@ -202,12 +213,14 @@ function checkExtraKeys(
   locale: string,
   relGroup: string,
   result: ValidationResult,
-  options?: { fix?: boolean },
+  options?: I18nRuleOptions,
 ): boolean {
   let modified = false;
+  const own = options?.localeOnlyKeys?.[locale] ?? [];
 
   for (const key of localeKeySet) {
     if (refKeySet.has(key)) continue;
+    if (own.some((one) => key === one || key.startsWith(`${one}.`))) continue;
 
     if (options?.fix) {
       deleteNestedValue(content, key);
@@ -355,10 +368,12 @@ function flattenKeys(
   return result;
 }
 
+/**
+ * The variable names an i18next string interpolates. A placeholder may carry a formatter after a comma
+ * (`{{plan, josa(을/를)}}`, `{{n, number}}`) or the unescape flag (`{{- html}}`); only the name counts.
+ */
 function extractInterpolationVars(str: string): string[] {
-  const matches = str.match(/\{\{(\w+)\}\}/g);
-  if (!matches) return [];
-  return matches.map((m) => m.replace(/\{\{|\}\}/g, ""));
+  return [...str.matchAll(/\{\{\s*-?\s*([\w.]+)\s*(?:,[^}]*)?\}\}/g)].map((m) => m[1]!);
 }
 
 async function discoverLocaleFiles(

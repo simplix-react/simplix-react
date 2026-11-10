@@ -258,6 +258,13 @@ export interface SimplixConfig {
     locales?: string[];
     /** Default locale code (default: "en") */
     defaultLocale?: string;
+    /**
+     * Keys a locale may hold that the reference locale does not, by locale code
+     * (`{ ko: ["help.particles"] }`): a word list one language needs and another has no use for. The
+     * catalogue check of `simplix validate` neither reports such a key as extra nor removes it under
+     * `--fix`; a key beneath a listed one is covered too.
+     */
+    localeOnlyKeys?: Readonly<Record<string, readonly string[]>>;
   };
 
   /** OpenAPI code generation — array of per-spec configurations */
