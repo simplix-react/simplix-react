@@ -1690,6 +1690,21 @@
   [data-slot="wizard-previous"][data-slot][data-s-wizard-previous] {
     @apply rounded-md border px-4 py-2 text-sm font-medium transition-colors;
   }
+  [data-slot="wizard-step-cell"][data-layout="cells"][data-s-wizard-step-cell] {
+    @apply flex min-h-11 w-full min-w-0 items-center gap-2 rounded-lg border px-3 py-2 text-left break-keep;
+  }
+  [data-slot="wizard-step-cell"][data-state="active"][data-s-wizard-step-cell] {
+    @apply border-primary bg-primary/10;
+  }
+  [data-slot="wizard-step-cell"][data-state="completed"][data-s-wizard-step-cell] {
+    @apply border-border bg-card;
+  }
+  [data-slot="wizard-step-cell"][data-state="pending"][data-s-wizard-step-cell] {
+    @apply border-border bg-card;
+  }
+  [data-slot="wizard-step-cell"][data-state="rejected"][data-s-wizard-step-cell] {
+    @apply border-destructive bg-destructive/10;
+  }
   [data-slot="wizard-step-connector"][data-done="true"][data-s-wizard-step-connector] {
     @apply bg-primary;
   }

@@ -8,6 +8,28 @@ export const wizardStepsStyle = defineSlotStyle({
   defaultVariants: {},
 });
 
+/**
+ * One step as a cell of its own (`variant="cells"` of the step indicator): the box that holds the marker and
+ * the title, one per step, side by side. The line variant draws no box, so this slot is empty there.
+ */
+export const wizardStepCellStyle = defineSlotStyle({
+  slot: "wizard-step-cell",
+  base: "",
+  variants: {
+    layout: {
+      line: "",
+      cells: "flex min-h-11 w-full min-w-0 items-center gap-2 rounded-lg border px-3 py-2 text-left break-keep",
+    },
+    state: {
+      active: "border-primary bg-primary/10",
+      completed: "border-border bg-card",
+      pending: "border-border bg-card",
+      rejected: "border-destructive bg-destructive/10",
+    },
+  },
+  defaultVariants: { layout: "line", state: "pending" },
+});
+
 /** The numbered circle of one step. */
 export const wizardStepMarkerStyle = defineSlotStyle({
   slot: "wizard-step-marker",

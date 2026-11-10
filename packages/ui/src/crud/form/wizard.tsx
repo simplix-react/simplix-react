@@ -15,6 +15,7 @@ import {
   wizardActionsStyle,
   wizardNextStyle,
   wizardPreviousStyle,
+  wizardStepCellStyle,
   wizardStepConnectorStyle,
   wizardStepDescriptionStyle,
   wizardStepMarkerStyle,
@@ -64,6 +65,22 @@ export interface StepIndicatorProps {
    * @default "horizontal"
    */
   orientation?: "horizontal" | "vertical";
+  /**
+   * `line` joins the markers with a rule; `cells` draws each step as a box of its own, side by side
+   * and as wide as the others, for a form whose steps are the first thing the reader meets. A cells
+   * strip is always horizontal and draws no rule.
+   *
+   * @default "line"
+   */
+  variant?: "line" | "cells";
+  /**
+   * Makes a step the reader has passed a button that goes back to it. A step ahead of the one in
+   * hand is never selectable: it has not been answered yet. Without it the strip only shows where
+   * the reader is.
+   */
+  onSelect?: (index: number) => void;
+  /** Stops every selectable step from answering, while something is being sent. */
+  selectDisabled?: boolean;
 }
 
 /**
@@ -71,60 +88,68 @@ export interface StepIndicatorProps {
  * the done steps ticked, the one in hand filled, the rest outlined, so the order and the place in
  * it read at a glance. One line that scrolls sideways when it is wider than its box.
  */
-export function StepIndicator({ steps, currentStep, rejectedStep, label, orientation = "horizontal" }: StepIndicatorProps) {
+export function StepIndicator({ steps, currentStep, rejectedStep, label, orientation = "horizontal", variant = "line", onSelect, selectDisabled }: StepIndicatorProps) {
   const { t } = useTranslation("simplix/ui");
-  const vertical = orientation === "vertical";
+  const cells = variant === "cells";
+  const vertical = !cells && orientation === "vertical";
   return (
-    <nav aria-label={label ?? t("wizard.steps")} className={vertical ? "min-w-0" : "min-w-0 overflow-x-auto"}>
-      <ol className={vertical ? "flex flex-col" : "flex items-center"} {...slotAttributes(wizardStepsStyle, {})}>
+    <nav aria-label={label ?? t("wizard.steps")} className={vertical || cells ? "min-w-0" : "min-w-0 overflow-x-auto"}>
+      <ol className={vertical ? "flex flex-col" : cells ? "flex flex-wrap gap-2" : "flex items-center"} {...slotAttributes(wizardStepsStyle, {})}>
         {steps.map((step, index) => {
           const isRejected = index === rejectedStep;
           const isActive = index === currentStep && !isRejected;
           const isCompleted = index < currentStep && !isRejected;
+          const state = isRejected ? "rejected" : isActive ? "active" : isCompleted ? "completed" : "pending";
+          // Only a step the reader has passed answers a press: a step ahead has not been answered yet.
+          const selectable = cells && onSelect !== undefined && index < currentStep;
+
+          const marker = (
+            <span
+              className={cells ? "inline-flex h-6 w-6 shrink-0 items-center justify-center" : "inline-flex h-8 w-8 items-center justify-center"}
+              {...slotAttributes(wizardStepMarkerStyle, { state })}
+              aria-current={isActive && !cells ? "step" : undefined}
+            >
+              {isCompleted ? (
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M4 8L7 11L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              ) : (
+                index + 1
+              )}
+            </span>
+          );
+          const text = (
+            <Stack gap="none" className={vertical || cells ? "min-w-0" : "min-w-0 whitespace-nowrap"}>
+              <span {...slotAttributes(wizardStepTitleStyle, { active: isActive })}>{step.title}</span>
+              {step.description && <span {...slotAttributes(wizardStepDescriptionStyle, {})}>{step.description}</span>}
+              {step.detail}
+            </Stack>
+          );
+
+          if (cells) {
+            const cellProps = { ...slotAttributes(wizardStepCellStyle, { layout: "cells", state }) };
+            return (
+              <li key={`${index}-${step.title}`} className="flex min-w-0 flex-1 basis-40">
+                {selectable ? (
+                  <button type="button" onClick={() => onSelect(index)} disabled={selectDisabled} aria-label={`${index + 1}. ${step.title}`} {...cellProps}>
+                    {marker}
+                    {text}
+                  </button>
+                ) : (
+                  <div aria-current={isActive ? "step" : undefined} {...cellProps}>
+                    {marker}
+                    {text}
+                  </div>
+                )}
+              </li>
+            );
+          }
 
           return (
             <li key={`${index}-${step.title}`} className={vertical ? "flex flex-col" : "flex shrink-0 items-center"}>
               <Flex gap="xs" align="center">
-                <span
-                  className="inline-flex h-8 w-8 items-center justify-center"
-                  {...slotAttributes(wizardStepMarkerStyle, {
-                    state: isRejected ? "rejected" : isActive ? "active" : isCompleted ? "completed" : "pending",
-                  })}
-                  aria-current={isActive ? "step" : undefined}
-                >
-                  {isCompleted ? (
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      aria-hidden="true"
-                    >
-                      <path
-                        d="M4 8L7 11L12 5"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  ) : (
-                    index + 1
-                  )}
-                </span>
-                <Stack gap="none" className={vertical ? "min-w-0" : "min-w-0 whitespace-nowrap"}>
-                  <span
-                    {...slotAttributes(wizardStepTitleStyle, { active: isActive })}
-                  >
-                    {step.title}
-                  </span>
-                  {step.description && (
-                    <span {...slotAttributes(wizardStepDescriptionStyle, {})}>
-                      {step.description}
-                    </span>
-                  )}
-                  {step.detail}
-                </Stack>
+                {marker}
+                {text}
               </Flex>
               {index < steps.length - 1 && (
                 <span
